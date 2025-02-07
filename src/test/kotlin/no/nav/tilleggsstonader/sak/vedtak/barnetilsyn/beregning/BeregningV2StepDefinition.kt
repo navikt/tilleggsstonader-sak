@@ -7,7 +7,8 @@ import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.barnIder
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
@@ -20,7 +21,12 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV2.TilsynBarnBeregningServiceV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
@@ -38,10 +44,12 @@ class BeregningV2StepDefinition {
     private val logger = LoggerFactory.getLogger(javaClass)
     val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>()
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
+    val vedtakRepository = mockk<VedtakRepository>()
     val beregningService =
         TilsynBarnBeregningServiceV2(
             tilsynBarnUtgiftService = tilsynBarnUtgiftService,
             vilkårperiodeRepository = vilkårperiodeRepository,
+            vedtakRepository = vedtakRepository,
         )
 
     var exception: Exception? = null
@@ -50,6 +58,11 @@ class BeregningV2StepDefinition {
     var utgifter = mutableMapOf<BarnId, List<UtgiftBeregning>>()
     var beregningsresultat: BeregningsresultatTilsynBarn? = null
     var behandlingId = BehandlingId.random()
+
+    init {
+        every { vedtakRepository.findByIdOrThrow(any()) } returns
+            innvilgetVedtak(beregningsresultat = BeregningsresultatTilsynBarn(perioder = emptyList()))
+    }
 
     @Gitt("V2 - følgende vedtaksperioder")
     fun `følgende vedtaksperioder`(dataTable: DataTable) {
@@ -64,6 +77,17 @@ class BeregningV2StepDefinition {
                 ResultatVilkårperiode.OPPFYLT,
             )
         } returns mapAktiviteter(behandlingId, dataTable)
+    }
+
+    @Gitt("V2 - beregningsperioder fra forrige behandling")
+    fun `perioder fra forrige behandling`(dataTable: DataTable) {
+        val perioder =
+            dataTable.mapRad {
+                val måned = parseÅrMåned(BeregningNøkler.MÅNED, it)
+                beregningsresultatForMåned(måned)
+            }
+        every { vedtakRepository.findByIdOrThrow(any()) } returns
+            innvilgetVedtak(beregningsresultat = BeregningsresultatTilsynBarn(perioder = perioder))
     }
 
     @Gitt("V2 - følgende utgifter for barn med id: {}")
@@ -85,16 +109,30 @@ class BeregningV2StepDefinition {
 
     @Når("V2 - beregner")
     fun beregner() {
-        beregn(saksbehandling(id = behandlingId))
+        beregn(behandling(id = behandlingId))
     }
 
-    private fun beregn(behandling: Saksbehandling) {
+    @Når("V2 - beregner med revurderFra={}")
+    fun `beregner med revurder fra`(revurderFraStr: String) {
+        val revurderFra = parseDato(revurderFraStr)
+        beregn(
+            behandling(
+                id = behandlingId,
+                type = BehandlingType.REVURDERING,
+                revurderFra = revurderFra,
+                forrigeBehandlingId = BehandlingId.random(),
+            ),
+        )
+    }
+
+    private fun beregn(behandling: Behandling) {
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
         try {
             beregningsresultat =
                 beregningService.beregn(
                     vedtaksperioder = vedtaksperioder,
-                    behandlingId = behandlingId,
+                    behandling = behandling,
+                    typeVedtak = TypeVedtak.INNVILGELSE,
                 )
         } catch (e: Exception) {
             exception = e

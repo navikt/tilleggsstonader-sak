@@ -4,9 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningValideringUtil.erOverlappMellomPerioderOgUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFraMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.erOverlappMellomStønadsperioderOgUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
@@ -200,7 +200,7 @@ class TilsynBeregningUtilTest {
         inner class OverlappMellomStønadsperioderOgUtgifter {
             @Test
             fun `skal retunere true når flere barn overlapper`() {
-                assertThat(erOverlappMellomStønadsperioderOgUtgifter(stønadsperioder, utgifter)).isTrue
+                assertThat(erOverlappMellomPerioderOgUtgifter(stønadsperioder, utgifter)).isTrue
             }
 
             @Test
@@ -217,7 +217,7 @@ class TilsynBeregningUtilTest {
                                 utgiftMars,
                             ),
                     )
-                assertThat(erOverlappMellomStønadsperioderOgUtgifter(stønadsperioder, utgifter)).isTrue
+                assertThat(erOverlappMellomPerioderOgUtgifter(stønadsperioder, utgifter)).isTrue
             }
 
             @Test
@@ -232,7 +232,7 @@ class TilsynBeregningUtilTest {
                         ),
                     )
 
-                assertThat(erOverlappMellomStønadsperioderOgUtgifter(stønadsperioder, utgifter)).isFalse
+                assertThat(erOverlappMellomPerioderOgUtgifter(stønadsperioder, utgifter)).isFalse
             }
         }
 

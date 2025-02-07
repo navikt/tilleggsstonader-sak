@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
-import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.domain.splitFraRevurderFra
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -131,24 +130,7 @@ object TilsynBeregningUtil {
         tom: LocalDate,
     ): Int = ChronoUnit.DAYS.between(fom, tom).toInt() + 1
 
-    fun erOverlappMellomStønadsperioderOgUtgifter(
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
-        utgifter: Map<BarnId, List<UtgiftBeregning>>,
-    ): Boolean {
-        val utgiftPerioder =
-            utgifter.values.flatMap {
-                it.map { Datoperiode(fom = it.fom.atDay(1), tom = it.tom.atEndOfMonth()) }
-            }
-        return utgiftPerioder.any { utgifterPeriode ->
-            stønadsperioder.any { stønadsperiode ->
-                stønadsperiode.overlapper(utgifterPeriode)
-            }
-        }
-    }
-
-    fun List<StønadsperiodeBeregningsgrunnlag>.brukPerioderFraOgMedRevurderFra(
-        revurderFra: LocalDate?,
-    ): List<StønadsperiodeBeregningsgrunnlag> =
+    fun <P> List<P>.brukPerioderFraOgMedRevurderFra(revurderFra: LocalDate?): List<P> where P : Periode<LocalDate>, P : KopierPeriode<P> =
         revurderFra?.let {
             this.splitFraRevurderFra(revurderFra).filter { it.fom >= revurderFra }
         } ?: this
@@ -162,6 +144,20 @@ object TilsynBeregningUtil {
             .mapValues { (_, utgifter) ->
                 utgifter.splitFraRevurderFra(revurderFra).filter { it.fom >= revurderFraMåned }
             }.filterValues { it.isNotEmpty() }
+    }
+
+    fun <P> List<P>.splitFraRevurderFra(revurderFra: LocalDate?): List<P> where P : Periode<LocalDate>, P : KopierPeriode<P> {
+        if (revurderFra == null) return this
+        return this.flatMap {
+            if (it.fom < revurderFra && revurderFra <= it.tom) {
+                listOf(
+                    it.medPeriode(fom = it.fom, tom = revurderFra.minusDays(1)),
+                    it.medPeriode(fom = revurderFra, tom = it.tom),
+                )
+            } else {
+                listOf(it)
+            }
+        }
     }
 }
 
