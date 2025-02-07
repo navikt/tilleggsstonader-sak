@@ -210,14 +210,24 @@ class TotrinnskontrollService(
         val totrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
                 ?: error("mangler totrinnskontroll på behandling id=$behandlingId")
+
+        val totrinnskontrollDto = TotrinnskontrollDto(
+            opprettetAv =totrinnskontroll.saksbehandler,
+            opprettetTid =totrinnskontroll.sporbar.opprettetTid,
+            begrunnelse = totrinnskontroll.begrunnelse
+        )
+
         return if (beslutterErLikBehandler(totrinnskontroll) || !tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER)
         ) {
             StatusTotrinnskontrollDto(
                 TotrinnkontrollStatus.IKKE_AUTORISERT,
-                TotrinnskontrollDto(totrinnskontroll.saksbehandler, totrinnskontroll.sporbar.opprettetTid),
+                totrinnskontrollDto
             )
         } else {
-            StatusTotrinnskontrollDto(TotrinnkontrollStatus.KAN_FATTE_VEDTAK)
+            StatusTotrinnskontrollDto(
+                TotrinnkontrollStatus.KAN_FATTE_VEDTAK,
+                totrinnskontrollDto
+            )
         }
     }
 
