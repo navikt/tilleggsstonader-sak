@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollRepository
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import org.assertj.core.api.Assertions
@@ -103,7 +104,7 @@ internal class TotrinnskontrollServiceTest {
     @Test
     internal fun `totrinnskontroll eksisterer og har ikkje underkjent eller angret som status`() {
         assertThatThrownBy {
-            totrinnskontrollService.sendtilBeslutter(saksbehandling(status = BehandlingStatus.UTREDES), null)
+            totrinnskontrollService.sendtilBeslutter(saksbehandling(status = BehandlingStatus.UTREDES), SendTilBeslutterRequest())
         }.hasMessage("Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status=KAN_FATTE_VEDTAK")
     }
 
@@ -132,7 +133,7 @@ internal class TotrinnskontrollServiceTest {
         } returns totrinnskontroll(opprettetAv = saksbehandler, TotrinnInternStatus.UNDERKJENT)
 
         assertDoesNotThrow {
-            totrinnskontrollService.sendtilBeslutter(behandling, null)
+            totrinnskontrollService.sendtilBeslutter(behandling, SendTilBeslutterRequest())
         }
     }
 
@@ -142,7 +143,7 @@ internal class TotrinnskontrollServiceTest {
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns null
 
         assertDoesNotThrow {
-            totrinnskontrollService.sendtilBeslutter(saksbehandling, null)
+            totrinnskontrollService.sendtilBeslutter(saksbehandling, SendTilBeslutterRequest())
         }
     }
 
@@ -317,7 +318,7 @@ internal class TotrinnskontrollServiceTest {
             } answers { firstArg() }
 
             assertDoesNotThrow {
-                totrinnskontrollService.sendtilBeslutter(behandling, "kommentar")
+                totrinnskontrollService.sendtilBeslutter(behandling, SendTilBeslutterRequest("kommentar"))
             }
 
             assertThat(oppdaterSlot.captured.status).isEqualTo(TotrinnInternStatus.KAN_FATTE_VEDTAK)
@@ -332,7 +333,7 @@ internal class TotrinnskontrollServiceTest {
             } returns null
 
             assertThatThrownBy {
-                totrinnskontrollService.sendtilBeslutter(behandling, "kommentar")
+                totrinnskontrollService.sendtilBeslutter(behandling, SendTilBeslutterRequest("kommentar"))
             }.hasMessageContaining("Kan ikke legge ved kommentar til beslutter dersom behandlingen ikke er tidligere underkjent")
         }
     }

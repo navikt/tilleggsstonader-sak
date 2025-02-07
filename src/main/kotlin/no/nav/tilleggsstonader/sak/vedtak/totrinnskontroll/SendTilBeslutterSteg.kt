@@ -55,7 +55,7 @@ class SendTilBeslutterSteg(
     ) {
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.FATTER_VEDTAK)
         ferdigstillOppgave(saksbehandling)
-        totrinnskontrollService.sendtilBeslutter(saksbehandling, data.kommentarTilBeslutter)
+        totrinnskontrollService.sendtilBeslutter(saksbehandling, data)
         opprettGodkjennVedtakOppgave(saksbehandling)
     }
 
@@ -134,4 +134,6 @@ class SendTilBeslutterSteg(
     }
 
     override fun stegType(): StegType = StegType.SEND_TIL_BESLUTTER
+
+    override fun settInnHistorikk(): Boolean = false
 }

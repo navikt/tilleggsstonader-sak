@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollRepository
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.StatusTotrinnskontrollDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnskontrollDto
@@ -39,7 +40,7 @@ class TotrinnskontrollService(
     @Transactional
     fun sendtilBeslutter(
         saksbehandling: Saksbehandling,
-        kommentarTilBeslutter: String?,
+        sendTilBeslutterRequest: SendTilBeslutterRequest,
     ) {
         val eksisterandeTotrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(saksbehandling.id)
@@ -47,24 +48,31 @@ class TotrinnskontrollService(
         if (eksisterandeTotrinnskontroll != null) {
             feilHvis(
                 (
-                    eksisterandeTotrinnskontroll.status != TotrinnInternStatus.ANGRET &&
-                        eksisterandeTotrinnskontroll.status != TotrinnInternStatus.UNDERKJENT
-                ),
+                        eksisterandeTotrinnskontroll.status != TotrinnInternStatus.ANGRET &&
+                                eksisterandeTotrinnskontroll.status != TotrinnInternStatus.UNDERKJENT
+                        ),
             ) {
                 "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status=${eksisterandeTotrinnskontroll.status}"
             }
         } else {
-            feilHvis(kommentarTilBeslutter != null) {
+            feilHvis(sendTilBeslutterRequest.kommentarTilBeslutter != null) {
                 "Kan ikke legge ved kommentar til beslutter dersom behandlingen ikke er tidligere underkjent"
             }
         }
+
+        behandlingshistorikkService.opprettHistorikkInnslag(
+            behandlingId = saksbehandling.id,
+            stegtype = saksbehandling.steg,
+            utfall = null,
+            metadata = sendTilBeslutterRequest,
+        )
 
         totrinnskontrollRepository.insert(
             Totrinnskontroll(
                 behandlingId = saksbehandling.id,
                 saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
                 status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
-                begrunnelse = kommentarTilBeslutter,
+                begrunnelse = sendTilBeslutterRequest.kommentarTilBeslutter,
             ),
         )
 
@@ -186,9 +194,9 @@ class TotrinnskontrollService(
 
     private fun behandlingErGodkjentEllerOpprettet(behandlingStatus: BehandlingStatus) =
         behandlingStatus == BehandlingStatus.FERDIGSTILT ||
-            behandlingStatus == BehandlingStatus.IVERKSETTER_VEDTAK ||
-            behandlingStatus == BehandlingStatus.SATT_PÅ_VENT ||
-            behandlingStatus == BehandlingStatus.OPPRETTET
+                behandlingStatus == BehandlingStatus.IVERKSETTER_VEDTAK ||
+                behandlingStatus == BehandlingStatus.SATT_PÅ_VENT ||
+                behandlingStatus == BehandlingStatus.OPPRETTET
 
     private fun finnStatusForVedtakSomSkalFattes(behandling: Behandling): StatusTotrinnskontrollDto {
         val behandlingId = behandling.id
@@ -244,7 +252,7 @@ class TotrinnskontrollService(
             else ->
                 error(
                     "Skal ikke kunne være annen status enn UNDERKJENT når " +
-                        "behandligStatus!=${BehandlingStatus.FATTER_VEDTAK}",
+                            "behandligStatus!=${BehandlingStatus.FATTER_VEDTAK}",
                 )
         }
     }
@@ -259,8 +267,8 @@ class TotrinnskontrollService(
         // generisk metode for å logge endringene som er utført
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +
-                "endrer på totrinnskontroll knyttet til behandlingId $gjeldeneTotrinnskontroll.id" +
-                "til $status",
+                    "endrer på totrinnskontroll knyttet til behandlingId $gjeldeneTotrinnskontroll.id" +
+                    "til $status",
         )
         return totrinnskontrollRepository.update(gjeldeneTotrinnskontroll.copy(status = status))
     }
