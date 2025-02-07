@@ -151,6 +151,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
                     type = BehandlingType.REVURDERING,
                     årsak = BehandlingÅrsak.SØKNAD,
                     henlagtÅrsak = HenlagtÅrsak.FEILREGISTRERT,
+                    henlagtBegrunnelse = "Registrert feil",
                     vedtakstidspunkt = SporbarUtils.now(),
                     kravMottatt = LocalDate.now(),
                 ),
@@ -186,6 +187,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         assertThat(kravMottatt).isEqualTo(behandling.kravMottatt)
         assertThat(resultat).isEqualTo(behandling.resultat)
         assertThat(henlagtÅrsak).isEqualTo(behandling.henlagtÅrsak)
+        assertThat(henlagtBegrunnelse).isEqualTo(behandling.henlagtBegrunnelse)
         assertThat(ident).isEqualTo("2")
         assertThat(fagsakId).isEqualTo(fagsak.id)
         assertThat(fagsakPersonId).isEqualTo(fagsak.fagsakPersonId)

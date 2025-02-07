@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatLær
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import org.springframework.web.bind.annotation.GetMapping
@@ -71,8 +71,11 @@ class LæremidlerVedtakController(
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtaksperioder: List<VedtaksperiodeDto>,
-    ): BeregningsresultatLæremidlerDto = beregningService.beregn(vedtaksperioder.tilDomene(), behandlingId).tilDto()
+        @RequestBody vedtaksperioder: List<VedtaksperiodeLæremidlerDto>,
+    ): BeregningsresultatLæremidlerDto {
+        val revurderFra = behandlingService.hentBehandling(behandlingId).revurderFra
+        return beregningService.beregn(vedtaksperioder.tilDomene(), behandlingId).tilDto(revurderFra = revurderFra)
+    }
 
     /**
      * TODO Post og Get burde kanskje håndtere 2 ulike objekt?

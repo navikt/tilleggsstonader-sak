@@ -114,7 +114,7 @@ class AdminOpprettBehandlingService(
             OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
                 OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
                     behandlingId = behandling.id,
-                    saksbehandler = SikkerhetContext.SYSTEM_FORKORTELSE,
+                    saksbehandler = SikkerhetContext.hentSaksbehandler(),
                     beskrivelse = "Manuelt opprettet sak fra journalpost. Skal saksbehandles i ny løsning.",
                 ),
             )

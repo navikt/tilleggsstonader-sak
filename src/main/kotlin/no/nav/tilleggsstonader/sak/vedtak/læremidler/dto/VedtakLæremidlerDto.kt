@@ -29,7 +29,7 @@ sealed interface VedtakLæremidlerRequest : VedtakRequest
 
 sealed interface VedtakLæremidlerResponse : VedtakResponse
 
-data class VedtaksperiodeDto(
+data class VedtaksperiodeLæremidlerDto(
     val id: UUID,
     val fom: LocalDate,
     val tom: LocalDate,
@@ -43,6 +43,6 @@ enum class VedtaksperiodeStatus {
     SLETTET,
 }
 
-fun List<Vedtaksperiode>.tilDto() = this.map { VedtaksperiodeDto(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }
+fun List<Vedtaksperiode>.tilDto() = this.map { VedtaksperiodeLæremidlerDto(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }
 
-fun List<VedtaksperiodeDto>.tilDomene() = this.map { Vedtaksperiode(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }
+fun List<VedtaksperiodeLæremidlerDto>.tilDomene() = this.map { Vedtaksperiode(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }
