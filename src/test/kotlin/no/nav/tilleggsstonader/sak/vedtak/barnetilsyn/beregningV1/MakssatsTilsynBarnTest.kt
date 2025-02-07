@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1
 
 import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.finnMakssats
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.satser
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.YearMonth
