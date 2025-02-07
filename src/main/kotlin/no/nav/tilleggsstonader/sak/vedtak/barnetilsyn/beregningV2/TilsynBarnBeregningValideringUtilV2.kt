@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1
+package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV2
 
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -6,13 +6,14 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnBeregningValideringUtilFelles.validerAktiviteter
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnBeregningValideringUtilFelles.validerOverlappendePeriodeOgUtgiftEtterRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnBeregningValideringUtilFelles.validerUtgifter
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import java.time.LocalDate
 
-object TilsynBarnBeregningValideringUtil {
+object TilsynBarnBeregningValideringUtilV2 {
     fun validerPerioderForInnvilgelse(
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
+        vedtaksperioder: List<VedtaksperiodeDto>,
         aktiviteter: List<Aktivitet>,
         utgifter: Map<BarnId, List<UtgiftBeregning>>,
         typeVedtak: TypeVedtak,
@@ -21,15 +22,15 @@ object TilsynBarnBeregningValideringUtil {
         if (typeVedtak == TypeVedtak.OPPHØR) {
             return
         }
-        validerStønadsperioder(stønadsperioder)
+        validerVedtaksperioder(vedtaksperioder)
         validerAktiviteter(aktiviteter)
         validerUtgifter(utgifter)
-        validerOverlappendePeriodeOgUtgiftEtterRevurderFra(stønadsperioder, utgifter, revurderFra)
+        validerOverlappendePeriodeOgUtgiftEtterRevurderFra(vedtaksperioder, utgifter, revurderFra)
     }
 
-    private fun validerStønadsperioder(stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>) {
-        brukerfeilHvis(stønadsperioder.isEmpty()) {
-            "Kan ikke innvilge når det ikke finnes noen overlappende målgruppe og aktivitet"
+    private fun validerVedtaksperioder(vedtaksperioder: List<VedtaksperiodeDto>) {
+        brukerfeilHvis(vedtaksperioder.isEmpty()) {
+            "Kan ikke innvilge når det ikke finnes noen vedtaksperioder"
         }
     }
 }

@@ -4,10 +4,10 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnBeregningFellesService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.TilsynBarnBeregningValideringUtil.validerPerioderForInnvilgelseV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.TilsynBarnUtgiftService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.TilsynBeregningUtil.brukBeregningsgrunnlagFraOgMedRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.TilsynBeregningUtil.splitFraRevurderFra
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV2.TilsynBarnBeregningValideringUtilV2.validerPerioderForInnvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
@@ -41,7 +41,7 @@ class TilsynBarnBeregningServiceV2(
         val aktiviteter = tilsynBarnBeregningFellesService.finnAktiviteter(behandling.id)
         val vedtaksperioderEtterRevurderFra = vedtaksperioder.sorted().splitFraRevurderFra(behandling.revurderFra)
 
-        validerPerioderForInnvilgelseV2(
+        validerPerioderForInnvilgelse(
             vedtaksperioder = vedtaksperioderEtterRevurderFra,
             aktiviteter = aktiviteter,
             utgifter = utgifterPerBarn,
