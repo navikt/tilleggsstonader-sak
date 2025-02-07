@@ -1,1 +1,0 @@
-UPDATE vedtak SET status = 'UENDRET';
