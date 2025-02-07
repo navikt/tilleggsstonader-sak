@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
+package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import java.time.YearMonth

@@ -3,10 +3,10 @@ package no.nav.tilleggsstonader.sak.vedtak.dto
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.PeriodeMedDager
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.antallDagerIPeriodeInklusiv
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.splitPerUke
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.Uke
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.PeriodeMedDager
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.TilsynBeregningUtil.antallDagerIPeriodeInklusiv
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.TilsynBeregningUtil.splitPerUke
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.Uke
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate

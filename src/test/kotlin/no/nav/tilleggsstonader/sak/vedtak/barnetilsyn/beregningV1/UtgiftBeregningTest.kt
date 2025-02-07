@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
+package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
