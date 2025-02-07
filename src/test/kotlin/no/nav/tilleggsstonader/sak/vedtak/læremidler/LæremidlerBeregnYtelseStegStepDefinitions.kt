@@ -135,6 +135,8 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                 VedtaksperiodeLæremidlerDto(
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    status = VedtaksperiodeStatus.NY,
+                    id = UUID.randomUUID(),
                 )
             }
         steg.utførSteg(dummyBehandling(behandlingId, revurderFra), InnvilgelseLæremidlerRequest(vedtaksperioder))
@@ -163,6 +165,8 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             Vedtaksperiode(
                 fom = perioderBeregningsresultat.minOf { it.fom },
                 tom = perioderBeregningsresultat.maxOf { it.tom },
+                status = VedtaksperiodeStatus.NY,
+                id = UUID.randomUUID(),
             )
         val vedtak =
             InnvilgelseLæremidler(

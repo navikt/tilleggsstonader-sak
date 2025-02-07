@@ -236,14 +236,14 @@ class LæremidlerBeregnYtelseStegTest(
         val vedtaksperiodeid1 = UUID.randomUUID()
         val vedtaksperiodeid2 = UUID.randomUUID()
         val vedtaksperiode1 =
-            VedtaksperiodeDto(
+            VedtaksperiodeLæremidlerDto(
                 vedtaksperiodeid1,
                 fom = LocalDate.of(2024, 12, 1),
                 tom = LocalDate.of(2024, 12, 31),
                 status = VedtaksperiodeStatus.NY,
             )
         val vedtaksperiode2 =
-            VedtaksperiodeDto(
+            VedtaksperiodeLæremidlerDto(
                 vedtaksperiodeid2,
                 fom = LocalDate.of(2024, 12, 1),
                 tom = LocalDate.of(2024, 12, 31),
