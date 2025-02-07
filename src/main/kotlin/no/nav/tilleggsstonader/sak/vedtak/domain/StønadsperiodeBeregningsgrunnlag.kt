@@ -1,9 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
-import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnBeregningObjekt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -15,10 +14,9 @@ import java.time.LocalDate
 data class StønadsperiodeBeregningsgrunnlag(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val målgruppe: MålgruppeType,
-    val aktivitet: AktivitetType,
-) : Periode<LocalDate>,
-    KopierPeriode<StønadsperiodeBeregningsgrunnlag> {
+    override val målgruppe: MålgruppeType,
+    override val aktivitet: AktivitetType,
+) : TilsynBarnBeregningObjekt {
     init {
         validatePeriode()
     }

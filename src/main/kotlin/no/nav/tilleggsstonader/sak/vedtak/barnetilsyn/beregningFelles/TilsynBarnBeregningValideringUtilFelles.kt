@@ -8,12 +8,35 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBeregningUtilsFelles.brukPerioderFraOgMedRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBeregningUtilsFelles.brukPerioderFraOgMedRevurderFraMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import java.time.LocalDate
 
 object TilsynBarnBeregningValideringUtilFelles {
+    fun validerPerioderForInnvilgelse(
+        perioder: List<TilsynBarnBeregningObjekt>,
+        aktiviteter: List<Aktivitet>,
+        utgifter: Map<BarnId, List<UtgiftBeregning>>,
+        typeVedtak: TypeVedtak,
+        revurderFra: LocalDate?,
+    ) {
+        if (typeVedtak == TypeVedtak.OPPHØR) {
+            return
+        }
+        validerPerioder(perioder)
+        validerAktiviteter(aktiviteter)
+        validerUtgifter(utgifter)
+        validerOverlappendePeriodeOgUtgiftEtterRevurderFra(perioder, utgifter, revurderFra)
+    }
+
+    private fun validerPerioder(perioder: List<TilsynBarnBeregningObjekt>) {
+        brukerfeilHvis(perioder.isEmpty()) {
+            "Kan ikke innvilge når det ikke finnes noen overlappende målgruppe og aktivitet"
+        }
+    }
+
     fun <P> validerOverlappendePeriodeOgUtgiftEtterRevurderFra(
         perioder: List<P>,
         utgifter: Map<BarnId, List<UtgiftBeregning>>,

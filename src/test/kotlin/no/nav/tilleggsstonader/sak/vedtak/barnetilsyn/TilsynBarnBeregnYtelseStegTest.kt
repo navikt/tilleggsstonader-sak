@@ -46,12 +46,12 @@ class TilsynBarnBeregnYtelseStegTest {
         TilsynBarnBeregningFellesService(
             vilkårperiodeRepository = vilkårperiodeRepository,
             vedtakRepository = repository,
+            tilsynBarnUtgiftService = tilsynBarnUtgiftService,
         )
 
     val tilsynBarnBeregningService =
         TilsynBarnBeregningService(
             stønadsperiodeRepository = stønadsperiodeService,
-            tilsynBarnUtgiftService = tilsynBarnUtgiftService,
             tilsynBarnBeregningFellesService = tilsynBarnBeregningFellesService,
         )
     val steg =

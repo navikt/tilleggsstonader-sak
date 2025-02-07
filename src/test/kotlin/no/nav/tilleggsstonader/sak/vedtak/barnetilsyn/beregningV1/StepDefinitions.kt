@@ -58,12 +58,12 @@ class StepDefinitions {
         TilsynBarnBeregningFellesService(
             vilkårperiodeRepository = vilkårperiodeRepository,
             vedtakRepository = repository,
+            tilsynBarnUtgiftService = tilsynBarnUtgiftService,
         )
 
     val service =
         TilsynBarnBeregningService(
             stønadsperiodeRepository = stønadsperiodeRepository,
-            tilsynBarnUtgiftService = tilsynBarnUtgiftService,
             tilsynBarnBeregningFellesService = tilsynBarnBeregningFellesService,
         )
 

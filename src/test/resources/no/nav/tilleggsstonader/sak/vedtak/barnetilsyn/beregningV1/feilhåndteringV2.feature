@@ -55,7 +55,7 @@ Egenskap: Feilhåndtering i beregning
 
     Når V2 - beregner
 
-    Så V2 - forvent følgende feil: Finner ikke aktiviteter for UTDANNING
+    Så V2 - forvent følgende feil: Finnes ingen aktiviteter av type UTDANNING
 
   Scenario: Ingen aktiviteter i en uke stønadsperiode strekker seg over
     Gitt V2 - følgende vedtaksperioder

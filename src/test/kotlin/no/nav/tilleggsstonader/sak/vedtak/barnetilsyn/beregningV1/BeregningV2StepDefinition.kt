@@ -52,10 +52,10 @@ class BeregningV2StepDefinition {
         TilsynBarnBeregningFellesService(
             vilkårperiodeRepository = vilkårperiodeRepository,
             vedtakRepository = vedtakRepository,
+            tilsynBarnUtgiftService = tilsynBarnUtgiftService,
         )
     val beregningService =
         TilsynBarnBeregningServiceV2(
-            tilsynBarnUtgiftService = tilsynBarnUtgiftService,
             tilsynBarnBeregningFellesService = tilsynBarnBeregningFellesService,
         )
 
@@ -187,7 +187,7 @@ class BeregningV2StepDefinition {
                 }
 
                 forventetResultat.grunnlag.antallDagerTotal?.let {
-                    assertThat(resultat.grunnlag.vedtaksperioderGrunnlag.sumOf { it.antallAktivitetsDager })
+                    assertThat(resultat.grunnlag.stønadsperioderGrunnlag.sumOf { it.antallDager })
                         .`as` { "antallDagerTotal" }
                         .isEqualTo(it)
                 }
@@ -227,17 +227,17 @@ class BeregningV2StepDefinition {
                 .perioder
                 .find { it.grunnlag.måned == måned }
                 ?.grunnlag
-                ?.vedtaksperioderGrunnlag
+                ?.stønadsperioderGrunnlag
                 ?: error("Finner ikke beregningsresultat for $måned")
 
         perioder.forEachIndexed { index, resultat ->
             val forventetResultat = forventetVedtaksperiodeGrunnlag[index]
             try {
-                assertThat(resultat.fom).`as` { "fom" }.isEqualTo(forventetResultat.fom)
-                assertThat(resultat.tom).`as` { "tom" }.isEqualTo(forventetResultat.tom)
-                assertThat(resultat.antallAktivitetsDager)
+                assertThat(resultat.stønadsperiode.fom).`as` { "fom" }.isEqualTo(forventetResultat.vedtaksperiode.fom)
+                assertThat(resultat.stønadsperiode.tom).`as` { "tom" }.isEqualTo(forventetResultat.vedtaksperiode.tom)
+                assertThat(resultat.antallDager)
                     .`as` { "antallAktivitetsDager" }
-                    .isEqualTo(forventetResultat.antallAktivitetsDager)
+                    .isEqualTo(forventetResultat.antallDager)
             } catch (e: Throwable) {
                 logger.error("Feilet validering av rad ${index + 1}")
                 throw e
@@ -295,14 +295,17 @@ fun parseForventedeBeløpsperioder(dataTable: DataTable): List<Beløpsperiode> =
 fun mapVedtaksperiodeGrunnlag(dataTable: DataTable) =
     dataTable.mapRad { rad ->
         VedtaksperiodeGrunnlag(
-            fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
-            tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
-            målgruppeType = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
-            aktivitetType =
-                parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
-                    ?: AktivitetType.TILTAK,
+            vedtaksperiode =
+                VedtaksperiodeDto(
+                    fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
+                    tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
+                    målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
+                    aktivitet =
+                        parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
+                            ?: AktivitetType.TILTAK,
+                ),
             aktiviteter = emptyList(),
-            antallAktivitetsDager = parseInt(BeregningNøkler.ANTALL_DAGER, rad),
+            antallDager = parseInt(BeregningNøkler.ANTALL_DAGER, rad),
         )
     }
 
@@ -311,8 +314,8 @@ fun mapVedtaksperioder(dataTable: DataTable) =
         VedtaksperiodeDto(
             fom = parseDato(DomenenøkkelFelles.FOM, rad),
             tom = parseDato(DomenenøkkelFelles.TOM, rad),
-            målgruppeType = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
-            aktivitetType =
+            målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
+            aktivitet =
                 parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
                     ?: AktivitetType.TILTAK,
         )

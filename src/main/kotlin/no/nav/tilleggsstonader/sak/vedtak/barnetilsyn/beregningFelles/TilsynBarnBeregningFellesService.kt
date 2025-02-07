@@ -4,10 +4,15 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnBeregningValideringUtilFelles.validerPerioderForInnvilgelse
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBeregningUtilsFelles.brukBeregningsgrunnlagFraOgMedRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.DEKNINGSGRAD_TILSYN_BARN
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilAktiviteter
@@ -26,7 +31,57 @@ private val SNITT_ANTALL_VIRKEDAGER_PER_MÅNED = BigDecimal("21.67")
 class TilsynBarnBeregningFellesService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val vedtakRepository: VedtakRepository,
+    private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
 ) {
+    /**
+     * Dersom behandling er en revurdering beregnes perioder fra og med måneden for revurderFra
+     * Ellers beregnes perioder for hele perioden som man har stønadsperioder og utgifter
+     */
+    fun beregnAktuellePerioder(
+        behandling: Saksbehandling,
+        typeVedtak: TypeVedtak,
+        beregningPerioder: List<TilsynBarnBeregningObjekt>,
+    ): List<BeregningsresultatForMåned> {
+        val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandling.id)
+
+        val aktiviteter = finnAktiviteter(behandling.id)
+
+        validerPerioderForInnvilgelse(beregningPerioder, aktiviteter, utgifterPerBarn, typeVedtak, behandling.revurderFra)
+
+        val beregningsgrunnlag =
+            BeregningsgrunnlagUtilsFelles
+                .lagBeregningsgrunnlagPerMåned(beregningPerioder, aktiviteter, utgifterPerBarn)
+                .brukBeregningsgrunnlagFraOgMedRevurderFra(behandling.revurderFra)
+        return beregn(beregningsgrunnlag)
+    }
+
+    private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<BeregningsresultatForMåned> =
+        beregningsgrunnlag.map {
+            val dagsats = beregnDagsats(it)
+            val beløpsperioder = lagBeløpsperioder(dagsats, it)
+
+            BeregningsresultatForMåned(
+                dagsats = dagsats,
+                månedsbeløp = beløpsperioder.sumOf { it.beløp },
+                grunnlag = it,
+                beløpsperioder = beløpsperioder,
+            )
+        }
+
+    private fun lagBeløpsperioder(
+        dagsats: BigDecimal,
+        it: Beregningsgrunnlag,
+    ): List<Beløpsperiode> =
+        it.stønadsperioderGrunnlag.map {
+            // Datoer som treffer helger må endres til neste mandag fordi andeler med type dagsats betales ikke ut i helger
+            val dato = it.stønadsperiode.fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
+            Beløpsperiode(
+                dato = dato,
+                beløp = beregnBeløp(dagsats, it.antallDager),
+                målgruppe = it.stønadsperiode.målgruppe,
+            )
+        }
+
     // Kopiert fra V1
     fun finnRelevantePerioderFraForrigeVedtak(behandling: Saksbehandling): List<BeregningsresultatForMåned> =
         behandling.forrigeBehandlingId?.let { forrigeBehandlingId ->
