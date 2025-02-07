@@ -63,7 +63,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     val stønadsperiodeRepository = StønadsperiodeRepositoryFake()
     val vedtakRepository = VedtakRepositoryFake()
     val tilkjentYtelseRepository = TilkjentYtelseRepositoryFake()
-    val repository = VedtakRepositoryFake()
 
     val simuleringService =
         mockk<SimuleringService>().apply {
@@ -80,8 +79,8 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             vedtakRepository = vedtakRepository,
             tilkjentytelseService = TilkjentYtelseService(tilkjentYtelseRepository),
             simuleringService = simuleringService,
-            repository = repository,
         )
+    val VedtaksperiodeId = UUID.randomUUID()
 
     @Gitt("følgende aktiviteter for læremidler behandling={}")
     fun `følgende aktiviteter`(
@@ -110,7 +109,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val vedtaksperioder =
             dataTable.mapRad { rad ->
                 VedtaksperiodeDto(
-                    id = UUID.randomUUID(),
+                    id = VedtaksperiodeId,
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
                     status = VedtaksperiodeStatus.NY
@@ -225,7 +224,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val forventedeVedtaksperioder =
             dataTable.mapRad { rad ->
                 Vedtaksperiode(
-                    id = UUID.randomUUID(),
+                    id = VedtaksperiodeId,
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
                     status = VedtaksperiodeStatus.NY

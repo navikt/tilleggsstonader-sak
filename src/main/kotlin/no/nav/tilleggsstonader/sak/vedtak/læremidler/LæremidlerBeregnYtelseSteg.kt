@@ -50,7 +50,6 @@ import java.time.LocalDate
 class LæremidlerBeregnYtelseSteg(
     private val beregningService: LæremidlerBeregningService,
     private val opphørValideringService: OpphørValideringService,
-    private val repository: VedtakRepository,
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -76,53 +75,53 @@ class LæremidlerBeregnYtelseSteg(
         }
     }
 
-        private fun beregnOgLagreInnvilgelse(
-            vedtaksperioder: List<Vedtaksperiode>,
-            saksbehandling: Saksbehandling,
-        ) {
-    //        feilHvis(saksbehandling.forrigeBehandlingId != null) {
-    //            "Har foreløpig ikke støtte for innvilgelse av revurdering"
-    //        }
+            private fun beregnOgLagreInnvilgelse(
+                vedtaksperioder: List<Vedtaksperiode>,
+                saksbehandling: Saksbehandling,
+            ) {
+        //        feilHvis(saksbehandling.forrigeBehandlingId != null) {
+        //            "Har foreløpig ikke støtte for innvilgelse av revurdering"
+        //        }
 
-            // Hvis førstegangsbehandling
-            if (saksbehandling.type == BehandlingType.FØRSTEGANGSBEHANDLING){
-                lagreVedtak(vedtaksperioder,saksbehandling )
-            }
-            else // Hvis revurdering:
-            {
-                if (saksbehandling.type == BehandlingType.REVURDERING && saksbehandling.forrigeBehandlingId != null) {
+                // Hvis førstegangsbehandling
+                if (saksbehandling.type == BehandlingType.FØRSTEGANGSBEHANDLING){
+                    lagreVedtak(vedtaksperioder,saksbehandling )
+                }
+                else // Hvis revurdering:
+                {
+                    if (saksbehandling.type == BehandlingType.REVURDERING && saksbehandling.forrigeBehandlingId != null) {
 
-                    val forrigeBehandlingId =  saksbehandling.forrigeBehandlingId
-                    val vedtaksDataForForrigeBehandling = hentVedtak(forrigeBehandlingId)?.data as VedtakLæremidler
-                    val vedtaksperioderForForrigeBehandling =   vedtaksDataForForrigeBehandling.vedtaksperioder()
-                    val vedtaksperiodeIdforidForForrigeBehandling = vedtaksperioderForForrigeBehandling?.map { it.id }.orEmpty()
+                        val forrigeBehandlingId =  saksbehandling.forrigeBehandlingId
+                        val vedtaksDataForForrigeBehandling = hentVedtak(forrigeBehandlingId)?.data as VedtakLæremidler
+                        val vedtaksperioderForForrigeBehandling =   vedtaksDataForForrigeBehandling.vedtaksperioder()
+                        val vedtaksperiodeIdforidForForrigeBehandling = vedtaksperioderForForrigeBehandling?.map { it.id }.orEmpty()
 
-                    val nyeVedtakPerioder = vedtaksperioder.filterNot { it.id in vedtaksperiodeIdforidForForrigeBehandling }
+                        val nyeVedtakPerioder = vedtaksperioder.filterNot { it.id in vedtaksperiodeIdforidForForrigeBehandling }
 
-                    val endretdeVedtakPerioder = vedtaksperioder.filter { vedtaksperiode ->
-                        vedtaksperiode.id in vedtaksperiodeIdforidForForrigeBehandling &&
-                                vedtaksperioderForForrigeBehandling?.find { it.id == vedtaksperiode.id }
-                                    ?.let { it.fom != vedtaksperiode.fom || it.tom != vedtaksperiode.tom } == true
+                        val endretdeVedtakPerioder = vedtaksperioder.filter { vedtaksperiode ->
+                            vedtaksperiode.id in vedtaksperiodeIdforidForForrigeBehandling &&
+                                    vedtaksperioderForForrigeBehandling?.find { it.id == vedtaksperiode.id }
+                                        ?.let { it.fom != vedtaksperiode.fom || it.tom != vedtaksperiode.tom } == true
+                        }
+                        val endretVedtakPerioderMedEndretStatus = endretdeVedtakPerioder.map {
+                            it.copy(status = VedtaksperiodeStatus.ENDRET)
+                        }
+
+                        val uendretVedtaksperioder =  vedtaksperioder.filter { vedtaksperiode ->
+                            vedtaksperiode.id in vedtaksperiodeIdforidForForrigeBehandling &&
+                                    vedtaksperioderForForrigeBehandling?.find { it.id == vedtaksperiode.id }
+                                        ?.let { it.fom == vedtaksperiode.fom && it.tom == vedtaksperiode.tom } == true
+                        }
+                        val uendretVedtakPerioderMedEndretStatus = uendretVedtaksperioder.map {
+                            it.copy(status = VedtaksperiodeStatus.UENDRET)
+                        }
+
+                        val oppdatertVedtaksperioderMedStatus = nyeVedtakPerioder + endretVedtakPerioderMedEndretStatus + uendretVedtakPerioderMedEndretStatus
+                        lagreVedtak(oppdatertVedtaksperioderMedStatus, saksbehandling)
                     }
-                    val endretVedtakPerioderMedEndretStatus = endretdeVedtakPerioder.map {
-                        it.copy(status = VedtaksperiodeStatus.ENDRET)
-                    }
-
-                    val uendretVedtaksperioder =  vedtaksperioder.filter { vedtaksperiode ->
-                        vedtaksperiode.id in vedtaksperiodeIdforidForForrigeBehandling &&
-                                vedtaksperioderForForrigeBehandling?.find { it.id == vedtaksperiode.id }
-                                    ?.let { it.fom == vedtaksperiode.fom && it.tom == vedtaksperiode.tom } == true
-                    }
-                    val uendretVedtakPerioderMedEndretStatus = uendretVedtaksperioder.map {
-                        it.copy(status = VedtaksperiodeStatus.UENDRET)
-                    }
-
-                    val oppdatertVedtaksperioderMedStatus = nyeVedtakPerioder + endretVedtakPerioderMedEndretStatus + uendretVedtakPerioderMedEndretStatus
-                    lagreVedtak(oppdatertVedtaksperioderMedStatus, saksbehandling)
                 }
             }
-        }
-    private fun hentVedtak(behandlingId: BehandlingId): Vedtak? = repository.findByIdOrNull(behandlingId)
+    private fun hentVedtak(behandlingId: BehandlingId): Vedtak? = vedtakRepository.findByIdOrNull(behandlingId)
     private fun lagreVedtak(vedtaksperioder: List<Vedtaksperiode>, saksbehandling: Saksbehandling ) {
         val beregningsresultat = beregningService.beregn(vedtaksperioder, saksbehandling.id)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling.id, vedtaksperioder, beregningsresultat))

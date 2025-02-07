@@ -1,7 +1,7 @@
 {
   "type": "INNVILGELSE_LÆREMIDLER",
   "vedtaksperioder": [
-    { "id": "new-uuid-1",
+    { "id": "550e8400-e29b-41d4-a716-446655440000",
       "fom": "2024-01-01",
       "tom": "2024-01-31",
       "status": "NY"

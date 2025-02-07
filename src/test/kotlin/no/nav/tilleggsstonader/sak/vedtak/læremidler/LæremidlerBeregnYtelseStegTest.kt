@@ -222,21 +222,30 @@ class LæremidlerBeregnYtelseStegTest(
         }
     }
     @Test
-    fun `skal finne ut vedtaksperioder som er endret `() {
+    fun `skal lagre vedtak for førstegangsbehandling`() {
         val vedtaksperiodeid1 = UUID.randomUUID()
         val vedtaksperiodeid2 = UUID.randomUUID()
         val vedtaksperiode1 = VedtaksperiodeDto(vedtaksperiodeid1,fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31), status = VedtaksperiodeStatus.NY)
         val vedtaksperiode2 = VedtaksperiodeDto(vedtaksperiodeid2,fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31), status = VedtaksperiodeStatus.NY)
+        val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
+        println("3######################################" +saksbehandling)
+        //steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode1, vedtaksperiode2)))
+        //val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
+
+    }
+    @Test
+    fun `skal ikke lagre vedtak hvis revurdering ikke har forrige behandling`() {
+
+    }
+    @Test
+    fun `skal lagre nye vedtaksperioder ved revurdering`() {
 
     }
 
+    @Test
+    fun `skal oppdatere endrede vedtaksperioder ved revurdering`() {
 
-
-
-
-
-
-
+    }
 
     fun lagreAktivitetOgStønadsperiode(
         fom: LocalDate,
