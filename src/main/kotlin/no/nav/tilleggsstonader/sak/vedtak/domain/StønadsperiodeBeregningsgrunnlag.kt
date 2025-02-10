@@ -1,8 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnBeregningObjekt
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.VedtaksperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -14,9 +16,10 @@ import java.time.LocalDate
 data class StønadsperiodeBeregningsgrunnlag(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    override val målgruppe: MålgruppeType,
-    override val aktivitet: AktivitetType,
-) : TilsynBarnBeregningObjekt {
+    val målgruppe: MålgruppeType,
+    val aktivitet: AktivitetType,
+) : Periode<LocalDate>,
+    KopierPeriode<StønadsperiodeBeregningsgrunnlag> {
     init {
         validatePeriode()
     }
@@ -35,6 +38,7 @@ fun Stønadsperiode.tilStønadsperiodeBeregningsgrunnlag() =
         aktivitet = this.aktivitet,
     )
 
+// TODO fjerne denne?
 fun List<Stønadsperiode>.tilSortertStønadsperiodeBeregningsgrunnlag() =
     this
         .map { it.tilStønadsperiodeBeregningsgrunnlag() }
@@ -45,3 +49,5 @@ fun List<StønadsperiodeBeregningsgrunnlag>.slåSammenSammenhengende(): List<St�
         skalMerges = { a, b -> a.påfølgesAv(b) && a.målgruppe == b.målgruppe && a.aktivitet == b.aktivitet },
         merge = { a, b -> a.copy(tom = b.tom) },
     )
+
+fun List<Stønadsperiode>.tilVedtaksperiodeBeregingsgrunnlag() = map { VedtaksperiodeBeregningsgrunnlag(it) }

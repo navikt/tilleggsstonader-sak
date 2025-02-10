@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnBeregningObjekt
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.VedtaksperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
@@ -36,11 +36,11 @@ object VedtaksperiodeTilsynBarnMapper {
             validatePeriode()
         }
 
-        constructor(stønadsperiode: TilsynBarnBeregningObjekt, barn: List<BarnId>) : this(
-            fom = stønadsperiode.fom,
-            tom = stønadsperiode.tom,
-            målgruppe = stønadsperiode.målgruppe,
-            aktivitet = stønadsperiode.aktivitet,
+        constructor(vedtakpseriodeBeregningsgrunnlag: VedtaksperiodeBeregningsgrunnlag, barn: List<BarnId>) : this(
+            fom = vedtakpseriodeBeregningsgrunnlag.fom,
+            tom = vedtakpseriodeBeregningsgrunnlag.tom,
+            målgruppe = vedtakpseriodeBeregningsgrunnlag.målgruppe,
+            aktivitet = vedtakpseriodeBeregningsgrunnlag.aktivitet,
             antallBarn = barn.size,
             barn = barn,
         )

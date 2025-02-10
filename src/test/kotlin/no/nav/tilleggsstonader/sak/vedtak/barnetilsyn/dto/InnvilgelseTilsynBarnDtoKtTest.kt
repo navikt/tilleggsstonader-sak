@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto
 
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.VedtaksperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -162,7 +162,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
         tom: LocalDate,
     ) = StønadsperiodeGrunnlag(
         stønadsperiode =
-            StønadsperiodeBeregningsgrunnlag(
+            VedtaksperiodeBeregningsgrunnlag(
                 fom = fom,
                 tom = tom,
                 målgruppe = MålgruppeType.AAP,

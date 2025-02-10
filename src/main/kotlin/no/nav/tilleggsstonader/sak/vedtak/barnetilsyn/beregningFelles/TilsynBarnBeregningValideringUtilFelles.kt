@@ -16,7 +16,7 @@ import java.time.LocalDate
 
 object TilsynBarnBeregningValideringUtilFelles {
     fun validerPerioderForInnvilgelse(
-        perioder: List<TilsynBarnBeregningObjekt>,
+        perioder: List<VedtaksperiodeBeregningsgrunnlag>,
         aktiviteter: List<Aktivitet>,
         utgifter: Map<BarnId, List<UtgiftBeregning>>,
         typeVedtak: TypeVedtak,
@@ -31,7 +31,7 @@ object TilsynBarnBeregningValideringUtilFelles {
         validerOverlappendePeriodeOgUtgiftEtterRevurderFra(perioder, utgifter, revurderFra)
     }
 
-    private fun validerPerioder(perioder: List<TilsynBarnBeregningObjekt>) {
+    private fun validerPerioder(perioder: List<VedtaksperiodeBeregningsgrunnlag>) {
         brukerfeilHvis(perioder.isEmpty()) {
             "Kan ikke innvilge når det ikke finnes noen overlappende målgruppe og aktivitet"
         }

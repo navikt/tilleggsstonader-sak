@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnBeregningFellesService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBeregningUtilsFelles.splitFraRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregingsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -31,7 +31,8 @@ class TilsynBarnBeregningService(
         val stønadsperioder =
             stønadsperiodeRepository
                 .findAllByBehandlingId(behandling.id)
-                .tilSortertStønadsperiodeBeregningsgrunnlag()
+                .tilVedtaksperiodeBeregingsgrunnlag()
+                .sorted()
                 .splitFraRevurderFra(behandling.revurderFra)
         val perioder = tilsynBarnBeregningFellesService.beregnAktuellePerioder(behandling, typeVedtak, stønadsperioder)
         val relevantePerioderFraForrigeVedtak =

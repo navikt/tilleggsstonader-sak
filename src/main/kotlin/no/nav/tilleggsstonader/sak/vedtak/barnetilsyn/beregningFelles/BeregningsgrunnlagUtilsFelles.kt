@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 
 object BeregningsgrunnlagUtilsFelles {
     fun lagBeregningsgrunnlagPerMåned(
-        perioder: List<TilsynBarnBeregningObjekt>,
+        perioder: List<VedtaksperiodeBeregningsgrunnlag>,
         aktiviteter: List<Aktivitet>,
         utgifterPerBarn: Map<BarnId, List<UtgiftBeregning>>,
     ): List<Beregningsgrunnlag> {
@@ -28,7 +28,8 @@ object BeregningsgrunnlagUtilsFelles {
                 Beregningsgrunnlag(
                     måned = måned,
                     makssats = makssats,
-                    stønadsperioderGrunnlag = finnPerioderMedAktiviteter(perioder, aktiviteterForMåned),
+                    // TODO rename til vedtaksperiodeGrunnlag
+                    stønadsperioderGrunnlag = lagStønadsperiodeGrunnlag(perioder, aktiviteterForMåned),
                     utgifter = utgifter,
                     utgifterTotal = utgifter.sumOf { it.utgift },
                     antallBarn = antallBarn,
@@ -37,40 +38,40 @@ object BeregningsgrunnlagUtilsFelles {
         }
     }
 
-    private fun finnPerioderMedAktiviteter(
-        stønadsperioder: List<TilsynBarnBeregningObjekt>,
+    private fun lagStønadsperiodeGrunnlag(
+        vedtaksperiodeBeregningsgrunnlag: List<VedtaksperiodeBeregningsgrunnlag>,
         aktiviteter: Map<AktivitetType, List<Aktivitet>>,
     ): List<StønadsperiodeGrunnlag> {
         val aktiviteterPerUke = aktiviteter.map { it.key to it.value.tilDagerPerUke() }.toMap()
 
-        return stønadsperioder.map { stønadsperiode ->
-            val relevanteAktiviteter = finnAktiviteterForPeriode(stønadsperiode, aktiviteter)
+        return vedtaksperiodeBeregningsgrunnlag.map { vedtaksperiode ->
+            val relevanteAktiviteter = finnAktiviteterForPeriode(vedtaksperiode, aktiviteter)
 
             StønadsperiodeGrunnlag(
-                stønadsperiode = stønadsperiode,
+                stønadsperiode = vedtaksperiode,
                 aktiviteter = relevanteAktiviteter,
-                antallDager = finnAntallAktivitestdagerIVedtaksperioden(stønadsperiode, aktiviteterPerUke),
+                antallDager = finnAntallAktivitestdagerIVedtaksperioden(vedtaksperiode, aktiviteterPerUke),
             )
         }
     }
 
     private fun finnAktiviteterForPeriode(
-        stønadsperiode: TilsynBarnBeregningObjekt,
+        vedtaksperiodeBeregningsgrunnlag: VedtaksperiodeBeregningsgrunnlag,
         aktiviteter: Map<AktivitetType, List<Aktivitet>>,
     ): List<Aktivitet> =
-        aktiviteter[stønadsperiode.aktivitet]?.filter { it.overlapper(stønadsperiode) }
+        aktiviteter[vedtaksperiodeBeregningsgrunnlag.aktivitet]?.filter { it.overlapper(vedtaksperiodeBeregningsgrunnlag) }
             ?: error(
-                "Finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som passer med stønadsperiode med fom=${stønadsperiode.fom} og tom=${stønadsperiode.tom}",
+                "Finnes ingen aktiviteter av type ${vedtaksperiodeBeregningsgrunnlag.aktivitet} som passer med stønadsperiode med fom=${vedtaksperiodeBeregningsgrunnlag.fom} og tom=${vedtaksperiodeBeregningsgrunnlag.tom}",
             )
 
     private fun finnAntallAktivitestdagerIVedtaksperioden(
-        vedtaksperiode: TilsynBarnBeregningObjekt,
+        vedtaksperiodeBeregningsgrunnlag: VedtaksperiodeBeregningsgrunnlag,
         aktiviteterPerType: Map<AktivitetType, Map<Uke, List<PeriodeMedDager>>>,
     ): Int {
-        val vedtaksperiodeUker = vedtaksperiode.tilUke()
+        val vedtaksperiodeUker = vedtaksperiodeBeregningsgrunnlag.tilUke()
         val aktiviteterPerUke =
-            aktiviteterPerType[vedtaksperiode.aktivitet]
-                ?: error("Finner ikke aktiviteter for ${vedtaksperiode.aktivitet}")
+            aktiviteterPerType[vedtaksperiodeBeregningsgrunnlag.aktivitet]
+                ?: error("Finner ikke aktiviteter for ${vedtaksperiodeBeregningsgrunnlag.aktivitet}")
 
         return vedtaksperiodeUker
             .map { (uke, periode) ->
@@ -107,11 +108,11 @@ object BeregningsgrunnlagUtilsFelles {
      * Dersom stønadsperioden har 3 dager, og aktiviten 2 dager, så skal man kun totalt kunne bruke 2 dager
      */
     private fun trekkFraBrukteDager(
-        stønadsperiode: PeriodeMedDager,
+        periode: PeriodeMedDager,
         aktivitet: PeriodeMedDager,
         antallTilgjengeligeDager: Int,
     ) {
         aktivitet.antallDager -= antallTilgjengeligeDager
-        stønadsperiode.antallDager -= antallTilgjengeligeDager
+        periode.antallDager -= antallTilgjengeligeDager
     }
 }

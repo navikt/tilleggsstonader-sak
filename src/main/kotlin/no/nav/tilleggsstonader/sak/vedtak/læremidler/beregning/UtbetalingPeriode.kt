@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.lørdagEllerSøndag
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnBeregningObjekt
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
@@ -118,7 +117,7 @@ data class LøpendeMåned(
 
     private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteAktiviteter(
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
-        stønadsperiode: TilsynBarnBeregningObjekt,
+        stønadsperiode: StønadsperiodeBeregningsgrunnlag,
     ): List<AktivitetLæremidlerBeregningGrunnlag> {
         val relevanteAktiviteter =
             aktiviteter
@@ -139,8 +138,8 @@ data class LøpendeMåned(
     }
 
     private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteStønadsperioder(
-        stønadsperioder: List<TilsynBarnBeregningObjekt>,
-    ): List<TilsynBarnBeregningObjekt> {
+        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
+    ): List<StønadsperiodeBeregningsgrunnlag> {
         val relevanteStønadsperioderForPeriode =
             stønadsperioder
                 .mapNotNull { it.beregnSnitt(this) }

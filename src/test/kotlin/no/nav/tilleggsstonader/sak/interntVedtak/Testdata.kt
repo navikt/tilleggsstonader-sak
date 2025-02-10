@@ -18,12 +18,12 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.stønadsperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.VedtaksperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
@@ -188,8 +188,8 @@ object Testdata {
                 ).tilDto(),
             )
 
-        val stønadsperiodeBeregningsgrunnlag =
-            StønadsperiodeBeregningsgrunnlag(
+        val vedtaksperiodeBeregningsgrunnlag =
+            VedtaksperiodeBeregningsgrunnlag(
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 1),
                 målgruppe = MålgruppeType.AAP,
@@ -209,7 +209,7 @@ object Testdata {
                                         beregningsresultatForMåned(
                                             stønadsperioder =
                                                 listOf(
-                                                    stønadsperiodeGrunnlag(stønadsperiode = stønadsperiodeBeregningsgrunnlag),
+                                                    stønadsperiodeGrunnlag(stønadsperiode = vedtaksperiodeBeregningsgrunnlag),
                                                 ),
                                         ),
                                     ),

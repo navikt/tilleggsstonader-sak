@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.behandlingId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.VedtaksperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
@@ -15,7 +16,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnR
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -43,8 +43,8 @@ object TilsynBarnTestUtil {
             Beløpsperiode(dato = LocalDate.now().plusDays(7), beløp = 2000, målgruppe = MålgruppeType.OVERGANGSSTØNAD),
         )
 
-    val defaultStønadsperiodeBeregningsgrunnlag =
-        StønadsperiodeBeregningsgrunnlag(
+    val defaultVedtaksperiodeBeregningsgrunnlag =
+        VedtaksperiodeBeregningsgrunnlag(
             fom = LocalDate.of(2024, 1, 1),
             tom = LocalDate.of(2024, 1, 31),
             målgruppe = MålgruppeType.AAP,
@@ -98,7 +98,7 @@ object TilsynBarnTestUtil {
         )
 
     fun stønadsperiodeGrunnlag(
-        stønadsperiode: StønadsperiodeBeregningsgrunnlag = defaultStønadsperiodeBeregningsgrunnlag,
+        stønadsperiode: VedtaksperiodeBeregningsgrunnlag = defaultVedtaksperiodeBeregningsgrunnlag,
     ): StønadsperiodeGrunnlag =
         StønadsperiodeGrunnlag(
             stønadsperiode = stønadsperiode,

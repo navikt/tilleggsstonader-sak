@@ -40,17 +40,17 @@ class TilsynBarnBeregningFellesService(
     fun beregnAktuellePerioder(
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
-        beregningPerioder: List<TilsynBarnBeregningObjekt>,
+        vedtaksperiodeBeregningsgrunnlag: List<VedtaksperiodeBeregningsgrunnlag>,
     ): List<BeregningsresultatForMåned> {
         val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandling.id)
 
         val aktiviteter = finnAktiviteter(behandling.id)
 
-        validerPerioderForInnvilgelse(beregningPerioder, aktiviteter, utgifterPerBarn, typeVedtak, behandling.revurderFra)
+        validerPerioderForInnvilgelse(vedtaksperiodeBeregningsgrunnlag, aktiviteter, utgifterPerBarn, typeVedtak, behandling.revurderFra)
 
         val beregningsgrunnlag =
             BeregningsgrunnlagUtilsFelles
-                .lagBeregningsgrunnlagPerMåned(beregningPerioder, aktiviteter, utgifterPerBarn)
+                .lagBeregningsgrunnlagPerMåned(vedtaksperiodeBeregningsgrunnlag, aktiviteter, utgifterPerBarn)
                 .brukBeregningsgrunnlagFraOgMedRevurderFra(behandling.revurderFra)
         return beregn(beregningsgrunnlag)
     }

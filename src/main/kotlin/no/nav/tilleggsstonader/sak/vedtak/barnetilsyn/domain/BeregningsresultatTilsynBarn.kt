@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnBeregningObjekt
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.VedtaksperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -49,15 +49,8 @@ data class Beregningsgrunnlag(
     val antallBarn: Int,
 )
 
-// TODO fjern denne klassen
-data class VedtaksperiodeGrunnlag(
-    val vedtaksperiode: TilsynBarnBeregningObjekt,
-    val aktiviteter: List<Aktivitet>,
-    val antallDager: Int,
-)
-
 data class StønadsperiodeGrunnlag(
-    val stønadsperiode: TilsynBarnBeregningObjekt,
+    val stønadsperiode: VedtaksperiodeBeregningsgrunnlag,
     val aktiviteter: List<Aktivitet>,
     val antallDager: Int,
 )

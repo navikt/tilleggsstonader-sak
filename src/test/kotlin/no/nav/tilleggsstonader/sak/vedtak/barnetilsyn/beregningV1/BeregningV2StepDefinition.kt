@@ -30,10 +30,11 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilg
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnBeregningFellesService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnUtgiftService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.UtgiftBeregning
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.VedtaksperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV2.TilsynBarnBeregningServiceV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -220,7 +221,7 @@ class BeregningV2StepDefinition {
     ) {
         assertThat(exception).isNull()
         val måned = parseÅrMåned(månedStr)
-        val forventetVedtaksperiodeGrunnlag = mapVedtaksperiodeGrunnlag(dataTable)
+        val forventetVedtaksperiodeGrunnlag = mapStønadsperiodeGrunnlag(dataTable)
 
         val perioder =
             beregningsresultat!!
@@ -233,8 +234,8 @@ class BeregningV2StepDefinition {
         perioder.forEachIndexed { index, resultat ->
             val forventetResultat = forventetVedtaksperiodeGrunnlag[index]
             try {
-                assertThat(resultat.stønadsperiode.fom).`as` { "fom" }.isEqualTo(forventetResultat.vedtaksperiode.fom)
-                assertThat(resultat.stønadsperiode.tom).`as` { "tom" }.isEqualTo(forventetResultat.vedtaksperiode.tom)
+                assertThat(resultat.stønadsperiode.fom).`as` { "fom" }.isEqualTo(forventetResultat.stønadsperiode.fom)
+                assertThat(resultat.stønadsperiode.tom).`as` { "tom" }.isEqualTo(forventetResultat.stønadsperiode.tom)
                 assertThat(resultat.antallDager)
                     .`as` { "antallAktivitetsDager" }
                     .isEqualTo(forventetResultat.antallDager)
@@ -292,11 +293,11 @@ fun parseForventedeBeløpsperioder(dataTable: DataTable): List<Beløpsperiode> =
         )
     }
 
-fun mapVedtaksperiodeGrunnlag(dataTable: DataTable) =
+fun mapStønadsperiodeGrunnlag(dataTable: DataTable) =
     dataTable.mapRad { rad ->
-        VedtaksperiodeGrunnlag(
-            vedtaksperiode =
-                VedtaksperiodeDto(
+        StønadsperiodeGrunnlag(
+            stønadsperiode =
+                VedtaksperiodeBeregningsgrunnlag(
                     fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
                     tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
                     målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,

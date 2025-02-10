@@ -7,7 +7,10 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBeregningUtilsFelles.splitFraRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeBeregingsgrunnlag
+import org.springframework.stereotype.Service
 
+@Service
 class TilsynBarnBeregningServiceV2(
     private val tilsynBarnBeregningFellesService: TilsynBarnBeregningFellesService,
 ) {
@@ -21,7 +24,11 @@ class TilsynBarnBeregningServiceV2(
         }
         // TODO Valider ingen overlapp mellom vedtaksperioder?
 
-        val vedtaksperioderEtterRevurderFra = vedtaksperioder.sorted().splitFraRevurderFra(behandling.revurderFra)
+        val vedtaksperioderEtterRevurderFra =
+            vedtaksperioder
+                .tilVedtaksperiodeBeregingsgrunnlag()
+                .sorted()
+                .splitFraRevurderFra(behandling.revurderFra)
         val perioder =
             tilsynBarnBeregningFellesService.beregnAktuellePerioder(
                 behandling,

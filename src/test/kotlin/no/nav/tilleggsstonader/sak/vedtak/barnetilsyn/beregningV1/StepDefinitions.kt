@@ -33,7 +33,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregingsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -254,7 +254,10 @@ class StepDefinitions {
 
         assertThat(perioder)
             .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
-            .containsExactlyElementsOf(forventeteStønadsperioder.tilSortertStønadsperiodeBeregningsgrunnlag())
+            .containsExactlyElementsOf(
+                forventeteStønadsperioder
+                    .tilVedtaksperiodeBeregingsgrunnlag(),
+            )
     }
 
     @Så("forvent følgende stønadsperiodeGrunnlag for: {}")
