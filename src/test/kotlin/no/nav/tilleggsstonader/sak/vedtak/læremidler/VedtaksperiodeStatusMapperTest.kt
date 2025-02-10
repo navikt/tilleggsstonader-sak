@@ -29,6 +29,16 @@ class VedtaksperiodeStatusMapperTest {
     }
 
     @Test
+    fun `settVedtaksperiodeStatus returnerer tom liste hvis input er tomme lister`() {
+        val vedtaksperioderMedOppdatertStatus =
+            VedtaksperiodeStatusMapper.settStatusPåVedtaksperioder(
+                vedtaksperioder = emptyList(),
+                vedtaksperioderForrigeBehandling = emptyList(),
+            )
+        assertThat(vedtaksperioderMedOppdatertStatus.isEmpty())
+    }
+
+    @Test
     fun `vedtaksperiodeStatus blir ENDRET hvis fra-og-med-datoen har blitt endret på i revurderingen`() {
         val vedtaksperioderMedOppdatertStatus =
             VedtaksperiodeStatusMapper.settStatusPåVedtaksperioder(
