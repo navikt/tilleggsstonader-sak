@@ -1,7 +1,5 @@
-package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1
+package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.splitFraRevurderFra
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
