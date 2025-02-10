@@ -21,8 +21,6 @@ sealed interface FaktaOgVurdering : FaktaOgVurderingJson {
     }
 }
 
-sealed interface MålgruppeFaktaOgVurdering : FaktaOgVurdering
-
 sealed interface AktivitetFaktaOgVurdering : FaktaOgVurdering
 
 /**
