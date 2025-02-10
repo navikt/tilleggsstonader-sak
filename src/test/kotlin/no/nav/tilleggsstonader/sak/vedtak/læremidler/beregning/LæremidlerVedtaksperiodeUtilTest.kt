@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedta
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.splitPerLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.splitVedtaksperiodePerÅr
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -26,7 +25,7 @@ class LæremidlerVedtaksperiodeUtilTest {
     inner class SplitVedtaksperiodePerÅr {
         @Test
         fun `skal ikke splitte periode som er innenfor samme år`() {
-            val periode = Vedtaksperiode(id = UUID.randomUUID(), førsteJan2024, sisteDes2024, VedtaksperiodeStatus.NY)
+            val periode = Vedtaksperiode(fom = førsteJan2024, tom = sisteDes2024, id = UUID.randomUUID())
 
             assertThat(listOf(periode).splitVedtaksperiodePerÅr()).containsExactly(
                 VedtaksperiodeInnenforÅr(førsteJan2024, sisteDes2024),
@@ -36,8 +35,7 @@ class LæremidlerVedtaksperiodeUtilTest {
         @Test
         fun `skal splitte periode som løper over 2 år`() {
             val periode =
-                Vedtaksperiode(id = UUID.randomUUID(), sisteDes2024, sisteDes2024.plusDays(1), VedtaksperiodeStatus.NY)
-
+                Vedtaksperiode(fom = sisteDes2024, tom = sisteDes2024.plusDays(1), id = UUID.randomUUID())
             assertThat(listOf(periode).splitVedtaksperiodePerÅr()).containsExactly(
                 VedtaksperiodeInnenforÅr(sisteDes2024, sisteDes2024),
                 VedtaksperiodeInnenforÅr(sisteDes2024.plusDays(1), sisteDes2024.plusDays(1)),
@@ -47,7 +45,7 @@ class LæremidlerVedtaksperiodeUtilTest {
         @Test
         fun `skal splitte periode som løper over 3 år`() {
             val periode =
-                Vedtaksperiode(id = UUID.randomUUID(), sisteDes2024, LocalDate.of(2026, 2, 3), VedtaksperiodeStatus.NY)
+                Vedtaksperiode(fom = sisteDes2024, tom = LocalDate.of(2026, 2, 3), id = UUID.randomUUID())
 
             assertThat(listOf(periode).splitVedtaksperiodePerÅr()).containsExactly(
                 VedtaksperiodeInnenforÅr(sisteDes2024, sisteDes2024),

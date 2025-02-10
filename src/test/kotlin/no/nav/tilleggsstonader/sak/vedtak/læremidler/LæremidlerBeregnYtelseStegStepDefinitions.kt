@@ -52,7 +52,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeLæremidlerDto
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
@@ -115,7 +114,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                     id = vedtaksperiodeId,
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    status = VedtaksperiodeStatus.NY,
                 )
             }
         steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseLæremidlerRequest(vedtaksperioder))
@@ -135,7 +133,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                 VedtaksperiodeLæremidlerDto(
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    status = VedtaksperiodeStatus.NY,
                     id = UUID.randomUUID(),
                 )
             }
@@ -165,7 +162,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             Vedtaksperiode(
                 fom = perioderBeregningsresultat.minOf { it.fom },
                 tom = perioderBeregningsresultat.maxOf { it.tom },
-                status = VedtaksperiodeStatus.NY,
                 id = UUID.randomUUID(),
             )
         val vedtak =
@@ -282,7 +278,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                     id = vedtaksperiodeId,
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    status = VedtaksperiodeStatus.NY,
                 )
             }
 

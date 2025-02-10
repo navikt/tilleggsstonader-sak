@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.vedtaksperioderInnenforLøpendeMåned
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -22,14 +21,12 @@ class VedtaksperiodeUtilTest {
             id = UUID.randomUUID(),
             fom = LocalDate.of(2024, 1, 1),
             tom = LocalDate.of(2024, 1, 31),
-            status = VedtaksperiodeStatus.NY,
         )
     val vedtaksperiodeFebruar =
         Vedtaksperiode(
             id = UUID.randomUUID(),
             fom = LocalDate.of(2024, 2, 1),
             tom = LocalDate.of(2024, 2, 28),
-            status = VedtaksperiodeStatus.NY,
         )
 
     val stønadsperiodeJanTilFeb =
@@ -73,13 +70,11 @@ class VedtaksperiodeUtilTest {
                         id = UUID.randomUUID(),
                         fom = LocalDate.of(2024, 1, 15),
                         tom = LocalDate.of(2024, 2, 14),
-                        status = VedtaksperiodeStatus.NY,
                     ),
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
                         fom = LocalDate.of(2024, 2, 15),
                         tom = LocalDate.of(2024, 2, 28),
-                        status = VedtaksperiodeStatus.NY,
                     ),
                 )
             val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
@@ -120,7 +115,6 @@ class VedtaksperiodeUtilTest {
                             id = vedtaksperiodeId,
                             fom = LocalDate.of(2024, 1, 5),
                             tom = LocalDate.of(2024, 1, 10),
-                            status = VedtaksperiodeStatus.NY,
                         ),
                     ),
                     lagBeregningsgrunnlag(fom = LocalDate.of(2024, 1, 1), tom = LocalDate.of(2024, 1, 31)),
@@ -128,10 +122,9 @@ class VedtaksperiodeUtilTest {
 
             assertThat(vedtaksperioder).containsExactly(
                 Vedtaksperiode(
-                    vedtaksperiodeId,
+                    id = vedtaksperiodeId,
                     fom = LocalDate.of(2024, 1, 5),
                     tom = LocalDate.of(2024, 1, 10),
-                    status = VedtaksperiodeStatus.NY,
                 ),
             )
         }
@@ -146,7 +139,6 @@ class VedtaksperiodeUtilTest {
                             id = vedtaksperiodeId,
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 2, 29),
-                            status = VedtaksperiodeStatus.NY,
                         ),
                     ),
                     lagBeregningsgrunnlag(fom = LocalDate.of(2024, 1, 15), tom = LocalDate.of(2024, 2, 14)),
@@ -157,7 +149,6 @@ class VedtaksperiodeUtilTest {
                     id = vedtaksperiodeId,
                     fom = LocalDate.of(2024, 1, 15),
                     tom = LocalDate.of(2024, 2, 14),
-                    status = VedtaksperiodeStatus.NY,
                 ),
             )
         }
@@ -173,33 +164,29 @@ class VedtaksperiodeUtilTest {
                             id = UUID.randomUUID(),
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 1, 1),
-                            status = VedtaksperiodeStatus.NY,
                         ),
                         Vedtaksperiode(
                             id = id1,
                             fom = LocalDate.of(2024, 1, 2),
                             tom = LocalDate.of(2024, 1, 2),
-                            status = VedtaksperiodeStatus.NY,
                         ),
                         Vedtaksperiode(
                             id = id2,
                             fom = LocalDate.of(2024, 1, 3),
                             tom = LocalDate.of(2024, 1, 3),
-                            status = VedtaksperiodeStatus.NY,
                         ),
                         Vedtaksperiode(
                             id = UUID.randomUUID(),
                             fom = LocalDate.of(2024, 1, 4),
                             tom = LocalDate.of(2024, 1, 4),
-                            status = VedtaksperiodeStatus.NY,
                         ),
                     ),
                     lagBeregningsgrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 3)),
                 )
 
             assertThat(vedtaksperioder).containsExactly(
-                Vedtaksperiode(id = id1, fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 2), status = VedtaksperiodeStatus.NY),
-                Vedtaksperiode(id = id2, fom = LocalDate.of(2024, 1, 3), tom = LocalDate.of(2024, 1, 3), status = VedtaksperiodeStatus.NY),
+                Vedtaksperiode(id = id1, fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 2)),
+                Vedtaksperiode(id = id2, fom = LocalDate.of(2024, 1, 3), tom = LocalDate.of(2024, 1, 3)),
             )
         }
 

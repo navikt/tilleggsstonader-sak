@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -25,13 +24,11 @@ class OpphørValideringServiceLæremidlerTest {
     val fom = måned.atDay(1)
     val tom = måned.atEndOfMonth()
 
-    val vedtaksperiodeJanuar =
-        Vedtaksperiode(fom = fom, tom = tom, status = VedtaksperiodeStatus.NY, id = UUID.randomUUID())
+    val vedtaksperiodeJanuar = Vedtaksperiode(fom = fom, tom = tom, id = UUID.randomUUID())
     val vedtaksperiodeFebruar =
         Vedtaksperiode(
             fom = fom.plusMonths(1),
             tom = tom.plusMonths(1),
-            status = VedtaksperiodeStatus.NY,
             id = UUID.randomUUID(),
         )
 

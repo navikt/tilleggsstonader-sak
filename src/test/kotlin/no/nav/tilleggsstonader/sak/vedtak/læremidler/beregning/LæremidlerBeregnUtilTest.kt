@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -19,9 +18,8 @@ class LæremidlerBeregnUtilTest {
             listOf(
                 Vedtaksperiode(
                     id = UUID.randomUUID(),
-                    LocalDate.of(2024, 12, 5),
-                    LocalDate.of(2025, 1, 4),
-                    status = VedtaksperiodeStatus.NY,
+                    fom = LocalDate.of(2024, 12, 5),
+                    tom = LocalDate.of(2025, 1, 4),
                 ),
             )
         val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
@@ -51,9 +49,8 @@ class LæremidlerBeregnUtilTest {
                 listOf(
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
-                        LocalDate.of(2025, 2, 1),
-                        LocalDate.of(2025, 2, 2),
-                        status = VedtaksperiodeStatus.NY,
+                        fom = LocalDate.of(2025, 2, 1),
+                        tom = LocalDate.of(2025, 2, 2),
                     ),
                 )
             val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
@@ -69,9 +66,8 @@ class LæremidlerBeregnUtilTest {
                 listOf(
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
-                        LocalDate.of(2024, 1, 5),
-                        LocalDate.of(2024, 1, 15),
-                        VedtaksperiodeStatus.NY,
+                        fom = LocalDate.of(2024, 1, 5),
+                        tom = LocalDate.of(2024, 1, 15),
                     ),
                 )
             val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
@@ -91,15 +87,13 @@ class LæremidlerBeregnUtilTest {
                 listOf(
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
-                        LocalDate.of(2024, 1, 5),
-                        LocalDate.of(2024, 1, 15),
-                        VedtaksperiodeStatus.NY,
+                        fom = LocalDate.of(2024, 1, 5),
+                        tom = LocalDate.of(2024, 1, 15),
                     ),
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
-                        LocalDate.of(2024, 2, 7),
-                        LocalDate.of(2024, 3, 2),
-                        VedtaksperiodeStatus.NY,
+                        fom = LocalDate.of(2024, 2, 7),
+                        tom = LocalDate.of(2024, 3, 2),
                     ),
                 )
             val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
@@ -126,15 +120,13 @@ class LæremidlerBeregnUtilTest {
                 listOf(
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
-                        førsteJan2024,
-                        LocalDate.of(2024, 1, 5),
-                        VedtaksperiodeStatus.NY,
+                        fom = førsteJan2024,
+                        tom = LocalDate.of(2024, 1, 5),
                     ),
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
-                        LocalDate.of(2024, 1, 7),
-                        LocalDate.of(2024, 1, 7),
-                        VedtaksperiodeStatus.NY,
+                        fom = LocalDate.of(2024, 1, 7),
+                        tom = LocalDate.of(2024, 1, 7),
                     ),
                 )
             val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
@@ -154,15 +146,13 @@ class LæremidlerBeregnUtilTest {
                 listOf(
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
-                        LocalDate.of(2024, 1, 5),
-                        LocalDate.of(2024, 1, 5),
-                        VedtaksperiodeStatus.NY,
+                        fom = LocalDate.of(2024, 1, 5),
+                        tom = LocalDate.of(2024, 1, 5),
                     ),
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
-                        LocalDate.of(2024, 2, 1),
-                        LocalDate.of(2024, 2, 4),
-                        VedtaksperiodeStatus.NY,
+                        fom = LocalDate.of(2024, 2, 1),
+                        tom = LocalDate.of(2024, 2, 4),
                     ),
                 )
             val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
@@ -182,15 +172,13 @@ class LæremidlerBeregnUtilTest {
                 listOf(
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
-                        LocalDate.of(2024, 1, 5),
-                        LocalDate.of(2024, 1, 5),
-                        VedtaksperiodeStatus.NY,
+                        fom = LocalDate.of(2024, 1, 5),
+                        tom = LocalDate.of(2024, 1, 5),
                     ),
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
-                        LocalDate.of(2024, 2, 4),
-                        LocalDate.of(2024, 2, 4),
-                        VedtaksperiodeStatus.NY,
+                        fom = LocalDate.of(2024, 2, 4),
+                        tom = LocalDate.of(2024, 2, 4),
                     ),
                 )
             val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
@@ -210,15 +198,13 @@ class LæremidlerBeregnUtilTest {
                 listOf(
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
-                        LocalDate.of(2024, 1, 5),
-                        LocalDate.of(2024, 1, 5),
-                        VedtaksperiodeStatus.NY,
+                        fom = LocalDate.of(2024, 1, 5),
+                        tom = LocalDate.of(2024, 1, 5),
                     ),
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
-                        LocalDate.of(2024, 2, 1),
-                        LocalDate.of(2024, 2, 28),
-                        VedtaksperiodeStatus.NY,
+                        fom = LocalDate.of(2024, 2, 1),
+                        tom = LocalDate.of(2024, 2, 28),
                     ),
                 )
             val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()

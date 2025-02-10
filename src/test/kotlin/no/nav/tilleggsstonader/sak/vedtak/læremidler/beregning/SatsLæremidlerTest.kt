@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -17,9 +16,8 @@ class SatsLæremidlerTest {
         val periode =
             Vedtaksperiode(
                 id = UUID.randomUUID(),
-                LocalDate.of(2024, 1, 1),
-                LocalDate.of(2024, 2, 1),
-                VedtaksperiodeStatus.NY,
+                fom = LocalDate.of(2024, 1, 1),
+                tom = LocalDate.of(2024, 2, 1),
             )
         val sats =
             finnSatsForStudienivå(
@@ -34,9 +32,8 @@ class SatsLæremidlerTest {
         val periode =
             Vedtaksperiode(
                 id = UUID.randomUUID(),
-                LocalDate.of(2023, 3, 1),
-                LocalDate.of(2023, 5, 1),
-                VedtaksperiodeStatus.NY,
+                fom = LocalDate.of(2023, 3, 1),
+                tom = LocalDate.of(2023, 5, 1),
             )
         val sats =
             finnSatsForStudienivå(
@@ -51,9 +48,8 @@ class SatsLæremidlerTest {
         val periode =
             Vedtaksperiode(
                 id = UUID.randomUUID(),
-                LocalDate.of(2024, 11, 1),
-                LocalDate.of(2024, 12, 1),
-                VedtaksperiodeStatus.NY,
+                fom = LocalDate.of(2024, 11, 1),
+                tom = LocalDate.of(2024, 12, 1),
             )
         val sats =
             finnSatsForStudienivå(
@@ -68,9 +64,8 @@ class SatsLæremidlerTest {
         val periode =
             Vedtaksperiode(
                 id = UUID.randomUUID(),
-                LocalDate.of(2023, 10, 1),
-                LocalDate.of(2023, 12, 1),
-                VedtaksperiodeStatus.NY,
+                fom = LocalDate.of(2023, 10, 1),
+                tom = LocalDate.of(2023, 12, 1),
             )
         val sats =
             finnSatsForStudienivå(

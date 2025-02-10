@@ -33,7 +33,7 @@ data class VedtaksperiodeLæremidlerDto(
     val id: UUID,
     val fom: LocalDate,
     val tom: LocalDate,
-    val status: VedtaksperiodeStatus?,
+    val status: VedtaksperiodeStatus? = null,
 )
 
 enum class VedtaksperiodeStatus {
