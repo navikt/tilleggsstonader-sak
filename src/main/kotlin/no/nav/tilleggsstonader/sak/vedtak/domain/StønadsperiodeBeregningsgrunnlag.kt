@@ -38,7 +38,6 @@ fun Stønadsperiode.tilStønadsperiodeBeregningsgrunnlag() =
         aktivitet = this.aktivitet,
     )
 
-// TODO fjerne denne?
 fun List<Stønadsperiode>.tilSortertStønadsperiodeBeregningsgrunnlag() =
     this
         .map { it.tilStønadsperiodeBeregningsgrunnlag() }

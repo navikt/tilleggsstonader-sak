@@ -42,7 +42,7 @@ data class Beløpsperiode(
 data class Beregningsgrunnlag(
     val måned: YearMonth,
     val makssats: Int,
-    // TODO? Heter støndsperiodeGrunnlag for backward compatibility, men er også for vedtaksperioder
+    // TODO rename til vedtaksperiodeGrunnlag
     val stønadsperioderGrunnlag: List<StønadsperiodeGrunnlag>,
     val utgifter: List<UtgiftBarn>,
     val utgifterTotal: Int,
