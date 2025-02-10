@@ -35,4 +35,4 @@ data class VedtaksperiodeLæremidlerDto(
 
 fun List<Vedtaksperiode>.tilDto() = this.map { VedtaksperiodeLæremidlerDto(fom = it.fom, tom = it.tom) }
 
-fun List<VedtaksperiodeLæremidlerDto>.tilDomene() = this.map { Vedtaksperiode(fom = it.fom, tom = it.tom) }
+fun List<VedtaksperiodeLæremidlerDto>.tilDomene() = this.map { Vedtaksperiode(fom = it.fom, tom = it.tom) }.sorted()
