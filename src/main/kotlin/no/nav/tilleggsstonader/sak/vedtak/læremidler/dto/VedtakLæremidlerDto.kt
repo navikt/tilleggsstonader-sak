@@ -44,4 +44,4 @@ enum class VedtaksperiodeStatus {
 
 fun List<Vedtaksperiode>.tilDto() = this.map { VedtaksperiodeLæremidlerDto(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }
 
-fun List<VedtaksperiodeLæremidlerDto>.tilDomene() = this.map { Vedtaksperiode(id = it.id, fom = it.fom, tom = it.tom) }
+fun List<VedtaksperiodeLæremidlerDto>.tilDomene() = this.map { Vedtaksperiode(id = it.id, fom = it.fom, tom = it.tom) }.sorted()
