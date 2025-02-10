@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -11,14 +12,12 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
-import no.nav.tilleggsstonader.sak.util.max
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import org.springframework.stereotype.Service
@@ -111,28 +110,28 @@ class BehandlingsoversiktService(
         when (vedtak.data) {
             is InnvilgelseTilsynBarn -> vedtak.data.beregningsresultat.vedtaksperiode(revurdererFra)
             is OpphørTilsynBarn -> vedtak.data.beregningsresultat.vedtaksperiode(revurdererFra)
-            is InnvilgelseLæremidler -> vedtak.data.vedtaksperiode(revurdererFra)
             is AvslagTilsynBarn -> null
+            is InnvilgelseEllerOpphørLæremidler -> vedtak.data.vedtaksperiode(revurdererFra)
             is AvslagLæremidler -> null
-            is OpphørLæremidler -> vedtak.data.vedtaksperiode(revurdererFra)
         }
 
     private fun BeregningsresultatTilsynBarn.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {
-        val stønadsperioder = perioder.flatMap { it.grunnlag.stønadsperioderGrunnlag }.map { it.stønadsperiode }
+        val stønadsperioder =
+            perioder
+                .flatMap { it.grunnlag.stønadsperioderGrunnlag }
+                .map { it.stønadsperiode }
+                .avkortPerioderFør(revurdererFra)
         val minFom = stønadsperioder.minOfOrNull { it.fom }
         val maksTom = stønadsperioder.maxOfOrNull { it.tom }
-        return Vedtaksperiode(fom = max(minFom, revurdererFra), tom = max(maksTom, revurdererFra))
+        return Vedtaksperiode(fom = minFom, tom = maksTom)
     }
 
-    private fun InnvilgelseLæremidler.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {
-        val minFom = vedtaksperioder.minOfOrNull { it.fom }
-        val maksTom = vedtaksperioder.maxOfOrNull { it.tom }
-        return Vedtaksperiode(fom = max(minFom, revurdererFra), tom = max(maksTom, revurdererFra))
-    }
-
-    private fun OpphørLæremidler.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {
-        val minFom = vedtaksperioder.minOfOrNull { it.fom }
-        val maksTom = vedtaksperioder.maxOfOrNull { it.tom }
-        return Vedtaksperiode(fom = max(minFom, revurdererFra), tom = max(maksTom, revurdererFra))
+    private fun InnvilgelseEllerOpphørLæremidler.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {
+        val avkortedePerioder =
+            vedtaksperioder
+                .avkortPerioderFør(revurdererFra)
+        val minFom = avkortedePerioder.minOfOrNull { it.fom }
+        val maksTom = avkortedePerioder.maxOfOrNull { it.tom }
+        return Vedtaksperiode(fom = minFom, tom = maksTom)
     }
 }

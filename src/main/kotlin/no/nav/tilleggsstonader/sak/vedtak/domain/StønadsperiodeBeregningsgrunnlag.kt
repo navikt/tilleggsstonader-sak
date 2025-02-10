@@ -47,22 +47,3 @@ fun List<StønadsperiodeBeregningsgrunnlag>.slåSammenSammenhengende(): List<St�
         skalMerges = { a, b -> a.påfølgesAv(b) && a.målgruppe == b.målgruppe && a.aktivitet == b.aktivitet },
         merge = { a, b -> a.copy(tom = b.tom) },
     )
-
-/**
- * Dersom man har en lang stønadsperiode for 1.1 - 31.1 så skal den splittes opp fra revurderFra sånn at man får 2 perioder
- * Eks for revurderFra=15.1 så får man 1.1 - 14.1 og 15.1 - 31.1
- * Dette for å kunne filtrere vekk perioder som begynner før revurderFra og beregne beløp som skal utbetales i gitt måned
- */
-fun List<StønadsperiodeBeregningsgrunnlag>.splitFraRevurderFra(revurderFra: LocalDate?): List<StønadsperiodeBeregningsgrunnlag> {
-    if (revurderFra == null) return this
-    return this.flatMap {
-        if (it.fom < revurderFra && revurderFra <= it.tom) {
-            listOf(
-                it.copy(tom = revurderFra.minusDays(1)),
-                it.copy(fom = revurderFra),
-            )
-        } else {
-            listOf(it)
-        }
-    }
-}

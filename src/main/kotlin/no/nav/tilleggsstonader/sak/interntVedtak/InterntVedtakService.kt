@@ -79,7 +79,7 @@ class InterntVedtakService(
                         læremidler =
                             data.beregningsresultat
                                 .filtrerFraOgMed(behandling.revurderFra)
-                                .tilDto()
+                                .tilDto(behandling.revurderFra)
                                 .perioder,
                     )
 
