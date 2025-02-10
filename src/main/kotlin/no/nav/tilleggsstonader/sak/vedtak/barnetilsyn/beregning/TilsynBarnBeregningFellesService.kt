@@ -54,6 +54,25 @@ class TilsynBarnBeregningFellesService(
         return beregn(beregningsgrunnlag)
     }
 
+    fun finnRelevantePerioderFraForrigeVedtak(behandling: Saksbehandling): List<BeregningsresultatForMåned> =
+        behandling.forrigeBehandlingId?.let { forrigeBehandlingId ->
+            val beregningsresultat =
+                vedtakRepository
+                    .findByIdOrThrow(forrigeBehandlingId)
+                    .withTypeOrThrow<VedtakTilsynBarn>()
+                    .data
+                    .beregningsresultat()
+                    ?: error("Finner ikke beregningsresultat på vedtak for behandling=$forrigeBehandlingId")
+            val revurderFraMåned = behandling.revurderFra?.toYearMonth() ?: YEAR_MONTH_MIN
+
+            beregningsresultat.perioder.filter { it.grunnlag.måned < revurderFraMåned }
+        } ?: emptyList()
+
+    fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> =
+        vilkårperiodeRepository
+            .findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
+            .tilAktiviteter()
+
     private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<BeregningsresultatForMåned> =
         beregningsgrunnlag.map {
             val dagsats = beregnDagsats(it)
@@ -81,28 +100,6 @@ class TilsynBarnBeregningFellesService(
             )
         }
 
-    // Kopiert fra V1
-    fun finnRelevantePerioderFraForrigeVedtak(behandling: Saksbehandling): List<BeregningsresultatForMåned> =
-        behandling.forrigeBehandlingId?.let { forrigeBehandlingId ->
-            val beregningsresultat =
-                vedtakRepository
-                    .findByIdOrThrow(forrigeBehandlingId)
-                    .withTypeOrThrow<VedtakTilsynBarn>()
-                    .data
-                    .beregningsresultat()
-                    ?: error("Finner ikke beregningsresultat på vedtak for behandling=$forrigeBehandlingId")
-            val revurderFraMåned = behandling.revurderFra?.toYearMonth() ?: YEAR_MONTH_MIN
-
-            beregningsresultat.perioder.filter { it.grunnlag.måned < revurderFraMåned }
-        } ?: emptyList()
-
-    fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> =
-        vilkårperiodeRepository
-            .findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
-            .tilAktiviteter()
-
-    // Kopiert fra V1
-
     /**
      * Divide trenger en scale som gir antall desimaler på resultatet fra divideringen
      * Sånn sett blir `setScale(2, RoundingMode.HALF_UP)` etteråt unødvendig
@@ -121,7 +118,6 @@ class TilsynBarnBeregningFellesService(
             .setScale(2, RoundingMode.HALF_UP)
     }
 
-    // Kopiert fra V1
     fun beregnBeløp(
         dagsats: BigDecimal,
         antallDager: Int,
