@@ -13,7 +13,7 @@ data class Vedtaksperiode(
     val id: UUID,
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val status: VedtaksperiodeStatus,
+    val status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
 ) : Periode<LocalDate>,
     KopierPeriode<Vedtaksperiode> {
     init {

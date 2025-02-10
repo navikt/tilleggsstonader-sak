@@ -33,7 +33,7 @@ data class VedtaksperiodeLæremidlerDto(
     val id: UUID,
     val fom: LocalDate,
     val tom: LocalDate,
-    val status: VedtaksperiodeStatus,
+    val status: VedtaksperiodeStatus?,
 )
 
 enum class VedtaksperiodeStatus {
@@ -44,4 +44,4 @@ enum class VedtaksperiodeStatus {
 
 fun List<Vedtaksperiode>.tilDto() = this.map { VedtaksperiodeLæremidlerDto(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }
 
-fun List<VedtaksperiodeLæremidlerDto>.tilDomene() = this.map { Vedtaksperiode(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }
+fun List<VedtaksperiodeLæremidlerDto>.tilDomene() = this.map { Vedtaksperiode(id = it.id, fom = it.fom, tom = it.tom) }
