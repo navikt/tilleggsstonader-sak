@@ -162,11 +162,6 @@ class LæremidlerBeregnYtelseSteg(
         val avkortetBeregningsresultat = avkortBeregningsresultatVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
         val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
 
-        opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
-            forrigeBeregningsresultat = forrigeVedtak.data.beregningsresultat.perioder,
-            revurderFraDato = saksbehandling.revurderFra,
-        )
-
         opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
             forrigeBehandlingsVedtaksperioder = forrigeVedtak.data.vedtaksperioder,
             revurderFraDato = saksbehandling.revurderFra,
