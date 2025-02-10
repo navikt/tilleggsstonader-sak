@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 
-object BeregningsgrunnlagUtilsFelles {
+object BeregningsgrunnlagUtils {
     fun lagBeregningsgrunnlagPerMåned(
         perioder: List<VedtaksperiodeBeregningsgrunnlag>,
         aktiviteter: List<Aktivitet>,

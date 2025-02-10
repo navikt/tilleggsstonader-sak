@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningU
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import java.time.LocalDate
 
-object TilsynBarnBeregningValideringUtilFelles {
+object TilsynBarnBeregningValideringUtil {
     fun validerPerioderForInnvilgelse(
         perioder: List<VedtaksperiodeBeregningsgrunnlag>,
         aktiviteter: List<Aktivitet>,

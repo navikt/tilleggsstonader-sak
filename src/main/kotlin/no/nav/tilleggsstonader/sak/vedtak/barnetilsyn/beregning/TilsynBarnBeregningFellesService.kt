@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøn
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningValideringUtilFelles.validerPerioderForInnvilgelse
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningValideringUtil.validerPerioderForInnvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtilsFelles.brukBeregningsgrunnlagFraOgMedRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
@@ -48,7 +48,7 @@ class TilsynBarnBeregningFellesService(
         validerPerioderForInnvilgelse(vedtaksperiodeBeregningsgrunnlag, aktiviteter, utgifterPerBarn, typeVedtak, behandling.revurderFra)
 
         val beregningsgrunnlag =
-            BeregningsgrunnlagUtilsFelles
+            BeregningsgrunnlagUtils
                 .lagBeregningsgrunnlagPerMåned(vedtaksperiodeBeregningsgrunnlag, aktiviteter, utgifterPerBarn)
                 .brukBeregningsgrunnlagFraOgMedRevurderFra(behandling.revurderFra)
         return beregn(beregningsgrunnlag)
