@@ -8,78 +8,54 @@ import java.time.LocalDate
 import java.util.UUID
 
 class VedtaksperiodeStatusMapperTest {
+    val førsteJan: LocalDate = LocalDate.of(2024, 1, 1)
+    val trettiførsteJan: LocalDate = LocalDate.of(2024, 1, 31)
+    val dummyVedtaksperiode =
+        Vedtaksperiode(
+            id = UUID.randomUUID(),
+            fom = førsteJan,
+            tom = trettiførsteJan,
+        )
+
     @Test
-    fun `vedtaksperiodeStatus blir NY hvis førstegangsbehandling`() {
-        val vedtaksperiodeId = UUID.randomUUID()
-        val vedtaksperioder =
-            listOf(
-                Vedtaksperiode(
-                    vedtaksperiodeId,
-                    LocalDate.of(2024, 1, 1),
-                    LocalDate.of(2024, 1, 31),
-                    VedtaksperiodeStatus.NY,
-                ),
+    fun `vedtaksperiodeStatus blir NY i førstegangsbehandling`() {
+        val vedtaksperioder = listOf(dummyVedtaksperiode)
+        val vedtaksperioderMedOppdatertStatus =
+            VedtaksperiodeStatusMapper.settStatusPåVedtaksperioder(
+                vedtaksperioder = vedtaksperioder,
+                vedtaksperioderForrigeBehandling = null,
             )
-        val vedtaksperioderMedOppdatertStatus = VedtaksperiodeStatusMapper.settStatusPåVedtaksperioder(vedtaksperioder, null)
         assertThat(vedtaksperioderMedOppdatertStatus.single().status).isEqualTo(VedtaksperiodeStatus.NY)
     }
 
     @Test
-    fun `vedtaksperiodeStatus blir ENDRET hvis vedtaksperioden har blitt endret i revurdering`() {
-        val vedtaksperiodeId = UUID.randomUUID()
-        val forrigeVedtaksperioder =
-            listOf(
-                Vedtaksperiode(
-                    vedtaksperiodeId,
-                    LocalDate.of(2024, 1, 1),
-                    LocalDate.of(2024, 1, 31),
-                    VedtaksperiodeStatus.NY,
-                ),
-            )
-        val endretVedtaksperioder =
-            listOf(
-                Vedtaksperiode(
-                    vedtaksperiodeId,
-                    LocalDate.of(2024, 1, 5),
-                    LocalDate.of(2024, 1, 31),
-                    VedtaksperiodeStatus.NY,
-                ),
-            )
-
+    fun `vedtaksperiodeStatus blir ENDRET hvis fra-og-med-datoen har blitt endret på i revurderingen`() {
         val vedtaksperioderMedOppdatertStatus =
             VedtaksperiodeStatusMapper.settStatusPåVedtaksperioder(
-                endretVedtaksperioder,
-                forrigeVedtaksperioder,
+                vedtaksperioder = listOf(dummyVedtaksperiode),
+                vedtaksperioderForrigeBehandling =
+                    listOf(dummyVedtaksperiode.copy(fom = førsteJan.plusDays(1))),
             )
         assertThat(vedtaksperioderMedOppdatertStatus.single().status).isEqualTo(VedtaksperiodeStatus.ENDRET)
     }
 
     @Test
-    fun `vedtaksperiodeStatus blir UENDRET hvis vedtaksperioden har ikke blitt endret i revurdering`() {
-        val vedtaksperiodeId = UUID.randomUUID()
-        val forrigeVedtaksperioder =
-            listOf(
-                Vedtaksperiode(
-                    vedtaksperiodeId,
-                    LocalDate.of(2024, 1, 1),
-                    LocalDate.of(2024, 1, 31),
-                    VedtaksperiodeStatus.NY,
-                ),
-            )
-        val endretVedtaksperioder =
-            listOf(
-                Vedtaksperiode(
-                    vedtaksperiodeId,
-                    LocalDate.of(2024, 1, 1),
-                    LocalDate.of(2024, 1, 31),
-                    VedtaksperiodeStatus.NY,
-                ),
-            )
-
+    fun `vedtaksperiodeStatus blir ENDRET hvis til-og-med-datoen har blitt endret på i revurderingen`() {
         val vedtaksperioderMedOppdatertStatus =
             VedtaksperiodeStatusMapper.settStatusPåVedtaksperioder(
-                endretVedtaksperioder,
-                forrigeVedtaksperioder,
+                vedtaksperioder = listOf(dummyVedtaksperiode),
+                vedtaksperioderForrigeBehandling =
+                    listOf(dummyVedtaksperiode.copy(tom = trettiførsteJan.plusMonths(1))),
+            )
+        assertThat(vedtaksperioderMedOppdatertStatus.single().status).isEqualTo(VedtaksperiodeStatus.ENDRET)
+    }
+
+    @Test
+    fun `vedtaksperiodeStatus blir UENDRET hvis vedtaksperiodene ikke ahr blitt endret på i revurderingen`() {
+        val vedtaksperioderMedOppdatertStatus =
+            VedtaksperiodeStatusMapper.settStatusPåVedtaksperioder(
+                vedtaksperioder = listOf(dummyVedtaksperiode),
+                vedtaksperioderForrigeBehandling = listOf(dummyVedtaksperiode),
             )
 
         assertThat(vedtaksperioderMedOppdatertStatus.single().status).isEqualTo(VedtaksperiodeStatus.UENDRET)
