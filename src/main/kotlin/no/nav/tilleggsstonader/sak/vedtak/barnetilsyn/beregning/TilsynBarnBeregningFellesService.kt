@@ -183,8 +183,7 @@ class TilsynBarnBeregningFellesService(
     ): List<Aktivitet> =
         aktiviteter[vedtaksperiode.aktivitet]?.filter { it.overlapper(vedtaksperiode) }
             ?: error(
-                // TODO ny feilmelding
-                "Finnes ingen aktiviteter av type ${vedtaksperiode.aktivitet} som passer med stønadsperiode med fom=${vedtaksperiode.fom} og tom=${vedtaksperiode.tom}",
+                "Finnes ingen aktiviteter av type ${vedtaksperiode.aktivitet} som passer med vedtaksperiode med fom=${vedtaksperiode.fom} og tom=${vedtaksperiode.tom}",
             )
 
     private fun antallDager(
