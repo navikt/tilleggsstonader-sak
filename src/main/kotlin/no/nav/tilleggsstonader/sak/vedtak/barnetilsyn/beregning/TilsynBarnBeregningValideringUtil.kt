@@ -12,29 +12,12 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFraMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import java.time.LocalDate
 
 object TilsynBarnBeregningValideringUtil {
     fun validerPerioderForInnvilgelse(
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
-        aktiviteter: List<Aktivitet>,
-        utgifter: Map<BarnId, List<UtgiftBeregning>>,
-        typeVedtak: TypeVedtak,
-        revurderFra: LocalDate?,
-    ) {
-        if (typeVedtak == TypeVedtak.OPPHØR) {
-            return
-        }
-        validerStønadsperioder(stønadsperioder)
-        validerAktiviteter(aktiviteter)
-        validerUtgifter(utgifter)
-        validerOverlappendePeriodeOgUtgiftEtterRevurderFra(stønadsperioder, utgifter, revurderFra)
-    }
-
-    fun validerPerioderForInnvilgelseV2(
-        vedtaksperioder: List<VedtaksperiodeDto>,
+        vedtaksperioder: List<Vedtaksperiode>,
         aktiviteter: List<Aktivitet>,
         utgifter: Map<BarnId, List<UtgiftBeregning>>,
         typeVedtak: TypeVedtak,
@@ -83,13 +66,7 @@ object TilsynBarnBeregningValideringUtil {
         }
     }
 
-    private fun validerStønadsperioder(stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>) {
-        brukerfeilHvis(stønadsperioder.isEmpty()) {
-            "Kan ikke innvilge når det ikke finnes noen overlappende målgruppe og aktivitet"
-        }
-    }
-
-    private fun validerVedtaksperioder(vedtaksperioder: List<VedtaksperiodeDto>) {
+    private fun validerVedtaksperioder(vedtaksperioder: List<Vedtaksperiode>) {
         brukerfeilHvis(vedtaksperioder.isEmpty()) {
             "Kan ikke innvilge når det ikke finnes noen vedtaksperioder"
         }

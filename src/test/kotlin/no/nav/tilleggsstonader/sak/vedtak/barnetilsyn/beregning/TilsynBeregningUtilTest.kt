@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningU
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFraMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.tilVedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -41,7 +41,7 @@ class TilsynBeregningUtilTest {
                 val stønadsperioder =
                     listOf(
                         stønadsperiode,
-                    ).tilSortertStønadsperiodeBeregningsgrunnlag()
+                    ).tilVedtaksperiode().sorted()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 
@@ -58,7 +58,7 @@ class TilsynBeregningUtilTest {
                         tom = LocalDate.of(2024, 3, 31),
                     )
 
-                val stønadsperioder = listOf(stønadsperiode).tilSortertStønadsperiodeBeregningsgrunnlag()
+                val stønadsperioder = listOf(stønadsperiode).tilVedtaksperiode().sorted()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 
@@ -93,7 +93,7 @@ class TilsynBeregningUtilTest {
                     listOf(
                         stønadsperiode1,
                         stønadsperiode2,
-                    ).tilSortertStønadsperiodeBeregningsgrunnlag()
+                    ).tilVedtaksperiode().sorted()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 
@@ -125,7 +125,7 @@ class TilsynBeregningUtilTest {
                     listOf(
                         stønadsperiode1,
                         stønadsperiode2,
-                    ).tilSortertStønadsperiodeBeregningsgrunnlag()
+                    ).tilVedtaksperiode().sorted()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 
