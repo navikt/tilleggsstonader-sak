@@ -109,3 +109,20 @@ data class VurderingDekketAvAnnetRegelverk private constructor(
             }
     }
 }
+
+data class VurderingAldersVilkårOppfylt constructor(
+    override val svar: SvarJaNei?,
+    override val resultat: ResultatDelvilkårperiode,
+) : Vurdering {
+    constructor(svar: SvarJaNei?) : this(svar, utledResultat(svar))
+
+    companion object {
+        private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =
+            when (svar) {
+                null -> ResultatDelvilkårperiode.IKKE_VURDERT
+                SvarJaNei.JA -> ResultatDelvilkårperiode.OPPFYLT
+                SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+                SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingAldersVilkårOppfylt::class.simpleName}")
+            }
+    }
+}
