@@ -209,8 +209,10 @@ class TotrinnskontrollService(
      */
     private fun finnStatusForVedtakSomErFattet(behandlingId: BehandlingId): StatusTotrinnskontrollDto {
         val totrinnskontroll =
-            totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
-                ?: return StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
+            totrinnskontrollRepository.findTopByBehandlingIdAndStatusNotOrderBySporbarEndretEndretTidDesc(
+                behandlingId,
+                TotrinnInternStatus.ANGRET,
+            ) ?: return StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
         return when (totrinnskontroll.status) {
             TotrinnInternStatus.UNDERKJENT -> {
                 val beslutter = totrinnskontroll.beslutter
@@ -230,7 +232,6 @@ class TotrinnskontrollService(
                 )
             }
 
-            TotrinnInternStatus.ANGRET -> StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
             else ->
                 error(
                     "Skal ikke kunne være annen status enn UNDERKJENT når " +
