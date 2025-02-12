@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling.historikk
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
@@ -154,7 +153,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
             behandling = behandling,
             opprettetAv = "A",
             endretTid = osloNow(),
-            steg = StegType.SEND_TIL_BESLUTTER
+            steg = StegType.SEND_TIL_BESLUTTER,
         )
 
         insert(
@@ -163,7 +162,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
             endretTid = osloNow().plusDays(1),
             steg = StegType.BESLUTTE_VEDTAK,
             utfall = StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT,
-            metadata = mapOf("begrunnelse" to "begrunnelse")
+            metadata = mapOf("begrunnelse" to "begrunnelse"),
         )
 
         insert(
@@ -171,7 +170,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
             opprettetAv = "A",
             endretTid = osloNow().plusDays(2),
             steg = StegType.SEND_TIL_BESLUTTER,
-            metadata = mapOf("kommentarTilBeslutter" to "kommentar")
+            metadata = mapOf("kommentarTilBeslutter" to "kommentar"),
         )
 
         val historikkFørSletting =
@@ -180,7 +179,6 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
         assertThat(historikkFørSletting).anySatisfy { it.metadata?.containsKey("kommentarTilBeslutter") }
         assertThat(historikkFørSletting).anySatisfy { it.metadata?.containsKey("begrunnelse") }
 
-
         behandlingshistorikkService.slettFritekstMetadataVedFerdigstillelse(behandling.id)
         val historikk = behandlingshistorikkService.finnHendelseshistorikk(saksbehandling(behandling = behandling))
 
@@ -188,7 +186,6 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
 
         historikk.mapNotNull { it.metadata }.forEach { metadata ->
             assertThat(metadata).doesNotContainKeys("kommentarTilBeslutter", "begrunnelse")
-
         }
     }
 

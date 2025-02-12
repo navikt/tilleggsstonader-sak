@@ -27,7 +27,6 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
@@ -106,7 +105,7 @@ internal class TotrinnskontrollServiceTest {
         assertThatThrownBy {
             totrinnskontrollService.sendtilBeslutter(
                 saksbehandling(status = BehandlingStatus.UTREDES),
-                SendTilBeslutterRequest()
+                SendTilBeslutterRequest(),
             )
         }.hasMessage("Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status=KAN_FATTE_VEDTAK")
     }
@@ -188,10 +187,10 @@ internal class TotrinnskontrollServiceTest {
     @Test
     internal fun `skal returnere TOTRINNSKONTROLL_UNDERKJENT når behandlingen UTREDES og vedtak er underkjent`() {
         mockFinnSisteTotrinnskontrollUtenomAngret() returns
-                totrinnskontrollMedbeslutterAArsakogBegrunnelse(
-                    opprettetAv = saksbehandler,
-                    beslutter = beslutter,
-                )
+            totrinnskontrollMedbeslutterAArsakogBegrunnelse(
+                opprettetAv = saksbehandler,
+                beslutter = beslutter,
+            )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
 
@@ -207,10 +206,10 @@ internal class TotrinnskontrollServiceTest {
     internal fun `skal returnere KAN_FATTE_VEDTAK i gitt situasjon`() {
         every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.FATTER_VEDTAK)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
-                totrinnskontroll(
-                    opprettetAv = "Annen saksbehandler",
-                    status = TotrinnInternStatus.GODKJENT,
-                )
+            totrinnskontroll(
+                opprettetAv = "Annen saksbehandler",
+                status = TotrinnInternStatus.GODKJENT,
+            )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
 
@@ -225,7 +224,7 @@ internal class TotrinnskontrollServiceTest {
     internal fun `skal returnere IKKE_AUTORISERT i gitt situasjon`() {
         every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.FATTER_VEDTAK)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
-                totrinnskontroll(opprettetAv = beslutter)
+            totrinnskontroll(opprettetAv = beslutter)
 
         val totrinnskontroll =
             testWithBrukerContext(beslutter) {
@@ -241,10 +240,10 @@ internal class TotrinnskontrollServiceTest {
         every { tilgangService.harTilgangTilRolle(any()) } returns false
         every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.FATTER_VEDTAK)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
-                totrinnskontroll(
-                    status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
-                    opprettetAv = "Annen saksbehandler",
-                )
+            totrinnskontroll(
+                status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
+                opprettetAv = "Annen saksbehandler",
+            )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
 
@@ -256,10 +255,10 @@ internal class TotrinnskontrollServiceTest {
     @Test
     internal fun `skal kaste feil når behandlingstatus er UTREDES og utfall er GODKJENT`() {
         mockFinnSisteTotrinnskontrollUtenomAngret() returns
-                totrinnskontroll(
-                    opprettetAv = "Annen saksbehandler",
-                    status = TotrinnInternStatus.GODKJENT,
-                )
+            totrinnskontroll(
+                opprettetAv = "Annen saksbehandler",
+                status = TotrinnInternStatus.GODKJENT,
+            )
 
         assertThatThrownBy {
             totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
@@ -269,10 +268,10 @@ internal class TotrinnskontrollServiceTest {
     @Test
     internal fun `skal returnere begrunnelse og årsaker underkjent når vedtak er underkjent`() {
         mockFinnSisteTotrinnskontrollUtenomAngret() returns
-                totrinnskontrollMedbeslutterAArsakogBegrunnelse(
-                    opprettetAv = "Noe",
-                    beslutter = "Noen annen",
-                )
+            totrinnskontrollMedbeslutterAArsakogBegrunnelse(
+                opprettetAv = "Noe",
+                beslutter = "Noen annen",
+            )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
 
