@@ -122,7 +122,7 @@ data class VurderingAldersVilkårOppfylt constructor(
                 null -> ResultatDelvilkårperiode.IKKE_VURDERT
                 SvarJaNei.JA -> ResultatDelvilkårperiode.OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
-                SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingAldersVilkårOppfylt::class.simpleName}")
+                SvarJaNei.JA_IMPLISITT -> ResultatDelvilkårperiode.OPPFYLT
             }
     }
 }
