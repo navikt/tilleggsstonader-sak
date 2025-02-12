@@ -11,12 +11,12 @@ sealed interface DekketAvAnnetRegelverkVurdering : VurderingerMålgruppe {
 }
 
 sealed interface AldersvilkårOppfyltVurdering : VurderingerMålgruppe {
-    val aldersvilkårOppfyltVurdering: VurderingAldersVilkårOppfylt
+    val aldersvilkårOppfylt: VurderingAldersVilkårOppfylt
 }
 
 data class VurderingAAP(
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
-    override val aldersvilkårOppfyltVurdering: VurderingAldersVilkårOppfylt,
+    override val aldersvilkårOppfylt: VurderingAldersVilkårOppfylt,
 ) : MedlemskapVurdering,
     DekketAvAnnetRegelverkVurdering,
     AldersvilkårOppfyltVurdering {
@@ -26,7 +26,7 @@ data class VurderingAAP(
 data class VurderingUføretrygd(
     override val medlemskap: VurderingMedlemskap,
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
-    override val aldersvilkårOppfyltVurdering: VurderingAldersVilkårOppfylt,
+    override val aldersvilkårOppfylt: VurderingAldersVilkårOppfylt,
 ) : MedlemskapVurdering,
     DekketAvAnnetRegelverkVurdering,
     AldersvilkårOppfyltVurdering
@@ -34,18 +34,18 @@ data class VurderingUføretrygd(
 data class VurderingNedsattArbeidsevne(
     override val medlemskap: VurderingMedlemskap,
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
-    override val aldersvilkårOppfyltVurdering: VurderingAldersVilkårOppfylt,
+    override val aldersvilkårOppfylt: VurderingAldersVilkårOppfylt,
 ) : MedlemskapVurdering,
     DekketAvAnnetRegelverkVurdering,
     AldersvilkårOppfyltVurdering
 
 data class VurderingOmstillingsstønad(
     override val medlemskap: VurderingMedlemskap,
-    override val aldersvilkårOppfyltVurdering: VurderingAldersVilkårOppfylt,
+    override val aldersvilkårOppfylt: VurderingAldersVilkårOppfylt,
 ) : MedlemskapVurdering,
     AldersvilkårOppfyltVurdering
 
 data object VurderingOvergangsstønad : MedlemskapVurdering, AldersvilkårOppfyltVurdering {
     override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
-    override val aldersvilkårOppfyltVurdering: VurderingAldersVilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT)
+    override val aldersvilkårOppfylt: VurderingAldersVilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT)
 }

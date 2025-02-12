@@ -183,7 +183,7 @@ private fun mapMålgruppeBarnetilsyn(
                 vurderinger =
                     VurderingOmstillingsstønad(
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                     ),
             )
         }
@@ -197,7 +197,7 @@ private fun mapMålgruppeBarnetilsyn(
                 vurderinger =
                     VurderingAAP(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
-                        aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                     ),
             )
         }
@@ -208,7 +208,7 @@ private fun mapMålgruppeBarnetilsyn(
                     VurderingUføretrygd(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                     ),
             )
         }
@@ -219,7 +219,7 @@ private fun mapMålgruppeBarnetilsyn(
                     VurderingNedsattArbeidsevne(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                     ),
             )
         }
@@ -239,7 +239,7 @@ private fun mapMålgruppeLæremidler(
                 vurderinger =
                     VurderingOmstillingsstønad(
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                     ),
             )
         }
@@ -253,7 +253,7 @@ private fun mapMålgruppeLæremidler(
                 vurderinger =
                     VurderingAAP(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
-                        aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                     ),
             )
         }
@@ -264,7 +264,7 @@ private fun mapMålgruppeLæremidler(
                     VurderingUføretrygd(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                     ),
             )
         }
@@ -275,7 +275,7 @@ private fun mapMålgruppeLæremidler(
                     VurderingNedsattArbeidsevne(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                     ),
             )
         }

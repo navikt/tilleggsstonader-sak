@@ -85,7 +85,7 @@ object VilkårperiodeTestUtil {
                     vurderinger =
                         VurderingOmstillingsstønad(
                             medlemskap = medlemskap,
-                            aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                         ),
                 )
 
@@ -95,7 +95,7 @@ object VilkårperiodeTestUtil {
                     vurderinger =
                         VurderingAAP(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
-                            aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                         ),
                 )
 
@@ -105,7 +105,7 @@ object VilkårperiodeTestUtil {
                         VurderingUføretrygd(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
-                            aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                         ),
                 )
 
@@ -115,7 +115,7 @@ object VilkårperiodeTestUtil {
                         VurderingNedsattArbeidsevne(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
-                            aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                         ),
                 )
 

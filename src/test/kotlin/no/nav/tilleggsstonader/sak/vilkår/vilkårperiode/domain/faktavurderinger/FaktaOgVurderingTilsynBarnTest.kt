@@ -43,7 +43,7 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                         ),
                 )
 
@@ -58,7 +58,7 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
-                            aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                         ),
                 )
 
@@ -73,7 +73,7 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
-                            aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                         ),
                 )
 
@@ -88,7 +88,7 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                         ),
                 )
 

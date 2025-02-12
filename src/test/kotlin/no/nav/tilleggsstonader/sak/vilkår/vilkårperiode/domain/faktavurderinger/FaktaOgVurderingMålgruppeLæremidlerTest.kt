@@ -36,7 +36,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                         ),
                 )
 
@@ -51,7 +51,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
-                            aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                         ),
                 )
 
@@ -66,7 +66,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
-                            aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                         ),
                 )
 
@@ -81,7 +81,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkårOppfylt = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                         ),
                 )
 

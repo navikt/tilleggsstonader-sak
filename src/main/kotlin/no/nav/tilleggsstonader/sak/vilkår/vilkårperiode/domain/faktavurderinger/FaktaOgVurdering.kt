@@ -76,7 +76,7 @@ sealed interface Vurderinger {
             resultater.add(harRettTilUtstyrsstipend.resultat)
         }
         if (this is AldersvilkårOppfyltVurdering) {
-            resultater.add(aldersvilkårOppfyltVurdering.resultat)
+            resultater.add(aldersvilkårOppfylt.resultat)
         }
         return resultater
     }

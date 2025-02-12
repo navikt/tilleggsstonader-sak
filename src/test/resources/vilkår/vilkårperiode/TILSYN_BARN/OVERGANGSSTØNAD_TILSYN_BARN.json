@@ -2,7 +2,7 @@
   "type": "OVERGANGSSTØNAD_TILSYN_BARN",
   "fakta": {},
   "vurderinger": {
-    "aldersvilkårOppfyltVurdering": {
+    "aldersvilkårOppfylt": {
       "resultat":"OPPFYLT",
       "svar":"JA_IMPLISITT"
     },
