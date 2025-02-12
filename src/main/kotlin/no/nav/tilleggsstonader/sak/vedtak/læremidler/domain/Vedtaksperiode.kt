@@ -9,7 +9,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 data class Vedtaksperiode(
-    val id: UUID,
+    val id: UUID = UUID.randomUUID(),
     override val fom: LocalDate,
     override val tom: LocalDate,
     val status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
