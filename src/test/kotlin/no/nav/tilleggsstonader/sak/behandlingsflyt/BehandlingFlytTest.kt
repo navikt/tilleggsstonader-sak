@@ -77,7 +77,6 @@ class BehandlingFlytTest(
     @Autowired val vilkårperiodeService: VilkårperiodeService,
     @Autowired val stønadsperiodeService: StønadsperiodeService,
     @Autowired val simuleringStegService: SimuleringStegService,
-    @Autowired val behandlingshistorikkRepository: BehandlingshistorikkRepository,
 ) : IntegrationTest() {
     val personIdent = FnrGenerator.generer(år = 2000)
 
