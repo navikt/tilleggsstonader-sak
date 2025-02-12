@@ -239,7 +239,7 @@ private fun mapMålgruppeLæremidler(
                 vurderinger =
                     VurderingOmstillingsstønad(
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkårOppfyltVurdering = VurderingAldersVilkårOppfylt(SvarJaNei.JA_IMPLISITT),
                     ),
             )
         }
