@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.historikk
 
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -11,6 +13,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.tilHendelseshisto
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -142,27 +145,77 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
         assertThat(siste!!.opprettetAvNavn).isEqualTo("B")
     }
 
+    @Test
+    internal fun `skal slette fritekst metadata ved ferdigstillelse`() {
+        val fagsak = testoppsettService.lagreFagsak(fagsak())
+        val behandling = testoppsettService.lagre(behandling(fagsak))
+
+        insert(
+            behandling = behandling,
+            opprettetAv = "A",
+            endretTid = osloNow(),
+            steg = StegType.SEND_TIL_BESLUTTER
+        )
+
+        insert(
+            behandling = behandling,
+            opprettetAv = "A",
+            endretTid = osloNow().plusDays(1),
+            steg = StegType.BESLUTTE_VEDTAK,
+            utfall = StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT,
+            metadata = mapOf("begrunnelse" to "begrunnelse")
+        )
+
+        insert(
+            behandling = behandling,
+            opprettetAv = "A",
+            endretTid = osloNow().plusDays(2),
+            steg = StegType.SEND_TIL_BESLUTTER,
+            metadata = mapOf("kommentarTilBeslutter" to "kommentar")
+        )
+
+        val historikkFørSletting =
+            behandlingshistorikkService.finnHendelseshistorikk(saksbehandling(behandling = behandling))
+
+        assertThat(historikkFørSletting).anySatisfy { it.metadata?.containsKey("kommentarTilBeslutter") }
+        assertThat(historikkFørSletting).anySatisfy { it.metadata?.containsKey("begrunnelse") }
+
+
+        behandlingshistorikkService.slettFritekstMetadataVedFerdigstillelse(behandling.id)
+        val historikk = behandlingshistorikkService.finnHendelseshistorikk(saksbehandling(behandling = behandling))
+
+        assertThat(historikk).hasSameSizeAs(historikkFørSletting)
+
+        historikk.mapNotNull { it.metadata }.forEach { metadata ->
+            assertThat(metadata).doesNotContainKeys("kommentarTilBeslutter", "begrunnelse")
+
+        }
+    }
+
     private fun insert(
         behandling: Behandling,
         endretTid: LocalDateTime,
         utfall: StegUtfall? = null,
     ) {
-        insert(behandling, "opprettetAv", endretTid, utfall)
+        insert(behandling, "opprettetAv", endretTid, utfall = utfall)
     }
 
     private fun insert(
         behandling: Behandling,
         opprettetAv: String,
         endretTid: LocalDateTime,
+        steg: StegType = behandling.steg,
         utfall: StegUtfall? = null,
+        metadata: Map<String, Any>? = null,
     ) {
         behandlingshistorikkRepository.insert(
             Behandlingshistorikk(
                 behandlingId = behandling.id,
-                steg = behandling.steg,
+                steg = steg,
                 utfall = utfall,
                 opprettetAvNavn = opprettetAv,
                 endretTid = endretTid,
+                metadata = metadata?.let { JsonWrapper(objectMapper.writeValueAsString(metadata)) },
             ),
         )
     }
