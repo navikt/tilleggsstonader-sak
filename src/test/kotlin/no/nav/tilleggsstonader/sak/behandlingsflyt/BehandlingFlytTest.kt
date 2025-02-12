@@ -17,6 +17,8 @@ import no.nav.tilleggsstonader.sak.behandling.TestBehandlingRequest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
+import no.nav.tilleggsstonader.sak.behandling.historikk.domain.tilJson
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
@@ -76,6 +78,7 @@ class BehandlingFlytTest(
     @Autowired val vilkårperiodeService: VilkårperiodeService,
     @Autowired val stønadsperiodeService: StønadsperiodeService,
     @Autowired val simuleringStegService: SimuleringStegService,
+    @Autowired val behandlingshistorikkRepository: BehandlingshistorikkRepository,
 ) : IntegrationTest() {
     val personIdent = FnrGenerator.generer(år = 2000)
 
@@ -144,6 +147,7 @@ class BehandlingFlytTest(
         somBeslutter {
             godkjennTotrinnskontroll(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
+            assertFritekstHistorikkSlettet(behandlingId)
         }
 
         verifiserBehandlingIverksettes(behandlingId)
@@ -393,6 +397,20 @@ class BehandlingFlytTest(
     ) {
         with(totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId)) {
             assertThat(status).isEqualTo(expectedStatus)
+        }
+    }
+
+    private fun assertFritekstHistorikkSlettet(behandlingId: BehandlingId) {
+        val historikk = behandlingshistorikkRepository.findByBehandlingIdOrderByEndretTidDesc(behandlingId)
+
+        historikk.forEach { historikkElement ->
+            val metadata = historikkElement.metadata?.tilJson()
+            if (historikkElement.steg == StegType.SEND_TIL_BESLUTTER) {
+                assertThat(metadata).doesNotContainKey("kommentarSettPåVent")
+            }
+            if (historikkElement.steg == StegType.BESLUTTE_VEDTAK) {
+                assertThat(metadata).doesNotContainKey("begrunnelse")
+            }
         }
     }
 

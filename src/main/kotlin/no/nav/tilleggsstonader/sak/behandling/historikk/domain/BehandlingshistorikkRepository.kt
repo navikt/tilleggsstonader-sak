@@ -21,4 +21,9 @@ interface BehandlingshistorikkRepository :
         behandlingId: BehandlingId,
         steg: StegType,
     ): Behandlingshistorikk?
+
+    fun findByBehandlingIdAndStegIn(
+        behandlingId: BehandlingId,
+        steg: List<StegType>,
+    ): List<Behandlingshistorikk>
 }
