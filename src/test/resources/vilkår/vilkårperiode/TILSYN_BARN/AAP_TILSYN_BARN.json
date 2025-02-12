@@ -2,6 +2,10 @@
   "type": "AAP_TILSYN_BARN",
   "fakta": {},
   "vurderinger": {
+    "aldersvilkårOppfyltVurdering": {
+      "resultat":"OPPFYLT",
+      "svar":"JA_IMPLISITT"
+    },
     "dekketAvAnnetRegelverk": {
       "svar": "NEI",
       "resultat": "OPPFYLT"

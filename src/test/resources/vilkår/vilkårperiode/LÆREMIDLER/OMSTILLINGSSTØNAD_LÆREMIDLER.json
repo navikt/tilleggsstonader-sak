@@ -2,6 +2,10 @@
   "type": "OMSTILLINGSSTØNAD_LÆREMIDLER",
   "fakta": {},
   "vurderinger": {
+    "aldersvilkårOppfyltVurdering": {
+      "resultat":"OPPFYLT",
+      "svar":"JA_IMPLISITT"
+    },
     "medlemskap": {
       "svar": "JA",
       "resultat": "OPPFYLT"

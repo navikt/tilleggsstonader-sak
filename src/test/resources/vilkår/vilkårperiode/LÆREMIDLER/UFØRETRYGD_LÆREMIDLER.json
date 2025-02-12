@@ -2,6 +2,10 @@
   "type": "UFØRETRYGD_LÆREMIDLER",
   "fakta": {},
   "vurderinger": {
+    "aldersvilkårOppfyltVurdering": {
+      "resultat":"OPPFYLT",
+      "svar":"JA_IMPLISITT"
+    },
     "dekketAvAnnetRegelverk": {
       "svar": "NEI",
       "resultat": "OPPFYLT"
