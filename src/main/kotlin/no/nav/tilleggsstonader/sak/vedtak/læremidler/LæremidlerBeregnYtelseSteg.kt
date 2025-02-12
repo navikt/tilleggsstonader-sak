@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.periode.AvkortResult
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -78,22 +77,12 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         saksbehandling: Saksbehandling,
     ) {
+        val forrigeVedtaksperioder = saksbehandling.forrigeBehandlingId?.let { hentVedtak(it).data.vedtaksperioder }
         val vedtaksperioderMedStatus =
-            when (saksbehandling.type) {
-                BehandlingType.FØRSTEGANGSBEHANDLING ->
-                    settStatusPåVedtaksperioder(
-                        vedtaksperioder = vedtaksperioder,
-                        vedtaksperioderForrigeBehandling = emptyList(),
-                    )
-
-                BehandlingType.REVURDERING -> {
-                    val forrigeBehandlingId = saksbehandling.forrigeBehandlingId
-                    feilHvis(forrigeBehandlingId == null) { "Mangler behandlingen som skal revurderes" }
-                    val vedtaksperioderForrigeBehandling = hentVedtak(forrigeBehandlingId).data.vedtaksperioder
-
-                    settStatusPåVedtaksperioder(vedtaksperioder, vedtaksperioderForrigeBehandling)
-                }
-            }
+            settStatusPåVedtaksperioder(
+                vedtaksperioder = vedtaksperioder,
+                vedtaksperioderForrigeBehandling = forrigeVedtaksperioder,
+            )
 
         lagreVedtak(vedtaksperioderMedStatus, saksbehandling)
     }
