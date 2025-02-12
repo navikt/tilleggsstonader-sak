@@ -84,13 +84,18 @@ object VilkårperiodeTestUtil {
                     vurderinger =
                         VurderingOmstillingsstønad(
                             medlemskap = medlemskap,
+                            aldersvilkårOppfyltVurdering = TODO(),
                         ),
                 )
 
             MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadTilsynBarn
             MålgruppeType.AAP ->
                 AAPTilsynBarn(
-                    vurderinger = VurderingAAP(dekketAvAnnetRegelverk = dekketAvAnnetRegelverk),
+                    vurderinger =
+                        VurderingAAP(
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
+                            aldersvilkårOppfyltVurdering = TODO(),
+                        ),
                 )
 
             MålgruppeType.UFØRETRYGD ->
@@ -99,6 +104,7 @@ object VilkårperiodeTestUtil {
                         VurderingUføretrygd(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
+                            aldersvilkårOppfyltVurdering = TODO(),
                         ),
                 )
 
@@ -108,6 +114,7 @@ object VilkårperiodeTestUtil {
                         VurderingNedsattArbeidsevne(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
+                            aldersvilkårOppfyltVurdering = TODO(),
                         ),
                 )
 
