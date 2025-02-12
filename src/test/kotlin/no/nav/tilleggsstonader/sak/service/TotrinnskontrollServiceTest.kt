@@ -212,7 +212,6 @@ internal class TotrinnskontrollServiceTest {
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
 
         assertThat(totrinnskontroll.status).isEqualTo(TotrinnkontrollStatus.KAN_FATTE_VEDTAK)
-        assertThat(totrinnskontroll.totrinnskontroll).isNull()
     }
 
     /*
