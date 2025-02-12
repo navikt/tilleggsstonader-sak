@@ -22,8 +22,8 @@ class OpphørValideringServiceLæremidlerTest {
     private val førsteFebruar = YearMonth.of(2025, 2).atDay(1)
     private val sisteFebruar = YearMonth.of(2025, 2).atEndOfMonth()
 
-    private val vedtaksperiodeJanuar = Vedtaksperiode(førsteJanuar, sisteJanuar)
-    private val vedtaksperiodeFebruar = Vedtaksperiode(førsteFebruar, sisteFebruar)
+    private val vedtaksperiodeJanuar = Vedtaksperiode(fom = førsteJanuar, tom = sisteJanuar)
+    private val vedtaksperiodeFebruar = Vedtaksperiode(fom = førsteFebruar, tom = sisteFebruar)
 
     private val førsteMars = YearMonth.of(2025, 3).atDay(1)
 

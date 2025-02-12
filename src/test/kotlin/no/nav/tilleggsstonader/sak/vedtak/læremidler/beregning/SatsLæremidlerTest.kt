@@ -12,7 +12,11 @@ import java.time.LocalDate
 class SatsLæremidlerTest {
     @Test
     fun `høyere utdanning 2024`() {
-        val periode = Vedtaksperiode(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 2, 1))
+        val periode =
+            Vedtaksperiode(
+                fom = LocalDate.of(2024, 1, 1),
+                tom = LocalDate.of(2024, 2, 1),
+            )
         val sats =
             finnSatsForStudienivå(
                 finnSatsForPeriode(periode),
@@ -23,7 +27,11 @@ class SatsLæremidlerTest {
 
     @Test
     fun `høyere utdanning 2023`() {
-        val periode = Vedtaksperiode(LocalDate.of(2023, 3, 1), LocalDate.of(2023, 5, 1))
+        val periode =
+            Vedtaksperiode(
+                fom = LocalDate.of(2023, 3, 1),
+                tom = LocalDate.of(2023, 5, 1),
+            )
         val sats =
             finnSatsForStudienivå(
                 finnSatsForPeriode(periode),
@@ -34,7 +42,11 @@ class SatsLæremidlerTest {
 
     @Test
     fun `videregående utdanning 2024`() {
-        val periode = Vedtaksperiode(LocalDate.of(2024, 11, 1), LocalDate.of(2024, 12, 1))
+        val periode =
+            Vedtaksperiode(
+                fom = LocalDate.of(2024, 11, 1),
+                tom = LocalDate.of(2024, 12, 1),
+            )
         val sats =
             finnSatsForStudienivå(
                 finnSatsForPeriode(periode),
@@ -45,7 +57,11 @@ class SatsLæremidlerTest {
 
     @Test
     fun `videregående utdanning 2023`() {
-        val periode = Vedtaksperiode(LocalDate.of(2023, 10, 1), LocalDate.of(2023, 12, 1))
+        val periode =
+            Vedtaksperiode(
+                fom = LocalDate.of(2023, 10, 1),
+                tom = LocalDate.of(2023, 12, 1),
+            )
         val sats =
             finnSatsForStudienivå(
                 finnSatsForPeriode(periode),

@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.VedtaksperiodeStatusMapper.settStatusPåVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
@@ -73,6 +74,25 @@ class LæremidlerBeregnYtelseSteg(
     }
 
     private fun beregnOgLagreInnvilgelse(
+        vedtaksperioder: List<Vedtaksperiode>,
+        saksbehandling: Saksbehandling,
+    ) {
+        val forrigeVedtaksperioder = saksbehandling.forrigeBehandlingId?.let { hentVedtak(it).data.vedtaksperioder }
+        val vedtaksperioderMedStatus =
+            settStatusPåVedtaksperioder(
+                vedtaksperioder = vedtaksperioder,
+                vedtaksperioderForrigeBehandling = forrigeVedtaksperioder,
+            )
+
+        lagreVedtak(vedtaksperioderMedStatus, saksbehandling)
+    }
+
+    private fun hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørLæremidler> =
+        vedtakRepository
+            .findByIdOrThrow(behandlingId)
+            .withTypeOrThrow<InnvilgelseEllerOpphørLæremidler>()
+
+    private fun lagreVedtak(
         vedtaksperioder: List<Vedtaksperiode>,
         saksbehandling: Saksbehandling,
     ) {
@@ -136,11 +156,6 @@ class LæremidlerBeregnYtelseSteg(
                 }
             }
     }
-
-    private fun hentVedtak(forrigeBehandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørLæremidler> =
-        vedtakRepository
-            .findByIdOrThrow(forrigeBehandlingId)
-            .withTypeOrThrow<InnvilgelseEllerOpphørLæremidler>()
 
     private fun beregnOgLagreOpphør(
         saksbehandling: Saksbehandling,

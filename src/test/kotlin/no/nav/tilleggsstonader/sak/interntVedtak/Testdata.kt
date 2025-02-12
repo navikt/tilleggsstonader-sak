@@ -264,7 +264,14 @@ object Testdata {
 
         val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = emptyList()))
 
-        val vedtaksperioder = listOf(Vedtaksperiode(fom = LocalDate.of(2024, 1, 1), tom = LocalDate.of(2024, 3, 31)))
+        val vedtaksperioder =
+            listOf(
+                Vedtaksperiode(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2024, 1, 1),
+                    tom = LocalDate.of(2024, 3, 31),
+                ),
+            )
         val beregningsresultat =
             BeregningsresultatLæremidler(
                 perioder =
