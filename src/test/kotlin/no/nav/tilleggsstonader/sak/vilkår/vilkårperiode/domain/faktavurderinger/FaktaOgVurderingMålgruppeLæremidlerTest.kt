@@ -36,7 +36,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            aldersvilkårOppfyltVurdering = TODO(),
+                            aldersvilkårOppfyltVurdering = null,
                         ),
                 )
 
@@ -51,7 +51,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
-                            aldersvilkårOppfyltVurdering = TODO(),
+                            aldersvilkårOppfyltVurdering = null,
                         ),
                 )
 
@@ -66,7 +66,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
-                            aldersvilkårOppfyltVurdering = TODO(),
+                            aldersvilkårOppfyltVurdering = null,
                         ),
                 )
 
@@ -81,7 +81,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            aldersvilkårOppfyltVurdering = TODO(),
+                            aldersvilkårOppfyltVurdering = null,
                         ),
                 )
 
