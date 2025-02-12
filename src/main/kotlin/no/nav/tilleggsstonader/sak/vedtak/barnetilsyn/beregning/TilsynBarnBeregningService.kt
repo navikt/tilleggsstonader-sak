@@ -1,21 +1,17 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
-import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFra
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFraMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.erOverlappMellomStønadsperioderOgUtgifter
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningValideringUtil.validerPerioderForInnvilgelse
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.splitFraRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilDagerPerUke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilUke
@@ -31,7 +27,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnl
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.beregningsresultat
-import no.nav.tilleggsstonader.sak.vedtak.domain.splitFraRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -227,41 +222,8 @@ class TilsynBarnBeregningService(
                     aktiviteterPerUke[uke]
                         ?: error("Ingen aktivitet i uke fom=${uke.fom} og tom=${uke.tom}")
 
-                beregnAntallAktivitetsdagerForUke(periode, aktiviteterForUke)
+                BeregningsgrunnlagUtils.beregnAntallAktivitetsdagerForUke(periode, aktiviteterForUke)
             }.sum()
-    }
-
-    /**
-     * Beregner antall dager per uke som kan brukes
-     * Hvis antall dager fra stønadsperiode er 1, så kan man maks bruke 1 dag fra aktiviteter
-     * Hvis antall dager fra stønadsperiode er 5, men aktiviteter kun har 2 dager så kan man kun bruke 2 dager
-     */
-    private fun beregnAntallAktivitetsdagerForUke(
-        stønadsperiode: PeriodeMedDager,
-        aktiviteter: List<PeriodeMedDager>,
-    ): Int =
-        aktiviteter.filter { it.overlapper(stønadsperiode) }.fold(0) { acc, aktivitet ->
-            // Tilgjengelige dager i uke i overlapp mellom stønadsperiode og aktivitet
-            val antallTilgjengeligeDager = minOf(stønadsperiode.antallDager, aktivitet.antallDager)
-
-            trekkFraBrukteDager(stønadsperiode, aktivitet, antallTilgjengeligeDager)
-
-            acc + antallTilgjengeligeDager
-        }
-
-    /**
-     * Skal ikke kunne bruke en dager fra aktivitet eller stønadsperiode flere ganger.
-     * Trekker fra tilgjengelige dager fra antallDager
-     * Dersom stønadsperioden har 2 dager, og aktiviten 3 dager, så skal man kun totalt kunne bruke 2 dager
-     * Dersom stønadsperioden har 3 dager, og aktiviten 2 dager, så skal man kun totalt kunne bruke 2 dager
-     */
-    private fun trekkFraBrukteDager(
-        stønadsperiode: PeriodeMedDager,
-        aktivitet: PeriodeMedDager,
-        antallTilgjengeligeDager: Int,
-    ) {
-        aktivitet.antallDager -= antallTilgjengeligeDager
-        stønadsperiode.antallDager -= antallTilgjengeligeDager
     }
 
     /**
@@ -283,67 +245,4 @@ class TilsynBarnBeregningService(
         vilkårperiodeRepository
             .findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
             .tilAktiviteter()
-
-    private fun validerPerioderForInnvilgelse(
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
-        aktiviteter: List<Aktivitet>,
-        utgifter: Map<BarnId, List<UtgiftBeregning>>,
-        typeVedtak: TypeVedtak,
-        revurderFra: LocalDate?,
-    ) {
-        if (typeVedtak == TypeVedtak.OPPHØR) {
-            return
-        }
-        validerStønadsperioder(stønadsperioder)
-        validerAktiviteter(aktiviteter)
-        validerUtgifter(utgifter)
-        validerStønadsperioderOverlapperUtgifterEtterRevurderFra(stønadsperioder, utgifter, revurderFra)
-    }
-
-    private fun validerStønadsperioderOverlapperUtgifterEtterRevurderFra(
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
-        utgifter: Map<BarnId, List<UtgiftBeregning>>,
-        revurderFra: LocalDate?,
-    ) {
-        brukerfeilHvisIkke(
-            erOverlappMellomStønadsperioderOgUtgifter(
-                stønadsperioder = stønadsperioder.brukPerioderFraOgMedRevurderFra(revurderFra),
-                utgifter = utgifter.brukPerioderFraOgMedRevurderFraMåned(revurderFra),
-            ),
-        ) {
-            if (revurderFra != null) {
-                "Kan ikke innvilge når det ikke finnes noen overlapp mellom målgruppe, aktivitet og utgifter etter revurder fra dato"
-            } else {
-                "Kan ikke innvilge når det ikke finnes noen overlapp mellom målgruppe, aktivitet og utgifter"
-            }
-        }
-    }
-
-    private fun validerStønadsperioder(stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>) {
-        brukerfeilHvis(stønadsperioder.isEmpty()) {
-            "Kan ikke innvilge når det ikke finnes noen overlappende målgruppe og aktivitet"
-        }
-    }
-
-    private fun validerAktiviteter(aktiviteter: List<Aktivitet>) {
-        feilHvis(aktiviteter.isEmpty()) {
-            "Aktiviteter mangler"
-        }
-    }
-
-    private fun validerUtgifter(utgifter: Map<BarnId, List<UtgiftBeregning>>) {
-        brukerfeilHvis(utgifter.values.flatten().isEmpty()) {
-            "Kan ikke innvilge når det ikke finnes noen utgiftsperioder"
-        }
-        utgifter.entries.forEach { (_, utgifterForBarn) ->
-            feilHvis(utgifterForBarn.overlapper()) {
-                "Utgiftsperioder overlapper"
-            }
-
-            val ikkePositivUtgift = utgifterForBarn.firstOrNull { it.utgift < 0 }?.utgift
-            feilHvis(ikkePositivUtgift != null) {
-                "Utgiftsperioder inneholder ugyldig utgift: $ikkePositivUtgift"
-            }
-        }
-    }
 }

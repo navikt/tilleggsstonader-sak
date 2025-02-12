@@ -7,9 +7,12 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnR
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class VedtakDtoMapperTest {
     @Nested
@@ -39,6 +42,31 @@ class VedtakDtoMapperTest {
 
             assertThat(dto.begrunnelse).isEqualTo(vedtak.data.begrunnelse)
             assertThat(dto.type).isEqualTo(vedtak.type)
+        }
+    }
+
+    @Nested
+    inner class Læremidler {
+        val innvilgelse = LæremidlerTestUtil.innvilgelse()
+
+        @Test
+        fun `skal mappe innvilget vedtak til dto`() {
+            val dto = VedtakDtoMapper.toDto(innvilgelse, revurderFra = null)
+
+            assertThat(dto).isInstanceOf(InnvilgelseLæremidlerResponse::class.java)
+
+            val innvilgetDto = dto as InnvilgelseLæremidlerResponse
+            assertThat(innvilgetDto.gjelderFraOgMed).isEqualTo(LocalDate.of(2024, 1, 1))
+            assertThat(innvilgetDto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 7))
+        }
+
+        @Test
+        fun `skal mappe revurdert innvilget vedtak til dto`() {
+            val dto = VedtakDtoMapper.toDto(innvilgelse, revurderFra = LocalDate.of(2024, 1, 3))
+
+            val innvilgetDto = dto as InnvilgelseLæremidlerResponse
+            assertThat(innvilgetDto.gjelderFraOgMed).isEqualTo(LocalDate.of(2024, 1, 3))
+            assertThat(innvilgetDto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 7))
         }
     }
 }

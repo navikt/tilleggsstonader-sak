@@ -33,6 +33,7 @@ data class BehandlingDto(
     val stønadstype: Stønadstype,
     val vedtaksdato: LocalDateTime?,
     val henlagtÅrsak: HenlagtÅrsak?,
+    val henlagtBegrunnelse: String?,
     val revurderFra: LocalDate?,
 )
 
@@ -55,6 +56,7 @@ fun Behandling.tilDto(
         opprettetAv = this.sporbar.opprettetAv,
         behandlingsårsak = this.årsak,
         henlagtÅrsak = this.henlagtÅrsak,
+        henlagtBegrunnelse = this.henlagtBegrunnelse,
         stønadstype = stønadstype,
         vedtaksdato = this.vedtakstidspunkt,
         revurderFra = this.revurderFra,
@@ -76,6 +78,7 @@ fun Saksbehandling.tilDto(): BehandlingDto =
         opprettetAv = this.opprettetAv,
         behandlingsårsak = this.årsak,
         henlagtÅrsak = this.henlagtÅrsak,
+        henlagtBegrunnelse = this.henlagtBegrunnelse,
         stønadstype = stønadstype,
         vedtaksdato = this.vedtakstidspunkt,
         revurderFra = this.revurderFra,

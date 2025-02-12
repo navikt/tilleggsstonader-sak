@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
+import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
@@ -66,9 +67,9 @@ object VedtakDtoMapper {
             is InnvilgelseLæremidler ->
                 InnvilgelseLæremidlerResponse(
                     vedtaksperioder = data.vedtaksperioder.tilDto(),
-                    beregningsresultat = data.beregningsresultat.tilDto(),
-                    gjelderFraOgMed = data.vedtaksperioder.minOf { it.fom },
-                    gjelderTilOgMed = data.vedtaksperioder.maxOf { it.tom },
+                    beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
+                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).minOf { it.fom },
+                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).maxOf { it.tom },
                 )
             is AvslagLæremidler ->
                 AvslagLæremidlerDto(

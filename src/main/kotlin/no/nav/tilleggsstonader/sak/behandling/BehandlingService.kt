@@ -243,6 +243,7 @@ class BehandlingService(
         val henlagtBehandling =
             behandling.copy(
                 henlagtÅrsak = henlagt.årsak,
+                henlagtBegrunnelse = henlagt.begrunnelse,
                 resultat = BehandlingResultat.HENLAGT,
                 steg = StegType.BEHANDLING_FERDIGSTILT,
                 status = FERDIGSTILT,

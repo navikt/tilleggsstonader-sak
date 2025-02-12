@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -119,18 +118,9 @@ class VilkårperiodeGrunnlagService(
 
         return mottattTidspunkt
             .toLocalDate()
-            .minusMonths(behandling.stønadstype.antallMånederBakITiden())
+            .minusMonths(behandling.stønadstype.grunnlagAntallMånederBakITiden.toLong())
             .tilFørsteDagIMåneden()
     }
-
-    /**
-     * Ulike stønader har ulikt behov for antall måneder bak i tiden som skal hentes
-     */
-    private fun Stønadstype.antallMånederBakITiden(): Long =
-        when (this) {
-            Stønadstype.BARNETILSYN -> 3
-            Stønadstype.LÆREMIDLER -> 6
-        }
 
     private fun hentGrunnlagsdata(
         behandlingId: BehandlingId,

@@ -34,12 +34,12 @@ object SettPåVentBeskrivelseUtil {
         inkluderKommentar: Boolean,
     ): String {
         val fristBeskrivelse = utledOppgavefristBeskrivelse(oppgave, frist)
-        if (fristBeskrivelse.isEmpty()) {
+        val kommentarRad = "Kommentar: ${settPåVent.kommentar}".takeIf { inkluderKommentar } ?: ""
+        if (fristBeskrivelse.isEmpty() && kommentarRad.isEmpty()) {
             return oppgave.beskrivelse ?: ""
         }
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, "")
-        val kommentarRad = "Kommentar: ${settPåVent.kommentar}".takeIf { inkluderKommentar }
         return utledBeskrivelsePrefix(tidspunkt) +
             fristBeskrivelse.påNyRadEllerTomString() +
             tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +

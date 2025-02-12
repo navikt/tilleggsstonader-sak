@@ -96,6 +96,9 @@ class SettPåVentBeskrivelseUtilTest {
                 )
             assertThat(beskrivelse).isEqualTo(
                 """
+                --- 05.03.2024 18:00 a100 (a100) ---
+                Kommentar: En kommentar
+                
                 tidligere beskrivelse
                 """.trimIndent(),
             )

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -45,6 +46,17 @@ class OpphørValideringService(
                 ) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato" }
             }
         }
+    }
+
+    fun validerVedtaksperioderAvkortetVedOpphør(
+        forrigeBehandlingsVedtaksperioder: List<Vedtaksperiode>,
+        revurderFraDato: LocalDate,
+    ) {
+        val senesteTomIForrigeVedtaksperioder = forrigeBehandlingsVedtaksperioder.maxOf { it.tom }
+
+        brukerfeilHvis(
+            senesteTomIForrigeVedtaksperioder < revurderFraDato,
+        ) { "Opphør er et ugyldig vedtaksresultat fordi ingen vedtaksperioder har blitt avkortet" }
     }
 
     private fun validerIngenNyeOppfylteVilkårEllerVilkårperioder(
