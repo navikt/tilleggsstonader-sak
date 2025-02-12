@@ -53,7 +53,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-import java.util.UUID
 
 object Testdata {
     val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")
@@ -61,7 +60,6 @@ object Testdata {
     val stønadsperioder =
         listOf(
             StønadsperiodeDto(
-                id = UUID.randomUUID(),
                 fom = LocalDate.of(2024, 2, 1),
                 tom = LocalDate.of(2024, 3, 31),
                 målgruppe = MålgruppeType.AAP,
@@ -69,7 +67,6 @@ object Testdata {
                 status = StønadsperiodeStatus.NY,
             ),
             StønadsperiodeDto(
-                id = UUID.randomUUID(),
                 fom = LocalDate.of(2024, 2, 1),
                 tom = LocalDate.of(2024, 3, 31),
                 målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE,
@@ -267,7 +264,6 @@ object Testdata {
         val vedtaksperioder =
             listOf(
                 Vedtaksperiode(
-                    id = UUID.randomUUID(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 3, 31),
                 ),

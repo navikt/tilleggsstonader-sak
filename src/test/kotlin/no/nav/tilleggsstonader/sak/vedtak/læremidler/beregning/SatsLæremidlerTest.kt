@@ -8,14 +8,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.UUID
 
 class SatsLæremidlerTest {
     @Test
     fun `høyere utdanning 2024`() {
         val periode =
             Vedtaksperiode(
-                id = UUID.randomUUID(),
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 1),
             )
@@ -31,7 +29,6 @@ class SatsLæremidlerTest {
     fun `høyere utdanning 2023`() {
         val periode =
             Vedtaksperiode(
-                id = UUID.randomUUID(),
                 fom = LocalDate.of(2023, 3, 1),
                 tom = LocalDate.of(2023, 5, 1),
             )
@@ -47,7 +44,6 @@ class SatsLæremidlerTest {
     fun `videregående utdanning 2024`() {
         val periode =
             Vedtaksperiode(
-                id = UUID.randomUUID(),
                 fom = LocalDate.of(2024, 11, 1),
                 tom = LocalDate.of(2024, 12, 1),
             )
@@ -63,7 +59,6 @@ class SatsLæremidlerTest {
     fun `videregående utdanning 2023`() {
         val periode =
             Vedtaksperiode(
-                id = UUID.randomUUID(),
                 fom = LocalDate.of(2023, 10, 1),
                 tom = LocalDate.of(2023, 12, 1),
             )

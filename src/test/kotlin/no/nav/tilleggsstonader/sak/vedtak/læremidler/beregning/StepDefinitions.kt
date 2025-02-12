@@ -61,7 +61,6 @@ class StepDefinitions {
         vedtaksPerioder =
             dataTable.mapRad { rad ->
                 Vedtaksperiode(
-                    id = UUID.randomUUID(),
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 )
