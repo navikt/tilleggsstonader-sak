@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnReque
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -71,6 +72,15 @@ class TilsynBarnVedtakController(
     ): BeregningsresultatTilsynBarnDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         return beregningService.beregn(behandling, TypeVedtak.INNVILGELSE).tilDto(behandling.revurderFra)
+    }
+
+    @PostMapping("{behandlingId}/beregnV2")
+    fun beregnV2(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtaksperioder: List<VedtaksperiodeDto>,
+    ): BeregningsresultatTilsynBarnDto {
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        return beregningService.beregnV2(vedtaksperioder, behandling, TypeVedtak.INNVILGELSE).tilDto(behandling.revurderFra)
     }
 
     /**
