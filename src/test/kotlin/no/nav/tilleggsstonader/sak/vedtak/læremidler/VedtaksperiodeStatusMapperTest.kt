@@ -5,14 +5,12 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatu
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.UUID
 
 class VedtaksperiodeStatusMapperTest {
     val førsteJan: LocalDate = LocalDate.of(2024, 1, 1)
     val trettiførsteJan: LocalDate = LocalDate.of(2024, 1, 31)
     val dummyVedtaksperiode =
         Vedtaksperiode(
-            id = UUID.randomUUID(),
             fom = førsteJan,
             tom = trettiførsteJan,
         )

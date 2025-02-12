@@ -6,7 +6,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.UUID
 
 class LæremidlerBeregnUtilTest {
     private val førsteJan2024 = LocalDate.of(2024, 1, 1)
@@ -17,7 +16,6 @@ class LæremidlerBeregnUtilTest {
         val vedtaksperioder =
             listOf(
                 Vedtaksperiode(
-                    id = UUID.randomUUID(),
                     fom = LocalDate.of(2024, 12, 5),
                     tom = LocalDate.of(2025, 1, 4),
                 ),
@@ -48,7 +46,6 @@ class LæremidlerBeregnUtilTest {
             val vedtaksperioder =
                 listOf(
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
                         fom = LocalDate.of(2025, 2, 1),
                         tom = LocalDate.of(2025, 2, 2),
                     ),
@@ -65,7 +62,6 @@ class LæremidlerBeregnUtilTest {
             val vedtaksperioder =
                 listOf(
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
                         fom = LocalDate.of(2024, 1, 5),
                         tom = LocalDate.of(2024, 1, 15),
                     ),
@@ -86,12 +82,10 @@ class LæremidlerBeregnUtilTest {
             val vedtaksperioder =
                 listOf(
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
                         fom = LocalDate.of(2024, 1, 5),
                         tom = LocalDate.of(2024, 1, 15),
                     ),
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
                         fom = LocalDate.of(2024, 2, 7),
                         tom = LocalDate.of(2024, 3, 2),
                     ),
@@ -119,12 +113,10 @@ class LæremidlerBeregnUtilTest {
             val vedtaksperioder =
                 listOf(
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
                         fom = førsteJan2024,
                         tom = LocalDate.of(2024, 1, 5),
                     ),
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
                         fom = LocalDate.of(2024, 1, 7),
                         tom = LocalDate.of(2024, 1, 7),
                     ),
@@ -145,12 +137,10 @@ class LæremidlerBeregnUtilTest {
             val vedtaksperioder =
                 listOf(
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
                         fom = LocalDate.of(2024, 1, 5),
                         tom = LocalDate.of(2024, 1, 5),
                     ),
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
                         fom = LocalDate.of(2024, 2, 1),
                         tom = LocalDate.of(2024, 2, 4),
                     ),
@@ -171,12 +161,10 @@ class LæremidlerBeregnUtilTest {
             val vedtaksperioder =
                 listOf(
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
                         fom = LocalDate.of(2024, 1, 5),
                         tom = LocalDate.of(2024, 1, 5),
                     ),
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
                         fom = LocalDate.of(2024, 2, 4),
                         tom = LocalDate.of(2024, 2, 4),
                     ),
@@ -197,12 +185,10 @@ class LæremidlerBeregnUtilTest {
             val vedtaksperioder =
                 listOf(
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
                         fom = LocalDate.of(2024, 1, 5),
                         tom = LocalDate.of(2024, 1, 5),
                     ),
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
                         fom = LocalDate.of(2024, 2, 1),
                         tom = LocalDate.of(2024, 2, 28),
                     ),
