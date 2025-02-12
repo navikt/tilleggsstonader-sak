@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatus
 import java.time.LocalDate
 import java.util.UUID
 
@@ -35,12 +36,6 @@ data class VedtaksperiodeLæremidlerDto(
     val tom: LocalDate,
     val status: VedtaksperiodeStatus? = null,
 )
-
-enum class VedtaksperiodeStatus {
-    NY,
-    ENDRET,
-    UENDRET,
-}
 
 fun List<Vedtaksperiode>.tilDto() = this.map { VedtaksperiodeLæremidlerDto(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }
 

@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import java.time.LocalDate
 import java.util.UUID
 
@@ -24,6 +23,12 @@ data class Vedtaksperiode(
         fom: LocalDate,
         tom: LocalDate,
     ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
+}
+
+enum class VedtaksperiodeStatus {
+    NY,
+    ENDRET,
+    UENDRET,
 }
 
 fun avkortVedtaksperiodeVedOpphør(

@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
