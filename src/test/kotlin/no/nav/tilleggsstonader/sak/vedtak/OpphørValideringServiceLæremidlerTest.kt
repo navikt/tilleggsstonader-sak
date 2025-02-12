@@ -14,7 +14,6 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.YearMonth
-import java.util.UUID
 
 class OpphørValideringServiceLæremidlerTest {
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
@@ -24,12 +23,11 @@ class OpphørValideringServiceLæremidlerTest {
     val fom = måned.atDay(1)
     val tom = måned.atEndOfMonth()
 
-    val vedtaksperiodeJanuar = Vedtaksperiode(fom = fom, tom = tom, id = UUID.randomUUID())
+    val vedtaksperiodeJanuar = Vedtaksperiode(fom = fom, tom = tom)
     val vedtaksperiodeFebruar =
         Vedtaksperiode(
             fom = fom.plusMonths(1),
             tom = tom.plusMonths(1),
-            id = UUID.randomUUID(),
         )
 
     val opphørValideringService = OpphørValideringService(vilkårperiodeService, vilkårService)

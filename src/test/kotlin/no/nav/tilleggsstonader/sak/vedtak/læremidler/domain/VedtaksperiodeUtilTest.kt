@@ -18,13 +18,11 @@ class VedtaksperiodeUtilTest {
     val behandlingId = BehandlingId(UUID.randomUUID())
     val vedtaksperiodeJanuar =
         Vedtaksperiode(
-            id = UUID.randomUUID(),
             fom = LocalDate.of(2024, 1, 1),
             tom = LocalDate.of(2024, 1, 31),
         )
     val vedtaksperiodeFebruar =
         Vedtaksperiode(
-            id = UUID.randomUUID(),
             fom = LocalDate.of(2024, 2, 1),
             tom = LocalDate.of(2024, 2, 28),
         )
@@ -67,12 +65,10 @@ class VedtaksperiodeUtilTest {
             val vedtaksperioder =
                 listOf(
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
                         fom = LocalDate.of(2024, 1, 15),
                         tom = LocalDate.of(2024, 2, 14),
                     ),
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
                         fom = LocalDate.of(2024, 2, 15),
                         tom = LocalDate.of(2024, 2, 28),
                     ),
@@ -161,7 +157,6 @@ class VedtaksperiodeUtilTest {
                 vedtaksperioderInnenforLøpendeMåned(
                     listOf(
                         Vedtaksperiode(
-                            id = UUID.randomUUID(),
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 1, 1),
                         ),
@@ -176,7 +171,6 @@ class VedtaksperiodeUtilTest {
                             tom = LocalDate.of(2024, 1, 3),
                         ),
                         Vedtaksperiode(
-                            id = UUID.randomUUID(),
                             fom = LocalDate.of(2024, 1, 4),
                             tom = LocalDate.of(2024, 1, 4),
                         ),

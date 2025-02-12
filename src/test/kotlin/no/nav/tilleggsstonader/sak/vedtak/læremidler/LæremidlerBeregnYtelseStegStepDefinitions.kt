@@ -162,7 +162,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             Vedtaksperiode(
                 fom = perioderBeregningsresultat.minOf { it.fom },
                 tom = perioderBeregningsresultat.maxOf { it.tom },
-                id = UUID.randomUUID(),
             )
         val vedtak =
             InnvilgelseLæremidler(
