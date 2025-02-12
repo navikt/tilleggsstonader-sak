@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -44,12 +44,12 @@ data class Beregningsgrunnlag(
     val måned: YearMonth,
     val makssats: Int,
     val stønadsperioderGrunnlag: List<StønadsperiodeGrunnlag>,
-    val vedtaksperioderGrunnlag: List<VedtaksperiodeGrunnlag> = emptyList(), // Etterhvert bør ikke denne ha en default verdi
     val utgifter: List<UtgiftBarn>,
     val utgifterTotal: Int,
     val antallBarn: Int,
 )
 
+// TOOD Slett denne?
 data class VedtaksperiodeGrunnlag(
     override val fom: LocalDate,
     override val tom: LocalDate,
@@ -68,8 +68,10 @@ data class VedtaksperiodeGrunnlag(
     )
 }
 
+// TODO rename til vedtaksperiodeGrunnlag
 data class StønadsperiodeGrunnlag(
-    val stønadsperiode: StønadsperiodeBeregningsgrunnlag,
+    // TODO rename til vedtaksperiode
+    val stønadsperiode: Vedtaksperiode,
     val aktiviteter: List<Aktivitet>,
     val antallDager: Int,
 )

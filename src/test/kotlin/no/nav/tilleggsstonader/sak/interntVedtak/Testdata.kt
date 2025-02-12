@@ -23,7 +23,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
@@ -54,6 +53,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.UUID
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode as VedtaksperiodeBeregningsgrunnlag
 
 object Testdata {
     val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")
@@ -188,8 +188,8 @@ object Testdata {
                 ).tilDto(),
             )
 
-        val stønadsperiodeBeregningsgrunnlag =
-            StønadsperiodeBeregningsgrunnlag(
+        val vedtaksperiode =
+            VedtaksperiodeBeregningsgrunnlag(
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 1),
                 målgruppe = MålgruppeType.AAP,
@@ -209,7 +209,7 @@ object Testdata {
                                         beregningsresultatForMåned(
                                             stønadsperioder =
                                                 listOf(
-                                                    stønadsperiodeGrunnlag(stønadsperiode = stønadsperiodeBeregningsgrunnlag),
+                                                    stønadsperiodeGrunnlag(vedtaksperiode = vedtaksperiode),
                                                 ),
                                         ),
                                     ),

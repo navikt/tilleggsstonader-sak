@@ -46,8 +46,9 @@ class TilsynBarnBeregnYtelseStegTest {
             stønadsperiodeRepository = stønadsperiodeService,
             vilkårperiodeRepository = vilkårperiodeRepository,
             tilsynBarnUtgiftService = tilsynBarnUtgiftService,
-            repository = repository,
+            vedtakRepository = repository,
         )
+
     val steg =
         TilsynBarnBeregnYtelseSteg(
             beregningService = tilsynBarnBeregningService,

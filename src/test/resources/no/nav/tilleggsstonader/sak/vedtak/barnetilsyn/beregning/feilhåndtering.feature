@@ -55,7 +55,7 @@ Egenskap: Feilhåndtering i beregning
 
     Når beregner
 
-    Så forvent følgende feil: Finnes ingen aktiviteter av type UTDANNING som passer med stønadsperiode
+    Så forvent følgende feil: Finnes ingen aktiviteter av type UTDANNING som passer med vedtaksperiode
 
   Scenario: Ingen aktiviteter i en uke stønadsperiode strekker seg over
     Gitt følgende støndsperioder

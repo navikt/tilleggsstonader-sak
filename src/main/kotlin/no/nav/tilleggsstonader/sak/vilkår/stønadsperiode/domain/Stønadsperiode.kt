@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.data.annotation.Id
@@ -33,6 +34,8 @@ data class Stønadsperiode(
             sporbar = Sporbar(),
         )
 }
+
+fun List<Stønadsperiode>.tilVedtaksperiode() = map { Vedtaksperiode(it) }
 
 enum class StønadsperiodeStatus {
     NY,

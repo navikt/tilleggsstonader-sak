@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnR
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -43,8 +43,8 @@ object TilsynBarnTestUtil {
             Beløpsperiode(dato = LocalDate.now().plusDays(7), beløp = 2000, målgruppe = MålgruppeType.OVERGANGSSTØNAD),
         )
 
-    val defaultStønadsperiodeBeregningsgrunnlag =
-        StønadsperiodeBeregningsgrunnlag(
+    val defaultVedtaksperiode =
+        Vedtaksperiode(
             fom = LocalDate.of(2024, 1, 1),
             tom = LocalDate.of(2024, 1, 31),
             målgruppe = MålgruppeType.AAP,
@@ -97,11 +97,9 @@ object TilsynBarnTestUtil {
             data = data,
         )
 
-    fun stønadsperiodeGrunnlag(
-        stønadsperiode: StønadsperiodeBeregningsgrunnlag = defaultStønadsperiodeBeregningsgrunnlag,
-    ): StønadsperiodeGrunnlag =
+    fun stønadsperiodeGrunnlag(vedtaksperiode: Vedtaksperiode = defaultVedtaksperiode): StønadsperiodeGrunnlag =
         StønadsperiodeGrunnlag(
-            stønadsperiode = stønadsperiode,
+            stønadsperiode = vedtaksperiode,
             aktiviteter = emptyList(),
             antallDager = 0,
         )
