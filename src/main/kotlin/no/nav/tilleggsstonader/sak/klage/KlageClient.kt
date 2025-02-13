@@ -27,14 +27,6 @@ class KlageClient(
             .build()
             .toUriString()
 
-    private val hentKlagebehandlinger =
-        UriComponentsBuilder
-            .fromUri(klageUri)
-            .pathSegment(
-                "api/ekstern/behandling/${Fagsystem.TILLEGGSSTONADER}",
-            ).build()
-            .toUri()
-
     fun opprettKlage(opprettKlagebehandlingRequest: OpprettKlagebehandlingRequest) {
         postForEntityNullable<Void>(opprettKlage, opprettKlagebehandlingRequest)
     }
@@ -42,12 +34,20 @@ class KlageClient(
     fun hentKlagebehandlinger(eksternIder: Set<Long>): Map<Long, List<KlagebehandlingDto>> {
         val uri =
             UriComponentsBuilder
-                .fromUri(hentKlagebehandlinger)
-                .queryParam("eksternFagsakId", eksternIder.joinToString(","))
-                .build()
+                .fromUri(klageUri)
+                .pathSegment("api", "ekstern", "behandling", "{fagsystem}")
+                .queryParam("eksternFagsakId", "{eksternFagsakId}")
+                .encode()
                 .toUriString()
 
-        return getForEntity<Ressurs<Map<Long, List<KlagebehandlingDto>>>>(uri).getDataOrThrow()
+        return getForEntity<Ressurs<Map<Long, List<KlagebehandlingDto>>>>(
+            uri = uri,
+            uriVariables =
+                mapOf(
+                    "fagsystem" to Fagsystem.TILLEGGSSTONADER,
+                    "eksternFagsakId" to eksternIder.joinToString(","),
+                ),
+        ).getDataOrThrow()
     }
 
     fun hentBehandlingerForOppgaveIder(oppgaveIder: List<Long>): Map<Long, UUID> {
