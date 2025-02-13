@@ -27,7 +27,7 @@ object ForeslåVedtaksperiode {
         }
 
         val sammenslåtteVilkår =
-            oppfylteVilkår.tilDatoPeriode().mergeSammenhengende { a, b -> a.overlapperEllerPåfølgesAv(b) }
+            oppfylteVilkår.tilDatoPeriode().sorted().mergeSammenhengende { a, b -> a.overlapperEllerPåfølgesAv(b) }
 
         brukerfeilHvis(sammenslåtteVilkår.size > 1) {
             "Foreløpig klarer vi bare å foreslå perioder når vilkår har ett sammenhengende overlapp. Du må i stedet legge inn periodene manuelt."

@@ -130,6 +130,27 @@ Egenskap: Beregning av vedtaksperioder
 
       Så forvent følgende feil for vedtaksforsalg: Fant ingen gyldig overlapp mellom gitte aktiviteter, målgrupper og vilkår
 
+    Scenario: Vilkårsperiodene er ikke sortert
+      Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag
+        | Fom        | Tom        | type   |
+        | 01.01.2023 | 31.03.2023 | TILTAK |
+
+      Gitt følgende vilkårsperioder med målgrupper for vedtaksforslag
+        | Fom        | Tom        | type |
+        | 01.01.2023 | 31.03.2023 | AAP  |
+
+      Gitt følgende vilkår for vedtaksforslag
+        | Fom        | Tom        | Resultat |
+        | 01.02.2023 | 28.02.2023 | OPPFYLT  |
+        | 01.03.2023 | 31.03.2023 | OPPFYLT  |
+        | 01.01.2023 | 31.01.2023 | OPPFYLT  |
+
+      Når forslag til vedtaksperioder lages
+
+      Så forvent følgende vedtaksperioder
+        | Fom        | Tom        | aktivitet | målgruppe |
+        | 01.01.2023 | 31.03.2023 | TILTAK    | AAP       |
+
   Regel: Vedtaksperiode skal foreslås for flere oppfylte vilkår som er rett etter hverandre
     Scenario: To oppfylte vilkår som er rett etter hverandre
       Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag
