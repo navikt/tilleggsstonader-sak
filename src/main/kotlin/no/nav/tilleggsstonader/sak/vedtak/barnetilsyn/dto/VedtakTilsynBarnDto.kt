@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 )
 sealed class VedtakTilsynBarnDto(
     open val type: TypeVedtak,
-    val vedtaksperioder: List<VedtaksperiodeTilsynBarnDto>? = null,
 )
 
 sealed interface VedtakTilsynBarnRequest : VedtakRequest
