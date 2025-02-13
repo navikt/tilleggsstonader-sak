@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningU
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFraMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import java.time.LocalDate
 
 object TilsynBarnBeregningValideringUtil {
@@ -30,6 +31,12 @@ object TilsynBarnBeregningValideringUtil {
         validerAktiviteter(aktiviteter)
         validerUtgifter(utgifter)
         validerOverlappendePeriodeOgUtgiftEtterRevurderFra(vedtaksperioder, utgifter, revurderFra)
+    }
+
+    fun validerIngenOverlapp(vedtaksperioder: List<VedtaksperiodeDto>) {
+        brukerfeilHvis(vedtaksperioder.overlapper()) {
+            "Vedtaksperioder kan ikke overlappe"
+        }
     }
 
     private fun <P> validerOverlappendePeriodeOgUtgiftEtterRevurderFra(
