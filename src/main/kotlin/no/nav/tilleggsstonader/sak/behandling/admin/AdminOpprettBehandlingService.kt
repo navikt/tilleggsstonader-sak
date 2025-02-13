@@ -70,7 +70,7 @@ class AdminOpprettBehandlingService(
         brukerfeilHvisIkke(unleashService.isEnabled(Toggle.ADMIN_KAN_OPPRETTE_BEHANDLING)) {
             "Feature toggle for å kunne opprette behandling er slått av"
         }
-        feilHvis(stønadstype.gjelderBarn() && barn.isEmpty()) {
+        brukerfeilHvis(stønadstype.gjelderBarn() && barn.isEmpty()) {
             "Må velge minimum 1 barn"
         }
 
