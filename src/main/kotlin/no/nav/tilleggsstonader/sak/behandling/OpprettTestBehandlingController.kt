@@ -44,6 +44,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
+import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.context.annotation.Profile
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.PostMapping
@@ -57,6 +59,7 @@ import java.time.LocalDate
 @ProtectedWithClaims(issuer = "azuread")
 @Profile("!prod")
 class OpprettTestBehandlingController(
+    private val tilgangService: TilgangService,
     private val behandlingService: BehandlingService,
     private val fagsakService: FagsakService,
     private val personService: PersonService,
@@ -69,6 +72,8 @@ class OpprettTestBehandlingController(
     fun opprettBehandling(
         @RequestBody testBehandlingRequest: TestBehandlingRequest,
     ): BehandlingId {
+        tilgangService.validerTilgangTilPerson(testBehandlingRequest.personIdent, AuditLoggerEvent.CREATE)
+
         val fagsak: Fagsak = lagFagsak(testBehandlingRequest)
         val behandling = lagBehandling(fagsak)
         opprettSøknad(fagsak, behandling)
