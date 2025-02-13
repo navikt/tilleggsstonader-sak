@@ -30,8 +30,8 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregni
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.tilVedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -50,12 +50,13 @@ class StepDefinitions {
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>()
     val repository = mockk<VedtakRepository>(relaxed = true)
+
     val service =
         TilsynBarnBeregningService(
             stønadsperiodeRepository = stønadsperiodeRepository,
             vilkårperiodeRepository = vilkårperiodeRepository,
             tilsynBarnUtgiftService = tilsynBarnUtgiftService,
-            repository = repository,
+            vedtakRepository = repository,
         )
 
     var exception: Exception? = null
@@ -245,7 +246,7 @@ class StepDefinitions {
 
         assertThat(perioder)
             .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
-            .containsExactlyElementsOf(forventeteStønadsperioder.tilSortertStønadsperiodeBeregningsgrunnlag())
+            .containsExactlyElementsOf(forventeteStønadsperioder.tilVedtaksperiode().sorted())
     }
 
     @Så("forvent følgende stønadsperiodeGrunnlag for: {}")

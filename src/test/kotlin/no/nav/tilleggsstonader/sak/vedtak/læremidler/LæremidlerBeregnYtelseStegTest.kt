@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.util.UUID
 
 class LæremidlerBeregnYtelseStegTest(
     @Autowired
@@ -56,7 +57,7 @@ class LæremidlerBeregnYtelseStegTest(
         lagreAktivitetOgStønadsperiode(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeLæremidlerDto(fom = fom, tom = tom)
+        val vedtaksperiode = VedtaksperiodeLæremidlerDto(id = UUID.randomUUID(), fom = fom, tom = tom)
         val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
         steg.utførSteg(saksbehandling, innvilgelse)
 
@@ -94,7 +95,12 @@ class LæremidlerBeregnYtelseStegTest(
         lagreAktivitetOgStønadsperiode(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeLæremidlerDto(fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31))
+        val vedtaksperiode =
+            VedtaksperiodeLæremidlerDto(
+                id = UUID.randomUUID(),
+                fom = LocalDate.of(2024, 12, 1),
+                tom = LocalDate.of(2024, 12, 31),
+            )
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
         val andeler =
@@ -114,6 +120,7 @@ class LæremidlerBeregnYtelseStegTest(
 
     @Test
     fun `en vedtaksperiode med 2 ulike målgrupper skal bli 2 ulike andeler med ulike typer som betales ut samtidig`() {
+        val vedtaksperiodeId = UUID.randomUUID()
         val førsteJan = LocalDate.of(2025, 1, 1)
         val sisteJan = LocalDate.of(2025, 1, 31)
         val førsteFeb = LocalDate.of(2025, 2, 1)
@@ -146,7 +153,7 @@ class LæremidlerBeregnYtelseStegTest(
         vilkårperiodeRepository.insert(aktivitet)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeLæremidlerDto(fom = førsteJan, tom = sisteFeb)
+        val vedtaksperiode = VedtaksperiodeLæremidlerDto(vedtaksperiodeId, fom = førsteJan, tom = sisteFeb)
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
@@ -173,6 +180,7 @@ class LæremidlerBeregnYtelseStegTest(
 
     @Test
     fun `en vedtaksperiode med 2 ulike målgrupper men samme type andel skal bli 1 andel`() {
+        val vedtaksperiodeStatus = UUID.randomUUID()
         val førsteJan = LocalDate.of(2025, 1, 1)
         val sisteJan = LocalDate.of(2025, 1, 31)
         val førsteFeb = LocalDate.of(2025, 2, 1)
@@ -203,7 +211,12 @@ class LæremidlerBeregnYtelseStegTest(
         vilkårperiodeRepository.insert(aktivitet)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeLæremidlerDto(fom = førsteJan, tom = sisteFeb)
+        val vedtaksperiode =
+            VedtaksperiodeLæremidlerDto(
+                vedtaksperiodeStatus,
+                fom = førsteJan,
+                tom = sisteFeb,
+            )
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
@@ -216,6 +229,10 @@ class LæremidlerBeregnYtelseStegTest(
             assertThat(satstype).isEqualTo(Satstype.DAG)
             assertThat(utbetalingsdato).isEqualTo(førsteJan)
         }
+    }
+
+    @Test
+    fun `skal ikke lagre vedtak hvis revurdering ikke har forrige behandling`() {
     }
 
     fun lagreAktivitetOgStønadsperiode(

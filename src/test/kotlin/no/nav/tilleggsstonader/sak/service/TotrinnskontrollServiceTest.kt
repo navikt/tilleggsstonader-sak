@@ -26,7 +26,6 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
@@ -174,7 +173,7 @@ internal class TotrinnskontrollServiceTest {
 
     @Test
     internal fun `skal returnere UAKTUELT når behandlingen UTREDES og ikke har noen totrinnshistorikk`() {
-        every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns null
+        mockFinnSisteTotrinnskontrollUtenomAngret() returns null
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
 
         assertThat(totrinnskontroll.totrinnskontroll).isNull()
@@ -182,7 +181,7 @@ internal class TotrinnskontrollServiceTest {
 
     @Test
     internal fun `skal returnere TOTRINNSKONTROLL_UNDERKJENT når behandlingen UTREDES og vedtak er underkjent`() {
-        every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
+        mockFinnSisteTotrinnskontrollUtenomAngret() returns
             totrinnskontrollMedbeslutterAArsakogBegrunnelse(
                 opprettetAv = saksbehandler,
                 beslutter = beslutter,
@@ -251,25 +250,20 @@ internal class TotrinnskontrollServiceTest {
 
     @Test
     internal fun `skal kaste feil når behandlingstatus er UTREDES og utfall er GODKJENT`() {
-        every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
+        mockFinnSisteTotrinnskontrollUtenomAngret() returns
             totrinnskontroll(
                 opprettetAv = "Annen saksbehandler",
                 status = TotrinnInternStatus.GODKJENT,
             )
 
-        Assertions
-            .assertThat(
-                Assertions.catchThrowable {
-                    totrinnskontrollService.hentTotrinnskontrollStatus(
-                        BEHANDLING_ID,
-                    )
-                },
-            ).hasMessageContaining("Skal ikke kunne være annen status enn UNDERKJENT")
+        assertThatThrownBy {
+            totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
+        }.hasMessageContaining("Skal ikke kunne være annen status enn UNDERKJENT")
     }
 
     @Test
     internal fun `skal returnere begrunnelse og årsaker underkjent når vedtak er underkjent`() {
-        every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
+        mockFinnSisteTotrinnskontrollUtenomAngret() returns
             totrinnskontrollMedbeslutterAArsakogBegrunnelse(
                 opprettetAv = "Noe",
                 beslutter = "Noen annen",
@@ -288,9 +282,7 @@ internal class TotrinnskontrollServiceTest {
     @Test
     internal fun `skal kunne underkjenne en totrinnskontroll`() {
         val oppdaterSlot = slot<Totrinnskontroll>()
-        every {
-            totrinnskontrollRepository.update(capture(oppdaterSlot))
-        } answers { firstArg() }
+        every { totrinnskontrollRepository.update(capture(oppdaterSlot)) } answers { firstArg() }
 
         testWithBrukerContext(beslutter) {
             totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(
@@ -300,6 +292,14 @@ internal class TotrinnskontrollServiceTest {
         }
         assertThat(oppdaterSlot.captured.årsakerUnderkjent?.årsaker!!).containsExactly(ÅrsakUnderkjent.VEDTAKSBREV)
     }
+
+    private fun mockFinnSisteTotrinnskontrollUtenomAngret() =
+        every {
+            totrinnskontrollRepository.findTopByBehandlingIdAndStatusNotOrderBySporbarEndretEndretTidDesc(
+                any(),
+                TotrinnInternStatus.ANGRET,
+            )
+        }
 
     private fun totrinnskontroll(
         opprettetAv: String,

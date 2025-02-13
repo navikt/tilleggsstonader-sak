@@ -55,6 +55,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeLæremid
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
+import java.util.UUID
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class LæremidlerBeregnYtelseStegStepDefinitions {
@@ -81,6 +82,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             tilkjentytelseService = TilkjentYtelseService(tilkjentYtelseRepository),
             simuleringService = simuleringService,
         )
+    val vedtaksperiodeId: UUID = UUID.randomUUID()
 
     @Gitt("følgende aktiviteter for læremidler behandling={}")
     fun `følgende aktiviteter`(
@@ -109,6 +111,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val vedtaksperioder =
             dataTable.mapRad { rad ->
                 VedtaksperiodeLæremidlerDto(
+                    id = vedtaksperiodeId,
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 )
@@ -130,6 +133,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                 VedtaksperiodeLæremidlerDto(
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    id = UUID.randomUUID(),
                 )
             }
         steg.utførSteg(dummyBehandling(behandlingId, revurderFra), InnvilgelseLæremidlerRequest(vedtaksperioder))
@@ -270,6 +274,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val forventedeVedtaksperioder =
             dataTable.mapRad { rad ->
                 Vedtaksperiode(
+                    id = vedtaksperiodeId,
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 )

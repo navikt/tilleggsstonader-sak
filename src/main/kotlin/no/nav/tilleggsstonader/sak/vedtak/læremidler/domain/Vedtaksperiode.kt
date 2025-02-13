@@ -6,10 +6,13 @@ import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import java.time.LocalDate
+import java.util.UUID
 
 data class Vedtaksperiode(
+    val id: UUID = UUID.randomUUID(),
     override val fom: LocalDate,
     override val tom: LocalDate,
+    val status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
 ) : Periode<LocalDate>,
     KopierPeriode<Vedtaksperiode> {
     init {
@@ -20,6 +23,12 @@ data class Vedtaksperiode(
         fom: LocalDate,
         tom: LocalDate,
     ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
+}
+
+enum class VedtaksperiodeStatus {
+    NY,
+    ENDRET,
+    UENDRET,
 }
 
 fun avkortVedtaksperiodeVedOpphør(

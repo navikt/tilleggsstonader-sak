@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
+import no.nav.tilleggsstonader.kontrakter.periode.mergeOverlappende
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
@@ -98,8 +99,9 @@ data class LøpendeMåned(
         }
         val sorterteMålgruppeOgAktivitet =
             vedtaksperioder
-                .flatMap { vedtaksperiode -> vedtaksperiode.finnRelevantMålgruppeOgAktivitet(stønadsperioder, aktiviteter) }
-                .sorted()
+                .flatMap { vedtaksperiode ->
+                    vedtaksperiode.finnRelevantMålgruppeOgAktivitet(stønadsperioder, aktiviteter)
+                }.sorted()
 
         return UtbetalingPeriode(this, sorterteMålgruppeOgAktivitet.first())
     }
@@ -124,13 +126,20 @@ data class LøpendeMåned(
                 .filter { it.type == stønadsperiode.aktivitet }
                 .mapNotNull { it.beregnSnitt(stønadsperiode) }
                 .mapNotNull { it.beregnSnitt(this) }
+                .mergeOverlappende(
+                    erLike = { aktivitet1, aktivitet2 -> aktivitet1.studienivå == aktivitet2.studienivå },
+                    merge = { aktivitet1, aktivitet2 ->
+                        aktivitet1.copy(prosent = minOf(100, aktivitet1.prosent + aktivitet2.prosent))
+                    },
+                )
 
         brukerfeilHvis(relevanteAktiviteter.isEmpty()) {
             "Det finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som varer i hele perioden ${this.formatertPeriodeNorskFormat()}}"
         }
 
         feilHvis(relevanteAktiviteter.overlapper()) {
-            "Det er foreløpig ikke støtte for flere aktiviteter som overlapper (gjelder perioden ${this.formatertPeriodeNorskFormat()}). " +
+            "Det er foreløpig ikke støtte for flere aktiviteter med ulike studienivåer som overlapper" +
+                " (gjelder perioden ${this.formatertPeriodeNorskFormat()}). " +
                 "Ta kontakt med utviklerteamet for å forstå situasjonen og om det burde legges til støtte for det."
         }
 

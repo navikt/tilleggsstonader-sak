@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
@@ -49,6 +50,7 @@ class TilsynBarnBeregnYtelseSteg(
     ) {
         when (vedtak) {
             is InnvilgelseTilsynBarnRequest -> beregnOgLagreInnvilgelse(saksbehandling)
+            is InnvilgelseTilsynBarnRequestV2 -> beregnOgLagreInnvilgelseV2(saksbehandling, vedtak)
             is AvslagTilsynBarnDto -> lagreAvslag(saksbehandling, vedtak)
             is OpphørTilsynBarnRequest -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }
@@ -56,6 +58,16 @@ class TilsynBarnBeregnYtelseSteg(
 
     private fun beregnOgLagreInnvilgelse(saksbehandling: Saksbehandling) {
         val beregningsresultat = beregningService.beregn(saksbehandling, TypeVedtak.INNVILGELSE)
+        vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, beregningsresultat))
+        lagreAndeler(saksbehandling, beregningsresultat)
+    }
+
+    private fun beregnOgLagreInnvilgelseV2(
+        saksbehandling: Saksbehandling,
+        vedtak: InnvilgelseTilsynBarnRequestV2,
+    ) {
+        val beregningsresultat =
+            beregningService.beregnV2(vedtak.vedtaksperioder, saksbehandling, TypeVedtak.INNVILGELSE)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
     }
@@ -71,7 +83,10 @@ class TilsynBarnBeregnYtelseSteg(
         opphørValideringService.validerVilkårperioder(saksbehandling)
 
         val beregningsresultat = beregningService.beregn(saksbehandling, TypeVedtak.OPPHØR)
-        opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(beregningsresultat, saksbehandling.revurderFra)
+        opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
+            beregningsresultat,
+            saksbehandling.revurderFra,
+        )
         vedtakRepository.insert(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,

@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.opplysninger.dto
 
-import no.nav.tilleggsstonader.sak.opplysninger.dto.Folkeregisterpersonstatus.entries
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import java.time.LocalDate
@@ -12,6 +11,7 @@ data class PersonopplysningerDto(
     val harVergemål: Boolean,
     val harFullmektig: Boolean,
     val adressebeskyttelse: Adressebeskyttelse,
+    val erSkjermet: Boolean,
 )
 
 data class StatsborgerskapDto(

@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
@@ -19,8 +19,8 @@ object VedtaksperiodeTilsynBarnMapper {
     private fun tilVedtaksperioder(it: BeregningsresultatForMåned) =
         it.grunnlag.stønadsperioderGrunnlag
             .map { it.stønadsperiode }
-            .map { stønadsperiode ->
-                VedtaksperiodeTilsynBarn(stønadsperiode, it.grunnlag.utgifter.map { it.barnId })
+            .map { vedtaksperiode ->
+                VedtaksperiodeTilsynBarn(vedtaksperiode, it.grunnlag.utgifter.map { it.barnId })
             }
 
     data class VedtaksperiodeTilsynBarn(
@@ -36,11 +36,11 @@ object VedtaksperiodeTilsynBarnMapper {
             validatePeriode()
         }
 
-        constructor(stønadsperiode: StønadsperiodeBeregningsgrunnlag, barn: List<BarnId>) : this(
-            fom = stønadsperiode.fom,
-            tom = stønadsperiode.tom,
-            målgruppe = stønadsperiode.målgruppe,
-            aktivitet = stønadsperiode.aktivitet,
+        constructor(vedtaksperiode: Vedtaksperiode, barn: List<BarnId>) : this(
+            fom = vedtaksperiode.fom,
+            tom = vedtaksperiode.tom,
+            målgruppe = vedtaksperiode.målgruppe,
+            aktivitet = vedtaksperiode.aktivitet,
             antallBarn = barn.size,
             barn = barn,
         )

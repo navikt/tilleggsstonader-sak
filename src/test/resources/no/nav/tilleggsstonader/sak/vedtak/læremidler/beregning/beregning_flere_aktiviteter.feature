@@ -54,8 +54,8 @@ Egenskap: Beregning av læremidler - flere aktiviteter
 
     Gitt følgende aktiviteter for læremidler
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
-      | 15.08.2024 | 30.09.2024 | TILTAK    | VIDEREGÅENDE | 100           |
-      | 15.08.2024 | 30.09.2024 | TILTAK    | VIDEREGÅENDE | 100           |
+      | 15.08.2024 | 30.09.2024 | TILTAK    | VIDEREGÅENDE | 30            |
+      | 15.08.2024 | 30.09.2024 | TILTAK    | VIDEREGÅENDE | 40            |
 
     Gitt følgende stønadsperioder for læremidler
       | Fom        | Tom        | Målgruppe | Aktivitet |
@@ -63,11 +63,31 @@ Egenskap: Beregning av læremidler - flere aktiviteter
 
     Når beregner stønad for læremidler
 
-    Så forvent følgende feil fra læremidlerberegning: Det er foreløpig ikke støtte for flere aktiviteter
-    #Så skal stønaden være
-    #  | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-    #  | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024      |
-    #  | 15.09.2024 | 30.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024      |
+    Så skal stønaden være
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 70            | 438  | AAP       | 15.08.2024      |
+      | 15.09.2024 | 30.09.2024 | 438   | VIDEREGÅENDE | 70            | 438  | AAP       | 15.08.2024      |
+
+  Scenario: Flere aktiviteter som overlapper av samme type studienivå, der en aktivitet løper lengre enn den andre
+    Gitt følgende vedtaksperioder for læremidler
+      | Fom        | Tom        |
+      | 15.08.2024 | 30.09.2024 |
+
+    Gitt følgende aktiviteter for læremidler
+      | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
+      | 15.08.2024 | 14.09.2024 | TILTAK    | VIDEREGÅENDE | 30            |
+      | 15.08.2024 | 30.09.2024 | TILTAK    | VIDEREGÅENDE | 40            |
+
+    Gitt følgende stønadsperioder for læremidler
+      | Fom        | Tom        | Målgruppe | Aktivitet |
+      | 15.08.2024 | 30.09.2024 | AAP       | TILTAK    |
+
+    Når beregner stønad for læremidler
+
+    Så skal stønaden være
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 70            | 438  | AAP       | 15.08.2024      |
+      | 15.09.2024 | 30.09.2024 | 219   | VIDEREGÅENDE | 40            | 438  | AAP       | 15.08.2024      |
 
   Scenario: Flere aktiviteter i samme måned - ingen dekker hele måneden som skal beregnes
     Gitt følgende vedtaksperioder for læremidler
@@ -128,10 +148,6 @@ Egenskap: Beregning av læremidler - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så forvent følgende feil fra læremidlerberegning: Det er foreløpig ikke støtte for flere aktiviteter
-    #Så skal stønaden være
-    #  | Fom        | Tom        | Beløp | Studienivå       | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-    #  | 15.08.2024 | 14.09.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | AAP       | 15.08.2024      |
-    #  | 15.09.2024 | 30.09.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | AAP       | 15.08.2024      |
 
   Scenario: Flere aktiviteter med ulike datoer innenfor en vedtaksperiode
     Gitt følgende vedtaksperioder for læremidler
@@ -150,10 +166,9 @@ Egenskap: Beregning av læremidler - flere aktiviteter
 
     Når beregner stønad for læremidler
 
-    Så forvent følgende feil fra læremidlerberegning: Det er foreløpig ikke støtte for flere aktiviteter
-    #Så skal stønaden være
-    #  | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-    #  | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024      |
+    Så skal stønaden være
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024      |
 
   Scenario: Flere aktiviteter med ulike datoer innenfor løpende måned men utenfor vedtaksperiode
     Gitt følgende vedtaksperioder for læremidler

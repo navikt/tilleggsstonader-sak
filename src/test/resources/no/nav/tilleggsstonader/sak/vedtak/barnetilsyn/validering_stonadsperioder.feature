@@ -14,7 +14,7 @@ Egenskap: Beregning barnetilsyn - validering av stønadsperioder
 
     Når beregner
 
-    Så forvent følgende feil: Kan ikke innvilge når det ikke finnes noen overlappende målgruppe og aktivitet
+    Så forvent følgende feil: Kan ikke innvilge når det ikke finnes noen vedtaksperioder
 
   Scenario: Finner ingen aktiviteter på behandling
 

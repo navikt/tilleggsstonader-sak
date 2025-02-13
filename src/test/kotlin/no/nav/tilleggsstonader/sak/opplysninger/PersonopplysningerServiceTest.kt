@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.dto.Adressebeskyttelse
+import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.fullmakt.FullmaktService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
@@ -24,6 +25,7 @@ class PersonopplysningerServiceTest {
     private val behandlingService = mockk<BehandlingService>()
     private val personService = mockk<PersonService>()
     private val fullmaktService = mockk<FullmaktService>()
+    private val egenAnsattService = mockk<EgenAnsattService>()
 
     private val service =
         PersonopplysningerService(
@@ -31,6 +33,7 @@ class PersonopplysningerServiceTest {
             behandlingService = behandlingService,
             personService = personService,
             fullmaktService = fullmaktService,
+            egenAnsattService = egenAnsattService,
         )
 
     @BeforeEach
@@ -39,6 +42,7 @@ class PersonopplysningerServiceTest {
         every { behandlingService.hentAktivIdent(any()) } returns "1"
         every { personService.hentSøker(any()) } returns pdlSøker()
         every { fullmaktService.hentFullmektige(any()) } returns emptyList()
+        every { egenAnsattService.erEgenAnsatt(any<String>()) } returns true
     }
 
     @Nested

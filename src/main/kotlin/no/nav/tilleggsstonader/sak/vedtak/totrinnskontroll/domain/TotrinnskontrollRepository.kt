@@ -11,4 +11,9 @@ interface TotrinnskontrollRepository :
     RepositoryInterface<Totrinnskontroll, UUID>,
     InsertUpdateRepository<Totrinnskontroll> {
     fun findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId: BehandlingId): Totrinnskontroll?
+
+    fun findTopByBehandlingIdAndStatusNotOrderBySporbarEndretEndretTidDesc(
+        behandlingId: BehandlingId,
+        status: TotrinnInternStatus,
+    ): Totrinnskontroll?
 }

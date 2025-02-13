@@ -6,7 +6,9 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatus
 import java.time.LocalDate
+import java.util.UUID
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -29,10 +31,12 @@ sealed interface VedtakLæremidlerRequest : VedtakRequest
 sealed interface VedtakLæremidlerResponse : VedtakResponse
 
 data class VedtaksperiodeLæremidlerDto(
+    val id: UUID,
     val fom: LocalDate,
     val tom: LocalDate,
+    val status: VedtaksperiodeStatus? = null,
 )
 
-fun List<Vedtaksperiode>.tilDto() = this.map { VedtaksperiodeLæremidlerDto(fom = it.fom, tom = it.tom) }
+fun List<Vedtaksperiode>.tilDto() = this.map { VedtaksperiodeLæremidlerDto(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }
 
-fun List<VedtaksperiodeLæremidlerDto>.tilDomene() = this.map { Vedtaksperiode(fom = it.fom, tom = it.tom) }.sorted()
+fun List<VedtaksperiodeLæremidlerDto>.tilDomene() = this.map { Vedtaksperiode(id = it.id, fom = it.fom, tom = it.tom) }.sorted()
