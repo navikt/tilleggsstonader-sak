@@ -2,7 +2,7 @@
   "type": "AAP_TILSYN_BARN",
   "fakta": {},
   "vurderinger": {
-    "aldersvilkårOppfylt": {
+    "aldersvilkår": {
       "resultat":"OPPFYLT",
       "svar":"JA_IMPLISITT"
     },

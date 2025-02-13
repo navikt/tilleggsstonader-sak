@@ -110,7 +110,7 @@ data class VurderingDekketAvAnnetRegelverk private constructor(
     }
 }
 
-data class VurderingAldersVilkårOppfylt private constructor(
+data class VurderingAldersVilkår private constructor(
     override val svar: SvarJaNei?,
     override val resultat: ResultatDelvilkårperiode,
 ) : Vurdering {
