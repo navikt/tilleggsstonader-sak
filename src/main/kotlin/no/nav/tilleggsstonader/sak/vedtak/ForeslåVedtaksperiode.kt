@@ -23,7 +23,7 @@ object ForeslåVedtaksperiode {
         val oppfylteVilkår = vilkår.finnOppfylte()
 
         brukerfeilHvis(oppfylteVilkår.isEmpty()) {
-            "Det finnes ingen vilkår som kan brukes i vedtaksperioden"
+            "Kunne ikke foreslå vedtaksperiode, ettersom det ikke er lagt inn noen utgiftsperioder der vilkårene er oppfylt."
         }
 
         val sammenslåtteVilkår =
