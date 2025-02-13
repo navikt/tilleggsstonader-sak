@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
@@ -40,6 +41,14 @@ class TilsynBarnVedtakController(
         lagreVedtak(behandlingId, vedtak)
     }
 
+    @PostMapping("{behandlingId}/innvilgelseV2")
+    fun innvilgeV2(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: InnvilgelseTilsynBarnRequestV2,
+    ) {
+        lagreVedtakV2(behandlingId, vedtak)
+    }
+
     @PostMapping("{behandlingId}/avslag")
     fun avslå(
         @PathVariable behandlingId: BehandlingId,
@@ -64,6 +73,14 @@ class TilsynBarnVedtakController(
         vedtakService.håndterSteg(behandlingId, vedtak)
     }
 
+    fun lagreVedtakV2(
+        behandlingId: BehandlingId,
+        vedtak: VedtakTilsynBarnRequest,
+    ) {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
+        vedtakService.håndterSteg(behandlingId, vedtak)
+    }
+
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
@@ -71,6 +88,15 @@ class TilsynBarnVedtakController(
     ): BeregningsresultatTilsynBarnDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         return beregningService.beregn(behandling, TypeVedtak.INNVILGELSE).tilDto(behandling.revurderFra)
+    }
+
+    @PostMapping("{behandlingId}/beregnV2")
+    fun beregnV2(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: InnvilgelseTilsynBarnRequestV2,
+    ): BeregningsresultatTilsynBarnDto {
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        return beregningService.beregnV2(vedtak.vedtaksperioder, behandling, TypeVedtak.INNVILGELSE).tilDto(behandling.revurderFra)
     }
 
     /**
