@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.dto.NavnDto
 import no.nav.tilleggsstonader.sak.opplysninger.dto.PersonopplysningerDto
+import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.fullmakt.FullmaktService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
@@ -19,6 +20,7 @@ class PersonopplysningerService(
     private val behandlingService: BehandlingService,
     private val personService: PersonService,
     private val fullmaktService: FullmaktService,
+    private val egenAnsattService: EgenAnsattService,
 ) {
     // TODO denne burde hente fra grunnlag?
     fun hentPersonopplysninger(behandlingId: BehandlingId): PersonopplysningerDto =
@@ -39,6 +41,7 @@ class PersonopplysningerService(
             // fremtidsfullmakt gjelder frem i tiden
             harFullmektig = harFullmektig,
             adressebeskyttelse = Adressebeskyttelse.fraPdl(pdlSøker.adressebeskyttelse.gradering()),
+            erSkjermet = egenAnsattService.erEgenAnsatt(ident),
         )
     }
 }
