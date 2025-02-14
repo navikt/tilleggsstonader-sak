@@ -16,5 +16,6 @@ object SøknadsskjemaUtil {
         when (stønadstype) {
             Stønadstype.BARNETILSYN -> objectMapper.readValue<Søknadsskjema<SøknadsskjemaBarnetilsyn>>(data)
             Stønadstype.LÆREMIDLER -> objectMapper.readValue<Søknadsskjema<SøknadsskjemaLæremidler>>(data)
+            Stønadstype.BOUTGIFTER -> error("Har ikke støtte for parsing av skjema for $stønadstype ennå")
         }
 }
