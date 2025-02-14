@@ -24,9 +24,6 @@ class TilsynBarnVedtaksperiodeValidingerService(
     private val vilkårperiodeService: VilkårperiodeService,
     private val grunnlagsdataService: GrunnlagsdataService,
 ) {
-    // TODO
-    // Rydd hva som valideres her og senere
-
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
         behandlingId: BehandlingId,
