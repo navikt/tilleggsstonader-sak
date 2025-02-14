@@ -36,6 +36,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil.totrinnskontroll
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -240,6 +241,6 @@ class SendTilBeslutterStegTest {
     }
 
     private fun utførSteg() {
-        beslutteVedtakSteg.utførSteg(behandling, null)
+        beslutteVedtakSteg.utførSteg(behandling, SendTilBeslutterRequest())
     }
 }

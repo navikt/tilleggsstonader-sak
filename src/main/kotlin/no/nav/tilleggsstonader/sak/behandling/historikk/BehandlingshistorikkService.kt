@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistor
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.tilHendelseshistorikkDto
+import no.nav.tilleggsstonader.sak.behandling.historikk.domain.tilJson
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -68,4 +69,34 @@ class BehandlingshistorikkService(
             ),
         )
     }
+
+    fun slettFritekstMetadataVedFerdigstillelse(behandlingId: BehandlingId) {
+        val relevanteHistorikkinnslag =
+            behandlingshistorikkRepository
+                .findByBehandlingIdAndStegIn(
+                    behandlingId,
+                    listOf(StegType.SEND_TIL_BESLUTTER, StegType.BESLUTTE_VEDTAK),
+                )
+
+        relevanteHistorikkinnslag.forEach { historikkinnslag ->
+            val oppdatertHistorikkinnslag = historikkinnslag.slettFritekstmetadata()
+            behandlingshistorikkRepository.update(oppdatertHistorikkinnslag)
+        }
+    }
+
+    private fun Behandlingshistorikk.slettFritekstmetadata(): Behandlingshistorikk =
+        this.copy(
+            metadata =
+                metadata?.tilJson()?.let {
+                    val metadataMap = it.toMutableMap()
+
+                    when (this.steg) {
+                        StegType.SEND_TIL_BESLUTTER -> metadataMap.remove("kommentarTilBeslutter")
+                        StegType.BESLUTTE_VEDTAK -> metadataMap.remove("begrunnelse")
+                        else -> metadataMap
+                    }
+
+                    JsonWrapper(objectMapper.writeValueAsString(metadataMap))
+                },
+        )
 }

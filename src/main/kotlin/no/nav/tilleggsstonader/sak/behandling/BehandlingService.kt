@@ -256,6 +256,8 @@ class BehandlingService(
             metadata = henlagt,
         )
 
+        fjernFritekstFraBehandlingshistorikk(behandlingId)
+
         taskService.save(
             BehandlingsstatistikkTask.opprettFerdigTask(
                 behandlingId = henlagtBehandling.id,
@@ -305,4 +307,8 @@ class BehandlingService(
      */
     fun behandlingErLåstForVidereRedigering(behandlingId: BehandlingId): Boolean =
         behandlingRepository.findByIdOrThrow(behandlingId).status.behandlingErLåstForVidereRedigering()
+
+    fun fjernFritekstFraBehandlingshistorikk(behandlingId: BehandlingId) {
+        behandlingshistorikkService.slettFritekstMetadataVedFerdigstillelse(behandlingId)
+    }
 }

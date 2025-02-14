@@ -34,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnR
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
@@ -135,7 +136,7 @@ class BehandlingFlytTest(
 
         somSaksbehandler {
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT)
-            sendTilBeslutter(behandlingId)
+            sendTilBeslutter(behandlingId, "kommentar")
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.IKKE_AUTORISERT)
             assertSisteFerdigstillOppgaveTask(Oppgavetype.BehandleUnderkjentVedtak)
         }
@@ -332,9 +333,12 @@ class BehandlingFlytTest(
         return behandlingId
     }
 
-    private fun sendTilBeslutter(behandlingId: BehandlingId) {
+    private fun sendTilBeslutter(
+        behandlingId: BehandlingId,
+        kommentarTilBeslutter: String? = null,
+    ) {
         kjørTasks()
-        totrinnskontrollController.sendTilBeslutter(behandlingId)
+        totrinnskontrollController.sendTilBeslutter(behandlingId, SendTilBeslutterRequest(kommentarTilBeslutter = kommentarTilBeslutter))
         kjørTasks()
     }
 
