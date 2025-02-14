@@ -1,26 +1,27 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.springframework.stereotype.Service
-import kotlin.collections.forEach
 
 @Service
 class TilsynBarnVedtaksperiodeValidingerService(
     private val vilkårperiodeService: VilkårperiodeService,
 ) {
     // TODO
-    // valider gyldig målgruppe
-    // valider gyldig aktivitet
-    // valider gyldig kobinasjon av aktivitet og målgruppe
+    // validerStønadsperiodeErInnenfor18og67år
 
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -30,6 +31,17 @@ class TilsynBarnVedtaksperiodeValidingerService(
 
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
         validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett(vilkårperioder, vedtaksperioder)
+
+        val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeOppfylteVilkårperioder()
+        val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteVilkårperioder()
+
+        vedtaksperioder.forEach {
+            validerEnkeltperiode(
+                it,
+                målgrupper,
+                aktiviteter,
+            )
+        }
     }
 
     private fun validerIngenOverlappMellomVedtaksperioder(vedtaksperioder: List<Vedtaksperiode>) {
@@ -64,5 +76,31 @@ class TilsynBarnVedtaksperiodeValidingerService(
                         "med ${it.type}(${it.formatertPeriodeNorskFormat()}) som ikke gir rett på stønad",
                 )
             }
+    }
+
+    fun validerEnkeltperiode(
+        vedtaksperiode: Vedtaksperiode,
+        målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
+        aktivitetPerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
+    ) {
+        brukerfeilHvisIkke(vedtaksperiode.målgruppe.gyldigeAktiviter.contains(vedtaksperiode.aktivitet)) {
+            "Kombinasjonen av ${vedtaksperiode.målgruppe} og ${vedtaksperiode.aktivitet} er ikke gyldig"
+        }
+
+        val målgrupper =
+            målgruppePerioderPerType[vedtaksperiode.målgruppe]?.takeIf { it.isNotEmpty() }
+                ?: brukerfeil("Finner ingen perioder hvor vilkår for ${vedtaksperiode.målgruppe} er oppfylt")
+        val aktiviteter =
+            aktivitetPerioderPerType[vedtaksperiode.aktivitet]?.takeIf { it.isNotEmpty() }
+                ?: brukerfeil("Finner ingen perioder hvor vilkår for ${vedtaksperiode.aktivitet} er oppfylt")
+
+        målgrupper.firstOrNull { it.inneholder(vedtaksperiode) }
+            ?: brukerfeil(
+                "Finnes ingen periode med oppfylte vilkår for ${vedtaksperiode.målgruppe} i perioden ${vedtaksperiode.formatertPeriodeNorskFormat()}",
+            )
+        aktiviteter.firstOrNull { it.inneholder(vedtaksperiode) }
+            ?: brukerfeil(
+                "Finnes ingen periode med oppfylte vilkår for ${vedtaksperiode.aktivitet} i perioden ${vedtaksperiode.formatertPeriodeNorskFormat()}",
+            )
     }
 }
