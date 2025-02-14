@@ -95,6 +95,7 @@ class OpprettTestBehandlingController(
         when (fagsak.stønadstype) {
             Stønadstype.BARNETILSYN -> opprettSøknadBarnetilsyn(fagsak, behandling)
             Stønadstype.LÆREMIDLER -> opprettSøknadLæremidler(fagsak, behandling)
+            Stønadstype.BOUTGIFTER -> { /* Oppretter foreløpig ikke søknad for boutgifter*/ }
         }
     }
 
