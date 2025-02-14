@@ -201,4 +201,5 @@ private fun Stønadstype.tilDokumentBrevkode(): DokumentBrevkode =
     when (this) {
         Stønadstype.BARNETILSYN -> DokumentBrevkode.BARNETILSYN
         Stønadstype.LÆREMIDLER -> DokumentBrevkode.LÆREMIDLER
+        Stønadstype.BOUTGIFTER -> DokumentBrevkode.BOUTGIFTER
     }

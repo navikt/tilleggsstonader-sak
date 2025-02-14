@@ -77,6 +77,7 @@ class SøknadRoutingService(
             when (stønadstype) {
                 Stønadstype.BARNETILSYN -> true
                 Stønadstype.LÆREMIDLER -> true
+                Stønadstype.BOUTGIFTER -> false
             }
         logger.info("routing - stønadstype=$stønadstype skalRuteAlleSøkere=true")
         return skalRutes
@@ -86,7 +87,7 @@ class SøknadRoutingService(
         when (stønadstype) {
             Stønadstype.BARNETILSYN -> false // tilsyn barn skal ikke stoppes med feature toggle
             Stønadstype.LÆREMIDLER -> maksAntallErNådd(stønadstype)
-            else -> error("Støtter ennå ikke stønadstype=$stønadstype")
+            Stønadstype.BOUTGIFTER -> error("Støtter ennå ikke stønadstype=$stønadstype")
         }
 
     private fun maksAntallErNådd(stønadstype: Stønadstype): Boolean {
@@ -118,6 +119,7 @@ class SøknadRoutingService(
             when (stønadstype) {
                 Stønadstype.BARNETILSYN -> !harAktivtVedtak
                 Stønadstype.LÆREMIDLER -> !harAktivtVedtak
+                Stønadstype.BOUTGIFTER -> !harAktivtVedtak
             }
 
         logger.info(
