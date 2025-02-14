@@ -129,7 +129,7 @@ class JournalpostService(
         stønadstype: Stønadstype,
     ): Søknadsskjema<out Skjema> {
         val dokumentinfo =
-            JournalføringHelper.plukkUtOriginaldokument(søknadJournalpost, DokumentBrevkode.fraStønadstype(stønadstype))
+            JournalføringHelper.plukkUtOriginaldokument(søknadJournalpost, stønadstype.tilDokumentBrevkode())
         val data =
             journalpostClient.hentDokument(
                 journalpostId = søknadJournalpost.journalpostId,
@@ -197,8 +197,8 @@ class JournalpostService(
     }
 }
 
-private fun DokumentBrevkode.Companion.fraStønadstype(stønadstype: Stønadstype): DokumentBrevkode =
-    when (stønadstype) {
+private fun Stønadstype.tilDokumentBrevkode(): DokumentBrevkode =
+    when (this) {
         Stønadstype.BARNETILSYN -> DokumentBrevkode.BARNETILSYN
         Stønadstype.LÆREMIDLER -> DokumentBrevkode.LÆREMIDLER
     }
