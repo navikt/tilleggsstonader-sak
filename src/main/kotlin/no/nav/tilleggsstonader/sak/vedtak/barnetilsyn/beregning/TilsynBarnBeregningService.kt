@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningValideringUtil.validerPerioderForInnvilgelse
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtaksperiodeValidingerUtils.validerVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.splitFraRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilDagerPerUke
@@ -52,6 +51,7 @@ class TilsynBarnBeregningService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val vedtakRepository: VedtakRepository,
     private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
+    private val tilsynBarnVedtaksperiodeValidingerService: TilsynBarnVedtaksperiodeValidingerService,
 ) {
     fun beregn(
         behandling: Saksbehandling,
@@ -85,7 +85,7 @@ class TilsynBarnBeregningService(
         val vedtaksperioder =
             vedtaksperioderDto.tilVedtaksperiode().sorted().splitFraRevurderFra(behandling.revurderFra)
 
-        validerVedtaksperioder(vedtaksperioder)
+        tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(vedtaksperioder, behandling.id)
 
         val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioder)
         val relevantePerioderFraForrigeVedtak =
