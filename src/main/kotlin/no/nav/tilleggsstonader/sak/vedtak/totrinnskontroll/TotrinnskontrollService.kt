@@ -64,7 +64,7 @@ class TotrinnskontrollService(
             behandlingId = saksbehandling.id,
             stegtype = saksbehandling.steg,
             utfall = null,
-            metadata = sendTilBeslutterRequest,
+            metadata = mapOf("kommentarTilBeslutter" to sendTilBeslutterRequest.kommentarTilBeslutter),
         )
 
         totrinnskontrollRepository.insert(

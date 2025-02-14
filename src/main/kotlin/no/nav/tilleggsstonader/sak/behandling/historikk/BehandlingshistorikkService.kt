@@ -84,7 +84,7 @@ class BehandlingshistorikkService(
         }
     }
 
-    fun Behandlingshistorikk.slettFritekstmetadata(): Behandlingshistorikk =
+    private fun Behandlingshistorikk.slettFritekstmetadata(): Behandlingshistorikk =
         this.copy(
             metadata =
                 metadata?.tilJson()?.let {

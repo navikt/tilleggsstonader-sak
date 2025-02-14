@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -162,7 +163,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
             endretTid = osloNow().plusDays(1),
             steg = StegType.BESLUTTE_VEDTAK,
             utfall = StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT,
-            metadata = mapOf("begrunnelse" to "begrunnelse"),
+            metadata = mapOf("begrunnelse" to "begrunnelse", "årsakerUnderkjent" to listOf(ÅrsakUnderkjent.INNGANGSVILKÅR)),
         )
 
         insert(
@@ -184,8 +185,15 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
 
         assertThat(historikk).hasSameSizeAs(historikkFørSletting)
 
-        historikk.mapNotNull { it.metadata }.forEach { metadata ->
+        val historikkMedMetadata = historikk.mapNotNull { it.metadata }
+
+        historikkMedMetadata.forEach { metadata ->
             assertThat(metadata).doesNotContainKeys("kommentarTilBeslutter", "begrunnelse")
+        }
+
+        historikk.find { it.hendelse == Hendelse.VEDTAK_UNDERKJENT }?.let {
+            assertThat(it.metadata).containsKey("årsakerUnderkjent")
+            assertThat(it.metadata?.get("årsakerUnderkjent")).isEqualTo(listOf(ÅrsakUnderkjent.INNGANGSVILKÅR.toString()))
         }
     }
 
