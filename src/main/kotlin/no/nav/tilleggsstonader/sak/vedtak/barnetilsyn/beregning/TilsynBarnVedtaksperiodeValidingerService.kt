@@ -6,7 +6,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
+import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -15,13 +17,15 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class TilsynBarnVedtaksperiodeValidingerService(
     private val vilkårperiodeService: VilkårperiodeService,
+    private val grunnlagsdataService: GrunnlagsdataService,
 ) {
     // TODO
-    // validerStønadsperiodeErInnenfor18og67år
+    // Rydd hva som valideres her og senere
 
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -35,11 +39,18 @@ class TilsynBarnVedtaksperiodeValidingerService(
         val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeOppfylteVilkårperioder()
         val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteVilkårperioder()
 
+        val fødselsdato =
+            grunnlagsdataService
+                .hentGrunnlagsdata(behandlingId)
+                .grunnlag.fødsel
+                ?.fødselsdatoEller1JanForFødselsår()
+
         vedtaksperioder.forEach {
             validerEnkeltperiode(
                 it,
                 målgrupper,
                 aktiviteter,
+                fødselsdato,
             )
         }
     }
@@ -82,6 +93,7 @@ class TilsynBarnVedtaksperiodeValidingerService(
         vedtaksperiode: Vedtaksperiode,
         målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
         aktivitetPerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
+        fødselsdato: LocalDate?,
     ) {
         brukerfeilHvisIkke(vedtaksperiode.målgruppe.gyldigeAktiviter.contains(vedtaksperiode.aktivitet)) {
             "Kombinasjonen av ${vedtaksperiode.målgruppe} og ${vedtaksperiode.aktivitet} er ikke gyldig"
@@ -102,5 +114,23 @@ class TilsynBarnVedtaksperiodeValidingerService(
             ?: brukerfeil(
                 "Finnes ingen periode med oppfylte vilkår for ${vedtaksperiode.aktivitet} i perioden ${vedtaksperiode.formatertPeriodeNorskFormat()}",
             )
+
+        validerVedtaksperiodeErInnenfor18og67år(fødselsdato, vedtaksperiode)
+    }
+
+    private fun validerVedtaksperiodeErInnenfor18og67år(
+        fødselsdato: LocalDate?,
+        vedtaksperiode: Vedtaksperiode,
+    ) {
+        if (fødselsdato != null && vedtaksperiode.målgruppe.gjelderNedsattArbeidsevne()) {
+            val dato18år = fødselsdato.plusYears(18)
+            brukerfeilHvis(vedtaksperiode.fom < dato18år) {
+                "Periode kan ikke begynne før søker fyller 18 år (${dato18år.norskFormat()})"
+            }
+            val dato67år = fødselsdato.plusYears(67)
+            brukerfeilHvis(vedtaksperiode.tom >= dato67år) {
+                "Periode kan ikke slutte etter søker fylt 67 år (${dato67år.norskFormat()})"
+            }
+        }
     }
 }

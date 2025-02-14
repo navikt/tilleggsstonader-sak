@@ -4,6 +4,11 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Fødsel
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Navn
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -30,7 +35,12 @@ import java.time.YearMonth
 
 class TilsynBarnVedtaksperiodeValidingerUtilsTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
-    val tilsynBarnVedtaksperiodeValidingerService = TilsynBarnVedtaksperiodeValidingerService(vilkårperiodeService)
+    val grunnlagsdataService = mockk<GrunnlagsdataService>()
+    val tilsynBarnVedtaksperiodeValidingerService =
+        TilsynBarnVedtaksperiodeValidingerService(
+            vilkårperiodeService = vilkårperiodeService,
+            grunnlagsdataService = grunnlagsdataService,
+        )
 
     val behandlingId = BehandlingId.random()
 
@@ -58,6 +68,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 målgrupper = målgrupper,
                 aktiviteter = aktiviteter,
             )
+        every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns lagGrunnlagsdata()
     }
 
     @Test
@@ -587,7 +598,174 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 )
             }.doesNotThrowAnyException()
         }
+
+        @Nested
+        inner class ValideringAvFødselsdato {
+            val fom = LocalDate.of(2024, 1, 1)
+            val tom = LocalDate.of(2025, 12, 31)
+            val vedtaksperioder =
+                listOf(
+                    lagVedtaksperiode(
+                        målgruppe = MålgruppeType.AAP,
+                        aktivitet = AktivitetType.TILTAK,
+                        fom = fom,
+                        tom = tom,
+                    ),
+                )
+            val målgrupper = listOf(målgruppe(fom = fom, tom = tom))
+            val aktiviteter = listOf(aktivitet(fom = fom, tom = tom))
+            val vilkårperioder = Vilkårperioder(målgrupper, aktiviteter)
+
+            val dato18årGammel = fom.minusYears(18)
+            val dato67årGammel = tom.minusYears(67)
+
+            @BeforeEach
+            fun setup() {
+                every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
+            }
+
+            @Test
+            fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er over 18 år`() {
+                every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns lagGrunnlagsdata(dato18årGammel)
+                assertThatCode {
+                    tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                        vedtaksperioder = vedtaksperioder,
+                        behandlingId = behandlingId,
+                    )
+                }.doesNotThrowAnyException()
+
+                every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns
+                    lagGrunnlagsdata(
+                        dato18årGammel.minusDays(
+                            1,
+                        ),
+                    )
+                assertThatCode {
+                    tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                        vedtaksperioder = vedtaksperioder,
+                        behandlingId = behandlingId,
+                    )
+                }.doesNotThrowAnyException()
+            }
+
+            @Test
+            fun `skal kaste feil dersom nedsatt arbeidsevne og personen er under 18 år`() {
+                every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns
+                    lagGrunnlagsdata(
+                        dato18årGammel.plusDays(
+                            1,
+                        ),
+                    )
+                assertThatCode {
+                    tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                        vedtaksperioder = vedtaksperioder,
+                        behandlingId = behandlingId,
+                    )
+                }.hasMessageContaining("Periode kan ikke begynne før søker fyller 18 år")
+            }
+
+            @Test
+            fun `skal kaste feil dersom nedsatt arbeidsevne og personen er over 67 år`() {
+                every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns
+                    lagGrunnlagsdata(
+                        dato67årGammel,
+                    )
+                assertThatThrownBy {
+                    tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                        vedtaksperioder = vedtaksperioder,
+                        behandlingId = behandlingId,
+                    )
+                }.hasMessageContaining("Periode kan ikke slutte etter søker fylt 67 år")
+
+                every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns
+                    lagGrunnlagsdata(
+                        dato67årGammel.minusDays(1),
+                    )
+                assertThatThrownBy {
+                    tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                        vedtaksperioder = vedtaksperioder,
+                        behandlingId = behandlingId,
+                    )
+                }.hasMessageContaining("Periode kan ikke slutte etter søker fylt 67 år")
+            }
+
+            @Test
+            fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er under 67 år`() {
+                every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns
+                    lagGrunnlagsdata(
+                        dato67årGammel.plusDays(1),
+                    )
+                assertThatCode {
+                    tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                        vedtaksperioder = vedtaksperioder,
+                        behandlingId = behandlingId,
+                    )
+                }.doesNotThrowAnyException()
+            }
+
+            @Test
+            fun `skal ikke kaste feil dersom overgangsstønad og under 18 år eller over 67 år`() {
+                val vedtaksperioder =
+                    vedtaksperioder.map {
+                        it.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.UTDANNING)
+                    }
+                val vilkårperioder =
+                    vilkårperioder.copy(
+                        målgrupper =
+                            målgrupper.map {
+                                målgruppe(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.OVERGANGSSTØNAD),
+                                )
+                            },
+                        aktiviteter =
+                            aktiviteter.map {
+                                aktivitet(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                    faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.UTDANNING),
+                                )
+                            },
+                    )
+                every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
+
+                every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns
+                    lagGrunnlagsdata(
+                        dato18årGammel.minusYears(1),
+                    )
+                assertThatCode {
+                    tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                        vedtaksperioder = vedtaksperioder,
+                        behandlingId = behandlingId,
+                    )
+                }.doesNotThrowAnyException()
+
+                every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns
+                    lagGrunnlagsdata(
+                        dato67årGammel.plusYears(1),
+                    )
+                assertThatCode {
+                    tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                        vedtaksperioder = vedtaksperioder,
+                        behandlingId = behandlingId,
+                    )
+                }.doesNotThrowAnyException()
+            }
+        }
     }
+
+    private fun lagGrunnlagsdata(fødeslsdato: LocalDate = LocalDate.of(1990, 1, 1)) =
+        Grunnlagsdata(
+            behandlingId = behandlingId,
+            grunnlag =
+                Grunnlag(
+                    navn = Navn("fornavn", "mellomnavn", "etternavn"),
+                    fødsel = Fødsel(fødeslsdato, fødeslsdato.year),
+                    barn = emptyList(),
+                    arena = null,
+                ),
+        )
 
     private fun lagVedtaksperiode(
         fom: LocalDate = LocalDate.of(2025, 1, 1),
