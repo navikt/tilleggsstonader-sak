@@ -19,10 +19,11 @@ import java.time.LocalDateTime
 @JsonSubTypes(
     JsonSubTypes.Type(BehandlingFaktaTilsynBarnDto::class, name = "BARNETILSYN"),
     JsonSubTypes.Type(BehandlingFaktaLæremidlerDto::class, name = "LÆREMIDLER"),
+    JsonSubTypes.Type(BehandlingFaktaBoutgifterDto::class, name = "BOUTGIFTER"),
 )
 sealed interface BehandlingFaktaDto {
     val søknadMottattTidspunkt: LocalDateTime?
-    val hovedytelse: FaktaHovedytelse
+    val hovedytelse: FaktaHovedytelse?
     val dokumentasjon: FaktaDokumentasjon?
     val arena: ArenaFakta?
 }
@@ -43,6 +44,16 @@ data class BehandlingFaktaLæremidlerDto(
     override val arena: ArenaFakta?,
     val utdanning: FaktaUtdanning,
     val alder: Int?,
+) : BehandlingFaktaDto
+
+/**
+ * Dummy-objekt fordi vi ikke har en søknad ennå
+ */
+data class BehandlingFaktaBoutgifterDto(
+    override val søknadMottattTidspunkt: LocalDateTime? = null,
+    override val hovedytelse: FaktaHovedytelse? = null,
+    override val dokumentasjon: FaktaDokumentasjon? = null,
+    override val arena: ArenaFakta?,
 ) : BehandlingFaktaDto
 
 data class FaktaHovedytelse(
