@@ -7,9 +7,8 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Dokument
-import no.nav.tilleggsstonader.kontrakter.dokarkiv.Dokumenttype
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Filtype
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.dokumenttyper
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -68,7 +67,7 @@ class JournalførVedtaksbrevTask(
             Dokument(
                 dokument = vedtaksbrev.beslutterPdf?.bytes ?: error("Mangler beslutterpdf"),
                 filtype = Filtype.PDFA,
-                dokumenttype = utledDokumenttype(saksbehandling),
+                dokumenttype = saksbehandling.stønadstype.dokumenttyper.vedtaksbrev,
                 tittel = utledBrevtittel(saksbehandling),
             )
 
@@ -112,19 +111,7 @@ class JournalførVedtaksbrevTask(
         return response
     }
 
-    private fun utledBrevtittel(saksbehandling: Saksbehandling) =
-        when (saksbehandling.stønadstype) {
-            Stønadstype.BARNETILSYN -> "Vedtak om stønad til tilsyn barn" // TODO
-            Stønadstype.LÆREMIDLER -> "Vedtak om stønad til læremidler" // TODO
-            else -> error("Utledning av brevtype er ikke implementert for ${saksbehandling.stønadstype}")
-        }
-
-    private fun utledDokumenttype(saksbehandling: Saksbehandling) =
-        when (saksbehandling.stønadstype) {
-            Stønadstype.BARNETILSYN -> Dokumenttype.BARNETILSYN_VEDTAKSBREV
-            Stønadstype.LÆREMIDLER -> Dokumenttype.LÆREMIDLER_VEDTAKSBREV
-            else -> error("Utledning av dokumenttype er ikke implementert for ${saksbehandling.stønadstype}")
-        }
+    private fun utledBrevtittel(saksbehandling: Saksbehandling) = "Vedtak om ${saksbehandling.stønadstype.visningsnavn}"
 
     override fun onCompletion(task: Task) {
         taskService.save(DistribuerVedtaksbrevTask.opprettTask(BehandlingId.fromString(task.payload)))
