@@ -112,7 +112,7 @@ class TilsynBarnBeregningService(
 
         val aktiviteter = finnAktiviteter(behandling.id)
 
-        validerPerioderForInnvilgelse(vedtaksperioder, aktiviteter, utgifterPerBarn, typeVedtak, behandling.revurderFra)
+        validerPerioderForInnvilgelse(vedtaksperioder, utgifterPerBarn, typeVedtak)
 
         val beregningsgrunnlag =
             lagBeregningsgrunnlagPerMåned(vedtaksperioder, aktiviteter, utgifterPerBarn)
