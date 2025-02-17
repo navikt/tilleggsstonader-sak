@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.*
 
 class TilsynBarnVedtaksperiodeValidingerUtilsTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
@@ -770,6 +772,135 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                         utgifter,
                     )
                 }.doesNotThrowAnyException()
+            }
+        }
+
+        @Nested
+        inner class ValiderUtgifterHeleVedtaksperioden {
+            val vedtaksperiode = lagVedtaksperiode()
+
+            val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+                mapOf(
+                    BarnId.random() to
+                        listOf(
+                            UtgiftBeregning(
+                                fom = YearMonth.of(2025, 1),
+                                tom = YearMonth.of(2025, 1),
+                                utgift = 1000,
+                            ),
+                        ),
+                )
+
+            @Test
+            fun `kaster ikke feil når utgift hele vedtaksperioden`() {
+                assertDoesNotThrow {
+                    tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                        vedtaksperioder = listOf(vedtaksperiode),
+                        behandlingId = behandlingId,
+                        utgifter,
+                    )
+                }
+            }
+
+            @Test
+            fun `kaster feil når det ikke finnes utgifter hele vedtaksperioden`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                            vedtaksperioder = listOf(vedtaksperiode.copy(tom = LocalDate.of(2025, 2, 28))),
+                            behandlingId = behandlingId,
+                            utgifter,
+                        )
+                    }
+                assertThat(feil.feil).contains("Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden")
+            }
+
+            @Test
+            fun `kaster ikke feil når det utgifter hele vedtaksperioden fordelt i flere perioder`() {
+                val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+                    mapOf(
+                        BarnId.random() to
+                            listOf(
+                                UtgiftBeregning(
+                                    fom = YearMonth.of(2025, 1),
+                                    tom = YearMonth.of(2025, 1),
+                                    utgift = 1000,
+                                ),
+                                UtgiftBeregning(
+                                    fom = YearMonth.of(2025, 2),
+                                    tom = YearMonth.of(2025, 2),
+                                    utgift = 1000,
+                                ),
+                            ),
+                    )
+
+                Assertions.assertDoesNotThrow {
+                    tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                        vedtaksperioder = listOf(vedtaksperiode.copy(tom = LocalDate.of(2025, 2, 28))),
+                        behandlingId = behandlingId,
+                        utgifter,
+                    )
+                }
+            }
+
+            @Test
+            fun `kaster ikke feil når det utgifter hele vedtaksperioden fordelt på flere barn`() {
+                val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+                    mapOf(
+                        BarnId.random() to
+                            listOf(
+                                UtgiftBeregning(
+                                    fom = YearMonth.of(2025, 1),
+                                    tom = YearMonth.of(2025, 1),
+                                    utgift = 1000,
+                                ),
+                            ),
+                        BarnId.random() to
+                            listOf(
+                                UtgiftBeregning(
+                                    fom = YearMonth.of(2025, 2),
+                                    tom = YearMonth.of(2025, 2),
+                                    utgift = 1000,
+                                ),
+                            ),
+                    )
+
+                Assertions.assertDoesNotThrow {
+                    tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                        vedtaksperioder = listOf(vedtaksperiode.copy(tom = LocalDate.of(2025, 2, 28))),
+                        behandlingId = behandlingId,
+                        utgifter,
+                    )
+                }
+            }
+
+            @Test
+            fun `kaster feil når det ikke finnes utgifter hele vedtaksperioden pga pause mellom utgiftene`() {
+                val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+                    mapOf(
+                        BarnId.random() to
+                            listOf(
+                                UtgiftBeregning(
+                                    fom = YearMonth.of(2025, 1),
+                                    tom = YearMonth.of(2025, 1),
+                                    utgift = 1000,
+                                ),
+                                UtgiftBeregning(
+                                    fom = YearMonth.of(2025, 3),
+                                    tom = YearMonth.of(2025, 3),
+                                    utgift = 1000,
+                                ),
+                            ),
+                    )
+                val feil =
+                    assertThrows<ApiFeil> {
+                        tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                            vedtaksperioder = listOf(vedtaksperiode.copy(tom = LocalDate.of(2025, 3, 31))),
+                            behandlingId = behandlingId,
+                            utgifter,
+                        )
+                    }
+                assertThat(feil.feil).contains("Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden")
             }
         }
     }
