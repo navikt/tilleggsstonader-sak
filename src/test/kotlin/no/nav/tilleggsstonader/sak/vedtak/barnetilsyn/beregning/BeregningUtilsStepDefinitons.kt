@@ -5,6 +5,7 @@ import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
+import no.nav.tilleggsstonader.sak.cucumber.StønadsperiodeCucumberUtil.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
