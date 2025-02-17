@@ -24,6 +24,7 @@ class FerdigstillBehandlingSteg(
     ) {
         logger.info("Ferdigstiller behandling=${saksbehandling.id}")
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.FERDIGSTILT)
+        behandlingService.fjernFritekstFraBehandlingshistorikk(saksbehandling.id)
 
         taskService.save(InterntVedtakTask.lagTask(saksbehandling.id))
 

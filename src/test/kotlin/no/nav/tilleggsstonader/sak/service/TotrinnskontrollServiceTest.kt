@@ -24,12 +24,14 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollRepository
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 
@@ -101,7 +103,10 @@ internal class TotrinnskontrollServiceTest {
     @Test
     internal fun `totrinnskontroll eksisterer og har ikkje underkjent eller angret som status`() {
         assertThatThrownBy {
-            totrinnskontrollService.sendtilBeslutter(saksbehandling(status = BehandlingStatus.UTREDES))
+            totrinnskontrollService.sendtilBeslutter(
+                saksbehandling(status = BehandlingStatus.UTREDES),
+                SendTilBeslutterRequest(),
+            )
         }.hasMessage("Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status=KAN_FATTE_VEDTAK")
     }
 
@@ -130,7 +135,7 @@ internal class TotrinnskontrollServiceTest {
         } returns totrinnskontroll(opprettetAv = saksbehandler, TotrinnInternStatus.UNDERKJENT)
 
         assertDoesNotThrow {
-            totrinnskontrollService.sendtilBeslutter(behandling)
+            totrinnskontrollService.sendtilBeslutter(behandling, SendTilBeslutterRequest())
         }
     }
 
@@ -140,7 +145,7 @@ internal class TotrinnskontrollServiceTest {
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns null
 
         assertDoesNotThrow {
-            totrinnskontrollService.sendtilBeslutter(saksbehandling)
+            totrinnskontrollService.sendtilBeslutter(saksbehandling, SendTilBeslutterRequest())
         }
     }
 
@@ -209,7 +214,6 @@ internal class TotrinnskontrollServiceTest {
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
 
         assertThat(totrinnskontroll.status).isEqualTo(TotrinnkontrollStatus.KAN_FATTE_VEDTAK)
-        assertThat(totrinnskontroll.totrinnskontroll).isNull()
     }
 
     /*
@@ -291,6 +295,41 @@ internal class TotrinnskontrollServiceTest {
             )
         }
         assertThat(oppdaterSlot.captured.årsakerUnderkjent?.årsaker!!).containsExactly(ÅrsakUnderkjent.VEDTAKSBREV)
+    }
+
+    @Nested
+    inner class KommentarTilBeslutter {
+        @Test
+        internal fun `skal kunne legge ved kommentar om behandling tidlere er underkjent`() {
+            val behandling = saksbehandling(status = BehandlingStatus.UTREDES)
+            every {
+                totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
+            } returns totrinnskontroll(opprettetAv = saksbehandler, TotrinnInternStatus.UNDERKJENT)
+
+            val oppdaterSlot = slot<Totrinnskontroll>()
+            every {
+                totrinnskontrollRepository.insert(capture(oppdaterSlot))
+            } answers { firstArg() }
+
+            assertDoesNotThrow {
+                totrinnskontrollService.sendtilBeslutter(behandling, SendTilBeslutterRequest("kommentar"))
+            }
+
+            assertThat(oppdaterSlot.captured.status).isEqualTo(TotrinnInternStatus.KAN_FATTE_VEDTAK)
+            assertThat(oppdaterSlot.captured.begrunnelse).isNotNull()
+        }
+
+        @Test
+        internal fun `skal ikke kunne legge ved kommentar om det er første gang behandling sendes til beslutter`() {
+            val behandling = saksbehandling(status = BehandlingStatus.UTREDES)
+            every {
+                totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
+            } returns null
+
+            assertThatThrownBy {
+                totrinnskontrollService.sendtilBeslutter(behandling, SendTilBeslutterRequest("kommentar"))
+            }.hasMessageContaining("Kan ikke legge ved kommentar til beslutter dersom behandlingen ikke er tidligere underkjent")
+        }
     }
 
     private fun mockFinnSisteTotrinnskontrollUtenomAngret() =

@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.springframework.stereotype.Service
 
@@ -32,7 +33,7 @@ class SendTilBeslutterSteg(
     private val vilkårService: VilkårService,
     private val oppgaveService: OppgaveService,
     private val totrinnskontrollService: TotrinnskontrollService,
-) : BehandlingSteg<Void?> {
+) : BehandlingSteg<SendTilBeslutterRequest> {
     // TODO valider at man har opprettet vedtaksbrev?
     override fun validerSteg(saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.steg != stegType()) {
@@ -50,11 +51,11 @@ class SendTilBeslutterSteg(
 
     override fun utførSteg(
         saksbehandling: Saksbehandling,
-        data: Void?,
+        data: SendTilBeslutterRequest,
     ) {
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.FATTER_VEDTAK)
         ferdigstillOppgave(saksbehandling)
-        totrinnskontrollService.sendtilBeslutter(saksbehandling)
+        totrinnskontrollService.sendtilBeslutter(saksbehandling, data)
         opprettGodkjennVedtakOppgave(saksbehandling)
     }
 
@@ -133,4 +134,6 @@ class SendTilBeslutterSteg(
     }
 
     override fun stegType(): StegType = StegType.SEND_TIL_BESLUTTER
+
+    override fun settInnHistorikk(): Boolean = false
 }

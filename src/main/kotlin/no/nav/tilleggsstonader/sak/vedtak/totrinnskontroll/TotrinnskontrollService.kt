@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollRepository
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.StatusTotrinnskontrollDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnskontrollDto
@@ -37,7 +38,10 @@ class TotrinnskontrollService(
     private val totrinnskontrollRepository: TotrinnskontrollRepository,
 ) {
     @Transactional
-    fun sendtilBeslutter(saksbehandling: Saksbehandling) {
+    fun sendtilBeslutter(
+        saksbehandling: Saksbehandling,
+        sendTilBeslutterRequest: SendTilBeslutterRequest,
+    ) {
         val eksisterandeTotrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(saksbehandling.id)
 
@@ -50,12 +54,25 @@ class TotrinnskontrollService(
             ) {
                 "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status=${eksisterandeTotrinnskontroll.status}"
             }
+        } else {
+            feilHvis(sendTilBeslutterRequest.kommentarTilBeslutter != null) {
+                "Kan ikke legge ved kommentar til beslutter dersom behandlingen ikke er tidligere underkjent"
+            }
         }
+
+        behandlingshistorikkService.opprettHistorikkInnslag(
+            behandlingId = saksbehandling.id,
+            stegtype = saksbehandling.steg,
+            utfall = null,
+            metadata = mapOf("kommentarTilBeslutter" to sendTilBeslutterRequest.kommentarTilBeslutter),
+        )
+
         totrinnskontrollRepository.insert(
             Totrinnskontroll(
                 behandlingId = saksbehandling.id,
                 saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
                 status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
+                begrunnelse = sendTilBeslutterRequest.kommentarTilBeslutter,
             ),
         )
 
@@ -193,14 +210,25 @@ class TotrinnskontrollService(
         val totrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
                 ?: error("mangler totrinnskontroll på behandling id=$behandlingId")
+
+        val totrinnskontrollDto =
+            TotrinnskontrollDto(
+                opprettetAv = totrinnskontroll.saksbehandler,
+                opprettetTid = totrinnskontroll.sporbar.opprettetTid,
+                begrunnelse = totrinnskontroll.begrunnelse,
+            )
+
         return if (beslutterErLikBehandler(totrinnskontroll) || !tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER)
         ) {
             StatusTotrinnskontrollDto(
                 TotrinnkontrollStatus.IKKE_AUTORISERT,
-                TotrinnskontrollDto(totrinnskontroll.saksbehandler, totrinnskontroll.sporbar.opprettetTid),
+                totrinnskontrollDto,
             )
         } else {
-            StatusTotrinnskontrollDto(TotrinnkontrollStatus.KAN_FATTE_VEDTAK)
+            StatusTotrinnskontrollDto(
+                TotrinnkontrollStatus.KAN_FATTE_VEDTAK,
+                totrinnskontrollDto,
+            )
         }
     }
 

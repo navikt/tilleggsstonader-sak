@@ -1,8 +1,7 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
-import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import no.nav.tilleggsstonader.kontrakter.felles.tilBehandlingstema
+import no.nav.tilleggsstonader.kontrakter.felles.tilTema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
@@ -69,10 +68,10 @@ class OpprettOppgaveConfig(
         return oppgaveClient.opprettOppgave(
             OpprettOppgaveRequest(
                 ident = OppgaveIdentV2(ident = behandling.ident, gruppe = IdentGruppe.FOLKEREGISTERIDENT),
-                tema = mapTema(behandling.stønadstype),
+                tema = behandling.stønadstype.tilTema(),
                 tilordnetRessurs = mapTilordnetRessurs(oppgavetype, behandling),
                 oppgavetype = oppgavetype,
-                behandlingstema = mapBehandlingstema(behandling.stønadstype).value,
+                behandlingstema = behandling.stønadstype.tilBehandlingstema().value,
                 behandlingstype = Behandlingstype.NASJONAL.value,
                 enhetsnummer = mapEnhet(),
                 fristFerdigstillelse = osloDateNow().plusDays(14),
@@ -96,18 +95,5 @@ class OpprettOppgaveConfig(
             Oppgavetype.GodkjenneVedtak -> "Godkjenn vedtak (opprettet når applikasjonen starter)"
             Oppgavetype.BehandleUnderkjentVedtak -> "Behandle underkjent vedtak (opprettet når applikasjonen starter)"
             else -> error("Har ikke mappet $oppgavetype")
-        }
-
-    private fun mapTema(stønadstype: Stønadstype): Tema =
-        when (stønadstype) {
-            Stønadstype.BARNETILSYN -> Tema.TSO
-            Stønadstype.LÆREMIDLER -> Tema.TSO
-        }
-
-    private fun mapBehandlingstema(stønadstype: Stønadstype): Behandlingstema =
-        when (stønadstype) {
-            Stønadstype.BARNETILSYN -> Behandlingstema.TilsynBarn
-            Stønadstype.LÆREMIDLER -> Behandlingstema.Læremidler
-            else -> error("Finner ikke behandlingstema for stønadstype $stønadstype")
         }
 }

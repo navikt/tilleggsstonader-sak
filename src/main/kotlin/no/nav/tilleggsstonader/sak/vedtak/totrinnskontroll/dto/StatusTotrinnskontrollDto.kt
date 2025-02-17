@@ -38,3 +38,7 @@ enum class ÅrsakUnderkjent {
     RETUR_ETTER_ØNSKE_FRA_SAKSBEHANDLER,
     FEIL_I_UTGIFTER,
 }
+
+data class SendTilBeslutterRequest(
+    val kommentarTilBeslutter: String? = null,
+)

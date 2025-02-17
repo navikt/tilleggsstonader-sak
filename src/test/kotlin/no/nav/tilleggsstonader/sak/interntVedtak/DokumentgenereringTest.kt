@@ -18,12 +18,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeServic
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.postForEntity
 import org.springframework.http.HttpEntity
@@ -64,83 +64,77 @@ class DokumentgenereringTest {
         every { søknadService.hentSøknadMetadata(behandlingId) } returns Testdata.søknadMetadata
     }
 
-    @Nested
-    inner class GenererDokumenterTilsynBarn {
-        @BeforeEach
-        fun setUp() {
-            every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.TilsynBarn.behandling
-            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.TilsynBarn.vilkårperioder
-            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.TilsynBarn.grunnlagsdata
-            every { barnService.finnBarnPåBehandling(behandlingId) } returns Testdata.TilsynBarn.behandlingBarn
-            every { vilkårService.hentVilkårsett(behandlingId) } returns Testdata.TilsynBarn.vilkår
-            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.TilsynBarn.vedtak
-        }
-
-        @Test
-        fun `json til htmlify er riktig`() {
-            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
-            assertFileIsEqual("interntVedtak/BARNETILSYN/internt_vedtak.json", interntVedtak)
-        }
-
-        /**
-         * Kommenter ut Disabled for å oppdatere html og pdf ved endringer i htmlify.
-         * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
-         * Formatter htmlfil etter generering for å unngå stor diff
-         */
-        @Test
-        @Disabled
-        fun `lager html og pdf`() {
-            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
-            val html = lagHtmlifyClient().generateHtml(interntVedtak)
-            skrivTilFil("interntVedtak/BARNETILSYN/internt_vedtak.html", html)
-            generatePdf(html, "interntVedtak/BARNETILSYN/internt_vedtak.pdf")
-        }
-    }
-
-    @Nested
-    inner class GenererDokumenterLæremidler {
-        @BeforeEach
-        fun setUp() {
-            every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.Læremidler.behandling
-            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.Læremidler.vilkårperioder
-            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.Læremidler.grunnlagsdata
-            every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
-            every { vilkårService.hentVilkårsett(behandlingId) } returns emptyList()
-            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.innvilgetVedtak
-        }
-
-        @Test
-        fun `json til htmlify er riktig`() {
-            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
-            assertFileIsEqual("interntVedtak/LÆREMIDLER/internt_vedtak.json", interntVedtak)
-        }
-
-        /**
-         * Kommenter ut Disabled for å oppdatere html og pdf ved endringer i htmlify.
-         * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
-         * Formatter htmlfil etter generering for å unngå stor diff
-         */
-        @Test
-        @Disabled
-        fun `lager html og pdf`() {
-            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
-            val html = lagHtmlifyClient().generateHtml(interntVedtak)
-            skrivTilFil("interntVedtak/LÆREMIDLER/internt_vedtak.html", html)
-            generatePdf(html, "interntVedtak/LÆREMIDLER/internt_vedtak.pdf")
-        }
-    }
-
     @ParameterizedTest
-    @EnumSource(Stønadstype::class)
-    fun `html skal være formatert for å enklere kunne sjekke diff`(stønadstype: Stønadstype) {
-        Stønadstype.entries.forEach { }
-        val erIkkeFormatert =
-            FileUtil
-                .readFile("interntVedtak/$stønadstype/internt_vedtak.html")
-                .split("\n")
-                .none { it.contains("<body") && it.contains("<div") }
+    @MethodSource("stønadstyperInterntVedtak")
+    fun `json til htmlify er riktig`(type: StønadstypeInterntVedtak) {
+        if (type.håndteresAvInterntVedtak) {
+            mock(type)
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            assertFileIsEqual("interntVedtak/${type.stønadstype}/internt_vedtak.json", interntVedtak)
+        } else {
+            assertThatThrownBy {
+                service.lagInterntVedtak(behandlingId = behandlingId)
+            }.hasMessageContaining("Internt vedtak håndterer ikke stønadstype=${type.stønadstype}")
+        }
+    }
 
-        assertThat(erIkkeFormatert).isTrue()
+    /**
+     * Kommenter ut Disabled for å oppdatere html og pdf ved endringer i htmlify.
+     * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
+     * Formatter htmlfil etter generering for å unngå stor diff
+     */
+    @ParameterizedTest
+    @MethodSource("stønadstyperInterntVedtak")
+    @Disabled
+    fun `lager html og pdf`(type: StønadstypeInterntVedtak) {
+        if (!type.håndteresAvInterntVedtak) {
+            return
+        }
+        val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+        val html = lagHtmlifyClient().generateHtml(interntVedtak)
+        skrivTilFil("interntVedtak/${type.stønadstype}/internt_vedtak.html", html)
+        generatePdf(html, "interntVedtak/${type.stønadstype}/internt_vedtak.pdf")
+    }
+
+    private fun mock(type: StønadstypeInterntVedtak) {
+        when (type.stønadstype) {
+            Stønadstype.BARNETILSYN -> mockTilsynBarn()
+            Stønadstype.LÆREMIDLER -> mockLæremidler()
+            else -> error("Har ikke mapping for ${type.stønadstype}")
+        }
+    }
+
+    private fun mockTilsynBarn() {
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.TilsynBarn.behandling
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.TilsynBarn.vilkårperioder
+        every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.TilsynBarn.grunnlagsdata
+        every { barnService.finnBarnPåBehandling(behandlingId) } returns Testdata.TilsynBarn.behandlingBarn
+        every { vilkårService.hentVilkårsett(behandlingId) } returns Testdata.TilsynBarn.vilkår
+        every { vedtakService.hentVedtak(behandlingId) } returns Testdata.TilsynBarn.vedtak
+    }
+
+    private fun mockLæremidler() {
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.Læremidler.behandling
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.Læremidler.vilkårperioder
+        every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.Læremidler.grunnlagsdata
+        every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
+        every { vilkårService.hentVilkårsett(behandlingId) } returns emptyList()
+        every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.innvilgetVedtak
+    }
+
+    @Test
+    fun `html skal være formatert for å enklere kunne sjekke diff`() {
+        val rootFolder = "interntVedtak"
+        FileUtil
+            .listDir(rootFolder)
+            .forEach { dir ->
+                val fil = FileUtil.readFile("$rootFolder/${dir.fileName}/internt_vedtak.html")
+                val erIkkeFormatert =
+                    fil
+                        .split("\n")
+                        .none { it.contains("<body") && it.contains("<div") }
+                assertThat(erIkkeFormatert).isTrue()
+            }
     }
 
     private fun lagHtmlifyClient(): HtmlifyClient {
@@ -167,5 +161,23 @@ class DokumentgenereringTest {
             )
         val pdf = TestRestTemplate().postForEntity<ByteArray>(url, request).body!!
         skrivTilFil(name, pdf)
+    }
+
+    companion object {
+        @JvmStatic
+        fun stønadstyperInterntVedtak(): List<StønadstypeInterntVedtak> =
+            Stønadstype.entries.map {
+                it.enabled()
+            }
+
+        data class StønadstypeInterntVedtak(
+            val stønadstype: Stønadstype,
+            val håndteresAvInterntVedtak: Boolean,
+        )
+
+        private fun Stønadstype.enabled() =
+            when (this) {
+                else -> StønadstypeInterntVedtak(this, true)
+            }
     }
 }

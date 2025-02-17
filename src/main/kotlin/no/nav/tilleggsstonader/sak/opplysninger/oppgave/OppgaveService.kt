@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
-import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import no.nav.tilleggsstonader.kontrakter.felles.tilBehandlingstema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
@@ -198,7 +198,7 @@ class OppgaveService(
                 fristFerdigstillelse = oppgave.fristFerdigstillelse ?: lagFristForOppgave(osloNow()),
                 beskrivelse = lagOppgaveTekst(oppgave.beskrivelse),
                 enhetsnummer = enhetsnummer,
-                behandlingstema = finnBehandlingstema(stønadstype).value,
+                behandlingstema = stønadstype.tilBehandlingstema().value,
                 tilordnetRessurs = oppgave.tilordnetNavIdent,
                 mappeId = utledMappeId(personIdent, oppgave, enhetsnummer),
                 prioritet = oppgave.prioritet,
@@ -305,13 +305,6 @@ class OppgaveService(
         val beskrivelseMedNewLine = beskrivelse?.let { "\n$it" } ?: ""
         return prefix + beskrivelseMedNewLine
     }
-
-    private fun finnBehandlingstema(stønadstype: Stønadstype): Behandlingstema =
-        when (stønadstype) {
-            Stønadstype.BARNETILSYN -> Behandlingstema.TilsynBarn
-            Stønadstype.LÆREMIDLER -> Behandlingstema.Læremidler
-            else -> error("Behandlingstema er ikke implementert for stønadstype $stønadstype")
-        }
 
     /**
      * Frist skal være 1 dag hvis den opprettes før kl. 12

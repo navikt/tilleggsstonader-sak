@@ -13,7 +13,7 @@ data class ArenaFinnesPersonRequest(
     val stønadstype: Stønadstype
         get() =
             try {
-                Rettighet.fraKodeArena(rettighet).stønadstype
+                Rettighet.fraKodeArena(rettighet).stønadstypeEllerFeil()
             } catch (e: IllegalStateException) {
                 throw Feil(e.message ?: "Ukjent feil")
             }

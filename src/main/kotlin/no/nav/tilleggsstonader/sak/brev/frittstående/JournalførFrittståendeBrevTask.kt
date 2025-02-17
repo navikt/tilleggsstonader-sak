@@ -7,9 +7,8 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Dokument
-import no.nav.tilleggsstonader.kontrakter.dokarkiv.Dokumenttype
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Filtype
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.dokumenttyper
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereFrittståendeBrevService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerUtil.tilAvsenderMottaker
@@ -65,7 +64,7 @@ class JournalførFrittståendeBrevTask(
             Dokument(
                 dokument = brev.pdf.bytes,
                 filtype = Filtype.PDFA,
-                dokumenttype = utledDokumenttype(fagsak.stønadstype),
+                dokumenttype = fagsak.stønadstype.dokumenttyper.frittståendeBrev,
                 tittel = brev.tittel,
             )
 
@@ -106,13 +105,6 @@ class JournalførFrittståendeBrevTask(
         }
         return response
     }
-
-    private fun utledDokumenttype(stønadstype: Stønadstype) =
-        when (stønadstype) {
-            Stønadstype.BARNETILSYN -> Dokumenttype.BARNETILSYN_FRITTSTÅENDE_BREV
-            Stønadstype.LÆREMIDLER -> Dokumenttype.LÆREMIDLER_FRITTSTÅENDE_BREV
-            else -> error("Utledning av dokumenttype er ikke implementert for $stønadstype")
-        }
 
     companion object {
         fun opprettTask(
