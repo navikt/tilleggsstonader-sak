@@ -68,6 +68,7 @@ class OppfølgingService(
                     stønadsperioder.minOf { it.fom },
                     stønadsperioder.maxOf { it.tom },
                 )
+
             val stønadsperioderSomMåSjekkes =
                 stønadsperioder.filter { stønadsperiodeMåKontrolleres(it, registerAktiviteter) }
 
