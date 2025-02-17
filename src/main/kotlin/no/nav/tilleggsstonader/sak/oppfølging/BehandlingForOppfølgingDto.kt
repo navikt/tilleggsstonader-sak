@@ -4,15 +4,37 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class BehandlingForOppfølgingDto(
     val behandling: BehandlingInformasjon,
-    val stønadsperioderForKontroll: List<StønadsperiodeDto>,
+    val stønadsperioderForKontroll: List<StønadsperiodeForKontroll>,
     val registerAktiviteter: List<RegisterAktivitetDto>,
 )
+
+data class StønadsperiodeForKontroll(
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val målgruppe: MålgruppeType,
+    val aktivitet: AktivitetType,
+    val årsaker: Set<ÅrsakKontroll>,
+) {
+    fun trengerKontroll(): Boolean = årsaker.any { it.trengerKontroll }
+}
+
+enum class ÅrsakKontroll(
+    val trengerKontroll: Boolean = true,
+) {
+    SKAL_IKKE_KONTROLLERES(trengerKontroll = false),
+    INGEN_ENDRING(trengerKontroll = false),
+
+    INGEN_MATCH,
+    FOM_ENDRET,
+    TOM_ENDRET,
+}
 
 data class BehandlingInformasjon(
     val behandlingId: BehandlingId,

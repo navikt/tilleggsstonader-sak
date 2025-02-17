@@ -1,9 +1,10 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
-import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
+import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -15,7 +16,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDt
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class OppfølgingService(
@@ -46,7 +46,8 @@ class OppfølgingService(
             .flatMap { chunk ->
                 chunk
                     .map { behandling ->
-                        val fagsak = fagsakMetadata[behandling.fagsakId] ?: error("Finner ikke fagsak for ${behandling.id}")
+                        val fagsak =
+                            fagsakMetadata[behandling.fagsakId] ?: error("Finner ikke fagsak for ${behandling.id}")
                         hentOppfølgningFn(behandling, fagsak)
                     }.parallelt()
             }.mapNotNull { it }
@@ -68,13 +69,18 @@ class OppfølgingService(
                     stønadsperioder.minOf { it.fom },
                     stønadsperioder.maxOf { it.tom },
                 )
-            val stønadsperioderSomMåSjekkes =
-                stønadsperioder.filter { stønadsperiodeMåKontrolleres(it, registerAktiviteter) }
+            val tiltak = registerAktiviteter.filterNot(::tiltakErUtdanning).mergeSammenhengende()
+            val utdanningstiltak = registerAktiviteter.filter(::tiltakErUtdanning).mergeSammenhengende()
 
-            if (stønadsperioderSomMåSjekkes.isNotEmpty()) {
+            val stønadsperioderSomMåKontrolleres =
+                stønadsperioder
+                    .map { it.finnEndringer(tiltak, utdanningstiltak) }
+                    .filter { it.trengerKontroll() }
+
+            if (stønadsperioderSomMåKontrolleres.isNotEmpty()) {
                 BehandlingForOppfølgingDto(
                     behandling = tilBehandlingsinformasjon(behandling, fagsak),
-                    stønadsperioderForKontroll = stønadsperioderSomMåSjekkes,
+                    stønadsperioderForKontroll = stønadsperioderSomMåKontrolleres,
                     registerAktiviteter = registerAktiviteter.tilDto(),
                 )
             } else {
@@ -82,55 +88,63 @@ class OppfølgingService(
             }
         }
 
-    private fun stønadsperiodeMåKontrolleres(
-        stønadsperiode: StønadsperiodeDto,
-        registerAktivitet: List<AktivitetArenaDto>,
-    ): Boolean =
-        when (stønadsperiode.aktivitet) {
-            AktivitetType.REELL_ARBEIDSSØKER -> false
-            AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
-            AktivitetType.TILTAK -> {
-                val tiltak = finnOverlappendePerioder(registerAktivitet.filterNot(::tiltakErUtdanning), stønadsperiode)
-
-                tiltak.none { it.inneholder(stønadsperiode) }
+    private fun StønadsperiodeDto.finnEndringer(
+        tiltak: List<Datoperiode>,
+        utdanningstiltak: List<Datoperiode>,
+    ): StønadsperiodeForKontroll {
+        val stønadsperiode = Datoperiode(fom = this.fom, tom = this.tom)
+        val årsaker =
+            when (this.aktivitet) {
+                AktivitetType.REELL_ARBEIDSSØKER -> setOf(ÅrsakKontroll.SKAL_IKKE_KONTROLLERES)
+                AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
+                AktivitetType.TILTAK -> finnEndring(stønadsperiode, tiltak)
+                AktivitetType.UTDANNING -> finnEndring(stønadsperiode, utdanningstiltak)
             }
+        return StønadsperiodeForKontroll(
+            fom = this.fom,
+            tom = this.tom,
+            målgruppe = this.målgruppe,
+            aktivitet = this.aktivitet,
+            årsaker = årsaker,
+        )
+    }
 
-            AktivitetType.UTDANNING -> {
-                val utdanning =
-                    finnOverlappendePerioder(registerAktivitet.filter { tiltakErUtdanning(it) }, stønadsperiode)
-
-                utdanning.none { it.inneholder(stønadsperiode) }
+    private fun finnEndring(
+        stønadsperiode: Datoperiode,
+        tiltak: List<Datoperiode>,
+    ): Set<ÅrsakKontroll> {
+        val snitt = tiltak.mapNotNull { it.beregnSnitt(stønadsperiode) }
+        if (snitt.isEmpty()) {
+            return setOf(ÅrsakKontroll.INGEN_MATCH)
+        }
+        if (snitt.any { it.fom <= stønadsperiode.fom && it.tom >= stønadsperiode.tom }) {
+            return setOf(ÅrsakKontroll.INGEN_ENDRING)
+        }
+        val årsaker = mutableSetOf<ÅrsakKontroll>()
+        snitt.forEach {
+            if (it.fom > stønadsperiode.fom) {
+                årsaker.add(ÅrsakKontroll.FOM_ENDRET)
+            }
+            if (it.tom < stønadsperiode.tom) {
+                årsaker.add(ÅrsakKontroll.TOM_ENDRET)
             }
         }
+        return årsaker
+    }
 
-    private fun perioderErSammenhengende(
-        a: ArenaAktivitetPeriode,
-        b: ArenaAktivitetPeriode,
-    ) = a.tom.plusDays(1) == b.fom
+    private fun List<AktivitetArenaDto>.mergeSammenhengende() =
+        this
+            .mapNotNull { mapTilPeriode(it) }
+            .sorted()
+            .mergeSammenhengende { a, b -> a.overlapper(b) || a.påfølgesAv(b) }
 
-    private fun finnOverlappendePerioder(
-        registeraktiviteter: List<AktivitetArenaDto>,
-        stønadsperiode: StønadsperiodeDto,
-    ) = registeraktiviteter
-        .asSequence()
-        .filter { tiltakHarRelevantStatus(it) }
-        .mapNotNull { mapTilPeriode(it) }
-        .filter { it.overlapper(stønadsperiode) }
-        .sorted()
-        .toList()
-        .mergeSammenhengende { a, b -> a.overlapper(b) || perioderErSammenhengende(a, b) }
-
-    private fun mapTilPeriode(aktivitet: AktivitetArenaDto): ArenaAktivitetPeriode? {
+    private fun mapTilPeriode(aktivitet: AktivitetArenaDto): Datoperiode? {
         if (aktivitet.fom == null || aktivitet.tom == null) {
             logger.warn("Aktivitet med id=${aktivitet.id} mangler fom eller tom dato: ${aktivitet.fom} - ${aktivitet.tom}")
             return null
         }
-        return ArenaAktivitetPeriode(aktivitet.fom!!, aktivitet.tom!!)
+        return Datoperiode(aktivitet.fom!!, aktivitet.tom!!)
     }
-
-    // TODO Usikker på denne
-    private fun tiltakHarRelevantStatus(it: AktivitetArenaDto) = true
-// it.status != StatusAktivitet.AVBRUTT && it.status != StatusAktivitet.OPPHØRT
 
     private fun tiltakErUtdanning(it: AktivitetArenaDto) = it.erUtdanning ?: false
 
@@ -156,13 +170,4 @@ class OppfølgingService(
                 erUtdanning = it.erUtdanning,
             )
         }
-}
-
-data class ArenaAktivitetPeriode(
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-) : Periode<LocalDate>,
-    Mergeable<LocalDate, ArenaAktivitetPeriode> {
-    override fun merge(other: ArenaAktivitetPeriode): ArenaAktivitetPeriode =
-        ArenaAktivitetPeriode(minOf(fom, other.fom), maxOf(tom, other.tom))
 }
