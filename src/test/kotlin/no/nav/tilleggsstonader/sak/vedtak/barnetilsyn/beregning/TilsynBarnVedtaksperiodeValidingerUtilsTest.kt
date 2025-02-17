@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Navn
-import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -97,7 +96,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 ),
                 behandlingId,
             )
-        }.hasMessageContaining("Kombinasjonen av ${vedtaksperiode.målgruppe} og ${vedtaksperiode.aktivitet} er ikke gyldig")
+        }.hasMessageContaining("Kombinasjonen av OVERGANGSSTØNAD og TILTAK er ikke gyldig")
     }
 
     @Test
@@ -111,7 +110,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 ),
                 behandlingId,
             )
-        }.hasMessageContaining("Finner ingen perioder hvor vilkår for ${vedtaksperiode.målgruppe} er oppfylt")
+        }.hasMessageContaining("Finner ingen perioder hvor vilkår for NEDSATT_ARBEIDSEVNE er oppfylt")
     }
 
     @Test
@@ -125,7 +124,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 ),
                 behandlingId,
             )
-        }.hasMessageContaining("Finner ingen perioder hvor vilkår for ${vedtaksperiode.aktivitet} er oppfylt")
+        }.hasMessageContaining("Finner ingen perioder hvor vilkår for UTDANNING er oppfylt")
     }
 
     @Test
@@ -140,8 +139,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 behandlingId,
             )
         }.hasMessageContaining(
-            "Finnes ingen periode med oppfylte vilkår for ${vedtaksperiode.målgruppe} i perioden " +
-                "${vedtaksperiode.fom.norskFormat()} - ${vedtaksperiode.tom.norskFormat()}",
+            "Finnes ingen periode med oppfylte vilkår for AAP i perioden 01.12.2022 - 31.01.2025",
         )
     }
 
@@ -172,8 +170,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 behandlingId,
             )
         }.hasMessageContaining(
-            "Finnes ingen periode med oppfylte vilkår for ${vedtaksperiode.aktivitet} i perioden " +
-                "${vedtaksperiode.fom.norskFormat()} - ${vedtaksperiode.tom.norskFormat()}",
+            "Finnes ingen periode med oppfylte vilkår for TILTAK i perioden 01.01.2025 - 31.01.2025",
         )
     }
 
@@ -326,8 +323,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     behandlingId,
                 )
             }.hasMessageContaining(
-                "Finnes ingen periode med oppfylte vilkår for ${vedtaksperiode.målgruppe} i perioden " +
-                    "${vedtaksperiode.fom.norskFormat()} - ${vedtaksperiode.tom.norskFormat()}",
+                "Finnes ingen periode med oppfylte vilkår for AAP i perioden 01.01.2023 - 21.01.2023",
             )
         }
     }
