@@ -51,6 +51,7 @@ class TilsynBarnBeregningService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val vedtakRepository: VedtakRepository,
     private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
+    private val tilsynBarnVedtaksperiodeValidingerService: TilsynBarnVedtaksperiodeValidingerService,
 ) {
     fun beregn(
         behandling: Saksbehandling,
@@ -80,10 +81,11 @@ class TilsynBarnBeregningService(
         feilHvis(typeVedtak == TypeVedtak.AVSLAG) {
             "Skal ikke beregne for avslag"
         }
-        // TODO Valider ingen overlapp mellom vedtaksperioderDto
 
         val vedtaksperioder =
             vedtaksperioderDto.tilVedtaksperiode().sorted().splitFraRevurderFra(behandling.revurderFra)
+
+        tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(vedtaksperioder, behandling.id)
 
         val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioder)
         val relevantePerioderFraForrigeVedtak =
