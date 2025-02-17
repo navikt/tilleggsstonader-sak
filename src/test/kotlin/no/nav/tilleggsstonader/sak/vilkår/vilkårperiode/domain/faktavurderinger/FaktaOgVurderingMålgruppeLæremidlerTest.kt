@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 
 class FaktaOgVurderingMålgruppeLæremidlerTest {
     @Nested
@@ -36,7 +37,13 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    inputFakta = "Begrunnelse",
+                                    gitHash = "gitHash",
+                                    tidspunktForVurdering = LocalDateTime.now(),
+                                ),
                         ),
                 )
 
@@ -51,7 +58,13 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
-                            aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    inputFakta = "Begrunnelse",
+                                    gitHash = "gitHash",
+                                    tidspunktForVurdering = LocalDateTime.now(),
+                                ),
                         ),
                 )
 
@@ -66,7 +79,13 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
-                            aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    inputFakta = "Begrunnelse",
+                                    gitHash = "gitHash",
+                                    tidspunktForVurdering = LocalDateTime.now(),
+                                ),
                         ),
                 )
 
@@ -81,7 +100,13 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    inputFakta = "Begrunnelse",
+                                    gitHash = "gitHash",
+                                    tidspunktForVurdering = LocalDateTime.now(),
+                                ),
                         ),
                 )
 

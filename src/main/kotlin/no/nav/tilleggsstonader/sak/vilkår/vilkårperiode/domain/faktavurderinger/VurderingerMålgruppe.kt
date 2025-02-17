@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
+import java.time.LocalDateTime
+
 sealed interface VurderingerMålgruppe : Vurderinger
 
 sealed interface MedlemskapVurdering : VurderingerMålgruppe {
@@ -47,5 +49,6 @@ data class VurderingOmstillingsstønad(
 
 data object VurderingOvergangsstønad : MedlemskapVurdering, AldersvilkårVurdering {
     override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
-    override val aldersvilkår: VurderingAldersVilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT)
+    override val aldersvilkår: VurderingAldersVilkår =
+        VurderingAldersVilkår(SvarJaNei.JA, inputFakta = "inputFakta", gitHash = "gitHash", tidspunktForVurdering = LocalDateTime.now())
 }

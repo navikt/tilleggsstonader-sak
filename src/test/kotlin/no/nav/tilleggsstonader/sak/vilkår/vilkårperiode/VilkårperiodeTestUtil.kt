@@ -45,6 +45,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgru
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 object VilkårperiodeTestUtil {
@@ -85,7 +86,13 @@ object VilkårperiodeTestUtil {
                     vurderinger =
                         VurderingOmstillingsstønad(
                             medlemskap = medlemskap,
-                            aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    inputFakta = "Begrunnelse",
+                                    gitHash = "gitHash",
+                                    tidspunktForVurdering = LocalDateTime.now(),
+                                ),
                         ),
                 )
 
@@ -95,7 +102,13 @@ object VilkårperiodeTestUtil {
                     vurderinger =
                         VurderingAAP(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
-                            aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    inputFakta = "Begrunnelse",
+                                    gitHash = "gitHash",
+                                    tidspunktForVurdering = LocalDateTime.now(),
+                                ),
                         ),
                 )
 
@@ -105,7 +118,13 @@ object VilkårperiodeTestUtil {
                         VurderingUføretrygd(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
-                            aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    inputFakta = "Begrunnelse",
+                                    gitHash = "gitHash",
+                                    tidspunktForVurdering = LocalDateTime.now(),
+                                ),
                         ),
                 )
 
@@ -115,7 +134,13 @@ object VilkårperiodeTestUtil {
                         VurderingNedsattArbeidsevne(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
-                            aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    inputFakta = "Begrunnelse",
+                                    gitHash = "gitHash",
+                                    tidspunktForVurdering = LocalDateTime.now(),
+                                ),
                         ),
                 )
 

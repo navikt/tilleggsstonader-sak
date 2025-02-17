@@ -51,6 +51,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivit
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import java.time.LocalDateTime
 
 fun mapFaktaOgSvarDto(
     vilkårperiode: LagreVilkårperiode,
@@ -183,7 +184,13 @@ private fun mapMålgruppeBarnetilsyn(
                 vurderinger =
                     VurderingOmstillingsstønad(
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = "Begrunnelse",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.now(),
+                            ),
                     ),
             )
         }
@@ -197,7 +204,13 @@ private fun mapMålgruppeBarnetilsyn(
                 vurderinger =
                     VurderingAAP(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
-                        aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = "Begrunnelse",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.now(),
+                            ),
                     ),
             )
         }
@@ -208,7 +221,13 @@ private fun mapMålgruppeBarnetilsyn(
                     VurderingUføretrygd(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = "Begrunnelse",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.now(),
+                            ),
                     ),
             )
         }
@@ -219,7 +238,13 @@ private fun mapMålgruppeBarnetilsyn(
                     VurderingNedsattArbeidsevne(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = "Begrunnelse",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.now(),
+                            ),
                     ),
             )
         }
@@ -239,7 +264,13 @@ private fun mapMålgruppeLæremidler(
                 vurderinger =
                     VurderingOmstillingsstønad(
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = "Begrunnelse",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.now(),
+                            ),
                     ),
             )
         }
@@ -253,7 +284,13 @@ private fun mapMålgruppeLæremidler(
                 vurderinger =
                     VurderingAAP(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
-                        aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = "Begrunnelse",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.now(),
+                            ),
                     ),
             )
         }
@@ -264,7 +301,13 @@ private fun mapMålgruppeLæremidler(
                     VurderingUføretrygd(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = "Begrunnelse",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.now(),
+                            ),
                     ),
             )
         }
@@ -275,7 +318,13 @@ private fun mapMålgruppeLæremidler(
                     VurderingNedsattArbeidsevne(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        aldersvilkår = VurderingAldersVilkår(SvarJaNei.JA_IMPLISITT),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = "Begrunnelse",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.now(),
+                            ),
                     ),
             )
         }
