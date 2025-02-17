@@ -2,7 +2,9 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import java.time.LocalDate
 
 object MålgruppeValidering {
     fun validerKanLeggeTilMålgruppeManuelt(
@@ -27,4 +29,37 @@ object MålgruppeValidering {
             "målgruppe=$målgruppeType er ikke gyldig for $stønadstype"
         }
     }
+
+    fun aldersvilkårErOppfylt(
+        målgruppeType: MålgruppeType,
+        grunnlagsdata: Grunnlagsdata,
+    ) {
+        val fødselsdato = grunnlagsdata.grunnlag.fødsel?.fødselsdato
+
+        val gyldig =
+            when (målgruppeType) {
+                MålgruppeType.AAP, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD ->
+                    fødselsdatomellom18og67år(
+                        fødselsdato,
+                    )
+                MålgruppeType.OMSTILLINGSSTØNAD -> fødselsdatounder67år(fødselsdato)
+                MålgruppeType.OVERGANGSSTØNAD -> true
+                MålgruppeType.DAGPENGER -> false
+                MålgruppeType.SYKEPENGER_100_PROSENT -> false
+                MålgruppeType.INGEN_MÅLGRUPPE -> false
+            }
+
+        feilHvisIkke(gyldig) {
+            "Aldersvilkår er ikke oppfylt ved opprettelse av målgruppe=$målgruppeType for behandling=${grunnlagsdata.behandlingId}"
+        }
+    }
+
+    private fun fødselsdatomellom18og67år(fødselsdato: LocalDate?): Boolean {
+        val over18år: Boolean = fødselsdato?.plusYears(18)?.isBefore(LocalDate.now()) == true
+        val under67år: Boolean = fødselsdato?.plusYears(67)?.isAfter(LocalDate.now()) == true
+
+        return over18år && under67år
+    }
+
+    private fun fødselsdatounder67år(fødselsdato: LocalDate?): Boolean = fødselsdato?.plusYears(67)?.isAfter(LocalDate.now()) == true
 }
