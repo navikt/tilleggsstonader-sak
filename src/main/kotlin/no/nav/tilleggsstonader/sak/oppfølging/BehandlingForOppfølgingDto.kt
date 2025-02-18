@@ -20,11 +20,17 @@ data class StønadsperiodeForKontroll(
     val tom: LocalDate,
     val målgruppe: MålgruppeType,
     val aktivitet: AktivitetType,
-    val endringAktivitet: Set<ÅrsakKontroll>,
-    val endringMålgruppe: Set<ÅrsakKontroll>,
+    val endringAktivitet: List<Kontroll>,
+    val endringMålgruppe: List<Kontroll>,
 ) {
-    fun trengerKontroll(): Boolean = (endringAktivitet + endringMålgruppe).any { it.trengerKontroll }
+    fun trengerKontroll(): Boolean = (endringAktivitet + endringMålgruppe).any { it.årsak.trengerKontroll }
 }
+
+data class Kontroll(
+    val årsak: ÅrsakKontroll,
+    val fom: LocalDate? = null,
+    val tom: LocalDate? = null,
+)
 
 enum class ÅrsakKontroll(
     val trengerKontroll: Boolean = true,
@@ -33,6 +39,7 @@ enum class ÅrsakKontroll(
     INGEN_ENDRING(trengerKontroll = false),
 
     INGEN_TREFF,
+    FOM_TOM_ENDRET,
     FOM_ENDRET,
     TOM_ENDRET,
     TREFF_MEN_FEIL_TYPE,
