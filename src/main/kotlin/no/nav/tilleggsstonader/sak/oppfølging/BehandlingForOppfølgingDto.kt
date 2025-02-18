@@ -1,49 +1,16 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
-import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class BehandlingForOppfølgingDto(
     val behandling: BehandlingInformasjon,
-    val stønadsperioderForKontroll: List<StønadsperiodeForKontroll>,
+    val stønadsperioderForKontroll: List<PeriodeForKontroll>,
     val registerAktiviteter: List<RegisterAktivitetDto>,
 )
-
-data class StønadsperiodeForKontroll(
-    val fom: LocalDate,
-    val tom: LocalDate,
-    val målgruppe: MålgruppeType,
-    val aktivitet: AktivitetType,
-    val endringAktivitet: List<Kontroll>,
-    val endringMålgruppe: List<Kontroll>,
-) {
-    fun trengerKontroll(): Boolean = (endringAktivitet + endringMålgruppe).any { it.årsak.trengerKontroll }
-}
-
-data class Kontroll(
-    val årsak: ÅrsakKontroll,
-    val fom: LocalDate? = null,
-    val tom: LocalDate? = null,
-)
-
-enum class ÅrsakKontroll(
-    val trengerKontroll: Boolean = true,
-) {
-    SKAL_IKKE_KONTROLLERES(trengerKontroll = false),
-    INGEN_ENDRING(trengerKontroll = false),
-
-    INGEN_TREFF,
-    FOM_TOM_ENDRET,
-    FOM_ENDRET,
-    TOM_ENDRET,
-    TREFF_MEN_FEIL_TYPE,
-}
 
 data class BehandlingInformasjon(
     val behandlingId: BehandlingId,
@@ -55,9 +22,8 @@ data class BehandlingInformasjon(
 
 data class RegisterAktivitetDto(
     val id: String,
-    val fom: LocalDate?,
-    val tom: LocalDate?,
+    val fom: LocalDate,
+    val tom: LocalDate,
     val typeNavn: String,
-    val status: StatusAktivitet?,
     val erUtdanning: Boolean?,
 )

@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.oppfølging
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -39,6 +40,8 @@ class OppfølgingServiceTest {
     val stønadsperiodeService = mockk<StønadsperiodeService>()
     val registerAktivitetService = mockk<RegisterAktivitetService>()
     val ytelseService = mockk<YtelseService>()
+    val taskService = mockk<TaskService>()
+    val oppfølgningRepository = mockk<OppfølgningRepository>()
 
     val oppfølgingService =
         OppfølgingService(
@@ -47,6 +50,8 @@ class OppfølgingServiceTest {
             registerAktivitetService = registerAktivitetService,
             ytelseService = ytelseService,
             fagsakService = fagsakService,
+            taskService = taskService,
+            oppfølgningRepository = oppfølgningRepository,
         )
 
     val stønadsperiode =

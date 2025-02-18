@@ -5,6 +5,7 @@ import no.nav.familie.prosessering.PropertiesWrapperTilStringConverter
 import no.nav.familie.prosessering.StringTilPropertiesWrapperConverter
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.IdConverters.alleValueClassConverters
+import no.nav.tilleggsstonader.sak.oppfølging.OppfølgingData
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
@@ -101,6 +102,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 SkjemaLæremidlerWriter(),
                 FaktaOgVurderingReader(),
                 FaktaOgVurderingWriter(),
+                OppfølgingDataReader(),
+                OppfølgingDataWriter(),
             ) + alleVedtaksstatistikkJsonConverters +
                 alleValueClassConverters,
         )
@@ -206,4 +209,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class FaktaOgVurderingReader : JsonReader<FaktaOgVurdering>(FaktaOgVurdering::class)
 
     class FaktaOgVurderingWriter : JsonWriter<FaktaOgVurdering>()
+
+    class OppfølgingDataReader : JsonReader<OppfølgingData>(OppfølgingData::class)
+
+    class OppfølgingDataWriter : JsonWriter<OppfølgingData>()
 }
