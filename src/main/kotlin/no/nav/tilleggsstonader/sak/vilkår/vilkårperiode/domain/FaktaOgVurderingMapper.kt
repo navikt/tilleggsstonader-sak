@@ -187,7 +187,7 @@ private fun mapMålgruppeBarnetilsyn(
                         aldersvilkår =
                             VurderingAldersVilkår(
                                 SvarJaNei.JA,
-                                inputFakta = "Begrunnelse",
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
                                 gitHash = "gitHash",
                                 tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                             ),
@@ -207,7 +207,7 @@ private fun mapMålgruppeBarnetilsyn(
                         aldersvilkår =
                             VurderingAldersVilkår(
                                 SvarJaNei.JA,
-                                inputFakta = "Begrunnelse",
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
                                 gitHash = "gitHash",
                                 tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                             ),
@@ -224,7 +224,7 @@ private fun mapMålgruppeBarnetilsyn(
                         aldersvilkår =
                             VurderingAldersVilkår(
                                 SvarJaNei.JA,
-                                inputFakta = "Begrunnelse",
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
                                 gitHash = "gitHash",
                                 tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                             ),
@@ -241,7 +241,7 @@ private fun mapMålgruppeBarnetilsyn(
                         aldersvilkår =
                             VurderingAldersVilkår(
                                 SvarJaNei.JA,
-                                inputFakta = "Begrunnelse",
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
                                 gitHash = "gitHash",
                                 tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                             ),
@@ -267,7 +267,7 @@ private fun mapMålgruppeLæremidler(
                         aldersvilkår =
                             VurderingAldersVilkår(
                                 SvarJaNei.JA,
-                                inputFakta = "Begrunnelse",
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
                                 gitHash = "gitHash",
                                 tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                             ),
@@ -287,7 +287,7 @@ private fun mapMålgruppeLæremidler(
                         aldersvilkår =
                             VurderingAldersVilkår(
                                 SvarJaNei.JA,
-                                inputFakta = "Begrunnelse",
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
                                 gitHash = "gitHash",
                                 tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                             ),
@@ -304,7 +304,7 @@ private fun mapMålgruppeLæremidler(
                         aldersvilkår =
                             VurderingAldersVilkår(
                                 SvarJaNei.JA,
-                                inputFakta = "Begrunnelse",
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
                                 gitHash = "gitHash",
                                 tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                             ),
@@ -321,7 +321,7 @@ private fun mapMålgruppeLæremidler(
                         aldersvilkår =
                             VurderingAldersVilkår(
                                 SvarJaNei.JA,
-                                inputFakta = "Begrunnelse",
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
                                 gitHash = "gitHash",
                                 tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                             ),

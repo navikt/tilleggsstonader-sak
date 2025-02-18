@@ -3,9 +3,9 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fødselsdato
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AldersvilkårVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import java.time.LocalDate
 
@@ -30,7 +30,7 @@ sealed class FaktaOgSvarDto
 data class FaktaOgSvarMålgruppeDto(
     val svarMedlemskap: SvarJaNei? = null,
     val svarUtgifterDekketAvAnnetRegelverk: SvarJaNei? = null,
-    val aldersVilkår: AldersvilkårVurdering? = null,
+    val brukersFødselsdato: Fødselsdato? = null,
 ) : FaktaOgSvarDto()
 
 data class FaktaOgSvarAktivitetBarnetilsynDto(
