@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import java.time.LocalDate
 
 object MålgruppeValidering {
@@ -33,7 +34,7 @@ object MålgruppeValidering {
     }
 
     fun vurderAldersvilkår(
-        målgruppeType: MålgruppeType,
+        vilkårperiode: LagreVilkårperiode,
         stønadstype: Stønadstype,
         grunnlagsdata: Grunnlagsdata,
     ) {
@@ -42,13 +43,19 @@ object MålgruppeValidering {
         val gyldig: SvarJaNei? =
             when (stønadstype) {
                 Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER ->
-                    when (målgruppeType) {
+                    when (vilkårperiode.type as MålgruppeType) {
                         MålgruppeType.AAP, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD ->
-                            fødselsdatomellom18og67år(
-                                fødselsdato,
-                            )
-
-                        MålgruppeType.OMSTILLINGSSTØNAD -> fødselsdatounder67år(fødselsdato)
+                            brukerErEldreEnn18ogYngreEnn67IgjennomHelePerioden(fødselsdato, vilkårperiode.fom, vilkårperiode.tom)
+                        MålgruppeType.OMSTILLINGSSTØNAD ->
+                            if (brukerErYngreEnn67ÅrIgjennomHelePerioden(
+                                    fødselsdato,
+                                    vilkårperiode.fom,
+                                )
+                            ) {
+                                SvarJaNei.JA
+                            } else {
+                                SvarJaNei.NEI
+                            }
                         MålgruppeType.OVERGANGSSTØNAD -> SvarJaNei.JA
                         MålgruppeType.DAGPENGER -> null
                         MålgruppeType.SYKEPENGER_100_PROSENT -> null
@@ -56,24 +63,40 @@ object MålgruppeValidering {
                     }
             }
         feilHvis(gyldig == SvarJaNei.NEI) {
-            "Aldersvilkår er ikke oppfylt ved opprettelse av målgruppe=$målgruppeType for behandling=${grunnlagsdata.behandlingId}"
+            "Aldersvilkår er ikke oppfylt ved opprettelse av målgruppe=${vilkårperiode.type} for behandling=${grunnlagsdata.behandlingId}"
         }
     }
 
-    private fun fødselsdatomellom18og67år(fødselsdato: LocalDate?): SvarJaNei {
-        val over18år: Boolean = fødselsdato?.plusYears(18)?.isBefore(LocalDate.now()) == true
-        val under67år: Boolean = fødselsdato?.plusYears(67)?.isAfter(LocalDate.now()) == true
-
-        if (over18år && under67år) {
-            return SvarJaNei.JA
+    private fun brukerErYngreEnn67ÅrIgjennomHelePerioden(
+        fødselsdato: LocalDate?,
+        vilkårsperiodeFom: LocalDate,
+    ): Boolean {
+        val sekstisyvÅrsDagenTilBruker = fødselsdato?.plusYears(67)
+        if (sekstisyvÅrsDagenTilBruker != null) {
+            return (sekstisyvÅrsDagenTilBruker < vilkårsperiodeFom)
         }
-        return return SvarJaNei.NEI
+        return false
     }
 
-    private fun fødselsdatounder67år(fødselsdato: LocalDate?): SvarJaNei {
-        val under67år = fødselsdato?.plusYears(67)?.isAfter(LocalDate.now()) == true
+    private fun brukerErEldreEnn18ÅrIgjennomHelePerioden(
+        fødselsdato: LocalDate?,
+        vilkårsperiodeTom: LocalDate,
+    ): Boolean {
+        val attenårsdagenTilBruker = fødselsdato?.plusYears(18)
+        if (attenårsdagenTilBruker != null) {
+            return (vilkårsperiodeTom < attenårsdagenTilBruker)
+        }
+        return false
+    }
 
-        if (under67år) {
+    private fun brukerErEldreEnn18ogYngreEnn67IgjennomHelePerioden(
+        fødselsdato: LocalDate?,
+        vilkårsperiodeFom: LocalDate,
+        vilkårsperiodeTom: LocalDate,
+    ): SvarJaNei? {
+        if (brukerErYngreEnn67ÅrIgjennomHelePerioden(fødselsdato, vilkårsperiodeFom) &&
+            brukerErEldreEnn18ÅrIgjennomHelePerioden(fødselsdato, vilkårsperiodeTom)
+        ) {
             return SvarJaNei.JA
         }
         return SvarJaNei.NEI

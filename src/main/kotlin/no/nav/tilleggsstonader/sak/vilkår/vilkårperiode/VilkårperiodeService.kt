@@ -91,7 +91,7 @@ class VilkårperiodeService(
 
             val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandling.id)
 
-            vurderAldersvilkår(vilkårperiode.type, behandling.stønadstype, grunnlagsdata)
+            vurderAldersvilkår(vilkårperiode, behandling.stønadstype, grunnlagsdata)
         }
 
         validerKildeIdFinnesIGrunnlaget(
