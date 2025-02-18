@@ -202,6 +202,7 @@ object Testdata {
                 type = TypeVedtak.INNVILGELSE,
                 data =
                     InnvilgelseTilsynBarn(
+                        vedtaksperioder = listOf(vedtaksperiode),
                         beregningsresultat =
                             BeregningsresultatTilsynBarn(
                                 perioder =

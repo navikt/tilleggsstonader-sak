@@ -27,6 +27,9 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
@@ -58,7 +61,13 @@ class TilsynBarnBeregnYtelseSteg(
 
     private fun beregnOgLagreInnvilgelse(saksbehandling: Saksbehandling) {
         val beregningsresultat = beregningService.beregn(saksbehandling, TypeVedtak.INNVILGELSE)
-        vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, beregningsresultat))
+        vedtakRepository.insert(
+            lagInnvilgetVedtak(
+                behandling = saksbehandling,
+                beregningsresultat = beregningsresultat,
+                vedtaksperioder = beregningsresultat.tilVedtaksperioder(),
+            ),
+        )
         lagreAndeler(saksbehandling, beregningsresultat)
     }
 
@@ -68,7 +77,13 @@ class TilsynBarnBeregnYtelseSteg(
     ) {
         val beregningsresultat =
             beregningService.beregnV2(vedtak.vedtaksperioder, saksbehandling, TypeVedtak.INNVILGELSE)
-        vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, beregningsresultat))
+        vedtakRepository.insert(
+            lagInnvilgetVedtak(
+                behandling = saksbehandling,
+                beregningsresultat = beregningsresultat,
+                vedtaksperioder = vedtak.vedtaksperioder.tilDto(),
+            ),
+        )
         lagreAndeler(saksbehandling, beregningsresultat)
     }
 
@@ -155,12 +170,14 @@ class TilsynBarnBeregnYtelseSteg(
     private fun lagInnvilgetVedtak(
         behandling: Saksbehandling,
         beregningsresultat: BeregningsresultatTilsynBarn,
+        vedtaksperioder: List<Vedtaksperiode>,
     ): Vedtak =
         GeneriskVedtak(
             behandlingId = behandling.id,
             type = TypeVedtak.INNVILGELSE,
             data =
                 InnvilgelseTilsynBarn(
+                    vedtaksperioder = vedtaksperioder,
                     beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
                 ),
         )

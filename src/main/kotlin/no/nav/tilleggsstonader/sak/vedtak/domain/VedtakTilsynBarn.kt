@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper
 
 enum class TypeVedtakTilsynBarn(
     override val typeVedtak: TypeVedtak,
@@ -15,6 +16,8 @@ sealed interface VedtakTilsynBarn : Vedtaksdata
 
 data class InnvilgelseTilsynBarn(
     val beregningsresultat: BeregningsresultatTilsynBarn,
+    // For vedtak som ble gjort før vi innførte vedtaksperioder lager vi vedtaksperioder fra beregningsresultatet
+    val vedtaksperioder: List<Vedtaksperiode> = beregningsresultat.tilVedtaksperioder(),
 ) : VedtakTilsynBarn,
     Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakTilsynBarn.INNVILGELSE_TILSYN_BARN
@@ -51,3 +54,15 @@ fun VedtakTilsynBarn.beregningsresultat(): BeregningsresultatTilsynBarn? =
         is OpphørTilsynBarn -> this.beregningsresultat
         is AvslagTilsynBarn -> null
     }
+
+fun BeregningsresultatTilsynBarn.tilVedtaksperioder(): List<Vedtaksperiode> {
+    val vedtaksperioder = VedtaksperiodeTilsynBarnMapper.mapTilVedtaksperiode(this.perioder)
+    return vedtaksperioder.map {
+        Vedtaksperiode(
+            fom = it.fom,
+            tom = it.tom,
+            målgruppe = it.målgruppe,
+            aktivitet = it.aktivitet,
+        )
+    }
+}
