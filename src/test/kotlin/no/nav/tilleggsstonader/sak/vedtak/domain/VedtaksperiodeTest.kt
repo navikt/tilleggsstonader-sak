@@ -10,16 +10,19 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.util.UUID
 
 class VedtaksperiodeTest {
     val fom = LocalDate.of(2025, 1, 1)
     val tom = LocalDate.of(2025, 3, 1)
     val målgruppe = MålgruppeType.AAP
     val aktivitet = AktivitetType.TILTAK
+    val uuid = UUID.randomUUID()
 
     val vedtaksperiode =
         listOf(
             Vedtaksperiode(
+                id = uuid,
                 fom = fom,
                 tom = tom,
                 målgruppe = målgruppe,
@@ -32,6 +35,7 @@ class VedtaksperiodeTest {
         val vedtaksperiodeDto =
             listOf(
                 VedtaksperiodeDto(
+                    id = uuid,
                     fom = fom,
                     tom = tom,
                     målgruppeType = målgruppe,
@@ -54,7 +58,7 @@ class VedtaksperiodeTest {
                     aktivitet = aktivitet,
                 ),
             )
-        assertThat(stønadsperiodeBeregningsgrunnlag.tilVedtaksperiode()).isEqualTo(
+        assertThat(stønadsperiodeBeregningsgrunnlag.tilVedtaksperiode().map { it.copy(id = uuid) }).isEqualTo(
             vedtaksperiode,
         )
     }
