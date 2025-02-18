@@ -37,4 +37,12 @@ data class Vedtaksperiode(
         fom: LocalDate,
         tom: LocalDate,
     ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
+
+    fun tilDto() =
+        VedtaksperiodeDto(
+            fom = fom,
+            tom = tom,
+            målgruppeType = målgruppe,
+            aktivitetType = aktivitet,
+        )
 }
