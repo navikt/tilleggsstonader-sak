@@ -21,6 +21,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
@@ -59,6 +61,7 @@ class InterntVedtakService(
             målgrupper = mapVilkårperioder(vilkårsperioder.målgrupper),
             aktiviteter = mapVilkårperioder(vilkårsperioder.aktiviteter),
             stønadsperioder = mapStønadsperioder(behandling.id),
+            vedtaksperioder = mapVedtaksperioder(vedtak, behandling),
             vilkår = mapVilkår(behandling.id, behandlingbarn),
             vedtak = mapVedtak(vedtak),
             beregningsresultat = mapBeregningsresultatForStønadstype(vedtak, behandling),
@@ -160,6 +163,27 @@ class InterntVedtakService(
                 tom = it.tom,
             )
         }
+    }
+
+    private fun mapVedtaksperioder(
+        vedtak: Vedtak?,
+        behandling: Saksbehandling,
+    ): List<Vedtaksperiode> {
+        val vedtaksperioder =
+            vedtak
+                ?.takeIfType<InnvilgelseTilsynBarn>()
+                ?.data
+                ?.beregningsresultat
+                ?.tilDto(behandling.revurderFra)
+                ?.vedtaksperioder
+        return vedtaksperioder?.map {
+            Vedtaksperiode(
+                målgruppe = it.målgruppe,
+                aktivitet = it.aktivitet,
+                fom = it.fom,
+                tom = it.tom,
+            )
+        } ?: emptyList()
     }
 
     private fun mapVilkår(
