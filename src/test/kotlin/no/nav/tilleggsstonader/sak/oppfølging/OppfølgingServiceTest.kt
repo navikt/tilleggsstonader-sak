@@ -10,6 +10,9 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakMetadata
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.aktivitetArenaDto
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeAAP
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
@@ -17,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -44,12 +48,14 @@ class OppfølgingServiceTest {
         }
     val stønadsperiodeService = mockk<StønadsperiodeService>()
     val registerAktivitetService = mockk<RegisterAktivitetService>()
+    val ytelseService = mockk<YtelseService>()
 
     val oppfølgingService =
         OppfølgingService(
             behandlingRepository = behandlingRepository,
             stønadsperiodeService = stønadsperiodeService,
             registerAktivitetService = registerAktivitetService,
+            ytelseService = ytelseService,
             fagsakService = fagsakService,
         )
 
@@ -64,6 +70,12 @@ class OppfølgingServiceTest {
 
     @Nested
     inner class EndringIAktivitet {
+        @BeforeEach
+        fun setUp() {
+            every { ytelseService.hentYtelseForGrunnlag(any(), any(), any(), any()) } returns
+                ytelsePerioderDto(perioder = listOf(periodeAAP(fom = stønadsperiode.fom, tom = stønadsperiode.tom)))
+        }
+
         @Test
         fun `skal ikke finne treff hvis aktiviteten blitt forlenget`() {
             every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
@@ -108,7 +120,8 @@ class OppfølgingServiceTest {
             every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
                 listOf(stønadsperiode).tilSortertDto()
 
-            val aktivitet = aktivitetArenaDto(fom = stønadsperiode.fom.plusDays(3), tom = stønadsperiode.tom.minusDays(3))
+            val aktivitet =
+                aktivitetArenaDto(fom = stønadsperiode.fom.plusDays(3), tom = stønadsperiode.tom.minusDays(3))
             every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
                 listOf(aktivitet)
 

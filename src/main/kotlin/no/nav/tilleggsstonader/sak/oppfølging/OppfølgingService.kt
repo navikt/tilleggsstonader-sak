@@ -2,26 +2,31 @@ package no.nav.tilleggsstonader.sak.oppfølging
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
+import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.VirtualThreadUtil.parallelt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class OppfølgingService(
     private val behandlingRepository: BehandlingRepository,
     private val stønadsperiodeService: StønadsperiodeService,
     private val registerAktivitetService: RegisterAktivitetService,
+    private val ytelseService: YtelseService,
     private val fagsakService: FagsakService,
 ) {
     val logger = LoggerFactory.getLogger(javaClass)
@@ -63,19 +68,18 @@ class OppfølgingService(
         {
             val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandling.id)
 
-            val registerAktiviteter =
-                registerAktivitetService.hentAktiviteterForGrunnlagsdata(
-                    fagsak.ident,
-                    stønadsperioder.minOf { it.fom },
-                    stønadsperioder.maxOf { it.tom },
-                )
+            val fom = stønadsperioder.minOf { it.fom }
+            val tom = stønadsperioder.maxOf { it.tom }
+            val registerAktiviteter = hentAktiviteter(fagsak, fom, tom)
+            val registerYtelser = hentYtelser(fagsak, fom, tom)
+
             val alleAktiviteter = registerAktiviteter.mergeSammenhengende()
             val tiltak = registerAktiviteter.filterNot(::tiltakErUtdanning).mergeSammenhengende()
             val utdanningstiltak = registerAktiviteter.filter(::tiltakErUtdanning).mergeSammenhengende()
 
             val stønadsperioderSomMåKontrolleres =
                 stønadsperioder
-                    .map { it.finnEndringer(alleAktiviteter, tiltak, utdanningstiltak) }
+                    .map { it.finnEndringer(registerYtelser, alleAktiviteter, tiltak, utdanningstiltak) }
                     .filter { it.trengerKontroll() }
 
             if (stønadsperioderSomMåKontrolleres.isNotEmpty()) {
@@ -89,12 +93,54 @@ class OppfølgingService(
             }
         }
 
+    private fun hentAktiviteter(
+        fagsak: FagsakMetadata,
+        fom: LocalDate,
+        tom: LocalDate,
+    ) = registerAktivitetService.hentAktiviteterForGrunnlagsdata(
+        ident = fagsak.ident,
+        fom = fom,
+        tom = tom,
+    )
+
+    private fun hentYtelser(
+        fagsak: FagsakMetadata,
+        fom: LocalDate,
+        tom: LocalDate,
+    ) = ytelseService
+        .hentYtelseForGrunnlag(
+            stønadstype = fagsak.stønadstype,
+            ident = fagsak.ident,
+            fom = fom,
+            tom = tom,
+        ).perioder
+        .filter { it.aapErFerdigAvklart != true }
+        .filter { it.tom != null }
+        .map { Ytelsesperiode(fom = it.fom, tom = it.tom!!, type = it.type) }
+
     private fun StønadsperiodeDto.finnEndringer(
+        ytelser: List<Ytelsesperiode>,
         alleAktiviteter: List<Datoperiode>,
         tiltak: List<Datoperiode>,
         utdanningstiltak: List<Datoperiode>,
     ): StønadsperiodeForKontroll {
         val stønadsperiode = Datoperiode(fom = this.fom, tom = this.tom)
+        val årsaker = finnEndringIAktivitet(stønadsperiode, tiltak, utdanningstiltak, alleAktiviteter)
+        return StønadsperiodeForKontroll(
+            fom = this.fom,
+            tom = this.tom,
+            målgruppe = this.målgruppe,
+            aktivitet = this.aktivitet,
+            årsaker = årsaker,
+        )
+    }
+
+    private fun StønadsperiodeDto.finnEndringIAktivitet(
+        stønadsperiode: Datoperiode,
+        tiltak: List<Datoperiode>,
+        utdanningstiltak: List<Datoperiode>,
+        alleAktiviteter: List<Datoperiode>,
+    ): MutableSet<ÅrsakKontroll> {
         val årsaker =
             when (this.aktivitet) {
                 AktivitetType.REELL_ARBEIDSSØKER -> mutableSetOf(ÅrsakKontroll.SKAL_IKKE_KONTROLLERES)
@@ -106,20 +152,14 @@ class OppfølgingService(
         if (årsaker.any { it.trengerKontroll } && alleAktiviteter.any { it.inneholder(stønadsperiode) }) {
             årsaker.add(ÅrsakKontroll.TREFF_MEN_FEIL_TYPE)
         }
-        return StønadsperiodeForKontroll(
-            fom = this.fom,
-            tom = this.tom,
-            målgruppe = this.målgruppe,
-            aktivitet = this.aktivitet,
-            årsaker = årsaker,
-        )
+        return årsaker
     }
 
     private fun finnEndring(
         stønadsperiode: Datoperiode,
-        tiltak: List<Datoperiode>,
+        aktivitet: List<Datoperiode>,
     ): MutableSet<ÅrsakKontroll> {
-        val snitt = tiltak.mapNotNull { it.beregnSnitt(stønadsperiode) }
+        val snitt = aktivitet.mapNotNull { it.beregnSnitt(stønadsperiode) }
         if (snitt.isEmpty()) {
             return mutableSetOf(ÅrsakKontroll.INGEN_TREFF)
         }
@@ -176,4 +216,10 @@ class OppfølgingService(
                 erUtdanning = it.erUtdanning,
             )
         }
+
+    data class Ytelsesperiode(
+        override val fom: LocalDate,
+        override val tom: LocalDate,
+        val type: TypeYtelsePeriode,
+    ) : Periode<LocalDate>
 }
