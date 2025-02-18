@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.HentetInformasjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
@@ -62,7 +63,11 @@ class YtelseService(
 
         validerResultat(ytelsePerioder.hentetInformasjon)
 
-        return ytelsePerioder
+        return ytelsePerioder.copy(
+            perioder =
+                ytelsePerioder.perioder
+                    .filter { it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN },
+        )
     }
 
     private fun validerResultat(hentetInformasjon: List<HentetInformasjon>) {
@@ -81,6 +86,7 @@ class YtelseService(
                     TypeYtelsePeriode.ENSLIG_FORSØRGER,
                     TypeYtelsePeriode.OMSTILLINGSSTØNAD,
                 )
+
             else -> error("Finner ikke relevante ytelser for stønadstype $type")
         }
 }
