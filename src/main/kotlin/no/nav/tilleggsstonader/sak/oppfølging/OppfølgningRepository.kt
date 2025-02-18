@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.oppfølging
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
@@ -12,6 +13,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
 import org.springframework.data.jdbc.repository.query.Modifying
 import org.springframework.data.jdbc.repository.query.Query
+import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.stereotype.Repository
@@ -31,8 +33,15 @@ interface OppfølgningRepository :
         """
         SELECT 
         o.*,
+        fe.id AS saksnummer,
+        f.stonadstype,
+        f.fagsak_person_id,
+        b.vedtakstidspunkt,
         (select count(*) > 0 from behandling b where b.forrige_behandling_id = o.behandling_id) har_nyere_behandling
-        FROM oppfolging o 
+        FROM oppfolging o
+        JOIN behandling b ON b.id = o.behandling_id
+        JOIN fagsak f ON f.id = b.fagsak_id
+        JOIN fagsak_ekstern fe ON fe.fagsak_id = f.id
         WHERE o.aktiv=true
     """,
     )
@@ -42,10 +51,17 @@ interface OppfølgningRepository :
         """
         SELECT 
         o.*,
+        fe.id AS saksnummer,
+        f.stonadstype,
+        f.fagsak_person_id,
+        b.vedtakstidspunkt,
         (select count(*) > 0 from behandling b where b.forrige_behandling_id = o.behandling_id) har_nyere_behandling
         FROM oppfolging o 
+        JOIN behandling b ON b.id = o.behandling_id
+        JOIN fagsak f ON f.id = b.fagsak_id
+        JOIN fagsak_ekstern fe ON fe.fagsak_id = f.id
         WHERE o.aktiv=true
-        AND behandling_id = :behandlingId
+        AND o.behandling_id = :behandlingId
     """,
     )
     fun finnAktivMedDetaljer(behandlingId: BehandlingId): OppfølgingMedDetaljer
@@ -65,23 +81,7 @@ data class Oppfølging(
     val kontrollert: Kontrollert? = null,
 )
 
-/**
- * @param harNyereBehandling er true hvis det er en behandling som er opprettet etter denne behandlingen
- */
-data class OppfølgingMedDetaljer(
-    val id: UUID = UUID.randomUUID(),
-    val behandlingId: BehandlingId,
-    val version: Int = 0,
-    val opprettetTidspunkt: LocalDateTime = SporbarUtils.now(),
-    val data: OppfølgingData,
-    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "kontrollert_")
-    val kontrollert: Kontrollert? = null,
-    val harNyereBehandling: Boolean,
-)
-
 data class OppfølgingData(
-    val stønadstype: Stønadstype,
-    val vedtakstidspunkt: LocalDateTime,
     val perioderTilKontroll: List<PeriodeForKontroll>,
 )
 
@@ -125,3 +125,28 @@ enum class ÅrsakKontroll(
     TOM_ENDRET,
     TREFF_MEN_FEIL_TYPE,
 }
+
+/**
+ * Brukes for henting av aktiv behandling som joiner med andre tabeller også
+ * @param harNyereBehandling er true hvis det er en behandling som er opprettet etter denne behandlingen
+ */
+data class OppfølgingMedDetaljer(
+    val id: UUID = UUID.randomUUID(),
+    val behandlingId: BehandlingId,
+    val version: Int = 0,
+    val opprettetTidspunkt: LocalDateTime = SporbarUtils.now(),
+    val data: OppfølgingData,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "kontrollert_")
+    val kontrollert: Kontrollert? = null,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+    val behandlingsdetaljer: Behandlingsdetaljer,
+)
+
+data class Behandlingsdetaljer(
+    val saksnummer: Long,
+    val fagsakPersonId: FagsakPersonId,
+    @Column("stonadstype")
+    val stønadstype: Stønadstype,
+    val vedtakstidspunkt: LocalDateTime,
+    val harNyereBehandling: Boolean,
+)

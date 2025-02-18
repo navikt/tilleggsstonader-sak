@@ -97,19 +97,16 @@ class OppfølgingService(
         return oppfølgningRepository.finnAktivMedDetaljer(oppfølging.behandlingId)
     }
 
-    fun hentAktiveOppfølginger(): List<OppfølgingMedDetaljer> = oppfølgningRepository.finnAktiveMedDetaljer()
-        .sortedBy { it.data.vedtakstidspunkt }
+    fun hentAktiveOppfølginger(): List<OppfølgingMedDetaljer> =
+        oppfølgningRepository
+            .finnAktiveMedDetaljer()
+            .sortedBy { it.behandlingsdetaljer.vedtakstidspunkt }
 
     fun håndterBehandling(behandlingId: BehandlingId) {
         val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
         val fagsakMetadata = fagsakService.hentMetadata(listOf(behandling.fagsakId)).values.single()
         hentOppfølgningFn(behandling, fagsakMetadata)()?.let {
-            val data =
-                OppfølgingData(
-                    stønadstype = fagsakMetadata.stønadstype,
-                    vedtakstidspunkt = behandling.vedtakstidspunkt!!,
-                    perioderTilKontroll = it.stønadsperioderForKontroll,
-                )
+            val data = OppfølgingData(perioderTilKontroll = it.stønadsperioderForKontroll)
             oppfølgningRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
         }
     }

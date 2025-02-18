@@ -25,12 +25,7 @@ class OppfølgningRepositoryTest : IntegrationTest() {
             vedtakstidspunkt = LocalDateTime.now(),
         )
     val behandlingId = behandling.id
-    val data =
-        OppfølgingData(
-            stønadstype = Stønadstype.BARNETILSYN,
-            vedtakstidspunkt = LocalDateTime.now(),
-            perioderTilKontroll = emptyList(),
-        )
+    val data = OppfølgingData(perioderTilKontroll = emptyList())
 
     @BeforeEach
     fun setUp() {
@@ -87,7 +82,7 @@ class OppfølgningRepositoryTest : IntegrationTest() {
             val aktive = oppfølgningRepository.finnAktiveMedDetaljer()
 
             assertThat(aktive).hasSize(1)
-            assertThat(aktive.single().harNyereBehandling).isFalse()
+            assertThat(aktive.single().behandlingsdetaljer.harNyereBehandling).isFalse()
         }
 
         @Test
@@ -103,13 +98,22 @@ class OppfølgningRepositoryTest : IntegrationTest() {
 
             val aktive = oppfølgningRepository.finnAktiveMedDetaljer()
             assertThat(aktive).hasSize(1)
-            assertThat(aktive.single().harNyereBehandling).isTrue()
+            assertThat(aktive.single().behandlingsdetaljer.harNyereBehandling).isTrue()
         }
 
         @Test
         fun `skal ikke finne noen hvis det kun finnes ikke aktive`() {
             oppfølgningRepository.insert(Oppfølging(behandlingId = behandlingId, data = data, aktiv = false))
             assertThat(oppfølgningRepository.finnAktiveMedDetaljer()).isEmpty()
+        }
+
+        @Test
+        fun `skal finne aktiv for behandling`() {
+            oppfølgningRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+
+            val aktiv = oppfølgningRepository.finnAktivMedDetaljer(behandlingId)
+
+            assertThat(aktiv.behandlingsdetaljer.stønadstype).isEqualTo(Stønadstype.BARNETILSYN)
         }
     }
 }
