@@ -91,7 +91,7 @@ object VilkårperiodeTestUtil {
                                     SvarJaNei.JA,
                                     inputFakta = "Begrunnelse",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.now(),
+                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )
@@ -107,7 +107,7 @@ object VilkårperiodeTestUtil {
                                     SvarJaNei.JA,
                                     inputFakta = "Begrunnelse",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.now(),
+                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )
@@ -123,7 +123,7 @@ object VilkårperiodeTestUtil {
                                     SvarJaNei.JA,
                                     inputFakta = "Begrunnelse",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.now(),
+                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )
@@ -139,7 +139,7 @@ object VilkårperiodeTestUtil {
                                     SvarJaNei.JA,
                                     inputFakta = "Begrunnelse",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.now(),
+                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )

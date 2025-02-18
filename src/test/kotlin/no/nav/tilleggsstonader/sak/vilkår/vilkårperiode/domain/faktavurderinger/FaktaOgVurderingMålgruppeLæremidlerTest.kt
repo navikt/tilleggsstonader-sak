@@ -42,7 +42,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                                     SvarJaNei.JA,
                                     inputFakta = "Begrunnelse",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.now(),
+                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )
@@ -63,7 +63,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                                     SvarJaNei.JA,
                                     inputFakta = "Begrunnelse",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.now(),
+                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )
@@ -84,7 +84,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                                     SvarJaNei.JA,
                                     inputFakta = "Begrunnelse",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.now(),
+                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )
@@ -105,7 +105,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                                     SvarJaNei.JA,
                                     inputFakta = "Begrunnelse",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.now(),
+                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )

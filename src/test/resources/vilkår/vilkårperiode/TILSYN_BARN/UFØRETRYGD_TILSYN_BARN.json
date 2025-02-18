@@ -4,7 +4,10 @@
   "vurderinger": {
     "aldersvilkår": {
       "resultat":"OPPFYLT",
-      "svar":"JA_IMPLISITT"
+      "svar":"JA_IMPLISITT",
+      "inputFakta": "String",
+      "gitHash": "String",
+      "tidspunktForVurdering": "2025-01-01T00:00:00"
     },
     "dekketAvAnnetRegelverk": {
       "svar": "NEI",

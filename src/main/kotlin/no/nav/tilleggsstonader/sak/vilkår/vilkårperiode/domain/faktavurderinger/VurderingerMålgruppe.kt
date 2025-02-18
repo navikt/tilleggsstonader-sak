@@ -50,5 +50,10 @@ data class VurderingOmstillingsstønad(
 data object VurderingOvergangsstønad : MedlemskapVurdering, AldersvilkårVurdering {
     override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
     override val aldersvilkår: VurderingAldersVilkår =
-        VurderingAldersVilkår(SvarJaNei.JA, inputFakta = "inputFakta", gitHash = "gitHash", tidspunktForVurdering = LocalDateTime.now())
+        VurderingAldersVilkår(
+            SvarJaNei.JA,
+            inputFakta = "inputFakta",
+            gitHash = "gitHash",
+            tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
+        )
 }
