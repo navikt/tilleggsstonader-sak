@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
@@ -26,7 +27,16 @@ interface OppfølgningRepository :
     @Query("update oppfolging SET aktiv = false, version=version + 1 WHERE aktiv = true")
     fun markerAlleAktiveSomIkkeAktive()
 
-    fun findByAktivIsTrue(): List<Oppfølging>
+    @Query(
+        """
+        SELECT 
+        o.*,
+        (select count(*) > 0 from behandling b where b.forrige_behandling_id = o.behandling_id) har_nyere_behandling
+        FROM oppfolging o 
+        WHERE o.aktiv=true
+    """,
+    )
+    fun finnAktiveMedDetaljer(): List<OppfølgingMedDetaljer>
 }
 
 @Table("oppfolging")
@@ -43,16 +53,36 @@ data class Oppfølging(
     val kontrollert: Kontrollert? = null,
 )
 
-data class OppfølgingData(
+/**
+ * @param harNyereBehandling er true hvis det er en behandling som er opprettet etter denne behandlingen
+ */
+data class OppfølgingMedDetaljer(
+    val id: UUID = UUID.randomUUID(),
     val behandlingId: BehandlingId,
+    val version: Int = 0,
+    val opprettetTidspunkt: LocalDateTime = SporbarUtils.now(),
+    val data: OppfølgingData,
+    val kontrollert: Kontrollert? = null,
+    val harNyereBehandling: Boolean,
+)
+
+data class OppfølgingData(
+    val stønadstype: Stønadstype,
+    val vedtakstidspunkt: LocalDateTime,
     val perioderTilKontroll: List<PeriodeForKontroll>,
 )
 
 data class Kontrollert(
     val tidspunkt: LocalDateTime = SporbarUtils.now(),
     val saksbehandler: String = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+    val utfall: KontrollertUtfall,
     val kommentar: String?,
 )
+
+enum class KontrollertUtfall {
+    OK,
+    IKKE_OK,
+}
 
 data class PeriodeForKontroll(
     val fom: LocalDate,
@@ -78,7 +108,6 @@ enum class ÅrsakKontroll(
     INGEN_ENDRING(trengerKontroll = false),
 
     INGEN_TREFF,
-    FOM_TOM_ENDRET,
     FOM_ENDRET,
     TOM_ENDRET,
     TREFF_MEN_FEIL_TYPE,

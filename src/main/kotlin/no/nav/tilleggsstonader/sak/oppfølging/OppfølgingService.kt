@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakMetadata
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.VirtualThreadUtil.parallelt
@@ -79,13 +80,29 @@ class OppfølgingService(
         taskService.saveAll(behandlinger.map { OppfølgningTask.opprettTask(it.id, tidspunkt) })
     }
 
+    fun kontroller(request: KontrollerOppfølgingRequest) {
+        val oppfølging = oppfølgningRepository.findByIdOrThrow(request.id)
+        brukerfeilHvis(oppfølging.version != request.version) {
+            "Det har allerede skjedd en endring på oppfølging. Last siden på nytt"
+        }
+        val kontrollert =
+            Kontrollert(
+                utfall = request.utfall,
+                kommentar = request.kommentar,
+            )
+        oppfølgningRepository.update(oppfølging.copy(kontrollert = kontrollert))
+    }
+
+    fun hentAktiveOppfølginger(): List<OppfølgingMedDetaljer> = oppfølgningRepository.finnAktiveMedDetaljer()
+
     fun håndterBehandling(behandlingId: BehandlingId) {
         val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
         val fagsakMetadata = fagsakService.hentMetadata(listOf(behandling.fagsakId)).values.single()
         hentOppfølgningFn(behandling, fagsakMetadata)()?.let {
             val data =
                 OppfølgingData(
-                    behandlingId = behandlingId,
+                    stønadstype = fagsakMetadata.stønadstype,
+                    vedtakstidspunkt = behandling.vedtakstidspunkt!!,
                     perioderTilKontroll = it.stønadsperioderForKontroll,
                 )
             oppfølgningRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))

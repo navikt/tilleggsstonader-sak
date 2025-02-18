@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakIdRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -19,6 +20,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.fagsak.domain.tilFagsakMedPerson
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -38,12 +40,15 @@ import java.time.LocalDate.now
 class TestoppsettService(
     private val fagsakPersonRepository: FagsakPersonRepository,
     private val fagsakRepository: FagsakRepository,
+    private val fagsakService: FagsakService,
     private val eksternFagsakIdRepository: EksternFagsakIdRepository,
     private val behandlingRepository: BehandlingRepository,
     private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
     private val grunnlagsdataService: GrunnlagsdataService,
     private val repository: VedtakRepository,
 ) {
+    fun hentFagsak(fagsakId: FagsakId) = fagsakService.hentFagsak(fagsakId)
+
     fun hentBehandling(behandlingId: BehandlingId) = behandlingRepository.findByIdOrThrow(behandlingId)
 
     fun hentSaksbehandling(behandlingId: BehandlingId) = behandlingRepository.finnSaksbehandling(behandlingId)
