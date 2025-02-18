@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
@@ -76,8 +77,10 @@ class OppfølgingService(
     fun opprettTaskerForOppfølging() {
         val tidspunkt = LocalDateTime.now()
         oppfølgningRepository.markerAlleAktiveSomIkkeAktive()
-        val behandlinger = behandlingRepository.finnGjeldendeIverksatteBehandlinger()
-        taskService.saveAll(behandlinger.map { OppfølgningTask.opprettTask(it.id, tidspunkt) })
+        Stønadstype.entries.forEach { stønadstype ->
+            val behandlinger = behandlingRepository.finnGjeldendeIverksatteBehandlinger(stønadstype = stønadstype)
+            taskService.saveAll(behandlinger.map { OppfølgningTask.opprettTask(it.id, tidspunkt) })
+        }
     }
 
     fun kontroller(request: KontrollerOppfølgingRequest) {
