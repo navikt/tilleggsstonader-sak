@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
@@ -13,6 +14,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakMetadata
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.VirtualThreadUtil.parallelt
@@ -22,7 +25,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 class OppfølgingService(
@@ -31,6 +36,8 @@ class OppfølgingService(
     private val registerAktivitetService: RegisterAktivitetService,
     private val ytelseService: YtelseService,
     private val fagsakService: FagsakService,
+    private val taskService: TaskService,
+    private val oppfølgningRepository: OppfølgningRepository,
 ) {
     val logger = LoggerFactory.getLogger(javaClass)
 
@@ -59,6 +66,30 @@ class OppfølgingService(
                         hentOppfølgningFn(behandling, fagsak)
                     }.parallelt()
             }.mapNotNull { it }
+    }
+
+    /**
+     * Oppretter en task med unik behandlingId og tidspunkt
+     */
+    @Transactional
+    fun opprettTaskerForOppfølging() {
+        val tidspunkt = LocalDateTime.now()
+        oppfølgningRepository.markerAlleAktiveSomIkkeAktive()
+        val behandlinger = behandlingRepository.finnGjeldendeIverksatteBehandlinger()
+        taskService.saveAll(behandlinger.map { OppfølgningTask.opprettTask(it.id, tidspunkt) })
+    }
+
+    fun håndterBehandling(behandlingId: BehandlingId) {
+        val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
+        val fagsakMetadata = fagsakService.hentMetadata(listOf(behandling.fagsakId)).values.single()
+        hentOppfølgningFn(behandling, fagsakMetadata)()?.let {
+            val data =
+                OppfølgingData(
+                    behandlingId = behandlingId,
+                    perioderTilKontroll = it.stønadsperioderForKontroll,
+                )
+            oppfølgningRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+        }
     }
 
     /**
@@ -102,8 +133,8 @@ class OppfølgingService(
         alleAktiviteter: List<Datoperiode>,
         tiltak: List<Datoperiode>,
         utdanningstiltak: List<Datoperiode>,
-    ): StønadsperiodeForKontroll =
-        StønadsperiodeForKontroll(
+    ): PeriodeForKontroll =
+        PeriodeForKontroll(
             fom = this.fom,
             tom = this.tom,
             målgruppe = this.målgruppe,
@@ -222,16 +253,17 @@ class OppfølgingService(
     )
 
     private fun List<AktivitetArenaDto>.tilDto() =
-        map {
-            RegisterAktivitetDto(
-                id = it.id,
-                fom = it.fom,
-                tom = it.tom,
-                typeNavn = it.typeNavn,
-                status = it.status,
-                erUtdanning = it.erUtdanning,
-            )
-        }
+        this
+            .filter { it.fom == null || it.tom == null }
+            .map {
+                RegisterAktivitetDto(
+                    id = it.id,
+                    fom = it.fom!!,
+                    tom = it.tom!!,
+                    typeNavn = it.typeNavn,
+                    erUtdanning = it.erUtdanning,
+                )
+            }
 
     private fun TypeYtelsePeriode.tilMålgruppe() =
         when (this) {
