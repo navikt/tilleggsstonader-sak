@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.UUID
 
 data class BehandlingForOppfølgingDto(
     val behandling: BehandlingInformasjon,
@@ -26,4 +27,11 @@ data class RegisterAktivitetDto(
     val tom: LocalDate,
     val typeNavn: String,
     val erUtdanning: Boolean?,
+)
+
+data class KontrollerOppfølgingRequest(
+    val id: UUID,
+    val version: Int,
+    val utfall: KontrollertUtfall,
+    val kommentar: String?,
 )
