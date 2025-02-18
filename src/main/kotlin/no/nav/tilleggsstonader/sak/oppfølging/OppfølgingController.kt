@@ -41,14 +41,14 @@ class OppfølgingController(
     @PostMapping("kontroller")
     fun kontrollerBehandling(
         @RequestBody request: KontrollerOppfølgingRequest,
-    ) {
+    ): OppfølgingMedDetaljer {
         tilgangService.validerTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)
 
         feilHvisIkke(unleashService.isEnabled(Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING)) {
             "Feature toggle ${Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING} er ikke aktivert"
         }
 
-        oppfølgingService.kontroller(request)
+        return oppfølgingService.kontroller(request)
     }
 
     @GetMapping("behandlinger")

@@ -37,6 +37,18 @@ interface OppfølgningRepository :
     """,
     )
     fun finnAktiveMedDetaljer(): List<OppfølgingMedDetaljer>
+
+    @Query(
+        """
+        SELECT 
+        o.*,
+        (select count(*) > 0 from behandling b where b.forrige_behandling_id = o.behandling_id) har_nyere_behandling
+        FROM oppfolging o 
+        WHERE o.aktiv=true
+        AND behandling_id = :behandlingId
+    """,
+    )
+    fun finnAktivMedDetaljer(behandlingId: BehandlingId): OppfølgingMedDetaljer
 }
 
 @Table("oppfolging")
@@ -62,6 +74,7 @@ data class OppfølgingMedDetaljer(
     val version: Int = 0,
     val opprettetTidspunkt: LocalDateTime = SporbarUtils.now(),
     val data: OppfølgingData,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "kontrollert_")
     val kontrollert: Kontrollert? = null,
     val harNyereBehandling: Boolean,
 )

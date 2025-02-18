@@ -83,7 +83,7 @@ class OppfølgingService(
         }
     }
 
-    fun kontroller(request: KontrollerOppfølgingRequest) {
+    fun kontroller(request: KontrollerOppfølgingRequest): OppfølgingMedDetaljer {
         val oppfølging = oppfølgningRepository.findByIdOrThrow(request.id)
         brukerfeilHvis(oppfølging.version != request.version) {
             "Det har allerede skjedd en endring på oppfølging. Last siden på nytt"
@@ -94,9 +94,11 @@ class OppfølgingService(
                 kommentar = request.kommentar,
             )
         oppfølgningRepository.update(oppfølging.copy(kontrollert = kontrollert))
+        return oppfølgningRepository.finnAktivMedDetaljer(oppfølging.behandlingId)
     }
 
     fun hentAktiveOppfølginger(): List<OppfølgingMedDetaljer> = oppfølgningRepository.finnAktiveMedDetaljer()
+        .sortedBy { it.data.vedtakstidspunkt }
 
     fun håndterBehandling(behandlingId: BehandlingId) {
         val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
