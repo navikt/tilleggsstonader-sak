@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -61,73 +62,76 @@ class OppfølgingServiceTest {
             aktivitet = AktivitetType.TILTAK,
         )
 
-    @Test
-    fun `skal ikke finne treff hvis aktiviteten blitt forlenget`() {
-        every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
-            listOf(stønadsperiode).tilSortertDto()
+    @Nested
+    inner class EndringIAktivitet {
+        @Test
+        fun `skal ikke finne treff hvis aktiviteten blitt forlenget`() {
+            every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
+                listOf(stønadsperiode).tilSortertDto()
 
-        every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-            listOf(aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom.plusMonths(1)))
+            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+                listOf(aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom.plusMonths(1)))
 
-        assertThat(oppfølgingService.hentBehandlingerForOppfølging()).isEmpty()
-    }
-
-    @Test
-    fun `skal finne treff hvis aktiviteten slutter tidligere`() {
-        every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
-            listOf(stønadsperiode).tilSortertDto()
-
-        every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-            listOf(aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom.minusDays(5)))
-
-        with(oppfølgingService.hentBehandlingerForOppfølging()) {
-            assertThat(this).hasSize(1)
-            assertThat(this.årsaker()).containsExactly(ÅrsakKontroll.TOM_ENDRET)
+            assertThat(oppfølgingService.hentBehandlingerForOppfølging()).isEmpty()
         }
-    }
 
-    @Test
-    fun `skal finne treff hvis aktiviteten begynner senere`() {
-        every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
-            listOf(stønadsperiode).tilSortertDto()
+        @Test
+        fun `skal finne treff hvis aktiviteten slutter tidligere`() {
+            every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
+                listOf(stønadsperiode).tilSortertDto()
 
-        every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-            listOf(aktivitetArenaDto(fom = stønadsperiode.fom.plusDays(3), tom = stønadsperiode.tom))
+            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+                listOf(aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom.minusDays(5)))
 
-        with(oppfølgingService.hentBehandlingerForOppfølging()) {
-            assertThat(this).hasSize(1)
-            assertThat(this.årsaker()).containsExactly(ÅrsakKontroll.FOM_ENDRET)
+            with(oppfølgingService.hentBehandlingerForOppfølging()) {
+                assertThat(this).hasSize(1)
+                assertThat(this.årsaker()).containsExactly(ÅrsakKontroll.TOM_ENDRET)
+            }
         }
-    }
 
-    @Test
-    fun `skal finne treff hvis aktiviteten begynner senere og slutter tidligere`() {
-        every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
-            listOf(stønadsperiode).tilSortertDto()
+        @Test
+        fun `skal finne treff hvis aktiviteten begynner senere`() {
+            every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
+                listOf(stønadsperiode).tilSortertDto()
 
-        val aktivitet = aktivitetArenaDto(fom = stønadsperiode.fom.plusDays(3), tom = stønadsperiode.tom.minusDays(3))
-        every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-            listOf(aktivitet)
+            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+                listOf(aktivitetArenaDto(fom = stønadsperiode.fom.plusDays(3), tom = stønadsperiode.tom))
 
-        with(oppfølgingService.hentBehandlingerForOppfølging()) {
-            assertThat(this).hasSize(1)
-            assertThat(this.årsaker()).containsExactly(ÅrsakKontroll.FOM_ENDRET, ÅrsakKontroll.TOM_ENDRET)
+            with(oppfølgingService.hentBehandlingerForOppfølging()) {
+                assertThat(this).hasSize(1)
+                assertThat(this.årsaker()).containsExactly(ÅrsakKontroll.FOM_ENDRET)
+            }
         }
-    }
 
-    @Test
-    fun `skal finne treff hvis man har en aktivitet men er av feil type`() {
-        every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
-            listOf(stønadsperiode).tilSortertDto()
+        @Test
+        fun `skal finne treff hvis aktiviteten begynner senere og slutter tidligere`() {
+            every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
+                listOf(stønadsperiode).tilSortertDto()
 
-        val aktivitet =
-            aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom, erUtdanning = true)
-        every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-            listOf(aktivitet)
+            val aktivitet = aktivitetArenaDto(fom = stønadsperiode.fom.plusDays(3), tom = stønadsperiode.tom.minusDays(3))
+            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+                listOf(aktivitet)
 
-        with(oppfølgingService.hentBehandlingerForOppfølging()) {
-            assertThat(this).hasSize(1)
-            assertThat(this.årsaker()).containsExactly(ÅrsakKontroll.INGEN_TREFF, ÅrsakKontroll.TREFF_MEN_FEIL_TYPE)
+            with(oppfølgingService.hentBehandlingerForOppfølging()) {
+                assertThat(this).hasSize(1)
+                assertThat(this.årsaker()).containsExactly(ÅrsakKontroll.FOM_ENDRET, ÅrsakKontroll.TOM_ENDRET)
+            }
+        }
+
+        @Test
+        fun `skal finne treff hvis man har en aktivitet men er av feil type`() {
+            every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
+                listOf(stønadsperiode).tilSortertDto()
+
+            val aktivitet =
+                aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom, erUtdanning = true)
+            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+                listOf(aktivitet)
+
+            with(oppfølgingService.hentBehandlingerForOppfølging()) {
+                assertThat(this).hasSize(1)
+                assertThat(this.årsaker()).containsExactly(ÅrsakKontroll.INGEN_TREFF, ÅrsakKontroll.TREFF_MEN_FEIL_TYPE)
+            }
         }
     }
 
