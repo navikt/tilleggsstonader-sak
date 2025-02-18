@@ -1,7 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
+import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -27,8 +30,10 @@ class TilsynBarnVedtaksperiodeValidingerService(
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
         behandlingId: BehandlingId,
+        utgifter: Map<BarnId, List<UtgiftBeregning>>,
     ) {
         validerIngenOverlappMellomVedtaksperioder(vedtaksperioder)
+        validerUtgiftHeleVedtaksperioden(vedtaksperioder, utgifter)
 
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
         validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett(vilkårperioder, vedtaksperioder)
@@ -49,6 +54,36 @@ class TilsynBarnVedtaksperiodeValidingerService(
                 aktiviteter,
                 fødselsdato,
             )
+        }
+    }
+
+    private fun validerUtgiftHeleVedtaksperioden(
+        vedtaksperioder: List<Vedtaksperiode>,
+        utgifter: Map<BarnId, List<UtgiftBeregning>>,
+    ) {
+        brukerfeilHvisIkke(
+            erUtgiftperiodeSomInneholderVedtaksperiode(
+                vedtaksperioder = vedtaksperioder,
+                utgifter = utgifter,
+            ),
+        ) {
+            "Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden"
+        }
+    }
+
+    private fun erUtgiftperiodeSomInneholderVedtaksperiode(
+        vedtaksperioder: List<Vedtaksperiode>,
+        utgifter: Map<BarnId, List<UtgiftBeregning>>,
+    ): Boolean {
+        val sammenslåtteUtgiftPerioder =
+            utgifter.values
+                .flatMap {
+                    it.map { Datoperiode(fom = it.fom.atDay(1), tom = it.tom.atEndOfMonth()) }
+                }.sorted()
+                .mergeSammenhengende { p1, p2 -> p1.overlapperEllerPåfølgesAv(p2) }
+
+        return vedtaksperioder.any { vedtaksperiode ->
+            sammenslåtteUtgiftPerioder.any { utgiftPeriode -> utgiftPeriode.inneholder(vedtaksperiode) }
         }
     }
 

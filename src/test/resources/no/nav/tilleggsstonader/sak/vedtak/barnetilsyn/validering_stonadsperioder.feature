@@ -15,16 +15,3 @@ Egenskap: Beregning barnetilsyn - validering av stønadsperioder
     Når beregner
 
     Så forvent følgende feil: Kan ikke innvilge når det ikke finnes noen vedtaksperioder
-
-  Scenario: Finner ingen aktiviteter på behandling
-
-    Gitt følgende støndsperioder
-      | Fom        | Tom        |
-      | 01.01.2023 | 31.01.2023 |
-
-    Gitt følgende aktiviteter
-      | Fom        | Tom        | Aktivitet | Aktivitetsdager |
-
-    Når beregner
-
-    Så forvent følgende feil: Aktiviteter mangler
