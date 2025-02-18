@@ -35,7 +35,7 @@ class BehandlingFaktaService(
         return when (stønadstype) {
             Stønadstype.BARNETILSYN -> hentFaktaDTOForBarneTilsyn(behandlingId)
             Stønadstype.LÆREMIDLER -> hentFaktaDTOForLæremidler(behandlingId)
-            else -> error("Uthenting av Fakta er ikke implementert for stønadstype=$stønadstype")
+            Stønadstype.BOUTGIFTER -> hentFaktaDTOForBoutgifter(behandlingId)
         }
     }
 
@@ -63,6 +63,13 @@ class BehandlingFaktaService(
             arena = arenaFakta(grunnlagsdata),
             utdanning = søknad?.data?.utdanning.let { mapUtdanning(it) },
             alder = antallÅrSiden(fødselsdato),
+        )
+    }
+
+    private fun hentFaktaDTOForBoutgifter(behandlingId: BehandlingId): BehandlingFaktaBoutgifterDto {
+        val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandlingId)
+        return BehandlingFaktaBoutgifterDto(
+            arena = arenaFakta(grunnlagsdata),
         )
     }
 

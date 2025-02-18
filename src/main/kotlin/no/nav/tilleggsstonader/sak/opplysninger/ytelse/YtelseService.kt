@@ -75,12 +75,11 @@ class YtelseService(
 
     private fun finnRelevanteYtelsesTyper(type: Stønadstype) =
         when (type) {
-            Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER ->
+            Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER, Stønadstype.BOUTGIFTER ->
                 listOf(
                     TypeYtelsePeriode.AAP,
                     TypeYtelsePeriode.ENSLIG_FORSØRGER,
                     TypeYtelsePeriode.OMSTILLINGSSTØNAD,
                 )
-            else -> error("Finner ikke relevante ytelser for stønadstype $type")
         }
 }

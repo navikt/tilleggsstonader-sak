@@ -77,6 +77,10 @@ private fun mapAktiviteter(
             require(faktaOgSvar is FaktaOgSvarAktivitetLæremidlerDto)
             return mapAktiviteterLæremidler(type, faktaOgSvar)
         }
+
+        Stønadstype.BOUTGIFTER -> {
+            TODO("Ikke implementert mapping av aktiviteter for $stønadstype ennå")
+        }
     }
 }
 
@@ -97,6 +101,9 @@ private fun mapMålgruppe(
 
         Stønadstype.LÆREMIDLER -> {
             mapMålgruppeLæremidler(type, faktaOgSvar)
+        }
+        Stønadstype.BOUTGIFTER -> {
+            TODO("Ikke implementert ennå")
         }
     }
 }
