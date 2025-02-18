@@ -105,6 +105,7 @@
     "fom" : "2024-02-01",
     "tom" : "2024-03-31"
   } ],
+  "vedtaksperioder" : [ ],
   "vilkår" : [ ],
   "vedtak" : {
     "type" : "INNVILGELSE"
