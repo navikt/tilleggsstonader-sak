@@ -89,7 +89,7 @@ object VilkårperiodeTestUtil {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "Begrunnelse",
+                                    inputFakta = "input-fakta",
                                     gitHash = "gitHash",
                                     tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
@@ -105,7 +105,7 @@ object VilkårperiodeTestUtil {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "Begrunnelse",
+                                    inputFakta = "input-fakta",
                                     gitHash = "gitHash",
                                     tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
@@ -121,7 +121,7 @@ object VilkårperiodeTestUtil {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "Begrunnelse",
+                                    inputFakta = "input-fakta",
                                     gitHash = "gitHash",
                                     tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
@@ -137,7 +137,7 @@ object VilkårperiodeTestUtil {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "Begrunnelse",
+                                    inputFakta = "input-fakta",
                                     gitHash = "gitHash",
                                     tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),

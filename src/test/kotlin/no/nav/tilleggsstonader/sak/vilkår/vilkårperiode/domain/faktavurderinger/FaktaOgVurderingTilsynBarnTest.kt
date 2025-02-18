@@ -47,7 +47,7 @@ class FaktaOgVurderingTilsynBarnTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "Begrunnelse",
+                                    inputFakta = "input-fakta",
                                     gitHash = "gitHash",
                                     tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
@@ -68,7 +68,7 @@ class FaktaOgVurderingTilsynBarnTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "Begrunnelse",
+                                    inputFakta = "input-fakta",
                                     gitHash = "gitHash",
                                     tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
@@ -89,7 +89,7 @@ class FaktaOgVurderingTilsynBarnTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "Begrunnelse",
+                                    inputFakta = "input-fakta",
                                     gitHash = "gitHash",
                                     tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
@@ -110,7 +110,7 @@ class FaktaOgVurderingTilsynBarnTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "Begrunnelse",
+                                    inputFakta = "input-fakta",
                                     gitHash = "gitHash",
                                     tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
