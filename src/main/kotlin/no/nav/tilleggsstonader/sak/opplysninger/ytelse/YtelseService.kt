@@ -49,12 +49,21 @@ class YtelseService(
         tom: LocalDate,
     ): YtelsePerioderDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val typer = finnRelevanteYtelsesTyper(behandling.stønadstype)
+        return hentYtelseForGrunnlag(behandling.stønadstype, behandling.ident, fom, tom)
+    }
+
+    fun hentYtelseForGrunnlag(
+        stønadstype: Stønadstype,
+        ident: String,
+        fom: LocalDate,
+        tom: LocalDate,
+    ): YtelsePerioderDto {
+        val typer = finnRelevanteYtelsesTyper(stønadstype)
 
         val ytelsePerioder =
             ytelseClient.hentYtelser(
                 YtelsePerioderRequest(
-                    ident = behandling.ident,
+                    ident = ident,
                     fom = fom,
                     tom = tom,
                     typer = typer,
