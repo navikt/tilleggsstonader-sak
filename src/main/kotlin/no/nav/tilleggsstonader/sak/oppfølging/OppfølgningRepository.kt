@@ -62,6 +62,7 @@ data class OppfølgingMedDetaljer(
     val version: Int = 0,
     val opprettetTidspunkt: LocalDateTime = SporbarUtils.now(),
     val data: OppfølgingData,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "kontrollert_")
     val kontrollert: Kontrollert? = null,
     val harNyereBehandling: Boolean,
 )
@@ -74,7 +75,9 @@ data class OppfølgingData(
 
 data class Kontrollert(
     val tidspunkt: LocalDateTime = SporbarUtils.now(),
-    val saksbehandler: String = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+    val saksbehandler: String =
+        "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +
+                "(${SikkerhetContext.hentSaksbehandlerNavn(true)})",
     val utfall: KontrollertUtfall,
     val kommentar: String?,
 )

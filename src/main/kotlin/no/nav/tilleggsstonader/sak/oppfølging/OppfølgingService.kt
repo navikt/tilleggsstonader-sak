@@ -97,6 +97,7 @@ class OppfølgingService(
     }
 
     fun hentAktiveOppfølginger(): List<OppfølgingMedDetaljer> = oppfølgningRepository.finnAktiveMedDetaljer()
+        .sortedBy { it.id }
 
     fun håndterBehandling(behandlingId: BehandlingId) {
         val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
