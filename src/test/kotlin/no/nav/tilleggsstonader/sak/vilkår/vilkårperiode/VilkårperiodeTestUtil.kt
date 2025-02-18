@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
@@ -44,6 +45,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgru
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 object VilkårperiodeTestUtil {
@@ -84,13 +86,30 @@ object VilkårperiodeTestUtil {
                     vurderinger =
                         VurderingOmstillingsstønad(
                             medlemskap = medlemskap,
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    inputFakta = "input-fakta",
+                                    gitHash = "gitHash",
+                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
+                                ),
                         ),
                 )
 
             MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadTilsynBarn
             MålgruppeType.AAP ->
                 AAPTilsynBarn(
-                    vurderinger = VurderingAAP(dekketAvAnnetRegelverk = dekketAvAnnetRegelverk),
+                    vurderinger =
+                        VurderingAAP(
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    inputFakta = "input-fakta",
+                                    gitHash = "gitHash",
+                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
+                                ),
+                        ),
                 )
 
             MålgruppeType.UFØRETRYGD ->
@@ -99,6 +118,13 @@ object VilkårperiodeTestUtil {
                         VurderingUføretrygd(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    inputFakta = "input-fakta",
+                                    gitHash = "gitHash",
+                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
+                                ),
                         ),
                 )
 
@@ -108,6 +134,13 @@ object VilkårperiodeTestUtil {
                         VurderingNedsattArbeidsevne(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    inputFakta = "input-fakta",
+                                    gitHash = "gitHash",
+                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
+                                ),
                         ),
                 )
 

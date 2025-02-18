@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakLæremidler
@@ -34,6 +35,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
@@ -49,6 +51,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivit
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import java.time.LocalDateTime
 
 fun mapFaktaOgSvarDto(
     vilkårperiode: LagreVilkårperiode,
@@ -181,6 +184,13 @@ private fun mapMålgruppeBarnetilsyn(
                 vurderinger =
                     VurderingOmstillingsstønad(
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
+                            ),
                     ),
             )
         }
@@ -194,6 +204,13 @@ private fun mapMålgruppeBarnetilsyn(
                 vurderinger =
                     VurderingAAP(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
+                            ),
                     ),
             )
         }
@@ -204,6 +221,13 @@ private fun mapMålgruppeBarnetilsyn(
                     VurderingUføretrygd(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
+                            ),
                     ),
             )
         }
@@ -214,6 +238,13 @@ private fun mapMålgruppeBarnetilsyn(
                     VurderingNedsattArbeidsevne(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
+                            ),
                     ),
             )
         }
@@ -233,6 +264,13 @@ private fun mapMålgruppeLæremidler(
                 vurderinger =
                     VurderingOmstillingsstønad(
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
+                            ),
                     ),
             )
         }
@@ -246,6 +284,13 @@ private fun mapMålgruppeLæremidler(
                 vurderinger =
                     VurderingAAP(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
+                            ),
                     ),
             )
         }
@@ -256,6 +301,13 @@ private fun mapMålgruppeLæremidler(
                     VurderingUføretrygd(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
+                            ),
                     ),
             )
         }
@@ -266,6 +318,13 @@ private fun mapMålgruppeLæremidler(
                     VurderingNedsattArbeidsevne(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                            VurderingAldersVilkår(
+                                SvarJaNei.JA,
+                                inputFakta = faktaOgVurderinger.brukersFødselsdato?.fødselsdato?.toString() ?: "Fødselsdato mangler",
+                                gitHash = "gitHash",
+                                tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
+                            ),
                     ),
             )
         }
