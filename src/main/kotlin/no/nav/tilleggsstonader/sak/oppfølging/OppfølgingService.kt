@@ -54,7 +54,8 @@ class OppfølgingService(
             .flatMap { chunk ->
                 chunk
                     .map { behandling ->
-                        val fagsak = fagsakMetadata[behandling.fagsakId] ?: error("Finner ikke fagsak for ${behandling.id}")
+                        val fagsak =
+                            fagsakMetadata[behandling.fagsakId] ?: error("Finner ikke fagsak for ${behandling.id}")
                         hentOppfølgningFn(behandling, fagsak)
                     }.parallelt()
             }.mapNotNull { it }
@@ -111,51 +112,51 @@ class OppfølgingService(
             endringMålgruppe = finnEndringIMålgruppe(ytelser),
         )
 
-    private fun Vedtaksperiode.finnEndringIMålgruppe(ytelserPerMålgruppe: Map<MålgruppeType, List<Ytelsesperiode>>): Set<ÅrsakKontroll> {
+    private fun Vedtaksperiode.finnEndringIMålgruppe(ytelserPerMålgruppe: Map<MålgruppeType, List<Ytelsesperiode>>): List<Kontroll> {
         val ytelser = ytelserPerMålgruppe[this.målgruppe] ?: emptyList()
-        return finnEndring(this, ytelser)
+        return finnKontroller(this, ytelser)
     }
 
     private fun Vedtaksperiode.finnEndringIAktivitet(
         tiltak: List<Datoperiode>,
         utdanningstiltak: List<Datoperiode>,
         alleAktiviteter: List<Datoperiode>,
-    ): MutableSet<ÅrsakKontroll> {
-        val årsaker =
+    ): List<Kontroll> {
+        val kontroller =
             when (this.aktivitet) {
-                AktivitetType.REELL_ARBEIDSSØKER -> mutableSetOf(ÅrsakKontroll.SKAL_IKKE_KONTROLLERES)
+                AktivitetType.REELL_ARBEIDSSØKER -> mutableListOf(Kontroll(ÅrsakKontroll.SKAL_IKKE_KONTROLLERES))
                 AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
-                AktivitetType.TILTAK -> finnEndring(this, tiltak)
-                AktivitetType.UTDANNING -> finnEndring(this, utdanningstiltak)
+                AktivitetType.TILTAK -> finnKontroller(this, tiltak)
+                AktivitetType.UTDANNING -> finnKontroller(this, utdanningstiltak)
             }
 
-        if (årsaker.any { it.trengerKontroll } && alleAktiviteter.any { it.inneholder(this) }) {
-            årsaker.add(ÅrsakKontroll.TREFF_MEN_FEIL_TYPE)
+        if (kontroller.any { it.årsak.trengerKontroll } && alleAktiviteter.any { it.inneholder(this) }) {
+            kontroller.add(Kontroll(ÅrsakKontroll.TREFF_MEN_FEIL_TYPE))
         }
-        return årsaker
+        return kontroller
     }
 
-    private fun finnEndring(
+    private fun finnKontroller(
         vedtaksperiode: Vedtaksperiode,
         registerperioder: List<Periode<LocalDate>>,
-    ): MutableSet<ÅrsakKontroll> {
-        val snitt = registerperioder.mapNotNull { vedtaksperiode.beregnSnitt(it) }
-        if (snitt.isEmpty()) {
-            return mutableSetOf(ÅrsakKontroll.INGEN_TREFF)
+    ): MutableList<Kontroll> {
+        // har 1 eller inget snitt
+        val snitt = registerperioder.mapNotNull { vedtaksperiode.beregnSnitt(it) }.singleOrNull()
+
+        if (snitt == null) {
+            return mutableListOf(Kontroll(ÅrsakKontroll.INGEN_TREFF))
         }
-        if (snitt.any { it.fom <= vedtaksperiode.fom && it.tom >= vedtaksperiode.tom }) {
-            return mutableSetOf(ÅrsakKontroll.INGEN_ENDRING)
+        if (snitt.fom == vedtaksperiode.fom && snitt.tom == vedtaksperiode.tom) {
+            return mutableListOf(Kontroll(ÅrsakKontroll.INGEN_ENDRING))
         }
-        val årsaker = mutableSetOf<ÅrsakKontroll>()
-        snitt.forEach {
-            if (it.fom > vedtaksperiode.fom) {
-                årsaker.add(ÅrsakKontroll.FOM_ENDRET)
+        return mutableListOf<Kontroll>().apply {
+            if (snitt.fom > vedtaksperiode.fom) {
+                add(Kontroll(ÅrsakKontroll.FOM_ENDRET, fom = snitt.fom))
             }
-            if (it.tom < vedtaksperiode.tom) {
-                årsaker.add(ÅrsakKontroll.TOM_ENDRET)
+            if (snitt.tom < vedtaksperiode.tom) {
+                add(Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = snitt.tom))
             }
         }
-        return årsaker
     }
 
     private fun List<AktivitetArenaDto>.mergeSammenhengende() =
