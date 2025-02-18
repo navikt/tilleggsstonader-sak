@@ -31,9 +31,10 @@ enum class ÅrsakKontroll(
     SKAL_IKKE_KONTROLLERES(trengerKontroll = false),
     INGEN_ENDRING(trengerKontroll = false),
 
-    INGEN_MATCH,
+    INGEN_TREFF,
     FOM_ENDRET,
     TOM_ENDRET,
+    TREFF_MEN_FEIL_TYPE,
 }
 
 data class BehandlingInformasjon(
