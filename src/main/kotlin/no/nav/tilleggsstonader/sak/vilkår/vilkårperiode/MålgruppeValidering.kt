@@ -5,7 +5,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 object MålgruppeValidering {
     fun validerKanLeggeTilMålgruppeManuelt(
@@ -31,14 +34,14 @@ object MålgruppeValidering {
         }
     }
 
-    fun aldersvilkårErOppfylt(
+    fun vurderAldersvilkår(
         målgruppeType: MålgruppeType,
         stønadstype: Stønadstype,
         grunnlagsdata: Grunnlagsdata,
-    ) {
+    ): VurderingAldersVilkår {
         val fødselsdato = grunnlagsdata.grunnlag.fødsel?.fødselsdato
 
-        val gyldig: Boolean? =
+        val gyldig: SvarJaNei? =
             when (stønadstype) {
                 Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER ->
                     when (målgruppeType) {
@@ -48,23 +51,40 @@ object MålgruppeValidering {
                             )
 
                         MålgruppeType.OMSTILLINGSSTØNAD -> fødselsdatounder67år(fødselsdato)
-                        MålgruppeType.OVERGANGSSTØNAD -> true
+                        MålgruppeType.OVERGANGSSTØNAD -> SvarJaNei.JA
                         MålgruppeType.DAGPENGER -> null
                         MålgruppeType.SYKEPENGER_100_PROSENT -> null
                         MålgruppeType.INGEN_MÅLGRUPPE -> null
                     }
             }
-        feilHvis(gyldig == false) {
+        feilHvis(gyldig == SvarJaNei.NEI) {
             "Aldersvilkår er ikke oppfylt ved opprettelse av målgruppe=$målgruppeType for behandling=${grunnlagsdata.behandlingId}"
         }
+
+        return VurderingAldersVilkår(
+            gyldig,
+            inputFakta = "inputFakta",
+            gitHash = "gitHash",
+            tidspunktForVurdering = LocalDateTime.now(),
+        )
     }
 
-    private fun fødselsdatomellom18og67år(fødselsdato: LocalDate?): Boolean {
+    private fun fødselsdatomellom18og67år(fødselsdato: LocalDate?): SvarJaNei {
         val over18år: Boolean = fødselsdato?.plusYears(18)?.isBefore(LocalDate.now()) == true
         val under67år: Boolean = fødselsdato?.plusYears(67)?.isAfter(LocalDate.now()) == true
 
-        return over18år && under67år
+        if (over18år && under67år) {
+            return SvarJaNei.JA
+        }
+        return return SvarJaNei.NEI
     }
 
-    private fun fødselsdatounder67år(fødselsdato: LocalDate?): Boolean = fødselsdato?.plusYears(67)?.isAfter(LocalDate.now()) == true
+    private fun fødselsdatounder67år(fødselsdato: LocalDate?): SvarJaNei {
+        val under67år = fødselsdato?.plusYears(67)?.isAfter(LocalDate.now()) == true
+
+        if (under67år) {
+            return SvarJaNei.JA
+        }
+        return SvarJaNei.NEI
+    }
 }

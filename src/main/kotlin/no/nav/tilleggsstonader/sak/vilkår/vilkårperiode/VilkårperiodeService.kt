@@ -11,8 +11,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValidering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.aldersvilkårErOppfylt
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.vurderAldersvilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerEndrePeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
@@ -91,7 +91,7 @@ class VilkårperiodeService(
 
             val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandling.id)
 
-            aldersvilkårErOppfylt(vilkårperiode.type, behandling.stønadstype, grunnlagsdata)
+            vurderAldersvilkår(vilkårperiode.type, behandling.stønadstype, grunnlagsdata)
         }
 
         validerKildeIdFinnesIGrunnlaget(
