@@ -121,13 +121,13 @@ class OppfølgingServiceTest {
             listOf(stønadsperiode).tilSortertDto()
 
         val aktivitet =
-            aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom.minusDays(5), erUtdanning = true)
+            aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom, erUtdanning = true)
         every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
             listOf(aktivitet)
 
         with(oppfølgingService.hentBehandlingerForOppfølging()) {
             assertThat(this).hasSize(1)
-            assertThat(this.årsaker()).containsExactly(ÅrsakKontroll.INGEN_MATCH)
+            assertThat(this.årsaker()).containsExactly(ÅrsakKontroll.INGEN_TREFF, ÅrsakKontroll.TREFF_MEN_FEIL_TYPE)
         }
     }
 

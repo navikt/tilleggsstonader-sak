@@ -69,12 +69,13 @@ class OppfølgingService(
                     stønadsperioder.minOf { it.fom },
                     stønadsperioder.maxOf { it.tom },
                 )
+            val alleAktiviteter = registerAktiviteter.mergeSammenhengende()
             val tiltak = registerAktiviteter.filterNot(::tiltakErUtdanning).mergeSammenhengende()
             val utdanningstiltak = registerAktiviteter.filter(::tiltakErUtdanning).mergeSammenhengende()
 
             val stønadsperioderSomMåKontrolleres =
                 stønadsperioder
-                    .map { it.finnEndringer(tiltak, utdanningstiltak) }
+                    .map { it.finnEndringer(alleAktiviteter, tiltak, utdanningstiltak) }
                     .filter { it.trengerKontroll() }
 
             if (stønadsperioderSomMåKontrolleres.isNotEmpty()) {
@@ -89,17 +90,22 @@ class OppfølgingService(
         }
 
     private fun StønadsperiodeDto.finnEndringer(
+        alleAktiviteter: List<Datoperiode>,
         tiltak: List<Datoperiode>,
         utdanningstiltak: List<Datoperiode>,
     ): StønadsperiodeForKontroll {
         val stønadsperiode = Datoperiode(fom = this.fom, tom = this.tom)
         val årsaker =
             when (this.aktivitet) {
-                AktivitetType.REELL_ARBEIDSSØKER -> setOf(ÅrsakKontroll.SKAL_IKKE_KONTROLLERES)
+                AktivitetType.REELL_ARBEIDSSØKER -> mutableSetOf(ÅrsakKontroll.SKAL_IKKE_KONTROLLERES)
                 AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
                 AktivitetType.TILTAK -> finnEndring(stønadsperiode, tiltak)
                 AktivitetType.UTDANNING -> finnEndring(stønadsperiode, utdanningstiltak)
             }
+
+        if (årsaker.any { it.trengerKontroll } && alleAktiviteter.any { it.inneholder(stønadsperiode) }) {
+            årsaker.add(ÅrsakKontroll.TREFF_MEN_FEIL_TYPE)
+        }
         return StønadsperiodeForKontroll(
             fom = this.fom,
             tom = this.tom,
@@ -112,13 +118,13 @@ class OppfølgingService(
     private fun finnEndring(
         stønadsperiode: Datoperiode,
         tiltak: List<Datoperiode>,
-    ): Set<ÅrsakKontroll> {
+    ): MutableSet<ÅrsakKontroll> {
         val snitt = tiltak.mapNotNull { it.beregnSnitt(stønadsperiode) }
         if (snitt.isEmpty()) {
-            return setOf(ÅrsakKontroll.INGEN_MATCH)
+            return mutableSetOf(ÅrsakKontroll.INGEN_TREFF)
         }
         if (snitt.any { it.fom <= stønadsperiode.fom && it.tom >= stønadsperiode.tom }) {
-            return setOf(ÅrsakKontroll.INGEN_ENDRING)
+            return mutableSetOf(ÅrsakKontroll.INGEN_ENDRING)
         }
         val årsaker = mutableSetOf<ÅrsakKontroll>()
         snitt.forEach {
