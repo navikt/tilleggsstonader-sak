@@ -61,6 +61,8 @@ object MålgruppeValidering {
                         MålgruppeType.SYKEPENGER_100_PROSENT -> null
                         MålgruppeType.INGEN_MÅLGRUPPE -> null
                     }
+
+                Stønadstype.BOUTGIFTER -> TODO()
             }
         feilHvis(gyldig == SvarJaNei.NEI) {
             "Aldersvilkår er ikke oppfylt ved opprettelse av målgruppe=${vilkårperiode.type} for behandling=${grunnlagsdata.behandlingId}"
