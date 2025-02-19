@@ -80,7 +80,7 @@ class TilsynBarnBeregnYtelseSteg(
             lagInnvilgetVedtak(
                 behandling = saksbehandling,
                 beregningsresultat = beregningsresultat,
-                vedtaksperioder = vedtak.vedtaksperioder.tilDto(),
+                vedtaksperioder = vedtak.vedtaksperioder.tilDto().sorted(),
             ),
         )
         lagreAndeler(saksbehandling, beregningsresultat)
