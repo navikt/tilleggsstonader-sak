@@ -48,17 +48,7 @@ object MålgruppeValidering {
                     when (vilkårperiode.type as MålgruppeType) {
                         MålgruppeType.AAP, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD ->
                             vurderAldersvilkårForNedsattArbeidsevne(fødselsdato, vilkårperiode)
-                        MålgruppeType.OMSTILLINGSSTØNAD ->
-                            if (heleVilkårsperiodenErFørBrukerFyller67År(
-                                    fødselsdato,
-                                    vilkårperiode.fom,
-                                    vilkårperiode.tom,
-                                )
-                            ) {
-                                SvarJaNei.JA
-                            } else {
-                                SvarJaNei.NEI
-                            }
+                        MålgruppeType.OMSTILLINGSSTØNAD -> vurderAldersvilkårForOmstillingsstønad(fødselsdato, vilkårperiode)
                         MålgruppeType.OVERGANGSSTØNAD -> SvarJaNei.JA
                         MålgruppeType.DAGPENGER -> null
                         MålgruppeType.SYKEPENGER_100_PROSENT -> null
@@ -104,6 +94,21 @@ object MålgruppeValidering {
             heleVilkårsperiodenErEtterBrukerFyller18År(fødselsdato, vilkårperiode.fom, vilkårperiode.tom)
         ) {
             return SvarJaNei.JA
+        }
+        return SvarJaNei.NEI
+    }
+
+    private fun vurderAldersvilkårForOmstillingsstønad(
+        fødselsdato: LocalDate,
+        vilkårperiode: LagreVilkårperiode,
+    ): SvarJaNei {
+        if (heleVilkårsperiodenErFørBrukerFyller67År(
+                fødselsdato,
+                vilkårperiode.fom,
+                vilkårperiode.tom,
+            )
+        ) {
+            SvarJaNei.JA
         }
         return SvarJaNei.NEI
     }
