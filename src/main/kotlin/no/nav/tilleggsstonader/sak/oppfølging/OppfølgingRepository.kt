@@ -117,7 +117,7 @@ data class PeriodeForKontroll(
     val endringAktivitet: List<Kontroll>,
     val endringMålgruppe: List<Kontroll>,
 ) {
-    fun trengerKontroll(): Boolean = (endringAktivitet + endringMålgruppe).any { it.årsak.trengerKontroll }
+    fun trengerKontroll(): Boolean = endringAktivitet.isNotEmpty() || endringMålgruppe.isNotEmpty()
 }
 
 data class Kontroll(
@@ -126,13 +126,7 @@ data class Kontroll(
     val tom: LocalDate? = null,
 )
 
-enum class ÅrsakKontroll(
-    val trengerKontroll: Boolean = true,
-) {
-    SKAL_IKKE_KONTROLLERES(trengerKontroll = false),
-    INGEN_ENDRING(trengerKontroll = false),
-    AAP_SLUTTER_FØR_VEDTAKSPERIODE(trengerKontroll = false),
-
+enum class ÅrsakKontroll {
     INGEN_TREFF,
     FOM_ENDRET,
     TOM_ENDRET,

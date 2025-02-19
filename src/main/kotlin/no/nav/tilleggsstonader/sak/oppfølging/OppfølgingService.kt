@@ -141,14 +141,19 @@ class OppfølgingService(
                 val kontroller = finnKontroller(this, ytelser)
                 val enKontroll = kontroller.singleOrNull()
                 val sisteDagNesteMåned = YearMonth.now().plusMonths(1).atEndOfMonth()
-                if (enKontroll?.årsak == ÅrsakKontroll.TOM_ENDRET && enKontroll.tom!! > sisteDagNesteMåned) {
-                    listOf(Kontroll(ÅrsakKontroll.AAP_SLUTTER_FØR_VEDTAKSPERIODE))
+                if (
+                    målgruppe == MålgruppeType.AAP &&
+                    enKontroll?.årsak == ÅrsakKontroll.TOM_ENDRET &&
+                    enKontroll.tom!! > sisteDagNesteMåned
+                ) {
+                    // AAP slutter før vedtaksperiode
+                    emptyList()
                 } else {
                     kontroller
                 }
             }
 
-            else -> listOf(Kontroll(ÅrsakKontroll.SKAL_IKKE_KONTROLLERES))
+            else -> emptyList() // Sjekker kun målgrupper som vi henter fra andre systemer
         }
 
     private fun Vedtaksperiode.finnEndringIAktivitet(
@@ -158,13 +163,14 @@ class OppfølgingService(
     ): List<Kontroll> {
         val kontroller =
             when (this.aktivitet) {
-                AktivitetType.REELL_ARBEIDSSØKER -> mutableListOf(Kontroll(ÅrsakKontroll.SKAL_IKKE_KONTROLLERES))
+                AktivitetType.REELL_ARBEIDSSØKER -> mutableListOf() // Skal ikke kontrolleres
                 AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
                 AktivitetType.TILTAK -> finnKontroller(this, tiltak)
                 AktivitetType.UTDANNING -> finnKontroller(this, utdanningstiltak)
             }
 
-        if (kontroller.any { it.årsak.trengerKontroll } && alleAktiviteter.any { it.inneholder(this) }) {
+        val ingenTreff = kontroller.any { it.årsak == ÅrsakKontroll.INGEN_TREFF }
+        if (ingenTreff && alleAktiviteter.any { it.inneholder(this) }) {
             kontroller.add(Kontroll(ÅrsakKontroll.TREFF_MEN_FEIL_TYPE))
         }
         return kontroller
@@ -181,7 +187,7 @@ class OppfølgingService(
             return mutableListOf(Kontroll(ÅrsakKontroll.INGEN_TREFF))
         }
         if (snitt.fom == vedtaksperiode.fom && snitt.tom == vedtaksperiode.tom) {
-            return mutableListOf(Kontroll(ÅrsakKontroll.INGEN_ENDRING))
+            return mutableListOf() // Snitt er lik vedtaksperiode -> skal ikke kontrolleres
         }
         return mutableListOf<Kontroll>().apply {
             if (snitt.fom > vedtaksperiode.fom) {

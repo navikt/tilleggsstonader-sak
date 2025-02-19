@@ -328,11 +328,9 @@ class OppfølgingServiceTest {
 
     private fun opprettOppfølging(): Oppfølging? = oppfølgingService.opprettOppfølging(behandling.id)
 
-    private fun Oppfølging?.assertIngenEndringForMålgrupper() =
-        assertThat(endringMålgruppe().map { it.årsak }).containsExactly(ÅrsakKontroll.INGEN_ENDRING)
+    private fun Oppfølging?.assertIngenEndringForMålgrupper() = assertThat(endringMålgruppe()).isEmpty()
 
-    private fun Oppfølging?.assertIngenEndringForAktiviteter() =
-        assertThat(endringAktivitet().map { it.årsak }).containsExactly(ÅrsakKontroll.INGEN_ENDRING)
+    private fun Oppfølging?.assertIngenEndringForAktiviteter() = assertThat(endringAktivitet()).isEmpty()
 
     private fun Oppfølging?.endringAktivitet(): List<Kontroll> =
         this?.let { it.data.perioderTilKontroll.flatMap { stønadsperiode -> stønadsperiode.endringAktivitet } }
