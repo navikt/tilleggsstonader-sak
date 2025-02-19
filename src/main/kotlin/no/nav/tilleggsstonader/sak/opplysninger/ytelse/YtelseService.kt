@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.HentetInformasjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
@@ -48,12 +49,21 @@ class YtelseService(
         tom: LocalDate,
     ): YtelsePerioderDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val typer = finnRelevanteYtelsesTyper(behandling.stønadstype)
+        return hentYtelseForGrunnlag(behandling.stønadstype, behandling.ident, fom, tom)
+    }
+
+    fun hentYtelseForGrunnlag(
+        stønadstype: Stønadstype,
+        ident: String,
+        fom: LocalDate,
+        tom: LocalDate,
+    ): YtelsePerioderDto {
+        val typer = finnRelevanteYtelsesTyper(stønadstype)
 
         val ytelsePerioder =
             ytelseClient.hentYtelser(
                 YtelsePerioderRequest(
-                    ident = behandling.ident,
+                    ident = ident,
                     fom = fom,
                     tom = tom,
                     typer = typer,
@@ -62,7 +72,11 @@ class YtelseService(
 
         validerResultat(ytelsePerioder.hentetInformasjon)
 
-        return ytelsePerioder
+        return ytelsePerioder.copy(
+            perioder =
+                ytelsePerioder.perioder
+                    .filter { it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN },
+        )
     }
 
     private fun validerResultat(hentetInformasjon: List<HentetInformasjon>) {
@@ -75,12 +89,13 @@ class YtelseService(
 
     private fun finnRelevanteYtelsesTyper(type: Stønadstype) =
         when (type) {
-            Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER ->
+            Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER, Stønadstype.BOUTGIFTER ->
                 listOf(
                     TypeYtelsePeriode.AAP,
                     TypeYtelsePeriode.ENSLIG_FORSØRGER,
                     TypeYtelsePeriode.OMSTILLINGSSTØNAD,
                 )
+
             else -> error("Finner ikke relevante ytelser for stønadstype $type")
         }
 }
