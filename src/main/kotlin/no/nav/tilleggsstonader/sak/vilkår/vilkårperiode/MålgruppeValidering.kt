@@ -93,13 +93,7 @@ object MålgruppeValidering {
         feilHvis((vilkårsperiodeFom < attenårsdagenTilBruker) && (attenårsdagenTilBruker < vilkårsperiodeTom)) {
             "Brukeren fyller 18 år i løpet av vilkårsperioden"
         }
-        return if (vilkårsperiodeTom < attenårsdagenTilBruker) {
-            false
-        } else if (attenårsdagenTilBruker < vilkårsperiodeFom) {
-            true
-        } else {
-            false
-        }
+        return attenårsdagenTilBruker < vilkårsperiodeFom
     }
 
     private fun vurderAldersvilkårForNedsattArbeidsevne(
