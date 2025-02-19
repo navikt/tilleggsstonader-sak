@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeU
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mapFaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
@@ -86,12 +87,14 @@ class VilkårperiodeService(
         validerBehandling(behandling)
         validerNyPeriodeRevurdering(behandling, vilkårperiode.fom)
 
+        lateinit var vurderingAldersvilkår: VurderingAldersVilkår
+
         if (vilkårperiode.type is MålgruppeType) {
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
 
             val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandling.id)
 
-            vurderAldersvilkår(vilkårperiode, behandling.stønadstype, grunnlagsdata)
+            vurderingAldersvilkår = vurderAldersvilkår(vilkårperiode, behandling.stønadstype, grunnlagsdata)
         }
 
         validerKildeIdFinnesIGrunnlaget(
@@ -101,7 +104,11 @@ class VilkårperiodeService(
         )
 
         val faktaOgVurdering =
-            mapFaktaOgSvarDto(stønadstype = behandling.stønadstype, vilkårperiode = vilkårperiode)
+            mapFaktaOgSvarDto(
+                stønadstype = behandling.stønadstype,
+                vilkårperiode = vilkårperiode,
+                vurderingAldersvilkår = vurderingAldersvilkår,
+            )
         return vilkårperiodeRepository.insert(
             GeneriskVilkårperiode(
                 behandlingId = vilkårperiode.behandlingId,
@@ -132,6 +139,13 @@ class VilkårperiodeService(
             "Kan ikke oppdatere kildeId på en allerede eksisterende vilkårperiode"
         }
 
+        lateinit var vurderingAldersvilkår: VurderingAldersVilkår
+
+        if (vilkårperiode.type is MålgruppeType) {
+            val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandling.id)
+            vurderingAldersvilkår = vurderAldersvilkår(vilkårperiode, behandling.stønadstype, grunnlagsdata)
+        }
+
         val oppdatert =
             eksisterendeVilkårperiode.medVilkårOgVurdering(
                 fom = vilkårperiode.fom,
@@ -141,6 +155,7 @@ class VilkårperiodeService(
                     mapFaktaOgSvarDto(
                         stønadstype = behandling.stønadstype,
                         vilkårperiode = vilkårperiode,
+                        vurderingAldersvilkår = vurderingAldersvilkår,
                     ),
             )
 

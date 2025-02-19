@@ -6,8 +6,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 object MålgruppeValidering {
     fun validerKanLeggeTilMålgruppeManuelt(
@@ -37,7 +39,7 @@ object MålgruppeValidering {
         vilkårperiode: LagreVilkårperiode,
         stønadstype: Stønadstype,
         grunnlagsdata: Grunnlagsdata,
-    ) {
+    ): VurderingAldersVilkår {
         val fødselsdato = grunnlagsdata.grunnlag.fødsel?.fødselsdato
 
         feilHvis(fødselsdato == null) { "Kan ikke vurdere aldersvilkår uten å vite fødselsdato til bruker" }
@@ -60,6 +62,7 @@ object MålgruppeValidering {
         feilHvis(gyldig == SvarJaNei.NEI) {
             "Aldersvilkår er ikke oppfylt ved opprettelse av målgruppe=${vilkårperiode.type} for behandling=${grunnlagsdata.behandlingId}"
         }
+        return VurderingAldersVilkår(gyldig, fødselsdato.toString(), "gitHash", LocalDateTime.now())
     }
 
     private fun heleVilkårsperiodenErFørBrukerFyller67År(
