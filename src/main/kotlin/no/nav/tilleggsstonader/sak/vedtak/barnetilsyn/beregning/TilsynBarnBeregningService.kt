@@ -85,7 +85,13 @@ class TilsynBarnBeregningService(
         val vedtaksperioder =
             vedtaksperioderDto.tilVedtaksperiode().sorted().splitFraRevurderFra(behandling.revurderFra)
 
-        tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(vedtaksperioder, behandling.id)
+        val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandling.id)
+
+        tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+            vedtaksperioder,
+            behandling.id,
+            utgifterPerBarn,
+        )
 
         val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioder)
         val relevantePerioderFraForrigeVedtak =
@@ -106,7 +112,7 @@ class TilsynBarnBeregningService(
 
         val aktiviteter = finnAktiviteter(behandling.id)
 
-        validerPerioderForInnvilgelse(vedtaksperioder, aktiviteter, utgifterPerBarn, typeVedtak, behandling.revurderFra)
+        validerPerioderForInnvilgelse(vedtaksperioder, utgifterPerBarn, typeVedtak)
 
         val beregningsgrunnlag =
             lagBeregningsgrunnlagPerMåned(vedtaksperioder, aktiviteter, utgifterPerBarn)

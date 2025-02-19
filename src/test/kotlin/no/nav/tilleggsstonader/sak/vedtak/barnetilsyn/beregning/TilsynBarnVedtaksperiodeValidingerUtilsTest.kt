@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Fødsel
@@ -24,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -60,6 +62,18 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             ),
         )
 
+    val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+        mapOf(
+            BarnId.random() to
+                listOf(
+                    UtgiftBeregning(
+                        fom = YearMonth.of(2025, 1),
+                        tom = YearMonth.of(2025, 2),
+                        utgift = 1000,
+                    ),
+                ),
+        )
+
     @BeforeEach
     fun setup() {
         every { vilkårperiodeService.hentVilkårperioder(any()) } returns
@@ -80,6 +94,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     vedtaksperiode,
                 ),
                 behandlingId,
+                utgifter,
             )
         }.doesNotThrowAnyException()
     }
@@ -95,6 +110,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     vedtaksperiode,
                 ),
                 behandlingId,
+                utgifter,
             )
         }.hasMessageContaining("Kombinasjonen av OVERGANGSSTØNAD og TILTAK er ikke gyldig")
     }
@@ -109,6 +125,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     vedtaksperiode,
                 ),
                 behandlingId,
+                utgifter,
             )
         }.hasMessageContaining("Finner ingen perioder hvor vilkår for NEDSATT_ARBEIDSEVNE er oppfylt")
     }
@@ -123,13 +140,26 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     vedtaksperiode,
                 ),
                 behandlingId,
+                utgifter,
             )
         }.hasMessageContaining("Finner ingen perioder hvor vilkår for UTDANNING er oppfylt")
     }
 
     @Test
     fun `skal kaste feil om vedtaksperiode er utenfor målgruppeperiode`() {
-        val vedtaksperiode = lagVedtaksperiode(fom = LocalDate.of(2022, 12, 1))
+        val vedtaksperiode = lagVedtaksperiode(fom = LocalDate.of(2024, 12, 1))
+
+        val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+            mapOf(
+                BarnId.random() to
+                    listOf(
+                        UtgiftBeregning(
+                            fom = YearMonth.of(2024, 12),
+                            tom = YearMonth.of(2025, 2),
+                            utgift = 1000,
+                        ),
+                    ),
+            )
 
         assertThatThrownBy {
             tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
@@ -137,9 +167,10 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     vedtaksperiode,
                 ),
                 behandlingId,
+                utgifter,
             )
         }.hasMessageContaining(
-            "Finnes ingen periode med oppfylte vilkår for AAP i perioden 01.12.2022 - 31.01.2025",
+            "Finnes ingen periode med oppfylte vilkår for AAP i perioden 01.12.2024 - 31.01.2025",
         )
     }
 
@@ -168,6 +199,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     vedtaksperiode,
                 ),
                 behandlingId,
+                utgifter,
             )
         }.hasMessageContaining(
             "Finnes ingen periode med oppfylte vilkår for TILTAK i perioden 01.01.2025 - 31.01.2025",
@@ -176,25 +208,18 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
 
     @Test
     fun `skal ikke kaste feil dersom vedtaksperiode går på tvers av to sammengengdende vilkårsperioder`() {
-        val vedtaksperiode = lagVedtaksperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 12))
+        val vedtaksperiode = lagVedtaksperiode()
 
-        val målgrupper =
-            listOf(
-                målgruppe(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 31),
-                ),
-            )
         val aktiviteter =
             listOf(
                 aktivitet(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 10),
+                    fom = LocalDate.of(2025, 1, 1),
+                    tom = LocalDate.of(2025, 1, 10),
                     faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
                 ),
                 aktivitet(
-                    fom = LocalDate.of(2023, 1, 11),
-                    tom = LocalDate.of(2023, 1, 12),
+                    fom = LocalDate.of(2025, 1, 11),
+                    tom = LocalDate.of(2025, 1, 31),
                     faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
                 ),
             )
@@ -211,32 +236,24 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     vedtaksperiode,
                 ),
                 behandlingId,
+                utgifter,
             )
         }.doesNotThrowAnyException()
     }
 
     @Test
     fun `skal ikke kaste feil dersom vedtaksperiode går på tvers av to delvis overlappende vilkårsperioder`() {
-        val vedtaksperiode = lagVedtaksperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 12))
-
-        val målgrupper =
-            listOf(
-                målgruppe(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 31),
-                ),
-            )
-
+        val vedtaksperiode = lagVedtaksperiode()
         val aktiviteter =
             listOf(
                 aktivitet(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 10),
+                    fom = LocalDate.of(2025, 1, 1),
+                    tom = LocalDate.of(2025, 1, 10),
                     faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
                 ),
                 aktivitet(
-                    fom = LocalDate.of(2023, 1, 7),
-                    tom = LocalDate.of(2023, 1, 12),
+                    fom = LocalDate.of(2025, 1, 7),
+                    tom = LocalDate.of(2025, 1, 31),
                     faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
                 ),
             )
@@ -253,6 +270,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     vedtaksperiode,
                 ),
                 behandlingId,
+                utgifter,
             )
         }.doesNotThrowAnyException()
     }
@@ -262,16 +280,16 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
         val målgrupper =
             listOf(
                 målgruppe(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 7),
+                    fom = LocalDate.of(2025, 1, 1),
+                    tom = LocalDate.of(2025, 1, 7),
                 ),
                 målgruppe(
-                    fom = LocalDate.of(2023, 1, 8),
-                    tom = LocalDate.of(2023, 1, 18),
+                    fom = LocalDate.of(2025, 1, 8),
+                    tom = LocalDate.of(2025, 1, 18),
                 ),
                 målgruppe(
-                    fom = LocalDate.of(2023, 1, 20),
-                    tom = LocalDate.of(2023, 1, 31),
+                    fom = LocalDate.of(2025, 1, 20),
+                    tom = LocalDate.of(2025, 1, 31),
                 ),
             )
 
@@ -299,7 +317,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
 
         @Test
         fun `skal godta stønadsperiode på tvers av 2 godkjente sammenhengende vilkårsperioder`() {
-            val vedtaksperiode = lagVedtaksperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 10))
+            val vedtaksperiode = lagVedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 10))
 
             assertThatCode {
                 tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
@@ -307,13 +325,14 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                         vedtaksperiode,
                     ),
                     behandlingId,
+                    utgifter,
                 )
             }.doesNotThrowAnyException()
         }
 
         @Test
         fun `skal ikke godta stønadsperiode på tvers av 2 godkjente, men ikke sammenhengende vilkårsperioder`() {
-            val vedtaksperiode = lagVedtaksperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 21))
+            val vedtaksperiode = lagVedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 21))
 
             assertThatCode {
                 tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
@@ -321,9 +340,10 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                         vedtaksperiode,
                     ),
                     behandlingId,
+                    utgifter,
                 )
             }.hasMessageContaining(
-                "Finnes ingen periode med oppfylte vilkår for AAP i perioden 01.01.2023 - 21.01.2023",
+                "Finnes ingen periode med oppfylte vilkår for AAP i perioden 01.01.2025 - 21.01.2025",
             )
         }
     }
@@ -362,6 +382,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                             vedtaksperiodeJanFeb,
                         ),
                         behandlingId,
+                        utgifter,
                     )
                 }
             assertThat(feil.feil).contains("Vedtaksperioder kan ikke overlappe")
@@ -376,6 +397,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                         vedtaksperiodeFeb,
                     ),
                     behandlingId,
+                    utgifter,
                 )
             }
         }
@@ -383,7 +405,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
 
     @Nested
     inner class OverlappMedPeriodeSomIkkeGirRettPåStønad {
-        val jan = YearMonth.of(2024, 1)
+        val jan = YearMonth.of(2025, 1)
         val tilltakJan =
             aktivitet(
                 faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
@@ -462,6 +484,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                             lagVedtaksperiode(fom = jan.atDay(21), tom = jan.atDay(31)),
                         ),
                     behandlingId = behandlingId,
+                    utgifter,
                 )
             }.doesNotThrowAnyException()
         }
@@ -486,9 +509,10 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
                     vedtaksperioder = listOf(lagVedtaksperiode(fom = jan.atDay(1), tom = jan.atEndOfMonth())),
                     behandlingId = behandlingId,
+                    utgifter,
                 )
             }.hasMessage(
-                "Vedtaksperiode 01.01.2024 - 31.01.2024 overlapper med SYKEPENGER_100_PROSENT(10.01.2024 - 20.01.2024) som ikke gir rett på stønad",
+                "Vedtaksperiode 01.01.2025 - 31.01.2025 overlapper med SYKEPENGER_100_PROSENT(10.01.2025 - 20.01.2025) som ikke gir rett på stønad",
             )
         }
 
@@ -514,9 +538,10 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
                     vedtaksperioder = listOf(lagVedtaksperiode(fom = jan.atDay(1), tom = jan.atDay(15))),
                     behandlingId = behandlingId,
+                    utgifter,
                 )
             }.hasMessage(
-                "Vedtaksperiode 01.01.2024 - 15.01.2024 overlapper med INGEN_MÅLGRUPPE(10.01.2024 - 20.01.2024) som ikke gir rett på stønad",
+                "Vedtaksperiode 01.01.2025 - 15.01.2025 overlapper med INGEN_MÅLGRUPPE(10.01.2025 - 20.01.2025) som ikke gir rett på stønad",
             )
         }
 
@@ -542,9 +567,10 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
                     vedtaksperioder = listOf(lagVedtaksperiode(fom = jan.atDay(15), tom = jan.atDay(15))),
                     behandlingId = behandlingId,
+                    utgifter,
                 )
             }.hasMessage(
-                "Vedtaksperiode 15.01.2024 - 15.01.2024 overlapper med INGEN_AKTIVITET(10.01.2024 - 20.01.2024) som ikke gir rett på stønad",
+                "Vedtaksperiode 15.01.2025 - 15.01.2025 overlapper med INGEN_AKTIVITET(10.01.2025 - 20.01.2025) som ikke gir rett på stønad",
             )
         }
 
@@ -591,33 +617,23 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
                     vedtaksperioder = listOf(lagVedtaksperiode(fom = jan.atDay(10), tom = jan.atDay(20))),
                     behandlingId = behandlingId,
+                    utgifter,
                 )
             }.doesNotThrowAnyException()
         }
 
         @Nested
         inner class ValideringAvFødselsdato {
-            val fom = LocalDate.of(2024, 1, 1)
-            val tom = LocalDate.of(2025, 12, 31)
-            val vedtaksperioder =
-                listOf(
-                    lagVedtaksperiode(
-                        målgruppe = MålgruppeType.AAP,
-                        aktivitet = AktivitetType.TILTAK,
-                        fom = fom,
-                        tom = tom,
-                    ),
-                )
-            val målgrupper = listOf(målgruppe(fom = fom, tom = tom))
-            val aktiviteter = listOf(aktivitet(fom = fom, tom = tom))
-            val vilkårperioder = Vilkårperioder(målgrupper, aktiviteter)
+            val fom = LocalDate.of(2025, 1, 1)
+            val tom = LocalDate.of(2025, 1, 31)
+            val vedtaksperioder = lagVedtaksperiode()
 
             val dato18årGammel = fom.minusYears(18)
             val dato67årGammel = tom.minusYears(67)
 
             @BeforeEach
             fun setup() {
-                every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
+                every { vilkårperiodeService.hentVilkårperioder(any()) } returns Vilkårperioder(målgrupper, aktiviteter)
             }
 
             @Test
@@ -625,8 +641,9 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns lagGrunnlagsdata(dato18årGammel)
                 assertThatCode {
                     tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
-                        vedtaksperioder = vedtaksperioder,
+                        vedtaksperioder = listOf(vedtaksperioder),
                         behandlingId = behandlingId,
+                        utgifter,
                     )
                 }.doesNotThrowAnyException()
 
@@ -638,8 +655,9 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     )
                 assertThatCode {
                     tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
-                        vedtaksperioder = vedtaksperioder,
+                        vedtaksperioder = listOf(vedtaksperioder),
                         behandlingId = behandlingId,
+                        utgifter,
                     )
                 }.doesNotThrowAnyException()
             }
@@ -654,8 +672,9 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     )
                 assertThatCode {
                     tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
-                        vedtaksperioder = vedtaksperioder,
+                        vedtaksperioder = listOf(vedtaksperioder),
                         behandlingId = behandlingId,
+                        utgifter,
                     )
                 }.hasMessageContaining("Periode kan ikke begynne før søker fyller 18 år")
             }
@@ -668,8 +687,9 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     )
                 assertThatThrownBy {
                     tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
-                        vedtaksperioder = vedtaksperioder,
+                        vedtaksperioder = listOf(vedtaksperioder),
                         behandlingId = behandlingId,
+                        utgifter,
                     )
                 }.hasMessageContaining("Periode kan ikke slutte etter søker fylt 67 år")
 
@@ -679,8 +699,9 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     )
                 assertThatThrownBy {
                     tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
-                        vedtaksperioder = vedtaksperioder,
+                        vedtaksperioder = listOf(vedtaksperioder),
                         behandlingId = behandlingId,
+                        utgifter,
                     )
                 }.hasMessageContaining("Periode kan ikke slutte etter søker fylt 67 år")
             }
@@ -693,8 +714,9 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     )
                 assertThatCode {
                     tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
-                        vedtaksperioder = vedtaksperioder,
+                        vedtaksperioder = listOf(vedtaksperioder),
                         behandlingId = behandlingId,
+                        utgifter,
                     )
                 }.doesNotThrowAnyException()
             }
@@ -702,28 +724,28 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             @Test
             fun `skal ikke kaste feil dersom overgangsstønad og under 18 år eller over 67 år`() {
                 val vedtaksperioder =
-                    vedtaksperioder.map {
-                        it.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.UTDANNING)
-                    }
+                    lagVedtaksperiode(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.UTDANNING)
+
                 val vilkårperioder =
-                    vilkårperioder.copy(
+                    Vilkårperioder(
                         målgrupper =
-                            målgrupper.map {
+                            listOf(
                                 målgruppe(
-                                    fom = it.fom,
-                                    tom = it.tom,
                                     faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.OVERGANGSSTØNAD),
-                                )
-                            },
+                                    fom = LocalDate.of(2025, 1, 1),
+                                    tom = LocalDate.of(2025, 2, 28),
+                                ),
+                            ),
                         aktiviteter =
-                            aktiviteter.map {
+                            listOf(
                                 aktivitet(
-                                    fom = it.fom,
-                                    tom = it.tom,
                                     faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.UTDANNING),
-                                )
-                            },
+                                    fom = LocalDate.of(2025, 1, 1),
+                                    tom = LocalDate.of(2025, 2, 28),
+                                ),
+                            ),
                     )
+
                 every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
 
                 every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns
@@ -732,8 +754,9 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     )
                 assertThatCode {
                     tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
-                        vedtaksperioder = vedtaksperioder,
+                        vedtaksperioder = listOf(vedtaksperioder),
                         behandlingId = behandlingId,
+                        utgifter,
                     )
                 }.doesNotThrowAnyException()
 
@@ -743,10 +766,140 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     )
                 assertThatCode {
                     tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
-                        vedtaksperioder = vedtaksperioder,
+                        vedtaksperioder = listOf(vedtaksperioder),
                         behandlingId = behandlingId,
+                        utgifter,
                     )
                 }.doesNotThrowAnyException()
+            }
+        }
+
+        @Nested
+        inner class ValiderUtgifterHeleVedtaksperioden {
+            val vedtaksperiode = lagVedtaksperiode()
+
+            val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+                mapOf(
+                    BarnId.random() to
+                        listOf(
+                            UtgiftBeregning(
+                                fom = YearMonth.of(2025, 1),
+                                tom = YearMonth.of(2025, 1),
+                                utgift = 1000,
+                            ),
+                        ),
+                )
+
+            @Test
+            fun `kaster ikke feil når utgift hele vedtaksperioden`() {
+                assertDoesNotThrow {
+                    tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                        vedtaksperioder = listOf(vedtaksperiode),
+                        behandlingId = behandlingId,
+                        utgifter,
+                    )
+                }
+            }
+
+            @Test
+            fun `kaster feil når det ikke finnes utgifter hele vedtaksperioden`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                            vedtaksperioder = listOf(vedtaksperiode.copy(tom = LocalDate.of(2025, 2, 28))),
+                            behandlingId = behandlingId,
+                            utgifter,
+                        )
+                    }
+                assertThat(feil.feil).contains("Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden")
+            }
+
+            @Test
+            fun `kaster ikke feil når det utgifter hele vedtaksperioden fordelt i flere perioder`() {
+                val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+                    mapOf(
+                        BarnId.random() to
+                            listOf(
+                                UtgiftBeregning(
+                                    fom = YearMonth.of(2025, 1),
+                                    tom = YearMonth.of(2025, 1),
+                                    utgift = 1000,
+                                ),
+                                UtgiftBeregning(
+                                    fom = YearMonth.of(2025, 2),
+                                    tom = YearMonth.of(2025, 2),
+                                    utgift = 1000,
+                                ),
+                            ),
+                    )
+
+                Assertions.assertDoesNotThrow {
+                    tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                        vedtaksperioder = listOf(vedtaksperiode.copy(tom = LocalDate.of(2025, 2, 28))),
+                        behandlingId = behandlingId,
+                        utgifter,
+                    )
+                }
+            }
+
+            @Test
+            fun `kaster ikke feil når det utgifter hele vedtaksperioden fordelt på flere barn`() {
+                val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+                    mapOf(
+                        BarnId.random() to
+                            listOf(
+                                UtgiftBeregning(
+                                    fom = YearMonth.of(2025, 1),
+                                    tom = YearMonth.of(2025, 1),
+                                    utgift = 1000,
+                                ),
+                            ),
+                        BarnId.random() to
+                            listOf(
+                                UtgiftBeregning(
+                                    fom = YearMonth.of(2025, 2),
+                                    tom = YearMonth.of(2025, 2),
+                                    utgift = 1000,
+                                ),
+                            ),
+                    )
+
+                Assertions.assertDoesNotThrow {
+                    tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                        vedtaksperioder = listOf(vedtaksperiode.copy(tom = LocalDate.of(2025, 2, 28))),
+                        behandlingId = behandlingId,
+                        utgifter,
+                    )
+                }
+            }
+
+            @Test
+            fun `kaster feil når det ikke finnes utgifter hele vedtaksperioden pga pause mellom utgiftene`() {
+                val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+                    mapOf(
+                        BarnId.random() to
+                            listOf(
+                                UtgiftBeregning(
+                                    fom = YearMonth.of(2025, 1),
+                                    tom = YearMonth.of(2025, 1),
+                                    utgift = 1000,
+                                ),
+                                UtgiftBeregning(
+                                    fom = YearMonth.of(2025, 3),
+                                    tom = YearMonth.of(2025, 3),
+                                    utgift = 1000,
+                                ),
+                            ),
+                    )
+                val feil =
+                    assertThrows<ApiFeil> {
+                        tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+                            vedtaksperioder = listOf(vedtaksperiode.copy(tom = LocalDate.of(2025, 3, 31))),
+                            behandlingId = behandlingId,
+                            utgifter,
+                        )
+                    }
+                assertThat(feil.feil).contains("Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden")
             }
         }
     }
