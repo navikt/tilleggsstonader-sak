@@ -62,8 +62,19 @@ object MålgruppeValidering {
         feilHvis(gyldig == SvarJaNei.NEI) {
             "Aldersvilkår er ikke oppfylt ved opprettelse av målgruppe=${vilkårperiode.type} for behandling=${grunnlagsdata.behandlingId}"
         }
-        return VurderingAldersVilkår(gyldig, fødselsdato.toString(), "gitHash", LocalDateTime.now())
+
+        return VurderingAldersVilkår(
+            gyldig,
+            genererFaktaSomJson(fødselsdato = fødselsdato, vilkårperiode = vilkårperiode),
+            "gitHash",
+            LocalDateTime.now(),
+        )
     }
+
+    private fun genererFaktaSomJson(
+        fødselsdato: LocalDate,
+        vilkårperiode: LagreVilkårperiode,
+    ): String = "{ \"fødselsdato\": \"$fødselsdato\", \"vilkårperiode\": \"$vilkårperiode\" }"
 
     private fun heleVilkårsperiodenErFørBrukerFyller67År(
         fødselsdato: LocalDate,
