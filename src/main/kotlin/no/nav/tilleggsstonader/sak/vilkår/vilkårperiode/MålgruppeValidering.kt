@@ -99,7 +99,7 @@ object MålgruppeValidering {
     private fun vurderAldersvilkårForNedsattArbeidsevne(
         fødselsdato: LocalDate,
         vilkårperiode: LagreVilkårperiode,
-    ): SvarJaNei? {
+    ): SvarJaNei {
         if (heleVilkårsperiodenErFørBrukerFyller67År(fødselsdato, vilkårperiode.fom, vilkårperiode.tom) &&
             heleVilkårsperiodenErEtterBrukerFyller18År(fødselsdato, vilkårperiode.fom, vilkårperiode.tom)
         ) {
