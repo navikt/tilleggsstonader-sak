@@ -110,6 +110,7 @@ class TilsynBarnBeregnYtelseSteg(
                         beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
                         årsaker = vedtak.årsakerOpphør,
                         begrunnelse = vedtak.begrunnelse,
+                        vedtaksperioder = null, // TODO håndter opphør med vedtaksperioder
                     ),
             ),
         )

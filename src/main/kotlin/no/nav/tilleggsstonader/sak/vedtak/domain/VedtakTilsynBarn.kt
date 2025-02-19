@@ -37,6 +37,7 @@ data class OpphørTilsynBarn(
     val beregningsresultat: BeregningsresultatTilsynBarn,
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
+    val vedtaksperioder: List<Vedtaksperiode>? = null,
 ) : VedtakTilsynBarn,
     Opphør {
     override val type: TypeVedtaksdata = TypeVedtakTilsynBarn.OPPHØR_TILSYN_BARN
