@@ -119,6 +119,7 @@ enum class ÅrsakKontroll(
 ) {
     SKAL_IKKE_KONTROLLERES(trengerKontroll = false),
     INGEN_ENDRING(trengerKontroll = false),
+    AAP_SLUTTER_FØR_VEDTAKSPERIODE(trengerKontroll = false),
 
     INGEN_TREFF,
     FOM_ENDRET,

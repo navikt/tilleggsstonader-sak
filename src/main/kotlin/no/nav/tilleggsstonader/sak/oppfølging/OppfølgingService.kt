@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.YearMonth
 
 @Service
 class OppfølgingService(
@@ -120,10 +121,24 @@ class OppfølgingService(
             endringMålgruppe = finnEndringIMålgruppe(ytelser),
         )
 
-    private fun Vedtaksperiode.finnEndringIMålgruppe(ytelserPerMålgruppe: Map<MålgruppeType, List<Ytelsesperiode>>): List<Kontroll> {
-        val ytelser = ytelserPerMålgruppe[this.målgruppe] ?: emptyList()
-        return finnKontroller(this, ytelser)
-    }
+    private fun Vedtaksperiode.finnEndringIMålgruppe(ytelserPerMålgruppe: Map<MålgruppeType, List<Ytelsesperiode>>): List<Kontroll> =
+        when (this.målgruppe) {
+            MålgruppeType.AAP,
+            MålgruppeType.OMSTILLINGSSTØNAD,
+            MålgruppeType.OVERGANGSSTØNAD,
+            -> {
+                val ytelser = ytelserPerMålgruppe[this.målgruppe] ?: emptyList()
+                val kontroller = finnKontroller(this, ytelser)
+                val enKontroll = kontroller.singleOrNull()
+                val sisteDagNesteMåned = YearMonth.now().plusMonths(1).atEndOfMonth()
+                if (enKontroll?.årsak == ÅrsakKontroll.TOM_ENDRET && enKontroll.tom!! > sisteDagNesteMåned) {
+                    listOf(Kontroll(ÅrsakKontroll.AAP_SLUTTER_FØR_VEDTAKSPERIODE))
+                } else {
+                    kontroller
+                }
+            }
+            else -> listOf(Kontroll(ÅrsakKontroll.SKAL_IKKE_KONTROLLERES))
+        }
 
     private fun Vedtaksperiode.finnEndringIAktivitet(
         tiltak: List<Datoperiode>,

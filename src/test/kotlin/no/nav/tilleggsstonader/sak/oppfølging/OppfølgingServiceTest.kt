@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.YearMonth
 
 class OppfølgingServiceTest {
     val behandling =
@@ -150,6 +151,48 @@ class OppfølgingServiceTest {
                 this.assertIngenEndringForAktiviteter()
             }
         }
+
+        @Test
+        fun `skal ikke finne treff hvis det gjelder målgruppe som vi ikke henter fra annet system`() {
+            every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
+                listOf(stønadsperiode.copy(målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE)).tilSortertDto()
+            every { ytelseService.hentYtelseForGrunnlag(any(), any(), any(), any()) } returns
+                ytelsePerioderDto(perioder = emptyList())
+
+            assertThat(opprettOppfølging()).isNull()
+        }
+
+        @Test
+        fun `skal ikke finne treff hvis det gjelder gjelder endring i AAP som gjelder etter neste måned`() {
+            val tom = YearMonth.now().plusMonths(2).atDay(2)
+            every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
+                listOf(stønadsperiode.copy(tom = tom)).tilSortertDto()
+            val ytelse = periodeAAP(fom = stønadsperiode.fom, tom = tom.minusDays(1))
+            every { ytelseService.hentYtelseForGrunnlag(any(), any(), any(), any()) } returns
+                ytelsePerioderDto(perioder = listOf(ytelse))
+            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+                listOf(aktivitetArenaDto(fom = stønadsperiode.fom, tom = tom))
+
+            assertThat(opprettOppfølging()).isNull()
+        }
+
+        @Test
+        fun `skal finne treff hvis det gjelder gjelder endring i AAP som gjelder neste måned`() {
+            val tom = YearMonth.now().plusMonths(2).atDay(1)
+            every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
+                listOf(stønadsperiode.copy(tom = tom)).tilSortertDto()
+            val ytelse = periodeAAP(fom = stønadsperiode.fom, tom = tom.minusDays(1))
+            every { ytelseService.hentYtelseForGrunnlag(any(), any(), any(), any()) } returns
+                ytelsePerioderDto(perioder = listOf(ytelse))
+            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+                listOf(aktivitetArenaDto(fom = stønadsperiode.fom, tom = tom))
+
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
+                assertThat(this.endringMålgruppe())
+                    .containsExactly(Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = tom.minusDays(1)))
+            }
+        }
     }
 
     @Nested
@@ -226,6 +269,17 @@ class OppfølgingServiceTest {
                 )
                 this.assertIngenEndringForMålgrupper()
             }
+        }
+
+        @Test
+        fun `skal ikke finne treff hvis det gjelder aktivitet som vi ikke henter fra annet system`() {
+            every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
+                listOf(stønadsperiode.copy(aktivitet = AktivitetType.REELL_ARBEIDSSØKER)).tilSortertDto()
+
+            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+                emptyList()
+
+            assertThat(opprettOppfølging()).isNull()
         }
     }
 
