@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
-import no.nav.tilleggsstonader.sak.util.VirtualThreadUtil.parallelt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -39,36 +38,9 @@ class OppfølgingService(
     private val ytelseService: YtelseService,
     private val fagsakService: FagsakService,
     private val taskService: TaskService,
-    private val oppfølgningRepository: OppfølgningRepository,
+    private val oppfølgingRepository: OppfølgingRepository,
 ) {
-    val logger = LoggerFactory.getLogger(javaClass)
-
-    /**
-     * Hent alle behandlinger som er iverksatt og sjekk om det er stønadsperioder som må kontrolleres.
-     *
-     * Hent aktiviteter og sjekk om det er aktiviteter som overlapper stønadsperiodene.
-     *
-     * Hent ytelsesperioder og gjør det samme
-     *
-     * Ignorer aktivitetestypene, og målgruppene som vi ikke henter. (Reel arbeidssøker)
-     *
-     * Henter hver chunk parallellt for å redusere tiden
-     */
-    fun hentBehandlingerForOppfølging(): List<BehandlingForOppfølgingDto> {
-        val behandlingerMedMuligLøpendePerioder = behandlingRepository.finnGjeldendeIverksatteBehandlinger()
-        val fagsakMetadata = fagsakService.hentMetadata(behandlingerMedMuligLøpendePerioder.map { it.fagsakId })
-
-        return behandlingerMedMuligLøpendePerioder
-            .chunked(5)
-            .flatMap { chunk ->
-                chunk
-                    .map { behandling ->
-                        val fagsak =
-                            fagsakMetadata[behandling.fagsakId] ?: error("Finner ikke fagsak for ${behandling.id}")
-                        hentOppfølgningFn(behandling, fagsak)
-                    }.parallelt()
-            }.mapNotNull { it }
-    }
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     /**
      * Oppretter en task med unik behandlingId og tidspunkt
@@ -76,15 +48,15 @@ class OppfølgingService(
     @Transactional
     fun opprettTaskerForOppfølging() {
         val tidspunkt = LocalDateTime.now()
-        oppfølgningRepository.markerAlleAktiveSomIkkeAktive()
+        oppfølgingRepository.markerAlleAktiveSomIkkeAktive()
         Stønadstype.entries.forEach { stønadstype ->
             val behandlinger = behandlingRepository.finnGjeldendeIverksatteBehandlinger(stønadstype = stønadstype)
-            taskService.saveAll(behandlinger.map { OppfølgningTask.opprettTask(it.id, tidspunkt) })
+            taskService.saveAll(behandlinger.map { OppfølgingTask.opprettTask(it.id, tidspunkt) })
         }
     }
 
     fun kontroller(request: KontrollerOppfølgingRequest): OppfølgingMedDetaljer {
-        val oppfølging = oppfølgningRepository.findByIdOrThrow(request.id)
+        val oppfølging = oppfølgingRepository.findByIdOrThrow(request.id)
         brukerfeilHvis(oppfølging.version != request.version) {
             "Det har allerede skjedd en endring på oppfølging. Last siden på nytt"
         }
@@ -93,59 +65,45 @@ class OppfølgingService(
                 utfall = request.utfall,
                 kommentar = request.kommentar,
             )
-        oppfølgningRepository.update(oppfølging.copy(kontrollert = kontrollert))
-        return oppfølgningRepository.finnAktivMedDetaljer(oppfølging.behandlingId)
+        oppfølgingRepository.update(oppfølging.copy(kontrollert = kontrollert))
+        return oppfølgingRepository.finnAktivMedDetaljer(oppfølging.behandlingId)
     }
 
     fun hentAktiveOppfølginger(): List<OppfølgingMedDetaljer> =
-        oppfølgningRepository
+        oppfølgingRepository
             .finnAktiveMedDetaljer()
             .sortedBy { it.behandlingsdetaljer.vedtakstidspunkt }
 
-    fun håndterBehandling(behandlingId: BehandlingId) {
+    fun opprettOppfølging(behandlingId: BehandlingId) {
         val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
         val fagsakMetadata = fagsakService.hentMetadata(listOf(behandling.fagsakId)).values.single()
-        hentOppfølgningFn(behandling, fagsakMetadata)()?.let {
-            val data = OppfølgingData(perioderTilKontroll = it.stønadsperioderForKontroll)
-            oppfølgningRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+        val perioderForKontroll = hentPerioderForKontroll(behandling, fagsakMetadata)
+        if (perioderForKontroll.isNotEmpty()) {
+            val data = OppfølgingData(perioderTilKontroll = perioderForKontroll)
+            oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
         }
     }
 
-    /**
-     * Svarer med en lambda for å kunne parallellisere en chunk i [hentBehandlingerForOppfølging]
-     */
-    private fun hentOppfølgningFn(
+    private fun hentPerioderForKontroll(
         behandling: Behandling,
         fagsak: FagsakMetadata,
-    ): () -> BehandlingForOppfølgingDto? =
-        {
-            val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandling.id)
+    ): List<PeriodeForKontroll> {
+        val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandling.id)
 
-            val fom = stønadsperioder.minOf { it.fom }
-            val tom = stønadsperioder.maxOf { it.tom }
-            val registerAktiviteter = hentAktiviteter(fagsak, fom, tom)
-            val registerYtelser = hentYtelser(fagsak, fom, tom)
+        val fom = stønadsperioder.minOf { it.fom }
+        val tom = stønadsperioder.maxOf { it.tom }
+        val registerAktiviteter = hentAktiviteter(fagsak, fom, tom)
+        val registerYtelser = hentYtelser(fagsak, fom, tom)
 
-            val alleAktiviteter = registerAktiviteter.mergeSammenhengende()
-            val tiltak = registerAktiviteter.filterNot(::tiltakErUtdanning).mergeSammenhengende()
-            val utdanningstiltak = registerAktiviteter.filter(::tiltakErUtdanning).mergeSammenhengende()
+        val alleAktiviteter = registerAktiviteter.mergeSammenhengende()
+        val tiltak = registerAktiviteter.filterNot(::tiltakErUtdanning).mergeSammenhengende()
+        val utdanningstiltak = registerAktiviteter.filter(::tiltakErUtdanning).mergeSammenhengende()
 
-            val stønadsperioderSomMåKontrolleres =
-                stønadsperioder
-                    .map { Vedtaksperiode(it) }
-                    .map { it.finnEndringer(registerYtelser, alleAktiviteter, tiltak, utdanningstiltak) }
-                    .filter { it.trengerKontroll() }
-
-            if (stønadsperioderSomMåKontrolleres.isNotEmpty()) {
-                BehandlingForOppfølgingDto(
-                    behandling = tilBehandlingsinformasjon(behandling, fagsak),
-                    stønadsperioderForKontroll = stønadsperioderSomMåKontrolleres,
-                    registerAktiviteter = registerAktiviteter.tilDto(),
-                )
-            } else {
-                null
-            }
-        }
+        return stønadsperioder
+            .map { Vedtaksperiode(it) }
+            .map { it.finnEndringer(registerYtelser, alleAktiviteter, tiltak, utdanningstiltak) }
+            .filter { it.trengerKontroll() }
+    }
 
     private fun Vedtaksperiode.finnEndringer(
         ytelser: Map<MålgruppeType, List<Ytelsesperiode>>,
@@ -258,30 +216,6 @@ class OppfølgingService(
                         { y1, y2 -> y1.målgruppe == y2.målgruppe && y1.overlapperEllerPåfølgesAv(y2) },
                         { y1, y2 -> y1.copy(fom = minOf(y1.fom, y2.fom), tom = maxOf(y2.tom, y2.tom)) },
                     )
-            }
-
-    private fun tilBehandlingsinformasjon(
-        behandling: Behandling,
-        fagsak: FagsakMetadata,
-    ) = BehandlingInformasjon(
-        behandlingId = behandling.id,
-        fagsakId = fagsak.id,
-        eksternFagsakId = fagsak.eksternFagsakId,
-        stønadstype = fagsak.stønadstype,
-        vedtakstidspunkt = behandling.vedtakstidspunkt ?: error("Behandling=${behandling.id} mangler vedtakstidspunkt"),
-    )
-
-    private fun List<AktivitetArenaDto>.tilDto() =
-        this
-            .filter { it.fom == null || it.tom == null }
-            .map {
-                RegisterAktivitetDto(
-                    id = it.id,
-                    fom = it.fom!!,
-                    tom = it.tom!!,
-                    typeNavn = it.typeNavn,
-                    erUtdanning = it.erUtdanning,
-                )
             }
 
     private fun TypeYtelsePeriode.tilMålgruppe() =

@@ -14,9 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class OppfølgningRepositoryTest : IntegrationTest() {
+class OppfølgingRepositoryTest : IntegrationTest() {
     @Autowired
-    lateinit var oppfølgningRepository: OppfølgningRepository
+    lateinit var oppfølgingRepository: OppfølgingRepository
 
     val behandling =
         behandling(
@@ -34,9 +34,9 @@ class OppfølgningRepositoryTest : IntegrationTest() {
 
     @Test
     fun `skal kunne lagre og hente oppfølgning`() {
-        val oppfølging = oppfølgningRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+        val oppfølging = oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
 
-        val fraDb = oppfølgningRepository.findByIdOrThrow(oppfølging.id)
+        val fraDb = oppfølgingRepository.findByIdOrThrow(oppfølging.id)
         assertThat(fraDb).isEqualTo(oppfølging)
         assertThat(fraDb.version).isEqualTo(1)
         assertThat(fraDb.kontrollert).isNull()
@@ -44,7 +44,7 @@ class OppfølgningRepositoryTest : IntegrationTest() {
 
     @Test
     fun `skal oppdatere med kontrollert informasjon`() {
-        val oppfølging = oppfølgningRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+        val oppfølging = oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
 
         val kontrollert =
             Kontrollert(
@@ -52,9 +52,9 @@ class OppfølgningRepositoryTest : IntegrationTest() {
                 utfall = KontrollertUtfall.OK,
                 kommentar = "en kommentar",
             )
-        oppfølgningRepository.update(oppfølging.copy(kontrollert = kontrollert))
+        oppfølgingRepository.update(oppfølging.copy(kontrollert = kontrollert))
 
-        val fraDb = oppfølgningRepository.findByIdOrThrow(oppfølging.id)
+        val fraDb = oppfølgingRepository.findByIdOrThrow(oppfølging.id)
         assertThat(fraDb.version).isEqualTo(2)
         assertThat(fraDb.kontrollert).isEqualTo(kontrollert)
     }
@@ -63,11 +63,11 @@ class OppfølgningRepositoryTest : IntegrationTest() {
     inner class MarkerAlleAktiveSomIkkeAktive {
         @Test
         fun `skal oppdatere alle aktive til ikke aktive og oppdatere version`() {
-            val oppfølging = oppfølgningRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+            val oppfølging = oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
 
-            oppfølgningRepository.markerAlleAktiveSomIkkeAktive()
+            oppfølgingRepository.markerAlleAktiveSomIkkeAktive()
 
-            val fraDb = oppfølgningRepository.findByIdOrThrow(oppfølging.id)
+            val fraDb = oppfølgingRepository.findByIdOrThrow(oppfølging.id)
             assertThat(fraDb.version).isEqualTo(2)
             assertThat(fraDb.aktiv).isFalse()
         }
@@ -77,9 +77,9 @@ class OppfølgningRepositoryTest : IntegrationTest() {
     inner class FinnAktiveMedDetaljer {
         @Test
         fun `skal finne alle aktive`() {
-            oppfølgningRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+            oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
 
-            val aktive = oppfølgningRepository.finnAktiveMedDetaljer()
+            val aktive = oppfølgingRepository.finnAktiveMedDetaljer()
 
             assertThat(aktive).hasSize(1)
             assertThat(aktive.single().behandlingsdetaljer.harNyereBehandling).isFalse()
@@ -94,24 +94,24 @@ class OppfølgningRepositoryTest : IntegrationTest() {
                     fagsak = testoppsettService.hentFagsak(behandling.fagsakId),
                 )
 
-            oppfølgningRepository.insert(Oppfølging(behandlingId = revurdering.forrigeBehandlingId!!, data = data))
+            oppfølgingRepository.insert(Oppfølging(behandlingId = revurdering.forrigeBehandlingId!!, data = data))
 
-            val aktive = oppfølgningRepository.finnAktiveMedDetaljer()
+            val aktive = oppfølgingRepository.finnAktiveMedDetaljer()
             assertThat(aktive).hasSize(1)
             assertThat(aktive.single().behandlingsdetaljer.harNyereBehandling).isTrue()
         }
 
         @Test
         fun `skal ikke finne noen hvis det kun finnes ikke aktive`() {
-            oppfølgningRepository.insert(Oppfølging(behandlingId = behandlingId, data = data, aktiv = false))
-            assertThat(oppfølgningRepository.finnAktiveMedDetaljer()).isEmpty()
+            oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data, aktiv = false))
+            assertThat(oppfølgingRepository.finnAktiveMedDetaljer()).isEmpty()
         }
 
         @Test
         fun `skal finne aktiv for behandling`() {
-            oppfølgningRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+            oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
 
-            val aktiv = oppfølgningRepository.finnAktivMedDetaljer(behandlingId)
+            val aktiv = oppfølgingRepository.finnAktivMedDetaljer(behandlingId)
 
             assertThat(aktiv.behandlingsdetaljer.stønadstype).isEqualTo(Stønadstype.BARNETILSYN)
         }

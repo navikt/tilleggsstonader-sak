@@ -9,6 +9,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakMetadata
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.OppfølgingRepositoryFake
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.aktivitetArenaDto
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeAAP
@@ -41,7 +43,7 @@ class OppfølgingServiceTest {
     val registerAktivitetService = mockk<RegisterAktivitetService>()
     val ytelseService = mockk<YtelseService>()
     val taskService = mockk<TaskService>()
-    val oppfølgningRepository = mockk<OppfølgningRepository>()
+    val oppfølgingRepository = OppfølgingRepositoryFake()
 
     val oppfølgingService =
         OppfølgingService(
@@ -51,7 +53,7 @@ class OppfølgingServiceTest {
             ytelseService = ytelseService,
             fagsakService = fagsakService,
             taskService = taskService,
-            oppfølgningRepository = oppfølgningRepository,
+            oppfølgingRepository = oppfølgingRepository,
         )
 
     val stønadsperiode =
@@ -65,7 +67,8 @@ class OppfølgingServiceTest {
 
     @BeforeEach
     fun setUp() {
-        every { behandlingRepository.finnGjeldendeIverksatteBehandlinger() } returns listOf(behandling)
+        oppfølgingRepository.deleteAll()
+        every { behandlingRepository.findByIdOrThrow(behandling.id) } returns behandling
         every { fagsakService.hentMetadata(any()) } answers {
             val fagsakIds = firstArg<List<FagsakId>>()
             fagsakIds.associateWith { FagsakMetadata(it, 1, Stønadstype.BARNETILSYN, "1") }
@@ -89,7 +92,7 @@ class OppfølgingServiceTest {
             every { ytelseService.hentYtelseForGrunnlag(any(), any(), any(), any()) } returns
                 ytelsePerioderDto(perioder = listOf(ytelse))
 
-            assertThat(oppfølgingService.hentBehandlingerForOppfølging()).isEmpty()
+            assertThat(opprettOppfølging()).isNull()
         }
 
         @Test
@@ -97,8 +100,8 @@ class OppfølgingServiceTest {
             val ytelse = periodeAAP(fom = stønadsperiode.fom, tom = stønadsperiode.tom.minusDays(5))
             every { ytelseService.hentYtelseForGrunnlag(any(), any(), any(), any()) } returns
                 ytelsePerioderDto(perioder = listOf(ytelse))
-            with(oppfølgingService.hentBehandlingerForOppfølging()) {
-                assertThat(this).hasSize(1)
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
                 assertThat(this.endringMålgruppe())
                     .containsExactly(Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = ytelse.tom))
                 this.assertIngenEndringForAktiviteter()
@@ -111,8 +114,8 @@ class OppfølgingServiceTest {
             every { ytelseService.hentYtelseForGrunnlag(any(), any(), any(), any()) } returns
                 ytelsePerioderDto(perioder = listOf(ytelse))
 
-            with(oppfølgingService.hentBehandlingerForOppfølging()) {
-                assertThat(this).hasSize(1)
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
                 assertThat(this.endringMålgruppe())
                     .containsExactly(Kontroll(ÅrsakKontroll.FOM_ENDRET, fom = ytelse.fom))
                 this.assertIngenEndringForAktiviteter()
@@ -125,8 +128,8 @@ class OppfølgingServiceTest {
             every { ytelseService.hentYtelseForGrunnlag(any(), any(), any(), any()) } returns
                 ytelsePerioderDto(perioder = listOf(ytelse))
 
-            with(oppfølgingService.hentBehandlingerForOppfølging()) {
-                assertThat(this).hasSize(1)
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
                 assertThat(this.endringMålgruppe()).containsExactly(
                     Kontroll(ÅrsakKontroll.FOM_ENDRET, fom = ytelse.fom),
                     Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = ytelse.tom),
@@ -141,8 +144,8 @@ class OppfølgingServiceTest {
             every { ytelseService.hentYtelseForGrunnlag(any(), any(), any(), any()) } returns
                 ytelsePerioderDto(perioder = listOf(ytelse))
 
-            with(oppfølgingService.hentBehandlingerForOppfølging()) {
-                assertThat(this).hasSize(1)
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
                 assertThat(this.endringMålgruppe()).containsExactly(Kontroll(ÅrsakKontroll.INGEN_TREFF))
                 this.assertIngenEndringForAktiviteter()
             }
@@ -162,7 +165,7 @@ class OppfølgingServiceTest {
             every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
                 listOf(aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom.plusMonths(1)))
 
-            assertThat(oppfølgingService.hentBehandlingerForOppfølging()).isEmpty()
+            assertThat(opprettOppfølging()).isNull()
         }
 
         @Test
@@ -171,8 +174,8 @@ class OppfølgingServiceTest {
             every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
                 listOf(aktivitetArenaDto(fom = stønadsperiode.fom, tom = tom))
 
-            with(oppfølgingService.hentBehandlingerForOppfølging()) {
-                assertThat(this).hasSize(1)
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
                 assertThat(this.endringAktivitet()).containsExactly(Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = tom))
                 this.assertIngenEndringForMålgrupper()
             }
@@ -184,8 +187,8 @@ class OppfølgingServiceTest {
             every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
                 listOf(aktivitetArenaDto(fom = fom, tom = stønadsperiode.tom))
 
-            with(oppfølgingService.hentBehandlingerForOppfølging()) {
-                assertThat(this).hasSize(1)
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
                 assertThat(this.endringAktivitet()).containsExactly(Kontroll(ÅrsakKontroll.FOM_ENDRET, fom = fom))
                 this.assertIngenEndringForMålgrupper()
             }
@@ -198,8 +201,8 @@ class OppfølgingServiceTest {
             every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
                 listOf(aktivitet)
 
-            with(oppfølgingService.hentBehandlingerForOppfølging()) {
-                assertThat(this).hasSize(1)
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
                 assertThat(this.endringAktivitet()).containsExactly(
                     Kontroll(ÅrsakKontroll.FOM_ENDRET, fom = aktivitet.fom),
                     Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = aktivitet.tom),
@@ -215,8 +218,8 @@ class OppfølgingServiceTest {
             every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
                 listOf(aktivitet)
 
-            with(oppfølgingService.hentBehandlingerForOppfølging()) {
-                assertThat(this).hasSize(1)
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
                 assertThat(this.endringAktivitet()).containsExactly(
                     Kontroll(ÅrsakKontroll.INGEN_TREFF),
                     Kontroll(ÅrsakKontroll.TREFF_MEN_FEIL_TYPE),
@@ -235,22 +238,29 @@ class OppfølgingServiceTest {
         every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
             listOf(aktivitet)
 
-        with(oppfølgingService.hentBehandlingerForOppfølging()) {
-            assertThat(this).hasSize(1)
+        with(opprettOppfølging()) {
+            assertThat(this).isNotNull
             assertThat(this.endringMålgruppe()).containsExactly(Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = ytelse.tom))
             assertThat(this.endringAktivitet()).containsExactly(Kontroll(ÅrsakKontroll.FOM_ENDRET, fom = aktivitet.fom))
         }
     }
 
-    private fun List<BehandlingForOppfølgingDto>.assertIngenEndringForMålgrupper() =
+    private fun opprettOppfølging(): Oppfølging? {
+        oppfølgingService.opprettOppfølging(behandling.id)
+        return oppfølgingRepository.findAll().firstOrNull()
+    }
+
+    private fun Oppfølging?.assertIngenEndringForMålgrupper() =
         assertThat(endringMålgruppe().map { it.årsak }).containsExactly(ÅrsakKontroll.INGEN_ENDRING)
 
-    private fun List<BehandlingForOppfølgingDto>.assertIngenEndringForAktiviteter() =
+    private fun Oppfølging?.assertIngenEndringForAktiviteter() =
         assertThat(endringAktivitet().map { it.årsak }).containsExactly(ÅrsakKontroll.INGEN_ENDRING)
 
-    private fun List<BehandlingForOppfølgingDto>.endringAktivitet(): List<Kontroll> =
-        this.flatMap { it.stønadsperioderForKontroll.flatMap { stønadsperiode -> stønadsperiode.endringAktivitet } }
+    private fun Oppfølging?.endringAktivitet(): List<Kontroll> =
+        this?.let { it.data.perioderTilKontroll.flatMap { stønadsperiode -> stønadsperiode.endringAktivitet } }
+            ?: emptyList()
 
-    private fun List<BehandlingForOppfølgingDto>.endringMålgruppe(): List<Kontroll> =
-        this.flatMap { it.stønadsperioderForKontroll.flatMap { stønadsperiode -> stønadsperiode.endringMålgruppe } }
+    private fun Oppfølging?.endringMålgruppe(): List<Kontroll> =
+        this?.let { it.data.perioderTilKontroll.flatMap { stønadsperiode -> stønadsperiode.endringMålgruppe } }
+            ?: emptyList()
 }

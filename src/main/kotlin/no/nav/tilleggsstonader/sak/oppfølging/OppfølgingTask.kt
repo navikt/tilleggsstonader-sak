@@ -11,26 +11,26 @@ import java.time.LocalDateTime
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = OppfølgningTask.TYPE,
-    beskrivelse = "Oppretter oppfølgning for behandling",
+    taskStepType = OppfølgingTask.TYPE,
+    beskrivelse = "Oppretter oppfølging for behandling",
 )
-class OppfølgningTask(
+class OppfølgingTask(
     private val oppfølgingService: OppfølgingService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val data = objectMapper.readValue<OppfølgningTaskData>(task.payload)
-        oppfølgingService.håndterBehandling(data.behandlingId)
+        val data = objectMapper.readValue<OppfølgingTaskData>(task.payload)
+        oppfølgingService.opprettOppfølging(data.behandlingId)
     }
 
     companion object {
-        const val TYPE = "oppfølgning"
+        const val TYPE = "oppfølging"
 
         fun opprettTask(
             behandlingId: BehandlingId,
             tidspunkt: LocalDateTime,
         ) = Task(
             type = TYPE,
-            payload = objectMapper.writeValueAsString(OppfølgningTaskData(behandlingId = behandlingId, tidspunkt)),
+            payload = objectMapper.writeValueAsString(OppfølgingTaskData(behandlingId = behandlingId, tidspunkt)),
         )
     }
 }
@@ -38,7 +38,7 @@ class OppfølgningTask(
 /**
  * @param tidspunkt er for å få en unik payload då payload skal være unik
  */
-private data class OppfølgningTaskData(
+private data class OppfølgingTaskData(
     val behandlingId: BehandlingId,
     val tidspunkt: LocalDateTime,
 )

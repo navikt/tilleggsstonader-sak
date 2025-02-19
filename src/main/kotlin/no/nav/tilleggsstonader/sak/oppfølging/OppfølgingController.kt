@@ -51,17 +51,6 @@ class OppfølgingController(
         return oppfølgingService.kontroller(request)
     }
 
-    @GetMapping("behandlinger")
-    fun hentBehandlingerForOppfølging(): List<BehandlingForOppfølgingDto> {
-        tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
-
-        feilHvisIkke(unleashService.isEnabled(Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING)) {
-            "Feature toggle ${Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING} er ikke aktivert"
-        }
-
-        return oppfølgingService.hentBehandlingerForOppfølging()
-    }
-
     @PostMapping("start")
     fun startJobb() {
         tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)

@@ -22,7 +22,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Repository
-interface OppfølgningRepository :
+interface OppfølgingRepository :
     RepositoryInterface<Oppfølging, UUID>,
     InsertUpdateRepository<Oppfølging> {
     @Modifying
