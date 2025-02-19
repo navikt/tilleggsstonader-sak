@@ -62,7 +62,7 @@ object MålgruppeValidering {
                         MålgruppeType.INGEN_MÅLGRUPPE -> null
                     }
 
-                Stønadstype.BOUTGIFTER -> TODO()
+                Stønadstype.BOUTGIFTER -> TODO("Stønadstype BOUTGIFTER er ikke implementert")
             }
         feilHvis(gyldig == SvarJaNei.NEI) {
             "Aldersvilkår er ikke oppfylt ved opprettelse av målgruppe=${vilkårperiode.type} for behandling=${grunnlagsdata.behandlingId}"
