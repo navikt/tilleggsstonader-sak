@@ -32,6 +32,7 @@ class TilsynBarnVedtaksperiodeValidingerService(
         behandlingId: BehandlingId,
         utgifter: Map<BarnId, List<UtgiftBeregning>>,
     ) {
+        validerVedtaksperioderEksisterer(vedtaksperioder)
         validerIngenOverlappMellomVedtaksperioder(vedtaksperioder)
         validerUtgiftHeleVedtaksperioden(vedtaksperioder, utgifter)
 
@@ -54,6 +55,12 @@ class TilsynBarnVedtaksperiodeValidingerService(
                 aktiviteter,
                 fødselsdato,
             )
+        }
+    }
+
+    private fun validerVedtaksperioderEksisterer(vedtaksperioder: List<Vedtaksperiode>) {
+        brukerfeilHvis(vedtaksperioder.isEmpty()) {
+            "Kan ikke innvilge når det ikke finnes noen vedtaksperioder"
         }
     }
 
