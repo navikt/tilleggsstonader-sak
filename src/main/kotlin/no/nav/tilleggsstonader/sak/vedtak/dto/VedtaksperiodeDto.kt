@@ -9,7 +9,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 data class VedtaksperiodeDto(
-    val id: UUID = UUID.randomUUID(),
+    val id: UUID,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppeType: MålgruppeType,

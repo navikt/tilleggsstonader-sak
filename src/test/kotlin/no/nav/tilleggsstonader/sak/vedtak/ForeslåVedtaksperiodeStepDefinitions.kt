@@ -129,6 +129,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
     private fun mapVedtaksperioder(dataTable: DataTable) =
         dataTable.mapRad { rad ->
             Vedtaksperiode(
+                id = UUID.randomUUID(),
                 fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
                 tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
                 målgruppe = parseValgfriEnum<MålgruppeType>(DomenenøkkelForeslåVedtaksperioder.MÅLGRUPPE, rad)!!,

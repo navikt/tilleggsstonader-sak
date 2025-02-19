@@ -33,6 +33,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.UUID
 
 class TilsynBarnVedtaksperiodeValidingerUtilsTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
@@ -352,6 +353,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
     inner class ValiderIngenOverlapp {
         val vedtaksperiodeJan =
             Vedtaksperiode(
+                id = UUID.randomUUID(),
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 1, 31),
                 målgruppe = MålgruppeType.AAP,
@@ -359,6 +361,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             )
         val vedtaksperiodeFeb =
             Vedtaksperiode(
+                id = UUID.randomUUID(),
                 fom = LocalDate.of(2025, 2, 1),
                 tom = LocalDate.of(2025, 2, 28),
                 målgruppe = MålgruppeType.AAP,
@@ -366,6 +369,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             )
         val vedtaksperiodeJanFeb =
             Vedtaksperiode(
+                id = UUID.randomUUID(),
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 2, 28),
                 målgruppe = MålgruppeType.AAP,
@@ -922,6 +926,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
         målgruppe: MålgruppeType = MålgruppeType.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
     ) = Vedtaksperiode(
+        id = UUID.randomUUID(),
         fom = fom,
         tom = tom,
         målgruppe = målgruppe,

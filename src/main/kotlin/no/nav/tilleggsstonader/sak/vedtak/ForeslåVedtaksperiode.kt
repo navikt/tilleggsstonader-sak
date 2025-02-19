@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
+import java.util.UUID
 
 object ForeslåVedtaksperiode {
     fun finnVedtaksperiode(
@@ -56,6 +57,7 @@ object ForeslåVedtaksperiode {
     ): Vedtaksperiode =
         if (stønadsperiode.overlapper(vilkår)) {
             Vedtaksperiode(
+                id = UUID.randomUUID(),
                 fom = maxOf(stønadsperiode.fom, vilkår.fom),
                 tom = minOf(stønadsperiode.tom, vilkår.tom),
                 målgruppe = stønadsperiode.målgruppe,

@@ -10,7 +10,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 data class Vedtaksperiode(
-    val id: UUID = UUID.randomUUID(),
+    val id: UUID,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppe: MålgruppeType,
@@ -18,6 +18,7 @@ data class Vedtaksperiode(
 ) : Periode<LocalDate>,
     KopierPeriode<Vedtaksperiode> {
     constructor(stønadsperiode: Stønadsperiode) : this(
+        id = UUID.randomUUID(),
         fom = stønadsperiode.fom,
         tom = stønadsperiode.tom,
         målgruppe = stønadsperiode.målgruppe,
