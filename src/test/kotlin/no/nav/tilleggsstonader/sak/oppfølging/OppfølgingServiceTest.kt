@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.oppfølging
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -44,7 +45,7 @@ class OppfølgingServiceTest {
     val registerAktivitetService = mockk<RegisterAktivitetService>()
     val ytelseService = mockk<YtelseService>()
     val taskService = mockk<TaskService>()
-    val oppfølgingRepository = OppfølgingRepositoryFake()
+    val oppfølgingRepository = spyk(OppfølgingRepositoryFake())
 
     val oppfølgingService =
         OppfølgingService(
@@ -77,6 +78,10 @@ class OppfølgingServiceTest {
 
         every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
             listOf(stønadsperiode).tilSortertDto()
+        every { ytelseService.hentYtelseForGrunnlag(any(), any(), any(), any()) } returns
+            ytelsePerioderDto(perioder = emptyList())
+        every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+            emptyList()
     }
 
     @Nested
@@ -299,10 +304,29 @@ class OppfølgingServiceTest {
         }
     }
 
-    private fun opprettOppfølging(): Oppfølging? {
-        oppfølgingService.opprettOppfølging(behandling.id)
-        return oppfølgingRepository.findAll().firstOrNull()
+    @Nested
+    inner class HarLagretOppfølgingFraFør {
+        @Test
+        fun `skal lagre ny hvis det finnes en fra før men som ikke er kontrollert`() {
+            val førsteOppfølging = oppfølgingService.opprettOppfølging(behandling.id)
+            assertThat(førsteOppfølging).isNotNull
+
+            assertThat(oppfølgingService.opprettOppfølging(behandling.id)).isNotNull
+        }
+
+        @Test
+        fun `skal lagre på nytt hvis dataen endret seg`() {
+            val førsteOppfølging = oppfølgingService.opprettOppfølging(behandling.id)
+            assertThat(førsteOppfølging).isNotNull
+            val oppfølgingMedFjernedePerioder =
+                førsteOppfølging!!.copy(data = førsteOppfølging.data.copy(perioderTilKontroll = emptyList()))
+            oppfølgingRepository.update(oppfølgingMedFjernedePerioder)
+
+            assertThat(oppfølgingService.opprettOppfølging(behandling.id)).isNotNull
+        }
     }
+
+    private fun opprettOppfølging(): Oppfølging? = oppfølgingService.opprettOppfølging(behandling.id)
 
     private fun Oppfølging?.assertIngenEndringForMålgrupper() =
         assertThat(endringMålgruppe().map { it.årsak }).containsExactly(ÅrsakKontroll.INGEN_ENDRING)

@@ -13,6 +13,14 @@ class OppfølgingRepositoryFake :
         updateAll(findAll().map { it.copy(aktiv = false) })
     }
 
+    /**
+     * Finner siste for behandling i Fake, då den joiner med fagsak i riktig implementering
+     */
+    override fun finnSisteForFagsak(behandlingId: BehandlingId): Oppfølging? =
+        findAll()
+            .filter { it.behandlingId == behandlingId }
+            .maxByOrNull { it.opprettetTidspunkt }
+
     override fun finnAktiveMedDetaljer(): List<OppfølgingMedDetaljer> {
         TODO("Denne joiner med andre tabeller så er ikke tilgjengelig i fake")
     }

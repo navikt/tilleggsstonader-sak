@@ -2,10 +2,14 @@ package no.nav.tilleggsstonader.sak.oppfølging
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsakpersoner
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -87,12 +91,7 @@ class OppfølgingRepositoryTest : IntegrationTest() {
 
         @Test
         fun `skal finne alle aktive med informasjon om at det finnes en ny behandling`() {
-            val revurdering =
-                testoppsettService.opprettRevurdering(
-                    revurderFra = LocalDate.now(),
-                    forrigeBehandling = behandling,
-                    fagsak = testoppsettService.hentFagsak(behandling.fagsakId),
-                )
+            val revurdering = opprettRevurdering()
 
             oppfølgingRepository.insert(Oppfølging(behandlingId = revurdering.forrigeBehandlingId!!, data = data))
 
@@ -116,4 +115,68 @@ class OppfølgingRepositoryTest : IntegrationTest() {
             assertThat(aktiv.behandlingsdetaljer.stønadstype).isEqualTo(Stønadstype.BARNETILSYN)
         }
     }
+
+    @Nested
+    inner class FinnSisteForBehandling {
+        @Test
+        fun `skal returnere null hvis det ikke finnes en for behandlingen`() {
+            assertThat(oppfølgingRepository.finnSisteForFagsak(behandlingId)).isNull()
+        }
+
+        @Test
+        fun `skal finne siste for behandling`() {
+            oppfølgingRepository.insert(opprettOppfølging(SporbarUtils.now().minusDays(3)))
+            val enDagSiden =
+                oppfølgingRepository.insert(opprettOppfølging(SporbarUtils.now().minusDays(1)))
+            oppfølgingRepository.insert(opprettOppfølging(SporbarUtils.now().minusDays(2)))
+
+            val sisteForBehandling =
+                oppfølgingRepository.finnSisteForFagsak(behandlingId)
+            assertThat(sisteForBehandling?.id).isEqualTo(enDagSiden.id)
+        }
+
+        @Test
+        fun `skal finne siste for fagsak`() {
+            val revurdering = opprettRevurdering()
+            val enDagSiden =
+                oppfølgingRepository.insert(opprettOppfølging(SporbarUtils.now().minusDays(1), revurdering.id))
+            oppfølgingRepository.insert(opprettOppfølging(SporbarUtils.now().minusDays(2)))
+
+            val sisteForBehandling =
+                oppfølgingRepository.finnSisteForFagsak(behandlingId)
+            assertThat(sisteForBehandling?.id).isEqualTo(enDagSiden.id)
+        }
+
+        @Test
+        fun `skal ikke finne treff på en annen fagsak`() {
+            val annenBehandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling = behandling(),
+                    identer = fagsakpersoner(setOf("123")),
+                )
+            oppfølgingRepository.insert(opprettOppfølging(SporbarUtils.now().minusDays(1), annenBehandling.id))
+            val toDagerSiden = oppfølgingRepository.insert(opprettOppfølging(SporbarUtils.now().minusDays(2)))
+
+            val sisteForBehandling =
+                oppfølgingRepository.finnSisteForFagsak(behandlingId)
+            assertThat(sisteForBehandling?.id).isEqualTo(toDagerSiden.id)
+        }
+
+        fun opprettOppfølging(
+            opprettet: LocalDateTime,
+            behandlingId: BehandlingId = behandling.id,
+        ) = Oppfølging(
+            behandlingId = behandlingId,
+            aktiv = false,
+            data = data,
+            opprettetTidspunkt = opprettet,
+        )
+    }
+
+    private fun opprettRevurdering(): Behandling =
+        testoppsettService.opprettRevurdering(
+            revurderFra = LocalDate.now(),
+            forrigeBehandling = behandling,
+            fagsak = testoppsettService.hentFagsak(behandling.fagsakId),
+        )
 }

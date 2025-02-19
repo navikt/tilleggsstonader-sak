@@ -31,6 +31,18 @@ interface OppfølgingRepository :
 
     @Query(
         """
+        SELECT o.* 
+        FROM oppfolging o
+        WHERE o.behandling_id 
+            IN (SELECT id FROM behandling WHERE fagsak_id = (SELECT fagsak_id FROM behandling where id = :behandlingId))
+        ORDER BY o.opprettet_tidspunkt DESC
+        LIMIT 1
+    """,
+    )
+    fun finnSisteForFagsak(behandlingId: BehandlingId): Oppfølging?
+
+    @Query(
+        """
         SELECT 
         o.*,
         fe.id AS saksnummer,

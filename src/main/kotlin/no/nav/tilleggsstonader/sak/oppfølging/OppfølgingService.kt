@@ -75,14 +75,24 @@ class OppfølgingService(
             .finnAktiveMedDetaljer()
             .sortedBy { it.behandlingsdetaljer.vedtakstidspunkt }
 
-    fun opprettOppfølging(behandlingId: BehandlingId) {
+    fun opprettOppfølging(behandlingId: BehandlingId): Oppfølging? {
         val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
         val fagsakMetadata = fagsakService.hentMetadata(listOf(behandling.fagsakId)).values.single()
+
         val perioderForKontroll = hentPerioderForKontroll(behandling, fagsakMetadata)
         if (perioderForKontroll.isNotEmpty()) {
             val data = OppfølgingData(perioderTilKontroll = perioderForKontroll)
-            oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+            val sisteForFagsak = oppfølgingRepository.finnSisteForFagsak(behandlingId)
+            if (sisteForFagsak?.kontrollert == null || sisteForFagsak.data != data) {
+                return oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+            } else {
+                logger.warn(
+                    "Ingen endring for behandling=$behandlingId siden oppfølging=${sisteForFagsak.id} " +
+                        "ble kontrollert forrige gang, oppretter ikke ny oppfølging",
+                )
+            }
         }
+        return null
     }
 
     private fun hentPerioderForKontroll(
@@ -137,6 +147,7 @@ class OppfølgingService(
                     kontroller
                 }
             }
+
             else -> listOf(Kontroll(ÅrsakKontroll.SKAL_IKKE_KONTROLLERES))
         }
 
