@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 
 data class InnvilgelseTilsynBarnResponse(
     val beregningsresultat: BeregningsresultatTilsynBarnDto,
-    val vedtaksperioder: List<VedtaksperiodeDto>,
+    val vedtaksperioder: List<VedtaksperiodeDto>?,
 ) : VedtakTilsynBarnDto(TypeVedtak.INNVILGELSE),
     VedtakTilsynBarnResponse
 

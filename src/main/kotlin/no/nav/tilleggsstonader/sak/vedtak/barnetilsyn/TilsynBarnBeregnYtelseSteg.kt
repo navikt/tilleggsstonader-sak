@@ -28,7 +28,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
@@ -65,7 +64,7 @@ class TilsynBarnBeregnYtelseSteg(
             lagInnvilgetVedtak(
                 behandling = saksbehandling,
                 beregningsresultat = beregningsresultat,
-                vedtaksperioder = beregningsresultat.tilVedtaksperioder(),
+                vedtaksperioder = null,
             ),
         )
         lagreAndeler(saksbehandling, beregningsresultat)
@@ -170,7 +169,7 @@ class TilsynBarnBeregnYtelseSteg(
     private fun lagInnvilgetVedtak(
         behandling: Saksbehandling,
         beregningsresultat: BeregningsresultatTilsynBarn,
-        vedtaksperioder: List<Vedtaksperiode>,
+        vedtaksperioder: List<Vedtaksperiode>?,
     ): Vedtak =
         GeneriskVedtak(
             behandlingId = behandling.id,

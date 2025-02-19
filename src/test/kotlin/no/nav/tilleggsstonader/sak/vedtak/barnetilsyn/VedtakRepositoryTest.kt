@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultVedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
@@ -28,7 +27,6 @@ class VedtakRepositoryTest : IntegrationTest() {
                 behandlingId = behandling.id,
                 data =
                     InnvilgelseTilsynBarn(
-                        vedtaksperioder = listOf(defaultVedtaksperiode),
                         beregningsresultat = beregningsresultat,
                     ),
             ),

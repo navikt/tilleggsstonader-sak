@@ -53,7 +53,6 @@ object TilsynBarnTestUtil {
 
     val defaultInnvilgelseTilsynBarn =
         InnvilgelseTilsynBarn(
-            vedtaksperioder = listOf(defaultVedtaksperiode),
             beregningsresultat =
                 BeregningsresultatTilsynBarn(
                     perioder =
@@ -113,7 +112,6 @@ object TilsynBarnTestUtil {
         type = TypeVedtak.INNVILGELSE,
         data =
             InnvilgelseTilsynBarn(
-                vedtaksperioder = emptyList(),
                 beregningsresultat = beregningsresultat,
             ),
     )

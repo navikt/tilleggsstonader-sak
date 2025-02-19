@@ -44,7 +44,7 @@ object VedtakDtoMapper {
             is InnvilgelseTilsynBarn ->
                 InnvilgelseTilsynBarnResponse(
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
-                    vedtaksperioder = data.vedtaksperioder.tilDto(),
+                    vedtaksperioder = data.vedtaksperioder?.tilDto(),
                 )
 
             is OpphørTilsynBarn ->
