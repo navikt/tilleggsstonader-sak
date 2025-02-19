@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeA
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
+import java.util.UUID
 
 enum class DomenenøkkelForeslåVedtaksperioder(
     override val nøkkel: String,
@@ -84,8 +85,10 @@ class ForeslåVedtaksperiodeStepDefinitions {
 
     @Så("forvent følgende vedtaksperioder")
     fun `forvent følgende vedtaksperioder`(dataTable: DataTable) {
-        val forventetVedtaksperioder = mapVedtaksperioder(dataTable)
-        assertThat(resultat).isEqualTo(forventetVedtaksperioder)
+        val uuid = UUID.randomUUID()
+        val forventetVedtaksperioderMedSammeId = mapVedtaksperioder(dataTable).map { it.copy(id = uuid) }
+        val resultatMedSammeId = resultat.map { it.copy(id = uuid) }
+        assertThat(resultatMedSammeId).isEqualTo(forventetVedtaksperioderMedSammeId)
     }
 
     private fun mapAktiviteter(dataTable: DataTable) =
@@ -126,6 +129,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
     private fun mapVedtaksperioder(dataTable: DataTable) =
         dataTable.mapRad { rad ->
             Vedtaksperiode(
+                id = UUID.randomUUID(),
                 fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
                 tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
                 målgruppe = parseValgfriEnum<MålgruppeType>(DomenenøkkelForeslåVedtaksperioder.MÅLGRUPPE, rad)!!,

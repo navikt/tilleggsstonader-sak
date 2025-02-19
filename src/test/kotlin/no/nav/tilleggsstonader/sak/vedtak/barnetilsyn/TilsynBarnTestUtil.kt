@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.UUID
 
 object TilsynBarnTestUtil {
     fun innvilgelseDto() = InnvilgelseTilsynBarnRequest
@@ -33,6 +34,7 @@ object TilsynBarnTestUtil {
         )
 
     val defaultBehandling = behandling()
+    val defaultVedtaksperiodeId = UUID.randomUUID()
 
     val defaultBarn1 = BehandlingBarn(behandlingId = behandlingId, ident = "1")
     val defaultBarn2 = BehandlingBarn(behandlingId = behandlingId, ident = "2")
@@ -45,6 +47,7 @@ object TilsynBarnTestUtil {
 
     val defaultVedtaksperiode =
         Vedtaksperiode(
+            id = defaultVedtaksperiodeId,
             fom = LocalDate.of(2024, 1, 1),
             tom = LocalDate.of(2024, 1, 31),
             målgruppe = MålgruppeType.AAP,

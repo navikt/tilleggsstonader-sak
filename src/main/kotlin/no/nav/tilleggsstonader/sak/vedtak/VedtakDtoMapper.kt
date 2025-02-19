@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
@@ -43,6 +44,7 @@ object VedtakDtoMapper {
             is InnvilgelseTilsynBarn ->
                 InnvilgelseTilsynBarnResponse(
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
+                    vedtaksperioder = data.vedtaksperioder?.tilDto(),
                 )
 
             is OpphørTilsynBarn ->
