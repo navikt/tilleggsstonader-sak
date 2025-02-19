@@ -68,7 +68,7 @@ object MålgruppeValidering {
         vilkårsperiodeTom: LocalDate,
     ): Boolean {
         val sekstisyvÅrsDagenTilBruker = fødselsdato.plusYears(67)
-        feilHvis((vilkårsperiodeFom < sekstisyvÅrsDagenTilBruker) && (sekstisyvÅrsDagenTilBruker < vilkårsperiodeTom)) {
+        feilHvis((vilkårsperiodeFom <= sekstisyvÅrsDagenTilBruker) && (sekstisyvÅrsDagenTilBruker <= vilkårsperiodeTom)) {
             "Brukeren fyller 67 år i løpet av vilkårsperioden"
         }
         return vilkårsperiodeTom < sekstisyvÅrsDagenTilBruker
@@ -80,7 +80,7 @@ object MålgruppeValidering {
         vilkårsperiodeTom: LocalDate,
     ): Boolean {
         val attenårsdagenTilBruker = fødselsdato.plusYears(18)
-        feilHvis((vilkårsperiodeFom < attenårsdagenTilBruker) && (attenårsdagenTilBruker < vilkårsperiodeTom)) {
+        feilHvis((vilkårsperiodeFom <= attenårsdagenTilBruker) && (attenårsdagenTilBruker <= vilkårsperiodeTom)) {
             "Brukeren fyller 18 år i løpet av vilkårsperioden"
         }
         return attenårsdagenTilBruker < vilkårsperiodeFom
