@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -80,6 +81,7 @@ class BeregningsresultatLæremidlerTest {
                             sats = 875,
                             satsBekreftet = true,
                             målgruppe = MålgruppeType.AAP,
+                            aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
             ),
@@ -143,7 +145,7 @@ class BeregningsresultatLæremidlerTest {
         val kuttePerioderVedOpphør = avkortBeregningsresultatVedOpphør(forrigeVedtak, revurderFra).perioder
 
         assertThat(kuttePerioderVedOpphør).isEqualTo(
-            listOf<BeregningsresultatForMåned>(
+            listOf(
                 BeregningsresultatForMåned(
                     beløp = 875,
                     grunnlag =
@@ -156,6 +158,7 @@ class BeregningsresultatLæremidlerTest {
                             sats = 875,
                             satsBekreftet = true,
                             målgruppe = MålgruppeType.AAP,
+                            aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
                 BeregningsresultatForMåned(
@@ -170,6 +173,7 @@ class BeregningsresultatLæremidlerTest {
                             sats = 875,
                             satsBekreftet = true,
                             målgruppe = MålgruppeType.AAP,
+                            aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
                 BeregningsresultatForMåned(
@@ -184,6 +188,7 @@ class BeregningsresultatLæremidlerTest {
                             sats = 875,
                             satsBekreftet = true,
                             målgruppe = MålgruppeType.AAP,
+                            aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
                 BeregningsresultatForMåned(
@@ -198,6 +203,7 @@ class BeregningsresultatLæremidlerTest {
                             sats = 875,
                             satsBekreftet = true,
                             målgruppe = MålgruppeType.AAP,
+                            aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
             ),
@@ -211,7 +217,7 @@ class BeregningsresultatLæremidlerTest {
         val kuttePerioderVedOpphør = avkortBeregningsresultatVedOpphør(forrigeVedtak, revurderFra).perioder
 
         assertThat(kuttePerioderVedOpphør).isEqualTo(
-            listOf<BeregningsresultatForMåned>(
+            listOf(
                 BeregningsresultatForMåned(
                     beløp = 875,
                     grunnlag =
@@ -224,6 +230,7 @@ class BeregningsresultatLæremidlerTest {
                             sats = 875,
                             satsBekreftet = true,
                             målgruppe = MålgruppeType.AAP,
+                            aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
             ),
@@ -287,7 +294,7 @@ class BeregningsresultatLæremidlerTest {
         val kuttePerioderVedOpphør = avkortBeregningsresultatVedOpphør(forrigeVedtak, revurderFra).perioder
 
         assertThat(kuttePerioderVedOpphør).isEqualTo(
-            listOf<BeregningsresultatForMåned>(
+            listOf(
                 BeregningsresultatForMåned(
                     beløp = 875,
                     grunnlag =
@@ -300,6 +307,7 @@ class BeregningsresultatLæremidlerTest {
                             sats = 875,
                             satsBekreftet = true,
                             målgruppe = MålgruppeType.AAP,
+                            aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
                 BeregningsresultatForMåned(
@@ -314,6 +322,7 @@ class BeregningsresultatLæremidlerTest {
                             sats = 875,
                             satsBekreftet = true,
                             målgruppe = MålgruppeType.AAP,
+                            aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
             ),
