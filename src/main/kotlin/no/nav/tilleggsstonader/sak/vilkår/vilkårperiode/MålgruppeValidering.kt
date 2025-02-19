@@ -81,14 +81,7 @@ object MålgruppeValidering {
         feilHvis((vilkårsperiodeFom < sekstisyvÅrsDagenTilBruker) && (sekstisyvÅrsDagenTilBruker < vilkårsperiodeTom)) {
             "Brukeren fyller 67 år i løpet av vilkårsperioden"
         }
-        if (vilkårsperiodeTom < sekstisyvÅrsDagenTilBruker) {
-            return true
-        } else {
-            if (sekstisyvÅrsDagenTilBruker < vilkårsperiodeFom) {
-                return false
-            }
-        }
-        return false
+        return vilkårsperiodeTom < sekstisyvÅrsDagenTilBruker
     }
 
     private fun heleVilkårsperiodenErEtterBrukerFyller18År(
