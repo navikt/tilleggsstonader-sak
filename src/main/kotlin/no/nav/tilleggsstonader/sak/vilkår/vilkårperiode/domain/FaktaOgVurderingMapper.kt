@@ -54,7 +54,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 fun mapFaktaOgSvarDto(
     vilkårperiode: LagreVilkårperiode,
     stønadstype: Stønadstype,
-    vurderingAldersvilkår: VurderingAldersVilkår,
+    vurderingAldersvilkår: VurderingAldersVilkår?,
 ): FaktaOgVurdering =
     when (vilkårperiode.type) {
         is AktivitetType -> mapAktiviteter(stønadstype = stønadstype, aktivitet = vilkårperiode)
@@ -62,7 +62,11 @@ fun mapFaktaOgSvarDto(
             mapMålgruppe(
                 stønadstype = stønadstype,
                 målgruppe = vilkårperiode,
-                vurderingAldersvilkår = vurderingAldersvilkår,
+                vurderingAldersvilkår =
+                    vurderingAldersvilkår.let {
+                        it
+                            ?: error("Mangler vurdering av aldersvilkår for målgruppe=$vilkårperiode, stønadstype=$stønadstype")
+                    },
             )
     }
 

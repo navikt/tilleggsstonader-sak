@@ -87,7 +87,7 @@ class VilkårperiodeService(
         validerBehandling(behandling)
         validerNyPeriodeRevurdering(behandling, vilkårperiode.fom)
 
-        lateinit var vurderingAldersvilkår: VurderingAldersVilkår
+        var vurderingAldersvilkår: VurderingAldersVilkår? = null
 
         if (vilkårperiode.type is MålgruppeType) {
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
@@ -139,7 +139,7 @@ class VilkårperiodeService(
             "Kan ikke oppdatere kildeId på en allerede eksisterende vilkårperiode"
         }
 
-        lateinit var vurderingAldersvilkår: VurderingAldersVilkår
+        var vurderingAldersvilkår: VurderingAldersVilkår? = null
 
         if (vilkårperiode.type is MålgruppeType) {
             val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandling.id)
