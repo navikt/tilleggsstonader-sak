@@ -40,16 +40,19 @@ object MålgruppeValidering {
     ) {
         val fødselsdato = grunnlagsdata.grunnlag.fødsel?.fødselsdato
 
+        feilHvis(fødselsdato == null) { "Kan ikke vurdere aldersvilkår uten å vite fødselsdato til bruker" }
+
         val gyldig: SvarJaNei? =
             when (stønadstype) {
                 Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER ->
                     when (vilkårperiode.type as MålgruppeType) {
                         MålgruppeType.AAP, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD ->
-                            brukerErEldreEnn18ogYngreEnn67IgjennomHelePerioden(fødselsdato, vilkårperiode.fom, vilkårperiode.tom)
+                            vurderAldersvilkårForNedsattArbeidsevne(fødselsdato, vilkårperiode)
                         MålgruppeType.OMSTILLINGSSTØNAD ->
-                            if (brukerErYngreEnn67ÅrIgjennomHelePerioden(
+                            if (heleVilkårsperiodenErFørBrukerFyller67År(
                                     fødselsdato,
                                     vilkårperiode.fom,
+                                    vilkårperiode.tom,
                                 )
                             ) {
                                 SvarJaNei.JA
@@ -69,35 +72,50 @@ object MålgruppeValidering {
         }
     }
 
-    private fun brukerErYngreEnn67ÅrIgjennomHelePerioden(
-        fødselsdato: LocalDate?,
+    private fun heleVilkårsperiodenErFørBrukerFyller67År(
+        fødselsdato: LocalDate,
         vilkårsperiodeFom: LocalDate,
+        vilkårsperiodeTom: LocalDate,
     ): Boolean {
-        val sekstisyvÅrsDagenTilBruker = fødselsdato?.plusYears(67)
-        if (sekstisyvÅrsDagenTilBruker != null) {
-            return (sekstisyvÅrsDagenTilBruker < vilkårsperiodeFom)
+        val sekstisyvÅrsDagenTilBruker = fødselsdato.plusYears(67)
+        feilHvis((vilkårsperiodeFom < sekstisyvÅrsDagenTilBruker) && (sekstisyvÅrsDagenTilBruker < vilkårsperiodeTom)) {
+            "Brukeren fyller 67 år i løpet av vilkårsperioden"
+        }
+        if (vilkårsperiodeTom < sekstisyvÅrsDagenTilBruker) {
+            return true
+        } else {
+            if (sekstisyvÅrsDagenTilBruker < vilkårsperiodeFom) {
+                return false
+            }
         }
         return false
     }
 
-    private fun brukerErEldreEnn18ÅrIgjennomHelePerioden(
-        fødselsdato: LocalDate?,
+    private fun heleVilkårsperiodenErEtterBrukerFyller18År(
+        fødselsdato: LocalDate,
+        vilkårsperiodeFom: LocalDate,
         vilkårsperiodeTom: LocalDate,
     ): Boolean {
-        val attenårsdagenTilBruker = fødselsdato?.plusYears(18)
-        if (attenårsdagenTilBruker != null) {
-            return (vilkårsperiodeTom < attenårsdagenTilBruker)
+        val attenårsdagenTilBruker = fødselsdato.plusYears(18)
+        feilHvis((vilkårsperiodeFom < attenårsdagenTilBruker) && (attenårsdagenTilBruker < vilkårsperiodeTom)) {
+            "Brukeren fyller 18 år i løpet av vilkårsperioden"
+        }
+        if (vilkårsperiodeTom < attenårsdagenTilBruker) {
+            return false
+        } else {
+            if (attenårsdagenTilBruker < vilkårsperiodeFom) {
+                return true
+            }
         }
         return false
     }
 
-    private fun brukerErEldreEnn18ogYngreEnn67IgjennomHelePerioden(
-        fødselsdato: LocalDate?,
-        vilkårsperiodeFom: LocalDate,
-        vilkårsperiodeTom: LocalDate,
+    private fun vurderAldersvilkårForNedsattArbeidsevne(
+        fødselsdato: LocalDate,
+        vilkårperiode: LagreVilkårperiode,
     ): SvarJaNei? {
-        if (brukerErYngreEnn67ÅrIgjennomHelePerioden(fødselsdato, vilkårsperiodeFom) &&
-            brukerErEldreEnn18ÅrIgjennomHelePerioden(fødselsdato, vilkårsperiodeTom)
+        if (heleVilkårsperiodenErFørBrukerFyller67År(fødselsdato, vilkårperiode.fom, vilkårperiode.tom) &&
+            heleVilkårsperiodenErEtterBrukerFyller18År(fødselsdato, vilkårperiode.fom, vilkårperiode.tom)
         ) {
             return SvarJaNei.JA
         }
