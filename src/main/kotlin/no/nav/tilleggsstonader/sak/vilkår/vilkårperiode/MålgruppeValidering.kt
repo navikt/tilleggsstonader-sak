@@ -101,7 +101,7 @@ object MålgruppeValidering {
     private fun vurderAldersvilkårForOmstillingsstønad(
         fødselsdato: LocalDate,
         vilkårperiode: LagreVilkårperiode,
-    ): SvarJaNei {
+    ): SvarJaNei =
         if (heleVilkårsperiodenErFørBrukerFyller67År(
                 fødselsdato,
                 vilkårperiode.fom,
@@ -109,7 +109,7 @@ object MålgruppeValidering {
             )
         ) {
             SvarJaNei.JA
+        } else {
+            SvarJaNei.NEI
         }
-        return SvarJaNei.NEI
-    }
 }
