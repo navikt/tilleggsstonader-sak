@@ -131,6 +131,7 @@ enum class ÅrsakKontroll {
     FOM_ENDRET,
     TOM_ENDRET,
     TREFF_MEN_FEIL_TYPE,
+    FINNER_IKKE_REGISTERAKTIVITET,
 }
 
 /**

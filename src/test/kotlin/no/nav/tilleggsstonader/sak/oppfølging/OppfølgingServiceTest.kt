@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.oppfølging
 
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.spyk
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -22,8 +21,10 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -45,12 +46,14 @@ class OppfølgingServiceTest {
     val registerAktivitetService = mockk<RegisterAktivitetService>()
     val ytelseService = mockk<YtelseService>()
     val taskService = mockk<TaskService>()
-    val oppfølgingRepository = spyk(OppfølgingRepositoryFake())
+    val oppfølgingRepository = OppfølgingRepositoryFake()
+    val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
 
     val oppfølgingService =
         OppfølgingService(
             behandlingRepository = behandlingRepository,
             stønadsperiodeService = stønadsperiodeService,
+            vilkårperiodeRepository = vilkårperiodeRepository,
             registerAktivitetService = registerAktivitetService,
             ytelseService = ytelseService,
             fagsakService = fagsakService,
@@ -70,6 +73,7 @@ class OppfølgingServiceTest {
     @BeforeEach
     fun setUp() {
         oppfølgingRepository.deleteAll()
+        every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns emptyList()
         every { behandlingRepository.findByIdOrThrow(behandling.id) } returns behandling
         every { fagsakService.hentMetadata(any()) } answers {
             val fagsakIds = firstArg<List<FagsakId>>()
@@ -286,6 +290,25 @@ class OppfølgingServiceTest {
 
             assertThat(opprettOppfølging()).isNull()
         }
+
+        @Test
+        fun `gir ingen treff hvis man har 2 aktiviteter som løper innenfor en periode der begge delvis matcher`() {
+            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+                listOf(
+                    aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.fom.plusDays(1)),
+                    aktivitetArenaDto(fom = stønadsperiode.tom.minusDays(1), tom = stønadsperiode.tom.minusDays(1)),
+                )
+
+            every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
+                listOf(aktivitet(fom = stønadsperiode.fom, tom = stønadsperiode.tom))
+
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
+                val kontroll = Kontroll(ÅrsakKontroll.INGEN_TREFF)
+                assertThat(this.endringAktivitet()).containsExactly(kontroll)
+                assertIngenEndringForMålgrupper()
+            }
+        }
     }
 
     @Test
@@ -323,6 +346,105 @@ class OppfølgingServiceTest {
             oppfølgingRepository.update(oppfølgingMedFjernedePerioder)
 
             assertThat(oppfølgingService.opprettOppfølging(behandling.id)).isNotNull
+        }
+    }
+
+    @Nested
+    inner class SjekkAvRegisterAktivitetForInngangsvilkår {
+        @BeforeEach
+        fun setUp() {
+            val ytelse = periodeAAP(fom = stønadsperiode.fom, tom = stønadsperiode.tom)
+            every { ytelseService.hentYtelseForGrunnlag(any(), any(), any(), any()) } returns
+                ytelsePerioderDto(perioder = listOf(ytelse))
+        }
+
+        @Test
+        fun `fom har endret seg i vilkårsperiode sin aktivitet har endret seg, finnes en annen aktivitet som dekker hele perioden`() {
+            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+                listOf(
+                    aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom.minusDays(1), id = "1"),
+                    aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom),
+                )
+
+            every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
+                listOf(aktivitet(fom = stønadsperiode.fom, tom = stønadsperiode.tom, kildeId = "1"))
+
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
+                val kontroll = Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = stønadsperiode.tom.minusDays(1))
+                assertThat(this.endringAktivitet()).containsExactly(kontroll)
+                assertIngenEndringForMålgrupper()
+            }
+        }
+
+        @Test
+        fun `tom har endret seg i vilkårsperiode sin aktivitet har endret seg, finnes en annen aktivitet som dekker hele perioden`() {
+            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+                listOf(
+                    aktivitetArenaDto(fom = stønadsperiode.fom.plusDays(1), tom = stønadsperiode.tom, id = "1"),
+                    aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom),
+                )
+
+            every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
+                listOf(aktivitet(fom = stønadsperiode.fom, tom = stønadsperiode.tom, kildeId = "1"))
+
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
+                val kontroll = Kontroll(ÅrsakKontroll.FOM_ENDRET, fom = stønadsperiode.fom.plusDays(1))
+                assertThat(this.endringAktivitet()).containsExactly(kontroll)
+                assertIngenEndringForMålgrupper()
+            }
+        }
+
+        @Test
+        fun `skal ikke gi doble treff av samme dato hvis det finnes annen aktivitet i registeret som dekker perioden`() {
+            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+                listOf(
+                    aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom.minusDays(1), id = "1"),
+                    aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom.minusDays(1)),
+                )
+
+            every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
+                listOf(aktivitet(fom = stønadsperiode.fom, tom = stønadsperiode.tom, kildeId = "1"))
+
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
+                val kontroll = Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = stønadsperiode.tom.minusDays(1))
+                assertThat(this.endringAktivitet()).containsExactly(kontroll)
+                assertIngenEndringForMålgrupper()
+            }
+        }
+
+        @Test
+        fun `skal ikke gi treff hvis endring i registeraktivitet ikke påvirker overlappsperiode`() {
+            val vilkårTom = stønadsperiode.tom.plusMonths(4)
+            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+                listOf(
+                    aktivitetArenaDto(fom = stønadsperiode.fom, tom = vilkårTom.minusMonths(1), id = "1"),
+                    aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom.minusDays(1)),
+                )
+            every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
+                listOf(aktivitet(fom = stønadsperiode.fom, tom = vilkårTom, kildeId = "1"))
+
+            assertThat(opprettOppfølging()).isNull()
+        }
+
+        @Test
+        fun `finner ikke registeraktivitet`() {
+            val vilkårTom = stønadsperiode.tom.plusMonths(4)
+            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
+                listOf(
+                    aktivitetArenaDto(fom = stønadsperiode.fom, tom = stønadsperiode.tom),
+                )
+            every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
+                listOf(aktivitet(fom = stønadsperiode.fom, tom = vilkårTom, kildeId = "1"))
+
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
+                val kontroll = Kontroll(ÅrsakKontroll.FINNER_IKKE_REGISTERAKTIVITET)
+                assertThat(this.endringAktivitet()).containsExactly(kontroll)
+                assertIngenEndringForMålgrupper()
+            }
         }
     }
 
