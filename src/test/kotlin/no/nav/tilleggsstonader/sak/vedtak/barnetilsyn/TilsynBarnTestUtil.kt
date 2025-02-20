@@ -57,7 +57,6 @@ object TilsynBarnTestUtil {
 
     val defaultVedtaksperiodeBeregning =
         VedtaksperiodeBeregning(
-            id = defaultVedtaksperiodeId,
             fom = LocalDate.of(2024, 1, 1),
             tom = LocalDate.of(2024, 1, 31),
             målgruppe = MålgruppeType.AAP,

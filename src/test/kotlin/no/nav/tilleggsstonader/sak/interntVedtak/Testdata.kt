@@ -190,7 +190,6 @@ object Testdata {
 
         val vedtaksperiode =
             VedtaksperiodeBeregningsgrunnlag(
-                id = UUID.randomUUID(),
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 1),
                 målgruppe = MålgruppeType.AAP,

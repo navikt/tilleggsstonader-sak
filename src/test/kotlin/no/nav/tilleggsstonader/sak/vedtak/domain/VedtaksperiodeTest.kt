@@ -22,7 +22,6 @@ class VedtaksperiodeTest {
     val vedtaksperiode =
         listOf(
             VedtaksperiodeBeregning(
-                id = uuid,
                 fom = fom,
                 tom = tom,
                 målgruppe = målgruppe,
@@ -58,7 +57,7 @@ class VedtaksperiodeTest {
                     aktivitet = aktivitet,
                 ),
             )
-        assertThat(stønadsperiodeBeregningsgrunnlag.tilVedtaksperiodeBeregning().map { it.copy(id = uuid) }).isEqualTo(
+        assertThat(stønadsperiodeBeregningsgrunnlag.tilVedtaksperiodeBeregning()).isEqualTo(
             vedtaksperiode,
         )
     }

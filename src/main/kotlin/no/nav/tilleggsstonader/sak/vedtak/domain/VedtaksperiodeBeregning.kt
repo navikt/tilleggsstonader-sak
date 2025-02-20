@@ -7,10 +7,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
-import java.util.UUID
 
 data class VedtaksperiodeBeregning(
-    val id: UUID = UUID.randomUUID(),
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppe: MålgruppeType,
@@ -18,7 +16,6 @@ data class VedtaksperiodeBeregning(
 ) : Periode<LocalDate>,
     KopierPeriode<VedtaksperiodeBeregning> {
     constructor(stønadsperiode: Stønadsperiode) : this(
-        id = UUID.randomUUID(),
         fom = stønadsperiode.fom,
         tom = stønadsperiode.tom,
         målgruppe = stønadsperiode.målgruppe,
@@ -26,7 +23,6 @@ data class VedtaksperiodeBeregning(
     )
 
     constructor(vedtaksperiodeDto: VedtaksperiodeDto) : this(
-        id = vedtaksperiodeDto.id,
         fom = vedtaksperiodeDto.fom,
         tom = vedtaksperiodeDto.tom,
         målgruppe = vedtaksperiodeDto.målgruppeType,
@@ -41,15 +37,4 @@ data class VedtaksperiodeBeregning(
         fom: LocalDate,
         tom: LocalDate,
     ): VedtaksperiodeBeregning = this.copy(fom = fom, tom = tom)
-
-    fun tilDto() =
-        VedtaksperiodeDto(
-            id = id,
-            fom = fom,
-            tom = tom,
-            målgruppeType = målgruppe,
-            aktivitetType = aktivitet,
-        )
 }
-
-fun List<VedtaksperiodeBeregning>.tilDto() = map { it.tilDto() }

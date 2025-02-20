@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 class BehandlingsoversiktServiceTest {
     val fagsakService = mockk<FagsakService>()
@@ -87,7 +86,6 @@ class BehandlingsoversiktServiceTest {
         val stønadsperiodeGrunnlag =
             StønadsperiodeGrunnlag(
                 VedtaksperiodeBeregning(
-                    id = UUID.randomUUID(),
                     fom = LocalDate.of(2024, 3, 1),
                     tom = LocalDate.of(2024, 3, 13),
                     målgruppe = MålgruppeType.AAP,
@@ -99,7 +97,6 @@ class BehandlingsoversiktServiceTest {
         val stønadsperiodeGrunnlag2 =
             StønadsperiodeGrunnlag(
                 VedtaksperiodeBeregning(
-                    id = UUID.randomUUID(),
                     fom = LocalDate.of(2024, 3, 2),
                     tom = LocalDate.of(2024, 3, 14),
                     målgruppe = MålgruppeType.AAP,
