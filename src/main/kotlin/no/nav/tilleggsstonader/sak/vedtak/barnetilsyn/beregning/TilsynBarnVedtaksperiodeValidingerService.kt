@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.data.repository.findByIdOrNull
@@ -26,7 +26,7 @@ class TilsynBarnVedtaksperiodeValidingerService(
     private val vedtakRepository: VedtakRepository,
 ) {
     fun validerVedtaksperioder(
-        vedtaksperioder: List<VedtaksperiodeBeregning>,
+        vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         utgifter: Map<BarnId, List<UtgiftBeregning>>,
     ) {

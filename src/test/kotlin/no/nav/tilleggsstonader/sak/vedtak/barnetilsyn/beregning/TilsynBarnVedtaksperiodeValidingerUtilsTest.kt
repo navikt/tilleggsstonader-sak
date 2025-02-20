@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Navn
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtaksperiodeValideringUtils.validerIngenEndringerFørRevurderFra
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -37,6 +37,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.UUID
 
 class TilsynBarnVedtaksperiodeValidingerUtilsTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
@@ -98,11 +99,9 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
 
             assertThatCode {
                 tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
-                    listOf(
-                        vedtaksperiode,
-                    ),
-                    behandling,
-                    utgifter,
+                    vedtaksperioder = listOf(vedtaksperiode),
+                    behandling = behandling,
+                    utgifter = utgifter,
                 )
             }.doesNotThrowAnyException()
         }
@@ -283,7 +282,8 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
 
         @Test
         fun `skal godta stønadsperiode på tvers av 2 godkjente sammenhengende vilkårsperioder`() {
-            val vedtaksperiode = lagVedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 10))
+            val vedtaksperiode =
+                lagVedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 10))
 
             assertThatCode {
                 TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
@@ -297,7 +297,8 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
 
         @Test
         fun `skal ikke godta stønadsperiode på tvers av 2 godkjente, men ikke sammenhengende vilkårsperioder`() {
-            val vedtaksperiode = lagVedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 21))
+            val vedtaksperiode =
+                lagVedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 21))
 
             assertThatCode {
                 TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
@@ -315,25 +316,19 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
     @Nested
     inner class ValiderIngenOverlapp {
         val vedtaksperiodeJan =
-            VedtaksperiodeBeregning(
+            lagVedtaksperiode(
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 1, 31),
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
             )
         val vedtaksperiodeFeb =
-            VedtaksperiodeBeregning(
+            lagVedtaksperiode(
                 fom = LocalDate.of(2025, 2, 1),
                 tom = LocalDate.of(2025, 2, 28),
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
             )
         val vedtaksperiodeJanFeb =
-            VedtaksperiodeBeregning(
+            lagVedtaksperiode(
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 2, 28),
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
             )
 
         @Test
@@ -649,7 +644,10 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             @Test
             fun `skal ikke kaste feil dersom overgangsstønad og under 18 år eller over 67 år`() {
                 val vedtaksperioder =
-                    lagVedtaksperiode(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.UTDANNING)
+                    lagVedtaksperiode(
+                        målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                        aktivitet = AktivitetType.UTDANNING,
+                    )
 
                 val målgrupper =
                     listOf(
@@ -1074,7 +1072,8 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
         tom: LocalDate = LocalDate.of(2025, 1, 31),
         målgruppe: MålgruppeType = MålgruppeType.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
-    ) = VedtaksperiodeBeregning(
+    ) = Vedtaksperiode(
+        id = UUID.randomUUID(),
         fom = fom,
         tom = tom,
         målgruppe = målgruppe,
