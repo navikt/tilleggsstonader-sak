@@ -356,6 +356,29 @@ private data class InngangsvilkårAktivitet(
     val kildeId: String?,
     val registerAktivitet: AktivitetArenaDto?,
 ) : Periode<LocalDate> {
+    init {
+        fun <T> diff(
+            type: String,
+            vilkårVerdi: T,
+            registerVerdi: T,
+        ): String? =
+            if (vilkårVerdi != registerVerdi) {
+                "$type=$vilkårVerdi ${type}Register=$registerVerdi"
+            } else {
+                null
+            }
+        if (registerAktivitet != null) {
+            val fomDiff = diff("fom", fom, registerAktivitet.fom)
+            val tomDiff = diff("tom", tom, registerAktivitet.tom)
+            val prosentDiff = diff("prosent", prosent, registerAktivitet.prosentDeltakelse?.toInt())
+            val antallDagerDiff = diff("dager", antallDager, registerAktivitet.antallDagerPerUke)
+            val diff = listOfNotNull(fomDiff, tomDiff, prosentDiff, antallDagerDiff)
+            if (diff.isNotEmpty()) {
+                logger.info("Diff vilkår vs register ${diff.joinToString(" ")}")
+            }
+        }
+    }
+
     val datoperiodeAktivitet: Datoperiode? by lazy {
         val fom = registerAktivitet?.fom
         val tom = registerAktivitet?.tom
@@ -385,6 +408,10 @@ private data class InngangsvilkårAktivitet(
         kildeId = vilkårperiode.kildeId,
         registerAktivitet = registerAktivitet,
     )
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(InngangsvilkårAktivitet::class.java)
+    }
 }
 
 private class RegisterAktiviteter(
