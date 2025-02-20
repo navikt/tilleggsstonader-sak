@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -31,6 +32,6 @@ data class VedtaksperiodeDto(
         )
 }
 
-fun List<VedtaksperiodeDto>.tilDto() = map { it.tilDomene() }
+fun List<VedtaksperiodeDto>.tilDomene() = map { it.tilDomene() }
 
-fun List<VedtaksperiodeDto>.tilVedtaksperiode() = map { Vedtaksperiode(it) }
+fun List<VedtaksperiodeDto>.tilVedtaksperiodeBeregning() = map { VedtaksperiodeBeregning(it) }
