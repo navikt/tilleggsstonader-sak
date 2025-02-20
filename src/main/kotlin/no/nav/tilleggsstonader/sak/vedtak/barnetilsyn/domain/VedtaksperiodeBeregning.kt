@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.domain
+package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode

@@ -53,7 +53,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.UUID
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning as VedtaksperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning as VedtaksperiodeBeregningsgrunnlag
 
 object Testdata {
     val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")
