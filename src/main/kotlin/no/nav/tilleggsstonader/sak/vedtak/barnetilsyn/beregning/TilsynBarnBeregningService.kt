@@ -89,7 +89,7 @@ class TilsynBarnBeregningService(
 
         tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
             vedtaksperioder,
-            behandling.id,
+            behandling,
             utgifterPerBarn,
         )
 

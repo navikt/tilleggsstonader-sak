@@ -132,4 +132,39 @@ object TilsynBarnVedtaksperiodeValideringUtils {
             }
         }
     }
+
+    fun validerIngenEndringerFørRevurderFra(
+        vedtaksperioder: List<Vedtaksperiode>,
+        vedtaksperioderForrigeBehandling: List<Vedtaksperiode>?,
+        revurderFra: LocalDate?,
+    ) {
+        if (revurderFra == null) return
+
+        val vedtaksperioderFørRevurderFra = vedtaksperioder.filter { it.fom < revurderFra }
+        val vedtaksperioderForrigeBehandlingFørRevurderFra =
+            vedtaksperioderForrigeBehandling?.filter { it.fom < revurderFra }
+        val vedtaksperioderMap = vedtaksperioderFørRevurderFra.associateBy { it.id }
+
+        if (vedtaksperioderForrigeBehandlingFørRevurderFra.isNullOrEmpty()) {
+            brukerfeilHvis(vedtaksperioder.any { it.fom < revurderFra }) {
+                "Det er ikke tillat å legge til nye perioder før revurder fra dato"
+            }
+        } else {
+            val vedtaksperioderForrigeBehandlingFørRevurderFraMedOppdatertTom =
+                vedtaksperioderForrigeBehandlingFørRevurderFra.map { vedtaksperiodeForrigeBehandling ->
+                    val tilhørendeNyVedtaksperiode = vedtaksperioderMap[vedtaksperiodeForrigeBehandling.id]
+
+                    if (tilhørendeNyVedtaksperiode != null &&
+                        tilhørendeNyVedtaksperiode.tom > vedtaksperiodeForrigeBehandling.tom
+                    ) {
+                        vedtaksperiodeForrigeBehandling.copy(tom = tilhørendeNyVedtaksperiode.tom)
+                    } else {
+                        vedtaksperiodeForrigeBehandling
+                    }
+                }
+            brukerfeilHvis(vedtaksperioderForrigeBehandlingFørRevurderFraMedOppdatertTom != vedtaksperioderFørRevurderFra) {
+                "Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato"
+            }
+        }
+    }
 }
