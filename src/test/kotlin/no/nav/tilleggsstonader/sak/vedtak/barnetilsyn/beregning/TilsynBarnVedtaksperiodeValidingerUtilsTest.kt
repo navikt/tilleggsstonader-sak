@@ -975,6 +975,45 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     }
                 assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
             }
+
+            @Test
+            fun `kaster feil ved fom og tom før revurder fra der tom flyttes fremover i tid, men fortsatt før revurder fra`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 3, 31))),
+                            vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
+                            revurderFra = førsteApril,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+            }
+
+            @Test
+            fun `kaster feil ved fom og tom før revurder fra der tom flyttes fremover i tid forbi revurder fra`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 5, 31))),
+                            vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
+                            revurderFra = førsteApril,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+            }
+
+            @Test
+            fun `kaster feil ved fom og tom før revurder fra der fom flyttes fremover i tid, men fortsatt før revurder fra`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(fom = LocalDate.of(2025, 1, 3))),
+                            vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
+                            revurderFra = førsteApril,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+            }
         }
 
         @Nested
