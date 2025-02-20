@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 data class Vedtaksperiode(
     val id: UUID,
