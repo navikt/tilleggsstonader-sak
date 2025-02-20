@@ -106,29 +106,23 @@ class OppfølgingService(
         val registerAktiviteter = hentAktiviteter(fagsak, fom, tom)
         val registerYtelser = hentYtelser(fagsak, fom, tom)
 
-        val alleAktiviteter = registerAktiviteter.mergeSammenhengende()
-        val tiltak = registerAktiviteter.filterNot(::tiltakErUtdanning).mergeSammenhengende()
-        val utdanningstiltak = registerAktiviteter.filter(::tiltakErUtdanning).mergeSammenhengende()
-
         return stønadsperioder
             .map { Vedtaksperiode(it) }
-            .map { it.finnEndringer(registerYtelser, alleAktiviteter, tiltak, utdanningstiltak) }
+            .map { it.finnEndringer(registerYtelser, registerAktiviteter) }
             .filter { it.trengerKontroll() }
     }
 
     private fun Vedtaksperiode.finnEndringer(
-        ytelser: Map<MålgruppeType, List<Ytelsesperiode>>,
-        alleAktiviteter: List<Datoperiode>,
-        tiltak: List<Datoperiode>,
-        utdanningstiltak: List<Datoperiode>,
+        registerYtelser: Map<MålgruppeType, List<Ytelsesperiode>>,
+        registerAktiviteter: RegisterAktiviteter,
     ): PeriodeForKontroll =
         PeriodeForKontroll(
             fom = this.fom,
             tom = this.tom,
             målgruppe = this.målgruppe,
             aktivitet = this.aktivitet,
-            endringAktivitet = finnEndringIAktivitet(tiltak, utdanningstiltak, alleAktiviteter),
-            endringMålgruppe = finnEndringIMålgruppe(ytelser),
+            endringAktivitet = finnEndringIAktivitet(registerAktiviteter),
+            endringMålgruppe = finnEndringIMålgruppe(registerYtelser),
         )
 
     private fun Vedtaksperiode.finnEndringIMålgruppe(ytelserPerMålgruppe: Map<MålgruppeType, List<Ytelsesperiode>>): List<Kontroll> =
@@ -156,21 +150,17 @@ class OppfølgingService(
             else -> emptyList() // Sjekker kun målgrupper som vi henter fra andre systemer
         }
 
-    private fun Vedtaksperiode.finnEndringIAktivitet(
-        tiltak: List<Datoperiode>,
-        utdanningstiltak: List<Datoperiode>,
-        alleAktiviteter: List<Datoperiode>,
-    ): List<Kontroll> {
+    private fun Vedtaksperiode.finnEndringIAktivitet(registerAktiviteter: RegisterAktiviteter): List<Kontroll> {
         val kontroller =
             when (this.aktivitet) {
                 AktivitetType.REELL_ARBEIDSSØKER -> mutableListOf() // Skal ikke kontrolleres
                 AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
-                AktivitetType.TILTAK -> finnKontroller(this, tiltak)
-                AktivitetType.UTDANNING -> finnKontroller(this, utdanningstiltak)
+                AktivitetType.TILTAK -> finnKontroller(this, registerAktiviteter.tiltak)
+                AktivitetType.UTDANNING -> finnKontroller(this, registerAktiviteter.utdanningstiltak)
             }
 
         val ingenTreff = kontroller.any { it.årsak == ÅrsakKontroll.INGEN_TREFF }
-        if (ingenTreff && alleAktiviteter.any { it.inneholder(this) }) {
+        if (ingenTreff && registerAktiviteter.alleAktiviteter.any { it.inneholder(this) }) {
             kontroller.add(Kontroll(ÅrsakKontroll.TREFF_MEN_FEIL_TYPE))
         }
         return kontroller
@@ -199,31 +189,16 @@ class OppfølgingService(
         }
     }
 
-    private fun List<AktivitetArenaDto>.mergeSammenhengende() =
-        this
-            .mapNotNull { mapTilPeriode(it) }
-            .sorted()
-            .mergeSammenhengende { a, b -> a.overlapper(b) || a.påfølgesAv(b) }
-
-    private fun mapTilPeriode(aktivitet: AktivitetArenaDto): Datoperiode? {
-        if (aktivitet.fom == null || aktivitet.tom == null) {
-            logger.warn("Aktivitet med id=${aktivitet.id} mangler fom eller tom dato: ${aktivitet.fom} - ${aktivitet.tom}")
-            return null
-        }
-        return Datoperiode(aktivitet.fom!!, aktivitet.tom!!)
-    }
-
-    private fun tiltakErUtdanning(it: AktivitetArenaDto) = it.erUtdanning ?: false
-
     private fun hentAktiviteter(
         fagsak: FagsakMetadata,
         fom: LocalDate,
         tom: LocalDate,
-    ) = registerAktivitetService.hentAktiviteterForGrunnlagsdata(
-        ident = fagsak.ident,
-        fom = fom,
-        tom = tom,
-    )
+    ) = registerAktivitetService
+        .hentAktiviteterForGrunnlagsdata(
+            ident = fagsak.ident,
+            fom = fom,
+            tom = tom,
+        ).let { RegisterAktiviteter(it) }
 
     private fun hentYtelser(
         fagsak: FagsakMetadata,
@@ -284,5 +259,39 @@ class OppfølgingService(
             fom: LocalDate,
             tom: LocalDate,
         ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
+    }
+}
+
+private class RegisterAktiviteter(
+    private val aktiviteter: List<AktivitetArenaDto>,
+) {
+    val alleAktiviteter: List<Datoperiode> by lazy {
+        aktiviteter.mergeSammenhengende()
+    }
+    val tiltak: List<Datoperiode> by lazy {
+        aktiviteter.filterNot(::tiltakErUtdanning).mergeSammenhengende()
+    }
+    val utdanningstiltak: List<Datoperiode> by lazy {
+        aktiviteter.filter(::tiltakErUtdanning).mergeSammenhengende()
+    }
+
+    private fun List<AktivitetArenaDto>.mergeSammenhengende() =
+        this
+            .mapNotNull { mapTilPeriode(it) }
+            .sorted()
+            .mergeSammenhengende { a, b -> a.overlapper(b) || a.påfølgesAv(b) }
+
+    private fun mapTilPeriode(aktivitet: AktivitetArenaDto): Datoperiode? {
+        if (aktivitet.fom == null || aktivitet.tom == null) {
+            logger.warn("Aktivitet med id=${aktivitet.id} mangler fom eller tom dato: ${aktivitet.fom} - ${aktivitet.tom}")
+            return null
+        }
+        return Datoperiode(aktivitet.fom!!, aktivitet.tom!!)
+    }
+
+    private fun tiltakErUtdanning(it: AktivitetArenaDto) = it.erUtdanning ?: false
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(RegisterAktiviteter::class.java)
     }
 }
