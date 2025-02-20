@@ -94,7 +94,7 @@ class OppfølgingService(
         if (perioderForKontroll.isNotEmpty()) {
             val data = OppfølgingData(perioderTilKontroll = perioderForKontroll)
             val sisteForFagsak = oppfølgingRepository.finnSisteForFagsak(behandlingId)
-            if (sisteForFagsak?.kontrollert == null || sisteForFagsak.data != data) {
+            if (sisteForFagsak?.kontrollert?.utfall != KontrollertUtfall.IGNORERES || sisteForFagsak.data != data) {
                 return oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
             } else {
                 logger.warn(

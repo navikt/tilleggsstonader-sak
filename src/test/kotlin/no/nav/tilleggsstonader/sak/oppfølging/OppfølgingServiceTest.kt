@@ -329,6 +329,9 @@ class OppfølgingServiceTest {
 
     @Nested
     inner class HarLagretOppfølgingFraFør {
+        val ignoreres =
+            Kontrollert(saksbehandler = "saksbehandler", utfall = KontrollertUtfall.IGNORERES, kommentar = "")
+
         @Test
         fun `skal lagre ny hvis det finnes en fra før men som ikke er kontrollert`() {
             val førsteOppfølging = oppfølgingService.opprettOppfølging(behandling.id)
@@ -346,6 +349,44 @@ class OppfølgingServiceTest {
             oppfølgingRepository.update(oppfølgingMedFjernedePerioder)
 
             assertThat(oppfølgingService.opprettOppfølging(behandling.id)).isNotNull
+        }
+
+        @Test
+        fun `skal lagre på nytt hvis forrige ble håndtert og dataen endret seg`() {
+            val førsteOppfølging = oppfølgingService.opprettOppfølging(behandling.id)
+            assertThat(førsteOppfølging).isNotNull
+            val oppfølgingMedFjernedePerioder =
+                førsteOppfølging!!.copy(
+                    kontrollert = ignoreres.copy(utfall = KontrollertUtfall.HÅNDTERT),
+                    data = førsteOppfølging.data.copy(perioderTilKontroll = emptyList()),
+                )
+            oppfølgingRepository.update(oppfølgingMedFjernedePerioder)
+
+            assertThat(oppfølgingService.opprettOppfølging(behandling.id)).isNotNull()
+        }
+
+        @Test
+        fun `skal lagre på nytt hvis forrige skal ignoreres og dataen endret seg`() {
+            val førsteOppfølging = oppfølgingService.opprettOppfølging(behandling.id)
+            assertThat(førsteOppfølging).isNotNull
+            val oppfølgingMedFjernedePerioder =
+                førsteOppfølging!!.copy(
+                    kontrollert = ignoreres,
+                    data = førsteOppfølging.data.copy(perioderTilKontroll = emptyList()),
+                )
+            oppfølgingRepository.update(oppfølgingMedFjernedePerioder)
+
+            assertThat(oppfølgingService.opprettOppfølging(behandling.id)).isNotNull()
+        }
+
+        @Test
+        fun `skal ikke lagre på nytt hvis forrige skal ignoreres og dataen ikke endret seg`() {
+            val førsteOppfølging = oppfølgingService.opprettOppfølging(behandling.id)
+            assertThat(førsteOppfølging).isNotNull
+            val oppfølgingMedFjernedePerioder = førsteOppfølging!!.copy(kontrollert = ignoreres)
+            oppfølgingRepository.update(oppfølgingMedFjernedePerioder)
+
+            assertThat(oppfølgingService.opprettOppfølging(behandling.id)).isNull()
         }
     }
 

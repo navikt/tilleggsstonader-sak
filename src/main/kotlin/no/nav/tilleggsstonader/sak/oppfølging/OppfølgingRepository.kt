@@ -105,8 +105,9 @@ data class Kontrollert(
 )
 
 enum class KontrollertUtfall {
-    OK,
-    IKKE_OK,
+    HÅNDTERT,
+    IGNORERES,
+    UTSETTES,
 }
 
 data class PeriodeForKontroll(
