@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
+import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -288,14 +289,20 @@ class OppfølgingService(
         fagsak: FagsakMetadata,
         fom: LocalDate,
         tom: LocalDate,
-    ): Map<MålgruppeType, List<Ytelsesperiode>> =
-        ytelseService
-            .hentYtelseForGrunnlag(
-                stønadstype = fagsak.stønadstype,
-                ident = fagsak.ident,
-                fom = fom,
-                tom = tom,
-            ).perioder
+    ): Map<MålgruppeType, List<Ytelsesperiode>> {
+        val ytelseForGrunnlag =
+            ytelseService
+                .hentYtelseForGrunnlag(
+                    stønadstype = fagsak.stønadstype,
+                    ident = fagsak.ident,
+                    fom = fom,
+                    tom = tom,
+                )
+        val hentetInformasjon = ytelseForGrunnlag.hentetInformasjon.filter { it.status != StatusHentetInformasjon.OK }
+        if (hentetInformasjon.isNotEmpty()) {
+            error("Feilet henting av ytelser=${hentetInformasjon.map { it.type }}")
+        }
+        return ytelseForGrunnlag.perioder
             .filter { it.aapErFerdigAvklart != true }
             .filter { it.tom != null }
             .map { Ytelsesperiode(fom = it.fom, tom = it.tom!!, målgruppe = it.type.tilMålgruppe()) }
@@ -308,6 +315,7 @@ class OppfølgingService(
                         { y1, y2 -> y1.copy(fom = minOf(y1.fom, y2.fom), tom = maxOf(y2.tom, y2.tom)) },
                     )
             }
+    }
 
     private fun TypeYtelsePeriode.tilMålgruppe() =
         when (this) {
