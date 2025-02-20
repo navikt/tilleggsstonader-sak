@@ -31,6 +31,18 @@ interface OppfølgingRepository :
 
     @Query(
         """
+        SELECT o.* 
+        FROM oppfolging o
+        WHERE o.behandling_id 
+            IN (SELECT id FROM behandling WHERE fagsak_id = (SELECT fagsak_id FROM behandling where id = :behandlingId))
+        ORDER BY o.opprettet_tidspunkt DESC
+        LIMIT 1
+    """,
+    )
+    fun finnSisteForFagsak(behandlingId: BehandlingId): Oppfølging?
+
+    @Query(
+        """
         SELECT 
         o.*,
         fe.id AS saksnummer,
@@ -105,7 +117,7 @@ data class PeriodeForKontroll(
     val endringAktivitet: List<Kontroll>,
     val endringMålgruppe: List<Kontroll>,
 ) {
-    fun trengerKontroll(): Boolean = (endringAktivitet + endringMålgruppe).any { it.årsak.trengerKontroll }
+    fun trengerKontroll(): Boolean = endringAktivitet.isNotEmpty() || endringMålgruppe.isNotEmpty()
 }
 
 data class Kontroll(
@@ -114,16 +126,12 @@ data class Kontroll(
     val tom: LocalDate? = null,
 )
 
-enum class ÅrsakKontroll(
-    val trengerKontroll: Boolean = true,
-) {
-    SKAL_IKKE_KONTROLLERES(trengerKontroll = false),
-    INGEN_ENDRING(trengerKontroll = false),
-
+enum class ÅrsakKontroll {
     INGEN_TREFF,
     FOM_ENDRET,
     TOM_ENDRET,
     TREFF_MEN_FEIL_TYPE,
+    FINNER_IKKE_REGISTERAKTIVITET,
 }
 
 /**

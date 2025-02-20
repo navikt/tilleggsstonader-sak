@@ -162,6 +162,7 @@ object VilkårperiodeTestUtil {
         resultat: ResultatVilkårperiode = faktaOgVurdering.utledResultat(),
         slettetKommentar: String? = null,
         status: Vilkårstatus = Vilkårstatus.NY,
+        kildeId: String? = null,
     ) = GeneriskVilkårperiode(
         behandlingId = behandlingId,
         resultat = resultat,
@@ -172,6 +173,7 @@ object VilkårperiodeTestUtil {
         type = faktaOgVurdering.type.vilkårperiodeType,
         begrunnelse = begrunnelse,
         faktaOgVurdering = faktaOgVurdering,
+        kildeId = kildeId,
     )
 
     fun faktaOgVurderingAktivitetTilsynBarn(

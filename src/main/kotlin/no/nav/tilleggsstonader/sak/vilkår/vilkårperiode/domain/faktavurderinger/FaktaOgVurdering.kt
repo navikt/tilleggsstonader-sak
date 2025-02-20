@@ -21,9 +21,13 @@ sealed interface FaktaOgVurdering : FaktaOgVurderingJson {
     }
 }
 
-sealed interface MålgruppeFaktaOgVurdering : FaktaOgVurdering
+sealed interface MålgruppeFaktaOgVurdering : FaktaOgVurdering {
+    override val type: TypeMålgruppeOgVurdering
+}
 
-sealed interface AktivitetFaktaOgVurdering : FaktaOgVurdering
+sealed interface AktivitetFaktaOgVurdering : FaktaOgVurdering {
+    override val type: TypeAktivitetOgVurdering
+}
 
 /**
  * Typer, som implementers av enums for å få unike typer på hvert objekt

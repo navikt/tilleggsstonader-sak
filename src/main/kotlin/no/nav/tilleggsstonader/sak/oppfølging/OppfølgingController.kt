@@ -24,6 +24,7 @@ class OppfølgingController(
     private val tilgangService: TilgangService,
     private val oppfølgingService: OppfølgingService,
     private val unleashService: UnleashService,
+    private val oppfølgingRepository: OppfølgingRepository,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -62,5 +63,11 @@ class OppfølgingController(
                 secureLogger.error("Feilet start av oppfølgingjobb", e)
             }
         }
+    }
+
+    @PostMapping("reset-state")
+    fun fjernAlle() {
+        tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
+        oppfølgingRepository.deleteAll()
     }
 }

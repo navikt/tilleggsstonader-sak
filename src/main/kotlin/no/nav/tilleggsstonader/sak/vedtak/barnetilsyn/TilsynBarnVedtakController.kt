@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnReque
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -32,6 +33,7 @@ class TilsynBarnVedtakController(
     private val tilgangService: TilgangService,
     private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
+    private val vedtaksperiodeService: VedtaksperiodeService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -120,5 +122,15 @@ class TilsynBarnVedtakController(
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
         return VedtakDtoMapper.toDto(vedtak, null)
+    }
+
+    @GetMapping("{behandlingId}/foresla")
+    fun foreslåVedtaksperioder(
+        @PathVariable behandlingId: BehandlingId,
+    ): List<VedtaksperiodeDto> {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        return vedtaksperiodeService.foreslåPerioder(behandlingId).map { it.tilDto() }
     }
 }

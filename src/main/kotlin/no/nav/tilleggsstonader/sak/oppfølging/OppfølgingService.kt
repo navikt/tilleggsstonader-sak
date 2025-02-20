@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
+import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -23,17 +24,28 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaProsent
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.YearMonth
+import java.util.UUID
 
 @Service
 class OppfølgingService(
     private val behandlingRepository: BehandlingRepository,
     private val stønadsperiodeService: StønadsperiodeService,
+    private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val registerAktivitetService: RegisterAktivitetService,
     private val ytelseService: YtelseService,
     private val fagsakService: FagsakService,
@@ -74,14 +86,24 @@ class OppfølgingService(
             .finnAktiveMedDetaljer()
             .sortedBy { it.behandlingsdetaljer.vedtakstidspunkt }
 
-    fun opprettOppfølging(behandlingId: BehandlingId) {
+    fun opprettOppfølging(behandlingId: BehandlingId): Oppfølging? {
         val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
         val fagsakMetadata = fagsakService.hentMetadata(listOf(behandling.fagsakId)).values.single()
+
         val perioderForKontroll = hentPerioderForKontroll(behandling, fagsakMetadata)
         if (perioderForKontroll.isNotEmpty()) {
             val data = OppfølgingData(perioderTilKontroll = perioderForKontroll)
-            oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+            val sisteForFagsak = oppfølgingRepository.finnSisteForFagsak(behandlingId)
+            if (sisteForFagsak?.kontrollert == null || sisteForFagsak.data != data) {
+                return oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+            } else {
+                logger.warn(
+                    "Ingen endring for behandling=$behandlingId siden oppfølging=${sisteForFagsak.id} " +
+                        "ble kontrollert forrige gang, oppretter ikke ny oppfølging",
+                )
+            }
         }
+        return null
     }
 
     private fun hentPerioderForKontroll(
@@ -94,117 +116,193 @@ class OppfølgingService(
         val tom = stønadsperioder.maxOf { it.tom }
         val registerAktiviteter = hentAktiviteter(fagsak, fom, tom)
         val registerYtelser = hentYtelser(fagsak, fom, tom)
-
-        val alleAktiviteter = registerAktiviteter.mergeSammenhengende()
-        val tiltak = registerAktiviteter.filterNot(::tiltakErUtdanning).mergeSammenhengende()
-        val utdanningstiltak = registerAktiviteter.filter(::tiltakErUtdanning).mergeSammenhengende()
+        val aktiviteter = hentInngangsvilkårAktiviteter(behandling, registerAktiviteter)
 
         return stønadsperioder
             .map { Vedtaksperiode(it) }
-            .map { it.finnEndringer(registerYtelser, alleAktiviteter, tiltak, utdanningstiltak) }
+            .map { it.finnEndringer(registerYtelser, registerAktiviteter, aktiviteter) }
             .filter { it.trengerKontroll() }
     }
 
     private fun Vedtaksperiode.finnEndringer(
-        ytelser: Map<MålgruppeType, List<Ytelsesperiode>>,
-        alleAktiviteter: List<Datoperiode>,
-        tiltak: List<Datoperiode>,
-        utdanningstiltak: List<Datoperiode>,
+        registerYtelser: Map<MålgruppeType, List<Ytelsesperiode>>,
+        registerAktiviteter: RegisterAktiviteter,
+        aktiviteter: List<InngangsvilkårAktivitet>,
     ): PeriodeForKontroll =
         PeriodeForKontroll(
             fom = this.fom,
             tom = this.tom,
             målgruppe = this.målgruppe,
             aktivitet = this.aktivitet,
-            endringAktivitet = finnEndringIAktivitet(tiltak, utdanningstiltak, alleAktiviteter),
-            endringMålgruppe = finnEndringIMålgruppe(ytelser),
+            endringAktivitet = finnEndringIAktivitet(registerAktiviteter, aktiviteter),
+            endringMålgruppe = finnEndringIMålgruppe(registerYtelser),
         )
 
-    private fun Vedtaksperiode.finnEndringIMålgruppe(ytelserPerMålgruppe: Map<MålgruppeType, List<Ytelsesperiode>>): List<Kontroll> {
-        val ytelser = ytelserPerMålgruppe[this.målgruppe] ?: emptyList()
-        return finnKontroller(this, ytelser)
-    }
+    private fun Vedtaksperiode.finnEndringIMålgruppe(ytelserPerMålgruppe: Map<MålgruppeType, List<Ytelsesperiode>>): List<Kontroll> =
+        when (this.målgruppe) {
+            MålgruppeType.AAP,
+            MålgruppeType.OMSTILLINGSSTØNAD,
+            MålgruppeType.OVERGANGSSTØNAD,
+            -> {
+                val ytelser = ytelserPerMålgruppe[this.målgruppe] ?: emptyList()
+                val kontroller = finnKontroller(this, ytelser)
+                val enKontroll = kontroller.singleOrNull()
+                val sisteDagNesteMåned = YearMonth.now().plusMonths(1).atEndOfMonth()
+                if (
+                    målgruppe == MålgruppeType.AAP &&
+                    enKontroll?.årsak == ÅrsakKontroll.TOM_ENDRET &&
+                    enKontroll.tom!! > sisteDagNesteMåned
+                ) {
+                    // AAP slutter før vedtaksperiode
+                    emptyList()
+                } else {
+                    kontroller
+                }
+            }
+
+            else -> emptyList() // Sjekker kun målgrupper som vi henter fra andre systemer
+        }
 
     private fun Vedtaksperiode.finnEndringIAktivitet(
-        tiltak: List<Datoperiode>,
-        utdanningstiltak: List<Datoperiode>,
-        alleAktiviteter: List<Datoperiode>,
+        registerAktiviteter: RegisterAktiviteter,
+        aktiviteter: List<InngangsvilkårAktivitet>,
     ): List<Kontroll> {
         val kontroller =
             when (this.aktivitet) {
-                AktivitetType.REELL_ARBEIDSSØKER -> mutableListOf(Kontroll(ÅrsakKontroll.SKAL_IKKE_KONTROLLERES))
+                AktivitetType.REELL_ARBEIDSSØKER -> mutableListOf() // Skal ikke kontrolleres
                 AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
-                AktivitetType.TILTAK -> finnKontroller(this, tiltak)
-                AktivitetType.UTDANNING -> finnKontroller(this, utdanningstiltak)
+                AktivitetType.TILTAK ->
+                    finnEndringIRegisteraktivitetEllerAlle(this, aktiviteter, registerAktiviteter.tiltak)
+
+                AktivitetType.UTDANNING ->
+                    finnEndringIRegisteraktivitetEllerAlle(this, aktiviteter, registerAktiviteter.utdanningstiltak)
             }
 
-        if (kontroller.any { it.årsak.trengerKontroll } && alleAktiviteter.any { it.inneholder(this) }) {
-            kontroller.add(Kontroll(ÅrsakKontroll.TREFF_MEN_FEIL_TYPE))
+        val ingenTreff = kontroller.any { it.årsak == ÅrsakKontroll.INGEN_TREFF }
+        if (ingenTreff && registerAktiviteter.alleAktiviteter.any { it.inneholder(this) }) {
+            return kontroller + Kontroll(ÅrsakKontroll.TREFF_MEN_FEIL_TYPE)
         }
         return kontroller
+    }
+
+    /**
+     * Kontrollerer om det er endringer i registeraktivitet
+     * * Kontrollerer om en registeraktivitet inneholder hele vedtaksperioden
+     * * Kontrollerer om
+     */
+    private fun finnEndringIRegisteraktivitetEllerAlle(
+        vedtaksperiode: Vedtaksperiode,
+        aktiviteter: List<InngangsvilkårAktivitet>,
+        registerperioder: List<Periode<LocalDate>>,
+    ): List<Kontroll> {
+        val kontroller = mutableListOf<Kontroll>()
+
+        aktiviteter.forEach { aktivitet ->
+            val register = aktivitet.datoperiodeAktivitet
+            if (register != null && register.inneholder(vedtaksperiode)) {
+                // Har overlapp mellom register-data og vedtaksperiode
+                // returnerer tom liste for finnKontrollerAktivitet
+                return mutableListOf()
+            }
+            kontroller.addAll(kontrollerEndringerMotRegisterAktivitet(vedtaksperiode, aktivitet, register))
+        }
+        val kontrollMotAlleRegisterperioder = finnKontroller(vedtaksperiode, registerperioder)
+        kontroller.addAll(kontrollMotAlleRegisterperioder)
+        return kontroller.distinct()
+    }
+
+    /**
+     * Kontrollerer om endring i registeraktivitet påvirker snittet av en [Vedtaksperiode] og [InngangsvilkårAktivitet]
+     * En registeraktivitet kan ha endret seg, men det er ikke sikkert endringen påvirker vedtaksperioden
+     * Hvis man har flere aktiviteter som løper parallellt og en av de
+     *
+     * @param registerperiode er trukket ut fra [aktivitet] men er not null
+     */
+    private fun kontrollerEndringerMotRegisterAktivitet(
+        vedtaksperiode: Vedtaksperiode,
+        aktivitet: InngangsvilkårAktivitet,
+        registerperiode: Datoperiode?,
+    ): List<Kontroll> {
+        val snitt = vedtaksperiode.beregnSnitt(aktivitet)
+        if (registerperiode != null && snitt != null) {
+            // Kontrollerer om registeraktiviteten endret seg mott snittet av vedtaksperioden og aktiviteten
+            return finnEndringFomTom(snitt, registerperiode)
+        }
+        val finnerSnittMenManglerRegisteraktivitet =
+            registerperiode == null && snitt != null && aktivitet.kildeId != null
+        if (finnerSnittMenManglerRegisteraktivitet) {
+            return listOf(Kontroll(ÅrsakKontroll.FINNER_IKKE_REGISTERAKTIVITET))
+        }
+        return emptyList()
     }
 
     private fun finnKontroller(
         vedtaksperiode: Vedtaksperiode,
         registerperioder: List<Periode<LocalDate>>,
-    ): MutableList<Kontroll> {
-        // har 1 eller inget snitt
+    ): List<Kontroll> {
         val snitt = registerperioder.mapNotNull { vedtaksperiode.beregnSnitt(it) }.singleOrNull()
 
         if (snitt == null) {
-            return mutableListOf(Kontroll(ÅrsakKontroll.INGEN_TREFF))
+            return listOf(Kontroll(ÅrsakKontroll.INGEN_TREFF))
         }
         if (snitt.fom == vedtaksperiode.fom && snitt.tom == vedtaksperiode.tom) {
-            return mutableListOf(Kontroll(ÅrsakKontroll.INGEN_ENDRING))
+            return emptyList() // Snitt er lik vedtaksperiode -> skal ikke kontrolleres
         }
-        return mutableListOf<Kontroll>().apply {
-            if (snitt.fom > vedtaksperiode.fom) {
-                add(Kontroll(ÅrsakKontroll.FOM_ENDRET, fom = snitt.fom))
-            }
-            if (snitt.tom < vedtaksperiode.tom) {
-                add(Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = snitt.tom))
-            }
-        }
+        return finnEndringFomTom(vedtaksperiode, snitt)
     }
 
-    private fun List<AktivitetArenaDto>.mergeSammenhengende() =
-        this
-            .mapNotNull { mapTilPeriode(it) }
+    private fun finnEndringFomTom(
+        vedtaksperiode: Vedtaksperiode,
+        register: Periode<LocalDate>,
+    ): MutableList<Kontroll> =
+        mutableListOf<Kontroll>().apply {
+            if (register.fom > vedtaksperiode.fom) {
+                add(Kontroll(ÅrsakKontroll.FOM_ENDRET, fom = register.fom))
+            }
+            if (register.tom < vedtaksperiode.tom) {
+                add(Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = register.tom))
+            }
+        }
+
+    private fun hentInngangsvilkårAktiviteter(
+        behandling: Behandling,
+        registerAktiviteter: RegisterAktiviteter,
+    ): List<InngangsvilkårAktivitet> =
+        vilkårperiodeRepository
+            .findByBehandlingIdAndResultat(behandling.id, ResultatVilkårperiode.OPPFYLT)
+            .ofType<AktivitetFaktaOgVurdering>()
+            .map { vilkår -> InngangsvilkårAktivitet(vilkår, registerAktiviteter.forId(vilkår.kildeId)) }
             .sorted()
-            .mergeSammenhengende { a, b -> a.overlapper(b) || a.påfølgesAv(b) }
-
-    private fun mapTilPeriode(aktivitet: AktivitetArenaDto): Datoperiode? {
-        if (aktivitet.fom == null || aktivitet.tom == null) {
-            logger.warn("Aktivitet med id=${aktivitet.id} mangler fom eller tom dato: ${aktivitet.fom} - ${aktivitet.tom}")
-            return null
-        }
-        return Datoperiode(aktivitet.fom!!, aktivitet.tom!!)
-    }
-
-    private fun tiltakErUtdanning(it: AktivitetArenaDto) = it.erUtdanning ?: false
 
     private fun hentAktiviteter(
         fagsak: FagsakMetadata,
         fom: LocalDate,
         tom: LocalDate,
-    ) = registerAktivitetService.hentAktiviteterForGrunnlagsdata(
-        ident = fagsak.ident,
-        fom = fom,
-        tom = tom,
-    )
+    ) = registerAktivitetService
+        .hentAktiviteterForGrunnlagsdata(
+            ident = fagsak.ident,
+            fom = fom,
+            tom = tom,
+        ).let { RegisterAktiviteter(it) }
 
     private fun hentYtelser(
         fagsak: FagsakMetadata,
         fom: LocalDate,
         tom: LocalDate,
-    ): Map<MålgruppeType, List<Ytelsesperiode>> =
-        ytelseService
-            .hentYtelseForGrunnlag(
-                stønadstype = fagsak.stønadstype,
-                ident = fagsak.ident,
-                fom = fom,
-                tom = tom,
-            ).perioder
+    ): Map<MålgruppeType, List<Ytelsesperiode>> {
+        val ytelseForGrunnlag =
+            ytelseService
+                .hentYtelseForGrunnlag(
+                    stønadstype = fagsak.stønadstype,
+                    ident = fagsak.ident,
+                    fom = fom,
+                    tom = tom,
+                )
+        val hentetInformasjon = ytelseForGrunnlag.hentetInformasjon.filter { it.status != StatusHentetInformasjon.OK }
+        if (hentetInformasjon.isNotEmpty()) {
+            error("Feilet henting av ytelser=${hentetInformasjon.map { it.type }}")
+        }
+        return ytelseForGrunnlag.perioder
             .filter { it.aapErFerdigAvklart != true }
             .filter { it.tom != null }
             .map { Ytelsesperiode(fom = it.fom, tom = it.tom!!, målgruppe = it.type.tilMålgruppe()) }
@@ -217,6 +315,7 @@ class OppfølgingService(
                         { y1, y2 -> y1.copy(fom = minOf(y1.fom, y2.fom), tom = maxOf(y2.tom, y2.tom)) },
                     )
             }
+    }
 
     private fun TypeYtelsePeriode.tilMålgruppe() =
         when (this) {
@@ -252,5 +351,113 @@ class OppfølgingService(
             fom: LocalDate,
             tom: LocalDate,
         ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
+    }
+}
+
+private data class InngangsvilkårAktivitet(
+    val id: UUID,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val aktivitet: AktivitetType,
+    val prosent: Int?,
+    val antallDager: Int?,
+    val kildeId: String?,
+    val registerAktivitet: AktivitetArenaDto?,
+) : Periode<LocalDate> {
+    init {
+        fun <T> diff(
+            type: String,
+            vilkårVerdi: T,
+            registerVerdi: T,
+        ): String? =
+            if (vilkårVerdi != registerVerdi) {
+                "$type=$vilkårVerdi ${type}Register=$registerVerdi"
+            } else {
+                null
+            }
+        if (registerAktivitet != null) {
+            val fomDiff = diff("fom", fom, registerAktivitet.fom)
+            val tomDiff = diff("tom", tom, registerAktivitet.tom)
+            val prosentDiff = diff("prosent", prosent, registerAktivitet.prosentDeltakelse?.toInt())
+            val antallDagerDiff = diff("dager", antallDager, registerAktivitet.antallDagerPerUke)
+            val diff = listOfNotNull(fomDiff, tomDiff, prosentDiff, antallDagerDiff)
+            if (diff.isNotEmpty()) {
+                logger.info("Diff vilkår vs register ${diff.joinToString(" ")}")
+            }
+        }
+    }
+
+    val datoperiodeAktivitet: Datoperiode? by lazy {
+        val fom = registerAktivitet?.fom
+        val tom = registerAktivitet?.tom
+        if (fom != null && tom != null) {
+            Datoperiode(fom = fom, tom = tom)
+        } else {
+            null
+        }
+    }
+
+    constructor(
+        vilkårperiode: GeneriskVilkårperiode<AktivitetFaktaOgVurdering>,
+        registerAktivitet: AktivitetArenaDto?,
+    ) : this(
+        id = vilkårperiode.id,
+        fom = vilkårperiode.fom,
+        tom = vilkårperiode.tom,
+        aktivitet = vilkårperiode.faktaOgVurdering.type.vilkårperiodeType,
+        prosent =
+            vilkårperiode.faktaOgVurdering.fakta
+                .takeIfFakta<FaktaProsent>()
+                ?.prosent,
+        antallDager =
+            vilkårperiode.faktaOgVurdering.fakta
+                .takeIfFakta<FaktaAktivitetsdager>()
+                ?.aktivitetsdager,
+        kildeId = vilkårperiode.kildeId,
+        registerAktivitet = registerAktivitet,
+    )
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(InngangsvilkårAktivitet::class.java)
+    }
+}
+
+private class RegisterAktiviteter(
+    private val aktiviteter: List<AktivitetArenaDto>,
+) {
+    private val aktivitetPåId: Map<String, AktivitetArenaDto> by lazy {
+        aktiviteter.associateBy { it.id }
+    }
+
+    val alleAktiviteter: List<Datoperiode> by lazy {
+        aktiviteter.mergeSammenhengende()
+    }
+    val tiltak: List<Datoperiode> by lazy {
+        aktiviteter.filterNot(::tiltakErUtdanning).mergeSammenhengende()
+    }
+    val utdanningstiltak: List<Datoperiode> by lazy {
+        aktiviteter.filter(::tiltakErUtdanning).mergeSammenhengende()
+    }
+
+    fun forId(id: String?) = id?.let { aktivitetPåId[it] }
+
+    private fun List<AktivitetArenaDto>.mergeSammenhengende() =
+        this
+            .mapNotNull { mapTilPeriode(it) }
+            .sorted()
+            .mergeSammenhengende { a, b -> a.overlapper(b) || a.påfølgesAv(b) }
+
+    private fun mapTilPeriode(aktivitet: AktivitetArenaDto): Datoperiode? {
+        if (aktivitet.fom == null || aktivitet.tom == null) {
+            logger.warn("Aktivitet med id=${aktivitet.id} mangler fom eller tom dato: ${aktivitet.fom} - ${aktivitet.tom}")
+            return null
+        }
+        return Datoperiode(aktivitet.fom!!, aktivitet.tom!!)
+    }
+
+    private fun tiltakErUtdanning(it: AktivitetArenaDto) = it.erUtdanning ?: false
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(RegisterAktiviteter::class.java)
     }
 }
