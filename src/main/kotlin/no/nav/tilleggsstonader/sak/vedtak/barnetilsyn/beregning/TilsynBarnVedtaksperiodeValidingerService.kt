@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtaksperiodeValideringUtils.validerIngenOverlappMellomVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtaksperiodeValideringUtils.validerUtgiftHeleVedtaksperioden
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtaksperiodeValideringUtils.validerVedtaksperioderEksisterer
+import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
@@ -64,10 +65,11 @@ class TilsynBarnVedtaksperiodeValidingerService(
 
     private fun hentForrigeVedtaksperioder(behandling: Saksbehandling): List<Vedtaksperiode>? =
         behandling.forrigeBehandlingId?.let {
-            when (val forrgigeBehandling = vedtakService.hentVedtak(it)?.data) {
-                is InnvilgelseTilsynBarn -> forrgigeBehandling.vedtaksperioder
-                is OpphørTilsynBarn -> forrgigeBehandling.vedtaksperioder
-                else -> null
+            when (val forrigeVedtak = vedtakService.hentVedtak(it)?.data) {
+                is InnvilgelseTilsynBarn -> forrigeVedtak.vedtaksperioder
+                is OpphørTilsynBarn -> forrigeVedtak.vedtaksperioder
+                is Avslag -> null
+                else -> error("Håndterer ikke ${forrigeVedtak?.javaClass?.simpleName}")
             }
         }
 }
