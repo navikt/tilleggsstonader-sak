@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -43,7 +43,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
     var aktiviteter: List<VilkårperiodeAktivitet> = emptyList()
     var målgrupper: List<VilkårperiodeMålgruppe> = emptyList()
     var vilkår: List<Vilkår> = emptyList()
-    var resultat: List<VedtaksperiodeBeregning> = emptyList()
+    var resultat: List<Vedtaksperiode> = emptyList()
     var feil: ApiFeil? = null
 
     @Gitt("følgende vilkårsperioder med aktiviteter for vedtaksforslag")
@@ -128,7 +128,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
 
     private fun mapVedtaksperioder(dataTable: DataTable) =
         dataTable.mapRad { rad ->
-            VedtaksperiodeBeregning(
+            Vedtaksperiode(
                 id = UUID.randomUUID(),
                 fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
                 tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),

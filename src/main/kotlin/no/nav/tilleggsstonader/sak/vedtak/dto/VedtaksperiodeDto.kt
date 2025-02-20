@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -22,7 +23,7 @@ data class VedtaksperiodeDto(
     ): VedtaksperiodeDto = this.copy(fom = fom, tom = tom)
 
     fun tilDomene() =
-        VedtaksperiodeBeregning(
+        Vedtaksperiode(
             id = id,
             fom = fom,
             tom = tom,
@@ -31,6 +32,6 @@ data class VedtaksperiodeDto(
         )
 }
 
-fun List<VedtaksperiodeDto>.tilDto() = map { it.tilDomene() }
+fun List<VedtaksperiodeDto>.tilDomene() = map { it.tilDomene() }
 
 fun List<VedtaksperiodeDto>.tilVedtaksperiodeBeregning() = map { VedtaksperiodeBeregning(it) }
