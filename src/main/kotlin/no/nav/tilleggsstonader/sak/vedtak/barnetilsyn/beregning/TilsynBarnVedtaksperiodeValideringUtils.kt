@@ -152,12 +152,10 @@ object TilsynBarnVedtaksperiodeValideringUtils {
         } else {
             val vedtaksperioderForrigeBehandlingFørRevurderFraMedOppdatertTom =
                 vedtaksperioderForrigeBehandlingFørRevurderFra.map { vedtaksperiodeForrigeBehandling ->
-                    val tilhørendeNyVedtaksperiode = vedtaksperioderMap[vedtaksperiodeForrigeBehandling.id]
+                    val nyVedtaksperiode = vedtaksperioderMap[vedtaksperiodeForrigeBehandling.id]
 
-                    if (tilhørendeNyVedtaksperiode != null &&
-                        tilhørendeNyVedtaksperiode.tom > vedtaksperiodeForrigeBehandling.tom
-                    ) {
-                        vedtaksperiodeForrigeBehandling.copy(tom = tilhørendeNyVedtaksperiode.tom)
+                    if (nyVedtaksperiode != null && nyVedtaksperiode.tom > vedtaksperiodeForrigeBehandling.tom) {
+                        vedtaksperiodeForrigeBehandling.copy(tom = nyVedtaksperiode.tom)
                     } else {
                         vedtaksperiodeForrigeBehandling
                     }
