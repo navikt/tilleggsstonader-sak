@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.ForeslåStønadsperiode.finnStønadsperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
@@ -19,7 +19,7 @@ object ForeslåVedtaksperiode {
     fun finnVedtaksperiode(
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
-    ): List<Vedtaksperiode> {
+    ): List<VedtaksperiodeBeregning> {
         val stønadsperiode = finnStønadsperioder(vilkårperioder).single()
         val oppfylteVilkår = vilkår.finnOppfylte()
 
@@ -54,9 +54,9 @@ object ForeslåVedtaksperiode {
     private fun finnOverlapp(
         stønadsperiode: StønadsperiodeDto,
         vilkår: Periode<LocalDate>,
-    ): Vedtaksperiode =
+    ): VedtaksperiodeBeregning =
         if (stønadsperiode.overlapper(vilkår)) {
-            Vedtaksperiode(
+            VedtaksperiodeBeregning(
                 id = UUID.randomUUID(),
                 fom = maxOf(stønadsperiode.fom, vilkår.fom),
                 tom = minOf(stønadsperiode.tom, vilkår.tom),

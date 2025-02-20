@@ -3,8 +3,8 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.tilVedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -21,7 +21,7 @@ class VedtaksperiodeTest {
 
     val vedtaksperiode =
         listOf(
-            Vedtaksperiode(
+            VedtaksperiodeBeregning(
                 id = uuid,
                 fom = fom,
                 tom = tom,
@@ -43,7 +43,7 @@ class VedtaksperiodeTest {
                 ),
             )
 
-        assertThat(vedtaksperiodeDto.tilVedtaksperiode()).isEqualTo(vedtaksperiode)
+        assertThat(vedtaksperiodeDto.tilVedtaksperiodeBeregning()).isEqualTo(vedtaksperiode)
     }
 
     @Test
@@ -58,7 +58,7 @@ class VedtaksperiodeTest {
                     aktivitet = aktivitet,
                 ),
             )
-        assertThat(stønadsperiodeBeregningsgrunnlag.tilVedtaksperiode().map { it.copy(id = uuid) }).isEqualTo(
+        assertThat(stønadsperiodeBeregningsgrunnlag.tilVedtaksperiodeBeregning().map { it.copy(id = uuid) }).isEqualTo(
             vedtaksperiode,
         )
     }

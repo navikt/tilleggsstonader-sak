@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregni
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -86,7 +86,7 @@ class BehandlingsoversiktServiceTest {
     private fun mockVedtakRepository() {
         val stønadsperiodeGrunnlag =
             StønadsperiodeGrunnlag(
-                Vedtaksperiode(
+                VedtaksperiodeBeregning(
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2024, 3, 1),
                     tom = LocalDate.of(2024, 3, 13),
@@ -98,7 +98,7 @@ class BehandlingsoversiktServiceTest {
             )
         val stønadsperiodeGrunnlag2 =
             StønadsperiodeGrunnlag(
-                Vedtaksperiode(
+                VedtaksperiodeBeregning(
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2024, 3, 2),
                     tom = LocalDate.of(2024, 3, 14),

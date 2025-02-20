@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Navn
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -311,7 +311,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
     @Nested
     inner class ValiderIngenOverlapp {
         val vedtaksperiodeJan =
-            Vedtaksperiode(
+            VedtaksperiodeBeregning(
                 id = UUID.randomUUID(),
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 1, 31),
@@ -319,7 +319,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 aktivitet = AktivitetType.TILTAK,
             )
         val vedtaksperiodeFeb =
-            Vedtaksperiode(
+            VedtaksperiodeBeregning(
                 id = UUID.randomUUID(),
                 fom = LocalDate.of(2025, 2, 1),
                 tom = LocalDate.of(2025, 2, 28),
@@ -327,7 +327,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 aktivitet = AktivitetType.TILTAK,
             )
         val vedtaksperiodeJanFeb =
-            Vedtaksperiode(
+            VedtaksperiodeBeregning(
                 id = UUID.randomUUID(),
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 2, 28),
@@ -826,7 +826,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
         tom: LocalDate = LocalDate.of(2025, 1, 31),
         målgruppe: MålgruppeType = MålgruppeType.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
-    ) = Vedtaksperiode(
+    ) = VedtaksperiodeBeregning(
         id = UUID.randomUUID(),
         fom = fom,
         tom = tom,

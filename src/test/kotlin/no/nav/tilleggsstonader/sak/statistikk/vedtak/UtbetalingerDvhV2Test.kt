@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvhV2
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultVedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.stønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
@@ -19,7 +19,7 @@ class UtbetalingerDvhV2Test {
         val innvilgelse =
             innvilgelseTilsynBarn(
                 InnvilgelseTilsynBarn(
-                    vedtaksperioder = listOf(defaultVedtaksperiode),
+                    vedtaksperioder = listOf(defaultVedtaksperiodeBeregning),
                     beregningsresultat =
                         BeregningsresultatTilsynBarn(
                             perioder =

@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregni
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn1
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.stønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper.VedtaksperiodeTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -14,7 +14,7 @@ import java.util.UUID
 
 class VedtaksperiodeTilsynBarnMapperTest {
     val periode1 =
-        Vedtaksperiode(
+        VedtaksperiodeBeregning(
             id = UUID.randomUUID(),
             fom = LocalDate.of(2024, 1, 1),
             tom = LocalDate.of(2024, 1, 1),
@@ -23,7 +23,7 @@ class VedtaksperiodeTilsynBarnMapperTest {
         )
 
     val periode2 =
-        Vedtaksperiode(
+        VedtaksperiodeBeregning(
             id = UUID.randomUUID(),
             fom = LocalDate.of(2024, 1, 2),
             tom = LocalDate.of(2024, 1, 2),
@@ -119,7 +119,7 @@ class VedtaksperiodeTilsynBarnMapperTest {
     }
 
     private fun beregningsresultat(
-        vararg stønadsperioder: Vedtaksperiode,
+        vararg stønadsperioder: VedtaksperiodeBeregning,
         antallBarn: Int = 2,
     ): BeregningsresultatForMåned =
         beregningsresultatForMåned(

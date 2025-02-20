@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.norskFormat
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
@@ -18,20 +18,20 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
 
 object TilsynBarnVedtaksperiodeValideringUtils {
-    fun validerVedtaksperioderEksisterer(vedtaksperioder: List<Vedtaksperiode>) {
+    fun validerVedtaksperioderEksisterer(vedtaksperioder: List<VedtaksperiodeBeregning>) {
         brukerfeilHvis(vedtaksperioder.isEmpty()) {
             "Kan ikke innvilge når det ikke finnes noen vedtaksperioder"
         }
     }
 
-    fun validerIngenOverlappMellomVedtaksperioder(vedtaksperioder: List<Vedtaksperiode>) {
+    fun validerIngenOverlappMellomVedtaksperioder(vedtaksperioder: List<VedtaksperiodeBeregning>) {
         brukerfeilHvis(vedtaksperioder.overlapper()) {
             "Vedtaksperioder kan ikke overlappe"
         }
     }
 
     fun validerUtgiftHeleVedtaksperioden(
-        vedtaksperioder: List<Vedtaksperiode>,
+        vedtaksperioder: List<VedtaksperiodeBeregning>,
         utgifter: Map<BarnId, List<UtgiftBeregning>>,
     ) {
         brukerfeilHvisIkke(
@@ -45,7 +45,7 @@ object TilsynBarnVedtaksperiodeValideringUtils {
     }
 
     private fun erUtgiftperiodeSomInneholderVedtaksperiode(
-        vedtaksperioder: List<Vedtaksperiode>,
+        vedtaksperioder: List<VedtaksperiodeBeregning>,
         utgifter: Map<BarnId, List<UtgiftBeregning>>,
     ): Boolean {
         val sammenslåtteUtgiftPerioder =
@@ -66,7 +66,7 @@ object TilsynBarnVedtaksperiodeValideringUtils {
      */
     fun validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett(
         vilkårperioder: Vilkårperioder,
-        vedtaksperioder: List<Vedtaksperiode>,
+        vedtaksperioder: List<VedtaksperiodeBeregning>,
     ) {
         val perioderSomIkkeGirRett =
             (vilkårperioder.målgrupper + vilkårperioder.aktiviteter)
@@ -76,7 +76,7 @@ object TilsynBarnVedtaksperiodeValideringUtils {
 
     private fun validerIkkeOverlapperMedPeriodeSomIkkeGirRettPåStønad(
         vilkårperioder: List<Vilkårperiode>,
-        vedtaksperiode: Vedtaksperiode,
+        vedtaksperiode: VedtaksperiodeBeregning,
     ) {
         vilkårperioder
             .firstOrNull { vilkårperiode -> vilkårperiode.overlapper(vedtaksperiode) }
@@ -89,7 +89,7 @@ object TilsynBarnVedtaksperiodeValideringUtils {
     }
 
     fun validerEnkeltperiode(
-        vedtaksperiode: Vedtaksperiode,
+        vedtaksperiode: VedtaksperiodeBeregning,
         målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
         aktivitetPerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
         fødselsdato: LocalDate?,
@@ -119,7 +119,7 @@ object TilsynBarnVedtaksperiodeValideringUtils {
 
     private fun validerVedtaksperiodeErInnenfor18og67år(
         fødselsdato: LocalDate?,
-        vedtaksperiode: Vedtaksperiode,
+        vedtaksperiode: VedtaksperiodeBeregning,
     ) {
         if (fødselsdato != null && vedtaksperiode.målgruppe.gjelderNedsattArbeidsevne()) {
             val dato18år = fødselsdato.plusYears(18)

@@ -13,14 +13,14 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningU
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilUke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilAktiviteter
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import org.assertj.core.api.Assertions.assertThat
 
 @Suppress("ktlint:standard:function-naming", "unused")
 class BeregningUtilsStepDefinitons {
     val behandlingId = BehandlingId.random()
 
-    var stønadsperioder: Vedtaksperiode? = null
+    var stønadsperioder: VedtaksperiodeBeregning? = null
     var stønadsperiodePerUke: Map<Uke, PeriodeMedDager> = emptyMap()
 
     var aktiviteter = emptyList<Aktivitet>()
@@ -28,7 +28,7 @@ class BeregningUtilsStepDefinitons {
 
     @Gitt("disse stønadsperiodene")
     fun `denne stønadsperioden`(dataTable: DataTable) {
-        stønadsperioder = Vedtaksperiode(mapStønadsperioder(behandlingId, dataTable).first())
+        stønadsperioder = VedtaksperiodeBeregning(mapStønadsperioder(behandlingId, dataTable).first())
     }
 
     @Gitt("disse aktivitetene")

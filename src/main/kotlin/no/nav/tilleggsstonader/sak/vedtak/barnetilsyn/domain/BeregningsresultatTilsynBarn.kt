@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -51,7 +51,7 @@ data class Beregningsgrunnlag(
 // TODO rename til vedtaksperiodeGrunnlag
 data class StønadsperiodeGrunnlag(
     // TODO rename til vedtaksperiode
-    val stønadsperiode: Vedtaksperiode,
+    val stønadsperiode: VedtaksperiodeBeregning,
     val aktiviteter: List<Aktivitet>,
     val antallDager: Int,
 )
