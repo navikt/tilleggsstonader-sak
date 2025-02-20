@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtaksperiodeValideringUtils.validerIngenEndringerFørRevurderFra
@@ -16,15 +16,14 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import org.springframework.context.annotation.Lazy
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
 class TilsynBarnVedtaksperiodeValidingerService(
     private val vilkårperiodeService: VilkårperiodeService,
     private val grunnlagsdataService: GrunnlagsdataService,
-    @Lazy // For å unngå sirkulær avhenighet i spring
-    private val vedtakService: VedtakService,
+    private val vedtakRepository: VedtakRepository,
 ) {
     fun validerVedtaksperioder(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
@@ -65,7 +64,7 @@ class TilsynBarnVedtaksperiodeValidingerService(
 
     private fun hentForrigeVedtaksperioder(behandling: Saksbehandling): List<Vedtaksperiode>? =
         behandling.forrigeBehandlingId?.let {
-            when (val forrigeVedtak = vedtakService.hentVedtak(it)?.data) {
+            when (val forrigeVedtak = vedtakRepository.findByIdOrNull(it)?.data) {
                 is InnvilgelseTilsynBarn -> forrigeVedtak.vedtaksperioder
                 is OpphørTilsynBarn -> forrigeVedtak.vedtaksperioder
                 is Avslag -> null

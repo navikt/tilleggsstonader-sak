@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Navn
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtaksperiodeValideringUtils.validerIngenEndringerFørRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteVilkårperioder
@@ -41,12 +41,12 @@ import java.time.YearMonth
 class TilsynBarnVedtaksperiodeValidingerUtilsTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
     val grunnlagsdataService = mockk<GrunnlagsdataService>()
-    val vedtakService = mockk<VedtakService>()
+    val vedtakRepository = mockk<VedtakRepository>()
     val tilsynBarnVedtaksperiodeValidingerService =
         TilsynBarnVedtaksperiodeValidingerService(
             vilkårperiodeService = vilkårperiodeService,
             grunnlagsdataService = grunnlagsdataService,
-            vedtakService = vedtakService,
+            vedtakRepository = vedtakRepository,
         )
 
     val behandling = saksbehandling()
