@@ -41,6 +41,7 @@ class VedtaksperiodeLæremidlerMapperTest {
                 fom = beregningsresultatPeriode1.grunnlag.fom,
                 tom = beregningsresultatPeriode2.grunnlag.tom,
                 målgruppe = beregningsresultatPeriode1.grunnlag.målgruppe,
+                aktivitet = beregningsresultatPeriode1.grunnlag.aktivitet,
                 studienivå = beregningsresultatPeriode1.grunnlag.studienivå,
             ),
         )

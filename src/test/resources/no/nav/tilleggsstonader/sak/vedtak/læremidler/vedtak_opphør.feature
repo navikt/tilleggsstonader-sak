@@ -94,8 +94,8 @@ Egenskap: Opphør av læremidler
     Når opphør behandling=2 med revurderFra=10.01.2025
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe       | Utbetalingsdato |
-      | 01.01.2025 | 09.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | OVERGANGSSTØNAD | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe       | Aktivitet | Utbetalingsdato |
+      | 01.01.2025 | 09.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | OVERGANGSSTØNAD | UTDANNING | 01.01.2025      |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type                        | Utbetalingsdato |
