@@ -131,5 +131,6 @@ object LæremidlerTestUtil {
             stønadsbeløp = stønadsbeløp,
             utbetalingsdato = utbetalingsdato,
             målgruppe = MålgruppeType.AAP,
+            aktivitetType = AktivitetType.TILTAK,
         )
 }
