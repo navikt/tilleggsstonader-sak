@@ -10,7 +10,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Navn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtaksperiodeValideringUtils.validerIngenEndringerFørRevurderFra
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -34,17 +37,20 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.UUID
 
 class TilsynBarnVedtaksperiodeValidingerUtilsTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
     val grunnlagsdataService = mockk<GrunnlagsdataService>()
+    val vedtakRepository = mockk<VedtakRepository>()
     val tilsynBarnVedtaksperiodeValidingerService =
         TilsynBarnVedtaksperiodeValidingerService(
             vilkårperiodeService = vilkårperiodeService,
             grunnlagsdataService = grunnlagsdataService,
+            vedtakRepository = vedtakRepository,
         )
 
-    val behandlingId = BehandlingId.random()
+    val behandling = saksbehandling()
 
     val målgrupper =
         listOf(
@@ -93,11 +99,9 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
 
             assertThatCode {
                 tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
-                    listOf(
-                        vedtaksperiode,
-                    ),
-                    behandlingId,
-                    utgifter,
+                    vedtaksperioder = listOf(vedtaksperiode),
+                    behandling = behandling,
+                    utgifter = utgifter,
                 )
             }.doesNotThrowAnyException()
         }
@@ -278,7 +282,8 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
 
         @Test
         fun `skal godta stønadsperiode på tvers av 2 godkjente sammenhengende vilkårsperioder`() {
-            val vedtaksperiode = lagVedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 10))
+            val vedtaksperiode =
+                lagVedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 10))
 
             assertThatCode {
                 TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
@@ -292,7 +297,8 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
 
         @Test
         fun `skal ikke godta stønadsperiode på tvers av 2 godkjente, men ikke sammenhengende vilkårsperioder`() {
-            val vedtaksperiode = lagVedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 21))
+            val vedtaksperiode =
+                lagVedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 21))
 
             assertThatCode {
                 TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
@@ -310,25 +316,19 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
     @Nested
     inner class ValiderIngenOverlapp {
         val vedtaksperiodeJan =
-            VedtaksperiodeBeregning(
+            lagVedtaksperiode(
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 1, 31),
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
             )
         val vedtaksperiodeFeb =
-            VedtaksperiodeBeregning(
+            lagVedtaksperiode(
                 fom = LocalDate.of(2025, 2, 1),
                 tom = LocalDate.of(2025, 2, 28),
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
             )
         val vedtaksperiodeJanFeb =
-            VedtaksperiodeBeregning(
+            lagVedtaksperiode(
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 2, 28),
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
             )
 
         @Test
@@ -644,7 +644,10 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             @Test
             fun `skal ikke kaste feil dersom overgangsstønad og under 18 år eller over 67 år`() {
                 val vedtaksperioder =
-                    lagVedtaksperiode(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.UTDANNING)
+                    lagVedtaksperiode(
+                        målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                        aktivitet = AktivitetType.UTDANNING,
+                    )
 
                 val målgrupper =
                     listOf(
@@ -805,9 +808,256 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
         }
     }
 
+    @Nested
+    inner class ValiderIngenEndringerFørRevurderFra {
+        val vedtaksperiodeJanFeb =
+            lagVedtaksperiode(
+                fom = LocalDate.of(2025, 1, 1),
+                tom = LocalDate.of(2025, 2, 28),
+            )
+
+        val vedtaksperiodeMars =
+            lagVedtaksperiode(
+                fom = LocalDate.of(2025, 3, 1),
+                tom = LocalDate.of(2025, 3, 31),
+            )
+
+        val vedtaksperiodeApril =
+            lagVedtaksperiode(
+                fom = LocalDate.of(2025, 4, 1),
+                tom = LocalDate.of(2025, 4, 30),
+            )
+
+        val vedtaksperioderJanFeb = listOf(vedtaksperiodeJanFeb)
+        val vedtaksperioderJanMars = listOf(vedtaksperiodeJanFeb, vedtaksperiodeMars)
+        val førsteMars: LocalDate = LocalDate.of(2025, 3, 1)
+        val femtendeMars: LocalDate = LocalDate.of(2025, 3, 15)
+        val førsteApril: LocalDate = LocalDate.of(2025, 4, 1)
+
+        @Test
+        fun `kaster ikke feil ved ingen revurder fra og ingen gamle perioder (førstegangsbehandling)`() {
+            assertDoesNotThrow {
+                validerIngenEndringerFørRevurderFra(
+                    vedtaksperioder = vedtaksperioderJanMars,
+                    vedtaksperioderForrigeBehandling = emptyList(),
+                    revurderFra = null,
+                )
+            }
+        }
+
+        @Nested
+        inner class NyPeriode {
+            @Test
+            fun `kaster ikke feil ved ny periode som starter etter revurder fra`() {
+                assertDoesNotThrow {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = vedtaksperioderJanMars,
+                        vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
+                        revurderFra = førsteMars,
+                    )
+                }
+            }
+
+            @Test
+            fun `kaster feil ved ny periode med fom før revurder fra`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            vedtaksperioder = vedtaksperioderJanMars,
+                            vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
+                            revurderFra = femtendeMars,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+            }
+
+            @Test
+            fun `kaster feil ved ny periode med fom og tom før revuder fra`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            vedtaksperioder = vedtaksperioderJanMars,
+                            vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
+                            revurderFra = førsteApril,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+            }
+        }
+
+        @Test
+        fun `kaster feil ved ny periode som er lik eksisterende periode lagt til før revuder fra`() {
+            val nyeVedtaksperioder =
+                listOf(
+                    vedtaksperiodeJanFeb,
+                    vedtaksperiodeJanFeb.copy(id = UUID.randomUUID()),
+                )
+
+            val feil =
+                assertThrows<ApiFeil> {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = nyeVedtaksperioder,
+                        vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
+                        revurderFra = førsteMars,
+                    )
+                }
+            assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+        }
+
+        @Test
+        fun `kaster feil ved nye perioder før revurder fra etter opphør med ingen eksisterende vedtaksperioder`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = vedtaksperioderJanMars,
+                        vedtaksperioderForrigeBehandling = emptyList(),
+                        revurderFra = førsteMars,
+                    )
+                }
+            assertThat(feil).hasMessage("Det er ikke tillat å legge til nye perioder før revurder fra dato")
+        }
+
+        @Nested
+        inner class EndretPeriode {
+            @Test
+            fun `kaster ikke feil ved fom før revurder fra og tom etter revurder fra, der tom flyttet fremover i tid`() {
+                val nyeVedtaksperioder =
+                    listOf(
+                        vedtaksperiodeJanFeb,
+                        vedtaksperiodeMars.copy(tom = LocalDate.of(2025, 4, 10)),
+                    )
+
+                assertDoesNotThrow {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = nyeVedtaksperioder,
+                        vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
+                        revurderFra = femtendeMars,
+                    )
+                }
+            }
+
+            @Test
+            fun `kaster feil ved tom flyttet til før revurder fra`() {
+                val nyeVedtaksperioder =
+                    listOf(
+                        vedtaksperiodeJanFeb,
+                        vedtaksperiodeMars.copy(tom = LocalDate.of(2025, 3, 10)),
+                    )
+
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            vedtaksperioder = nyeVedtaksperioder,
+                            vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
+                            revurderFra = femtendeMars,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+            }
+
+            @Test
+            fun `kaster feil ved fom og tom flyttet til før revurder fra`() {
+                val gamleVedtaksperioder =
+                    listOf(
+                        vedtaksperiodeJanFeb,
+                        vedtaksperiodeApril,
+                    )
+
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            vedtaksperioder = vedtaksperioderJanMars,
+                            vedtaksperioderForrigeBehandling = gamleVedtaksperioder,
+                            revurderFra = førsteApril,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+            }
+
+            @Test
+            fun `kaster feil ved fom og tom før revurder fra der tom flyttes fremover i tid, men fortsatt før revurder fra`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 3, 31))),
+                            vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
+                            revurderFra = førsteApril,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+            }
+
+            @Test
+            fun `kaster feil ved fom og tom før revurder fra der tom flyttes fremover i tid forbi revurder fra`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 5, 31))),
+                            vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
+                            revurderFra = førsteApril,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+            }
+
+            @Test
+            fun `kaster feil ved fom og tom før revurder fra der fom flyttes fremover i tid, men fortsatt før revurder fra`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(fom = LocalDate.of(2025, 1, 3))),
+                            vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
+                            revurderFra = førsteApril,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+            }
+        }
+
+        @Nested
+        inner class SlettetPeriode {
+            @Test
+            fun `kaster ikke feil ved slettet perioder etter revurder fra`() {
+                assertDoesNotThrow {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = vedtaksperioderJanFeb,
+                        vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
+                        revurderFra = førsteMars,
+                    )
+                }
+            }
+
+            @Test
+            fun `kaster feil ved slettet periode med fom før revurder fra`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            vedtaksperioder = vedtaksperioderJanFeb,
+                            vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
+                            revurderFra = femtendeMars,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+            }
+
+            @Test
+            fun `kaster feil ved slettet periode med fom og tom før revurder fra`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            vedtaksperioder = vedtaksperioderJanFeb,
+                            vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
+                            revurderFra = førsteApril,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+            }
+        }
+    }
+
     private fun lagGrunnlagsdata(fødeslsdato: LocalDate = LocalDate.of(1990, 1, 1)) =
         Grunnlagsdata(
-            behandlingId = behandlingId,
+            behandlingId = behandling.id,
             grunnlag =
                 Grunnlag(
                     navn = Navn("fornavn", "mellomnavn", "etternavn"),
@@ -822,7 +1072,8 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
         tom: LocalDate = LocalDate.of(2025, 1, 31),
         målgruppe: MålgruppeType = MålgruppeType.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
-    ) = VedtaksperiodeBeregning(
+    ) = Vedtaksperiode(
+        id = UUID.randomUUID(),
         fom = fom,
         tom = tom,
         målgruppe = målgruppe,

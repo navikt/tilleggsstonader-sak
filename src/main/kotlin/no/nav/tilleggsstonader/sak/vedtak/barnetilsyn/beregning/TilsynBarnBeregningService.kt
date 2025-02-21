@@ -27,8 +27,9 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilAktiviteter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -82,18 +83,20 @@ class TilsynBarnBeregningService(
             "Skal ikke beregne for avslag"
         }
 
-        val vedtaksperioder =
-            vedtaksperioderDto.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(behandling.revurderFra)
+        val vedtaksperioder = vedtaksperioderDto.tilDomene()
 
         val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandling.id)
 
         tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
-            vedtaksperioder,
-            behandling.id,
-            utgifterPerBarn,
+            vedtaksperioder = vedtaksperioder,
+            behandling = behandling,
+            utgifter = utgifterPerBarn,
         )
 
-        val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioder)
+        val vedtaksperioderBeregning =
+            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(behandling.revurderFra)
+
+        val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioderBeregning)
         val relevantePerioderFraForrigeVedtak =
             finnRelevantePerioderFraForrigeVedtak(behandling)
         return BeregningsresultatTilsynBarn(relevantePerioderFraForrigeVedtak + perioder)
