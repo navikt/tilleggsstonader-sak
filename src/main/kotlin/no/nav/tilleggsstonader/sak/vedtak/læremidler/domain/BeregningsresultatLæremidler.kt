@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
@@ -51,6 +52,7 @@ data class Beregningsgrunnlag(
     val sats: Int,
     val satsBekreftet: Boolean,
     val målgruppe: MålgruppeType,
+    val aktivitet: AktivitetType,
 )
 
 fun avkortBeregningsresultatVedOpphør(

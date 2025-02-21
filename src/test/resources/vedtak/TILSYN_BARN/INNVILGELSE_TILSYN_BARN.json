@@ -1,5 +1,4 @@
 {
-  "type": "INNVILGELSE_TILSYN_BARN",
   "beregningsresultat": {
     "perioder" : [ {
       "dagsats" : 10.11,
@@ -36,5 +35,13 @@
         "målgruppe" : "AAP"
       } ]
     } ]
-  }
+  },
+  "type": "INNVILGELSE_TILSYN_BARN",
+  "vedtaksperioder" : [ {
+    "id" : "3580eb48-b676-49f1-9650-8b5062c2c604",
+    "fom" : "2024-01-01",
+    "tom" : "2024-01-02",
+    "målgruppe" : "AAP",
+    "aktivitet" : "TILTAK"
+  } ]
 }

@@ -53,6 +53,7 @@ fun mapBeregningsresultat(dataTable: DataTable) =
                     satsBekreftet = parseValgfriBoolean(BeregningNøkler.BEKREFTET_SATS, rad) ?: true,
                     utbetalingsdato = parseDato(BeregningNøkler.UTBETALINGSDATO, rad),
                     målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
+                    aktivitet = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad) ?: AktivitetType.TILTAK,
                 ),
         )
     }

@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 enum class StønadstypeDvh {
     BARNETILSYN,
     LÆREMIDLER,
+    BOUTGIFTER,
     ;
 
     companion object {
@@ -12,6 +13,7 @@ enum class StønadstypeDvh {
             when (stønadstype) {
                 Stønadstype.BARNETILSYN -> BARNETILSYN
                 Stønadstype.LÆREMIDLER -> LÆREMIDLER
+                Stønadstype.BOUTGIFTER -> BOUTGIFTER
             }
     }
 }

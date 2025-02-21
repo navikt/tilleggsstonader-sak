@@ -4,12 +4,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningValideringUtil.erOverlappMellomPerioderOgUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFraMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.tilVedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -41,7 +40,7 @@ class TilsynBeregningUtilTest {
                 val stønadsperioder =
                     listOf(
                         stønadsperiode,
-                    ).tilVedtaksperiode().sorted()
+                    ).tilVedtaksperiodeBeregning().sorted()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 
@@ -58,7 +57,7 @@ class TilsynBeregningUtilTest {
                         tom = LocalDate.of(2024, 3, 31),
                     )
 
-                val stønadsperioder = listOf(stønadsperiode).tilVedtaksperiode().sorted()
+                val stønadsperioder = listOf(stønadsperiode).tilVedtaksperiodeBeregning().sorted()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 
@@ -93,7 +92,7 @@ class TilsynBeregningUtilTest {
                     listOf(
                         stønadsperiode1,
                         stønadsperiode2,
-                    ).tilVedtaksperiode().sorted()
+                    ).tilVedtaksperiodeBeregning().sorted()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 
@@ -125,7 +124,7 @@ class TilsynBeregningUtilTest {
                     listOf(
                         stønadsperiode1,
                         stønadsperiode2,
-                    ).tilVedtaksperiode().sorted()
+                    ).tilVedtaksperiodeBeregning().sorted()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 
@@ -195,46 +194,6 @@ class TilsynBeregningUtilTest {
                         utgiftJanuarTilFebruar,
                     ),
             )
-
-        @Nested
-        inner class OverlappMellomStønadsperioderOgUtgifter {
-            @Test
-            fun `skal retunere true når flere barn overlapper`() {
-                assertThat(erOverlappMellomPerioderOgUtgifter(stønadsperioder, utgifter)).isTrue
-            }
-
-            @Test
-            fun `skal retunere true når kun ett barn overlapper`() {
-                val utgifter =
-                    mapOf(
-                        barn1 to
-                            listOf(
-                                utgiftJanuar,
-                                utgiftFebruar,
-                            ),
-                        barn2 to
-                            listOf(
-                                utgiftMars,
-                            ),
-                    )
-                assertThat(erOverlappMellomPerioderOgUtgifter(stønadsperioder, utgifter)).isTrue
-            }
-
-            @Test
-            fun `skal retunere false når ikke overlapp`() {
-                val stønadsperioder =
-                    listOf(
-                        StønadsperiodeBeregningsgrunnlag(
-                            fom = LocalDate.of(2025, 3, 1),
-                            tom = LocalDate.of(2025, 3, 31),
-                            målgruppe = MålgruppeType.AAP,
-                            aktivitet = AktivitetType.TILTAK,
-                        ),
-                    )
-
-                assertThat(erOverlappMellomPerioderOgUtgifter(stønadsperioder, utgifter)).isFalse
-            }
-        }
 
         @Nested
         inner class BrukPerioderFraOgMedRevurderFra {

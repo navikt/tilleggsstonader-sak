@@ -12,6 +12,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
 import no.nav.tilleggsstonader.sak.util.FileUtil.skrivTilFil
+import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
@@ -67,14 +69,17 @@ class DokumentgenereringTest {
     @ParameterizedTest
     @MethodSource("stønadstyperInterntVedtak")
     fun `json til htmlify er riktig`(type: StønadstypeInterntVedtak) {
+        val stønadstype = type.stønadstype
         if (type.håndteresAvInterntVedtak) {
             mock(type)
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
-            assertFileIsEqual("interntVedtak/${type.stønadstype}/internt_vedtak.json", interntVedtak)
+            assertFileIsEqual("interntVedtak/$stønadstype/internt_vedtak.json", interntVedtak)
         } else {
+            val saksbehandling = saksbehandling(fagsak(stønadstype = stønadstype))
+            every { behandlingService.hentSaksbehandling(behandlingId) } returns saksbehandling
             assertThatThrownBy {
                 service.lagInterntVedtak(behandlingId = behandlingId)
-            }.hasMessageContaining("Internt vedtak håndterer ikke stønadstype=${type.stønadstype}")
+            }.hasMessageContaining("Internt vedtak håndterer ikke stønadstype=$stønadstype")
         }
     }
 
@@ -167,7 +172,12 @@ class DokumentgenereringTest {
         @JvmStatic
         fun stønadstyperInterntVedtak(): List<StønadstypeInterntVedtak> =
             Stønadstype.entries.map {
-                it.enabled()
+                when (it) {
+                    Stønadstype.BARNETILSYN,
+                    Stønadstype.LÆREMIDLER,
+                    -> it.håndteres()
+                    Stønadstype.BOUTGIFTER -> it.håndteresIkke()
+                }
             }
 
         data class StønadstypeInterntVedtak(
@@ -175,9 +185,8 @@ class DokumentgenereringTest {
             val håndteresAvInterntVedtak: Boolean,
         )
 
-        private fun Stønadstype.enabled() =
-            when (this) {
-                else -> StønadstypeInterntVedtak(this, true)
-            }
+        private fun Stønadstype.håndteres() = StønadstypeInterntVedtak(this, true)
+
+        private fun Stønadstype.håndteresIkke() = StønadstypeInterntVedtak(this, false)
     }
 }

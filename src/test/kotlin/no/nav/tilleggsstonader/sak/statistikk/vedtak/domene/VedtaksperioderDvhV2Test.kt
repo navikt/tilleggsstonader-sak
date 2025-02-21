@@ -69,6 +69,7 @@ class VedtaksperioderDvhV2Test {
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 1, 7),
                             målgruppe = MålgruppeTypeDvh.AAP,
+                            aktivitet = AktivitetTypeDvh.TILTAK,
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.NEDSATT_ARBEIDSEVNE,
                             studienivå = StudienivåDvh.HØYERE_UTDANNING,
                         ),
