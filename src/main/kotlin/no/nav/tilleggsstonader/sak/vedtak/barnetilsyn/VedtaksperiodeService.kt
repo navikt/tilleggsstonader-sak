@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.vedtak.ForeslåVedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -44,13 +43,7 @@ class VedtaksperiodeService(
             "Kan ikke finne nye vedtaksperioder for opphør fordi revurder fra dato mangler"
         }
 
-        val forrigeVedtak = vedtakRepository.findByIdOrNull(behandling.forrigeBehandlingId)?.data
-        val forrigeVedtaksperioder =
-            when (forrigeVedtak) {
-                is InnvilgelseTilsynBarn -> forrigeVedtak.vedtaksperioder
-                is OpphørTilsynBarn -> forrigeVedtak.vedtaksperioder
-                else -> error("Vi støtter ikke opphør for tilsyn barn når forrige vedtak var ${forrigeVedtak?.javaClass?.simpleName}")
-            }
+        val forrigeVedtaksperioder = finnVedtaksperioder(behandling.forrigeBehandlingId)
 
         feilHvis(forrigeVedtaksperioder == null) {
             "Kan ikke opphøre fordi data fra forrige vedtak mangler"
@@ -59,12 +52,18 @@ class VedtaksperiodeService(
         return forrigeVedtaksperioder.avkortFraOgMed(behandling.revurderFra.minusDays(1))
     }
 
-    private fun detFinnesVedtaksperioder(behandlingId: BehandlingId) =
-        vedtakRepository
-            .findByIdOrNull(behandlingId)
-            ?.takeIfType<InnvilgelseTilsynBarn>()
-            ?.data
-            ?.vedtaksperioder
-            .isNullOrEmpty()
-            .not()
+    private fun detFinnesVedtaksperioder(behandlingId: BehandlingId) = !finnVedtaksperioder(behandlingId).isNullOrEmpty()
+
+    private fun finnVedtaksperioder(behandlingId: BehandlingId): List<Vedtaksperiode>? {
+        val forrigeVedtak = vedtakRepository.findByIdOrNull(behandlingId)?.data
+        return when (forrigeVedtak) {
+            null -> null
+            is InnvilgelseTilsynBarn -> forrigeVedtak.vedtaksperioder
+            is OpphørTilsynBarn -> forrigeVedtak.vedtaksperioder
+            else ->
+                error(
+                    "Kan ikke hente forrgie vedtaksperioder for tilsyn barn når forrgie vedtak var ${forrigeVedtak.javaClass.simpleName}",
+                )
+        }
+    }
 }
