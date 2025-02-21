@@ -6,22 +6,21 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.ForeslåVedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import org.springframework.context.annotation.Lazy
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
 class VedtaksperiodeService(
     private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
-    @Lazy // For å unngå sirkulær avhengighet i spring
-    private val vedtakService: VedtakService,
+    private val vedtakRepository: VedtakRepository,
 ) {
     fun foreslåPerioder(behandlingId: BehandlingId): List<Vedtaksperiode> {
         brukerfeilHvis(detFinnesVedtaksperioder(behandlingId)) {
@@ -45,7 +44,7 @@ class VedtaksperiodeService(
             "Kan ikke finne nye vedtaksperioder for opphør fordi revurder fra dato mangler"
         }
 
-        val forrigeVedtak = vedtakService.hentVedtak(behandling.forrigeBehandlingId)?.data
+        val forrigeVedtak = vedtakRepository.findByIdOrNull(behandling.forrigeBehandlingId)?.data
         val forrigeVedtaksperioder =
             when (forrigeVedtak) {
                 is InnvilgelseTilsynBarn -> forrigeVedtak.vedtaksperioder
@@ -61,8 +60,8 @@ class VedtaksperiodeService(
     }
 
     private fun detFinnesVedtaksperioder(behandlingId: BehandlingId) =
-        vedtakService
-            .hentVedtak(behandlingId)
+        vedtakRepository
+            .findByIdOrNull(behandlingId)
             ?.takeIfType<InnvilgelseTilsynBarn>()
             ?.data
             ?.vedtaksperioder
