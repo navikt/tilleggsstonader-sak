@@ -53,7 +53,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.UUID
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode as VedtaksperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning as VedtaksperiodeBeregningsgrunnlag
 
 object Testdata {
     val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")
@@ -190,7 +190,6 @@ object Testdata {
 
         val vedtaksperiode =
             VedtaksperiodeBeregningsgrunnlag(
-                id = UUID.randomUUID(),
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 1),
                 målgruppe = MålgruppeType.AAP,
@@ -289,6 +288,7 @@ object Testdata {
                                     sats = 951,
                                     satsBekreftet = true,
                                     målgruppe = MålgruppeType.AAP,
+                                    aktivitet = AktivitetType.TILTAK,
                                 ),
                         ),
                         BeregningsresultatForMåned(
@@ -303,6 +303,7 @@ object Testdata {
                                     sats = 951,
                                     satsBekreftet = true,
                                     målgruppe = MålgruppeType.AAP,
+                                    aktivitet = AktivitetType.TILTAK,
                                 ),
                         ),
                     ),

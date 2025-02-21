@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
@@ -48,6 +49,14 @@ object TilsynBarnTestUtil {
     val defaultVedtaksperiode =
         Vedtaksperiode(
             id = defaultVedtaksperiodeId,
+            fom = LocalDate.of(2024, 1, 1),
+            tom = LocalDate.of(2024, 1, 31),
+            målgruppe = MålgruppeType.AAP,
+            aktivitet = AktivitetType.TILTAK,
+        )
+
+    val defaultVedtaksperiodeBeregning =
+        VedtaksperiodeBeregning(
             fom = LocalDate.of(2024, 1, 1),
             tom = LocalDate.of(2024, 1, 31),
             målgruppe = MålgruppeType.AAP,
@@ -100,7 +109,7 @@ object TilsynBarnTestUtil {
             data = data,
         )
 
-    fun stønadsperiodeGrunnlag(vedtaksperiode: Vedtaksperiode = defaultVedtaksperiode): StønadsperiodeGrunnlag =
+    fun stønadsperiodeGrunnlag(vedtaksperiode: VedtaksperiodeBeregning = defaultVedtaksperiodeBeregning): StønadsperiodeGrunnlag =
         StønadsperiodeGrunnlag(
             stønadsperiode = vedtaksperiode,
             aktiviteter = emptyList(),

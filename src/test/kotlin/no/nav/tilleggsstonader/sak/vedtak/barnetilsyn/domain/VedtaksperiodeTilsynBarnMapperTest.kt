@@ -3,19 +3,17 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn1
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.stønadsperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper.VedtaksperiodeTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.UUID
 
 class VedtaksperiodeTilsynBarnMapperTest {
     val periode1 =
-        Vedtaksperiode(
-            id = UUID.randomUUID(),
+        VedtaksperiodeBeregning(
             fom = LocalDate.of(2024, 1, 1),
             tom = LocalDate.of(2024, 1, 1),
             målgruppe = MålgruppeType.AAP,
@@ -23,8 +21,7 @@ class VedtaksperiodeTilsynBarnMapperTest {
         )
 
     val periode2 =
-        Vedtaksperiode(
-            id = UUID.randomUUID(),
+        VedtaksperiodeBeregning(
             fom = LocalDate.of(2024, 1, 2),
             tom = LocalDate.of(2024, 1, 2),
             målgruppe = MålgruppeType.AAP,
@@ -119,7 +116,7 @@ class VedtaksperiodeTilsynBarnMapperTest {
     }
 
     private fun beregningsresultat(
-        vararg stønadsperioder: Vedtaksperiode,
+        vararg stønadsperioder: VedtaksperiodeBeregning,
         antallBarn: Int = 2,
     ): BeregningsresultatForMåned =
         beregningsresultatForMåned(

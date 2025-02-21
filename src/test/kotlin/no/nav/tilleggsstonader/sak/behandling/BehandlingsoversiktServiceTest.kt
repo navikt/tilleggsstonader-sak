@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregni
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 class BehandlingsoversiktServiceTest {
     val fagsakService = mockk<FagsakService>()
@@ -86,8 +85,7 @@ class BehandlingsoversiktServiceTest {
     private fun mockVedtakRepository() {
         val stønadsperiodeGrunnlag =
             StønadsperiodeGrunnlag(
-                Vedtaksperiode(
-                    id = UUID.randomUUID(),
+                VedtaksperiodeBeregning(
                     fom = LocalDate.of(2024, 3, 1),
                     tom = LocalDate.of(2024, 3, 13),
                     målgruppe = MålgruppeType.AAP,
@@ -98,8 +96,7 @@ class BehandlingsoversiktServiceTest {
             )
         val stønadsperiodeGrunnlag2 =
             StønadsperiodeGrunnlag(
-                Vedtaksperiode(
-                    id = UUID.randomUUID(),
+                VedtaksperiodeBeregning(
                     fom = LocalDate.of(2024, 3, 2),
                     tom = LocalDate.of(2024, 3, 14),
                     målgruppe = MålgruppeType.AAP,

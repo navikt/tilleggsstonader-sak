@@ -24,7 +24,8 @@
           "studieprosent": 100,
           "sats": 875,
           "satsBekreftet": true,
-          "målgruppe": "AAP"
+          "målgruppe": "AAP",
+          "aktivitet": "TILTAK"
         }
       }
     ]

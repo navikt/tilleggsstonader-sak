@@ -72,9 +72,9 @@ Egenskap: Beregning av læremidler - flere stønadsperioder
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe       | Utbetalingsdato |
-      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP             | 01.01.2025      |
-      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | OVERGANGSSTØNAD | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe       | Aktivitet | Utbetalingsdato |
+      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP             | UTDANNING | 01.01.2025      |
+      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | OVERGANGSSTØNAD | UTDANNING | 01.01.2025      |
 
   Scenario: To ulike målgrupper av typen nedsatt arbeidsevne innenfor en vedtaksperiode men ulike løpende måneder
     Gitt følgende vedtaksperioder for læremidler
@@ -114,6 +114,6 @@ Egenskap: Beregning av læremidler - flere stønadsperioder
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024      |
-      | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Aktivitet | Utbetalingsdato |
+      | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | UTDANNING | 01.04.2024      |
+      | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | UTDANNING | 01.04.2024      |

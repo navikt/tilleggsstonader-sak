@@ -143,9 +143,9 @@ Egenskap: Innvilgelse av læremidler - revurdering
 
     # Endrer målgruppe fra februar
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe       | Utbetalingsdato |
-      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP             | 01.01.2025      |
-      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | OVERGANGSSTØNAD | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe       | Aktivitet | Utbetalingsdato |
+      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP             | UTDANNING | 01.01.2025      |
+      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | OVERGANGSSTØNAD | UTDANNING | 01.01.2025      |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type                        | Utbetalingsdato |

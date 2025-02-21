@@ -53,7 +53,7 @@ class OppfølgingRepositoryTest : IntegrationTest() {
         val kontrollert =
             Kontrollert(
                 saksbehandler = "en saksbehandler",
-                utfall = KontrollertUtfall.OK,
+                utfall = KontrollertUtfall.HÅNDTERT,
                 kommentar = "en kommentar",
             )
         oppfølgingRepository.update(oppfølging.copy(kontrollert = kontrollert))

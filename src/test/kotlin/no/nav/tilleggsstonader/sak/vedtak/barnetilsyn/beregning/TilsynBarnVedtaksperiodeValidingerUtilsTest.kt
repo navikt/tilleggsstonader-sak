@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Navn
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -34,7 +34,6 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 class TilsynBarnVedtaksperiodeValidingerUtilsTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
@@ -311,24 +310,21 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
     @Nested
     inner class ValiderIngenOverlapp {
         val vedtaksperiodeJan =
-            Vedtaksperiode(
-                id = UUID.randomUUID(),
+            VedtaksperiodeBeregning(
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 1, 31),
                 målgruppe = MålgruppeType.AAP,
                 aktivitet = AktivitetType.TILTAK,
             )
         val vedtaksperiodeFeb =
-            Vedtaksperiode(
-                id = UUID.randomUUID(),
+            VedtaksperiodeBeregning(
                 fom = LocalDate.of(2025, 2, 1),
                 tom = LocalDate.of(2025, 2, 28),
                 målgruppe = MålgruppeType.AAP,
                 aktivitet = AktivitetType.TILTAK,
             )
         val vedtaksperiodeJanFeb =
-            Vedtaksperiode(
-                id = UUID.randomUUID(),
+            VedtaksperiodeBeregning(
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 2, 28),
                 målgruppe = MålgruppeType.AAP,
@@ -826,8 +822,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
         tom: LocalDate = LocalDate.of(2025, 1, 31),
         målgruppe: MålgruppeType = MålgruppeType.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
-    ) = Vedtaksperiode(
-        id = UUID.randomUUID(),
+    ) = VedtaksperiodeBeregning(
         fom = fom,
         tom = tom,
         målgruppe = målgruppe,
