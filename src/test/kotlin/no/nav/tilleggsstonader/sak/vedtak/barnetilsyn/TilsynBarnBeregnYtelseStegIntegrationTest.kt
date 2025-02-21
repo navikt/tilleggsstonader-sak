@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import io.mockk.every
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -8,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -29,6 +31,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
@@ -37,6 +40,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
@@ -51,6 +56,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.*
 
 class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Autowired
@@ -77,6 +83,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     val stønadsperiode =
         stønadsperiode(behandlingId = behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
     val aktivitet = aktivitet(behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
+    val målgruppe = målgruppe(behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 2, 28))
 
     val januar = YearMonth.of(2023, 1)
     val februar = YearMonth.of(2023, 2)
@@ -102,6 +109,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         fun `skal lagre vedtak`() {
             stønadsperiodeRepository.insert(stønadsperiode)
             vilkårperiodeRepository.insert(aktivitet)
+            vilkårperiodeRepository.insert(målgruppe)
             lagVilkårForPeriode(saksbehandling, januar, januar, 100)
 
             val vedtakDto = innvilgelseDto()
@@ -249,6 +257,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     inner class Opphør {
         @Test
         fun `skal lagre vedtak`() {
+            every { unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN) } returns false
             val beløpsperioderJanuar =
                 listOf(Beløpsperiode(dato = LocalDate.of(2023, 1, 2), beløp = 1000, målgruppe = MålgruppeType.AAP))
             val beløpsperiodeFebruar =
@@ -294,6 +303,83 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
             stønadsperiodeRepository.insert(stønadsperiodeForOpphør)
             vilkårperiodeRepository.insert(aktivitetForOpphør)
+            lagVilkårForPeriode(saksbehandlingForOpphør, januar, februar, 100, status = VilkårStatus.UENDRET)
+
+            val vedtakDto = opphørDto()
+            steg.utførOgReturnerNesteSteg(saksbehandlingForOpphør, vedtakDto)
+
+            val vedtak = repository.findByIdOrThrow(saksbehandlingForOpphør.id).withTypeOrThrow<OpphørTilsynBarn>()
+
+            val tilkjentYtelse =
+                tilkjentYtelseRepository.findByBehandlingId(saksbehandlingForOpphør.id)!!.andelerTilkjentYtelse
+
+            assertThat(vedtak.behandlingId).isEqualTo(saksbehandlingForOpphør.id)
+            assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
+            assertThat(vedtak.data.årsaker).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
+            assertThat(vedtak.data.begrunnelse).isEqualTo("Endring i utgifter")
+            assertThat(
+                vedtak.data.beregningsresultat.perioder
+                    .single(),
+            ).isEqualTo(beregningsresultatJanuar)
+            assertThat(tilkjentYtelse).hasSize(1)
+        }
+
+        @Test
+        fun `skal lagre vedtak med vedtaksperioder`() {
+            every { unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN) } returns true
+            val beløpsperioderJanuar =
+                listOf(Beløpsperiode(dato = LocalDate.of(2023, 1, 2), beløp = 1000, målgruppe = MålgruppeType.AAP))
+            val beløpsperiodeFebruar =
+                listOf(Beløpsperiode(dato = LocalDate.of(2023, 2, 1), beløp = 2000, målgruppe = MålgruppeType.AAP))
+            val beregningsresultatJanuar =
+                beregningsresultatForMåned(beløpsperioder = beløpsperioderJanuar, måned = YearMonth.of(2023, 1))
+            val beregningsresultatFebruar =
+                beregningsresultatForMåned(beløpsperioder = beløpsperiodeFebruar, måned = YearMonth.of(2023, 2))
+
+            val vedtakBeregningsresultatFørstegangsbehandling =
+                BeregningsresultatTilsynBarn(
+                    perioder =
+                        listOf(
+                            beregningsresultatJanuar,
+                            beregningsresultatFebruar,
+                        ),
+                )
+
+            val vedtaksperiode =
+                Vedtaksperiode(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2023, 1, 2),
+                    tom = LocalDate.of(2023, 2, 28),
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                )
+
+            testoppsettService.lagVedtak(
+                behandling = behandling,
+                beregningsresultat = vedtakBeregningsresultatFørstegangsbehandling,
+                vedtaksperioder = listOf(vedtaksperiode),
+            )
+            testoppsettService.ferdigstillBehandling(behandling = behandling)
+
+            val behandlingForOpphør =
+                testoppsettService.opprettRevurdering(
+                    revurderFra = LocalDate.of(2023, 2, 1),
+                    forrigeBehandling = behandling,
+                    fagsak = fagsak,
+                )
+            val saksbehandlingForOpphør = saksbehandling(behandling = behandlingForOpphør)
+            val aktivitetForOpphør =
+                aktivitet(
+                    behandlingForOpphør.id,
+                    fom = LocalDate.of(2023, 1, 2),
+                    tom = LocalDate.of(2023, 1, 31),
+                    status = Vilkårstatus.ENDRET,
+                )
+            val målgruppeForOpphør =
+                målgruppe.copy(behandlingId = behandlingForOpphør.id, status = Vilkårstatus.UENDRET)
+
+            vilkårperiodeRepository.insert(aktivitetForOpphør)
+            vilkårperiodeRepository.insert(målgruppeForOpphør)
             lagVilkårForPeriode(saksbehandlingForOpphør, januar, februar, 100, status = VilkårStatus.UENDRET)
 
             val vedtakDto = opphørDto()
