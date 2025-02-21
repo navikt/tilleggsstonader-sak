@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.mockk.every
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
@@ -23,6 +24,7 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPe
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.BrevController
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
@@ -182,6 +184,7 @@ class BehandlingFlytTest(
 
     @Test
     fun `skal ikke kunne gå videre til vilkår-steg dersom inngangsvilkåren ikke validerer`() {
+        every { unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN) } returns false
         somSaksbehandler {
             val behandlingId = opprettBehandling(personIdent)
             vurderInngangsvilkår(behandlingId)
