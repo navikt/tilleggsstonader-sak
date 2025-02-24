@@ -312,7 +312,7 @@ class OppfølgingService(
                     .sorted()
                     .mergeSammenhengende(
                         { y1, y2 -> y1.målgruppe == y2.målgruppe && y1.overlapperEllerPåfølgesAv(y2) },
-                        { y1, y2 -> y1.copy(fom = minOf(y1.fom, y2.fom), tom = maxOf(y2.tom, y2.tom)) },
+                        { y1, y2 -> y1.copy(fom = minOf(y1.fom, y2.fom), tom = maxOf(y1.tom, y2.tom)) },
                     )
             }
     }
