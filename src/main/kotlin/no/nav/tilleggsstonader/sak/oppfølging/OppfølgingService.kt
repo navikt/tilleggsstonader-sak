@@ -147,7 +147,7 @@ class OppfølgingService(
                 val ytelser = ytelserPerMålgruppe[this.målgruppe] ?: emptyList()
                 val kontroller = finnKontroller(this, ytelser)
                 val enKontroll = kontroller.singleOrNull()
-                val førsteDagINestNesteMåned = YearMonth.now().plusMonths(2).atDay(1)
+                val førsteDagINestNesteMåned = YearMonth.now().plusMonths(1).atEndOfMonth()
                 if (
                     målgruppe == MålgruppeType.AAP &&
                     enKontroll?.årsak == ÅrsakKontroll.TOM_ENDRET &&
