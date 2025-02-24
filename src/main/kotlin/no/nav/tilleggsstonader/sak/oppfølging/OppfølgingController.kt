@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
+import no.nav.familie.prosessering.util.MDCConstants
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
@@ -8,6 +9,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -55,12 +57,16 @@ class OppfølgingController(
     @PostMapping("start")
     fun startJobb() {
         tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
+        val callId = MDC.get(MDCConstants.MDC_CALL_ID)
         Executors.newVirtualThreadPerTaskExecutor().submit {
             try {
+                MDC.put(MDCConstants.MDC_CALL_ID, callId)
                 oppfølgingService.opprettTaskerForOppfølging()
             } catch (e: Exception) {
                 logger.warn("Feilet start av oppfølgingjobb, se secure logs for flere detaljer")
                 secureLogger.error("Feilet start av oppfølgingjobb", e)
+            } finally {
+                MDC.remove(MDCConstants.MDC_CALL_ID)
             }
         }
     }
