@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
-import java.time.LocalDateTime
-
 sealed interface Vurdering {
     val svar: SvarJaNei?
     val resultat: ResultatDelvilkårperiode
@@ -10,7 +8,6 @@ sealed interface Vurdering {
 sealed interface AutomatiskVurdering : Vurdering {
     val inputFakta: String
     val gitHash: String
-    val tidspunktForVurdering: LocalDateTime
 }
 
 enum class SvarJaNei {
@@ -123,14 +120,12 @@ data class VurderingAldersVilkår(
     override val resultat: ResultatDelvilkårperiode,
     override val inputFakta: String,
     override val gitHash: String,
-    override val tidspunktForVurdering: LocalDateTime,
 ) : AutomatiskVurdering {
     constructor(
         svar: SvarJaNei?,
         inputFakta: String,
         gitHash: String,
-        tidspunktForVurdering: LocalDateTime,
-    ) : this(svar, utledResultat(svar), inputFakta, gitHash, tidspunktForVurdering)
+    ) : this(svar, utledResultat(svar), inputFakta, gitHash)
 
     companion object {
         private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =

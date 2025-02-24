@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 object AldersvilkårVurdering {
     fun vurderAldersvilkår(
@@ -33,16 +32,12 @@ object AldersvilkårVurdering {
 
         return VurderingAldersVilkår(
             gyldig,
-            genererFaktaSomJson(fødselsdato = fødselsdato, vilkårperiode = vilkårperiode),
+            genererFaktaSomJson(fødselsdato = fødselsdato),
             "gitHash",
-            LocalDateTime.now(),
         )
     }
 
-    private fun genererFaktaSomJson(
-        fødselsdato: LocalDate,
-        vilkårperiode: LagreVilkårperiode,
-    ): String = "{ \"fødselsdato\": \"$fødselsdato\", \"vilkårperiode\": \"$vilkårperiode\" }"
+    private fun genererFaktaSomJson(fødselsdato: LocalDate): String = "{ \"fødselsdato\": \"$fødselsdato\"}"
 
     private fun heleVilkårsperiodenErFørBrukerFyller67År(
         fødselsdato: LocalDate,

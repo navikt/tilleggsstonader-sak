@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
 
 class FaktaOgVurderingMålgruppeLæremidlerTest {
     @Nested
@@ -42,7 +41,6 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )
@@ -63,7 +61,6 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )
@@ -84,7 +81,6 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )
@@ -105,7 +101,6 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )

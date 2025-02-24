@@ -3,11 +3,11 @@
   "fakta": {},
   "vurderinger": {
       "aldersvilkår": {
-      "resultat":"OPPFYLT",
-      "svar":"JA",
-      "inputFakta": "inputFakta",
-      "gitHash": "gitHash",
-      "tidspunktForVurdering": "2025-01-01T00:00:00" },
+        "resultat": "OPPFYLT",
+        "svar": "JA",
+        "inputFakta": "inputFakta",
+        "gitHash": "gitHash"
+      },
     "medlemskap": {
       "svar": "JA_IMPLISITT",
       "resultat": "OPPFYLT"

@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
-import java.time.LocalDateTime
-
 sealed interface VurderingerMålgruppe : Vurderinger
 
 sealed interface MedlemskapVurdering : VurderingerMålgruppe {
@@ -54,6 +52,5 @@ data object VurderingOvergangsstønad : MedlemskapVurdering, AldersvilkårVurder
             SvarJaNei.JA,
             inputFakta = "inputFakta",
             gitHash = "gitHash",
-            tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
         )
 }

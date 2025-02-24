@@ -45,7 +45,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgru
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 
 object VilkårperiodeTestUtil {
@@ -91,7 +90,6 @@ object VilkårperiodeTestUtil {
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )
@@ -107,7 +105,6 @@ object VilkårperiodeTestUtil {
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )
@@ -123,7 +120,6 @@ object VilkårperiodeTestUtil {
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )
@@ -139,7 +135,6 @@ object VilkårperiodeTestUtil {
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
                                     gitHash = "gitHash",
-                                    tidspunktForVurdering = LocalDateTime.of(2025, 1, 1, 0, 0),
                                 ),
                         ),
                 )
