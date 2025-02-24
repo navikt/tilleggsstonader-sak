@@ -29,7 +29,7 @@ Egenskap: Validering av vedtaksperioder for læremidler
 
     Når validerer vedtaksperiode for læremidler
 
-    Så forvent følgende feil fra vedtaksperiode validering: Vedtaksperiode er ikke innenfor en overlappsperiode
+    Så forvent følgende feil fra vedtaksperiode validering: Vedtaksperiode er ikke innenfor en periode med overlapp
 
 
   Scenario: Vedtaksperioder er ikke innenfor en stønadsperiode - mangler dag i starten
@@ -44,7 +44,7 @@ Egenskap: Validering av vedtaksperioder for læremidler
 
     Når validerer vedtaksperiode for læremidler
 
-    Så forvent følgende feil fra vedtaksperiode validering: Vedtaksperiode er ikke innenfor en overlappsperiode
+    Så forvent følgende feil fra vedtaksperiode validering: Vedtaksperiode er ikke innenfor en periode med overlapp
 
 
   Scenario: Vedtaksperioder er ikke innenfor en stønadsperiode - mangler dag i slutten
@@ -58,7 +58,7 @@ Egenskap: Validering av vedtaksperioder for læremidler
 
     Når validerer vedtaksperiode for læremidler
 
-    Så forvent følgende feil fra vedtaksperiode validering: Vedtaksperiode er ikke innenfor en overlappsperiode
+    Så forvent følgende feil fra vedtaksperiode validering: Vedtaksperiode er ikke innenfor en periode med overlapp
 
   Scenario: Skal kunne lage en vedtaksperiode som stekker seg over flere stønadsperioder
     Gitt følgende vedtaksperioder for læremidler

@@ -131,7 +131,7 @@ class AngreSendTilBeslutterServiceTest {
                 catchThrowableOfType<ApiFeil> {
                     service.angreSendTilBeslutter(behandling.id)
                 },
-            ).hasMessageContaining("Kan ikke angre send til beslutter når oppgave er plukket av $saksbehandler2")
+            ).hasMessageContaining("Kan ikke angre send til beslutter fordi Godkjenne vedtak-oppgave er plukket av $saksbehandler2")
         }
 
         @Test

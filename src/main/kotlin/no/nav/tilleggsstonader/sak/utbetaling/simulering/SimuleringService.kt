@@ -33,7 +33,7 @@ class SimuleringService(
     fun slettSimuleringForBehandling(saksbehandling: Saksbehandling) {
         val behandlingId = saksbehandling.id
         feilHvis(saksbehandling.status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke slette simulering for behandling=$behandlingId då den er låst"
+            "Kan ikke slette simulering for behandling=$behandlingId fordi den har har status ${saksbehandling.status.visningsnavn()}."
         }
         logger.info("Sletter simulering for behandling=$behandlingId")
         simuleringsresultatRepository.deleteById(behandlingId)
@@ -44,7 +44,7 @@ class SimuleringService(
         tilgangService.validerHarSaksbehandlerrolle()
 
         feilHvis(saksbehandling.status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke hente og lagre simuleringsresultat då behandling=${saksbehandling.id} er låst"
+            "Kan ikke hente og lagre simuleringsresultat for behandling=${saksbehandling.id} fordi den har har status ${saksbehandling.status.visningsnavn()}."
         }
 
         val resultat = simulerMedTilkjentYtelse(saksbehandling)

@@ -95,7 +95,7 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         faktaOgVurdering.vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.let {
             validerIkkeAktuelt(it.dekketAvAnnetRegelverk.resultat)
             brukerfeilHvis(it.dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) {
-                "Mangler begrunnelse for utgifter dekt av annet regelverk"
+                "Mangler begrunnelse for vurderingen av 'utgifter dekket av annet regelverk'"
             }
         }
         faktaOgVurdering.vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.let {
