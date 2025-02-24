@@ -47,7 +47,7 @@ class TilkjentYtelseService(
 
     fun slettTilkjentYtelseForBehandling(saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke reberegne tilkjent ytelse for en behandling som er låst for videre redigering"
+            "Kan ikke reberegne tilkjent ytelse for en behandling har status ${saksbehandling.status.visningsnavn()}"
         }
         tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)?.let {
             tilkjentYtelseRepository.deleteById(it.id)

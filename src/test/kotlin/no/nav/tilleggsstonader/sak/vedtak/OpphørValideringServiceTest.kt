@@ -114,7 +114,7 @@ class OpphørValideringServiceTest {
 
             assertThatThrownBy {
                 opphørValideringService.validerVilkårperioder(saksbehandling)
-            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er nye utgifter som er oppfylt")
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er lagt inn nye utgifter med oppfylte vilkår")
         }
 
         @Test
@@ -127,7 +127,7 @@ class OpphørValideringServiceTest {
 
             assertThatThrownBy {
                 opphørValideringService.validerVilkårperioder(saksbehandling)
-            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er nye målgrupper som er oppfylt")
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er lagt inn nye målgrupper med oppfylte vilkår")
         }
 
         @Test
@@ -140,14 +140,20 @@ class OpphørValideringServiceTest {
 
             assertThatThrownBy {
                 opphørValideringService.validerVilkårperioder(saksbehandling)
-            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er nye aktiviteter som er oppfylt")
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er lagt inn nye aktiviteter med oppfylte vilkår")
         }
 
         @Test
         fun `Kaster feil ved målgruppe flyttet til etter opphørt dato`() {
             every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns
                 Vilkårperioder(
-                    målgrupper = listOf(målgruppe.copy(tom = osloDateNow().plusMonths(2), status = Vilkårstatus.ENDRET)),
+                    målgrupper =
+                        listOf(
+                            målgruppe.copy(
+                                tom = osloDateNow().plusMonths(2),
+                                status = Vilkårstatus.ENDRET,
+                            ),
+                        ),
                     aktiviteter = listOf(aktivitet),
                 )
 

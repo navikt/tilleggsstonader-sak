@@ -196,7 +196,7 @@ class VilkårperiodeService(
 
     private fun validerBehandling(behandling: Saksbehandling) {
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke opprette eller endre periode når behandling er låst for videre redigering"
+            "Kan ikke opprette eller endre periode når behandling har status ${behandling.status.visningsnavn()}."
         }
         feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
             "Kan ikke opprette eller endre periode når behandling ikke er på steg ${StegType.INNGANGSVILKÅR}"

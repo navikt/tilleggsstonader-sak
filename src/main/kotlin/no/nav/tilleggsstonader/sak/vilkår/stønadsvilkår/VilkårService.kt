@@ -196,7 +196,10 @@ class VilkårService(
 
     private fun validerLåstForVidereRedigering(behandling: Saksbehandling) {
         if (behandling.status.behandlingErLåstForVidereRedigering()) {
-            throw ApiFeil("Behandlingen er låst for videre redigering", HttpStatus.BAD_REQUEST)
+            throw ApiFeil(
+                "Kan ikke gjøre ønsket endring fordi behandlingen har status ${behandling.status.visningsnavn()}",
+                HttpStatus.BAD_REQUEST,
+            )
         }
     }
 

@@ -93,6 +93,7 @@ class SendTilBeslutterSteg(
     private fun validerRiktigTilstandVedInvilgelse(saksbehandling: Saksbehandling) {
         val vedtaksresultat = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
         if (vedtaksresultat == TypeVedtak.INNVILGELSE) {
+            // TODO: SJekk
             brukerfeilHvisIkke(vilkårService.erAlleVilkårOppfylt(saksbehandling.id)) {
                 "Kan ikke innvilge hvis ikke alle vilkår er oppfylt for behandlingId: ${saksbehandling.id}"
             }

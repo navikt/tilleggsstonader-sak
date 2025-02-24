@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -90,7 +89,7 @@ class TilsynBarnBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtak: OpphørTilsynBarnRequest,
     ) {
-        brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
+        feilHvis(saksbehandling.forrigeBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
 

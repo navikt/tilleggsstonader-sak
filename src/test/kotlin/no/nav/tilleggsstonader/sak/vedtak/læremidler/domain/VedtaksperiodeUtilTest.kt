@@ -96,7 +96,7 @@ class VedtaksperiodeUtilTest {
 
             assertThatThrownBy {
                 validerVedtaksperioder(vedtaksperioder, stønadsperioder)
-            }.hasMessageContaining("Vedtaksperiode er ikke innenfor en overlappsperiode")
+            }.hasMessageContaining("Vedtaksperiode er ikke innenfor en periode med overlapp")
         }
     }
 

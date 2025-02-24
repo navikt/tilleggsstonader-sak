@@ -52,7 +52,7 @@ data class Behandling(
             brukerfeilHvis(henlagtÅrsak == null) { "Kan ikke henlegge behandling uten en årsak" }
         }
         feilHvis(revurderFra != null && type != BehandlingType.REVURDERING) {
-            "Kan ikke sette revurder fra når forrige behandling er annet enn revurdering"
+            "Kan ikke sette revurder fra når behandlingen ikke er en revurdering"
         }
     }
 }

@@ -357,7 +357,7 @@ internal class VilkårServiceTest {
                 )
             },
         ).isInstanceOf(ApiFeil::class.java)
-            .hasMessageContaining("er låst for videre redigering")
+            .hasMessageContaining("Kan ikke gjøre ønsket endring fordi behandlingen har status")
         verify(exactly = 0) { vilkårRepository.insertAll(any()) }
     }
 

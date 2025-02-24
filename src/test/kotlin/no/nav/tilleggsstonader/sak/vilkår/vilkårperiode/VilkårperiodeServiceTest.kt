@@ -75,7 +75,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             assertThatThrownBy {
                 vilkårperiodeService.slettVilkårperiode(lagretPeriode.id, SlettVikårperiode(behandling.id))
-            }.hasMessageContaining("Kan ikke opprette eller endre periode når behandling er låst for videre redigering")
+            }.hasMessageContaining("Kan ikke opprette eller endre periode når behandling behandling har status Ferdigstilt.")
         }
 
         @Nested

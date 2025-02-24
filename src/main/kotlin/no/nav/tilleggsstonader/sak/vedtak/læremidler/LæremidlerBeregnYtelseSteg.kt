@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.periode.AvkortResult
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
@@ -161,7 +160,7 @@ class LæremidlerBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtak: OpphørLæremidlerRequest,
     ) {
-        brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
+        feilHvis(saksbehandling.forrigeBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
         feilHvis(saksbehandling.revurderFra == null) {
