@@ -378,8 +378,10 @@ private data class InngangsvilkårAktivitet(
         if (registerAktivitet != null) {
             val fomDiff = diff("fom", fom, registerAktivitet.fom)
             val tomDiff = diff("tom", tom, registerAktivitet.tom)
-            val prosentDiff = diff("prosent", prosent, registerAktivitet.prosentDeltakelse?.toInt())
-            val antallDagerDiff = diff("dager", antallDager, registerAktivitet.antallDagerPerUke)
+            val prosentDiff =
+                diff("prosent", prosent, registerAktivitet.prosentDeltakelse?.toInt()).takeIf { prosent != null }
+            val antallDagerDiff =
+                diff("dager", antallDager, registerAktivitet.antallDagerPerUke).takeIf { antallDager != null }
             val diff = listOfNotNull(fomDiff, tomDiff, prosentDiff, antallDagerDiff)
             if (diff.isNotEmpty()) {
                 logger.info("Diff vilkår=$id vs register ${diff.joinToString(" ")}")
