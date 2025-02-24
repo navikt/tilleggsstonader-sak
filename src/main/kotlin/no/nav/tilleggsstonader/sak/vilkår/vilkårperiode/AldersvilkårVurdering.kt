@@ -23,7 +23,7 @@ object AldersvilkårVurdering {
                 MålgruppeType.AAP, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD ->
                     vurderAldersvilkårForNedsattArbeidsevne(fødselsdato, vilkårperiode)
                 MålgruppeType.OMSTILLINGSSTØNAD -> vurderAldersvilkårForOmstillingsstønad(fødselsdato, vilkårperiode)
-                MålgruppeType.OVERGANGSSTØNAD -> SvarJaNei.JA
+                MålgruppeType.OVERGANGSSTØNAD -> SvarJaNei.JA_IMPLISITT
                 MålgruppeType.DAGPENGER -> null
                 MålgruppeType.SYKEPENGER_100_PROSENT -> null
                 MålgruppeType.INGEN_MÅLGRUPPE -> null
@@ -52,7 +52,7 @@ object AldersvilkårVurdering {
         vilkårsperiodeTom: LocalDate,
     ): Boolean {
         val sekstisyvÅrsDagenTilBruker = fødselsdato.plusYears(67)
-        feilHvis((vilkårsperiodeFom <= sekstisyvÅrsDagenTilBruker) && (sekstisyvÅrsDagenTilBruker <= vilkårsperiodeTom)) {
+        feilHvis((vilkårsperiodeFom < sekstisyvÅrsDagenTilBruker) && (sekstisyvÅrsDagenTilBruker <= vilkårsperiodeTom)) {
             "Brukeren fyller 67 år i løpet av vilkårsperioden"
         }
         return vilkårsperiodeTom < sekstisyvÅrsDagenTilBruker
