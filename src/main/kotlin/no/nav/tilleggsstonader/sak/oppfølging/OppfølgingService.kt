@@ -147,11 +147,11 @@ class OppfølgingService(
                 val ytelser = ytelserPerMålgruppe[this.målgruppe] ?: emptyList()
                 val kontroller = finnKontroller(this, ytelser)
                 val enKontroll = kontroller.singleOrNull()
-                val sisteDagNesteMåned = YearMonth.now().plusMonths(1).atEndOfMonth()
+                val førsteDagINestNesteMåned = YearMonth.now().plusMonths(2).atDay(1)
                 if (
                     målgruppe == MålgruppeType.AAP &&
                     enKontroll?.årsak == ÅrsakKontroll.TOM_ENDRET &&
-                    enKontroll.tom!! > sisteDagNesteMåned
+                    enKontroll.tom!! >= førsteDagINestNesteMåned
                 ) {
                     // AAP slutter før vedtaksperiode
                     emptyList()
