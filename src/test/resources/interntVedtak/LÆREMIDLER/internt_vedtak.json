@@ -121,7 +121,7 @@
       "stønadsbeløp" : 1902,
       "utbetalingsdato" : "2024-01-01",
       "målgruppe" : "AAP",
-      "aktivitetType" : "TILTAK"
+      "aktivitet" : "TILTAK"
     } ]
   }
 }
