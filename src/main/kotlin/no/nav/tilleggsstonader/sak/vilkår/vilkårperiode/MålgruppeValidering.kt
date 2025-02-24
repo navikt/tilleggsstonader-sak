@@ -37,7 +37,6 @@ object MålgruppeValidering {
 
     fun vurderAldersvilkår(
         vilkårperiode: LagreVilkårperiode,
-        stønadstype: Stønadstype,
         grunnlagsdata: Grunnlagsdata,
     ): VurderingAldersVilkår {
         val fødselsdato = grunnlagsdata.grunnlag.fødsel?.fødselsdato
@@ -45,20 +44,16 @@ object MålgruppeValidering {
         feilHvis(fødselsdato == null) { "Kan ikke vurdere aldersvilkår uten å vite fødselsdato til bruker" }
 
         val gyldig: SvarJaNei? =
-            when (stønadstype) {
-                Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER ->
-                    when (vilkårperiode.type as MålgruppeType) {
-                        MålgruppeType.AAP, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD ->
-                            vurderAldersvilkårForNedsattArbeidsevne(fødselsdato, vilkårperiode)
-                        MålgruppeType.OMSTILLINGSSTØNAD -> vurderAldersvilkårForOmstillingsstønad(fødselsdato, vilkårperiode)
-                        MålgruppeType.OVERGANGSSTØNAD -> SvarJaNei.JA
-                        MålgruppeType.DAGPENGER -> null
-                        MålgruppeType.SYKEPENGER_100_PROSENT -> null
-                        MålgruppeType.INGEN_MÅLGRUPPE -> null
-                    }
-
-                Stønadstype.BOUTGIFTER -> TODO("Stønadstype BOUTGIFTER er ikke implementert")
+            when (vilkårperiode.type as MålgruppeType) {
+                MålgruppeType.AAP, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD ->
+                    vurderAldersvilkårForNedsattArbeidsevne(fødselsdato, vilkårperiode)
+                MålgruppeType.OMSTILLINGSSTØNAD -> vurderAldersvilkårForOmstillingsstønad(fødselsdato, vilkårperiode)
+                MålgruppeType.OVERGANGSSTØNAD -> SvarJaNei.JA
+                MålgruppeType.DAGPENGER -> null
+                MålgruppeType.SYKEPENGER_100_PROSENT -> null
+                MålgruppeType.INGEN_MÅLGRUPPE -> null
             }
+
         feilHvis(gyldig == SvarJaNei.NEI) {
             "Aldersvilkår er ikke oppfylt ved opprettelse av målgruppe=${vilkårperiode.type} for behandling=${grunnlagsdata.behandlingId}"
         }
