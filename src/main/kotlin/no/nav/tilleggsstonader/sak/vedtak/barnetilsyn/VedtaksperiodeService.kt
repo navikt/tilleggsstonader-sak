@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -20,9 +21,11 @@ class VedtaksperiodeService(
     private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
     private val vedtakRepository: VedtakRepository,
+    private val behandlingService: BehandlingService,
 ) {
     fun foreslåPerioder(behandlingId: BehandlingId): List<Vedtaksperiode> {
-        brukerfeilHvis(detFinnesVedtaksperioder(behandlingId)) {
+        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+        brukerfeilHvis(detFinnesVedtaksperioder(behandlingId, saksbehandling.forrigeBehandlingId)) {
             "Det finnes allerede lagrede vedtaksperioder for denne behandlingen"
         }
 
@@ -53,17 +56,21 @@ class VedtaksperiodeService(
         return forrigeVedtaksperioder.avkortFraOgMed(behandling.revurderFra.minusDays(1))
     }
 
-    private fun detFinnesVedtaksperioder(behandlingId: BehandlingId) = !finnVedtaksperioder(behandlingId).isNullOrEmpty()
+    fun detFinnesVedtaksperioder(
+        behandlingId: BehandlingId,
+        forrigeBehandlingId: BehandlingId?,
+    ) = finnVedtaksperioder(behandlingId)?.isNotEmpty() == true || finnVedtaksperioder(forrigeBehandlingId)?.isNotEmpty() == true
 
-    private fun finnVedtaksperioder(behandlingId: BehandlingId): List<Vedtaksperiode>? {
-        val forrigeVedtak = vedtakRepository.findByIdOrNull(behandlingId)?.data
-        return when (forrigeVedtak) {
+    private fun finnVedtaksperioder(behandlingId: BehandlingId?): List<Vedtaksperiode>? {
+        if (behandlingId == null) return null
+        val vedtak = vedtakRepository.findByIdOrNull(behandlingId)?.data
+        return when (vedtak) {
             null -> null
-            is InnvilgelseTilsynBarn -> forrigeVedtak.vedtaksperioder
-            is OpphørTilsynBarn -> forrigeVedtak.vedtaksperioder
+            is InnvilgelseTilsynBarn -> vedtak.vedtaksperioder
+            is OpphørTilsynBarn -> vedtak.vedtaksperioder
             else ->
                 error(
-                    "Kan ikke hente forrige vedtaksperioder for tilsyn barn når forrige vedtak var ${forrigeVedtak.javaClass.simpleName}",
+                    "Kan ikke hente forrige vedtaksperioder for tilsyn barn når forrige vedtak var ${vedtak.javaClass.simpleName}",
                 )
         }
     }
