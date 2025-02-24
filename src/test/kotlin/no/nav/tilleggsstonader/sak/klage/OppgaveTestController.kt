@@ -33,8 +33,9 @@ class OppgaveTestController(
     @PatchMapping("{oppgaveId}/ferdigstill")
     fun ferdigstillOppgave(
         @PathVariable oppgaveId: Long,
-    ) {
+    ): OppgaveResponse {
         oppgaveClient.ferdigstillOppgave(oppgaveId)
+        return OppgaveResponse(oppgaveId)
     }
 
     @PatchMapping("{oppgaveId}/oppdater")

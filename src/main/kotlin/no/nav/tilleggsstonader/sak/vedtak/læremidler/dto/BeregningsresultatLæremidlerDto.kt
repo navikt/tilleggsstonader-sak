@@ -24,7 +24,7 @@ data class BeregningsresultatForPeriodeDto(
     val stønadsbeløp: Int,
     val utbetalingsdato: LocalDate,
     val målgruppe: MålgruppeType,
-    val aktivitetType: AktivitetType,
+    val aktivitet: AktivitetType,
 ) : Periode<LocalDate> {
     fun slåSammen(nestePeriode: BeregningsresultatForPeriodeDto): BeregningsresultatForPeriodeDto =
         this.copy(
@@ -68,5 +68,5 @@ fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto =
         stønadsbeløp = beløp,
         utbetalingsdato = grunnlag.utbetalingsdato,
         målgruppe = grunnlag.målgruppe,
-        aktivitetType = grunnlag.aktivitet,
+        aktivitet = grunnlag.aktivitet,
     )
