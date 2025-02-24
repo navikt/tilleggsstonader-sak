@@ -24,9 +24,7 @@ object AldersvilkårVurdering {
                     vurderAldersvilkårForNedsattArbeidsevne(fødselsdato, vilkårperiode)
                 MålgruppeType.OMSTILLINGSSTØNAD -> vurderAldersvilkårForOmstillingsstønad(fødselsdato, vilkårperiode)
                 MålgruppeType.OVERGANGSSTØNAD -> SvarJaNei.JA_IMPLISITT
-                MålgruppeType.DAGPENGER -> null
-                MålgruppeType.SYKEPENGER_100_PROSENT -> null
-                MålgruppeType.INGEN_MÅLGRUPPE -> null
+                else -> null
             }
 
         feilHvis(gyldig == SvarJaNei.NEI) {
