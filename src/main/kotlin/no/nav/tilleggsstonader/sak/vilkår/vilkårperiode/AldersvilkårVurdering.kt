@@ -17,7 +17,7 @@ object AldersvilkårVurdering {
 
         feilHvis(fødselsdato == null) { "Kan ikke vurdere aldersvilkår uten å vite fødselsdato til bruker" }
 
-        val gyldig: SvarJaNei? =
+        val gyldig: SvarJaNei =
             when (vilkårperiode.type as MålgruppeType) {
                 MålgruppeType.AAP, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD ->
                     vurderAldersvilkårForNedsattArbeidsevne(fødselsdato, vilkårperiode)

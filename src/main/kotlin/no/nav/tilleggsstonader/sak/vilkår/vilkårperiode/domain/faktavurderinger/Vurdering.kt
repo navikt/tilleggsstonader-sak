@@ -115,12 +115,12 @@ data class VurderingDekketAvAnnetRegelverk private constructor(
 }
 
 data class VurderingAldersVilkår(
-    override val svar: SvarJaNei?,
+    override val svar: SvarJaNei,
     override val resultat: ResultatDelvilkårperiode,
     override val vurderingFaktaEtterlevelse: String,
 ) : AutomatiskVurdering {
     constructor(
-        svar: SvarJaNei?,
+        svar: SvarJaNei,
         vurderingFaktaEtterlevelse: String,
     ) : this(svar, utledResultat(svar), vurderingFaktaEtterlevelse)
 
