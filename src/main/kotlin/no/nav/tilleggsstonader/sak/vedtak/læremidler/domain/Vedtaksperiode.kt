@@ -5,19 +5,26 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.PeriodeMedId
 import java.time.LocalDate
 import java.util.UUID
 
 data class Vedtaksperiode(
-    val id: UUID = UUID.randomUUID(),
+    override val id: UUID = UUID.randomUUID(),
     override val fom: LocalDate,
     override val tom: LocalDate,
     val status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
 ) : Periode<LocalDate>,
-    KopierPeriode<Vedtaksperiode> {
+    KopierPeriode<Vedtaksperiode>,
+    PeriodeMedId {
     init {
         validatePeriode()
     }
+
+    override fun kopier(
+        fom: LocalDate,
+        tom: LocalDate,
+    ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
 
     override fun medPeriode(
         fom: LocalDate,

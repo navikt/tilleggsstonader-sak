@@ -11,15 +11,7 @@ import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 
 object VedtaksperiodeUtil {
-    fun validerVedtaksperioder(
-        vedtaksperioder: List<Vedtaksperiode>,
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
-    ) {
-        validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
-        validerVedtaksperiodeOmfattesAvStønadsperioder(vedtaksperioder, stønadsperioder)
-    }
-
-    private fun validerIngenOverlappendeVedtaksperioder(vedtaksperioder: List<Vedtaksperiode>) {
+    fun validerIngenOverlappendeVedtaksperioder(vedtaksperioder: List<Vedtaksperiode>) {
         val overlappendePeriode = vedtaksperioder.førsteOverlappendePeriode()
         if (overlappendePeriode != null) {
             brukerfeil(
@@ -28,7 +20,7 @@ object VedtaksperiodeUtil {
         }
     }
 
-    private fun validerVedtaksperiodeOmfattesAvStønadsperioder(
+    fun validerVedtaksperiodeOmfattesAvStønadsperioder(
         vedtaksperioder: List<Vedtaksperiode>,
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
     ) {

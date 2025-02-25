@@ -4,10 +4,12 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
+import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelAndelTilkjentYtelse
@@ -48,6 +50,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBereg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapAktiviteter
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapBeregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.LæremidlerVedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
@@ -65,6 +68,12 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     val stønadsperiodeRepository = StønadsperiodeRepositoryFake()
     val vedtakRepository = VedtakRepositoryFake()
     val tilkjentYtelseRepository = TilkjentYtelseRepositoryFake()
+    val behandlingService = mockk<BehandlingService>()
+    val læremidlerVedtaksperiodeValideringService =
+        LæremidlerVedtaksperiodeValideringService(
+            behandlingService = behandlingService,
+            vedtakRepository = vedtakRepository,
+        )
 
     val simuleringService =
         mockk<SimuleringService>().apply {
@@ -76,6 +85,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                 LæremidlerBeregningService(
                     vilkårperiodeRepository = vilkårperiodeRepository,
                     stønadsperiodeRepository = stønadsperiodeRepository,
+                    læremidlerVedtaksperiodeValideringService = læremidlerVedtaksperiodeValideringService,
                 ),
             opphørValideringService = mockk<OpphørValideringService>(relaxed = true),
             vedtakRepository = vedtakRepository,
@@ -107,6 +117,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         behandlingIdTall: Int,
         dataTable: DataTable,
     ) {
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         val vedtaksperioder =
             dataTable.mapRad { rad ->
@@ -125,6 +136,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         revurderFraStr: String,
         dataTable: DataTable,
     ) {
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
 

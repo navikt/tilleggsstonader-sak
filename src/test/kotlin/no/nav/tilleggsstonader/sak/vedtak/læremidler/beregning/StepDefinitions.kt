@@ -7,17 +7,20 @@ import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
+import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.LæremidlerVedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
@@ -43,7 +46,21 @@ class StepDefinitions {
 
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
-    val læremidlerBeregningService = LæremidlerBeregningService(vilkårperiodeRepository, stønadsperiodeRepository)
+    val behandlingService = mockk<BehandlingService>()
+    val vedtakRepository = VedtakRepositoryFake()
+
+    val læremidlerVedtaksperiodeValideringService =
+        LæremidlerVedtaksperiodeValideringService(
+            behandlingService = behandlingService,
+            vedtakRepository = vedtakRepository,
+        )
+
+    val læremidlerBeregningService =
+        LæremidlerBeregningService(
+            vilkårperiodeRepository = vilkårperiodeRepository,
+            stønadsperiodeRepository = stønadsperiodeRepository,
+            læremidlerVedtaksperiodeValideringService = læremidlerVedtaksperiodeValideringService,
+        )
 
     val behandlingId = BehandlingId(UUID.randomUUID())
 
@@ -84,6 +101,7 @@ class StepDefinitions {
 
     @Når("beregner stønad for læremidler")
     fun `beregner stønad for læremidler`() {
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
         try {
             resultat = læremidlerBeregningService.beregn(vedtaksPerioder, behandlingId)
         } catch (e: Exception) {
@@ -98,8 +116,13 @@ class StepDefinitions {
 
     @Når("validerer vedtaksperiode for læremidler")
     fun `validerer vedtaksperiode for læremidler`() {
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
         try {
-            validerVedtaksperioder(vedtaksPerioder, stønadsperioder.tilSortertStønadsperiodeBeregningsgrunnlag())
+            læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
+                vedtaksperioder = vedtaksPerioder,
+                stønadsperioder = stønadsperioder.tilSortertStønadsperiodeBeregningsgrunnlag(),
+                behandlingId = behandlingId,
+            )
         } catch (feil: Exception) {
             valideringException = feil
         }
