@@ -39,7 +39,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "input-fakta",
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
                                 ),
                         ),
                 )
@@ -58,7 +58,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "input-fakta",
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
                                 ),
                         ),
                 )
@@ -77,7 +77,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "input-fakta",
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
                                 ),
                         ),
                 )
@@ -96,7 +96,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "input-fakta",
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
                                 ),
                         ),
                 )

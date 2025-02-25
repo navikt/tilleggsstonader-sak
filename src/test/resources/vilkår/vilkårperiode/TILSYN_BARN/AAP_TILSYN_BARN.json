@@ -5,7 +5,7 @@
     "aldersvilkår": {
       "resultat":"OPPFYLT",
       "svar":"JA_IMPLISITT",
-      "inputFakta": "String"
+      "vurderingFaktaEtterlevelse": "Vurdering Fakta Etterlevelse"
     },
     "dekketAvAnnetRegelverk": {
       "svar": "NEI",

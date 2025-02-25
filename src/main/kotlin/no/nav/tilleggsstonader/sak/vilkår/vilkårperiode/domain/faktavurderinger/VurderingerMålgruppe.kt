@@ -50,6 +50,6 @@ data object VurderingOvergangsstønad : MedlemskapVurdering, AldersvilkårVurder
     override val aldersvilkår: VurderingAldersVilkår =
         VurderingAldersVilkår(
             SvarJaNei.JA,
-            inputFakta = "inputFakta",
+            vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
         )
 }

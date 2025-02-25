@@ -46,7 +46,7 @@ class FaktaOgVurderingTilsynBarnTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "input-fakta",
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
                                 ),
                         ),
                 )
@@ -65,7 +65,7 @@ class FaktaOgVurderingTilsynBarnTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "input-fakta",
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
                                 ),
                         ),
                 )
@@ -84,7 +84,7 @@ class FaktaOgVurderingTilsynBarnTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "input-fakta",
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
                                 ),
                         ),
                 )
@@ -103,7 +103,7 @@ class FaktaOgVurderingTilsynBarnTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "input-fakta",
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
                                 ),
                         ),
                 )

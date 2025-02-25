@@ -88,7 +88,7 @@ object VilkårperiodeTestUtil {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "input-fakta",
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
                                 ),
                         ),
                 )
@@ -102,7 +102,7 @@ object VilkårperiodeTestUtil {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "input-fakta",
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
                                 ),
                         ),
                 )
@@ -116,7 +116,7 @@ object VilkårperiodeTestUtil {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "input-fakta",
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
                                 ),
                         ),
                 )
@@ -130,7 +130,7 @@ object VilkårperiodeTestUtil {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    inputFakta = "input-fakta",
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
                                 ),
                         ),
                 )
