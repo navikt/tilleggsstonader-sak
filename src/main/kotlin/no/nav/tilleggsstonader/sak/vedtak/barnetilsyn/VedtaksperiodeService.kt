@@ -36,10 +36,10 @@ class VedtaksperiodeService(
     }
 
     fun finnNyeVedtaksperioderForOpphør(behandling: Saksbehandling): List<Vedtaksperiode> {
-        brukerfeilHvis(behandling.forrigeBehandlingId == null) {
+        feilHvis(behandling.forrigeBehandlingId == null) {
             "Kan ikke finne nye vedtaksperioder for opphør fordi behandlingen er en førstegangsbehandling"
         }
-        brukerfeilHvis(behandling.revurderFra == null) {
+        feilHvis(behandling.revurderFra == null) {
             "Kan ikke finne nye vedtaksperioder for opphør fordi revurder fra dato mangler"
         }
 
@@ -63,7 +63,7 @@ class VedtaksperiodeService(
             is OpphørTilsynBarn -> forrigeVedtak.vedtaksperioder
             else ->
                 error(
-                    "Kan ikke hente forrgie vedtaksperioder for tilsyn barn når forrgie vedtak var ${forrigeVedtak.javaClass.simpleName}",
+                    "Kan ikke hente forrige vedtaksperioder for tilsyn barn når forrige vedtak var ${forrigeVedtak.javaClass.simpleName}",
                 )
         }
     }
