@@ -3,6 +3,9 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.security.token.support.core.api.Unprotected
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
+import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
@@ -10,10 +13,12 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import org.slf4j.MDC
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
+import java.util.UUID
+import java.util.concurrent.Executors
 
 @RestController
 @RequestMapping("/admin/vedtak/migrer")
@@ -21,9 +26,26 @@ import java.util.*
 class VedtaksperiodeMigreringsController(
     val vedtakservice: VedtakService,
     val vedtakRepository: VedtakRepository,
+    private val transactionHandler: TransactionHandler,
 ) {
     @GetMapping()
-    fun migrer() {
+    fun migrerINyTråd() {
+        val callId = MDC.get(MDCConstants.MDC_CALL_ID)
+        Executors.newVirtualThreadPerTaskExecutor().submit {
+            MDC.put(MDCConstants.MDC_CALL_ID, callId)
+            try {
+                transactionHandler.runInNewTransaction {
+                    migrer()
+                }
+            } catch (e: Exception) {
+                secureLogger.error("Feilet jobb", e)
+            } finally {
+                MDC.remove(MDCConstants.MDC_CALL_ID)
+            }
+        }
+    }
+
+    private fun migrer() {
         val innvilgelseTilsynBarn = hentInnvilgelser()
         val opphørTilsynBarn = hentOpphør()
 
