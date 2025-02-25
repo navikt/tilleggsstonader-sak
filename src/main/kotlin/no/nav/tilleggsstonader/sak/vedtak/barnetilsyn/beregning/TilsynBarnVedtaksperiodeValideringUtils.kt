@@ -157,7 +157,7 @@ object TilsynBarnVedtaksperiodeValideringUtils {
                     if (nyVedtaksperiode != null &&
                         // revurderFra.minusDays(1) tillater endringer dagen før revurder fra som trengs i opphør
                         nyVedtaksperiode.tom >= revurderFra.minusDays(1) &&
-                        vedtaksperiodeForrigeBehandling.tom >= revurderFra
+                        vedtaksperiodeForrigeBehandling.tom >= revurderFra.minusDays(1)
                     ) {
                         vedtaksperiodeForrigeBehandling.copy(tom = nyVedtaksperiode.tom)
                     } else {
