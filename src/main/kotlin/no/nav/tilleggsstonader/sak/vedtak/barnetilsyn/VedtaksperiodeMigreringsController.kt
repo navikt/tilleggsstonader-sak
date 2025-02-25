@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
@@ -14,6 +15,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -30,6 +33,8 @@ class VedtaksperiodeMigreringsController(
     val unleashService: UnleashService,
     private val transactionHandler: TransactionHandler,
 ) {
+    val logger: Logger = LoggerFactory.getLogger(javaClass)
+
     @GetMapping()
     fun migrerINyTråd() {
         val callId = MDC.get(MDCConstants.MDC_CALL_ID)
@@ -52,10 +57,8 @@ class VedtaksperiodeMigreringsController(
             return
         }
 
-        val innvilgelseTilsynBarn = hentInnvilgelser()
-        val opphørTilsynBarn = hentOpphør()
-
-        innvilgelseTilsynBarn.forEach {
+        logger.info("Starter migrering av vedtaksperioder for innvilgelser...")
+        hentInnvilgelser().forEach {
             if (it.data.vedtaksperioder == null) {
                 val beregningsresultat = it.data.beregningsresultat
                 val vedtaksperioder = mapTilVedtaksperiode(beregningsresultat.perioder)
@@ -66,7 +69,8 @@ class VedtaksperiodeMigreringsController(
             }
         }
 
-        opphørTilsynBarn.forEach {
+        logger.info("Starter migrering av vedtaksperioder for opphør...")
+        hentOpphør().forEach {
             if (it.data.vedtaksperioder == null) {
                 val beregningsresultat = it.data.beregningsresultat
                 val vedtaksperioder = mapTilVedtaksperiode(beregningsresultat.perioder)
@@ -76,6 +80,8 @@ class VedtaksperiodeMigreringsController(
                 vedtakRepository.update(nyttVedtak)
             }
         }
+
+        logger.info("... migrering av vedtaksperioder er ferdig! \uD83E\uDD73")
     }
 
     private fun hentInnvilgelser(): List<GeneriskVedtak<InnvilgelseTilsynBarn>> {
@@ -125,6 +131,6 @@ private fun tilVedtaksperioder(beregningsresultat: BeregningsresultatForMåned) 
                 fom = vedtaksperiode.fom,
                 tom = vedtaksperiode.tom,
                 målgruppe = vedtaksperiode.målgruppe,
-                vedtaksperiode.aktivitet,
+                aktivitet = vedtaksperiode.aktivitet,
             )
         }
