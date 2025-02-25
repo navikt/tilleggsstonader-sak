@@ -9,8 +9,8 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBereg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.LæremidlerVedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service
 class LæremidlerBeregningService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val stønadsperiodeRepository: StønadsperiodeRepository,
+    private val læremidlerVedtaksperiodeValideringService: LæremidlerVedtaksperiodeValideringService,
 ) {
     /**
      * Beregning av læremidler har foreløpig noen begrensninger.
@@ -35,7 +36,11 @@ class LæremidlerBeregningService(
     ): BeregningsresultatLæremidler {
         val stønadsperioder = hentStønadsperioder(behandlingId)
 
-        validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+        læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
+            vedtaksperioder = vedtaksperioder,
+            stønadsperioder = stønadsperioder,
+            behandlingId = behandlingId,
+        )
 
         val aktiviteter = finnAktiviteter(behandlingId)
         val beregningsresultatForMåned = beregnLæremidlerPerMåned(vedtaksperioder, stønadsperioder, aktiviteter)
