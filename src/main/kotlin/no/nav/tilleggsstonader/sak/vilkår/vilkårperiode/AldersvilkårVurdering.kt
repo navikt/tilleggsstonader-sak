@@ -23,12 +23,10 @@ object AldersvilkårVurdering {
                     vurderAldersvilkårForNedsattArbeidsevne(fødselsdato, vilkårperiode)
                 MålgruppeType.OMSTILLINGSSTØNAD -> vurderAldersvilkårForOmstillingsstønad(fødselsdato, vilkårperiode)
                 MålgruppeType.OVERGANGSSTØNAD -> SvarJaNei.JA_IMPLISITT
-                else -> null
+                MålgruppeType.DAGPENGER -> SvarJaNei.NEI
+                MålgruppeType.SYKEPENGER_100_PROSENT -> SvarJaNei.NEI
+                MålgruppeType.INGEN_MÅLGRUPPE -> SvarJaNei.NEI
             }
-
-        feilHvis(gyldig == SvarJaNei.NEI) {
-            "Aldersvilkår er ikke oppfylt ved opprettelse av målgruppe=${vilkårperiode.type} for behandling=${grunnlagsdata.behandlingId}"
-        }
 
         return VurderingAldersVilkår(
             gyldig,
