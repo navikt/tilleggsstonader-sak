@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -26,6 +27,7 @@ import java.util.concurrent.Executors
 class VedtaksperiodeMigreringsController(
     val vedtakservice: VedtakService,
     val vedtakRepository: VedtakRepository,
+    val unleashService: UnleashService,
     private val transactionHandler: TransactionHandler,
 ) {
     @GetMapping()
@@ -46,6 +48,10 @@ class VedtaksperiodeMigreringsController(
     }
 
     private fun migrer() {
+        if (!unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN)) {
+            return
+        }
+
         val innvilgelseTilsynBarn = hentInnvilgelser()
         val opphørTilsynBarn = hentOpphør()
 
