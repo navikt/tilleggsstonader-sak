@@ -75,18 +75,18 @@ class BehandlingsstatistikkService(
         val relatertBehandlingId = utledRelatertBehandling(saksbehandling)
 
         return mapTilBehandlingDVH(
-            saksbehandling,
-            behandlingId,
-            henvendelseTidspunkt,
-            hendelse,
-            hendelseTidspunkt,
-            søkerHarStrengtFortroligAdresse,
-            saksbehandlerId,
-            sisteOppgaveForBehandling,
-            behandlingMetode,
-            beslutterId,
-            osloNow(),
-            relatertBehandlingId,
+            saksbehandling = saksbehandling,
+            behandlingId = behandlingId,
+            henvendelseTidspunkt = henvendelseTidspunkt,
+            hendelse = hendelse,
+            hendelseTidspunkt = hendelseTidspunkt,
+            søkerHarStrengtFortroligAdresse = søkerHarStrengtFortroligAdresse,
+            saksbehandlerId = saksbehandlerId,
+            sisteOppgaveForBehandling = sisteOppgaveForBehandling,
+            behandlingMetode = behandlingMetode,
+            beslutterId = beslutterId,
+            tekniskTid = osloNow(),
+            relatertBehandlingId = relatertBehandlingId,
         )
     }
 
