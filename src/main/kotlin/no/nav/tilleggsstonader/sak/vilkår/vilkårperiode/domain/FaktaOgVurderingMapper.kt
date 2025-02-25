@@ -34,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
@@ -53,10 +54,20 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 fun mapFaktaOgSvarDto(
     vilkårperiode: LagreVilkårperiode,
     stønadstype: Stønadstype,
+    vurderingAldersvilkår: VurderingAldersVilkår?,
 ): FaktaOgVurdering =
     when (vilkårperiode.type) {
         is AktivitetType -> mapAktiviteter(stønadstype = stønadstype, aktivitet = vilkårperiode)
-        is MålgruppeType -> mapMålgruppe(stønadstype = stønadstype, målgruppe = vilkårperiode)
+        is MålgruppeType ->
+            mapMålgruppe(
+                stønadstype = stønadstype,
+                målgruppe = vilkårperiode,
+                vurderingAldersvilkår =
+                    vurderingAldersvilkår.let {
+                        it
+                            ?: error("Mangler vurdering av aldersvilkår for målgruppe=$vilkårperiode, stønadstype=$stønadstype")
+                    },
+            )
     }
 
 private fun mapAktiviteter(
@@ -87,6 +98,7 @@ private fun mapAktiviteter(
 private fun mapMålgruppe(
     stønadstype: Stønadstype,
     målgruppe: LagreVilkårperiode,
+    vurderingAldersvilkår: VurderingAldersVilkår,
 ): MålgruppeFaktaOgVurdering {
     val type = målgruppe.type
     require(type is MålgruppeType)
@@ -96,11 +108,11 @@ private fun mapMålgruppe(
 
     return when (stønadstype) {
         Stønadstype.BARNETILSYN -> {
-            mapMålgruppeBarnetilsyn(type, faktaOgSvar)
+            mapMålgruppeBarnetilsyn(type, faktaOgSvar, vurderingAldersvilkår)
         }
 
         Stønadstype.LÆREMIDLER -> {
-            mapMålgruppeLæremidler(type, faktaOgSvar)
+            mapMålgruppeLæremidler(type, faktaOgSvar, vurderingAldersvilkår)
         }
         Stønadstype.BOUTGIFTER -> {
             TODO("Ikke implementert ennå")
@@ -179,6 +191,7 @@ fun mapAktiviteterLæremidler(
 private fun mapMålgruppeBarnetilsyn(
     type: MålgruppeType,
     faktaOgVurderinger: FaktaOgSvarMålgruppeDto,
+    vurderingAldersvilkår: VurderingAldersVilkår,
 ): MålgruppeTilsynBarn =
     when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
@@ -188,6 +201,8 @@ private fun mapMålgruppeBarnetilsyn(
                 vurderinger =
                     VurderingOmstillingsstønad(
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                        vurderingAldersvilkår,
                     ),
             )
         }
@@ -201,6 +216,8 @@ private fun mapMålgruppeBarnetilsyn(
                 vurderinger =
                     VurderingAAP(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                        aldersvilkår =
+                        vurderingAldersvilkår,
                     ),
             )
         }
@@ -211,6 +228,8 @@ private fun mapMålgruppeBarnetilsyn(
                     VurderingUføretrygd(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                        vurderingAldersvilkår,
                     ),
             )
         }
@@ -221,6 +240,8 @@ private fun mapMålgruppeBarnetilsyn(
                     VurderingNedsattArbeidsevne(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                        vurderingAldersvilkår,
                     ),
             )
         }
@@ -231,6 +252,7 @@ private fun mapMålgruppeBarnetilsyn(
 private fun mapMålgruppeLæremidler(
     type: MålgruppeType,
     faktaOgVurderinger: FaktaOgSvarMålgruppeDto,
+    vurderingAldersvilkår: VurderingAldersVilkår,
 ): MålgruppeLæremidler =
     when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeLæremidler
@@ -240,6 +262,8 @@ private fun mapMålgruppeLæremidler(
                 vurderinger =
                     VurderingOmstillingsstønad(
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                        vurderingAldersvilkår,
                     ),
             )
         }
@@ -253,6 +277,8 @@ private fun mapMålgruppeLæremidler(
                 vurderinger =
                     VurderingAAP(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                        aldersvilkår =
+                        vurderingAldersvilkår,
                     ),
             )
         }
@@ -263,6 +289,8 @@ private fun mapMålgruppeLæremidler(
                     VurderingUføretrygd(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                        vurderingAldersvilkår,
                     ),
             )
         }
@@ -273,6 +301,8 @@ private fun mapMålgruppeLæremidler(
                     VurderingNedsattArbeidsevne(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                        vurderingAldersvilkår,
                     ),
             )
         }

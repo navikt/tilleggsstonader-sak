@@ -43,6 +43,11 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                ),
                         ),
                 )
 
@@ -57,6 +62,11 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                ),
                         ),
                 )
 
@@ -71,6 +81,11 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                ),
                         ),
                 )
 
@@ -85,6 +100,11 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                ),
                         ),
                 )
 

@@ -2,6 +2,11 @@
   "type": "AAP_LÆREMIDLER",
   "fakta": {},
   "vurderinger": {
+    "aldersvilkår": {
+      "resultat": "OPPFYLT",
+      "svar": "JA_IMPLISITT",
+      "vurderingFaktaEtterlevelse": "Vurdering Fakta Etterlevelse"
+    },
     "dekketAvAnnetRegelverk": {
       "svar": "NEI",
       "resultat": "OPPFYLT"

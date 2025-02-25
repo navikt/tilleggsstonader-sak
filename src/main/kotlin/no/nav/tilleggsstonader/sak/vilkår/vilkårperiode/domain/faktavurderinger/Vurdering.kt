@@ -5,6 +5,10 @@ sealed interface Vurdering {
     val resultat: ResultatDelvilkårperiode
 }
 
+sealed interface AutomatiskVurdering : Vurdering {
+    val vurderingFaktaEtterlevelse: String
+}
+
 enum class SvarJaNei {
     JA,
     JA_IMPLISITT,
@@ -106,6 +110,27 @@ data class VurderingDekketAvAnnetRegelverk private constructor(
                 SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
                 SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingDekketAvAnnetRegelverk::class.simpleName}")
+            }
+    }
+}
+
+data class VurderingAldersVilkår(
+    override val svar: SvarJaNei?,
+    override val resultat: ResultatDelvilkårperiode,
+    override val vurderingFaktaEtterlevelse: String,
+) : AutomatiskVurdering {
+    constructor(
+        svar: SvarJaNei?,
+        vurderingFaktaEtterlevelse: String,
+    ) : this(svar, utledResultat(svar), vurderingFaktaEtterlevelse)
+
+    companion object {
+        private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =
+            when (svar) {
+                null -> ResultatDelvilkårperiode.IKKE_VURDERT
+                SvarJaNei.JA -> ResultatDelvilkårperiode.OPPFYLT
+                SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+                SvarJaNei.JA_IMPLISITT -> ResultatDelvilkårperiode.OPPFYLT
             }
     }
 }

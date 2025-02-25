@@ -36,6 +36,11 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                ),
                         ),
                 )
 
@@ -50,6 +55,11 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                ),
                         ),
                 )
 
@@ -64,6 +74,11 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                ),
                         ),
                 )
 
@@ -78,6 +93,11 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            aldersvilkår =
+                                VurderingAldersVilkår(
+                                    SvarJaNei.JA,
+                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                ),
                         ),
                 )
 

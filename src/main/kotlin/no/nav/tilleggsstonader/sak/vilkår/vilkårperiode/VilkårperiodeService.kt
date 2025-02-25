@@ -7,9 +7,11 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValidering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.AldersvilkårVurdering.vurderAldersvilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerEndrePeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
@@ -24,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeU
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mapFaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
@@ -45,6 +48,7 @@ class VilkårperiodeService(
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
     private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
+    private val grunnlagsdataService: GrunnlagsdataService,
 ) {
     fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
         val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
@@ -83,8 +87,14 @@ class VilkårperiodeService(
         validerBehandling(behandling)
         validerNyPeriodeRevurdering(behandling, vilkårperiode.fom)
 
+        var vurderingAldersvilkår: VurderingAldersVilkår? = null
+
         if (vilkårperiode.type is MålgruppeType) {
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
+
+            val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandling.id)
+
+            vurderingAldersvilkår = vurderAldersvilkår(vilkårperiode, grunnlagsdata)
         }
 
         validerKildeIdFinnesIGrunnlaget(
@@ -94,7 +104,11 @@ class VilkårperiodeService(
         )
 
         val faktaOgVurdering =
-            mapFaktaOgSvarDto(stønadstype = behandling.stønadstype, vilkårperiode = vilkårperiode)
+            mapFaktaOgSvarDto(
+                stønadstype = behandling.stønadstype,
+                vilkårperiode = vilkårperiode,
+                vurderingAldersvilkår = vurderingAldersvilkår,
+            )
         return vilkårperiodeRepository.insert(
             GeneriskVilkårperiode(
                 behandlingId = vilkårperiode.behandlingId,
@@ -125,6 +139,13 @@ class VilkårperiodeService(
             "Kan ikke oppdatere kildeId på en allerede eksisterende vilkårperiode"
         }
 
+        var vurderingAldersvilkår: VurderingAldersVilkår? = null
+
+        if (vilkårperiode.type is MålgruppeType) {
+            val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandling.id)
+            vurderingAldersvilkår = vurderAldersvilkår(vilkårperiode, grunnlagsdata)
+        }
+
         val oppdatert =
             eksisterendeVilkårperiode.medVilkårOgVurdering(
                 fom = vilkårperiode.fom,
@@ -134,6 +155,7 @@ class VilkårperiodeService(
                     mapFaktaOgSvarDto(
                         stønadstype = behandling.stønadstype,
                         vilkårperiode = vilkårperiode,
+                        vurderingAldersvilkår = vurderingAldersvilkår,
                     ),
             )
 
