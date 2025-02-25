@@ -212,20 +212,6 @@ class BehandlingsstatistikkService(
             null
         }
 
-        private fun finnSaksbehandler(
-            hendelse: Hendelse,
-            gjeldendeSaksbehandler: String?,
-            totrinnskontroll: Totrinnskontroll?,
-        ): String =
-            when (hendelse) {
-                Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER ->
-                    gjeldendeSaksbehandler ?: error("Mangler saksbehandler for hendelse=$hendelse")
-
-                Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG ->
-                    totrinnskontroll?.saksbehandler ?: gjeldendeSaksbehandler
-                        ?: error("Mangler totrinnskontroll for hendelse=$hendelse")
-            }
-
         private fun maskerVerdiHvisStrengtFortrolig(
             erStrengtFortrolig: Boolean,
             verdi: String,
