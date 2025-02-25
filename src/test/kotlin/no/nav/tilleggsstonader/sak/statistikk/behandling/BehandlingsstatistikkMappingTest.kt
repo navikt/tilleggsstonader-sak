@@ -24,61 +24,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class BehandlingsstatistikkMappingTest {
-    fun saksbehandling(
-        behandlingId: BehandlingId,
-        saksbehandler: String,
-        eksternId: Long,
-        eksternFagId: Long,
-        kategori: BehandlingKategori = BehandlingKategori.NASJONAL,
-    ) = Saksbehandling(
-        id = behandlingId,
-        eksternId = eksternId,
-        forrigeBehandlingId = null,
-        type = BehandlingType.FØRSTEGANGSBEHANDLING,
-        status = BehandlingStatus.OPPRETTET,
-        steg = StegType.INNGANGSVILKÅR,
-        kategori = kategori,
-        årsak = BehandlingÅrsak.SØKNAD,
-        kravMottatt = null,
-        resultat = BehandlingResultat.IKKE_SATT,
-        vedtakstidspunkt = null,
-        henlagtÅrsak = null,
-        henlagtBegrunnelse = null,
-        ident = saksbehandler,
-        fagsakId = FagsakId(UUID.randomUUID()),
-        fagsakPersonId = FagsakPersonId(UUID.randomUUID()),
-        eksternFagsakId = eksternFagId,
-        stønadstype = Stønadstype.BARNETILSYN,
-        revurderFra = null,
-        opprettetAv = "VL",
-        opprettetTid = LocalDateTime.now(),
-        endretAv = "<endret-av-test>",
-        endretTid = LocalDateTime.now(),
-    )
-
-    fun map(
-        saksbehandling: Saksbehandling,
-        henvendelseTidspunkt: LocalDateTime,
-        hendelseTidspunkt: LocalDateTime,
-        tekniskTid: LocalDateTime,
-        søkerHarStrengtFortroligAdresse: Boolean = false,
-        hendelse: Hendelse = Hendelse.MOTTATT,
-        behandlingMetode: BehandlingMetode = BehandlingMetode.AUTOMATISK,
-    ) = BehandlingsstatistikkService.mapTilBehandlingDVH(
-        saksbehandling,
-        behandlingId = saksbehandling.id,
-        henvendelseTidspunkt = henvendelseTidspunkt,
-        hendelse = hendelse,
-        hendelseTidspunkt = hendelseTidspunkt,
-        søkerHarStrengtFortroligAdresse = søkerHarStrengtFortroligAdresse,
-        saksbehandlerId = saksbehandling.ident,
-        sisteOppgaveForBehandling = null,
-        behandlingMetode = behandlingMetode,
-        beslutterId = null,
-        tekniskTid = tekniskTid,
-        relatertBehandlingId = null,
-    )
-
     @Test
     fun `mapping med hendelse MOTTATT`() {
         val behandlingId = BehandlingId(UUID.randomUUID())
@@ -350,4 +295,59 @@ class BehandlingsstatistikkMappingTest {
 
         assertThat(actual).isEqualTo(expected)
     }
+
+    fun saksbehandling(
+        behandlingId: BehandlingId,
+        saksbehandler: String,
+        eksternId: Long,
+        eksternFagId: Long,
+        kategori: BehandlingKategori = BehandlingKategori.NASJONAL,
+    ) = Saksbehandling(
+        id = behandlingId,
+        eksternId = eksternId,
+        forrigeBehandlingId = null,
+        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+        status = BehandlingStatus.OPPRETTET,
+        steg = StegType.INNGANGSVILKÅR,
+        kategori = kategori,
+        årsak = BehandlingÅrsak.SØKNAD,
+        kravMottatt = null,
+        resultat = BehandlingResultat.IKKE_SATT,
+        vedtakstidspunkt = null,
+        henlagtÅrsak = null,
+        henlagtBegrunnelse = null,
+        ident = saksbehandler,
+        fagsakId = FagsakId(UUID.randomUUID()),
+        fagsakPersonId = FagsakPersonId(UUID.randomUUID()),
+        eksternFagsakId = eksternFagId,
+        stønadstype = Stønadstype.BARNETILSYN,
+        revurderFra = null,
+        opprettetAv = "VL",
+        opprettetTid = LocalDateTime.now(),
+        endretAv = "<endret-av-test>",
+        endretTid = LocalDateTime.now(),
+    )
+
+    fun map(
+        saksbehandling: Saksbehandling,
+        henvendelseTidspunkt: LocalDateTime,
+        hendelseTidspunkt: LocalDateTime,
+        tekniskTid: LocalDateTime,
+        søkerHarStrengtFortroligAdresse: Boolean = false,
+        hendelse: Hendelse = Hendelse.MOTTATT,
+        behandlingMetode: BehandlingMetode = BehandlingMetode.AUTOMATISK,
+    ) = BehandlingsstatistikkService.mapTilBehandlingDVH(
+        saksbehandling,
+        behandlingId = saksbehandling.id,
+        henvendelseTidspunkt = henvendelseTidspunkt,
+        hendelse = hendelse,
+        hendelseTidspunkt = hendelseTidspunkt,
+        søkerHarStrengtFortroligAdresse = søkerHarStrengtFortroligAdresse,
+        saksbehandlerId = saksbehandling.ident,
+        sisteOppgaveForBehandling = null,
+        behandlingMetode = behandlingMetode,
+        beslutterId = null,
+        tekniskTid = tekniskTid,
+        relatertBehandlingId = null,
+    )
 }
