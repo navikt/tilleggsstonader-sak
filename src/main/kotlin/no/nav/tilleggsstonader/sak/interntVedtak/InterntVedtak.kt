@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatForMånedDto
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatForPeriodeDto
@@ -28,7 +27,7 @@ data class InterntVedtak(
     val målgrupper: List<VilkårperiodeInterntVedtak>,
     val aktiviteter: List<VilkårperiodeInterntVedtak>,
     val stønadsperioder: List<Stønadsperiode>,
-    val vedtaksperioder: List<Vedtaksperiode>,
+    val vedtaksperioder: List<VedtaksperiodeInterntVedtak>,
     val vilkår: List<VilkårInternt>,
     val vedtak: VedtakInternt?,
     val beregningsresultat: BeregningsresultatInterntVedtakDto?,
@@ -127,4 +126,11 @@ data class VurderingInternt(
     val regel: String,
     val svar: String?,
     val begrunnelse: String?,
+)
+
+data class VedtaksperiodeInterntVedtak(
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val målgruppe: MålgruppeType?,
+    val aktivitet: AktivitetType?,
 )
