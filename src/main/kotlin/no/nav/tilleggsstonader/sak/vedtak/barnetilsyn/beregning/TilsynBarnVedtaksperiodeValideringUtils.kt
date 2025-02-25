@@ -155,8 +155,9 @@ object TilsynBarnVedtaksperiodeValideringUtils {
                     val nyVedtaksperiode = vedtaksperioderMap[vedtaksperiodeForrigeBehandling.id]
 
                     if (nyVedtaksperiode != null &&
-                        nyVedtaksperiode.tom > vedtaksperiodeForrigeBehandling.tom &&
-                        vedtaksperiodeForrigeBehandling.tom > revurderFra
+                        // revurderFra.minusDays(1) tillater endringer dagen før revurder fra som trengs i opphør
+                        nyVedtaksperiode.tom >= revurderFra.minusDays(1) &&
+                        vedtaksperiodeForrigeBehandling.tom >= revurderFra
                     ) {
                         vedtaksperiodeForrigeBehandling.copy(tom = nyVedtaksperiode.tom)
                     } else {

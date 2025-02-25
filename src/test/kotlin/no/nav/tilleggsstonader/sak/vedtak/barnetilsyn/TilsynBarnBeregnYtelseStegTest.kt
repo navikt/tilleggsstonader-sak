@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -41,7 +42,10 @@ class TilsynBarnBeregnYtelseStegTest {
     private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>(relaxed = true)
     private val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>(relaxed = true)
     private val opphørValideringService = mockk<OpphørValideringService>(relaxed = true)
-    private val tilsynBarnVedtaksperiodeValidingerService = mockk<TilsynBarnVedtaksperiodeValidingerService>(relaxed = true)
+    private val tilsynBarnVedtaksperiodeValidingerService =
+        mockk<TilsynBarnVedtaksperiodeValidingerService>(relaxed = true)
+    private val unleashService = mockk<UnleashService>(relaxed = true)
+    private val vedtaksperiodeService = mockk<VedtaksperiodeService>(relaxed = true)
 
     val tilsynBarnBeregningService =
         TilsynBarnBeregningService(
@@ -59,6 +63,8 @@ class TilsynBarnBeregnYtelseStegTest {
             tilkjentytelseService = tilkjentYtelseService,
             simuleringService = simuleringService,
             opphørValideringService = opphørValideringService,
+            unleashService = unleashService,
+            vedtaksperiodeService = vedtaksperiodeService,
         )
 
     val saksbehandling = saksbehandling()

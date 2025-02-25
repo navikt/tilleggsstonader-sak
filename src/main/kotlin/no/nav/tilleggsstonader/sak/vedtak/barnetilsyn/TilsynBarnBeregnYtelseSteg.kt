@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -37,6 +39,8 @@ import java.time.DayOfWeek
 class TilsynBarnBeregnYtelseSteg(
     private val beregningService: TilsynBarnBeregningService,
     private val opphørValideringService: OpphørValideringService,
+    private val unleashService: UnleashService,
+    private val vedtaksperiodeService: VedtaksperiodeService,
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -75,7 +79,11 @@ class TilsynBarnBeregnYtelseSteg(
         vedtak: InnvilgelseTilsynBarnRequestV2,
     ) {
         val beregningsresultat =
-            beregningService.beregnV2(vedtak.vedtaksperioder, saksbehandling, TypeVedtak.INNVILGELSE)
+            beregningService.beregnV2(
+                vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
+                behandling = saksbehandling,
+                typeVedtak = TypeVedtak.INNVILGELSE,
+            )
         vedtakRepository.insert(
             lagInnvilgetVedtak(
                 behandling = saksbehandling,
@@ -87,6 +95,17 @@ class TilsynBarnBeregnYtelseSteg(
     }
 
     private fun beregnOgLagreOpphør(
+        saksbehandling: Saksbehandling,
+        vedtak: OpphørTilsynBarnRequest,
+    ) {
+        if (unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN)) {
+            beregnOgLagreOpphørV2(saksbehandling, vedtak)
+        } else {
+            beregnOgLagreOpphørV1(saksbehandling, vedtak)
+        }
+    }
+
+    private fun beregnOgLagreOpphørV1(
         saksbehandling: Saksbehandling,
         vedtak: OpphørTilsynBarnRequest,
     ) {
@@ -110,7 +129,46 @@ class TilsynBarnBeregnYtelseSteg(
                         beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
                         årsaker = vedtak.årsakerOpphør,
                         begrunnelse = vedtak.begrunnelse,
-                        vedtaksperioder = null, // TODO håndter opphør med vedtaksperioder
+                        vedtaksperioder = null,
+                    ),
+            ),
+        )
+
+        lagreAndeler(saksbehandling, beregningsresultat)
+    }
+
+    private fun beregnOgLagreOpphørV2(
+        saksbehandling: Saksbehandling,
+        vedtak: OpphørTilsynBarnRequest,
+    ) {
+        brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
+            "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
+        }
+
+        opphørValideringService.validerVilkårperioder(saksbehandling)
+
+        val vedtaksperioder = vedtaksperiodeService.finnNyeVedtaksperioderForOpphør(saksbehandling)
+
+        val beregningsresultat =
+            beregningService.beregnV2(
+                vedtaksperioder = vedtaksperioder,
+                behandling = saksbehandling,
+                typeVedtak = TypeVedtak.OPPHØR,
+            )
+        opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
+            beregningsresultat,
+            saksbehandling.revurderFra,
+        )
+        vedtakRepository.insert(
+            GeneriskVedtak(
+                behandlingId = saksbehandling.id,
+                type = TypeVedtak.OPPHØR,
+                data =
+                    OpphørTilsynBarn(
+                        beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
+                        årsaker = vedtak.årsakerOpphør,
+                        begrunnelse = vedtak.begrunnelse,
+                        vedtaksperioder = vedtaksperioder,
                     ),
             ),
         )
