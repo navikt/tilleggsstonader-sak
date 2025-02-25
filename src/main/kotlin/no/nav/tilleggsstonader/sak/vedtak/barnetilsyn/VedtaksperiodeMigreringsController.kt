@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.security.token.support.core.api.Unprotected
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
@@ -12,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
+import java.util.*
 
 @RestController
 @RequestMapping("/admin/vedtak/migrer")
@@ -70,8 +71,7 @@ fun Vedtaksperiode.erLikOgPåfølgesAv(other: Vedtaksperiode): Boolean {
     val erLik =
         this.aktivitet == other.aktivitet &&
             this.målgruppe == other.målgruppe
-    val påfølgesAv = this.tom.plusDays(1) == other.fom
-    return erLik && påfølgesAv
+    return erLik && this.påfølgesAv(other)
 }
 
 fun mapTilVedtaksperiode(beregningsresultat: List<BeregningsresultatForMåned>): List<Vedtaksperiode> =
