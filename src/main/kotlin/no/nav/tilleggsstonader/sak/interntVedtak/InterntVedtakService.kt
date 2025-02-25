@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
@@ -21,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
@@ -31,6 +33,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgVurderingDto
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode as VedtaksperiodeLæremidler
 
 @Service
 class InterntVedtakService(
@@ -59,6 +62,7 @@ class InterntVedtakService(
             målgrupper = mapVilkårperioder(vilkårsperioder.målgrupper),
             aktiviteter = mapVilkårperioder(vilkårsperioder.aktiviteter),
             stønadsperioder = mapStønadsperioder(behandling.id),
+            vedtaksperioder = mapVedtaksperioder(vedtak),
             vilkår = mapVilkår(behandling.id, behandlingbarn),
             vedtak = mapVedtak(vedtak),
             beregningsresultat = mapBeregningsresultatForStønadstype(vedtak, behandling),
@@ -160,6 +164,41 @@ class InterntVedtakService(
             )
         }
     }
+
+    private fun mapVedtaksperioder(vedtak: Vedtak?): List<VedtaksperiodeInterntVedtak> =
+        when (vedtak?.data) {
+            is InnvilgelseTilsynBarn -> mapVedtaksperioderTilsynBarn(vedtak.data.vedtaksperioder)
+            is OpphørTilsynBarn -> mapVedtaksperioderTilsynBarn(vedtak.data.vedtaksperioder)
+
+            is InnvilgelseLæremidler -> mapVedtaksperioderLæremidler(vedtak.data.vedtaksperioder)
+            is OpphørLæremidler -> mapVedtaksperioderLæremidler(vedtak.data.vedtaksperioder)
+
+            is Avslag -> emptyList()
+
+            else -> {
+                error("Kan ikke mappe vedtaksperioder for type ${vedtak?.data?.javaClass?.simpleName}")
+            }
+        }
+
+    private fun mapVedtaksperioderTilsynBarn(vedtaksperioder: List<Vedtaksperiode>?): List<VedtaksperiodeInterntVedtak> =
+        vedtaksperioder?.map {
+            VedtaksperiodeInterntVedtak(
+                målgruppe = it.målgruppe,
+                aktivitet = it.aktivitet,
+                fom = it.fom,
+                tom = it.tom,
+            )
+        } ?: emptyList()
+
+    private fun mapVedtaksperioderLæremidler(vedtaksperioder: List<VedtaksperiodeLæremidler>?): List<VedtaksperiodeInterntVedtak> =
+        vedtaksperioder?.map {
+            VedtaksperiodeInterntVedtak(
+                målgruppe = null,
+                aktivitet = null,
+                fom = it.fom,
+                tom = it.tom,
+            )
+        } ?: emptyList()
 
     private fun mapVilkår(
         behandlingId: BehandlingId,

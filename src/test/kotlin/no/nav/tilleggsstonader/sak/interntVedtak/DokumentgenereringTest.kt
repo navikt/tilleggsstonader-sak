@@ -95,6 +95,7 @@ class DokumentgenereringTest {
         if (!type.håndteresAvInterntVedtak) {
             return
         }
+        mock(type)
         val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
         val html = lagHtmlifyClient().generateHtml(interntVedtak)
         skrivTilFil("interntVedtak/${type.stønadstype}/internt_vedtak.html", html)
