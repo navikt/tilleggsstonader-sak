@@ -110,6 +110,8 @@ class VilkårperiodeGrunnlagService(
     private fun antallMånederBakITiden(behandling: Saksbehandling): LocalDate {
         if (behandling.revurderFra != null) {
             return behandling.revurderFra
+                .minusMonths(behandling.stønadstype.grunnlagAntallMånederBakITiden.toLong())
+                .tilFørsteDagIMåneden()
         }
         val mottattTidspunkt =
             søknadService.hentSøknadMetadata(behandling.id)?.mottattTidspunkt
