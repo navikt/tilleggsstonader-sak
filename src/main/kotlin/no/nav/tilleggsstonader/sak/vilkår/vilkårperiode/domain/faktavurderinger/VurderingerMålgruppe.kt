@@ -51,6 +51,5 @@ data object VurderingOvergangsstønad : MedlemskapVurdering, AldersvilkårVurder
         VurderingAldersVilkår(
             SvarJaNei.JA,
             inputFakta = "inputFakta",
-            gitHash = "gitHash",
         )
 }

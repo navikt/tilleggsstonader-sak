@@ -89,7 +89,6 @@ object VilkårperiodeTestUtil {
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
-                                    gitHash = "gitHash",
                                 ),
                         ),
                 )
@@ -104,7 +103,6 @@ object VilkårperiodeTestUtil {
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
-                                    gitHash = "gitHash",
                                 ),
                         ),
                 )
@@ -119,7 +117,6 @@ object VilkårperiodeTestUtil {
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
-                                    gitHash = "gitHash",
                                 ),
                         ),
                 )
@@ -134,7 +131,6 @@ object VilkårperiodeTestUtil {
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
-                                    gitHash = "gitHash",
                                 ),
                         ),
                 )

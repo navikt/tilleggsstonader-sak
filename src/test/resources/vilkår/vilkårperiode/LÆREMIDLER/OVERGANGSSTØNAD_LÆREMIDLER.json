@@ -5,8 +5,7 @@
       "aldersvilkår": {
         "resultat": "OPPFYLT",
         "svar": "JA",
-        "inputFakta": "inputFakta",
-        "gitHash": "gitHash"
+        "inputFakta": "inputFakta"
       },
     "medlemskap": {
       "svar": "JA_IMPLISITT",

@@ -31,7 +31,6 @@ object AldersvilkårVurdering {
         return VurderingAldersVilkår(
             gyldig,
             genererFaktaSomJson(fødselsdato = fødselsdato),
-            "gitHash",
         )
     }
 

@@ -47,7 +47,6 @@ class FaktaOgVurderingTilsynBarnTest {
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
-                                    gitHash = "gitHash",
                                 ),
                         ),
                 )
@@ -67,7 +66,6 @@ class FaktaOgVurderingTilsynBarnTest {
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
-                                    gitHash = "gitHash",
                                 ),
                         ),
                 )
@@ -87,7 +85,6 @@ class FaktaOgVurderingTilsynBarnTest {
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
-                                    gitHash = "gitHash",
                                 ),
                         ),
                 )
@@ -107,7 +104,6 @@ class FaktaOgVurderingTilsynBarnTest {
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
-                                    gitHash = "gitHash",
                                 ),
                         ),
                 )

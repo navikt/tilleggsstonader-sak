@@ -5,8 +5,7 @@
     "aldersvilkår": {
       "resultat": "OPPFYLT",
       "svar": "JA_IMPLISITT",
-      "inputFakta": "String",
-      "gitHash": "String"
+      "inputFakta": "String"
     },
     "dekketAvAnnetRegelverk": {
       "svar": "NEI",

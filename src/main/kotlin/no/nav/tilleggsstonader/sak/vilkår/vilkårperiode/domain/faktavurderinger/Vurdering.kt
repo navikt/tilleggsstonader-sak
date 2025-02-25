@@ -7,7 +7,6 @@ sealed interface Vurdering {
 
 sealed interface AutomatiskVurdering : Vurdering {
     val inputFakta: String
-    val gitHash: String
 }
 
 enum class SvarJaNei {
@@ -119,13 +118,11 @@ data class VurderingAldersVilkår(
     override val svar: SvarJaNei?,
     override val resultat: ResultatDelvilkårperiode,
     override val inputFakta: String,
-    override val gitHash: String,
 ) : AutomatiskVurdering {
     constructor(
         svar: SvarJaNei?,
         inputFakta: String,
-        gitHash: String,
-    ) : this(svar, utledResultat(svar), inputFakta, gitHash)
+    ) : this(svar, utledResultat(svar), inputFakta)
 
     companion object {
         private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =

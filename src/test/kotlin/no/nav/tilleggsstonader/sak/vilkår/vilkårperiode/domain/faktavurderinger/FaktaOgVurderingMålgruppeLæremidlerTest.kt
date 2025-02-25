@@ -40,7 +40,6 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
-                                    gitHash = "gitHash",
                                 ),
                         ),
                 )
@@ -60,7 +59,6 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
-                                    gitHash = "gitHash",
                                 ),
                         ),
                 )
@@ -80,7 +78,6 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
-                                    gitHash = "gitHash",
                                 ),
                         ),
                 )
@@ -100,7 +97,6 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
                                     inputFakta = "input-fakta",
-                                    gitHash = "gitHash",
                                 ),
                         ),
                 )
