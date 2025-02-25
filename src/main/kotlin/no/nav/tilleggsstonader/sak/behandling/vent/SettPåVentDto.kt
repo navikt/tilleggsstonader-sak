@@ -8,6 +8,7 @@ data class SettPåVentDto(
     val årsaker: List<ÅrsakSettPåVent>,
     val frist: LocalDate,
     val kommentar: String?,
+    val beholdOppgave: Boolean = false,
 ) {
     init {
         brukerfeilHvis(årsaker.any { it == ÅrsakSettPåVent.ANNET } && kommentar.isNullOrBlank()) {
@@ -24,6 +25,7 @@ data class OppdaterSettPåVentDto(
     val frist: LocalDate,
     val kommentar: String?,
     val oppgaveVersjon: Int,
+    val beholdOppgave: Boolean = false,
 )
 
 data class StatusPåVentDto(
