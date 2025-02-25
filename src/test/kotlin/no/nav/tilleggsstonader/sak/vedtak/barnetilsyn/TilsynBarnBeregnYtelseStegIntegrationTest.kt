@@ -390,6 +390,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             val tilkjentYtelse =
                 tilkjentYtelseRepository.findByBehandlingId(saksbehandlingForOpphør.id)!!.andelerTilkjentYtelse
 
+            val forventetVedtaksperioderForOpphør = vedtaksperiode.copy(tom = LocalDate.of(2023, 1, 31))
+
             assertThat(vedtak.behandlingId).isEqualTo(saksbehandlingForOpphør.id)
             assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
             assertThat(vedtak.data.årsaker).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
@@ -399,6 +401,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     .single(),
             ).isEqualTo(beregningsresultatJanuar)
             assertThat(tilkjentYtelse).hasSize(1)
+            assertThat(vedtak.data.vedtaksperioder).isEqualTo(listOf(forventetVedtaksperioderForOpphør))
         }
     }
 
