@@ -5,7 +5,12 @@ import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.SakYtelseDvh
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
-import no.nav.tilleggsstonader.sak.behandling.domain.*
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -21,6 +26,7 @@ import java.util.UUID
 class BehandlingsstatistikkMappingTest {
     fun saksbehandling(
         behandlingId: BehandlingId,
+        saksbehandler: String,
         eksternId: Long,
         eksternFagId: Long,
         kategori: BehandlingKategori = BehandlingKategori.NASJONAL,
@@ -38,7 +44,7 @@ class BehandlingsstatistikkMappingTest {
         vedtakstidspunkt = null,
         henlagtÅrsak = null,
         henlagtBegrunnelse = null,
-        ident = "<ident-test>",
+        ident = saksbehandler,
         fagsakId = FagsakId(UUID.randomUUID()),
         fagsakPersonId = FagsakPersonId(UUID.randomUUID()),
         eksternFagsakId = eksternFagId,
@@ -51,7 +57,6 @@ class BehandlingsstatistikkMappingTest {
     )
 
     fun map(
-        behandlingId: BehandlingId,
         saksbehandling: Saksbehandling,
         henvendelseTidspunkt: LocalDateTime,
         hendelseTidspunkt: LocalDateTime,
@@ -61,12 +66,12 @@ class BehandlingsstatistikkMappingTest {
         behandlingMetode: BehandlingMetode = BehandlingMetode.AUTOMATISK,
     ) = BehandlingsstatistikkService.mapTilBehandlingDVH(
         saksbehandling,
-        behandlingId = behandlingId,
+        behandlingId = saksbehandling.id,
         henvendelseTidspunkt = henvendelseTidspunkt,
         hendelse = hendelse,
         hendelseTidspunkt = hendelseTidspunkt,
         søkerHarStrengtFortroligAdresse = søkerHarStrengtFortroligAdresse,
-        saksbehandlerId = "<saksbehandler-test>",
+        saksbehandlerId = saksbehandling.ident,
         sisteOppgaveForBehandling = null,
         behandlingMetode = behandlingMetode,
         beslutterId = null,
@@ -77,17 +82,23 @@ class BehandlingsstatistikkMappingTest {
     @Test
     fun `mapping med hendelse MOTTATT`() {
         val behandlingId = BehandlingId(UUID.randomUUID())
+        val saksbehandlerId = "<saksbehandler-test>"
 
         val henvendelseTidspunkt = osloNow()
         val hendelseTidspunkt = osloNow()
         val tekniskTid = osloNow()
 
         val saksbehandling =
-            saksbehandling(behandlingId = behandlingId, eksternId = 17L, eksternFagId = 29L, kategori = BehandlingKategori.NASJONAL)
+            saksbehandling(
+                behandlingId = behandlingId,
+                saksbehandler = saksbehandlerId,
+                eksternId = 17L,
+                eksternFagId = 29L,
+                kategori = BehandlingKategori.NASJONAL,
+            )
 
         val actual =
             map(
-                behandlingId = behandlingId,
                 saksbehandling = saksbehandling,
                 henvendelseTidspunkt = henvendelseTidspunkt,
                 hendelseTidspunkt = hendelseTidspunkt,
@@ -100,7 +111,7 @@ class BehandlingsstatistikkMappingTest {
                 behandlingUuid = behandlingId.id.toString(),
                 saksnummer = "29",
                 sakId = "29",
-                aktorId = saksbehandling.ident,
+                aktorId = saksbehandlerId,
                 mottattTid = henvendelseTidspunkt,
                 registrertTid = henvendelseTidspunkt,
                 ferdigBehandletTid = null,
@@ -140,17 +151,17 @@ class BehandlingsstatistikkMappingTest {
     @Test
     fun `mapping med hendelse FERDIG`() {
         val behandlingId = BehandlingId(UUID.randomUUID())
+        val saksbehandlerId = "<saksbehandler-test>"
 
         val henvendelseTidspunkt = osloNow()
         val hendelseTidspunkt = osloNow()
         val tekniskTid = osloNow()
 
         val saksbehandling =
-            saksbehandling(behandlingId = behandlingId, eksternId = 1337L, eksternFagId = 8080L)
+            saksbehandling(behandlingId = behandlingId, saksbehandler = saksbehandlerId, eksternId = 1337L, eksternFagId = 8080L)
 
         val actual =
             map(
-                behandlingId = behandlingId,
                 saksbehandling = saksbehandling,
                 henvendelseTidspunkt = henvendelseTidspunkt,
                 hendelseTidspunkt = hendelseTidspunkt,
@@ -164,7 +175,7 @@ class BehandlingsstatistikkMappingTest {
                 behandlingUuid = behandlingId.id.toString(),
                 saksnummer = "8080",
                 sakId = "8080",
-                aktorId = saksbehandling.ident,
+                aktorId = saksbehandlerId,
                 mottattTid = henvendelseTidspunkt,
                 registrertTid = henvendelseTidspunkt,
                 ferdigBehandletTid = hendelseTidspunkt,
@@ -204,17 +215,23 @@ class BehandlingsstatistikkMappingTest {
     @Test
     fun `mapping med kategori EØS`() {
         val behandlingId = BehandlingId(UUID.randomUUID())
+        val saksbehandler = "<saksbehandler-test>"
 
         val henvendelseTidspunkt = osloNow()
         val hendelseTidspunkt = osloNow()
         val tekniskTid = osloNow()
 
         val saksbehandling =
-            saksbehandling(behandlingId = behandlingId, eksternId = 1999L, eksternFagId = 5150L, kategori = BehandlingKategori.EØS)
+            saksbehandling(
+                behandlingId = behandlingId,
+                saksbehandler = saksbehandler,
+                eksternId = 1999L,
+                eksternFagId = 5150L,
+                kategori = BehandlingKategori.EØS,
+            )
 
         val actual =
             map(
-                behandlingId = behandlingId,
                 saksbehandling = saksbehandling,
                 henvendelseTidspunkt = henvendelseTidspunkt,
                 hendelseTidspunkt = hendelseTidspunkt,
@@ -227,7 +244,7 @@ class BehandlingsstatistikkMappingTest {
                 behandlingUuid = behandlingId.id.toString(),
                 saksnummer = "5150",
                 sakId = "5150",
-                aktorId = saksbehandling.ident,
+                aktorId = saksbehandler,
                 mottattTid = henvendelseTidspunkt,
                 registrertTid = henvendelseTidspunkt,
                 ferdigBehandletTid = null,
@@ -267,23 +284,28 @@ class BehandlingsstatistikkMappingTest {
     @Test
     fun `mapping med strengt fortrolig adresse`() {
         val behandlingId = BehandlingId(UUID.randomUUID())
+        val saksbehandler = "<saksbehandler-test>"
 
         val henvendelseTidspunkt = osloNow()
         val hendelseTidspunkt = osloNow()
         val tekniskTid = osloNow()
 
-        val saksbehandling = saksbehandling(behandlingId, 33L, 99L, kategori = BehandlingKategori.NASJONAL)
+        val saksbehandling =
+            saksbehandling(
+                behandlingId = behandlingId,
+                saksbehandler = saksbehandler,
+                eksternId = 33L,
+                eksternFagId = 99L,
+                kategori = BehandlingKategori.NASJONAL,
+            )
 
         val actual =
             map(
-                behandlingId = behandlingId,
                 saksbehandling = saksbehandling,
                 henvendelseTidspunkt = henvendelseTidspunkt,
-                hendelse = Hendelse.MOTTATT,
                 hendelseTidspunkt = hendelseTidspunkt,
-                søkerHarStrengtFortroligAdresse = true,
-                behandlingMetode = BehandlingMetode.AUTOMATISK,
                 tekniskTid = tekniskTid,
+                søkerHarStrengtFortroligAdresse = true,
             )
 
         val expected =
@@ -292,7 +314,7 @@ class BehandlingsstatistikkMappingTest {
                 behandlingUuid = behandlingId.id.toString(),
                 saksnummer = "99",
                 sakId = "99",
-                aktorId = saksbehandling.ident,
+                aktorId = saksbehandler,
                 mottattTid = henvendelseTidspunkt,
                 registrertTid = henvendelseTidspunkt,
                 ferdigBehandletTid = null,
