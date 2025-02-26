@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
@@ -28,7 +27,6 @@ import java.util.concurrent.Executors
 @RequestMapping("/admin/vedtak/migrer")
 @Unprotected
 class VedtaksperiodeMigreringsController(
-    val vedtakservice: VedtakService,
     val vedtakRepository: VedtakRepository,
     val unleashService: UnleashService,
     private val transactionHandler: TransactionHandler,
@@ -36,13 +34,24 @@ class VedtaksperiodeMigreringsController(
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     @GetMapping()
-    fun migrerINyTråd() {
+    fun migrerINyTråd(): String {
+        logger.info("Vi traff admin/vedtak/migrer")
+
+        if (!unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN)) {
+            logger.info("Vedtaksperioder for tilsyn barn er skrudd av")
+            return "Unleash-toggelen er avskrudd"
+        }
+
         val callId = MDC.get(MDCConstants.MDC_CALL_ID)
+        logger.info("Starter ny tråd for migrering")
         Executors.newVirtualThreadPerTaskExecutor().submit {
             MDC.put(MDCConstants.MDC_CALL_ID, callId)
             try {
+                logger.info("Starter transaksjon")
                 transactionHandler.runInNewTransaction {
+                    logger.info("Kaller på migreringsfunksjonen")
                     migrer()
+                    logger.info("Migrering ferdig")
                 }
             } catch (e: Exception) {
                 secureLogger.error("Feilet jobb", e)
@@ -50,13 +59,11 @@ class VedtaksperiodeMigreringsController(
                 MDC.remove(MDCConstants.MDC_CALL_ID)
             }
         }
+
+        return "Unleash-toggelen er påskrudd"
     }
 
     private fun migrer() {
-        if (!unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN)) {
-            return
-        }
-
         logger.info("Starter migrering av vedtaksperioder for innvilgelser...")
         hentInnvilgelser().forEach {
             if (it.data.vedtaksperioder == null) {
