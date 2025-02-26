@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import java.time.LocalDate
 
@@ -12,7 +11,7 @@ object AldersvilkårVurdering {
     fun vurderAldersvilkår(
         vilkårperiode: LagreVilkårperiode,
         grunnlagsData: Grunnlagsdata,
-    ): VurderingAldersVilkår {
+    ): SvarJaNei {
         val fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato
 
         feilHvis(fødselsdato == null) { "Kan ikke vurdere aldersvilkår uten å vite fødselsdato til bruker" }
@@ -28,10 +27,7 @@ object AldersvilkårVurdering {
                 MålgruppeType.INGEN_MÅLGRUPPE -> SvarJaNei.NEI
             }
 
-        return VurderingAldersVilkår(
-            gyldig,
-            genererFaktaSomJson(fødselsdato = fødselsdato),
-        )
+        return gyldig
     }
 
     private fun genererFaktaSomJson(fødselsdato: LocalDate): String = "{ \"fødselsdato\": \"$fødselsdato\"}"

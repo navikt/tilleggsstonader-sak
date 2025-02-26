@@ -110,7 +110,7 @@ private fun mapMålgruppe(
         }
 
         Stønadstype.LÆREMIDLER -> {
-            mapMålgruppeLæremidler(type, faktaOgSvar)
+            mapMålgruppeLæremidler(type, faktaOgSvar, målgruppe, grunnlagsData)
         }
         Stønadstype.BOUTGIFTER -> {
             TODO("Ikke implementert ennå")
@@ -216,7 +216,7 @@ private fun mapMålgruppeBarnetilsyn(
                     VurderingAAP(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         aldersvilkår =
-                        vurderingAldersvilkår,
+                            VurderingAldersVilkår(vurderAldersvilkår(målgruppe, grunnlagsData), grunnlagsData.toString()),
                     ),
             )
         }
@@ -228,7 +228,7 @@ private fun mapMålgruppeBarnetilsyn(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                         aldersvilkår =
-                        vurderingAldersvilkår,
+                            VurderingAldersVilkår(vurderAldersvilkår(målgruppe, grunnlagsData), grunnlagsData.toString()),
                     ),
             )
         }
@@ -240,7 +240,7 @@ private fun mapMålgruppeBarnetilsyn(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                         aldersvilkår =
-                        vurderingAldersvilkår,
+                            VurderingAldersVilkår(vurderAldersvilkår(målgruppe, grunnlagsData), grunnlagsData.toString()),
                     ),
             )
         }
@@ -251,6 +251,8 @@ private fun mapMålgruppeBarnetilsyn(
 private fun mapMålgruppeLæremidler(
     type: MålgruppeType,
     faktaOgVurderinger: FaktaOgSvarMålgruppeDto,
+    målgruppe: LagreVilkårperiode,
+    grunnlagsData: Grunnlagsdata,
 ): MålgruppeLæremidler =
     when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeLæremidler
@@ -261,7 +263,7 @@ private fun mapMålgruppeLæremidler(
                     VurderingOmstillingsstønad(
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                         aldersvilkår =
-                        vurderingAldersvilkår,
+                            VurderingAldersVilkår(vurderAldersvilkår(målgruppe, grunnlagsData), grunnlagsData.toString()),
                     ),
             )
         }
@@ -276,7 +278,7 @@ private fun mapMålgruppeLæremidler(
                     VurderingAAP(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         aldersvilkår =
-                        vurderingAldersvilkår,
+                            VurderingAldersVilkår(vurderAldersvilkår(målgruppe, grunnlagsData), grunnlagsData.toString()),
                     ),
             )
         }
@@ -288,7 +290,7 @@ private fun mapMålgruppeLæremidler(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                         aldersvilkår =
-                        vurderingAldersvilkår,
+                            VurderingAldersVilkår(vurderAldersvilkår(målgruppe, grunnlagsData), grunnlagsData.toString()),
                     ),
             )
         }
@@ -300,7 +302,7 @@ private fun mapMålgruppeLæremidler(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                         aldersvilkår =
-                        vurderingAldersvilkår,
+                            VurderingAldersVilkår(vurderAldersvilkår(målgruppe, grunnlagsData), grunnlagsData.toString()),
                     ),
             )
         }
