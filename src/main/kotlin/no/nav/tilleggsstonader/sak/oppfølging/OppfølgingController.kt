@@ -70,10 +70,4 @@ class OppfølgingController(
             }
         }
     }
-
-    @PostMapping("reset-state")
-    fun fjernAlle() {
-        tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
-        oppfølgingRepository.deleteAll()
-    }
 }
