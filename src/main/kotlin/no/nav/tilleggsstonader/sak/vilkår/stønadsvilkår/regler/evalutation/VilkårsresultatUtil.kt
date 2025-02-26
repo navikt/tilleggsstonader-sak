@@ -1,10 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 
 object VilkårsresultatUtil {
@@ -16,16 +14,6 @@ object VilkårsresultatUtil {
                 it.value.single().resultat
             }
         }
-
-    fun erAlleVilkårOppfylt(
-        vilkårsett: List<Vilkår>,
-        stønadstype: Stønadstype,
-    ): Boolean {
-        val inneholderAlleTyperVilkår =
-            vilkårsett.map { it.type }.containsAll(VilkårType.hentVilkårForStønad(stønadstype))
-        val vilkårsresultat = utledVilkårsresultat(vilkårsett)
-        return inneholderAlleTyperVilkår && vilkårsresultat.all { it == Vilkårsresultat.OPPFYLT }
-    }
 
     /**
      * Et vilkår skal anses som vurdert dersom det er oppfylt eller saksbehandler har valgt å ikke vurdere det
