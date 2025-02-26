@@ -5,7 +5,7 @@
     "aldersvilkår": {
       "resultat": "OPPFYLT",
       "svar": "JA",
-      "vurderingFaktaEtterlevelse": "Vurdering Fakta Etterlevelse"
+      "vurderingFaktaEtterlevelse": null
     },
     "medlemskap": {
       "svar": "JA_IMPLISITT",
