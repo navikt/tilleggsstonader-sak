@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -25,7 +26,7 @@ class VedtaksperiodeService(
 ) {
     fun foreslåPerioder(behandlingId: BehandlingId): List<Vedtaksperiode> {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        brukerfeilHvis(detFinnesVedtaksperioder(behandlingId, saksbehandling.forrigeBehandlingId)) {
+        brukerfeilHvis(detFinnesVedtaksperioderPåForrigeBehandling(saksbehandling)) {
             "Det finnes allerede lagrede vedtaksperioder for denne behandlingen"
         }
 
@@ -56,10 +57,18 @@ class VedtaksperiodeService(
         return forrigeVedtaksperioder.avkortFraOgMed(behandling.revurderFra.minusDays(1))
     }
 
-    fun detFinnesVedtaksperioder(
-        behandlingId: BehandlingId,
-        forrigeBehandlingId: BehandlingId?,
-    ) = finnVedtaksperioder(behandlingId)?.isNotEmpty() == true || finnVedtaksperioder(forrigeBehandlingId)?.isNotEmpty() == true
+    fun detFinnesVedtaksperioderPåForrigeBehandling(saksbehandling: Saksbehandling): Boolean {
+        if (saksbehandling.type == BehandlingType.FØRSTEGANGSBEHANDLING ||
+            finnesTidligereIverksatteVedtak(saksbehandling)
+        ) {
+            return false
+        }
+
+        return finnVedtaksperioder(saksbehandling.forrigeBehandlingId)?.isNotEmpty() == true
+    }
+
+    private fun finnesTidligereIverksatteVedtak(saksbehandling: Saksbehandling) =
+        saksbehandling.type == BehandlingType.REVURDERING && saksbehandling.forrigeBehandlingId == null
 
     private fun finnVedtaksperioder(behandlingId: BehandlingId?): List<Vedtaksperiode>? {
         if (behandlingId == null) return null
@@ -70,7 +79,7 @@ class VedtaksperiodeService(
             is OpphørTilsynBarn -> vedtak.vedtaksperioder
             else ->
                 error(
-                    "Kan ikke hente forrige vedtaksperioder for tilsyn barn når forrige vedtak var ${vedtak.javaClass.simpleName}",
+                    "Kan ikke hente vedtaksperioder for tilsyn barn når vedtak var ${vedtak.type}",
                 )
         }
     }

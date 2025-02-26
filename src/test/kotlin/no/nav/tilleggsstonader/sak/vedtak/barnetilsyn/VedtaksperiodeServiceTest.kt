@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -38,6 +39,12 @@ class VedtaksperiodeServiceTest {
         val behandlingId = BehandlingId.random()
         val saksbehandling = saksbehandling(id = behandlingId)
 
+        val revurdering =
+            saksbehandling(
+                forrigeBehandlingId = behandlingId,
+                type = BehandlingType.REVURDERING,
+            )
+
         val vedtakFørstegangsbehandlingMedVedtaksperioder =
             innvilgetVedtak(
                 vedtaksperioder =
@@ -53,36 +60,29 @@ class VedtaksperiodeServiceTest {
             )
 
         @Test
-        fun `skal retunere false hvis det ikke finnes tidligere vedtaksperioder`() {
-            every { vedtakRepository.findByIdOrNull(behandlingId) } returns null
+        fun `skal retunere false hvis saksbehandling er førstegangsbehandling`() {
             assertThat(
-                vedtaksperiodeService.detFinnesVedtaksperioder(
-                    behandlingId = behandlingId,
-                    forrigeBehandlingId = null,
+                vedtaksperiodeService.detFinnesVedtaksperioderPåForrigeBehandling(
+                    saksbehandling = saksbehandling,
                 ),
             ).isFalse
         }
 
         @Test
-        fun `skal retunere true hvis det finnes vedtaksperioder på dette vedtaket`() {
-            every { vedtakRepository.findByIdOrNull(behandlingId) } returns vedtakFørstegangsbehandlingMedVedtaksperioder
+        fun `skal retunere false hvis det revurdering uten tidligere iverksatt vedtak`() {
             assertThat(
-                vedtaksperiodeService.detFinnesVedtaksperioder(
-                    behandlingId = behandlingId,
-                    forrigeBehandlingId = null,
+                vedtaksperiodeService.detFinnesVedtaksperioderPåForrigeBehandling(
+                    saksbehandling = saksbehandling.copy(type = BehandlingType.REVURDERING),
                 ),
-            ).isTrue
+            ).isFalse
         }
 
         @Test
-        fun `skal retunere true hvis det ikke finnes vedtaksperioder på dette vedtaket, men på forrgie vedtak`() {
-            val denneBehandlingen = BehandlingId.random()
+        fun `skal retunere true hvis det finnes vedtaksperioder på forrige behandling`() {
             every { vedtakRepository.findByIdOrNull(behandlingId) } returns vedtakFørstegangsbehandlingMedVedtaksperioder
-            every { vedtakRepository.findByIdOrNull(denneBehandlingen) } returns null
             assertThat(
-                vedtaksperiodeService.detFinnesVedtaksperioder(
-                    behandlingId = denneBehandlingen,
-                    forrigeBehandlingId = behandlingId,
+                vedtaksperiodeService.detFinnesVedtaksperioderPåForrigeBehandling(
+                    saksbehandling = revurdering,
                 ),
             ).isTrue
         }
