@@ -37,7 +37,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.lagNyttVilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.VilkårsresultatUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.finnesVilkårTypeForStønadstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import org.slf4j.LoggerFactory
@@ -303,12 +302,6 @@ class VilkårService(
             barnIdMap[it]
                 ?: error("Fant ikke barn=$it på gjeldende behandling med barnIdMapping=$barnIdMap")
         }
-
-    fun erAlleVilkårOppfylt(behandlingId: BehandlingId): Boolean {
-        val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
-        val lagretVilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
-        return VilkårsresultatUtil.erAlleVilkårOppfylt(lagretVilkårsett, stønadstype)
-    }
 
     fun hentOppfyltePassBarnVilkår(behandlingId: BehandlingId): List<Vilkår> =
         hentPassBarnVilkår(behandlingId)

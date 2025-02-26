@@ -59,8 +59,6 @@ class SendTilBeslutterStegTest {
             taskService,
             behandlingService,
             vedtaksbrevRepository,
-            vedtaksresultatService,
-            vilkårService,
             oppgaveService,
             totrinnskontrollService,
         )
@@ -107,8 +105,6 @@ class SendTilBeslutterStegTest {
 
         every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev
 
-        every { vilkårService.erAlleVilkårOppfylt(any()) } returns true
-
         every { vedtaksbrevRepository.existsById(any()) } returns true
         every { oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(any()) } returns oppgave(behandling.id)
         every { oppgaveService.hentOppgaveSomIkkeErFerdigstilt(any(), any()) } returns null
@@ -132,16 +128,6 @@ class SendTilBeslutterStegTest {
     internal fun `Innvilget behandling - alt ok`() {
         val innvilgetBehandling = behandling.copy(resultat = INNVILGET)
         beslutteVedtakSteg.validerSteg(innvilgetBehandling)
-    }
-
-    @Test
-    internal fun `Innvilget behandling - IKKE ok hvis erAlleVilkårOppfylt false`() {
-        every { vilkårService.erAlleVilkårOppfylt(any()) } returns false
-        val innvilgetBehandling = behandling.copy(resultat = INNVILGET)
-        val forvetetFeilmelding =
-            "Kan ikke innvilge hvis ikke alle vilkår er oppfylt for behandlingId: ${innvilgetBehandling.id}"
-        assertThat(catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(innvilgetBehandling) }.feil)
-            .isEqualTo(forvetetFeilmelding)
     }
 
     @Test
