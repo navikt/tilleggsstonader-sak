@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
@@ -23,6 +24,7 @@ data class BeregningsresultatForPeriodeDto(
     val stønadsbeløp: Int,
     val utbetalingsdato: LocalDate,
     val målgruppe: MålgruppeType,
+    val aktivitet: AktivitetType,
 ) : Periode<LocalDate> {
     fun slåSammen(nestePeriode: BeregningsresultatForPeriodeDto): BeregningsresultatForPeriodeDto =
         this.copy(
@@ -32,7 +34,9 @@ data class BeregningsresultatForPeriodeDto(
         )
 
     fun kanSlåsSammen(nestePeriode: BeregningsresultatForPeriodeDto): Boolean =
-        this.studienivå == nestePeriode.studienivå &&
+        this.målgruppe == nestePeriode.målgruppe &&
+            this.aktivitet == nestePeriode.aktivitet &&
+            this.studienivå == nestePeriode.studienivå &&
             this.studieprosent == nestePeriode.studieprosent &&
             this.beløp == nestePeriode.beløp &&
             this.utbetalingsdato == nestePeriode.utbetalingsdato &&
@@ -66,4 +70,5 @@ fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto =
         stønadsbeløp = beløp,
         utbetalingsdato = grunnlag.utbetalingsdato,
         målgruppe = grunnlag.målgruppe,
+        aktivitet = grunnlag.aktivitet,
     )

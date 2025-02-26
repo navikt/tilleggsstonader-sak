@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtakB
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import org.springframework.context.annotation.Profile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -116,11 +117,13 @@ class TestoppsettService(
     fun lagVedtak(
         behandling: Behandling,
         beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
+        vedtaksperioder: List<Vedtaksperiode>? = null,
     ): GeneriskVedtak<InnvilgelseTilsynBarn> {
         val vedtak =
             innvilgetVedtak(
                 behandlingId = behandling.id,
                 beregningsresultat = beregningsresultat,
+                vedtaksperioder = vedtaksperioder,
             )
         repository.insert(vedtak)
         return vedtak

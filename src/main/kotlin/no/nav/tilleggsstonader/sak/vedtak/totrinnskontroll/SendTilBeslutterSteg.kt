@@ -10,18 +10,14 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.springframework.stereotype.Service
 
 @Service
@@ -29,8 +25,6 @@ class SendTilBeslutterSteg(
     private val taskService: TaskService,
     private val behandlingService: BehandlingService,
     private val vedtaksbrevRepository: VedtaksbrevRepository,
-    private val vedtaksresultatService: VedtaksresultatService,
-    private val vilkårService: VilkårService,
     private val oppgaveService: OppgaveService,
     private val totrinnskontrollService: TotrinnskontrollService,
 ) : BehandlingSteg<SendTilBeslutterRequest> {
@@ -44,7 +38,6 @@ class SendTilBeslutterSteg(
             "Feilutbetaling detektert. Må ta stilling til feilutbetalingsvarsel under simulering"
         }
          */
-        validerRiktigTilstandVedInvilgelse(saksbehandling)
         validerSaksbehandlersignatur(saksbehandling)
         validerOppgaver(saksbehandling)
     }
@@ -88,16 +81,6 @@ class SendTilBeslutterSteg(
                 null,
             ),
         )
-    }
-
-    private fun validerRiktigTilstandVedInvilgelse(saksbehandling: Saksbehandling) {
-        val vedtaksresultat = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
-        if (vedtaksresultat == TypeVedtak.INNVILGELSE) {
-            // TODO: SJekk
-            brukerfeilHvisIkke(vilkårService.erAlleVilkårOppfylt(saksbehandling.id)) {
-                "Kan ikke innvilge hvis ikke alle vilkår er oppfylt for behandlingId: ${saksbehandling.id}"
-            }
-        }
     }
 
     private fun validerSaksbehandlersignatur(saksbehandling: Saksbehandling) {

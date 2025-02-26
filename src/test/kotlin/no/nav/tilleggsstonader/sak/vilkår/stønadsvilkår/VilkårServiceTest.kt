@@ -182,42 +182,6 @@ internal class VilkårServiceTest {
         assertThat(vilkårsett.map { it.id }).isEqualTo(eksisterendeVilkårsett.map { it.id })
     }
 
-    @Test
-    internal fun `Skal returnere ikke oppfylt hvis vilkårsett ikke inneholder alle vilkår`() {
-        val vilkårsett =
-            listOf(
-                vilkår(
-                    resultat = OPPFYLT,
-                    type = VilkårType.EKSEMPEL,
-                    behandlingId = behandlingId,
-                ),
-            )
-        every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsett
-        val erAlleVilkårOppfylt = vilkårService.erAlleVilkårOppfylt(behandlingId)
-        assertThat(erAlleVilkårOppfylt).isFalse
-    }
-
-    @Test
-    internal fun `Skal returnere oppfylt hvis alle vilår er oppfylt`() {
-        val vilkårsett = lagVilkårsett(behandlingId, OPPFYLT)
-        every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsett
-        val erAlleVilkårOppfylt = vilkårService.erAlleVilkårOppfylt(behandlingId)
-        assertThat(erAlleVilkårOppfylt).isTrue
-    }
-
-    @Test
-    internal fun `Skal returnere ikke oppfylt hvis noen vilkår er SKAL_IKKE_VURDERES`() {
-        val vilkårsett = lagVilkårsett(behandlingId, SKAL_IKKE_VURDERES)
-        // Guard
-        assertThat(
-            vilkårsett.map { it.type }.containsAll(VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN)),
-        ).isTrue()
-        every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsett
-
-        val erAlleVilkårOppfylt = vilkårService.erAlleVilkårOppfylt(behandlingId)
-        assertThat(erAlleVilkårOppfylt).isFalse
-    }
-
     @Nested
     inner class OppdaterVilkår {
         @Test

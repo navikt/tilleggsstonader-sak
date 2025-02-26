@@ -52,6 +52,7 @@ object VedtakDtoMapper {
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
+                    vedtaksperioder = data.vedtaksperioder?.tilDto(),
                 )
 
             is AvslagTilsynBarn ->
