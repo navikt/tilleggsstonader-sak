@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -49,7 +48,7 @@ data class Behandling(
 
     init {
         if (resultat == BehandlingResultat.HENLAGT) {
-            brukerfeilHvis(henlagtÅrsak == null) { "Kan ikke henlegge behandling uten en årsak" }
+            feilHvis(henlagtÅrsak == null) { "Kan ikke henlegge behandling uten en årsak" }
         }
         feilHvis(revurderFra != null && type != BehandlingType.REVURDERING) {
             "Kan ikke sette revurder fra når behandlingen ikke er en revurdering"
