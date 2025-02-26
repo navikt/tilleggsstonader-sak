@@ -11,9 +11,9 @@ import java.time.LocalDate
 object AldersvilkårVurdering {
     fun vurderAldersvilkår(
         vilkårperiode: LagreVilkårperiode,
-        grunnlagsdata: Grunnlagsdata,
+        grunnlagsData: Grunnlagsdata,
     ): VurderingAldersVilkår {
-        val fødselsdato = grunnlagsdata.grunnlag.fødsel?.fødselsdato
+        val fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato
 
         feilHvis(fødselsdato == null) { "Kan ikke vurdere aldersvilkår uten å vite fødselsdato til bruker" }
 

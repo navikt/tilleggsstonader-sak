@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.AldersvilkårVurdering.vurderAldersvilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
@@ -54,7 +56,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 fun mapFaktaOgSvarDto(
     vilkårperiode: LagreVilkårperiode,
     stønadstype: Stønadstype,
-    vurderingAldersvilkår: VurderingAldersVilkår?,
+    grunnlagsData: Grunnlagsdata,
 ): FaktaOgVurdering =
     when (vilkårperiode.type) {
         is AktivitetType -> mapAktiviteter(stønadstype = stønadstype, aktivitet = vilkårperiode)
@@ -62,11 +64,7 @@ fun mapFaktaOgSvarDto(
             mapMålgruppe(
                 stønadstype = stønadstype,
                 målgruppe = vilkårperiode,
-                vurderingAldersvilkår =
-                    vurderingAldersvilkår.let {
-                        it
-                            ?: error("Mangler vurdering av aldersvilkår for målgruppe=$vilkårperiode, stønadstype=$stønadstype")
-                    },
+                grunnlagsData = grunnlagsData,
             )
     }
 
@@ -98,7 +96,7 @@ private fun mapAktiviteter(
 private fun mapMålgruppe(
     stønadstype: Stønadstype,
     målgruppe: LagreVilkårperiode,
-    vurderingAldersvilkår: VurderingAldersVilkår,
+    grunnlagsData: Grunnlagsdata,
 ): MålgruppeFaktaOgVurdering {
     val type = målgruppe.type
     require(type is MålgruppeType)
@@ -108,11 +106,11 @@ private fun mapMålgruppe(
 
     return when (stønadstype) {
         Stønadstype.BARNETILSYN -> {
-            mapMålgruppeBarnetilsyn(type, faktaOgSvar, vurderingAldersvilkår)
+            mapMålgruppeBarnetilsyn(type, faktaOgSvar, målgruppe, grunnlagsData)
         }
 
         Stønadstype.LÆREMIDLER -> {
-            mapMålgruppeLæremidler(type, faktaOgSvar, vurderingAldersvilkår)
+            mapMålgruppeLæremidler(type, faktaOgSvar)
         }
         Stønadstype.BOUTGIFTER -> {
             TODO("Ikke implementert ennå")
@@ -191,7 +189,8 @@ fun mapAktiviteterLæremidler(
 private fun mapMålgruppeBarnetilsyn(
     type: MålgruppeType,
     faktaOgVurderinger: FaktaOgSvarMålgruppeDto,
-    vurderingAldersvilkår: VurderingAldersVilkår,
+    målgruppe: LagreVilkårperiode,
+    grunnlagsData: Grunnlagsdata,
 ): MålgruppeTilsynBarn =
     when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
@@ -202,7 +201,7 @@ private fun mapMålgruppeBarnetilsyn(
                     VurderingOmstillingsstønad(
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                         aldersvilkår =
-                        vurderingAldersvilkår,
+                            VurderingAldersVilkår(vurderAldersvilkår(målgruppe, grunnlagsData), grunnlagsData.toString()),
                     ),
             )
         }
@@ -252,7 +251,6 @@ private fun mapMålgruppeBarnetilsyn(
 private fun mapMålgruppeLæremidler(
     type: MålgruppeType,
     faktaOgVurderinger: FaktaOgSvarMålgruppeDto,
-    vurderingAldersvilkår: VurderingAldersVilkår,
 ): MålgruppeLæremidler =
     when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeLæremidler
