@@ -56,7 +56,7 @@ class TilsynBarnVedtaksperiodeValidingerService(
         }
 
         validerIngenEndringerFørRevurderFra(
-            vedtaksperioder = vedtaksperioder,
+            innsendteVedtaksperioder = vedtaksperioder,
             vedtaksperioderForrigeBehandling = hentForrigeVedtaksperioder(behandling),
             revurderFra = behandling.revurderFra,
         )

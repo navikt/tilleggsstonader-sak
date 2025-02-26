@@ -31,7 +31,7 @@ class LæremidlerVedtaksperiodeValideringService(
         val vedtaksperioderForrigeBehandling = hentForrigeVedtaksperioder(behandling)
 
         validerIngenEndringerFørRevurderFra(
-            vedtaksperioder = vedtaksperioder,
+            innsendteVedtaksperioder = vedtaksperioder,
             vedtaksperioderForrigeBehandling = vedtaksperioderForrigeBehandling,
             revurderFra = behandling.revurderFra,
         )

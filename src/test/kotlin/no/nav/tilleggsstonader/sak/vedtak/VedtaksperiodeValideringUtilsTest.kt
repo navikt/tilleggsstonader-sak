@@ -44,7 +44,7 @@ class VedtaksperiodeValideringUtilsTest {
         fun `kaster ikke feil ved ingen revurder fra og ingen gamle perioder (førstegangsbehandling)`() {
             assertDoesNotThrow {
                 validerIngenEndringerFørRevurderFra(
-                    vedtaksperioder = vedtaksperioderJanMars,
+                    innsendteVedtaksperioder = vedtaksperioderJanMars,
                     vedtaksperioderForrigeBehandling = emptyList(),
                     revurderFra = null,
                 )
@@ -57,7 +57,7 @@ class VedtaksperiodeValideringUtilsTest {
             fun `kaster ikke feil ved ny periode som starter etter revurder fra`() {
                 assertDoesNotThrow {
                     validerIngenEndringerFørRevurderFra(
-                        vedtaksperioder = vedtaksperioderJanMars,
+                        innsendteVedtaksperioder = vedtaksperioderJanMars,
                         vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
                         revurderFra = førsteMars,
                     )
@@ -69,12 +69,12 @@ class VedtaksperiodeValideringUtilsTest {
                 val feil =
                     assertThrows<ApiFeil> {
                         validerIngenEndringerFørRevurderFra(
-                            vedtaksperioder = vedtaksperioderJanMars,
+                            innsendteVedtaksperioder = vedtaksperioderJanMars,
                             vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
                             revurderFra = femtendeMars,
                         )
                     }
-                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+                assertThat(feil).hasMessage("Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato")
             }
 
             @Test
@@ -82,12 +82,12 @@ class VedtaksperiodeValideringUtilsTest {
                 val feil =
                     assertThrows<ApiFeil> {
                         validerIngenEndringerFørRevurderFra(
-                            vedtaksperioder = vedtaksperioderJanMars,
+                            innsendteVedtaksperioder = vedtaksperioderJanMars,
                             vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
                             revurderFra = førsteApril,
                         )
                     }
-                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+                assertThat(feil).hasMessage("Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato")
             }
         }
 
@@ -102,12 +102,12 @@ class VedtaksperiodeValideringUtilsTest {
             val feil =
                 assertThrows<ApiFeil> {
                     validerIngenEndringerFørRevurderFra(
-                        vedtaksperioder = nyeVedtaksperioder,
+                        innsendteVedtaksperioder = nyeVedtaksperioder,
                         vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
                         revurderFra = førsteMars,
                     )
                 }
-            assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+            assertThat(feil).hasMessage("Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato")
         }
 
         @Test
@@ -115,7 +115,7 @@ class VedtaksperiodeValideringUtilsTest {
             val feil =
                 assertThrows<ApiFeil> {
                     validerIngenEndringerFørRevurderFra(
-                        vedtaksperioder = vedtaksperioderJanMars,
+                        innsendteVedtaksperioder = vedtaksperioderJanMars,
                         vedtaksperioderForrigeBehandling = emptyList(),
                         revurderFra = førsteMars,
                     )
@@ -135,7 +135,7 @@ class VedtaksperiodeValideringUtilsTest {
 
                 assertDoesNotThrow {
                     validerIngenEndringerFørRevurderFra(
-                        vedtaksperioder = nyeVedtaksperioder,
+                        innsendteVedtaksperioder = nyeVedtaksperioder,
                         vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
                         revurderFra = femtendeMars,
                     )
@@ -153,12 +153,12 @@ class VedtaksperiodeValideringUtilsTest {
                 val feil =
                     assertThrows<ApiFeil> {
                         validerIngenEndringerFørRevurderFra(
-                            vedtaksperioder = nyeVedtaksperioder,
+                            innsendteVedtaksperioder = nyeVedtaksperioder,
                             vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
                             revurderFra = femtendeMars,
                         )
                     }
-                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+                assertThat(feil).hasMessage("Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato")
             }
 
             @Test
@@ -172,12 +172,12 @@ class VedtaksperiodeValideringUtilsTest {
                 val feil =
                     assertThrows<ApiFeil> {
                         validerIngenEndringerFørRevurderFra(
-                            vedtaksperioder = vedtaksperioderJanMars,
+                            innsendteVedtaksperioder = vedtaksperioderJanMars,
                             vedtaksperioderForrigeBehandling = gamleVedtaksperioder,
                             revurderFra = førsteApril,
                         )
                     }
-                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+                assertThat(feil).hasMessage("Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato")
             }
 
             @Test
@@ -185,12 +185,12 @@ class VedtaksperiodeValideringUtilsTest {
                 val feil =
                     assertThrows<ApiFeil> {
                         validerIngenEndringerFørRevurderFra(
-                            vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 3, 31))),
+                            innsendteVedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 3, 31))),
                             vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
                             revurderFra = førsteApril,
                         )
                     }
-                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+                assertThat(feil).hasMessage("Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato")
             }
 
             @Test
@@ -198,12 +198,12 @@ class VedtaksperiodeValideringUtilsTest {
                 val feil =
                     assertThrows<ApiFeil> {
                         validerIngenEndringerFørRevurderFra(
-                            vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 5, 31))),
+                            innsendteVedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 5, 31))),
                             vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
                             revurderFra = førsteApril,
                         )
                     }
-                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+                assertThat(feil).hasMessage("Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato")
             }
 
             @Test
@@ -211,19 +211,19 @@ class VedtaksperiodeValideringUtilsTest {
                 val feil =
                     assertThrows<ApiFeil> {
                         validerIngenEndringerFørRevurderFra(
-                            vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(fom = LocalDate.of(2025, 1, 3))),
+                            innsendteVedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(fom = LocalDate.of(2025, 1, 3))),
                             vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
                             revurderFra = førsteApril,
                         )
                     }
-                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+                assertThat(feil).hasMessage("Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato")
             }
 
             @Test
             fun `kaster ikke feil når forlenger fom som er dagen før revurder fra`() {
                 assertDoesNotThrow {
                     validerIngenEndringerFørRevurderFra(
-                        vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 3, 31))),
+                        innsendteVedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 3, 31))),
                         vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
                         revurderFra = førsteMars,
                     )
@@ -235,19 +235,19 @@ class VedtaksperiodeValideringUtilsTest {
                 val feil =
                     assertThrows<ApiFeil> {
                         validerIngenEndringerFørRevurderFra(
-                            vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(fom = LocalDate.of(2025, 2, 27))),
+                            innsendteVedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(fom = LocalDate.of(2025, 2, 27))),
                             vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
                             revurderFra = førsteMars,
                         )
                     }
-                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+                assertThat(feil).hasMessage("Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato")
             }
 
             @Test
             fun `kaster ikke feil når avkorter tom til dagen før revurder fra`() {
                 assertDoesNotThrow {
                     validerIngenEndringerFørRevurderFra(
-                        vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 2, 28))),
+                        innsendteVedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 2, 28))),
                         vedtaksperioderForrigeBehandling =
                             listOf(
                                 vedtaksperiodeJanFeb.copy(
@@ -271,7 +271,7 @@ class VedtaksperiodeValideringUtilsTest {
             fun `kaster ikke feil ved slettet perioder etter revurder fra`() {
                 assertDoesNotThrow {
                     validerIngenEndringerFørRevurderFra(
-                        vedtaksperioder = vedtaksperioderJanFeb,
+                        innsendteVedtaksperioder = vedtaksperioderJanFeb,
                         vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
                         revurderFra = førsteMars,
                     )
@@ -283,12 +283,12 @@ class VedtaksperiodeValideringUtilsTest {
                 val feil =
                     assertThrows<ApiFeil> {
                         validerIngenEndringerFørRevurderFra(
-                            vedtaksperioder = vedtaksperioderJanFeb,
+                            innsendteVedtaksperioder = vedtaksperioderJanFeb,
                             vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
                             revurderFra = femtendeMars,
                         )
                     }
-                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+                assertThat(feil).hasMessage("Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato")
             }
 
             @Test
@@ -296,12 +296,12 @@ class VedtaksperiodeValideringUtilsTest {
                 val feil =
                     assertThrows<ApiFeil> {
                         validerIngenEndringerFørRevurderFra(
-                            vedtaksperioder = vedtaksperioderJanFeb,
+                            innsendteVedtaksperioder = vedtaksperioderJanFeb,
                             vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
                             revurderFra = førsteApril,
                         )
                     }
-                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+                assertThat(feil).hasMessage("Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato")
             }
         }
     }
