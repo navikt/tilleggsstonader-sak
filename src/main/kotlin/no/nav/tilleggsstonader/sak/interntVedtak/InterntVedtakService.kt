@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
@@ -169,12 +170,10 @@ class InterntVedtakService(
     private fun mapVedtaksperioder(vedtak: Vedtak?): List<VedtaksperiodeInterntVedtak> =
         when (vedtak?.data) {
             is InnvilgelseTilsynBarn -> mapVedtaksperioderTilsynBarn(vedtak.data.vedtaksperioder)
-            is OpphørTilsynBarn -> mapVedtaksperioderTilsynBarn(vedtak.data.vedtaksperioder)
 
             is InnvilgelseLæremidler -> mapVedtaksperioderLæremidler(vedtak.data.vedtaksperioder)
-            is OpphørLæremidler -> mapVedtaksperioderLæremidler(vedtak.data.vedtaksperioder)
 
-            is Avslag -> emptyList()
+            is Avslag, is Opphør -> emptyList()
 
             else -> {
                 error("Kan ikke mappe vedtaksperioder for type ${vedtak?.data?.javaClass?.simpleName}")
