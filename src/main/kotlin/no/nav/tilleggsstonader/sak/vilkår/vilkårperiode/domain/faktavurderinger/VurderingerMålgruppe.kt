@@ -49,7 +49,7 @@ data object VurderingOvergangsstønad : MedlemskapVurdering, AldersvilkårVurder
     override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
     override val aldersvilkår: VurderingAldersVilkår =
         VurderingAldersVilkår(
-            SvarJaNei.JA,
+            SvarJaNei.JA_IMPLISITT,
             null,
         )
 }

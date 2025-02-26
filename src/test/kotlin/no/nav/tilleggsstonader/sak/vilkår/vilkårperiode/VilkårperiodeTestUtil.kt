@@ -73,9 +73,9 @@ object VilkårperiodeTestUtil {
         )
 
     fun vurderingFaktaEtterlevelseAldersvilkår(
-        vilkårperiodeFom: LocalDate = osloDateNow(),
-        vilkårperiodeTom: LocalDate = osloDateNow().plusDays(5),
-        fødselsdato: LocalDate = osloDateNow().minusYears(20),
+        vilkårperiodeFom: LocalDate = LocalDate.of(2025, 1, 1),
+        vilkårperiodeTom: LocalDate = LocalDate.of(2025, 2, 1),
+        fødselsdato: LocalDate = LocalDate.of(2000, 1, 1),
     ) = AldersvilkårVurdering
         .VurderingFaktaEtterlevelseAldersvilkår(
             vilkårperiodeFom = vilkårperiodeFom,
