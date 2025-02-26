@@ -5,7 +5,11 @@
     "aldersvilkår": {
       "resultat": "OPPFYLT",
       "svar": "JA_IMPLISITT",
-      "vurderingFaktaEtterlevelse": "Vurdering Fakta Etterlevelse"
+      "vurderingFaktaEtterlevelse": {
+        "fødselsdato": "2000-01-01",
+        "vilkårperiodeFom": "2025-02-26",
+        "vilkårperiodeTom": "2027-02-26"
+      }
     },
     "dekketAvAnnetRegelverk": {
       "svar": "NEI",
