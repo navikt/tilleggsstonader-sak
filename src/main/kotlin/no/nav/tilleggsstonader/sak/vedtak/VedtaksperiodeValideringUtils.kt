@@ -24,7 +24,8 @@ object VedtaksperiodeValideringUtils {
         } else {
             val vedtaksperioderForrigeBehandlingFørRevurderFraMedOppdatertTom =
                 vedtaksperioderForrigeBehandlingFørRevurderFra.map { vedtaksperiodeForrigeBehandling ->
-                    val tilhørendeInnsendtVedtaksperiode = innsendteVedtaksperioderMap[vedtaksperiodeForrigeBehandling.id]
+                    val tilhørendeInnsendtVedtaksperiode =
+                        innsendteVedtaksperioderMap[vedtaksperiodeForrigeBehandling.id]
 
                     if (tilhørendeInnsendtVedtaksperiode != null &&
                         // revurderFra.minusDays(1) tillater endringer dagen før revurder fra som trengs i opphør
@@ -40,7 +41,7 @@ object VedtaksperiodeValideringUtils {
                     }
                 }
             brukerfeilHvis(
-                vedtaksperioderForrigeBehandlingFørRevurderFraMedOppdatertTom != innsendteVedtaksperioderFørRevurderFra,
+                vedtaksperioderForrigeBehandlingFørRevurderFraMedOppdatertTom.toSet() != innsendteVedtaksperioderFørRevurderFra.toSet(),
             ) {
                 "Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato"
             }
