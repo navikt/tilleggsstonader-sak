@@ -209,7 +209,7 @@ private fun mapMålgruppeBarnetilsyn(
                                         vilkårperiodeFom = målgruppe.fom,
                                         vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
-                                    ).toString(),
+                                    ),
                             ),
                     ),
             )
@@ -232,7 +232,7 @@ private fun mapMålgruppeBarnetilsyn(
                                         vilkårperiodeFom = målgruppe.fom,
                                         vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
-                                    ).toString(),
+                                    ),
                             ),
                     ),
             )
@@ -252,7 +252,7 @@ private fun mapMålgruppeBarnetilsyn(
                                         vilkårperiodeFom = målgruppe.fom,
                                         vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
-                                    ).toString(),
+                                    ),
                             ),
                     ),
             )
@@ -272,7 +272,7 @@ private fun mapMålgruppeBarnetilsyn(
                                         vilkårperiodeFom = målgruppe.fom,
                                         vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
-                                    ).toString(),
+                                    ),
                             ),
                     ),
             )
@@ -303,7 +303,7 @@ private fun mapMålgruppeLæremidler(
                                         vilkårperiodeFom = målgruppe.fom,
                                         vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
-                                    ).toString(),
+                                    ),
                             ),
                     ),
             )
@@ -326,7 +326,7 @@ private fun mapMålgruppeLæremidler(
                                         vilkårperiodeFom = målgruppe.fom,
                                         vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
-                                    ).toString(),
+                                    ),
                             ),
                     ),
             )
@@ -346,7 +346,7 @@ private fun mapMålgruppeLæremidler(
                                         vilkårperiodeFom = målgruppe.fom,
                                         vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
-                                    ).toString(),
+                                    ),
                             ),
                     ),
             )
@@ -366,7 +366,7 @@ private fun mapMålgruppeLæremidler(
                                         vilkårperiodeFom = målgruppe.fom,
                                         vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
-                                    ).toString(),
+                                    ),
                             ),
                     ),
             )

@@ -1,12 +1,14 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.AldersvilkårVurdering.VurderingFaktaEtterlevelseAldersvilkår
+
 sealed interface Vurdering {
     val svar: SvarJaNei?
     val resultat: ResultatDelvilkårperiode
 }
 
 sealed interface AutomatiskVurdering : Vurdering {
-    val vurderingFaktaEtterlevelse: String
+    val vurderingFaktaEtterlevelse: VurderingFaktaEtterlevelseAldersvilkår?
 }
 
 enum class SvarJaNei {
@@ -117,11 +119,11 @@ data class VurderingDekketAvAnnetRegelverk private constructor(
 data class VurderingAldersVilkår(
     override val svar: SvarJaNei,
     override val resultat: ResultatDelvilkårperiode,
-    override val vurderingFaktaEtterlevelse: String,
+    override val vurderingFaktaEtterlevelse: VurderingFaktaEtterlevelseAldersvilkår?,
 ) : AutomatiskVurdering {
     constructor(
         svar: SvarJaNei,
-        vurderingFaktaEtterlevelse: String,
+        vurderingFaktaEtterlevelse: VurderingFaktaEtterlevelseAldersvilkår?,
     ) : this(svar, utledResultat(svar), vurderingFaktaEtterlevelse)
 
     companion object {

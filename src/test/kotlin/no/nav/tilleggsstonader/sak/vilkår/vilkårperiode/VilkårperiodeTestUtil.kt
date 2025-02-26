@@ -72,6 +72,17 @@ object VilkårperiodeTestUtil {
             faktaOgVurdering = faktaOgVurdering,
         )
 
+    fun vurderingFaktaEtterlevelseAldersvilkår(
+        vilkårperiodeFom: LocalDate = osloDateNow(),
+        vilkårperiodeTom: LocalDate = osloDateNow().plusDays(5),
+        fødselsdato: LocalDate = osloDateNow().minusYears(20),
+    ) = AldersvilkårVurdering
+        .VurderingFaktaEtterlevelseAldersvilkår(
+            vilkårperiodeFom = vilkårperiodeFom,
+            vilkårperiodeTom = vilkårperiodeTom,
+            fødselsdato = fødselsdato,
+        )
+
     fun faktaOgVurderingMålgruppe(
         type: MålgruppeType = MålgruppeType.AAP,
         medlemskap: VurderingMedlemskap = vurderingMedlemskap(),
@@ -88,7 +99,8 @@ object VilkårperiodeTestUtil {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                    vurderingFaktaEtterlevelse =
+                                        vurderingFaktaEtterlevelseAldersvilkår(),
                                 ),
                         ),
                 )
@@ -102,7 +114,8 @@ object VilkårperiodeTestUtil {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                    vurderingFaktaEtterlevelse =
+                                        vurderingFaktaEtterlevelseAldersvilkår(),
                                 ),
                         ),
                 )
@@ -116,7 +129,8 @@ object VilkårperiodeTestUtil {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                    vurderingFaktaEtterlevelse =
+                                        vurderingFaktaEtterlevelseAldersvilkår(),
                                 ),
                         ),
                 )
@@ -130,7 +144,8 @@ object VilkårperiodeTestUtil {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                    vurderingFaktaEtterlevelse =
+                                        vurderingFaktaEtterlevelseAldersvilkår(),
                                 ),
                         ),
                 )

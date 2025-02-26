@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingFaktaEtterlevelseAldersvilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
@@ -46,7 +47,8 @@ class FaktaOgVurderingTilsynBarnTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                    vurderingFaktaEtterlevelse =
+                                        vurderingFaktaEtterlevelseAldersvilkår(),
                                 ),
                         ),
                 )
@@ -65,7 +67,8 @@ class FaktaOgVurderingTilsynBarnTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                    vurderingFaktaEtterlevelse =
+                                        vurderingFaktaEtterlevelseAldersvilkår(),
                                 ),
                         ),
                 )
@@ -84,7 +87,8 @@ class FaktaOgVurderingTilsynBarnTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                    vurderingFaktaEtterlevelse =
+                                        vurderingFaktaEtterlevelseAldersvilkår(),
                                 ),
                         ),
                 )
@@ -103,7 +107,8 @@ class FaktaOgVurderingTilsynBarnTest {
                             aldersvilkår =
                                 VurderingAldersVilkår(
                                     SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse = "Vurdering Fakta Etterlevelse",
+                                    vurderingFaktaEtterlevelse =
+                                        vurderingFaktaEtterlevelseAldersvilkår(),
                                 ),
                         ),
                 )
