@@ -30,8 +30,6 @@ object AldersvilkårVurdering {
         return gyldig
     }
 
-    private fun genererFaktaSomJson(fødselsdato: LocalDate): String = "{ \"fødselsdato\": \"$fødselsdato\"}"
-
     private fun heleVilkårsperiodenErFørBrukerFyller67År(
         fødselsdato: LocalDate,
         vilkårsperiodeFom: LocalDate,
@@ -82,4 +80,14 @@ object AldersvilkårVurdering {
         } else {
             SvarJaNei.NEI
         }
+
+    data class VurderingFaktaEtterlevelseAldersvilkår(
+        val vilkårperiodeFom: LocalDate,
+        val vilkårperiodeTom: LocalDate,
+        val fødselsdato: LocalDate?,
+    ) {
+        init {
+            require(fødselsdato != null) { "Fødselsdato må være kjent for å vurdere aldersvilkår" }
+        }
+    }
 }
