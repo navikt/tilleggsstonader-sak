@@ -97,7 +97,12 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `AAP med 18-års dag midt i vilkårsperiode skal kaste feil`() {
-        val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.AAP)
+        val målgruppe =
+            dummyVilkårperiodeMålgruppe().copy(
+                type = MålgruppeType.AAP,
+                fom = osloDateNow().minusDays(10),
+                tom = osloDateNow().plusDays(10),
+            )
 
         val grunnlagsdata =
             grunnlagsdataDomain(
@@ -112,5 +117,54 @@ class AldersvilkårVurderingTest {
             )
         val feil = assertThrows<Feil> { vurderAldersvilkår(målgruppe, grunnlagsdata) }
         assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
+    }
+
+    @Test
+    fun `AAP med 18-års dag første dag i vilkårsperiode skal kaste feil`() {
+        val målgruppe =
+            dummyVilkårperiodeMålgruppe().copy(
+                type = MålgruppeType.AAP,
+                fom = osloDateNow().minusDays(10),
+                tom = osloDateNow().plusDays(10),
+            )
+
+        val grunnlagsdata =
+            grunnlagsdataDomain(
+                grunnlag =
+                    lagGrunnlagsdata(
+                        fødsel =
+                            Fødsel(
+                                fødselsdato = osloDateNow().minusYears(18).minusDays(10),
+                                osloDateNow().minusYears(18).minusDays(10).year,
+                            ),
+                    ),
+            )
+        val feil = assertThrows<Feil> { vurderAldersvilkår(målgruppe, grunnlagsdata) }
+        assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
+    }
+
+    @Test
+    fun `AAP med 18-års dag dagen før vilkårsperioden starter skal ikke kaste feil`() {
+        val målgruppe =
+            dummyVilkårperiodeMålgruppe().copy(
+                type = MålgruppeType.AAP,
+                fom = osloDateNow().minusDays(10),
+                tom = osloDateNow().plusDays(10),
+            )
+
+        val grunnlagsdata =
+            grunnlagsdataDomain(
+                grunnlag =
+                    lagGrunnlagsdata(
+                        fødsel =
+                            Fødsel(
+                                fødselsdato = osloDateNow().minusYears(18).minusDays(11),
+                                osloDateNow().minusYears(18).minusDays(11).year,
+                            ),
+                    ),
+            )
+        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
+            assertEquals(SvarJaNei.JA, it)
+        }
     }
 }
