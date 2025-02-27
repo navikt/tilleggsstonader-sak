@@ -1,12 +1,18 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Fødsel
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.grunnlagsdataDomain
+import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.AldersvilkårVurdering.vurderAldersvilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class AldersvilkårVurderingTest {
     @Test
@@ -87,5 +93,24 @@ class AldersvilkårVurderingTest {
         vurderAldersvilkår(målgruppe, grunnlagsdata).also {
             assertEquals(SvarJaNei.NEI, it)
         }
+    }
+
+    @Test
+    fun `AAP med 18-års dag midt i vilkårsperiode skal kaste feil`() {
+        val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.AAP)
+
+        val grunnlagsdata =
+            grunnlagsdataDomain(
+                grunnlag =
+                    lagGrunnlagsdata(
+                        fødsel =
+                            Fødsel(
+                                fødselsdato = osloDateNow().minusYears(18),
+                                osloDateNow().minusYears(18).year,
+                            ),
+                    ),
+            )
+        val feil = assertThrows<Feil> { vurderAldersvilkår(målgruppe, grunnlagsdata) }
+        assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
     }
 }
