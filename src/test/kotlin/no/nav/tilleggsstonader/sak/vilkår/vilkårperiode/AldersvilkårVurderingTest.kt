@@ -167,4 +167,53 @@ class AldersvilkårVurderingTest {
             assertEquals(SvarJaNei.JA, it)
         }
     }
+
+    @Test
+    fun `AAP med 18-års dag dagen etter vilkårsperioden starter skal gi NEI`() {
+        val målgruppe =
+            dummyVilkårperiodeMålgruppe().copy(
+                type = MålgruppeType.AAP,
+                fom = osloDateNow().minusDays(10),
+                tom = osloDateNow().plusDays(10),
+            )
+
+        val grunnlagsdata =
+            grunnlagsdataDomain(
+                grunnlag =
+                    lagGrunnlagsdata(
+                        fødsel =
+                            Fødsel(
+                                fødselsdato = osloDateNow().minusYears(18).plusDays(11),
+                                osloDateNow().minusYears(18).plusDays(11).year,
+                            ),
+                    ),
+            )
+        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
+            assertEquals(SvarJaNei.NEI, it)
+        }
+    }
+
+    @Test
+    fun `AAP med 18-års dag siste dag i vilkårsperiode skal kaste feil`() {
+        val målgruppe =
+            dummyVilkårperiodeMålgruppe().copy(
+                type = MålgruppeType.AAP,
+                fom = osloDateNow().minusDays(10),
+                tom = osloDateNow().plusDays(10),
+            )
+
+        val grunnlagsdata =
+            grunnlagsdataDomain(
+                grunnlag =
+                    lagGrunnlagsdata(
+                        fødsel =
+                            Fødsel(
+                                fødselsdato = osloDateNow().minusYears(18).plusDays(10),
+                                osloDateNow().minusYears(18).plusDays(10).year,
+                            ),
+                    ),
+            )
+        val feil = assertThrows<Feil> { vurderAldersvilkår(målgruppe, grunnlagsdata) }
+        assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
+    }
 }
