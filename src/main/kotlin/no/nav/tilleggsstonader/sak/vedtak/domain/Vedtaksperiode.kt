@@ -9,15 +9,30 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.util.UUID
 
+interface PeriodeMedId : Periode<LocalDate> {
+    val id: UUID
+
+    fun kopier(
+        fom: LocalDate,
+        tom: LocalDate,
+    ): PeriodeMedId
+}
+
 data class Vedtaksperiode(
-    val id: UUID,
+    override val id: UUID,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppe: MålgruppeType,
     val aktivitet: AktivitetType,
 ) : Periode<LocalDate>,
-    KopierPeriode<Vedtaksperiode> {
+    KopierPeriode<Vedtaksperiode>,
+    PeriodeMedId {
     override fun medPeriode(
+        fom: LocalDate,
+        tom: LocalDate,
+    ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
+
+    override fun kopier(
         fom: LocalDate,
         tom: LocalDate,
     ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
