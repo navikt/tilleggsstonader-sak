@@ -147,11 +147,11 @@ class OppfølgingService(
                 val ytelser = ytelserPerMålgruppe[this.målgruppe] ?: emptyList()
                 val kontroller = finnKontroller(this, ytelser)
                 val enKontroll = kontroller.singleOrNull()
-                val sisteDagNesteMåned = YearMonth.now().plusMonths(1).atEndOfMonth()
+                val førsteDagINestNesteMåned = YearMonth.now().plusMonths(1).atEndOfMonth()
                 if (
                     målgruppe == MålgruppeType.AAP &&
                     enKontroll?.årsak == ÅrsakKontroll.TOM_ENDRET &&
-                    enKontroll.tom!! > sisteDagNesteMåned
+                    enKontroll.tom!! >= førsteDagINestNesteMåned
                 ) {
                     // AAP slutter før vedtaksperiode
                     emptyList()
@@ -312,7 +312,7 @@ class OppfølgingService(
                     .sorted()
                     .mergeSammenhengende(
                         { y1, y2 -> y1.målgruppe == y2.målgruppe && y1.overlapperEllerPåfølgesAv(y2) },
-                        { y1, y2 -> y1.copy(fom = minOf(y1.fom, y2.fom), tom = maxOf(y2.tom, y2.tom)) },
+                        { y1, y2 -> y1.copy(fom = minOf(y1.fom, y2.fom), tom = maxOf(y1.tom, y2.tom)) },
                     )
             }
     }
@@ -378,11 +378,13 @@ private data class InngangsvilkårAktivitet(
         if (registerAktivitet != null) {
             val fomDiff = diff("fom", fom, registerAktivitet.fom)
             val tomDiff = diff("tom", tom, registerAktivitet.tom)
-            val prosentDiff = diff("prosent", prosent, registerAktivitet.prosentDeltakelse?.toInt())
-            val antallDagerDiff = diff("dager", antallDager, registerAktivitet.antallDagerPerUke)
+            val prosentDiff =
+                diff("prosent", prosent, registerAktivitet.prosentDeltakelse?.toInt()).takeIf { prosent != null }
+            val antallDagerDiff =
+                diff("dager", antallDager, registerAktivitet.antallDagerPerUke).takeIf { antallDager != null }
             val diff = listOfNotNull(fomDiff, tomDiff, prosentDiff, antallDagerDiff)
             if (diff.isNotEmpty()) {
-                logger.info("Diff vilkår vs register ${diff.joinToString(" ")}")
+                logger.info("Diff vilkår=$id vs register ${diff.joinToString(" ")}")
             }
         }
     }

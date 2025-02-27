@@ -172,8 +172,8 @@ class OppfølgingServiceTest {
         }
 
         @Test
-        fun `skal ikke finne treff hvis det gjelder gjelder endring i AAP som gjelder etter neste måned`() {
-            val tom = YearMonth.now().plusMonths(2).atDay(2)
+        fun `skal ikke finne treff hvis det gjelder gjelder endring i AAP som gjelder fra og med siste dagen i neste måneden`() {
+            val tom = YearMonth.now().plusMonths(2).atDay(1)
             every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
                 listOf(stønadsperiode.copy(tom = tom)).tilSortertDto()
             val ytelse = periodeAAP(fom = stønadsperiode.fom, tom = tom.minusDays(1))
@@ -187,7 +187,7 @@ class OppfølgingServiceTest {
 
         @Test
         fun `skal finne treff hvis det gjelder gjelder endring i AAP som gjelder neste måned`() {
-            val tom = YearMonth.now().plusMonths(2).atDay(1)
+            val tom = YearMonth.now().plusMonths(1).atEndOfMonth()
             every { stønadsperiodeService.hentStønadsperioder(behandling.id) } returns
                 listOf(stønadsperiode.copy(tom = tom)).tilSortertDto()
             val ytelse = periodeAAP(fom = stønadsperiode.fom, tom = tom.minusDays(1))

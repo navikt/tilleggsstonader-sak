@@ -13,11 +13,13 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrun
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
@@ -27,6 +29,11 @@ import java.util.UUID
 
 object TilsynBarnTestUtil {
     fun innvilgelseDto() = InnvilgelseTilsynBarnRequest
+
+    fun innvilgelseDtoV2(vedtaksperioder: List<VedtaksperiodeDto>) =
+        InnvilgelseTilsynBarnRequestV2(
+            vedtaksperioder = vedtaksperioder,
+        )
 
     fun opphørDto() =
         OpphørTilsynBarnRequest(
@@ -119,12 +126,14 @@ object TilsynBarnTestUtil {
     fun innvilgetVedtak(
         beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
         behandlingId: BehandlingId = defaultBehandling.id,
+        vedtaksperioder: List<Vedtaksperiode>? = null,
     ) = GeneriskVedtak(
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,
         data =
             InnvilgelseTilsynBarn(
                 beregningsresultat = beregningsresultat,
+                vedtaksperioder = vedtaksperioder,
             ),
     )
 }

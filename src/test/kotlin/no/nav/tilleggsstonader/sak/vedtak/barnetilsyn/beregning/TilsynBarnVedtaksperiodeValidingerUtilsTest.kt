@@ -1012,6 +1012,41 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     }
                 assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
             }
+
+            @Test
+            fun `kaster ikke feil når forlenger fom som er dagen før revurder fra`() {
+                assertDoesNotThrow {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 3, 31))),
+                        vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
+                        revurderFra = førsteMars,
+                    )
+                }
+            }
+
+            @Test
+            fun `kaster feil når avkorter fom som er dagen før revurder fra`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(fom = LocalDate.of(2025, 2, 27))),
+                            vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
+                            revurderFra = førsteMars,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legg til, endre eller slette perioder fra før revurder fra dato")
+            }
+
+            @Test
+            fun `kaster ikke feil når avkorter tom til dagen før revurder fra`() {
+                assertDoesNotThrow {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 2, 28))),
+                        vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb.copy(tom = LocalDate.of(2025, 3, 31))),
+                        revurderFra = førsteMars,
+                    )
+                }
+            }
         }
 
         @Nested

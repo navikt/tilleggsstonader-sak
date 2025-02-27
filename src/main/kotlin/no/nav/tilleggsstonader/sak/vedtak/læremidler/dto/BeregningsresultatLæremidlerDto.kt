@@ -34,7 +34,9 @@ data class BeregningsresultatForPeriodeDto(
         )
 
     fun kanSlåsSammen(nestePeriode: BeregningsresultatForPeriodeDto): Boolean =
-        this.studienivå == nestePeriode.studienivå &&
+        this.målgruppe == nestePeriode.målgruppe &&
+            this.aktivitet == nestePeriode.aktivitet &&
+            this.studienivå == nestePeriode.studienivå &&
             this.studieprosent == nestePeriode.studieprosent &&
             this.beløp == nestePeriode.beløp &&
             this.utbetalingsdato == nestePeriode.utbetalingsdato &&

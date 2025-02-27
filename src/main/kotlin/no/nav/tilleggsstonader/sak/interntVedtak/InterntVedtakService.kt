@@ -88,7 +88,6 @@ class InterntVedtakService(
                     BeregningsresultatInterntVedtakDto(
                         læremidler =
                             data.beregningsresultat
-                                .filtrerFraOgMed(behandling.revurderFra)
                                 .tilDto(behandling.revurderFra)
                                 .perioder,
                     )
