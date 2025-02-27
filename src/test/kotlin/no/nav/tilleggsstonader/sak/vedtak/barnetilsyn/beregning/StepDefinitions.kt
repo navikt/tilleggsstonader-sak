@@ -191,7 +191,7 @@ class StepDefinitions {
                 }
 
                 forventetResultat.grunnlag.antallDagerTotal?.let {
-                    assertThat(resultat.grunnlag.stønadsperioderGrunnlag.sumOf { it.antallDager })
+                    assertThat(resultat.grunnlag.vedtaksperiodeGrunnlag.sumOf { it.antallDager })
                         .`as` { "antallDagerTotal" }
                         .isEqualTo(it)
                 }
@@ -231,7 +231,7 @@ class StepDefinitions {
                 .perioder
                 .find { it.grunnlag.måned == måned }
                 ?.grunnlag
-                ?.stønadsperioderGrunnlag
+                ?.vedtaksperiodeGrunnlag
                 ?.map { it.stønadsperiode }
                 ?: error("Finner ikke beregningsresultat for $måned")
 
@@ -265,7 +265,7 @@ class StepDefinitions {
                 .perioder
                 .find { it.grunnlag.måned == måned }
                 ?.grunnlag
-                ?.stønadsperioderGrunnlag
+                ?.vedtaksperiodeGrunnlag
                 ?: error("Finner ikke beregningsresultat for $måned")
 
         perioder.forEachIndexed { index, resultat ->

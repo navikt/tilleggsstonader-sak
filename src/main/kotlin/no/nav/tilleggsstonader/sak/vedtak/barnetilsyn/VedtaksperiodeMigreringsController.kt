@@ -130,7 +130,7 @@ fun mapTilVedtaksperiode(beregningsresultat: List<BeregningsresultatForMåned>):
         )
 
 private fun tilVedtaksperioder(beregningsresultat: BeregningsresultatForMåned) =
-    beregningsresultat.grunnlag.stønadsperioderGrunnlag
+    beregningsresultat.grunnlag.vedtaksperiodeGrunnlag
         .map { it.stønadsperiode }
         .map { vedtaksperiode ->
             Vedtaksperiode(

@@ -118,7 +118,7 @@ class BehandlingsoversiktService(
     private fun BeregningsresultatTilsynBarn.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {
         val stønadsperioder =
             perioder
-                .flatMap { it.grunnlag.stønadsperioderGrunnlag }
+                .flatMap { it.grunnlag.vedtaksperiodeGrunnlag }
                 .map { it.stønadsperiode }
                 .avkortPerioderFør(revurdererFra)
         val minFom = stønadsperioder.minOfOrNull { it.fom }

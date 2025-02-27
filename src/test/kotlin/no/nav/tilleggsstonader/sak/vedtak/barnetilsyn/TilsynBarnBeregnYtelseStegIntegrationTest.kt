@@ -241,7 +241,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     .hentVedtak<InnvilgelseTilsynBarn>(behandling.id)!!
                     .data.beregningsresultat
             with(beregningsresultat!!.perioder.single()) {
-                with(this.grunnlag.stønadsperioderGrunnlag.single()) {
+                with(this.grunnlag.vedtaksperiodeGrunnlag.single()) {
                     assertThat(this.stønadsperiode.fom).isEqualTo(juni.atDay(1))
                     assertThat(this.stønadsperiode.tom).isEqualTo(juni.atEndOfMonth())
                 }
@@ -522,24 +522,24 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 .beregningsresultat
 
         private fun assertHarPerioderForJanuarOgFebruar(beregningsresultat: List<BeregningsresultatForMåned>) {
-            with(beregningsresultat[0].grunnlag.stønadsperioderGrunnlag.single()) {
+            with(beregningsresultat[0].grunnlag.vedtaksperiodeGrunnlag.single()) {
                 assertThat(this.stønadsperiode.fom).isEqualTo(januar.atDay(1))
                 assertThat(this.stønadsperiode.tom).isEqualTo(januar.atEndOfMonth())
             }
 
-            with(beregningsresultat[1].grunnlag.stønadsperioderGrunnlag.single()) {
+            with(beregningsresultat[1].grunnlag.vedtaksperiodeGrunnlag.single()) {
                 assertThat(this.stønadsperiode.fom).isEqualTo(februar.atDay(1))
                 assertThat(this.stønadsperiode.tom).isEqualTo(februar.atEndOfMonth())
             }
         }
 
         private fun assertHarPerioderForMars(beregningsresultatForMåneds: List<BeregningsresultatForMåned>) {
-            assertThat(beregningsresultatForMåneds[2].grunnlag.stønadsperioderGrunnlag).hasSize(2)
-            with(beregningsresultatForMåneds[2].grunnlag.stønadsperioderGrunnlag[0]) {
+            assertThat(beregningsresultatForMåneds[2].grunnlag.vedtaksperiodeGrunnlag).hasSize(2)
+            with(beregningsresultatForMåneds[2].grunnlag.vedtaksperiodeGrunnlag[0]) {
                 assertThat(this.stønadsperiode.fom).isEqualTo(mars.atDay(1))
                 assertThat(this.stønadsperiode.tom).isEqualTo(mars.atDay(14))
             }
-            with(beregningsresultatForMåneds[2].grunnlag.stønadsperioderGrunnlag[1]) {
+            with(beregningsresultatForMåneds[2].grunnlag.vedtaksperiodeGrunnlag[1]) {
                 assertThat(this.stønadsperiode.fom).isEqualTo(mars.atDay(15))
                 assertThat(this.stønadsperiode.tom).isEqualTo(mars.atDay(31))
             }

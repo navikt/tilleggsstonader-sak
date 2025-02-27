@@ -4,8 +4,8 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -22,7 +22,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
                 perioder =
                     listOf(
                         beregningsresultatForMåned(
-                            stønadsperiodeGrunnlag =
+                            vedtaksperiodeGrunnlag =
                                 listOf(
                                     stønadsperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
                                 ),
@@ -52,14 +52,14 @@ class InnvilgelseTilsynBarnDtoKtTest {
                 perioder =
                     listOf(
                         beregningsresultatForMåned(
-                            stønadsperiodeGrunnlag =
+                            vedtaksperiodeGrunnlag =
                                 listOf(
                                     stønadsperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
                                     stønadsperiodeGrunnlag(LocalDate.of(2024, 1, 15), LocalDate.of(2024, 1, 16)),
                                 ),
                         ),
                         beregningsresultatForMåned(
-                            stønadsperiodeGrunnlag =
+                            vedtaksperiodeGrunnlag =
                                 listOf(
                                     stønadsperiodeGrunnlag(LocalDate.of(2024, 2, 3), LocalDate.of(2024, 2, 4)),
                                 ),
@@ -130,17 +130,17 @@ class InnvilgelseTilsynBarnDtoKtTest {
             assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 19))
         }
 
-        private fun resultatMedEnStønadsperiode(stønadsperiodeGrunnlag: StønadsperiodeGrunnlag) =
+        private fun resultatMedEnStønadsperiode(vedtaksperiodeGrunnlag: VedtaksperiodeGrunnlag) =
             BeregningsresultatTilsynBarn(
                 perioder =
                     listOf(
-                        beregningsresultatForMåned(stønadsperiodeGrunnlag = listOf(stønadsperiodeGrunnlag)),
+                        beregningsresultatForMåned(vedtaksperiodeGrunnlag = listOf(vedtaksperiodeGrunnlag)),
                     ),
             )
     }
 
     private fun beregningsresultatForMåned(
-        stønadsperiodeGrunnlag: List<StønadsperiodeGrunnlag> = emptyList(),
+        vedtaksperiodeGrunnlag: List<VedtaksperiodeGrunnlag> = emptyList(),
         beløpsperioder: List<Beløpsperiode> = emptyList(),
     ) = BeregningsresultatForMåned(
         dagsats = 10.toBigDecimal(),
@@ -149,7 +149,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
             Beregningsgrunnlag(
                 måned = YearMonth.of(2024, 1),
                 makssats = 1000,
-                stønadsperioderGrunnlag = stønadsperiodeGrunnlag,
+                vedtaksperiodeGrunnlag = vedtaksperiodeGrunnlag,
                 utgifter = emptyList(),
                 antallBarn = 4,
                 utgifterTotal = 100,
@@ -160,7 +160,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
     private fun stønadsperiodeGrunnlag(
         fom: LocalDate,
         tom: LocalDate,
-    ) = StønadsperiodeGrunnlag(
+    ) = VedtaksperiodeGrunnlag(
         stønadsperiode =
             VedtaksperiodeBeregning(
                 fom = fom,
