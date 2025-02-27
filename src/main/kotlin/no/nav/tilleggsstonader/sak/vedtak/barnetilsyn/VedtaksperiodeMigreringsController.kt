@@ -131,7 +131,7 @@ fun mapTilVedtaksperiode(beregningsresultat: List<BeregningsresultatForMåned>):
 
 private fun tilVedtaksperioder(beregningsresultat: BeregningsresultatForMåned) =
     beregningsresultat.grunnlag.vedtaksperiodeGrunnlag
-        .map { it.stønadsperiode }
+        .map { it.vedtaksperiode }
         .map { vedtaksperiode ->
             Vedtaksperiode(
                 id = UUID.randomUUID(),

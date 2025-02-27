@@ -17,7 +17,7 @@ object VedtaksperiodeTilsynBarnMapper {
 
     private fun tilVedtaksperioder(it: BeregningsresultatForMåned) =
         it.grunnlag.vedtaksperiodeGrunnlag
-            .map { it.stønadsperiode }
+            .map { it.vedtaksperiode }
             .map { vedtaksperiode ->
                 VedtaksperiodeTilsynBarn(vedtaksperiode, it.grunnlag.utgifter.map { it.barnId })
             }

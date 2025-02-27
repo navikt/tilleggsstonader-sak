@@ -76,7 +76,7 @@ object TilsynBarnTestUtil {
                 BeregningsresultatTilsynBarn(
                     perioder =
                         listOf(
-                            beregningsresultatForMåned(stønadsperioder = listOf(stønadsperiodeGrunnlag())),
+                            beregningsresultatForMåned(stønadsperioder = listOf(vedtaksperiodeGrunnlag())),
                         ),
                 ),
         )
@@ -116,9 +116,9 @@ object TilsynBarnTestUtil {
             data = data,
         )
 
-    fun stønadsperiodeGrunnlag(vedtaksperiode: VedtaksperiodeBeregning = defaultVedtaksperiodeBeregning): VedtaksperiodeGrunnlag =
+    fun vedtaksperiodeGrunnlag(vedtaksperiode: VedtaksperiodeBeregning = defaultVedtaksperiodeBeregning): VedtaksperiodeGrunnlag =
         VedtaksperiodeGrunnlag(
-            stønadsperiode = vedtaksperiode,
+            vedtaksperiode = vedtaksperiode,
             aktiviteter = emptyList(),
             antallDager = 0,
         )

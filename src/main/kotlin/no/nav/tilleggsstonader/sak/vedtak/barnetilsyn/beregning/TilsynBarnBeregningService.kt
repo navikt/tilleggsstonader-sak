@@ -153,11 +153,11 @@ class TilsynBarnBeregningService(
     ): List<Beløpsperiode> =
         it.vedtaksperiodeGrunnlag.map {
             // Datoer som treffer helger må endres til neste mandag fordi andeler med type dagsats betales ikke ut i helger
-            val dato = it.stønadsperiode.fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
+            val dato = it.vedtaksperiode.fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
             Beløpsperiode(
                 dato = dato,
                 beløp = beregnBeløp(dagsats, it.antallDager),
-                målgruppe = it.stønadsperiode.målgruppe,
+                målgruppe = it.vedtaksperiode.målgruppe,
             )
         }
 
@@ -225,7 +225,7 @@ class TilsynBarnBeregningService(
             val relevanteAktiviteter = finnAktiviteterForStønadsperiode(vedtaksperiode, aktiviteter)
 
             VedtaksperiodeGrunnlag(
-                stønadsperiode = vedtaksperiode,
+                vedtaksperiode = vedtaksperiode,
                 aktiviteter = relevanteAktiviteter,
                 antallDager = antallDager(vedtaksperiode, aktiviteterPerUke),
             )

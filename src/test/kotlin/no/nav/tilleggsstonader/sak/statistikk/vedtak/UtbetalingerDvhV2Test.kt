@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvhV2
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultVedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.stønadsperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import org.assertj.core.api.Assertions.assertThat
@@ -25,7 +25,7 @@ class UtbetalingerDvhV2Test {
                             perioder =
                                 listOf(
                                     beregningsresultatForMåned(
-                                        stønadsperioder = listOf(stønadsperiodeGrunnlag()),
+                                        stønadsperioder = listOf(vedtaksperiodeGrunnlag()),
                                         utgifterTotal = 4000,
                                     ),
                                 ),

@@ -24,7 +24,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
                         beregningsresultatForMåned(
                             vedtaksperiodeGrunnlag =
                                 listOf(
-                                    stønadsperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
+                                    vedtaksperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
                                 ),
                             beløpsperioder = listOf(Beløpsperiode(LocalDate.of(2024, 1, 1), 20, MålgruppeType.AAP)),
                         ),
@@ -54,14 +54,14 @@ class InnvilgelseTilsynBarnDtoKtTest {
                         beregningsresultatForMåned(
                             vedtaksperiodeGrunnlag =
                                 listOf(
-                                    stønadsperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
-                                    stønadsperiodeGrunnlag(LocalDate.of(2024, 1, 15), LocalDate.of(2024, 1, 16)),
+                                    vedtaksperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
+                                    vedtaksperiodeGrunnlag(LocalDate.of(2024, 1, 15), LocalDate.of(2024, 1, 16)),
                                 ),
                         ),
                         beregningsresultatForMåned(
                             vedtaksperiodeGrunnlag =
                                 listOf(
-                                    stønadsperiodeGrunnlag(LocalDate.of(2024, 2, 3), LocalDate.of(2024, 2, 4)),
+                                    vedtaksperiodeGrunnlag(LocalDate.of(2024, 2, 3), LocalDate.of(2024, 2, 4)),
                                 ),
                         ),
                     ),
@@ -105,7 +105,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
 
         @Test
         fun `periode som overlapper skal bruke revurderFra som startdato`() {
-            val periode = stønadsperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 18))
+            val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 18))
             val dto = resultatMedEnStønadsperiode(periode).tilDto(revurderFra)
 
             assertThat(dto.gjelderFraOgMed).isEqualTo(revurderFra)
@@ -114,7 +114,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
 
         @Test
         fun `periode som begynner før revurderFra skal ikke brukes til gjelderFra eller gjelderTil`() {
-            val periode = stønadsperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 16))
+            val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 16))
             val dto = resultatMedEnStønadsperiode(periode).tilDto(revurderFra)
 
             assertThat(dto.gjelderFraOgMed).isNull()
@@ -123,7 +123,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
 
         @Test
         fun `periode som begynner fra og med revurderFra brukes til gjelderFra og gjelderTil`() {
-            val periode = stønadsperiodeGrunnlag(fom = LocalDate.of(2024, 1, 17), tom = LocalDate.of(2024, 1, 19))
+            val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 17), tom = LocalDate.of(2024, 1, 19))
             val dto = resultatMedEnStønadsperiode(periode).tilDto(revurderFra)
 
             assertThat(dto.gjelderFraOgMed).isEqualTo(LocalDate.of(2024, 1, 17))
@@ -157,11 +157,11 @@ class InnvilgelseTilsynBarnDtoKtTest {
         beløpsperioder = beløpsperioder,
     )
 
-    private fun stønadsperiodeGrunnlag(
+    private fun vedtaksperiodeGrunnlag(
         fom: LocalDate,
         tom: LocalDate,
     ) = VedtaksperiodeGrunnlag(
-        stønadsperiode =
+        vedtaksperiode =
             VedtaksperiodeBeregning(
                 fom = fom,
                 tom = tom,

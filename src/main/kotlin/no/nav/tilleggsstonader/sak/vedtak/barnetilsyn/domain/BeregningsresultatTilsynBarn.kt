@@ -50,7 +50,7 @@ data class Beregningsgrunnlag(
 // TODO rename til vedtaksperiodeGrunnlag
 data class VedtaksperiodeGrunnlag(
     // TODO rename til vedtaksperiode
-    val stønadsperiode: VedtaksperiodeBeregning,
+    val vedtaksperiode: VedtaksperiodeBeregning,
     val aktiviteter: List<Aktivitet>,
     val antallDager: Int,
 )
