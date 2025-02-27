@@ -26,7 +26,7 @@ class VedtaksperiodeService(
     fun foreslåPerioder(behandlingId: BehandlingId): List<Vedtaksperiode> {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         brukerfeilHvis(detFinnesVedtaksperioderPåForrigeBehandling(saksbehandling)) {
-            "Det finnes allerede lagrede vedtaksperioder for denne behandlingen"
+            "Kan ikke foreslå vedtaksperioder fordi det finnes lagrede vedtaksperioder fra en tidligere behandling"
         }
 
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
