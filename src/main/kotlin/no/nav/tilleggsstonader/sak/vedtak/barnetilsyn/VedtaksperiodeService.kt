@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -57,18 +56,8 @@ class VedtaksperiodeService(
         return forrigeVedtaksperioder.avkortFraOgMed(behandling.revurderFra.minusDays(1))
     }
 
-    fun detFinnesVedtaksperioderPåForrigeBehandling(saksbehandling: Saksbehandling): Boolean {
-        if (saksbehandling.type == BehandlingType.FØRSTEGANGSBEHANDLING ||
-            finnesTidligereIverksatteVedtak(saksbehandling)
-        ) {
-            return false
-        }
-
-        return finnVedtaksperioder(saksbehandling.forrigeBehandlingId)?.isNotEmpty() == true
-    }
-
-    private fun finnesTidligereIverksatteVedtak(saksbehandling: Saksbehandling) =
-        saksbehandling.type == BehandlingType.REVURDERING && saksbehandling.forrigeBehandlingId == null
+    fun detFinnesVedtaksperioderPåForrigeBehandling(saksbehandling: Saksbehandling): Boolean =
+        finnVedtaksperioder(saksbehandling.forrigeBehandlingId)?.isNotEmpty() == true
 
     private fun finnVedtaksperioder(behandlingId: BehandlingId?): List<Vedtaksperiode>? {
         if (behandlingId == null) return null
