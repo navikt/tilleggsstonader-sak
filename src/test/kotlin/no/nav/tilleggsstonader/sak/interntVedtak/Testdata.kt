@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -215,6 +216,7 @@ object Testdata {
                                     ),
                             ),
                     ),
+                gitVersjon = Applikasjonsversjon.versjon,
             )
 
         private val aktiviteterTilsynBarn =
@@ -318,6 +320,7 @@ object Testdata {
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = beregningsresultat,
                     ),
+                gitVersjon = Applikasjonsversjon.versjon,
             )
 
         val avslåttVedtak =
@@ -329,6 +332,7 @@ object Testdata {
                         årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND),
                         begrunnelse = "Begrunelse for avslag",
                     ),
+                gitVersjon = Applikasjonsversjon.versjon,
             )
 
         private val aktivitetererLæremidler =

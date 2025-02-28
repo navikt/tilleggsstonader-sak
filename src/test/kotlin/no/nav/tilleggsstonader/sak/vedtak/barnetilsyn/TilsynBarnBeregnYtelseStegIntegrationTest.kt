@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -120,6 +121,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             assertThat(vedtak.behandlingId).isEqualTo(saksbehandling.id)
             assertThat(vedtak.type).isEqualTo(TypeVedtak.INNVILGELSE)
             assertThat(vedtak.data.beregningsresultat.perioder).hasSize(1)
+            assertThat(vedtak.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
         }
 
         @Test
@@ -321,6 +323,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 vedtak.data.beregningsresultat.perioder
                     .single(),
             ).isEqualTo(beregningsresultatJanuar)
+            assertThat(vedtak.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
             assertThat(tilkjentYtelse).hasSize(1)
         }
 
