@@ -10,14 +10,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.JdbcTemplate
 
 class TotrinnskontrollRepositoryTest : IntegrationTest() {
     @Autowired
     lateinit var totrinnskontrollRepository: TotrinnskontrollRepository
-
-    @Autowired
-    lateinit var jdbcTemplate: JdbcTemplate
 
     val behandling = behandling()
 
@@ -106,9 +102,11 @@ class TotrinnskontrollRepositoryTest : IntegrationTest() {
     private fun lagreOgOppdaterEndretTidTilOpprettetTid(totrinnskontroll: Totrinnskontroll): Totrinnskontroll {
         totrinnskontrollRepository.insert(totrinnskontroll)
         jdbcTemplate.update(
-            "UPDATE totrinnskontroll SET endret_tid = ? WHERE id = ?",
-            totrinnskontroll.sporbar.opprettetTid,
-            totrinnskontroll.id,
+            "UPDATE totrinnskontroll SET endret_tid = :endretTid WHERE id = :id",
+            mapOf(
+                "endretTid" to totrinnskontroll.sporbar.opprettetTid,
+                "id" to totrinnskontroll.id,
+            ),
         )
         return totrinnskontrollRepository.findByIdOrThrow(totrinnskontroll.id)
     }

@@ -56,7 +56,9 @@ class OpphørValideringService(
 
         brukerfeilHvis(
             senesteTomIForrigeVedtaksperioder < revurderFraDato,
-        ) { "Opphør er et ugyldig vedtaksresultat fordi ingen vedtaksperioder har blitt avkortet" }
+        ) {
+            "Opphør er et ugyldig vedtaksresultat fordi ønsket opphørsdato ikke fører til at noen ekisterende vedtaksperioder blir opphørt."
+        }
     }
 
     private fun validerIngenNyeOppfylteVilkårEllerVilkårperioder(
@@ -64,13 +66,13 @@ class OpphørValideringService(
         vilkårperioder: Vilkårperioder,
     ) {
         brukerfeilHvis(vilkår.any { it.status == VilkårStatus.NY && it.resultat == Vilkårsresultat.OPPFYLT }) {
-            "Opphør er et ugyldig vedtaksresultat fordi det er nye utgifter som er oppfylt"
+            "Opphør er et ugyldig vedtaksresultat fordi det er lagt inn nye utgifter med oppfylte vilkår"
         }
         brukerfeilHvis(vilkårperioder.målgrupper.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT }) {
-            "Opphør er et ugyldig vedtaksresultat fordi det er nye målgrupper som er oppfylt"
+            "Opphør er et ugyldig vedtaksresultat fordi det er lagt inn nye målgrupper med oppfylte vilkår"
         }
         brukerfeilHvis(vilkårperioder.aktiviteter.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT }) {
-            "Opphør er et ugyldig vedtaksresultat fordi det er nye aktiviteter som er oppfylt"
+            "Opphør er et ugyldig vedtaksresultat fordi det er lagt inn nye aktiviteter med oppfylte vilkår"
         }
     }
 

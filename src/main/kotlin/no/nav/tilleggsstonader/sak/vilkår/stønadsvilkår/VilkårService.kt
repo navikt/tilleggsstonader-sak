@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -194,9 +193,7 @@ class VilkårService(
     }
 
     private fun validerLåstForVidereRedigering(behandling: Saksbehandling) {
-        if (behandling.status.behandlingErLåstForVidereRedigering()) {
-            throw ApiFeil("Behandlingen er låst for videre redigering", HttpStatus.BAD_REQUEST)
-        }
+        behandling.status.validerKanBehandlingRedigeres()
     }
 
     /**

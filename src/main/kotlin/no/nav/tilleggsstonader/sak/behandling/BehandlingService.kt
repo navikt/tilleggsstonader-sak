@@ -186,9 +186,7 @@ class BehandlingService(
         forrigeBehandlingId: BehandlingId,
     ): Behandling {
         val behandling = hentBehandling(behandlingId)
-        feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke endre forrigeBehandlingId når behandlingen er låst"
-        }
+        behandling.status.validerKanBehandlingRedigeres()
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer forrigeBehandlingId på behandling $behandlingId " +
                 "fra ${behandling.forrigeBehandlingId} til $forrigeBehandlingId",

@@ -19,15 +19,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.io.File
 import java.time.LocalDate
 import java.util.UUID
 
 class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
-    @Autowired
-    lateinit var namedParameterJdbcTemplate: NamedParameterJdbcTemplate
-
     @Autowired
     lateinit var vilkårperiodeRepository: VilkårperiodeRepository
 
@@ -79,7 +75,7 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
         type: VilkårperiodeType,
         json: String,
     ) {
-        namedParameterJdbcTemplate.update(
+        jdbcTemplate.update(
             insertQuery.trimIndent(),
             mapOf(
                 "id" to id,

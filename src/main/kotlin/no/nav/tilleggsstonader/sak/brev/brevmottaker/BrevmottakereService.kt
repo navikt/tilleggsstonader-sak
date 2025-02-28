@@ -57,8 +57,9 @@ class BrevmottakereService(
     }
 
     private fun validerBehandlingKanRedigeres(behandlingId: BehandlingId) {
-        brukerfeilHvis(behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke oppdatere brevmottakere fordi behandling er låst for redigering."
+        val behandling = behandlingService.hentBehandling(behandlingId)
+        brukerfeilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
+            "Kan ikke oppdatere brevmottakere fordi behandling har status ${behandling.status.visningsnavn()}."
         }
     }
 

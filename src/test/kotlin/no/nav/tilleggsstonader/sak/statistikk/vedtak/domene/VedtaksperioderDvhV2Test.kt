@@ -3,14 +3,11 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.AktivitetTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.MålgruppeTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2.Companion.finnFødselsnumre
-import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn1
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBehandling
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.avslag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -82,14 +79,9 @@ class VedtaksperioderDvhV2Test {
     @Test
     fun `Avslag skal ikke ha vedtaksperioder`() {
         val avslag =
-            GeneriskVedtak(
-                behandlingId = behandling().id,
-                type = TypeVedtak.AVSLAG,
-                data =
-                    AvslagLæremidler(
-                        årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND),
-                        begrunnelse = "Begrunelse for avslag",
-                    ),
+            avslag(
+                årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND),
+                begrunnelse = "Begrunelse for avslag",
             )
 
         val resultat = VedtaksperioderDvhV2.fraDomene(vedtak = avslag, barn = emptyList())

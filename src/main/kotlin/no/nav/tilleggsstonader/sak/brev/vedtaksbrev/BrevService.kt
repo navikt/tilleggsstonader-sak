@@ -172,11 +172,7 @@ class BrevService(
             .replace(BREVDATO_PLACEHOLDER, osloDateNow().norskFormat())
     }
 
-    private fun validerRedigerbarBehandling(saksbehandling: Saksbehandling) {
-        feilHvis(saksbehandling.status.behandlingErLåstForVidereRedigering()) {
-            "Behandling er i feil steg=${saksbehandling.steg} status=${saksbehandling.status}"
-        }
-    }
+    private fun validerRedigerbarBehandling(saksbehandling: Saksbehandling) = saksbehandling.status.validerKanBehandlingRedigeres()
 
     fun slettVedtaksbrev(saksbehandling: Saksbehandling) {
         vedtaksbrevRepository.deleteById(saksbehandling.id)
