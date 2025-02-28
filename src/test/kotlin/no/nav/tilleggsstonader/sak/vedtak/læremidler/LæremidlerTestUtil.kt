@@ -51,10 +51,11 @@ object LæremidlerTestUtil {
         )
 
     fun innvilgelse(
+        behandlingId: BehandlingId = BehandlingId.random(),
         vedtaksperioder: List<Vedtaksperiode> = defaultVedtaksperioder,
         beregningsresultat: BeregningsresultatLæremidler = defaultBeregningsresultat,
     ) = GeneriskVedtak(
-        behandlingId = BehandlingId.random(),
+        behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,
         data =
             InnvilgelseLæremidler(

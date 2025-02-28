@@ -1,11 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.avslagVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
@@ -29,13 +28,10 @@ class VedtakDtoMapperTest {
         @Test
         fun `skal mappe avslått vedtak til dto`() {
             val vedtak =
-                GeneriskVedtak(
+                avslagVedtak(
                     behandlingId = BehandlingId.random(),
-                    data =
-                        AvslagTilsynBarn(
-                            begrunnelse = "begrunnelse",
-                            årsaker = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
-                        ),
+                    årsaker = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
+                    begrunnelse = "begrunnelse",
                 )
 
             val dto = VedtakDtoMapper.toDto(vedtak, revurderFra = null) as AvslagTilsynBarnDto

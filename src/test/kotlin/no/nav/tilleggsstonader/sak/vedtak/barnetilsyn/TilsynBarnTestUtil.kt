@@ -15,9 +15,11 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBereg
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -134,6 +136,29 @@ object TilsynBarnTestUtil {
             InnvilgelseTilsynBarn(
                 beregningsresultat = beregningsresultat,
                 vedtaksperioder = vedtaksperioder,
+            ),
+    )
+
+    fun innvilgetVedtak(
+        behandlingId: BehandlingId = defaultBehandling.id,
+        vedtak: InnvilgelseTilsynBarn,
+    ) = GeneriskVedtak(
+        behandlingId = behandlingId,
+        type = TypeVedtak.INNVILGELSE,
+        data = vedtak,
+    )
+
+    fun avslagVedtak(
+        behandlingId: BehandlingId = defaultBehandling.id,
+        årsaker: List<ÅrsakAvslag>,
+        begrunnelse: String,
+    ) = GeneriskVedtak(
+        behandlingId = behandlingId,
+        type = TypeVedtak.AVSLAG,
+        data =
+            AvslagTilsynBarn(
+                årsaker = årsaker,
+                begrunnelse = begrunnelse,
             ),
     )
 }

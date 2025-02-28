@@ -16,9 +16,9 @@ internal class VilkårTest {
     @Test
     internal fun `opprettOpphavsvilkår - et vilkår som ikke er gjenbrukt skal peke til behandlingen`() {
         val vilkår =
-            Vilkår(
+            vilkår(
                 behandlingId = behandlingIdFørstegangsbehandling,
-                delvilkårwrapper = DelvilkårWrapper(emptyList()),
+                delvilkår = emptyList(),
                 type = VilkårType.EKSEMPEL,
                 status = VilkårStatus.NY,
                 opphavsvilkår = null,
@@ -40,9 +40,9 @@ internal class VilkårTest {
     internal fun `opprettOpphavsvilkår skal bruke opphavsvilkår hvis den finnes`() {
         val opphavsvilkår = Opphavsvilkår(behandlingIdFørstegangsbehandling, osloNow())
         val vilkår =
-            Vilkår(
+            vilkår(
                 behandlingId = behandlingIdRevurdering,
-                delvilkårwrapper = DelvilkårWrapper(emptyList()),
+                delvilkår = emptyList(),
                 type = VilkårType.EKSEMPEL,
                 opphavsvilkår = opphavsvilkår,
                 status = VilkårStatus.UENDRET,
@@ -55,9 +55,9 @@ internal class VilkårTest {
     internal fun `opprettOpphavsvilkår - skal ikke bruke opphavsvilkår hvis den finnes og vilkåret er endret`() {
         val opphavsvilkår = Opphavsvilkår(behandlingIdFørstegangsbehandling, osloNow())
         val vilkår =
-            Vilkår(
+            vilkår(
                 behandlingId = behandlingIdRevurdering,
-                delvilkårwrapper = DelvilkårWrapper(emptyList()),
+                delvilkår = emptyList(),
                 type = VilkårType.EKSEMPEL,
                 opphavsvilkår = opphavsvilkår,
                 status = VilkårStatus.ENDRET,

@@ -5,8 +5,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import org.assertj.core.api.Assertions.assertThat
@@ -23,12 +23,9 @@ class VedtakRepositoryTest : IntegrationTest() {
 
         val beregningsresultat = BeregningsresultatTilsynBarn(emptyList())
         vedtakRepository.insert(
-            GeneriskVedtak(
+            innvilgetVedtak(
                 behandlingId = behandling.id,
-                data =
-                    InnvilgelseTilsynBarn(
-                        beregningsresultat = beregningsresultat,
-                    ),
+                vedtak = InnvilgelseTilsynBarn(beregningsresultat = beregningsresultat),
             ),
         )
 
