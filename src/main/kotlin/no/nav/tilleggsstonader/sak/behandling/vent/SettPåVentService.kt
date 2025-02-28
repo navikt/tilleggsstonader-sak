@@ -56,9 +56,8 @@ class SettPåVentService(
         dto: SettPåVentDto,
     ): StatusPåVentDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
-        feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke sette behandling på vent når status=${behandling.status}"
-        }
+        behandling.status.validerKanBehandlingRedigeres()
+
         opprettHistorikkInnslag(behandling, StegUtfall.SATT_PÅ_VENT, årsaker = dto.årsaker, kommentar = dto.kommentar)
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT)
 

@@ -326,7 +326,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                     periode.id,
                     periode.tilOppdatering(),
                 )
-            }.hasMessageContaining("Kan ikke opprette eller endre periode når behandling har status Ferdigstilt.")
+            }.hasMessageContaining("Kan ikke gjøre endringer på denne behandlingen fordi den er ferdigstilt.")
         }
 
         @Test

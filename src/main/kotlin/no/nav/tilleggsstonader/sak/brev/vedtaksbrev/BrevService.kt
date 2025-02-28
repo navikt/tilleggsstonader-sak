@@ -173,9 +173,7 @@ class BrevService(
     }
 
     private fun validerRedigerbarBehandling(saksbehandling: Saksbehandling) {
-        feilHvis(saksbehandling.status.behandlingErLåstForVidereRedigering()) {
-            "Behandling er i feil steg=${saksbehandling.steg} status=${saksbehandling.status}"
-        }
+        saksbehandling.status.validerKanBehandlingRedigeres()
     }
 
     fun slettVedtaksbrev(saksbehandling: Saksbehandling) {

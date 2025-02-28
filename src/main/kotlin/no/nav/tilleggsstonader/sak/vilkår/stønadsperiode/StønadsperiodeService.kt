@@ -48,9 +48,7 @@ class StønadsperiodeService(
     }
 
     private fun validerBehandling(behandling: Saksbehandling) {
-        feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke lagre stønadsperioder når behandlingen er låst"
-        }
+        behandling.status.validerKanBehandlingRedigeres()
         feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
             "Kan ikke lagre stønadsperioder når behandlingen er på steg=${behandling.steg}"
         }
