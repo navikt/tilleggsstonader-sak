@@ -30,36 +30,34 @@ object AldersvilkårVurdering {
         return gyldig
     }
 
-    private fun heleVilkårsperiodenErFørBrukerFyller67År(
-        fødselsdato: LocalDate,
-        vilkårsperiodeFom: LocalDate,
-        vilkårsperiodeTom: LocalDate,
-    ): Boolean {
-        val sekstisyvÅrsDagenTilBruker = fødselsdato.plusYears(67)
-        feilHvis((vilkårsperiodeFom <= sekstisyvÅrsDagenTilBruker) && (sekstisyvÅrsDagenTilBruker <= vilkårsperiodeTom)) {
-            "Brukeren fyller 67 år i løpet av vilkårsperioden"
-        }
-        return vilkårsperiodeTom < sekstisyvÅrsDagenTilBruker
-    }
-
     private fun heleVilkårsperiodenErEtterBrukerFyller18År(
         fødselsdato: LocalDate,
-        vilkårsperiodeFom: LocalDate,
-        vilkårsperiodeTom: LocalDate,
+        vilkårperiode: LagreVilkårperiode,
     ): Boolean {
         val attenårsdagenTilBruker = fødselsdato.plusYears(18)
-        feilHvis((vilkårsperiodeFom <= attenårsdagenTilBruker) && (attenårsdagenTilBruker <= vilkårsperiodeTom)) {
+        feilHvis((vilkårperiode.fom <= attenårsdagenTilBruker) && (attenårsdagenTilBruker <= vilkårperiode.tom)) {
             "Brukeren fyller 18 år i løpet av vilkårsperioden"
         }
-        return attenårsdagenTilBruker < vilkårsperiodeFom
+        return attenårsdagenTilBruker < vilkårperiode.fom
+    }
+
+    private fun heleVilkårsperiodenErFørBrukerFyller67År(
+        fødselsdato: LocalDate,
+        vilkårperiode: LagreVilkårperiode,
+    ): Boolean {
+        val sekstisyvÅrsDagenTilBruker = fødselsdato.plusYears(67)
+        feilHvis((vilkårperiode.fom <= sekstisyvÅrsDagenTilBruker) && (sekstisyvÅrsDagenTilBruker <= vilkårperiode.tom)) {
+            "Brukeren fyller 67 år i løpet av vilkårsperioden"
+        }
+        return vilkårperiode.tom < sekstisyvÅrsDagenTilBruker
     }
 
     private fun vurderAldersvilkårForNedsattArbeidsevne(
         fødselsdato: LocalDate,
         vilkårperiode: LagreVilkårperiode,
     ): SvarJaNei {
-        if (heleVilkårsperiodenErFørBrukerFyller67År(fødselsdato, vilkårperiode.fom, vilkårperiode.tom) &&
-            heleVilkårsperiodenErEtterBrukerFyller18År(fødselsdato, vilkårperiode.fom, vilkårperiode.tom)
+        if (heleVilkårsperiodenErEtterBrukerFyller18År(fødselsdato, vilkårperiode) &&
+            heleVilkårsperiodenErFørBrukerFyller67År(fødselsdato, vilkårperiode)
         ) {
             return SvarJaNei.JA
         }
@@ -70,11 +68,7 @@ object AldersvilkårVurdering {
         fødselsdato: LocalDate,
         vilkårperiode: LagreVilkårperiode,
     ): SvarJaNei =
-        if (heleVilkårsperiodenErFørBrukerFyller67År(
-                fødselsdato,
-                vilkårperiode.fom,
-                vilkårperiode.tom,
-            )
+        if (heleVilkårsperiodenErFørBrukerFyller67År(fødselsdato, vilkårperiode)
         ) {
             SvarJaNei.JA
         } else {
