@@ -233,8 +233,6 @@ class AldersvilkårVurderingTest {
         assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
     }
 
-    // *****
-
     @Test
     fun `Målgruppe NEDSATT_ARBEIDSEVNE hvor bruker fyller 18 år dagen før vilkårsperioden starter skal gi svar JA`() {
         val fom = osloDateNow().minusDays(10)
@@ -354,6 +352,144 @@ class AldersvilkårVurderingTest {
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                fom = osloDateNow().minusDays(10),
+                tom = tom,
+            )
+
+        val grunnlagsdata =
+            grunnlagsdataDomain(
+                grunnlag =
+                    lagGrunnlagsdata(
+                        fødsel =
+                            Fødsel(
+                                fødselsdato = fødselsdato,
+                                fødselsår = fødselsår,
+                            ),
+                    ),
+            )
+        val feil = assertThrows<Feil> { vurderAldersvilkår(målgruppe, grunnlagsdata) }
+        assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
+    }
+
+    @Test
+    fun `Målgruppe UFØRETRYGD hvor bruker fyller 18 år dagen før vilkårsperioden starter skal gi svar JA`() {
+        val fom = osloDateNow().minusDays(10)
+        val fødselsdato = fom.minusDays(1).minusYears(18)
+        val fødselsår = fødselsdato.year
+
+        val målgruppe =
+            dummyVilkårperiodeMålgruppe().copy(
+                type = MålgruppeType.UFØRETRYGD,
+                fom = fom,
+                tom = osloDateNow().plusDays(10),
+            )
+
+        val grunnlagsdata =
+            grunnlagsdataDomain(
+                grunnlag =
+                    lagGrunnlagsdata(
+                        fødsel =
+                            Fødsel(
+                                fødselsdato = fødselsdato,
+                                fødselsår = fødselsår,
+                            ),
+                    ),
+            )
+        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
+            assertEquals(SvarJaNei.JA, it)
+        }
+    }
+
+    @Test
+    fun `Målgruppe UFØRETRYGD hvor bruker fyller 18 år dagen etter vilkårsperioden starter skal gi svar NEI`() {
+        val tom = osloDateNow().plusDays(10)
+        val fødselsdato = tom.plusDays(1).minusYears(18)
+        val fødselsår = fødselsdato.year
+
+        val målgruppe =
+            dummyVilkårperiodeMålgruppe().copy(
+                type = MålgruppeType.UFØRETRYGD,
+                fom = osloDateNow().minusDays(10),
+                tom = tom,
+            )
+
+        val grunnlagsdata =
+            grunnlagsdataDomain(
+                grunnlag =
+                    lagGrunnlagsdata(
+                        fødsel =
+                            Fødsel(
+                                fødselsdato = fødselsdato,
+                                fødselsår = fødselsår,
+                            ),
+                    ),
+            )
+        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
+            assertEquals(SvarJaNei.NEI, it)
+        }
+    }
+
+    @Test
+    fun `Målgruppe UFØRETRYGD hvor bruker fyller 18 år midt i vilkårsperiode skal kaste feil`() {
+        val målgruppe =
+            dummyVilkårperiodeMålgruppe().copy(
+                type = MålgruppeType.UFØRETRYGD,
+                fom = osloDateNow().minusDays(10),
+                tom = osloDateNow().plusDays(10),
+            )
+
+        val grunnlagsdata =
+            grunnlagsdataDomain(
+                grunnlag =
+                    lagGrunnlagsdata(
+                        fødsel =
+                            Fødsel(
+                                fødselsdato = osloDateNow().minusYears(18),
+                                osloDateNow().minusYears(18).year,
+                            ),
+                    ),
+            )
+        val feil = assertThrows<Feil> { vurderAldersvilkår(målgruppe, grunnlagsdata) }
+        assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
+    }
+
+    @Test
+    fun `Målgruppe UFØRETRYGD hvor bruker fyller 18 år første dag i vilkårsperiode skal kaste feil`() {
+        val fom = osloDateNow().minusDays(10)
+        val fødselsdato = fom.minusYears(18)
+        val fødselsår = fødselsdato.year
+
+        val målgruppe =
+            dummyVilkårperiodeMålgruppe().copy(
+                type = MålgruppeType.UFØRETRYGD,
+                fom = fom,
+                tom = osloDateNow().plusDays(10),
+            )
+
+        val grunnlagsdata =
+            grunnlagsdataDomain(
+                grunnlag =
+                    lagGrunnlagsdata(
+                        fødsel =
+                            Fødsel(
+                                fødselsdato = fødselsdato,
+                                fødselsår = fødselsår,
+                            ),
+                    ),
+            )
+        val feil = assertThrows<Feil> { vurderAldersvilkår(målgruppe, grunnlagsdata) }
+        assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
+    }
+
+    @Test
+    fun `Målgruppe UFØRETRYGD hvor bruker fyller 18 år siste dag i vilkårsperiode skal kaste feil`() {
+        val tom = osloDateNow().plusDays(10)
+        val fødselsdato = tom.minusYears(18)
+        val fødselsår = fødselsdato.year
+
+        val målgruppe =
+            dummyVilkårperiodeMålgruppe().copy(
+                type = MålgruppeType.UFØRETRYGD,
                 fom = osloDateNow().minusDays(10),
                 tom = tom,
             )
