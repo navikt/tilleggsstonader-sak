@@ -306,6 +306,78 @@ class BehandlingsstatistikkMappingTest {
     }
 
     @Test
+    fun `mapping ved avslag`() {
+        val behandlingId = BehandlingId(UUID.randomUUID())
+        val aktørId = "9876543210127"
+        val saksbehandlerId = "7873486250023"
+
+        val henvendelseTidspunkt = osloNow()
+        val hendelseTidspunkt = osloNow()
+        val tekniskTid = osloNow()
+
+        val saksbehandling =
+            saksbehandling(
+                behandlingId = behandlingId,
+                ident = aktørId,
+                eksternId = 10L,
+                eksternFagId = 20L,
+                kategori = BehandlingKategori.NASJONAL,
+                resultat = BehandlingResultat.AVSLÅTT,
+            )
+
+        val actual =
+            map(
+                saksbehandling = saksbehandling,
+                saksbehandlerId = saksbehandlerId,
+                henvendelseTidspunkt = henvendelseTidspunkt,
+                hendelseTidspunkt = hendelseTidspunkt,
+                tekniskTid = tekniskTid,
+            )
+
+        val expected =
+            BehandlingDVH(
+                behandlingId = "10",
+                behandlingUuid = behandlingId.id.toString(),
+                saksnummer = "20",
+                sakId = "20",
+                aktorId = aktørId,
+                mottattTid = henvendelseTidspunkt,
+                registrertTid = henvendelseTidspunkt,
+                ferdigBehandletTid = null,
+                endretTid = henvendelseTidspunkt,
+                tekniskTid = tekniskTid,
+                sakYtelse = SakYtelseDvh.TILLEGG_BARNETILSYN,
+                sakUtland = "Nasjonal",
+                behandlingType = "FØRSTEGANGSBEHANDLING",
+                behandlingStatus = "MOTTATT",
+                behandlingMetode = "AUTOMATISK",
+                kravMottatt = null,
+                opprettetAv = "VL",
+                saksbehandler = saksbehandlerId,
+                ansvarligEnhet = ArbeidsfordelingService.MASKINELL_JOURNALFOERENDE_ENHET,
+                behandlingResultat = "AVSLÅTT",
+                resultatBegrunnelse = "UKJENT",
+                avsender = "Nav Tilleggstønader",
+                versjon = Applikasjonsversjon.versjon,
+                relatertBehandlingId = null,
+                vedtakTid = null,
+                utbetaltTid = null,
+                forventetOppstartTid = null,
+                papirSøknad = null,
+                ansvarligBeslutter = null,
+                totrinnsbehandling = false,
+                vilkårsprøving = emptyList(),
+                venteAarsak = null,
+                behandlingBegrunnelse = null,
+                revurderingOpplysningskilde = null,
+                revurderingÅrsak = null,
+                behandlingÅrsak = "SØKNAD",
+            )
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
     fun `mapping ved henleggelse`() {
         val behandlingId = BehandlingId(UUID.randomUUID())
         val aktørId = "9876543210127"
