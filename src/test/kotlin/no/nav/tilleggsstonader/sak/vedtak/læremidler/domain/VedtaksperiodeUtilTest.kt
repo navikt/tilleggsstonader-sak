@@ -1,9 +1,15 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
+import io.mockk.every
+import io.mockk.mockk
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilStønadsperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerIngenOverlappendeVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperiodeOmfattesAvStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.vedtaksperioderInnenforLøpendeMåned
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -17,6 +23,13 @@ import java.util.UUID
 
 class VedtaksperiodeUtilTest {
     val behandlingId = BehandlingId(UUID.randomUUID())
+    val behandlingService = mockk<BehandlingService>()
+    val vedtakRepository = mockk<VedtakRepository>()
+    val læremidlerVedtaksperiodeValideringService =
+        LæremidlerVedtaksperiodeValideringService(
+            behandlingService = behandlingService,
+            vedtakRepository = vedtakRepository,
+        )
     val vedtaksperiodeJanuar =
         Vedtaksperiode(
             fom = LocalDate.of(2024, 1, 1),
@@ -39,11 +52,16 @@ class VedtaksperiodeUtilTest {
     inner class ValiderVedtaksperioder {
         @Test
         fun `Kaster ikke feil ved gyldig data`() {
+            every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
             val vedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar)
             val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
 
             assertDoesNotThrow {
-                validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+                læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
+                    vedtaksperioder = vedtaksperioder,
+                    stønadsperioder = stønadsperioder,
+                    behandlingId = behandlingId,
+                )
             }
         }
 
@@ -57,7 +75,7 @@ class VedtaksperiodeUtilTest {
             val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
 
             assertThatThrownBy {
-                validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+                validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
             }.hasMessageContaining("overlapper")
         }
 
@@ -77,7 +95,8 @@ class VedtaksperiodeUtilTest {
             val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
 
             assertDoesNotThrow {
-                validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+                validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
+                validerVedtaksperiodeOmfattesAvStønadsperioder(vedtaksperioder, stønadsperioder)
             }
         }
 
@@ -95,7 +114,7 @@ class VedtaksperiodeUtilTest {
                 )
 
             assertThatThrownBy {
-                validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+                validerVedtaksperiodeOmfattesAvStønadsperioder(vedtaksperioder, stønadsperioder)
             }.hasMessageContaining("Vedtaksperiode er ikke innenfor en periode med overlapp")
         }
     }

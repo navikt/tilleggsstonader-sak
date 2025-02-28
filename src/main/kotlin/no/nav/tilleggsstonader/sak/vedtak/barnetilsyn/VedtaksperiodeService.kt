@@ -25,8 +25,8 @@ class VedtaksperiodeService(
 ) {
     fun foreslåPerioder(behandlingId: BehandlingId): List<Vedtaksperiode> {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        brukerfeilHvis(detFinnesVedtaksperioder(behandlingId, saksbehandling.forrigeBehandlingId)) {
-            "Det finnes allerede lagrede vedtaksperioder for denne behandlingen"
+        brukerfeilHvis(detFinnesVedtaksperioderPåForrigeBehandling(saksbehandling)) {
+            "Kan ikke foreslå vedtaksperioder fordi det finnes lagrede vedtaksperioder fra en tidligere behandling"
         }
 
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
@@ -56,10 +56,8 @@ class VedtaksperiodeService(
         return forrigeVedtaksperioder.avkortFraOgMed(behandling.revurderFra.minusDays(1))
     }
 
-    fun detFinnesVedtaksperioder(
-        behandlingId: BehandlingId,
-        forrigeBehandlingId: BehandlingId?,
-    ) = finnVedtaksperioder(behandlingId)?.isNotEmpty() == true || finnVedtaksperioder(forrigeBehandlingId)?.isNotEmpty() == true
+    fun detFinnesVedtaksperioderPåForrigeBehandling(saksbehandling: Saksbehandling): Boolean =
+        finnVedtaksperioder(saksbehandling.forrigeBehandlingId)?.isNotEmpty() == true
 
     private fun finnVedtaksperioder(behandlingId: BehandlingId?): List<Vedtaksperiode>? {
         if (behandlingId == null) return null
@@ -70,7 +68,7 @@ class VedtaksperiodeService(
             is OpphørTilsynBarn -> vedtak.vedtaksperioder
             else ->
                 error(
-                    "Kan ikke hente forrige vedtaksperioder for tilsyn barn når forrige vedtak var ${vedtak.javaClass.simpleName}",
+                    "Kan ikke hente vedtaksperioder for tilsyn barn når vedtak var ${vedtak.type}",
                 )
         }
     }
