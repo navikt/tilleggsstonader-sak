@@ -19,15 +19,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 
 class VedtakRepositoryJsonTest : IntegrationTest() {
-    @Autowired
-    lateinit var namedParameterJdbcTemplate: NamedParameterJdbcTemplate
-
     @Autowired
     lateinit var repository: VedtakRepository
 
@@ -79,7 +75,7 @@ class VedtakRepositoryJsonTest : IntegrationTest() {
         type: TypeVedtak,
         json: String,
     ) {
-        namedParameterJdbcTemplate.update(
+        jdbcTemplate.update(
             insertQuery.trimIndent(),
             mapOf(
                 "behandlingId" to behandling.id.id,

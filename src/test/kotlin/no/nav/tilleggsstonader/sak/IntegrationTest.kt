@@ -52,6 +52,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.jdbc.core.JdbcAggregateOperations
 import org.springframework.http.HttpHeaders
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -99,6 +100,9 @@ abstract class IntegrationTest {
 
     @Autowired
     private lateinit var jdbcAggregateOperations: JdbcAggregateOperations
+
+    @Autowired
+    protected lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
     protected lateinit var rolleConfig: RolleConfig
