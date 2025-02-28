@@ -115,10 +115,10 @@ class VedtaksperiodeTilsynBarnMapperTest {
     }
 
     private fun beregningsresultat(
-        vararg stønadsperioder: VedtaksperiodeBeregning,
+        vararg vedtaksperioder: VedtaksperiodeBeregning,
         antallBarn: Int = 2,
     ): BeregningsresultatForMåned =
         beregningsresultatForMåned(
-            stønadsperioder = stønadsperioder.map { vedtaksperiodeGrunnlag(vedtaksperiode = it) },
+            vedtaksperioder = vedtaksperioder.map { vedtaksperiodeGrunnlag(vedtaksperiode = it) },
         ).let { it.copy(grunnlag = it.grunnlag.copy(antallBarn = antallBarn)) }
 }

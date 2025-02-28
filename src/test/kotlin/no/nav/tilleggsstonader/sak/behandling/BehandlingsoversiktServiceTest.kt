@@ -108,7 +108,7 @@ class BehandlingsoversiktServiceTest {
         val beregningsresultatForMåned =
             beregningsresultatForMåned(
                 YearMonth.of(2024, 3),
-                stønadsperioder = listOf(vedtaksperiodeGrunnlag, vedtaksperiodeGrunnlag2),
+                vedtaksperioder = listOf(vedtaksperiodeGrunnlag, vedtaksperiodeGrunnlag2),
             )
         val beregningsresultat = BeregningsresultatTilsynBarn(perioder = listOf(beregningsresultatForMåned))
 

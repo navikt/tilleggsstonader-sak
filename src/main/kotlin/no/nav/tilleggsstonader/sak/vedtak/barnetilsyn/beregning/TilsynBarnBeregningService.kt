@@ -201,12 +201,11 @@ class TilsynBarnBeregningService(
             utgifterPerMåned[måned]?.let { utgifter ->
                 val antallBarn = utgifter.map { it.barnId }.toSet().size
                 val makssats = finnMakssats(måned, antallBarn)
-                // TODO rename til vedtaksperiodeGrunnlag
-                val stønadsperioderGrunnlag = finnStønadsperioderMedAktiviteter(vedtaksperiode, aktiviteterForMåned)
+                val vedtaksperiodeGrunnlag = finnVedtaksperiodeGrunnlag(vedtaksperiode, aktiviteterForMåned)
                 Beregningsgrunnlag(
                     måned = måned,
                     makssats = makssats,
-                    vedtaksperiodeGrunnlag = stønadsperioderGrunnlag,
+                    vedtaksperiodeGrunnlag = vedtaksperiodeGrunnlag,
                     utgifter = utgifter,
                     utgifterTotal = utgifter.sumOf { it.utgift },
                     antallBarn = antallBarn,
@@ -215,14 +214,14 @@ class TilsynBarnBeregningService(
         }
     }
 
-    private fun finnStønadsperioderMedAktiviteter(
+    private fun finnVedtaksperiodeGrunnlag(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
         aktiviteter: Map<AktivitetType, List<Aktivitet>>,
     ): List<VedtaksperiodeGrunnlag> {
         val aktiviteterPerUke = aktiviteter.map { it.key to it.value.tilDagerPerUke() }.toMap()
 
         return vedtaksperioder.map { vedtaksperiode ->
-            val relevanteAktiviteter = finnAktiviteterForStønadsperiode(vedtaksperiode, aktiviteter)
+            val relevanteAktiviteter = finnAktiviteterForVedtaksperiode(vedtaksperiode, aktiviteter)
 
             VedtaksperiodeGrunnlag(
                 vedtaksperiode = vedtaksperiode,
@@ -232,7 +231,7 @@ class TilsynBarnBeregningService(
         }
     }
 
-    private fun finnAktiviteterForStønadsperiode(
+    private fun finnAktiviteterForVedtaksperiode(
         vedtaksperiode: VedtaksperiodeBeregning,
         aktiviteter: Map<AktivitetType, List<Aktivitet>>,
     ): List<Aktivitet> =

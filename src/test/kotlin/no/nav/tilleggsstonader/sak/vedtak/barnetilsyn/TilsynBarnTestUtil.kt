@@ -76,7 +76,7 @@ object TilsynBarnTestUtil {
                 BeregningsresultatTilsynBarn(
                     perioder =
                         listOf(
-                            beregningsresultatForMåned(stønadsperioder = listOf(vedtaksperiodeGrunnlag())),
+                            beregningsresultatForMåned(vedtaksperioder = listOf(vedtaksperiodeGrunnlag())),
                         ),
                 ),
         )
@@ -91,7 +91,7 @@ object TilsynBarnTestUtil {
 
     fun beregningsresultatForMåned(
         måned: YearMonth = YearMonth.of(2024, 1),
-        stønadsperioder: List<VedtaksperiodeGrunnlag> = emptyList(),
+        vedtaksperioder: List<VedtaksperiodeGrunnlag> = emptyList(),
         beløpsperioder: List<Beløpsperiode> = beløpsperioderDefault,
         utgifterTotal: Int = 5000,
     ) = BeregningsresultatForMåned(
@@ -101,7 +101,7 @@ object TilsynBarnTestUtil {
             Beregningsgrunnlag(
                 måned = måned,
                 makssats = 3000,
-                vedtaksperiodeGrunnlag = stønadsperioder,
+                vedtaksperiodeGrunnlag = vedtaksperioder,
                 utgifter = listOf(UtgiftBarn(defaultBarn1.id, 1000)),
                 utgifterTotal = utgifterTotal,
                 antallBarn = 1,

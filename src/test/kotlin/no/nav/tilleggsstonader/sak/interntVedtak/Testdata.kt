@@ -207,7 +207,7 @@ object Testdata {
                                 perioder =
                                     listOf(
                                         beregningsresultatForMåned(
-                                            stønadsperioder =
+                                            vedtaksperioder =
                                                 listOf(
                                                     vedtaksperiodeGrunnlag(vedtaksperiode = vedtaksperiode),
                                                 ),

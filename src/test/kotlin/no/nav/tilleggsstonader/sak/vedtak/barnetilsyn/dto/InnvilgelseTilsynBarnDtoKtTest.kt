@@ -46,7 +46,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
     }
 
     @Test
-    fun `gjelder fra og til skal mappes fra min og maks ax stønadsperioder`() {
+    fun `gjelder fra og til skal mappes fra min og maks ax vedtaksperioder`() {
         val dto =
             BeregningsresultatTilsynBarn(
                 perioder =
@@ -106,7 +106,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
         @Test
         fun `periode som overlapper skal bruke revurderFra som startdato`() {
             val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 18))
-            val dto = resultatMedEnStønadsperiode(periode).tilDto(revurderFra)
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(revurderFra)
 
             assertThat(dto.gjelderFraOgMed).isEqualTo(revurderFra)
             assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 18))
@@ -115,7 +115,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
         @Test
         fun `periode som begynner før revurderFra skal ikke brukes til gjelderFra eller gjelderTil`() {
             val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 16))
-            val dto = resultatMedEnStønadsperiode(periode).tilDto(revurderFra)
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(revurderFra)
 
             assertThat(dto.gjelderFraOgMed).isNull()
             assertThat(dto.gjelderTilOgMed).isNull()
@@ -124,13 +124,13 @@ class InnvilgelseTilsynBarnDtoKtTest {
         @Test
         fun `periode som begynner fra og med revurderFra brukes til gjelderFra og gjelderTil`() {
             val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 17), tom = LocalDate.of(2024, 1, 19))
-            val dto = resultatMedEnStønadsperiode(periode).tilDto(revurderFra)
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(revurderFra)
 
             assertThat(dto.gjelderFraOgMed).isEqualTo(LocalDate.of(2024, 1, 17))
             assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 19))
         }
 
-        private fun resultatMedEnStønadsperiode(vedtaksperiodeGrunnlag: VedtaksperiodeGrunnlag) =
+        private fun resultatMedEnVedtaksperiode(vedtaksperiodeGrunnlag: VedtaksperiodeGrunnlag) =
             BeregningsresultatTilsynBarn(
                 perioder =
                     listOf(

@@ -25,7 +25,7 @@ class UtbetalingerDvhV2Test {
                             perioder =
                                 listOf(
                                     beregningsresultatForMåned(
-                                        stønadsperioder = listOf(vedtaksperiodeGrunnlag()),
+                                        vedtaksperioder = listOf(vedtaksperiodeGrunnlag()),
                                         utgifterTotal = 4000,
                                     ),
                                 ),
