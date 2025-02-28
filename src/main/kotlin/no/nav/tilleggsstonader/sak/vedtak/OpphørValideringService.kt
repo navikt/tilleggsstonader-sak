@@ -57,7 +57,7 @@ class OpphørValideringService(
         brukerfeilHvis(
             senesteTomIForrigeVedtaksperioder < revurderFraDato,
         ) {
-            "Opphør er et ugyldig vedtaksresultat fordi ønsket opphørsdato fører ikke til at noen ekisterende vedtaksperioder blir opphørt."
+            "Opphør er et ugyldig vedtaksresultat fordi ønsket opphørsdato ikke fører til at noen ekisterende vedtaksperioder blir opphørt."
         }
     }
 
