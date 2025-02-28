@@ -109,7 +109,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                         behandlingId = behandling.id,
                     ),
                 )
-            }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
+            }.hasMessageContaining("Mangler begrunnelse for vurderingen av 'utgifter dekket av annet regelverk'")
         }
 
         @Test
@@ -310,7 +310,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                 )
             assertThatThrownBy {
                 vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
-            }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
+            }.hasMessageContaining("Mangler begrunnelse for vurderingen av 'utgifter dekket av annet regelverk'")
         }
 
         @Test
@@ -326,7 +326,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                     periode.id,
                     periode.tilOppdatering(),
                 )
-            }.hasMessageContaining("Kan ikke opprette eller endre periode når behandling er låst for videre redigering")
+            }.hasMessageContaining("Kan ikke gjøre endringer på denne behandlingen fordi den er ferdigstilt.")
         }
 
         @Test

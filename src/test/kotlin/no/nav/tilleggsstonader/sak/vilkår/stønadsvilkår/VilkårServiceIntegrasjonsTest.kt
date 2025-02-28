@@ -184,7 +184,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
             assertThatThrownBy {
                 vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår)
-            }.hasMessageContaining("Behandlingen er låst for videre redigering")
+            }.hasMessageContaining("Kan ikke gjøre endringer på denne behandlingen fordi den er ferdigstilt.")
         }
 
         @Test

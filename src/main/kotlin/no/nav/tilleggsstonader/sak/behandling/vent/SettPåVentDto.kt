@@ -12,10 +12,10 @@ data class SettPåVentDto(
 ) {
     init {
         brukerfeilHvis(årsaker.any { it == ÅrsakSettPåVent.ANNET } && kommentar.isNullOrBlank()) {
-            "Mangler påkrevd begrunnelse når man valgt Annet"
+            "Kommentar er påkrevd ved valg av årsak 'Annet'"
         }
         brukerfeilHvis((kommentar?.length ?: 0) > 1000) {
-            "Kan ikke sende inn kommentar med over 1000 tegn"
+            "Kommentar kan maks være 1000 tegn"
         }
     }
 }

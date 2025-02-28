@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
@@ -46,9 +45,7 @@ class TilkjentYtelseService(
             ?.let { it.andelerTilkjentYtelse.any { andel -> andel.tom.isAfter(osloDateNow()) } } ?: false
 
     fun slettTilkjentYtelseForBehandling(saksbehandling: Saksbehandling) {
-        brukerfeilHvis(saksbehandling.status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke reberegne tilkjent ytelse for en behandling som er låst for videre redigering"
-        }
+        saksbehandling.status.validerKanBehandlingRedigeres()
         tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)?.let {
             tilkjentYtelseRepository.deleteById(it.id)
         }

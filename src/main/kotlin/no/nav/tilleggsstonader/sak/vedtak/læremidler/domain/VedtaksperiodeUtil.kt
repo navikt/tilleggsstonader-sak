@@ -25,7 +25,7 @@ object VedtaksperiodeUtil {
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
     ) {
         brukerfeilHvis(vedtaksperioder.ingenOmfattesAvStønadsperioder(stønadsperioder)) {
-            "Vedtaksperiode er ikke innenfor en overlappsperiode"
+            "Vedtaksperiode er ikke innenfor en periode med overlapp mellom aktivitet og målgruppe."
         }
     }
 
