@@ -20,9 +20,7 @@ class AldersvilkårVurderingTest {
         val målgruppe = dummyVilkårperiodeMålgruppe()
         val grunnlagsdata = grunnlagsdataDomain()
 
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.JA, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA)
     }
 
     @Test
