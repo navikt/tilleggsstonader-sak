@@ -271,6 +271,7 @@ fun vilkår(
         fom = fom,
         tom = tom,
         utgift = utgift,
+        gitVersjon = Applikasjonsversjon.versjon,
     )
 
 fun fagsakpersoner(vararg identer: String): Set<PersonIdent> =

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.behandlingId
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
@@ -116,6 +117,7 @@ object TilsynBarnTestUtil {
             behandlingId = defaultBehandling.id,
             type = TypeVedtak.INNVILGELSE,
             data = data,
+            gitVersjon = Applikasjonsversjon.versjon,
         )
 
     fun stønadsperiodeGrunnlag(vedtaksperiode: VedtaksperiodeBeregning = defaultVedtaksperiodeBeregning): StønadsperiodeGrunnlag =
@@ -126,8 +128,8 @@ object TilsynBarnTestUtil {
         )
 
     fun innvilgetVedtak(
-        beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
         behandlingId: BehandlingId = defaultBehandling.id,
+        beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
         vedtaksperioder: List<Vedtaksperiode>? = null,
     ) = GeneriskVedtak(
         behandlingId = behandlingId,
@@ -137,6 +139,7 @@ object TilsynBarnTestUtil {
                 beregningsresultat = beregningsresultat,
                 vedtaksperioder = vedtaksperioder,
             ),
+        gitVersjon = Applikasjonsversjon.versjon,
     )
 
     fun innvilgetVedtak(
@@ -146,6 +149,7 @@ object TilsynBarnTestUtil {
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,
         data = vedtak,
+        gitVersjon = Applikasjonsversjon.versjon,
     )
 
     fun avslagVedtak(
@@ -160,5 +164,6 @@ object TilsynBarnTestUtil {
                 årsaker = årsaker,
                 begrunnelse = begrunnelse,
             ),
+        gitVersjon = Applikasjonsversjon.versjon,
     )
 }
