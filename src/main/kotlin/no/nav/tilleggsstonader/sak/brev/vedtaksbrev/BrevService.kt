@@ -172,9 +172,7 @@ class BrevService(
             .replace(BREVDATO_PLACEHOLDER, osloDateNow().norskFormat())
     }
 
-    private fun validerRedigerbarBehandling(saksbehandling: Saksbehandling) {
-        saksbehandling.status.validerKanBehandlingRedigeres()
-    }
+    private fun validerRedigerbarBehandling(saksbehandling: Saksbehandling) = saksbehandling.status.validerKanBehandlingRedigeres()
 
     fun slettVedtaksbrev(saksbehandling: Saksbehandling) {
         vedtaksbrevRepository.deleteById(saksbehandling.id)
