@@ -32,6 +32,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -202,7 +203,7 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
 
         @Test
         fun `skal slette grunnlag for behandling under arbeid`() {
-            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(revurdering.id)
+            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(revurdering.id, Vilkårperioder(emptyList(), emptyList()))
 
             nullstillBehandlingService.slettVilkårperiodegrunnlag(revurdering.id)
 
