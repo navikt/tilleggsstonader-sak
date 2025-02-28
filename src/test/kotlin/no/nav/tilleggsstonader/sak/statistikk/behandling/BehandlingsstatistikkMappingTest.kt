@@ -50,6 +50,7 @@ class BehandlingsstatistikkMappingTest {
                 henvendelseTidspunkt = henvendelseTidspunkt,
                 hendelseTidspunkt = hendelseTidspunkt,
                 tekniskTid = tekniskTid,
+                hendelse = Hendelse.MOTTATT,
             )
 
         val expected =
@@ -304,12 +305,87 @@ class BehandlingsstatistikkMappingTest {
         assertThat(actual).isEqualTo(expected)
     }
 
+    @Test
+    fun `mapping ved henleggelse`() {
+        val behandlingId = BehandlingId(UUID.randomUUID())
+        val aktørId = "9876543210127"
+        val saksbehandlerId = "7873486250023"
+
+        val henvendelseTidspunkt = osloNow()
+        val hendelseTidspunkt = osloNow()
+        val tekniskTid = osloNow()
+
+        val saksbehandling =
+            saksbehandling(
+                behandlingId = behandlingId,
+                ident = aktørId,
+                eksternId = 7878L,
+                eksternFagId = 8989L,
+                kategori = BehandlingKategori.NASJONAL,
+                resultat = BehandlingResultat.HENLAGT,
+                henlagtÅrsak = HenlagtÅrsak.TRUKKET_TILBAKE,
+            )
+
+        val actual =
+            map(
+                saksbehandling = saksbehandling,
+                saksbehandlerId = saksbehandlerId,
+                henvendelseTidspunkt = henvendelseTidspunkt,
+                hendelseTidspunkt = hendelseTidspunkt,
+                tekniskTid = tekniskTid,
+            )
+
+        val expected =
+            BehandlingDVH(
+                behandlingId = "7878",
+                behandlingUuid = behandlingId.id.toString(),
+                saksnummer = "8989",
+                sakId = "8989",
+                aktorId = aktørId,
+                mottattTid = henvendelseTidspunkt,
+                registrertTid = henvendelseTidspunkt,
+                ferdigBehandletTid = null,
+                endretTid = henvendelseTidspunkt,
+                tekniskTid = tekniskTid,
+                sakYtelse = SakYtelseDvh.TILLEGG_BARNETILSYN,
+                sakUtland = "Nasjonal",
+                behandlingType = "FØRSTEGANGSBEHANDLING",
+                behandlingStatus = "MOTTATT",
+                behandlingMetode = "AUTOMATISK",
+                kravMottatt = null,
+                opprettetAv = "VL",
+                saksbehandler = saksbehandlerId,
+                ansvarligEnhet = ArbeidsfordelingService.MASKINELL_JOURNALFOERENDE_ENHET,
+                behandlingResultat = "HENLAGT",
+                resultatBegrunnelse = "TRUKKET_TILBAKE",
+                avsender = "Nav Tilleggstønader",
+                versjon = Applikasjonsversjon.versjon,
+                relatertBehandlingId = null,
+                vedtakTid = null,
+                utbetaltTid = null,
+                forventetOppstartTid = null,
+                papirSøknad = null,
+                ansvarligBeslutter = null,
+                totrinnsbehandling = false,
+                vilkårsprøving = emptyList(),
+                venteAarsak = null,
+                behandlingBegrunnelse = null,
+                revurderingOpplysningskilde = null,
+                revurderingÅrsak = null,
+                behandlingÅrsak = "SØKNAD",
+            )
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
     fun saksbehandling(
         behandlingId: BehandlingId,
         ident: String,
         eksternId: Long,
         eksternFagId: Long,
         kategori: BehandlingKategori = BehandlingKategori.NASJONAL,
+        resultat: BehandlingResultat = BehandlingResultat.IKKE_SATT,
+        henlagtÅrsak: HenlagtÅrsak? = null,
     ) = Saksbehandling(
         id = behandlingId,
         eksternId = eksternId,
@@ -320,10 +396,10 @@ class BehandlingsstatistikkMappingTest {
         kategori = kategori,
         årsak = BehandlingÅrsak.SØKNAD,
         kravMottatt = null,
-        resultat = BehandlingResultat.IKKE_SATT,
+        resultat = resultat,
         vedtakstidspunkt = null,
-        henlagtÅrsak = null,
-        henlagtBegrunnelse = null,
+        henlagtÅrsak = henlagtÅrsak,
+        henlagtBegrunnelse = "<blir ikke mappet>",
         ident = ident,
         fagsakId = FagsakId(UUID.randomUUID()),
         fagsakPersonId = FagsakPersonId(UUID.randomUUID()),
