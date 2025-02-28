@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringSteg
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.VilkårSteg
 import org.slf4j.LoggerFactory
@@ -195,6 +196,7 @@ class StegService(
                     behandlingId = behandlingId,
                     steg = behandlingSteg.stegType(),
                     opprettetAv = saksbehandlerIdent,
+                    gitVersjon = Applikasjonsversjon.versjon,
                 ),
             )
         }
