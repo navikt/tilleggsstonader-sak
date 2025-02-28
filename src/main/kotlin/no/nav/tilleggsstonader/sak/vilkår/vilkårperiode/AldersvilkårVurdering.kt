@@ -36,7 +36,7 @@ object AldersvilkårVurdering {
         vilkårsperiodeTom: LocalDate,
     ): Boolean {
         val sekstisyvÅrsDagenTilBruker = fødselsdato.plusYears(67)
-        feilHvis((vilkårsperiodeFom < sekstisyvÅrsDagenTilBruker) && (sekstisyvÅrsDagenTilBruker <= vilkårsperiodeTom)) {
+        feilHvis((vilkårsperiodeFom <= sekstisyvÅrsDagenTilBruker) && (sekstisyvÅrsDagenTilBruker <= vilkårsperiodeTom)) {
             "Brukeren fyller 67 år i løpet av vilkårsperioden"
         }
         return vilkårsperiodeTom < sekstisyvÅrsDagenTilBruker
