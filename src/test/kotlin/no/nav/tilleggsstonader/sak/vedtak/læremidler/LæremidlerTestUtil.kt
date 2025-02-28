@@ -83,12 +83,13 @@ object LæremidlerTestUtil {
     )
 
     fun opphør(
+        behandlingId: BehandlingId = BehandlingId.random(),
         vedtaksperioder: List<Vedtaksperiode> = defaultVedtaksperioder,
         beregningsresultat: BeregningsresultatLæremidler = defaultBeregningsresultat,
         årsaker: List<ÅrsakOpphør> = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
         begrunnelse: String = "En begrunnelse",
     ) = GeneriskVedtak(
-        behandlingId = BehandlingId.random(),
+        behandlingId = behandlingId,
         type = TypeVedtak.OPPHØR,
         data =
             OpphørLæremidler(
