@@ -549,7 +549,7 @@ class BehandlingsstatistikkMappingTest {
         resultat = resultat,
         vedtakstidspunkt = null,
         henlagtÅrsak = henlagtÅrsak,
-        henlagtBegrunnelse = "<blir ikke mappet>",
+        henlagtBegrunnelse = null,
         ident = ident,
         fagsakId = FagsakId(UUID.randomUUID()),
         fagsakPersonId = FagsakPersonId(UUID.randomUUID()),
