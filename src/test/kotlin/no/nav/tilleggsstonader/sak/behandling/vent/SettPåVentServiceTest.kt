@@ -125,7 +125,7 @@ class SettPåVentServiceTest : IntegrationTest() {
             }
             assertThatThrownBy {
                 settPåVentService.settPåVent(behandling.id, settPåVentDto)
-            }.hasMessageContaining("Kan ikke sette behandling på vent når status=${BehandlingStatus.SATT_PÅ_VENT}")
+            }.hasMessageContaining("Kan ikke gjøre endringer på denne behandlingen fordi den er satt på vent.")
         }
     }
 

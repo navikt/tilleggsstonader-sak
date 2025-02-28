@@ -121,6 +121,23 @@ enum class BehandlingStatus {
 
     fun behandlingErLåstForVidereRedigering(): Boolean = setOf(FATTER_VEDTAK, IVERKSETTER_VEDTAK, FERDIGSTILT, SATT_PÅ_VENT).contains(this)
 
+    fun validerKanBehandlingRedigeres() {
+        feilHvis(behandlingErLåstForVidereRedigering()) {
+            genererFeiltekstForBehandlingsstatus()
+        }
+    }
+
+    private fun genererFeiltekstForBehandlingsstatus(): String {
+        val prefix = "Kan ikke gjøre endringer på denne behandlingen fordi"
+        return when (this) {
+            FATTER_VEDTAK -> "$prefix vedtak er sendt til beslutter."
+            IVERKSETTER_VEDTAK -> "$prefix vedtak er alt fattet av beslutter."
+            FERDIGSTILT -> "$prefix den er ferdigstilt."
+            SATT_PÅ_VENT -> "$prefix den er satt på vent."
+            else -> error("Burde kunne redigere en behandling med status=$this.")
+        }
+    }
+
     fun iverksetterEllerFerdigstilt() = this == IVERKSETTER_VEDTAK || this == FERDIGSTILT
 }
 

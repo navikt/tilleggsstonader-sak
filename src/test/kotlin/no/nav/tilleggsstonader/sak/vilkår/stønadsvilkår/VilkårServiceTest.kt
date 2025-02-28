@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -320,8 +321,8 @@ internal class VilkårServiceTest {
                     ),
                 )
             },
-        ).isInstanceOf(ApiFeil::class.java)
-            .hasMessageContaining("Kan ikke gjøre ønsket endring fordi behandlingen har status")
+        ).isInstanceOf(Feil::class.java)
+            .hasMessageContaining("Kan ikke gjøre endringer på denne behandlingen fordi den er ferdigstilt.")
         verify(exactly = 0) { vilkårRepository.insertAll(any()) }
     }
 
