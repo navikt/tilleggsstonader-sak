@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.util.tilFørsteDagIMåneden
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
@@ -71,7 +72,10 @@ class VilkårperiodeGrunnlagService(
         logger.info("Oppdatert grunnlagsdata for behandling=$behandlingId timerSidenForrige=$tidSidenForrigeHenting")
     }
 
-    fun hentEllerOpprettGrunnlag(behandlingId: BehandlingId): VilkårperioderGrunnlag? {
+    fun hentEllerOpprettGrunnlag(
+        behandlingId: BehandlingId,
+        vilkårperioder: Vilkårperioder,
+    ): VilkårperioderGrunnlag? {
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)?.grunnlag
 
         if (grunnlag != null) {
@@ -82,16 +86,19 @@ class VilkårperiodeGrunnlagService(
         return if (behandling.status.behandlingErLåstForVidereRedigering()) {
             null
         } else {
-            opprettGrunnlagsdata(behandling).grunnlag
+            opprettGrunnlagsdata(behandling, vilkårperioder).grunnlag
         }
     }
 
-    private fun opprettGrunnlagsdata(behandling: Saksbehandling): VilkårperioderGrunnlagDomain {
+    private fun opprettGrunnlagsdata(
+        behandling: Saksbehandling,
+        vilkårperioder: Vilkårperioder,
+    ): VilkårperioderGrunnlagDomain {
         brukerfeilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
             "Behandlingen er ikke påbegynt. Kan ikke opprette vilkårperiode hvis man ikke er saksbehandler"
         }
 
-        val fom = antallMånederBakITiden(behandling)
+        val fom = antallMånederBakITiden(behandling, vilkårperioder)
         val tom = YearMonth.now().plusYears(1).atEndOfMonth()
 
         val grunnlag = hentGrunnlagsdata(behandling.id, fom, tom)
@@ -105,13 +112,15 @@ class VilkårperiodeGrunnlagService(
 
     /**
      * Vid en førstegangsbehandling skal man bruke mottatt tidspunkt minus antall måneder for gitt stønadstype
-     * Når man revurderer skal man hente grunnlag fra og med datoet man revurderer fra, uavhengig når man søker fra
+     * Når man revurderer skal man hente grunnlag fra og med den startdatoen til den første eksisterende vilkårperioden (målgruppe eller ytelse), uavhengig når man søker fra
      */
-    private fun antallMånederBakITiden(behandling: Saksbehandling): LocalDate {
+    private fun antallMånederBakITiden(
+        behandling: Saksbehandling,
+        vilkårperioder: Vilkårperioder,
+    ): LocalDate {
         if (behandling.revurderFra != null) {
-            return behandling.revurderFra
-                .minusMonths(behandling.stønadstype.grunnlagAntallMånederBakITiden.toLong())
-                .tilFørsteDagIMåneden()
+            return sluttdatoPåFørsteEksisterendeVilkårperiode(vilkårperioder)
+                ?: behandling.revurderFra
         }
         val mottattTidspunkt =
             søknadService.hentSøknadMetadata(behandling.id)?.mottattTidspunkt
@@ -122,6 +131,9 @@ class VilkårperiodeGrunnlagService(
             .minusMonths(behandling.stønadstype.grunnlagAntallMånederBakITiden.toLong())
             .tilFørsteDagIMåneden()
     }
+
+    private fun sluttdatoPåFørsteEksisterendeVilkårperiode(vilkårperioder: Vilkårperioder) =
+        (vilkårperioder.aktiviteter.map { it.fom } + vilkårperioder.målgrupper.map { it.fom }).minOrNull()
 
     private fun hentGrunnlagsdata(
         behandlingId: BehandlingId,
