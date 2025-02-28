@@ -96,30 +96,6 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `Målgruppe AAP hvor bruker fyller 18 år midt i vilkårsperiode skal kaste feil`() {
-        val målgruppe =
-            dummyVilkårperiodeMålgruppe().copy(
-                type = MålgruppeType.AAP,
-                fom = osloDateNow().minusDays(10),
-                tom = osloDateNow().plusDays(10),
-            )
-
-        val grunnlagsdata =
-            grunnlagsdataDomain(
-                grunnlag =
-                    lagGrunnlagsdata(
-                        fødsel =
-                            Fødsel(
-                                fødselsdato = osloDateNow().minusYears(18),
-                                osloDateNow().minusYears(18).year,
-                            ),
-                    ),
-            )
-        val feil = assertThrows<Feil> { vurderAldersvilkår(målgruppe, grunnlagsdata) }
-        assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
-    }
-
-    @Test
     fun `Målgruppe AAP hvor bruker fyller 18 år dagen før vilkårsperioden starter skal gi svar JA`() {
         val fom = osloDateNow().minusDays(10)
         val fødselsdato = fom.minusDays(1).minusYears(18)
@@ -175,6 +151,30 @@ class AldersvilkårVurderingTest {
         vurderAldersvilkår(målgruppe, grunnlagsdata).also {
             assertEquals(SvarJaNei.NEI, it)
         }
+    }
+
+    @Test
+    fun `Målgruppe AAP hvor bruker fyller 18 år midt i vilkårsperiode skal kaste feil`() {
+        val målgruppe =
+            dummyVilkårperiodeMålgruppe().copy(
+                type = MålgruppeType.AAP,
+                fom = osloDateNow().minusDays(10),
+                tom = osloDateNow().plusDays(10),
+            )
+
+        val grunnlagsdata =
+            grunnlagsdataDomain(
+                grunnlag =
+                    lagGrunnlagsdata(
+                        fødsel =
+                            Fødsel(
+                                fødselsdato = osloDateNow().minusYears(18),
+                                osloDateNow().minusYears(18).year,
+                            ),
+                    ),
+            )
+        val feil = assertThrows<Feil> { vurderAldersvilkår(målgruppe, grunnlagsdata) }
+        assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
     }
 
     @Test
