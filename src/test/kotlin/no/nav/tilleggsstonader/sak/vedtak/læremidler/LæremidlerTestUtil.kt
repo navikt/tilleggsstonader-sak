@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
@@ -48,6 +49,7 @@ object LæremidlerTestUtil {
             behandlingId = BehandlingId.random(),
             type = TypeVedtak.INNVILGELSE,
             data = data,
+            gitVersjon = Applikasjonsversjon.versjon,
         )
 
     fun innvilgelse(
@@ -62,19 +64,22 @@ object LæremidlerTestUtil {
                 vedtaksperioder = vedtaksperioder,
                 beregningsresultat = beregningsresultat,
             ),
+        gitVersjon = Applikasjonsversjon.versjon,
     )
 
     fun avslag(
+        behandlingId: BehandlingId = BehandlingId.random(),
         årsaker: List<ÅrsakAvslag> = listOf(ÅrsakAvslag.ANNET),
         begrunnelse: String = "en begrunnelse",
     ) = GeneriskVedtak(
-        behandlingId = BehandlingId.random(),
+        behandlingId = behandlingId,
         type = TypeVedtak.AVSLAG,
         data =
             AvslagLæremidler(
                 årsaker = årsaker,
                 begrunnelse = begrunnelse,
             ),
+        gitVersjon = Applikasjonsversjon.versjon,
     )
 
     fun opphør(
@@ -92,6 +97,7 @@ object LæremidlerTestUtil {
                 årsaker = årsaker,
                 begrunnelse = begrunnelse,
             ),
+        gitVersjon = Applikasjonsversjon.versjon,
     )
 
     fun beregningsresultatForMåned(
