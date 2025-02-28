@@ -26,7 +26,7 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `OVERGANGSSTØNAD gi svar JA_IMPLISITT`() {
+    fun `OVERGANGSSTØNAD skal gi svar JA_IMPLISITT`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.OVERGANGSSTØNAD)
         val grunnlagsdata = grunnlagsdataDomain()
 
@@ -36,7 +36,7 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `AAP gi svar JA`() {
+    fun `AAP skal skal gi svar JA`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.AAP)
         val grunnlagsdata = grunnlagsdataDomain()
 
@@ -46,7 +46,7 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `NEDSATT_ARBEIDSEVNE gi svar JA`() {
+    fun `NEDSATT_ARBEIDSEVNE skal gi svar JA`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.NEDSATT_ARBEIDSEVNE)
         val grunnlagsdata = grunnlagsdataDomain()
 
@@ -56,7 +56,7 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `UFØRETRYGD gi svar JA`() {
+    fun `UFØRETRYGD skal gi svar JA`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.UFØRETRYGD)
         val grunnlagsdata = grunnlagsdataDomain()
 
@@ -66,7 +66,7 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `DAGPENGER gi svar NEI`() {
+    fun `DAGPENGER skal gi svar NEI`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.DAGPENGER)
         val grunnlagsdata = grunnlagsdataDomain()
 
@@ -76,7 +76,7 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `SYKEPENGER_100_PROSENT gi svar NEI`() {
+    fun `SYKEPENGER_100_PROSENT skal gi svar NEI`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.SYKEPENGER_100_PROSENT)
         val grunnlagsdata = grunnlagsdataDomain()
 
@@ -86,7 +86,7 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `INGEN_MÅLGRUPPE gi svar NEI`() {
+    fun `INGEN_MÅLGRUPPE skal gi svar NEI`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.INGEN_MÅLGRUPPE)
         val grunnlagsdata = grunnlagsdataDomain()
 
@@ -96,7 +96,7 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `AAP med 18-års dag midt i vilkårsperiode skal kaste feil`() {
+    fun `AAP hvor bruker fyller 18 år midt i vilkårsperiode skal kaste feil`() {
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
@@ -120,11 +120,15 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `AAP med 18-års dag første dag i vilkårsperiode skal kaste feil`() {
+    fun `AAP hvor bruker fyller 18 år første dag i vilkårsperiode skal kaste feil`() {
+        val fom = osloDateNow().minusDays(10)
+        val fødselsdato = fom.minusYears(18)
+        val fødselsår = fødselsdato.year
+
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
-                fom = osloDateNow().minusDays(10),
+                fom = fom,
                 tom = osloDateNow().plusDays(10),
             )
 
@@ -134,8 +138,8 @@ class AldersvilkårVurderingTest {
                     lagGrunnlagsdata(
                         fødsel =
                             Fødsel(
-                                fødselsdato = osloDateNow().minusYears(18).minusDays(10),
-                                osloDateNow().minusYears(18).minusDays(10).year,
+                                fødselsdato = fødselsdato,
+                                fødselsår = fødselsår,
                             ),
                     ),
             )
@@ -144,11 +148,15 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `AAP med 18-års dag dagen før vilkårsperioden starter skal ikke kaste feil`() {
+    fun `AAP hvor bruker fyller 18 år dagen før vilkårsperioden starter skal ikke kaste feil`() {
+        val fom = osloDateNow().minusDays(10)
+        val fødselsdato = fom.minusDays(1).minusYears(18)
+        val fødselsår = fødselsdato.year
+
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
-                fom = osloDateNow().minusDays(10),
+                fom = fom,
                 tom = osloDateNow().plusDays(10),
             )
 
@@ -158,8 +166,8 @@ class AldersvilkårVurderingTest {
                     lagGrunnlagsdata(
                         fødsel =
                             Fødsel(
-                                fødselsdato = osloDateNow().minusYears(18).minusDays(11),
-                                osloDateNow().minusYears(18).minusDays(11).year,
+                                fødselsdato = fødselsdato,
+                                fødselsår = fødselsår,
                             ),
                     ),
             )
@@ -169,12 +177,16 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `AAP med 18-års dag dagen etter vilkårsperioden starter skal gi NEI`() {
+    fun `AAP hvor bruker fyller 18 år dagen etter vilkårsperioden starter skal gi NEI`() {
+        val tom = osloDateNow().plusDays(10)
+        val fødselsdato = tom.plusDays(1).minusYears(18)
+        val fødselsår = fødselsdato.year
+
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
                 fom = osloDateNow().minusDays(10),
-                tom = osloDateNow().plusDays(10),
+                tom = tom,
             )
 
         val grunnlagsdata =
@@ -183,8 +195,8 @@ class AldersvilkårVurderingTest {
                     lagGrunnlagsdata(
                         fødsel =
                             Fødsel(
-                                fødselsdato = osloDateNow().minusYears(18).plusDays(11),
-                                osloDateNow().minusYears(18).plusDays(11).year,
+                                fødselsdato = fødselsdato,
+                                fødselsår = fødselsår,
                             ),
                     ),
             )
@@ -194,12 +206,16 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `AAP med 18-års dag siste dag i vilkårsperiode skal kaste feil`() {
+    fun `AAP hvor bruker fyller 18 år siste dag i vilkårsperiode skal kaste feil`() {
+        val tom = osloDateNow().plusDays(10)
+        val fødselsdato = tom.minusYears(18)
+        val fødselsår = fødselsdato.year
+
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
                 fom = osloDateNow().minusDays(10),
-                tom = osloDateNow().plusDays(10),
+                tom = tom,
             )
 
         val grunnlagsdata =
@@ -208,8 +224,8 @@ class AldersvilkårVurderingTest {
                     lagGrunnlagsdata(
                         fødsel =
                             Fødsel(
-                                fødselsdato = osloDateNow().minusYears(18).plusDays(10),
-                                osloDateNow().minusYears(18).plusDays(10).year,
+                                fødselsdato = fødselsdato,
+                                fødselsår = fødselsår,
                             ),
                     ),
             )
