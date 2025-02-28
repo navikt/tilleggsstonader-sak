@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
@@ -88,6 +89,7 @@ object OppdaterVilkår {
             fom = utledFom(vilkår, oppdatering),
             tom = utledTom(vilkår, oppdatering),
             utgift = oppdatering.utgift,
+            gitVersjon = Applikasjonsversjon.versjon,
         )
     }
 
@@ -195,6 +197,7 @@ object OppdaterVilkår {
             resultat = utledResultat(vilkårsregel, delvilkårsett.map { it.tilDto() }).vilkår,
             status = VilkårStatus.NY,
             opphavsvilkår = null,
+            gitVersjon = Applikasjonsversjon.versjon,
         )
     }
 }
