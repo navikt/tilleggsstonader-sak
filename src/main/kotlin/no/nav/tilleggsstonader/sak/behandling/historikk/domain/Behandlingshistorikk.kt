@@ -27,6 +27,7 @@ data class Behandlingshistorikk(
     val opprettetAvNavn: String = SikkerhetContext.hentSaksbehandlerNavn(),
     val opprettetAv: String = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
     val endretTid: LocalDateTime = osloNow().truncatedTo(ChronoUnit.MILLIS),
+    val gitVersjon: String?,
 )
 
 fun Behandlingshistorikk.tilDto(): BehandlingshistorikkDto =

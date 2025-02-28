@@ -41,6 +41,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -129,6 +130,7 @@ class BehandlingService(
                 Behandlingshistorikk(
                     behandlingId = behandling.id,
                     steg = stegType,
+                    gitVersjon = Applikasjonsversjon.versjon,
                 ),
         )
 
