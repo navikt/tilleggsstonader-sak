@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -28,9 +27,7 @@ class AldersvilkårVurderingTest {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.OVERGANGSSTØNAD)
         val grunnlagsdata = grunnlagsdataDomain()
 
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.JA_IMPLISITT, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA_IMPLISITT)
     }
 
     @Test
@@ -38,9 +35,7 @@ class AldersvilkårVurderingTest {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.AAP)
         val grunnlagsdata = grunnlagsdataDomain()
 
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.JA, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA)
     }
 
     @Test
@@ -48,9 +43,7 @@ class AldersvilkårVurderingTest {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.NEDSATT_ARBEIDSEVNE)
         val grunnlagsdata = grunnlagsdataDomain()
 
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.JA, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA)
     }
 
     @Test
@@ -58,9 +51,7 @@ class AldersvilkårVurderingTest {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.UFØRETRYGD)
         val grunnlagsdata = grunnlagsdataDomain()
 
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.JA, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA)
     }
 
     @Test
@@ -68,9 +59,9 @@ class AldersvilkårVurderingTest {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.DAGPENGER)
         val grunnlagsdata = grunnlagsdataDomain()
 
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.NEI, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
+
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
     }
 
     @Test
@@ -78,9 +69,7 @@ class AldersvilkårVurderingTest {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.SYKEPENGER_100_PROSENT)
         val grunnlagsdata = grunnlagsdataDomain()
 
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.NEI, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
     }
 
     @Test
@@ -88,9 +77,7 @@ class AldersvilkårVurderingTest {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.INGEN_MÅLGRUPPE)
         val grunnlagsdata = grunnlagsdataDomain()
 
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.NEI, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
     }
 
     @Test
@@ -117,9 +104,7 @@ class AldersvilkårVurderingTest {
                             ),
                     ),
             )
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.JA, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA)
     }
 
     @Test
@@ -146,9 +131,7 @@ class AldersvilkårVurderingTest {
                             ),
                     ),
             )
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.NEI, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
     }
 
     @Test
@@ -255,9 +238,7 @@ class AldersvilkårVurderingTest {
                             ),
                     ),
             )
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.JA, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA)
     }
 
     @Test
@@ -284,9 +265,7 @@ class AldersvilkårVurderingTest {
                             ),
                     ),
             )
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.NEI, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
     }
 
     @Test
@@ -393,9 +372,7 @@ class AldersvilkårVurderingTest {
                             ),
                     ),
             )
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.JA, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA)
     }
 
     @Test
@@ -422,9 +399,7 @@ class AldersvilkårVurderingTest {
                             ),
                     ),
             )
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.NEI, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
     }
 
     @Test
@@ -531,9 +506,7 @@ class AldersvilkårVurderingTest {
                             ),
                     ),
             )
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.NEI, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
     }
 
     @Test
@@ -560,9 +533,7 @@ class AldersvilkårVurderingTest {
                             ),
                     ),
             )
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.JA, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA)
     }
 
     @Test
@@ -669,9 +640,7 @@ class AldersvilkårVurderingTest {
                             ),
                     ),
             )
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.NEI, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
     }
 
     @Test
@@ -698,9 +667,7 @@ class AldersvilkårVurderingTest {
                             ),
                     ),
             )
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.JA, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA)
     }
 
     @Test
@@ -807,9 +774,7 @@ class AldersvilkårVurderingTest {
                             ),
                     ),
             )
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.NEI, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
     }
 
     @Test
@@ -836,9 +801,7 @@ class AldersvilkårVurderingTest {
                             ),
                     ),
             )
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.JA, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA)
     }
 
     @Test
@@ -945,9 +908,7 @@ class AldersvilkårVurderingTest {
                             ),
                     ),
             )
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.NEI, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
     }
 
     @Test
@@ -974,9 +935,7 @@ class AldersvilkårVurderingTest {
                             ),
                     ),
             )
-        vurderAldersvilkår(målgruppe, grunnlagsdata).also {
-            assertEquals(SvarJaNei.JA, it)
-        }
+        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA)
     }
 
     @Test
