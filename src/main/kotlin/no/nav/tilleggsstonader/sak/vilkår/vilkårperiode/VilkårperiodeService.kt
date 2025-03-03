@@ -61,7 +61,7 @@ class VilkårperiodeService(
             vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandlingId, vilkårperioder)
 
         return VilkårperioderResponse(
-            vilkårperioder = hentVilkårperioder(behandlingId).tilDto(),
+            vilkårperioder = vilkårperioder.tilDto(),
             grunnlag = grunnlagsdataVilkårsperioder?.tilDto(),
         )
     }
