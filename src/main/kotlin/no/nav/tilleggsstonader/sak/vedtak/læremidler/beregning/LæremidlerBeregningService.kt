@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.slåSammenSammenhengende
@@ -31,18 +32,18 @@ class LæremidlerBeregningService(
      */
 
     fun beregn(
+        behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
-        behandlingId: BehandlingId,
     ): BeregningsresultatLæremidler {
-        val stønadsperioder = hentStønadsperioder(behandlingId)
+        val stønadsperioder = hentStønadsperioder(behandling.id)
 
         læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             stønadsperioder = stønadsperioder,
-            behandlingId = behandlingId,
+            behandlingId = behandling.id,
         )
 
-        val aktiviteter = finnAktiviteter(behandlingId)
+        val aktiviteter = finnAktiviteter(behandling.id)
         val beregningsresultatForMåned = beregnLæremidlerPerMåned(vedtaksperioder, stønadsperioder, aktiviteter)
 
         return BeregningsresultatLæremidler(beregningsresultatForMåned)

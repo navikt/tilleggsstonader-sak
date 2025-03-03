@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
+import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
@@ -101,9 +102,10 @@ class StepDefinitions {
 
     @Når("beregner stønad for læremidler")
     fun `beregner stønad for læremidler`() {
-        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
+        val behandling = saksbehandling(behandling = behandling(id = behandlingId))
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
         try {
-            resultat = læremidlerBeregningService.beregn(vedtaksPerioder, behandlingId)
+            resultat = læremidlerBeregningService.beregn(behandling, vedtaksPerioder)
         } catch (e: Exception) {
             beregningException = e
         }

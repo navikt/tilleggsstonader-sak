@@ -95,7 +95,7 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         saksbehandling: Saksbehandling,
     ) {
-        val beregningsresultat = beregningService.beregn(vedtaksperioder, saksbehandling.id)
+        val beregningsresultat = beregningService.beregn(saksbehandling, vedtaksperioder)
         val nyttBeregningsresultat = settSammenGamleOgNyePerioder(saksbehandling, beregningsresultat)
 
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling.id, vedtaksperioder, nyttBeregningsresultat))
@@ -256,7 +256,7 @@ class LæremidlerBeregnYtelseSteg(
         val vedtaksperioderSomOmregnes =
             vedtaksperioderInnenforLøpendeMåned(avkortetVedtaksperioder, beregningsresultatTilReberegning)
 
-        val reberegnedePerioder = beregningService.beregn(vedtaksperioderSomOmregnes, behandling.id).perioder
+        val reberegnedePerioder = beregningService.beregn(behandling, vedtaksperioderSomOmregnes).perioder
         feilHvisIkke(reberegnedePerioder.size <= 1) {
             "Når vi reberegner vedtaksperioder innenfor en måned burde vi få maks 1 reberegnet periode, faktiskAntall=${reberegnedePerioder.size}"
         }
