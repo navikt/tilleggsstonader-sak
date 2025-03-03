@@ -111,15 +111,15 @@ class VilkårperiodeGrunnlagService(
     }
 
     /**
-     * Vid en førstegangsbehandling skal man bruke mottatt tidspunkt minus antall måneder for gitt stønadstype
-     * Når man revurderer skal man hente grunnlag fra og med den startdatoen til den første eksisterende vilkårperioden (målgruppe eller ytelse), uavhengig når man søker fra
+     * Ved en førstegangsbehandling skal man bruke mottatt tidspunkt minus antall måneder for gitt stønadstype
+     * Når man revurderer skal man hente grunnlag fra og med startdatoen til den første eksisterende vilkårperioden (målgruppe eller aktivitet), uavhengig når man søker fra
      */
     private fun antallMånederBakITiden(
         behandling: Saksbehandling,
         vilkårperioder: Vilkårperioder,
     ): LocalDate {
         if (behandling.revurderFra != null) {
-            return sluttdatoPåFørsteEksisterendeVilkårperiode(vilkårperioder)
+            return startdatoPåFørsteEksisterendeVilkårperiode(vilkårperioder)
                 ?: behandling.revurderFra
         }
         val mottattTidspunkt =
@@ -132,7 +132,7 @@ class VilkårperiodeGrunnlagService(
             .tilFørsteDagIMåneden()
     }
 
-    private fun sluttdatoPåFørsteEksisterendeVilkårperiode(vilkårperioder: Vilkårperioder) =
+    private fun startdatoPåFørsteEksisterendeVilkårperiode(vilkårperioder: Vilkårperioder) =
         (vilkårperioder.aktiviteter.map { it.fom } + vilkårperioder.målgrupper.map { it.fom }).minOrNull()
 
     private fun hentGrunnlagsdata(
