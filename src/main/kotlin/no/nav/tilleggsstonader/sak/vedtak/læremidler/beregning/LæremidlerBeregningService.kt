@@ -2,7 +2,12 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.slåSammenSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnBeløpUtil.beregnBeløp
@@ -22,6 +27,7 @@ class LæremidlerBeregningService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val læremidlerVedtaksperiodeValideringService: LæremidlerVedtaksperiodeValideringService,
+    private val vedtakRepository: VedtakRepository,
 ) {
     /**
      * Beregning av læremidler har foreløpig noen begrensninger.
@@ -36,6 +42,7 @@ class LæremidlerBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatLæremidler {
         val stønadsperioder = hentStønadsperioder(behandling.id)
+        val forrigeVedtak = hentForrigeVedtak(behandling)
 
         læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
@@ -46,8 +53,20 @@ class LæremidlerBeregningService(
         val aktiviteter = finnAktiviteter(behandling.id)
         val beregningsresultatForMåned = beregnLæremidlerPerMåned(vedtaksperioder, stønadsperioder, aktiviteter)
 
-        return BeregningsresultatLæremidler(beregningsresultatForMåned)
+        return if (forrigeVedtak != null) {
+            val revurderFra = behandling.revurderFra
+            feilHvis(revurderFra == null) { "Behandling=$behandling mangler revurderFra" }
+            BeregningsresultatLæremidler(beregningsresultatForMåned)
+        } else {
+            BeregningsresultatLæremidler(beregningsresultatForMåned)
+        }
     }
+
+    private fun hentForrigeVedtak(saksbehandling: Saksbehandling): InnvilgelseEllerOpphørLæremidler? =
+        saksbehandling.forrigeBehandlingId
+            ?.let {
+                vedtakRepository.findByIdOrThrow(it).withTypeOrThrow<InnvilgelseEllerOpphørLæremidler>()
+            }?.data
 
     private fun hentStønadsperioder(behandlingId: BehandlingId): List<StønadsperiodeBeregningsgrunnlag> =
         stønadsperiodeRepository

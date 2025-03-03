@@ -61,6 +61,7 @@ class StepDefinitions {
             vilkårperiodeRepository = vilkårperiodeRepository,
             stønadsperiodeRepository = stønadsperiodeRepository,
             læremidlerVedtaksperiodeValideringService = læremidlerVedtaksperiodeValideringService,
+            vedtakRepository = VedtakRepositoryFake(),
         )
 
     val behandlingId = BehandlingId(UUID.randomUUID())
