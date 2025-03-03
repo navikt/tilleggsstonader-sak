@@ -133,5 +133,6 @@ object LæremidlerTestUtil {
             utbetalingsdato = utbetalingsdato,
             målgruppe = MålgruppeType.AAP,
             aktivitet = AktivitetType.TILTAK,
+            delAvTidligereUtbetaling = false,
         )
 }

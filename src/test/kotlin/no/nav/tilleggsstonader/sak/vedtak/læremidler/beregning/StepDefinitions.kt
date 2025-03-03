@@ -39,6 +39,7 @@ enum class BeregningNøkler(
     UTBETALINGSDATO("Utbetalingsdato"),
     MÅLGRUPPE("Målgruppe"),
     BEKREFTET_SATS("Bekreftet sats"),
+    DEL_AV_TIDLIGERE_UTBETALING("Del av tidligere utbetaling"),
 }
 
 @Suppress("unused", "ktlint:standard:function-naming")
