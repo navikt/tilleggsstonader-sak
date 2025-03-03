@@ -59,9 +59,8 @@ class AldersvilkårVurderingTest {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.DAGPENGER)
         val grunnlagsdata = grunnlagsdataDomain()
 
-        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
-
-        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
+        val feil = assertThrows<Feil> { vurderAldersvilkår(målgruppe, grunnlagsdata) }
+        assertThat(feil.message).isEqualTo("Aldersvilkår vurderes ikke for målgruppe: DAGPENGER")
     }
 
     @Test
@@ -69,7 +68,8 @@ class AldersvilkårVurderingTest {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.SYKEPENGER_100_PROSENT)
         val grunnlagsdata = grunnlagsdataDomain()
 
-        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
+        val feil = assertThrows<Feil> { vurderAldersvilkår(målgruppe, grunnlagsdata) }
+        assertThat(feil.message).isEqualTo("Aldersvilkår vurderes ikke for målgruppe: SYKEPENGER_100_PROSENT")
     }
 
     @Test
@@ -77,7 +77,8 @@ class AldersvilkårVurderingTest {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.INGEN_MÅLGRUPPE)
         val grunnlagsdata = grunnlagsdataDomain()
 
-        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.NEI)
+        val feil = assertThrows<Feil> { vurderAldersvilkår(målgruppe, grunnlagsdata) }
+        assertThat(feil.message).isEqualTo("Aldersvilkår vurderes ikke for målgruppe: INGEN_MÅLGRUPPE")
     }
 
     @Test

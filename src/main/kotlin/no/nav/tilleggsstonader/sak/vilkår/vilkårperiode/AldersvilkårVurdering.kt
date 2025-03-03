@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -22,11 +23,8 @@ object AldersvilkårVurdering {
                     vurderAldersvilkårForNedsattArbeidsevne(fødselsdato, vilkårperiode)
                 MålgruppeType.OMSTILLINGSSTØNAD -> vurderAldersvilkårForOmstillingsstønad(fødselsdato, vilkårperiode)
                 MålgruppeType.OVERGANGSSTØNAD -> SvarJaNei.JA_IMPLISITT
-                MålgruppeType.DAGPENGER -> SvarJaNei.NEI
-                MålgruppeType.SYKEPENGER_100_PROSENT -> SvarJaNei.NEI
-                MålgruppeType.INGEN_MÅLGRUPPE -> SvarJaNei.NEI
+                else -> throw Feil("Aldersvilkår vurderes ikke for målgruppe: ${vilkårperiode.type}")
             }
-
         return gyldig
     }
 
