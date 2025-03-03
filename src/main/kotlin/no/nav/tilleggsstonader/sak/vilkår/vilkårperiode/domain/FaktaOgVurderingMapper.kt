@@ -206,8 +206,6 @@ private fun mapMålgruppeBarnetilsyn(
                                 vurderAldersvilkår(målgruppe, grunnlagsData),
                                 AldersvilkårVurdering
                                     .VurderingFaktaEtterlevelseAldersvilkår(
-                                        vilkårperiodeFom = målgruppe.fom,
-                                        vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
                                     ),
                             ),
@@ -229,8 +227,6 @@ private fun mapMålgruppeBarnetilsyn(
                                 vurderAldersvilkår(målgruppe, grunnlagsData),
                                 AldersvilkårVurdering
                                     .VurderingFaktaEtterlevelseAldersvilkår(
-                                        vilkårperiodeFom = målgruppe.fom,
-                                        vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
                                     ),
                             ),
@@ -249,8 +245,6 @@ private fun mapMålgruppeBarnetilsyn(
                                 vurderAldersvilkår(målgruppe, grunnlagsData),
                                 AldersvilkårVurdering
                                     .VurderingFaktaEtterlevelseAldersvilkår(
-                                        vilkårperiodeFom = målgruppe.fom,
-                                        vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
                                     ),
                             ),
@@ -269,8 +263,6 @@ private fun mapMålgruppeBarnetilsyn(
                                 vurderAldersvilkår(målgruppe, grunnlagsData),
                                 AldersvilkårVurdering
                                     .VurderingFaktaEtterlevelseAldersvilkår(
-                                        vilkårperiodeFom = målgruppe.fom,
-                                        vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
                                     ),
                             ),
@@ -300,8 +292,6 @@ private fun mapMålgruppeLæremidler(
                                 vurderAldersvilkår(målgruppe, grunnlagsData),
                                 AldersvilkårVurdering
                                     .VurderingFaktaEtterlevelseAldersvilkår(
-                                        vilkårperiodeFom = målgruppe.fom,
-                                        vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
                                     ),
                             ),
@@ -323,8 +313,6 @@ private fun mapMålgruppeLæremidler(
                                 vurderAldersvilkår(målgruppe, grunnlagsData),
                                 AldersvilkårVurdering
                                     .VurderingFaktaEtterlevelseAldersvilkår(
-                                        vilkårperiodeFom = målgruppe.fom,
-                                        vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
                                     ),
                             ),
@@ -343,8 +331,6 @@ private fun mapMålgruppeLæremidler(
                                 vurderAldersvilkår(målgruppe, grunnlagsData),
                                 AldersvilkårVurdering
                                     .VurderingFaktaEtterlevelseAldersvilkår(
-                                        vilkårperiodeFom = målgruppe.fom,
-                                        vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
                                     ),
                             ),
@@ -363,8 +349,6 @@ private fun mapMålgruppeLæremidler(
                                 vurderAldersvilkår(målgruppe, grunnlagsData),
                                 AldersvilkårVurdering
                                     .VurderingFaktaEtterlevelseAldersvilkår(
-                                        vilkårperiodeFom = målgruppe.fom,
-                                        vilkårperiodeTom = målgruppe.tom,
                                         fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
                                     ),
                             ),

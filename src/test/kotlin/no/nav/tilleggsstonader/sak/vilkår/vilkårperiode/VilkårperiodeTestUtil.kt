@@ -72,16 +72,11 @@ object VilkårperiodeTestUtil {
             faktaOgVurdering = faktaOgVurdering,
         )
 
-    fun vurderingFaktaEtterlevelseAldersvilkår(
-        vilkårperiodeFom: LocalDate = LocalDate.of(2025, 1, 1),
-        vilkårperiodeTom: LocalDate = LocalDate.of(2025, 2, 1),
-        fødselsdato: LocalDate = LocalDate.of(2000, 1, 1),
-    ) = AldersvilkårVurdering
-        .VurderingFaktaEtterlevelseAldersvilkår(
-            vilkårperiodeFom = vilkårperiodeFom,
-            vilkårperiodeTom = vilkårperiodeTom,
-            fødselsdato = fødselsdato,
-        )
+    fun vurderingFaktaEtterlevelseAldersvilkår(fødselsdato: LocalDate = LocalDate.of(2000, 1, 1)) =
+        AldersvilkårVurdering
+            .VurderingFaktaEtterlevelseAldersvilkår(
+                fødselsdato = fødselsdato,
+            )
 
     fun faktaOgVurderingMålgruppe(
         type: MålgruppeType = MålgruppeType.AAP,

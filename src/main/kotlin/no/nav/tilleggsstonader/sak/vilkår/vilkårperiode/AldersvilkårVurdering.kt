@@ -74,8 +74,6 @@ object AldersvilkårVurdering {
         }
 
     data class VurderingFaktaEtterlevelseAldersvilkår(
-        val vilkårperiodeFom: LocalDate,
-        val vilkårperiodeTom: LocalDate,
         val fødselsdato: LocalDate?,
     ) {
         init {
