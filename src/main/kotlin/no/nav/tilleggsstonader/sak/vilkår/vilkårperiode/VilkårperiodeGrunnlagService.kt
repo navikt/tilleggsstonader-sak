@@ -120,7 +120,7 @@ class VilkårperiodeGrunnlagService(
     ): LocalDate {
         if (behandling.revurderFra != null) {
             return startdatoPåFørsteEksisterendeVilkårperiode(vilkårperioder)
-                ?: behandling.revurderFra
+                ?: behandling.revurderFra.minusMonths(1).tilFørsteDagIMåneden()
         }
         val mottattTidspunkt =
             søknadService.hentSøknadMetadata(behandling.id)?.mottattTidspunkt
