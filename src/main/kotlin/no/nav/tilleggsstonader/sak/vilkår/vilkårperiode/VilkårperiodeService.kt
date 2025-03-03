@@ -56,10 +56,12 @@ class VilkårperiodeService(
     }
 
     fun hentVilkårperioderResponse(behandlingId: BehandlingId): VilkårperioderResponse {
-        val grunnlagsdataVilkårsperioder = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandlingId)
+        val vilkårperioder = hentVilkårperioder(behandlingId)
+        val grunnlagsdataVilkårsperioder =
+            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandlingId, vilkårperioder)
 
         return VilkårperioderResponse(
-            vilkårperioder = hentVilkårperioder(behandlingId).tilDto(),
+            vilkårperioder = vilkårperioder.tilDto(),
             grunnlag = grunnlagsdataVilkårsperioder?.tilDto(),
         )
     }

@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClien
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
@@ -52,6 +53,8 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
     @Autowired
     lateinit var ytelseClient: YtelseClient
 
+    val ingenVilkårperioder = Vilkårperioder(emptyList(), emptyList())
+
     @AfterEach
     override fun tearDown() {
         super.tearDown()
@@ -64,7 +67,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
 
         assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)).isNull()
 
-        val response = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+        val response = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)
 
         assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)!!.grunnlag)
             .isEqualTo(
@@ -79,7 +82,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         val behandling =
             testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
 
-        vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+        vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)
 
         assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)).isNull()
     }
@@ -96,7 +99,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
             )
 
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-        vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+        vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)
 
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
         assertThat(
@@ -114,7 +117,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         val exception =
             catchThrowableOfType<ApiFeil> {
                 BrukerContextUtil.testWithBrukerContext(groups = listOf(rolleConfig.veilederRolle)) {
-                    vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+                    vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)
                 }
             }
         assertThat(exception.frontendFeilmelding).contains("Behandlingen er ikke påbegynt")
@@ -128,7 +131,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         val exception =
             catchThrowableOfType<ApiFeil> {
                 BrukerContextUtil.testWithBrukerContext(groups = listOf(rolleConfig.veilederRolle)) {
-                    vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+                    vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)
                 }
             }
         assertThat(exception.frontendFeilmelding).contains("Behandlingen er ikke påbegynt")
@@ -139,7 +142,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
         BrukerContextUtil.testWithBrukerContext(groups = listOf(rolleConfig.saksbehandlerRolle)) {
-            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)
         }
     }
 
@@ -166,7 +169,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
             )
 
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-        vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+        vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)
 
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
         val perioder = grunnlag!!.grunnlag.ytelse.perioder
@@ -222,7 +225,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
             )
 
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-        vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+        vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)
 
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
         val perioder = grunnlag!!.grunnlag.ytelse.perioder
@@ -256,14 +259,14 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
             }
 
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(steg = StegType.INNGANGSVILKÅR))
-            val grunnlag = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)!!
-            val grunnlag2 = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)!!
+            val grunnlag = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)!!
+            val grunnlag2 = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)!!
 
             BrukerContextUtil.testWithBrukerContext(groups = listOf(rolleConfig.saksbehandlerRolle)) {
                 vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id)
             }
 
-            val grunnlag3 = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)!!
+            val grunnlag3 = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)!!
 
             assertThat(grunnlag.aktivitet.aktiviteter.map { it.id }).containsExactly("1")
             assertThat(grunnlag2.aktivitet.aktiviteter.map { it.id }).containsExactly("1")
@@ -300,10 +303,10 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
             val henteFom = LocalDate.of(2023, 1, 1)
 
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(steg = StegType.INNGANGSVILKÅR))
-            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)
 
             vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id, henteFom)
-            val grunnlag = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+            val grunnlag = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)
 
             assertThat(grunnlag!!.hentetInformasjon.fom).isEqualTo(henteFom)
         }
