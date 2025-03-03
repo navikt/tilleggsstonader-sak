@@ -47,9 +47,7 @@ data class Beregningsgrunnlag(
     val antallBarn: Int,
 )
 
-// TODO rename til vedtaksperiodeGrunnlag
 data class VedtaksperiodeGrunnlag(
-    // TODO rename til vedtaksperiode
     val vedtaksperiode: VedtaksperiodeBeregning,
     val aktiviteter: List<Aktivitet>,
     val antallDager: Int,
