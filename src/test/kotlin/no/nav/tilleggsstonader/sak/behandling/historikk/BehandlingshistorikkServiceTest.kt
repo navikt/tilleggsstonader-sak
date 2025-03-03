@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDt
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -45,6 +46,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
                     steg = behandling.steg,
                     opprettetAvNavn = "Saksbehandlernavn",
                     opprettetAv = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+                    gitVersjon = Applikasjonsversjon.versjon,
                 ),
             )
         val hendelseshistorikkDto = behandlingHistorikk.tilHendelseshistorikkDto(saksbehandling(fagsak, behandling))
@@ -221,6 +223,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
                 opprettetAvNavn = opprettetAv,
                 endretTid = endretTid,
                 metadata = metadata?.let { JsonWrapper(objectMapper.writeValueAsString(metadata)) },
+                gitVersjon = Applikasjonsversjon.versjon,
             ),
         )
     }

@@ -10,6 +10,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.util.UUID
 
 internal class VilkårperiodeRepositoryTest : IntegrationTest() {
     @Autowired
@@ -53,6 +54,40 @@ internal class VilkårperiodeRepositoryTest : IntegrationTest() {
 
             assertThat(vilkårperiodeRepository.findByBehandlingId(behandling.id))
                 .containsExactlyInAnyOrder(vilkårperiode1, vilkårperiode2)
+        }
+    }
+
+    @Nested
+    inner class GitVersjon {
+        @Test
+        fun `skal returnere null hvis det ikke finnes en versjon`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
+            val målgruppe =
+                målgruppe(
+                    behandlingId = behandling.id,
+                    faktaOgVurdering =
+                        faktaOgVurderingMålgruppe(
+                            type = MålgruppeType.UFØRETRYGD,
+                        ),
+                ).copy(gitVersjon = null)
+            vilkårperiodeRepository.insert(målgruppe)
+            assertThat(vilkårperiodeRepository.findByIdOrThrow(målgruppe.id).gitVersjon).isNull()
+        }
+
+        @Test
+        fun `skal returnere versjon hvis det finnes en versjon`() {
+            val gitVersjon = UUID.randomUUID().toString()
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
+            val målgruppe =
+                målgruppe(
+                    behandlingId = behandling.id,
+                    faktaOgVurdering =
+                        faktaOgVurderingMålgruppe(
+                            type = MålgruppeType.UFØRETRYGD,
+                        ),
+                ).copy(gitVersjon = gitVersjon)
+            vilkårperiodeRepository.insert(målgruppe)
+            assertThat(vilkårperiodeRepository.findByIdOrThrow(målgruppe.id).gitVersjon).isEqualTo(gitVersjon)
         }
     }
 }

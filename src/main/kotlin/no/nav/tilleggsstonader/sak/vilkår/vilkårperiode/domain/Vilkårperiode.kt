@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
@@ -59,6 +60,7 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
     // TODO kilde burde kunne fjernes, den brukes aldri til noe annet enn manuell. Må fjernes i frontend og.
     @InsertOnlyProperty
     val kilde: KildeVilkårsperiode = KildeVilkårsperiode.MANUELL,
+    val gitVersjon: String?,
 ) : IVilkårperiode<T> {
     init {
         // TODO valider kombinasjon av type og type og FaktaOgVurdering.type
@@ -176,6 +178,7 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
             faktaOgVurdering = faktaOgVurdering as T,
             status = nyStatus,
             resultat = resultat,
+            gitVersjon = Applikasjonsversjon.versjon,
         )
     }
 
