@@ -109,10 +109,7 @@ class LæremidlerBeregnYtelseSteg(
         feilHvis(saksbehandling.revurderFra == null) {
             "revurderFra-dato er påkrevd for opphør"
         }
-        val forrigeVedtak =
-            vedtakRepository
-                .findByIdOrThrow(saksbehandling.forrigeBehandlingId)
-                .withTypeOrThrow<InnvilgelseEllerOpphørLæremidler>()
+        val forrigeVedtak = hentVedtak(saksbehandling.forrigeBehandlingId)
 
         opphørValideringService.validerVilkårperioder(saksbehandling)
 
