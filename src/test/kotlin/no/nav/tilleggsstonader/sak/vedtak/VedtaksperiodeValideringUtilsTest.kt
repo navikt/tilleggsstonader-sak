@@ -44,7 +44,6 @@ class VedtaksperiodeValideringUtilsTest {
 
         val vedtaksperioderJanFeb = listOf(vedtaksperiodeJanFeb)
         val vedtaksperioderJanMars = listOf(vedtaksperiodeJanFeb, vedtaksperiodeMars)
-        val førsteFeb: LocalDate = LocalDate.of(2025, 2, 1)
         val førsteMars: LocalDate = LocalDate.of(2025, 3, 1)
         val femtendeMars: LocalDate = LocalDate.of(2025, 3, 15)
         val førsteApril: LocalDate = LocalDate.of(2025, 4, 1)
@@ -66,7 +65,7 @@ class VedtaksperiodeValideringUtilsTest {
                 validerIngenEndringerFørRevurderFra(
                     innsendteVedtaksperioder = listOf(vedtaksperiodeLæremidlerJanFeb.copy(status = VedtaksperiodeStatus.UENDRET)),
                     vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeLæremidlerJanFeb),
-                    revurderFra = førsteFeb,
+                    revurderFra = førsteMars,
                 )
             }
         }
@@ -282,6 +281,32 @@ class VedtaksperiodeValideringUtilsTest {
                         revurderFra = førsteMars,
                     )
                 }
+            }
+
+            @Test
+            fun `kaster feil ved endret målgruppe`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            innsendteVedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD)),
+                            vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
+                            revurderFra = førsteMars,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato")
+            }
+
+            @Test
+            fun `kaster feil ved endret aktivitet`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerIngenEndringerFørRevurderFra(
+                            innsendteVedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(aktivitet = AktivitetType.REELL_ARBEIDSSØKER)),
+                            vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
+                            revurderFra = førsteMars,
+                        )
+                    }
+                assertThat(feil).hasMessage("Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato")
             }
         }
 

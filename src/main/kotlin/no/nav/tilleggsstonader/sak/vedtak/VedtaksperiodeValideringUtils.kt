@@ -2,7 +2,9 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.PeriodeMedId
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatus
 import java.time.LocalDate
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode as VedtaksperiodeLæremidler
 
 object VedtaksperiodeValideringUtils {
     fun validerIngenEndringerFørRevurderFra(
@@ -52,5 +54,11 @@ object VedtaksperiodeValideringUtils {
 
     private fun List<PeriodeMedId>.erUlik(other: List<PeriodeMedId>) = this.tilSammenlikningsSet() != other.tilSammenlikningsSet()
 
-    private fun List<PeriodeMedId>.tilSammenlikningsSet() = map { Triple(it.id, it.fom, it.tom) }.toSet()
+    private fun List<PeriodeMedId>.tilSammenlikningsSet() =
+        map {
+            when (it) {
+                is VedtaksperiodeLæremidler -> it.copy(status = VedtaksperiodeStatus.NY)
+                else -> it
+            }
+        }.toSet()
 }
