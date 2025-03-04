@@ -45,10 +45,9 @@ class LæremidlerBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
-        slåSammenMedForrigeVedtak: Boolean = true,
     ): BeregningsresultatLæremidler {
         val stønadsperioder = hentStønadsperioder(behandling.id)
-        val forrigeVedtak = if (slåSammenMedForrigeVedtak) hentForrigeVedtak(behandling) else null
+        val forrigeVedtak = hentForrigeVedtak(behandling)
 
         læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
