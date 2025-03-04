@@ -1,4 +1,5 @@
 {
+  "begrunnelse" : "Begrunnelse for vedtaksperiodene",
   "beregningsresultat": {
     "perioder" : [ {
       "dagsats" : 10.11,

@@ -17,7 +17,6 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDtoV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
@@ -168,7 +167,14 @@ class TilsynBarnVedtakControllerTest(
     @Test
     fun `skal lagre og hente opphør med vedtaksperioder`() {
         every { unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN) } returns true
-        innvilgeVedtakV2(behandling, innvilgelseDtoV2(listOf(vedtaksperiodeDto)))
+        innvilgeVedtakV2(
+            behandling = behandling,
+            vedtak =
+                InnvilgelseTilsynBarnRequestV2(
+                    listOf(vedtaksperiodeDto),
+                    begrunnelse = "Jo du skjønner det, at...",
+                ),
+        )
         testoppsettService.ferdigstillBehandling(behandling)
         val behandlingLagreOpphør =
             testoppsettService.opprettRevurdering(
