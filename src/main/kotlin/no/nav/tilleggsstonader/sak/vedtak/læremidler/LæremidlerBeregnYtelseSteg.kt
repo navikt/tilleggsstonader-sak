@@ -58,8 +58,9 @@ class LæremidlerBeregnYtelseSteg(
         when (vedtak) {
             is InnvilgelseLæremidlerRequest ->
                 beregnOgLagreInnvilgelse(
-                    vedtak.vedtaksperioder.tilDomene(),
-                    saksbehandling,
+                    saksbehandling = saksbehandling,
+                    vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
+                    begrunnelse = vedtak.begrunnelse,
                 )
 
             is AvslagLæremidlerDto -> lagreAvslag(saksbehandling, vedtak)
@@ -68,8 +69,9 @@ class LæremidlerBeregnYtelseSteg(
     }
 
     private fun beregnOgLagreInnvilgelse(
-        vedtaksperioder: List<Vedtaksperiode>,
         saksbehandling: Saksbehandling,
+        vedtaksperioder: List<Vedtaksperiode>,
+        begrunnelse: String?,
     ) {
         val forrigeVedtaksperioder = saksbehandling.forrigeBehandlingId?.let { hentVedtak(it).data.vedtaksperioder }
         val vedtaksperioderMedStatus =
@@ -78,7 +80,7 @@ class LæremidlerBeregnYtelseSteg(
                 vedtaksperioderForrigeBehandling = forrigeVedtaksperioder,
             )
 
-        lagreVedtak(vedtaksperioderMedStatus, saksbehandling)
+        lagreVedtak(saksbehandling, vedtaksperioderMedStatus, begrunnelse)
     }
 
     private fun hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørLæremidler> =
@@ -87,12 +89,20 @@ class LæremidlerBeregnYtelseSteg(
             .withTypeOrThrow<InnvilgelseEllerOpphørLæremidler>()
 
     private fun lagreVedtak(
-        vedtaksperioder: List<Vedtaksperiode>,
         saksbehandling: Saksbehandling,
+        vedtaksperioder: List<Vedtaksperiode>,
+        begrunnelse: String?,
     ) {
         val beregningsresultat = beregningService.beregn(saksbehandling, vedtaksperioder)
 
-        vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling.id, vedtaksperioder, beregningsresultat))
+        vedtakRepository.insert(
+            lagInnvilgetVedtak(
+                behandlingId = saksbehandling.id,
+                vedtaksperioder = vedtaksperioder,
+                beregningsresultat = beregningsresultat,
+                begrunnelse = begrunnelse,
+            ),
+        )
         lagreAndeler(saksbehandling, beregningsresultat)
     }
 
@@ -205,6 +215,7 @@ class LæremidlerBeregnYtelseSteg(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
         beregningsresultat: BeregningsresultatLæremidler,
+        begrunnelse: String?,
     ): Vedtak =
         GeneriskVedtak(
             behandlingId = behandlingId,
@@ -213,6 +224,7 @@ class LæremidlerBeregnYtelseSteg(
                 InnvilgelseLæremidler(
                     vedtaksperioder = vedtaksperioder,
                     beregningsresultat = BeregningsresultatLæremidler(beregningsresultat.perioder),
+                    begrunnelse = begrunnelse,
                 ),
         )
 
