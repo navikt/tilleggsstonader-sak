@@ -2,6 +2,13 @@
   "type": "OMSTILLINGSSTØNAD_TILSYN_BARN",
   "fakta": {},
   "vurderinger": {
+    "aldersvilkår": {
+      "resultat": "OPPFYLT",
+      "svar": "JA",
+      "vurderingFaktaEtterlevelse": {
+        "fødselsdato": "2000-01-01"
+      }
+    },
     "medlemskap": {
       "svar": "JA",
       "resultat": "OPPFYLT"

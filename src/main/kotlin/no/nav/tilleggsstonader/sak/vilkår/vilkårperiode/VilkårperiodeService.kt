@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValidering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
@@ -45,6 +46,7 @@ class VilkårperiodeService(
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
     private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
+    private val grunnlagsdataService: GrunnlagsdataService,
 ) {
     fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
         val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
@@ -95,8 +97,16 @@ class VilkårperiodeService(
             kildeId = vilkårperiode.kildeId,
         )
 
+        val grunnlagsdata =
+            grunnlagsdataService
+                .hentGrunnlagsdata(behandling.id)
+
         val faktaOgVurdering =
-            mapFaktaOgSvarDto(stønadstype = behandling.stønadstype, vilkårperiode = vilkårperiode)
+            mapFaktaOgSvarDto(
+                stønadstype = behandling.stønadstype,
+                vilkårperiode = vilkårperiode,
+                grunnlagsData = grunnlagsdata,
+            )
         return vilkårperiodeRepository.insert(
             GeneriskVilkårperiode(
                 behandlingId = vilkårperiode.behandlingId,
@@ -127,6 +137,10 @@ class VilkårperiodeService(
             "Kan ikke oppdatere kildeId på en allerede eksisterende vilkårperiode"
         }
 
+        val grunnlagsdata =
+            grunnlagsdataService
+                .hentGrunnlagsdata(behandling.id)
+
         val oppdatert =
             eksisterendeVilkårperiode.medVilkårOgVurdering(
                 fom = vilkårperiode.fom,
@@ -136,6 +150,7 @@ class VilkårperiodeService(
                     mapFaktaOgSvarDto(
                         stønadstype = behandling.stønadstype,
                         vilkårperiode = vilkårperiode,
+                        grunnlagsData = grunnlagsdata,
                     ),
             )
 
