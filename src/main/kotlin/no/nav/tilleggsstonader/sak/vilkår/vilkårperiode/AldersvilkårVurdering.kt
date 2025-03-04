@@ -17,15 +17,13 @@ object AldersvilkårVurdering {
 
         feilHvis(fødselsdato == null) { "Kan ikke vurdere aldersvilkår uten å vite fødselsdato til bruker" }
 
-        val gyldig: SvarJaNei =
-            when (vilkårperiode.type as MålgruppeType) {
-                MålgruppeType.AAP, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD ->
-                    vurderAldersvilkårForNedsattArbeidsevne(fødselsdato, vilkårperiode)
-                MålgruppeType.OMSTILLINGSSTØNAD -> vurderAldersvilkårForOmstillingsstønad(fødselsdato, vilkårperiode)
-                MålgruppeType.OVERGANGSSTØNAD -> SvarJaNei.JA_IMPLISITT
-                else -> throw Feil("Aldersvilkår vurderes ikke for målgruppe: ${vilkårperiode.type}")
-            }
-        return gyldig
+        return when (vilkårperiode.type) {
+            MålgruppeType.AAP, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD ->
+                vurderAldersvilkårForNedsattArbeidsevne(fødselsdato, vilkårperiode)
+            MålgruppeType.OMSTILLINGSSTØNAD -> vurderAldersvilkårForOmstillingsstønad(fødselsdato, vilkårperiode)
+            MålgruppeType.OVERGANGSSTØNAD -> SvarJaNei.JA_IMPLISITT
+            else -> throw Feil("Aldersvilkår vurderes ikke for målgruppe: ${vilkårperiode.type}")
+        }
     }
 
     private fun heleVilkårsperiodenErEtterBrukerFyller18År(
