@@ -129,7 +129,10 @@ class LæremidlerBeregningService(
                 beregningsresultatTilReberegning = periodeTilReberegning,
             )
 
-        return BeregningsresultatLæremidler(perioderSomBeholdes + reberegnedePerioderKorrigertUtbetalingsdato)
+        val nyePerioder =
+            (perioderSomBeholdes + reberegnedePerioderKorrigertUtbetalingsdato)
+                .map { it.markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling = false) }
+        return BeregningsresultatLæremidler(nyePerioder)
     }
 
     /**
@@ -176,6 +179,7 @@ class LæremidlerBeregningService(
             forrigeBeregningsresultat
                 .perioder
                 .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < revurderFra }
+                .map { it.markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling = true) }
         val nyePerioder =
             beregningsresultat
                 .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() >= revurderFra }
@@ -200,7 +204,9 @@ class LæremidlerBeregningService(
             .map {
                 val utbetalingsdato = utbetalingsdatoPerMåned[it.fom.toYearMonth()]
                 if (utbetalingsdato != null) {
-                    it.medKorrigertUtbetalingsdato(utbetalingsdato)
+                    it
+                        .medKorrigertUtbetalingsdato(utbetalingsdato)
+                        .markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling = true)
                 } else {
                     it
                 }
