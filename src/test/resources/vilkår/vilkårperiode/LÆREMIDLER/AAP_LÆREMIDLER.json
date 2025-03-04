@@ -4,7 +4,7 @@
   "vurderinger": {
     "aldersvilkår": {
       "resultat": "OPPFYLT",
-      "svar": "JA_IMPLISITT",
+      "svar": "JA",
       "vurderingFaktaEtterlevelse": {
         "fødselsdato": "2000-01-01"
       }
