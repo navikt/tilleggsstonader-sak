@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerIngenEndringerFørRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -12,12 +13,19 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.util.UUID
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode as VedtaksperiodeLæremidler
 
 class VedtaksperiodeValideringUtilsTest {
     @Nested
     inner class ValiderIngenEndringerFørRevurderFra {
         val vedtaksperiodeJanFeb =
             lagVedtaksperiode(
+                fom = LocalDate.of(2025, 1, 1),
+                tom = LocalDate.of(2025, 2, 28),
+            )
+
+        val vedtaksperiodeLæremidlerJanFeb =
+            lagVedtaksperiodeLæremidler(
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 2, 28),
             )
@@ -36,6 +44,7 @@ class VedtaksperiodeValideringUtilsTest {
 
         val vedtaksperioderJanFeb = listOf(vedtaksperiodeJanFeb)
         val vedtaksperioderJanMars = listOf(vedtaksperiodeJanFeb, vedtaksperiodeMars)
+        val førsteFeb: LocalDate = LocalDate.of(2025, 2, 1)
         val førsteMars: LocalDate = LocalDate.of(2025, 3, 1)
         val femtendeMars: LocalDate = LocalDate.of(2025, 3, 15)
         val førsteApril: LocalDate = LocalDate.of(2025, 4, 1)
@@ -47,6 +56,17 @@ class VedtaksperiodeValideringUtilsTest {
                     innsendteVedtaksperioder = vedtaksperioderJanMars,
                     vedtaksperioderForrigeBehandling = emptyList(),
                     revurderFra = null,
+                )
+            }
+        }
+
+        @Test
+        fun `kaster ikke feil ved ingen endringer, men oppdatert status`() {
+            assertDoesNotThrow {
+                validerIngenEndringerFørRevurderFra(
+                    innsendteVedtaksperioder = listOf(vedtaksperiodeLæremidlerJanFeb.copy(status = VedtaksperiodeStatus.UENDRET)),
+                    vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeLæremidlerJanFeb),
+                    revurderFra = førsteFeb,
                 )
             }
         }
@@ -305,6 +325,17 @@ class VedtaksperiodeValideringUtilsTest {
             }
         }
     }
+
+    private fun lagVedtaksperiodeLæremidler(
+        fom: LocalDate = LocalDate.of(2025, 1, 1),
+        tom: LocalDate = LocalDate.of(2025, 1, 31),
+        status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
+    ) = VedtaksperiodeLæremidler(
+        id = UUID.randomUUID(),
+        fom = fom,
+        tom = tom,
+        status = status,
+    )
 
     private fun lagVedtaksperiode(
         fom: LocalDate = LocalDate.of(2025, 1, 1),

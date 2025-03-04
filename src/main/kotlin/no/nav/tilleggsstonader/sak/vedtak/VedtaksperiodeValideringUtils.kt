@@ -41,10 +41,16 @@ object VedtaksperiodeValideringUtils {
                     }
                 }
             brukerfeilHvis(
-                vedtaksperioderForrigeBehandlingFørRevurderFraMedOppdatertTom.toSet() != innsendteVedtaksperioderFørRevurderFra.toSet(),
+                vedtaksperioderForrigeBehandlingFørRevurderFraMedOppdatertTom.erUlik(
+                    innsendteVedtaksperioderFørRevurderFra,
+                ),
             ) {
                 "Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato"
             }
         }
     }
+
+    private fun List<PeriodeMedId>.erUlik(other: List<PeriodeMedId>) = this.tilSammenlikningsSet() != other.tilSammenlikningsSet()
+
+    private fun List<PeriodeMedId>.tilSammenlikningsSet() = map { Triple(it.id, it.fom, it.tom) }.toSet()
 }
