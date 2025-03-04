@@ -105,6 +105,12 @@
     "fom" : "2024-02-01",
     "tom" : "2024-03-31"
   } ],
+  "vedtaksperioder" : [ {
+    "fom" : "2024-01-01",
+    "tom" : "2024-03-31",
+    "målgruppe" : null,
+    "aktivitet" : null
+  } ],
   "vilkår" : [ ],
   "vedtak" : {
     "type" : "INNVILGELSE"
@@ -121,7 +127,8 @@
       "stønadsbeløp" : 1902,
       "utbetalingsdato" : "2024-01-01",
       "målgruppe" : "AAP",
-      "aktivitet" : "TILTAK"
+      "aktivitet" : "TILTAK",
+      "delAvTidligereUtbetaling" : false
     } ]
   }
 }
