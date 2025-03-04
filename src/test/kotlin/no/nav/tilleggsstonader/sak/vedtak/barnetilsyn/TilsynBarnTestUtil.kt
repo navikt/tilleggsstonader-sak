@@ -9,9 +9,9 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
@@ -78,7 +78,7 @@ object TilsynBarnTestUtil {
                 BeregningsresultatTilsynBarn(
                     perioder =
                         listOf(
-                            beregningsresultatForMåned(stønadsperioder = listOf(stønadsperiodeGrunnlag())),
+                            beregningsresultatForMåned(vedtaksperioder = listOf(vedtaksperiodeGrunnlag())),
                         ),
                 ),
         )
@@ -93,7 +93,7 @@ object TilsynBarnTestUtil {
 
     fun beregningsresultatForMåned(
         måned: YearMonth = YearMonth.of(2024, 1),
-        stønadsperioder: List<StønadsperiodeGrunnlag> = emptyList(),
+        vedtaksperioder: List<VedtaksperiodeGrunnlag> = emptyList(),
         beløpsperioder: List<Beløpsperiode> = beløpsperioderDefault,
         utgifterTotal: Int = 5000,
     ) = BeregningsresultatForMåned(
@@ -103,7 +103,7 @@ object TilsynBarnTestUtil {
             Beregningsgrunnlag(
                 måned = måned,
                 makssats = 3000,
-                stønadsperioderGrunnlag = stønadsperioder,
+                vedtaksperiodeGrunnlag = vedtaksperioder,
                 utgifter = listOf(UtgiftBarn(defaultBarn1.id, 1000)),
                 utgifterTotal = utgifterTotal,
                 antallBarn = 1,
@@ -118,9 +118,9 @@ object TilsynBarnTestUtil {
             data = data,
         )
 
-    fun stønadsperiodeGrunnlag(vedtaksperiode: VedtaksperiodeBeregning = defaultVedtaksperiodeBeregning): StønadsperiodeGrunnlag =
-        StønadsperiodeGrunnlag(
-            stønadsperiode = vedtaksperiode,
+    fun vedtaksperiodeGrunnlag(vedtaksperiode: VedtaksperiodeBeregning = defaultVedtaksperiodeBeregning): VedtaksperiodeGrunnlag =
+        VedtaksperiodeGrunnlag(
+            vedtaksperiode = vedtaksperiode,
             aktiviteter = emptyList(),
             antallDager = 0,
         )

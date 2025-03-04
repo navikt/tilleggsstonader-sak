@@ -17,7 +17,7 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.stønadsperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
@@ -217,9 +217,9 @@ object Testdata {
                                 perioder =
                                     listOf(
                                         beregningsresultatForMåned(
-                                            stønadsperioder =
+                                            vedtaksperioder =
                                                 listOf(
-                                                    stønadsperiodeGrunnlag(vedtaksperiode = vedtaksperiodeBeregningsgrunnlag),
+                                                    vedtaksperiodeGrunnlag(vedtaksperiode = vedtaksperiodeBeregningsgrunnlag),
                                                 ),
                                         ),
                                     ),

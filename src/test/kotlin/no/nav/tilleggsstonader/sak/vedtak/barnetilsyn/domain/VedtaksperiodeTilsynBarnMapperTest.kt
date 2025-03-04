@@ -2,8 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn1
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.stønadsperiodeGrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper.VedtaksperiodeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -116,10 +115,10 @@ class VedtaksperiodeTilsynBarnMapperTest {
     }
 
     private fun beregningsresultat(
-        vararg stønadsperioder: VedtaksperiodeBeregning,
+        vararg vedtaksperioder: VedtaksperiodeBeregning,
         antallBarn: Int = 2,
     ): BeregningsresultatForMåned =
         beregningsresultatForMåned(
-            stønadsperioder = stønadsperioder.map { stønadsperiodeGrunnlag(vedtaksperiode = it) },
+            vedtaksperioder = vedtaksperioder.map { vedtaksperiodeGrunnlag(vedtaksperiode = it) },
         ).let { it.copy(grunnlag = it.grunnlag.copy(antallBarn = antallBarn)) }
 }
