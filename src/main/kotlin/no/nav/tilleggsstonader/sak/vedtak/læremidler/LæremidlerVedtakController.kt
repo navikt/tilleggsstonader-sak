@@ -73,8 +73,10 @@ class LæremidlerVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtaksperioder: List<VedtaksperiodeLæremidlerDto>,
     ): BeregningsresultatLæremidlerDto {
-        val revurderFra = behandlingService.hentBehandling(behandlingId).revurderFra
-        return beregningService.beregn(vedtaksperioder.tilDomene(), behandlingId).tilDto(revurderFra = revurderFra)
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        return beregningService
+            .beregn(behandling, vedtaksperioder.tilDomene())
+            .tilDto(revurderFra = behandling.revurderFra)
     }
 
     /**

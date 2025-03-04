@@ -1,8 +1,10 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequestDto
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
+import no.nav.tilleggsstonader.sak.util.EnvUtil
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -67,6 +69,13 @@ class IverksettClient(
                 .pathSegment("api", "simulering", "v2")
                 .toUriString()
 
-        return postForEntityNullable<SimuleringResponseDto>(url, simuleringRequest)
+        return try {
+            postForEntityNullable<SimuleringResponseDto>(url, simuleringRequest)
+        } catch (e: HttpClientErrorException.NotFound) {
+            brukerfeilHvis(EnvUtil.erIDev() && e.responseBodyAsString.contains("Personen finnes ikke i PDL")) {
+                "Simulering finner ikke personen i PDL. Prøv å gjenopprette personen i Dolly og prøv på nytt."
+            }
+            throw e
+        }
     }
 }

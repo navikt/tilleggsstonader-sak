@@ -46,7 +46,9 @@ class OpphørValideringServiceLæremidlerTest {
                     forrigeBehandlingsVedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
                     revurderFraDato = førsteMars,
                 )
-            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen vedtaksperioder har blitt avkortet")
+            }.hasMessage(
+                "Opphør er et ugyldig vedtaksresultat fordi ønsket opphørsdato ikke fører til at noen ekisterende vedtaksperioder blir opphørt.",
+            )
         }
     }
 }

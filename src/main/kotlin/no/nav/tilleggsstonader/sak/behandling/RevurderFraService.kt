@@ -23,7 +23,7 @@ class RevurderFraService(
         val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
 
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke oppdatere revurder fra når behandlingen er låst"
+            "Kan ikke oppdatere revurder fra når behandlingen har status ${behandling.status.visningsnavn()}."
         }
 
         behandlingRepository.update(behandling.copy(revurderFra = revurderFra))

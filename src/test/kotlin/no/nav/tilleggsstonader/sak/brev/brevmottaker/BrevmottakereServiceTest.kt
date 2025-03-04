@@ -45,7 +45,7 @@ class BrevmottakereServiceTest {
 
         assertThatThrownBy {
             brevmottakereService.lagreBrevmottakere(BehandlingId.random(), vanligeBrevmottakereDto)
-        }.hasMessageContaining("Kan ikke oppdatere brevmottakere fordi behandling er låst for redigering.")
+        }.hasMessageContaining("Kan ikke oppdatere brevmottakere fordi behandling har status Fatter vedtak.")
     }
 
     @Test
@@ -56,7 +56,7 @@ class BrevmottakereServiceTest {
 
         assertThatThrownBy {
             brevmottakereService.lagreBrevmottakere(BehandlingId.random(), vanligeBrevmottakereDto)
-        }.hasMessageContaining("Kan ikke oppdatere brevmottakere fordi behandling er låst for redigering.")
+        }.hasMessageContaining("Kan ikke oppdatere brevmottakere fordi behandling har status Iverksetter vedtak.")
     }
 
     @Test
@@ -67,7 +67,7 @@ class BrevmottakereServiceTest {
 
         assertThatThrownBy {
             brevmottakereService.lagreBrevmottakere(BehandlingId.random(), vanligeBrevmottakereDto)
-        }.hasMessageContaining("Kan ikke oppdatere brevmottakere fordi behandling er låst for redigering.")
+        }.hasMessageContaining("Kan ikke oppdatere brevmottakere fordi behandling har status Ferdigstilt.")
     }
 
     @Test
@@ -78,7 +78,7 @@ class BrevmottakereServiceTest {
 
         assertThatThrownBy {
             brevmottakereService.lagreBrevmottakere(BehandlingId.random(), vanligeBrevmottakereDto)
-        }.hasMessageContaining("Kan ikke oppdatere brevmottakere fordi behandling er låst for redigering.")
+        }.hasMessageContaining("Kan ikke oppdatere brevmottakere fordi behandling har status Satt på vent.")
     }
 
     @Test

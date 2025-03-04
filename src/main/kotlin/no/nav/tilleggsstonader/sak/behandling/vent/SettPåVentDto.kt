@@ -8,13 +8,14 @@ data class SettPåVentDto(
     val årsaker: List<ÅrsakSettPåVent>,
     val frist: LocalDate,
     val kommentar: String?,
+    val beholdOppgave: Boolean = false,
 ) {
     init {
         brukerfeilHvis(årsaker.any { it == ÅrsakSettPåVent.ANNET } && kommentar.isNullOrBlank()) {
-            "Mangler påkrevd begrunnelse når man valgt Annet"
+            "Kommentar er påkrevd ved valg av årsak 'Annet'"
         }
         brukerfeilHvis((kommentar?.length ?: 0) > 1000) {
-            "Kan ikke sende inn kommentar med over 1000 tegn"
+            "Kommentar kan maks være 1000 tegn"
         }
     }
 }
@@ -24,6 +25,7 @@ data class OppdaterSettPåVentDto(
     val frist: LocalDate,
     val kommentar: String?,
     val oppgaveVersjon: Int,
+    val beholdOppgave: Boolean = false,
 )
 
 data class StatusPåVentDto(

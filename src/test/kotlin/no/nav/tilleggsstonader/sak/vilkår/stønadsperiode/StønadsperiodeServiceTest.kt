@@ -241,7 +241,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
             assertThatThrownBy {
                 stønadsperiodeService.lagreStønadsperioder(behandlingId = behandling.id, listOf())
-            }.hasMessageContaining("Kan ikke lagre stønadsperioder når behandlingen er låst")
+            }.hasMessageContaining("Kan ikke gjøre endringer på denne behandlingen fordi den er ferdigstilt.")
         }
     }
 

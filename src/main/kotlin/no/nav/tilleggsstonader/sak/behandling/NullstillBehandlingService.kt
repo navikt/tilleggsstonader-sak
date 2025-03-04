@@ -39,7 +39,7 @@ class NullstillBehandlingService(
     fun nullstillBehandling(behandlingId: BehandlingId) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
-            "Behandling er låst for videre redigering og kan ikke nullstilles"
+            "Behandlingen kan ikke nullstilles fordi den har status ${behandling.status.visningsnavn()}."
         }
         logger.info("Nullstiller behandling=$behandlingId")
 
@@ -59,7 +59,7 @@ class NullstillBehandlingService(
     fun slettVilkårperiodegrunnlag(behandlingId: BehandlingId) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
-            "Behandling er låst for videre redigering og endres på"
+            "Kan ikke slette vilkårperiodegrunnlag fordi behandlingen har status ${behandling.status.visningsnavn()}."
         }
         logger.info("Sletter vilkårperiodegrunnlag behandling=$behandlingId")
 

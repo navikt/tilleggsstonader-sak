@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
@@ -25,9 +24,6 @@ import java.time.temporal.ChronoUnit
 class VedtaksstatistikkTest : IntegrationTest() {
     @Autowired
     lateinit var vedtakstatistikkRepository: VedtaksstatistikkRepository
-
-    @Autowired
-    lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     final val id: BehandlingId = BehandlingId.random()
     final val fagsakId: FagsakId = FagsakId.random()

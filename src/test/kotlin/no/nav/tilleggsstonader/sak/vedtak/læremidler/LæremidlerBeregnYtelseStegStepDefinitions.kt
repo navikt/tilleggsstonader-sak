@@ -39,13 +39,12 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
-import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.domain.vedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapAktiviteter
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapBeregningsresultat
@@ -86,6 +85,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                     vilkårperiodeRepository = vilkårperiodeRepository,
                     stønadsperiodeRepository = stønadsperiodeRepository,
                     læremidlerVedtaksperiodeValideringService = læremidlerVedtaksperiodeValideringService,
+                    vedtakRepository = vedtakRepository,
                 ),
             opphørValideringService = mockk<OpphørValideringService>(relaxed = true),
             vedtakRepository = vedtakRepository,
@@ -176,11 +176,12 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                 tom = perioderBeregningsresultat.maxOf { it.tom },
             )
         val vedtak =
-            InnvilgelseLæremidler(
+            innvilgelse(
+                behandlingId = behandlingId,
                 vedtaksperioder = listOf(vedtaksperiode),
                 beregningsresultat = BeregningsresultatLæremidler(perioderBeregningsresultat),
             )
-        vedtakRepository.insert(GeneriskVedtak(behandlingId = behandlingId, vedtak))
+        vedtakRepository.insert(vedtak)
     }
 
     @Gitt("lagrer andeler behandling={}")

@@ -23,12 +23,12 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
@@ -54,6 +54,7 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning as VedtaksperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode as VedtaksperiodeLæremidler
 
 object Testdata {
     val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")
@@ -188,8 +189,17 @@ object Testdata {
                 ).tilDto(),
             )
 
-        val vedtaksperiode =
+        val vedtaksperiodeBeregningsgrunnlag =
             VedtaksperiodeBeregningsgrunnlag(
+                fom = LocalDate.of(2024, 1, 1),
+                tom = LocalDate.of(2024, 2, 1),
+                målgruppe = MålgruppeType.AAP,
+                aktivitet = AktivitetType.TILTAK,
+            )
+
+        val vedtaksperiode =
+            Vedtaksperiode(
+                id = UUID.randomUUID(),
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 1),
                 målgruppe = MålgruppeType.AAP,
@@ -209,10 +219,14 @@ object Testdata {
                                         beregningsresultatForMåned(
                                             vedtaksperioder =
                                                 listOf(
-                                                    vedtaksperiodeGrunnlag(vedtaksperiode = vedtaksperiode),
+                                                    vedtaksperiodeGrunnlag(vedtaksperiode = vedtaksperiodeBeregningsgrunnlag),
                                                 ),
                                         ),
                                     ),
+                            ),
+                        vedtaksperioder =
+                            listOf(
+                                vedtaksperiode,
                             ),
                     ),
             )
@@ -266,7 +280,7 @@ object Testdata {
 
         val vedtaksperioder =
             listOf(
-                Vedtaksperiode(
+                VedtaksperiodeLæremidler(
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 3, 31),

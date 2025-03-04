@@ -43,7 +43,7 @@ class RevurderFraServiceTest {
         val revurderFra = LocalDate.of(2024, 3, 1)
         assertThatThrownBy {
             service.oppdaterRevurderFra(behandling.id, revurderFra)
-        }.hasMessageContaining("Kan ikke oppdatere revurder fra når behandlingen er låst")
+        }.hasMessageContaining("Kan ikke oppdatere revurder fra når behandlingen har status Ferdigstilt.")
         verify(exactly = 0) { nullstillBehandlingService.nullstillBehandling(any()) }
     }
 

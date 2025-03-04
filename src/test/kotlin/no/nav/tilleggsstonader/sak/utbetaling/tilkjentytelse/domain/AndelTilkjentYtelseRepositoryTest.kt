@@ -15,15 +15,11 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
-    @Autowired
-    lateinit var jdbcTemplate: NamedParameterJdbcTemplate
-
     @Autowired
     lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 

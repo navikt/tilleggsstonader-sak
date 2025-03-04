@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
@@ -56,13 +57,15 @@ class SettPåVentService(
         dto: SettPåVentDto,
     ): StatusPåVentDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
-        feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke sette behandling på vent når status=${behandling.status}"
-        }
+        behandling.status.validerKanBehandlingRedigeres()
+
         opprettHistorikkInnslag(behandling, StegUtfall.SATT_PÅ_VENT, årsaker = dto.årsaker, kommentar = dto.kommentar)
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT)
 
         val oppgave = hentOppgave(behandlingId)
+        brukerfeilHvis(ikkeEierAvOppgave(oppgave)) {
+            "Kan ikke sette behandling på vent når man ikke er eier av oppgaven."
+        }
         val settPåVent =
             SettPåVent(
                 behandlingId = behandlingId,
@@ -72,7 +75,7 @@ class SettPåVentService(
             )
         settPåVentRepository.insert(settPåVent)
 
-        val oppdatertOppgave = settOppgavePåVent(oppgave, settPåVent, dto.frist)
+        val oppdatertOppgave = settOppgavePåVent(oppgave, settPåVent, dto.frist, dto.beholdOppgave)
 
         taskService.save(
             BehandlingsstatistikkTask.opprettVenterTask(behandlingId),
@@ -182,6 +185,7 @@ class SettPåVentService(
         oppgave: Oppgave,
         settPåVent: SettPåVent,
         frist: LocalDate,
+        beholdOppgave: Boolean,
     ): OppdatertOppgaveResponse {
         val enhet = oppgave.tildeltEnhetsnr ?: error("Oppgave=${oppgave.id} mangler enhetsnummer")
         val mappe = oppgaveService.finnMappe(enhet, OppgaveMappe.PÅ_VENT)
@@ -190,9 +194,15 @@ class SettPåVentService(
             Oppgave(
                 id = oppgave.id,
                 versjon = oppgave.versjon,
-                tilordnetRessurs = "",
+                tilordnetRessurs = if (beholdOppgave) SikkerhetContext.hentSaksbehandler() else "",
                 fristFerdigstillelse = frist,
-                beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, settPåVent, frist, inkluderKommentar = inkluderKommentar),
+                beskrivelse =
+                    SettPåVentBeskrivelseUtil.settPåVent(
+                        oppgave,
+                        settPåVent,
+                        frist,
+                        inkluderKommentar = inkluderKommentar,
+                    ),
                 mappeId = Optional.of(mappe.id),
             )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
@@ -203,6 +213,9 @@ class SettPåVentService(
         dto: OppdaterSettPåVentDto,
     ): OppdatertOppgaveResponse {
         val oppgave = oppgaveService.hentOppgave(settPåVent.oppgaveId)
+        brukerfeilHvis(ikkeEierAvOppgave(oppgave)) {
+            "Kan ikke oppdatere behandling på vent når man ikke er eier av oppgaven."
+        }
         val inkluderKommentar = unleashService.isEnabled(Toggle.PÅ_VENT_KOMMENTAR)
         val oppdatertOppgave =
             Oppgave(
@@ -216,10 +229,12 @@ class SettPåVentService(
                         dto.frist,
                         inkluderKommentar = inkluderKommentar,
                     ),
-                tilordnetRessurs = "",
+                tilordnetRessurs = if (dto.beholdOppgave) SikkerhetContext.hentSaksbehandler() else "",
             )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
     }
+
+    private fun ikkeEierAvOppgave(oppgave: Oppgave) = oppgave.tilordnetRessurs != SikkerhetContext.hentSaksbehandler()
 
     private fun taOppgaveAvVent(
         oppgaveId: Long,
@@ -227,6 +242,9 @@ class SettPåVentService(
         skalTilordnesRessurs: Boolean,
     ) {
         val oppgave = oppgaveService.hentOppgave(oppgaveId)
+        brukerfeilHvis(ikkeEierAvOppgave(oppgave)) {
+            "Kan ikke ta behandling av vent når man ikke er eier av oppgaven."
+        }
         val tilordnetRessurs =
             if (SikkerhetContext.erSaksbehandler() && skalTilordnesRessurs) {
                 SikkerhetContext.hentSaksbehandler()

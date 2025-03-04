@@ -42,6 +42,7 @@ class PersonopplysningerService(
             harFullmektig = harFullmektig,
             adressebeskyttelse = Adressebeskyttelse.fraPdl(pdlSøker.adressebeskyttelse.gradering()),
             erSkjermet = egenAnsattService.erEgenAnsatt(ident),
+            dødsdato = pdlSøker.dødsfall.gjeldende()?.dødsdato,
         )
     }
 }

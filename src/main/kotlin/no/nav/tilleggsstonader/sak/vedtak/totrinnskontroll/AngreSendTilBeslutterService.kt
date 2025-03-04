@@ -123,7 +123,7 @@ class AngreSendTilBeslutterService(
 
         val tilordnetRessurs = oppgaveService.hentOppgave(oppgave.gsakOppgaveId).tilordnetRessurs
         brukerfeilHvis(tilordnetRessurs != null && tilordnetRessurs != SikkerhetContext.hentSaksbehandler()) {
-            "Kan ikke angre send til beslutter når oppgave er plukket av $tilordnetRessurs"
+            "Kan ikke angre send til beslutter fordi Godkjenne vedtak-oppgave er plukket av $tilordnetRessurs"
         }
     }
 }

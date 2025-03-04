@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -49,10 +48,10 @@ data class Behandling(
 
     init {
         if (resultat == BehandlingResultat.HENLAGT) {
-            brukerfeilHvis(henlagtÅrsak == null) { "Kan ikke henlegge behandling uten en årsak" }
+            feilHvis(henlagtÅrsak == null) { "Kan ikke henlegge behandling uten en årsak" }
         }
         feilHvis(revurderFra != null && type != BehandlingType.REVURDERING) {
-            "Kan ikke sette revurder fra når forrige behandling er annet enn revurdering"
+            "Kan ikke sette revurder fra når behandlingen ikke er en revurdering"
         }
     }
 }
@@ -121,6 +120,23 @@ enum class BehandlingStatus {
             .replaceFirstChar { it.uppercase() }
 
     fun behandlingErLåstForVidereRedigering(): Boolean = setOf(FATTER_VEDTAK, IVERKSETTER_VEDTAK, FERDIGSTILT, SATT_PÅ_VENT).contains(this)
+
+    fun validerKanBehandlingRedigeres() {
+        feilHvis(behandlingErLåstForVidereRedigering()) {
+            genererFeiltekstForBehandlingsstatus()
+        }
+    }
+
+    private fun genererFeiltekstForBehandlingsstatus(): String {
+        val prefix = "Kan ikke gjøre endringer på denne behandlingen fordi"
+        return when (this) {
+            FATTER_VEDTAK -> "$prefix vedtak er sendt til beslutter."
+            IVERKSETTER_VEDTAK -> "$prefix vedtak er alt fattet av beslutter."
+            FERDIGSTILT -> "$prefix den er ferdigstilt."
+            SATT_PÅ_VENT -> "$prefix den er satt på vent."
+            else -> error("Burde kunne redigere en behandling med status=$this.")
+        }
+    }
 
     fun iverksetterEllerFerdigstilt() = this == IVERKSETTER_VEDTAK || this == FERDIGSTILT
 }

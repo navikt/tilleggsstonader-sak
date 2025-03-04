@@ -56,10 +56,12 @@ class VilkårperiodeService(
     }
 
     fun hentVilkårperioderResponse(behandlingId: BehandlingId): VilkårperioderResponse {
-        val grunnlagsdataVilkårsperioder = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandlingId)
+        val vilkårperioder = hentVilkårperioder(behandlingId)
+        val grunnlagsdataVilkårsperioder =
+            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandlingId, vilkårperioder)
 
         return VilkårperioderResponse(
-            vilkårperioder = hentVilkårperioder(behandlingId).tilDto(),
+            vilkårperioder = vilkårperioder.tilDto(),
             grunnlag = grunnlagsdataVilkårsperioder?.tilDto(),
         )
     }
@@ -195,9 +197,7 @@ class VilkårperiodeService(
     }
 
     private fun validerBehandling(behandling: Saksbehandling) {
-        feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke opprette eller endre periode når behandling er låst for videre redigering"
-        }
+        behandling.status.validerKanBehandlingRedigeres()
         feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
             "Kan ikke opprette eller endre periode når behandling ikke er på steg ${StegType.INNGANGSVILKÅR}"
         }

@@ -22,7 +22,8 @@
           "satsBekreftet": true,
           "målgruppe": "AAP",
           "aktivitet": "TILTAK"
-        }
+        },
+        "delAvTidligereUtbetaling": false
       }
     ]
   }

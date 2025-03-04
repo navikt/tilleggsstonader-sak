@@ -12,6 +12,7 @@ data class PersonopplysningerDto(
     val harFullmektig: Boolean,
     val adressebeskyttelse: Adressebeskyttelse,
     val erSkjermet: Boolean,
+    val dødsdato: LocalDate?,
 )
 
 data class StatsborgerskapDto(

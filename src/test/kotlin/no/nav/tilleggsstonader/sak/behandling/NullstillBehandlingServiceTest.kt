@@ -32,6 +32,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -188,7 +189,7 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
     fun `kan ikke nullstille er behandling som er ferdigstilt`() {
         assertThatThrownBy {
             nullstillBehandlingService.nullstillBehandling(behandling.id)
-        }.hasMessageContaining("Behandling er låst for videre redigering og kan ikke nullstilles")
+        }.hasMessageContaining("Behandlingen kan ikke nullstilles fordi den har status Ferdigstilt.")
     }
 
     @Nested
@@ -197,12 +198,12 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
         fun `skal ikke kunne slette for ferdigstilt behandling`() {
             assertThatThrownBy {
                 nullstillBehandlingService.slettVilkårperiodegrunnlag(behandling.id)
-            }.hasMessageContaining("Behandling er låst for videre redigering og endres på")
+            }.hasMessageContaining("Kan ikke slette vilkårperiodegrunnlag fordi behandlingen har status Ferdigstilt.")
         }
 
         @Test
         fun `skal slette grunnlag for behandling under arbeid`() {
-            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(revurdering.id)
+            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(revurdering.id, Vilkårperioder(emptyList(), emptyList()))
 
             nullstillBehandlingService.slettVilkårperiodegrunnlag(revurdering.id)
 

@@ -1,11 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.periode.AvkortResult
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
@@ -14,7 +12,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -28,12 +25,9 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.VedtaksperiodeStatusMapper.settStatusPåVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.vedtaksperioderInnenforLøpendeMåned
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.avkortBeregningsresultatVedOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.avkortVedtaksperiodeVedOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
@@ -96,98 +90,34 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         saksbehandling: Saksbehandling,
     ) {
-        val beregningsresultat = beregningService.beregn(vedtaksperioder, saksbehandling.id)
-        val nyttBeregningsresultat = settSammenGamleOgNyePerioder(saksbehandling, beregningsresultat)
+        val beregningsresultat = beregningService.beregn(saksbehandling, vedtaksperioder)
 
-        vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling.id, vedtaksperioder, nyttBeregningsresultat))
-        lagreAndeler(saksbehandling, nyttBeregningsresultat)
-    }
-
-    /**
-     * Slår sammen perioder fra forrige og nytt vedtak.
-     * Beholder perioder fra forrige vedtak frem til og med revurder-fra
-     * Bruker reberegnede perioder fra og med revurder-fra dato
-     * Dette gjøres for at vi ikke skal reberegne perioder før revurder-fra datoet
-     * Men vi trenger å reberegne perioder som løper i revurder-fra datoet då en periode kan ha endrer % eller sats
-     */
-    private fun settSammenGamleOgNyePerioder(
-        saksbehandling: Saksbehandling,
-        beregningsresultat: BeregningsresultatLæremidler,
-    ): BeregningsresultatLæremidler {
-        if (saksbehandling.forrigeBehandlingId == null) {
-            return beregningsresultat
-        }
-        val revurderFra = saksbehandling.revurderFra
-        feilHvis(revurderFra == null) { "Behandling=$saksbehandling mangler revurderFra" }
-
-        val forrigeBeregningsresultat = hentVedtak(saksbehandling.forrigeBehandlingId).data.beregningsresultat
-
-        val perioderFraForrigeVedtakSomSkalBeholdes =
-            forrigeBeregningsresultat
-                .perioder
-                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < revurderFra }
-        val nyePerioder =
-            beregningsresultat.perioder
-                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() >= revurderFra }
-
-        val nyePerioderMedKorrigertUtbetalingsdato = korrigerUtbetalingsdato(nyePerioder, forrigeBeregningsresultat)
-
-        return BeregningsresultatLæremidler(
-            perioder = perioderFraForrigeVedtakSomSkalBeholdes + nyePerioderMedKorrigertUtbetalingsdato,
-        )
-    }
-
-    private fun korrigerUtbetalingsdato(
-        nyePerioder: List<BeregningsresultatForMåned>,
-        forrigeBeregningsresultat: BeregningsresultatLæremidler,
-    ): List<BeregningsresultatForMåned> {
-        val utbetalingsdatoPerMåned =
-            forrigeBeregningsresultat
-                .perioder
-                .associate { it.grunnlag.fom.toYearMonth() to it.grunnlag.utbetalingsdato }
-
-        return nyePerioder
-            .map {
-                val utbetalingsdato = utbetalingsdatoPerMåned[it.fom.toYearMonth()]
-                if (utbetalingsdato != null) {
-                    it.medKorrigertUtbetalingsdato(utbetalingsdato)
-                } else {
-                    it
-                }
-            }
+        vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling.id, vedtaksperioder, beregningsresultat))
+        lagreAndeler(saksbehandling, beregningsresultat)
     }
 
     private fun beregnOgLagreOpphør(
         saksbehandling: Saksbehandling,
         vedtak: OpphørLæremidlerRequest,
     ) {
-        brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
+        feilHvis(saksbehandling.forrigeBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
         feilHvis(saksbehandling.revurderFra == null) {
             "revurderFra-dato er påkrevd for opphør"
         }
-        val forrigeVedtak =
-            vedtakRepository
-                .findByIdOrThrow(saksbehandling.forrigeBehandlingId)
-                .withTypeOrThrow<InnvilgelseEllerOpphørLæremidler>()
+        val forrigeVedtak = hentVedtak(saksbehandling.forrigeBehandlingId)
 
         opphørValideringService.validerVilkårperioder(saksbehandling)
-
-        val avkortetBeregningsresultat = avkortBeregningsresultatVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
-        val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
 
         opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
             forrigeBehandlingsVedtaksperioder = forrigeVedtak.data.vedtaksperioder,
             revurderFraDato = saksbehandling.revurderFra,
         )
 
-        val beregningsresultat =
-            beregningsresultatForOpphør(
-                behandling = saksbehandling,
-                avkortetBeregningsresultat = avkortetBeregningsresultat,
-                avkortetVedtaksperioder = avkortetVedtaksperioder,
-            )
+        val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
+
+        val beregningsresultat = beregningService.beregnForOpphør(saksbehandling, avkortetVedtaksperioder)
 
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -204,67 +134,6 @@ class LæremidlerBeregnYtelseSteg(
         )
 
         lagreAndeler(saksbehandling, beregningsresultat)
-    }
-
-    /**
-     * Hvis man har avkortet siste måneden må man reberegne den i tilfelle % på aktiviteter har endret seg
-     * Eks at man hadde 2 aktiviteter, 50 og 100% som då gir 100%.
-     * Etter opphør så har man kun 50% og då trenger å omberegne perioden
-     */
-    private fun beregningsresultatForOpphør(
-        behandling: Saksbehandling,
-        avkortetBeregningsresultat: AvkortResult<BeregningsresultatForMåned>,
-        avkortetVedtaksperioder: List<Vedtaksperiode>,
-    ): BeregningsresultatLæremidler {
-        if (!avkortetBeregningsresultat.harAvkortetPeriode) {
-            return BeregningsresultatLæremidler(avkortetBeregningsresultat.perioder)
-        }
-
-        return beregningsresultatOpphørMedReberegnetPeriode(
-            behandling = behandling,
-            avkortetBeregningsresultat = avkortetBeregningsresultat,
-            avkortetVedtaksperioder = avkortetVedtaksperioder,
-        )
-    }
-
-    private fun beregningsresultatOpphørMedReberegnetPeriode(
-        behandling: Saksbehandling,
-        avkortetBeregningsresultat: AvkortResult<BeregningsresultatForMåned>,
-        avkortetVedtaksperioder: List<Vedtaksperiode>,
-    ): BeregningsresultatLæremidler {
-        val perioderSomBeholdes = avkortetBeregningsresultat.perioder.dropLast(1)
-        val periodeTilReberegning = avkortetBeregningsresultat.perioder.last()
-
-        val reberegnedePerioderKorrigertUtbetalingsdato =
-            reberegnPerioderForOpphør(
-                behandling = behandling,
-                avkortetVedtaksperioder = avkortetVedtaksperioder,
-                beregningsresultatTilReberegning = periodeTilReberegning,
-            )
-
-        return BeregningsresultatLæremidler(perioderSomBeholdes + reberegnedePerioderKorrigertUtbetalingsdato)
-    }
-
-    /**
-     * Reberegner siste perioden då den er avkortet og ev skal få annet beløp utbetalt
-     * Korrigerer utbetalingsdatoet då vedtaksperioden sånn at andelen som sen genereres for det utbetales på likt dato
-     */
-    private fun reberegnPerioderForOpphør(
-        behandling: Saksbehandling,
-        avkortetVedtaksperioder: List<Vedtaksperiode>,
-        beregningsresultatTilReberegning: BeregningsresultatForMåned,
-    ): List<BeregningsresultatForMåned> {
-        val vedtaksperioderSomOmregnes =
-            vedtaksperioderInnenforLøpendeMåned(avkortetVedtaksperioder, beregningsresultatTilReberegning)
-
-        val reberegnedePerioder = beregningService.beregn(vedtaksperioderSomOmregnes, behandling.id).perioder
-        feilHvisIkke(reberegnedePerioder.size <= 1) {
-            "Når vi reberegner vedtaksperioder innenfor en måned burde vi få maks 1 reberegnet periode, faktiskAntall=${reberegnedePerioder.size}"
-        }
-
-        return reberegnedePerioder.map {
-            it.medKorrigertUtbetalingsdato(beregningsresultatTilReberegning.grunnlag.utbetalingsdato)
-        }
     }
 
     private fun lagreAvslag(

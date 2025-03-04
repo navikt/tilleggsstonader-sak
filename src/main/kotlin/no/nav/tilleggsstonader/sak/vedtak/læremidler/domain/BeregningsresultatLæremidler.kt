@@ -26,6 +26,7 @@ data class BeregningsresultatLæremidler(
 data class BeregningsresultatForMåned(
     val beløp: Int,
     val grunnlag: Beregningsgrunnlag,
+    val delAvTidligereUtbetaling: Boolean = false,
 ) : Periode<LocalDate>,
     KopierPeriode<BeregningsresultatForMåned> {
     @get:JsonIgnore
@@ -41,6 +42,9 @@ data class BeregningsresultatForMåned(
 
     fun medKorrigertUtbetalingsdato(utbetalingsdato: LocalDate): BeregningsresultatForMåned =
         this.copy(grunnlag = grunnlag.copy(utbetalingsdato = utbetalingsdato))
+
+    fun markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling: Boolean) =
+        this.copy(delAvTidligereUtbetaling = delAvTidligereUtbetaling)
 }
 
 data class Beregningsgrunnlag(
