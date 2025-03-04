@@ -86,7 +86,9 @@ class OppgaveClient(
                 uriVariables = uriVariables,
             )
         } catch (e: ProblemDetailException) {
-            if (e.detail.detail?.contains("allerede er ferdigstilt") == true) {
+            if (e.detail.detail?.contains("navIdent har ikke tilgang til enheten") == true) {
+                throw ApiFeil("Bruker har ikke tilgang til enhet", HttpStatus.BAD_REQUEST)
+            } else if (e.detail.detail?.contains("allerede er ferdigstilt") == true) {
                 throw ApiFeil(
                     "Oppgaven med id=$oppgaveId er allerede ferdigstilt. Prøv å hente oppgaver på nytt.",
                     HttpStatus.BAD_REQUEST,
