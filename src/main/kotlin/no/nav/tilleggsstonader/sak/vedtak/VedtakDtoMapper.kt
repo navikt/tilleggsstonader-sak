@@ -45,6 +45,7 @@ object VedtakDtoMapper {
                 InnvilgelseTilsynBarnResponse(
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
                     vedtaksperioder = data.vedtaksperioder?.tilDto(),
+                    begrunnelse = data.begrunnelse,
                 )
 
             is OpphørTilsynBarn ->
@@ -73,7 +74,9 @@ object VedtakDtoMapper {
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).minOf { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).maxOf { it.tom },
+                    begrunnelse = data.begrunnelse,
                 )
+
             is AvslagLæremidler ->
                 AvslagLæremidlerDto(
                     årsakerAvslag = data.årsaker,

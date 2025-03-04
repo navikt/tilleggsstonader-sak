@@ -32,10 +32,13 @@ import java.util.UUID
 object TilsynBarnTestUtil {
     fun innvilgelseDto() = InnvilgelseTilsynBarnRequest
 
-    fun innvilgelseDtoV2(vedtaksperioder: List<VedtaksperiodeDto>) =
-        InnvilgelseTilsynBarnRequestV2(
-            vedtaksperioder = vedtaksperioder,
-        )
+    fun innvilgelseDtoV2(
+        vedtaksperioder: List<VedtaksperiodeDto>,
+        begrunnelse: String? = null,
+    ) = InnvilgelseTilsynBarnRequestV2(
+        vedtaksperioder = vedtaksperioder,
+        begrunnelse = begrunnelse,
+    )
 
     fun opphørDto() =
         OpphørTilsynBarnRequest(

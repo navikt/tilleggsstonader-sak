@@ -69,6 +69,7 @@ class TilsynBarnBeregnYtelseSteg(
                 behandling = saksbehandling,
                 beregningsresultat = beregningsresultat,
                 vedtaksperioder = null,
+                begrunnelse = null,
             ),
         )
         lagreAndeler(saksbehandling, beregningsresultat)
@@ -89,6 +90,7 @@ class TilsynBarnBeregnYtelseSteg(
                 behandling = saksbehandling,
                 beregningsresultat = beregningsresultat,
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene().sorted(),
+                begrunnelse = vedtak.begrunnelse,
             ),
         )
         lagreAndeler(saksbehandling, beregningsresultat)
@@ -229,6 +231,7 @@ class TilsynBarnBeregnYtelseSteg(
         behandling: Saksbehandling,
         beregningsresultat: BeregningsresultatTilsynBarn,
         vedtaksperioder: List<Vedtaksperiode>?,
+        begrunnelse: String?,
     ): Vedtak =
         GeneriskVedtak(
             behandlingId = behandling.id,
@@ -236,6 +239,7 @@ class TilsynBarnBeregnYtelseSteg(
             data =
                 InnvilgelseTilsynBarn(
                     vedtaksperioder = vedtaksperioder,
+                    begrunnelse = begrunnelse,
                     beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
                 ),
         )
