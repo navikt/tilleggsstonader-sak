@@ -23,14 +23,6 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `Gyldige perioder med målgruppe OVERGANGSSTØNAD skal gi svar JA_IMPLISITT`() {
-        val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.OVERGANGSSTØNAD)
-        val grunnlagsdata = grunnlagsdataDomain()
-
-        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA_IMPLISITT)
-    }
-
-    @Test
     fun `Gyldige perioder med målgruppe AAP skal skal gi svar JA`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.AAP)
         val grunnlagsdata = grunnlagsdataDomain()
@@ -52,6 +44,15 @@ class AldersvilkårVurderingTest {
         val grunnlagsdata = grunnlagsdataDomain()
 
         assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA)
+    }
+
+    @Test
+    fun `Gyldige perioder med målgruppe OVERGANGSSTØNAD skal gi svar NEI`() {
+        val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.OVERGANGSSTØNAD)
+        val grunnlagsdata = grunnlagsdataDomain()
+
+        val feil = assertThrows<Feil> { vurderAldersvilkår(målgruppe, grunnlagsdata) }
+        assertThat(feil.message).isEqualTo("Aldersvilkår vurderes ikke for målgruppe: OVERGANGSSTØNAD")
     }
 
     @Test
