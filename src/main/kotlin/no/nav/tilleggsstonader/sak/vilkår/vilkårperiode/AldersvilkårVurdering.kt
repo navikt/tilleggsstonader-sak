@@ -21,7 +21,6 @@ object AldersvilkårVurdering {
             MålgruppeType.AAP, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD ->
                 vurderAldersvilkårForNedsattArbeidsevne(fødselsdato, vilkårperiode)
             MålgruppeType.OMSTILLINGSSTØNAD -> vurderAldersvilkårForOmstillingsstønad(fødselsdato, vilkårperiode)
-            MålgruppeType.OVERGANGSSTØNAD -> SvarJaNei.JA_IMPLISITT
             else -> throw Feil("Aldersvilkår vurderes ikke for målgruppe: ${vilkårperiode.type}")
         }
     }

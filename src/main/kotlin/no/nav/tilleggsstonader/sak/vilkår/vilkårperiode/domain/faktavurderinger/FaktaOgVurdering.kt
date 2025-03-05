@@ -80,7 +80,7 @@ sealed interface Vurderinger {
             resultater.add(harRettTilUtstyrsstipend.resultat)
         }
         if (this is AldersvilkårVurdering) {
-            resultater.add(aldersvilkår.resultat)
+            resultater.add(aldersvilkår?.resultat ?: ResultatDelvilkårperiode.OPPFYLT)
         }
         return resultater
     }
