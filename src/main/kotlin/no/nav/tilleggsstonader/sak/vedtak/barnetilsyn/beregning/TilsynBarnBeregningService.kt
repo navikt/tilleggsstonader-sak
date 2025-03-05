@@ -28,8 +28,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBa
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
@@ -46,32 +44,11 @@ private val SNITT_ANTALL_VIRKEDAGER_PER_MÅNED = BigDecimal("21.67")
 
 @Service
 class TilsynBarnBeregningService(
-    private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val vedtakRepository: VedtakRepository,
     private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
     private val tilsynBarnVedtaksperiodeValidingerService: TilsynBarnVedtaksperiodeValidingerService,
 ) {
-    fun beregn(
-        behandling: Saksbehandling,
-        typeVedtak: TypeVedtak,
-    ): BeregningsresultatTilsynBarn {
-        feilHvis(typeVedtak == TypeVedtak.AVSLAG) {
-            "Skal ikke beregne for avslag"
-        }
-
-        val vedtaksperioder =
-            stønadsperiodeRepository
-                .findAllByBehandlingId(behandling.id)
-                .tilVedtaksperiodeBeregning()
-                .sorted()
-                .splitFraRevurderFra(behandling.revurderFra)
-        val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioder)
-        val relevantePerioderFraForrigeVedtak =
-            finnRelevantePerioderFraForrigeVedtak(behandling)
-        return BeregningsresultatTilsynBarn(relevantePerioderFraForrigeVedtak + perioder)
-    }
-
     fun beregnV2(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,

@@ -1,11 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -21,7 +19,6 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
@@ -40,7 +37,6 @@ import java.time.DayOfWeek
 class TilsynBarnBeregnYtelseSteg(
     private val beregningService: TilsynBarnBeregningService,
     private val opphørValideringService: OpphørValideringService,
-    private val unleashService: UnleashService,
     private val vedtaksperiodeService: VedtaksperiodeService,
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
@@ -56,24 +52,10 @@ class TilsynBarnBeregnYtelseSteg(
         vedtak: VedtakTilsynBarnRequest,
     ) {
         when (vedtak) {
-            is InnvilgelseTilsynBarnRequest -> beregnOgLagreInnvilgelse(saksbehandling)
             is InnvilgelseTilsynBarnRequestV2 -> beregnOgLagreInnvilgelseV2(saksbehandling, vedtak)
             is AvslagTilsynBarnDto -> lagreAvslag(saksbehandling, vedtak)
             is OpphørTilsynBarnRequest -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }
-    }
-
-    private fun beregnOgLagreInnvilgelse(saksbehandling: Saksbehandling) {
-        val beregningsresultat = beregningService.beregn(saksbehandling, TypeVedtak.INNVILGELSE)
-        vedtakRepository.insert(
-            lagInnvilgetVedtak(
-                behandling = saksbehandling,
-                beregningsresultat = beregningsresultat,
-                vedtaksperioder = null,
-                begrunnelse = null,
-            ),
-        )
-        lagreAndeler(saksbehandling, beregningsresultat)
     }
 
     private fun beregnOgLagreInnvilgelseV2(
@@ -98,50 +80,6 @@ class TilsynBarnBeregnYtelseSteg(
     }
 
     private fun beregnOgLagreOpphør(
-        saksbehandling: Saksbehandling,
-        vedtak: OpphørTilsynBarnRequest,
-    ) {
-        if (unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN)) {
-            beregnOgLagreOpphørV2(saksbehandling, vedtak)
-        } else {
-            beregnOgLagreOpphørV1(saksbehandling, vedtak)
-        }
-    }
-
-    private fun beregnOgLagreOpphørV1(
-        saksbehandling: Saksbehandling,
-        vedtak: OpphørTilsynBarnRequest,
-    ) {
-        brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
-            "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
-        }
-
-        opphørValideringService.validerVilkårperioder(saksbehandling)
-
-        val beregningsresultat = beregningService.beregn(saksbehandling, TypeVedtak.OPPHØR)
-        opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
-            beregningsresultat,
-            saksbehandling.revurderFra,
-        )
-        vedtakRepository.insert(
-            GeneriskVedtak(
-                behandlingId = saksbehandling.id,
-                type = TypeVedtak.OPPHØR,
-                data =
-                    OpphørTilsynBarn(
-                        beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
-                        årsaker = vedtak.årsakerOpphør,
-                        begrunnelse = vedtak.begrunnelse,
-                        vedtaksperioder = null,
-                    ),
-                gitVersjon = Applikasjonsversjon.versjon,
-            ),
-        )
-
-        lagreAndeler(saksbehandling, beregningsresultat)
-    }
-
-    private fun beregnOgLagreOpphørV2(
         saksbehandling: Saksbehandling,
         vedtak: OpphørTilsynBarnRequest,
     ) {

@@ -10,9 +10,6 @@ data class InnvilgelseTilsynBarnResponse(
 ) : VedtakTilsynBarnDto(TypeVedtak.INNVILGELSE),
     VedtakTilsynBarnResponse
 
-data object InnvilgelseTilsynBarnRequest :
-    VedtakTilsynBarnRequest, VedtakTilsynBarnDto(TypeVedtak.INNVILGELSE)
-
 data class InnvilgelseTilsynBarnRequestV2(
     val vedtaksperioder: List<VedtaksperiodeDto>,
     val begrunnelse: String?,
