@@ -24,7 +24,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
@@ -54,7 +53,6 @@ class StepDefinitions {
 
     val service =
         TilsynBarnBeregningService(
-            stønadsperiodeRepository = stønadsperiodeRepository,
             vilkårperiodeRepository = vilkårperiodeRepository,
             tilsynBarnUtgiftService = tilsynBarnUtgiftService,
             vedtakRepository = repository,
@@ -139,7 +137,8 @@ class StepDefinitions {
     private fun beregn(behandling: Saksbehandling) {
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
         try {
-            beregningsresultat = service.beregn(behandling, TypeVedtak.INNVILGELSE)
+            TODO()
+//            beregningsresultat = service.beregnV2(behandling, TypeVedtak.INNVILGELSE)
         } catch (e: Exception) {
             exception = e
         }

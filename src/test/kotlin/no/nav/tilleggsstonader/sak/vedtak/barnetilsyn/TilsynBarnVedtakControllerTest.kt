@@ -16,14 +16,13 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDtoV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
@@ -100,14 +99,14 @@ class TilsynBarnVedtakControllerTest(
     @Test
     fun `skal validere token`() {
         headers.clear()
-        val exception = catchProblemDetailException { hentVedtak(BehandlingId.random()) }
+        val exception = catchProblemDetailException { hentVedtak<InnvilgelseTilsynBarnResponse>(BehandlingId.random()) }
 
         assertThat(exception.httpStatus).isEqualTo(HttpStatus.UNAUTHORIZED)
     }
 
     @Test
     fun `skal returnere empty body når det ikke finnes noe lagret`() {
-        val response = hentVedtak(behandling.id)
+        val response = hentVedtak<InnvilgelseTilsynBarnResponse>(behandling.id)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(response.body).isNull()
@@ -117,12 +116,11 @@ class TilsynBarnVedtakControllerTest(
         "Parsingen til InnvilgelseTilsynBarnResponse feiler, men det er lettere å fikse etter at V1 av vedtaksperioder har blitt fjernet.",
     )
     @Test
-    fun `skal lagre og hente innvilgelse med vedtaksperioder og begrunnelse`() {
-        val vedtak = innvilgelseDtoV2(vedtaksperioder = listOf(vedtaksperiodeDto))
-
+    fun `Skal lagre og hente innvilgelse med vedtaksperioder og begrunnelse`() {
+        val vedtak = innvilgelseDtoV2(listOf(vedtaksperiodeDto))
         innvilgeVedtakV2(behandling, vedtak)
 
-        val lagretDto = hentVedtak(behandling.id).body!!
+        val lagretDto = hentVedtak<InnvilgelseTilsynBarnResponse>(behandling.id).body!!
 
         with(lagretDto as InnvilgelseTilsynBarnResponse) {
             assertThat(this.vedtaksperioder).isEqualTo(vedtak.vedtaksperioder)
@@ -141,38 +139,11 @@ class TilsynBarnVedtakControllerTest(
 
         avslåVedtak(behandling, vedtak)
 
-        val lagretDto = hentVedtak(behandling.id).body!!
+        val lagretDto = hentVedtak<AvslagTilsynBarnDto>(behandling.id).body!!
 
-        assertThat((lagretDto as AvslagTilsynBarnDto).årsakerAvslag).isEqualTo(vedtak.årsakerAvslag)
+        assertThat((lagretDto).årsakerAvslag).isEqualTo(vedtak.årsakerAvslag)
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
         assertThat(lagretDto.type).isEqualTo(TypeVedtak.AVSLAG)
-    }
-
-    @Test
-    fun `skal lagre og hente opphør`() {
-        every { unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN) } returns false
-        innvilgeVedtak(behandling, innvilgelseDto())
-        testoppsettService.ferdigstillBehandling(behandling)
-        val behandlingLagreOpphør =
-            testoppsettService.opprettRevurdering(
-                forrigeBehandling = behandling,
-                revurderFra = LocalDate.now(),
-                fagsak = fagsak,
-            )
-
-        val vedtak =
-            OpphørTilsynBarnRequest(
-                årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
-                begrunnelse = "endre utgifter opphør",
-            )
-
-        opphørVedtak(behandlingLagreOpphør, vedtak)
-
-        val lagretDto = hentVedtak(behandlingLagreOpphør.id).body!!
-
-        assertThat((lagretDto as OpphørTilsynBarnRequest).årsakerOpphør).isEqualTo(vedtak.årsakerOpphør)
-        assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
-        assertThat(lagretDto.type).isEqualTo(TypeVedtak.OPPHØR)
     }
 
     @Test
@@ -224,22 +195,11 @@ class TilsynBarnVedtakControllerTest(
 
         opphørVedtak(behandlingLagreOpphør, vedtak)
 
-        val lagretDto = hentVedtak(behandlingLagreOpphør.id).body!!
+        val lagretDto = hentVedtak<OpphørTilsynBarnResponse>(behandlingLagreOpphør.id).body!!
 
-        assertThat((lagretDto as OpphørTilsynBarnRequest).årsakerOpphør).isEqualTo(vedtak.årsakerOpphør)
+        assertThat(lagretDto.årsakerOpphør).isEqualTo(vedtak.årsakerOpphør)
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
         assertThat(lagretDto.type).isEqualTo(TypeVedtak.OPPHØR)
-    }
-
-    private fun innvilgeVedtak(
-        behandling: Behandling,
-        vedtak: InnvilgelseTilsynBarnRequest,
-    ) {
-        restTemplate.exchange<Map<String, Any>?>(
-            localhost("api/vedtak/tilsyn-barn/${behandling.id}/innvilgelse"),
-            HttpMethod.POST,
-            HttpEntity(vedtak, headers),
-        )
     }
 
     private fun innvilgeVedtakV2(
@@ -275,8 +235,8 @@ class TilsynBarnVedtakControllerTest(
         )
     }
 
-    private fun hentVedtak(behandlingId: BehandlingId) =
-        restTemplate.exchange<VedtakTilsynBarnDto>(
+    private inline fun <reified T : VedtakTilsynBarnResponse> hentVedtak(behandlingId: BehandlingId) =
+        restTemplate.exchange<T>(
             localhost("api/vedtak/tilsyn-barn/$behandlingId"),
             HttpMethod.GET,
             HttpEntity(null, headers),

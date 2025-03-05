@@ -4,7 +4,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -13,17 +12,18 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDtoV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnUtgiftService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtaksperiodeValidingerService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -32,24 +32,22 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.UUID
 
 class TilsynBarnBeregnYtelseStegTest {
     private val repository = mockk<VedtakRepository>(relaxed = true)
     private val barnService = mockk<BarnService>()
     private val tilkjentYtelseService = mockk<TilkjentYtelseService>(relaxed = true)
     private val simuleringService = mockk<SimuleringService>(relaxed = true)
-    private val stønadsperiodeService = mockk<StønadsperiodeRepository>(relaxed = true)
     private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>(relaxed = true)
     private val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>(relaxed = true)
     private val opphørValideringService = mockk<OpphørValideringService>(relaxed = true)
     private val tilsynBarnVedtaksperiodeValidingerService =
         mockk<TilsynBarnVedtaksperiodeValidingerService>(relaxed = true)
-    private val unleashService = mockk<UnleashService>(relaxed = true)
     private val vedtaksperiodeService = mockk<VedtaksperiodeService>(relaxed = true)
 
     val tilsynBarnBeregningService =
         TilsynBarnBeregningService(
-            stønadsperiodeRepository = stønadsperiodeService,
             vilkårperiodeRepository = vilkårperiodeRepository,
             tilsynBarnUtgiftService = tilsynBarnUtgiftService,
             vedtakRepository = repository,
@@ -63,21 +61,27 @@ class TilsynBarnBeregnYtelseStegTest {
             tilkjentytelseService = tilkjentYtelseService,
             simuleringService = simuleringService,
             opphørValideringService = opphørValideringService,
-            unleashService = unleashService,
             vedtaksperiodeService = vedtaksperiodeService,
         )
 
     val saksbehandling = saksbehandling()
     val måned = YearMonth.of(2023, 1)
     val barn = BehandlingBarn(behandlingId = saksbehandling.id, ident = "")
+    val fom = LocalDate.of(2023, 1, 1)
+    val tom = LocalDate.of(2023, 1, 31)
+    val vedtaksperiode =
+        VedtaksperiodeDto(
+            id = UUID.randomUUID(),
+            fom = fom,
+            tom = tom,
+            målgruppeType = MålgruppeType.AAP,
+            aktivitetType = AktivitetType.TILTAK,
+        )
 
     @BeforeEach
     fun setUp() {
         every { barnService.finnBarnPåBehandling(saksbehandling.id) } returns listOf(barn)
         every { repository.insert(any()) } answers { firstArg() }
-        val fom = LocalDate.of(2023, 1, 1)
-        val tom = LocalDate.of(2023, 1, 31)
-        mockStønadsperioder(fom, tom, saksbehandling.id)
         mockVilkårperioder(fom, tom, saksbehandling.id)
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns
             mapOf(barn.id to listOf(UtgiftBeregning(YearMonth.of(2023, 1), YearMonth.of(2023, 1), 1)))
@@ -85,7 +89,7 @@ class TilsynBarnBeregnYtelseStegTest {
 
     @Test
     fun `skal slette data som finnes fra før, før man lagrer ny data`() {
-        val vedtak = innvilgelseDto()
+        val vedtak = innvilgelseDtoV2(listOf(vedtaksperiode))
         steg.utførOgReturnerNesteSteg(saksbehandling, vedtak)
 
         verifyOrder {
@@ -103,7 +107,7 @@ class TilsynBarnBeregnYtelseStegTest {
 
     @Test
     fun `skal returnere neste steg SIMULERING ved førstegangsbehandling`() {
-        val vedtak = innvilgelseDto()
+        val vedtak = innvilgelseDtoV2(listOf(vedtaksperiode))
 
         val nesteSteg = steg.utførOgReturnerNesteSteg(saksbehandling, vedtak)
 
@@ -124,10 +128,9 @@ class TilsynBarnBeregnYtelseStegTest {
     fun `skal returnere neste steg SIMULERING ved revurdering`() {
         val revurdering = saksbehandling(type = BehandlingType.REVURDERING)
 
-        val vedtak = innvilgelseDto()
+        val vedtak = innvilgelseDtoV2(listOf(vedtaksperiode))
 
         mockVilkårperioder(behandlingId = revurdering.id)
-        mockStønadsperioder(behandlingId = revurdering.id)
 
         val nesteSteg = steg.utførOgReturnerNesteSteg(revurdering, vedtak)
         assertThat(revurdering.type).isEqualTo(BehandlingType.REVURDERING)
@@ -147,21 +150,6 @@ class TilsynBarnBeregnYtelseStegTest {
         } returns
             listOf(
                 aktivitet(
-                    behandlingId = behandlingId,
-                    fom = fom,
-                    tom = tom,
-                ),
-            )
-    }
-
-    private fun mockStønadsperioder(
-        fom: LocalDate = LocalDate.of(2023, 1, 1),
-        tom: LocalDate = LocalDate.of(2023, 1, 31),
-        behandlingId: BehandlingId,
-    ) {
-        every { stønadsperiodeService.findAllByBehandlingId(behandlingId) } returns
-            listOf(
-                stønadsperiode(
                     behandlingId = behandlingId,
                     fom = fom,
                     tom = tom,
