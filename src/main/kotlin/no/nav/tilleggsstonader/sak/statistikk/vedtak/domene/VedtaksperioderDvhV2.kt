@@ -8,12 +8,9 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeLæremidlerMapper
 import java.time.LocalDate
@@ -40,18 +37,14 @@ data class VedtaksperioderDvhV2(
             barn: List<BehandlingBarn>,
         ): JsonWrapper =
             when (val data = vedtak.data) {
-                is InnvilgelseTilsynBarn, is OpphørTilsynBarn ->
+                is InnvilgelseEllerOpphørTilsynBarn ->
                     mapVedtaksperioderTilsynBarn(
-                        beregningsresultat =
-                            data.beregningsresultat()
-                                ?: error("Vedtaket mangler beregningsresultat"),
+                        beregningsresultat = data.beregningsresultat,
                         barnIBehandlingen = barn,
                     )
-                is InnvilgelseLæremidler, is OpphørLæremidler ->
+                is InnvilgelseEllerOpphørLæremidler ->
                     mapVedtaksperioderLæremidler(
-                        beregningsresultat =
-                            data.beregningsresultat()
-                                ?: error("Vedtaket mangler beregningsresultat"),
+                        beregningsresultat = data.beregningsresultat,
                     )
                 is AvslagLæremidler, is AvslagTilsynBarn -> JsonWrapper(vedtaksperioder = emptyList())
             }
