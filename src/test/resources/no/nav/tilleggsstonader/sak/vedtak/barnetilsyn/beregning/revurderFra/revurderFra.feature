@@ -4,7 +4,7 @@
 Egenskap: Beregning - med revurderFra
 
   Scenario: Skal ikke ta med perioder som slutter før måneden for revurderFra
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 02.01.2024 | 21.02.2024 | TILTAK    | AAP       |
 
@@ -23,7 +23,7 @@ Egenskap: Beregning - med revurderFra
       | 02.2024 | 29.53   | 11            | 1000   | 325         |
 
   Scenario: Skal ta med alle perioder som starter etter revurderFra
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 02.01.2024 | 21.01.2024 | TILTAK    | AAP       |
 
@@ -42,7 +42,7 @@ Egenskap: Beregning - med revurderFra
       | 01.2024 | 29.53   | 9            | 1000   | 266         |
 
   Scenario: Skal ta med perioder fra og med den måneden man revurderer dersom de overlapper
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 02.01.2024 | 31.03.2024 | TILTAK    | AAP       |
 
@@ -86,7 +86,7 @@ Egenskap: Beregning - med revurderFra
   # Det betyr at hvis man tidligere har en periode fra 1.8-31.8 så er hele beløpet lagt inn på en andel med fom/tom = 1.8, med det fulle beløpet for hele den perioden
   # Når man då revurderer må man få et nytt beløp for 1.8 for å sen få ett nytt beløp fra og med 15.8
   Scenario: Skal ta med perioder som er før revurderFra men fortsatt i den samme måneden
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 02.01.2024 | 02.01.2024 | TILTAK    | AAP       |
       | 15.01.2024 | 31.01.2024 | TILTAK    | AAP       |
@@ -107,8 +107,8 @@ Egenskap: Beregning - med revurderFra
       | 01.2024 | 29.53   | 14           | 1000   | 414         |
     # Antall dager = 1 + 13
 
-  Scenario: Skal splitte grunnlaget for stønadsperioder sånn at man kan filtrere ut de som endret seg til frontend
-    Gitt følgende støndsperioder
+  Scenario: Skal splitte grunnlaget for vedtaksperioder sånn at man kan filtrere ut de som endret seg til frontend
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 02.01.2024 | 31.01.2024 | TILTAK    | AAP       |
 
@@ -128,13 +128,13 @@ Egenskap: Beregning - med revurderFra
       | 01.2024 | 29.53   | 15           | 1000   | 443         |
     # Antall dager = 1 + 13
 
-    Så forvent følgende stønadsperiodeGrunnlag for: 01.2024
+    Så forvent følgende vedtaksperiodeGrunnlag for: 01.2024
       | Fom        | Tom        | Målgruppe | Aktivitet | Antall aktiviteter | Antall dager |
       | 02.01.2024 | 14.01.2024 | AAP       | TILTAK    | 1                  | 2            |
       | 15.01.2024 | 31.01.2024 | AAP       | TILTAK    | 1                  | 13           |
 
-  Scenario: Skal splitte stønadsperioder 2
-    Gitt følgende støndsperioder
+  Scenario: Skal splitte vedtaksperioder 2
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 02.01.2024 | 31.01.2024 | TILTAK    | AAP       |
 
@@ -154,7 +154,7 @@ Egenskap: Beregning - med revurderFra
       | 01.2024 | 29.53   | 11           | 1000   | 325         |
     # Antall dager = 1 + 13
 
-    Så forvent følgende stønadsperiodeGrunnlag for: 01.2024
+    Så forvent følgende vedtaksperiodeGrunnlag for: 01.2024
       | Fom        | Tom        | Målgruppe | Aktivitet | Antall aktiviteter | Antall dager |
       | 02.01.2024 | 14.01.2024 | AAP       | TILTAK    | 1                  | 2            |
       | 15.01.2024 | 31.01.2024 | AAP       | TILTAK    | 2                  | 9            |

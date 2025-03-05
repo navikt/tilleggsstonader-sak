@@ -3,10 +3,10 @@
 
 Egenskap: Beregning - Utgifter
 
-  Scenario: Stønadsperiode skal begrenses av perioder med utgifter:
+  Scenario: Vedtaksperiode skal begrenses av perioder med utgifter:
     # Mål: Beregningen skal ikke gi resultat for februar fordi det ikke er utgifter i denne perioden
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe       |
       | 01.01.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
 
@@ -24,10 +24,10 @@ Egenskap: Beregning - Utgifter
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
       | 01.2023 | 29.53   | 22           | 1000   | 650         |
 
-  Scenario: Beregning skal ikke ta med utgifter utenfor stønadsperiode
+  Scenario: Beregning skal ikke ta med utgifter utenfor vedtaksperiode
     # Mål: Beregningen skal ikke gi resultat for februar fordi det ikke er utgifter i denne perioden
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe       |
       | 01.02.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
 
@@ -48,7 +48,7 @@ Egenskap: Beregning - Utgifter
   Scenario: Kun et barn har utgift i deler av perioden
     # Mål: Beregning skal kun inkludere utgifter for barn med utgift den måneden
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe       |
       | 01.01.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
 
@@ -71,17 +71,17 @@ Egenskap: Beregning - Utgifter
       | 01.2023 | 59.07   | 22           | 2000   | 1300        |
       | 02.2023 | 29.53   | 20           | 1000   | 591         |
 
-    Så forvent følgende stønadsperioder for: 01.2023
+    Så forvent følgende vedtaksperioder for: 01.2023
       | Fom        | Tom        | Aktivitet | Målgruppe       |
       | 01.01.2023 | 31.01.2023 | UTDANNING | OVERGANGSSTØNAD |
 
-    Så forvent følgende stønadsperioder for: 02.2023
+    Så forvent følgende vedtaksperioder for: 02.2023
       | Fom        | Tom        | Aktivitet | Målgruppe       |
       | 01.02.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
 
   Scenario: Skal avrunde månedsbeløpet
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 02.01.2023 | 03.01.2023 | TILTAK    | AAP       |
       | 06.02.2023 | 07.02.2023 | TILTAK    | AAP       |
@@ -109,7 +109,7 @@ Egenskap: Beregning - Utgifter
 
   Scenario: 0 i utgifter:
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe       |
       | 01.01.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
 

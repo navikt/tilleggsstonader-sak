@@ -4,7 +4,7 @@
 Egenskap: Beregning - Håndtering av helgdager
 
   Scenario: Håndtering av periode som starter en søndag
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 01.01.2023 | 31.01.2023 | UTDANNING | AAP       |
 
@@ -22,7 +22,7 @@ Egenskap: Beregning - Håndtering av helgdager
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
       | 01.2023 | 29.53   | 22           | 1000   | 650         |
 
-    Så forvent følgende stønadsperiodeGrunnlag for: 01.2023
+    Så forvent følgende vedtaksperiodeGrunnlag for: 01.2023
       | Fom        | Tom        | Målgruppe | Aktivitet | Antall aktiviteter | Antall dager |
       | 01.01.2023 | 31.01.2023 | AAP       | UTDANNING | 1                  | 22           |
 
@@ -32,7 +32,7 @@ Egenskap: Beregning - Håndtering av helgdager
       | 02.01.2023 | 650   | AAP       |
 
   Scenario: Håndtering av periode som starter en lørdag
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 01.04.2023 | 30.04.2023 | UTDANNING | AAP       |
 
@@ -50,7 +50,7 @@ Egenskap: Beregning - Håndtering av helgdager
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
       | 04.2023 | 29.53   | 20           | 1000   | 591         |
 
-    Så forvent følgende stønadsperiodeGrunnlag for: 04.2023
+    Så forvent følgende vedtaksperiodeGrunnlag for: 04.2023
       | Fom        | Tom        | Målgruppe | Aktivitet | Antall aktiviteter | Antall dager |
       | 01.04.2023 | 30.04.2023 | AAP       | UTDANNING | 1                  | 20           |
 

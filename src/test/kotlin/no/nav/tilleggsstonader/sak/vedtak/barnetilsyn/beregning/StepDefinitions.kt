@@ -24,14 +24,14 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.tilVedtaksperiodeBeregning
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -45,7 +45,6 @@ import java.time.YearMonth
 @Suppress("unused", "ktlint:standard:function-naming")
 class StepDefinitions {
     private val logger = LoggerFactory.getLogger(javaClass)
-    val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>()
     val repository = mockk<VedtakRepository>(relaxed = true)
@@ -61,7 +60,7 @@ class StepDefinitions {
 
     var exception: Exception? = null
 
-    var stønadsperioder = emptyList<StønadsperiodeDto>()
+    var vedtaksperioder = emptyList<Vedtaksperiode>()
     var utgifter = mutableMapOf<BarnId, List<UtgiftBeregning>>()
     var beregningsresultat: BeregningsresultatTilsynBarn? = null
     var behandlingId = BehandlingId.random()
@@ -72,10 +71,9 @@ class StepDefinitions {
             innvilgetVedtak(beregningsresultat = BeregningsresultatTilsynBarn(perioder = emptyList()))
     }
 
-    @Gitt("følgende støndsperioder")
+    @Gitt("følgende vedtaksperioder")
     fun `følgende støndsperioder`(dataTable: DataTable) {
-        every { stønadsperiodeRepository.findAllByBehandlingId(behandlingId) } returns
-            mapStønadsperioder(behandlingId, dataTable)
+        vedtaksperioder = mapVedtaksperioder(dataTable)
     }
 
     @Gitt("følgende aktiviteter")
@@ -137,8 +135,7 @@ class StepDefinitions {
     private fun beregn(behandling: Saksbehandling) {
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
         try {
-            TODO()
-//            beregningsresultat = service.beregnV2(behandling, TypeVedtak.INNVILGELSE)
+            beregningsresultat = service.beregnV2(vedtaksperioder, behandling, TypeVedtak.INNVILGELSE)
         } catch (e: Exception) {
             exception = e
         }
@@ -216,14 +213,14 @@ class StepDefinitions {
         assertThat(perioder).hasSize(forventetBeregningsresultat.size)
     }
 
-    @Så("forvent følgende stønadsperioder for: {}")
-    fun `forvent følgende stønadsperioder`(
+    @Så("forvent følgende vedtaksperioder for: {}")
+    fun `forvent følgende vedtaksperioder`(
         månedStr: String,
         dataTable: DataTable,
     ) {
         assertThat(exception).isNull()
         val måned = parseÅrMåned(månedStr)
-        val forventeteStønadsperioder = mapStønadsperioder(behandlingId, dataTable)
+        val forventeteVedtaksperioder = mapVedtaksperioder(dataTable)
 
         val perioder =
             beregningsresultat!!
@@ -235,7 +232,7 @@ class StepDefinitions {
                 ?: error("Finner ikke beregningsresultat for $måned")
 
         perioder.forEachIndexed { index, resultat ->
-            val forventetResultat = forventeteStønadsperioder[index]
+            val forventetResultat = forventeteVedtaksperioder[index]
             try {
                 assertThat(resultat.fom).`as` { "fom" }.isEqualTo(forventetResultat.fom)
                 assertThat(resultat.tom).`as` { "tom" }.isEqualTo(forventetResultat.tom)
@@ -247,17 +244,17 @@ class StepDefinitions {
 
         assertThat(perioder)
             .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
-            .containsExactlyElementsOf(forventeteStønadsperioder.tilVedtaksperiodeBeregning().sorted())
+            .containsExactlyElementsOf(forventeteVedtaksperioder.tilVedtaksperiodeBeregning().sorted())
     }
 
-    @Så("forvent følgende stønadsperiodeGrunnlag for: {}")
-    fun `forvent følgende stønadsperiodeGrunnlag`(
+    @Så("forvent følgende vedtaksperiodeGrunnlag for: {}")
+    fun `forvent følgende vedtaksperiodeGrunnlag`(
         månedStr: String,
         dataTable: DataTable,
     ) {
         assertThat(exception).isNull()
         val måned = parseÅrMåned(månedStr)
-        val forventeteStønadsperioder = parseForventedeStønadsperioder(dataTable)
+        val forventeteVedtaksperioder = parseForventedeVedtaksperioder(dataTable)
 
         val perioder =
             beregningsresultat!!
@@ -268,7 +265,7 @@ class StepDefinitions {
                 ?: error("Finner ikke beregningsresultat for $måned")
 
         perioder.forEachIndexed { index, resultat ->
-            val forventetResultat = forventeteStønadsperioder[index]
+            val forventetResultat = forventeteVedtaksperioder[index]
             try {
                 assertThat(resultat.vedtaksperiode.fom).isEqualTo(forventetResultat.fom)
                 assertThat(resultat.vedtaksperiode.tom).isEqualTo(forventetResultat.tom)
@@ -335,9 +332,9 @@ class StepDefinitions {
         assertThat(beløpsperioder).hasSize(forventedeBeløpsperioder.size)
     }
 
-    private fun parseForventedeStønadsperioder(dataTable: DataTable): List<ForventedeStønadsperioder> =
+    private fun parseForventedeVedtaksperioder(dataTable: DataTable): List<ForventedeVedtaksperioder> =
         dataTable.mapRad { rad ->
-            ForventedeStønadsperioder(
+            ForventedeVedtaksperioder(
                 fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
                 tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
                 målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
@@ -373,7 +370,7 @@ data class ForventetBeregningsgrunnlag(
     val antallBarn: Int?,
 )
 
-data class ForventedeStønadsperioder(
+data class ForventedeVedtaksperioder(
     val fom: LocalDate,
     val tom: LocalDate,
     val målgruppe: MålgruppeType,

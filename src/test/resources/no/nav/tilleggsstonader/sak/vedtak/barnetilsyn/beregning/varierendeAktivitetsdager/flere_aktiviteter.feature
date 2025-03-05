@@ -6,7 +6,7 @@ Egenskap: Beregning - Flere aktiviteter med delvis aktivitet
   Scenario: Full uker med flere aktiviteter hvor summen av antall dager er mindre enn 5
     # Mål: Summen av antall dager skal inkludere alle aktiviteter
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 02.01.2023 | 08.01.2023 | TILTAK    | AAP       |
 
@@ -28,7 +28,7 @@ Egenskap: Beregning - Flere aktiviteter med delvis aktivitet
   Scenario: Full uker med flere aktiviteter hvor summen av antall dager er mer enn 5
     # Mål: Summen av antall dager skal maks bli 5
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 02.01.2023 | 08.01.2023 | TILTAK    | AAP       |
 
@@ -50,7 +50,7 @@ Egenskap: Beregning - Flere aktiviteter med delvis aktivitet
   Scenario: Full uker med flere aktiviteter hvor summen av antall dager er mer enn 5
     # Mål: Summen av antall dager skal maks bli 5
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 02.01.2023 | 08.01.2023 | TILTAK    | AAP       |
 
@@ -72,7 +72,7 @@ Egenskap: Beregning - Flere aktiviteter med delvis aktivitet
   Scenario: Flere aktiviteter i månedsskifte
     # Mål: Summen av antall dager skal ikke bli mer enn antall dager i uken som er innenfor måneden
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 30.01.2023 | 05.02.2023 | TILTAK    | AAP       |
 
@@ -95,8 +95,8 @@ Egenskap: Beregning - Flere aktiviteter med delvis aktivitet
       | 01.2023 | 29.53   | 2            | 1000   | 59          |
       | 02.2023 | 29.53   | 3            | 1000   | 89          |
 
-  Scenario: Stønadsperiode skal bruke 1 dag fra aktivitet 1 og 1 fra aktivitet 2
-    Gitt følgende støndsperioder
+  Scenario: Vedtaksperiode skal bruke 1 dag fra aktivitet 1 og 1 fra aktivitet 2
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 05.02.2024 | 09.02.2024 | TILTAK    | AAP       |
 
@@ -116,7 +116,7 @@ Egenskap: Beregning - Flere aktiviteter med delvis aktivitet
       | 02.2024 | 29.53   | 2            | 1000   | 59          |
 
   Scenario: Skal bruke 1 dag fra første aktivitet og 1 dag fra den andre aktiviteten
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 05.02.2024 | 05.02.2024 | TILTAK    | AAP       |
       | 09.02.2024 | 09.02.2024 | TILTAK    | AAP       |
