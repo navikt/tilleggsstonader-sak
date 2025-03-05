@@ -24,10 +24,9 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilAktiviteter
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.domain.beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.tilVedtaksperiodeBeregning
@@ -125,10 +124,9 @@ class TilsynBarnBeregningService(
             val beregningsresultat =
                 vedtakRepository
                     .findByIdOrThrow(forrigeBehandlingId)
-                    .withTypeOrThrow<VedtakTilsynBarn>()
+                    .withTypeOrThrow<InnvilgelseEllerOpphørTilsynBarn>()
                     .data
-                    .beregningsresultat()
-                    ?: error("Finner ikke beregningsresultat på vedtak for behandling=$forrigeBehandlingId")
+                    .beregningsresultat
             val revurderFraMåned = behandling.revurderFra?.toYearMonth() ?: YEAR_MONTH_MIN
 
             beregningsresultat.perioder.filter { it.grunnlag.måned < revurderFraMåned }

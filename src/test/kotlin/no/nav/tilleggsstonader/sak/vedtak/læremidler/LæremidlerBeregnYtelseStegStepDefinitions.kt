@@ -39,10 +39,8 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
-import no.nav.tilleggsstonader.sak.vedtak.domain.beregningsresultat
-import no.nav.tilleggsstonader.sak.vedtak.domain.vedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
@@ -231,7 +229,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         val forventedeBeregningsperioder = mapBeregningsresultat(dataTable)
 
-        val beregningsresultat = hentVedtak(behandlingId).beregningsresultat()!!
+        val beregningsresultat = hentVedtak(behandlingId).beregningsresultat
 
         forventedeBeregningsperioder.forEachIndexed { index, periode ->
             try {
@@ -282,7 +280,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
 
-        val vedtaksperioder = hentVedtak(behandlingId).vedtaksperioder()!!
+        val vedtaksperioder = hentVedtak(behandlingId).vedtaksperioder
 
         val forventedeVedtaksperioder =
             dataTable.mapRad { rad ->
@@ -305,10 +303,10 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         assertThat(vedtaksperioder).hasSize(forventedeVedtaksperioder.size)
     }
 
-    private fun hentVedtak(behandlingId: BehandlingId): VedtakLæremidler =
+    private fun hentVedtak(behandlingId: BehandlingId): InnvilgelseEllerOpphørLæremidler =
         vedtakRepository
             .findByIdOrThrow(behandlingId)
-            .withTypeOrThrow<VedtakLæremidler>()
+            .withTypeOrThrow<InnvilgelseEllerOpphørLæremidler>()
             .data
 
     private data class ForenkletAndel(

@@ -13,10 +13,15 @@ enum class TypeVedtakTilsynBarn(
 
 sealed interface VedtakTilsynBarn : Vedtaksdata
 
+sealed interface InnvilgelseEllerOpphørTilsynBarn : VedtakTilsynBarn {
+    val beregningsresultat: BeregningsresultatTilsynBarn
+    val vedtaksperioder: List<Vedtaksperiode>?
+}
+
 data class InnvilgelseTilsynBarn(
-    val beregningsresultat: BeregningsresultatTilsynBarn,
-    val vedtaksperioder: List<Vedtaksperiode>? = null,
-) : VedtakTilsynBarn,
+    override val beregningsresultat: BeregningsresultatTilsynBarn,
+    override val vedtaksperioder: List<Vedtaksperiode>? = null,
+) : InnvilgelseEllerOpphørTilsynBarn,
     Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakTilsynBarn.INNVILGELSE_TILSYN_BARN
 }
@@ -34,11 +39,11 @@ data class AvslagTilsynBarn(
 }
 
 data class OpphørTilsynBarn(
-    val beregningsresultat: BeregningsresultatTilsynBarn,
+    override val beregningsresultat: BeregningsresultatTilsynBarn,
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
-    val vedtaksperioder: List<Vedtaksperiode>? = null,
-) : VedtakTilsynBarn,
+    override val vedtaksperioder: List<Vedtaksperiode>? = null,
+) : InnvilgelseEllerOpphørTilsynBarn,
     Opphør {
     override val type: TypeVedtaksdata = TypeVedtakTilsynBarn.OPPHØR_TILSYN_BARN
 
