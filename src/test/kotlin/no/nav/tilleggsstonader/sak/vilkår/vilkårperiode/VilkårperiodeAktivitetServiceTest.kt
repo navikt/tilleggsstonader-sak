@@ -98,7 +98,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
 
         @Test
         fun `skal lagre kildeId på aktivitet`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = true)
             val hentetInformasjon = HentetInformasjon(fom = now(), tom = now(), tidspunktHentet = LocalDateTime.now())
             val grunnlag =
                 VilkårperioderGrunnlag(
