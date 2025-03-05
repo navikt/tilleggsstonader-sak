@@ -28,7 +28,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
@@ -72,12 +71,6 @@ object VilkårperiodeTestUtil {
             faktaOgVurdering = faktaOgVurdering,
         )
 
-    fun vurderingFaktaEtterlevelseAldersvilkår(fødselsdato: LocalDate = LocalDate.of(2000, 1, 1)) =
-        AldersvilkårVurdering
-            .VurderingFaktaEtterlevelseAldersvilkår(
-                fødselsdato = fødselsdato,
-            )
-
     fun faktaOgVurderingMålgruppe(
         type: MålgruppeType = MålgruppeType.AAP,
         medlemskap: VurderingMedlemskap = vurderingMedlemskap(),
@@ -91,28 +84,13 @@ object VilkårperiodeTestUtil {
                     vurderinger =
                         VurderingOmstillingsstønad(
                             medlemskap = medlemskap,
-                            aldersvilkår =
-                                VurderingAldersVilkår(
-                                    SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse =
-                                        vurderingFaktaEtterlevelseAldersvilkår(),
-                                ),
                         ),
                 )
 
             MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadTilsynBarn
             MålgruppeType.AAP ->
                 AAPTilsynBarn(
-                    vurderinger =
-                        VurderingAAP(
-                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
-                            aldersvilkår =
-                                VurderingAldersVilkår(
-                                    SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse =
-                                        vurderingFaktaEtterlevelseAldersvilkår(),
-                                ),
-                        ),
+                    vurderinger = VurderingAAP(dekketAvAnnetRegelverk = dekketAvAnnetRegelverk),
                 )
 
             MålgruppeType.UFØRETRYGD ->
@@ -121,12 +99,6 @@ object VilkårperiodeTestUtil {
                         VurderingUføretrygd(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
-                            aldersvilkår =
-                                VurderingAldersVilkår(
-                                    SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse =
-                                        vurderingFaktaEtterlevelseAldersvilkår(),
-                                ),
                         ),
                 )
 
@@ -136,12 +108,6 @@ object VilkårperiodeTestUtil {
                         VurderingNedsattArbeidsevne(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
-                            aldersvilkår =
-                                VurderingAldersVilkår(
-                                    SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse =
-                                        vurderingFaktaEtterlevelseAldersvilkår(),
-                                ),
                         ),
                 )
 

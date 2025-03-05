@@ -2,13 +2,6 @@
   "type": "OMSTILLINGSSTØNAD_LÆREMIDLER",
   "fakta": {},
   "vurderinger": {
-    "aldersvilkår": {
-      "resultat": "OPPFYLT",
-      "svar": "JA",
-      "vurderingFaktaEtterlevelse": {
-        "fødselsdato": "2000-01-01"
-      }
-    },
     "medlemskap": {
       "svar": "JA",
       "resultat": "OPPFYLT"

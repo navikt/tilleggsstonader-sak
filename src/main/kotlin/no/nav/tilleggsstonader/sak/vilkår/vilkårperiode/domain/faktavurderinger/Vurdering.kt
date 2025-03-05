@@ -1,14 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.AldersvilkårVurdering.VurderingFaktaEtterlevelseAldersvilkår
-
 sealed interface Vurdering {
     val svar: SvarJaNei?
     val resultat: ResultatDelvilkårperiode
-}
-
-sealed interface AutomatiskVurdering : Vurdering {
-    val vurderingFaktaEtterlevelse: VurderingFaktaEtterlevelseAldersvilkår?
 }
 
 enum class SvarJaNei {
@@ -112,27 +106,6 @@ data class VurderingDekketAvAnnetRegelverk private constructor(
                 SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
                 SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingDekketAvAnnetRegelverk::class.simpleName}")
-            }
-    }
-}
-
-data class VurderingAldersVilkår(
-    override val svar: SvarJaNei,
-    override val resultat: ResultatDelvilkårperiode,
-    override val vurderingFaktaEtterlevelse: VurderingFaktaEtterlevelseAldersvilkår?,
-) : AutomatiskVurdering {
-    constructor(
-        svar: SvarJaNei,
-        vurderingFaktaEtterlevelse: VurderingFaktaEtterlevelseAldersvilkår?,
-    ) : this(svar, utledResultat(svar), vurderingFaktaEtterlevelse)
-
-    companion object {
-        private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =
-            when (svar) {
-                null -> ResultatDelvilkårperiode.IKKE_VURDERT
-                SvarJaNei.JA -> ResultatDelvilkårperiode.OPPFYLT
-                SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
-                SvarJaNei.JA_IMPLISITT -> ResultatDelvilkårperiode.OPPFYLT
             }
     }
 }
