@@ -85,6 +85,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                     vilkårperiodeRepository = vilkårperiodeRepository,
                     stønadsperiodeRepository = stønadsperiodeRepository,
                     læremidlerVedtaksperiodeValideringService = læremidlerVedtaksperiodeValideringService,
+                    vedtakRepository = vedtakRepository,
                 ),
             opphørValideringService = mockk<OpphørValideringService>(relaxed = true),
             vedtakRepository = vedtakRepository,

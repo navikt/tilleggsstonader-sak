@@ -27,9 +27,9 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 01.02.2025 | 28.02.2025 |
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
-      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 03.02.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato | Del av tidligere utbetaling |
+      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      | Ja                          |
+      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 03.02.2025      | Nei                         |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -70,10 +70,10 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 01.01.2025 | 31.03.2025 |
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
-      | 01.02.2025 | 28.02.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
-      | 01.03.2025 | 31.03.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato | Del av tidligere utbetaling |
+      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      | Ja                          |
+      | 01.02.2025 | 28.02.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      | Ja                          |
+      | 01.03.2025 | 31.03.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      | Ja                          |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -104,10 +104,10 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 20.02.2025 | 31.03.2025 |
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
-      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
-      | 01.03.2025 | 31.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 03.03.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato | Del av tidligere utbetaling |
+      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      | Ja                          |
+      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      | Ja                          |
+      | 01.03.2025 | 31.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 03.03.2025      | Nei                         |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -143,9 +143,9 @@ Egenskap: Innvilgelse av læremidler - revurdering
 
     # Endrer målgruppe fra februar
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe       | Aktivitet | Utbetalingsdato |
-      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP             | UTDANNING | 01.01.2025      |
-      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | OVERGANGSSTØNAD | UTDANNING | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe       | Aktivitet | Utbetalingsdato | Del av tidligere utbetaling |
+      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP             | UTDANNING | 01.01.2025      | Ja                          |
+      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | OVERGANGSSTØNAD | UTDANNING | 01.01.2025      | Ja                          |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type                        | Utbetalingsdato |
@@ -177,9 +177,9 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 01.01.2025 | 31.01.2025 |
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 20.12.2024 | 31.12.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 20.12.2024      |
-      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato | Del av tidligere utbetaling |
+      | 20.12.2024 | 31.12.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 20.12.2024      | Ja                          |
+      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      | Nei                         |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -217,9 +217,9 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 20.12.2024 | 31.01.2025 |
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 20.12.2024 | 31.12.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 20.12.2024      |
-      | 01.01.2025 | 31.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato | Del av tidligere utbetaling |
+      | 20.12.2024 | 31.12.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 20.12.2024      | Ja                          |
+      | 01.01.2025 | 31.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      | Ja                          |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -250,10 +250,10 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 01.02.2025 | 31.03.2025 |
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2025 | 31.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
-      | 01.02.2025 | 28.02.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
-      | 01.03.2025 | 31.03.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato | Del av tidligere utbetaling |
+      | 01.01.2025 | 31.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      | Ja                          |
+      | 01.02.2025 | 28.02.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      | Ja                          |
+      | 01.03.2025 | 31.03.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      | Ja                          |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -286,10 +286,10 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 01.01.2025 | 31.03.2025 |
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2025 | 31.01.2025 | 100   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
-      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
-      | 01.03.2025 | 31.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato | Del av tidligere utbetaling |
+      | 01.01.2025 | 31.01.2025 | 100   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      | Ja                          |
+      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      | Ja                          |
+      | 01.03.2025 | 31.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      | Ja                          |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -322,10 +322,10 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 01.01.2025 | 31.03.2025 |
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2025 | 31.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
-      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
-      | 01.03.2025 | 31.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato | Del av tidligere utbetaling |
+      | 01.01.2025 | 31.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      | Ja                          |
+      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      | Ja                          |
+      | 01.03.2025 | 31.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      | Ja                          |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -353,10 +353,10 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 06.01.2025 | 10.02.2025 |
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 06.01.2025 | 05.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 06.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato | Del av tidligere utbetaling |
+      | 06.01.2025 | 05.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 06.01.2025      | Nei                         |
       # utbetalingsdatoet er fortsatt 10.02 då det var datoet det var då perioden ble utbetalt i førstegangsbehandlingen
-      | 06.02.2025 | 10.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 10.02.2025      |
+      | 06.02.2025 | 10.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 10.02.2025      | Ja                          |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -385,9 +385,9 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 10.02.2025 | 10.02.2025 |
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato | Del av tidligere utbetaling |
       # utbetalingsdatoet er fortsatt 10.02 då det var datoet det var då perioden ble utbetalt i førstegangsbehandlingen
-      | 01.02.2025 | 10.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 10.02.2025      |
+      | 01.02.2025 | 10.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 10.02.2025      | Ja                          |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -416,11 +416,11 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 10.02.2025 | 31.03.2025 |
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 20.01.2025 | 19.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 20.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato | Del av tidligere utbetaling |
+      | 20.01.2025 | 19.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 20.01.2025      | Nei                         |
       # løpende måneden som begynner i februar endrer fra og med dato då den påvirkes av løpende måneden som begynner i januar og forskyves
-      | 20.02.2025 | 19.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 10.02.2025      |
-      | 20.03.2025 | 31.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 10.02.2025      |
+      | 20.02.2025 | 19.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 10.02.2025      | Ja                          |
+      | 20.03.2025 | 31.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 10.02.2025      | Ja                          |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |

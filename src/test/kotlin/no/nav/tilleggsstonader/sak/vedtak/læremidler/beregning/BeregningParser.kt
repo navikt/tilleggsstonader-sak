@@ -55,5 +55,6 @@ fun mapBeregningsresultat(dataTable: DataTable) =
                     målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
                     aktivitet = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad) ?: AktivitetType.TILTAK,
                 ),
+            delAvTidligereUtbetaling = parseValgfriBoolean(BeregningNøkler.DEL_AV_TIDLIGERE_UTBETALING, rad) ?: false,
         )
     }
