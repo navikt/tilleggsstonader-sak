@@ -51,10 +51,3 @@ data class OpphørTilsynBarn(
         this.validerÅrsakerOgBegrunnelse()
     }
 }
-
-fun VedtakTilsynBarn.beregningsresultat(): BeregningsresultatTilsynBarn? =
-    when (this) {
-        is InnvilgelseTilsynBarn -> this.beregningsresultat
-        is OpphørTilsynBarn -> this.beregningsresultat
-        is AvslagTilsynBarn -> null
-    }
