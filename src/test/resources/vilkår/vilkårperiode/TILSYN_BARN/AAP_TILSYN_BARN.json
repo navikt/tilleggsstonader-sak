@@ -2,6 +2,13 @@
   "type": "AAP_TILSYN_BARN",
   "fakta": {},
   "vurderinger": {
+    "aldersvilkår": {
+      "resultat": "OPPFYLT",
+      "svar": "JA",
+      "vurderingFaktaEtterlevelse": {
+        "fødselsdato": "2000-01-01"
+      }
+    },
     "dekketAvAnnetRegelverk": {
       "svar": "NEI",
       "resultat": "OPPFYLT"
