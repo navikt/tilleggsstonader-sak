@@ -125,11 +125,11 @@ data class VurderingDekketAvAnnetRegelverk private constructor(
 data class VurderingAldersVilkår(
     override val svar: SvarJaNei,
     override val resultat: ResultatDelvilkårperiode,
-    override val vurderingFaktaEtterlevelse: VurderingFaktaEtterlevelseAldersvilkår?,
+    override val vurderingFaktaEtterlevelse: VurderingFaktaEtterlevelseAldersvilkår,
 ) : AutomatiskVurdering {
     constructor(
         svar: SvarJaNei,
-        vurderingFaktaEtterlevelse: VurderingFaktaEtterlevelseAldersvilkår?,
+        vurderingFaktaEtterlevelse: VurderingFaktaEtterlevelseAldersvilkår,
     ) : this(svar, utledResultat(svar), vurderingFaktaEtterlevelse)
 
     companion object {
