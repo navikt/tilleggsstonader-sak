@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
@@ -87,6 +88,7 @@ fun Vurdering.tilDto() =
     JsonSubTypes.Type(MålgruppeFaktaOgVurderingerDto::class, name = "MÅLGRUPPE"),
     JsonSubTypes.Type(AktivitetBarnetilsynFaktaOgVurderingerDto::class, name = "AKTIVITET_BARNETILSYN"),
     JsonSubTypes.Type(AktivitetLæremidlerFaktaOgVurderingerDto::class, name = "AKTIVITET_LÆREMIDLER"),
+    JsonSubTypes.Type(AktivitetBoutgifterFaktaOgVurderingerDto::class, name = "AKTIVITET_BOUTGIFTER"),
 )
 sealed class FaktaOgVurderingerDto
 
@@ -105,6 +107,11 @@ data class AktivitetLæremidlerFaktaOgVurderingerDto(
     val studienivå: Studienivå? = null,
     val harUtgifter: VurderingDto? = null,
     val harRettTilUtstyrsstipend: VurderingDto? = null,
+) : FaktaOgVurderingerDto()
+
+data class AktivitetBoutgifterFaktaOgVurderingerDto(
+    val aktivitetsdager: Int? = null,
+    val lønnet: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
 fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
@@ -137,6 +144,11 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                                 .takeIfVurderinger<HarRettTilUtstyrsstipendVurdering>()
                                 ?.harRettTilUtstyrsstipend
                                 ?.tilDto(),
+                    )
+                is FaktaOgVurderingBoutgifter ->
+                    AktivitetBoutgifterFaktaOgVurderingerDto(
+                        aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
+                        lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
                     )
             }
         }
