@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.behandling.vent
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -14,7 +13,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
@@ -31,7 +29,6 @@ class SettPåVentService(
     private val oppgaveService: OppgaveService,
     private val taskService: TaskService,
     private val settPåVentRepository: SettPåVentRepository,
-    private val unleashService: UnleashService,
 ) {
     fun hentStatusSettPåVent(behandlingId: BehandlingId): StatusPåVentDto {
         val settPåVent = finnAktivSattPåVent(behandlingId)
@@ -189,7 +186,6 @@ class SettPåVentService(
     ): OppdatertOppgaveResponse {
         val enhet = oppgave.tildeltEnhetsnr ?: error("Oppgave=${oppgave.id} mangler enhetsnummer")
         val mappe = oppgaveService.finnMappe(enhet, OppgaveMappe.PÅ_VENT)
-        val inkluderKommentar = unleashService.isEnabled(Toggle.PÅ_VENT_KOMMENTAR)
         val oppdatertOppgave =
             Oppgave(
                 id = oppgave.id,
@@ -201,7 +197,6 @@ class SettPåVentService(
                         oppgave,
                         settPåVent,
                         frist,
-                        inkluderKommentar = inkluderKommentar,
                     ),
                 mappeId = Optional.of(mappe.id),
             )
@@ -216,7 +211,6 @@ class SettPåVentService(
         brukerfeilHvis(ikkeEierAvOppgave(oppgave)) {
             "Kan ikke oppdatere behandling på vent når man ikke er eier av oppgaven."
         }
-        val inkluderKommentar = unleashService.isEnabled(Toggle.PÅ_VENT_KOMMENTAR)
         val oppdatertOppgave =
             Oppgave(
                 id = settPåVent.oppgaveId,
@@ -227,7 +221,6 @@ class SettPåVentService(
                         oppgave,
                         settPåVent,
                         dto.frist,
-                        inkluderKommentar = inkluderKommentar,
                     ),
                 tilordnetRessurs = if (dto.beholdOppgave) SikkerhetContext.hentSaksbehandler() else "",
             )
@@ -254,14 +247,13 @@ class SettPåVentService(
 
         val enhet = oppgave.tildeltEnhetsnr ?: error("Oppgave=${oppgave.id} mangler enhetsnummer")
         val mappeId = oppgaveService.finnMappe(enhet, OppgaveMappe.KLAR).id
-        val inkluderKommentar = unleashService.isEnabled(Toggle.PÅ_VENT_KOMMENTAR)
         oppgaveService.oppdaterOppgave(
             Oppgave(
                 id = oppgave.id,
                 versjon = oppgave.versjon,
                 tilordnetRessurs = tilordnetRessurs,
                 fristFerdigstillelse = osloDateNow(),
-                beskrivelse = SettPåVentBeskrivelseUtil.taAvVent(oppgave, settPåVent, inkluderKommentar = inkluderKommentar),
+                beskrivelse = SettPåVentBeskrivelseUtil.taAvVent(oppgave, settPåVent),
                 mappeId = Optional.ofNullable(mappeId),
             ),
         )

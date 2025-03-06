@@ -14,11 +14,10 @@ object SettPåVentBeskrivelseUtil {
         settPåVent: SettPåVent,
         frist: LocalDate,
         tidspunkt: LocalDateTime = osloNow(),
-        inkluderKommentar: Boolean,
     ): String {
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, "")
-        val kommentarRad = "Kommentar: ${settPåVent.kommentar}".takeIf { inkluderKommentar }
+        val kommentarRad = "Kommentar: ${settPåVent.kommentar}"
         return utledBeskrivelsePrefix(tidspunkt) +
             utledOppgavefristBeskrivelse(oppgave, frist).påNyRadEllerTomString() +
             tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
@@ -31,10 +30,9 @@ object SettPåVentBeskrivelseUtil {
         settPåVent: SettPåVent,
         frist: LocalDate,
         tidspunkt: LocalDateTime = osloNow(),
-        inkluderKommentar: Boolean,
     ): String {
         val fristBeskrivelse = utledOppgavefristBeskrivelse(oppgave, frist)
-        val kommentarRad = "Kommentar: ${settPåVent.kommentar}".takeIf { inkluderKommentar } ?: ""
+        val kommentarRad = "Kommentar: ${settPåVent.kommentar}"
         if (fristBeskrivelse.isEmpty() && kommentarRad.isEmpty()) {
             return oppgave.beskrivelse ?: ""
         }
@@ -51,11 +49,10 @@ object SettPåVentBeskrivelseUtil {
         oppgave: Oppgave,
         settPåVent: SettPåVent,
         tidspunkt: LocalDateTime = osloNow(),
-        inkluderKommentar: Boolean,
     ): String {
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, SikkerhetContext.hentSaksbehandlerEllerSystembruker())
-        val kommentarRad = "Kommentar: ${settPåVent.taAvVentKommentar}".takeIf { inkluderKommentar }
+        val kommentarRad = "Kommentar: ${settPåVent.taAvVentKommentar}"
         return utledBeskrivelsePrefix(tidspunkt) +
             "\nTatt av vent" +
             tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
