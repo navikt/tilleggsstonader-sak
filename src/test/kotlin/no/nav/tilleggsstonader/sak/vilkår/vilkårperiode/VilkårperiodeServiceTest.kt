@@ -200,7 +200,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
         @Test
         fun `skal validere stønadsperioder ved oppdatering av vilkårperioder`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = true)
 
             val fom1 = LocalDate.of(2024, 1, 1)
             val tom1 = LocalDate.of(2024, 2, 1)

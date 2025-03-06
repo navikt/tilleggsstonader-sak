@@ -93,7 +93,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
     @BeforeEach
     fun setUp() {
-        testoppsettService.opprettBehandlingMedFagsak(behandling)
+        testoppsettService.opprettBehandlingMedFagsak(behandling, opprettGrunnlagsdata = true)
         barnRepository.insert(barn)
     }
 
@@ -366,6 +366,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     revurderFra = LocalDate.of(2023, 2, 1),
                     forrigeBehandling = behandling,
                     fagsak = fagsak,
+                    opprettGrunnlagsdata = true,
                 )
             val saksbehandlingForOpphør = saksbehandling(behandling = behandlingForOpphør)
             val aktivitetForOpphør =

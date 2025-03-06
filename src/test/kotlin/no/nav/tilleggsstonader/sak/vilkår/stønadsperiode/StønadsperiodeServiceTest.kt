@@ -53,7 +53,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
     inner class LagreStønadsperioder {
         @Test
         fun `skal feile hvis man prøver å opprette en støndsperiode med id`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = true)
             opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
             opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
@@ -65,7 +65,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
         @Test
         fun `skal kunne opprette flere stønadsperioder`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = true)
             opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
             opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
@@ -93,7 +93,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
         @Test
         fun `endring av perioden oppdaterer felter men ikke opprettetAv`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = true)
             opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
             opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
             opprettVilkårperiode(
@@ -144,7 +144,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
         @Test
         fun `skal kunne slette en periode`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = true)
             opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
             opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
@@ -160,7 +160,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
         @Test
         fun `skal kunne endre, legge til og slette i en oppdatering`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = true)
             opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
             opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
             opprettVilkårperiode(
@@ -262,7 +262,10 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @BeforeEach
         fun setUp() {
             val revurdering =
-                testoppsettService.opprettBehandlingMedFagsak(behandling.copy(revurderFra = enMånedSiden))
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling = behandling.copy(revurderFra = enMånedSiden),
+                    opprettGrunnlagsdata = true,
+                )
             opprettVilkårperiode(målgruppe(behandlingId = revurdering.id, fom = enMånedSiden, tom = enMånedFram))
             opprettVilkårperiode(aktivitet(behandlingId = revurdering.id, fom = enMånedSiden, tom = enMånedFram))
             opprettVilkårperiode(
@@ -419,7 +422,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
         @BeforeEach
         fun setUp() {
-            val revurdering = testoppsettService.opprettBehandlingMedFagsak(behandling)
+            val revurdering = testoppsettService.opprettBehandlingMedFagsak(behandling, opprettGrunnlagsdata = true)
             opprettVilkårperiode(målgruppe(behandlingId = revurdering.id, fom = enMånedSiden, tom = enMånedFram))
             opprettVilkårperiode(aktivitet(behandlingId = revurdering.id, fom = enMånedSiden, tom = enMånedFram))
             stønadsperiodeRepository.insert(eksisterendeStønadsperiode)

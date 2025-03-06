@@ -35,7 +35,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
 
     @Test
     fun `skal kunne lagre og hente stønadsperioder`() {
-        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = true)
 
         opprettOppfylteInngangsvilkår(behandling)
 

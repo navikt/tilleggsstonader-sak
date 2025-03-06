@@ -89,7 +89,7 @@ class TilsynBarnVedtakControllerTest(
     @BeforeEach
     fun setUp() {
         headers.setBearerAuth(onBehalfOfToken())
-        testoppsettService.opprettBehandlingMedFagsak(behandling)
+        testoppsettService.opprettBehandlingMedFagsak(behandling, opprettGrunnlagsdata = true)
         barnRepository.insert(barn)
         stønadsperiodeRepository.insert(stønadsperiode)
         vilkårperiodeRepository.insert(aktivitet)
@@ -192,6 +192,7 @@ class TilsynBarnVedtakControllerTest(
                 forrigeBehandling = behandling,
                 revurderFra = LocalDate.of(2023, 1, 15),
                 fagsak = fagsak,
+                opprettGrunnlagsdata = true,
             )
 
         vilkårRepository.insert(

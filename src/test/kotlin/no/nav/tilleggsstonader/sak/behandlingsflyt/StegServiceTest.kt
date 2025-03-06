@@ -162,6 +162,7 @@ class StegServiceTest(
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(
                     behandling(steg = StegType.BEHANDLING_FERDIGSTILT, status = BehandlingStatus.FERDIGSTILT),
+                    opprettGrunnlagsdata = true,
                 )
             val revurdering =
                 testoppsettService.opprettRevurdering(
@@ -169,6 +170,7 @@ class StegServiceTest(
                     forrigeBehandling = behandling,
                     fagsak = fagsak(id = behandling.fagsakId),
                     steg = StegType.INNGANGSVILKÅR,
+                    opprettGrunnlagsdata = true,
                 )
 
             val exception =

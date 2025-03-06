@@ -57,7 +57,7 @@ class TestoppsettService(
     fun opprettBehandlingMedFagsak(
         behandling: Behandling,
         stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
-        opprettGrunnlagsdata: Boolean = true,
+        opprettGrunnlagsdata: Boolean = false,
         identer: Set<PersonIdent> = defaultIdenter,
     ): Behandling {
         val person = opprettPerson(fagsak(identer = identer))
@@ -81,7 +81,7 @@ class TestoppsettService(
 
     fun lagre(
         behandling: Behandling,
-        opprettGrunnlagsdata: Boolean = true,
+        opprettGrunnlagsdata: Boolean = false,
     ): Behandling {
         val dbBehandling = behandlingRepository.insert(behandling)
         eksternBehandlingIdRepository.insert(EksternBehandlingId(behandlingId = dbBehandling.id))
@@ -139,6 +139,7 @@ class TestoppsettService(
         forrigeBehandling: Behandling,
         fagsak: Fagsak,
         steg: StegType = StegType.BEREGNE_YTELSE,
+        opprettGrunnlagsdata: Boolean = false,
     ): Behandling =
         lagre(
             behandling(
@@ -149,6 +150,7 @@ class TestoppsettService(
                 status = BehandlingStatus.UTREDES,
                 steg = steg,
             ),
+            opprettGrunnlagsdata = opprettGrunnlagsdata,
         )
 
     fun lagBehandlingOgRevurdering(): Behandling {
