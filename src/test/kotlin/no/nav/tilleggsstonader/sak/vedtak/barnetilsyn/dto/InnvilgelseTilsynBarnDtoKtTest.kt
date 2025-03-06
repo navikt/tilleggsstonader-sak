@@ -4,8 +4,8 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -22,9 +22,9 @@ class InnvilgelseTilsynBarnDtoKtTest {
                 perioder =
                     listOf(
                         beregningsresultatForMåned(
-                            stønadsperiodeGrunnlag =
+                            vedtaksperiodeGrunnlag =
                                 listOf(
-                                    stønadsperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
+                                    vedtaksperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
                                 ),
                             beløpsperioder = listOf(Beløpsperiode(LocalDate.of(2024, 1, 1), 20, MålgruppeType.AAP)),
                         ),
@@ -46,22 +46,22 @@ class InnvilgelseTilsynBarnDtoKtTest {
     }
 
     @Test
-    fun `gjelder fra og til skal mappes fra min og maks ax stønadsperioder`() {
+    fun `gjelder fra og til skal mappes fra min og maks ax vedtaksperioder`() {
         val dto =
             BeregningsresultatTilsynBarn(
                 perioder =
                     listOf(
                         beregningsresultatForMåned(
-                            stønadsperiodeGrunnlag =
+                            vedtaksperiodeGrunnlag =
                                 listOf(
-                                    stønadsperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
-                                    stønadsperiodeGrunnlag(LocalDate.of(2024, 1, 15), LocalDate.of(2024, 1, 16)),
+                                    vedtaksperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
+                                    vedtaksperiodeGrunnlag(LocalDate.of(2024, 1, 15), LocalDate.of(2024, 1, 16)),
                                 ),
                         ),
                         beregningsresultatForMåned(
-                            stønadsperiodeGrunnlag =
+                            vedtaksperiodeGrunnlag =
                                 listOf(
-                                    stønadsperiodeGrunnlag(LocalDate.of(2024, 2, 3), LocalDate.of(2024, 2, 4)),
+                                    vedtaksperiodeGrunnlag(LocalDate.of(2024, 2, 3), LocalDate.of(2024, 2, 4)),
                                 ),
                         ),
                     ),
@@ -105,8 +105,8 @@ class InnvilgelseTilsynBarnDtoKtTest {
 
         @Test
         fun `periode som overlapper skal bruke revurderFra som startdato`() {
-            val periode = stønadsperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 18))
-            val dto = resultatMedEnStønadsperiode(periode).tilDto(revurderFra)
+            val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 18))
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(revurderFra)
 
             assertThat(dto.gjelderFraOgMed).isEqualTo(revurderFra)
             assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 18))
@@ -114,8 +114,8 @@ class InnvilgelseTilsynBarnDtoKtTest {
 
         @Test
         fun `periode som begynner før revurderFra skal ikke brukes til gjelderFra eller gjelderTil`() {
-            val periode = stønadsperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 16))
-            val dto = resultatMedEnStønadsperiode(periode).tilDto(revurderFra)
+            val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 16))
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(revurderFra)
 
             assertThat(dto.gjelderFraOgMed).isNull()
             assertThat(dto.gjelderTilOgMed).isNull()
@@ -123,24 +123,24 @@ class InnvilgelseTilsynBarnDtoKtTest {
 
         @Test
         fun `periode som begynner fra og med revurderFra brukes til gjelderFra og gjelderTil`() {
-            val periode = stønadsperiodeGrunnlag(fom = LocalDate.of(2024, 1, 17), tom = LocalDate.of(2024, 1, 19))
-            val dto = resultatMedEnStønadsperiode(periode).tilDto(revurderFra)
+            val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 17), tom = LocalDate.of(2024, 1, 19))
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(revurderFra)
 
             assertThat(dto.gjelderFraOgMed).isEqualTo(LocalDate.of(2024, 1, 17))
             assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 19))
         }
 
-        private fun resultatMedEnStønadsperiode(stønadsperiodeGrunnlag: StønadsperiodeGrunnlag) =
+        private fun resultatMedEnVedtaksperiode(vedtaksperiodeGrunnlag: VedtaksperiodeGrunnlag) =
             BeregningsresultatTilsynBarn(
                 perioder =
                     listOf(
-                        beregningsresultatForMåned(stønadsperiodeGrunnlag = listOf(stønadsperiodeGrunnlag)),
+                        beregningsresultatForMåned(vedtaksperiodeGrunnlag = listOf(vedtaksperiodeGrunnlag)),
                     ),
             )
     }
 
     private fun beregningsresultatForMåned(
-        stønadsperiodeGrunnlag: List<StønadsperiodeGrunnlag> = emptyList(),
+        vedtaksperiodeGrunnlag: List<VedtaksperiodeGrunnlag> = emptyList(),
         beløpsperioder: List<Beløpsperiode> = emptyList(),
     ) = BeregningsresultatForMåned(
         dagsats = 10.toBigDecimal(),
@@ -149,7 +149,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
             Beregningsgrunnlag(
                 måned = YearMonth.of(2024, 1),
                 makssats = 1000,
-                stønadsperioderGrunnlag = stønadsperiodeGrunnlag,
+                vedtaksperiodeGrunnlag = vedtaksperiodeGrunnlag,
                 utgifter = emptyList(),
                 antallBarn = 4,
                 utgifterTotal = 100,
@@ -157,11 +157,11 @@ class InnvilgelseTilsynBarnDtoKtTest {
         beløpsperioder = beløpsperioder,
     )
 
-    private fun stønadsperiodeGrunnlag(
+    private fun vedtaksperiodeGrunnlag(
         fom: LocalDate,
         tom: LocalDate,
-    ) = StønadsperiodeGrunnlag(
-        stønadsperiode =
+    ) = VedtaksperiodeGrunnlag(
+        vedtaksperiode =
             VedtaksperiodeBeregning(
                 fom = fom,
                 tom = tom,

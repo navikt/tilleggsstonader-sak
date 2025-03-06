@@ -108,6 +108,7 @@ enum class KontrollertUtfall {
     HÅNDTERT,
     IGNORERES,
     UTSETTES,
+    UNDER_ARBEID,
 }
 
 data class PeriodeForKontroll(

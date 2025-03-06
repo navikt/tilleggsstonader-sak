@@ -53,17 +53,3 @@ data class OpphørLæremidler(
         this.validerÅrsakerOgBegrunnelse()
     }
 }
-
-fun VedtakLæremidler.beregningsresultat(): BeregningsresultatLæremidler? =
-    when (this) {
-        is InnvilgelseLæremidler -> this.beregningsresultat
-        is OpphørLæremidler -> this.beregningsresultat
-        is AvslagLæremidler -> null
-    }
-
-fun VedtakLæremidler.vedtaksperioder(): List<Vedtaksperiode>? =
-    when (this) {
-        is InnvilgelseLæremidler -> this.vedtaksperioder
-        is OpphørLæremidler -> this.vedtaksperioder
-        is AvslagLæremidler -> null
-    }

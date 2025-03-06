@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakMetadata
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
@@ -71,6 +72,9 @@ class OppfølgingService(
         val oppfølging = oppfølgingRepository.findByIdOrThrow(request.id)
         brukerfeilHvis(oppfølging.version != request.version) {
             "Det har allerede skjedd en endring på oppfølging. Last siden på nytt"
+        }
+        feilHvis(!oppfølging.aktiv) {
+            "Kan ikke redigere en oppfølging som ikke lengre er aktiv"
         }
         val kontrollert =
             Kontrollert(

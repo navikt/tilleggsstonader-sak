@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -486,6 +487,32 @@ class OppfølgingServiceTest {
                 assertThat(this.endringAktivitet()).containsExactly(kontroll)
                 assertIngenEndringForMålgrupper()
             }
+        }
+    }
+
+    @Nested
+    inner class IkkeAktiv {
+        @Test
+        fun `skal ikke kunne redigere en oppfølging som ikke lengre er aktiv`() {
+            val oppfølging =
+                oppfølgingRepository.insert(
+                    Oppfølging(
+                        behandlingId = behandling.id,
+                        data = OppfølgingData(emptyList()),
+                        aktiv = false,
+                    ),
+                )
+
+            assertThatThrownBy {
+                oppfølgingService.kontroller(
+                    KontrollerOppfølgingRequest(
+                        oppfølging.id,
+                        oppfølging.version,
+                        KontrollertUtfall.HÅNDTERT,
+                        "kommentar",
+                    ),
+                )
+            }.hasMessageContaining("Kan ikke redigere en oppfølging som ikke lengre er aktiv")
         }
     }
 

@@ -191,7 +191,7 @@ class StepDefinitions {
                 }
 
                 forventetResultat.grunnlag.antallDagerTotal?.let {
-                    assertThat(resultat.grunnlag.stønadsperioderGrunnlag.sumOf { it.antallDager })
+                    assertThat(resultat.grunnlag.vedtaksperiodeGrunnlag.sumOf { it.antallDager })
                         .`as` { "antallDagerTotal" }
                         .isEqualTo(it)
                 }
@@ -231,8 +231,8 @@ class StepDefinitions {
                 .perioder
                 .find { it.grunnlag.måned == måned }
                 ?.grunnlag
-                ?.stønadsperioderGrunnlag
-                ?.map { it.stønadsperiode }
+                ?.vedtaksperiodeGrunnlag
+                ?.map { it.vedtaksperiode }
                 ?: error("Finner ikke beregningsresultat for $måned")
 
         perioder.forEachIndexed { index, resultat ->
@@ -265,25 +265,25 @@ class StepDefinitions {
                 .perioder
                 .find { it.grunnlag.måned == måned }
                 ?.grunnlag
-                ?.stønadsperioderGrunnlag
+                ?.vedtaksperiodeGrunnlag
                 ?: error("Finner ikke beregningsresultat for $måned")
 
         perioder.forEachIndexed { index, resultat ->
             val forventetResultat = forventeteStønadsperioder[index]
             try {
-                assertThat(resultat.stønadsperiode.fom).isEqualTo(forventetResultat.fom)
-                assertThat(resultat.stønadsperiode.tom).isEqualTo(forventetResultat.tom)
-                assertThat(resultat.stønadsperiode.målgruppe).isEqualTo(forventetResultat.målgruppe)
-                assertThat(resultat.stønadsperiode.aktivitet).isEqualTo(forventetResultat.aktivitet)
+                assertThat(resultat.vedtaksperiode.fom).isEqualTo(forventetResultat.fom)
+                assertThat(resultat.vedtaksperiode.tom).isEqualTo(forventetResultat.tom)
+                assertThat(resultat.vedtaksperiode.målgruppe).isEqualTo(forventetResultat.målgruppe)
+                assertThat(resultat.vedtaksperiode.aktivitet).isEqualTo(forventetResultat.aktivitet)
                 assertThat(resultat.aktiviteter.size).isEqualTo(forventetResultat.antallAktiviteter)
                 assertThat(resultat.antallDager).isEqualTo(forventetResultat.antallDager)
             } catch (e: Throwable) {
                 val actual =
                     listOf(
-                        resultat.stønadsperiode.fom,
-                        resultat.stønadsperiode.tom,
-                        resultat.stønadsperiode.målgruppe,
-                        resultat.stønadsperiode.aktivitet,
+                        resultat.vedtaksperiode.fom,
+                        resultat.vedtaksperiode.tom,
+                        resultat.vedtaksperiode.målgruppe,
+                        resultat.vedtaksperiode.aktivitet,
                         resultat.aktiviteter.size,
                         resultat.antallDager,
                     ).joinToString(" | ")

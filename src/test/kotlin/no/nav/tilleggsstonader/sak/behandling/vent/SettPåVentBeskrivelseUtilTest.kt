@@ -45,7 +45,6 @@ class SettPåVentBeskrivelseUtilTest {
                     settPåVent,
                     LocalDate.of(2023, 1, 1),
                     tidspunkt,
-                    inkluderKommentar = true,
                 )
             assertThat(beskrivelse).isEqualTo(
                 """
@@ -70,7 +69,6 @@ class SettPåVentBeskrivelseUtilTest {
                     settPåVent,
                     LocalDate.of(2023, 1, 1),
                     tidspunkt,
-                    inkluderKommentar = true,
                 )
             assertThat(beskrivelse).isEqualTo(
                 """
@@ -92,7 +90,6 @@ class SettPåVentBeskrivelseUtilTest {
                     settPåVent,
                     frist,
                     tidspunkt,
-                    inkluderKommentar = true,
                 )
             assertThat(beskrivelse).isEqualTo(
                 """
@@ -112,7 +109,6 @@ class SettPåVentBeskrivelseUtilTest {
                     settPåVent,
                     LocalDate.of(2023, 1, 1),
                     tidspunkt,
-                    inkluderKommentar = true,
                 )
             assertThat(beskrivelse).isEqualTo(
                 """
@@ -134,7 +130,6 @@ class SettPåVentBeskrivelseUtilTest {
                     Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", tilordnetRessurs = null),
                     settPåVent,
                     tidspunkt,
-                    inkluderKommentar = true,
                 )
             assertThat(beskrivelse).isEqualTo(
                 """
