@@ -224,6 +224,7 @@ object Testdata {
                                         ),
                                     ),
                             ),
+                        begrunnelse = "Sånn her vil en begrunnelse se ut",
                         vedtaksperioder =
                             listOf(
                                 vedtaksperiode,
@@ -331,6 +332,7 @@ object Testdata {
                     InnvilgelseLæremidler(
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = beregningsresultat,
+                        begrunnelse = "Sånn her vil en begrunnelse se ut",
                     ),
             )
 

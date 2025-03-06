@@ -88,9 +88,9 @@ class InterntVedtakGenereringTest {
      * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
      * Formatter htmlfil etter generering for å unngå stor diff
      */
+    @Disabled
     @ParameterizedTest
     @MethodSource("stønadstyperInterntVedtak")
-    @Disabled
     fun `lager html og pdf`(type: StønadstypeInterntVedtak) {
         if (!type.håndteresAvInterntVedtak) {
             return

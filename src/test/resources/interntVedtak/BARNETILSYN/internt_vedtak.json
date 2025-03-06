@@ -190,6 +190,7 @@
     "utgift" : 200
   } ],
   "vedtak" : {
+    "innvilgelseBegrunnelse" : "Sånn her vil en begrunnelse se ut",
     "type" : "INNVILGELSE"
   },
   "beregningsresultat" : {
