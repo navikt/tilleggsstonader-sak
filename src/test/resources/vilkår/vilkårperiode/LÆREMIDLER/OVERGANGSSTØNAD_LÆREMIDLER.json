@@ -2,11 +2,9 @@
   "type": "OVERGANGSSTØNAD_LÆREMIDLER",
   "fakta": {},
   "vurderinger": {
-    "aldersvilkår": {
-      "medlemskap": {
-        "svar": "JA_IMPLISITT",
-        "resultat": "OPPFYLT"
-      }
+    "medlemskap": {
+      "svar": "JA_IMPLISITT",
+      "resultat": "OPPFYLT"
     }
   }
 }
