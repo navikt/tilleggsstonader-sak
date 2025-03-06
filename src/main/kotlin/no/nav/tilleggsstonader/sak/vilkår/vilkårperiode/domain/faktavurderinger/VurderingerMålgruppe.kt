@@ -11,7 +11,7 @@ sealed interface DekketAvAnnetRegelverkVurdering : VurderingerMålgruppe {
 }
 
 sealed interface AldersvilkårVurdering : VurderingerMålgruppe {
-    val aldersvilkår: VurderingAldersVilkår?
+    val aldersvilkår: VurderingAldersVilkår
 }
 
 data class VurderingAAP(
