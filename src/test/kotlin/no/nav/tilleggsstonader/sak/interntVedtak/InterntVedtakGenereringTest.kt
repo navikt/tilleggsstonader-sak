@@ -35,7 +35,7 @@ import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import java.net.URI
 
-class DokumentgenereringTest {
+class InterntVedtakGenereringTest {
     private val behandlingService = mockk<BehandlingService>()
     private val totrinnskontrollService = mockk<TotrinnskontrollService>()
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
