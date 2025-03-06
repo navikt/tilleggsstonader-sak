@@ -21,6 +21,7 @@ sealed interface InnvilgelseEllerOpphørTilsynBarn : VedtakTilsynBarn {
 data class InnvilgelseTilsynBarn(
     override val beregningsresultat: BeregningsresultatTilsynBarn,
     override val vedtaksperioder: List<Vedtaksperiode>? = null,
+    val begrunnelse: String? = null,
 ) : InnvilgelseEllerOpphørTilsynBarn,
     Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakTilsynBarn.INNVILGELSE_TILSYN_BARN

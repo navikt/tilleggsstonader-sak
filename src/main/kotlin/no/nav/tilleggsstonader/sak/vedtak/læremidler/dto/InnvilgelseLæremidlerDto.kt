@@ -14,10 +14,12 @@ data class InnvilgelseLæremidlerResponse(
     val beregningsresultat: BeregningsresultatLæremidlerDto,
     val gjelderFraOgMed: LocalDate,
     val gjelderTilOgMed: LocalDate,
+    val begrunnelse: String? = null,
 ) : VedtakLæremidlerDto(TypeVedtak.INNVILGELSE),
     VedtakLæremidlerResponse
 
 data class InnvilgelseLæremidlerRequest(
     val vedtaksperioder: List<VedtaksperiodeLæremidlerDto>,
+    val begrunnelse: String? = null,
 ) : VedtakLæremidlerDto(TypeVedtak.INNVILGELSE),
     VedtakLæremidlerRequest

@@ -60,7 +60,9 @@ sealed class VedtakInternt(
     val type: TypeVedtak,
 )
 
-data object VedtakInnvilgelseInternt : VedtakInternt(TypeVedtak.INNVILGELSE)
+data class VedtakInnvilgelseInternt(
+    val innvilgelseBegrunnelse: String?,
+) : VedtakInternt(TypeVedtak.INNVILGELSE)
 
 data class VedtakAvslagInternt(
     val årsakerAvslag: List<ÅrsakAvslag>,

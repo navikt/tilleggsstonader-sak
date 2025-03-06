@@ -241,7 +241,8 @@ class InterntVedtakService(
 
     private fun mapVedtakTilsynBarn(vedtak: VedtakTilsynBarn) =
         when (vedtak) {
-            is InnvilgelseTilsynBarn -> VedtakInnvilgelseInternt
+            is InnvilgelseTilsynBarn -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
+
             is AvslagTilsynBarn ->
                 VedtakAvslagInternt(
                     årsakerAvslag = vedtak.årsaker,
@@ -257,7 +258,8 @@ class InterntVedtakService(
 
     private fun mapVedtakLæremidler(vedtak: VedtakLæremidler) =
         when (vedtak) {
-            is InnvilgelseLæremidler -> VedtakInnvilgelseInternt
+            is InnvilgelseLæremidler -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
+
             is AvslagLæremidler ->
                 VedtakAvslagInternt(
                     årsakerAvslag = vedtak.årsaker,
