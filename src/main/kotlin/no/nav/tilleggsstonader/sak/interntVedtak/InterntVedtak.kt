@@ -61,7 +61,7 @@ sealed class VedtakInternt(
 )
 
 data class VedtakInnvilgelseInternt(
-    val innvilgelseBegrunnelse: String? = null,
+    val innvilgelseBegrunnelse: String?,
 ) : VedtakInternt(TypeVedtak.INNVILGELSE)
 
 data class VedtakAvslagInternt(
