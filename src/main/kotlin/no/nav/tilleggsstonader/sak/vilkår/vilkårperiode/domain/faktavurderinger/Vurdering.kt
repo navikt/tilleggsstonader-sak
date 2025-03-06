@@ -15,6 +15,7 @@ enum class SvarJaNei {
     JA,
     JA_IMPLISITT,
     NEI,
+    GAMMEL_MANGLER_DATA,
     ;
 
     fun harVurdert(): Boolean = this != JA_IMPLISITT
@@ -40,6 +41,7 @@ data class VurderingLønnet private constructor(
                 SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
                 SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingLønnet::class.simpleName}")
+                SvarJaNei.GAMMEL_MANGLER_DATA -> TODO("Ikke implementert funksjonalitet for gammel data")
             }
     }
 }
@@ -57,6 +59,7 @@ data class VurderingHarUtgifter private constructor(
                 SvarJaNei.JA -> ResultatDelvilkårperiode.OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
                 SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingHarUtgifter::class.simpleName}")
+                SvarJaNei.GAMMEL_MANGLER_DATA -> TODO("Ikke implementert funksjonalitet for gammel data")
             }
     }
 }
@@ -74,6 +77,7 @@ data class VurderingHarRettTilUtstyrsstipend private constructor(
                 SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
                 SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingHarUtgifter::class.simpleName}")
+                SvarJaNei.GAMMEL_MANGLER_DATA -> TODO("Ikke implementert funksjonalitet for gammel data")
             }
     }
 }
@@ -93,6 +97,7 @@ data class VurderingMedlemskap private constructor(
                 -> ResultatDelvilkårperiode.OPPFYLT
 
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+                SvarJaNei.GAMMEL_MANGLER_DATA -> TODO("Ikke implementert funksjonalitet for gammel data")
             }
 
         val IMPLISITT = VurderingMedlemskap(SvarJaNei.JA_IMPLISITT)
@@ -112,6 +117,7 @@ data class VurderingDekketAvAnnetRegelverk private constructor(
                 SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
                 SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingDekketAvAnnetRegelverk::class.simpleName}")
+                SvarJaNei.GAMMEL_MANGLER_DATA -> TODO("Ikke implementert funksjonalitet for gammel data")
             }
     }
 }
@@ -133,6 +139,7 @@ data class VurderingAldersVilkår(
                 SvarJaNei.JA -> ResultatDelvilkårperiode.OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
                 SvarJaNei.JA_IMPLISITT -> ResultatDelvilkårperiode.OPPFYLT
+                SvarJaNei.GAMMEL_MANGLER_DATA -> ResultatDelvilkårperiode.OPPFYLT
             }
     }
 }
