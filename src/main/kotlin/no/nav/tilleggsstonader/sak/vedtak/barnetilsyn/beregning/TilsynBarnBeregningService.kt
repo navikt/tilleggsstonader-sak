@@ -21,8 +21,8 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilAktiviteter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
@@ -149,13 +149,13 @@ class TilsynBarnBeregningService(
         dagsats: BigDecimal,
         it: Beregningsgrunnlag,
     ): List<Beløpsperiode> =
-        it.stønadsperioderGrunnlag.map {
+        it.vedtaksperiodeGrunnlag.map {
             // Datoer som treffer helger må endres til neste mandag fordi andeler med type dagsats betales ikke ut i helger
-            val dato = it.stønadsperiode.fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
+            val dato = it.vedtaksperiode.fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
             Beløpsperiode(
                 dato = dato,
                 beløp = beregnBeløp(dagsats, it.antallDager),
-                målgruppe = it.stønadsperiode.målgruppe,
+                målgruppe = it.vedtaksperiode.målgruppe,
             )
         }
 
@@ -199,12 +199,11 @@ class TilsynBarnBeregningService(
             utgifterPerMåned[måned]?.let { utgifter ->
                 val antallBarn = utgifter.map { it.barnId }.toSet().size
                 val makssats = finnMakssats(måned, antallBarn)
-                // TODO rename til vedtaksperiodeGrunnlag
-                val stønadsperioderGrunnlag = finnStønadsperioderMedAktiviteter(vedtaksperiode, aktiviteterForMåned)
+                val vedtaksperiodeGrunnlag = finnVedtaksperiodeGrunnlag(vedtaksperiode, aktiviteterForMåned)
                 Beregningsgrunnlag(
                     måned = måned,
                     makssats = makssats,
-                    stønadsperioderGrunnlag = stønadsperioderGrunnlag,
+                    vedtaksperiodeGrunnlag = vedtaksperiodeGrunnlag,
                     utgifter = utgifter,
                     utgifterTotal = utgifter.sumOf { it.utgift },
                     antallBarn = antallBarn,
@@ -213,24 +212,24 @@ class TilsynBarnBeregningService(
         }
     }
 
-    private fun finnStønadsperioderMedAktiviteter(
+    private fun finnVedtaksperiodeGrunnlag(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
         aktiviteter: Map<AktivitetType, List<Aktivitet>>,
-    ): List<StønadsperiodeGrunnlag> {
+    ): List<VedtaksperiodeGrunnlag> {
         val aktiviteterPerUke = aktiviteter.map { it.key to it.value.tilDagerPerUke() }.toMap()
 
         return vedtaksperioder.map { vedtaksperiode ->
-            val relevanteAktiviteter = finnAktiviteterForStønadsperiode(vedtaksperiode, aktiviteter)
+            val relevanteAktiviteter = finnAktiviteterForVedtaksperiode(vedtaksperiode, aktiviteter)
 
-            StønadsperiodeGrunnlag(
-                stønadsperiode = vedtaksperiode,
+            VedtaksperiodeGrunnlag(
+                vedtaksperiode = vedtaksperiode,
                 aktiviteter = relevanteAktiviteter,
                 antallDager = antallDager(vedtaksperiode, aktiviteterPerUke),
             )
         }
     }
 
-    private fun finnAktiviteterForStønadsperiode(
+    private fun finnAktiviteterForVedtaksperiode(
         vedtaksperiode: VedtaksperiodeBeregning,
         aktiviteter: Map<AktivitetType, List<Aktivitet>>,
     ): List<Aktivitet> =

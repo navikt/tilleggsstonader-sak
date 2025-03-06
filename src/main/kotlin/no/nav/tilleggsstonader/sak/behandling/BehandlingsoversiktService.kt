@@ -94,11 +94,11 @@ class BehandlingsoversiktService(
     }
 
     /**
-     * Alle stønadsperioder blir lagret ned i en revurdering.
+     * Alle vedtaksperioder i beregningsreulatet blir lagret ned i en revurdering.
      * Dvs hvis jag revurderer fra 15 april, så lagrer vi ned perioder før det og.
      *
      * Av den grunnen hentes min(it.fom) og bruker max(minFom, revurderFra),
-     * då revurderFra egentlige gjøres etter minFom på stønadsperioden
+     * då revurderFra egentlige gjøres etter minFom på vedtaksperioden
      *
      * I tilfelle man kun har opphørt perioder, så vil revurderFra kunne være etter maksTom,
      * av den grunnen settes tom=max(maksTom, revurderFra)
@@ -116,13 +116,13 @@ class BehandlingsoversiktService(
         }
 
     private fun BeregningsresultatTilsynBarn.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {
-        val stønadsperioder =
+        val vedtaksperioder =
             perioder
-                .flatMap { it.grunnlag.stønadsperioderGrunnlag }
-                .map { it.stønadsperiode }
+                .flatMap { it.grunnlag.vedtaksperiodeGrunnlag }
+                .map { it.vedtaksperiode }
                 .avkortPerioderFør(revurdererFra)
-        val minFom = stønadsperioder.minOfOrNull { it.fom }
-        val maksTom = stønadsperioder.maxOfOrNull { it.tom }
+        val minFom = vedtaksperioder.minOfOrNull { it.fom }
+        val maksTom = vedtaksperioder.maxOfOrNull { it.tom }
         return Vedtaksperiode(fom = minFom, tom = maksTom)
     }
 

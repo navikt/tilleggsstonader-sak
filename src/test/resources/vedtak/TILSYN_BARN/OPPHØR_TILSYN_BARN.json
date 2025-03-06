@@ -13,9 +13,9 @@
         "grunnlag": {
           "måned": "2024-01",
           "makssats": 200,
-          "stønadsperioderGrunnlag": [
+          "vedtaksperiodeGrunnlag": [
             {
-              "stønadsperiode": {
+              "vedtaksperiode": {
                 "fom": "2024-01-01",
                 "tom": "2024-01-02",
                 "målgruppe": "AAP",
