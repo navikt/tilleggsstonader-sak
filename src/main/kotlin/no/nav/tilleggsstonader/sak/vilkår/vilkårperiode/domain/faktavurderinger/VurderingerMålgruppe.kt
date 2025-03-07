@@ -45,11 +45,6 @@ data class VurderingOmstillingsstønad(
 ) : MedlemskapVurdering,
     AldersvilkårVurdering
 
-data object VurderingOvergangsstønad : MedlemskapVurdering, AldersvilkårVurdering {
+data object VurderingOvergangsstønad : MedlemskapVurdering {
     override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
-    override val aldersvilkår: VurderingAldersVilkår =
-        VurderingAldersVilkår(
-            SvarJaNei.JA_IMPLISITT,
-            null,
-        )
 }

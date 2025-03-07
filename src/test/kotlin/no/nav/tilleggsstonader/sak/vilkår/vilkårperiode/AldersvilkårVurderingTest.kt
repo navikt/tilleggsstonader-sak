@@ -23,14 +23,6 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `Gyldige perioder med målgruppe OVERGANGSSTØNAD skal gi svar JA_IMPLISITT`() {
-        val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.OVERGANGSSTØNAD)
-        val grunnlagsdata = grunnlagsdataDomain()
-
-        assertThat(vurderAldersvilkår(målgruppe, grunnlagsdata)).isEqualTo(SvarJaNei.JA_IMPLISITT)
-    }
-
-    @Test
     fun `Gyldige perioder med målgruppe AAP skal skal gi svar JA`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.AAP)
         val grunnlagsdata = grunnlagsdataDomain()
@@ -55,7 +47,16 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `Gyldige perioder med målgruppe DAGPENGER skal gi svar NEI`() {
+    fun `Gyldige perioder med målgruppe OVERGANGSSTØNAD skal kaste feil`() {
+        val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.OVERGANGSSTØNAD)
+        val grunnlagsdata = grunnlagsdataDomain()
+
+        val feil = assertThrows<Feil> { vurderAldersvilkår(målgruppe, grunnlagsdata) }
+        assertThat(feil.message).isEqualTo("Aldersvilkår vurderes ikke for målgruppe: OVERGANGSSTØNAD")
+    }
+
+    @Test
+    fun `Gyldige perioder med målgruppe DAGPENGER skal kaste feil`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.DAGPENGER)
         val grunnlagsdata = grunnlagsdataDomain()
 
@@ -64,7 +65,7 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `Gyldige perioder med målgruppe SYKEPENGER_100_PROSENT skal gi svar NEI`() {
+    fun `Gyldige perioder med målgruppe SYKEPENGER_100_PROSENT skal kaste feil`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.SYKEPENGER_100_PROSENT)
         val grunnlagsdata = grunnlagsdataDomain()
 
@@ -73,7 +74,7 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `Gyldige perioder med målgruppe INGEN_MÅLGRUPPE skal gi svar NEI`() {
+    fun `Gyldige perioder med målgruppe INGEN_MÅLGRUPPE skal kaste feil`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.INGEN_MÅLGRUPPE)
         val grunnlagsdata = grunnlagsdataDomain()
 
