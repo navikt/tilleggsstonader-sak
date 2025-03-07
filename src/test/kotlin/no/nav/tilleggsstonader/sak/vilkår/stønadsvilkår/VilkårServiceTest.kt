@@ -6,7 +6,6 @@ import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -15,10 +14,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
@@ -26,9 +22,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
-import no.nav.tilleggsstonader.sak.util.SøknadUtil
-import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
-import no.nav.tilleggsstonader.sak.util.VilkårGrunnlagUtil.mockVilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -67,29 +60,16 @@ internal class VilkårServiceTest {
     private val behandlingService = mockk<BehandlingService>()
     private val vilkårRepository = mockk<VilkårRepository>()
     private val barnService = mockk<BarnService>()
-    private val behandlingFaktaService = mockk<BehandlingFaktaService>()
-    private val fagsakService = mockk<FagsakService>()
 
     private val vilkårService =
         VilkårService(
             behandlingService = behandlingService,
             vilkårRepository = vilkårRepository,
-            behandlingFaktaService = behandlingFaktaService,
             barnService = barnService,
-            fagsakService = fagsakService,
         )
 
     private val barnUnder9år = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)
     private val barnOver10år = FnrGenerator.generer(Year.now().minusYears(11).value, 1, 13)
-
-    private val søknadskjemaBarnetilsyn =
-        SøknadUtil.søknadskjemaBarnetilsyn(
-            barnMedBarnepass =
-                listOf(
-                    barnMedBarnepass(ident = barnUnder9år),
-                    barnMedBarnepass(ident = barnOver10år),
-                ),
-        )
 
     val sokandBarnMedBarnepass = BarnMedBarnepass(type = TypeBarnepass.BARNEHAGE_SFO_AKS, null, null)
     val soknadBarn1 = SøknadBarn(ident = barnUnder9år, data = sokandBarnMedBarnepass)
@@ -113,9 +93,7 @@ internal class VilkårServiceTest {
 
         every { vilkårRepository.insertAll(any()) } answers { firstArg() }
         every { barnService.finnBarnPåBehandling(behandlingId) } returns barn
-        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak()
 
-        every { behandlingFaktaService.hentFakta(behandlingId) } returns mockVilkårGrunnlagDto()
         every { vilkårRepository.insertAll(any()) } answers { firstArg() }
         justRun { vilkårRepository.deleteById(any()) }
         BrukerContextUtil.mockBrukerContext("saksbehandlernavn")
@@ -125,43 +103,6 @@ internal class VilkårServiceTest {
     internal fun tearDown() {
         BrukerContextUtil.clearBrukerContext()
     }
-
-    /*
-    @Test
-    internal fun `skal ikke returnere delvilkår som er ikke aktuelle til frontend`() {
-        val delvilkårsvurdering =
-            SivilstandRegel().initiereDelvilkårsvurdering(
-                HovedregelMetadata(
-                    mockk(),
-                    Sivilstandstype.ENKE_ELLER_ENKEMANN,
-                    barn = emptyList(),
-                    søktOmBarnetilsyn = emptyList(),
-                    vilkårgrunnlagDto = mockk(),
-                    behandling = mockk(),
-                ),
-            )
-        every { vilkårsvurderingRepository.findByBehandlingId(behandlingId) } returns
-            listOf(
-                Vilkårsvurdering(
-                    behandlingId = behandlingId,
-                    type = VilkårType.SIVILSTAND,
-                    delvilkårsvurdering = DelvilkårsvurderingWrapper(delvilkårsvurdering),
-                    opphavsvilkår = null,
-                ),
-            )
-
-        val vilkår = vurderingService.hentEllerOpprettVurderinger(behandlingId)
-
-        assertThat(delvilkårsvurdering).hasSize(5)
-        assertThat(delvilkårsvurdering.filter { it.resultat == Vilkårsresultat.IKKE_AKTUELL }).hasSize(4)
-        assertThat(delvilkårsvurdering.filter { it.resultat == Vilkårsresultat.IKKE_TATT_STILLING_TIL }).hasSize(1)
-
-        assertThat(vilkår.vurderinger).hasSize(1)
-        val delvilkårsvurderinger = vilkår.vurderinger.first().delvilkårsvurderinger
-        assertThat(delvilkårsvurderinger).hasSize(1)
-        assertThat(delvilkårsvurderinger.first().resultat).isEqualTo(Vilkårsresultat.IKKE_TATT_STILLING_TIL)
-        assertThat(delvilkårsvurderinger.first().vurderinger).hasSize(1)
-    }*/
 
     @Disabled
     @Test
@@ -432,30 +373,6 @@ internal class VilkårServiceTest {
             }.hasMessageContaining("Kan ikke slette periode")
         }
     }
-
-    private fun lagVilkårsett(
-        behandlingId: BehandlingId,
-        resultat: Vilkårsresultat = OPPFYLT,
-    ): List<Vilkår> =
-        VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN).map {
-            vilkår(
-                behandlingId = behandlingId,
-                resultat = resultat,
-                type = it,
-                delvilkår = listOf(),
-            )
-        }
-
-    private fun List<Vilkår>.finnVilkårAvType(vilkårType: VilkårType): List<Vilkår> = this.filter { it.type == vilkårType }
-
-    private fun List<Vilkår>.inneholderKunResultat(resultat: Vilkårsresultat = IKKE_TATT_STILLING_TIL) {
-        assertThat(
-            this.map { it.resultat }.toSet(),
-        ).containsOnly(resultat)
-    }
-
-    private fun List<Vilkår>.finnVurderingResultaterForBarn(barnId: BarnId): List<Vilkårsresultat>? =
-        this.find { vilkår -> vilkår.barnId == barnId }?.delvilkårsett?.map { delvilkår -> delvilkår.resultat }
 
     private fun initiererVilkår(lagretVilkår: CapturingSlot<Vilkår>): Vilkår {
         val vilkår =

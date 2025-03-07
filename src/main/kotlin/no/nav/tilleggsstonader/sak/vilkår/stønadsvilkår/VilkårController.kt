@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController
 class VilkårController(
     private val vilkårService: VilkårService,
     private val tilgangService: TilgangService,
-    // private val gjenbrukVilkårService: GjenbrukVilkårService,
 ) {
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
@@ -91,23 +90,4 @@ class VilkårController(
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return vilkårService.hentVilkårsvurdering(behandlingId)
     }
-
-    @GetMapping("{behandlingId}/oppdater")
-    fun oppdaterRegisterdata(
-        @PathVariable behandlingId: BehandlingId,
-    ): VilkårsvurderingDto {
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
-        return vilkårService.oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId)
-    }
-
-    /*@PostMapping("gjenbruk")
-    fun gjenbrukVilkår(@RequestBody request: GjenbrukVilkårDto): VilkårDto {
-        tilgangService.validerTilgangTilBehandling(request.kopierBehandlingId, AuditLoggerEvent.ACCESS)
-        tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
-        gjenbrukVilkårService.gjenbrukInngangsvilkårVurderinger(request.behandlingId, request.kopierBehandlingId)
-        return vurderingService.hentEllerOpprettVurderinger(request.behandlingId)
-    }
-     */
 }

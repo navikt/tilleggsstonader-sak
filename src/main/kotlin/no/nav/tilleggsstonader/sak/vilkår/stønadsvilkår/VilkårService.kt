@@ -6,10 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.NyttBarnId
 import no.nav.tilleggsstonader.sak.behandling.barn.TidligereBarnId
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaDto
-import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
@@ -38,7 +35,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.Op
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.lagNyttVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.finnesVilkårTypeForStønadstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -48,12 +44,7 @@ class VilkårService(
     private val behandlingService: BehandlingService,
     private val vilkårRepository: VilkårRepository,
     private val barnService: BarnService,
-    private val behandlingFaktaService: BehandlingFaktaService,
-    private val fagsakService: FagsakService,
 ) {
-    private val logger = LoggerFactory.getLogger(javaClass)
-    private val secureLogger = LoggerFactory.getLogger("secureLogger")
-
     @Transactional
     fun oppdaterVilkår(svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
         val vilkår = vilkårRepository.findByIdOrThrow(svarPåVilkårDto.id)
@@ -77,7 +68,7 @@ class VilkårService(
         validerBehandlingOgVilkårType(behandlingId, opprettVilkårDto.vilkårType)
 
         val relevanteRegler = hentVilkårsregel(opprettVilkårDto.vilkårType)
-        val metadata = hentHovedregelMetadata(behandlingId)
+        val metadata = hentHovedregelMetadata(behandling)
         validerBarnFinnesPåBehandling(metadata, opprettVilkårDto)
 
         val nyttVilkår =
@@ -138,14 +129,14 @@ class VilkårService(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
 
-        return oppdaterVilkårTilSkalIkkeVurderes(behandlingId, vilkår)
+        return oppdaterVilkårTilSkalIkkeVurderes(behandling, vilkår)
     }
 
     private fun oppdaterVilkårTilSkalIkkeVurderes(
-        behandlingId: BehandlingId,
+        behandling: Saksbehandling,
         vilkår: Vilkår,
     ): VilkårDto {
-        val metadata = hentHovedregelMetadata(behandlingId)
+        val metadata = hentHovedregelMetadata(behandling)
         val nyeDelvilkår =
             hentVilkårsregel(vilkår.type).initiereDelvilkår(
                 metadata,
@@ -162,7 +153,10 @@ class VilkårService(
             ).tilDto()
     }
 
-    private fun hentHovedregelMetadata(behandlingId: BehandlingId) = hentGrunnlagOgMetadata(behandlingId).second
+    private fun hentHovedregelMetadata(behandling: Saksbehandling): HovedregelMetadata {
+        val barn = barnService.finnBarnPåBehandling(behandling.id)
+        return HovedregelMetadata(barn, behandling)
+    }
 
     private fun validerBehandlingOgVilkårType(
         behandlingId: BehandlingId,
@@ -219,11 +213,9 @@ class VilkårService(
         }
     }
 
-    @Transactional
     fun hentVilkårsvurdering(behandlingId: BehandlingId): VilkårsvurderingDto {
-        val (grunnlag, metadata) = hentGrunnlagOgMetadata(behandlingId)
-        val vurderinger = hentVilkår(behandlingId, metadata).map(Vilkår::tilDto)
-        return VilkårsvurderingDto(vilkårsett = vurderinger, grunnlag = grunnlag)
+        val vurderinger = hentVilkår(behandlingId).map(Vilkår::tilDto)
+        return VilkårsvurderingDto(vilkårsett = vurderinger)
     }
 
     fun hentVilkårsett(behandlingId: BehandlingId): List<VilkårDto> {
@@ -231,34 +223,10 @@ class VilkårService(
         return vilkårsett.map { it.tilDto() }
     }
 
-    fun hentVilkår(behandlingId: BehandlingId): List<Vilkår> = vilkårRepository.findByBehandlingId(behandlingId)
-
-    @Transactional
-    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: BehandlingId): VilkårsvurderingDto {
-        // grunnlagsdataService.oppdaterOgHentNyGrunnlagsdata(behandlingId)
-        return this.hentVilkårsvurdering(behandlingId)
-    }
-
-    fun hentGrunnlagOgMetadata(behandlingId: BehandlingId): Pair<BehandlingFaktaDto, HovedregelMetadata> {
-        val behandling = behandlingService.hentBehandling(behandlingId)
-        val barn = barnService.finnBarnPåBehandling(behandlingId)
-        val grunnlag = behandlingFaktaService.hentFakta(behandlingId)
-        return Pair(grunnlag, HovedregelMetadata(barn, behandling))
-    }
-
-    private fun hentVilkår(
-        behandlingId: BehandlingId,
-        metadata: HovedregelMetadata,
-    ): List<Vilkår> =
+    fun hentVilkår(behandlingId: BehandlingId): List<Vilkår> =
         vilkårRepository
             .findByBehandlingId(behandlingId)
             .sortedWith(compareBy({ it.fom }, { it.tom }))
-
-    /*private fun finnEndringerIGrunnlagsdata(behandlingId: UUID): List<GrunnlagsdataEndring> {
-        val oppdaterteGrunnlagsdata = grunnlagsdataService.hentFraRegister(behandlingId)
-        val eksisterendeGrunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandlingId)
-        return oppdaterteGrunnlagsdata.endringerMellom(eksisterendeGrunnlagsdata)
-    }*/
 
     /**
      * Når en revurdering opprettes skal den kopiere de tidligere vilkårene for samme stønad.
