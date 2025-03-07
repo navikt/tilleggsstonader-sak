@@ -52,7 +52,15 @@
       "navn" : "Fornavn mellomnavn Etternavn",
       "fødselsdato" : "2024-06-04",
       "alder" : 0,
-      "dødsdato" : null
+      "dødsdato" : null,
+      "saksinformasjonAndreForeldre" : {
+        "hentetTidspunkt" : "2025-01-02T00:00:00",
+        "harBehandlingUnderArbeid" : true,
+        "vedtaksperioderBarn" : [ {
+          "fom" : "2025-01-01",
+          "tom" : "2025-01-31"
+        } ]
+      }
     },
     "søknadgrunnlag" : {
       "type" : "BARNEHAGE_SFO_AKS",
