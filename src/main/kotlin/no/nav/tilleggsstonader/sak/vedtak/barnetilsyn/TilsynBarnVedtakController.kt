@@ -35,6 +35,14 @@ class TilsynBarnVedtakController(
     private val behandlingService: BehandlingService,
     private val vedtaksperiodeService: VedtaksperiodeService,
 ) {
+    @PostMapping("{behandlingId}/innvilgelse")
+    fun innvilge(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: InnvilgelseTilsynBarnRequestV2,
+    ) {
+        lagreVedtak(behandlingId, vedtak)
+    }
+
     @PostMapping("{behandlingId}/innvilgelseV2")
     fun innvilgeV2(
         @PathVariable behandlingId: BehandlingId,
@@ -65,6 +73,20 @@ class TilsynBarnVedtakController(
     ) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         vedtakService.håndterSteg(behandlingId, vedtak)
+    }
+
+    @PostMapping("{behandlingId}/beregn")
+    fun beregn(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: InnvilgelseTilsynBarnRequestV2,
+    ): BeregningsresultatTilsynBarnDto {
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        return beregningService
+            .beregnV2(
+                vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
+                behandling = behandling,
+                typeVedtak = TypeVedtak.INNVILGELSE,
+            ).tilDto(behandling.revurderFra)
     }
 
     @PostMapping("{behandlingId}/beregnV2")
