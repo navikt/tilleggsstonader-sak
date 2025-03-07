@@ -130,7 +130,11 @@ data class VurderingAldersVilkår(
     constructor(
         svar: SvarJaNei,
         vurderingFaktaEtterlevelse: VurderingFaktaEtterlevelseAldersvilkår?,
-    ) : this(svar, utledResultat(svar), if (svar == SvarJaNei.GAMMEL_MANGLER_DATA) null else requireNotNull(vurderingFaktaEtterlevelse))
+    ) : this(
+        svar = svar,
+        resultat = utledResultat(svar),
+        vurderingFaktaEtterlevelse = if (svar == SvarJaNei.GAMMEL_MANGLER_DATA) null else requireNotNull(vurderingFaktaEtterlevelse),
+    )
 
     companion object {
         private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =
