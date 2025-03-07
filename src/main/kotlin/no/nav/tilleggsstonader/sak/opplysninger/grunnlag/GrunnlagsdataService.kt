@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import org.slf4j.LoggerFactory
@@ -20,6 +21,7 @@ class GrunnlagsdataService(
     private val barnService: BarnService,
     private val personService: PersonService,
     private val grunnlagsdataRepository: GrunnlagsdataRepository,
+    private val faktaGrunnlagService: FaktaGrunnlagService,
     private val arenaService: ArenaService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -29,6 +31,7 @@ class GrunnlagsdataService(
     fun opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId: BehandlingId) {
         if (!grunnlagsdataRepository.existsById(behandlingId)) {
             opprettGrunnlagsdata(behandlingId)
+            faktaGrunnlagService.opprettGrunnlag(behandlingId)
         }
     }
 
