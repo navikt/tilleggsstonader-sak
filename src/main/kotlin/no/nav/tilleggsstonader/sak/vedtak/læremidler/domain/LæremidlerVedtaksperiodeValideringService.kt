@@ -25,7 +25,7 @@ class LæremidlerVedtaksperiodeValideringService(
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
         behandlingId: BehandlingId,
     ) {
-        brukerfeilHvis(vedtaksperioder.isEmpty()) { "Kan ikke innvilge uten vedtaksperioder." }
+        brukerfeilHvis(vedtaksperioder.isEmpty()) { "Kan ikke innvilge når det ikke finnes noen vedtaksperioder." }
         validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
         validerVedtaksperiodeOmfattesAvStønadsperioder(vedtaksperioder, stønadsperioder)
 

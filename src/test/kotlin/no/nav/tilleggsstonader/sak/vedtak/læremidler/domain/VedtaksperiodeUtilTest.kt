@@ -78,7 +78,7 @@ class VedtaksperiodeUtilTest {
                     stønadsperioder = stønadsperioder,
                     behandlingId = behandlingId,
                 )
-            }.hasMessageContaining("Kan ikke innvilge uten vedtaksperioder.")
+            }.hasMessageContaining("Kan ikke innvilge når det ikke finnes noen vedtaksperioder.")
         }
 
         @Test
