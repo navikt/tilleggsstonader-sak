@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningU
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilAktiviteter
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilDto
 import org.assertj.core.api.Assertions.assertThat
 
 @Suppress("ktlint:standard:function-naming", "unused")
@@ -28,7 +29,7 @@ class BeregningUtilsStepDefinitons {
 
     @Gitt("disse vedtaksperiodene")
     fun `denne vedtaksperioden`(dataTable: DataTable) {
-        vedtaksperiodeBeregning = VedtaksperiodeBeregning(mapVedtaksperioderDto(dataTable).first())
+        vedtaksperiodeBeregning = VedtaksperiodeBeregning(mapVedtaksperioder(dataTable).tilDto().first())
     }
 
     @Gitt("disse aktivitetene")
