@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
@@ -181,7 +181,7 @@ fun mapAktiviteterLæremidler(
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetLæremidler
 
-        AktivitetType.REELL_ARBEIDSSØKER -> brukerfeil("Reell arbeidssøker er ikke en gyldig aktivitet for læremidler")
+        AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for læremidler")
     }
 
 private fun mapAktiviteterBoutgifter(
@@ -208,7 +208,7 @@ private fun mapAktiviteterBoutgifter(
             IngenAktivitetBoutgifter
         }
 
-        AktivitetType.REELL_ARBEIDSSØKER -> brukerfeil("Reell arbeidssøker er ikke en gyldig aktivitet for boutgifter")
+        AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for boutgifter")
     }
 
 private fun mapMålgruppeBarnetilsyn(

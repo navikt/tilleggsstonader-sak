@@ -27,6 +27,12 @@ class Feil(
     throwable: Throwable? = null,
 ) : RuntimeException(message, throwable)
 
+@Suppress("NOTHING_TO_INLINE")
+inline fun feil(
+    message: String,
+    httpStatus: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
+): Nothing = throw Feil(message = message, httpStatus = httpStatus)
+
 @OptIn(ExperimentalContracts::class)
 inline fun feilHvis(
     boolean: Boolean,
