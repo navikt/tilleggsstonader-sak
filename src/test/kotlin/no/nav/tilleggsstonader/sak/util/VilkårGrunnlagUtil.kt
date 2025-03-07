@@ -36,6 +36,7 @@ object VilkårGrunnlagUtil {
                 fødselsdato = LocalDate.of(2024, 6, 4),
                 alder = null,
                 dødsdato = null,
+                saksinformasjonAndreForeldre = null,
             ),
         søknadgrunnlag: SøknadsgrunnlagBarn? = null,
     ) = FaktaBarn(

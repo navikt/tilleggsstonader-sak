@@ -15,4 +15,6 @@ enum class Toggle(
     SØKNAD_ROUTING_LÆREMIDLER("sak.soknad-routing.laremidler"),
 
     KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN("sak.kan-bruke-vedtaksperioder-tilsyn-barn"),
+
+    SKAL_HENTE_GRUNNLAG_ANNEN_FORELDER("sak.skal-hente-grunnlag-annen-forelder"),
 }
