@@ -42,9 +42,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -117,7 +117,7 @@ internal class VilkårServiceTest {
             )
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns eksisterendeVilkårsett
 
-        val vilkårsett = vilkårService.hentVilkårsvurdering(behandlingId).vilkårsett
+        val vilkårsett = vilkårService.hentVilkår(behandlingId)
 
         assertThat(vilkårsett).hasSize(1)
         verify(exactly = 0) { vilkårRepository.insertAll(any()) }
@@ -131,7 +131,7 @@ internal class VilkårServiceTest {
             val vilkårId = VilkårId.random()
             every { vilkårRepository.findByIdOrNull(vilkårId) } returns null
             assertThat(
-                Assertions.catchThrowable {
+                catchThrowable {
                     vilkårService.oppdaterVilkår(
                         SvarPåVilkårDto(
                             id = vilkårId,
@@ -250,7 +250,7 @@ internal class VilkårServiceTest {
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
         assertThat(
-            Assertions.catchThrowable {
+            catchThrowable {
                 vilkårService.oppdaterVilkår(
                     SvarPåVilkårDto(
                         id = vilkår.id,
@@ -285,7 +285,7 @@ internal class VilkårServiceTest {
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
         assertThat(
-            Assertions.catchThrowable {
+            catchThrowable {
                 vilkårService.oppdaterVilkår(
                     SvarPåVilkårDto(
                         id = vilkår.id,

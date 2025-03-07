@@ -28,7 +28,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
@@ -46,7 +45,7 @@ class VilkårService(
     private val barnService: BarnService,
 ) {
     @Transactional
-    fun oppdaterVilkår(svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
+    fun oppdaterVilkår(svarPåVilkårDto: SvarPåVilkårDto): Vilkår {
         val vilkår = vilkårRepository.findByIdOrThrow(svarPåVilkårDto.id)
         val behandlingId = vilkår.behandlingId
 
@@ -56,7 +55,7 @@ class VilkårService(
 
         val oppdatertVilkår = flettVilkårOgVurderResultat(vilkår, svarPåVilkårDto)
         validerEndrePeriodeRevurdering(behandling, vilkår, oppdatertVilkår)
-        return vilkårRepository.update(oppdatertVilkår).tilDto()
+        return vilkårRepository.update(oppdatertVilkår)
     }
 
     @Transactional
@@ -211,16 +210,6 @@ class VilkårService(
         brukerfeilHvisIkke(behandling.steg == StegType.VILKÅR) {
             "Kan ikke oppdatere vilkår når behandling er på steg=${behandling.steg}."
         }
-    }
-
-    fun hentVilkårsvurdering(behandlingId: BehandlingId): VilkårsvurderingDto {
-        val vurderinger = hentVilkår(behandlingId).map(Vilkår::tilDto)
-        return VilkårsvurderingDto(vilkårsett = vurderinger)
-    }
-
-    fun hentVilkårsett(behandlingId: BehandlingId): List<VilkårDto> {
-        val vilkårsett = hentVilkår(behandlingId)
-        return vilkårsett.map { it.tilDto() }
     }
 
     fun hentVilkår(behandlingId: BehandlingId): List<Vilkår> =

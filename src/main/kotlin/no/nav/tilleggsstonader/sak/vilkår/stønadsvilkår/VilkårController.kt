@@ -42,7 +42,7 @@ class VilkårController(
         tilgangService.validerTilgangTilBehandling(svarPåVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         try {
-            return vilkårService.oppdaterVilkår(svarPåVilkårDto)
+            return vilkårService.oppdaterVilkår(svarPåVilkårDto).tilDto()
         } catch (e: Exception) {
             val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
@@ -88,6 +88,6 @@ class VilkårController(
         @PathVariable behandlingId: BehandlingId,
     ): VilkårsvurderingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        return vilkårService.hentVilkårsvurdering(behandlingId)
+        return VilkårsvurderingDto(vilkårService.hentVilkår(behandlingId).map { it.tilDto() })
     }
 }
