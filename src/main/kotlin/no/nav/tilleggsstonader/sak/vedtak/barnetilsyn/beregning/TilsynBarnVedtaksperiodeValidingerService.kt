@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerIngenEndringerFørRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett
@@ -29,8 +30,11 @@ class TilsynBarnVedtaksperiodeValidingerService(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         utgifter: Map<BarnId, List<UtgiftBeregning>>,
+        typeVedtak: TypeVedtak,
     ) {
-        validerVedtaksperioderEksisterer(vedtaksperioder)
+        if (typeVedtak != TypeVedtak.OPPHØR) {
+            validerVedtaksperioderEksisterer(vedtaksperioder)
+        }
         validerIngenOverlappMellomVedtaksperioder(vedtaksperioder)
         validerUtgiftHeleVedtaksperioden(vedtaksperioder, utgifter)
 
@@ -48,10 +52,10 @@ class TilsynBarnVedtaksperiodeValidingerService(
 
         vedtaksperioder.forEach {
             validerEnkeltperiode(
-                it,
-                målgrupper,
-                aktiviteter,
-                fødselsdato,
+                vedtaksperiode = it,
+                målgruppePerioderPerType = målgrupper,
+                aktivitetPerioderPerType = aktiviteter,
+                fødselsdato = fødselsdato,
             )
         }
 

@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Navn
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteVilkårperioder
@@ -101,6 +102,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     vedtaksperioder = listOf(vedtaksperiode),
                     behandling = behandling,
                     utgifter = utgifter,
+                    typeVedtak = TypeVedtak.INNVILGELSE,
                 )
             }.doesNotThrowAnyException()
         }
