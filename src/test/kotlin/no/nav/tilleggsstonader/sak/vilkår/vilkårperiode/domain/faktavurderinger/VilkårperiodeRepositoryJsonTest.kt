@@ -145,6 +145,8 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
             return forventetTypeTilsynBarn(type)
         } else if (type is TypeFaktaOgVurderingLæremidler) {
             return forventetTypeLæremidler(type)
+        } else if (type is TypeFaktaOgVurderingBoutgifter) {
+            return forventetTypeBoutgifter(type)
         }
         error("Ukjent type")
     }
@@ -192,6 +194,30 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
                     AktivitetLæremidlerType.UTDANNING_LÆREMIDLER -> UtdanningLæremidler::class
                     AktivitetLæremidlerType.TILTAK_LÆREMIDLER -> TiltakLæremidler::class
                     AktivitetLæremidlerType.INGEN_AKTIVITET_LÆREMIDLER -> IngenAktivitetLæremidler::class
+                }
+            }
+        }.java
+
+    private fun forventetTypeBoutgifter(type: TypeFaktaOgVurderingBoutgifter): Class<out FaktaOgVurderingBoutgifter> =
+        when (type) {
+            // TODO kommenter inn når implementerer målgruppe for boutgifter
+//            is MålgruppeLæremidlerType -> {
+//                when (type) {
+//                    MålgruppeLæremidlerType.AAP_LÆREMIDLER -> AAPLæremidler::class
+//                    MålgruppeLæremidlerType.UFØRETRYGD_LÆREMIDLER -> UføretrygdLæremidler::class
+//                    MålgruppeLæremidlerType.NEDSATT_ARBEIDSEVNE_LÆREMIDLER -> NedsattArbeidsevneLæremidler::class
+//                    MålgruppeLæremidlerType.OMSTILLINGSSTØNAD_LÆREMIDLER -> OmstillingsstønadLæremidler::class
+//                    MålgruppeLæremidlerType.OVERGANGSSTØNAD_LÆREMIDLER -> OvergangssstønadLæremidler::class
+//                    MålgruppeLæremidlerType.INGEN_MÅLGRUPPE_LÆREMIDLER -> IngenMålgruppeLæremidler::class
+//                    MålgruppeLæremidlerType.SYKEPENGER_100_PROSENT_LÆREMIDLER -> SykepengerLæremidler::class
+//                }
+//            }
+
+            is AktivitetBoutgifterType -> {
+                when (type) {
+                    AktivitetBoutgifterType.TILTAK_BOUTGIFTER -> TiltakBoutgifter::class
+                    AktivitetBoutgifterType.UTDANNING_BOUTGIFTER -> UtdanningBoutgifter::class
+                    AktivitetBoutgifterType.INGEN_AKTIVITET_BOUTGIFTER -> IngenAktivitetBoutgifter::class
                 }
             }
         }.java

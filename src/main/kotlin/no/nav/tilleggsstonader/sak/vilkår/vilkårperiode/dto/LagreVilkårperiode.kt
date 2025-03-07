@@ -23,6 +23,7 @@ data class LagreVilkårperiode(
     JsonSubTypes.Type(FaktaOgSvarMålgruppeDto::class, name = "MÅLGRUPPE"),
     JsonSubTypes.Type(FaktaOgSvarAktivitetBarnetilsynDto::class, name = "AKTIVITET_BARNETILSYN"),
     JsonSubTypes.Type(FaktaOgSvarAktivitetLæremidlerDto::class, name = "AKTIVITET_LÆREMIDLER"),
+    JsonSubTypes.Type(FaktaOgSvarAktivitetBoutgifterDto::class, name = "AKTIVITET_BOUTGIFTER"),
 )
 sealed class FaktaOgSvarDto
 
@@ -41,4 +42,9 @@ data class FaktaOgSvarAktivitetLæremidlerDto(
     val studienivå: Studienivå? = null,
     val svarHarUtgifter: SvarJaNei? = null,
     val svarHarRettTilUtstyrsstipend: SvarJaNei? = null,
+) : FaktaOgSvarDto()
+
+data class FaktaOgSvarAktivitetBoutgifterDto(
+    val aktivitetsdager: Int? = null,
+    val svarLønnet: SvarJaNei? = null,
 ) : FaktaOgSvarDto()
