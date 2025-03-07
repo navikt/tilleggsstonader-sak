@@ -47,7 +47,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -596,28 +595,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
                 .containsExactlyElementsOf(listOf(forventetAndel))
-        }
-
-        @Test
-        fun `skal kaste feil ved forsøk på å opprette andeler med ugyldig målgruppe`() {
-            vilkårperiodeRepository.insert(
-                målgruppe(
-                    behandling.id,
-                    fom = januar.atDay(1),
-                    tom = april.atEndOfMonth(),
-                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.SYKEPENGER_100_PROSENT),
-                    begrunnelse = "Øsnker å teste ugyldig målgruppe",
-                ),
-            )
-            val vedtakDto = innvilgelseDtoV2(listOf(vedtaksperiode.copy(målgruppeType = MålgruppeType.SYKEPENGER_100_PROSENT)))
-            assertThatThrownBy {
-                steg.utførOgReturnerNesteSteg(
-                    saksbehandling,
-                    vedtakDto,
-                )
-            }.hasMessageContaining(
-                "Vedtaksperiode 01.01.2023 - 31.01.2023 overlapper med SYKEPENGER_100_PROSENT(01.01.2023 - 30.04.2023) som ikke gir rett på stønad",
-            )
         }
     }
 

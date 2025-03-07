@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
@@ -29,7 +28,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
 
@@ -159,7 +157,7 @@ class TilsynBarnBeregnYtelseSteg(
                         fom = beløpsperiode.dato,
                         tom = beløpsperiode.dato,
                         satstype = satstype,
-                        type = beløpsperiode.målgruppe.tilTypeAndel(),
+                        type = beløpsperiode.målgruppe.tilTypeAndel(Stønadstype.BARNETILSYN),
                         kildeBehandlingId = saksbehandling.id,
                         utbetalingsdato = førsteDagIMåneden,
                     )
@@ -186,12 +184,4 @@ class TilsynBarnBeregnYtelseSteg(
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
         )
-
-    private fun MålgruppeType.tilTypeAndel(): TypeAndel =
-        when (this) {
-            MålgruppeType.AAP, MålgruppeType.UFØRETRYGD, MålgruppeType.NEDSATT_ARBEIDSEVNE -> TypeAndel.TILSYN_BARN_AAP
-            MålgruppeType.OVERGANGSSTØNAD -> TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER
-            MålgruppeType.OMSTILLINGSSTØNAD -> TypeAndel.TILSYN_BARN_ETTERLATTE
-            else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
-        }
 }
