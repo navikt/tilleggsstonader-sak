@@ -191,13 +191,13 @@ class BehandlingsstatistikkService(
             ferdigBehandletTid = if (Hendelse.FERDIG == hendelse) hendelseTidspunkt else null,
             totrinnsbehandling = beslutterId != null,
             sakUtland = mapTilStreng(saksbehandling.kategori),
-            relatertBehandlingId = relatertBehandlingId, // utledRelatertBehandling(saksbehandling),
+            relatertBehandlingId = relatertBehandlingId,
             versjon = Applikasjonsversjon.versjon,
-            vilkårsprøving = emptyList(), // TODO: Implementer dette i samarbeid med Team SAK. Ikke kritisk å ha med i starten.
-            revurderingÅrsak = null, // TODO aktiver når revurdering er implementert
-            revurderingOpplysningskilde = null, // TODO aktiver når revurdering er implementert
-            venteAarsak = null, // TODO?
-            papirSøknad = null, // TODO?
+            vilkårsprøving = emptyList(),
+            revurderingÅrsak = null,
+            revurderingOpplysningskilde = null,
+            venteAarsak = null,
+            papirSøknad = null,
         )
 
         private fun finnAnsvarligBeslutter(
@@ -227,7 +227,7 @@ class BehandlingsstatistikkService(
         private fun utledResultatBegrunnelse(behandling: Saksbehandling): String? =
             when (behandling.resultat) {
                 BehandlingResultat.HENLAGT -> behandling.henlagtÅrsak?.name
-                BehandlingResultat.AVSLÅTT -> "UKJENT" // TODO: Send riktig verdier når vi får en liste over avslagsårsaker
+                BehandlingResultat.AVSLÅTT -> "UKJENT"
 
                 else -> null
             }
