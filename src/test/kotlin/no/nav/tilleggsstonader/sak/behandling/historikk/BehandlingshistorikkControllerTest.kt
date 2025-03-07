@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -167,6 +168,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
                 behandlingId = behandling.id,
                 steg = behandling.steg,
                 metadata = metadata,
+                gitVersjon = Applikasjonsversjon.versjon,
             ),
         )
 
@@ -189,6 +191,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
                 opprettetAv = opprettetAv,
                 opprettetAvNavn = opprettetAv,
                 endretTid = endretTid,
+                gitVersjon = Applikasjonsversjon.versjon,
             ),
         )
     }

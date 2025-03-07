@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
@@ -69,6 +70,7 @@ object VilkårperiodeTestUtil {
             type = faktaOgVurdering.type.vilkårperiodeType,
             begrunnelse = begrunnelse,
             faktaOgVurdering = faktaOgVurdering,
+            gitVersjon = Applikasjonsversjon.versjon,
         )
 
     fun faktaOgVurderingMålgruppe(
@@ -141,6 +143,7 @@ object VilkårperiodeTestUtil {
         begrunnelse = begrunnelse,
         faktaOgVurdering = faktaOgVurdering,
         kildeId = kildeId,
+        gitVersjon = Applikasjonsversjon.versjon,
     )
 
     fun faktaOgVurderingAktivitetTilsynBarn(

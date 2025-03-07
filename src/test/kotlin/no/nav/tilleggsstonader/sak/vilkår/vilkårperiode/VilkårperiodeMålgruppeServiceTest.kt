@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
@@ -64,6 +66,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             assertThat(vilkårperiode.medlemskap.svar).isEqualTo(SvarJaNei.NEI)
             assertThat(vilkårperiode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
             assertThat(vilkårperiode.faktaOgVurdering.vurderinger).isNotInstanceOf(DekketAvAnnetRegelverkVurdering::class.java)
+            assertThat(vilkårperiode.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
         }
 
         @Test
@@ -208,6 +211,42 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             assertThat(oppdatertPeriode.begrunnelse).isEqualTo("Oppdatert begrunnelse")
             assertThat(oppdatertPeriode.medlemskap.svar).isEqualTo(SvarJaNei.JA)
             assertThat(oppdatertPeriode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+        }
+
+        @Test
+        fun `skal oppdatere gitVersjon`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            val eksisterendeMålgruppeId =
+                vilkårperiodeService
+                    .opprettVilkårperiode(
+                        dummyVilkårperiodeMålgruppe(
+                            medlemskap = null,
+                            behandlingId = behandling.id,
+                        ),
+                    ).id
+            jdbcTemplate.update(
+                "update vilkar_periode SET git_versjon=:versjon",
+                mapOf("versjon" to "versjon"),
+            )
+
+            val målgruppe = vilkårperiodeRepository.findByIdOrThrow(eksisterendeMålgruppeId)
+            assertThat(målgruppe.gitVersjon).isEqualTo("versjon")
+            val faktaOgSvar =
+                FaktaOgSvarMålgruppeDto(
+                    svarMedlemskap = SvarJaNei.JA,
+                    svarUtgifterDekketAvAnnetRegelverk = null,
+                )
+            val oppdatering =
+                målgruppe.tilOppdatering().copy(
+                    fom = LocalDate.of(2020, 1, 1),
+                    tom = LocalDate.of(2020, 1, 1),
+                    begrunnelse = "Oppdatert begrunnelse",
+                    faktaOgSvar = faktaOgSvar,
+                )
+            vilkårperiodeService.oppdaterVilkårperiode(eksisterendeMålgruppeId, oppdatering)
+            assertThat(vilkårperiodeRepository.findByIdOrThrow(eksisterendeMålgruppeId).gitVersjon)
+                .isEqualTo(Applikasjonsversjon.versjon)
         }
 
         @Test

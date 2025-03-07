@@ -43,6 +43,7 @@ data class Vilkår(
     val delvilkårwrapper: DelvilkårWrapper,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "opphavsvilkaar_")
     val opphavsvilkår: Opphavsvilkår?,
+    val gitVersjon: String?,
 ) {
     val delvilkårsett get() = delvilkårwrapper.delvilkårsett
 

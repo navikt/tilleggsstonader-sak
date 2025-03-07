@@ -324,6 +324,25 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         }
 
         @Test
+        fun `skal beholde gitVersjon`() {
+            val gitVersjon = UUID.randomUUID().toString()
+            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+
+            val eksisterendeVilkårperioder =
+                listOf(
+                    målgruppe(behandlingId = revurdering.forrigeBehandlingId!!)
+                        .copy(gitVersjon = gitVersjon),
+                )
+            vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
+
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeBehandlingId!!, revurdering.id)
+
+            val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
+            assertThat(res).hasSize(1)
+            assertThat(res.single().gitVersjon).isEqualTo(gitVersjon)
+        }
+
+        @Test
         fun `skal ikke gjenbruke slettede vilkår fra forrige behandling`() {
             val revurdering = testoppsettService.lagBehandlingOgRevurdering()
 
