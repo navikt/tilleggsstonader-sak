@@ -49,12 +49,15 @@ data class BehandlingsinformasjonAnnenForelder(
             val perioderForBarn: MutableMap<BarnId, MutableList<Datoperiode>> = mutableMapOf()
             vedtak.beregningsresultat.perioder
                 .forEach { perioder ->
-                    val fom = perioder.grunnlag.måned.atDay(1)
-                    val tom = perioder.grunnlag.måned.atEndOfMonth()
-                    perioder.grunnlag.utgifter.forEach { utgift ->
-                        perioderForBarn
-                            .getOrPut(utgift.barnId) { mutableListOf() }
-                            .add(Datoperiode(fom = fom, tom = tom))
+
+                    perioder.grunnlag.vedtaksperiodeGrunnlag.forEach { vedtaksperiode ->
+                        val fom = vedtaksperiode.vedtaksperiode.fom
+                        val tom = vedtaksperiode.vedtaksperiode.tom
+                        perioder.grunnlag.utgifter.forEach { utgift ->
+                            perioderForBarn
+                                .getOrPut(utgift.barnId) { mutableListOf() }
+                                .add(Datoperiode(fom = fom, tom = tom))
+                        }
                     }
                 }
             perioderForBarn

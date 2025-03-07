@@ -186,7 +186,10 @@ class BehandlingFaktaService(
                 SaksinformasjonAndreForeldre(
                     hentetTidspunkt = fakta.sporbar.opprettetTid,
                     harBehandlingUnderArbeid = fakta.data.andreForeldre.any { it.harBehandlingUnderArbeid },
-                    vedtaksperioderBarn = fakta.data.andreForeldre.flatMap { it.vedtaksperioderBarn }.sorted(),
+                    vedtaksperioderBarn =
+                        fakta.data.andreForeldre
+                            .flatMap { it.vedtaksperioderBarn }
+                            .sorted(),
                 )
             }
 
