@@ -50,7 +50,7 @@ class VedtaksstatistikkService(
     ) {
         val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
-        val vilkårsvurderinger = vilkårService.hentVilkårsett(behandlingId)
+        val vilkårsvurderinger = vilkårService.hentVilkår(behandlingId)
         val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandlingId)

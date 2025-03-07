@@ -69,7 +69,7 @@ class InterntVedtakServiceTest {
             every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.TilsynBarn.vilkårperioder
             every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.TilsynBarn.grunnlagsdata
             every { barnService.finnBarnPåBehandling(behandlingId) } returns Testdata.TilsynBarn.behandlingBarn
-            every { vilkårService.hentVilkårsett(behandlingId) } returns Testdata.TilsynBarn.vilkår
+            every { vilkårService.hentVilkår(behandlingId) } returns Testdata.TilsynBarn.vilkår
             every { vedtakService.hentVedtak(behandlingId) } returns Testdata.TilsynBarn.vedtak
         }
 
@@ -196,7 +196,7 @@ class InterntVedtakServiceTest {
             every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.Læremidler.vilkårperioder
             every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.Læremidler.grunnlagsdata
             every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
-            every { vilkårService.hentVilkårsett(behandlingId) } returns emptyList()
+            every { vilkårService.hentVilkår(behandlingId) } returns emptyList()
             every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.avslåttVedtak
         }
 

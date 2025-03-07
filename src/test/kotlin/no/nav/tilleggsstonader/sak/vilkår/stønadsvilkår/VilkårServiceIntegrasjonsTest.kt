@@ -29,9 +29,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -145,15 +143,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             val vilkårForRevurdering = vilkårRepository.findByBehandlingId(revurdering.id).first()
             assertThat(vilkårForRevurdering.gitVersjon).isEqualTo(gitVersjon)
         }
-    }
-
-    @Disabled // TODO
-    @Test
-    internal fun `oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger skal kaste feil dersom behandlingen er låst for videre behandling`() {
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-        assertThat(catchThrowable { vilkårService.oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandling.id) })
-            .hasMessage("Kan ikke laste inn nye grunnlagsdata for behandling med status ${behandling.status}")
     }
 
     @Nested

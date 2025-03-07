@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.util.norskFormat
@@ -17,7 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
  */
 data class HovedregelMetadata(
     val barn: List<BehandlingBarn>,
-    val behandling: Behandling,
+    val behandling: Saksbehandling,
 )
 
 abstract class Vilkårsregel(
