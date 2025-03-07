@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDt
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import org.springframework.stereotype.Service
 
 @Service
@@ -66,6 +67,7 @@ class BehandlingshistorikkService(
                     metadata?.let {
                         JsonWrapper(objectMapper.writeValueAsString(it))
                     },
+                gitVersjon = Applikasjonsversjon.versjon,
             ),
         )
     }

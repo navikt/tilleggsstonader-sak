@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -140,6 +141,7 @@ class LæremidlerBeregnYtelseSteg(
                         årsaker = vedtak.årsakerOpphør,
                         begrunnelse = vedtak.begrunnelse,
                     ),
+                gitVersjon = Applikasjonsversjon.versjon,
             ),
         )
 
@@ -159,6 +161,7 @@ class LæremidlerBeregnYtelseSteg(
                         årsaker = vedtak.årsakerAvslag,
                         begrunnelse = vedtak.begrunnelse,
                     ),
+                gitVersjon = Applikasjonsversjon.versjon,
             ),
         )
     }
@@ -226,6 +229,7 @@ class LæremidlerBeregnYtelseSteg(
                     beregningsresultat = BeregningsresultatLæremidler(beregningsresultat.perioder),
                     begrunnelse = begrunnelse,
                 ),
+            gitVersjon = Applikasjonsversjon.versjon,
         )
 
     /**

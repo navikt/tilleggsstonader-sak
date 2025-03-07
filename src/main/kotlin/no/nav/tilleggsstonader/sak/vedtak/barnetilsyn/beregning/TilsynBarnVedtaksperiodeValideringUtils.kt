@@ -34,6 +34,9 @@ object TilsynBarnVedtaksperiodeValideringUtils {
         vedtaksperioder: List<Vedtaksperiode>,
         utgifter: Map<BarnId, List<UtgiftBeregning>>,
     ) {
+        if (vedtaksperioder.isEmpty()) {
+            return
+        }
         brukerfeilHvisIkke(
             erUtgiftperiodeSomInneholderVedtaksperiode(
                 vedtaksperioder = vedtaksperioder,

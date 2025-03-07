@@ -87,6 +87,7 @@ class TilsynBarnBeregningService(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             utgifter = utgifterPerBarn,
+            typeVedtak = typeVedtak,
         )
 
         val vedtaksperioderBeregning =

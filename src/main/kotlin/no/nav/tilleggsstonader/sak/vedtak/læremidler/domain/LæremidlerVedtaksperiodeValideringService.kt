@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerIngenEndringerFørRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
@@ -24,6 +25,7 @@ class LæremidlerVedtaksperiodeValideringService(
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
         behandlingId: BehandlingId,
     ) {
+        brukerfeilHvis(vedtaksperioder.isEmpty()) { "Kan ikke innvilge når det ikke finnes noen vedtaksperioder." }
         validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
         validerVedtaksperiodeOmfattesAvStønadsperioder(vedtaksperioder, stønadsperioder)
 

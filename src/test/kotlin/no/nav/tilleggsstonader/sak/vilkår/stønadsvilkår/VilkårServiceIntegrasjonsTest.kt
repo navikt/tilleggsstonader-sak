@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -23,6 +24,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -34,6 +37,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.UUID
 
 internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     @Autowired
@@ -108,7 +112,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             )
 
             val vilkårForRevurdering = vilkårRepository.findByBehandlingId(revurdering.id)
-
             assertThat(vilkårForRevurdering).isEmpty()
         }
 
@@ -125,6 +128,22 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             val vilkårForRevurdering = vilkårRepository.findByBehandlingId(revurdering.id)
 
             assertThat(vilkårForRevurdering).isEmpty()
+        }
+
+        @Test
+        fun `skal beholde gitVersjon`() {
+            val gitVersjon = UUID.randomUUID().toString()
+            lagreVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling).first()
+            jdbcTemplate.update("UPDATE vilkar SET git_versjon=:versjon", mapOf("versjon" to gitVersjon))
+
+            vilkårService.kopierVilkårsettTilNyBehandling(
+                forrigeBehandlingId = førstegangsbehandling.id,
+                nyBehandling = revurdering,
+                barnIdMap = barnIdMap,
+            )
+
+            val vilkårForRevurdering = vilkårRepository.findByBehandlingId(revurdering.id).first()
+            assertThat(vilkårForRevurdering.gitVersjon).isEqualTo(gitVersjon)
         }
     }
 
@@ -176,6 +195,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             assertThat(vilkårFraDb.opphavsvilkår).isNull()
             assertThat(vilkårFraDb.delvilkårsett.map { it.hovedregel })
                 .containsExactlyInAnyOrderElementsOf(opprettOppfyltDelvilkår.delvilkårsett.map { it.hovedregel() })
+            assertThat(vilkårFraDb.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
         }
 
         @Test
@@ -208,6 +228,61 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             assertThatThrownBy {
                 vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår.copy(vilkårType = VilkårType.EKSEMPEL))
             }.hasMessageContaining("Vilkårtype=EKSEMPEL eksisterer ikke for stønadstype=BARNETILSYN")
+        }
+    }
+
+    @Nested
+    inner class OppdaterVilkår {
+        val behandling = behandling(status = BehandlingStatus.UTREDES, steg = StegType.VILKÅR)
+        val barn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.BARN_FNR)
+
+        val opprettOppfyltDelvilkår =
+            OpprettVilkårDto(
+                vilkårType = VilkårType.PASS_BARN,
+                barnId = barn.id,
+                behandlingId = behandling.id,
+                delvilkårsett = oppfylteDelvilkårPassBarnDto(),
+                fom = LocalDate.of(2024, 1, 1),
+                tom = LocalDate.of(2024, 1, 31),
+                utgift = 1,
+            )
+
+        @BeforeEach
+        fun setUp() {
+            testoppsettService.opprettBehandlingMedFagsak(behandling, opprettGrunnlagsdata = false)
+            barnRepository.insert(barn)
+            testoppsettService.opprettGrunnlagsdata(behandling.id)
+        }
+
+        @Test
+        fun `skal oppdatere vilkår på behandling`() {
+            val gitVersjon = UUID.randomUUID().toString()
+            val vilkår = vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår)
+            jdbcTemplate.update("UPDATE vilkar SET git_versjon=:versjon", mapOf("versjon" to gitVersjon))
+            vilkårService.oppdaterVilkår(
+                SvarPåVilkårDto(
+                    id = vilkår.id,
+                    behandlingId = behandling.id,
+                    delvilkårsett = vilkår.delvilkårsett.map { it.tilDto() },
+                    fom = LocalDate.of(2025, 1, 1),
+                    tom = LocalDate.of(2025, 1, 31),
+                    utgift = 1000,
+                ),
+            )
+
+            val vilkårFraDb = vilkårRepository.findByBehandlingId(behandling.id).single()
+            assertThat(vilkårFraDb.behandlingId).isEqualTo(behandling.id)
+            assertThat(vilkårFraDb.type).isEqualTo(VilkårType.PASS_BARN)
+            assertThat(vilkårFraDb.fom).isEqualTo(LocalDate.of(2025, 1, 1))
+            assertThat(vilkårFraDb.tom).isEqualTo(LocalDate.of(2025, 1, 31))
+            assertThat(vilkårFraDb.utgift).isEqualTo(1000)
+            assertThat(vilkårFraDb.barnId).isEqualTo(barn.id)
+            assertThat(vilkårFraDb.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
+            assertThat(vilkårFraDb.status).isEqualTo(VilkårStatus.NY)
+            assertThat(vilkårFraDb.opphavsvilkår).isNull()
+            assertThat(vilkårFraDb.delvilkårsett.map { it.hovedregel })
+                .containsExactlyInAnyOrderElementsOf(opprettOppfyltDelvilkår.delvilkårsett.map { it.hovedregel() })
+            assertThat(vilkårFraDb.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
         }
     }
 

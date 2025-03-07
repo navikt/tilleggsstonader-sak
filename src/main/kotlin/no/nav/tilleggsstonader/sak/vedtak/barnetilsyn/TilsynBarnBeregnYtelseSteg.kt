@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
@@ -133,6 +134,7 @@ class TilsynBarnBeregnYtelseSteg(
                         begrunnelse = vedtak.begrunnelse,
                         vedtaksperioder = null,
                     ),
+                gitVersjon = Applikasjonsversjon.versjon,
             ),
         )
 
@@ -172,6 +174,7 @@ class TilsynBarnBeregnYtelseSteg(
                         begrunnelse = vedtak.begrunnelse,
                         vedtaksperioder = vedtaksperioder,
                     ),
+                gitVersjon = Applikasjonsversjon.versjon,
             ),
         )
 
@@ -191,6 +194,7 @@ class TilsynBarnBeregnYtelseSteg(
                         årsaker = vedtak.årsakerAvslag,
                         begrunnelse = vedtak.begrunnelse,
                     ),
+                gitVersjon = Applikasjonsversjon.versjon,
             ),
         )
     }
@@ -242,6 +246,7 @@ class TilsynBarnBeregnYtelseSteg(
                     begrunnelse = begrunnelse,
                     beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
                 ),
+            gitVersjon = Applikasjonsversjon.versjon,
         )
 
     private fun MålgruppeType.tilTypeAndel(): TypeAndel =

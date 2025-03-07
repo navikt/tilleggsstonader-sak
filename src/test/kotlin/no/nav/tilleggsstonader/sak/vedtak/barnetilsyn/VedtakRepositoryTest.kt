@@ -10,8 +10,10 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.util.UUID
 
 class VedtakRepositoryTest : IntegrationTest() {
     @Autowired
@@ -32,5 +34,23 @@ class VedtakRepositoryTest : IntegrationTest() {
         val lagretVedtak = vedtakRepository.findByIdOrThrow(behandling.id).withTypeOrThrow<InnvilgelseTilsynBarn>()
         assertThat(lagretVedtak.type).isEqualTo(TypeVedtak.INNVILGELSE)
         assertThat(lagretVedtak.data.beregningsresultat).isEqualTo(beregningsresultat)
+    }
+
+    @Nested
+    inner class GitVersjon {
+        @Test
+        fun `skal returnere null hvis det ikke finnes en versjon`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
+            val vedtak = vedtakRepository.insert(innvilgetVedtak(behandling.id).copy(gitVersjon = null))
+            assertThat(vedtakRepository.findByIdOrThrow(vedtak.behandlingId).gitVersjon).isNull()
+        }
+
+        @Test
+        fun `skal returnere versjon hvis det finnes en versjon`() {
+            val gitVersjon = UUID.randomUUID().toString()
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
+            val vedtak = vedtakRepository.insert(innvilgetVedtak(behandling.id).copy(gitVersjon = gitVersjon))
+            assertThat(vedtakRepository.findByIdOrThrow(vedtak.behandlingId).gitVersjon).isEqualTo(gitVersjon)
+        }
     }
 }
