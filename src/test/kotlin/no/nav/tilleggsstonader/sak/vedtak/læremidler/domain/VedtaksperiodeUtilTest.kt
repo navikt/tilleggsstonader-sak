@@ -66,6 +66,22 @@ class VedtaksperiodeUtilTest {
         }
 
         @Test
+        fun `Manglende vedtaksperioder kaster feil`() {
+            every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
+
+            val vedtaksperioder = emptyList<Vedtaksperiode>()
+            val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
+
+            assertThatThrownBy {
+                læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
+                    vedtaksperioder = vedtaksperioder,
+                    stønadsperioder = stønadsperioder,
+                    behandlingId = behandlingId,
+                )
+            }.hasMessageContaining("Kan ikke innvilge når det ikke finnes noen vedtaksperioder.")
+        }
+
+        @Test
         fun `Overlappende vedtaksperioder kaster feil`() {
             val vedtaksperioder =
                 listOf(
