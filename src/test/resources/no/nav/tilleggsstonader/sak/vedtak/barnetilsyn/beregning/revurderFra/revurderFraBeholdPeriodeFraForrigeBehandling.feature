@@ -11,7 +11,7 @@ Egenskap: Beregning - med revurderFra - behold perioder fra forrige behandling
       | 02.2024 |
       | 03.2024 |
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 05.02.2024 | 08.02.2024 | TILTAK    | AAP       |
 
@@ -39,7 +39,7 @@ Egenskap: Beregning - med revurderFra - behold perioder fra forrige behandling
       | 02.2024 |
       | 03.2024 |
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 05.02.2024 | 08.02.2024 | TILTAK    | AAP       |
 

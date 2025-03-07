@@ -1,5 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+
 /**
  * @param prioritet lavest er den som har høyest prioritet
  */
@@ -50,6 +53,29 @@ enum class MålgruppeType(
     override fun girIkkeRettPåStønadsperiode() =
         this == INGEN_MÅLGRUPPE ||
             this == SYKEPENGER_100_PROSENT
+
+    fun tilTypeAndel(stønadstype: Stønadstype): TypeAndel =
+        when (stønadstype) {
+            Stønadstype.BARNETILSYN -> {
+                when (this) {
+                    AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE -> TypeAndel.TILSYN_BARN_AAP
+                    OVERGANGSSTØNAD -> TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER
+                    OMSTILLINGSSTØNAD -> TypeAndel.TILSYN_BARN_ETTERLATTE
+                    else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
+                }
+            }
+            Stønadstype.LÆREMIDLER -> {
+                when (this) {
+                    AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE -> TypeAndel.LÆREMIDLER_AAP
+                    OVERGANGSSTØNAD -> TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER
+                    OMSTILLINGSSTØNAD -> TypeAndel.LÆREMIDLER_ETTERLATTE
+                    else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
+                }
+            }
+            Stønadstype.BOUTGIFTER -> {
+                error("Mappingen til TypeAndel for stønadstype boutgifter er ikke implementert")
+            }
+        }
 }
 
 private val NULL_IKKE_RETT_PÅ_STØNAD: Int? = null

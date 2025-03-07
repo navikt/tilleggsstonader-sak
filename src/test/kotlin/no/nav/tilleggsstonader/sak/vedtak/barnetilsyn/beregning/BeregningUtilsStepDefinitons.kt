@@ -14,21 +14,22 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningU
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilAktiviteter
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilDto
 import org.assertj.core.api.Assertions.assertThat
 
 @Suppress("ktlint:standard:function-naming", "unused")
 class BeregningUtilsStepDefinitons {
     val behandlingId = BehandlingId.random()
 
-    var stønadsperioder: VedtaksperiodeBeregning? = null
-    var stønadsperiodePerUke: Map<Uke, PeriodeMedDager> = emptyMap()
+    var vedtaksperiodeBeregning: VedtaksperiodeBeregning? = null
+    var vedtaksperiodePerUke: Map<Uke, PeriodeMedDager> = emptyMap()
 
     var aktiviteter = emptyList<Aktivitet>()
     var aktiviteterPerUke: Map<Uke, List<PeriodeMedDager>> = emptyMap()
 
-    @Gitt("disse stønadsperiodene")
-    fun `denne stønadsperioden`(dataTable: DataTable) {
-        stønadsperioder = VedtaksperiodeBeregning(mapStønadsperioder(behandlingId, dataTable).first())
+    @Gitt("disse vedtaksperiodene")
+    fun `denne vedtaksperioden`(dataTable: DataTable) {
+        vedtaksperiodeBeregning = VedtaksperiodeBeregning(mapVedtaksperioder(dataTable).tilDto().first())
     }
 
     @Gitt("disse aktivitetene")
@@ -36,9 +37,9 @@ class BeregningUtilsStepDefinitons {
         aktiviteter = mapAktiviteter(behandlingId, dataTable).tilAktiviteter()
     }
 
-    @Når("splitter stønadsperiode per uke")
-    fun `splitter stønadsperioder per uke`() {
-        stønadsperiodePerUke = stønadsperioder!!.tilUke()
+    @Når("splitter vedtaksperiodeBeregning per uke")
+    fun `splitter vedtaksperioderBeregning per uke`() {
+        vedtaksperiodePerUke = vedtaksperiodeBeregning!!.tilUke()
     }
 
     @Når("splitter aktiviteter per uke")
@@ -51,17 +52,17 @@ class BeregningUtilsStepDefinitons {
         assertThat(aktiviteterPerUke).hasSize(antallUker)
     }
 
-    @Så("forvent følgende stønadsperioder per uke")
-    fun `forvent følgende stønadsperioder per uke`(dataTable: DataTable) {
+    @Så("forvent følgende vedtaksperioder per uke")
+    fun `forvent følgende vedtaksperioder per uke`(dataTable: DataTable) {
         val uker = parseUke(dataTable)
         val forventedePerioder = parsePeriodeMedDager(dataTable)
 
         uker.forEachIndexed { indeks, uke ->
-            assertThat(stønadsperiodePerUke[uke]).isEqualTo(forventedePerioder[indeks])
+            assertThat(vedtaksperiodePerUke[uke]).isEqualTo(forventedePerioder[indeks])
         }
 
         // Sjekk at det ikke ble laget flere uker enn forventet
-        assertThat(stønadsperiodePerUke.size).isEqualTo(uker.size)
+        assertThat(vedtaksperiodePerUke.size).isEqualTo(uker.size)
     }
 
     @Så("forvent følgende aktiviteter for uke med fom={} og tom={}")

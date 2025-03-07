@@ -18,13 +18,12 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDtoV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
@@ -34,20 +33,20 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -69,8 +68,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Autowired
     val tilkjentYtelseRepository: TilkjentYtelseRepository,
     @Autowired
-    val stønadsperiodeRepository: StønadsperiodeRepository,
-    @Autowired
     val vilkårperiodeRepository: VilkårperiodeRepository,
     @Autowired
     val vilkårRepository: VilkårRepository,
@@ -81,8 +78,14 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     val behandling = behandling(fagsak = fagsak)
     val saksbehandling = saksbehandling(behandling = behandling)
     val barn = BehandlingBarn(behandlingId = behandling.id, ident = "123")
-    val stønadsperiode =
-        stønadsperiode(behandlingId = behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
+    val vedtaksperiode =
+        VedtaksperiodeDto(
+            id = UUID.randomUUID(),
+            fom = LocalDate.of(2023, 1, 1),
+            tom = LocalDate.of(2023, 1, 31),
+            målgruppeType = MålgruppeType.AAP,
+            aktivitetType = AktivitetType.TILTAK,
+        )
     val aktivitet = aktivitet(behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
     val målgruppe = målgruppe(behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 2, 28))
 
@@ -108,12 +111,11 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     inner class Innvilgelse {
         @Test
         fun `skal lagre vedtak`() {
-            stønadsperiodeRepository.insert(stønadsperiode)
             vilkårperiodeRepository.insert(aktivitet)
             vilkårperiodeRepository.insert(målgruppe)
             lagVilkårForPeriode(saksbehandling, januar, januar, 100)
 
-            val vedtakDto = innvilgelseDto()
+            val vedtakDto = innvilgelseDtoV2(listOf(vedtaksperiode))
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
             val vedtak = repository.findByIdOrThrow(saksbehandling.id).withTypeOrThrow<InnvilgelseTilsynBarn>()
@@ -125,45 +127,28 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         }
 
         @Test
-        fun `skal lagre andeler for hver stønadsperiode, splittede per måned`() {
-            val stønadsperiode1 =
-                stønadsperiode(
-                    behandlingId = behandling.id,
-                    fom = januar.atDay(2),
-                    tom = januar.atDay(6),
-                )
-            val stønadsperiode2 =
-                stønadsperiode(
-                    behandlingId = behandling.id,
-                    fom = januar.atDay(10),
-                    tom = januar.atDay(11),
-                )
-            val stønadsperiode3 =
-                stønadsperiode(
-                    behandlingId = behandling.id,
-                    fom = januar.atDay(24),
-                    tom = februar.atDay(3),
-                )
-            val stønadsperiode4 =
-                stønadsperiode(
-                    behandlingId = behandling.id,
-                    fom = februar.atDay(28),
-                    tom = april.atDay(3),
-                )
+        fun `skal lagre andeler for hver vedtakssperiode, splittede per måned`() {
+            val vedtaksperiode1 = vedtaksperiode.copy(fom = januar.atDay(2), tom = januar.atDay(6))
+            val vedtaksperiode2 = vedtaksperiode.copy(fom = januar.atDay(10), tom = januar.atDay(11))
+            val vedtaksperiode3 = vedtaksperiode.copy(fom = januar.atDay(24), tom = februar.atDay(3))
+            val vedtaksperiode4 = vedtaksperiode.copy(fom = februar.atDay(28), tom = april.atDay(3))
 
-            stønadsperiodeRepository.insertAll(
-                listOf(
-                    stønadsperiode1,
-                    stønadsperiode2,
-                    stønadsperiode3,
-                    stønadsperiode4,
-                ),
-            )
             vilkårperiodeRepository.insert(aktivitet(behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
+            vilkårperiodeRepository.insert(målgruppe(behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
             lagVilkårForPeriode(saksbehandling, januar, februar, 100)
             lagVilkårForPeriode(saksbehandling, mars, april, 200)
 
-            steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelseDto())
+            steg.utførOgReturnerNesteSteg(
+                saksbehandling,
+                innvilgelseDtoV2(
+                    listOf(
+                        vedtaksperiode1,
+                        vedtaksperiode2,
+                        vedtaksperiode3,
+                        vedtaksperiode4,
+                    ),
+                ),
+            )
 
             val dagsatsForUtgift100 = BigDecimal("2.95")
             val dagsatsForUtgift200 = BigDecimal("5.91")
@@ -172,19 +157,19 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 listOf(
                     andelTilkjentYtelse(
                         kildeBehandlingId = behandling.id,
-                        fom = stønadsperiode1.fom,
+                        fom = vedtaksperiode1.fom,
                         beløp = finnTotalbeløp(dagsatsForUtgift100, 5),
                         utbetalingsdato = januar.atDay(2),
                     ),
                     andelTilkjentYtelse(
                         kildeBehandlingId = behandling.id,
-                        fom = stønadsperiode2.fom,
+                        fom = vedtaksperiode2.fom,
                         beløp = finnTotalbeløp(dagsatsForUtgift100, 2),
                         utbetalingsdato = januar.atDay(2),
                     ),
                     andelTilkjentYtelse(
                         kildeBehandlingId = behandling.id,
-                        fom = stønadsperiode3.fom,
+                        fom = vedtaksperiode3.fom,
                         beløp = finnTotalbeløp(dagsatsForUtgift100, 6),
                         utbetalingsdato = januar.atDay(2),
                     ),
@@ -196,7 +181,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     ),
                     andelTilkjentYtelse(
                         kildeBehandlingId = behandling.id,
-                        fom = stønadsperiode4.fom,
+                        fom = vedtaksperiode4.fom,
                         beløp = finnTotalbeløp(dagsatsForUtgift100, 1),
                         utbetalingsdato = februar.atDay(1),
                     ),
@@ -219,19 +204,18 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         }
 
         @Test
-        fun `hvis en stønadsperiode begynner en helgdag skal man opprette stønadsperioder og andeler som begynner neste mandag`() {
+        fun `hvis en vedtakssperiode begynner en helgdag skal man opprette vedtakssperiode og andeler som begynner neste mandag`() {
             val juni = YearMonth.of(2024, 6)
 
-            val stønadsperiode1 =
-                stønadsperiode(
-                    behandlingId = behandling.id,
+            val vedtaksperiode1 =
+                vedtaksperiode.copy(
                     fom = juni.atDay(1),
                     tom = juni.atEndOfMonth(),
                 )
-            stønadsperiodeRepository.insert(stønadsperiode1)
             vilkårperiodeRepository.insert(aktivitet(behandling.id, fom = juni.atDay(1), tom = juni.atEndOfMonth()))
+            vilkårperiodeRepository.insert(målgruppe(behandling.id, fom = juni.atDay(1), tom = juni.atEndOfMonth()))
             lagVilkårForPeriode(saksbehandling, juni, juni, 100)
-            steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelseDto())
+            steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelseDtoV2(listOf(vedtaksperiode1)))
 
             with(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.single()) {
                 assertThat(this.fom).isEqualTo(juni.atDay(3))
@@ -259,76 +243,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     inner class Opphør {
         @Test
         fun `skal lagre vedtak`() {
-            every { unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN) } returns false
-            val beløpsperioderJanuar =
-                listOf(Beløpsperiode(dato = LocalDate.of(2023, 1, 2), beløp = 1000, målgruppe = MålgruppeType.AAP))
-            val beløpsperiodeFebruar =
-                listOf(Beløpsperiode(dato = LocalDate.of(2023, 2, 1), beløp = 2000, målgruppe = MålgruppeType.AAP))
-            val beregningsresultatJanuar =
-                beregningsresultatForMåned(beløpsperioder = beløpsperioderJanuar, måned = YearMonth.of(2023, 1))
-            val beregningsresultatFebruar =
-                beregningsresultatForMåned(beløpsperioder = beløpsperiodeFebruar, måned = YearMonth.of(2023, 2))
-
-            val vedtakBeregningsresultatFørstegangsbehandling =
-                BeregningsresultatTilsynBarn(
-                    perioder =
-                        listOf(
-                            beregningsresultatJanuar,
-                            beregningsresultatFebruar,
-                        ),
-                )
-            testoppsettService.lagVedtak(
-                behandling = behandling,
-                beregningsresultat = vedtakBeregningsresultatFørstegangsbehandling,
-            )
-            testoppsettService.ferdigstillBehandling(behandling = behandling)
-            val behandlingForOpphør =
-                testoppsettService.opprettRevurdering(
-                    revurderFra = LocalDate.of(2023, 2, 1),
-                    forrigeBehandling = behandling,
-                    fagsak = fagsak,
-                )
-            val saksbehandlingForOpphør = saksbehandling(behandling = behandlingForOpphør)
-            val stønadsperiodeForOpphør =
-                stønadsperiode(
-                    behandlingId = behandlingForOpphør.id,
-                    fom = LocalDate.of(2023, 1, 2),
-                    tom = LocalDate.of(2023, 1, 31),
-                )
-            val aktivitetForOpphør =
-                aktivitet(
-                    behandlingForOpphør.id,
-                    fom = LocalDate.of(2023, 1, 2),
-                    tom = LocalDate.of(2023, 1, 31),
-                    status = Vilkårstatus.ENDRET,
-                )
-
-            stønadsperiodeRepository.insert(stønadsperiodeForOpphør)
-            vilkårperiodeRepository.insert(aktivitetForOpphør)
-            lagVilkårForPeriode(saksbehandlingForOpphør, januar, februar, 100, status = VilkårStatus.UENDRET)
-
-            val vedtakDto = opphørDto()
-            steg.utførOgReturnerNesteSteg(saksbehandlingForOpphør, vedtakDto)
-
-            val vedtak = repository.findByIdOrThrow(saksbehandlingForOpphør.id).withTypeOrThrow<OpphørTilsynBarn>()
-
-            val tilkjentYtelse =
-                tilkjentYtelseRepository.findByBehandlingId(saksbehandlingForOpphør.id)!!.andelerTilkjentYtelse
-
-            assertThat(vedtak.behandlingId).isEqualTo(saksbehandlingForOpphør.id)
-            assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
-            assertThat(vedtak.data.årsaker).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
-            assertThat(vedtak.data.begrunnelse).isEqualTo("Endring i utgifter")
-            assertThat(
-                vedtak.data.beregningsresultat.perioder
-                    .single(),
-            ).isEqualTo(beregningsresultatJanuar)
-            assertThat(vedtak.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
-            assertThat(tilkjentYtelse).hasSize(1)
-        }
-
-        @Test
-        fun `skal lagre vedtak med vedtaksperioder`() {
             every { unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN) } returns true
             val beløpsperioderJanuar =
                 listOf(Beløpsperiode(dato = LocalDate.of(2023, 1, 2), beløp = 1000, målgruppe = MålgruppeType.AAP))
@@ -405,6 +319,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             ).isEqualTo(beregningsresultatJanuar)
             assertThat(tilkjentYtelse).hasSize(1)
             assertThat(vedtak.data.vedtaksperioder).isEqualTo(listOf(forventetVedtaksperioderForOpphør))
+            assertThat(vedtak.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
         }
     }
 
@@ -416,7 +331,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             assertHarPerioderForJanuarOgFebruar(behandling.id)
 
             testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.FERDIGSTILT))
-            val revurdering = opprettRevurdering(revurderFra = mars.atDay(15))
+            val revurdering = opprettRevurdering(revurderFra = mars.atDay(1))
 
             innvilgPerioderForMars(revurdering)
 
@@ -432,64 +347,50 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                         revurderFra = revurderFra,
                         forrigeBehandlingId = behandling.id,
                     ),
-                    opprettGrunnlagsdata = false,
+                    opprettGrunnlagsdata = true,
                 ).let { testoppsettService.hentSaksbehandling(it.id) }
 
         /**
-         * Stønadsperioder jan-mars
+         * vedtakssperiode jan-feb
          * Aktivitet jan-april
          * Vilkår(utgifter) jan-feb
          */
         private fun innvilgPerioderForJanuarOgFebruar(behandlingId: BehandlingId) {
             val behandling = testoppsettService.hentSaksbehandling(behandlingId)
 
-            val stønadsperiode =
-                stønadsperiode(
-                    behandlingId = behandlingId,
-                    fom = januar.atDay(1),
-                    tom = mars.atEndOfMonth(),
-                )
-            stønadsperiodeRepository.insert(stønadsperiode)
-            vilkårperiodeRepository.insert(
-                aktivitet(
-                    behandlingId,
-                    fom = januar.atDay(1),
-                    tom = april.atEndOfMonth(),
-                ),
-            )
+            val vedtaksperiode = vedtaksperiode.copy(fom = januar.atDay(1), tom = februar.atEndOfMonth())
+            vilkårperiodeRepository.insert(aktivitet(behandlingId = behandlingId, fom = januar.atDay(1), tom = april.atEndOfMonth()))
+            vilkårperiodeRepository.insert(målgruppe(behandlingId = behandlingId, fom = januar.atDay(1), tom = april.atEndOfMonth()))
             lagVilkårForPeriode(behandling, januar, februar, 100)
-            steg.utførOgReturnerNesteSteg(behandling, innvilgelseDto())
+            steg.utførOgReturnerNesteSteg(behandling, innvilgelseDtoV2(listOf(vedtaksperiode)))
         }
 
         /**
-         * Ikke helt reellt tilfelle. Vanligvis når man oppretter en revurdering gjenbruker man vilkårperioder, stønadsperioder og vilkår fra forrige behandling
+         * Ikke helt reellt tilfelle. Vanligvis når man oppretter en revurdering gjenbruker man vilkårperioder, vedtakssperiode og vilkår fra forrige behandling
          * Dette er mest for å vise at man faktiskt beholder beregningsresultat fra forrige behandling
-         * Stønadsperiode mars-mars
-         * Aktivitet mars-april
-         * Vilkår(utgifter) mars-april
+         * vedtakssperiode jan-mars og mars-mars
+         * Aktivitet jan-april
+         * Vilkår(utgifter) jan-april
          */
         private fun innvilgPerioderForMars(behandling: Saksbehandling) {
-            val stønadsperiode =
-                stønadsperiode(
-                    behandlingId = behandling.id,
-                    fom = mars.atDay(1),
+            val vedtaksperiodeJanFeb = vedtaksperiode.copy(fom = januar.atDay(1), tom = mars.atDay(14))
+            val vedtaksperiodeMars =
+                VedtaksperiodeDto(
+                    id = UUID.randomUUID(),
+                    fom = mars.atDay(15),
                     tom = mars.atEndOfMonth(),
+                    målgruppeType = MålgruppeType.AAP,
+                    aktivitetType = AktivitetType.TILTAK,
                 )
-            stønadsperiodeRepository.insert(stønadsperiode)
-            vilkårperiodeRepository.insert(
-                aktivitet(
-                    behandling.id,
-                    fom = mars.atDay(1),
-                    tom = april.atEndOfMonth(),
-                ),
-            )
-            lagVilkårForPeriode(behandling, mars, april, 100)
-            steg.utførOgReturnerNesteSteg(behandling, innvilgelseDto())
+            vilkårperiodeRepository.insert(aktivitet(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
+            vilkårperiodeRepository.insert(målgruppe(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
+            lagVilkårForPeriode(behandling, januar, april, 100)
+            steg.utførOgReturnerNesteSteg(behandling, innvilgelseDtoV2(listOf(vedtaksperiodeJanFeb, vedtaksperiodeMars)))
         }
 
         /**
          * For førstegangsbehandlingen opprettes det kun perioder for jan og feb
-         * då det kun finnes overlapp mellom stønadsperioder og vilkår for januar og mars
+         * då det kun finnes overlapp mellom vedtakssperioder og vilkår for januar og mars
          */
         private fun assertHarPerioderForJanuarOgFebruar(behandlingId: BehandlingId) {
             val beregningsresultat = hentBeregningsresultat(behandlingId)
@@ -510,7 +411,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 assertHarPerioderForJanuarOgFebruar(this)
 
                 /**
-                 * På grunn av at man revurder fra den 15 mars splittes stønadsperioder i 2
+                 * På grunn av at man revurder fra den 15 mars splittes vedtakssperioder i 2
                  * Det er fordi man i beregningsresultat i behandlingen kun ønsker å se
                  * beløp som blir innvilget fra datoet man revurderer fra
                  */
@@ -552,15 +453,28 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Nested
     inner class MålgruppeMapping {
         val beløp1DagUtgift100 = 3
-        val vedtakDto = innvilgelseDto()
 
         @BeforeEach
         fun setUp() {
+            val faktaOgVurderingUføretrygd = faktaOgVurderingMålgruppe(type = MålgruppeType.UFØRETRYGD)
+            val faktaOgVurderingNedsattArbeidsevne = faktaOgVurderingMålgruppe(type = MålgruppeType.NEDSATT_ARBEIDSEVNE)
+            vilkårperiodeRepository.insert(aktivitet(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
+            vilkårperiodeRepository.insert(målgruppe(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
             vilkårperiodeRepository.insert(
-                aktivitet(
-                    behandling.id,
+                målgruppe(
+                    behandlingId = behandling.id,
                     fom = januar.atDay(1),
                     tom = april.atEndOfMonth(),
+                    faktaOgVurdering = faktaOgVurderingUføretrygd,
+                ),
+            )
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                    faktaOgVurdering = faktaOgVurderingNedsattArbeidsevne,
+                    begrunnelse = "nedsatt arbeidsevne",
                 ),
             )
             lagVilkårForPeriode(saksbehandling, januar, mars, 100)
@@ -568,34 +482,18 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
         @Test
         fun `skal mappe nedsatt arbeidsevne til riktig TypeAndel`() {
-            val stønadsperioder =
+            val vedtaksperioder =
                 listOf(
-                    stønadsperiode(
-                        behandlingId = behandling.id,
-                        fom = januar.atDay(2),
-                        tom = januar.atDay(2),
-                        målgruppe = MålgruppeType.AAP,
-                    ),
-                    stønadsperiode(
-                        behandlingId = behandling.id,
-                        fom = februar.atDay(1),
-                        tom = februar.atDay(1),
-                        målgruppe = MålgruppeType.UFØRETRYGD,
-                    ),
-                    stønadsperiode(
-                        behandlingId = behandling.id,
-                        fom = mars.atDay(1),
-                        tom = mars.atDay(1),
-                        målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-                    ),
+                    vedtaksperiode.copy(fom = januar.atDay(2), tom = januar.atDay(2), målgruppeType = MålgruppeType.AAP),
+                    vedtaksperiode.copy(fom = februar.atDay(1), tom = februar.atDay(1), målgruppeType = MålgruppeType.UFØRETRYGD),
+                    vedtaksperiode.copy(fom = mars.atDay(1), tom = mars.atDay(1), målgruppeType = MålgruppeType.NEDSATT_ARBEIDSEVNE),
                 )
 
-            stønadsperiodeRepository.insertAll(stønadsperioder)
-
+            val vedtakDto = innvilgelseDtoV2(vedtaksperioder)
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
             val forventedeAndeler =
-                stønadsperioder.map {
+                vedtaksperioder.map {
                     andelTilkjentYtelse(
                         fom = it.fom,
                         tom = it.fom,
@@ -612,22 +510,40 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
         @Test
         fun `skal mappe overgangsstønad til riktig TypeAndel`() {
-            val stønadsperiode =
-                stønadsperiode(
-                    behandlingId = behandling.id,
+            val vedtaksperiode =
+                VedtaksperiodeDto(
+                    id = UUID.randomUUID(),
                     fom = januar.atDay(2),
                     tom = januar.atDay(2),
-                    målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                    målgruppeType = MålgruppeType.OVERGANGSSTØNAD,
+                    aktivitetType = AktivitetType.UTDANNING,
                 )
 
-            stønadsperiodeRepository.insert(stønadsperiode)
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                    faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.UTDANNING),
+                ),
+            )
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.OVERGANGSSTØNAD),
+                ),
+            )
+
+            val vedtakDto = innvilgelseDtoV2(listOf(vedtaksperiode))
 
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
             val forventetAndel =
                 andelTilkjentYtelse(
-                    fom = stønadsperiode.fom,
-                    tom = stønadsperiode.fom,
+                    fom = vedtaksperiode.fom,
+                    tom = vedtaksperiode.fom,
                     beløp = beløp1DagUtgift100,
                     kildeBehandlingId = behandling.id,
                     type = TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER,
@@ -639,22 +555,39 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
         @Test
         fun `skal mappe omstillingsstønad til riktig TypeAndel`() {
-            val stønadsperiode =
-                stønadsperiode(
-                    behandlingId = behandling.id,
+            val vedtaksperiode =
+                VedtaksperiodeDto(
+                    id = UUID.randomUUID(),
                     fom = januar.atDay(2),
                     tom = januar.atDay(2),
-                    målgruppe = MålgruppeType.OMSTILLINGSSTØNAD,
+                    målgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,
+                    aktivitetType = AktivitetType.UTDANNING,
                 )
 
-            stønadsperiodeRepository.insert(stønadsperiode)
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                    faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.UTDANNING),
+                ),
+            )
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.OMSTILLINGSSTØNAD),
+                ),
+            )
 
+            val vedtakDto = innvilgelseDtoV2(listOf(vedtaksperiode))
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
             val forventetAndel =
                 andelTilkjentYtelse(
-                    fom = stønadsperiode.fom,
-                    tom = stønadsperiode.fom,
+                    fom = vedtaksperiode.fom,
+                    tom = vedtaksperiode.fom,
                     beløp = beløp1DagUtgift100,
                     kildeBehandlingId = behandling.id,
                     type = TypeAndel.TILSYN_BARN_ETTERLATTE,
@@ -662,26 +595,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
                 .containsExactlyElementsOf(listOf(forventetAndel))
-        }
-
-        @Test
-        fun `skal kaste feil ved forsøk på å opprette andeler med ugyldig målgruppe`() {
-            val stønadsperiode =
-                stønadsperiode(
-                    behandlingId = behandling.id,
-                    fom = januar.atDay(2),
-                    tom = januar.atDay(2),
-                    målgruppe = MålgruppeType.DAGPENGER,
-                )
-
-            stønadsperiodeRepository.insert(stønadsperiode)
-
-            assertThatThrownBy {
-                steg.utførOgReturnerNesteSteg(
-                    saksbehandling,
-                    vedtakDto,
-                )
-            }.hasMessageContaining("Kan ikke opprette andel tilkjent ytelse for målgruppe")
         }
     }
 
@@ -705,8 +618,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             ),
         )
     }
-
-    private fun Stønadsperiode.medLikTomSomFom() = copy(tom = fom)
 
     private fun finnTotalbeløp(
         dagsats: BigDecimal,

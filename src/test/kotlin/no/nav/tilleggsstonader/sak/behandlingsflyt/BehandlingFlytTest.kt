@@ -32,7 +32,8 @@ import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringStegService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -61,6 +62,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Pageable
 import org.springframework.test.context.transaction.TestTransaction
 import java.time.LocalDate
+import java.util.UUID
 
 class BehandlingFlytTest(
     @Autowired val barnService: BarnService,
@@ -422,9 +424,19 @@ class BehandlingFlytTest(
     }
 
     private fun opprettVedtak(behandlingId: BehandlingId) {
+        val vedtaksperioderDto =
+            listOf(
+                VedtaksperiodeDto(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2024, 1, 1),
+                    tom = LocalDate.of(2024, 1, 31),
+                    målgruppeType = MålgruppeType.AAP,
+                    aktivitetType = AktivitetType.TILTAK,
+                ),
+            )
         tilsynBarnVedtakController.lagreVedtak(
             behandlingId,
-            InnvilgelseTilsynBarnRequest,
+            InnvilgelseTilsynBarnRequestV2(vedtaksperioder = vedtaksperioderDto, begrunnelse = null),
         )
     }
 

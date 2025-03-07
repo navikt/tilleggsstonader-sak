@@ -5,7 +5,7 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
 
   Scenario: Sender inn tomme utgifter
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom     | Tom     | Målgruppe | Aktivitet |
       | 01.2023 | 02.2023 | AAP       | TILTAK    |
 
@@ -22,7 +22,7 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
 
   Scenario: Sender inn overlappende utgiftsperioder
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom     | Tom     | Målgruppe | Aktivitet |
       | 01.2023 | 03.2023 | AAP       | TILTAK    |
 
@@ -41,7 +41,7 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
 
   Scenario: Sender inn negativ utgift
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom     | Tom     | Målgruppe | Aktivitet |
       | 01.2023 | 03.2023 | AAP       | TILTAK    |
 

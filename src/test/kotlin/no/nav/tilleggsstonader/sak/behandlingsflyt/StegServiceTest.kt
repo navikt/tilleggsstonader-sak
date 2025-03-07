@@ -18,16 +18,19 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnBeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchIllegalStateException
@@ -38,6 +41,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.util.UUID
 
 class StegServiceTest(
     @Autowired
@@ -289,8 +293,8 @@ class StegServiceTest(
     ) {
         val fom = LocalDate.of(2023, 1, 1)
         val tom = LocalDate.of(2023, 1, 31)
-        stønadsperiodeRepository.insert(stønadsperiode(behandlingId = behandlingId, fom = fom, tom = tom))
         vilkårperiodeRepository.insert(aktivitet(behandlingId = behandlingId, fom = fom, tom = tom))
+        vilkårperiodeRepository.insert(målgruppe(behandlingId = behandlingId, fom = fom, tom = tom))
         vilkårRepository.insert(
             vilkår(
                 behandlingId = behandlingId,
@@ -303,7 +307,22 @@ class StegServiceTest(
         )
     }
 
-    private fun opprettVedtakTilsynBarn(): InnvilgelseTilsynBarnRequest = InnvilgelseTilsynBarnRequest
+    private fun opprettVedtakTilsynBarn(): InnvilgelseTilsynBarnRequestV2 {
+        val vedtaksperioderDto =
+            listOf(
+                VedtaksperiodeDto(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2023, 1, 1),
+                    tom = LocalDate.of(2023, 1, 31),
+                    målgruppeType = MålgruppeType.AAP,
+                    aktivitetType = AktivitetType.TILTAK,
+                ),
+            )
+        return InnvilgelseTilsynBarnRequestV2(
+            vedtaksperioder = vedtaksperioderDto,
+            begrunnelse = null,
+        )
+    }
 
     private fun behandlingSomIverksettes(): Behandling {
         val nyBehandling =

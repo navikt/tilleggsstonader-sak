@@ -3,8 +3,8 @@
 
 Egenskap: Beregning - Komplisert scenario
 
-  Scenario: Flere stønadsperioder og aktiviteter over lenger periode
-    Gitt følgende støndsperioder
+  Scenario: Flere vedtaksperioder og aktiviteter over lenger periode
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Målgruppe       | Aktivitet |
       | 01.01.2023 | 15.02.2023 | AAP             | TILTAK    |
       | 16.02.2023 | 28.02.2023 | AAP             | UTDANNING |
@@ -39,7 +39,7 @@ Egenskap: Beregning - Komplisert scenario
       | 05.2023 | 59.07   | 6            | 2000   | 354         |
       | 06.2023 | 59.07   | 15           | 2000   | 886         |
 
-    Så forvent følgende stønadsperiodeGrunnlag for: 01.2023
+    Så forvent følgende vedtaksperiodeGrunnlag for: 01.2023
       | Fom        | Tom        | Målgruppe | Aktivitet | Antall aktiviteter | Antall dager |
       | 01.01.2023 | 31.01.2023 | AAP       | TILTAK    | 1                  | 14           |
 
@@ -47,7 +47,7 @@ Egenskap: Beregning - Komplisert scenario
       | Dato       | Beløp | Målgruppe |
       | 02.01.2023 | 413   | AAP       |
 
-    Så forvent følgende stønadsperiodeGrunnlag for: 02.2023
+    Så forvent følgende vedtaksperiodeGrunnlag for: 02.2023
       | Fom        | Tom        | Målgruppe | Aktivitet | Antall aktiviteter | Antall dager |
       | 01.02.2023 | 15.02.2023 | AAP       | TILTAK    | 1                  | 9            |
       | 16.02.2023 | 28.02.2023 | AAP       | UTDANNING | 1                  | 9            |
@@ -57,7 +57,7 @@ Egenskap: Beregning - Komplisert scenario
       | 01.02.2023 | 266   | AAP       |
       | 16.02.2023 | 266   | AAP       |
 
-    Så forvent følgende stønadsperiodeGrunnlag for: 03.2023
+    Så forvent følgende vedtaksperiodeGrunnlag for: 03.2023
       | Fom        | Tom        | Målgruppe       | Aktivitet | Antall aktiviteter | Antall dager |
       | 01.03.2023 | 31.03.2023 | OVERGANGSSTØNAD | UTDANNING | 1                  | 23           |
 
@@ -65,7 +65,7 @@ Egenskap: Beregning - Komplisert scenario
       | Dato       | Beløp | Målgruppe       |
       | 01.03.2023 | 679   | OVERGANGSSTØNAD |
 
-    Så forvent følgende stønadsperiodeGrunnlag for: 04.2023
+    Så forvent følgende vedtaksperiodeGrunnlag for: 04.2023
       | Fom        | Tom        | Målgruppe       | Aktivitet | Antall aktiviteter | Antall dager |
       | 01.04.2023 | 30.04.2023 | OVERGANGSSTØNAD | UTDANNING | 1                  | 20           |
 
@@ -73,7 +73,7 @@ Egenskap: Beregning - Komplisert scenario
       | Dato       | Beløp | Målgruppe       |
       | 03.04.2023 | 1181  | OVERGANGSSTØNAD |
 
-    Så forvent følgende stønadsperiodeGrunnlag for: 05.2023
+    Så forvent følgende vedtaksperiodeGrunnlag for: 05.2023
       | Fom        | Tom        | Målgruppe | Aktivitet | Antall aktiviteter | Antall dager |
       | 15.05.2023 | 31.05.2023 | AAP       | TILTAK    | 1                  | 6            |
 
@@ -81,7 +81,7 @@ Egenskap: Beregning - Komplisert scenario
       | Dato       | Beløp | Målgruppe |
       | 15.05.2023 | 354   | AAP       |
 
-    Så forvent følgende stønadsperiodeGrunnlag for: 06.2023
+    Så forvent følgende vedtaksperiodeGrunnlag for: 06.2023
       | Fom        | Tom        | Målgruppe | Aktivitet | Antall aktiviteter | Antall dager |
       | 01.06.2023 | 04.06.2023 | AAP       | TILTAK    | 1                  | 2            |
       | 12.06.2023 | 30.06.2023 | AAP       | TILTAK    | 2                  | 13           |
