@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.fakta
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
@@ -145,6 +146,13 @@ data class RegistergrunnlagBarn(
     val fødselsdato: LocalDate?,
     val alder: Int?,
     val dødsdato: LocalDate?,
+    val saksinformasjonAndreForeldre: SaksinformasjonAndreForeldre?,
+)
+
+data class SaksinformasjonAndreForeldre(
+    val hentetTidspunkt: LocalDateTime,
+    val harBehandlingUnderArbeid: Boolean,
+    val vedtaksperioderBarn: List<Datoperiode>,
 )
 
 data class SøknadsgrunnlagBarn(
