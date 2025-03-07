@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAnnenForelderMapper.mapFaktaGrunnlagBarnAnnenForelder
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapper.mapBarnAndreForeldreSaksinformasjon
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
@@ -61,7 +61,7 @@ class FaktaGrunnlagService(
         val behandlingsinformasjonAnnenForelder = finnBehandlingsinformasjonAnnenForelder(barnAnnenForelder)
 
         faktaGrunnlagRepository.insertAll(
-            mapFaktaGrunnlagBarnAnnenForelder(behandling.id, barnAnnenForelder, behandlingsinformasjonAnnenForelder),
+            mapBarnAndreForeldreSaksinformasjon(behandling.id, barnAnnenForelder, behandlingsinformasjonAnnenForelder),
         )
     }
 

@@ -67,8 +67,8 @@ data class BehandlingsinformasjonAnnenForelder(
     }
 }
 
-object FaktaGrunnlagBarnAnnenForelderMapper {
-    fun mapFaktaGrunnlagBarnAnnenForelder(
+object FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapper {
+    fun mapBarnAndreForeldreSaksinformasjon(
         behandlingId: BehandlingId,
         barnAnnenForelder: Map<IdentBarn, List<IdentAnnenForelder>>,
         behandlingsinformasjonAnnenForelder: List<BehandlingsinformasjonAnnenForelder>,
