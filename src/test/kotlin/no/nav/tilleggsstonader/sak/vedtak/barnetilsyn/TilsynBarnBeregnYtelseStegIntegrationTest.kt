@@ -457,8 +457,27 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
         @BeforeEach
         fun setUp() {
+            val faktaOgVurderingUføretrygd = faktaOgVurderingMålgruppe(type = MålgruppeType.UFØRETRYGD)
+            val faktaOgVurderingNedsattArbeidsevne = faktaOgVurderingMålgruppe(type = MålgruppeType.NEDSATT_ARBEIDSEVNE)
             vilkårperiodeRepository.insert(aktivitet(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
             vilkårperiodeRepository.insert(målgruppe(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                    faktaOgVurdering = faktaOgVurderingUføretrygd,
+                ),
+            )
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                    faktaOgVurdering = faktaOgVurderingNedsattArbeidsevne,
+                    begrunnelse = "nedsatt arbeidsevne",
+                ),
+            )
             lagVilkårForPeriode(saksbehandling, januar, mars, 100)
         }
 
@@ -466,9 +485,9 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         fun `skal mappe nedsatt arbeidsevne til riktig TypeAndel`() {
             val vedtaksperioder =
                 listOf(
-                    vedtaksperiode.copy(fom = januar.atDay(2), tom = januar.atDay(2)),
-                    vedtaksperiode.copy(fom = februar.atDay(1), tom = februar.atDay(1)),
-                    vedtaksperiode.copy(fom = mars.atDay(1), tom = mars.atDay(1)),
+                    vedtaksperiode.copy(fom = januar.atDay(2), tom = januar.atDay(2), målgruppeType = MålgruppeType.AAP),
+                    vedtaksperiode.copy(fom = februar.atDay(1), tom = februar.atDay(1), målgruppeType = MålgruppeType.UFØRETRYGD),
+                    vedtaksperiode.copy(fom = mars.atDay(1), tom = mars.atDay(1), målgruppeType = MålgruppeType.NEDSATT_ARBEIDSEVNE),
                 )
 
             val vedtakDto = innvilgelseDtoV2(vedtaksperioder)
