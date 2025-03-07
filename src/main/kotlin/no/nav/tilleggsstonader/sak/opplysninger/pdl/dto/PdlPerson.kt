@@ -281,7 +281,7 @@ data class Dødsfall(
 data class ForelderBarnRelasjon(
     val relatertPersonsIdent: String?,
     val relatertPersonsRolle: Familierelasjonsrolle,
-    val minRolleForPerson: Familierelasjonsrolle?,
+    val minRolleForPerson: Familierelasjonsrolle,
 )
 
 enum class Familierelasjonsrolle {
