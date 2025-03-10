@@ -28,7 +28,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgVurderingDto
@@ -204,10 +204,10 @@ class InterntVedtakService(
         behandlingBarn: Map<BarnId, GrunnlagBarn>,
     ): List<VilkårInternt> =
         vilkårService
-            .hentVilkårsett(behandlingId)
+            .hentVilkår(behandlingId)
             .map { vilkår ->
                 VilkårInternt(
-                    type = vilkår.vilkårType,
+                    type = vilkår.type,
                     resultat = vilkår.resultat,
                     fødselsdatoBarn = vilkår.barnId?.let { behandlingBarn.finnFødselsdato(it) },
                     delvilkår = vilkår.delvilkårsett.map { mapDelvilkår(it) },
@@ -217,7 +217,7 @@ class InterntVedtakService(
                 )
             }.sortedWith(compareBy<VilkårInternt> { it.type }.thenBy { it.fødselsdatoBarn }.thenBy { it.fom })
 
-    private fun mapDelvilkår(delvilkår: DelvilkårDto) =
+    private fun mapDelvilkår(delvilkår: Delvilkår) =
         DelvilkårInternt(
             resultat = delvilkår.resultat,
             vurderinger =

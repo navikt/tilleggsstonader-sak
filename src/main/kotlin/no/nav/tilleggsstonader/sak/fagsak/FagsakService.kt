@@ -67,8 +67,12 @@ class FagsakService(
         stønadstype: Stønadstype,
     ): Fagsak? = fagsakRepository.findBySøkerIdent(personIdenter, stønadstype)?.tilFagsakMedPerson()
 
-    fun finnFagsaker(personIdenter: Set<String>): List<Fagsak> =
-        fagsakRepository.findBySøkerIdent(personIdenter).map { it.tilFagsakMedPerson() }
+    fun finnFagsaker(personIdenter: Set<String>): List<Fagsak> {
+        if (personIdenter.isEmpty()) {
+            return emptyList()
+        }
+        return fagsakRepository.findBySøkerIdent(personIdenter).map { it.tilFagsakMedPerson() }
+    }
 
     fun finnFagsakerForFagsakPersonId(fagsakPersonId: FagsakPersonId): Fagsaker {
         val fagsaker =

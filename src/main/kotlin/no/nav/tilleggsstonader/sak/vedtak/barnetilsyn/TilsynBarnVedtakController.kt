@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
@@ -39,7 +38,7 @@ class TilsynBarnVedtakController(
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
+        @RequestBody vedtak: InnvilgelseTilsynBarnRequestV2,
     ) {
         lagreVedtak(behandlingId, vedtak)
     }
@@ -49,7 +48,7 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequestV2,
     ) {
-        lagreVedtakV2(behandlingId, vedtak)
+        lagreVedtak(behandlingId, vedtak)
     }
 
     @PostMapping("{behandlingId}/avslag")
@@ -76,21 +75,18 @@ class TilsynBarnVedtakController(
         vedtakService.håndterSteg(behandlingId, vedtak)
     }
 
-    fun lagreVedtakV2(
-        behandlingId: BehandlingId,
-        vedtak: VedtakTilsynBarnRequest,
-    ) {
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
-        vedtakService.håndterSteg(behandlingId, vedtak)
-    }
-
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
+        @RequestBody vedtak: InnvilgelseTilsynBarnRequestV2,
     ): BeregningsresultatTilsynBarnDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        return beregningService.beregn(behandling, TypeVedtak.INNVILGELSE).tilDto(behandling.revurderFra)
+        return beregningService
+            .beregnV2(
+                vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
+                behandling = behandling,
+                typeVedtak = TypeVedtak.INNVILGELSE,
+            ).tilDto(behandling.revurderFra)
     }
 
     @PostMapping("{behandlingId}/beregnV2")

@@ -27,6 +27,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
@@ -266,6 +269,57 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 assertThat(harUtgifter?.svar).isEqualTo(SvarJaNei.JA)
                 assertThat(harRettTilUtstyrsstipend?.svar).isEqualTo(SvarJaNei.NEI)
             }
+        }
+    }
+
+    @Nested
+    inner class Boutgifter {
+        @Test
+        fun `skal ikke kunne lage aktivitet med type reell arbeidssøker for søknad om boutgifter`() {
+            val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = Stønadstype.BOUTGIFTER))
+            val behandling = testoppsettService.lagre(behandling(fagsak))
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    LagreVilkårperiode(
+                        type = AktivitetType.REELL_ARBEIDSSØKER,
+                        behandlingId = behandling.id,
+                        fom = now(),
+                        tom = now(),
+                        faktaOgSvar =
+                            FaktaOgSvarAktivitetBoutgifterDto(
+                                svarLønnet = SvarJaNei.NEI,
+                            ),
+                    ),
+                )
+            }.hasMessageContaining("Reell arbeidssøker er ikke en gyldig aktivitet for boutgifter")
+        }
+
+        @Test
+        fun `Skal kunne sende inn og hente ut felter for boutgfiter`() {
+            val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = Stønadstype.BOUTGIFTER))
+            val behandling = testoppsettService.lagre(behandling(fagsak))
+
+            val persistertAktivitet =
+                vilkårperiodeService.opprettVilkårperiode(
+                    LagreVilkårperiode(
+                        type = AktivitetType.TILTAK,
+                        behandlingId = behandling.id,
+                        fom = now(),
+                        tom = now(),
+                        faktaOgSvar =
+                            FaktaOgSvarAktivitetBoutgifterDto(
+                                svarLønnet = SvarJaNei.NEI,
+                            ),
+                    ),
+                )
+
+            val harUtgifter =
+                persistertAktivitet.faktaOgVurdering.vurderinger
+                    .takeIfVurderinger<VurderingTiltakBoutgifter>()
+                    ?.lønnet
+
+            assertThat(harUtgifter).isEqualTo(VurderingLønnet(SvarJaNei.NEI))
         }
     }
 

@@ -35,7 +35,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -200,7 +199,7 @@ class LæremidlerBeregnYtelseSteg(
         utbetalingsdato: LocalDate,
         satsBekreftet: Boolean,
     ) = perioder
-        .groupBy { it.grunnlag.målgruppe.tilTypeAndel() }
+        .groupBy { it.grunnlag.målgruppe.tilTypeAndel(Stønadstype.LÆREMIDLER) }
         .map { (typeAndel, perioder) ->
             AndelTilkjentYtelse(
                 beløp = perioder.sumOf { it.beløp },
@@ -242,12 +241,4 @@ class LæremidlerBeregnYtelseSteg(
 
         return StatusIverksetting.UBEHANDLET
     }
-
-    private fun MålgruppeType.tilTypeAndel(): TypeAndel =
-        when (this) {
-            MålgruppeType.AAP, MålgruppeType.UFØRETRYGD, MålgruppeType.NEDSATT_ARBEIDSEVNE -> TypeAndel.LÆREMIDLER_AAP
-            MålgruppeType.OVERGANGSSTØNAD -> TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER
-            MålgruppeType.OMSTILLINGSSTØNAD -> TypeAndel.LÆREMIDLER_ETTERLATTE
-            else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
-        }
 }

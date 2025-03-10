@@ -6,7 +6,7 @@ Egenskap: Beregning - En aktivitet med delvisaktivitet
   Scenario: Tre fulle uker med delvisaktivitet
     # Mål: Antall dager skal bli aktivitetsdager x antall uker
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 02.01.2023 | 21.01.2023 | TILTAK    | AAP       |
 
@@ -24,9 +24,9 @@ Egenskap: Beregning - En aktivitet med delvisaktivitet
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
       | 01.2023 | 29.53   | 9            | 1000   | 266         |
 
-  Scenario: Færre dager i stønadsperiode enn antall aktivitetsdager:
+  Scenario: Færre dager i vedtaksperiode enn antall aktivitetsdager:
       # Mål: Antall dager skal ikke bli flere enn det er plass til i en uke
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 02.01.2023 | 04.01.2023 | TILTAK    | AAP       |
 

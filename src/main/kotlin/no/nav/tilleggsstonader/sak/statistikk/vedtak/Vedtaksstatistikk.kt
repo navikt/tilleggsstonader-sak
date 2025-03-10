@@ -14,9 +14,9 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -316,7 +316,7 @@ data class VilkårsvurderingerDvh(
     )
 
     companion object {
-        fun fraDomene(vilkår: List<VilkårDto>) =
+        fun fraDomene(vilkår: List<Vilkår>) =
             JsonWrapper(
                 vilkår.map {
                     VilkårsvurderingerDvh(
@@ -333,7 +333,7 @@ data class DelvilkårDvh(
     val vurderinger: List<RegelId>, // Anti corruption layer
 ) {
     companion object {
-        fun fraDomene(delvilkår: List<DelvilkårDto>): List<DelvilkårDvh> =
+        fun fraDomene(delvilkår: List<Delvilkår>): List<DelvilkårDvh> =
             delvilkår.map {
                 DelvilkårDvh(
                     resultat = it.resultat,

@@ -35,7 +35,6 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
@@ -169,7 +168,7 @@ object Testdata {
                     fom = LocalDate.of(2024, 2, 1),
                     tom = LocalDate.of(2024, 2, 29),
                     utgift = 100,
-                ).tilDto(),
+                ),
                 vilkår(
                     behandlingId = behandlingId,
                     type = VilkårType.PASS_BARN,
@@ -178,7 +177,7 @@ object Testdata {
                     fom = LocalDate.of(2024, 2, 1),
                     tom = LocalDate.of(2024, 2, 29),
                     utgift = 200,
-                ).tilDto(),
+                ),
                 vilkår(
                     behandlingId = behandlingId,
                     type = VilkårType.PASS_BARN,
@@ -187,7 +186,7 @@ object Testdata {
                     fom = LocalDate.of(2024, 2, 1),
                     tom = LocalDate.of(2024, 2, 29),
                     utgift = 200,
-                ).tilDto(),
+                ),
             )
 
         val vedtaksperiodeBeregningsgrunnlag =

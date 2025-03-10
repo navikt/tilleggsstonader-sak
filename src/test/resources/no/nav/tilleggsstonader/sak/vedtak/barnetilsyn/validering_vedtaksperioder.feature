@@ -1,11 +1,11 @@
 # language: no
 # encoding: UTF-8
 
-Egenskap: Beregning barnetilsyn - validering av stønadsperioder
+Egenskap: Beregning barnetilsyn - validering av vedtaksperioder
 
-  Scenario: Sender inn tomme stønadsperioder
+  Scenario: Sender inn tomme vedtaksperioder
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom | Tom |
 
     Gitt følgende aktiviteter

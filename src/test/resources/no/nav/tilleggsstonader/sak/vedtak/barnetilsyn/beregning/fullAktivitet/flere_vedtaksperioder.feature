@@ -1,10 +1,10 @@
 # language: no
 # encoding: UTF-8
 
-Egenskap: Beregning - Flere stønadsperioder med full aktivitet
+Egenskap: Beregning - Flere vedtaksperioder med full aktivitet
 
-  Scenario: Flere stønadsperioder innenfor samme måned - en aktivitet:
-    Gitt følgende støndsperioder
+  Scenario: Flere vedtaksperioder innenfor samme måned - en aktivitet:
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe       |
       | 01.01.2023 | 11.01.2023 | UTDANNING | OVERGANGSSTØNAD |
       | 12.01.2023 | 31.01.2023 | UTDANNING | AAP             |
@@ -23,7 +23,7 @@ Egenskap: Beregning - Flere stønadsperioder med full aktivitet
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
       | 01.2023 | 29.53   | 22           | 1000   | 649         |
 
-    Så forvent følgende stønadsperiodeGrunnlag for: 01.2023
+    Så forvent følgende vedtaksperiodeGrunnlag for: 01.2023
       | Fom        | Tom        | Målgruppe       | Aktivitet | Antall aktiviteter | Antall dager |
       | 01.01.2023 | 11.01.2023 | OVERGANGSSTØNAD | UTDANNING | 1                  | 8            |
       | 12.01.2023 | 31.01.2023 | AAP             | UTDANNING | 1                  | 14           |
@@ -34,10 +34,10 @@ Egenskap: Beregning - Flere stønadsperioder med full aktivitet
       | 02.01.2023 | 236   | OVERGANGSSTØNAD |
       | 12.01.2023 | 413   | AAP             |
 
-  Scenario: Flere stønadsperioder innenfor samme måned - ulike aktiviteter:
-    # Mål: Beregning skal kun bruke aktiviteter som matcher aktivitet i stønadsperiode selv om det er overlapp i periode
+  Scenario: Flere vedtaksperioder innenfor samme måned - ulike aktiviteter:
+    # Mål: Beregning skal kun bruke aktiviteter som matcher aktivitet i vedtaksperiode selv om det er overlapp i periode
 
-    Gitt følgende støndsperioder
+    Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe       |
       | 01.01.2023 | 11.01.2023 | UTDANNING | OVERGANGSSTØNAD |
       | 12.01.2023 | 31.01.2023 | TILTAK    | AAP             |
@@ -57,7 +57,7 @@ Egenskap: Beregning - Flere stønadsperioder med full aktivitet
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
       | 01.2023 | 29.53   | 22           | 1000   | 649         |
 
-    Så forvent følgende stønadsperiodeGrunnlag for: 01.2023
+    Så forvent følgende vedtaksperiodeGrunnlag for: 01.2023
       | Fom        | Tom        | Målgruppe       | Aktivitet | Antall aktiviteter | Antall dager |
       | 01.01.2023 | 11.01.2023 | OVERGANGSSTØNAD | UTDANNING | 1                  | 8            |
       | 12.01.2023 | 31.01.2023 | AAP             | TILTAK    | 1                  | 14           |
