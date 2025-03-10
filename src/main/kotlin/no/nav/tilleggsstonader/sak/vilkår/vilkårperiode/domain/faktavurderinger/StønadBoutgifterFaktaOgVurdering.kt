@@ -67,37 +67,27 @@ sealed interface AktivitetBoutgifter :
 // }
 
 data class TiltakBoutgifter(
-    override val fakta: FaktaAktivitetBoutgifter,
     override val vurderinger: VurderingTiltakBoutgifter,
 ) : AktivitetBoutgifter {
+    override val fakta: IngenFakta = IngenFakta
     override val type: AktivitetBoutgifterType = AktivitetBoutgifterType.TILTAK_BOUTGIFTER
 }
 
-data class UtdanningBoutgifter(
-    override val fakta: FaktaAktivitetBoutgifter,
-) : AktivitetBoutgifter {
+data object UtdanningBoutgifter : AktivitetBoutgifter {
     override val type: AktivitetBoutgifterType = AktivitetBoutgifterType.UTDANNING_BOUTGIFTER
+    override val fakta: IngenFakta = IngenFakta
     override val vurderinger: IngenVurderinger = IngenVurderinger
 }
 
 data object IngenAktivitetBoutgifter : AktivitetBoutgifter {
     override val type: AktivitetBoutgifterType = AktivitetBoutgifterType.INGEN_AKTIVITET_BOUTGIFTER
-    override val fakta: Fakta = IngenFakta
+    override val fakta: IngenFakta = IngenFakta
     override val vurderinger: Vurderinger = IngenVurderinger
 }
 
 data class VurderingTiltakBoutgifter(
     override val lønnet: VurderingLønnet,
 ) : LønnetVurdering
-
-data class FaktaAktivitetBoutgifter(
-    override val aktivitetsdager: Int,
-) : Fakta,
-    FaktaAktivitetsdager {
-    init {
-        require(aktivitetsdager in 1..5) { "Aktivitetsdager må være mellom 1 og 5" }
-    }
-}
 
 sealed interface TypeFaktaOgVurderingBoutgifter : TypeFaktaOgVurdering
 

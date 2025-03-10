@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
@@ -191,22 +190,13 @@ private fun mapAktiviteterBoutgifter(
     when (aktivitetType) {
         AktivitetType.TILTAK -> {
             TiltakBoutgifter(
-                fakta = FaktaAktivitetBoutgifter(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
                 vurderinger = VurderingTiltakBoutgifter(lønnet = VurderingLønnet(faktaOgSvar.svarLønnet)),
             )
         }
 
-        AktivitetType.UTDANNING ->
-            UtdanningBoutgifter(
-                fakta = FaktaAktivitetBoutgifter(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
-            )
+        AktivitetType.UTDANNING -> UtdanningBoutgifter
 
-        AktivitetType.INGEN_AKTIVITET -> {
-            feilHvis(faktaOgSvar.aktivitetsdager != null) {
-                "Kan ikke registrere aktivitetsdager på ingen aktivitet"
-            }
-            IngenAktivitetBoutgifter
-        }
+        AktivitetType.INGEN_AKTIVITET -> IngenAktivitetBoutgifter
 
         AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for boutgifter")
     }

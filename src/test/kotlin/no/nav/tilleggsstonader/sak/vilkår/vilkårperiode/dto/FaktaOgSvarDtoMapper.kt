@@ -48,7 +48,6 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                     )
                 is FaktaOgVurderingBoutgifter ->
                     FaktaOgSvarAktivitetBoutgifterDto(
-                        aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
                         svarLønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.svar,
                     )
             }

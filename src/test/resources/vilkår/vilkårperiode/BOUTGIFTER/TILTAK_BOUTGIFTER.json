@@ -1,8 +1,6 @@
 {
   "type": "TILTAK_BOUTGIFTER",
-  "fakta": {
-    "aktivitetsdager": 3
-  },
+  "fakta": {},
   "vurderinger": {
     "lønnet": {
       "svar": "NEI",
