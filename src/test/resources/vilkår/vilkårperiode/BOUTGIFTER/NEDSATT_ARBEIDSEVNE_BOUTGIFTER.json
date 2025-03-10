@@ -1,0 +1,14 @@
+{
+  "type": "NEDSATT_ARBEIDSEVNE_BOUTGIFTER",
+  "fakta": {},
+  "vurderinger": {
+    "dekketAvAnnetRegelverk": {
+      "svar": "NEI",
+      "resultat": "OPPFYLT"
+    },
+    "medlemskap": {
+      "svar": "JA",
+      "resultat": "OPPFYLT"
+    }
+  }
+}

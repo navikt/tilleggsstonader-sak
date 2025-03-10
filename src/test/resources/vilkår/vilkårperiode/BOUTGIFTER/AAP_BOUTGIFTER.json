@@ -1,0 +1,14 @@
+{
+  "type": "AAP_BOUTGIFTER",
+  "fakta": {},
+  "vurderinger": {
+    "dekketAvAnnetRegelverk": {
+      "svar": "NEI",
+      "resultat": "OPPFYLT"
+    },
+    "medlemskap": {
+      "svar": "JA_IMPLISITT",
+      "resultat": "OPPFYLT"
+    }
+  }
+}
