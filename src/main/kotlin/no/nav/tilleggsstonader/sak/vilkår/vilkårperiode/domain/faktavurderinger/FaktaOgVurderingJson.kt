@@ -39,6 +39,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     JsonSubTypes.Type(UtdanningBoutgifter::class, name = "UTDANNING_BOUTGIFTER"),
     JsonSubTypes.Type(TiltakBoutgifter::class, name = "TILTAK_BOUTGIFTER"),
     JsonSubTypes.Type(IngenAktivitetBoutgifter::class, name = "INGEN_AKTIVITET_BOUTGIFTER"),
+    JsonSubTypes.Type(AAPBoutgifter::class, name = "AAP_BOUTGIFTER"),
+    JsonSubTypes.Type(OmstillingsstønadBoutgifter::class, name = "OMSTILLINGSSTØNAD_BOUTGIFTER"),
+    JsonSubTypes.Type(OvergangssstønadBoutgifter::class, name = "OVERGANGSSTØNAD_BOUTGIFTER"),
+    JsonSubTypes.Type(NedsattArbeidsevneBoutgifter::class, name = "NEDSATT_ARBEIDSEVNE_BOUTGIFTER"),
+    JsonSubTypes.Type(UføretrygdBoutgifter::class, name = "UFØRETRYGD_BOUTGIFTER"),
+    JsonSubTypes.Type(IngenMålgruppeBoutgifter::class, name = "INGEN_MÅLGRUPPE_BOUTGIFTER"),
     failOnRepeatedNames = true,
 )
 sealed interface FaktaOgVurderingJson

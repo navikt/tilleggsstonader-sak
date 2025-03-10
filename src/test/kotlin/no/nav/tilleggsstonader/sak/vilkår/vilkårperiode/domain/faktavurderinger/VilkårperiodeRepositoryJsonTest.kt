@@ -200,18 +200,16 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
 
     private fun forventetTypeBoutgifter(type: TypeFaktaOgVurderingBoutgifter): Class<out FaktaOgVurderingBoutgifter> =
         when (type) {
-            // TODO kommenter inn når implementerer målgruppe for boutgifter
-//            is MålgruppeLæremidlerType -> {
-//                when (type) {
-//                    MålgruppeLæremidlerType.AAP_LÆREMIDLER -> AAPLæremidler::class
-//                    MålgruppeLæremidlerType.UFØRETRYGD_LÆREMIDLER -> UføretrygdLæremidler::class
-//                    MålgruppeLæremidlerType.NEDSATT_ARBEIDSEVNE_LÆREMIDLER -> NedsattArbeidsevneLæremidler::class
-//                    MålgruppeLæremidlerType.OMSTILLINGSSTØNAD_LÆREMIDLER -> OmstillingsstønadLæremidler::class
-//                    MålgruppeLæremidlerType.OVERGANGSSTØNAD_LÆREMIDLER -> OvergangssstønadLæremidler::class
-//                    MålgruppeLæremidlerType.INGEN_MÅLGRUPPE_LÆREMIDLER -> IngenMålgruppeLæremidler::class
-//                    MålgruppeLæremidlerType.SYKEPENGER_100_PROSENT_LÆREMIDLER -> SykepengerLæremidler::class
-//                }
-//            }
+            is MålgruppeBoutgifterType -> {
+                when (type) {
+                    MålgruppeBoutgifterType.AAP_BOUTGIFTER -> AAPBoutgifter::class
+                    MålgruppeBoutgifterType.UFØRETRYGD_BOUTGIFTER -> UføretrygdBoutgifter::class
+                    MålgruppeBoutgifterType.NEDSATT_ARBEIDSEVNE_BOUTGIFTER -> NedsattArbeidsevneBoutgifter::class
+                    MålgruppeBoutgifterType.OMSTILLINGSSTØNAD_BOUTGIFTER -> OmstillingsstønadBoutgifter::class
+                    MålgruppeBoutgifterType.OVERGANGSSTØNAD_BOUTGIFTER -> OvergangssstønadBoutgifter::class
+                    MålgruppeBoutgifterType.INGEN_MÅLGRUPPE_BOUTGIFTER -> IngenMålgruppeBoutgifter::class
+                }
+            }
 
             is AktivitetBoutgifterType -> {
                 when (type) {

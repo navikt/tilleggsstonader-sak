@@ -18,15 +18,20 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerTilsynBarn
@@ -35,6 +40,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningBoutgifter
@@ -121,7 +127,7 @@ private fun mapMålgruppe(
             mapMålgruppeLæremidler(type, faktaOgSvar, målgruppe, grunnlagsData)
         }
         Stønadstype.BOUTGIFTER -> {
-            TODO("Ikke implementert ennå")
+            mapMålgruppeBoutgfiter(type, faktaOgSvar)
         }
     }
 }
@@ -345,5 +351,57 @@ private fun mapMålgruppeLæremidler(
             )
         }
 
+        MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
+    }
+
+private fun mapMålgruppeBoutgfiter(
+    type: MålgruppeType,
+    faktaOgVurderinger: FaktaOgSvarMålgruppeDto,
+): MålgruppeBoutgifter =
+    when (type) {
+        MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeBoutgifter
+        MålgruppeType.OMSTILLINGSSTØNAD -> {
+            OmstillingsstønadBoutgifter(
+                vurderinger =
+                    VurderingOmstillingsstønad(
+                        medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                    ),
+            )
+        }
+
+        MålgruppeType.OVERGANGSSTØNAD -> {
+            OvergangssstønadBoutgifter
+        }
+
+        MålgruppeType.AAP -> {
+            AAPBoutgifter(
+                vurderinger =
+                    VurderingAAP(
+                        dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    ),
+            )
+        }
+
+        MålgruppeType.UFØRETRYGD -> {
+            UføretrygdBoutgifter(
+                vurderinger =
+                    VurderingUføretrygd(
+                        dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                        medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                    ),
+            )
+        }
+
+        MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
+            NedsattArbeidsevneBoutgifter(
+                vurderinger =
+                    VurderingNedsattArbeidsevne(
+                        dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                        medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                    ),
+            )
+        }
+
+        MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for boutgifter")
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
     }
