@@ -137,9 +137,8 @@ data class VurderingAldersVilkår(
     )
 
     companion object {
-        private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =
+        private fun utledResultat(svar: SvarJaNei): ResultatDelvilkårperiode =
             when (svar) {
-                null -> ResultatDelvilkårperiode.IKKE_VURDERT
                 SvarJaNei.JA -> ResultatDelvilkårperiode.OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
                 SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingAldersVilkår::class.simpleName}")
