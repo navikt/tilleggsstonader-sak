@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.AldersvilkårVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.AldersvilkårVurdering.vurderAldersvilkår
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetBoutgifter
@@ -127,7 +128,7 @@ private fun mapMålgruppe(
             mapMålgruppeLæremidler(type, faktaOgSvar, målgruppe, grunnlagsData)
         }
         Stønadstype.BOUTGIFTER -> {
-            mapMålgruppeBoutgfiter(type, faktaOgSvar)
+            mapMålgruppeBoutgfiter(type, faktaOgSvar, målgruppe, grunnlagsData)
         }
     }
 }
@@ -357,6 +358,8 @@ private fun mapMålgruppeLæremidler(
 private fun mapMålgruppeBoutgfiter(
     type: MålgruppeType,
     faktaOgVurderinger: FaktaOgSvarMålgruppeDto,
+    målgruppe: LagreVilkårperiode,
+    grunnlagsData: Grunnlagsdata,
 ): MålgruppeBoutgifter =
     when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeBoutgifter
@@ -365,6 +368,8 @@ private fun mapMålgruppeBoutgfiter(
                 vurderinger =
                     VurderingOmstillingsstønad(
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                            lagVurderingAldersvilkår(målgruppe, grunnlagsData),
                     ),
             )
         }
@@ -378,6 +383,8 @@ private fun mapMålgruppeBoutgfiter(
                 vurderinger =
                     VurderingAAP(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                        aldersvilkår =
+                            lagVurderingAldersvilkår(målgruppe, grunnlagsData),
                     ),
             )
         }
@@ -388,6 +395,8 @@ private fun mapMålgruppeBoutgfiter(
                     VurderingUføretrygd(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                            lagVurderingAldersvilkår(målgruppe, grunnlagsData),
                     ),
             )
         }
@@ -398,6 +407,8 @@ private fun mapMålgruppeBoutgfiter(
                     VurderingNedsattArbeidsevne(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår =
+                            lagVurderingAldersvilkår(målgruppe, grunnlagsData),
                     ),
             )
         }
