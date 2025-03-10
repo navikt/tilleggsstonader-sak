@@ -47,7 +47,7 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `Gyldige perioder med målgruppe OVERGANGSSTØNAD skal kaste feil`() {
+    fun `Periode med målgruppe OVERGANGSSTØNAD skal kaste feil`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.OVERGANGSSTØNAD)
         val grunnlagsdata = grunnlagsdataDomain()
 
@@ -56,7 +56,7 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `Gyldige perioder med målgruppe DAGPENGER skal kaste feil`() {
+    fun `Periode med målgruppe DAGPENGER skal kaste feil`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.DAGPENGER)
         val grunnlagsdata = grunnlagsdataDomain()
 
@@ -65,7 +65,7 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `Gyldige perioder med målgruppe SYKEPENGER_100_PROSENT skal kaste feil`() {
+    fun `Periode med målgruppe SYKEPENGER_100_PROSENT skal kaste feil`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.SYKEPENGER_100_PROSENT)
         val grunnlagsdata = grunnlagsdataDomain()
 
@@ -74,7 +74,7 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
-    fun `Gyldige perioder med målgruppe INGEN_MÅLGRUPPE skal kaste feil`() {
+    fun `Periode med målgruppe INGEN_MÅLGRUPPE skal kaste feil`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.INGEN_MÅLGRUPPE)
         val grunnlagsdata = grunnlagsdataDomain()
 
