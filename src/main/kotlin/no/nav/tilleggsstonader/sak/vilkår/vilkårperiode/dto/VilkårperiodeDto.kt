@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.HarUtgifterVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MottarFulleSykepengerVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
@@ -95,6 +96,7 @@ sealed class FaktaOgVurderingerDto
 data class MålgruppeFaktaOgVurderingerDto(
     val medlemskap: VurderingDto? = null,
     val utgifterDekketAvAnnetRegelverk: VurderingDto? = null,
+    val mottarFulleSykepenger: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
 data class AktivitetBarnetilsynFaktaOgVurderingerDto(
@@ -124,6 +126,7 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                         .takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()
                         ?.dekketAvAnnetRegelverk
                         ?.tilDto(),
+                mottarFulleSykepenger = vurderinger.takeIfVurderinger<MottarFulleSykepengerVurdering>()?.mottarFulleSykepenger?.tilDto(),
             )
 
         is AktivitetFaktaOgVurdering -> {
@@ -145,6 +148,7 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                                 ?.harRettTilUtstyrsstipend
                                 ?.tilDto(),
                     )
+
                 is FaktaOgVurderingBoutgifter ->
                     AktivitetBoutgifterFaktaOgVurderingerDto(
                         aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,

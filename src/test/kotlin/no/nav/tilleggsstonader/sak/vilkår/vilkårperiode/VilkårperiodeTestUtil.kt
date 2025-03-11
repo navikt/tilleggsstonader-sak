@@ -34,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMottarFulleSykepenger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
@@ -77,6 +78,7 @@ object VilkårperiodeTestUtil {
         type: MålgruppeType = MålgruppeType.AAP,
         medlemskap: VurderingMedlemskap = vurderingMedlemskap(),
         dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(),
+        mottarFulleSykepenger: VurderingMottarFulleSykepenger = vurderingMottarFulleSykepenger(),
     ): MålgruppeFaktaOgVurdering =
         when (type) {
             MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
@@ -110,6 +112,7 @@ object VilkårperiodeTestUtil {
                         VurderingNedsattArbeidsevne(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
+                            mottarFulleSykepenger = mottarFulleSykepenger,
                         ),
                 )
 
@@ -217,6 +220,8 @@ object VilkårperiodeTestUtil {
     fun vurderingDekketAvAnnetRegelverk(svar: SvarJaNei? = SvarJaNei.NEI) = VurderingDekketAvAnnetRegelverk(svar = svar)
 
     fun vurderingHarUtgifter(svar: SvarJaNei? = SvarJaNei.JA) = VurderingHarUtgifter(svar = svar)
+
+    fun vurderingMottarFulleSykepenger(svar: SvarJaNei? = SvarJaNei.NEI) = VurderingMottarFulleSykepenger(svar = svar)
 
     fun dummyVilkårperiodeMålgruppe(
         type: MålgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,

@@ -30,6 +30,7 @@ sealed class FaktaOgSvarDto
 data class FaktaOgSvarMålgruppeDto(
     val svarMedlemskap: SvarJaNei? = null,
     val svarUtgifterDekketAvAnnetRegelverk: SvarJaNei? = null,
+    val svarMottarFulleSykepenger: SvarJaNei? = null,
 ) : FaktaOgSvarDto()
 
 data class FaktaOgSvarAktivitetBarnetilsynDto(
