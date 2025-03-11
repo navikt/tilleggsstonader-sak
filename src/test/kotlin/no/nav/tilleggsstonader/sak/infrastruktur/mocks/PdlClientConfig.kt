@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -54,69 +55,7 @@ class PdlClientConfig {
     @Primary
     fun pdlClient(): PdlClient {
         val pdlClient: PdlClient = mockk()
-
-        every { pdlClient.hentPersonKortBolk(any()) } answers {
-            firstArg<List<String>>().associateWith { lagPersonKort(it) }
-        }
-
-        every { pdlClient.hentSøker(any()) } answers {
-            opprettPdlSøker()
-        }
-
-        every { pdlClient.hentBarn(any()) } returns barn()
-
-        every { pdlClient.hentAndreForeldre(any()) } returns mapOf(ANNEN_FORELDER_FNR to annenForelder())
-
-        every { pdlClient.hentAktørIder(any()) } answers {
-            val ident = firstArg<String>()
-            if (ident == "19117313797") {
-                throw PdlNotFoundException()
-            } else {
-                PdlIdenter(listOf(PdlIdent("00$ident", false)))
-            }
-        }
-
-        val personIdent = slot<String>()
-        every { pdlClient.hentPersonidenter(capture(personIdent)) } answers {
-            if (personIdent.captured == "19117313797") {
-                throw PdlNotFoundException()
-            } else {
-                PdlIdenter(listOf(PdlIdent(firstArg(), false), PdlIdent("98765432109", true)))
-            }
-        }
-
-        every { pdlClient.hentIdenterBolk(listOf("123", "456")) }
-            .returns(
-                mapOf(
-                    "123" to PdlIdent("ny123", false),
-                    "456" to PdlIdent("ny456", false),
-                ),
-            )
-
-        every { pdlClient.hentIdenterBolk(listOf("456", "123")) }
-            .returns(
-                mapOf(
-                    "123" to PdlIdent("ny123", false),
-                    "456" to PdlIdent("ny456", false),
-                ),
-            )
-
-        every { pdlClient.hentIdenterBolk(listOf("111", "222")) }
-            .returns(
-                mapOf(
-                    "111" to PdlIdent("111", false),
-                    "222" to PdlIdent("222", false),
-                ),
-            )
-
-        every { pdlClient.hentGeografiskTilknytning(any()) } returns
-            GeografiskTilknytningDto(
-                gtBydel = "030103",
-                gtKommune = "0301",
-                gtType = GeografiskTilknytningType.BYDEL,
-                gtLand = "NOR",
-            )
-
+        resetMock(pdlClient)
         return pdlClient
     }
 
@@ -127,6 +66,72 @@ class PdlClientConfig {
         const val BARN2_FNR = "14041385481"
         const val SØKER_FNR = "01010172272"
         const val ANNEN_FORELDER_FNR = "17097926735"
+
+        fun resetMock(pdlClient: PdlClient) {
+            clearMocks(pdlClient)
+
+            every { pdlClient.hentPersonKortBolk(any()) } answers {
+                firstArg<List<String>>().associateWith { lagPersonKort(it) }
+            }
+
+            every { pdlClient.hentSøker(any()) } answers {
+                opprettPdlSøker()
+            }
+
+            every { pdlClient.hentBarn(any()) } returns barn()
+
+            every { pdlClient.hentAndreForeldre(any()) } returns mapOf(ANNEN_FORELDER_FNR to annenForelder())
+
+            every { pdlClient.hentAktørIder(any()) } answers {
+                val ident = firstArg<String>()
+                if (ident == "19117313797") {
+                    throw PdlNotFoundException()
+                } else {
+                    PdlIdenter(listOf(PdlIdent("00$ident", false)))
+                }
+            }
+
+            val personIdent = slot<String>()
+            every { pdlClient.hentPersonidenter(capture(personIdent)) } answers {
+                if (personIdent.captured == "19117313797") {
+                    throw PdlNotFoundException()
+                } else {
+                    PdlIdenter(listOf(PdlIdent(firstArg(), false), PdlIdent("98765432109", true)))
+                }
+            }
+
+            every { pdlClient.hentIdenterBolk(listOf("123", "456")) }
+                .returns(
+                    mapOf(
+                        "123" to PdlIdent("ny123", false),
+                        "456" to PdlIdent("ny456", false),
+                    ),
+                )
+
+            every { pdlClient.hentIdenterBolk(listOf("456", "123")) }
+                .returns(
+                    mapOf(
+                        "123" to PdlIdent("ny123", false),
+                        "456" to PdlIdent("ny456", false),
+                    ),
+                )
+
+            every { pdlClient.hentIdenterBolk(listOf("111", "222")) }
+                .returns(
+                    mapOf(
+                        "111" to PdlIdent("111", false),
+                        "222" to PdlIdent("222", false),
+                    ),
+                )
+
+            every { pdlClient.hentGeografiskTilknytning(any()) } returns
+                GeografiskTilknytningDto(
+                    gtBydel = "030103",
+                    gtKommune = "0301",
+                    gtType = GeografiskTilknytningType.BYDEL,
+                    gtLand = "NOR",
+                )
+        }
 
         fun lagPersonKort(it: String) =
             PdlPersonKort(
@@ -242,7 +247,7 @@ class PdlClientConfig {
                 ),
             )
 
-        private fun familierelasjonerBarn(): List<ForelderBarnRelasjon> =
+        fun familierelasjonerBarn(): List<ForelderBarnRelasjon> =
             listOf(
                 ForelderBarnRelasjon(
                     relatertPersonsIdent = SØKER_FNR,
