@@ -112,7 +112,7 @@ class TilsynBarnVedtakControllerTest(
     @Test
     fun `Skal lagre og hente innvilgelse med vedtaksperioder og begrunnelse`() {
         val vedtak = innvilgelseDto(listOf(vedtaksperiodeDto), "Jo du skjønner det, at...")
-        innvilgeVedtakV2(behandling, vedtak)
+        innvilgeVedtak(behandling, vedtak)
 
         val lagretDto = hentVedtak<InnvilgelseTilsynBarnResponse>(behandling.id).body!!
 
@@ -140,7 +140,7 @@ class TilsynBarnVedtakControllerTest(
 
     @Test
     fun `skal lagre og hente opphør med vedtaksperioder`() {
-        innvilgeVedtakV2(
+        innvilgeVedtak(
             behandling = behandling,
             vedtak =
                 InnvilgelseTilsynBarnRequest(
@@ -193,12 +193,12 @@ class TilsynBarnVedtakControllerTest(
         assertThat(lagretDto.type).isEqualTo(TypeVedtak.OPPHØR)
     }
 
-    private fun innvilgeVedtakV2(
+    private fun innvilgeVedtak(
         behandling: Behandling,
         vedtak: InnvilgelseTilsynBarnRequest,
     ) {
         restTemplate.exchange<Map<String, Any>?>(
-            localhost("api/vedtak/tilsyn-barn/${behandling.id}/innvilgelseV2"),
+            localhost("api/vedtak/tilsyn-barn/${behandling.id}/innvilgelse"),
             HttpMethod.POST,
             HttpEntity(vedtak, headers),
         )
