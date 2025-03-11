@@ -36,4 +36,11 @@ class VurderingHarUtgifterTest {
             vurderingHarUtgifter(SvarJaNei.JA_IMPLISITT)
         }.hasMessageContaining("ugyldig")
     }
+
+    @Test
+    fun `svar=NEI_IMPLISITT er ikke gyldig`() {
+        assertThatThrownBy {
+            vurderingHarUtgifter(SvarJaNei.NEI_IMPLISITT)
+        }.hasMessageContaining("ugyldig")
+    }
 }
