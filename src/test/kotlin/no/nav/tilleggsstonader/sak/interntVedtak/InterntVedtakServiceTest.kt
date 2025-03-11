@@ -5,6 +5,7 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.behandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
@@ -170,10 +171,16 @@ class InterntVedtakServiceTest {
 
         @Test
         fun `stønadsperiodefelter skal bli riktig mappet`() {
+            val behandlingId = BehandlingId.random()
+            every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.Læremidler.behandling
+            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.Læremidler.vilkårperioder
+            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.Læremidler.grunnlagsdata
+            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.innvilgetVedtak
+
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
             assertThat(interntVedtak.stønadsperioder).hasSize(2)
-            with(interntVedtak.stønadsperioder.first()) {
+            with(interntVedtak.stønadsperioder!!.first()) {
                 assertThat(målgruppe).isEqualTo(MålgruppeType.AAP)
                 assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 2, 1))
