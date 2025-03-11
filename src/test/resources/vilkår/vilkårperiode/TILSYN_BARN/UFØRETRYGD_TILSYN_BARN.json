@@ -3,11 +3,9 @@
   "fakta": {},
   "vurderinger": {
     "aldersvilkår": {
-      "resultat": "OPPFYLT",
-      "svar": "JA",
-      "vurderingFaktaEtterlevelse": {
-        "fødselsdato": "2000-01-01"
-      }
+      "svar": "GAMMEL_MANGLER_DATA",
+      "resultat": "IKKE_VURDERT",
+      "vurderingFaktaEtterlevelse": null
     },
     "dekketAvAnnetRegelverk": {
       "svar": "NEI",
