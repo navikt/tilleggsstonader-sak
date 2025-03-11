@@ -193,6 +193,19 @@ class InterntVedtakServiceTest {
                 assertThat(tom).isEqualTo(LocalDate.of(2024, 3, 31))
             }
         }
+
+        @Test
+        fun `vedtaksperiodefelter skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+
+            assertThat(interntVedtak.vedtaksperioder).hasSize(1)
+            with(interntVedtak.vedtaksperioder.single()) {
+                assertThat(målgruppe).isEqualTo(MålgruppeType.AAP)
+                assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
+                assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 1))
+                assertThat(tom).isEqualTo(LocalDate.of(2024, 2, 1))
+            }
+        }
     }
 
     @Nested
