@@ -1,5 +1,5 @@
 import no.nav.familie.prosessering.util.MDCConstants
-import no.nav.security.token.support.core.api.Unprotected
+import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
@@ -20,7 +20,7 @@ import java.util.concurrent.Executors
 
 @RestController
 @RequestMapping("/admin/statistikk/migrering")
-@Unprotected
+@ProtectedWithClaims("azuread")
 class VedtaksstatistikkV2MigreringController(
     private val behandlingRepository: BehandlingRepository,
     private val vedtaksstatistikkRepositoryV2: VedtaksstatistikkRepositoryV2,
