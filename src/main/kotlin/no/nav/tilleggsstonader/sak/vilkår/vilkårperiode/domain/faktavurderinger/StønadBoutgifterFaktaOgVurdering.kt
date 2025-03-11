@@ -1,17 +1,17 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
 sealed interface FaktaOgVurderingBoutgifter : FaktaOgVurdering {
     override val type: TypeFaktaOgVurderingBoutgifter
 }
 
-// TODO disse er kopiert inn fra Tilsyn Barn. Kommenter inn når implemterer målgruppe for boutgifter
-// sealed interface MålgruppeBoutgifter :
-//    MålgruppeFaktaOgVurdering,
-//    FaktaOgVurderingBoutgifter {
-//    override val type: MålgruppeBoutgifterType
-// }
+sealed interface MålgruppeBoutgifter :
+    MålgruppeFaktaOgVurdering,
+    FaktaOgVurderingBoutgifter {
+    override val type: MålgruppeBoutgifterType
+}
 
 sealed interface AktivitetBoutgifter :
     AktivitetFaktaOgVurdering,
@@ -19,85 +19,68 @@ sealed interface AktivitetBoutgifter :
     override val type: AktivitetBoutgifterType
 }
 
-// TODO disse er kopiert inn fra Tilsyn Barn. Kommenter inn når implemterer målgruppe for boutgifter
-// data class AAPBoutgifter(
-//    override val vurderinger: VurderingAAP,
-// ) : MålgruppeBoutgifter {
-//    override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.AAP_TILSYN_BARN
-//    override val fakta: IngenFakta = IngenFakta
-// }
-//
-// data class UføretrygdBoutgifter(
-//    override val vurderinger: VurderingUføretrygd,
-// ) : MålgruppeBoutgifter {
-//    override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.UFØRETRYGD_TILSYN_BARN
-//    override val fakta: IngenFakta = IngenFakta
-// }
-//
-// data class NedsattArbeidsevneBoutgifter(
-//    override val vurderinger: VurderingNedsattArbeidsevne,
-// ) : MålgruppeBoutgifter {
-//    override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.NEDSATT_ARBEIDSEVNE_TILSYN_BARN
-//    override val fakta: IngenFakta = IngenFakta
-// }
-//
-// data class OmstillingsstønadBoutgifter(
-//    override val vurderinger: VurderingOmstillingsstønad,
-// ) : MålgruppeBoutgifter {
-//    override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.OMSTILLINGSSTØNAD_TILSYN_BARN
-//    override val fakta: IngenFakta = IngenFakta
-// }
-//
-// data object OvergangssstønadBoutgifter : MålgruppeBoutgifter {
-//    override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.OVERGANGSSTØNAD_TILSYN_BARN
-//    override val vurderinger: VurderingOvergangsstønad = VurderingOvergangsstønad
-//    override val fakta: IngenFakta = IngenFakta
-// }
-//
-// data object IngenMålgruppeBoutgifter : MålgruppeBoutgifter {
-//    override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.INGEN_MÅLGRUPPE_TILSYN_BARN
-//    override val vurderinger: IngenVurderinger = IngenVurderinger
-//    override val fakta: IngenFakta = IngenFakta
-// }
-//
-// data object SykepengerBoutgifter : MålgruppeBoutgifter {
-//    override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.SYKEPENGER_100_PROSENT_TILSYN_BARN
-//    override val vurderinger: IngenVurderinger = IngenVurderinger
-//    override val fakta: IngenFakta = IngenFakta
-// }
+data class AAPBoutgifter(
+    override val vurderinger: VurderingAAP,
+) : MålgruppeBoutgifter {
+    override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.AAP_BOUTGIFTER
+    override val fakta: IngenFakta = IngenFakta
+}
+
+data class UføretrygdBoutgifter(
+    override val vurderinger: VurderingUføretrygd,
+) : MålgruppeBoutgifter {
+    override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.UFØRETRYGD_BOUTGIFTER
+    override val fakta: IngenFakta = IngenFakta
+}
+
+data class NedsattArbeidsevneBoutgifter(
+    override val vurderinger: VurderingNedsattArbeidsevne,
+) : MålgruppeBoutgifter {
+    override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.NEDSATT_ARBEIDSEVNE_BOUTGIFTER
+    override val fakta: IngenFakta = IngenFakta
+}
+
+data class OmstillingsstønadBoutgifter(
+    override val vurderinger: VurderingOmstillingsstønad,
+) : MålgruppeBoutgifter {
+    override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.OMSTILLINGSSTØNAD_BOUTGIFTER
+    override val fakta: IngenFakta = IngenFakta
+}
+
+data object OvergangssstønadBoutgifter : MålgruppeBoutgifter {
+    override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.OVERGANGSSTØNAD_BOUTGIFTER
+    override val vurderinger: VurderingOvergangsstønad = VurderingOvergangsstønad
+    override val fakta: IngenFakta = IngenFakta
+}
+
+data object IngenMålgruppeBoutgifter : MålgruppeBoutgifter {
+    override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.INGEN_MÅLGRUPPE_BOUTGIFTER
+    override val vurderinger: IngenVurderinger = IngenVurderinger
+    override val fakta: IngenFakta = IngenFakta
+}
 
 data class TiltakBoutgifter(
-    override val fakta: FaktaAktivitetBoutgifter,
     override val vurderinger: VurderingTiltakBoutgifter,
 ) : AktivitetBoutgifter {
+    override val fakta: IngenFakta = IngenFakta
     override val type: AktivitetBoutgifterType = AktivitetBoutgifterType.TILTAK_BOUTGIFTER
 }
 
-data class UtdanningBoutgifter(
-    override val fakta: FaktaAktivitetBoutgifter,
-) : AktivitetBoutgifter {
+data object UtdanningBoutgifter : AktivitetBoutgifter {
     override val type: AktivitetBoutgifterType = AktivitetBoutgifterType.UTDANNING_BOUTGIFTER
+    override val fakta: IngenFakta = IngenFakta
     override val vurderinger: IngenVurderinger = IngenVurderinger
 }
 
 data object IngenAktivitetBoutgifter : AktivitetBoutgifter {
     override val type: AktivitetBoutgifterType = AktivitetBoutgifterType.INGEN_AKTIVITET_BOUTGIFTER
-    override val fakta: Fakta = IngenFakta
+    override val fakta: IngenFakta = IngenFakta
     override val vurderinger: Vurderinger = IngenVurderinger
 }
 
 data class VurderingTiltakBoutgifter(
     override val lønnet: VurderingLønnet,
 ) : LønnetVurdering
-
-data class FaktaAktivitetBoutgifter(
-    override val aktivitetsdager: Int,
-) : Fakta,
-    FaktaAktivitetsdager {
-    init {
-        require(aktivitetsdager in 1..5) { "Aktivitetsdager må være mellom 1 og 5" }
-    }
-}
 
 sealed interface TypeFaktaOgVurderingBoutgifter : TypeFaktaOgVurdering
 
@@ -110,16 +93,14 @@ enum class AktivitetBoutgifterType(
     INGEN_AKTIVITET_BOUTGIFTER(AktivitetType.INGEN_AKTIVITET),
 }
 
-// TODO disse er kopiert inn fra Tilsyn Barn. Kommenter inn når implemterer målgruppe for boutgifter
-// enum class MålgruppeBoutgifterType(
-//    override val vilkårperiodeType: MålgruppeType,
-// ) : TypeMålgruppeOgVurdering,
-//    TypeFaktaOgVurderingBoutgifter {
-//    AAP_TILSYN_BARN(MålgruppeType.AAP),
-//    OMSTILLINGSSTØNAD_TILSYN_BARN(MålgruppeType.OMSTILLINGSSTØNAD),
-//    OVERGANGSSTØNAD_TILSYN_BARN(MålgruppeType.OVERGANGSSTØNAD),
-//    NEDSATT_ARBEIDSEVNE_TILSYN_BARN(MålgruppeType.NEDSATT_ARBEIDSEVNE),
-//    UFØRETRYGD_TILSYN_BARN(MålgruppeType.UFØRETRYGD),
-//    SYKEPENGER_100_PROSENT_TILSYN_BARN(MålgruppeType.SYKEPENGER_100_PROSENT),
-//    INGEN_MÅLGRUPPE_TILSYN_BARN(MålgruppeType.INGEN_MÅLGRUPPE),
-// }
+enum class MålgruppeBoutgifterType(
+    override val vilkårperiodeType: MålgruppeType,
+) : TypeMålgruppeOgVurdering,
+    TypeFaktaOgVurderingBoutgifter {
+    AAP_BOUTGIFTER(MålgruppeType.AAP),
+    OMSTILLINGSSTØNAD_BOUTGIFTER(MålgruppeType.OMSTILLINGSSTØNAD),
+    OVERGANGSSTØNAD_BOUTGIFTER(MålgruppeType.OVERGANGSSTØNAD),
+    NEDSATT_ARBEIDSEVNE_BOUTGIFTER(MålgruppeType.NEDSATT_ARBEIDSEVNE),
+    UFØRETRYGD_BOUTGIFTER(MålgruppeType.UFØRETRYGD),
+    INGEN_MÅLGRUPPE_BOUTGIFTER(MålgruppeType.INGEN_MÅLGRUPPE),
+}

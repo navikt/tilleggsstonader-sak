@@ -112,7 +112,6 @@ data class AktivitetLæremidlerFaktaOgVurderingerDto(
 ) : FaktaOgVurderingerDto()
 
 data class AktivitetBoutgifterFaktaOgVurderingerDto(
-    val aktivitetsdager: Int? = null,
     val lønnet: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
@@ -151,7 +150,6 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
 
                 is FaktaOgVurderingBoutgifter ->
                     AktivitetBoutgifterFaktaOgVurderingerDto(
-                        aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
                         lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
                     )
             }

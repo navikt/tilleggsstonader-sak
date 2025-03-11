@@ -46,6 +46,5 @@ data class FaktaOgSvarAktivitetLæremidlerDto(
 ) : FaktaOgSvarDto()
 
 data class FaktaOgSvarAktivitetBoutgifterDto(
-    val aktivitetsdager: Int? = null,
     val svarLønnet: SvarJaNei? = null,
 ) : FaktaOgSvarDto()

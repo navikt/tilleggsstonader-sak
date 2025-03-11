@@ -18,7 +18,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårspe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
@@ -289,7 +288,6 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                         tom = now(),
                         faktaOgSvar =
                             FaktaOgSvarAktivitetBoutgifterDto(
-                                aktivitetsdager = 5,
                                 svarLønnet = SvarJaNei.NEI,
                             ),
                     ),
@@ -311,22 +309,16 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                         tom = now(),
                         faktaOgSvar =
                             FaktaOgSvarAktivitetBoutgifterDto(
-                                aktivitetsdager = 5,
                                 svarLønnet = SvarJaNei.NEI,
                             ),
                     ),
                 )
 
-            val aktivitetsdager =
-                persistertAktivitet.faktaOgVurdering.fakta
-                    .takeIfFakta<FaktaAktivitetBoutgifter>()
-                    ?.aktivitetsdager
             val harUtgifter =
                 persistertAktivitet.faktaOgVurdering.vurderinger
                     .takeIfVurderinger<VurderingTiltakBoutgifter>()
                     ?.lønnet
 
-            assertThat(aktivitetsdager).isEqualTo(5)
             assertThat(harUtgifter).isEqualTo(VurderingLønnet(SvarJaNei.NEI))
         }
     }
