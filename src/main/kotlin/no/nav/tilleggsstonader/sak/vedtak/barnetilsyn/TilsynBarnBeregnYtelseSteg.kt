@@ -50,13 +50,13 @@ class TilsynBarnBeregnYtelseSteg(
         vedtak: VedtakTilsynBarnRequest,
     ) {
         when (vedtak) {
-            is InnvilgelseTilsynBarnRequest -> beregnOgLagreInnvilgelseV2(saksbehandling, vedtak)
+            is InnvilgelseTilsynBarnRequest -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
             is AvslagTilsynBarnDto -> lagreAvslag(saksbehandling, vedtak)
             is OpphørTilsynBarnRequest -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }
     }
 
-    private fun beregnOgLagreInnvilgelseV2(
+    private fun beregnOgLagreInnvilgelse(
         saksbehandling: Saksbehandling,
         vedtak: InnvilgelseTilsynBarnRequest,
     ) {
