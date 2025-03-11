@@ -10,17 +10,17 @@ sealed interface DekketAvAnnetRegelverkVurdering : VurderingerMålgruppe {
     val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk
 }
 
-sealed interface MottarFulleSykepengerVurdering : VurderingerMålgruppe {
-    val mottarFulleSykepenger: VurderingMottarFulleSykepenger
+sealed interface MottarSykepengerForFulltidsstillingVurdering : VurderingerMålgruppe {
+    val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling
 }
 
 data class VurderingAAP(
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
 ) : MedlemskapVurdering,
     DekketAvAnnetRegelverkVurdering,
-    MottarFulleSykepengerVurdering {
+    MottarSykepengerForFulltidsstillingVurdering {
     override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
-    override val mottarFulleSykepenger: VurderingMottarFulleSykepenger = VurderingMottarFulleSykepenger.NEI_IMPLISITT
+    override val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling = VurderingMottarSykepengerForFulltidsstilling.NEI_IMPLISITT
 }
 
 data class VurderingUføretrygd(
@@ -28,17 +28,17 @@ data class VurderingUføretrygd(
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
 ) : MedlemskapVurdering,
     DekketAvAnnetRegelverkVurdering,
-    MottarFulleSykepengerVurdering {
-    override val mottarFulleSykepenger: VurderingMottarFulleSykepenger = VurderingMottarFulleSykepenger.NEI_IMPLISITT
+    MottarSykepengerForFulltidsstillingVurdering {
+    override val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling = VurderingMottarSykepengerForFulltidsstilling.NEI_IMPLISITT
 }
 
 data class VurderingNedsattArbeidsevne(
     override val medlemskap: VurderingMedlemskap,
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
-    override val mottarFulleSykepenger: VurderingMottarFulleSykepenger,
+    override val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling,
 ) : MedlemskapVurdering,
     DekketAvAnnetRegelverkVurdering,
-    MottarFulleSykepengerVurdering
+    MottarSykepengerForFulltidsstillingVurdering
 
 data class VurderingOmstillingsstønad(
     override val medlemskap: VurderingMedlemskap,

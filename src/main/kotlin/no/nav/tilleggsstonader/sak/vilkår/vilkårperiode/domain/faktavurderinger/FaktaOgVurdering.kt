@@ -79,8 +79,8 @@ sealed interface Vurderinger {
         if (this is HarRettTilUtstyrsstipendVurdering) {
             resultater.add(harRettTilUtstyrsstipend.resultat)
         }
-        if (this is MottarFulleSykepengerVurdering) {
-            resultater.add(mottarFulleSykepenger.resultat)
+        if (this is MottarSykepengerForFulltidsstillingVurdering) {
+            resultater.add(mottarSykepengerForFulltidsstilling.resultat)
         }
         return resultater
     }

@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurdering
 
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMottarFulleSykepenger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -29,8 +29,8 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
         private val dekketAvAnnetRegelverkIkkeOppfylt = vurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA)
         private val dekketAvAnnetRegelverkOppfylt = vurderingDekketAvAnnetRegelverk()
 
-        private val mottarFulleSykepengerOppfylt = vurderingMottarFulleSykepenger(svar = SvarJaNei.NEI)
-        private val mottarFulleSykepengerIkkeOppfylt = vurderingMottarFulleSykepenger(svar = SvarJaNei.JA)
+        private val mottarSykepengerOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.NEI)
+        private val mottarSykepengerIkkeOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.JA)
 
         @Test
         fun `resultat er IKKE_VURDERT hvis én vurdering ikke er vurdert og resten er oppfylt`() {
@@ -40,7 +40,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            mottarFulleSykepenger = mottarFulleSykepengerOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 
@@ -55,7 +55,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
-                            mottarFulleSykepenger = mottarFulleSykepengerIkkeOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerIkkeOppfylt,
                         ),
                 )
 
@@ -70,7 +70,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
-                            mottarFulleSykepenger = mottarFulleSykepengerOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 
@@ -85,7 +85,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            mottarFulleSykepenger = mottarFulleSykepengerOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 

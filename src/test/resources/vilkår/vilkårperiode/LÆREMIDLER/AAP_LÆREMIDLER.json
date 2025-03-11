@@ -10,7 +10,7 @@
       "svar": "JA_IMPLISITT",
       "resultat": "OPPFYLT"
     },
-    "mottarFulleSykepenger": {
+    "mottarSykepengerForFulltidsstilling": {
       "resultat": "OPPFYLT",
       "svar": "NEI_IMPLISITT"
     }

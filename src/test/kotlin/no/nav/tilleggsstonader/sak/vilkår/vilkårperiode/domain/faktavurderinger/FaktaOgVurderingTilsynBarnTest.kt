@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurdering
 
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMottarFulleSykepenger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -36,8 +36,8 @@ class FaktaOgVurderingTilsynBarnTest {
         val dekketAvAnnetRegelverkIkkeOppfylt = vurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA)
         val dekketAvAnnetRegelverkOppfylt = vurderingDekketAvAnnetRegelverk()
 
-        private val mottarFulleSykepengerOppfylt = vurderingMottarFulleSykepenger(svar = SvarJaNei.NEI)
-        private val mottarFulleSykepengerIkkeOppfylt = vurderingMottarFulleSykepenger(svar = SvarJaNei.JA)
+        private val mottarSykepengerOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.NEI)
+        private val mottarSykepengerIkkeOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.JA)
 
         @Test
         fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og resten er oppfylt`() {
@@ -47,7 +47,7 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            mottarFulleSykepenger = mottarFulleSykepengerOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 
@@ -62,7 +62,7 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
-                            mottarFulleSykepenger = mottarFulleSykepengerIkkeOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerIkkeOppfylt,
                         ),
                 )
 
@@ -77,7 +77,7 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
-                            mottarFulleSykepenger = mottarFulleSykepengerIkkeOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerIkkeOppfylt,
                         ),
                 )
 
@@ -92,7 +92,7 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            mottarFulleSykepenger = mottarFulleSykepengerOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 

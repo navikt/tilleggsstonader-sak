@@ -34,7 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMottarFulleSykepenger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
@@ -78,7 +78,7 @@ object VilkårperiodeTestUtil {
         type: MålgruppeType = MålgruppeType.AAP,
         medlemskap: VurderingMedlemskap = vurderingMedlemskap(),
         dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(),
-        mottarFulleSykepenger: VurderingMottarFulleSykepenger = vurderingMottarFulleSykepenger(),
+        mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling = vurderingMottarSykepengerForFulltidsstilling(),
     ): MålgruppeFaktaOgVurdering =
         when (type) {
             MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
@@ -112,7 +112,7 @@ object VilkårperiodeTestUtil {
                         VurderingNedsattArbeidsevne(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
-                            mottarFulleSykepenger = mottarFulleSykepenger,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerForFulltidsstilling,
                         ),
                 )
 
@@ -221,7 +221,8 @@ object VilkårperiodeTestUtil {
 
     fun vurderingHarUtgifter(svar: SvarJaNei? = SvarJaNei.JA) = VurderingHarUtgifter(svar = svar)
 
-    fun vurderingMottarFulleSykepenger(svar: SvarJaNei? = SvarJaNei.NEI) = VurderingMottarFulleSykepenger(svar = svar)
+    fun vurderingMottarSykepengerForFulltidsstilling(svar: SvarJaNei? = SvarJaNei.NEI) =
+        VurderingMottarSykepengerForFulltidsstilling(svar = svar)
 
     fun dummyVilkårperiodeMålgruppe(
         type: MålgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,

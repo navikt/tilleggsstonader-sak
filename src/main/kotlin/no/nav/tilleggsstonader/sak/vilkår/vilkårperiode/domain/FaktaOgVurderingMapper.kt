@@ -50,7 +50,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMottarFulleSykepenger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakBoutgifter
@@ -117,6 +117,7 @@ private fun mapMålgruppe(
         Stønadstype.LÆREMIDLER -> {
             mapMålgruppeLæremidler(type, faktaOgSvar)
         }
+
         Stønadstype.BOUTGIFTER -> {
             mapMålgruppeBoutgfiter(type, faktaOgSvar)
         }
@@ -254,7 +255,10 @@ private fun mapMålgruppeBarnetilsyn(
                     VurderingNedsattArbeidsevne(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        mottarFulleSykepenger = VurderingMottarFulleSykepenger(faktaOgVurderinger.svarMottarFulleSykepenger),
+                        mottarSykepengerForFulltidsstilling =
+                            VurderingMottarSykepengerForFulltidsstilling(
+                                faktaOgVurderinger.svarMottarSykepengerForFulltidsstilling,
+                            ),
                     ),
             )
         }
@@ -307,7 +311,10 @@ private fun mapMålgruppeLæremidler(
                     VurderingNedsattArbeidsevne(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        mottarFulleSykepenger = VurderingMottarFulleSykepenger(faktaOgVurderinger.svarMottarFulleSykepenger),
+                        mottarSykepengerForFulltidsstilling =
+                            VurderingMottarSykepengerForFulltidsstilling(
+                                faktaOgVurderinger.svarMottarSykepengerForFulltidsstilling,
+                            ),
                     ),
             )
         }
