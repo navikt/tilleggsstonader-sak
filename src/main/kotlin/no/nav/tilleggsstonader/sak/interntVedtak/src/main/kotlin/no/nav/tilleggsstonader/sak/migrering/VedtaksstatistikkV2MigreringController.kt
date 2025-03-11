@@ -1,11 +1,13 @@
 import no.nav.familie.prosessering.util.MDCConstants
 import no.nav.security.token.support.core.api.Unprotected
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.VedtaksstatistikkRepositoryV2
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.VedtaksstatistikkService
 import org.jboss.logging.MDC
@@ -23,6 +25,8 @@ class VedtaksstatistikkV2MigreringController(
     private val behandlingRepository: BehandlingRepository,
     private val vedtaksstatistikkRepositoryV2: VedtaksstatistikkRepositoryV2,
     private val vedtaksstatistikkService: VedtaksstatistikkService,
+    private val personService: PersonService,
+    private val behandlingService: BehandlingService,
     private val transactionHandler: TransactionHandler,
 ) {
     val logger: Logger = LoggerFactory.getLogger(javaClass)
@@ -49,10 +53,19 @@ class VedtaksstatistikkV2MigreringController(
     fun migrerStatistikkData() {
         vedtaksstatistikkRepositoryV2.deleteAll()
 
-        behandlingRepository
-            .findAll()
-            .filter { it.status == BehandlingStatus.FERDIGSTILT }
-            .filter { it.resultat != BehandlingResultat.HENLAGT }
+        val behandinger =
+            behandlingRepository
+                .findAll()
+                .filter { it.status == BehandlingStatus.FERDIGSTILT }
+                .filter { it.resultat != BehandlingResultat.HENLAGT }
+
+        // Bygger opp PDL-cache så vi slipper å gjøre ett kall per person
+        personService
+            .hentPersonKortBolk(
+                behandinger.map { behandlingService.hentAktivIdent(it.id) },
+            )
+
+        behandinger
             .sortertEtterVedtakstidspunkt()
             .forEach { behandling ->
                 vedtaksstatistikkService.lagreVedtaksstatistikkV2(behandling.id, behandling.fagsakId)
