@@ -30,7 +30,7 @@ import java.time.YearMonth
 import java.util.UUID
 
 object TilsynBarnTestUtil {
-    fun innvilgelseDtoV2(
+    fun innvilgelseDto(
         vedtaksperioder: List<VedtaksperiodeDto>,
         begrunnelse: String? = null,
     ) = InnvilgelseTilsynBarnRequest(

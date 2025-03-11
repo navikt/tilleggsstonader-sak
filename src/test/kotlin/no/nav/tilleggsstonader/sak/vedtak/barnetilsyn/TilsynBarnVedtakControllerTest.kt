@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDtoV2
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
@@ -111,7 +111,7 @@ class TilsynBarnVedtakControllerTest(
 
     @Test
     fun `Skal lagre og hente innvilgelse med vedtaksperioder og begrunnelse`() {
-        val vedtak = innvilgelseDtoV2(listOf(vedtaksperiodeDto), "Jo du skjønner det, at...")
+        val vedtak = innvilgelseDto(listOf(vedtaksperiodeDto), "Jo du skjønner det, at...")
         innvilgeVedtakV2(behandling, vedtak)
 
         val lagretDto = hentVedtak<InnvilgelseTilsynBarnResponse>(behandling.id).body!!

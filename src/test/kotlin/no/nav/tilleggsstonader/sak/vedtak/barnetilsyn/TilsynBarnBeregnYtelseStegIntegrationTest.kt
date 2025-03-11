@@ -21,7 +21,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDtoV2
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
@@ -113,7 +113,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             vilkårperiodeRepository.insert(målgruppe)
             lagVilkårForPeriode(saksbehandling, januar, januar, 100)
 
-            val vedtakDto = innvilgelseDtoV2(listOf(vedtaksperiode))
+            val vedtakDto = innvilgelseDto(listOf(vedtaksperiode))
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
             val vedtak = repository.findByIdOrThrow(saksbehandling.id).withTypeOrThrow<InnvilgelseTilsynBarn>()
@@ -138,7 +138,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
             steg.utførOgReturnerNesteSteg(
                 saksbehandling,
-                innvilgelseDtoV2(
+                innvilgelseDto(
                     listOf(
                         vedtaksperiode1,
                         vedtaksperiode2,
@@ -213,7 +213,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             vilkårperiodeRepository.insert(aktivitet(behandling.id, fom = juni.atDay(1), tom = juni.atEndOfMonth()))
             vilkårperiodeRepository.insert(målgruppe(behandling.id, fom = juni.atDay(1), tom = juni.atEndOfMonth()))
             lagVilkårForPeriode(saksbehandling, juni, juni, 100)
-            steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelseDtoV2(listOf(vedtaksperiode1)))
+            steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelseDto(listOf(vedtaksperiode1)))
 
             with(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.single()) {
                 assertThat(this.fom).isEqualTo(juni.atDay(3))
@@ -359,7 +359,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             vilkårperiodeRepository.insert(aktivitet(behandlingId = behandlingId, fom = januar.atDay(1), tom = april.atEndOfMonth()))
             vilkårperiodeRepository.insert(målgruppe(behandlingId = behandlingId, fom = januar.atDay(1), tom = april.atEndOfMonth()))
             lagVilkårForPeriode(behandling, januar, februar, 100)
-            steg.utførOgReturnerNesteSteg(behandling, innvilgelseDtoV2(listOf(vedtaksperiode)))
+            steg.utførOgReturnerNesteSteg(behandling, innvilgelseDto(listOf(vedtaksperiode)))
         }
 
         /**
@@ -382,7 +382,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             vilkårperiodeRepository.insert(aktivitet(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
             vilkårperiodeRepository.insert(målgruppe(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
             lagVilkårForPeriode(behandling, januar, april, 100)
-            steg.utførOgReturnerNesteSteg(behandling, innvilgelseDtoV2(listOf(vedtaksperiodeJanFeb, vedtaksperiodeMars)))
+            steg.utførOgReturnerNesteSteg(behandling, innvilgelseDto(listOf(vedtaksperiodeJanFeb, vedtaksperiodeMars)))
         }
 
         /**
@@ -486,7 +486,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     vedtaksperiode.copy(fom = mars.atDay(1), tom = mars.atDay(1), målgruppeType = MålgruppeType.NEDSATT_ARBEIDSEVNE),
                 )
 
-            val vedtakDto = innvilgelseDtoV2(vedtaksperioder)
+            val vedtakDto = innvilgelseDto(vedtaksperioder)
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
             val forventedeAndeler =
@@ -533,7 +533,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 ),
             )
 
-            val vedtakDto = innvilgelseDtoV2(listOf(vedtaksperiode))
+            val vedtakDto = innvilgelseDto(listOf(vedtaksperiode))
 
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
@@ -578,7 +578,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 ),
             )
 
-            val vedtakDto = innvilgelseDtoV2(listOf(vedtaksperiode))
+            val vedtakDto = innvilgelseDto(listOf(vedtaksperiode))
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
             val forventetAndel =
