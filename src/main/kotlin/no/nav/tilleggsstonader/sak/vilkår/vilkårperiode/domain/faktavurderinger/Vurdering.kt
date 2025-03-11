@@ -142,7 +142,10 @@ data class VurderingAldersVilkår(
                 SvarJaNei.JA -> ResultatDelvilkårperiode.OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
                 SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingAldersVilkår::class.simpleName}")
-                SvarJaNei.GAMMEL_MANGLER_DATA -> ResultatDelvilkårperiode.OPPFYLT
+                SvarJaNei.GAMMEL_MANGLER_DATA ->
+                    error(
+                        "$svar er ugyldig for nye eller oppdaterte vurderinger av typen: ${VurderingAldersVilkår::class.simpleName}",
+                    )
             }
     }
 }

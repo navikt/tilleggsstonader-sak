@@ -46,13 +46,10 @@ class VurderingAldersvilkårTest {
     }
 
     @Test
-    fun `hvis svar=GAMMEL_MANGLER_DATA så skal resultatet=OPPFYLT`() {
-        val vurdering = vurderingAldersvilkår(SvarJaNei.GAMMEL_MANGLER_DATA)
-
-        assertThat(vurdering.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
-        assertThat(vurdering.svar).isEqualTo(SvarJaNei.GAMMEL_MANGLER_DATA)
+    fun `hvis svar=GAMMEL_MANGLER_DATA så skal det kastes feil`() {
+        val feil = assertThrows<IllegalStateException> { vurderingAldersvilkår(SvarJaNei.GAMMEL_MANGLER_DATA) }
         assertThat(
-            vurdering.vurderingFaktaEtterlevelse,
-        ).isEqualTo(null)
+            feil.message,
+        ).isEqualTo("GAMMEL_MANGLER_DATA er ugyldig for nye eller oppdaterte vurderinger av typen: VurderingAldersVilkår")
     }
 }
