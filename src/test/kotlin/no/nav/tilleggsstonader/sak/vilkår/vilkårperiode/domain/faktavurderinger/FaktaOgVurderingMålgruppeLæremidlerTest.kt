@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurdering
 
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMottarFulleSykepenger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -28,14 +29,18 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
         private val dekketAvAnnetRegelverkIkkeOppfylt = vurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA)
         private val dekketAvAnnetRegelverkOppfylt = vurderingDekketAvAnnetRegelverk()
 
+        private val mottarFulleSykepengerOppfylt = vurderingMottarFulleSykepenger(svar = SvarJaNei.NEI)
+        private val mottarFulleSykepengerIkkeOppfylt = vurderingMottarFulleSykepenger(svar = SvarJaNei.JA)
+
         @Test
-        fun `resultat er IKKE_VURDERT hvis én vurdering ikke er vurdert og én er oppfylt`() {
+        fun `resultat er IKKE_VURDERT hvis én vurdering ikke er vurdert og resten er oppfylt`() {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            mottarFulleSykepenger = mottarFulleSykepengerOppfylt,
                         ),
                 )
 
@@ -43,13 +48,14 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
         }
 
         @Test
-        fun `resultat er IKKE_VURDERT hvis én vurdering mangler vurdering og én ikke er oppfylt`() {
+        fun `resultat er IKKE_VURDERT hvis én vurdering mangler vurdering og resten ikke er oppfylt`() {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
+                            mottarFulleSykepenger = mottarFulleSykepengerIkkeOppfylt,
                         ),
                 )
 
@@ -57,13 +63,14 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
         }
 
         @Test
-        fun `resultat er IKKE_OPPFYKT hvis én vurdering er oppfylt og én er ikke oppfylt`() {
+        fun `resultat er IKKE_OPPFYLT hvis minst én er ikke oppfylt`() {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
+                            mottarFulleSykepenger = mottarFulleSykepengerOppfylt,
                         ),
                 )
 
@@ -78,6 +85,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            mottarFulleSykepenger = mottarFulleSykepengerOppfylt,
                         ),
                 )
 

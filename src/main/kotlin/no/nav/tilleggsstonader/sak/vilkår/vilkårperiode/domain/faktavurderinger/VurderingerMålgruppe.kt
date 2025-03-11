@@ -10,24 +10,35 @@ sealed interface DekketAvAnnetRegelverkVurdering : VurderingerMålgruppe {
     val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk
 }
 
+sealed interface MottarFulleSykepengerVurdering : VurderingerMålgruppe {
+    val mottarFulleSykepenger: VurderingMottarFulleSykepenger
+}
+
 data class VurderingAAP(
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
 ) : MedlemskapVurdering,
-    DekketAvAnnetRegelverkVurdering {
+    DekketAvAnnetRegelverkVurdering,
+    MottarFulleSykepengerVurdering {
     override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
+    override val mottarFulleSykepenger: VurderingMottarFulleSykepenger = VurderingMottarFulleSykepenger.NEI_IMPLISITT
 }
 
 data class VurderingUføretrygd(
     override val medlemskap: VurderingMedlemskap,
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
 ) : MedlemskapVurdering,
-    DekketAvAnnetRegelverkVurdering
+    DekketAvAnnetRegelverkVurdering,
+    MottarFulleSykepengerVurdering {
+    override val mottarFulleSykepenger: VurderingMottarFulleSykepenger = VurderingMottarFulleSykepenger.NEI_IMPLISITT
+}
 
 data class VurderingNedsattArbeidsevne(
     override val medlemskap: VurderingMedlemskap,
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
+    override val mottarFulleSykepenger: VurderingMottarFulleSykepenger,
 ) : MedlemskapVurdering,
-    DekketAvAnnetRegelverkVurdering
+    DekketAvAnnetRegelverkVurdering,
+    MottarFulleSykepengerVurdering
 
 data class VurderingOmstillingsstønad(
     override val medlemskap: VurderingMedlemskap,

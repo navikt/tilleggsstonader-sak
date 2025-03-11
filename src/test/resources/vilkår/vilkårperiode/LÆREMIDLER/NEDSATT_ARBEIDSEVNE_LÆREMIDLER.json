@@ -9,6 +9,10 @@
     "medlemskap": {
       "svar": "JA",
       "resultat": "OPPFYLT"
+    },
+    "mottarFulleSykepenger": {
+      "resultat": "OPPFYLT",
+      "svar": "NEI"
     }
   }
 }

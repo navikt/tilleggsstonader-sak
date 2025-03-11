@@ -117,3 +117,23 @@ data class VurderingDekketAvAnnetRegelverk private constructor(
             }
     }
 }
+
+data class VurderingMottarFulleSykepenger private constructor(
+    override val svar: SvarJaNei?,
+    override val resultat: ResultatDelvilkårperiode,
+) : Vurdering {
+    constructor(svar: SvarJaNei?) : this(svar, utledResultat(svar))
+
+    companion object {
+        private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =
+            when (svar) {
+                null -> ResultatDelvilkårperiode.IKKE_VURDERT
+                SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+                SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
+                SvarJaNei.NEI_IMPLISITT -> ResultatDelvilkårperiode.OPPFYLT
+                SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingMottarFulleSykepenger::class.simpleName}")
+            }
+
+        val NEI_IMPLISITT = VurderingMottarFulleSykepenger(SvarJaNei.NEI_IMPLISITT)
+    }
+}
