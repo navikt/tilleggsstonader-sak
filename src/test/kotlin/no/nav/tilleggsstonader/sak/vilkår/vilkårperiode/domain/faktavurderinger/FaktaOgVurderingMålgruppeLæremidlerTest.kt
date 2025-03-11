@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingFaktaEtterlevelseAldersvilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
@@ -29,6 +29,8 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
         private val dekketAvAnnetRegelverkIkkeOppfylt = vurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA)
         private val dekketAvAnnetRegelverkOppfylt = vurderingDekketAvAnnetRegelverk()
 
+        val aldersvilkårOppfylt = vurderingAldersVilkår()
+
         @Test
         fun `resultat er IKKE_VURDERT hvis én vurdering ikke er vurdert og én er oppfylt`() {
             val inngangsvilkår =
@@ -37,12 +39,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            aldersvilkår =
-                                VurderingAldersVilkår(
-                                    SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse =
-                                        vurderingFaktaEtterlevelseAldersvilkår(),
-                                ),
+                            aldersvilkår = aldersvilkårOppfylt,
                         ),
                 )
 
@@ -57,12 +54,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
-                            aldersvilkår =
-                                VurderingAldersVilkår(
-                                    SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse =
-                                        vurderingFaktaEtterlevelseAldersvilkår(),
-                                ),
+                            aldersvilkår = aldersvilkårOppfylt,
                         ),
                 )
 
@@ -77,12 +69,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
-                            aldersvilkår =
-                                VurderingAldersVilkår(
-                                    SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse =
-                                        vurderingFaktaEtterlevelseAldersvilkår(),
-                                ),
+                            aldersvilkår = aldersvilkårOppfylt,
                         ),
                 )
 
@@ -97,12 +84,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            aldersvilkår =
-                                VurderingAldersVilkår(
-                                    SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse =
-                                        vurderingFaktaEtterlevelseAldersvilkår(),
-                                ),
+                            aldersvilkår = aldersvilkårOppfylt,
                         ),
                 )
 

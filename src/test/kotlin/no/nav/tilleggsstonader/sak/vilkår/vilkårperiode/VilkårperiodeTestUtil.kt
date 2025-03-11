@@ -253,6 +253,9 @@ object VilkårperiodeTestUtil {
 
     fun vurderingHarUtgifter(svar: SvarJaNei? = SvarJaNei.JA) = VurderingHarUtgifter(svar = svar)
 
+    fun vurderingAldersVilkår(svar: SvarJaNei = SvarJaNei.JA) =
+        VurderingAldersVilkår(svar = svar, vurderingFaktaEtterlevelse = vurderingFaktaEtterlevelseAldersvilkår())
+
     fun dummyVilkårperiodeMålgruppe(
         type: MålgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,
         fom: LocalDate = osloDateNow(),
