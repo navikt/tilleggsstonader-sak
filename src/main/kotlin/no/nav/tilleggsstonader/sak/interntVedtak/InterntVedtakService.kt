@@ -62,7 +62,7 @@ class InterntVedtakService(
             søknad = mapSøknadsinformasjon(behandling),
             målgrupper = mapVilkårperioder(vilkårsperioder.målgrupper),
             aktiviteter = mapVilkårperioder(vilkårsperioder.aktiviteter),
-            stønadsperioder = mapStønadsperioder(behandling.id),
+            stønadsperioder = mapStønadsperioder(behandling),
             vedtaksperioder = mapVedtaksperioder(vedtak),
             vilkår = mapVilkår(behandling.id, behandlingbarn),
             vedtak = mapVedtak(vedtak),
@@ -154,16 +154,19 @@ class InterntVedtakService(
             )
         }
 
-    private fun mapStønadsperioder(behandlingId: BehandlingId): List<Stønadsperiode> {
-        val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandlingId)
-        return stønadsperioder.map {
-            Stønadsperiode(
-                målgruppe = it.målgruppe,
-                aktivitet = it.aktivitet,
-                fom = it.fom,
-                tom = it.tom,
-            )
+    private fun mapStønadsperioder(behandling: Saksbehandling): List<Stønadsperiode>? {
+        if (behandling.stønadstype == Stønadstype.LÆREMIDLER) {
+            val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandling.id)
+            return stønadsperioder.map {
+                Stønadsperiode(
+                    målgruppe = it.målgruppe,
+                    aktivitet = it.aktivitet,
+                    fom = it.fom,
+                    tom = it.tom,
+                )
+            }
         }
+        return null
     }
 
     private fun mapVedtaksperioder(vedtak: Vedtak?): List<VedtaksperiodeInterntVedtak> =
