@@ -16,7 +16,7 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDtoV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
@@ -143,7 +143,7 @@ class TilsynBarnVedtakControllerTest(
         innvilgeVedtakV2(
             behandling = behandling,
             vedtak =
-                InnvilgelseTilsynBarnRequestV2(
+                InnvilgelseTilsynBarnRequest(
                     listOf(vedtaksperiodeDto),
                     begrunnelse = "Jo du skjønner det, at...",
                 ),
@@ -195,7 +195,7 @@ class TilsynBarnVedtakControllerTest(
 
     private fun innvilgeVedtakV2(
         behandling: Behandling,
-        vedtak: InnvilgelseTilsynBarnRequestV2,
+        vedtak: InnvilgelseTilsynBarnRequest,
     ) {
         restTemplate.exchange<Map<String, Any>?>(
             localhost("api/vedtak/tilsyn-barn/${behandling.id}/innvilgelseV2"),

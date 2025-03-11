@@ -30,7 +30,7 @@ import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringStegService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
@@ -449,7 +449,7 @@ class BehandlingFlytTest(
             )
         tilsynBarnVedtakController.lagreVedtak(
             behandlingId,
-            InnvilgelseTilsynBarnRequestV2(vedtaksperioder = vedtaksperioderDto, begrunnelse = null),
+            InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioderDto, begrunnelse = null),
         )
     }
 
