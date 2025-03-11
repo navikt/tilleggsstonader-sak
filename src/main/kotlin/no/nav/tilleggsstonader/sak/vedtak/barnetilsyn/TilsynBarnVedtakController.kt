@@ -82,7 +82,7 @@ class TilsynBarnVedtakController(
     ): BeregningsresultatTilsynBarnDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         return beregningService
-            .beregnV2(
+            .beregn(
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                 behandling = behandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
@@ -96,7 +96,7 @@ class TilsynBarnVedtakController(
     ): BeregningsresultatTilsynBarnDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         return beregningService
-            .beregnV2(
+            .beregn(
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                 behandling = behandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,

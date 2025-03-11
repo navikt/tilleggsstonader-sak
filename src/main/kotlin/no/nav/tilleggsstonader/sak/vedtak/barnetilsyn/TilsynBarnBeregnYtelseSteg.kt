@@ -61,7 +61,7 @@ class TilsynBarnBeregnYtelseSteg(
         vedtak: InnvilgelseTilsynBarnRequest,
     ) {
         val beregningsresultat =
-            beregningService.beregnV2(
+            beregningService.beregn(
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
@@ -90,7 +90,7 @@ class TilsynBarnBeregnYtelseSteg(
         val vedtaksperioder = vedtaksperiodeService.finnNyeVedtaksperioderForOpphør(saksbehandling)
 
         val beregningsresultat =
-            beregningService.beregnV2(
+            beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.OPPHØR,
