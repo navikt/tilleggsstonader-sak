@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import io.mockk.every
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -9,7 +8,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -243,7 +241,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     inner class Opphør {
         @Test
         fun `skal lagre vedtak`() {
-            every { unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN) } returns true
             val beløpsperioderJanuar =
                 listOf(Beløpsperiode(dato = LocalDate.of(2023, 1, 2), beløp = 1000, målgruppe = MålgruppeType.AAP))
             val beløpsperiodeFebruar =

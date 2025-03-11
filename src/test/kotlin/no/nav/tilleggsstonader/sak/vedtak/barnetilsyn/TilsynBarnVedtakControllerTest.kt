@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import io.mockk.every
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -9,7 +8,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -142,7 +140,6 @@ class TilsynBarnVedtakControllerTest(
 
     @Test
     fun `skal lagre og hente opphør med vedtaksperioder`() {
-        every { unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN) } returns true
         innvilgeVedtakV2(
             behandling = behandling,
             vedtak =
