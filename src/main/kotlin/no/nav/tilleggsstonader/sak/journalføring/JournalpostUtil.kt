@@ -12,11 +12,13 @@ fun Journalpost.erInnkommende(): Boolean = journalposttype == Journalposttype.I
 /**
  * Finner brevkode for orginaldokument
  */
-fun Journalpost.brevkode(): String? =
+fun Journalpost.dokumentBrevkode(): DokumentBrevkode? =
     dokumenter
-        ?.filter { it.harOriginaldokument() }
-        ?.map { it.brevkode }
+        ?.mapNotNull { it.brevkode }
+        ?.mapNotNull { DokumentBrevkode.fraBrevkode(it) }
         ?.singleOrNullOrError()
+
+fun Journalpost.brevkoder(): List<String> = dokumenter?.mapNotNull { it.brevkode } ?: emptyList()
 
 fun Journalpost.gjelderKanalSkanningEllerNavNo(): Boolean = this.kanal?.substring(0, 5) == "SKAN_" || this.kanal == "NAV_NO"
 

@@ -3,8 +3,11 @@ package no.nav.tilleggsstonader.sak.hendelser.journalføring
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
+import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
-import no.nav.tilleggsstonader.sak.journalføring.brevkode
+import no.nav.tilleggsstonader.sak.journalføring.brevkoder
+import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
 import no.nav.tilleggsstonader.sak.journalføring.erInnkommende
 import no.nav.tilleggsstonader.sak.journalføring.gjelderKanalSkanningEllerNavNo
 import org.slf4j.LoggerFactory
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service
 @Service
 class JournalhendelseKafkaHåndterer(
     private val journalpostService: JournalpostService,
+    private val håndterSøknadService: HåndterSøknadService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -20,7 +24,14 @@ class JournalhendelseKafkaHåndterer(
         val journalpost = journalpostService.hentJournalpost(hendelseRecord.journalpostId.toString())
         val kanBehandles = journalpost.kanBehandles()
 
-        logSkalBehandles(journalpost, kanBehandles = kanBehandles) // TODO erstatt med håndterSøknad
+        val brevkode = journalpost.dokumentBrevkode()
+        if (kanBehandles && brevkode == DokumentBrevkode.BOUTGIFTER) {
+            val stønadstype = brevkode.stønadstype
+            logSkalBehandles(journalpost, kanBehandles = true)
+            håndterSøknadService.håndterSøknad(journalpost, stønadstype)
+        } else {
+            logSkalBehandles(journalpost, kanBehandles = false)
+        }
     }
 
     private fun Journalpost.kanBehandles() =
@@ -40,7 +51,7 @@ class JournalhendelseKafkaHåndterer(
                 "status=${journalpost.journalstatus} " +
                 "type=${journalpost.journalposttype} " +
                 "kanal=${journalpost.kanal} " +
-                "brevkode=${journalpost.brevkode()}",
+                "brevkode=${journalpost.brevkoder()}",
         )
     }
 }

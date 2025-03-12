@@ -243,6 +243,10 @@ class JournalføringService(
         behandling: Behandling,
         stønadstype: Stønadstype,
     ) {
+        if (stønadstype == Stønadstype.BOUTGIFTER) {
+            logger.info("Oppretter ikke søknad for journalpost=${journalpost.journalpostId}")
+            return
+        }
         lagreSøknad(journalpost, behandling.id, stønadstype)
         if (stønadstype.gjelderBarn()) {
             lagreBarn(behandling)
