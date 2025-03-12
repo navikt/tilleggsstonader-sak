@@ -1,11 +1,14 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20241112093526_694e258"
 val tilleggsstønaderLibsVersion = "2025.01.21-10.26.933160d62458"
 val tilleggsstønaderKontrakterVersion = "2025.02.19-08.07.9480bf6879c8"
+val avroVersion = "1.12.0"
+val confluentVersion = "7.9.0"
 val tokenSupportVersion = "5.0.11"
 val wiremockVersion = "3.9.2"
 val mockkVersion = "1.13.12"
@@ -26,6 +29,8 @@ plugins {
     id("io.spring.dependency-management") version "1.1.6"
     kotlin("plugin.spring") version "2.0.21"
 
+    id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
+
     id("org.cyclonedx.bom") version "1.10.0"
 }
 
@@ -33,9 +38,8 @@ repositories {
     mavenCentral()
     mavenLocal()
 
-    maven {
-        url = uri("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
-    }
+    maven(url = "https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
+    maven(url = "https://packages.confluent.io/maven/")
 }
 
 apply(plugin = "com.diffplug.spotless")
@@ -65,6 +69,11 @@ dependencies {
     implementation("org.postgresql:postgresql")
     implementation("org.flywaydb:flyway-database-postgresql")
 
+    // Kafka
+    implementation("org.springframework.kafka:spring-kafka")
+    implementation("org.apache.avro:avro:$avroVersion")
+    implementation("io.confluent:kafka-avro-serializer:$confluentVersion")
+
     // Logging
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
 
@@ -78,14 +87,12 @@ dependencies {
     implementation("no.nav.tilleggsstonader-libs:http-client:$tilleggsstønaderLibsVersion")
     implementation("no.nav.tilleggsstonader-libs:sikkerhet:$tilleggsstønaderLibsVersion")
     implementation("no.nav.tilleggsstonader-libs:unleash:$tilleggsstønaderLibsVersion")
+    implementation("no.nav.tilleggsstonader-libs:kafka:$tilleggsstønaderLibsVersion")
 
     implementation("no.nav.tilleggsstonader.kontrakter:tilleggsstonader-kontrakter:$tilleggsstønaderKontrakterVersion")
 
     // For auditlogger. August, 2014, men det er den som blir brukt på NAV
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
-
-    // Kafka
-    implementation("org.springframework.kafka:spring-kafka")
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
@@ -121,8 +128,18 @@ if (project.hasProperty("skipLint")) {
     gradle.startParameter.excludedTaskNames += "spotlessKotlinCheck"
 }
 
-// Oppretter version.properties med git-sha som version
 tasks {
+    generateAvroJava {
+        source("src/main/resources/avro")
+    }
+    withType<KotlinCompile> {
+        dependsOn(":generateAvroJava")
+        dependsOn(":generateTestAvroJava")
+    }
+
+    /**
+     *  Oppretter version.properties med git-sha som version
+     */
     fun getCheckedOutGitCommitHash(): String {
         if (System.getenv("GITHUB_ACTIONS") == "true") {
             return System.getenv("GITHUB_SHA")
