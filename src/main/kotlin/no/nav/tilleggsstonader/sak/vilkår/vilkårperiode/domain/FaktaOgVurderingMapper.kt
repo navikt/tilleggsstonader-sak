@@ -224,11 +224,12 @@ private fun lagVurderingAldersvilkår(
     grunnlagsData: Grunnlagsdata,
 ): VurderingAldersVilkår =
     VurderingAldersVilkår(
-        vurderAldersvilkår(målgruppe, grunnlagsData),
-        AldersvilkårVurdering
-            .VurderingFaktaEtterlevelseAldersvilkår(
-                fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
-            ),
+        svar = vurderAldersvilkår(målgruppe, grunnlagsData),
+        vurderingFaktaEtterlevelse =
+            AldersvilkårVurdering
+                .VurderingFaktaEtterlevelseAldersvilkår(
+                    fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato,
+                ),
     )
 
 private fun mapMålgruppeBarnetilsyn(

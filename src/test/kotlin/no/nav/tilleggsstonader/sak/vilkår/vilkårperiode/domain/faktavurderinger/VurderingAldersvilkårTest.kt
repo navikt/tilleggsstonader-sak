@@ -12,9 +12,10 @@ class VurderingAldersvilkårTest {
     fun vurderingAldersvilkår(svar: SvarJaNei) =
         VurderingAldersVilkår(
             svar = svar,
-            AldersvilkårVurdering.VurderingFaktaEtterlevelseAldersvilkår(
-                fødselsdatoBruker,
-            ),
+            vurderingFaktaEtterlevelse =
+                AldersvilkårVurdering.VurderingFaktaEtterlevelseAldersvilkår(
+                    fødselsdato = fødselsdatoBruker,
+                ),
         )
 
     @Test
