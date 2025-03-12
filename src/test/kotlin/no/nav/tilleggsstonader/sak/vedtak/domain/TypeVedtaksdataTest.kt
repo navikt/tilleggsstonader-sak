@@ -10,6 +10,7 @@ class TypeVedtaksdataTest {
             listOf(
                 TypeVedtakTilsynBarn.entries,
                 TypeVedtakLæremidler.entries,
+                TypeVedtakBoutgifter.entries,
             ).flatten()
         assertThat(typerVedtaksdata.keys)
             .hasSize(alleEnums.size)

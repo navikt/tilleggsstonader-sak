@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilDto
@@ -33,6 +34,7 @@ object VedtakDtoMapper {
         return when (data) {
             is VedtakTilsynBarn -> mapVedtakTilsynBarn(data, revurderFra)
             is VedtakLæremidler -> mapVedtakLæremidler(data, revurderFra)
+            is VedtakBoutgifter -> TODO("Henting av vedtak for boutgifter er ikke implementert enda")
         }
     }
 
