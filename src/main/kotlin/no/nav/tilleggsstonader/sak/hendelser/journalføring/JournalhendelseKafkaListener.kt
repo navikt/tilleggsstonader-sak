@@ -4,6 +4,9 @@ import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.libs.log.IdUtils
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
+import no.nav.tilleggsstonader.sak.hendelser.Hendelse
+import no.nav.tilleggsstonader.sak.hendelser.HendelseRepository
+import no.nav.tilleggsstonader.sak.hendelser.TypeHendelse
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service
 @Service
 @Profile("!local & !integrasjonstest")
 class JournalhendelseKafkaListener(
+    private val hendelseRepository: HendelseRepository,
     private val transactionHandler: TransactionHandler,
     private val journalhendelseKafkaHåndterer: JournalhendelseKafkaHåndterer,
 ) {
@@ -54,12 +58,13 @@ class JournalhendelseKafkaListener(
             return
         }
         val hendelseId = hendelseRecord.hendelsesId.takeIf { it.isNotBlank() } ?: error("Mangler hendelseId")
-        // if (!hendelseRepository.existsByTypeAndId(TypeHendelse.JOURNALPOST, hendelseId)) {
-        transactionHandler.runInNewTransaction {
-            journalhendelseKafkaHåndterer.behandleJournalpost(hendelseRecord)
-            // val hendelse = Hendelse(TypeHendelse.JOURNALPOST, id = hendelseId)
-            //        hendelseRepository.insert(hendelse)
-            //   }
+        if (!hendelseRepository.existsByTypeAndId(TypeHendelse.JOURNALPOST, hendelseId)) {
+            transactionHandler.runInNewTransaction {
+                journalhendelseKafkaHåndterer.behandleJournalpost(hendelseRecord)
+                val metadata = mapOf("journalpostId" to hendelseRecord.journalpostId)
+                val hendelse = Hendelse(TypeHendelse.JOURNALPOST, id = hendelseId, metadata = metadata)
+                hendelseRepository.insert(hendelse)
+            }
         }
     }
 
