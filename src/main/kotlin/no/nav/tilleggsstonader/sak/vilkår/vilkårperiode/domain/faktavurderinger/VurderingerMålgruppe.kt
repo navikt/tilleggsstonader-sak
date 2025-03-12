@@ -10,28 +10,40 @@ sealed interface DekketAvAnnetRegelverkVurdering : VurderingerMålgruppe {
     val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk
 }
 
+sealed interface AldersvilkårVurdering : VurderingerMålgruppe {
+    val aldersvilkår: VurderingAldersVilkår
+}
+
 data class VurderingAAP(
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
+    override val aldersvilkår: VurderingAldersVilkår,
 ) : MedlemskapVurdering,
-    DekketAvAnnetRegelverkVurdering {
+    DekketAvAnnetRegelverkVurdering,
+    AldersvilkårVurdering {
     override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
 }
 
 data class VurderingUføretrygd(
     override val medlemskap: VurderingMedlemskap,
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
+    override val aldersvilkår: VurderingAldersVilkår,
 ) : MedlemskapVurdering,
-    DekketAvAnnetRegelverkVurdering
+    DekketAvAnnetRegelverkVurdering,
+    AldersvilkårVurdering
 
 data class VurderingNedsattArbeidsevne(
     override val medlemskap: VurderingMedlemskap,
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
+    override val aldersvilkår: VurderingAldersVilkår,
 ) : MedlemskapVurdering,
-    DekketAvAnnetRegelverkVurdering
+    DekketAvAnnetRegelverkVurdering,
+    AldersvilkårVurdering
 
 data class VurderingOmstillingsstønad(
     override val medlemskap: VurderingMedlemskap,
-) : MedlemskapVurdering
+    override val aldersvilkår: VurderingAldersVilkår,
+) : MedlemskapVurdering,
+    AldersvilkårVurdering
 
 data object VurderingOvergangsstønad : MedlemskapVurdering {
     override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -35,6 +36,8 @@ class FaktaOgVurderingBoutgifterTest {
         val dekketAvAnnetRegelverkIkkeOppfylt = vurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA)
         val dekketAvAnnetRegelverkOppfylt = vurderingDekketAvAnnetRegelverk()
 
+        val aldersvilkårOppfylt = vurderingAldersVilkår()
+
         @Test
         fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og en er oppfylt`() {
             val inngangsvilkår =
@@ -43,6 +46,7 @@ class FaktaOgVurderingBoutgifterTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
                         ),
                 )
 
@@ -57,6 +61,7 @@ class FaktaOgVurderingBoutgifterTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
+                            aldersvilkår = aldersvilkårOppfylt,
                         ),
                 )
 
@@ -71,6 +76,7 @@ class FaktaOgVurderingBoutgifterTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
                         ),
                 )
 
@@ -85,6 +91,7 @@ class FaktaOgVurderingBoutgifterTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
                         ),
                 )
 
