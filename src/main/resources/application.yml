@@ -224,3 +224,6 @@ clients:
   ereg:
     uri: https://ereg-services.${CLIENT_ENV}-fss-pub.nais.io
     scope: api://${CLIENT_ENV}-fss.arbeidsforhold.ereg-services/.default
+
+topics:
+  journalhendelser: teamdokumenthandtering.aapen-dok-journalfoering
