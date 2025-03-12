@@ -155,15 +155,12 @@ class JournalføringServiceTest {
 
     @Test
     internal fun `skal kunne journalføre og opprette behandling`() {
-        every { fagsakService.finnFagsak(any(), any()) } returns fagsak
-
         every {
             behandlingService.opprettBehandling(
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.SØKNAD,
             )
         } returns behandling(fagsak = fagsak)
-        every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()
 
         journalføringService.journalførTilNyBehandling(
             journalpost,
@@ -352,6 +349,7 @@ class JournalføringServiceTest {
                     forrigeBehandling.id,
                 )
             }
+            verify(exactly = 1) { søknadService.lagreSøknad(any(), any(), any()) }
         }
 
         @Test
@@ -384,6 +382,53 @@ class JournalføringServiceTest {
                 ident = ident,
                 behandlingId = nyBehandling.id,
             )
+    }
+
+    @Nested
+    inner class Boutgifter {
+        val dokumentvariant =
+            Dokumentvariant(
+                variantformat = Dokumentvariantformat.ORIGINAL,
+                filnavn = null,
+                saksbehandlerHarTilgang = true,
+            )
+        val dokumentSøknadTilsynBarn =
+            DokumentInfo(
+                "",
+                brevkode = DokumentBrevkode.BOUTGIFTER.verdi,
+                dokumentvarianter = listOf(dokumentvariant),
+            )
+        val journalpostMedSøknadBoutgifter = journalpost.copy(dokumenter = listOf(dokumentSøknadTilsynBarn))
+
+        @Test
+        fun `skal foreløpig ikke lagre søknaden`() {
+            every {
+                behandlingService.opprettBehandling(
+                    fagsakId = fagsak.id,
+                    behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                )
+            } returns behandling(fagsak = fagsak)
+
+            journalføringService.journalførTilNyBehandling(
+                journalpostMedSøknadBoutgifter,
+                personIdent,
+                Stønadstype.BOUTGIFTER,
+                BehandlingÅrsak.SØKNAD,
+                "beskrivelse",
+                enhet,
+            )
+
+            verify(exactly = 1) {
+                behandlingService.opprettBehandling(
+                    fagsakId = fagsak.id,
+                    behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                )
+            }
+            verifyOppdaterOgFerdigstilJournalpost(1)
+            verify(exactly = 0) { søknadService.lagreSøknad(any(), any(), any()) }
+
+            assertThat(taskSlot.captured.type).isEqualTo(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
+        }
     }
 
     private fun verifyOppdaterOgFerdigstilJournalpost(antallKall: Int) {
