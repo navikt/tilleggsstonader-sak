@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.mockk.every
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
@@ -24,7 +23,6 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPe
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.BrevController
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
@@ -32,8 +30,9 @@ import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringStegService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -50,9 +49,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBa
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgSvarTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -186,10 +188,16 @@ class BehandlingFlytTest(
 
     @Test
     fun `skal ikke kunne gå videre til vilkår-steg dersom inngangsvilkåren ikke validerer`() {
-        every { unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN) } returns false
         somSaksbehandler {
-            val behandlingId = opprettBehandling(personIdent)
-            vurderInngangsvilkår(behandlingId)
+            val behandlingId = opprettBehandling(personIdent = personIdent, stønadstype = Stønadstype.LÆREMIDLER)
+            val faktaOgSvarLæremidler =
+                FaktaOgSvarAktivitetLæremidlerDto(
+                    prosent = 100,
+                    studienivå = Studienivå.HØYERE_UTDANNING,
+                    svarHarUtgifter = SvarJaNei.JA,
+                    svarHarRettTilUtstyrsstipend = SvarJaNei.JA,
+                )
+            vurderInngangsvilkår(behandlingId = behandlingId, aktivitetFaktaOgSvar = faktaOgSvarLæremidler)
             stegService.resetSteg(behandlingId, StegType.INNGANGSVILKÅR)
             with(vilkårperiodeService.hentVilkårperioder(behandlingId)) {
                 val slettVikårperiode = SlettVikårperiode(behandlingId, "kommentar")
@@ -271,7 +279,10 @@ class BehandlingFlytTest(
         return behandlingId
     }
 
-    private fun vurderInngangsvilkår(behandlingId: BehandlingId) {
+    private fun vurderInngangsvilkår(
+        behandlingId: BehandlingId,
+        aktivitetFaktaOgSvar: FaktaOgSvarDto = faktaOgSvarTilsynBarnDto,
+    ) {
         val fom = LocalDate.of(2024, 1, 1)
         val tom = LocalDate.of(2024, 1, 31)
 
@@ -290,8 +301,7 @@ class BehandlingFlytTest(
                 fom = fom,
                 tom = tom,
                 type = AktivitetType.TILTAK,
-                svarLønnet = SvarJaNei.NEI,
-                aktivitetsdager = 5,
+                faktaOgSvar = aktivitetFaktaOgSvar,
             ),
         )
         stønadsperiodeService.lagreStønadsperioder(
@@ -325,12 +335,15 @@ class BehandlingFlytTest(
         stegService.håndterSteg(behandlingId, StegType.VILKÅR)
     }
 
-    private fun opprettBehandling(personIdent: String): BehandlingId {
+    private fun opprettBehandling(
+        personIdent: String,
+        stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
+    ): BehandlingId {
         val behandlingId =
             opprettTestBehandlingController.opprettBehandling(
                 TestBehandlingRequest(
                     personIdent,
-                    stønadstype = Stønadstype.BARNETILSYN,
+                    stønadstype = stønadstype,
                 ),
             )
         testoppsettService.opprettGrunnlagsdata(behandlingId)
@@ -436,7 +449,7 @@ class BehandlingFlytTest(
             )
         tilsynBarnVedtakController.lagreVedtak(
             behandlingId,
-            InnvilgelseTilsynBarnRequestV2(vedtaksperioder = vedtaksperioderDto, begrunnelse = null),
+            InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioderDto, begrunnelse = null),
         )
     }
 

@@ -49,7 +49,7 @@ class TilsynBarnBeregningService(
     private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
     private val tilsynBarnVedtaksperiodeValidingerService: TilsynBarnVedtaksperiodeValidingerService,
 ) {
-    fun beregnV2(
+    fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,

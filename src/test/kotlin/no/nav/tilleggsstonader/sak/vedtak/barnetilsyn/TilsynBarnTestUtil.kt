@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
@@ -30,10 +30,10 @@ import java.time.YearMonth
 import java.util.UUID
 
 object TilsynBarnTestUtil {
-    fun innvilgelseDtoV2(
+    fun innvilgelseDto(
         vedtaksperioder: List<VedtaksperiodeDto>,
         begrunnelse: String? = null,
-    ) = InnvilgelseTilsynBarnRequestV2(
+    ) = InnvilgelseTilsynBarnRequest(
         vedtaksperioder = vedtaksperioder,
         begrunnelse = begrunnelse,
     )

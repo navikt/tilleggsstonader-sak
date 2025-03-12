@@ -42,6 +42,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
@@ -273,24 +274,25 @@ object VilkårperiodeTestUtil {
         behandlingId = behandlingId,
     )
 
+    val faktaOgSvarTilsynBarnDto =
+        FaktaOgSvarAktivitetBarnetilsynDto(
+            svarLønnet = SvarJaNei.NEI,
+            aktivitetsdager = 5,
+        )
+
     fun dummyVilkårperiodeAktivitet(
         type: AktivitetType = AktivitetType.TILTAK,
         fom: LocalDate = osloDateNow(),
         tom: LocalDate = osloDateNow(),
-        svarLønnet: SvarJaNei? = null,
         begrunnelse: String? = null,
         behandlingId: BehandlingId = BehandlingId.random(),
-        aktivitetsdager: Int? = 5,
         kildeId: String? = null,
+        faktaOgSvar: FaktaOgSvarDto = faktaOgSvarTilsynBarnDto,
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
-        faktaOgSvar =
-            FaktaOgSvarAktivitetBarnetilsynDto(
-                svarLønnet = svarLønnet,
-                aktivitetsdager = aktivitetsdager,
-            ),
+        faktaOgSvar = faktaOgSvar,
         kildeId = kildeId,
         begrunnelse = begrunnelse,
         behandlingId = behandlingId,

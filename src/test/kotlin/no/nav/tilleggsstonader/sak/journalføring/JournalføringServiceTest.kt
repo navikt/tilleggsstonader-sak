@@ -142,16 +142,13 @@ class JournalføringServiceTest {
 
     @Test
     internal fun `skal ikke kunne journalføre hvis journalpostens bruker mangler`() {
-        every { journalpostService.hentJournalpost(journalpostId) } returns journalpost.copy(bruker = null)
-
         assertThatThrownBy {
             journalføringService.journalførTilNyBehandling(
-                journalpostId,
-                personIdent,
-                Stønadstype.BARNETILSYN,
-                BehandlingÅrsak.SØKNAD,
-                "oppgaveBeskrivelse",
-                enhet,
+                journalpost = journalpost.copy(bruker = null),
+                stønadstype = Stønadstype.BARNETILSYN,
+                behandlingÅrsak = BehandlingÅrsak.SØKNAD,
+                oppgaveBeskrivelse = "oppgaveBeskrivelse",
+                journalførendeEnhet = enhet,
             )
         }.hasMessageContaining("Journalposten mangler bruker")
     }
@@ -169,7 +166,7 @@ class JournalføringServiceTest {
         every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()
 
         journalføringService.journalførTilNyBehandling(
-            journalpostId,
+            journalpost,
             personIdent,
             Stønadstype.BARNETILSYN,
             BehandlingÅrsak.SØKNAD,
@@ -307,26 +304,22 @@ class JournalføringServiceTest {
         val barn2 = SøknadBarn(ident = "987654321", data = mockk())
         val eksisterendeBarn = listOf(barn1, barn2)
 
+        val dokumentvariant =
+            Dokumentvariant(
+                variantformat = Dokumentvariantformat.ORIGINAL,
+                filnavn = null,
+                saksbehandlerHarTilgang = true,
+            )
+        val dokumentSøknadTilsynBarn =
+            DokumentInfo(
+                "",
+                brevkode = DokumentBrevkode.BARNETILSYN.verdi,
+                dokumentvarianter = listOf(dokumentvariant),
+            )
+        val journalpostMedTilsynBarnSøknad = journalpost.copy(dokumenter = listOf(dokumentSøknadTilsynBarn))
+
         @BeforeEach
         fun setUp() {
-            every { journalpostService.hentJournalpost(journalpostId) } returns
-                journalpost.copy(
-                    dokumenter =
-                        listOf(
-                            DokumentInfo(
-                                "",
-                                brevkode = DokumentBrevkode.BARNETILSYN.verdi,
-                                dokumentvarianter =
-                                    listOf(
-                                        Dokumentvariant(
-                                            variantformat = Dokumentvariantformat.ORIGINAL,
-                                            null,
-                                            true,
-                                        ),
-                                    ),
-                            ),
-                        ),
-                )
             every { behandlingService.finnesBehandlingForFagsak(any()) } returns true
             every { behandlingService.opprettBehandling(any(), any(), any(), any()) } returns nyBehandling
             every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(forrigeBehandling)
@@ -345,7 +338,7 @@ class JournalføringServiceTest {
                 forrigeBehandling.id
 
             journalføringService.journalførTilNyBehandling(
-                journalpost.journalpostId,
+                journalpostMedTilsynBarnSøknad,
                 personIdent,
                 Stønadstype.BARNETILSYN,
                 BehandlingÅrsak.NYE_OPPLYSNINGER,
@@ -374,7 +367,7 @@ class JournalføringServiceTest {
             every { barnService.opprettBarn(capture(barnSlot)) } returns mockk()
 
             journalføringService.journalførTilNyBehandling(
-                journalpost.journalpostId,
+                journalpostMedTilsynBarnSøknad,
                 personIdent,
                 Stønadstype.BARNETILSYN,
                 BehandlingÅrsak.SØKNAD,

@@ -135,7 +135,7 @@ class StepDefinitions {
     private fun beregn(behandling: Saksbehandling) {
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
         try {
-            beregningsresultat = service.beregnV2(vedtaksperioder, behandling, TypeVedtak.INNVILGELSE)
+            beregningsresultat = service.beregn(vedtaksperioder, behandling, TypeVedtak.INNVILGELSE)
         } catch (e: Exception) {
             exception = e
         }

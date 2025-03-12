@@ -235,9 +235,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     type = AktivitetType.TILTAK,
                     fom = fom1,
                     tom = tom1,
-                    svarLønnet = SvarJaNei.NEI,
                     behandlingId = behandling.id,
-                    aktivitetsdager = 5,
                 )
             val opprettetTiltakPeriode = vilkårperiodeService.opprettVilkårperiode(ulønnetTiltak)
             assertThat(
