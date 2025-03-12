@@ -85,6 +85,7 @@ object VilkårperiodeTestUtil {
         type: MålgruppeType = MålgruppeType.AAP,
         medlemskap: VurderingMedlemskap = vurderingMedlemskap(),
         dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(),
+        aldersvilkår: VurderingAldersVilkår = vurderingAldersVilkår(),
     ): MålgruppeFaktaOgVurdering =
         when (type) {
             MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
@@ -94,12 +95,7 @@ object VilkårperiodeTestUtil {
                     vurderinger =
                         VurderingOmstillingsstønad(
                             medlemskap = medlemskap,
-                            aldersvilkår =
-                                VurderingAldersVilkår(
-                                    SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse =
-                                        vurderingFaktaEtterlevelseAldersvilkår(),
-                                ),
+                            aldersvilkår = aldersvilkår,
                         ),
                 )
 
@@ -109,12 +105,7 @@ object VilkårperiodeTestUtil {
                     vurderinger =
                         VurderingAAP(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
-                            aldersvilkår =
-                                VurderingAldersVilkår(
-                                    SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse =
-                                        vurderingFaktaEtterlevelseAldersvilkår(),
-                                ),
+                            aldersvilkår = aldersvilkår,
                         ),
                 )
 
@@ -124,12 +115,7 @@ object VilkårperiodeTestUtil {
                         VurderingUføretrygd(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
-                            aldersvilkår =
-                                VurderingAldersVilkår(
-                                    SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse =
-                                        vurderingFaktaEtterlevelseAldersvilkår(),
-                                ),
+                            aldersvilkår = aldersvilkår,
                         ),
                 )
 
@@ -139,12 +125,7 @@ object VilkårperiodeTestUtil {
                         VurderingNedsattArbeidsevne(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
-                            aldersvilkår =
-                                VurderingAldersVilkår(
-                                    SvarJaNei.JA,
-                                    vurderingFaktaEtterlevelse =
-                                        vurderingFaktaEtterlevelseAldersvilkår(),
-                                ),
+                            aldersvilkår = aldersvilkår,
                         ),
                 )
 
