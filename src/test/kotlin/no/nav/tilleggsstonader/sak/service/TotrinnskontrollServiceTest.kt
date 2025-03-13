@@ -318,18 +318,6 @@ internal class TotrinnskontrollServiceTest {
             assertThat(oppdaterSlot.captured.status).isEqualTo(TotrinnInternStatus.KAN_FATTE_VEDTAK)
             assertThat(oppdaterSlot.captured.begrunnelse).isNotNull()
         }
-
-        @Test
-        internal fun `skal ikke kunne legge ved kommentar om det er første gang behandling sendes til beslutter`() {
-            val behandling = saksbehandling(status = BehandlingStatus.UTREDES)
-            every {
-                totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
-            } returns null
-
-            assertThatThrownBy {
-                totrinnskontrollService.sendtilBeslutter(behandling, SendTilBeslutterRequest("kommentar"))
-            }.hasMessageContaining("Kan ikke legge ved kommentar til beslutter dersom behandlingen ikke er tidligere underkjent")
-        }
     }
 
     private fun mockFinnSisteTotrinnskontrollUtenomAngret() =
