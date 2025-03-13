@@ -87,6 +87,7 @@ fun Vurdering.tilDto() =
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(
     JsonSubTypes.Type(MålgruppeFaktaOgVurderingerDto::class, name = "MÅLGRUPPE"),
+    JsonSubTypes.Type(MålgruppeLæremidlerFaktaOgVurderingerDto::class, name = "MÅLGRUPPE_LÆREMIDLER"),
     JsonSubTypes.Type(AktivitetBarnetilsynFaktaOgVurderingerDto::class, name = "AKTIVITET_BARNETILSYN"),
     JsonSubTypes.Type(AktivitetLæremidlerFaktaOgVurderingerDto::class, name = "AKTIVITET_LÆREMIDLER"),
     JsonSubTypes.Type(AktivitetBoutgifterFaktaOgVurderingerDto::class, name = "AKTIVITET_BOUTGIFTER"),
@@ -97,6 +98,11 @@ data class MålgruppeFaktaOgVurderingerDto(
     val medlemskap: VurderingDto? = null,
     val utgifterDekketAvAnnetRegelverk: VurderingDto? = null,
     val mottarSykepengerForFulltidsstilling: VurderingDto? = null,
+) : FaktaOgVurderingerDto()
+
+data class MålgruppeLæremidlerFaktaOgVurderingerDto(
+    val medlemskap: VurderingDto? = null,
+    val utgifterDekketAvAnnetRegelverk: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
 data class AktivitetBarnetilsynFaktaOgVurderingerDto(
@@ -118,19 +124,32 @@ data class AktivitetBoutgifterFaktaOgVurderingerDto(
 fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
     when (this) {
         is MålgruppeFaktaOgVurdering ->
-            MålgruppeFaktaOgVurderingerDto(
-                medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
-                utgifterDekketAvAnnetRegelverk =
-                    vurderinger
-                        .takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()
-                        ?.dekketAvAnnetRegelverk
-                        ?.tilDto(),
-                mottarSykepengerForFulltidsstilling =
-                    vurderinger
-                        .takeIfVurderinger<MottarSykepengerForFulltidsstillingVurdering>()
-                        ?.mottarSykepengerForFulltidsstilling
-                        ?.tilDto(),
-            )
+            when (this) {
+                is FaktaOgVurderingLæremidler ->
+                    MålgruppeLæremidlerFaktaOgVurderingerDto(
+                        medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
+                        utgifterDekketAvAnnetRegelverk =
+                            vurderinger
+                                .takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()
+                                ?.dekketAvAnnetRegelverk
+                                ?.tilDto(),
+                    )
+
+                else ->
+                    MålgruppeFaktaOgVurderingerDto(
+                        medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
+                        utgifterDekketAvAnnetRegelverk =
+                            vurderinger
+                                .takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()
+                                ?.dekketAvAnnetRegelverk
+                                ?.tilDto(),
+                        mottarSykepengerForFulltidsstilling =
+                            vurderinger
+                                .takeIfVurderinger<MottarSykepengerForFulltidsstillingVurdering>()
+                                ?.mottarSykepengerForFulltidsstilling
+                                ?.tilDto(),
+                    )
+            }
 
         is AktivitetFaktaOgVurdering -> {
             when (this) {

@@ -57,6 +57,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerAAPLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerNedsattArbeidsevneLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
@@ -289,7 +292,7 @@ private fun mapMålgruppeLæremidler(
         MålgruppeType.AAP -> {
             AAPLæremidler(
                 vurderinger =
-                    VurderingAAP(
+                    VurderingerAAPLæremidler(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                     ),
             )
@@ -298,7 +301,7 @@ private fun mapMålgruppeLæremidler(
         MålgruppeType.UFØRETRYGD -> {
             UføretrygdLæremidler(
                 vurderinger =
-                    VurderingUføretrygd(
+                    VurderingerUføretrygdLæremidler(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                     ),
@@ -308,13 +311,9 @@ private fun mapMålgruppeLæremidler(
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
             NedsattArbeidsevneLæremidler(
                 vurderinger =
-                    VurderingNedsattArbeidsevne(
+                    VurderingerNedsattArbeidsevneLæremidler(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                        mottarSykepengerForFulltidsstilling =
-                            VurderingMottarSykepengerForFulltidsstilling(
-                                faktaOgVurderinger.svarMottarSykepengerForFulltidsstilling,
-                            ),
                     ),
             )
         }
@@ -366,6 +365,10 @@ private fun mapMålgruppeBoutgfiter(
                     VurderingNedsattArbeidsevne(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        mottarSykepengerForFulltidsstilling =
+                            VurderingMottarSykepengerForFulltidsstilling(
+                                faktaOgVurderinger.svarMottarSykepengerForFulltidsstilling,
+                            ),
                     ),
             )
         }

@@ -37,10 +37,9 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
-                        VurderingNedsattArbeidsevne(
+                        VurderingerNedsattArbeidsevneLæremidler(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 
@@ -52,10 +51,9 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
-                        VurderingNedsattArbeidsevne(
+                        VurderingerNedsattArbeidsevneLæremidler(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
-                            mottarSykepengerForFulltidsstilling = mottarSykepengerIkkeOppfylt,
                         ),
                 )
 
@@ -67,10 +65,9 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
-                        VurderingNedsattArbeidsevne(
+                        VurderingerNedsattArbeidsevneLæremidler(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
-                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 
@@ -82,10 +79,9 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
-                        VurderingNedsattArbeidsevne(
+                        VurderingerNedsattArbeidsevneLæremidler(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 

@@ -24,21 +24,21 @@ sealed interface AktivitetLæremidler :
 }
 
 data class AAPLæremidler(
-    override val vurderinger: VurderingAAP,
+    override val vurderinger: VurderingerAAPLæremidler,
 ) : MålgruppeLæremidler {
     override val type: MålgruppeLæremidlerType = MålgruppeLæremidlerType.AAP_LÆREMIDLER
     override val fakta: IngenFakta = IngenFakta
 }
 
 data class UføretrygdLæremidler(
-    override val vurderinger: VurderingUføretrygd,
+    override val vurderinger: VurderingerUføretrygdLæremidler,
 ) : MålgruppeLæremidler {
     override val type: MålgruppeLæremidlerType = MålgruppeLæremidlerType.UFØRETRYGD_LÆREMIDLER
     override val fakta: IngenFakta = IngenFakta
 }
 
 data class NedsattArbeidsevneLæremidler(
-    override val vurderinger: VurderingNedsattArbeidsevne,
+    override val vurderinger: VurderingerNedsattArbeidsevneLæremidler,
 ) : MålgruppeLæremidler {
     override val type: MålgruppeLæremidlerType = MålgruppeLæremidlerType.NEDSATT_ARBEIDSEVNE_LÆREMIDLER
     override val fakta: IngenFakta = IngenFakta
@@ -113,6 +113,25 @@ data object IngenAktivitetLæremidler : AktivitetLæremidler {
     override val vurderinger: Vurderinger = IngenVurderinger
 }
 
+data class VurderingerAAPLæremidler(
+    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
+) : MedlemskapVurdering,
+    DekketAvAnnetRegelverkVurdering {
+    override val medlemskap = VurderingMedlemskap.IMPLISITT
+}
+
+data class VurderingerUføretrygdLæremidler(
+    override val medlemskap: VurderingMedlemskap,
+    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
+) : MedlemskapVurdering,
+    DekketAvAnnetRegelverkVurdering
+
+data class VurderingerNedsattArbeidsevneLæremidler(
+    override val medlemskap: VurderingMedlemskap,
+    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
+) : MedlemskapVurdering,
+    DekketAvAnnetRegelverkVurdering
+
 data class VurderingTiltakLæremidler(
     override val harUtgifter: VurderingHarUtgifter,
     override val harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend,
@@ -144,7 +163,9 @@ enum class AktivitetLæremidlerType(
     TypeFaktaOgVurderingLæremidler {
     UTDANNING_LÆREMIDLER(AktivitetType.UTDANNING),
     TILTAK_LÆREMIDLER(AktivitetType.TILTAK),
-    INGEN_AKTIVITET_LÆREMIDLER(AktivitetType.INGEN_AKTIVITET),
+    INGEN_AKTIVITET_LÆREMIDLER(
+        AktivitetType.INGEN_AKTIVITET,
+    ),
 }
 
 enum class MålgruppeLæremidlerType(
@@ -153,9 +174,13 @@ enum class MålgruppeLæremidlerType(
     TypeFaktaOgVurderingLæremidler {
     AAP_LÆREMIDLER(MålgruppeType.AAP),
     OMSTILLINGSSTØNAD_LÆREMIDLER(MålgruppeType.OMSTILLINGSSTØNAD),
-    OVERGANGSSTØNAD_LÆREMIDLER(MålgruppeType.OVERGANGSSTØNAD),
+    OVERGANGSSTØNAD_LÆREMIDLER(
+        MålgruppeType.OVERGANGSSTØNAD,
+    ),
     NEDSATT_ARBEIDSEVNE_LÆREMIDLER(MålgruppeType.NEDSATT_ARBEIDSEVNE),
     UFØRETRYGD_LÆREMIDLER(MålgruppeType.UFØRETRYGD),
-    SYKEPENGER_100_PROSENT_LÆREMIDLER(MålgruppeType.SYKEPENGER_100_PROSENT),
+    SYKEPENGER_100_PROSENT_LÆREMIDLER(
+        MålgruppeType.SYKEPENGER_100_PROSENT,
+    ),
     INGEN_MÅLGRUPPE_LÆREMIDLER(MålgruppeType.INGEN_MÅLGRUPPE),
 }

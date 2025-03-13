@@ -20,7 +20,8 @@ data class VurderingAAP(
     DekketAvAnnetRegelverkVurdering,
     MottarSykepengerForFulltidsstillingVurdering {
     override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
-    override val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling = VurderingMottarSykepengerForFulltidsstilling.NEI_IMPLISITT
+    override val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling =
+        VurderingMottarSykepengerForFulltidsstilling.NEI_IMPLISITT
 }
 
 data class VurderingUføretrygd(
@@ -29,7 +30,8 @@ data class VurderingUføretrygd(
 ) : MedlemskapVurdering,
     DekketAvAnnetRegelverkVurdering,
     MottarSykepengerForFulltidsstillingVurdering {
-    override val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling = VurderingMottarSykepengerForFulltidsstilling.NEI_IMPLISITT
+    override val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling =
+        VurderingMottarSykepengerForFulltidsstilling.NEI_IMPLISITT
 }
 
 data class VurderingNedsattArbeidsevne(

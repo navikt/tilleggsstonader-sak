@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -77,6 +78,7 @@ class VilkårperiodeDtoTest {
                             type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
                             medlemskap = VurderingMedlemskap(svar = SvarJaNei.JA),
                             dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA),
+                            mottarSykepengerForFulltidsstilling = VurderingMottarSykepengerForFulltidsstilling(SvarJaNei.NEI),
                         ),
                 ).tilDto()
 
@@ -84,6 +86,7 @@ class VilkårperiodeDtoTest {
                 MålgruppeFaktaOgVurderingerDto(
                     medlemskap = VurderingDto(svar = SvarJaNei.JA, resultat = OPPFYLT),
                     utgifterDekketAvAnnetRegelverk = VurderingDto(SvarJaNei.JA, resultat = IKKE_OPPFYLT),
+                    mottarSykepengerForFulltidsstilling = VurderingDto(SvarJaNei.NEI, resultat = OPPFYLT),
                 ),
             )
         }
