@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
+package no.nav.tilleggsstonader.sak.vedtak.domain
 
 object BeregningsgrunnlagUtils {
     /**
