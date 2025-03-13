@@ -51,6 +51,19 @@ class JournalhendelseKafkaListener(
 
     private fun prosesserHendelse(hendelseRecord: JournalfoeringHendelseRecord) {
         if (!hendelseRecord.skalProsesseres()) {
+            if (Tema.gjelderTemaTilleggsstønader(hendelseRecord.temaNytt)) {
+                logger.info(
+                    "Prosesserer ikke " +
+                        "hendelse=${hendelseRecord.hendelsesId} " +
+                        "journalpost=${hendelseRecord.journalpostId} " +
+                        "versjon=${hendelseRecord.versjon} " +
+                        "henselsesType=${hendelseRecord.hendelsesType} " +
+                        "journalpostStatus=${hendelseRecord.journalpostStatus} " +
+                        "mottaksKanal=${hendelseRecord.mottaksKanal} " +
+                        "behandlingstema=${hendelseRecord.behandlingstema} " +
+                        "temaGammelt=${hendelseRecord.temaGammelt} ",
+                )
+            }
             return
         }
         val hendelseId = hendelseRecord.hendelsesId.takeIf { it.isNotBlank() } ?: error("Mangler hendelseId")
@@ -78,4 +91,8 @@ private enum class JournalpostHendelseType {
     TemaEndret,
     EndeligJournalført,
     JournalpostUtgått,
+}
+
+fun main() {
+    println(JournalfoeringHendelseRecord())
 }
