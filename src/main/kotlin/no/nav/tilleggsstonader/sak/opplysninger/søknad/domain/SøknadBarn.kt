@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad.domain
 
-import no.nav.tilleggsstonader.kontrakter.søknad.DatoFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDate
 import java.util.UUID
 
 @Table("soknad_barn")
@@ -25,6 +25,6 @@ data class BarnMedBarnepass(
 
 data class Utgifter(
     val harUtgifterTilPass: JaNei,
-    val fom: DatoFelt?,
-    val tom: DatoFelt?,
+    val fom: LocalDate?,
+    val tom: LocalDate?,
 )

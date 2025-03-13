@@ -65,8 +65,8 @@ object SøknadsskjemaBarnetilsynMapper {
                                 it.utgifter?.let { utgifter ->
                                     Utgifter(
                                         harUtgifterTilPass = utgifter.harUtgifterTilPass.verdi,
-                                        fom = utgifter.fom,
-                                        tom = utgifter.tom,
+                                        fom = utgifter.fom?.verdi,
+                                        tom = utgifter.tom?.verdi,
                                     )
                                 },
                             startetIFemte = it.startetIFemte?.verdi,
