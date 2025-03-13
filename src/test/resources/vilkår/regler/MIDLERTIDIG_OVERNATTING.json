@@ -1,0 +1,19 @@
+{
+  "vilkårType" : "MIDLERTIDIG_OVERNATTING",
+  "regler" : {
+    "NØDVENDIGE_MERUTGIFTER" : {
+      "regelId" : "NØDVENDIGE_MERUTGIFTER",
+      "erHovedregel" : true,
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "VALGFRI",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "PÅKREVD",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    }
+  }
+}
