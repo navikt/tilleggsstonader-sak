@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.DEKNINGSGRAD_TIL
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
@@ -56,6 +57,7 @@ data class UtbetalingerDvhV2(
                 is InnvilgelseTilsynBarn -> vedtak.data.finnGrunnlag(this.fom.toYearMonth())
                 is OpphørTilsynBarn -> vedtak.data.finnGrunnlag(this.fom.toYearMonth())
                 is OpphørLæremidler -> null
+                is InnvilgelseBoutgifter -> TODO("Utbetaling for boutgifter er ikke implementert enda")
             }
 
         private fun InnvilgelseTilsynBarn.finnGrunnlag(måned: YearMonth): Beregningsgrunnlag =
