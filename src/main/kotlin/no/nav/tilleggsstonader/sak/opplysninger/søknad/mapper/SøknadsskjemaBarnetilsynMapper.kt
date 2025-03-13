@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper
 
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
-import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
@@ -62,20 +61,14 @@ object SøknadsskjemaBarnetilsynMapper {
                     data =
                         BarnMedBarnepass(
                             type = it.type.verdi,
-//                            utgifter =
-//                                it.utgifter?.let { utgifter ->
-//                                    Utgifter(
-//                                        harUtgifterTilPass = utgifter.harUtgifterTilPass.verdi,
-//                                        fom = utgifter.fom,
-//                                        tom = utgifter.tom,
-//                                    )
-//                                },
                             utgifter =
-                                no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Utgifter(
-                                    harUtgifterTilPass = JaNei.JA,
-                                    fom = null,
-                                    tom = null,
-                                ),
+                                it.utgifter?.let { utgifter ->
+                                    Utgifter(
+                                        harUtgifterTilPass = utgifter.harUtgifterTilPass.verdi,
+                                        fom = utgifter.fom,
+                                        tom = utgifter.tom,
+                                    )
+                                },
                             startetIFemte = it.startetIFemte?.verdi,
                             årsak = it.årsak?.verdi,
                         ),
