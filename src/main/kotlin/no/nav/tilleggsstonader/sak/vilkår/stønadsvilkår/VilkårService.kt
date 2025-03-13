@@ -179,6 +179,7 @@ class VilkårService(
         metadata: HovedregelMetadata,
         opprettVilkårDto: OpprettVilkårDto,
     ) {
+        if (opprettVilkårDto.barnId == null) return
         val barnIderPåBehandling = metadata.barn.map { it.id }.toSet()
         feilHvisIkke(barnIderPåBehandling.contains(opprettVilkårDto.barnId)) {
             "Finner ikke barn på behandling"
