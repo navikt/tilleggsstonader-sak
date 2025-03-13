@@ -28,6 +28,10 @@
       "utgifterDekketAvAnnetRegelverk" : {
         "svar" : "NEI",
         "resultat" : "OPPFYLT"
+      },
+      "aldersvilkår" : {
+        "svar" : "JA",
+        "resultat" : "OPPFYLT"
       }
     },
     "kilde" : "MANUELL",
@@ -44,7 +48,8 @@
         "svar" : "JA_IMPLISITT",
         "resultat" : "OPPFYLT"
       },
-      "utgifterDekketAvAnnetRegelverk" : null
+      "utgifterDekketAvAnnetRegelverk" : null,
+      "aldersvilkår" : null
     },
     "kilde" : "MANUELL",
     "resultat" : "OPPFYLT",
