@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
+import no.nav.tilleggsstonader.sak.behandling.dto.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
@@ -54,6 +55,18 @@ data class UtbetalingPeriode(
 //        prosent = målgruppeOgAktivitet.aktivitet.prosent,
         utbetalingsdato = løpendeMåned.utbetalingsdato,
     )
+
+    constructor(
+        løpendeMåned: LøpendeMåned,
+    ) : this(
+        fom = løpendeMåned.fom,
+        tom = løpendeMåned.vedtaksperioder.maxOf { it.tom },
+        målgruppe = løpendeMåned.vedtaksperioder.first().målgruppe, // TODO: Prioriter hvilken målgruppe som skal være gjeldende til økonomi hvis ulike målgrupper havner innenfor samme løpende måned
+        aktivitet = løpendeMåned.vedtaksperioder.first().aktivitet,
+//        studienivå = målgruppeOgAktivitet.aktivitet.studienivå,
+//        prosent = målgruppeOgAktivitet.aktivitet.prosent,
+        utbetalingsdato = løpendeMåned.utbetalingsdato,
+    )
 }
 
 data class LøpendeMåned(
@@ -89,6 +102,7 @@ data class LøpendeMåned(
      * Finner hvilken stønadsperiode og aktivitet som skal brukes for den aktuelle utbetalingsperioden
      */
     fun tilUtbetalingPeriode(
+        vedtaksperiode: List<Vedtaksperiode>,
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
         aktiviteter: List<AktivitetBoutgifterBeregningGrunnlag>,
     ): UtbetalingPeriode {

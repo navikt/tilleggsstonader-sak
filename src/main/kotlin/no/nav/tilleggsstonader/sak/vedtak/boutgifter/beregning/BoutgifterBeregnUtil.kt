@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøn
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.splitPerLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.splitVedtaksperiodePerÅr
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import kotlin.collections.plus
 
 object BoutgifterBeregnUtil {
@@ -13,7 +13,7 @@ object BoutgifterBeregnUtil {
      * Grupperer vedtaksperioder innenfor en løpende måned
      * Hvis en vedtaksperiode løper lengre enn første måned vil det bli en ny periode, med nytt utbetalingsdatum
      */
-    fun List<Vedtaksperiode>.grupperVedtaksperioderPerLøpendeMåned(): List<LøpendeMåned> =
+    fun List<VedtaksperiodeBeregning>.grupperVedtaksperioderPerLøpendeMåned(): List<LøpendeMåned> =
         this
             .sorted()
             .splitVedtaksperiodePerÅr()
@@ -44,6 +44,8 @@ object BoutgifterBeregnUtil {
                 VedtaksperiodeInnenforLøpendeMåned(
                     fom = vedtaksperiode.fom,
                     tom = minOf(this.tom, vedtaksperiode.tom),
+                    målgruppe = vedtaksperiode.målgruppe,
+                    aktivitet = vedtaksperiode.aktivitet,
                 )
             this.medVedtaksperiode(overlappendeVedtaksperiode)
         }
@@ -79,7 +81,14 @@ object BoutgifterBeregnUtil {
                 fom = fom,
                 tom = minOf(fom.sisteDagenILøpendeMåned(), this.tom.sisteDagIÅret()),
                 utbetalingsdato = this.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
-            ).medVedtaksperiode(VedtaksperiodeInnenforLøpendeMåned(fom = fom, tom = tom))
+            ).medVedtaksperiode(
+                VedtaksperiodeInnenforLøpendeMåned(
+                    fom = fom,
+                    tom = tom,
+                    målgruppe = this.målgruppe,
+                    aktivitet = this.aktivitet,
+                ),
+            )
         }
     }
 }

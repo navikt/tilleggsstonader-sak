@@ -5,9 +5,9 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.BeregningsresultatBoutgifterDto
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtaksperiodeBoutgifterDto
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -60,7 +60,7 @@ class BoutgifterVedtakController(
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtaksperioder: List<VedtaksperiodeBoutgifterDto>,
+        @RequestBody vedtaksperioder: List<VedtaksperiodeDto>,
     ): BeregningsresultatBoutgifterDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         return beregningService

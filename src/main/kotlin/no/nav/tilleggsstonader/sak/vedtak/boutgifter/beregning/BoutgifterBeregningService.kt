@@ -13,21 +13,16 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.domain.slåSammenSammenhengende
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.splitFraRevurderFra
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import org.springframework.stereotype.Service
-import kotlin.collections.plus
 
 @Service
 class BoutgifterBeregningService(
-    private val vilkårperiodeRepository: VilkårperiodeRepository,
-    private val stønadsperiodeRepository: StønadsperiodeRepository,
+    private val boutgifterUtgiftService: BoutgifterUtgiftService,
 //    private val vedtaksperiodeValideringService: BoutgifterVedtaksperiodeValideringService,
     private val vedtakRepository: VedtakRepository,
 ) {
@@ -43,8 +38,10 @@ class BoutgifterBeregningService(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatBoutgifter {
-        val stønadsperioder = hentStønadsperioder(behandling.id)
+//        val stønadsperioder = hentStønadsperioder(behandling.id)
         val forrigeVedtak = hentForrigeVedtak(behandling)
+
+        val utgifterPerVilkårtype = boutgifterUtgiftService.hentUtgifterTilBeregning(behandling.id)
 
 //        vedtaksperiodeValideringService.validerVedtaksperioder(
 //            vedtaksperioder = vedtaksperioder,
@@ -52,22 +49,43 @@ class BoutgifterBeregningService(
 //            behandlingId = behandling.id,
 //        )
 
-        val beregningsresultatForMåned = beregn(behandling, vedtaksperioder, stønadsperioder)
+        val vedtaksperioderBeregning =
+            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(behandling.revurderFra)
+
+//        val beregningsresultat = beregnAktuellePerioder(behandling, vedtaksperioder, stønadsperioder)
+        val beregningsresultat =
+            beregnAktuellePerioder(
+                vedtaksperioder = vedtaksperioderBeregning,
+                utgifter = utgifterPerVilkårtype,
+            )
 
         return if (forrigeVedtak != null) {
-            settSammenGamleOgNyePerioder(behandling, beregningsresultatForMåned, forrigeVedtak)
+            settSammenGamleOgNyePerioder(behandling, beregningsresultat, forrigeVedtak)
         } else {
-            BeregningsresultatBoutgifter(beregningsresultatForMåned)
+            BeregningsresultatBoutgifter(beregningsresultat)
         }
     }
 
-    private fun beregn(
-        behandling: Saksbehandling,
-        vedtaksperioder: List<Vedtaksperiode>,
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
+    private fun beregnAktuellePerioder(
+        vedtaksperioder: List<VedtaksperiodeBeregning>,
+        utgifter: Map<Unit, List<UtgiftBeregning>>,
+//        revurderFra: LocalDate?,
     ): List<BeregningsresultatForMåned> {
-        val aktiviteter = finnAktiviteter(behandling.id)
-        return beregnBoutgifterPerMåned(vedtaksperioder, stønadsperioder, aktiviteter)
+//        validerPerioderForInnvilgelse(vedtaksperioder, utgifterPerBarn, typeVedtak)
+
+        // TODO: Deal med revurderFra-datoen
+
+        return vedtaksperioder
+            .sorted()
+            .grupperVedtaksperioderPerLøpendeMåned()
+            .map { UtbetalingPeriode(it) }
+            .map { utbetalingPeriode ->
+                val grunnlagsdata = lagBeregningsGrunnlag(periode = utbetalingPeriode)
+                BeregningsresultatForMåned(
+                    beløp = beregnBeløp(utgifter),
+                    grunnlag = grunnlagsdata,
+                )
+            }
     }
 
 //    fun beregnForOpphør(
@@ -217,40 +235,6 @@ class BoutgifterBeregningService(
         vedtakRepository
             .findByIdOrThrow(behandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørBoutgifter>()
-
-    private fun hentStønadsperioder(behandlingId: BehandlingId): List<StønadsperiodeBeregningsgrunnlag> =
-        stønadsperiodeRepository
-            .findAllByBehandlingId(behandlingId)
-            .tilSortertStønadsperiodeBeregningsgrunnlag()
-            .slåSammenSammenhengende()
-
-    private fun finnAktiviteter(behandlingId: BehandlingId): List<AktivitetBoutgifterBeregningGrunnlag> =
-        vilkårperiodeRepository
-            .findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
-            .tilAktiviteter()
-
-    private fun beregnBoutgifterPerMåned(
-        vedtaksperioder: List<Vedtaksperiode>,
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
-        aktiviteter: List<AktivitetBoutgifterBeregningGrunnlag>,
-    ): List<BeregningsresultatForMåned> =
-        vedtaksperioder
-            .sorted()
-            .grupperVedtaksperioderPerLøpendeMåned()
-            .map { it.tilUtbetalingPeriode(stønadsperioder, aktiviteter) }
-            .beregn()
-
-    private fun List<UtbetalingPeriode>.beregn(): List<BeregningsresultatForMåned> =
-        this
-            .map { utbetalingPeriode ->
-                val grunnlagsdata = lagBeregningsGrunnlag(periode = utbetalingPeriode)
-
-                BeregningsresultatForMåned(
-//                    beløp = beregnBeløp(grunnlagsdata.sats, grunnlagsdata.studieprosent),
-                    beløp = beregnBeløp(),
-                    grunnlag = grunnlagsdata,
-                )
-            }
 
     private fun lagBeregningsGrunnlag(periode: UtbetalingPeriode): Beregningsgrunnlag {
         val sats = finnSatsForPeriode(periode)
