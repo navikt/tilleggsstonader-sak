@@ -61,7 +61,8 @@ data class UtbetalingPeriode(
     ) : this(
         fom = løpendeMåned.fom,
         tom = løpendeMåned.vedtaksperioder.maxOf { it.tom },
-        målgruppe = løpendeMåned.vedtaksperioder.first().målgruppe, // TODO: Prioriter hvilken målgruppe som skal være gjeldende til økonomi hvis ulike målgrupper havner innenfor samme løpende måned
+        // TODO: Prioriter hvilken målgruppe som skal være gjeldende til økonomi hvis ulike målgrupper havner innenfor samme løpende måned
+        målgruppe = løpendeMåned.vedtaksperioder.first().målgruppe,
         aktivitet = løpendeMåned.vedtaksperioder.first().aktivitet,
 //        studienivå = målgruppeOgAktivitet.aktivitet.studienivå,
 //        prosent = målgruppeOgAktivitet.aktivitet.prosent,
@@ -180,7 +181,7 @@ data class MålgruppeOgAktivitet(
     override fun compareTo(other: MålgruppeOgAktivitet): Int = COMPARE_BY.compare(this, other)
 
     companion object {
-//        val COMPARE_BY =
+        //        val COMPARE_BY =
 //            compareBy<MålgruppeOgAktivitet> { it.aktivitet.studienivå.prioritet }
 //                .thenByDescending { it.aktivitet.prosent }
 //                .thenBy { it.målgruppe.prioritet() }
