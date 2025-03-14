@@ -11,6 +11,9 @@ server:
       max-request-size: 200MB
 
 spring:
+  jackson:
+    deserialization:
+      FAIL_ON_NULL_FOR_PRIMITIVES: true
   mvc:
     format:
       date: iso
