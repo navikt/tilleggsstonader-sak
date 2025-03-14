@@ -60,6 +60,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAPLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevneLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
@@ -321,7 +324,7 @@ private fun mapMålgruppeLæremidler(
         MålgruppeType.AAP -> {
             AAPLæremidler(
                 vurderinger =
-                    VurderingAAP(
+                    VurderingAAPLæremidler(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         aldersvilkår =
                             lagVurderingAldersvilkår(målgruppe, grunnlagsData),
@@ -332,7 +335,7 @@ private fun mapMålgruppeLæremidler(
         MålgruppeType.UFØRETRYGD -> {
             UføretrygdLæremidler(
                 vurderinger =
-                    VurderingUføretrygd(
+                    VurderingUføretrygdLæremidler(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                         aldersvilkår =
@@ -344,7 +347,7 @@ private fun mapMålgruppeLæremidler(
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
             NedsattArbeidsevneLæremidler(
                 vurderinger =
-                    VurderingNedsattArbeidsevne(
+                    VurderingNedsattArbeidsevneLæremidler(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                         medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                         aldersvilkår =

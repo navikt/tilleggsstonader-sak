@@ -36,7 +36,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
-                        VurderingNedsattArbeidsevne(
+                        VurderingNedsattArbeidsevneLæremidler(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
                             aldersvilkår = aldersvilkårOppfylt,
@@ -51,7 +51,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
-                        VurderingNedsattArbeidsevne(
+                        VurderingNedsattArbeidsevneLæremidler(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
                             aldersvilkår = aldersvilkårOppfylt,
@@ -66,7 +66,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
-                        VurderingNedsattArbeidsevne(
+                        VurderingNedsattArbeidsevneLæremidler(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
                             aldersvilkår = aldersvilkårOppfylt,
@@ -81,7 +81,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
-                        VurderingNedsattArbeidsevne(
+                        VurderingNedsattArbeidsevneLæremidler(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
                             aldersvilkår = aldersvilkårOppfylt,
