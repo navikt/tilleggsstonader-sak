@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class GrunnlagsdataService(
@@ -28,6 +29,7 @@ class GrunnlagsdataService(
 
     fun hentGrunnlagsdata(behandlingId: BehandlingId): Grunnlagsdata = grunnlagsdataRepository.findByIdOrThrow(behandlingId)
 
+    @Transactional
     fun opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId: BehandlingId) {
         if (!grunnlagsdataRepository.existsById(behandlingId)) {
             opprettGrunnlagsdata(behandlingId)
