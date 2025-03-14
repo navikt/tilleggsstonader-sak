@@ -2,15 +2,9 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
-import no.nav.tilleggsstonader.kontrakter.felles.overlapper
-import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
-import no.nav.tilleggsstonader.sak.behandling.dto.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.lørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.sisteDagenILøpendeMåned
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
@@ -43,18 +37,18 @@ data class UtbetalingPeriode(
         }
     }
 
-    constructor(
-        løpendeMåned: LøpendeMåned,
-        målgruppeOgAktivitet: MålgruppeOgAktivitet,
-    ) : this(
-        fom = løpendeMåned.fom,
-        tom = løpendeMåned.vedtaksperioder.maxOf { it.tom },
-        målgruppe = målgruppeOgAktivitet.målgruppe,
-        aktivitet = målgruppeOgAktivitet.aktivitet.type,
+//    constructor(
+//        løpendeMåned: LøpendeMåned,
+//        målgruppeOgAktivitet: MålgruppeOgAktivitet,
+//    ) : this(
+//        fom = løpendeMåned.fom,
+//        tom = løpendeMåned.vedtaksperioder.maxOf { it.tom },
+//        målgruppe = målgruppeOgAktivitet.målgruppe,
+//        aktivitet = målgruppeOgAktivitet.aktivitet.type,
 //        studienivå = målgruppeOgAktivitet.aktivitet.studienivå,
 //        prosent = målgruppeOgAktivitet.aktivitet.prosent,
-        utbetalingsdato = løpendeMåned.utbetalingsdato,
-    )
+//        utbetalingsdato = løpendeMåned.utbetalingsdato,
+//    )
 
     constructor(
         løpendeMåned: LøpendeMåned,
@@ -98,80 +92,6 @@ data class LøpendeMåned(
     }
 
     fun harDatoerIUkedager(): Boolean = vedtaksperioder.any { it.alleDatoer().any { !it.lørdagEllerSøndag() } }
-
-    /**
-     * Finner hvilken stønadsperiode og aktivitet som skal brukes for den aktuelle utbetalingsperioden
-     */
-    fun tilUtbetalingPeriode(
-        vedtaksperiode: List<Vedtaksperiode>,
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
-        aktiviteter: List<AktivitetBoutgifterBeregningGrunnlag>,
-    ): UtbetalingPeriode {
-        require(vedtaksperioder.isNotEmpty()) {
-            "Kan ikke lage UtbetalingPeriode når vedtaksperioder er tom"
-        }
-        val sorterteMålgruppeOgAktivitet =
-            vedtaksperioder
-                .flatMap { vedtaksperiode ->
-                    vedtaksperiode.finnRelevantMålgruppeOgAktivitet(stønadsperioder, aktiviteter)
-                }.sorted()
-
-        return UtbetalingPeriode(this, sorterteMålgruppeOgAktivitet.first())
-    }
-
-    private fun VedtaksperiodeInnenforLøpendeMåned.finnRelevantMålgruppeOgAktivitet(
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
-        aktiviteter: List<AktivitetBoutgifterBeregningGrunnlag>,
-    ) = this
-        .finnSnittAvRelevanteStønadsperioder(stønadsperioder)
-        .flatMap { stønadsperiode ->
-            this
-                .finnSnittAvRelevanteAktiviteter(aktiviteter, stønadsperiode)
-                .map { aktivitet -> MålgruppeOgAktivitet(stønadsperiode.målgruppe, aktivitet) }
-        }
-
-    private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteAktiviteter(
-        aktiviteter: List<AktivitetBoutgifterBeregningGrunnlag>,
-        stønadsperiode: StønadsperiodeBeregningsgrunnlag,
-    ): List<AktivitetBoutgifterBeregningGrunnlag> {
-        val relevanteAktiviteter =
-            aktiviteter
-                .filter { it.type == stønadsperiode.aktivitet }
-                .mapNotNull { it.beregnSnitt(stønadsperiode) }
-                .mapNotNull { it.beregnSnitt(this) }
-//                .mergeOverlappende(
-//                    erLike = { aktivitet1, aktivitet2 -> aktivitet1.studienivå == aktivitet2.studienivå },
-//                    merge = { aktivitet1, aktivitet2 ->
-//                        aktivitet1.copy(prosent = minOf(100, aktivitet1.prosent + aktivitet2.prosent))
-//                    },
-//                )
-
-        brukerfeilHvis(relevanteAktiviteter.isEmpty()) {
-            "Det finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som varer i hele perioden ${this.formatertPeriodeNorskFormat()}}"
-        }
-
-        feilHvis(relevanteAktiviteter.overlapper()) {
-            "Det er foreløpig ikke støtte for flere aktiviteter med ulike studienivåer som overlapper" +
-                " (gjelder perioden ${this.formatertPeriodeNorskFormat()}). " +
-                "Ta kontakt med utviklerteamet for å forstå situasjonen og om det burde legges til støtte for det."
-        }
-
-        return relevanteAktiviteter
-    }
-
-    private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteStønadsperioder(
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
-    ): List<StønadsperiodeBeregningsgrunnlag> {
-        val relevanteStønadsperioderForPeriode =
-            stønadsperioder
-                .mapNotNull { it.beregnSnitt(this) }
-
-        feilHvis(relevanteStønadsperioderForPeriode.isEmpty()) {
-            "Det finnes ingen periode med overlapp mellom målgruppe og aktivitet for perioden ${this.formatertPeriodeNorskFormat()}"
-        }
-
-        return relevanteStønadsperioderForPeriode
-    }
 }
 
 data class MålgruppeOgAktivitet(
