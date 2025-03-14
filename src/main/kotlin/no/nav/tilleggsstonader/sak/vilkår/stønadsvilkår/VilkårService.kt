@@ -266,4 +266,13 @@ class VilkårService(
         vilkårRepository
             .findByBehandlingId(behandlingId)
             .filter { it.type == VilkårType.PASS_BARN }
+
+    fun hentOppfylteBoutgiftVilkår(behandlingId: BehandlingId): List<Vilkår> =
+        hentBoutgiftVilkår(behandlingId)
+            .filter { it.resultat == Vilkårsresultat.OPPFYLT }
+
+    fun hentBoutgiftVilkår(behandlingId: BehandlingId): List<Vilkår> =
+        vilkårRepository
+            .findByBehandlingId(behandlingId)
+            .filter { it.type == VilkårType.MIDLERTIDIG_OVERNATTING } // TODO: Skal også hente faste utgifter
 }

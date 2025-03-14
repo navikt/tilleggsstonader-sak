@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AldersvilkårVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
@@ -96,11 +97,13 @@ sealed class FaktaOgVurderingerDto
 data class MålgruppeFaktaOgVurderingerDto(
     val medlemskap: VurderingDto? = null,
     val utgifterDekketAvAnnetRegelverk: VurderingDto? = null,
+    val aldersvilkår: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
 data class MålgruppeLæremidlerFaktaOgVurderingerDto(
     val medlemskap: VurderingDto? = null,
     val utgifterDekketAvAnnetRegelverk: VurderingDto? = null,
+    val aldersvilkår: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
 data class AktivitetBarnetilsynFaktaOgVurderingerDto(
@@ -128,6 +131,7 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                         medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
                         utgifterDekketAvAnnetRegelverk =
                             vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.dekketAvAnnetRegelverk?.tilDto(),
+                        aldersvilkår = vurderinger.takeIfVurderinger<AldersvilkårVurdering>()?.aldersvilkår?.tilDto(),
                     )
 
                 else ->
@@ -135,6 +139,7 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                         medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
                         utgifterDekketAvAnnetRegelverk =
                             vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.dekketAvAnnetRegelverk?.tilDto(),
+                        aldersvilkår = vurderinger.takeIfVurderinger<AldersvilkårVurdering>()?.aldersvilkår?.tilDto(),
                     )
             }
 

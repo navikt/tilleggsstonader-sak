@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.domain
+package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.util.toYearMonth
