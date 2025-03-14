@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
@@ -47,10 +48,9 @@ data class Beregningsgrunnlag(
     val fom: LocalDate,
     val tom: LocalDate,
     val utbetalingsdato: LocalDate,
-//    val studienivå: Studienivå,
-//    val studieprosent: Int,
-    val sats: Int,
-    val satsBekreftet: Boolean,
+    val utgifter: Map<Unit, List<UtgiftBeregning>>,
+    val makssats: Int,
+    val makssatsBekreftet: Boolean,
     val målgruppe: MålgruppeType,
     val aktivitet: AktivitetType,
 )

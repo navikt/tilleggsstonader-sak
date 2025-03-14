@@ -1,15 +1,13 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import java.time.YearMonth
+import java.time.LocalDate
 
-// TODO: Denne er kopiert fra tilsyn barn, og der forventes det utgifter for en hel kalendermåned.
-//  I boutgifter trenger vi å forholde oss til spesifikke datoer.
 data class UtgiftBeregning(
-    override val fom: YearMonth,
-    override val tom: YearMonth,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
     val utgift: Int,
-) : Periode<YearMonth> {
+) : Periode<LocalDate> {
     init {
         validatePeriode()
     }
