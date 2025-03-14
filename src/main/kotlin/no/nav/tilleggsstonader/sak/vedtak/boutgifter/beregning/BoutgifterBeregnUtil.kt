@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøn
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.splitPerLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.splitVedtaksperiodePerÅr
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import kotlin.collections.plus
 
 object BoutgifterBeregnUtil {

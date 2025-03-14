@@ -28,7 +28,7 @@ import kotlin.collections.plus
 class BoutgifterBeregningService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val stønadsperiodeRepository: StønadsperiodeRepository,
-    private val vedtaksperiodeValideringService: BoutgifterVedtaksperiodeValideringService,
+//    private val vedtaksperiodeValideringService: BoutgifterVedtaksperiodeValideringService,
     private val vedtakRepository: VedtakRepository,
 ) {
     /**
@@ -46,11 +46,11 @@ class BoutgifterBeregningService(
         val stønadsperioder = hentStønadsperioder(behandling.id)
         val forrigeVedtak = hentForrigeVedtak(behandling)
 
-        vedtaksperiodeValideringService.validerVedtaksperioder(
-            vedtaksperioder = vedtaksperioder,
-            stønadsperioder = stønadsperioder,
-            behandlingId = behandling.id,
-        )
+//        vedtaksperiodeValideringService.validerVedtaksperioder(
+//            vedtaksperioder = vedtaksperioder,
+//            stønadsperioder = stønadsperioder,
+//            behandlingId = behandling.id,
+//        )
 
         val beregningsresultatForMåned = beregn(behandling, vedtaksperioder, stønadsperioder)
 

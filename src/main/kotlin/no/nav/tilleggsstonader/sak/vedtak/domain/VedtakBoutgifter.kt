@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Vedtaksperiode
 
 enum class TypeVedtakBoutgifter(
     override val typeVedtak: TypeVedtak,

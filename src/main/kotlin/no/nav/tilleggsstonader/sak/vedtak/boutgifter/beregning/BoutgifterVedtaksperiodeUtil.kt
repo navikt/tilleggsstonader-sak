@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
 import no.nav.tilleggsstonader.sak.util.lørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.sisteDagenILøpendeMåned
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import java.time.LocalDate
 
 object BoutgifterVedtaksperiodeUtil {
