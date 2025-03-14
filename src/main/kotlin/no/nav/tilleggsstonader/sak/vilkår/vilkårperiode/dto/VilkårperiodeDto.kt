@@ -125,7 +125,12 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                         .takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()
                         ?.dekketAvAnnetRegelverk
                         ?.tilDto(),
-                aldersvilkår = vurderinger.takeIfVurderinger<AldersvilkårVurdering>()?.aldersvilkår?.tilDto(),
+                aldersvilkår =
+                    vurderinger
+                        .takeIfVurderinger<AldersvilkårVurdering>()
+                        ?.aldersvilkår
+                        ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
+                        ?.tilDto(),
             )
 
         is AktivitetFaktaOgVurdering -> {
