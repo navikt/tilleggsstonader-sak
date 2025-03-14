@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Utgifter
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -150,6 +151,7 @@ data class RegistergrunnlagBarn(
 data class SøknadsgrunnlagBarn(
     val type: TypeBarnepass,
     val startetIFemte: JaNei?,
+    val utgifter: Utgifter?,
     val årsak: ÅrsakBarnepass?,
 )
 

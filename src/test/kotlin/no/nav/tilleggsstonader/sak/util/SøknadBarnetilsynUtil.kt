@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.OppholdUtenforNor
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Utgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -52,10 +53,12 @@ object SøknadBarnetilsynUtil {
 
     fun lagBarnMedBarnepass(
         type: TypeBarnepass = TypeBarnepass.BARNEHAGE_SFO_AKS,
+        utgifter: Utgifter = Utgifter(harUtgifterTilPass = JaNei.JA, null, null),
         startetIFemte: JaNei? = JaNei.JA,
         årsak: ÅrsakBarnepass? = ÅrsakBarnepass.MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID,
     ) = BarnMedBarnepass(
         type = type,
+        utgifter = utgifter,
         startetIFemte = startetIFemte,
         årsak = årsak,
     )

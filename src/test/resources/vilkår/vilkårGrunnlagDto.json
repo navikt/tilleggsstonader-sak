@@ -57,6 +57,11 @@
     "søknadgrunnlag" : {
       "type" : "BARNEHAGE_SFO_AKS",
       "startetIFemte" : "JA",
+      "utgifter" : {
+        "harUtgifterTilPass" : "JA",
+        "fom" : null,
+        "tom" : null
+      },
       "årsak" : "MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID"
     },
     "vilkårFakta" : {
