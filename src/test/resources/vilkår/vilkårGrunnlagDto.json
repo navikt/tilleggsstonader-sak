@@ -58,9 +58,9 @@
       "type" : "BARNEHAGE_SFO_AKS",
       "startetIFemte" : "JA",
       "utgifter" : {
-        "harUtgifterTilPass" : "JA",
-        "fom" : null,
-        "tom" : null
+        "harUtgifterTilPassHelePerioden" : "NEI",
+        "fom" : "2025-01-01",
+        "tom" : "2025-05-31"
       },
       "årsak" : "MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID"
     },

@@ -53,7 +53,7 @@ object SøknadBarnetilsynUtil {
 
     fun lagBarnMedBarnepass(
         type: TypeBarnepass = TypeBarnepass.BARNEHAGE_SFO_AKS,
-        utgifter: Utgifter = Utgifter(harUtgifterTilPass = JaNei.JA, null, null),
+        utgifter: Utgifter = Utgifter(harUtgifterTilPassHelePerioden = JaNei.NEI, LocalDate.of(2025, 1, 1), LocalDate.of(2025, 5, 31)),
         startetIFemte: JaNei? = JaNei.JA,
         årsak: ÅrsakBarnepass? = ÅrsakBarnepass.MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID,
     ) = BarnMedBarnepass(

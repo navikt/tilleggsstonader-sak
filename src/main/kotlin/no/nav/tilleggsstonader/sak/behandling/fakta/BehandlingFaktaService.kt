@@ -144,14 +144,7 @@ class BehandlingFaktaService(
                 søknadBarnPåIdent[behandlingBarn.ident]?.let { søknadBarn ->
                     SøknadsgrunnlagBarn(
                         type = søknadBarn.data.type,
-                        utgifter =
-                            søknadBarn.data.utgifter?.let { utgifter ->
-                                no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Utgifter(
-                                    harUtgifterTilPass = utgifter.harUtgifterTilPass,
-                                    fom = utgifter.fom,
-                                    tom = utgifter.tom,
-                                )
-                            },
+                        utgifter = søknadBarn.data.utgifter,
                         startetIFemte = søknadBarn.data.startetIFemte,
                         årsak = søknadBarn.data.årsak,
                     )
