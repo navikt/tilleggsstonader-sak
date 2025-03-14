@@ -5,6 +5,22 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
+import no.nav.tilleggsstonader.libs.utils.CollectionUtil.singleOrNullOrError
+
+fun Journalpost.erInnkommende(): Boolean = journalposttype == Journalposttype.I
+
+/**
+ * Finner brevkode for orginaldokument
+ */
+fun Journalpost.dokumentBrevkode(): DokumentBrevkode? =
+    dokumenter
+        ?.mapNotNull { it.brevkode }
+        ?.mapNotNull { DokumentBrevkode.fraBrevkode(it) }
+        ?.singleOrNullOrError()
+
+fun Journalpost.brevkoder(): List<String> = dokumenter?.mapNotNull { it.brevkode } ?: emptyList()
+
+fun Journalpost.gjelderKanalSkanningEllerNavNo(): Boolean = this.kanal?.substring(0, 5) == "SKAN_" || this.kanal == "NAV_NO"
 
 fun Journalpost.harStrukturertSøknad(): Boolean =
     this.dokumenter?.any {
