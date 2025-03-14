@@ -29,9 +29,10 @@ class JournalhendelseKafkaHåndterer(
             val stønadstype = brevkode.stønadstype
             logSkalBehandles(journalpost, kanBehandles = true)
             håndterSøknadService.håndterSøknad(journalpost, stønadstype)
-        } else {
+        } else if (journalpost.erInnkommende()) {
             logSkalBehandles(journalpost, kanBehandles = false)
         }
+        // Trenger ikke å logge andre journalposter av typen utgående eller notat
     }
 
     private fun Journalpost.kanBehandles() =
