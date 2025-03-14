@@ -84,6 +84,7 @@ class VilkårperiodeDtoTest {
                 MålgruppeFaktaOgVurderingerDto(
                     medlemskap = VurderingDto(svar = SvarJaNei.JA, resultat = OPPFYLT),
                     utgifterDekketAvAnnetRegelverk = VurderingDto(SvarJaNei.JA, resultat = IKKE_OPPFYLT),
+                    aldersvilkår = VurderingDto(svar = SvarJaNei.JA, resultat = OPPFYLT),
                 ),
             )
         }
