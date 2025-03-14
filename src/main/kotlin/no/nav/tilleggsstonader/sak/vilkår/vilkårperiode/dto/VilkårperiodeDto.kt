@@ -131,16 +131,24 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                         medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
                         utgifterDekketAvAnnetRegelverk =
                             vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.dekketAvAnnetRegelverk?.tilDto(),
-                        aldersvilkår = vurderinger.takeIfVurderinger<AldersvilkårVurdering>()?.aldersvilkår?.tilDto(),
-                    )
+                        aldersvilkår =
+                            vurderinger
+                                .takeIfVurderinger<AldersvilkårVurdering>()
+                                ?.aldersvilkår
+                                ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
+                                ?.tilDto(),                    )
 
                 else ->
                     MålgruppeFaktaOgVurderingerDto(
                         medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
                         utgifterDekketAvAnnetRegelverk =
                             vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.dekketAvAnnetRegelverk?.tilDto(),
-                        aldersvilkår = vurderinger.takeIfVurderinger<AldersvilkårVurdering>()?.aldersvilkår?.tilDto(),
-                    )
+                        aldersvilkår =
+                            vurderinger
+                                .takeIfVurderinger<AldersvilkårVurdering>()
+                                ?.aldersvilkår
+                                ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
+                                ?.tilDto(),                    )
             }
 
         is AktivitetFaktaOgVurdering -> {
