@@ -45,17 +45,6 @@ class SøkController(
         return søkeresultat
     }
 
-    // brukes til brev, burde vi flytte den til brev?
-    @PostMapping("/person/uten-fagsak")
-    fun søkPersonUtenFagsak(
-        @RequestBody personIdentRequest: PersonIdentDto,
-    ): SøkeresultatUtenFagsak {
-        validerPersonIdent(personIdentRequest)
-        tilgangService.validerTilgangTilPerson(personIdentRequest.personIdent, AuditLoggerEvent.ACCESS)
-
-        return søkService.søkPersonUtenFagsak(personIdentRequest.personIdent)
-    }
-
     private fun validerPersonIdent(personIdentRequest: PersonIdentDto) {
         validerIdent(personIdentRequest.personIdent)
     }
