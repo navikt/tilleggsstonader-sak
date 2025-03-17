@@ -8,7 +8,9 @@ import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getNullable
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.tilDiskresjonskode
+import no.nav.tilleggsstonader.sak.tilgang.TilgangskontrollUtil.høyesteGraderingen
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.CacheManager
@@ -69,22 +71,25 @@ class ArbeidsfordelingService(
         arbeidsfordelingstema: Tema,
         oppgavetype: Oppgavetype? = null,
     ): ArbeidsfordelingKriterie {
-        val personinfo = personService.hentSøker(personIdent)
+        val adressebeskyttelseForPersonMedRelasjoner =
+            personService.hentAdressebeskyttelseForPersonOgRelasjoner(personIdent)
         val geografiskTilknytning = utledGeografiskTilknytningKode(personService.hentGeografiskTilknytning(personIdent))
-        val diskresjonskode =
-            personinfo.adressebeskyttelse
-                .singleOrNull()
-                ?.gradering
-                ?.tilDiskresjonskode()
+        val diskresjonskode = høyesteGraderingen(adressebeskyttelseForPersonMedRelasjoner).tilDiskresjonskode()
 
         return ArbeidsfordelingKriterie(
             tema = arbeidsfordelingstema.name,
             diskresjonskode = diskresjonskode,
             geografiskOmraade = geografiskTilknytning ?: GEOGRAFISK_TILKNYTTING_OSLO,
-            skjermet = egenAnsattService.erEgenAnsatt(personIdent),
+            skjermet = erEgenAnsatt(adressebeskyttelseForPersonMedRelasjoner),
             oppgavetype = oppgavetype,
         )
     }
+
+    private fun erEgenAnsatt(adressebeskyttelseForPersonMedRelasjoner: AdressebeskyttelseForPersonMedRelasjoner) =
+        egenAnsattService
+            .erEgenAnsatt(adressebeskyttelseForPersonMedRelasjoner.identerForEgenAnsattKontroll())
+            .values
+            .any { it.erEgenAnsatt }
 
     private fun utledGeografiskTilknytningKode(geografiskTilknytning: GeografiskTilknytningDto?): String? =
         geografiskTilknytning?.let {

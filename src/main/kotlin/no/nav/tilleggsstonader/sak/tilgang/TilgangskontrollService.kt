@@ -80,7 +80,7 @@ class TilgangskontrollService(
     private fun erEgenAnsatt(adressebeskyttelseForPersonMedRelasjoner: AdressebeskyttelseForPersonMedRelasjoner): Boolean {
         val relevanteIdenter = adressebeskyttelseForPersonMedRelasjoner.identerForEgenAnsattKontroll()
 
-        return egenAnsattService.erEgenAnsatt(relevanteIdenter).any { it.value }
+        return egenAnsattService.erEgenAnsatt(relevanteIdenter).any { it.value.erEgenAnsatt }
     }
 
     private fun hentTilgangForRolle(
