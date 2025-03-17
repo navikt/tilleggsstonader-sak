@@ -25,7 +25,7 @@ data class SvarPåVilkårDto(
 
 data class OpprettVilkårDto(
     val vilkårType: VilkårType,
-    val barnId: BarnId,
+    val barnId: BarnId? = null,
     override val behandlingId: BehandlingId,
     override val delvilkårsett: List<DelvilkårDto>,
     override val fom: LocalDate?,

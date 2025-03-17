@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
@@ -113,6 +114,7 @@ class BehandlingsoversiktService(
             is AvslagTilsynBarn -> null
             is InnvilgelseEllerOpphørLæremidler -> vedtak.data.vedtaksperiode(revurdererFra)
             is AvslagLæremidler -> null
+            is InnvilgelseEllerOpphørBoutgifter -> TODO("Behandlingsoversikt for boutgifter er ikke implementert")
         }
 
     private fun BeregningsresultatTilsynBarn.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {

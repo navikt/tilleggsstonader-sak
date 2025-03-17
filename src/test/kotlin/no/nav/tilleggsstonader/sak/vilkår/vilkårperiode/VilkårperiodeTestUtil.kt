@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
@@ -74,10 +75,17 @@ object VilkårperiodeTestUtil {
             gitVersjon = Applikasjonsversjon.versjon,
         )
 
+    fun vurderingFaktaEtterlevelseAldersvilkår(fødselsdato: LocalDate = LocalDate.of(2000, 1, 1)) =
+        AldersvilkårVurdering
+            .VurderingFaktaEtterlevelseAldersvilkår(
+                fødselsdato = fødselsdato,
+            )
+
     fun faktaOgVurderingMålgruppe(
         type: MålgruppeType = MålgruppeType.AAP,
         medlemskap: VurderingMedlemskap = vurderingMedlemskap(),
         dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(),
+        aldersvilkår: VurderingAldersVilkår = vurderingAldersVilkår(),
     ): MålgruppeFaktaOgVurdering =
         when (type) {
             MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
@@ -87,13 +95,18 @@ object VilkårperiodeTestUtil {
                     vurderinger =
                         VurderingOmstillingsstønad(
                             medlemskap = medlemskap,
+                            aldersvilkår = aldersvilkår,
                         ),
                 )
 
             MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadTilsynBarn
             MålgruppeType.AAP ->
                 AAPTilsynBarn(
-                    vurderinger = VurderingAAP(dekketAvAnnetRegelverk = dekketAvAnnetRegelverk),
+                    vurderinger =
+                        VurderingAAP(
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
+                            aldersvilkår = aldersvilkår,
+                        ),
                 )
 
             MålgruppeType.UFØRETRYGD ->
@@ -102,6 +115,7 @@ object VilkårperiodeTestUtil {
                         VurderingUføretrygd(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
+                            aldersvilkår = aldersvilkår,
                         ),
                 )
 
@@ -111,6 +125,7 @@ object VilkårperiodeTestUtil {
                         VurderingNedsattArbeidsevne(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
+                            aldersvilkår = aldersvilkår,
                         ),
                 )
 
@@ -218,6 +233,9 @@ object VilkårperiodeTestUtil {
     fun vurderingDekketAvAnnetRegelverk(svar: SvarJaNei? = SvarJaNei.NEI) = VurderingDekketAvAnnetRegelverk(svar = svar)
 
     fun vurderingHarUtgifter(svar: SvarJaNei? = SvarJaNei.JA) = VurderingHarUtgifter(svar = svar)
+
+    fun vurderingAldersVilkår(svar: SvarJaNei = SvarJaNei.JA) =
+        VurderingAldersVilkår(svar = svar, vurderingFaktaEtterlevelse = vurderingFaktaEtterlevelseAldersvilkår())
 
     fun dummyVilkårperiodeMålgruppe(
         type: MålgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,

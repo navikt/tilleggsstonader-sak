@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
+import no.nav.tilleggsstonader.libs.test.httpclient.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchException
@@ -13,6 +14,9 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
+import org.springframework.http.ProblemDetail
+import org.springframework.http.converter.HttpMessageConversionException
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -93,6 +97,56 @@ class TestControllerTest : IntegrationTest() {
     }
 
     @Nested
+    inner class PrimtiveFelter {
+        val headers =
+            HttpHeaders().apply {
+                contentType = APPLICATION_JSON
+                accept = listOf(APPLICATION_JSON)
+            }
+
+        @Test
+        fun `skal feile hvis påkrevd booleanfelt er null`() {
+            val entity = HttpEntity("{}", headers)
+
+            val exception =
+                catchProblemDetailException {
+                    restTemplate.postForEntity<TestObjectBoolean>(localhost("api/test/boolean"), entity)
+                }
+            assertThat(exception.detail.detail).contains("Missing required creator property 'verdi'")
+        }
+
+        @Test
+        fun `skal feile hvis påkrevd booleanfelt sendes inn som null`() {
+            val entity = HttpEntity("""{"verdi": null}""", headers)
+
+            val exception =
+                catchProblemDetailException {
+                    restTemplate.postForEntity<TestObjectBoolean>(localhost("api/test/boolean"), entity)
+                }
+            assertThat(exception.detail.detail).contains("JSON parse error: Cannot map `null` into type `boolean`")
+        }
+
+        @Test
+        fun `skal ikke feile hvis påkrevd booleanfelt med default-verdi er null `() {
+            val entity = HttpEntity("{}", headers)
+
+            val response =
+                restTemplate.postForEntity<TestObjectBooleanDefault>(localhost("api/test/boolean-default"), entity)
+            assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(response.body).isEqualTo(TestObjectBooleanDefault(true))
+        }
+
+        @Test
+        fun `skal ikke feile hvis valgfritt booleanfelt er null `() {
+            val entity = HttpEntity("{}", headers)
+            val response =
+                restTemplate.postForEntity<TestObjectBooleanOptional>(localhost("api/test/boolean-optional"), entity)
+            assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(response.body).isEqualTo(TestObjectBooleanOptional(null))
+        }
+    }
+
+    @Nested
     inner class EndepunktMedTokenValidering {
         @Test
         fun `autorisert token, men mangler saksbehandler-relatert rolle`() {
@@ -168,8 +222,44 @@ class TestController {
     fun getMedAzureAd(): TestObject = get()
 }
 
+@RestController
+@RequestMapping("/api/test")
+@Unprotected
+class TestBooleanController {
+    @ExceptionHandler(HttpMessageConversionException::class)
+    fun handleThrowable(throwable: HttpMessageConversionException): ProblemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, throwable.message)
+
+    @PostMapping("/boolean")
+    fun boolean(
+        @RequestBody testObject: TestObjectBoolean,
+    ): TestObjectBoolean = testObject
+
+    @PostMapping("/boolean-default")
+    fun booleanDefault(
+        @RequestBody testObject: TestObjectBooleanDefault,
+    ): TestObjectBooleanDefault = testObject
+
+    @PostMapping("/boolean-optional")
+    fun booleanOptional(
+        @RequestBody testObject: TestObjectBooleanOptional,
+    ): TestObjectBooleanOptional = testObject
+}
+
 data class TestObject(
     val tekst: String,
     val dato: LocalDate,
     val tidspunkt: LocalDateTime,
+)
+
+data class TestObjectBoolean(
+    val verdi: Boolean,
+)
+
+data class TestObjectBooleanDefault(
+    val verdi: Boolean = true,
+)
+
+data class TestObjectBooleanOptional(
+    val verdi: Boolean?,
 )

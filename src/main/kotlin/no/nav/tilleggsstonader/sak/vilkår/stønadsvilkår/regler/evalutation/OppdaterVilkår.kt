@@ -53,6 +53,7 @@ object OppdaterVilkår {
         val resultat = vilkårsresultat.vilkår
         val fom = oppdatering.fom
         val tom = oppdatering.tom
+        val vilkårMedUtgift = listOf(VilkårType.PASS_BARN, VilkårType.MIDLERTIDIG_OVERNATTING)
         brukerfeilHvis(fom == null || tom == null) {
             "Mangler fra og med/til og med på vilkår"
         }
@@ -66,7 +67,7 @@ object OppdaterVilkår {
         ) {
             "Mangler utgift på vilkår"
         }
-        feilHvis(vilkårType != VilkårType.PASS_BARN && oppdatering.utgift != null) {
+        feilHvis(vilkårType !in vilkårMedUtgift && oppdatering.utgift != null) {
             "Kan ikke ha utgift på vilkårType=$vilkårType"
         }
     }
@@ -103,6 +104,9 @@ object OppdaterVilkår {
                     validerErFørsteDagIMåned(it)
                     it
                 }
+                VilkårType.MIDLERTIDIG_OVERNATTING -> {
+                    it
+                }
 
                 else -> error("Har ikke tatt stilling til type dato for ${vilkår.type}")
             }
@@ -116,6 +120,9 @@ object OppdaterVilkår {
             when (vilkår.type) {
                 VilkårType.PASS_BARN -> {
                     validerErSisteDagIMåned(it)
+                    it
+                }
+                VilkårType.MIDLERTIDIG_OVERNATTING -> {
                     it
                 }
 

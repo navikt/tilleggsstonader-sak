@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -239,6 +240,8 @@ class InterntVedtakService(
                 is VedtakTilsynBarn -> mapVedtakTilsynBarn(vedtak.data)
 
                 is VedtakLæremidler -> mapVedtakLæremidler(vedtak.data)
+
+                is VedtakBoutgifter -> TODO("Internt vedtak for boutgifter er ikke implementert")
             }
         }
 
