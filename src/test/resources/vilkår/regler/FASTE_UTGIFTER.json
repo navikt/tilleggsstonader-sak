@@ -1,0 +1,33 @@
+{
+  "vilkårType" : "FASTE_UTGIFTER",
+  "regler" : {
+    "NØDVENDIGE_MERUTGIFTER" : {
+      "regelId" : "NØDVENDIGE_MERUTGIFTER",
+      "erHovedregel" : true,
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "VALGFRI",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "PÅKREVD",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    },
+    "RETT_TIL_BOSTØTTE" : {
+      "regelId" : "RETT_TIL_BOSTØTTE",
+      "erHovedregel" : true,
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "PÅKREVD",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "VALGFRI",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    }
+  }
+}

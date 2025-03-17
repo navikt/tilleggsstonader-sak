@@ -18,4 +18,5 @@ enum class RegelId(
 
     // BOUTGIFTER
     NØDVENDIGE_MERUTGIFTER("Har søker nødvendige merutgifter til bolig eller overnatting?"),
+    RETT_TIL_BOSTØTTE("Har søker rett til bostøtte"),
 }
