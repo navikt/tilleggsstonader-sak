@@ -7,7 +7,6 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.util.UUID
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.Utgifter as UtgifterKontrakter
 
 @Table("soknad_barn")
 data class SøknadBarn(
@@ -29,12 +28,3 @@ data class Utgifter(
     val fom: LocalDate?,
     val tom: LocalDate?,
 )
-
-fun UtgifterKontrakter?.tilDomene(): Utgifter? =
-    this?.let {
-        Utgifter(
-            harUtgifterTilPassHelePerioden = it.harUtgifterTilPassHelePerioden.verdi,
-            fom = it.fom?.verdi,
-            tom = it.tom?.verdi,
-        )
-    }
