@@ -75,13 +75,13 @@ class LæremidlerBeregningService(
         behandling: Saksbehandling,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatLæremidler {
-        feilHvis(behandling.forrigeBehandlingId == null) {
+        feilHvis(behandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
         feilHvis(behandling.revurderFra == null) {
             "revurderFra-dato er påkrevd for opphør"
         }
-        val forrigeVedtak = hentVedtak(behandling.forrigeBehandlingId)
+        val forrigeVedtak = hentVedtak(behandling.forrigeIverksatteBehandlingId)
         val avkortetBeregningsresultat = avkortBeregningsresultatVedOpphør(forrigeVedtak, behandling.revurderFra)
 
         return beregningsresultatForOpphør(
@@ -212,7 +212,7 @@ class LæremidlerBeregningService(
     }
 
     private fun hentForrigeVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørLæremidler? =
-        behandling.forrigeBehandlingId?.let { hentVedtak(it) }?.data
+        behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
 
     private fun hentVedtak(behandlingId: BehandlingId) =
         vedtakRepository

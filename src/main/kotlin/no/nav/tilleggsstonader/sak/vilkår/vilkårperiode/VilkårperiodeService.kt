@@ -181,11 +181,11 @@ class VilkårperiodeService(
     }
 
     fun gjenbrukVilkårperioder(
-        forrigeBehandlingId: BehandlingId,
+        forrigeIverksatteBehandlingId: BehandlingId,
         nyBehandlingId: BehandlingId,
     ) {
         val eksisterendeVilkårperioder =
-            vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeBehandlingId, ResultatVilkårperiode.SLETTET)
+            vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeIverksatteBehandlingId, ResultatVilkårperiode.SLETTET)
 
         val kopiertePerioderMedReferanse = eksisterendeVilkårperioder.map { it.kopierTilBehandling(nyBehandlingId) }
         vilkårperiodeRepository.insertAll(kopiertePerioderMedReferanse)

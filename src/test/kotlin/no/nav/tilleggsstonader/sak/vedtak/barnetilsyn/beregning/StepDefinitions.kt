@@ -127,7 +127,7 @@ class StepDefinitions {
                 id = behandlingId,
                 type = BehandlingType.REVURDERING,
                 revurderFra = revurderFra,
-                forrigeBehandlingId = BehandlingId.random(),
+                forrigeIverksatteBehandlingId = BehandlingId.random(),
             ),
         )
     }

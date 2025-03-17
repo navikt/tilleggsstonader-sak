@@ -64,11 +64,11 @@ internal class SimuleringServiceTest {
 
     @Test
     internal fun `skal bruke lagret tilkjentYtelse for simulering`() {
-        val forrigeBehandlingId = behandling(fagsak).id
+        val forrigeIverksatteBehandlingId = behandling(fagsak).id
         val behandling =
             behandling(
                 fagsak = fagsak,
-                forrigeBehandlingId = forrigeBehandlingId,
+                forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
             )
 
         val saksbehandling = saksbehandling(fagsak, behandling)
@@ -118,7 +118,7 @@ internal class SimuleringServiceTest {
             behandling(
                 fagsak = fagsak,
                 type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                forrigeBehandlingId = forrigeBehandling.id,
+                forrigeIverksatteBehandlingId = forrigeBehandling.id,
             )
 
         val tilkjentYtelse = tilkjentYtelse(behandlingId = behandling.id)

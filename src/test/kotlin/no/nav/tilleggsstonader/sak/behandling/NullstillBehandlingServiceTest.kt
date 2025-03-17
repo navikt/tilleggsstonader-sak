@@ -80,7 +80,7 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
 
     val fagsak = fagsak()
     val behandling = behandling(fagsak, status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET)
-    val revurdering = behandling(fagsak, forrigeBehandlingId = behandling.id)
+    val revurdering = behandling(fagsak, forrigeIverksatteBehandlingId = behandling.id)
 
     val behandlingBarn1 = behandlingBarn(behandlingId = behandling.id, personIdent = "1")
     val revurderingBarn1 = behandlingBarn(behandlingId = revurdering.id, personIdent = "1")

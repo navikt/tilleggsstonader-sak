@@ -82,7 +82,7 @@ fun behandling(
     type: BehandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
     resultat: BehandlingResultat = BehandlingResultat.IKKE_SATT,
     opprettetTid: LocalDateTime = SporbarUtils.now(),
-    forrigeBehandlingId: BehandlingId? = null,
+    forrigeIverksatteBehandlingId: BehandlingId? = null,
     årsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
     henlagtÅrsak: HenlagtÅrsak? = HenlagtÅrsak.FEILREGISTRERT,
     henlagtBegrunnelse: String? = "Registrert feil",
@@ -92,7 +92,7 @@ fun behandling(
 ): Behandling =
     Behandling(
         fagsakId = fagsak.id,
-        forrigeBehandlingId = forrigeBehandlingId,
+        forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
         id = id,
         type = type,
         status = status,
@@ -118,7 +118,7 @@ fun saksbehandling(
     type: BehandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
     resultat: BehandlingResultat = BehandlingResultat.IKKE_SATT,
     opprettetTid: LocalDateTime = SporbarUtils.now(),
-    forrigeBehandlingId: BehandlingId? = null,
+    forrigeIverksatteBehandlingId: BehandlingId? = null,
     årsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
     henlagtÅrsak: HenlagtÅrsak? = HenlagtÅrsak.FEILREGISTRERT,
     kravMottatt: LocalDate? = null,
@@ -128,7 +128,7 @@ fun saksbehandling(
         fagsak,
         Behandling(
             fagsakId = fagsak.id,
-            forrigeBehandlingId = forrigeBehandlingId,
+            forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
             id = id,
             type = type,
             status = status,
@@ -150,7 +150,7 @@ fun saksbehandling(
     Saksbehandling(
         id = behandling.id,
         eksternId = EksternBehandlingId(behandlingId = behandling.id).id,
-        forrigeBehandlingId = behandling.forrigeBehandlingId,
+        forrigeIverksatteBehandlingId = behandling.forrigeIverksatteBehandlingId,
         type = behandling.type,
         status = behandling.status,
         steg = behandling.steg,

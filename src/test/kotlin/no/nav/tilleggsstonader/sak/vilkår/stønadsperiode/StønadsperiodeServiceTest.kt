@@ -366,14 +366,14 @@ class StønadsperiodeServiceTest : IntegrationTest() {
             val eksisterendeStønadsperidoder =
                 listOf(
                     stønadsperiode(
-                        behandlingId = revurdering.forrigeBehandlingId!!,
+                        behandlingId = revurdering.forrigeIverksatteBehandlingId!!,
                         fom = LocalDate.of(2024, 1, 1),
                         tom = LocalDate.of(2024, 1, 31),
                         målgruppe = MålgruppeType.AAP,
                         aktivitet = AktivitetType.TILTAK,
                     ),
                     stønadsperiode(
-                        behandlingId = revurdering.forrigeBehandlingId,
+                        behandlingId = revurdering.forrigeIverksatteBehandlingId,
                         fom = LocalDate.of(2024, 2, 1),
                         tom = LocalDate.of(2024, 1, 10),
                         målgruppe = MålgruppeType.OVERGANGSSTØNAD,
@@ -383,7 +383,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
             stønadsperiodeRepository.insertAll(eksisterendeStønadsperidoder)
 
             stønadsperiodeService.gjenbrukStønadsperioder(
-                forrigeBehandlingId = revurdering.forrigeBehandlingId,
+                forrigeIverksatteBehandlingId = revurdering.forrigeIverksatteBehandlingId,
                 nyBehandlingId = revurdering.id,
             )
 

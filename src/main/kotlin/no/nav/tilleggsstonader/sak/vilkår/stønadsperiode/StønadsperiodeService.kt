@@ -162,10 +162,10 @@ class StønadsperiodeService(
     }
 
     fun gjenbrukStønadsperioder(
-        forrigeBehandlingId: BehandlingId,
+        forrigeIverksatteBehandlingId: BehandlingId,
         nyBehandlingId: BehandlingId,
     ) {
-        val eksisterendeStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(forrigeBehandlingId)
+        val eksisterendeStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(forrigeIverksatteBehandlingId)
         stønadsperiodeRepository.insertAll(eksisterendeStønadsperioder.map { it.kopierTilBehandling(nyBehandlingId) })
     }
 

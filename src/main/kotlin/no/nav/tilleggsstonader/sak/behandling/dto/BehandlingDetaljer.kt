@@ -30,7 +30,7 @@ data class FagsakMedBehandlinger(
 
 data class BehandlingDetaljer(
     val id: BehandlingId,
-    val forrigeBehandlingId: BehandlingId?,
+    val forrigeIverksatteBehandlingId: BehandlingId?,
     val fagsakId: FagsakId,
     val steg: StegType,
     val kategori: BehandlingKategori,

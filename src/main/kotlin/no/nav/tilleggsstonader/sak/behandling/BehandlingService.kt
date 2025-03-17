@@ -113,7 +113,7 @@ class BehandlingService(
             behandlingRepository.insert(
                 Behandling(
                     fagsakId = fagsakId,
-                    forrigeBehandlingId = forrigeBehandling?.id,
+                    forrigeIverksatteBehandlingId = forrigeBehandling?.id,
                     type = behandlingType,
                     steg = stegType,
                     status = status,
@@ -183,17 +183,17 @@ class BehandlingService(
         return behandlingRepository.update(behandling.copy(kategori = kategori))
     }
 
-    fun oppdaterForrigeBehandlingId(
+    fun oppdaterforrigeIverksatteBehandlingId(
         behandlingId: BehandlingId,
-        forrigeBehandlingId: BehandlingId,
+        forrigeIverksatteBehandlingId: BehandlingId,
     ): Behandling {
         val behandling = hentBehandling(behandlingId)
         behandling.status.validerKanBehandlingRedigeres()
         secureLogger.info(
-            "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer forrigeBehandlingId på behandling $behandlingId " +
-                "fra ${behandling.forrigeBehandlingId} til $forrigeBehandlingId",
+            "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer forrigeIverksatteBehandlingId på behandling $behandlingId " +
+                "fra ${behandling.forrigeIverksatteBehandlingId} til $forrigeIverksatteBehandlingId",
         )
-        return behandlingRepository.update(behandling.copy(forrigeBehandlingId = forrigeBehandlingId))
+        return behandlingRepository.update(behandling.copy(forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId))
     }
 
     fun oppdaterStegPåBehandling(

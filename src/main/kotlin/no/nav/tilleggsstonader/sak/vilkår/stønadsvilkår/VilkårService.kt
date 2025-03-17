@@ -231,12 +231,12 @@ class VilkårService(
      * Når en revurdering opprettes skal den kopiere de tidligere vilkårene for samme stønad.
      */
     fun kopierVilkårsettTilNyBehandling(
-        forrigeBehandlingId: BehandlingId,
+        forrigeIverksatteBehandlingId: BehandlingId,
         nyBehandling: Behandling,
         barnIdMap: Map<TidligereBarnId, NyttBarnId>,
     ) {
         val tidligereVurderinger =
-            vilkårRepository.findByBehandlingId(forrigeBehandlingId).associateBy { it.id }
+            vilkårRepository.findByBehandlingId(forrigeIverksatteBehandlingId).associateBy { it.id }
 
         val kopiAvVurderinger =
             lagKopiAvTidligereVurderinger(

@@ -145,7 +145,7 @@ class TestoppsettService(
                 fagsak = fagsak,
                 type = BehandlingType.REVURDERING,
                 revurderFra = revurderFra,
-                forrigeBehandlingId = forrigeBehandling.id,
+                forrigeIverksatteBehandlingId = forrigeBehandling.id,
                 status = BehandlingStatus.UTREDES,
                 steg = steg,
             ),
@@ -159,7 +159,7 @@ class TestoppsettService(
         val revurdering =
             behandling(
                 fagsak = fagsak,
-                forrigeBehandlingId = førsteBehandling.id,
+                forrigeIverksatteBehandlingId = førsteBehandling.id,
                 type = BehandlingType.REVURDERING,
                 revurderFra = now(),
             )

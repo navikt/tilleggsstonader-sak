@@ -39,14 +39,14 @@ class VedtaksperiodeService(
     }
 
     fun finnNyeVedtaksperioderForOpphør(behandling: Saksbehandling): List<Vedtaksperiode> {
-        feilHvis(behandling.forrigeBehandlingId == null) {
+        feilHvis(behandling.forrigeIverksatteBehandlingId == null) {
             "Kan ikke finne nye vedtaksperioder for opphør fordi behandlingen er en førstegangsbehandling"
         }
         feilHvis(behandling.revurderFra == null) {
             "Kan ikke finne nye vedtaksperioder for opphør fordi revurder fra dato mangler"
         }
 
-        val forrigeVedtaksperioder = finnVedtaksperioder(behandling.forrigeBehandlingId)
+        val forrigeVedtaksperioder = finnVedtaksperioder(behandling.forrigeIverksatteBehandlingId)
 
         feilHvis(forrigeVedtaksperioder == null) {
             "Kan ikke opphøre fordi data fra forrige vedtak mangler"
@@ -57,7 +57,7 @@ class VedtaksperiodeService(
     }
 
     fun detFinnesVedtaksperioderPåForrigeBehandling(saksbehandling: Saksbehandling): Boolean =
-        finnVedtaksperioder(saksbehandling.forrigeBehandlingId)?.isNotEmpty() == true
+        finnVedtaksperioder(saksbehandling.forrigeIverksatteBehandlingId)?.isNotEmpty() == true
 
     private fun finnVedtaksperioder(behandlingId: BehandlingId?): List<Vedtaksperiode>? {
         if (behandlingId == null) return null

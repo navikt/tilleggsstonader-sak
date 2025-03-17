@@ -21,7 +21,7 @@ class DagligIverksettBehandlingTaskTest {
 
     val fagsak = fagsak()
     val behandling = behandling(fagsak, vedtakstidspunkt = osloNow().minusDays(1))
-    val behandling2 = behandling(fagsak, forrigeBehandlingId = behandling.id, vedtakstidspunkt = osloNow())
+    val behandling2 = behandling(fagsak, forrigeIverksatteBehandlingId = behandling.id, vedtakstidspunkt = osloNow())
     val utbetalingsdato = LocalDate.now()
 
     @BeforeEach

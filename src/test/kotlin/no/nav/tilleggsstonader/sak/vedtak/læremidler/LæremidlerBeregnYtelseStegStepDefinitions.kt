@@ -152,10 +152,11 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     @Når("kopierer perioder fra forrige behandling for behandling={}")
     fun `kopierer perioder`(behandlingIdTall: Int) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-        val forrigeBehandlingId = forrigeBehandlingId(behandlingId) ?: error("Forventer å finne forrigeBehandlingId")
+        val forrigeIverksatteBehandlingId =
+            forrigeIverksatteBehandlingId(behandlingId) ?: error("Forventer å finne forrigeIverksatteBehandlingId")
 
-        val tidligereStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(forrigeBehandlingId)
-        val tidligereVilkårsperioder = vilkårperiodeRepository.findByBehandlingId(forrigeBehandlingId)
+        val tidligereStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(forrigeIverksatteBehandlingId)
+        val tidligereVilkårsperioder = vilkårperiodeRepository.findByBehandlingId(forrigeIverksatteBehandlingId)
         stønadsperiodeRepository.insertAll(tidligereStønadsperioder.map { it.kopierTilBehandling(behandlingId) })
         vilkårperiodeRepository.insertAll(tidligereVilkårsperioder.map { it.kopierTilBehandling(behandlingId) })
     }
@@ -350,17 +351,17 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         behandlingId: BehandlingId,
         revurderFra: LocalDate? = null,
     ): Saksbehandling {
-        val forrigeBehandlingId = forrigeBehandlingId(behandlingId)
+        val forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId(behandlingId)
         return saksbehandling(
             id = behandlingId,
             fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER),
-            forrigeBehandlingId = forrigeBehandlingId,
+            forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
             revurderFra = revurderFra,
-            type = if (forrigeBehandlingId != null) BehandlingType.REVURDERING else BehandlingType.FØRSTEGANGSBEHANDLING,
+            type = if (forrigeIverksatteBehandlingId != null) BehandlingType.REVURDERING else BehandlingType.FØRSTEGANGSBEHANDLING,
         )
     }
 
-    private fun forrigeBehandlingId(behandlingId: BehandlingId): BehandlingId? {
+    private fun forrigeIverksatteBehandlingId(behandlingId: BehandlingId): BehandlingId? {
         val behandlingIdInt = behandlingIdFraUUID(behandlingId)
         return if (behandlingIdInt > 1) {
             behandlingIdTilUUID.getValue(behandlingIdInt - 1)
