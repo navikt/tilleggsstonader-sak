@@ -33,7 +33,7 @@ data class Utgifter(
 fun UtgifterKontrakter?.tilDomene(): Utgifter? =
     this?.let {
         Utgifter(
-            harUtgifterTilPassHelePerioden = it.harUtgifterTilPass.verdi,
+            harUtgifterTilPassHelePerioden = it.harUtgifterTilPassHelePerioden.verdi,
             fom = it.fom?.verdi,
             tom = it.tom?.verdi,
         )

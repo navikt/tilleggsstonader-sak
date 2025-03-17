@@ -9,8 +9,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnit
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Utgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.tilDomene
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.ArbeidOgOppholdMapper.mapArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.DokumentasjonMapper.mapDokumentasjon
 import java.time.LocalDateTime
@@ -61,7 +61,14 @@ object SøknadsskjemaBarnetilsynMapper {
                     data =
                         BarnMedBarnepass(
                             type = it.type.verdi,
-                            utgifter = it.utgifter.tilDomene(),
+                            utgifter =
+                                it.utgifter?.let { utgifter ->
+                                    Utgifter(
+                                        harUtgifterTilPassHelePerioden = utgifter.harUtgifterTilPassHelePerioden.verdi,
+                                        fom = utgifter.fom?.verdi,
+                                        tom = utgifter.tom?.verdi,
+                                    )
+                                },
                             startetIFemte = it.startetIFemte?.verdi,
                             årsak = it.årsak?.verdi,
                         ),
