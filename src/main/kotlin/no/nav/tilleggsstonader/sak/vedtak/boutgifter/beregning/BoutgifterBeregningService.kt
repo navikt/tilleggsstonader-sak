@@ -233,7 +233,7 @@ class BoutgifterBeregningService(
         periode: UtbetalingPeriode,
         utgifter: Map<Unit, List<UtgiftBeregning>>,
     ): Beregningsgrunnlag {
-        val sats = finnSatsForPeriode(periode)
+        val sats = finnMakssatsForPeriode(periode)
 
         val utgifterIPerioden = finnUtgiftForUtbetalingsperiode(utgifter, periode)
 
@@ -241,7 +241,7 @@ class BoutgifterBeregningService(
             fom = periode.fom,
             tom = periode.tom,
             utgifter = utgifterIPerioden,
-            makssats = finnSatsForStudienivå(),
+            makssats = sats.beløp,
             makssatsBekreftet = sats.bekreftet,
             utbetalingsdato = periode.utbetalingsdato,
             målgruppe = periode.målgruppe,
@@ -254,7 +254,7 @@ class BoutgifterBeregningService(
         periode: UtbetalingPeriode,
     ): Map<Unit, List<UtgiftBeregning>> {
         require(utgifter.values.all { utgifterListe -> utgifterListe.all { periode.inneholder(it) } }) {
-            "Per nå krever vi at alle ugiftene havner innefor samme utgiftsperiode"
+            "Per nå krever vi at alle utgiftene havner innefor samme utgiftsperiode."
         }
 
         return utgifter
