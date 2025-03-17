@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
 data class BeregningsresultatBoutgifter(
-    val perioder: List<BeregningsresultatForMåned>,
+    val perioder: List<BeregningsresultatForLøpendeMåned>,
 ) {
     fun filtrerFraOgMed(dato: LocalDate?): BeregningsresultatBoutgifter {
         if (dato == null) {
@@ -19,12 +21,12 @@ data class BeregningsresultatBoutgifter(
     }
 }
 
-data class BeregningsresultatForMåned(
-    val beløp: Int,
+data class BeregningsresultatForLøpendeMåned(
+    val stønadsbeløp: Int,
     val grunnlag: Beregningsgrunnlag,
     val delAvTidligereUtbetaling: Boolean = false,
 ) : Periode<LocalDate>,
-    KopierPeriode<BeregningsresultatForMåned> {
+    KopierPeriode<BeregningsresultatForLøpendeMåned> {
     @get:JsonIgnore
     override val fom: LocalDate get() = grunnlag.fom
 
@@ -34,9 +36,9 @@ data class BeregningsresultatForMåned(
     override fun medPeriode(
         fom: LocalDate,
         tom: LocalDate,
-    ): BeregningsresultatForMåned = this.copy(grunnlag = this.grunnlag.copy(fom = fom, tom = tom))
+    ): BeregningsresultatForLøpendeMåned = this.copy(grunnlag = this.grunnlag.copy(fom = fom, tom = tom))
 
-    fun medKorrigertUtbetalingsdato(utbetalingsdato: LocalDate): BeregningsresultatForMåned =
+    fun medKorrigertUtbetalingsdato(utbetalingsdato: LocalDate): BeregningsresultatForLøpendeMåned =
         this.copy(grunnlag = grunnlag.copy(utbetalingsdato = utbetalingsdato))
 
     fun markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling: Boolean) =
@@ -47,10 +49,9 @@ data class Beregningsgrunnlag(
     val fom: LocalDate,
     val tom: LocalDate,
     val utbetalingsdato: LocalDate,
-//    val studienivå: Studienivå,
-//    val studieprosent: Int,
-    val sats: Int,
-    val satsBekreftet: Boolean,
+    val utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    val makssats: Int,
+    val makssatsBekreftet: Boolean,
     val målgruppe: MålgruppeType,
     val aktivitet: AktivitetType,
 )
