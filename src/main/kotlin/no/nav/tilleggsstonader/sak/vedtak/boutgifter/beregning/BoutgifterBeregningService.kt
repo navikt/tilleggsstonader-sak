@@ -27,7 +27,9 @@ class BoutgifterBeregningService(
 ) {
     /**
      * Kjente begrensninger i beregningen (programmet kaster feil dersom antagelsene ikke stemmer):
-     * - Vi antar at satsen ikke endrer seg i vedtaksperioden
+     * - Vi antar at satsen ikke endrer seg i vedtaksperioden (TODO: SJEKK AT DET STEMMER)
+     * - Vi antar at det er overlapp mellom utgift og aktivitetsperiode (TODO)
+     * - Utgiftene krysser ikke overgangen fra én løpende måned til en annen (TODO)
      */
     fun beregn(
         behandling: Saksbehandling,
