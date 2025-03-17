@@ -136,7 +136,8 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                                 .takeIfVurderinger<AldersvilkårVurdering>()
                                 ?.aldersvilkår
                                 ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
-                                ?.tilDto(),                    )
+                                ?.tilDto(),
+                    )
 
                 else ->
                     MålgruppeFaktaOgVurderingerDto(
@@ -148,7 +149,8 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                                 .takeIfVurderinger<AldersvilkårVurdering>()
                                 ?.aldersvilkår
                                 ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
-                                ?.tilDto(),                    )
+                                ?.tilDto(),
+                    )
             }
 
         is AktivitetFaktaOgVurdering -> {
