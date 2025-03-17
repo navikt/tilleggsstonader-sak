@@ -67,7 +67,7 @@ class TilsynBarnVedtaksperiodeValidingerService(
     }
 
     private fun hentForrigeVedtaksperioder(behandling: Saksbehandling): List<Vedtaksperiode>? =
-        behandling.forrigeBehandlingId?.let {
+        behandling.forrigeIverksatteBehandlingId?.let {
             when (val forrigeVedtak = vedtakRepository.findByIdOrNull(it)?.data) {
                 is InnvilgelseTilsynBarn -> forrigeVedtak.vedtaksperioder
                 is OpphørTilsynBarn -> forrigeVedtak.vedtaksperioder

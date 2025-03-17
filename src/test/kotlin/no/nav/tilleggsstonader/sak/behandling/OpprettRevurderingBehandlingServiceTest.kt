@@ -85,7 +85,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling.fagsakId))
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
-            assertThat(nyBehandling.forrigeBehandlingId).isEqualTo(behandling.id)
+            assertThat(nyBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
         }
 
         /**
@@ -114,7 +114,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             val nyBehandlingId = service.opprettBehandling(request)
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
-            assertThat(nyBehandling.forrigeBehandlingId).isNull()
+            assertThat(nyBehandling.forrigeIverksatteBehandlingId).isNull()
         }
 
         /*
@@ -138,7 +138,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling.fagsakId))
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
-            assertThat(nyBehandling.forrigeBehandlingId).isNull()
+            assertThat(nyBehandling.forrigeIverksatteBehandlingId).isNull()
         }
     }
 

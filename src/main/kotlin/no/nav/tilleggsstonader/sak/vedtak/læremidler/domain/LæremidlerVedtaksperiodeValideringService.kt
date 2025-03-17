@@ -40,7 +40,7 @@ class LæremidlerVedtaksperiodeValideringService(
     }
 
     private fun hentForrigeVedtaksperioder(behandling: Saksbehandling): List<Vedtaksperiode>? =
-        behandling.forrigeBehandlingId?.let {
+        behandling.forrigeIverksatteBehandlingId?.let {
             when (val forrigeVedtak = vedtakRepository.findByIdOrNull(it)?.data) {
                 is InnvilgelseLæremidler -> forrigeVedtak.vedtaksperioder
                 is OpphørLæremidler -> forrigeVedtak.vedtaksperioder

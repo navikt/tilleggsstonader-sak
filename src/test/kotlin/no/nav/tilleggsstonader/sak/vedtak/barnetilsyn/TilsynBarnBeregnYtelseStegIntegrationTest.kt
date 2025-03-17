@@ -342,7 +342,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                         fagsak = fagsak(id = behandling.fagsakId),
                         type = BehandlingType.REVURDERING,
                         revurderFra = revurderFra,
-                        forrigeBehandlingId = behandling.id,
+                        forrigeIverksatteBehandlingId = behandling.id,
                     ),
                     opprettGrunnlagsdata = true,
                 ).let { testoppsettService.hentSaksbehandling(it.id) }

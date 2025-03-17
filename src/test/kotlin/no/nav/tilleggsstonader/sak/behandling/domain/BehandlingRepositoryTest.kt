@@ -57,7 +57,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
     fun `skal ikke være mulig å legge inn en behandling med referanse til en behandling som ikke eksisterer`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         assertThatThrownBy {
-            testoppsettService.lagre(behandling(fagsak, forrigeBehandlingId = BehandlingId.random()))
+            testoppsettService.lagre(behandling(fagsak, forrigeIverksatteBehandlingId = BehandlingId.random()))
         }.isInstanceOf(DbActionExecutionException::class.java)
     }
 
@@ -182,7 +182,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
     ) {
         assertThat(id).isEqualTo(behandling.id)
         assertThat(eksternId).isGreaterThan(0)
-        assertThat(forrigeBehandlingId).isEqualTo(behandling.forrigeBehandlingId)
+        assertThat(forrigeIverksatteBehandlingId).isEqualTo(behandling.forrigeIverksatteBehandlingId)
         assertThat(type).isEqualTo(behandling.type)
         assertThat(status).isEqualTo(behandling.status)
         assertThat(steg).isEqualTo(behandling.steg)

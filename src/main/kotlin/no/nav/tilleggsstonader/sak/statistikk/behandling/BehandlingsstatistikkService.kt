@@ -91,7 +91,7 @@ class BehandlingsstatistikkService(
     }
 
     private fun utledRelatertBehandling(saksbehandling: Saksbehandling) =
-        saksbehandling.forrigeBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).id.toString() }
+        saksbehandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).id.toString() }
 
     private fun finnSisteOppgaveForBehandlingen(
         behandlingId: BehandlingId,

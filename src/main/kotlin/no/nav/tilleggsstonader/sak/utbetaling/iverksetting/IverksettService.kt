@@ -137,11 +137,11 @@ class IverksettService(
      * får man ikke iverksatt revurderingen, man må vente på en OK kvittering
      */
     private fun markerAndelerFraForrigeBehandlingSomUaktuelle(behandling: Saksbehandling) {
-        if (behandling.forrigeBehandlingId == null) {
+        if (behandling.forrigeIverksatteBehandlingId == null) {
             return
         }
 
-        val forrigeBehandling = behandlingService.hentSaksbehandling(behandling.forrigeBehandlingId)
+        val forrigeBehandling = behandlingService.hentSaksbehandling(behandling.forrigeIverksatteBehandlingId)
 
         val andelerTilkjentYtelse =
             tilkjentYtelseService.hentForBehandling(forrigeBehandling.id).andelerTilkjentYtelse
@@ -243,9 +243,9 @@ class IverksettService(
             ?: forrigeIverksettingForrigeBehandling(behandling)
 
     private fun forrigeIverksettingForrigeBehandling(behandling: Saksbehandling): ForrigeIverksettingDto? {
-        val forrigeBehandlingId = behandling.forrigeBehandlingId
-        return forrigeBehandlingId?.let {
-            tilkjentYtelseService.hentForBehandling(forrigeBehandlingId).forrigeIverksetting(forrigeBehandlingId)
+        val forrigeIverksatteBehandlingId = behandling.forrigeIverksatteBehandlingId
+        return forrigeIverksatteBehandlingId?.let {
+            tilkjentYtelseService.hentForBehandling(forrigeIverksatteBehandlingId).forrigeIverksetting(forrigeIverksatteBehandlingId)
         }
     }
 

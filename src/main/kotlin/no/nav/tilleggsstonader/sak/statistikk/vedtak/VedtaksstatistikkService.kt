@@ -132,7 +132,7 @@ class VedtaksstatistikkService(
         )
 
     private fun hentRelatertBehandlingId(behandling: Saksbehandling) =
-        behandling.forrigeBehandlingId
+        behandling.forrigeIverksatteBehandlingId
             ?.let {
                 behandlingService.hentEksternBehandlingId(it)
             }?.id

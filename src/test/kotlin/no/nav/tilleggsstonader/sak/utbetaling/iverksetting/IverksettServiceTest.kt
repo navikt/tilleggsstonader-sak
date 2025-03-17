@@ -143,7 +143,7 @@ class IverksettServiceTest : IntegrationTest() {
                 fagsak,
                 resultat = BehandlingResultat.INNVILGET,
                 status = BehandlingStatus.FERDIGSTILT,
-                forrigeBehandlingId = behandling.id,
+                forrigeIverksatteBehandlingId = behandling.id,
             )
 
         val tilkjentYtelse = tilkjentYtelse(behandlingId = behandling.id, andeler = lagAndeler(behandling))

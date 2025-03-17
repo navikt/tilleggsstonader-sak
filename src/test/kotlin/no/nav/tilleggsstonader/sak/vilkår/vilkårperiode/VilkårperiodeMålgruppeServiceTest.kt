@@ -307,11 +307,11 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             val opprinneligVilkårperiode =
                 vilkårperiodeRepository.insert(
                     målgruppe(
-                        behandlingId = revurdering.forrigeBehandlingId!!,
+                        behandlingId = revurdering.forrigeIverksatteBehandlingId!!,
                     ),
                 )
 
-            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeBehandlingId!!, revurdering.id)
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
 
             val vilkårperiode = vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()
             val oppdatertPeriode =

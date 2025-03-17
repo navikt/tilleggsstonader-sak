@@ -72,12 +72,12 @@ class SøknadService(
     }
 
     fun kopierSøknad(
-        forrigeBehandlingId: BehandlingId,
+        forrigeIverksatteBehandlingId: BehandlingId,
         nyBehandlingId: BehandlingId,
     ) {
-        val søknad = søknadBehandlingRepository.findByIdOrNull(forrigeBehandlingId)
+        val søknad = søknadBehandlingRepository.findByIdOrNull(forrigeIverksatteBehandlingId)
         if (søknad == null) {
-            logger.info("Finner ingen søknad på forrige behandling=$forrigeBehandlingId")
+            logger.info("Finner ingen søknad på forrige behandling=$forrigeIverksatteBehandlingId")
             return
         }
         søknadBehandlingRepository.insert(

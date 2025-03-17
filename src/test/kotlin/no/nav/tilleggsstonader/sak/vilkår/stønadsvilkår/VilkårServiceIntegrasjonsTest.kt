@@ -78,7 +78,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             val vilkårForBehandling = lagreVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling).first()
 
             vilkårService.kopierVilkårsettTilNyBehandling(
-                forrigeBehandlingId = førstegangsbehandling.id,
+                forrigeIverksatteBehandlingId = førstegangsbehandling.id,
                 nyBehandling = revurdering,
                 barnIdMap = barnIdMap,
             )
@@ -104,7 +104,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             lagreVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling, fom = null, tom = null).first()
 
             vilkårService.kopierVilkårsettTilNyBehandling(
-                forrigeBehandlingId = førstegangsbehandling.id,
+                forrigeIverksatteBehandlingId = førstegangsbehandling.id,
                 nyBehandling = revurdering,
                 barnIdMap = barnIdMap,
             )
@@ -118,7 +118,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             lagreVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling, status = VilkårStatus.SLETTET).first()
 
             vilkårService.kopierVilkårsettTilNyBehandling(
-                forrigeBehandlingId = førstegangsbehandling.id,
+                forrigeIverksatteBehandlingId = førstegangsbehandling.id,
                 nyBehandling = revurdering,
                 barnIdMap = barnIdMap,
             )
@@ -135,7 +135,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             jdbcTemplate.update("UPDATE vilkar SET git_versjon=:versjon", mapOf("versjon" to gitVersjon))
 
             vilkårService.kopierVilkårsettTilNyBehandling(
-                forrigeBehandlingId = førstegangsbehandling.id,
+                forrigeIverksatteBehandlingId = førstegangsbehandling.id,
                 nyBehandling = revurdering,
                 barnIdMap = barnIdMap,
             )
