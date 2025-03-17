@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import java.time.LocalDate
 
-data class UtgiftBeregning(
+data class UtgiftBeregningBoutgifter(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val utgift: Int,

@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregning
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
@@ -48,7 +49,7 @@ data class Beregningsgrunnlag(
     val fom: LocalDate,
     val tom: LocalDate,
     val utbetalingsdato: LocalDate,
-    val utgifter: Map<Unit, List<UtgiftBeregning>>,
+    val utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
     val makssats: Int,
     val makssatsBekreftet: Boolean,
     val målgruppe: MålgruppeType,

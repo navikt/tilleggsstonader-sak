@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
@@ -64,7 +65,7 @@ class BoutgifterBeregningService(
 
     private fun beregnAktuellePerioder(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
-        utgifter: Map<Unit, List<UtgiftBeregning>>,
+        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
     ): List<BeregningsresultatForLøpendeMåned> {
 //        validerPerioderForInnvilgelse(vedtaksperioder, utgifterPerBarn, typeVedtak)
 
@@ -231,7 +232,7 @@ class BoutgifterBeregningService(
 
     private fun lagBeregningsGrunnlag(
         periode: UtbetalingPeriode,
-        utgifter: Map<Unit, List<UtgiftBeregning>>,
+        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
     ): Beregningsgrunnlag {
         val sats = finnMakssatsForPeriode(periode)
 
@@ -250,9 +251,9 @@ class BoutgifterBeregningService(
     }
 
     private fun finnUtgiftForUtbetalingsperiode(
-        utgifter: Map<Unit, List<UtgiftBeregning>>,
+        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
         periode: UtbetalingPeriode,
-    ): Map<Unit, List<UtgiftBeregning>> {
+    ): Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> {
         require(utgifter.values.all { utgifterListe -> utgifterListe.all { periode.inneholder(it) } }) {
             "Per nå krever vi at alle utgiftene havner innefor samme utgiftsperiode."
         }

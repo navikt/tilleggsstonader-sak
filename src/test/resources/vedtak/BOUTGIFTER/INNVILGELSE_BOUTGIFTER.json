@@ -13,13 +13,22 @@
   "beregningsresultat": {
     "perioder": [
       {
-        "beløp": 875,
+        "stønadsbeløp": 875,
         "grunnlag": {
           "fom": "2024-01-01",
           "tom": "2024-01-31",
           "utbetalingsdato": "2024-01-01",
-          "sats": 875,
-          "satsBekreftet": true,
+          "utgifter": {
+            "MIDLERTIDIG_OVERNATTING": [
+              {
+                "fom": "2024-01-01",
+                "tom": "2024-01-20",
+                "utgift": 2000
+              }
+            ]
+          },
+          "makssats": 4953,
+          "makssatsBekreftet": true,
           "målgruppe": "AAP",
           "aktivitet": "TILTAK"
         },
