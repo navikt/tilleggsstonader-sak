@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
 data class BeregningsresultatBoutgifter(
-    val perioder: List<BeregningsresultatForMåned>,
+    val perioder: List<BeregningsresultatForLøpendeMåned>,
 ) {
     fun filtrerFraOgMed(dato: LocalDate?): BeregningsresultatBoutgifter {
         if (dato == null) {
@@ -20,12 +20,12 @@ data class BeregningsresultatBoutgifter(
     }
 }
 
-data class BeregningsresultatForMåned(
+data class BeregningsresultatForLøpendeMåned(
     val stønadsbeløp: Int,
     val grunnlag: Beregningsgrunnlag,
     val delAvTidligereUtbetaling: Boolean = false,
 ) : Periode<LocalDate>,
-    KopierPeriode<BeregningsresultatForMåned> {
+    KopierPeriode<BeregningsresultatForLøpendeMåned> {
     @get:JsonIgnore
     override val fom: LocalDate get() = grunnlag.fom
 
@@ -35,9 +35,9 @@ data class BeregningsresultatForMåned(
     override fun medPeriode(
         fom: LocalDate,
         tom: LocalDate,
-    ): BeregningsresultatForMåned = this.copy(grunnlag = this.grunnlag.copy(fom = fom, tom = tom))
+    ): BeregningsresultatForLøpendeMåned = this.copy(grunnlag = this.grunnlag.copy(fom = fom, tom = tom))
 
-    fun medKorrigertUtbetalingsdato(utbetalingsdato: LocalDate): BeregningsresultatForMåned =
+    fun medKorrigertUtbetalingsdato(utbetalingsdato: LocalDate): BeregningsresultatForLøpendeMåned =
         this.copy(grunnlag = grunnlag.copy(utbetalingsdato = utbetalingsdato))
 
     fun markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling: Boolean) =

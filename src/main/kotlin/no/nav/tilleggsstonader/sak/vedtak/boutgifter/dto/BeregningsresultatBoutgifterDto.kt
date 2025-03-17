@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
@@ -55,7 +55,7 @@ fun BeregningsresultatBoutgifter.tilDto(revurderFra: LocalDate?): Beregningsresu
     )
 }
 
-fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto =
+fun BeregningsresultatForLøpendeMåned.tilDto(): BeregningsresultatForPeriodeDto =
     BeregningsresultatForPeriodeDto(
         fom = grunnlag.fom,
         tom = grunnlag.tom,

@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnB
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -65,7 +65,7 @@ class BoutgifterBeregningService(
     private fun beregnAktuellePerioder(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
         utgifter: Map<Unit, List<UtgiftBeregning>>,
-    ): List<BeregningsresultatForMåned> {
+    ): List<BeregningsresultatForLøpendeMåned> {
 //        validerPerioderForInnvilgelse(vedtaksperioder, utgifterPerBarn, typeVedtak)
 
         return vedtaksperioder
@@ -74,7 +74,7 @@ class BoutgifterBeregningService(
             .map { UtbetalingPeriode(it) }
             .map { utbetalingPeriode ->
                 val grunnlagsdata = lagBeregningsGrunnlag(periode = utbetalingPeriode, utgifter = utgifter)
-                BeregningsresultatForMåned(
+                BeregningsresultatForLøpendeMåned(
                     stønadsbeløp = beregnBeløp(utgifter = utgifter, makssats = grunnlagsdata.makssats),
                     grunnlag = grunnlagsdata,
                 )
