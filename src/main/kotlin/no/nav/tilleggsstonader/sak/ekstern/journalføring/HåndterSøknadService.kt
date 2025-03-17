@@ -39,6 +39,15 @@ class HåndterSøknadService(
         håndterSøknad(personIdent = personIdent, stønadstype = stønadstype, journalpost = journalpost)
     }
 
+    @Transactional
+    fun håndterSøknad(
+        journalpost: Journalpost,
+        stønadstype: Stønadstype,
+    ) {
+        val personIdent = journalpostService.hentIdentFraJournalpost(journalpost)
+        håndterSøknad(personIdent = personIdent, stønadstype = stønadstype, journalpost = journalpost)
+    }
+
     private fun håndterSøknad(
         personIdent: String,
         stønadstype: Stønadstype,
