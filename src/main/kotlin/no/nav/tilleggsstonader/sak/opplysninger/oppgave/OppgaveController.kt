@@ -41,7 +41,7 @@ class OppgaveController(
         @PathVariable fagsakPersonId: FagsakPersonId,
     ): FinnOppgaveResponseDto {
         val personIdent = fagsakPersonService.hentAktivIdent(fagsakPersonId)
-        tilgangService.validerTilgangTilPerson(personIdent, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
 
         return oppgaveService.hentOppgaverForPerson(personIdent)
     }
