@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -29,17 +29,17 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
         private val dekketAvAnnetRegelverkIkkeOppfylt = vurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA)
         private val dekketAvAnnetRegelverkOppfylt = vurderingDekketAvAnnetRegelverk()
 
-        private val mottarSykepengerOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.NEI)
-        private val mottarSykepengerIkkeOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.JA)
+        val aldersvilkårOppfylt = vurderingAldersVilkår()
 
         @Test
         fun `resultat er IKKE_VURDERT hvis én vurdering ikke er vurdert og resten er oppfylt`() {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
-                        VurderingerNedsattArbeidsevneLæremidler(
+                        VurderingNedsattArbeidsevneLæremidler(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
                         ),
                 )
 
@@ -51,9 +51,10 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
-                        VurderingerNedsattArbeidsevneLæremidler(
+                        VurderingNedsattArbeidsevneLæremidler(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
+                            aldersvilkår = aldersvilkårOppfylt,
                         ),
                 )
 
@@ -65,9 +66,10 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
-                        VurderingerNedsattArbeidsevneLæremidler(
+                        VurderingNedsattArbeidsevneLæremidler(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
                         ),
                 )
 
@@ -79,9 +81,10 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
-                        VurderingerNedsattArbeidsevneLæremidler(
+                        VurderingNedsattArbeidsevneLæremidler(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
                         ),
                 )
 

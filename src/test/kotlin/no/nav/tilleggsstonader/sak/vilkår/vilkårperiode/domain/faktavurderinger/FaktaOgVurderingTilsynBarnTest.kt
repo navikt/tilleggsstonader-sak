@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMottarSykepengerForFulltidsstilling
@@ -36,8 +37,10 @@ class FaktaOgVurderingTilsynBarnTest {
         val dekketAvAnnetRegelverkIkkeOppfylt = vurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA)
         val dekketAvAnnetRegelverkOppfylt = vurderingDekketAvAnnetRegelverk()
 
-        private val mottarSykepengerOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.NEI)
-        private val mottarSykepengerIkkeOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.JA)
+        val aldersvilkårOppfylt = vurderingAldersVilkår()
+
+        val mottarSykepengerOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.NEI)
+        val mottarSykepengerIkkeOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.JA)
 
         @Test
         fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og resten er oppfylt`() {
@@ -47,6 +50,7 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
                             mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
@@ -62,6 +66,7 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
+                            aldersvilkår = aldersvilkårOppfylt,
                             mottarSykepengerForFulltidsstilling = mottarSykepengerIkkeOppfylt,
                         ),
                 )
@@ -77,6 +82,7 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
                             mottarSykepengerForFulltidsstilling = mottarSykepengerIkkeOppfylt,
                         ),
                 )
@@ -92,6 +98,7 @@ class FaktaOgVurderingTilsynBarnTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
                             mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )

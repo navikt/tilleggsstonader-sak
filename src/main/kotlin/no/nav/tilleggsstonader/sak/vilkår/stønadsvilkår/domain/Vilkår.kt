@@ -68,6 +68,9 @@ data class Vilkår(
                 validerFørsteOgSisteDagIValgtMåned(fom, tom)
                 validerPåkrevdBeløpHvisOppfylt()
             }
+            VilkårType.MIDLERTIDIG_OVERNATTING -> {
+                validerPåkrevdBeløpHvisOppfylt()
+            }
 
             VilkårType.EKSEMPEL -> {
                 // Dette er kun for tester foreløpig
@@ -204,6 +207,9 @@ enum class VilkårType(
 
     // Barnetilsyn
     PASS_BARN("Pass av barn", listOf(Stønadstype.BARNETILSYN)),
+
+    // Boutgifter
+    MIDLERTIDIG_OVERNATTING("Midlertidig overnatting", listOf(Stønadstype.BOUTGIFTER)),
     ;
 
     fun gjelderFlereBarn(): Boolean = this == PASS_BARN

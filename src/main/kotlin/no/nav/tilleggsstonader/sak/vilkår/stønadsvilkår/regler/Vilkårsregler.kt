@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.MidlertidigOvernattingRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegel
 
 /**
@@ -25,7 +26,10 @@ fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
                 PassBarnRegel(),
             )
         Stønadstype.LÆREMIDLER -> emptyList()
-        Stønadstype.BOUTGIFTER -> emptyList()
+        Stønadstype.BOUTGIFTER ->
+            listOf(
+                MidlertidigOvernattingRegel(),
+            )
     }
 
 private val vilkårstyperPerStønad: Map<Stønadstype, Set<VilkårType>> =

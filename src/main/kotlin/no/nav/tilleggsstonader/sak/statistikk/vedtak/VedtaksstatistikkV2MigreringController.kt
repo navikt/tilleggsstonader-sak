@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.concurrent.Executors
 
 @RestController
-@RequestMapping("/admin/statistikk/migrering")
+@RequestMapping("/api/statistikk/migrering")
 @ProtectedWithClaims("azuread")
 class VedtaksstatistikkV2MigreringController(
     private val behandlingRepository: BehandlingRepository,

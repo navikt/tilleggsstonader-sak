@@ -20,7 +20,7 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnBeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
@@ -307,7 +307,7 @@ class StegServiceTest(
         )
     }
 
-    private fun opprettVedtakTilsynBarn(): InnvilgelseTilsynBarnRequestV2 {
+    private fun opprettVedtakTilsynBarn(): InnvilgelseTilsynBarnRequest {
         val vedtaksperioderDto =
             listOf(
                 VedtaksperiodeDto(
@@ -318,7 +318,7 @@ class StegServiceTest(
                     aktivitetType = AktivitetType.TILTAK,
                 ),
             )
-        return InnvilgelseTilsynBarnRequestV2(
+        return InnvilgelseTilsynBarnRequest(
             vedtaksperioder = vedtaksperioderDto,
             begrunnelse = null,
         )

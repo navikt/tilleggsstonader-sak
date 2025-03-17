@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
@@ -42,6 +43,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
@@ -74,10 +76,17 @@ object VilkårperiodeTestUtil {
             gitVersjon = Applikasjonsversjon.versjon,
         )
 
+    fun vurderingFaktaEtterlevelseAldersvilkår(fødselsdato: LocalDate = LocalDate.of(2000, 1, 1)) =
+        AldersvilkårVurdering
+            .VurderingFaktaEtterlevelseAldersvilkår(
+                fødselsdato = fødselsdato,
+            )
+
     fun faktaOgVurderingMålgruppe(
         type: MålgruppeType = MålgruppeType.AAP,
         medlemskap: VurderingMedlemskap = vurderingMedlemskap(),
         dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(),
+        aldersvilkår: VurderingAldersVilkår = vurderingAldersVilkår(),
         mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling = vurderingMottarSykepengerForFulltidsstilling(),
     ): MålgruppeFaktaOgVurdering =
         when (type) {
@@ -88,13 +97,18 @@ object VilkårperiodeTestUtil {
                     vurderinger =
                         VurderingOmstillingsstønad(
                             medlemskap = medlemskap,
+                            aldersvilkår = aldersvilkår,
                         ),
                 )
 
             MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadTilsynBarn
             MålgruppeType.AAP ->
                 AAPTilsynBarn(
-                    vurderinger = VurderingAAP(dekketAvAnnetRegelverk = dekketAvAnnetRegelverk),
+                    vurderinger =
+                        VurderingAAP(
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
+                            aldersvilkår = aldersvilkår,
+                        ),
                 )
 
             MålgruppeType.UFØRETRYGD ->
@@ -103,6 +117,7 @@ object VilkårperiodeTestUtil {
                         VurderingUføretrygd(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
+                            aldersvilkår = aldersvilkår,
                         ),
                 )
 
@@ -112,6 +127,7 @@ object VilkårperiodeTestUtil {
                         VurderingNedsattArbeidsevne(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
+                            aldersvilkår = aldersvilkår,
                             mottarSykepengerForFulltidsstilling = mottarSykepengerForFulltidsstilling,
                         ),
                 )
@@ -221,6 +237,9 @@ object VilkårperiodeTestUtil {
 
     fun vurderingHarUtgifter(svar: SvarJaNei? = SvarJaNei.JA) = VurderingHarUtgifter(svar = svar)
 
+    fun vurderingAldersVilkår(svar: SvarJaNei = SvarJaNei.JA) =
+        VurderingAldersVilkår(svar = svar, vurderingFaktaEtterlevelse = vurderingFaktaEtterlevelseAldersvilkår())
+
     fun vurderingMottarSykepengerForFulltidsstilling(svar: SvarJaNei? = SvarJaNei.NEI) =
         VurderingMottarSykepengerForFulltidsstilling(svar = svar)
 
@@ -245,24 +264,25 @@ object VilkårperiodeTestUtil {
         behandlingId = behandlingId,
     )
 
+    val faktaOgSvarTilsynBarnDto =
+        FaktaOgSvarAktivitetBarnetilsynDto(
+            svarLønnet = SvarJaNei.NEI,
+            aktivitetsdager = 5,
+        )
+
     fun dummyVilkårperiodeAktivitet(
         type: AktivitetType = AktivitetType.TILTAK,
         fom: LocalDate = osloDateNow(),
         tom: LocalDate = osloDateNow(),
-        svarLønnet: SvarJaNei? = null,
         begrunnelse: String? = null,
         behandlingId: BehandlingId = BehandlingId.random(),
-        aktivitetsdager: Int? = 5,
         kildeId: String? = null,
+        faktaOgSvar: FaktaOgSvarDto = faktaOgSvarTilsynBarnDto,
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
-        faktaOgSvar =
-            FaktaOgSvarAktivitetBarnetilsynDto(
-                svarLønnet = svarLønnet,
-                aktivitetsdager = aktivitetsdager,
-            ),
+        faktaOgSvar = faktaOgSvar,
         kildeId = kildeId,
         begrunnelse = begrunnelse,
         behandlingId = behandlingId,

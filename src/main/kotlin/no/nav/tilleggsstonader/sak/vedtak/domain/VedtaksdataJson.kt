@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
     JsonSubTypes.Type(InnvilgelseLæremidler::class, name = "INNVILGELSE_LÆREMIDLER"),
     JsonSubTypes.Type(AvslagLæremidler::class, name = "AVSLAG_LÆREMIDLER"),
     JsonSubTypes.Type(OpphørLæremidler::class, name = "OPPHØR_LÆREMIDLER"),
+    JsonSubTypes.Type(InnvilgelseBoutgifter::class, name = "INNVILGELSE_BOUTGIFTER"),
     failOnRepeatedNames = true,
 )
 sealed interface VedtaksdataJson
@@ -43,4 +44,5 @@ val typerVedtaksdata: Map<String, TypeVedtaksdata> =
     listOf(
         TypeVedtakTilsynBarn.entries,
         TypeVedtakLæremidler.entries,
+        TypeVedtakBoutgifter.entries,
     ).flatten().associateBy { it.name }

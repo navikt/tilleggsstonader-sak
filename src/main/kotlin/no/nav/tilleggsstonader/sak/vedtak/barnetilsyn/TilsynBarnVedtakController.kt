@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
@@ -38,15 +38,7 @@ class TilsynBarnVedtakController(
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseTilsynBarnRequestV2,
-    ) {
-        lagreVedtak(behandlingId, vedtak)
-    }
-
-    @PostMapping("{behandlingId}/innvilgelseV2")
-    fun innvilgeV2(
-        @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseTilsynBarnRequestV2,
+        @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ) {
         lagreVedtak(behandlingId, vedtak)
     }
@@ -78,25 +70,11 @@ class TilsynBarnVedtakController(
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseTilsynBarnRequestV2,
+        @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ): BeregningsresultatTilsynBarnDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         return beregningService
-            .beregnV2(
-                vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
-                behandling = behandling,
-                typeVedtak = TypeVedtak.INNVILGELSE,
-            ).tilDto(behandling.revurderFra)
-    }
-
-    @PostMapping("{behandlingId}/beregnV2")
-    fun beregnV2(
-        @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseTilsynBarnRequestV2,
-    ): BeregningsresultatTilsynBarnDto {
-        val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        return beregningService
-            .beregnV2(
+            .beregn(
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                 behandling = behandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,

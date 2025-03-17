@@ -36,10 +36,8 @@ class LæremidlerBeregningService(
     private val vedtakRepository: VedtakRepository,
 ) {
     /**
-     * Beregning av læremidler har foreløpig noen begrensninger.
-     * Vi antar kun en aktivitet gjennom hele vedtaksperioden
-     * Vi antar kun en stønadsperiode per vedtaksperiode for å kunne velge ut rett målgruppe
-     * Vi antar at satsen ikke endrer seg i vedtaksperioden
+     * Kjente begrensninger i beregningen:
+     * 1. Vi antar at satsen ikke endrer seg i vedtaksperioden
      * Programmet kaster feil dersom antagelsene ikke stemmer
      */
     fun beregn(

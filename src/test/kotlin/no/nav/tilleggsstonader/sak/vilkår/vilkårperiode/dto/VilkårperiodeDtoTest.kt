@@ -86,7 +86,6 @@ class VilkårperiodeDtoTest {
                 MålgruppeFaktaOgVurderingerDto(
                     medlemskap = VurderingDto(svar = SvarJaNei.JA, resultat = OPPFYLT),
                     utgifterDekketAvAnnetRegelverk = VurderingDto(SvarJaNei.JA, resultat = IKKE_OPPFYLT),
-                    mottarSykepengerForFulltidsstilling = VurderingDto(SvarJaNei.NEI, resultat = OPPFYLT),
                 ),
             )
         }

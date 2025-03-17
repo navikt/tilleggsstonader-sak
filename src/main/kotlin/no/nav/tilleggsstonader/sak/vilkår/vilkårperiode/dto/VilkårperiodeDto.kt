@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AldersvilkårVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
@@ -97,12 +98,14 @@ sealed class FaktaOgVurderingerDto
 data class MålgruppeFaktaOgVurderingerDto(
     val medlemskap: VurderingDto? = null,
     val utgifterDekketAvAnnetRegelverk: VurderingDto? = null,
+    val aldersvilkår: VurderingDto? = null,
     val mottarSykepengerForFulltidsstilling: VurderingDto? = null,
-) : FaktaOgVurderingerDto()
+    ) : FaktaOgVurderingerDto()
 
 data class MålgruppeLæremidlerFaktaOgVurderingerDto(
     val medlemskap: VurderingDto? = null,
     val utgifterDekketAvAnnetRegelverk: VurderingDto? = null,
+    val aldersvilkår: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
 data class AktivitetBarnetilsynFaktaOgVurderingerDto(
@@ -129,26 +132,32 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                     MålgruppeLæremidlerFaktaOgVurderingerDto(
                         medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
                         utgifterDekketAvAnnetRegelverk =
+                            vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.dekketAvAnnetRegelverk?.tilDto(),
+                        aldersvilkår =
                             vurderinger
-                                .takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()
-                                ?.dekketAvAnnetRegelverk
-                                ?.tilDto(),
-                    )
+                                .takeIfVurderinger<AldersvilkårVurdering>()
+                                ?.aldersvilkår
+                                ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
+                                ?.tilDto(),                    )
 
                 else ->
                     MålgruppeFaktaOgVurderingerDto(
                         medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
                         utgifterDekketAvAnnetRegelverk =
+                            vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.dekketAvAnnetRegelverk?.tilDto(),
+                        aldersvilkår =
                             vurderinger
-                                .takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()
-                                ?.dekketAvAnnetRegelverk
+                                .takeIfVurderinger<AldersvilkårVurdering>()
+                                ?.aldersvilkår
+                                ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
                                 ?.tilDto(),
+                        // TODO: Håndter gammel mangler data
                         mottarSykepengerForFulltidsstilling =
                             vurderinger
                                 .takeIfVurderinger<MottarSykepengerForFulltidsstillingVurdering>()
                                 ?.mottarSykepengerForFulltidsstilling
                                 ?.tilDto(),
-                    )
+                        )
             }
 
         is AktivitetFaktaOgVurdering -> {

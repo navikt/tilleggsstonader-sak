@@ -18,7 +18,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
@@ -50,18 +50,18 @@ class TilsynBarnBeregnYtelseSteg(
         vedtak: VedtakTilsynBarnRequest,
     ) {
         when (vedtak) {
-            is InnvilgelseTilsynBarnRequestV2 -> beregnOgLagreInnvilgelseV2(saksbehandling, vedtak)
+            is InnvilgelseTilsynBarnRequest -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
             is AvslagTilsynBarnDto -> lagreAvslag(saksbehandling, vedtak)
             is OpphørTilsynBarnRequest -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }
     }
 
-    private fun beregnOgLagreInnvilgelseV2(
+    private fun beregnOgLagreInnvilgelse(
         saksbehandling: Saksbehandling,
-        vedtak: InnvilgelseTilsynBarnRequestV2,
+        vedtak: InnvilgelseTilsynBarnRequest,
     ) {
         val beregningsresultat =
-            beregningService.beregnV2(
+            beregningService.beregn(
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
@@ -90,7 +90,7 @@ class TilsynBarnBeregnYtelseSteg(
         val vedtaksperioder = vedtaksperiodeService.finnNyeVedtaksperioderForOpphør(saksbehandling)
 
         val beregningsresultat =
-            beregningService.beregnV2(
+            beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.OPPHØR,

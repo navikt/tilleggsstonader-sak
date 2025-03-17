@@ -110,6 +110,7 @@ internal class HåndterSøknadServiceTest {
         every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent(aktørId, false)))
         every { taskService.save(capture(taskSlot)) } returns mockk()
         every { behandlingService.utledNesteBehandlingstype(fagsak.id) } returns BehandlingType.FØRSTEGANGSBEHANDLING
+        every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
     }
 
     @Test
@@ -161,7 +162,7 @@ internal class HåndterSøknadServiceTest {
     internal fun `skal kunne automatisk journalføre`() {
         every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
 
-        justRun { journalføringService.journalførTilNyBehandling(journalpostId, personIdent, Stønadstype.BARNETILSYN, any(), any(), any()) }
+        justRun { journalføringService.journalførTilNyBehandling(journalpost, personIdent, Stønadstype.BARNETILSYN, any(), any(), any()) }
 
         håndterSøknadService.håndterSøknad(
             HåndterSøknadRequest(
@@ -173,7 +174,7 @@ internal class HåndterSøknadServiceTest {
 
         verify(exactly = 1) {
             journalføringService.journalførTilNyBehandling(
-                journalpostId,
+                journalpost,
                 personIdent,
                 Stønadstype.BARNETILSYN,
                 BehandlingÅrsak.SØKNAD,
@@ -185,7 +186,6 @@ internal class HåndterSøknadServiceTest {
 
     @Test
     fun `skal opprette journalføringsoppgave hvis man ikke kan automatisk journalføre`() {
-        every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
         every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(behandling())
 
         håndterSøknadService.håndterSøknad(

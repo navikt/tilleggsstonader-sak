@@ -72,7 +72,7 @@ class OpphørValideringServiceTest {
                 målgrupper = listOf(målgruppe),
                 aktiviteter = listOf(aktivitet),
             )
-        every { tilsynBarnBeregningService.beregnV2(any(), any(), any()) } returns beregningsresultat
+        every { tilsynBarnBeregningService.beregn(any(), any(), any()) } returns beregningsresultat
     }
 
     @Nested
