@@ -74,6 +74,10 @@
         "svar" : null,
         "resultat" : "IKKE_VURDERT"
       },
+      "aldersvilkår" : {
+        "svar" : "JA",
+        "resultat" : "OPPFYLT"
+      },
       "mottarSykepengerForFulltidsstilling" : {
         "svar" : "NEI",
         "resultat" : "OPPFYLT"
