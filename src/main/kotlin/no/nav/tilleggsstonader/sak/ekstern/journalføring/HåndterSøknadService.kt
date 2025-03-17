@@ -35,9 +35,18 @@ class HåndterSøknadService(
         val personIdent = request.personIdent
         val stønadstype = request.stønadstype
 
+        val journalpost = journalpostService.hentJournalpost(request.journalpostId)
+        håndterSøknad(personIdent = personIdent, stønadstype = stønadstype, journalpost = journalpost)
+    }
+
+    private fun håndterSøknad(
+        personIdent: String,
+        stønadstype: Stønadstype,
+        journalpost: Journalpost,
+    ) {
         if (kanAutomatiskJournalføre(personIdent, stønadstype)) {
             journalføringService.journalførTilNyBehandling(
-                journalpostId = request.journalpostId,
+                journalpost = journalpost,
                 personIdent = personIdent,
                 stønadstype = stønadstype,
                 behandlingÅrsak = BehandlingÅrsak.SØKNAD,
@@ -45,7 +54,11 @@ class HåndterSøknadService(
                 journalførendeEnhet = arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(personIdent),
             )
         } else {
-            håndterSøknadSomIkkeKanAutomatiskJournalføres(request)
+            håndterSøknadSomIkkeKanAutomatiskJournalføres(
+                personIdent = personIdent,
+                stønadstype = stønadstype,
+                journalpost = journalpost,
+            )
         }
     }
 
@@ -66,12 +79,15 @@ class HåndterSøknadService(
 
     private fun harÅpenBehandling(behandlinger: List<Behandling>): Boolean = behandlinger.any { !it.erAvsluttet() }
 
-    private fun håndterSøknadSomIkkeKanAutomatiskJournalføres(request: HåndterSøknadRequest) {
-        val journalpost = journalpostService.hentJournalpost(request.journalpostId)
+    private fun håndterSøknadSomIkkeKanAutomatiskJournalføres(
+        personIdent: String,
+        stønadstype: Stønadstype,
+        journalpost: Journalpost,
+    ) {
         taskService.save(
             OpprettOppgaveTask.opprettTask(
-                personIdent = request.personIdent,
-                stønadstype = request.stønadstype,
+                personIdent = personIdent,
+                stønadstype = stønadstype,
                 oppgave =
                     OpprettOppgave(
                         oppgavetype = Oppgavetype.Journalføring,

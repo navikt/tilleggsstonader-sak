@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -62,7 +63,7 @@ class InterntVedtakService(
             søknad = mapSøknadsinformasjon(behandling),
             målgrupper = mapVilkårperioder(vilkårsperioder.målgrupper),
             aktiviteter = mapVilkårperioder(vilkårsperioder.aktiviteter),
-            stønadsperioder = mapStønadsperioder(behandling.id),
+            stønadsperioder = mapStønadsperioder(behandling),
             vedtaksperioder = mapVedtaksperioder(vedtak),
             vilkår = mapVilkår(behandling.id, behandlingbarn),
             vedtak = mapVedtak(vedtak),
@@ -154,16 +155,19 @@ class InterntVedtakService(
             )
         }
 
-    private fun mapStønadsperioder(behandlingId: BehandlingId): List<Stønadsperiode> {
-        val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandlingId)
-        return stønadsperioder.map {
-            Stønadsperiode(
-                målgruppe = it.målgruppe,
-                aktivitet = it.aktivitet,
-                fom = it.fom,
-                tom = it.tom,
-            )
+    private fun mapStønadsperioder(behandling: Saksbehandling): List<Stønadsperiode>? {
+        if (behandling.stønadstype == Stønadstype.LÆREMIDLER) {
+            val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandling.id)
+            return stønadsperioder.map {
+                Stønadsperiode(
+                    målgruppe = it.målgruppe,
+                    aktivitet = it.aktivitet,
+                    fom = it.fom,
+                    tom = it.tom,
+                )
+            }
         }
+        return null
     }
 
     private fun mapVedtaksperioder(vedtak: Vedtak?): List<VedtaksperiodeInterntVedtak> =
@@ -236,6 +240,8 @@ class InterntVedtakService(
                 is VedtakTilsynBarn -> mapVedtakTilsynBarn(vedtak.data)
 
                 is VedtakLæremidler -> mapVedtakLæremidler(vedtak.data)
+
+                is VedtakBoutgifter -> TODO("Internt vedtak for boutgifter er ikke implementert")
             }
         }
 

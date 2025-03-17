@@ -169,21 +169,15 @@ class InterntVedtakServiceTest {
         }
 
         @Test
-        fun `stønadsperiodefelter skal bli riktig mappet`() {
+        fun `vedtaksperiodefelter skal bli riktig mappet`() {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
-            assertThat(interntVedtak.stønadsperioder).hasSize(2)
-            with(interntVedtak.stønadsperioder.first()) {
+            assertThat(interntVedtak.vedtaksperioder).hasSize(1)
+            with(interntVedtak.vedtaksperioder.single()) {
                 assertThat(målgruppe).isEqualTo(MålgruppeType.AAP)
                 assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
-                assertThat(fom).isEqualTo(LocalDate.of(2024, 2, 1))
-                assertThat(tom).isEqualTo(LocalDate.of(2024, 3, 31))
-            }
-            with(interntVedtak.stønadsperioder.last()) {
-                assertThat(målgruppe).isEqualTo(MålgruppeType.NEDSATT_ARBEIDSEVNE)
-                assertThat(aktivitet).isEqualTo(AktivitetType.REELL_ARBEIDSSØKER)
-                assertThat(fom).isEqualTo(LocalDate.of(2024, 2, 1))
-                assertThat(tom).isEqualTo(LocalDate.of(2024, 3, 31))
+                assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 1))
+                assertThat(tom).isEqualTo(LocalDate.of(2024, 2, 1))
             }
         }
     }
@@ -264,6 +258,25 @@ class InterntVedtakServiceTest {
                     avslagBegrunnelse = dummyAvslåttVedtak.begrunnelse,
                 ),
             )
+        }
+
+        @Test
+        fun `stønadsperiodefelter skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+
+            assertThat(interntVedtak.stønadsperioder).hasSize(2)
+            with(interntVedtak.stønadsperioder!!.first()) {
+                assertThat(målgruppe).isEqualTo(MålgruppeType.AAP)
+                assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
+                assertThat(fom).isEqualTo(LocalDate.of(2024, 2, 1))
+                assertThat(tom).isEqualTo(LocalDate.of(2024, 3, 31))
+            }
+            with(interntVedtak.stønadsperioder.last()) {
+                assertThat(målgruppe).isEqualTo(MålgruppeType.NEDSATT_ARBEIDSEVNE)
+                assertThat(aktivitet).isEqualTo(AktivitetType.REELL_ARBEIDSSØKER)
+                assertThat(fom).isEqualTo(LocalDate.of(2024, 2, 1))
+                assertThat(tom).isEqualTo(LocalDate.of(2024, 3, 31))
+            }
         }
     }
 }

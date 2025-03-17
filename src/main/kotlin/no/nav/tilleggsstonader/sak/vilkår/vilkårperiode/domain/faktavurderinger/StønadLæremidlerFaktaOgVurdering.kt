@@ -24,21 +24,21 @@ sealed interface AktivitetLæremidler :
 }
 
 data class AAPLæremidler(
-    override val vurderinger: VurderingerAAPLæremidler,
+    override val vurderinger: VurderingAAPLæremidler,
 ) : MålgruppeLæremidler {
     override val type: MålgruppeLæremidlerType = MålgruppeLæremidlerType.AAP_LÆREMIDLER
     override val fakta: IngenFakta = IngenFakta
 }
 
 data class UføretrygdLæremidler(
-    override val vurderinger: VurderingerUføretrygdLæremidler,
+    override val vurderinger: VurderingUføretrygdLæremidler,
 ) : MålgruppeLæremidler {
     override val type: MålgruppeLæremidlerType = MålgruppeLæremidlerType.UFØRETRYGD_LÆREMIDLER
     override val fakta: IngenFakta = IngenFakta
 }
 
 data class NedsattArbeidsevneLæremidler(
-    override val vurderinger: VurderingerNedsattArbeidsevneLæremidler,
+    override val vurderinger: VurderingNedsattArbeidsevneLæremidler,
 ) : MålgruppeLæremidler {
     override val type: MålgruppeLæremidlerType = MålgruppeLæremidlerType.NEDSATT_ARBEIDSEVNE_LÆREMIDLER
     override val fakta: IngenFakta = IngenFakta
@@ -107,30 +107,36 @@ data class UtdanningLæremidler(
     }
 }
 
+data class VurderingAAPLæremidler(
+    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
+    override val aldersvilkår: VurderingAldersVilkår,
+) : MedlemskapVurdering,
+    DekketAvAnnetRegelverkVurdering,
+    AldersvilkårVurdering {
+    override val medlemskap = VurderingMedlemskap.IMPLISITT
+}
+
+data class VurderingUføretrygdLæremidler(
+    override val medlemskap: VurderingMedlemskap,
+    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
+    override val aldersvilkår: VurderingAldersVilkår,
+) : MedlemskapVurdering,
+    DekketAvAnnetRegelverkVurdering,
+    AldersvilkårVurdering
+
+data class VurderingNedsattArbeidsevneLæremidler(
+    override val medlemskap: VurderingMedlemskap,
+    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
+    override val aldersvilkår: VurderingAldersVilkår,
+) : MedlemskapVurdering,
+    DekketAvAnnetRegelverkVurdering,
+    AldersvilkårVurdering
+
 data object IngenAktivitetLæremidler : AktivitetLæremidler {
     override val type: AktivitetLæremidlerType = AktivitetLæremidlerType.INGEN_AKTIVITET_LÆREMIDLER
     override val fakta: Fakta = IngenFakta
     override val vurderinger: Vurderinger = IngenVurderinger
 }
-
-data class VurderingerAAPLæremidler(
-    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
-) : MedlemskapVurdering,
-    DekketAvAnnetRegelverkVurdering {
-    override val medlemskap = VurderingMedlemskap.IMPLISITT
-}
-
-data class VurderingerUføretrygdLæremidler(
-    override val medlemskap: VurderingMedlemskap,
-    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
-) : MedlemskapVurdering,
-    DekketAvAnnetRegelverkVurdering
-
-data class VurderingerNedsattArbeidsevneLæremidler(
-    override val medlemskap: VurderingMedlemskap,
-    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
-) : MedlemskapVurdering,
-    DekketAvAnnetRegelverkVurdering
 
 data class VurderingTiltakLæremidler(
     override val harUtgifter: VurderingHarUtgifter,

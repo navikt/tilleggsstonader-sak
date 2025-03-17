@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -84,7 +85,6 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 aktivitetService.opprettVilkårperiode(
                     dummyVilkårperiodeAktivitet(
                         behandlingId = behandling.id,
-                        svarLønnet = SvarJaNei.NEI,
                     ),
                 )
             with(opprettetAktivitet) {
@@ -101,7 +101,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
 
         @Test
         fun `skal lagre kildeId på aktivitet`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = true)
             val hentetInformasjon = HentetInformasjon(fom = now(), tom = now(), tidspunktHentet = LocalDateTime.now())
             val grunnlag =
                 VilkårperioderGrunnlag(
@@ -143,14 +143,19 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         @Test
         fun `skal kaste feil ved opprettelse av lønnet tiltak uten begrunnelse`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val faktaOgSvarTilsynBarnDto =
+                FaktaOgSvarAktivitetBarnetilsynDto(
+                    svarLønnet = SvarJaNei.JA,
+                    aktivitetsdager = 5,
+                )
 
             assertThatThrownBy {
                 aktivitetService.opprettVilkårperiode(
                     dummyVilkårperiodeAktivitet(
                         type = AktivitetType.TILTAK,
-                        svarLønnet = SvarJaNei.JA,
                         behandlingId = behandling.id,
                         begrunnelse = null,
+                        faktaOgSvar = faktaOgSvarTilsynBarnDto,
                     ),
                 )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
@@ -159,6 +164,11 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         @Test
         fun `skal kaste feil ved tom og null begrunnelse på ingen aktivitet`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val faktaOgSvarTilsynBarnDto =
+                FaktaOgSvarAktivitetBarnetilsynDto(
+                    svarLønnet = SvarJaNei.JA,
+                    aktivitetsdager = null,
+                )
             listOf("", null).forEach {
                 assertThatThrownBy {
                     aktivitetService.opprettVilkårperiode(
@@ -166,7 +176,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                             type = AktivitetType.INGEN_AKTIVITET,
                             begrunnelse = it,
                             behandlingId = behandling.id,
-                            aktivitetsdager = null,
+                            faktaOgSvar = faktaOgSvarTilsynBarnDto,
                         ),
                     )
                 }.hasMessageContaining("Mangler begrunnelse for ingen relevant aktivitet")
@@ -182,7 +192,6 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                     dummyVilkårperiodeAktivitet(
                         behandlingId = behandling.id,
                         type = AktivitetType.INGEN_AKTIVITET,
-                        aktivitetsdager = 5,
                     ),
                 )
             }.hasMessageContaining("Kan ikke registrere aktivitetsdager på ingen aktivitet")
@@ -200,7 +209,6 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                     dummyVilkårperiodeAktivitet(
                         behandlingId = behandling.id,
                         fom = now().plusDays(1),
-                        aktivitetsdager = 5,
                     ),
                 )
             }.hasMessageContaining("Til-og-med før fra-og-med")
@@ -396,7 +404,6 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 aktivitetService.opprettVilkårperiode(
                     dummyVilkårperiodeAktivitet(
                         behandlingId = behandling.id,
-                        svarLønnet = SvarJaNei.NEI,
                     ),
                 )
 
@@ -493,21 +500,26 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             aktivitetsdager: Int? = null,
             svarLønnet: SvarJaNei? = null,
             nyBegrunnelse: String? = null,
-        ): LagreVilkårperiode =
-            dummyVilkårperiodeAktivitet(
+        ): LagreVilkårperiode {
+            val faktaOgSvarTilsynBarnDto =
+                FaktaOgSvarAktivitetBarnetilsynDto(
+                    svarLønnet =
+                        svarLønnet ?: faktaOgVurdering.vurderinger
+                            .takeIfVurderinger<LønnetVurdering>()
+                            ?.lønnet
+                            ?.svar,
+                    aktivitetsdager =
+                        aktivitetsdager
+                            ?: faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
+                )
+            return dummyVilkårperiodeAktivitet(
                 behandlingId = behandlingId,
                 type = type as AktivitetType,
                 fom = nyFom ?: fom,
                 tom = nyTom ?: tom,
-                aktivitetsdager =
-                    aktivitetsdager
-                        ?: faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
-                svarLønnet =
-                    svarLønnet ?: faktaOgVurdering.vurderinger
-                        .takeIfVurderinger<LønnetVurdering>()
-                        ?.lønnet
-                        ?.svar,
+                faktaOgSvar = faktaOgSvarTilsynBarnDto,
                 begrunnelse = nyBegrunnelse ?: begrunnelse,
             )
+        }
     }
 }

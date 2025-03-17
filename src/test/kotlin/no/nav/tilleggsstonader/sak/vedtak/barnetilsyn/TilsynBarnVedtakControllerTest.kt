@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import io.mockk.every
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -9,16 +8,15 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDtoV2
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestV2
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
@@ -39,7 +37,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeR
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
@@ -112,21 +109,16 @@ class TilsynBarnVedtakControllerTest(
         assertThat(response.body).isNull()
     }
 
-    @Disabled(
-        "Parsingen til InnvilgelseTilsynBarnResponse feiler, men det er lettere å fikse etter at V1 av vedtaksperioder har blitt fjernet.",
-    )
     @Test
     fun `Skal lagre og hente innvilgelse med vedtaksperioder og begrunnelse`() {
-        val vedtak = innvilgelseDtoV2(listOf(vedtaksperiodeDto))
-        innvilgeVedtakV2(behandling, vedtak)
+        val vedtak = innvilgelseDto(listOf(vedtaksperiodeDto), "Jo du skjønner det, at...")
+        innvilgeVedtak(behandling, vedtak)
 
         val lagretDto = hentVedtak<InnvilgelseTilsynBarnResponse>(behandling.id).body!!
 
-        with(lagretDto as InnvilgelseTilsynBarnResponse) {
-            assertThat(this.vedtaksperioder).isEqualTo(vedtak.vedtaksperioder)
-            assertThat(this.begrunnelse).isEqualTo(vedtak.begrunnelse)
-            assertThat(this.type).isEqualTo(TypeVedtak.INNVILGELSE)
-        }
+        assertThat(lagretDto.vedtaksperioder).isEqualTo(vedtak.vedtaksperioder)
+        assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
+        assertThat(lagretDto.type).isEqualTo(TypeVedtak.INNVILGELSE)
     }
 
     @Test
@@ -148,11 +140,10 @@ class TilsynBarnVedtakControllerTest(
 
     @Test
     fun `skal lagre og hente opphør med vedtaksperioder`() {
-        every { unleashService.isEnabled(Toggle.KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN) } returns true
-        innvilgeVedtakV2(
+        innvilgeVedtak(
             behandling = behandling,
             vedtak =
-                InnvilgelseTilsynBarnRequestV2(
+                InnvilgelseTilsynBarnRequest(
                     listOf(vedtaksperiodeDto),
                     begrunnelse = "Jo du skjønner det, at...",
                 ),
@@ -202,12 +193,12 @@ class TilsynBarnVedtakControllerTest(
         assertThat(lagretDto.type).isEqualTo(TypeVedtak.OPPHØR)
     }
 
-    private fun innvilgeVedtakV2(
+    private fun innvilgeVedtak(
         behandling: Behandling,
-        vedtak: InnvilgelseTilsynBarnRequestV2,
+        vedtak: InnvilgelseTilsynBarnRequest,
     ) {
         restTemplate.exchange<Map<String, Any>?>(
-            localhost("api/vedtak/tilsyn-barn/${behandling.id}/innvilgelseV2"),
+            localhost("api/vedtak/tilsyn-barn/${behandling.id}/innvilgelse"),
             HttpMethod.POST,
             HttpEntity(vedtak, headers),
         )

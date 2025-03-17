@@ -15,4 +15,7 @@ enum class RegelId(
     UTGIFTER_DOKUMENTERT("Har bruker dokumenterte utgifter til pass?"),
     HAR_FULLFØRT_FJERDEKLASSE("Er barnet ferdig med 4. skoleår?"),
     UNNTAK_ALDER("Har barnet behov for pass utover 4. skoleår, og er behovet tilfredsstillende dokumentert?"),
+
+    // BOUTGIFTER
+    NØDVENDIGE_MERUTGIFTER("Har søker nødvendige merutgifter til bolig eller overnatting?"),
 }

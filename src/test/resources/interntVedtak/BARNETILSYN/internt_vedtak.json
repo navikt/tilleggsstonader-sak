@@ -29,6 +29,10 @@
         "svar" : "NEI",
         "resultat" : "OPPFYLT"
       },
+      "aldersvilkår" : {
+        "svar" : "JA",
+        "resultat" : "OPPFYLT"
+      },
       "mottarSykepengerForFulltidsstilling" : {
         "svar" : "NEI_IMPLISITT",
         "resultat" : "OPPFYLT"
@@ -49,6 +53,7 @@
         "resultat" : "OPPFYLT"
       },
       "utgifterDekketAvAnnetRegelverk" : null,
+      "aldersvilkår" : null,
       "mottarSykepengerForFulltidsstilling" : null
     },
     "kilde" : "MANUELL",
@@ -112,17 +117,7 @@
     "begrunnelse" : null,
     "slettetKommentar" : "kommentar slettet"
   } ],
-  "stønadsperioder" : [ {
-    "målgruppe" : "AAP",
-    "aktivitet" : "TILTAK",
-    "fom" : "2024-02-01",
-    "tom" : "2024-03-31"
-  }, {
-    "målgruppe" : "NEDSATT_ARBEIDSEVNE",
-    "aktivitet" : "REELL_ARBEIDSSØKER",
-    "fom" : "2024-02-01",
-    "tom" : "2024-03-31"
-  } ],
+  "stønadsperioder" : null,
   "vedtaksperioder" : [ {
     "fom" : "2024-01-01",
     "tom" : "2024-02-01",

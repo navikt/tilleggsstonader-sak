@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMottarSykepengerForFulltidsstilling
@@ -36,17 +37,18 @@ class FaktaOgVurderingBoutgifterTest {
         val dekketAvAnnetRegelverkIkkeOppfylt = vurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA)
         val dekketAvAnnetRegelverkOppfylt = vurderingDekketAvAnnetRegelverk()
 
-        val mottarSykepengerIkkeOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.JA)
-        val mottarSykepengerOppfylt = vurderingMottarSykepengerForFulltidsstilling(SvarJaNei.NEI)
+        val aldersvilkårOppfylt = vurderingAldersVilkår()
+        val mottarSykepengerOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.NEI)
 
         @Test
-        fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og resten er oppfylt`() {
+        fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og en er oppfylt`() {
             val inngangsvilkår =
                 NedsattArbeidsevneBoutgifter(
                     vurderinger =
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
                             mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
@@ -55,14 +57,15 @@ class FaktaOgVurderingBoutgifterTest {
         }
 
         @Test
-        fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og resten er ikke oppfylt`() {
+        fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og en er ikke oppfylt`() {
             val inngangsvilkår =
                 NedsattArbeidsevneBoutgifter(
                     vurderinger =
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
-                            mottarSykepengerForFulltidsstilling = mottarSykepengerIkkeOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 
@@ -70,14 +73,15 @@ class FaktaOgVurderingBoutgifterTest {
         }
 
         @Test
-        fun `resultat er IKKE_OPPFYLT hvis en vurdering er oppfylt og resten er ikke oppfylt`() {
+        fun `resultat er IKKE_OPPFYKT hvis en vurdering er oppfylt og en er ikke oppfylt`() {
             val inngangsvilkår =
                 NedsattArbeidsevneBoutgifter(
                     vurderinger =
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
-                            mottarSykepengerForFulltidsstilling = mottarSykepengerIkkeOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 
@@ -92,6 +96,7 @@ class FaktaOgVurderingBoutgifterTest {
                         VurderingNedsattArbeidsevne(
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
                             mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )

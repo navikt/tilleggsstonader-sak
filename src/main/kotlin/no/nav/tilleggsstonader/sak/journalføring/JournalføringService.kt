@@ -64,8 +64,7 @@ class JournalføringService(
 
         if (journalføringRequest.skalJournalføreTilNyBehandling() && !journalføringRequest.gjelderKlage()) {
             journalførTilNyBehandling(
-                journalpostId = journalpost.journalpostId,
-                personIdent = journalpostService.hentIdentFraJournalpost(journalpost),
+                journalpost = journalpost,
                 stønadstype = journalføringRequest.stønadstype,
                 behandlingÅrsak = journalføringRequest.årsak.behandlingsårsak,
                 journalførendeEnhet = journalføringRequest.journalførendeEnhet,
@@ -76,7 +75,6 @@ class JournalføringService(
         } else if (journalføringRequest.skalJournalføreTilNyBehandling() && journalføringRequest.gjelderKlage()) {
             journalførTilNyKlage(
                 journalpost = journalpost,
-                personIdent = journalpostService.hentIdentFraJournalpost(journalpost),
                 journalføringRequest = journalføringRequest,
             )
         } else {
@@ -101,9 +99,10 @@ class JournalføringService(
         taskService.save(FerdigstillJournalføringsoppgaveTask.opprettTask(oppgaveId))
     }
 
+    @Transactional
     fun journalførTilNyBehandling(
-        journalpostId: String,
-        personIdent: String,
+        journalpost: Journalpost,
+        personIdent: String = journalpostService.hentIdentFraJournalpost(journalpost),
         stønadstype: Stønadstype,
         behandlingÅrsak: BehandlingÅrsak,
         oppgaveBeskrivelse: String? = null,
@@ -112,8 +111,6 @@ class JournalføringService(
         logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
         avsenderMottaker: AvsenderMottaker? = null,
     ) {
-        val journalpost = journalpostService.hentJournalpost(journalpostId)
-
         val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
 
         validerKanOppretteBehandling(journalpost, fagsak, behandlingÅrsak, gjelderKlage = false)
@@ -155,11 +152,11 @@ class JournalføringService(
         )
     }
 
-    fun journalførTilNyKlage(
+    private fun journalførTilNyKlage(
         journalpost: Journalpost,
-        personIdent: String,
         journalføringRequest: JournalføringRequest,
     ) {
+        val personIdent = journalpostService.hentIdentFraJournalpost(journalpost)
         val behandlingÅrsak = journalføringRequest.årsak.behandlingsårsak
         val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, journalføringRequest.stønadstype)
 
