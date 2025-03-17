@@ -71,7 +71,7 @@ internal class VilkårServiceTest {
     private val barnUnder9år = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)
     private val barnOver10år = FnrGenerator.generer(Year.now().minusYears(11).value, 1, 13)
 
-    val sokandBarnMedBarnepass = BarnMedBarnepass(type = TypeBarnepass.BARNEHAGE_SFO_AKS, null, null)
+    val sokandBarnMedBarnepass = BarnMedBarnepass(type = TypeBarnepass.BARNEHAGE_SFO_AKS, null, null, null)
     val soknadBarn1 = SøknadBarn(ident = barnUnder9år, data = sokandBarnMedBarnepass)
     val soknadBarn2 = SøknadBarn(ident = barnOver10år, data = sokandBarnMedBarnepass)
 

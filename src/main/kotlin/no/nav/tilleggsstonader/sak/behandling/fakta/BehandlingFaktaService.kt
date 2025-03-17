@@ -144,6 +144,7 @@ class BehandlingFaktaService(
                 søknadBarnPåIdent[behandlingBarn.ident]?.let { søknadBarn ->
                     SøknadsgrunnlagBarn(
                         type = søknadBarn.data.type,
+                        utgifter = søknadBarn.data.utgifter,
                         startetIFemte = søknadBarn.data.startetIFemte,
                         årsak = søknadBarn.data.årsak,
                     )
