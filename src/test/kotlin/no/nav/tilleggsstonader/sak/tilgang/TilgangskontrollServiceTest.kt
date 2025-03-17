@@ -31,8 +31,8 @@ internal class TilgangskontrollServiceTest {
     private val egenAnsattId = "egenANsatt"
 
     private val søkerIdent = "søker"
+    private val annenForeldreIdent = "annenForeldreIdent"
     private val barnIdent = "barn1"
-    private val annenForeldreIdent = "annenForelder"
 
     private val tilgangConfig =
         RolleConfig(
@@ -109,10 +109,11 @@ internal class TilgangskontrollServiceTest {
             val tilgang = sjekkTilgangTilPersonMedRelasjoner()
 
             assertThat(tilgang).isTrue
-            assertThat(slotEgenAnsatt.captured).containsExactlyInAnyOrder(søkerIdent)
+            assertThat(slotEgenAnsatt.captured).containsExactlyInAnyOrder(søkerIdent, annenForeldreIdent)
 
             verify(exactly = 1) { personService.hentPersonMedBarn(any()) }
             verify(exactly = 0) { personService.hentBarn(any()) }
+            verify(exactly = 1) { personService.hentPersonKortBolk(listOf(annenForeldreIdent)) }
         }
 
         @Test
@@ -168,7 +169,7 @@ internal class TilgangskontrollServiceTest {
                 firstArg<Set<String>>().associateWith { false }
             }
             sjekkTilgangTilPersonMedRelasjoner()
-            assertThat(slot.captured).containsOnly(søkerIdent)
+            assertThat(slot.captured).containsOnly(søkerIdent, annenForeldreIdent)
         }
 
         private fun sjekkTilgangTilPersonMedRelasjoner() =
@@ -191,6 +192,22 @@ internal class TilgangskontrollServiceTest {
                 firstArg<List<String>>().single() to
                     pdlPersonKort(adressebeskyttelse = adressebeskyttelse(adressebeskyttelse)),
             )
+        }
+    }
+
+    private fun mockAnnenForeldreStrengtFortrolig() {
+        every { personService.hentPersonKortBolk(any()) } answers {
+            firstArg<List<String>>().associateWith {
+                val adressebeskyttelse =
+                    if (it == annenForeldreIdent) {
+                        AdressebeskyttelseGradering.STRENGT_FORTROLIG
+                    } else {
+                        AdressebeskyttelseGradering.UGRADERT
+                    }
+                pdlPersonKort(
+                    adressebeskyttelse = adressebeskyttelse(adressebeskyttelse),
+                )
+            }
         }
     }
 

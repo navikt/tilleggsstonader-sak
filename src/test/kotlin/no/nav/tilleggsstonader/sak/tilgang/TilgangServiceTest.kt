@@ -22,12 +22,14 @@ import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlSøker
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.fagsakpersoner
+import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 
 internal class TilgangServiceTest {
@@ -60,8 +62,8 @@ internal class TilgangServiceTest {
     internal fun setUp() {
         mockBrukerContext("A")
         every { fagsakPersonService.hentAktivIdent(fagsak.fagsakPersonId) } returns fagsak.hentAktivIdent()
-        every { behandlingService.hentAktivIdent(behandling.id) } returns fagsak.hentAktivIdent()
-        every { fagsakService.hentAktivIdent(fagsak.id) } returns fagsak.hentAktivIdent()
+        every { behandlingService.hentSaksbehandling(behandling.id) } returns saksbehandling(fagsak, behandling)
+        every { fagsakService.hentFagsak(fagsak.id) } returns fagsak
     }
 
     @AfterEach
@@ -69,114 +71,109 @@ internal class TilgangServiceTest {
         clearBrukerContext()
     }
 
-    @Test
-    internal fun `skal kaste ManglerTilgang dersom saksbehandler ikke har tilgang til person eller dets barn`() {
-        every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(false)
+    @Nested
+    inner class ValiderTilgangTilPersonMedRelasjoner {
+        @Test
+        internal fun `skal kaste ManglerTilgang dersom saksbehandler ikke har tilgang til person eller dets barn`() {
+            every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(false)
 
-        val assertThatThrownBy =
-            assertThatThrownBy {
-                tilgangService.validerTilgangTilPersonMedBarn(mocketPersonIdent, AuditLoggerEvent.ACCESS)
+            val assertThatThrownBy =
+                assertThatThrownBy {
+                    tilgangService.validerTilgangTilPersonMedRelasjoner(mocketPersonIdent, AuditLoggerEvent.ACCESS)
+                }
+            assertThatThrownBy.isInstanceOf(ManglerTilgang::class.java)
+        }
+
+        @Test
+        internal fun `skal ikke feile når saksbehandler har tilgang til person og dets barn`() {
+            every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
+
+            tilgangService.validerTilgangTilPersonMedRelasjoner(mocketPersonIdent, AuditLoggerEvent.ACCESS)
+        }
+
+        @Test
+        internal fun `skal kaste ManglerTilgang dersom saksbehandler ikke har tilgang til behandling`() {
+            val tilgangsfeilNavAnsatt = Tilgang(false, "Nav-ansatt")
+            every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns tilgangsfeilNavAnsatt
+
+            val feil =
+                catchThrowableOfType<ManglerTilgang> {
+                    tilgangService.validerTilgangTilBehandling(
+                        behandling.id,
+                        AuditLoggerEvent.ACCESS,
+                    )
+                }
+
+            assertThat(feil.frontendFeilmelding).contains(tilgangsfeilNavAnsatt.begrunnelse)
+            assertThat(feil.frontendFeilmelding).contains(tilgangsfeilNavAnsatt.begrunnelse)
+        }
+
+        @Test
+        internal fun `skal ikke feile når saksbehandler har tilgang til behandling`() {
+            every {
+                tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any())
+            } returns Tilgang(true)
+
+            assertDoesNotThrow {
+                tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
             }
-        assertThatThrownBy.isInstanceOf(ManglerTilgang::class.java)
-    }
+        }
 
-    @Test
-    internal fun `skal ikke feile når saksbehandler har tilgang til person og dets barn`() {
-        every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
+        @Test
+        internal fun `validerTilgangTilPersonMedBarn - cachear ikke svaret då pdl allikevel er cachet`() {
+            every {
+                tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any())
+            } returns Tilgang(true)
 
-        tilgangService.validerTilgangTilPersonMedBarn(mocketPersonIdent, AuditLoggerEvent.ACCESS)
-    }
-
-    @Test
-    internal fun `skal kaste ManglerTilgang dersom saksbehandler ikke har tilgang til behandling`() {
-        val tilgangsfeilNavAnsatt = Tilgang(false, "Nav-ansatt")
-        every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns tilgangsfeilNavAnsatt
-
-        val feil =
-            catchThrowableOfType<ManglerTilgang> {
-                tilgangService.validerTilgangTilBehandling(
-                    behandling.id,
-                    AuditLoggerEvent.ACCESS,
-                )
+            mockBrukerContext("A")
+            tilgangService.validerTilgangTilPersonMedRelasjoner(olaIdent, AuditLoggerEvent.ACCESS)
+            tilgangService.validerTilgangTilPersonMedRelasjoner(olaIdent, AuditLoggerEvent.ACCESS)
+            verify(exactly = 2) {
+                tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any())
             }
+        }
 
-        assertThat(feil.frontendFeilmelding).contains(tilgangsfeilNavAnsatt.begrunnelse)
-        assertThat(feil.frontendFeilmelding).contains(tilgangsfeilNavAnsatt.begrunnelse)
-    }
+        @Test
+        internal fun `validerTilgangTilPersonMedBarn - hvis to ulike saksbehandler kaller skal den sjekke tilgang på nytt`() {
+            every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
 
-    @Test
-    internal fun `skal ikke feile når saksbehandler har tilgang til behandling`() {
-        every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
+            mockBrukerContext("A")
+            tilgangService.validerTilgangTilPersonMedRelasjoner(olaIdent, AuditLoggerEvent.ACCESS)
+            mockBrukerContext("B")
+            tilgangService.validerTilgangTilPersonMedRelasjoner(olaIdent, AuditLoggerEvent.ACCESS)
 
-        tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
-    }
-
-    @Test
-    internal fun `validerTilgangTilPersonMedBarn - hvis samme saksbehandler kaller skal den ha cachet`() {
-        every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
-
-        mockBrukerContext("A")
-        tilgangService.validerTilgangTilPersonMedBarn(olaIdent, AuditLoggerEvent.ACCESS)
-        tilgangService.validerTilgangTilPersonMedBarn(olaIdent, AuditLoggerEvent.ACCESS)
-        verify(exactly = 1) {
-            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any())
+            verify(exactly = 2) {
+                tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any())
+            }
         }
     }
 
-    @Test
-    internal fun `validerTilgangTilPersonMedBarn - hvis to ulike saksbehandler kaller skal den sjekke tilgang på nytt`() {
-        every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
+    @Nested
+    inner class ValiderTilgangTilBehandling {
+        @Test
+        internal fun `validerTilgangTilBehandling - hvis samme saksbehandler kaller skal den ha cachet`() {
+            every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
 
-        mockBrukerContext("A")
-        tilgangService.validerTilgangTilPersonMedBarn(olaIdent, AuditLoggerEvent.ACCESS)
-        mockBrukerContext("B")
-        tilgangService.validerTilgangTilPersonMedBarn(olaIdent, AuditLoggerEvent.ACCESS)
+            mockBrukerContext("A")
 
-        verify(exactly = 2) {
-            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any())
+            tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
+            tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
+
+            verify(exactly = 1) { behandlingService.hentSaksbehandling(behandling.id) }
+            verify(exactly = 2) { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) }
         }
-    }
 
-    @Test
-    internal fun `validerTilgangTilBehandling - hvis samme saksbehandler kaller skal den ha cachet`() {
-        every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
+        @Test
+        internal fun `validerTilgangTilBehandling - hvis to ulike saksbehandler kaller skal den sjekke tilgang på nytt`() {
+            every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
 
-        mockBrukerContext("A")
+            mockBrukerContext("A")
+            tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
+            mockBrukerContext("B")
+            tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
 
-        tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
-        tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
-
-        verify(exactly = 1) {
-            behandlingService.hentAktivIdent(behandling.id)
-            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any())
-        }
-    }
-
-    @Test
-    internal fun `validerTilgangTilBehandling - hvis to ulike saksbehandler kaller skal den sjekke tilgang på nytt`() {
-        every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
-
-        mockBrukerContext("A")
-        tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
-        mockBrukerContext("B")
-        tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
-
-        verify(exactly = 2) {
-            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any())
-        }
-    }
-
-    @Test
-    internal fun `validerTilgangTilFagsakPerson - hvis to ulike saksbehandler kaller skal den sjekke tilgang på nytt`() {
-        every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
-
-        mockBrukerContext("A")
-        tilgangService.validerTilgangTilFagsakPerson(fagsak.fagsakPersonId, AuditLoggerEvent.ACCESS)
-        mockBrukerContext("B")
-        tilgangService.validerTilgangTilFagsakPerson(fagsak.fagsakPersonId, AuditLoggerEvent.ACCESS)
-
-        verify(exactly = 2) {
-            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any())
+            verify(exactly = 1) { behandlingService.hentSaksbehandling(behandling.id) }
+            verify(exactly = 2) { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) }
         }
     }
 

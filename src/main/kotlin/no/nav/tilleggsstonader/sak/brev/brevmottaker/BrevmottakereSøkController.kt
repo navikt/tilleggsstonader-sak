@@ -30,7 +30,7 @@ class BrevmottakereSøkController(
     ): PersonTreffDto {
         val personIdent = personIdentDto.personIdent
         brukerfeilHvisIkke(FNR_REGEX.matches(personIdent)) { "Ugyldig fødselsnummer" }
-        tilgangService.validerTilgangTilPersonMedBarn(personIdent, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilPersonMedRelasjoner(personIdent, AuditLoggerEvent.ACCESS)
         return PersonTreffDto(personIdent, personService.hentVisningsnavnForPerson(personIdent))
     }
 

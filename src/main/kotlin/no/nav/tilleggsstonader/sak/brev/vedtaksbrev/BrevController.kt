@@ -29,7 +29,7 @@ class BrevController(
     ): ByteArray {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
-        tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.UPDATE)
+        tilgangService.validerTilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
         return Base64.getEncoder().encode(brevService.lagSaksbehandlerBrev(saksbehandling, request.html))
@@ -49,7 +49,7 @@ class BrevController(
         @PathVariable behandlingId: BehandlingId,
     ): ByteArray {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.ACCESS)
 
         return Base64.getEncoder().encode(brevService.forhåndsvisBeslutterBrev(saksbehandling))
     }

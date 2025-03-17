@@ -69,9 +69,9 @@ internal class TilgangskontrollUtilTest {
         barn: AdressebeskyttelseGradering = UGRADERT,
     ): PersonMedRelasjoner =
         PersonMedRelasjoner(
-            personIdent = "",
-            adressebeskyttelse = adressebeskyttelse,
+            søker = PersonMedAdresseBeskyttelse(personIdent = "", adressebeskyttelse = adressebeskyttelse),
             barn = lagPersonMedBeskyttelse(barn, "barn"),
+            andreForeldre = listOf(),
         )
 
     private fun lagPersonMedBeskyttelse(

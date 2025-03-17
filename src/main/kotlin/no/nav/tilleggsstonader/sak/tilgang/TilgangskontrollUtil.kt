@@ -8,8 +8,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGrader
 
 object TilgangskontrollUtil {
     fun høyesteGraderingen(personUtvidet: PersonMedRelasjoner): AdressebeskyttelseGradering {
-        val adressebeskyttelser =
-            lagListeAvRelasjonersAdressegraderinger(personUtvidet) + personUtvidet.adressebeskyttelse
+        val adressebeskyttelser = personUtvidet.adressebeskyttelser()
         return when {
             adressebeskyttelser.contains(STRENGT_FORTROLIG_UTLAND) -> STRENGT_FORTROLIG_UTLAND
             adressebeskyttelser.contains(STRENGT_FORTROLIG) -> STRENGT_FORTROLIG
@@ -18,8 +17,4 @@ object TilgangskontrollUtil {
             else -> UGRADERT
         }
     }
-
-    private fun lagListeAvRelasjonersAdressegraderinger(personUtvidet: PersonMedRelasjoner) =
-        listOf(personUtvidet.barn)
-            .flatMap { relasjoner -> relasjoner.mapNotNull { it.adressebeskyttelse } }
 }

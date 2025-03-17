@@ -30,7 +30,7 @@ class SøkController(
     ): Søkeresultat {
         validerPersonIdent(personIdentRequest)
         val personIdenter = hentOgValiderAtIdentEksisterer(personIdentRequest)
-        tilgangService.validerTilgangTilPersonMedBarn(personIdentRequest.personIdent, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilPersonMedRelasjoner(personIdentRequest.personIdent, AuditLoggerEvent.ACCESS)
         return søkService.søkPerson(personIdenter)
     }
 

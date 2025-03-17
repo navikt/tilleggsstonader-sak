@@ -4,11 +4,13 @@ import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.AdRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
+import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 /**
@@ -23,11 +25,11 @@ class TilgangskontrollService(
 ) {
     private val adRoller = rolleConfig.rollerMedBeskrivelse
 
-    @Cacheable(
-        cacheNames = ["TILGANG_TIL_BRUKER"],
-        key = "#jwtToken.subject.concat(#personIdent)",
-        condition = "#personIdent != null && #jwtToken.subject != null",
-    )
+    /**
+     * Sjekker tilgang til person.
+     * Noter at denne ikke skal brukes per default. Bruk [sjekkTilgangTilPersonMedRelasjoner]
+     * Bruk kun denne hvis man skal sjekke tilgang person
+     */
     fun sjekkTilgang(
         personIdent: String,
         jwtToken: JwtToken,
@@ -39,39 +41,46 @@ class TilgangskontrollService(
                 .single()
                 .adressebeskyttelse
                 .gradering()
+        secureLogger.info("Sjekker tilgang til $personIdent")
         return hentTilgang(adressebeskyttelse, jwtToken, personIdent) { egenAnsattService.erEgenAnsatt(personIdent) }
     }
 
-    @Cacheable(
-        cacheNames = ["TILGANG_TIL_PERSON_MED_RELASJONER"],
-        key = "#jwtToken.subject.concat(#personIdent)",
-        condition = "#jwtToken.subject != null",
-    )
+    /**
+     * Når vi sjekker tilgang til person med relasjoner vet vi ikke hvilke barn som er relevante
+     * Då kontrolleres alle barnen til bruker og alle andre foreldre
+     */
     fun sjekkTilgangTilPersonMedRelasjoner(
         personIdent: String,
         jwtToken: JwtToken,
     ): Tilgang {
-        val personMedRelasjoner = hentPersonMedRelasjoner(personIdent)
-        secureLogger.info("Sjekker tilgang til {}", personMedRelasjoner)
+        val søkerMedBarn = personService.hentPersonMedBarn(personIdent)
+        val personMedRelasjoner = personMedRelasjoner(søkerMedBarn)
+        secureLogger.info("Sjekker tilgang til $personMedRelasjoner")
 
         val høyesteGraderingen = TilgangskontrollUtil.høyesteGraderingen(personMedRelasjoner)
         return hentTilgang(høyesteGraderingen, jwtToken, personIdent) { erEgenAnsatt(personMedRelasjoner) }
     }
 
-    private fun hentPersonMedRelasjoner(personIdent: String): PersonMedRelasjoner {
-        val søkerMedBarn = personService.hentPersonMedBarn(personIdent)
-        val barn =
-            søkerMedBarn.barn.map { PersonMedAdresseBeskyttelse(it.key, it.value.adressebeskyttelse.gradering()) }
+    private fun personMedRelasjoner(søkerMedBarn: SøkerMedBarn): PersonMedRelasjoner {
+        val personIdent = søkerMedBarn.søkerIdent
+        val barn = søkerMedBarn.barn
+        val andreForeldreIdenter = barn.identerAndreForeldre(identSøker = personIdent)
+        val søkerOgAndreForeldre = personService.hentPersonKortBolk(andreForeldreIdenter)
+        val søkerOgAndreForeldreMedAdressbeskyttelse = søkerOgAndreForeldre.tilPersonMedAdresseBeskyttelse()
 
         return PersonMedRelasjoner(
-            personIdent = søkerMedBarn.søkerIdent,
-            adressebeskyttelse = søkerMedBarn.søker.adressebeskyttelse.gradering(),
-            barn = barn,
+            søker =
+                PersonMedAdresseBeskyttelse(
+                    personIdent = personIdent,
+                    adressebeskyttelse = søkerMedBarn.søker.adressebeskyttelse.gradering(),
+                ),
+            barn = barn.tilPersonMedAdresseBeskyttelse(),
+            andreForeldre = søkerOgAndreForeldreMedAdressbeskyttelse.filter { it.personIdent != personIdent },
         )
     }
 
     private fun hentTilgang(
-        adressebeskyttelsegradering: AdressebeskyttelseGradering?,
+        adressebeskyttelsegradering: AdressebeskyttelseGradering,
         jwtToken: JwtToken,
         personIdent: String,
         egenAnsattSjekk: () -> Boolean,
@@ -96,8 +105,8 @@ class TilgangskontrollService(
     /**
      * Trenger ikke å sjekke barn, men muligens andre forelderen
      */
-    fun erEgenAnsatt(personMedRelasjoner: PersonMedRelasjoner): Boolean {
-        val relevanteIdenter = setOf(personMedRelasjoner.personIdent)
+    private fun erEgenAnsatt(personMedRelasjoner: PersonMedRelasjoner): Boolean {
+        val relevanteIdenter = personMedRelasjoner.identerForEgenAnsattKontroll()
 
         return egenAnsattService.erEgenAnsatt(relevanteIdenter).any { it.value }
     }
@@ -117,4 +126,14 @@ class TilgangskontrollService(
         )
         return Tilgang(harTilgang = false, begrunnelse = adRolle?.beskrivelse)
     }
+
+    private fun Map<String, PdlBarn>.identerAndreForeldre(identSøker: String): List<String> =
+        this
+            .asSequence()
+            .flatMap { it.value.forelderBarnRelasjon }
+            .filter { it.minRolleForPerson == Familierelasjonsrolle.BARN }
+            .mapNotNull { it.relatertPersonsIdent }
+            .filter { it != identSøker }
+            .distinct()
+            .toList()
 }
