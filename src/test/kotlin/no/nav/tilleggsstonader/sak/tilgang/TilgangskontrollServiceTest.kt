@@ -7,17 +7,12 @@ import io.mockk.verify
 import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.security.token.support.core.jwt.JwtTokenClaims
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
-import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
+import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsatt
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.PersonMedAdresseBeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
-import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.metadataGjeldende
-import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlBarn
-import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlPersonKort
-import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlSøker
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -62,13 +57,10 @@ internal class TilgangskontrollServiceTest {
         every { jwtToken.jwtTokenClaims } returns jwtTokenClaims
         every { jwtTokenClaims.get("preferred_username") }.returns(listOf("bob"))
         every { jwtTokenClaims.getAsList(any()) }.returns(emptyList())
-        mockHentPersonMedAdressebeskyttelse()
-        every { personService.hentPersonKortBolk(any()) } answers {
-            firstArg<List<String>>().associateWith { pdlPersonKort() }
-        }
+        every { personService.hentAdressebeskyttelse(any()) } returns AdressebeskyttelseGradering.UGRADERT
         every { egenAnsattService.erEgenAnsatt(any<String>()) } returns false
         every { egenAnsattService.erEgenAnsatt(capture(slotEgenAnsatt)) } answers
-            { firstArg<Set<String>>().associateWith { false } }
+            { firstArg<Set<String>>().associateWith { EgenAnsatt(it, false) } }
         slotEgenAnsatt.clear()
     }
 
@@ -82,7 +74,7 @@ internal class TilgangskontrollServiceTest {
 
         @Test
         internal fun `har ikke tilgang når det finnes adressebeskyttelser for enskild person`() {
-            mockHentPersonMedAdressebeskyttelse(AdressebeskyttelseGradering.FORTROLIG)
+            every { personService.hentAdressebeskyttelse(any()) } returns AdressebeskyttelseGradering.FORTROLIG
             assertThat(sjekkTilgangTilPerson()).isFalse
             verify(exactly = 0) { egenAnsattService.erEgenAnsatt(any<String>()) }
         }
@@ -101,31 +93,27 @@ internal class TilgangskontrollServiceTest {
      * Når man sjekker tilgang på ident og sjekker alle relasjoner vet vi ikke hvilke barn som kan være relevante
      */
     @Nested
-    inner class SjekkTilgangTilPersonMedRelasjonerFagsakPersonIdent {
+    inner class SjekkTilgangTilPersonMedRelasjonerFagsakAdressebeskyttelseForPersonIdent {
         @Test
         fun `skal hente ut barn koblet til fagsakPerson og kontrollere barn og andre foreldre`() {
-            every { personService.hentPersonMedBarn(any()) } returns lagPersonMedRelasjoner()
+            every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns lagPersonMedRelasjoner()
 
             val tilgang = sjekkTilgangTilPersonMedRelasjoner()
 
             assertThat(tilgang).isTrue
             assertThat(slotEgenAnsatt.captured).containsExactlyInAnyOrder(søkerIdent, annenForeldreIdent)
-
-            verify(exactly = 1) { personService.hentPersonMedBarn(any()) }
-            verify(exactly = 0) { personService.hentBarn(any()) }
-            verify(exactly = 1) { personService.hentPersonKortBolk(listOf(annenForeldreIdent)) }
         }
 
         @Test
         internal fun `har tilgang når det ikke finnes noen adressebeskyttelser`() {
-            every { personService.hentPersonMedBarn(any()) } returns lagPersonMedRelasjoner()
+            every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns lagPersonMedRelasjoner()
             assertThat(sjekkTilgangTilPersonMedRelasjoner()).isTrue
         }
 
         @Test
         internal fun `har ikke tilgang når søkeren er STRENGT_FORTROLIG og saksbehandler har kode7`() {
             mockHarKode7()
-            every { personService.hentPersonMedBarn(any()) } returns
+            every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns
                 lagPersonMedRelasjoner(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
             assertThat(sjekkTilgangTilPersonMedRelasjoner()).isFalse
         }
@@ -133,40 +121,40 @@ internal class TilgangskontrollServiceTest {
         @Test
         internal fun `har tilgang når søkeren er STRENGT_FORTROLIG og saksbehandler har kode6`() {
             mockHarKode6()
-            every { personService.hentPersonMedBarn(any()) } returns
+            every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns
                 lagPersonMedRelasjoner(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
             assertThat(sjekkTilgangTilPersonMedRelasjoner()).isTrue
         }
 
         @Test
         internal fun `har ikke tilgang når det finnes adressebeskyttelse for søkeren`() {
-            every { personService.hentPersonMedBarn(any()) } returns
+            every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns
                 lagPersonMedRelasjoner(graderingSøker = AdressebeskyttelseGradering.FORTROLIG)
             assertThat(sjekkTilgangTilPersonMedRelasjoner()).isFalse
         }
 
         @Test
         internal fun `har ikke tilgang når barn inneholder FORTROLIG`() {
-            every { personService.hentPersonMedBarn(any()) } returns
+            every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns
                 lagPersonMedRelasjoner(graderingBarn = AdressebeskyttelseGradering.FORTROLIG)
             assertThat(sjekkTilgangTilPersonMedRelasjoner()).isFalse
         }
 
         @Test
         internal fun `har ikke tilgang når søker er egenansatt`() {
-            every { personService.hentPersonMedBarn(any()) } returns lagPersonMedRelasjoner()
+            every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns lagPersonMedRelasjoner()
             every { egenAnsattService.erEgenAnsatt(any<Set<String>>()) } answers {
-                firstArg<Set<String>>().associateWith { it == søkerIdent }
+                firstArg<Set<String>>().associateWith { EgenAnsatt(it, it == søkerIdent) }
             }
             assertThat(sjekkTilgangTilPersonMedRelasjoner()).isFalse
         }
 
         @Test
         fun `skal ikke kontrollere egenansatt på barn`() {
-            every { personService.hentPersonMedBarn(any()) } returns lagPersonMedRelasjoner()
+            every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns lagPersonMedRelasjoner()
             val slot = slot<Set<String>>()
             every { egenAnsattService.erEgenAnsatt(capture(slot)) } answers {
-                firstArg<Set<String>>().associateWith { false }
+                firstArg<Set<String>>().associateWith { EgenAnsatt(it, false) }
             }
             sjekkTilgangTilPersonMedRelasjoner()
             assertThat(slot.captured).containsOnly(søkerIdent, annenForeldreIdent)
@@ -184,61 +172,14 @@ internal class TilgangskontrollServiceTest {
         every { jwtTokenClaims.getAsList(any()) }.returns(listOf(kode6Id))
     }
 
-    private fun mockHentPersonMedAdressebeskyttelse(
-        adressebeskyttelse: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT,
-    ) {
-        every { personService.hentPersonKortBolk(any()) } answers {
-            mapOf(
-                firstArg<List<String>>().single() to
-                    pdlPersonKort(adressebeskyttelse = adressebeskyttelse(adressebeskyttelse)),
-            )
-        }
-    }
-
-    private fun mockAnnenForeldreStrengtFortrolig() {
-        every { personService.hentPersonKortBolk(any()) } answers {
-            firstArg<List<String>>().associateWith {
-                val adressebeskyttelse =
-                    if (it == annenForeldreIdent) {
-                        AdressebeskyttelseGradering.STRENGT_FORTROLIG
-                    } else {
-                        AdressebeskyttelseGradering.UGRADERT
-                    }
-                pdlPersonKort(
-                    adressebeskyttelse = adressebeskyttelse(adressebeskyttelse),
-                )
-            }
-        }
-    }
-
     private fun lagPersonMedRelasjoner(
         graderingSøker: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT,
         graderingBarn: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT,
-    ): SøkerMedBarn =
-        SøkerMedBarn(
-            søkerIdent = søkerIdent,
-            søker = pdlSøker(adressebeskyttelse = adressebeskyttelse(graderingSøker)),
-            barn = mapOf(barnIdent to pdlBarn(graderingBarn)),
+        graderingAnnenForelder: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT,
+    ): AdressebeskyttelseForPersonMedRelasjoner =
+        AdressebeskyttelseForPersonMedRelasjoner(
+            søker = PersonMedAdresseBeskyttelse(søkerIdent, graderingSøker),
+            barn = listOf(PersonMedAdresseBeskyttelse(barnIdent, graderingBarn)),
+            andreForeldre = listOf(PersonMedAdresseBeskyttelse(annenForeldreIdent, graderingAnnenForelder)),
         )
-
-    private fun pdlBarn(adressebeskyttelse: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT) =
-        pdlBarn(
-            adressebeskyttelse = adressebeskyttelse(adressebeskyttelse),
-            forelderBarnRelasjon =
-                listOf(
-                    ForelderBarnRelasjon(
-                        relatertPersonsIdent = søkerIdent,
-                        relatertPersonsRolle = Familierelasjonsrolle.MOR,
-                        minRolleForPerson = Familierelasjonsrolle.BARN,
-                    ),
-                    ForelderBarnRelasjon(
-                        relatertPersonsIdent = annenForeldreIdent,
-                        relatertPersonsRolle = Familierelasjonsrolle.FAR,
-                        minRolleForPerson = Familierelasjonsrolle.BARN,
-                    ),
-                ),
-        )
-
-    private fun adressebeskyttelse(gradering: AdressebeskyttelseGradering?) =
-        gradering?.let { listOf(Adressebeskyttelse(it, metadataGjeldende)) } ?: emptyList()
 }

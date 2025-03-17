@@ -4,13 +4,10 @@ import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.AdRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
-import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import org.springframework.stereotype.Service
 
 /**
@@ -34,13 +31,7 @@ class TilgangskontrollService(
         personIdent: String,
         jwtToken: JwtToken,
     ): Tilgang {
-        val adressebeskyttelse =
-            personService
-                .hentPersonKortBolk(listOf(personIdent))
-                .values
-                .single()
-                .adressebeskyttelse
-                .gradering()
+        val adressebeskyttelse = personService.hentAdressebeskyttelse(personIdent)
         secureLogger.info("Sjekker tilgang til $personIdent")
         return hentTilgang(adressebeskyttelse, jwtToken, personIdent) { egenAnsattService.erEgenAnsatt(personIdent) }
     }
@@ -53,30 +44,11 @@ class TilgangskontrollService(
         personIdent: String,
         jwtToken: JwtToken,
     ): Tilgang {
-        val søkerMedBarn = personService.hentPersonMedBarn(personIdent)
-        val personMedRelasjoner = personMedRelasjoner(søkerMedBarn)
+        val personMedRelasjoner = personService.hentAdressebeskyttelseForPersonOgRelasjoner(personIdent)
         secureLogger.info("Sjekker tilgang til $personMedRelasjoner")
 
         val høyesteGraderingen = TilgangskontrollUtil.høyesteGraderingen(personMedRelasjoner)
         return hentTilgang(høyesteGraderingen, jwtToken, personIdent) { erEgenAnsatt(personMedRelasjoner) }
-    }
-
-    private fun personMedRelasjoner(søkerMedBarn: SøkerMedBarn): PersonMedRelasjoner {
-        val personIdent = søkerMedBarn.søkerIdent
-        val barn = søkerMedBarn.barn
-        val andreForeldreIdenter = barn.identerAndreForeldre(identSøker = personIdent)
-        val søkerOgAndreForeldre = personService.hentPersonKortBolk(andreForeldreIdenter)
-        val søkerOgAndreForeldreMedAdressbeskyttelse = søkerOgAndreForeldre.tilPersonMedAdresseBeskyttelse()
-
-        return PersonMedRelasjoner(
-            søker =
-                PersonMedAdresseBeskyttelse(
-                    personIdent = personIdent,
-                    adressebeskyttelse = søkerMedBarn.søker.adressebeskyttelse.gradering(),
-                ),
-            barn = barn.tilPersonMedAdresseBeskyttelse(),
-            andreForeldre = søkerOgAndreForeldreMedAdressbeskyttelse.filter { it.personIdent != personIdent },
-        )
     }
 
     private fun hentTilgang(
@@ -105,8 +77,8 @@ class TilgangskontrollService(
     /**
      * Trenger ikke å sjekke barn, men muligens andre forelderen
      */
-    private fun erEgenAnsatt(personMedRelasjoner: PersonMedRelasjoner): Boolean {
-        val relevanteIdenter = personMedRelasjoner.identerForEgenAnsattKontroll()
+    private fun erEgenAnsatt(adressebeskyttelseForPersonMedRelasjoner: AdressebeskyttelseForPersonMedRelasjoner): Boolean {
+        val relevanteIdenter = adressebeskyttelseForPersonMedRelasjoner.identerForEgenAnsattKontroll()
 
         return egenAnsattService.erEgenAnsatt(relevanteIdenter).any { it.value }
     }
@@ -126,14 +98,4 @@ class TilgangskontrollService(
         )
         return Tilgang(harTilgang = false, begrunnelse = adRolle?.beskrivelse)
     }
-
-    private fun Map<String, PdlBarn>.identerAndreForeldre(identSøker: String): List<String> =
-        this
-            .asSequence()
-            .flatMap { it.value.forelderBarnRelasjon }
-            .filter { it.minRolleForPerson == Familierelasjonsrolle.BARN }
-            .mapNotNull { it.relatertPersonsIdent }
-            .filter { it != identSøker }
-            .distinct()
-            .toList()
 }

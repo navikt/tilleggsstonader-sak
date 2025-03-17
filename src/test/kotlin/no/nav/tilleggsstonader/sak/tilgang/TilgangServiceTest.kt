@@ -72,7 +72,7 @@ internal class TilgangServiceTest {
     }
 
     @Nested
-    inner class ValiderTilgangTilPersonMedRelasjoner {
+    inner class ValiderTilgangTilAdressebeskyttelseForPersonMedRelasjoner {
         @Test
         internal fun `skal kaste ManglerTilgang dersom saksbehandler ikke har tilgang til person eller dets barn`() {
             every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(false)

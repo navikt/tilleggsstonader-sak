@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.tilgang
 
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.PersonMedAdresseBeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.FORTROLIG
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.STRENGT_FORTROLIG
@@ -67,8 +69,8 @@ internal class TilgangskontrollUtilTest {
     private fun lagPersonMedRelasjoner(
         adressebeskyttelse: AdressebeskyttelseGradering = UGRADERT,
         barn: AdressebeskyttelseGradering = UGRADERT,
-    ): PersonMedRelasjoner =
-        PersonMedRelasjoner(
+    ): AdressebeskyttelseForPersonMedRelasjoner =
+        AdressebeskyttelseForPersonMedRelasjoner(
             søker = PersonMedAdresseBeskyttelse(personIdent = "", adressebeskyttelse = adressebeskyttelse),
             barn = lagPersonMedBeskyttelse(barn, "barn"),
             andreForeldre = listOf(),

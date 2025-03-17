@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.tilgang
 
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.FORTROLIG
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.STRENGT_FORTROLIG
@@ -7,7 +8,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGrader
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.UGRADERT
 
 object TilgangskontrollUtil {
-    fun høyesteGraderingen(personUtvidet: PersonMedRelasjoner): AdressebeskyttelseGradering {
+    fun høyesteGraderingen(personUtvidet: AdressebeskyttelseForPersonMedRelasjoner): AdressebeskyttelseGradering {
         val adressebeskyttelser = personUtvidet.adressebeskyttelser()
         return when {
             adressebeskyttelser.contains(STRENGT_FORTROLIG_UTLAND) -> STRENGT_FORTROLIG_UTLAND

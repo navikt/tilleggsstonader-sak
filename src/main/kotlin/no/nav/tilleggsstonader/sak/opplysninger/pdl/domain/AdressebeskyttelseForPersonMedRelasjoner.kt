@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.tilgang
+package no.nav.tilleggsstonader.sak.opplysninger.pdl.domain
 
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.FORTROLIG
@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 
-data class PersonMedRelasjoner(
+data class AdressebeskyttelseForPersonMedRelasjoner(
     val søker: PersonMedAdresseBeskyttelse,
     val barn: List<PersonMedAdresseBeskyttelse>,
     val andreForeldre: List<PersonMedAdresseBeskyttelse>,
