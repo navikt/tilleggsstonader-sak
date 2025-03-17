@@ -75,7 +75,7 @@ class BoutgifterBeregningService(
             .map { utbetalingPeriode ->
                 val grunnlagsdata = lagBeregningsGrunnlag(periode = utbetalingPeriode, utgifter = utgifter)
                 BeregningsresultatForMåned(
-                    beløp = beregnBeløp(utgifter),
+                    stønadsbeløp = beregnBeløp(utgifter = utgifter, makssats = grunnlagsdata.makssats),
                     grunnlag = grunnlagsdata,
                 )
             }

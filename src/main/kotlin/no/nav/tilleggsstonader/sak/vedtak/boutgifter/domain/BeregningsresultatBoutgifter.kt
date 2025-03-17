@@ -21,7 +21,7 @@ data class BeregningsresultatBoutgifter(
 }
 
 data class BeregningsresultatForMåned(
-    val beløp: Int,
+    val stønadsbeløp: Int,
     val grunnlag: Beregningsgrunnlag,
     val delAvTidligereUtbetaling: Boolean = false,
 ) : Periode<LocalDate>,
