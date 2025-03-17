@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnBeløpUtil.beregnBeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -32,10 +33,8 @@ class BoutgifterBeregningService(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatBoutgifter {
-//        val stønadsperioder = hentStønadsperioder(behandling.id)
 //        val forrigeVedtak = hentForrigeVedtak(behandling)
-
-        val utgifterPerVilkårtype = boutgifterUtgiftService.hentUtgifterTilBeregning(behandling.id)
+        // TODO: Deal med revurderFra-datoen
 
 //        vedtaksperiodeValideringService.validerVedtaksperioder(
 //            vedtaksperioder = vedtaksperioder,
@@ -43,12 +42,12 @@ class BoutgifterBeregningService(
 //            behandlingId = behandling.id,
 //        )
 
-        // TODO: Deal med revurderFra-datoen
+        val utgifterPerVilkårtype = boutgifterUtgiftService.hentUtgifterTilBeregning(behandling.id)
+        validerUtgifter(utgifterPerVilkårtype)
 
         val vedtaksperioderBeregning =
             vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(behandling.revurderFra)
 
-//        val beregningsresultat = beregnAktuellePerioder(behandling, vedtaksperioder, stønadsperioder)
         val beregningsresultat =
             beregnAktuellePerioder(
                 vedtaksperioder = vedtaksperioderBeregning,
@@ -66,10 +65,8 @@ class BoutgifterBeregningService(
     private fun beregnAktuellePerioder(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
-    ): List<BeregningsresultatForLøpendeMåned> {
-//        validerPerioderForInnvilgelse(vedtaksperioder, utgifterPerBarn, typeVedtak)
-
-        return vedtaksperioder
+    ): List<BeregningsresultatForLøpendeMåned> =
+        vedtaksperioder
             .sorted()
             .grupperVedtaksperioderPerLøpendeMåned()
             .map { UtbetalingPeriode(it) }
@@ -80,7 +77,6 @@ class BoutgifterBeregningService(
                     grunnlag = grunnlagsdata,
                 )
             }
-    }
 
 //    fun beregnForOpphør(
 //        behandling: Saksbehandling,
