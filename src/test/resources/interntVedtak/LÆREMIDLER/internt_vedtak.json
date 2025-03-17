@@ -20,7 +20,7 @@
     "fom" : "2024-02-05",
     "tom" : "2024-02-10",
     "faktaOgVurderinger" : {
-      "@type" : "MÅLGRUPPE",
+      "@type" : "MÅLGRUPPE_LÆREMIDLER",
       "medlemskap" : {
         "svar" : "JA_IMPLISITT",
         "resultat" : "OPPFYLT"
@@ -39,7 +39,7 @@
     "fom" : "2024-02-05",
     "tom" : "2024-02-10",
     "faktaOgVurderinger" : {
-      "@type" : "MÅLGRUPPE",
+      "@type" : "MÅLGRUPPE_LÆREMIDLER",
       "medlemskap" : {
         "svar" : "JA_IMPLISITT",
         "resultat" : "OPPFYLT"

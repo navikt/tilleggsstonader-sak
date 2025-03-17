@@ -28,6 +28,10 @@
       "utgifterDekketAvAnnetRegelverk" : {
         "svar" : "NEI",
         "resultat" : "OPPFYLT"
+      },
+      "mottarSykepengerForFulltidsstilling" : {
+        "svar" : "NEI_IMPLISITT",
+        "resultat" : "OPPFYLT"
       }
     },
     "kilde" : "MANUELL",
@@ -44,11 +48,35 @@
         "svar" : "JA_IMPLISITT",
         "resultat" : "OPPFYLT"
       },
-      "utgifterDekketAvAnnetRegelverk" : null
+      "utgifterDekketAvAnnetRegelverk" : null,
+      "mottarSykepengerForFulltidsstilling" : null
     },
     "kilde" : "MANUELL",
     "resultat" : "OPPFYLT",
     "begrunnelse" : "målgruppe os",
+    "slettetKommentar" : null
+  }, {
+    "type" : "NEDSATT_ARBEIDSEVNE",
+    "fom" : "2024-02-05",
+    "tom" : "2024-02-10",
+    "faktaOgVurderinger" : {
+      "@type" : "MÅLGRUPPE",
+      "medlemskap" : {
+        "svar" : "JA",
+        "resultat" : "OPPFYLT"
+      },
+      "utgifterDekketAvAnnetRegelverk" : {
+        "svar" : null,
+        "resultat" : "IKKE_VURDERT"
+      },
+      "mottarSykepengerForFulltidsstilling" : {
+        "svar" : "NEI",
+        "resultat" : "OPPFYLT"
+      }
+    },
+    "kilde" : "MANUELL",
+    "resultat" : "IKKE_VURDERT",
+    "begrunnelse" : "målgruppe na",
     "slettetKommentar" : null
   } ],
   "aktiviteter" : [ {
