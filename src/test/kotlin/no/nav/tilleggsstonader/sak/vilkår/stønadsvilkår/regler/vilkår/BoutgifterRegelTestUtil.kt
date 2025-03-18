@@ -15,7 +15,7 @@ object BoutgifterRegelTestUtil {
 
     fun ikkeOppfylteDelvilkårMidlertidigOvernatting() =
         listOf(
-            delvilkår(Vurdering(RegelId.NØDVENDIGE_MERUTGIFTER, SvarId.JA)),
+            delvilkår(Vurdering(RegelId.NØDVENDIGE_MERUTGIFTER, SvarId.NEI)),
         )
 
     fun oppfylteDelvilkårMidlertidigOvernattingDto() = oppfylteDelvilkårMidlertidigOvernatting().map { it.tilDto() }
