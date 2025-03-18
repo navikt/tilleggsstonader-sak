@@ -1,0 +1,1 @@
+ALTER TABLE vilkar ADD COLUMN er_nullvedtak BOOLEAN DEFAULT false;

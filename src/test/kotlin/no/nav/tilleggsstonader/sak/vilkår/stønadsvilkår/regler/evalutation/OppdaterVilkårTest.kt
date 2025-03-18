@@ -42,6 +42,7 @@ internal class OppdaterVilkårTest {
                 fom = LocalDate.now(),
                 tom = LocalDate.now().plusDays(1),
                 utgift = 1,
+                erNullvedtak = false,
             )
 
         @Test
@@ -128,6 +129,7 @@ internal class OppdaterVilkårTest {
                 fom = originaltVilkår.fom,
                 tom = originaltVilkår.tom,
                 utgift = 100,
+                erNullvedtak = false,
             )
     }
 }

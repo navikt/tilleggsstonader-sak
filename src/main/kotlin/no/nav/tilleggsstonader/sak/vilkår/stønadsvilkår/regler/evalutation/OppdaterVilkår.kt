@@ -95,6 +95,7 @@ object OppdaterVilkår {
             fom = utledFom(vilkår, oppdatering),
             tom = utledTom(vilkår, oppdatering),
             utgift = oppdatering.utgift,
+            erNullvedtak = oppdatering.erNullvedtak == true,
             gitVersjon = Applikasjonsversjon.versjon,
         )
     }
@@ -209,6 +210,7 @@ object OppdaterVilkår {
             behandlingId = behandlingId,
             type = vilkårsregel.vilkårType,
             barnId = barnId,
+            erNullvedtak = false,
             delvilkårwrapper = DelvilkårWrapper(delvilkårsett),
             resultat = utledResultat(vilkårsregel, delvilkårsett.map { it.tilDto() }).vilkår,
             status = VilkårStatus.NY,
