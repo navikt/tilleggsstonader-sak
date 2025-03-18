@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
@@ -17,9 +17,6 @@ data class BeregningsresultatForPeriodeDto(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val antallMåneder: Int,
-//    val studienivå: Studienivå,
-//    val studieprosent: Int,
-    val beløp: Int,
     val stønadsbeløp: Int,
     val utbetalingsdato: LocalDate,
     val målgruppe: MålgruppeType,
@@ -36,9 +33,7 @@ data class BeregningsresultatForPeriodeDto(
     fun kanSlåsSammen(nestePeriode: BeregningsresultatForPeriodeDto): Boolean =
         this.målgruppe == nestePeriode.målgruppe &&
             this.aktivitet == nestePeriode.aktivitet &&
-//            this.studienivå == nestePeriode.studienivå &&
-//            this.studieprosent == nestePeriode.studieprosent &&
-            this.beløp == nestePeriode.beløp &&
+            this.stønadsbeløp == nestePeriode.stønadsbeløp &&
             this.utbetalingsdato == nestePeriode.utbetalingsdato &&
             this.delAvTidligereUtbetaling == nestePeriode.delAvTidligereUtbetaling &&
             this.påfølgesAv(nestePeriode)
@@ -60,15 +55,12 @@ fun BeregningsresultatBoutgifter.tilDto(revurderFra: LocalDate?): Beregningsresu
     )
 }
 
-fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto =
+fun BeregningsresultatForLøpendeMåned.tilDto(): BeregningsresultatForPeriodeDto =
     BeregningsresultatForPeriodeDto(
         fom = grunnlag.fom,
         tom = grunnlag.tom,
         antallMåneder = 1,
-//        studienivå = grunnlag.studienivå,
-//        studieprosent = grunnlag.studieprosent,
-        beløp = beløp,
-        stønadsbeløp = beløp,
+        stønadsbeløp = stønadsbeløp,
         utbetalingsdato = grunnlag.utbetalingsdato,
         målgruppe = grunnlag.målgruppe,
         aktivitet = grunnlag.aktivitet,

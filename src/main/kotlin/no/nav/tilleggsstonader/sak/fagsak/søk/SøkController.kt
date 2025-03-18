@@ -30,7 +30,7 @@ class SøkController(
     ): Søkeresultat {
         validerPersonIdent(personIdentRequest)
         val personIdenter = hentOgValiderAtIdentEksisterer(personIdentRequest)
-        tilgangService.validerTilgangTilPersonMedBarn(personIdentRequest.personIdent, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilPersonMedRelasjoner(personIdentRequest.personIdent, AuditLoggerEvent.ACCESS)
         return søkService.søkPerson(personIdenter)
     }
 
@@ -43,17 +43,6 @@ class SøkController(
             tilgangService.validerTilgangTilFagsakPerson(it, AuditLoggerEvent.ACCESS)
         }
         return søkeresultat
-    }
-
-    // brukes til brev, burde vi flytte den til brev?
-    @PostMapping("/person/uten-fagsak")
-    fun søkPersonUtenFagsak(
-        @RequestBody personIdentRequest: PersonIdentDto,
-    ): SøkeresultatUtenFagsak {
-        validerPersonIdent(personIdentRequest)
-        tilgangService.validerTilgangTilPerson(personIdentRequest.personIdent, AuditLoggerEvent.ACCESS)
-
-        return søkService.søkPersonUtenFagsak(personIdentRequest.personIdent)
     }
 
     private fun validerPersonIdent(personIdentRequest: PersonIdentDto) {

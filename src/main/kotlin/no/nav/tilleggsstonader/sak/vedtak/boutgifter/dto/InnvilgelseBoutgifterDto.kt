@@ -22,5 +22,4 @@ data class InnvilgelseBoutgifterResponse(
 data class InnvilgelseBoutgifterRequest(
     val vedtaksperioder: List<VedtaksperiodeDto>,
     val begrunnelse: String? = null,
-) : VedtakBoutgifterDto(TypeVedtak.INNVILGELSE),
-    VedtakBoutgifterRequest
+) : VedtakBoutgifterRequest

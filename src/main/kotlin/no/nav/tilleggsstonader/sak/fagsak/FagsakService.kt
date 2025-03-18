@@ -54,7 +54,7 @@ class FagsakService(
         personIdent: String,
         stønadstype: Stønadstype,
     ): List<BehandlingDto> =
-        finnFagsak(setOf(personIdent), stønadstype)?.let { fagsak ->
+        finnFagsak(personService.hentPersonIdenter(personIdent).identer(), stønadstype)?.let { fagsak ->
             behandlingService.hentBehandlinger(fagsak.id).map {
                 it.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId)
             }

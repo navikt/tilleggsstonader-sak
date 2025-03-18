@@ -4,13 +4,19 @@ import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.PersonMedAdresseBeskyttelse
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.tilPersonMedAdresseBeskyttelse
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlAnnenForelder
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.Cacheable
@@ -35,6 +41,30 @@ class PersonService(
                 .filter { it.relatertPersonsRolle == Familierelasjonsrolle.BARN }
                 .mapNotNull { it.relatertPersonsIdent }
         return SøkerMedBarn(ident, søker, hentBarn(barnIdentifikatorer))
+    }
+
+    fun hentAdressebeskyttelse(ident: String): AdressebeskyttelseGradering =
+        hentPersonKortBolk(listOf(ident))
+            .values
+            .single()
+            .adressebeskyttelse
+            .gradering()
+
+    fun hentAdressebeskyttelseForPersonOgRelasjoner(ident: String): AdressebeskyttelseForPersonMedRelasjoner {
+        val søkerMedBarn = hentPersonMedBarn(ident)
+        val barn = søkerMedBarn.barn
+        val andreForeldreIdenter = barn.identerAndreForeldre(identSøker = ident)
+        val andreForeldre = hentPersonKortBolk(andreForeldreIdenter)
+
+        return AdressebeskyttelseForPersonMedRelasjoner(
+            søker =
+                PersonMedAdresseBeskyttelse(
+                    personIdent = ident,
+                    adressebeskyttelse = søkerMedBarn.søker.adressebeskyttelse.gradering(),
+                ),
+            barn = barn.tilPersonMedAdresseBeskyttelse(),
+            andreForeldre = andreForeldre.tilPersonMedAdresseBeskyttelse(),
+        )
     }
 
     fun hentBarn(barnIdentifikatorer: List<String>) =
@@ -77,4 +107,14 @@ class PersonService(
             ?.navn
             ?.gjeldende()
             ?.visningsnavn() ?: "Mangler navn"
+
+    private fun Map<String, PdlBarn>.identerAndreForeldre(identSøker: String): List<String> =
+        this
+            .asSequence()
+            .flatMap { it.value.forelderBarnRelasjon }
+            .filter { it.minRolleForPerson == Familierelasjonsrolle.BARN }
+            .mapNotNull { it.relatertPersonsIdent }
+            .filter { it != identSøker }
+            .distinct()
+            .toList()
 }

@@ -5,9 +5,11 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.BeregningsresultatBoutgifterDto
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -60,23 +62,24 @@ class BoutgifterVedtakController(
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtaksperioder: List<VedtaksperiodeDto>,
+        @RequestBody vedtak: InnvilgelseBoutgifterRequest,
     ): BeregningsresultatBoutgifterDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         return beregningService
-            .beregn(behandling, vedtaksperioder.tilDomene())
+            .beregn(behandling, vedtak.vedtaksperioder.tilDomene())
             .tilDto(revurderFra = behandling.revurderFra)
     }
 
-//    @GetMapping("{behandlingId}")
-//    fun hentVedtak(
-//        @PathVariable behandlingId: BehandlingId,
-//    ): VedtakResponse? {
+    @GetMapping("{behandlingId}")
+    fun hentVedtak(
+        @PathVariable behandlingId: BehandlingId,
+    ): VedtakResponse? {
+        return null
 //        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 //        val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
 //        val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
 //        return VedtakDtoMapper.toDto(vedtak, revurderFra)
-//    }
+    }
 
 //    @GetMapping("/fullstendig-oversikt/{behandlingId}")
 //    fun hentFullstendigVedtaksoversikt(

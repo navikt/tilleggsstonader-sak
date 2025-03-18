@@ -8,8 +8,9 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnB
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
@@ -32,7 +33,7 @@ class BoutgifterBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatBoutgifter {
 //        val stønadsperioder = hentStønadsperioder(behandling.id)
-        val forrigeVedtak = hentForrigeVedtak(behandling)
+//        val forrigeVedtak = hentForrigeVedtak(behandling)
 
         val utgifterPerVilkårtype = boutgifterUtgiftService.hentUtgifterTilBeregning(behandling.id)
 
@@ -41,6 +42,8 @@ class BoutgifterBeregningService(
 //            stønadsperioder = stønadsperioder,
 //            behandlingId = behandling.id,
 //        )
+
+        // TODO: Deal med revurderFra-datoen
 
         val vedtaksperioderBeregning =
             vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(behandling.revurderFra)
@@ -62,21 +65,18 @@ class BoutgifterBeregningService(
 
     private fun beregnAktuellePerioder(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
-        utgifter: Map<Unit, List<UtgiftBeregning>>,
-//        revurderFra: LocalDate?,
-    ): List<BeregningsresultatForMåned> {
+        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    ): List<BeregningsresultatForLøpendeMåned> {
 //        validerPerioderForInnvilgelse(vedtaksperioder, utgifterPerBarn, typeVedtak)
-
-        // TODO: Deal med revurderFra-datoen
 
         return vedtaksperioder
             .sorted()
             .grupperVedtaksperioderPerLøpendeMåned()
             .map { UtbetalingPeriode(it) }
             .map { utbetalingPeriode ->
-                val grunnlagsdata = lagBeregningsGrunnlag(periode = utbetalingPeriode)
-                BeregningsresultatForMåned(
-                    beløp = beregnBeløp(utgifter),
+                val grunnlagsdata = lagBeregningsGrunnlag(periode = utbetalingPeriode, utgifter = utgifter)
+                BeregningsresultatForLøpendeMåned(
+                    stønadsbeløp = beregnBeløp(utgifter = utgifter, makssats = grunnlagsdata.makssats),
                     grunnlag = grunnlagsdata,
                 )
             }
@@ -230,20 +230,34 @@ class BoutgifterBeregningService(
             .findByIdOrThrow(behandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørBoutgifter>()
 
-    private fun lagBeregningsGrunnlag(periode: UtbetalingPeriode): Beregningsgrunnlag {
-        val sats = finnSatsForPeriode(periode)
+    private fun lagBeregningsGrunnlag(
+        periode: UtbetalingPeriode,
+        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    ): Beregningsgrunnlag {
+        val sats = finnMakssatsForPeriode(periode)
+
+        val utgifterIPerioden = finnUtgiftForUtbetalingsperiode(utgifter, periode)
 
         return Beregningsgrunnlag(
             fom = periode.fom,
             tom = periode.tom,
-//            studienivå = periode.studienivå,
-//            studieprosent = periode.prosent,
-//            sats = finnSatsForStudienivå(sats, periode.studienivå),
-            sats = finnSatsForStudienivå(),
-            satsBekreftet = sats.bekreftet,
+            utgifter = utgifterIPerioden,
+            makssats = sats.beløp,
+            makssatsBekreftet = sats.bekreftet,
             utbetalingsdato = periode.utbetalingsdato,
             målgruppe = periode.målgruppe,
             aktivitet = periode.aktivitet,
         )
+    }
+
+    private fun finnUtgiftForUtbetalingsperiode(
+        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+        periode: UtbetalingPeriode,
+    ): Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> {
+        require(utgifter.values.all { utgifterListe -> utgifterListe.all { periode.inneholder(it) } }) {
+            "Per nå krever vi at alle utgiftene havner innefor samme utgiftsperiode."
+        }
+
+        return utgifter
     }
 }

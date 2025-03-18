@@ -88,7 +88,7 @@ class BehandlingController(
     fun hentBehandlingerForPersonOgStønadstype(
         @RequestBody identStønadstype: IdentStønadstype,
     ): List<BehandlingDto> {
-        tilgangService.validerTilgangTilPersonMedBarn(identStønadstype.ident, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilPersonMedRelasjoner(identStønadstype.ident, AuditLoggerEvent.ACCESS)
 
         return fagsakService.hentBehandlingerForPersonOgStønadstype(
             identStønadstype.ident,
@@ -113,7 +113,7 @@ class BehandlingController(
         @PathVariable eksternBehandlingId: Long,
     ): BehandlingDto {
         val saksbehandling = behandlingService.hentSaksbehandling(eksternBehandlingId)
-        tilgangService.validerTilgangTilPersonMedBarn(saksbehandling.ident, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.ACCESS)
         return saksbehandling.tilDto()
     }
 

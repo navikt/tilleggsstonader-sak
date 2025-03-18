@@ -24,7 +24,7 @@ class BehandlingshistorikkController(
         @PathVariable behandlingId: BehandlingId,
     ): List<HendelseshistorikkDto> {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.ACCESS)
         val behandlingHistorikk = behandlingshistorikkService.finnHendelseshistorikk(saksbehandling)
         return behandlingHistorikk
     }

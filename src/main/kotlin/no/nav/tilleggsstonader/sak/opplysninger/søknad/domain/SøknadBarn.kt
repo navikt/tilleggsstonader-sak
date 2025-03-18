@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDate
 import java.util.UUID
 
 @Table("soknad_barn")
@@ -18,5 +19,12 @@ data class SøknadBarn(
 data class BarnMedBarnepass(
     val type: TypeBarnepass,
     val startetIFemte: JaNei?,
+    val utgifter: Utgifter?,
     val årsak: ÅrsakBarnepass?,
+)
+
+data class Utgifter(
+    val harUtgifterTilPassHelePerioden: JaNei,
+    val fom: LocalDate?,
+    val tom: LocalDate?,
 )

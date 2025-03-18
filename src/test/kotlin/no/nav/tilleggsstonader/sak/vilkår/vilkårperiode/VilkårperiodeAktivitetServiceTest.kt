@@ -491,7 +491,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                     id = aktivitet.id,
                     vilkårperiode = aktivitet.tilOppdatering(aktivitetsdager = 3),
                 )
-            }.hasMessageContaining("Ugyldig endring på periode")
+            }.hasMessageContaining("Kan ikke endre fakta på perioden")
         }
 
         private fun Vilkårperiode.tilOppdatering(
