@@ -55,6 +55,8 @@ class VilkårService(
 
         val oppdatertVilkår = flettVilkårOgVurderResultat(vilkår, svarPåVilkårDto)
         validerEndrePeriodeRevurdering(behandling, vilkår, oppdatertVilkår)
+        validerIngenUtgiftPåNullvedtak(svarPåVilkårDto)
+
         return vilkårRepository.update(oppdatertVilkår)
     }
 
@@ -79,6 +81,7 @@ class VilkårService(
             )
         val oppdatertVilkår = flettVilkårOgVurderResultat(nyttVilkår, opprettVilkårDto)
         validerNyPeriodeRevurdering(behandling, oppdatertVilkår)
+        validerIngenUtgiftPåNullvedtak(opprettVilkårDto)
 
         return vilkårRepository.insert(oppdatertVilkår)
     }
@@ -188,6 +191,12 @@ class VilkårService(
 
     private fun validerLåstForVidereRedigering(behandling: Saksbehandling) {
         behandling.status.validerKanBehandlingRedigeres()
+    }
+
+    private fun validerIngenUtgiftPåNullvedtak(lagreVilkårDto: LagreVilkårDto) {
+        feilHvis(lagreVilkårDto.erNullvedtak == true && lagreVilkårDto.utgift !== null) {
+            "Kan ikke ha utgift på nullvedtak"
+        }
     }
 
     /**

@@ -36,6 +36,7 @@ data class Vilkår(
     val tom: LocalDate? = null,
     val utgift: Int? = null,
     val barnId: BarnId? = null,
+    val erNullvedtak: Boolean,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     @Column("delvilkar")
@@ -82,7 +83,7 @@ data class Vilkår(
     }
 
     private fun validerPåkrevdBeløpHvisOppfylt() {
-        if (resultat == Vilkårsresultat.OPPFYLT) {
+        if (resultat == Vilkårsresultat.OPPFYLT && !erNullvedtak) {
             require(utgift != null) { "Utgift er påkrevd når resultat er oppfylt" }
         }
     }
