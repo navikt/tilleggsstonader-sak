@@ -73,11 +73,12 @@ class BoutgifterBeregningService(
             .sorted()
             .grupperVedtaksperioderPerLøpendeMåned()
             .map { UtbetalingPeriode(it) }
+            .validerIngenUtgifterKrysserUtbetalingsperioder(utgifter)
             .map {
                 BeregningsresultatForLøpendeMåned(
                     grunnlag = lagBeregningsGrunnlag(periode = it, utgifter = utgifter),
                 )
-            }.validerIngenUtgifterKrysserUtbetalingsperioder(utgifter)
+            }
 
 //    fun beregnForOpphør(
 //        behandling: Saksbehandling,
@@ -253,10 +254,10 @@ class BoutgifterBeregningService(
     ) = utgifter.mapValues { it.value.filter { utgift -> periode.inneholder(utgift) } }
 }
 
-private fun List<BeregningsresultatForLøpendeMåned>.validerIngenUtgifterKrysserUtbetalingsperioder(
+private fun List<UtbetalingPeriode>.validerIngenUtgifterKrysserUtbetalingsperioder(
     utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
-): List<BeregningsresultatForLøpendeMåned> {
-    val utbetalingsperioder = this.map { it.grunnlag }
+): List<UtbetalingPeriode> {
+    val utbetalingsperioder = this
     val alleUtgifter = utgifter.values.flatten()
 
     val detFinnesUtgiftSomKrysserUtbetalingsperioder =
