@@ -34,6 +34,9 @@ data class BeregningsresultatForLøpendeMåned(
     @get:JsonIgnore
     override val tom: LocalDate get() = grunnlag.tom
 
+    @get:JsonProperty("stønadsbeløp")
+    val stønadsbeløp get() = beregnBeløp()
+
     override fun medPeriode(
         fom: LocalDate,
         tom: LocalDate,
@@ -44,6 +47,14 @@ data class BeregningsresultatForLøpendeMåned(
 
     fun markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling: Boolean) =
         this.copy(delAvTidligereUtbetaling = delAvTidligereUtbetaling)
+
+    private fun beregnBeløp(): Int {
+        val summerteUtgifter =
+            grunnlag.utgifter.values
+                .flatten()
+                .sumOf { it.utgift }
+        return min(summerteUtgifter, grunnlag.makssats)
+    }
 }
 
 data class Beregningsgrunnlag(

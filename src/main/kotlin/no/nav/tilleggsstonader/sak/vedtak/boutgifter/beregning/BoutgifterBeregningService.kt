@@ -73,11 +73,9 @@ class BoutgifterBeregningService(
             .sorted()
             .grupperVedtaksperioderPerLøpendeMåned()
             .map { UtbetalingPeriode(it) }
-            .map { utbetalingPeriode ->
-                val grunnlagsdata = lagBeregningsGrunnlag(periode = utbetalingPeriode, utgifter = utgifter)
+            .map {
                 BeregningsresultatForLøpendeMåned(
-                    stønadsbeløp = beregnBeløp(utgifter = utgifter, makssats = grunnlagsdata.makssats),
-                    grunnlag = grunnlagsdata,
+                    grunnlag = lagBeregningsGrunnlag(periode = it, utgifter = utgifter),
                 )
             }.validerIngenUtgifterKrysserUtbetalingsperioder(utgifter)
 
