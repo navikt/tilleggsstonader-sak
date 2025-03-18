@@ -87,21 +87,10 @@ sealed interface Vurderinger {
 
     private fun utledResultat(resultater: List<ResultatDelvilkårperiode>) =
         when {
-            resultater.contains(ResultatDelvilkårperiode.IKKE_VURDERT) -> {
-                ResultatVilkårperiode.IKKE_VURDERT
-            }
-
-            resultater.contains(ResultatDelvilkårperiode.IKKE_OPPFYLT) -> {
-                ResultatVilkårperiode.IKKE_OPPFYLT
-            }
-
-            resultater.all { it == ResultatDelvilkårperiode.OPPFYLT } -> {
-                ResultatVilkårperiode.OPPFYLT
-            }
-
-            else -> {
-                error("Ugyldig resultat ($resultater)")
-            }
+            resultater.contains(ResultatDelvilkårperiode.IKKE_VURDERT) -> ResultatVilkårperiode.IKKE_VURDERT
+            resultater.contains(ResultatDelvilkårperiode.IKKE_OPPFYLT) -> ResultatVilkårperiode.IKKE_OPPFYLT
+            resultater.all { it == ResultatDelvilkårperiode.OPPFYLT } -> ResultatVilkårperiode.OPPFYLT
+            else -> error("Ugyldig resultat ($resultater)")
         }
 }
 

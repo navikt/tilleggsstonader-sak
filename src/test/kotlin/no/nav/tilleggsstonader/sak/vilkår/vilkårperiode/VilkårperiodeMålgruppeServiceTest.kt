@@ -391,7 +391,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                         .tilOppdatering()
                         .copy(faktaOgSvar = FaktaOgSvarMålgruppeDto(svarMedlemskap = SvarJaNei.JA)),
                 )
-            }.hasMessageContaining("Ugyldig endring på periode")
+            }.hasMessageContaining("Kan ikke endre vurderinger på perioden.")
         }
 
         private fun Vilkårperiode.tilOppdatering() =

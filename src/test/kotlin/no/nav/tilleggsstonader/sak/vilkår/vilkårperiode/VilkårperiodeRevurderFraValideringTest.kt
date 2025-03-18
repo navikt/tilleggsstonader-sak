@@ -7,13 +7,19 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medAktivitetsdager
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingAldersVilkår
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingLønnet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -143,34 +149,7 @@ class VilkårperiodeRevurderFraValideringTest {
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.copy(tom = revurderFra.minusDays(2)),
                 )
-            }.hasMessageContaining("Ugyldig endring på periode som begynner(01.12.2023) før revurderingsdato(01.01.2024)")
-        }
-
-        @Test
-        fun `kan ikke oppdatere data på periode hvis det begynner før revurder-fra`() {
-            val eksisterendeVilkårperiode =
-                aktivitet(
-                    fom = revurderFra.minusMonths(1),
-                    tom = revurderFra.plusMonths(1),
-                    faktaOgVurdering =
-                        faktaOgVurderingAktivitetTilsynBarn(
-                            aktivitetsdager = 3,
-                            lønnet = vurderingLønnet(SvarJaNei.NEI),
-                        ),
-                    resultat = ResultatVilkårperiode.OPPFYLT,
-                )
-            listOf<(Vilkårperiode) -> Vilkårperiode>(
-                { it.medAktivitetsdager(aktivitetsdager = 2) },
-                { it.copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT) },
-                { it.copy(begrunnelse = "en begrunnelse").medLønnet(vurderingLønnet(SvarJaNei.JA)) },
-            ).forEach { endreVilkårperiode ->
-                assertThatThrownBy {
-                    endringMedRevurderFra(
-                        eksisterendeVilkårperiode,
-                        endreVilkårperiode(eksisterendeVilkårperiode),
-                    )
-                }.hasMessageContaining("Ugyldig endring på periode som begynner(01.12.2023) før revurderingsdato(01.01.2024)")
-            }
+            }.hasMessageContaining("Kan ikke sette tom tidligere enn dagen før revurder-fra")
         }
 
         @Test
@@ -185,7 +164,119 @@ class VilkårperiodeRevurderFraValideringTest {
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.copy(fom = revurderFra.minusDays(2)),
                 )
-            }.hasMessageContaining("Kan ikke sette fom før revurderingsdato")
+            }.hasMessageContaining("Kan ikke sette fom før revurder-fra")
+        }
+
+        @Test
+        fun `kan kunne oppdatere begrunnelse på periode hvis det begynner før revurder-fra`() {
+            val eksisterendeVilkårperiode =
+                aktivitet(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.plusMonths(1),
+                )
+
+            assertDoesNotThrow {
+                endringMedRevurderFra(
+                    eksisterendeVilkårperiode,
+                    eksisterendeVilkårperiode.copy(begrunnelse = "en begrunnelse"),
+                )
+            }
+        }
+
+        @Test
+        fun `skal ikke kunne oppdatere resultat`() {
+            val eksisterendeVilkårperiode =
+                aktivitet(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.plusMonths(1),
+                    resultat = ResultatVilkårperiode.OPPFYLT,
+                )
+            assertThatThrownBy {
+                endringMedRevurderFra(
+                    eksisterendeVilkårperiode,
+                    eksisterendeVilkårperiode.copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
+                )
+            }.hasMessageContaining("Resultat kan ikke endre seg")
+        }
+
+        @Test
+        fun `skal ikke kunne oppdatere fakta`() {
+            val eksisterendeVilkårperiode =
+                aktivitet(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.plusMonths(1),
+                    faktaOgVurdering =
+                        faktaOgVurderingAktivitetTilsynBarn(
+                            aktivitetsdager = 3,
+                            lønnet = vurderingLønnet(SvarJaNei.NEI),
+                        ),
+                    resultat = ResultatVilkårperiode.OPPFYLT,
+                )
+            assertThatThrownBy {
+                endringMedRevurderFra(
+                    eksisterendeVilkårperiode,
+                    eksisterendeVilkårperiode.medAktivitetsdager(5),
+                )
+            }.hasMessageContaining("Kan ikke endre fakta på perioden")
+        }
+
+        @Test
+        fun `skal ikke kunne oppdatere vurderinger`() {
+            val eksisterendeVilkårperiode =
+                målgruppe(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.plusMonths(1),
+                    faktaOgVurdering =
+                        faktaOgVurderingMålgruppe(
+                            dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(SvarJaNei.JA),
+                        ),
+                    begrunnelse = "en begrunnelse",
+                )
+            val oppdatert =
+                eksisterendeVilkårperiode.let {
+                    @Suppress("UNCHECKED_CAST")
+                    it as GeneriskVilkårperiode<AAPTilsynBarn>
+                    val dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(SvarJaNei.NEI)
+                    val oppdaterteVurderinger =
+                        it.faktaOgVurdering.vurderinger.copy(dekketAvAnnetRegelverk = dekketAvAnnetRegelverk)
+                    it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(vurderinger = oppdaterteVurderinger))
+                }
+            assertThatThrownBy {
+                endringMedRevurderFra(
+                    eksisterendeVilkårperiode,
+                    oppdatert,
+                )
+            }.hasMessageContaining("Kan ikke endre vurderinger på perioden")
+        }
+
+        @Test
+        fun `skal kunne oppdatere aldersvilkår uten at det kastes feil då det er en automatisk vurdering`() {
+            val vurderingAldersVilkår =
+                VurderingAldersVilkår(
+                    svar = SvarJaNei.GAMMEL_MANGLER_DATA,
+                    vurderingFaktaEtterlevelse = null,
+                    resultat = ResultatDelvilkårperiode.IKKE_VURDERT,
+                )
+            val eksisterendeVilkårperiode =
+                målgruppe(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.plusMonths(1),
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(aldersvilkår = vurderingAldersVilkår),
+                )
+            val oppdatert =
+                eksisterendeVilkårperiode.let {
+                    @Suppress("UNCHECKED_CAST")
+                    it as GeneriskVilkårperiode<AAPTilsynBarn>
+                    val oppdaterteVurderinger =
+                        it.faktaOgVurdering.vurderinger.copy(aldersvilkår = vurderingAldersVilkår(SvarJaNei.JA))
+                    it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(vurderinger = oppdaterteVurderinger))
+                }
+            assertDoesNotThrow {
+                endringMedRevurderFra(
+                    eksisterendeVilkårperiode,
+                    oppdatert,
+                )
+            }
         }
 
         private fun endringMedRevurderFra(
