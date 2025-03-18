@@ -3,8 +3,9 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnBeløpUtil.beregnBeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
@@ -29,7 +30,7 @@ class BoutgifterBeregningService(
      * Kjente begrensninger i beregningen (programmet kaster feil dersom antagelsene ikke stemmer):
      * - Vi antar at satsen ikke endrer seg i vedtaksperioden (TODO: SJEKK AT DET STEMMER)
      * - Vi antar at det er overlapp mellom utgift og aktivitetsperiode (TODO)
-     * - Utgiftene krysser ikke overgangen fra én løpende måned til en annen (TODO)
+     * - Utgiftene krysser ikke overgangen fra én løpende måned til en annen
      */
     fun beregn(
         behandling: Saksbehandling,
@@ -78,7 +79,7 @@ class BoutgifterBeregningService(
                     stønadsbeløp = beregnBeløp(utgifter = utgifter, makssats = grunnlagsdata.makssats),
                     grunnlag = grunnlagsdata,
                 )
-            }
+            }.validerIngenUtgifterKrysserUtbetalingsperioder(utgifter)
 
 //    fun beregnForOpphør(
 //        behandling: Saksbehandling,
@@ -251,11 +252,27 @@ class BoutgifterBeregningService(
     private fun finnUtgiftForUtbetalingsperiode(
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
         periode: UtbetalingPeriode,
-    ): Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> {
-        require(utgifter.values.all { utgifterListe -> utgifterListe.all { periode.inneholder(it) } }) {
-            "Per nå krever vi at alle utgiftene havner innefor samme utgiftsperiode."
+    ) = utgifter.mapValues { it.value.filter { utgift -> periode.inneholder(utgift) } }
+}
+
+private fun List<BeregningsresultatForLøpendeMåned>.validerIngenUtgifterKrysserUtbetalingsperioder(
+    utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+): List<BeregningsresultatForLøpendeMåned> {
+    val utbetalingsperioder = this.map { it.grunnlag }
+    val alleUtgifter = utgifter.values.flatten()
+
+    val detFinnesUtgiftSomKrysserUtbetalingsperioder =
+        alleUtgifter.any { utgift ->
+            utbetalingsperioder.none { it.inneholder(utgift) }
         }
 
-        return utgifter
+    brukerfeilHvis(detFinnesUtgiftSomKrysserUtbetalingsperioder) {
+        """
+        Vi støtter foreløpig ikke at utgifter krysser ulike utbetalingsperioder. 
+        Utbetalingsperioder for denne behandlingen er: ${utbetalingsperioder.map { it.formatertPeriodeNorskFormat() }}, 
+        mens utgiftsperiodene er: ${alleUtgifter.map { it.formatertPeriodeNorskFormat() }}
+        """.trimIndent()
     }
+
+    return this
 }
