@@ -19,6 +19,8 @@ import java.time.LocalDateTime
 data class BehandlingDto(
     val id: BehandlingId,
     val forrigeIverksatteBehandlingId: BehandlingId?,
+    @Deprecated("Skal bruke forrgieIverksatteBehandling id")
+    val forrigeBehandlingId: BehandlingId?,
     val fagsakId: FagsakId,
     val fagsakPersonId: FagsakPersonId,
     val steg: StegType,
@@ -44,6 +46,7 @@ fun Behandling.tilDto(
     BehandlingDto(
         id = this.id,
         forrigeIverksatteBehandlingId = this.forrigeIverksatteBehandlingId,
+        forrigeBehandlingId = this.forrigeIverksatteBehandlingId,
         fagsakId = this.fagsakId,
         fagsakPersonId = fagsakPersonId,
         steg = this.steg,
@@ -66,6 +69,7 @@ fun Saksbehandling.tilDto(): BehandlingDto =
     BehandlingDto(
         id = this.id,
         forrigeIverksatteBehandlingId = this.forrigeIverksatteBehandlingId,
+        forrigeBehandlingId = this.forrigeIverksatteBehandlingId,
         fagsakId = this.fagsakId,
         fagsakPersonId = this.fagsakPersonId,
         steg = this.steg,
