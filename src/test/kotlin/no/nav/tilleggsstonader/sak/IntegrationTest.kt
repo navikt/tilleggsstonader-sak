@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRouting
 import no.nav.tilleggsstonader.sak.oppfølging.Oppfølging
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
@@ -136,6 +137,7 @@ abstract class IntegrationTest {
             BrevmottakerFrittståendeBrev::class,
             FrittståendeBrev::class,
             Oppfølging::class,
+            FaktaGrunnlag::class,
             Grunnlagsdata::class,
             Vedtak::class,
             Simuleringsresultat::class,

@@ -65,13 +65,17 @@ object TilsynBarnTestUtil {
             aktivitet = AktivitetType.TILTAK,
         )
 
-    val defaultVedtaksperiodeBeregning =
-        VedtaksperiodeBeregning(
-            fom = LocalDate.of(2024, 1, 1),
-            tom = LocalDate.of(2024, 1, 31),
-            målgruppe = MålgruppeType.AAP,
-            aktivitet = AktivitetType.TILTAK,
-        )
+    fun vedtaksperiodeBeregning(
+        fom: LocalDate = LocalDate.of(2024, 1, 1),
+        tom: LocalDate = LocalDate.of(2024, 1, 31),
+        målgruppe: MålgruppeType = MålgruppeType.AAP,
+        aktivitet: AktivitetType = AktivitetType.TILTAK,
+    ) = VedtaksperiodeBeregning(
+        fom = fom,
+        tom = tom,
+        målgruppe = målgruppe,
+        aktivitet = aktivitet,
+    )
 
     val defaultInnvilgelseTilsynBarn =
         InnvilgelseTilsynBarn(
@@ -112,6 +116,31 @@ object TilsynBarnTestUtil {
         beløpsperioder = beløpsperioder,
     )
 
+    fun beregningsresultatForMåned(
+        måned: YearMonth = YearMonth.of(2024, 1),
+        beløpsperioder: List<Beløpsperiode> = beløpsperioderDefault,
+        grunnlag: Beregningsgrunnlag = beregningsgrunnlag(måned),
+    ) = BeregningsresultatForMåned(
+        dagsats = BigDecimal.TEN,
+        månedsbeløp = 3000,
+        grunnlag = grunnlag,
+        beløpsperioder = beløpsperioder,
+    )
+
+    fun beregningsgrunnlag(
+        måned: YearMonth = YearMonth.of(2024, 1),
+        vedtaksperioder: List<VedtaksperiodeGrunnlag> = emptyList(),
+        utgifterTotal: Int = 5000,
+        utgifter: List<UtgiftBarn> = listOf(UtgiftBarn(defaultBarn1.id, 1000)),
+    ) = Beregningsgrunnlag(
+        måned = måned,
+        makssats = 3000,
+        vedtaksperiodeGrunnlag = vedtaksperioder,
+        utgifter = utgifter,
+        utgifterTotal = utgifterTotal,
+        antallBarn = 1,
+    )
+
     fun innvilgelse(data: InnvilgelseTilsynBarn = defaultInnvilgelseTilsynBarn) =
         GeneriskVedtak(
             behandlingId = defaultBehandling.id,
@@ -120,7 +149,7 @@ object TilsynBarnTestUtil {
             gitVersjon = Applikasjonsversjon.versjon,
         )
 
-    fun vedtaksperiodeGrunnlag(vedtaksperiode: VedtaksperiodeBeregning = defaultVedtaksperiodeBeregning): VedtaksperiodeGrunnlag =
+    fun vedtaksperiodeGrunnlag(vedtaksperiode: VedtaksperiodeBeregning = vedtaksperiodeBeregning()): VedtaksperiodeGrunnlag =
         VedtaksperiodeGrunnlag(
             vedtaksperiode = vedtaksperiode,
             aktiviteter = emptyList(),
