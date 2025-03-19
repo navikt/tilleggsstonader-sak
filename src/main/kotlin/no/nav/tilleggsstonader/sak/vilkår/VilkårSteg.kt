@@ -39,7 +39,7 @@ class VilkårSteg(
         val manglerVerdierPåOppfylteVilkår =
             vilkår
                 .filter { it.resultat == Vilkårsresultat.OPPFYLT }
-                .any { it.fom == null || it.tom == null || it.utgift == null }
+                .any { it.fom == null || it.tom == null || (!it.erNullvedtak && it.utgift == null) }
         brukerfeilHvis(manglerVerdierPåOppfylteVilkår) {
             "Mangler fom, tom eller utgift på et eller flere vilkår. " +
                 "Vennligst ta stilling til hvilken periode vilkåret gjelder for."
