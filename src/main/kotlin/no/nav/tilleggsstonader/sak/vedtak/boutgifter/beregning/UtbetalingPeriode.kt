@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.lørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.sisteDagenILøpendeMåned
@@ -35,29 +36,28 @@ data class UtbetalingPeriode(
         }
     }
 
-//    constructor(
-//        løpendeMåned: LøpendeMåned,
-//        målgruppeOgAktivitet: MålgruppeOgAktivitet,
-//    ) : this(
-//        fom = løpendeMåned.fom,
-//        tom = løpendeMåned.vedtaksperioder.maxOf { it.tom },
-//        målgruppe = målgruppeOgAktivitet.målgruppe,
-//        aktivitet = målgruppeOgAktivitet.aktivitet.type,
-//        studienivå = målgruppeOgAktivitet.aktivitet.studienivå,
-//        prosent = målgruppeOgAktivitet.aktivitet.prosent,
-//        utbetalingsdato = løpendeMåned.utbetalingsdato,
-//    )
-
     constructor(
         løpendeMåned: LøpendeMåned,
     ) : this(
         fom = løpendeMåned.fom,
         tom = løpendeMåned.vedtaksperioder.maxOf { it.tom },
-        // TODO: Prioriter hvilken målgruppe som skal være gjeldende til økonomi hvis ulike målgrupper havner innenfor samme løpende måned
-        målgruppe = løpendeMåned.vedtaksperioder.first().målgruppe,
-        aktivitet = løpendeMåned.vedtaksperioder.first().aktivitet,
-//        studienivå = målgruppeOgAktivitet.aktivitet.studienivå,
-//        prosent = målgruppeOgAktivitet.aktivitet.prosent,
+        // TODO: Prioriter hvilken målgruppe+aktivitet som skal være gjeldende til økonomi hvis ulike målgrupper havner innenfor samme løpende måned
+        målgruppe =
+            løpendeMåned.vedtaksperioder
+                .distinctBy { it.målgruppe }
+                .singleOrNull()
+                ?.målgruppe
+                ?: brukerfeil(
+                    "Det finnes flere ulike målgrupper i utbetalingsperioden ${løpendeMåned.formatertPeriodeNorskFormat()}. Dette er foreløpig ikke noe vi har støtte for.",
+                ),
+        aktivitet =
+            løpendeMåned.vedtaksperioder
+                .distinctBy { it.aktivitet }
+                .singleOrNull()
+                ?.aktivitet
+                ?: brukerfeil(
+                    "Det finnes flere ulike målgrupper i utbetalingsperioden ${løpendeMåned.formatertPeriodeNorskFormat()}. Dette er foreløpig ikke noe vi har støtte for.",
+                ),
         utbetalingsdato = løpendeMåned.utbetalingsdato,
     )
 }
