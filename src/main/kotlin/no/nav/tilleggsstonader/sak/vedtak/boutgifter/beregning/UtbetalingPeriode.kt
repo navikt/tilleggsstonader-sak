@@ -91,18 +91,3 @@ data class LøpendeMåned(
 
     fun harDatoerIUkedager(): Boolean = vedtaksperioder.any { it.alleDatoer().any { !it.lørdagEllerSøndag() } }
 }
-
-data class MålgruppeOgAktivitet(
-    val målgruppe: MålgruppeType,
-    val aktivitet: AktivitetBoutgifterBeregningGrunnlag,
-) : Comparable<MålgruppeOgAktivitet> {
-    override fun compareTo(other: MålgruppeOgAktivitet): Int = COMPARE_BY.compare(this, other)
-
-    companion object {
-        //        val COMPARE_BY =
-//            compareBy<MålgruppeOgAktivitet> { it.aktivitet.studienivå.prioritet }
-//                .thenByDescending { it.aktivitet.prosent }
-//                .thenBy { it.målgruppe.prioritet() }
-        val COMPARE_BY = compareBy<MålgruppeOgAktivitet>(TODO("Ikke implementert for boutgifter"))
-    }
-}
