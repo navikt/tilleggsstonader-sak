@@ -54,7 +54,7 @@ class OpprettRevurderingBehandlingService(
             behandlingService.opprettBehandling(
                 fagsakId = fagsakId,
                 behandlingsårsak = request.årsak,
-                kravMottatt = null, // TODO flytt til request
+                kravMottatt = request.kravMottatt,
             )
 
         val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
