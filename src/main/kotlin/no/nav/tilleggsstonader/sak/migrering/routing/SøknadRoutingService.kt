@@ -87,7 +87,7 @@ class SøknadRoutingService(
         when (stønadstype) {
             Stønadstype.BARNETILSYN -> false // tilsyn barn skal ikke stoppes med feature toggle
             Stønadstype.LÆREMIDLER -> maksAntallErNådd(stønadstype)
-            Stønadstype.BOUTGIFTER -> error("Støtter ennå ikke stønadstype=$stønadstype")
+            Stønadstype.BOUTGIFTER -> maksAntallErNådd(stønadstype)
         }
 
     private fun maksAntallErNådd(stønadstype: Stønadstype): Boolean {
@@ -103,6 +103,7 @@ class SøknadRoutingService(
     private fun Stønadstype.maksAntallToggle() =
         when (this) {
             Stønadstype.LÆREMIDLER -> Toggle.SØKNAD_ROUTING_LÆREMIDLER
+            Stønadstype.BOUTGIFTER -> Toggle.SØKNAD_ROUTING_BOUTGIFTER
             else -> error("Har ikke maksAntalLToggle for stønadstype=$this")
         }
 
