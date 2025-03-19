@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
@@ -267,7 +268,7 @@ private fun validerUtgifterErInnenforVedtaksperiodene(
             vedtaksperioder.any { it.inneholder(utgiftsperiode) }
         }
 
-    brukerfeilHvis(!alleUtgifterErInnenforEnVedtaksperiode) {
+    brukerfeilHvisIkke(alleUtgifterErInnenforEnVedtaksperiode) {
         "Du har lagt inn utgifter som er utenfor vedtaksperioden. Foreløpig støtter vi ikke dette."
     }
 }
