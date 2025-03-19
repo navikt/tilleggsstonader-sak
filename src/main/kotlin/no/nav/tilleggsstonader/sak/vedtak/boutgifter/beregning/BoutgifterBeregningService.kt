@@ -29,7 +29,7 @@ class BoutgifterBeregningService(
     /**
      * Kjente begrensninger i beregningen (programmet kaster feil dersom antagelsene ikke stemmer):
      * - Vi antar at satsen ikke endrer seg i vedtaksperioden (TODO: SJEKK AT DET STEMMER)
-     * - Vi antar at det er overlapp mellom utgift og aktivitetsperiode (TODO)
+     * - Vi antar at det er overlapp mellom utgift og vedtaksperiode
      * - Utgiftene krysser ikke overgangen fra én løpende måned til en annen
      */
     fun beregn(
@@ -50,6 +50,8 @@ class BoutgifterBeregningService(
 
         val vedtaksperioderBeregning =
             vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(behandling.revurderFra)
+
+        validerUtgifterErInnenforVedtaksperiodene(utgifterPerVilkårtype, vedtaksperioderBeregning)
 
         val beregningsresultat =
             beregnAktuellePerioder(
@@ -254,14 +256,30 @@ class BoutgifterBeregningService(
     ) = utgifter.mapValues { it.value.filter { utgift -> periode.inneholder(utgift) } }
 }
 
+private fun validerUtgifterErInnenforVedtaksperiodene(
+    utgifterPerType: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    vedtaksperioder: List<VedtaksperiodeBeregning>,
+) {
+    val utgifter = utgifterPerType.values.flatten()
+
+    val alleUtgifterErInnenforEnVedtaksperiode =
+        utgifter.all { utgiftsperiode ->
+            vedtaksperioder.any { it.inneholder(utgiftsperiode) }
+        }
+
+    brukerfeilHvis(!alleUtgifterErInnenforEnVedtaksperiode) {
+        "Du har lagt inn utgifter som er utenfor vedtaksperioden. Foreløpig støtter vi ikke dette."
+    }
+}
+
 private fun List<UtbetalingPeriode>.validerIngenUtgifterKrysserUtbetalingsperioder(
-    utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    utgifterPerBoutgiftstype: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
 ): List<UtbetalingPeriode> {
     val utbetalingsperioder = this
-    val alleUtgifter = utgifter.values.flatten()
+    val utgifter = utgifterPerBoutgiftstype.values.flatten()
 
     val detFinnesUtgiftSomKrysserUtbetalingsperioder =
-        alleUtgifter.any { utgift ->
+        utgifter.any { utgift ->
             utbetalingsperioder.none { it.inneholder(utgift) }
         }
 
@@ -269,7 +287,7 @@ private fun List<UtbetalingPeriode>.validerIngenUtgifterKrysserUtbetalingsperiod
         """
         Vi støtter foreløpig ikke at utgifter krysser ulike utbetalingsperioder. 
         Utbetalingsperioder for denne behandlingen er: ${utbetalingsperioder.map { it.formatertPeriodeNorskFormat() }}, 
-        mens utgiftsperiodene er: ${alleUtgifter.map { it.formatertPeriodeNorskFormat() }}
+        mens utgiftsperiodene er: ${utgifter.map { it.formatertPeriodeNorskFormat() }}
         """.trimIndent()
     }
 
