@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 data class Saksbehandling(
     val id: BehandlingId,
     val eksternId: Long,
-    val forrigeBehandlingId: BehandlingId? = null,
+    val forrigeIverksatteBehandlingId: BehandlingId? = null,
     val type: BehandlingType,
     val status: BehandlingStatus,
     val steg: StegType,

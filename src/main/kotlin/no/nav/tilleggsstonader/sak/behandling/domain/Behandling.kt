@@ -15,13 +15,13 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
- * @param forrigeBehandlingId forrige iverksatte behandling
+ * @param forrigeIverksatteBehandlingId forrige iverksatte behandling
  */
 data class Behandling(
     @Id
     val id: BehandlingId = BehandlingId.random(),
     val fagsakId: FagsakId,
-    val forrigeBehandlingId: BehandlingId? = null,
+    val forrigeIverksatteBehandlingId: BehandlingId? = null,
     // @Version ?
     val versjon: Int = 0,
     val type: BehandlingType,

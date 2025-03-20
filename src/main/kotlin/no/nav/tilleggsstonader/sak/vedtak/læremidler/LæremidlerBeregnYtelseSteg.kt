@@ -73,7 +73,7 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
     ) {
-        val forrigeVedtaksperioder = saksbehandling.forrigeBehandlingId?.let { hentVedtak(it).data.vedtaksperioder }
+        val forrigeVedtaksperioder = saksbehandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it).data.vedtaksperioder }
         val vedtaksperioderMedStatus =
             settStatusPåVedtaksperioder(
                 vedtaksperioder = vedtaksperioder,
@@ -110,13 +110,13 @@ class LæremidlerBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtak: OpphørLæremidlerRequest,
     ) {
-        feilHvis(saksbehandling.forrigeBehandlingId == null) {
+        feilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
         feilHvis(saksbehandling.revurderFra == null) {
             "revurderFra-dato er påkrevd for opphør"
         }
-        val forrigeVedtak = hentVedtak(saksbehandling.forrigeBehandlingId)
+        val forrigeVedtak = hentVedtak(saksbehandling.forrigeIverksatteBehandlingId)
 
         opphørValideringService.validerVilkårperioder(saksbehandling)
 

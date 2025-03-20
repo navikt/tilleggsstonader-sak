@@ -28,7 +28,7 @@ class GjennbrukDataRevurderingService(
         behandlingIdForGjenbruk: BehandlingId,
     ) {
         val barnIder: Map<TidligereBarnId, NyttBarnId> =
-            barnService.gjenbrukBarn(forrigeBehandlingId = behandlingIdForGjenbruk, nyBehandlingId = behandling.id)
+            barnService.gjenbrukBarn(forrigeIverksatteBehandlingId = behandlingIdForGjenbruk, nyBehandlingId = behandling.id)
 
         gjenbrukData(behandling, behandlingIdForGjenbruk, barnIder)
     }
@@ -42,24 +42,24 @@ class GjennbrukDataRevurderingService(
         barnIder: Map<TidligereBarnId, NyttBarnId>,
     ) {
         vilkårperiodeService.gjenbrukVilkårperioder(
-            forrigeBehandlingId = behandlingIdForGjenbruk,
+            forrigeIverksatteBehandlingId = behandlingIdForGjenbruk,
             nyBehandlingId = behandling.id,
         )
 
         stønadsperiodeService.gjenbrukStønadsperioder(
-            forrigeBehandlingId = behandlingIdForGjenbruk,
+            forrigeIverksatteBehandlingId = behandlingIdForGjenbruk,
             nyBehandlingId = behandling.id,
         )
 
         vilkårService.kopierVilkårsettTilNyBehandling(
-            forrigeBehandlingId = behandlingIdForGjenbruk,
+            forrigeIverksatteBehandlingId = behandlingIdForGjenbruk,
             nyBehandling = behandling,
             barnIdMap = barnIder,
         )
     }
 
     fun finnBehandlingIdForGjenbruk(behandling: Behandling): BehandlingId? =
-        behandling.forrigeBehandlingId
+        behandling.forrigeIverksatteBehandlingId
             ?: finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(behandling.fagsakId)
 
     fun finnBehandlingIdForGjenbruk(fagsakId: FagsakId): BehandlingId? =
@@ -71,10 +71,10 @@ class GjennbrukDataRevurderingService(
      */
     fun finnNyttIdForBarn(
         nyBehandlingId: BehandlingId,
-        forrigeBehandlingId: BehandlingId,
+        forrigeIverksatteBehandlingId: BehandlingId,
     ): Map<TidligereBarnId, NyttBarnId> {
         val nyeBarn = barnService.finnBarnPåBehandling(nyBehandlingId).associateBy { it.ident }
-        val tidligereBarn = barnService.finnBarnPåBehandling(forrigeBehandlingId)
+        val tidligereBarn = barnService.finnBarnPåBehandling(forrigeIverksatteBehandlingId)
         return tidligereBarn.associate {
             val nyttBarnId =
                 nyeBarn[it.ident]

@@ -309,7 +309,7 @@ class BehandlingsstatistikkMappingTest {
     @Test
     fun `mapping ved revurdering`() {
         val behandlingId = BehandlingId(UUID.randomUUID())
-        val forrigeBehandlingId = BehandlingId(UUID.randomUUID())
+        val forrigeIverksatteBehandlingId = BehandlingId(UUID.randomUUID())
         val aktørId = "9876543210127"
         val saksbehandlerId = "7873486250023"
 
@@ -323,7 +323,7 @@ class BehandlingsstatistikkMappingTest {
                 ident = aktørId,
                 eksternId = 24L,
                 eksternFagId = 48L,
-                forrigeBehandlingId = forrigeBehandlingId,
+                forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
                 type = BehandlingType.REVURDERING,
                 kategori = BehandlingKategori.NASJONAL,
                 resultat = BehandlingResultat.INNVILGET,
@@ -531,7 +531,7 @@ class BehandlingsstatistikkMappingTest {
         ident: String,
         eksternId: Long,
         eksternFagId: Long,
-        forrigeBehandlingId: BehandlingId? = null,
+        forrigeIverksatteBehandlingId: BehandlingId? = null,
         type: BehandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
         kategori: BehandlingKategori = BehandlingKategori.NASJONAL,
         resultat: BehandlingResultat = BehandlingResultat.IKKE_SATT,
@@ -539,7 +539,7 @@ class BehandlingsstatistikkMappingTest {
     ) = Saksbehandling(
         id = behandlingId,
         eksternId = eksternId,
-        forrigeBehandlingId = forrigeBehandlingId,
+        forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
         type = type,
         status = BehandlingStatus.OPPRETTET,
         steg = StegType.INNGANGSVILKÅR,

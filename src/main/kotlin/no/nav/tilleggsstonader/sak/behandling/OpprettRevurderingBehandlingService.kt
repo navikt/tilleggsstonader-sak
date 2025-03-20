@@ -109,19 +109,19 @@ class OpprettRevurderingBehandlingService(
     }
 
     fun hentBarnTilRevurdering(fagsakId: FagsakId): BarnTilRevurderingDto {
-        val forrigeBehandlingId = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(fagsakId)
-        return hentBarnTilRevurdering(fagsakId, forrigeBehandlingId)
+        val forrigeIverksatteBehandlingId = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(fagsakId)
+        return hentBarnTilRevurdering(fagsakId, forrigeIverksatteBehandlingId)
     }
 
     private fun hentBarnTilRevurdering(
         fagsakId: FagsakId,
-        forrigeBehandlingId: BehandlingId?,
+        forrigeIverksatteBehandlingId: BehandlingId?,
     ): BarnTilRevurderingDto {
         val ident = fagsakService.hentAktivIdent(fagsakId)
         val barnPåSøker = personService.hentPersonMedBarn(ident).barn
         val eksisterendeBarn =
-            forrigeBehandlingId
-                ?.let { barnService.finnBarnPåBehandling(forrigeBehandlingId).associateBy { it.ident } }
+            forrigeIverksatteBehandlingId
+                ?.let { barnService.finnBarnPåBehandling(forrigeIverksatteBehandlingId).associateBy { it.ident } }
                 ?: emptyMap()
 
         return BarnTilRevurderingDto(

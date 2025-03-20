@@ -49,7 +49,7 @@ interface OppfølgingRepository :
         f.stonadstype,
         f.fagsak_person_id,
         b.vedtakstidspunkt,
-        (select count(*) > 0 from behandling b where b.forrige_behandling_id = o.behandling_id) har_nyere_behandling
+        (select count(*) > 0 from behandling b where b.forrige_iverksatte_behandling_id = o.behandling_id) har_nyere_behandling
         FROM oppfolging o
         JOIN behandling b ON b.id = o.behandling_id
         JOIN fagsak f ON f.id = b.fagsak_id
@@ -67,7 +67,7 @@ interface OppfølgingRepository :
         f.stonadstype,
         f.fagsak_person_id,
         b.vedtakstidspunkt,
-        (select count(*) > 0 from behandling b where b.forrige_behandling_id = o.behandling_id) har_nyere_behandling
+        (select count(*) > 0 from behandling b where b.forrige_iverksatte_behandling_id = o.behandling_id) har_nyere_behandling
         FROM oppfolging o 
         JOIN behandling b ON b.id = o.behandling_id
         JOIN fagsak f ON f.id = b.fagsak_id

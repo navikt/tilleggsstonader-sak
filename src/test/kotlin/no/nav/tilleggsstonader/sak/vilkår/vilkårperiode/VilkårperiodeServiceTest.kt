@@ -108,7 +108,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
                 val originalMålgruppe =
                     målgruppe(
-                        behandlingId = revurdering.forrigeBehandlingId!!,
+                        behandlingId = revurdering.forrigeIverksatteBehandlingId!!,
                     )
 
                 vilkårperiodeRepository.insert(originalMålgruppe)
@@ -287,13 +287,13 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             val eksisterendeVilkårperioder =
                 listOf(
-                    målgruppe(behandlingId = revurdering.forrigeBehandlingId!!),
-                    aktivitet(behandlingId = revurdering.forrigeBehandlingId!!),
+                    målgruppe(behandlingId = revurdering.forrigeIverksatteBehandlingId!!),
+                    aktivitet(behandlingId = revurdering.forrigeIverksatteBehandlingId!!),
                 )
 
             vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
 
-            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeBehandlingId!!, revurdering.id)
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
 
             val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
             assertThat(res).hasSize(2)
@@ -328,12 +328,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             val eksisterendeVilkårperioder =
                 listOf(
-                    målgruppe(behandlingId = revurdering.forrigeBehandlingId!!)
+                    målgruppe(behandlingId = revurdering.forrigeIverksatteBehandlingId!!)
                         .copy(gitVersjon = gitVersjon),
                 )
             vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
 
-            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeBehandlingId!!, revurdering.id)
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
 
             val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
             assertThat(res).hasSize(1)
@@ -346,15 +346,15 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             val eksisterendeVilkårperioder =
                 listOf(
-                    målgruppe(behandlingId = revurdering.forrigeBehandlingId!!),
+                    målgruppe(behandlingId = revurdering.forrigeIverksatteBehandlingId!!),
                     målgruppe(
-                        behandlingId = revurdering.forrigeBehandlingId!!,
+                        behandlingId = revurdering.forrigeIverksatteBehandlingId!!,
                         resultat = ResultatVilkårperiode.SLETTET,
                         slettetKommentar = "slettet",
                     ),
-                    aktivitet(behandlingId = revurdering.forrigeBehandlingId!!),
+                    aktivitet(behandlingId = revurdering.forrigeIverksatteBehandlingId!!),
                     aktivitet(
-                        behandlingId = revurdering.forrigeBehandlingId!!,
+                        behandlingId = revurdering.forrigeIverksatteBehandlingId!!,
                         resultat = ResultatVilkårperiode.SLETTET,
                         slettetKommentar = "slettet",
                     ),
@@ -362,7 +362,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
 
-            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeBehandlingId!!, revurdering.id)
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
 
             val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
             assertThat(res).hasSize(2)

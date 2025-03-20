@@ -20,12 +20,12 @@ class BarnService(
 
     @Transactional
     fun gjenbrukBarn(
-        forrigeBehandlingId: BehandlingId,
+        forrigeIverksatteBehandlingId: BehandlingId,
         nyBehandlingId: BehandlingId,
     ): Map<TidligereBarnId, NyttBarnId> {
         val nyeBarnPåGammelId =
             barnRepository
-                .findByBehandlingId(forrigeBehandlingId)
+                .findByBehandlingId(forrigeIverksatteBehandlingId)
                 .associate { it.id to it.copy(id = BarnId.random(), behandlingId = nyBehandlingId, sporbar = Sporbar()) }
         barnRepository.insertAll(nyeBarnPåGammelId.values.toList())
         return nyeBarnPåGammelId.map { it.key to it.value.id }.toMap()

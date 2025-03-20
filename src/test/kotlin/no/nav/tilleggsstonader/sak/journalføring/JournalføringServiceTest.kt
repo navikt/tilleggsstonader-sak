@@ -296,7 +296,7 @@ class JournalføringServiceTest {
                 resultat = BehandlingResultat.INNVILGET,
                 status = BehandlingStatus.FERDIGSTILT,
             )
-        val nyBehandling = behandling(fagsak = fagsak, forrigeBehandlingId = forrigeBehandling.id)
+        val nyBehandling = behandling(fagsak = fagsak, forrigeIverksatteBehandlingId = forrigeBehandling.id)
         val barn1 = SøknadBarn(ident = "123456789", data = mockk())
         val barn2 = SøknadBarn(ident = "987654321", data = mockk())
         val eksisterendeBarn = listOf(barn1, barn2)

@@ -81,7 +81,7 @@ class TilsynBarnBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtak: OpphørTilsynBarnRequest,
     ) {
-        brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
+        brukerfeilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
 

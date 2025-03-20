@@ -55,7 +55,8 @@ class BehandlingsoversiktService(
                 behandlinger.map {
                     BehandlingDetaljer(
                         id = it.id,
-                        forrigeBehandlingId = it.forrigeBehandlingId,
+                        forrigeIverksatteBehandlingId = it.forrigeIverksatteBehandlingId,
+                        forrigeBehandlingId = it.forrigeIverksatteBehandlingId,
                         fagsakId = it.fagsakId,
                         steg = it.steg,
                         kategori = it.kategori,

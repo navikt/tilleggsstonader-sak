@@ -51,7 +51,7 @@ interface BehandlingRepository :
     @Query(
         """SELECT
               b.id,
-              b.forrige_behandling_id,
+              b.forrige_iverksatte_behandling_id,
               be.id AS ekstern_id,
               b.type,
               b.status,
@@ -89,7 +89,7 @@ interface BehandlingRepository :
     @Query(
         """SELECT
               b.id,
-              b.forrige_behandling_id,
+              b.forrige_iverksatte_behandling_id,
               be.id AS ekstern_id,
               b.type,
               b.status,

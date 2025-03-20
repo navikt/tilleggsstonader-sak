@@ -102,10 +102,10 @@ class TilsynBarnBeregningService(
     }
 
     private fun finnRelevantePerioderFraForrigeVedtak(behandling: Saksbehandling): List<BeregningsresultatForMåned> =
-        behandling.forrigeBehandlingId?.let { forrigeBehandlingId ->
+        behandling.forrigeIverksatteBehandlingId?.let { forrigeIverksatteBehandlingId ->
             val beregningsresultat =
                 vedtakRepository
-                    .findByIdOrThrow(forrigeBehandlingId)
+                    .findByIdOrThrow(forrigeIverksatteBehandlingId)
                     .withTypeOrThrow<InnvilgelseEllerOpphørTilsynBarn>()
                     .data
                     .beregningsresultat

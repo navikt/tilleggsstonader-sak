@@ -41,7 +41,7 @@ class VedtaksperiodeServiceTest {
 
         val revurdering =
             saksbehandling(
-                forrigeBehandlingId = behandlingId,
+                forrigeIverksatteBehandlingId = behandlingId,
                 type = BehandlingType.REVURDERING,
             )
 

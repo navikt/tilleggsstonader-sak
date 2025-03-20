@@ -93,7 +93,7 @@ class OppfølgingRepositoryTest : IntegrationTest() {
         fun `skal finne alle aktive med informasjon om at det finnes en ny behandling`() {
             val revurdering = opprettRevurdering()
 
-            oppfølgingRepository.insert(Oppfølging(behandlingId = revurdering.forrigeBehandlingId!!, data = data))
+            oppfølgingRepository.insert(Oppfølging(behandlingId = revurdering.forrigeIverksatteBehandlingId!!, data = data))
 
             val aktive = oppfølgingRepository.finnAktiveMedDetaljer()
             assertThat(aktive).hasSize(1)
