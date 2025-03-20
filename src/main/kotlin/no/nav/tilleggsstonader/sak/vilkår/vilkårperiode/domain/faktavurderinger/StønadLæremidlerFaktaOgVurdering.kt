@@ -138,31 +138,6 @@ data object IngenAktivitetLæremidler : AktivitetLæremidler {
     override val vurderinger: Vurderinger = IngenVurderinger
 }
 
-data class VurderingAAPLæremidler(
-    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
-    override val aldersvilkår: VurderingAldersVilkår,
-) : MedlemskapVurdering,
-    DekketAvAnnetRegelverkVurdering,
-    AldersvilkårVurdering {
-    override val medlemskap = VurderingMedlemskap.IMPLISITT
-}
-
-data class VurderingUføretrygdLæremidler(
-    override val medlemskap: VurderingMedlemskap,
-    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
-    override val aldersvilkår: VurderingAldersVilkår,
-) : MedlemskapVurdering,
-    DekketAvAnnetRegelverkVurdering,
-    AldersvilkårVurdering
-
-data class VurderingNedsattArbeidsevneLæremidler(
-    override val medlemskap: VurderingMedlemskap,
-    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
-    override val aldersvilkår: VurderingAldersVilkår,
-) : MedlemskapVurdering,
-    DekketAvAnnetRegelverkVurdering,
-    AldersvilkårVurdering
-
 data class VurderingTiltakLæremidler(
     override val harUtgifter: VurderingHarUtgifter,
     override val harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend,
