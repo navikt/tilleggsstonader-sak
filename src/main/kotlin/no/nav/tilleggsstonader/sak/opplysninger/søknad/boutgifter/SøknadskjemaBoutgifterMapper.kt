@@ -1,6 +1,10 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter
 
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
+import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
+import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
@@ -12,24 +16,61 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.OppholdUtenforNorge
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
+import java.time.LocalDateTime
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.FasteUtgifter as FasteUtgifterKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Hovedytelse as HovedytelseKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.OppholdUtenforNorge as OppholdUtenforNorgeKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.SkjemaBoutgifter as SkjemaBoutgifterKontrakt
 
+/**
+ * TODO burde mappe iso2landkoder til 3 her
+ */
 object SøknadskjemaBoutgifterMapper {
-    fun mapSkjema(boutgifter: SøknadsskjemaBoutgifterFyllUtSendInn): SkjemaBoutgifter {
-        val skjemaBoutgifter = boutgifter.data.data
-        return mapSkjema(skjemaBoutgifter)
+    fun map(
+        mottattTidspunkt: LocalDateTime,
+        språk: Språkkode,
+        journalpost: Journalpost,
+        skjema: SøknadsskjemaBoutgifterFyllUtSendInn,
+    ): SøknadBoutgifter =
+        SøknadBoutgifter(
+            journalpostId = journalpost.journalpostId,
+            mottattTidspunkt = mottattTidspunkt,
+            språk = språk,
+            data = mapSkjema(skjema, mapDokumentasjon(journalpost.dokumenter)),
+        )
+
+    fun mapDokumentasjon(dokumenter: List<DokumentInfo>?): List<DokumentasjonBoutgifter> {
+        if (dokumenter == null) return emptyList()
+        return dokumenter
+            .filter { it.brevkode != DokumentBrevkode.BOUTGIFTER.verdi }
+            .filter { it.brevkode != "L7" || it.tittel == "Innsendingskvittering" } // Innsendingskvittering
+            .mapNotNull { dokument ->
+                dokument.tittel?.let {
+                    DokumentasjonBoutgifter(tittel = it, dokumentInfoId = dokument.dokumentInfoId)
+                }
+            }
     }
 
-    fun mapSkjema(skjemaBoutgifter: SkjemaBoutgifterKontrakt): SkjemaBoutgifter =
+    fun mapSkjema(
+        boutgifter: SøknadsskjemaBoutgifterFyllUtSendInn,
+        dokumentasjon: List<DokumentasjonBoutgifter>,
+    ): SkjemaBoutgifter {
+        val skjemaBoutgifter = boutgifter.data.data
+        return mapSkjema(skjemaBoutgifter, dokumentasjon)
+    }
+
+    private fun mapSkjema(
+        skjemaBoutgifter: SkjemaBoutgifterKontrakt,
+        dokumentasjon: List<DokumentasjonBoutgifter>,
+    ): SkjemaBoutgifter =
         SkjemaBoutgifter(
             hovedytelse = mapHovedytelse(skjemaBoutgifter),
             aktivitet = mapAktivitet(skjemaBoutgifter),
             boutgifter = mapBoutgifter(skjemaBoutgifter.boligEllerOvernatting),
+            dokumentasjon = dokumentasjon,
         )
 
     private fun mapHovedytelse(skjemaBoutgifter: SkjemaBoutgifterKontrakt) =
