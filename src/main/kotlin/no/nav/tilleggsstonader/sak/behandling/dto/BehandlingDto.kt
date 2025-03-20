@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 data class BehandlingDto(
     val id: BehandlingId,
     val forrigeIverksatteBehandlingId: BehandlingId?,
-    @Deprecated("Skal bruke forrgieIverksatteBehandling id")
+    @Deprecated("Skal bruke forrgieIverksatteBehandlingId")
     val forrigeBehandlingId: BehandlingId?,
     val fagsakId: FagsakId,
     val fagsakPersonId: FagsakPersonId,
