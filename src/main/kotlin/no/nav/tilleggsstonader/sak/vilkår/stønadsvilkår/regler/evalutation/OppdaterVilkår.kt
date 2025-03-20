@@ -58,6 +58,7 @@ object OppdaterVilkår {
                 VilkårType.PASS_BARN,
                 VilkårType.MIDLERTIDIG_OVERNATTING,
                 VilkårType.FASTE_UTGIFTER_EN_BOLIG,
+                VilkårType.FASTE_UTGIFTER_TO_BOLIGER,
             )
         brukerfeilHvis(fom == null || tom == null) {
             "Mangler fra og med/til og med på vilkår"
@@ -108,10 +109,12 @@ object OppdaterVilkår {
             when (vilkår.type) {
                 VilkårType.PASS_BARN,
                 VilkårType.FASTE_UTGIFTER_EN_BOLIG,
+                VilkårType.FASTE_UTGIFTER_TO_BOLIGER,
                 -> {
                     validerErFørsteDagIMåned(it)
                     it
                 }
+
                 VilkårType.MIDLERTIDIG_OVERNATTING -> {
                     it
                 }
@@ -128,10 +131,12 @@ object OppdaterVilkår {
             when (vilkår.type) {
                 VilkårType.PASS_BARN,
                 VilkårType.FASTE_UTGIFTER_EN_BOLIG,
+                VilkårType.FASTE_UTGIFTER_TO_BOLIGER,
                 -> {
                     validerErSisteDagIMåned(it)
                     it
                 }
+
                 VilkårType.MIDLERTIDIG_OVERNATTING -> {
                     it
                 }

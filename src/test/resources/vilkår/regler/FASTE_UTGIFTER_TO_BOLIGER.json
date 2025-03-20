@@ -1,0 +1,47 @@
+{
+  "vilkårType" : "FASTE_UTGIFTER_TO_BOLIGER",
+  "regler" : {
+    "NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET" : {
+      "regelId" : "NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET",
+      "erHovedregel" : true,
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "VALGFRI",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "PÅKREVD",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    },
+    "DOKUMENTERT_UTGIFTER_BOLIG" : {
+      "regelId" : "DOKUMENTERT_UTGIFTER_BOLIG",
+      "erHovedregel" : true,
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "VALGFRI",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "PÅKREVD",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    },
+    "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER" : {
+      "regelId" : "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER",
+      "erHovedregel" : true,
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "PÅKREVD",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "VALGFRI",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    }
+  }
+}
