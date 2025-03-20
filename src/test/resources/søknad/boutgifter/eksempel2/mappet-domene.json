@@ -6,7 +6,7 @@
   },
   "aktivitet" : {
     "aktiviteter" : [ {
-      "id" : "ingenAktivitet",
+      "id" : "ANNET",
       "label" : "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
     } ],
     "annenAktivitet" : "TILTAK",
