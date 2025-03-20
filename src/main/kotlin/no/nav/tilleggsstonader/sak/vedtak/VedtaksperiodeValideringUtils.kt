@@ -7,62 +7,14 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.norskFormat
-import no.nav.tilleggsstonader.sak.vedtak.domain.PeriodeMedId
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode as VedtaksperiodeLæremidler
 
 object VedtaksperiodeValideringUtils {
-    fun validerIngenEndringerFørRevurderFra(
-        innsendteVedtaksperioder: List<PeriodeMedId>,
-        vedtaksperioderForrigeBehandling: List<PeriodeMedId>?,
-        revurderFra: LocalDate?,
-    ) {
-        if (revurderFra == null) return
-
-        val innsendteVedtaksperioderFørRevurderFra = innsendteVedtaksperioder.filter { it.fom < revurderFra }
-        val vedtaksperioderForrigeBehandlingFørRevurderFra =
-            vedtaksperioderForrigeBehandling?.filter { it.fom < revurderFra }
-        val innsendteVedtaksperioderMap = innsendteVedtaksperioderFørRevurderFra.associateBy { it.id }
-
-        if (vedtaksperioderForrigeBehandlingFørRevurderFra.isNullOrEmpty()) {
-            brukerfeilHvis(innsendteVedtaksperioder.any { it.fom < revurderFra }) {
-                "Det er ikke tillat å legge til nye perioder før revurder fra dato"
-            }
-        } else {
-            val vedtaksperioderForrigeBehandlingFørRevurderFraMedOppdatertTom =
-                vedtaksperioderForrigeBehandlingFørRevurderFra.map { vedtaksperiodeForrigeBehandling ->
-                    val tilhørendeInnsendtVedtaksperiode =
-                        innsendteVedtaksperioderMap[vedtaksperiodeForrigeBehandling.id]
-
-                    if (tilhørendeInnsendtVedtaksperiode != null &&
-                        // revurderFra.minusDays(1) tillater endringer dagen før revurder fra som trengs i opphør
-                        tilhørendeInnsendtVedtaksperiode.tom >= revurderFra.minusDays(1) &&
-                        vedtaksperiodeForrigeBehandling.tom >= revurderFra.minusDays(1)
-                    ) {
-                        vedtaksperiodeForrigeBehandling.kopier(
-                            fom = vedtaksperiodeForrigeBehandling.fom,
-                            tom = tilhørendeInnsendtVedtaksperiode.tom,
-                        )
-                    } else {
-                        vedtaksperiodeForrigeBehandling
-                    }
-                }
-            brukerfeilHvis(
-                vedtaksperioderForrigeBehandlingFørRevurderFraMedOppdatertTom.erUlik(
-                    innsendteVedtaksperioderFørRevurderFra,
-                ),
-            ) {
-                "Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato"
-            }
-        }
-    }
-
     fun validerVedtaksperioderEksisterer(vedtaksperioder: List<Vedtaksperiode>) {
         brukerfeilHvis(vedtaksperioder.isEmpty()) {
             "Kan ikke innvilge når det ikke finnes noen vedtaksperioder"
@@ -74,16 +26,6 @@ object VedtaksperiodeValideringUtils {
             "Vedtaksperioder kan ikke overlappe"
         }
     }
-
-    private fun List<PeriodeMedId>.erUlik(other: List<PeriodeMedId>) = this.tilSammenlikningsSet() != other.tilSammenlikningsSet()
-
-    private fun List<PeriodeMedId>.tilSammenlikningsSet() =
-        map {
-            when (it) {
-                is VedtaksperiodeLæremidler -> it.copy(status = VedtaksperiodeStatus.NY)
-                else -> it
-            }
-        }.toSet()
 
     /**
      * Vedtaksperioder kan ikke overlappe med vilkårperioder som ikke gir rett på stønad,
