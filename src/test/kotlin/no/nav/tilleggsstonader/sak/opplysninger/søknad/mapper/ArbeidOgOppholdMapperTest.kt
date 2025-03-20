@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.OppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.ArbeidOgOppholdMapper.mapArbeidOgOpphold
 import org.assertj.core.api.Assertions.assertThat
@@ -22,7 +21,7 @@ class ArbeidOgOppholdMapperTest {
     fun `skal mappe alle verdier`() {
         val verdi = mapArbeidOgOpphold(arbeidOgOpphold())
         val expected =
-            ArbeidOgOpphold(
+            no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ArbeidOgOpphold(
                 jobberIAnnetLand = JaNei.JA,
                 jobbAnnetLand = "SWE",
                 harPengestøtteAnnetLand = listOf(TypePengestøtte.ANNEN_PENGESTØTTE),

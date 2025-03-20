@@ -103,6 +103,7 @@ data class UtdanningAvsnitt(
 
 data class HovedytelseAvsnitt(
     val hovedytelse: List<Hovedytelse>,
+    val harNedsattArbeidsevne: JaNei?,
     val arbeidOgOpphold: ArbeidOgOpphold?,
 )
 

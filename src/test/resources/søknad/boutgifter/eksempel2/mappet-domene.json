@@ -1,0 +1,28 @@
+{
+  "hovedytelse" : {
+    "hovedytelse" : [ "AAP" ],
+    "harNedsattArbeidsevne" : null,
+    "arbeidOgOpphold" : null
+  },
+  "aktivitet" : {
+    "aktiviteter" : [ {
+      "id" : "ingenAktivitet",
+      "label" : "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
+    } ],
+    "annenAktivitet" : "TILTAK",
+    "lønnetAktivitet" : null
+  },
+  "boutgifter" : {
+    "typeUtgifter" : "SAMLING",
+    "fasteUtgifter" : null,
+    "samling" : {
+      "periodeForSamling" : [ {
+        "fom" : "2025-03-06",
+        "tom" : "2025-03-21",
+        "trengteEkstraOvernatting" : "JA",
+        "utgifterTilOvernatting" : 100
+      } ]
+    },
+    "harSærligStoreUtgifterPgaFunksjonsnedsettelse" : "JA"
+  }
+}

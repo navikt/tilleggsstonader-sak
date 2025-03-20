@@ -1,0 +1,52 @@
+{
+  "hovedytelse" : {
+    "hovedytelse" : [ "AAP", "OVERGANGSSTØNAD", "GJENLEVENDEPENSJON", "UFØRETRYGD", "TILTAKSPENGER", "DAGPENGER", "SYKEPENGER", "KVALIFISERINGSSTØNAD", "INGEN_PENGESTØTTE", "INGEN_PASSENDE_ALTERNATIVER" ],
+    "harNedsattArbeidsevne" : "JA",
+    "arbeidOgOpphold" : {
+      "jobberIAnnetLand" : "JA",
+      "jobbAnnetLand" : "AF",
+      "harPengestøtteAnnetLand" : null,
+      "pengestøtteAnnetLand" : "Afghanistan",
+      "harOppholdUtenforNorgeSiste12mnd" : "JA",
+      "oppholdUtenforNorgeSiste12mnd" : [ {
+        "land" : "AF",
+        "årsak" : [ "JOBB", "STUDIER", "MEDISINSK_BEHANDLING", "FERIE", "FAMILIE_BESØK", "ANNET" ],
+        "fom" : "2025-01-01",
+        "tom" : "2025-01-01"
+      } ],
+      "harOppholdUtenforNorgeNeste12mnd" : "JA",
+      "oppholdUtenforNorgeNeste12mnd" : [ {
+        "land" : "AF",
+        "årsak" : [ "JOBB", "STUDIER", "MEDISINSK_BEHANDLING", "FERIE", "FAMILIE_BESØK", "ANNET" ],
+        "fom" : "2025-01-01",
+        "tom" : "2025-01-01"
+      } ]
+    }
+  },
+  "aktivitet" : {
+    "aktiviteter" : [ {
+      "id" : "123",
+      "label" : "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
+    } ],
+    "annenAktivitet" : "TILTAK",
+    "lønnetAktivitet" : null
+  },
+  "boutgifter" : {
+    "typeUtgifter" : "FASTE",
+    "fasteUtgifter" : {
+      "harUtgifterTilBoligToSteder" : "EKSTRA_BOLIG",
+      "harLeieinntekterSomDekkerUtgifteneTilBoligenPaHjemstedet" : "JA",
+      "harHoyereUtgifterPaNyttBosted" : "JA",
+      "mottarBostotte" : "JA"
+    },
+    "samling" : {
+      "periodeForSamling" : [ {
+        "fom" : "2025-01-01",
+        "tom" : "2025-01-01",
+        "trengteEkstraOvernatting" : "JA",
+        "utgifterTilOvernatting" : 100
+      } ]
+    },
+    "harSærligStoreUtgifterPgaFunksjonsnedsettelse" : "JA"
+  }
+}
