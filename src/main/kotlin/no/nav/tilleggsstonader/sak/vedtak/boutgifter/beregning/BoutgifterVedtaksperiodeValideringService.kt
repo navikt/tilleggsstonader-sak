@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerEnkeltperiode
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerIngenEndringerFørRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerIngenOverlappMellomVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerVedtaksperioderEksisterer
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeValideringUtils.validerUtgiftHeleVedtaksperioden
@@ -15,13 +14,14 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.validerIngenEndringerFørRevurderFra
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
-class BoutgifterVedtaksperiodeValidingerService(
+class BoutgifterVedtaksperiodeValideringService(
     private val vilkårperiodeService: VilkårperiodeService,
     private val grunnlagsdataService: GrunnlagsdataService,
     private val vedtakRepository: VedtakRepository,
@@ -67,7 +67,7 @@ class BoutgifterVedtaksperiodeValidingerService(
     }
 
     private fun hentForrigeVedtaksperioder(behandling: Saksbehandling): List<Vedtaksperiode>? =
-        behandling.forrigeBehandlingId?.let {
+        behandling.forrigeIverksatteBehandlingId?.let {
             when (val forrigeVedtak = vedtakRepository.findByIdOrNull(it)?.data) {
                 is InnvilgelseTilsynBarn -> forrigeVedtak.vedtaksperioder
                 is OpphørTilsynBarn -> forrigeVedtak.vedtaksperioder

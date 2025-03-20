@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service
 @Service
 class BoutgifterBeregningService(
     private val boutgifterUtgiftService: BoutgifterUtgiftService,
-    private val vedtaksperiodeValideringService: BoutgifterVedtaksperiodeValidingerService,
+    private val vedtaksperiodeValideringService: BoutgifterVedtaksperiodeValideringService,
     private val vedtakRepository: VedtakRepository,
 ) {
     /**
