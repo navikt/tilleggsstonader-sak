@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Service
 @Service
 class BoutgifterBeregningService(
     private val boutgifterUtgiftService: BoutgifterUtgiftService,
-//    private val vedtaksperiodeValideringService: BoutgifterVedtaksperiodeValideringService,
+    private val vedtaksperiodeValideringService: BoutgifterVedtaksperiodeValidingerService,
     private val vedtakRepository: VedtakRepository,
 ) {
     /**
@@ -41,14 +42,15 @@ class BoutgifterBeregningService(
 //        val forrigeVedtak = hentForrigeVedtak(behandling)
         // TODO: Deal med revurderFra-datoen
 
-//        vedtaksperiodeValideringService.validerVedtaksperioder(
-//            vedtaksperioder = vedtaksperioder,
-//            stønadsperioder = stønadsperioder,
-//            behandlingId = behandling.id,
-//        )
-
         val utgifterPerVilkårtype = boutgifterUtgiftService.hentUtgifterTilBeregning(behandling.id)
         validerUtgifter(utgifterPerVilkårtype)
+
+        vedtaksperiodeValideringService.validerVedtaksperioder(
+            vedtaksperioder = vedtaksperioder,
+            behandling = behandling,
+            utgifter = utgifterPerVilkårtype,
+            typeVedtak = TypeVedtak.INNVILGELSE,
+        )
 
         val vedtaksperioderBeregning =
             vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(behandling.revurderFra)
