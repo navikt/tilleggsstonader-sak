@@ -133,7 +133,14 @@ data class VurderingAldersVilkår(
     ) : this(
         svar = svar,
         resultat = utledResultat(svar),
-        vurderingFaktaEtterlevelse = if (svar == SvarJaNei.GAMMEL_MANGLER_DATA) null else requireNotNull(vurderingFaktaEtterlevelse),
+        vurderingFaktaEtterlevelse =
+            if (svar == SvarJaNei.GAMMEL_MANGLER_DATA) {
+                null
+            } else {
+                requireNotNull(
+                    vurderingFaktaEtterlevelse,
+                )
+            },
     )
 
     companion object {
