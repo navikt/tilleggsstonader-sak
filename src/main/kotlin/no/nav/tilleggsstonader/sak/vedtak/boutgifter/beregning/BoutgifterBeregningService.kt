@@ -272,7 +272,7 @@ private fun validerUtgifterErInnenforVedtaksperiodene(
         }
 
     brukerfeilHvisIkke(alleUtgifterErInnenforEnVedtaksperiode) {
-        "Du har lagt inn utgifter som er utenfor vedtaksperioden. Foreløpig støtter vi ikke dette."
+        "Du har lagt inn utgifter som er utenfor vedtaksperiodene. Foreløpig støtter vi ikke dette."
     }
 }
 
