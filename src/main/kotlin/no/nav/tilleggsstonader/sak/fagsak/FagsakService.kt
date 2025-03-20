@@ -65,7 +65,12 @@ class FagsakService(
     fun finnFagsak(
         personIdenter: Set<String>,
         stønadstype: Stønadstype,
-    ): Fagsak? = fagsakRepository.findBySøkerIdent(personIdenter, stønadstype)?.tilFagsakMedPerson()
+    ): Fagsak? {
+        if (personIdenter.isEmpty()) {
+            return null
+        }
+        return fagsakRepository.findBySøkerIdent(personIdenter, stønadstype)?.tilFagsakMedPerson()
+    }
 
     fun finnFagsaker(personIdenter: Set<String>): List<Fagsak> {
         if (personIdenter.isEmpty()) {
