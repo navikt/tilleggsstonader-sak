@@ -1,0 +1,73 @@
+{
+  "language": "nb-NO",
+  "data": {
+    "data": {
+      "jegBekrefterAtJegVilSvareSaRiktigSomJegKan": true,
+      "dineOpplysninger": {
+        "fornavn": "FORNUFTIG",
+        "etternavn": "SØNNAVIND",
+        "identitet": {
+          "identitetsnummer": "29500474120"
+        },
+        "adresse": {
+          "gyldigFraOgMed": "2004-10-29",
+          "adresse": "Hestehagen 2",
+          "postnummer": "2069",
+          "bySted": "JESSHEIM",
+          "landkode": "NOR",
+          "land": {
+            "label": "Norge",
+            "value": "NO"
+          }
+        }
+      },
+      "aktiviteter": {
+        "aktiviteterOgMaalgruppe": {
+          "aktivitet": {
+            "aktivitetId": "ingenAktivitet",
+            "text": "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
+          }
+        },
+        "arbeidsrettetAktivitet": "tiltakArbeidsrettetUtredning"
+      },
+      "boligEllerOvernatting": {
+        "typeUtgifter": "midlertidigUtgift",
+        "samling": {
+          "periodeForSamling": [
+            {
+              "utgifterTilOvernatting": 100,
+              "fom": "2025-03-06",
+              "tom": "2025-03-21",
+              "trengteEkstraOvernatting": "ja"
+            }
+          ]
+        },
+        "harSaerligStoreUtgifterPaGrunnAvFunksjonsnedsettelse": "ja"
+      },
+      "hovedytelse": {
+        "arbeidsavklaringspenger": true,
+        "overgangsstonad": false,
+        "gjenlevendepensjon": false,
+        "uforetrygd": false,
+        "tiltakspenger": false,
+        "dagpenger": false,
+        "sykepenger": false,
+        "kvalifiseringsstonad": false,
+        "mottarIngenPengestotte": false,
+        "ingenAvAlternativenePasserForMeg": false
+      }
+    },
+    "metadata": {
+      "timezone": "Europe/Oslo",
+      "offset": 60,
+      "origin": "https://skjemadelingslenke.ekstern.dev.nav.no",
+      "referrer": "https://skjemadelingslenke.ekstern.dev.nav.no/fyllut/nav111219/paabegynt?sub=digital",
+      "browserName": "Netscape",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36",
+      "pathName": "/fyllut/nav111219/boligEllerOvernattingPanel",
+      "onLine": true
+    },
+    "state": "submitted",
+    "_vnote": ""
+  }
+}
