@@ -57,7 +57,7 @@ object OppdaterVilkår {
             listOf(
                 VilkårType.PASS_BARN,
                 VilkårType.MIDLERTIDIG_OVERNATTING,
-                VilkårType.FASTE_UTGIFTER,
+                VilkårType.FASTE_UTGIFTER_EN_BOLIG,
             )
         brukerfeilHvis(fom == null || tom == null) {
             "Mangler fra og med/til og med på vilkår"
@@ -107,7 +107,7 @@ object OppdaterVilkår {
         oppdatering.fom?.let {
             when (vilkår.type) {
                 VilkårType.PASS_BARN,
-                VilkårType.FASTE_UTGIFTER,
+                VilkårType.FASTE_UTGIFTER_EN_BOLIG,
                 -> {
                     validerErFørsteDagIMåned(it)
                     it
@@ -127,7 +127,7 @@ object OppdaterVilkår {
         oppdatering.tom?.let {
             when (vilkår.type) {
                 VilkårType.PASS_BARN,
-                VilkårType.FASTE_UTGIFTER,
+                VilkårType.FASTE_UTGIFTER_EN_BOLIG,
                 -> {
                     validerErSisteDagIMåned(it)
                     it
