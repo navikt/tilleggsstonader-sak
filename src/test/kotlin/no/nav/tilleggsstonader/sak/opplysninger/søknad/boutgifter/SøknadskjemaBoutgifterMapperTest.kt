@@ -59,6 +59,9 @@ class SøknadskjemaBoutgifterMapperTest {
         validerAlleFelterMappes(Hovedytelse::class, SøknadskjemaBoutgifterMapper::mapHovedytelse)
     }
 
+    /**
+     * Pga at checkboxes mappes som {valg1: boolean, valg2: boolean, ..} så er det ønskelig å se at vi har mappet alle valgene
+     */
     private inline fun <reified T : Any> validerAlleFelterMappes(
         kClass: KClass<T>,
         mapper: KFunction1<T, Any>,
