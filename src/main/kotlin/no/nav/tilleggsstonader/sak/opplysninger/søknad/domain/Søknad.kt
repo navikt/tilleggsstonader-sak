@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.sak.behandling.fakta.HarRettTilUtstyrsstipendDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.SkjemaBoutgifter
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
@@ -87,6 +88,19 @@ data class SøknadLæremidler(
     override val sporbar: Sporbar = Sporbar(),
     override val data: SkjemaLæremidler,
 ) : Søknad<SkjemaLæremidler>
+
+@Table("soknad")
+data class SøknadBoutgifter(
+    @Id
+    override val id: UUID = UUID.randomUUID(),
+    override val journalpostId: String,
+    override val mottattTidspunkt: LocalDateTime,
+    @Column("sprak")
+    override val språk: Språkkode,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+    override val sporbar: Sporbar = Sporbar(),
+    override val data: SkjemaBoutgifter,
+) : Søknad<SkjemaBoutgifter>
 
 data class SkjemaLæremidler(
     val hovedytelse: HovedytelseAvsnitt,

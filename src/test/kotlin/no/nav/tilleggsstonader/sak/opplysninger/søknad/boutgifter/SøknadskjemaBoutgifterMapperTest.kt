@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapperFailOnUnknownProperties
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.BoutgifterFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.SkjemaBoutgifter
 import no.nav.tilleggsstonader.sak.util.FileUtil
@@ -25,7 +26,8 @@ class SøknadskjemaBoutgifterMapperTest {
     fun `skal kunne mappe skjema-eksempel som inneholder alle felter`() {
         val json = FileUtil.readFile("søknad/boutgifter/eksempel1/skjema-eksempel.json")
         val boutgifter = objectMapperFailOnUnknownProperties.readValue<SkjemaBoutgifter>(json)
-        val mappetSkjema = SøknadskjemaBoutgifterMapper.mapSkjema(boutgifter)
+        val skjema = SøknadsskjemaBoutgifterFyllUtSendInn(BoutgifterFyllUtSendInnData(boutgifter))
+        val mappetSkjema = SøknadskjemaBoutgifterMapper.mapSkjema(skjema, emptyList())
 
         val mappetJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
         assertFileIsEqual("søknad/boutgifter/eksempel1/mappet-domene.json", mappetJson)
@@ -38,7 +40,7 @@ class SøknadskjemaBoutgifterMapperTest {
     fun `skal kunne mappe søknad for boutgifter`() {
         val json = FileUtil.readFile("søknad/boutgifter/eksempel2/eksempel-boutgifter.json")
         val boutgifter = objectMapperFailOnUnknownProperties.readValue<SøknadsskjemaBoutgifterFyllUtSendInn>(json)
-        val mappetSkjema = SøknadskjemaBoutgifterMapper.mapSkjema(boutgifter)
+        val mappetSkjema = SøknadskjemaBoutgifterMapper.mapSkjema(boutgifter, emptyList())
 
         val mappetJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
         assertFileIsEqual("søknad/boutgifter/eksempel2/mappet-domene.json", mappetJson)
