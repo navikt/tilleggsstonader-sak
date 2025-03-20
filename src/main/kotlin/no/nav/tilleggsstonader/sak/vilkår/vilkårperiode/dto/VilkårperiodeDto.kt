@@ -100,7 +100,7 @@ data class MålgruppeFaktaOgVurderingerDto(
     val utgifterDekketAvAnnetRegelverk: VurderingDto? = null,
     val aldersvilkår: VurderingDto? = null,
     val mottarSykepengerForFulltidsstilling: VurderingDto? = null,
-    ) : FaktaOgVurderingerDto()
+) : FaktaOgVurderingerDto()
 
 data class MålgruppeLæremidlerFaktaOgVurderingerDto(
     val medlemskap: VurderingDto? = null,
@@ -138,7 +138,8 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                                 .takeIfVurderinger<AldersvilkårVurdering>()
                                 ?.aldersvilkår
                                 ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
-                                ?.tilDto(),                    )
+                                ?.tilDto(),
+                    )
 
                 else ->
                     MålgruppeFaktaOgVurderingerDto(
@@ -157,7 +158,7 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                                 .takeIfVurderinger<MottarSykepengerForFulltidsstillingVurdering>()
                                 ?.mottarSykepengerForFulltidsstilling
                                 ?.tilDto(),
-                        )
+                    )
             }
 
         is AktivitetFaktaOgVurdering -> {

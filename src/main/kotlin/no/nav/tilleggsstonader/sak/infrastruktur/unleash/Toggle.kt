@@ -13,4 +13,9 @@ enum class Toggle(
     HENT_BEHANDLINGER_FOR_OPPFØLGING("sak.hent-behandlinger-for-oppfoelging"),
 
     SØKNAD_ROUTING_LÆREMIDLER("sak.soknad-routing.laremidler"),
+    SØKNAD_ROUTING_BOUTGIFTER("sak.soknad-routing.boutgifter"),
+
+    KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN("sak.kan-bruke-vedtaksperioder-tilsyn-barn"),
+
+    SKAL_HENTE_GRUNNLAG_ANNEN_FORELDER("sak.skal-hente-grunnlag-annen-forelder"),
 }

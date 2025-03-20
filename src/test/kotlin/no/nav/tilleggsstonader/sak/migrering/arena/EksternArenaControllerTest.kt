@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.migrering.arena
 
 import no.nav.tilleggsstonader.kontrakter.arena.vedtak.Rettighet
+import no.nav.tilleggsstonader.libs.test.httpclient.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
-import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,7 +26,7 @@ class EksternArenaControllerTest : IntegrationTest() {
     @Test
     fun `skal kaste feil hvis man sender inn rettighet som ikke er mappet`() {
         val exception =
-            ProblemDetailUtil.catchProblemDetailException {
+            catchProblemDetailException {
                 hentStatus("ident", Rettighet.REISE)
             }
 

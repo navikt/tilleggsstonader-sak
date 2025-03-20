@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 
 enum class TypeVedtakBoutgifter(
     override val typeVedtak: TypeVedtak,
@@ -9,6 +10,19 @@ enum class TypeVedtakBoutgifter(
     INNVILGELSE_BOUTGIFTER(TypeVedtak.INNVILGELSE),
 //    AVSLAG_BOUTGIFTER(TypeVedtak.AVSLAG),
 //    OPPHØR_BOUTGIFTER(TypeVedtak.OPPHØR),
+}
+
+enum class TypeBoutgift {
+    MIDLERTIDIG_OVERNATTING,
+    ;
+
+    companion object {
+        fun fraVilkårType(vilkårType: VilkårType) =
+            when (vilkårType) {
+                VilkårType.MIDLERTIDIG_OVERNATTING -> MIDLERTIDIG_OVERNATTING
+                else -> error("$vilkårType er ikke en gyldig utgiftstype for boutgifter")
+            }
+    }
 }
 
 sealed interface VedtakBoutgifter : Vedtaksdata

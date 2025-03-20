@@ -1,9 +1,8 @@
 package no.nav.tilleggsstonader.sak.tilgang
 
-import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -35,7 +34,8 @@ class TilgangService(
     private val auditLogger: AuditLogger,
 ) {
     /**
-     * Kun ved tilgangskontroll for enskild person, ellers bruk [validerTilgangTilPersonMedBarn]
+     * Kun ved tilgangskontroll for enkeltperson (eks når man skal søke etter brevmottaker)
+     * Ellers bruk [validerTilgangTilPersonMedRelasjoner]
      */
     fun validerTilgangTilPerson(
         personIdent: String,
@@ -43,109 +43,81 @@ class TilgangService(
     ) {
         val tilgang = tilgangskontrollService.sjekkTilgang(personIdent, SikkerhetContext.hentToken())
         auditLogger.log(Sporingsdata(event, personIdent, tilgang))
-        if (!tilgang.harTilgang) {
-            secureLogger.warn(
-                "Saksbehandler ${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +
-                    "har ikke tilgang til $personIdent",
-            )
-            throw ManglerTilgang(
-                melding =
-                    "Saksbehandler ${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +
-                        "har ikke tilgang til person",
-                frontendFeilmelding = "Mangler tilgang til opplysningene. ${tilgang.begrunnelse}",
-            )
-        }
+        kastFeilHvisIkkeTilgang(tilgang, "person", personIdent)
     }
 
-    fun validerTilgangTilPersonMedBarn(
+    fun validerTilgangTilPersonMedRelasjoner(
         personIdent: String,
         event: AuditLoggerEvent,
     ) {
-        val tilgang = harTilgangTilPersonMedRelasjoner(personIdent)
+        val tilgang =
+            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(personIdent, SikkerhetContext.hentToken())
         auditLogger.log(Sporingsdata(event, personIdent, tilgang))
-        if (!tilgang.harTilgang) {
-            secureLogger.warn(
-                "Saksbehandler ${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +
-                    "har ikke tilgang til $personIdent eller dets barn",
-            )
-            throw ManglerTilgang(
-                melding =
-                    "Saksbehandler ${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +
-                        "har ikke tilgang til person eller dets barn",
-                frontendFeilmelding = "Mangler tilgang til opplysningene. ${tilgang.begrunnelse}",
-            )
-        }
+        kastFeilHvisIkkeTilgang(tilgang, "person", personIdent)
     }
 
+    /**
+     * Cachear henting av saksehandling då vi kun skal bruke ident og fagsakPersonId
+     */
     fun validerTilgangTilBehandling(
         behandlingId: BehandlingId,
         event: AuditLoggerEvent,
     ) {
-        val personIdent =
-            cacheManager.getValue("behandlingPersonIdent", behandlingId) {
-                behandlingService.hentAktivIdent(behandlingId)
+        val saksbehandling =
+            cacheManager.getValue("tilgangService_behandling", behandlingId) {
+                behandlingService.hentSaksbehandling(behandlingId)
             }
-        val tilgang = harTilgangTilPersonMedRelasjoner(personIdent)
-        auditLogger.log(
-            Sporingsdata(event, personIdent, tilgang, custom1 = CustomKeyValue("behandling", behandlingId.id)),
-        )
-        if (!tilgang.harTilgang) {
-            throw ManglerTilgang(
-                melding =
-                    "Saksbehandler ${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +
-                        "har ikke tilgang til behandling=$behandlingId",
-                frontendFeilmelding = "Mangler tilgang til opplysningene. ${tilgang.begrunnelse}",
+        val tilgang =
+            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(
+                personIdent = saksbehandling.ident,
+                jwtToken = SikkerhetContext.hentToken(),
             )
-        }
+        val key = CustomKeyValue("behandling", behandlingId.id)
+        auditLogger.log(Sporingsdata(event, saksbehandling.ident, tilgang, custom1 = key))
+        kastFeilHvisIkkeTilgang(tilgang, "behandling", behandlingId.id.toString())
     }
 
-    fun validerTilgangTilBehandling(
-        saksbehandling: Saksbehandling,
-        event: AuditLoggerEvent,
-    ) {
-        val tilgang = harTilgangTilPersonMedRelasjoner(saksbehandling.ident)
-        auditLogger.log(
-            Sporingsdata(event, saksbehandling.ident, tilgang, CustomKeyValue("behandling", saksbehandling.id.id)),
-        )
-        if (!tilgang.harTilgang) {
-            throw ManglerTilgang(
-                melding =
-                    "Saksbehandler ${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +
-                        "har ikke tilgang til behandling=${saksbehandling.id}",
-                frontendFeilmelding = "Mangler tilgang til opplysningene. ${tilgang.begrunnelse}",
-            )
-        }
-    }
-
+    /**
+     * Cachear henting av fagsak då vi kun skal bruke ident og fagsakPersonId
+     */
     fun validerTilgangTilFagsak(
         fagsakId: FagsakId,
         event: AuditLoggerEvent,
     ) {
-        val personIdent =
-            cacheManager.getValue("fagsakIdent", fagsakId) {
-                fagsakService.hentAktivIdent(fagsakId)
+        val fagsak =
+            cacheManager.getValue("tilgangService_fagsakIdent", fagsakId) {
+                fagsakService.hentFagsak(fagsakId)
             }
-        val tilgang = harTilgangTilPersonMedRelasjoner(personIdent)
-        auditLogger.log(Sporingsdata(event, personIdent, tilgang, custom1 = CustomKeyValue("fagsak", fagsakId.id)))
-        if (!tilgang.harTilgang) {
-            throw ManglerTilgang(
-                melding =
-                    "Saksbehandler ${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +
-                        "har ikke tilgang til fagsak=$fagsakId",
-                frontendFeilmelding = "Mangler tilgang til opplysningene. ${tilgang.begrunnelse}",
-            )
-        }
+        validerTilgangTilFagsak(fagsak, event)
     }
 
+    /**
+     * Cachear henting av fagsak då vi kun skal bruke ident og fagsakPersonId
+     */
     fun validerTilgangTilEksternFagsak(
         eksternFagsakId: Long,
         event: AuditLoggerEvent,
     ) {
-        val fagsakId =
-            cacheManager.getValue("eksternFagsakId", eksternFagsakId) {
-                fagsakService.hentFagsakPåEksternId(eksternFagsakId = eksternFagsakId).id
+        val fagsak =
+            cacheManager.getValue("tilgangService_eksternFagsakId", eksternFagsakId) {
+                fagsakService.hentFagsakPåEksternId(eksternFagsakId = eksternFagsakId)
             }
-        validerTilgangTilFagsak(fagsakId, event)
+        validerTilgangTilFagsak(fagsak, event)
+    }
+
+    private fun validerTilgangTilFagsak(
+        fagsak: Fagsak,
+        event: AuditLoggerEvent,
+    ) {
+        val fagsakId = fagsak.id
+        val tilgang =
+            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(
+                personIdent = fagsak.hentAktivIdent(),
+                SikkerhetContext.hentToken(),
+            )
+        val custom1 = CustomKeyValue("fagsak", fagsakId.id)
+        auditLogger.log(Sporingsdata(event, fagsak.hentAktivIdent(), tilgang, custom1 = custom1))
+        kastFeilHvisIkkeTilgang(tilgang, "fagsak", fagsakId.toString())
     }
 
     fun validerTilgangTilFagsakPerson(
@@ -156,24 +128,30 @@ class TilgangService(
             cacheManager.getValue("fagsakPersonIdent", fagsakPersonId) {
                 fagsakPersonService.hentAktivIdent(fagsakPersonId)
             }
-        val tilgang = harTilgangTilPersonMedRelasjoner(personIdent)
-        auditLogger.log(
-            Sporingsdata(event, personIdent, tilgang, custom1 = CustomKeyValue("fagsakPersonId", fagsakPersonId.id)),
-        )
+        val tilgang =
+            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(
+                personIdent = personIdent,
+                jwtToken = SikkerhetContext.hentToken(),
+            )
+        val custom1 = CustomKeyValue("fagsakPersonId", fagsakPersonId.id)
+        auditLogger.log(Sporingsdata(event, personIdent, tilgang, custom1 = custom1))
+        kastFeilHvisIkkeTilgang(tilgang, "fagsakPerson", fagsakPersonId.toString())
+    }
+
+    private fun kastFeilHvisIkkeTilgang(
+        tilgang: Tilgang,
+        type: String,
+        typeId: String,
+    ) {
         if (!tilgang.harTilgang) {
             throw ManglerTilgang(
                 melding =
                     "Saksbehandler ${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +
-                        "har ikke tilgang til fagsakPerson=$fagsakPersonId",
+                        "har ikke tilgang til $type=$typeId",
                 frontendFeilmelding = "Mangler tilgang til opplysningene. ${tilgang.begrunnelse}",
             )
         }
     }
-
-    private fun harTilgangTilPersonMedRelasjoner(personIdent: String): Tilgang =
-        harSaksbehandlerTilgang("validerTilgangTilPersonMedBarn", personIdent) {
-            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(personIdent, SikkerhetContext.hentToken())
-        }
 
     fun validerHarSaksbehandlerrolle() {
         validerTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)

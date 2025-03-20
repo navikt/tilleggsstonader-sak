@@ -54,7 +54,7 @@ class FagsakService(
         personIdent: String,
         stønadstype: Stønadstype,
     ): List<BehandlingDto> =
-        finnFagsak(setOf(personIdent), stønadstype)?.let { fagsak ->
+        finnFagsak(personService.hentPersonIdenter(personIdent).identer(), stønadstype)?.let { fagsak ->
             behandlingService.hentBehandlinger(fagsak.id).map {
                 it.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId)
             }
@@ -65,7 +65,12 @@ class FagsakService(
     fun finnFagsak(
         personIdenter: Set<String>,
         stønadstype: Stønadstype,
-    ): Fagsak? = fagsakRepository.findBySøkerIdent(personIdenter, stønadstype)?.tilFagsakMedPerson()
+    ): Fagsak? {
+        if (personIdenter.isEmpty()) {
+            return null
+        }
+        return fagsakRepository.findBySøkerIdent(personIdenter, stønadstype)?.tilFagsakMedPerson()
+    }
 
     fun finnFagsaker(personIdenter: Set<String>): List<Fagsak> {
         if (personIdenter.isEmpty()) {

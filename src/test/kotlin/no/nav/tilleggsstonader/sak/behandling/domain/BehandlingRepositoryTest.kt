@@ -1,8 +1,10 @@
 package no.nav.tilleggsstonader.sak.behandling.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.AVSLÅTT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.IKKE_SATT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.INNVILGET
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.FATTER_VEDTAK
@@ -33,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 class BehandlingRepositoryTest : IntegrationTest() {
     @Autowired
@@ -511,6 +514,64 @@ class BehandlingRepositoryTest : IntegrationTest() {
                     ).copy(vedtakstidspunkt = SporbarUtils.now()),
                 )
             }.has(hasCauseMessageContaining("behandling_resultat_vedtakstidspunkt_check"))
+        }
+    }
+
+    @Nested
+    inner class FinnGjeldendeIverksatteBehandlinger {
+        @Test
+        fun `ingen behandlinger - finner ingen gjeldende behandlinger`() {
+            assertThat(behandlingRepository.finnGjeldendeIverksatteBehandlinger(Stønadstype.BARNETILSYN))
+                .isEmpty()
+        }
+
+        @Test
+        fun `behandling men ikke ferdigstilt - finner ingen gjeldende behandlinger`() {
+            testoppsettService.opprettBehandlingMedFagsak(behandling())
+            assertThat(behandlingRepository.finnGjeldendeIverksatteBehandlinger(Stønadstype.BARNETILSYN))
+                .isEmpty()
+        }
+
+        @Test
+        fun `behandling ferdigstilt med resultat avslått - finner ingen gjeldende behandlinger`() {
+            val behandling = behandling(status = FERDIGSTILT, resultat = AVSLÅTT)
+            testoppsettService.opprettBehandlingMedFagsak(behandling)
+            assertThat(behandlingRepository.finnGjeldendeIverksatteBehandlinger(Stønadstype.BARNETILSYN))
+                .isEmpty()
+        }
+
+        @Test
+        fun `skal hente siste behandlingen som ble iverksatt for en iverksatte behandling`() {
+            val behandling = behandling(status = FERDIGSTILT, resultat = INNVILGET)
+            testoppsettService.opprettBehandlingMedFagsak(behandling)
+            assertThat(behandlingRepository.finnGjeldendeIverksatteBehandlinger(Stønadstype.BARNETILSYN))
+                .hasSize(1)
+        }
+
+        @Test
+        fun `skal hente behandlingen med siste vedtakstidspunktet`() {
+            val fagsak = testoppsettService.lagreFagsak(fagsak())
+            val behandling =
+                behandling(
+                    fagsak,
+                    status = FERDIGSTILT,
+                    resultat = INNVILGET,
+                    vedtakstidspunkt = LocalDateTime.now().minusDays(2),
+                )
+            val behandling2 =
+                behandling(fagsak, status = FERDIGSTILT, resultat = INNVILGET, vedtakstidspunkt = LocalDateTime.now())
+            val behandling3 =
+                behandling(
+                    fagsak,
+                    status = FERDIGSTILT,
+                    resultat = INNVILGET,
+                    vedtakstidspunkt = LocalDateTime.now().minusDays(1),
+                )
+
+            testoppsettService.lagre(listOf(behandling, behandling2, behandling3))
+
+            assertThat(behandlingRepository.finnGjeldendeIverksatteBehandlinger(Stønadstype.BARNETILSYN).map { it.id })
+                .containsExactly(behandling2.id)
         }
     }
 }

@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType.entries
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.springframework.data.annotation.Id
@@ -37,6 +36,7 @@ data class Vilkår(
     val tom: LocalDate? = null,
     val utgift: Int? = null,
     val barnId: BarnId? = null,
+    val erNullvedtak: Boolean,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     @Column("delvilkar")
@@ -64,7 +64,9 @@ data class Vilkår(
         tom: LocalDate,
     ) {
         when (type) {
-            VilkårType.PASS_BARN -> {
+            VilkårType.PASS_BARN,
+            VilkårType.FASTE_UTGIFTER,
+            -> {
                 validerFørsteOgSisteDagIValgtMåned(fom, tom)
                 validerPåkrevdBeløpHvisOppfylt()
             }
@@ -81,7 +83,7 @@ data class Vilkår(
     }
 
     private fun validerPåkrevdBeløpHvisOppfylt() {
-        if (resultat == Vilkårsresultat.OPPFYLT) {
+        if (resultat == Vilkårsresultat.OPPFYLT && !erNullvedtak) {
             require(utgift != null) { "Utgift er påkrevd når resultat er oppfylt" }
         }
     }
@@ -210,6 +212,7 @@ enum class VilkårType(
 
     // Boutgifter
     MIDLERTIDIG_OVERNATTING("Midlertidig overnatting", listOf(Stønadstype.BOUTGIFTER)),
+    FASTE_UTGIFTER("Faste utgifter", listOf(Stønadstype.BOUTGIFTER)),
     ;
 
     fun gjelderFlereBarn(): Boolean = this == PASS_BARN

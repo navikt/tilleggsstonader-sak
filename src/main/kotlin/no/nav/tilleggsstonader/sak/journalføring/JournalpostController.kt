@@ -30,7 +30,7 @@ class JournalpostController(
     ): ByteArray {
         val (journalpost, personIdent) = journalpostService.finnJournalpostOgPersonIdent(journalpostId)
 
-        tilgangService.validerTilgangTilPersonMedBarn(personIdent, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilPersonMedRelasjoner(personIdent, AuditLoggerEvent.ACCESS)
 
         return journalpostService.hentDokument(journalpost, dokumentInfoId)
     }
@@ -40,7 +40,7 @@ class JournalpostController(
         @PathVariable journalpostId: String,
     ): JournalpostResponse {
         val (journalpost, personIdent) = journalpostService.finnJournalpostOgPersonIdent(journalpostId)
-        tilgangService.validerTilgangTilPersonMedBarn(personIdent, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilPersonMedRelasjoner(personIdent, AuditLoggerEvent.ACCESS)
         return JournalpostResponse(
             journalpost,
             personIdent,
@@ -55,7 +55,7 @@ class JournalpostController(
         @RequestBody journalføringRequest: JournalføringRequest,
     ): String {
         val (journalpost, personIdent) = journalpostService.finnJournalpostOgPersonIdent(journalpostId)
-        tilgangService.validerTilgangTilPersonMedBarn(personIdent, AuditLoggerEvent.UPDATE)
+        tilgangService.validerTilgangTilPersonMedRelasjoner(personIdent, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
         journalføringService.fullførJournalpost(journalføringRequest, journalpost)

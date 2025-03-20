@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
@@ -63,12 +62,4 @@ class SøkService(
             fagsakPersonId = fagsakPerson?.id,
         )
     }
-
-    fun søkPersonUtenFagsak(personIdent: String): SøkeresultatUtenFagsak =
-        personService.hentPersonKortBolk(listOf(personIdent))[personIdent]?.let {
-            SøkeresultatUtenFagsak(
-                personIdent = personIdent,
-                navn = it.navn.gjeldende().visningsnavn(),
-            )
-        } ?: throw ApiFeil("Finner ingen personer for søket", HttpStatus.BAD_REQUEST)
 }

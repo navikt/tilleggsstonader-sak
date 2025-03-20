@@ -21,7 +21,7 @@ class AdminOpprettBehandlingController(
         @RequestBody request: AdminOpprettFørstegangsbehandlingHentPersonDto,
     ): PersoninfoDto {
         tilgangService.validerHarSaksbehandlerrolle()
-        tilgangService.validerTilgangTilPersonMedBarn(request.ident, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilPersonMedRelasjoner(request.ident, AuditLoggerEvent.ACCESS)
 
         return adminOpprettBehandlingService.hentPerson(stønadstype = request.stønadstype, ident = request.ident)
     }
@@ -31,7 +31,7 @@ class AdminOpprettBehandlingController(
         @RequestBody request: AdminOpprettFørstegangsbehandlingDto,
     ): BehandlingId {
         tilgangService.validerHarSaksbehandlerrolle()
-        tilgangService.validerTilgangTilPersonMedBarn(request.ident, AuditLoggerEvent.CREATE)
+        tilgangService.validerTilgangTilPersonMedRelasjoner(request.ident, AuditLoggerEvent.CREATE)
 
         return adminOpprettBehandlingService.opprettFørstegangsbehandling(
             stønadstype = request.stønadstype,

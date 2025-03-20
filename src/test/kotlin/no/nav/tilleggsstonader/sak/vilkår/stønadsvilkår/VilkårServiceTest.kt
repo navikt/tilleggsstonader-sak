@@ -40,6 +40,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårMidlertidigOvernatting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårMidlertidigOvernattingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import org.assertj.core.api.Assertions.assertThat
@@ -71,7 +73,7 @@ internal class VilkårServiceTest {
     private val barnUnder9år = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)
     private val barnOver10år = FnrGenerator.generer(Year.now().minusYears(11).value, 1, 13)
 
-    val sokandBarnMedBarnepass = BarnMedBarnepass(type = TypeBarnepass.BARNEHAGE_SFO_AKS, null, null)
+    val sokandBarnMedBarnepass = BarnMedBarnepass(type = TypeBarnepass.BARNEHAGE_SFO_AKS, null, null, null)
     val soknadBarn1 = SøknadBarn(ident = barnUnder9år, data = sokandBarnMedBarnepass)
     val soknadBarn2 = SøknadBarn(ident = barnOver10år, data = sokandBarnMedBarnepass)
 
@@ -140,6 +142,7 @@ internal class VilkårServiceTest {
                             fom = null,
                             tom = null,
                             utgift = null,
+                            erNullvedtak = false,
                         ),
                     )
                 },
@@ -159,6 +162,7 @@ internal class VilkårServiceTest {
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
                     utgift = 1,
+                    erNullvedtak = false,
                 ),
             )
 
@@ -177,6 +181,46 @@ internal class VilkårServiceTest {
             assertThat(delvilkår.vurderinger).hasSize(1)
             assertThat(delvilkår.vurderinger.first().svar).isEqualTo(SvarId.NEI)
             assertThat(delvilkår.vurderinger.first().begrunnelse).isEqualTo("en begrunnelse")
+        }
+
+        @Test
+        internal fun `Skal kunne oppdatere vilkår som nullvedtak`() {
+            val lagretVilkår = slot<Vilkår>()
+            val vilkår = initiererVilkårBoutgifter(lagretVilkår)
+
+            vilkårService.oppdaterVilkår(
+                SvarPåVilkårDto(
+                    id = vilkår.id,
+                    behandlingId = behandlingId,
+                    delvilkårsett = oppfylteDelvilkårMidlertidigOvernattingDto(),
+                    fom = LocalDate.of(2024, 1, 1),
+                    tom = LocalDate.of(2024, 1, 31),
+                    utgift = null,
+                    erNullvedtak = true,
+                ),
+            )
+
+            assertThat(lagretVilkår.captured.erNullvedtak).isTrue
+        }
+
+        @Test
+        internal fun `Skal ikke kunne oppdatere vilkår som nullvedtak og har utgift`() {
+            val lagretVilkår = slot<Vilkår>()
+            val vilkår = initiererVilkårBoutgifter(lagretVilkår)
+
+            assertThatThrownBy {
+                vilkårService.oppdaterVilkår(
+                    SvarPåVilkårDto(
+                        id = vilkår.id,
+                        behandlingId = behandlingId,
+                        delvilkårsett = oppfylteDelvilkårMidlertidigOvernattingDto(),
+                        fom = LocalDate.of(2024, 1, 1),
+                        tom = LocalDate.of(2024, 1, 31),
+                        utgift = 100,
+                        erNullvedtak = true,
+                    ),
+                )
+            }.hasMessageContaining("Kan ikke ha utgift på nullvedtak")
         }
     }
 
@@ -259,6 +303,7 @@ internal class VilkårServiceTest {
                         fom = null,
                         tom = null,
                         utgift = null,
+                        erNullvedtak = false,
                     ),
                 )
             },
@@ -294,6 +339,7 @@ internal class VilkårServiceTest {
                         fom = null,
                         tom = null,
                         utgift = null,
+                        erNullvedtak = false,
                     ),
                 )
             },
@@ -324,6 +370,7 @@ internal class VilkårServiceTest {
                     fom = fom.atDay(1),
                     tom = tom.atEndOfMonth(),
                     utgift = 1,
+                    erNullvedtak = false,
                 )
 
             assertThatThrownBy {
@@ -351,6 +398,7 @@ internal class VilkårServiceTest {
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
                     utgift = 1,
+                    erNullvedtak = false,
                 )
             assertThatThrownBy {
                 vilkårService.oppdaterVilkår(svarPåVilkårDto)
@@ -381,6 +429,20 @@ internal class VilkårServiceTest {
                 resultat = Vilkårsresultat.IKKE_OPPFYLT,
                 delvilkår = ikkeOppfylteDelvilkårPassBarn(),
                 type = VilkårType.PASS_BARN,
+            )
+        every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
+        every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(vilkår)
+        every { vilkårRepository.update(capture(lagretVilkår)) } answers { it.invocation.args.first() as Vilkår }
+        return vilkår
+    }
+
+    private fun initiererVilkårBoutgifter(lagretVilkår: CapturingSlot<Vilkår>): Vilkår {
+        val vilkår =
+            vilkår(
+                behandlingId = behandlingId,
+                resultat = Vilkårsresultat.IKKE_OPPFYLT,
+                delvilkår = ikkeOppfylteDelvilkårMidlertidigOvernatting(),
+                type = VilkårType.MIDLERTIDIG_OVERNATTING,
             )
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(vilkår)

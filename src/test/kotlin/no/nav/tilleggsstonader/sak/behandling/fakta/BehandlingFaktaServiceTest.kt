@@ -10,6 +10,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KodeverkServiceUtil.mockedKodeverkService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GeneriskFaktaGrunnlagTestUtil
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.TypeFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.grunnlagsdataDomain
@@ -36,6 +39,7 @@ internal class BehandlingFaktaServiceTest {
     val barnService = mockk<BarnService>()
     val faktaArbeidOgOppholdMapper = FaktaArbeidOgOppholdMapper(mockedKodeverkService())
     val fagsakService = mockk<FagsakService>()
+    val faktaGrunnlagService = mockk<FaktaGrunnlagService>()
 
     val service =
         BehandlingFaktaService(
@@ -44,6 +48,7 @@ internal class BehandlingFaktaServiceTest {
             barnService,
             faktaArbeidOgOppholdMapper,
             fagsakService,
+            faktaGrunnlagService,
         )
 
     val behandlingId = BehandlingId.random()
@@ -51,14 +56,19 @@ internal class BehandlingFaktaServiceTest {
     @BeforeEach
     fun setUp() {
         every { barnService.finnBarnPåBehandling(any()) } returns emptyList()
+        every { faktaGrunnlagService.hentGrunnlag(behandlingId, TypeFaktaGrunnlag.BARN_ANDRE_FORELDRE_SAKSINFORMASJON) } returns
+            emptyList()
     }
 
     @Test
     fun `skal mappe søknad og grunnlag`() {
         every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns grunnlagsdataDomain()
         every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn()
-        every { barnService.finnBarnPåBehandling(any()) } returns
-            listOf(behandlingBarn(personIdent = "1", id = BarnId.fromString("60921c76-f8ef-4000-9824-f127a50a575e")))
+        val behandlingBarn =
+            behandlingBarn(personIdent = "1", id = BarnId.fromString("60921c76-f8ef-4000-9824-f127a50a575e"))
+        every { barnService.finnBarnPåBehandling(any()) } returns listOf(behandlingBarn)
+        every { faktaGrunnlagService.hentGrunnlag(behandlingId, TypeFaktaGrunnlag.BARN_ANDRE_FORELDRE_SAKSINFORMASJON) } returns
+            listOf(GeneriskFaktaGrunnlagTestUtil.faktaGrunnlagBarnAnnenForelder(identBarn = "1"))
 
         val fagsak = fagsak(stønadstype = Stønadstype.BARNETILSYN)
 
@@ -89,6 +99,8 @@ internal class BehandlingFaktaServiceTest {
                     behandlingBarn(personIdent = "1"),
                     behandlingBarn(personIdent = "2"),
                 )
+            every { faktaGrunnlagService.hentGrunnlag(behandlingId, TypeFaktaGrunnlag.BARN_ANDRE_FORELDRE_SAKSINFORMASJON) } returns
+                listOf(GeneriskFaktaGrunnlagTestUtil.faktaGrunnlagBarnAnnenForelder(identBarn = "1"))
 
             val fagsak = fagsak(stønadstype = Stønadstype.BARNETILSYN)
 

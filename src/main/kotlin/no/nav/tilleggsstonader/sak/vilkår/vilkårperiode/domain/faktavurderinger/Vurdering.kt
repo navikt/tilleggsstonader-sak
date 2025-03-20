@@ -99,7 +99,7 @@ data class VurderingMedlemskap private constructor(
                 null -> ResultatDelvilkårperiode.IKKE_VURDERT
                 SvarJaNei.JA,
                 SvarJaNei.JA_IMPLISITT,
-                    -> ResultatDelvilkårperiode.OPPFYLT
+                -> ResultatDelvilkårperiode.OPPFYLT
 
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
                 SvarJaNei.NEI_IMPLISITT -> error("$svar er ugyldig for ${VurderingMedlemskap::class.simpleName}")
@@ -128,7 +128,6 @@ data class VurderingDekketAvAnnetRegelverk private constructor(
                     )
 
                 SvarJaNei.GAMMEL_MANGLER_DATA -> error("$svar er ugyldig for ${VurderingDekketAvAnnetRegelverk::class.simpleName}")
-
             }
     }
 }
@@ -144,9 +143,14 @@ data class VurderingAldersVilkår(
     ) : this(
         svar = svar,
         resultat = utledResultat(svar),
-        vurderingFaktaEtterlevelse = if (svar == SvarJaNei.GAMMEL_MANGLER_DATA) null else requireNotNull(
-            vurderingFaktaEtterlevelse
-        ),
+        vurderingFaktaEtterlevelse =
+            if (svar == SvarJaNei.GAMMEL_MANGLER_DATA) {
+                null
+            } else {
+                requireNotNull(
+                    vurderingFaktaEtterlevelse,
+                )
+            },
     )
 
     companion object {

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -9,6 +10,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaStatusDtoUtil.arenaStatusDto
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.TypeFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.fødsel
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlBarn
@@ -28,6 +31,7 @@ class GrunnlagsdataServiceTest {
     val personService = mockk<PersonService>()
     val grunnlagsdataRepository = mockk<GrunnlagsdataRepository>()
     val arenaService = mockk<ArenaService>()
+    val faktaGrunnlagService = mockk<FaktaGrunnlagService>()
 
     val service =
         GrunnlagsdataService(
@@ -36,6 +40,7 @@ class GrunnlagsdataServiceTest {
             personService = personService,
             grunnlagsdataRepository = grunnlagsdataRepository,
             arenaService = arenaService,
+            faktaGrunnlagService = faktaGrunnlagService,
         )
 
     val behandling = saksbehandling()
@@ -68,6 +73,8 @@ class GrunnlagsdataServiceTest {
         every { barnService.finnBarnPåBehandling(behandling.id) } returns emptyList()
         every { personService.hentPersonMedBarn(behandling.ident) } returns søkerMedBarn
         every { arenaService.hentStatus(any(), any()) } returns arenaStatusDto()
+        every { faktaGrunnlagService.hentGrunnlag(any(), TypeFaktaGrunnlag.BARN_ANDRE_FORELDRE_SAKSINFORMASJON) } returns emptyList()
+        justRun { faktaGrunnlagService.opprettGrunnlag(any()) }
     }
 
     @Nested
@@ -81,6 +88,7 @@ class GrunnlagsdataServiceTest {
             assertThat(grunnlagsdata.grunnlag.barn).isEmpty()
             assertThat(grunnlagsdata.grunnlag.navn.fornavn).isEqualTo("Fornavn")
             verify(exactly = 1) { grunnlagsdataRepository.insert(any()) }
+            verify(exactly = 1) { faktaGrunnlagService.opprettGrunnlag(behandling.id) }
         }
 
         @Test

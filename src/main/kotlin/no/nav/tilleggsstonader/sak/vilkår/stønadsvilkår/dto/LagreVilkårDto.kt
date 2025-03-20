@@ -12,6 +12,7 @@ sealed interface LagreVilkårDto {
     val fom: LocalDate?
     val tom: LocalDate?
     val utgift: Int?
+    val erNullvedtak: Boolean?
 }
 
 data class SvarPåVilkårDto(
@@ -21,6 +22,7 @@ data class SvarPåVilkårDto(
     override val fom: LocalDate?,
     override val tom: LocalDate?,
     override val utgift: Int?,
+    override val erNullvedtak: Boolean?,
 ) : LagreVilkårDto
 
 data class OpprettVilkårDto(
@@ -31,4 +33,5 @@ data class OpprettVilkårDto(
     override val fom: LocalDate?,
     override val tom: LocalDate?,
     override val utgift: Int?,
+    override val erNullvedtak: Boolean?,
 ) : LagreVilkårDto

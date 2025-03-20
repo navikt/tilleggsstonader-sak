@@ -6,9 +6,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.AdRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 /**
@@ -23,55 +22,37 @@ class TilgangskontrollService(
 ) {
     private val adRoller = rolleConfig.rollerMedBeskrivelse
 
-    @Cacheable(
-        cacheNames = ["TILGANG_TIL_BRUKER"],
-        key = "#jwtToken.subject.concat(#personIdent)",
-        condition = "#personIdent != null && #jwtToken.subject != null",
-    )
+    /**
+     * Sjekker tilgang til person.
+     * Noter at denne ikke skal brukes per default. Bruk [sjekkTilgangTilPersonMedRelasjoner]
+     * Bruk kun denne hvis man skal sjekke tilgang person
+     */
     fun sjekkTilgang(
         personIdent: String,
         jwtToken: JwtToken,
     ): Tilgang {
-        val adressebeskyttelse =
-            personService
-                .hentPersonKortBolk(listOf(personIdent))
-                .values
-                .single()
-                .adressebeskyttelse
-                .gradering()
+        val adressebeskyttelse = personService.hentAdressebeskyttelse(personIdent)
+        secureLogger.info("Sjekker tilgang til $personIdent")
         return hentTilgang(adressebeskyttelse, jwtToken, personIdent) { egenAnsattService.erEgenAnsatt(personIdent) }
     }
 
-    @Cacheable(
-        cacheNames = ["TILGANG_TIL_PERSON_MED_RELASJONER"],
-        key = "#jwtToken.subject.concat(#personIdent)",
-        condition = "#jwtToken.subject != null",
-    )
+    /**
+     * Når vi sjekker tilgang til person med relasjoner vet vi ikke hvilke barn som er relevante
+     * Då kontrolleres alle barnen til bruker og alle andre foreldre
+     */
     fun sjekkTilgangTilPersonMedRelasjoner(
         personIdent: String,
         jwtToken: JwtToken,
     ): Tilgang {
-        val personMedRelasjoner = hentPersonMedRelasjoner(personIdent)
-        secureLogger.info("Sjekker tilgang til {}", personMedRelasjoner)
+        val personMedRelasjoner = personService.hentAdressebeskyttelseForPersonOgRelasjoner(personIdent)
+        secureLogger.info("Sjekker tilgang til $personMedRelasjoner")
 
         val høyesteGraderingen = TilgangskontrollUtil.høyesteGraderingen(personMedRelasjoner)
         return hentTilgang(høyesteGraderingen, jwtToken, personIdent) { erEgenAnsatt(personMedRelasjoner) }
     }
 
-    private fun hentPersonMedRelasjoner(personIdent: String): PersonMedRelasjoner {
-        val søkerMedBarn = personService.hentPersonMedBarn(personIdent)
-        val barn =
-            søkerMedBarn.barn.map { PersonMedAdresseBeskyttelse(it.key, it.value.adressebeskyttelse.gradering()) }
-
-        return PersonMedRelasjoner(
-            personIdent = søkerMedBarn.søkerIdent,
-            adressebeskyttelse = søkerMedBarn.søker.adressebeskyttelse.gradering(),
-            barn = barn,
-        )
-    }
-
     private fun hentTilgang(
-        adressebeskyttelsegradering: AdressebeskyttelseGradering?,
+        adressebeskyttelsegradering: AdressebeskyttelseGradering,
         jwtToken: JwtToken,
         personIdent: String,
         egenAnsattSjekk: () -> Boolean,
@@ -96,10 +77,10 @@ class TilgangskontrollService(
     /**
      * Trenger ikke å sjekke barn, men muligens andre forelderen
      */
-    fun erEgenAnsatt(personMedRelasjoner: PersonMedRelasjoner): Boolean {
-        val relevanteIdenter = setOf(personMedRelasjoner.personIdent)
+    private fun erEgenAnsatt(adressebeskyttelseForPersonMedRelasjoner: AdressebeskyttelseForPersonMedRelasjoner): Boolean {
+        val relevanteIdenter = adressebeskyttelseForPersonMedRelasjoner.identerForEgenAnsattKontroll()
 
-        return egenAnsattService.erEgenAnsatt(relevanteIdenter).any { it.value }
+        return egenAnsattService.erEgenAnsatt(relevanteIdenter).any { it.value.erEgenAnsatt }
     }
 
     private fun hentTilgangForRolle(

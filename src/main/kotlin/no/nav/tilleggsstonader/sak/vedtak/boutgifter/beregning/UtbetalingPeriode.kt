@@ -26,8 +26,6 @@ data class UtbetalingPeriode(
     override val tom: LocalDate,
     val målgruppe: MålgruppeType,
     val aktivitet: AktivitetType,
-//    val studienivå: Studienivå,
-//    val prosent: Int,
     val utbetalingsdato: LocalDate,
 ) : Periode<LocalDate> {
     init {

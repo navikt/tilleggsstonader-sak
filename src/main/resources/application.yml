@@ -11,6 +11,9 @@ server:
       max-request-size: 200MB
 
 spring:
+  jackson:
+    deserialization:
+      FAIL_ON_NULL_FOR_PRIMITIVES: true
   mvc:
     format:
       date: iso
@@ -224,3 +227,6 @@ clients:
   ereg:
     uri: https://ereg-services.${CLIENT_ENV}-fss-pub.nais.io
     scope: api://${CLIENT_ENV}-fss.arbeidsforhold.ereg-services/.default
+
+topics:
+  journalhendelser: teamdokumenthandtering.aapen-dok-journalfoering

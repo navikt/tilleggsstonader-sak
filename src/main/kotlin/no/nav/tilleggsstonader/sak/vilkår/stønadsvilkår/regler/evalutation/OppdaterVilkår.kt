@@ -53,7 +53,12 @@ object OppdaterVilkår {
         val resultat = vilkårsresultat.vilkår
         val fom = oppdatering.fom
         val tom = oppdatering.tom
-        val vilkårMedUtgift = listOf(VilkårType.PASS_BARN, VilkårType.MIDLERTIDIG_OVERNATTING)
+        val vilkårMedUtgift =
+            listOf(
+                VilkårType.PASS_BARN,
+                VilkårType.MIDLERTIDIG_OVERNATTING,
+                VilkårType.FASTE_UTGIFTER,
+            )
         brukerfeilHvis(fom == null || tom == null) {
             "Mangler fra og med/til og med på vilkår"
         }
@@ -90,6 +95,7 @@ object OppdaterVilkår {
             fom = utledFom(vilkår, oppdatering),
             tom = utledTom(vilkår, oppdatering),
             utgift = oppdatering.utgift,
+            erNullvedtak = oppdatering.erNullvedtak == true,
             gitVersjon = Applikasjonsversjon.versjon,
         )
     }
@@ -100,7 +106,9 @@ object OppdaterVilkår {
     ): LocalDate? =
         oppdatering.fom?.let {
             when (vilkår.type) {
-                VilkårType.PASS_BARN -> {
+                VilkårType.PASS_BARN,
+                VilkårType.FASTE_UTGIFTER,
+                -> {
                     validerErFørsteDagIMåned(it)
                     it
                 }
@@ -118,7 +126,9 @@ object OppdaterVilkår {
     ): LocalDate? =
         oppdatering.tom?.let {
             when (vilkår.type) {
-                VilkårType.PASS_BARN -> {
+                VilkårType.PASS_BARN,
+                VilkårType.FASTE_UTGIFTER,
+                -> {
                     validerErSisteDagIMåned(it)
                     it
                 }
@@ -200,6 +210,7 @@ object OppdaterVilkår {
             behandlingId = behandlingId,
             type = vilkårsregel.vilkårType,
             barnId = barnId,
+            erNullvedtak = false,
             delvilkårwrapper = DelvilkårWrapper(delvilkårsett),
             resultat = utledResultat(vilkårsregel, delvilkårsett.map { it.tilDto() }).vilkår,
             status = VilkårStatus.NY,
