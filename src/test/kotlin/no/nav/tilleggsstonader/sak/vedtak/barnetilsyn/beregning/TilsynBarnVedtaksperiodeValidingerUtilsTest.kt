@@ -13,6 +13,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Navn
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerEnkeltperiode
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerIngenOverlappMellomVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtaksperiodeValideringUtils.validerUtgiftHeleVedtaksperioden
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -116,7 +120,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 lagVedtaksperiode(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.TILTAK)
 
             assertThatThrownBy {
-                TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
@@ -130,7 +134,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             val vedtaksperiode = lagVedtaksperiode(målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE)
 
             assertThatThrownBy {
-                TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
@@ -144,7 +148,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             val vedtaksperiode = lagVedtaksperiode(aktivitet = AktivitetType.UTDANNING)
 
             assertThatThrownBy {
-                TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
@@ -158,7 +162,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             val vedtaksperiode = lagVedtaksperiode(fom = LocalDate.of(2024, 12, 1))
 
             assertThatThrownBy {
-                TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
@@ -183,7 +187,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 )
 
             assertThatThrownBy {
-                TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
@@ -213,7 +217,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 )
 
             assertThatCode {
-                TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
@@ -240,7 +244,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 )
 
             assertThatCode {
-                TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
@@ -287,7 +291,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 lagVedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 10))
 
             assertThatCode {
-                TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
@@ -302,7 +306,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 lagVedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 21))
 
             assertThatCode {
-                TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
@@ -336,7 +340,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
         fun `kaster feil hvis vedtaksperioderDto overlapper`() {
             val feil =
                 assertThrows<ApiFeil> {
-                    TilsynBarnVedtaksperiodeValideringUtils.validerIngenOverlappMellomVedtaksperioder(
+                    validerIngenOverlappMellomVedtaksperioder(
                         listOf(
                             vedtaksperiodeJan,
                             vedtaksperiodeJanFeb,
@@ -349,7 +353,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
         @Test
         fun `kaster ikke feil hvis vedtaksperioderDto ikke overlapper`() {
             assertDoesNotThrow {
-                TilsynBarnVedtaksperiodeValideringUtils.validerIngenOverlappMellomVedtaksperioder(
+                validerIngenOverlappMellomVedtaksperioder(
                     listOf(
                         vedtaksperiodeJan,
                         vedtaksperiodeFeb,
@@ -433,7 +437,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 )
 
             assertThatCode {
-                TilsynBarnVedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett(
+                validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett(
                     vilkårperioder = vilkårperioder,
                     vedtaksperioder =
                         listOf(
@@ -461,7 +465,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     aktiviteter = listOf(tilltakJan),
                 )
             assertThatThrownBy {
-                TilsynBarnVedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett(
+                validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett(
                     vilkårperioder = vilkårperioder,
                     vedtaksperioder = listOf(lagVedtaksperiode(fom = jan.atDay(1), tom = jan.atEndOfMonth())),
                 )
@@ -489,7 +493,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 )
 
             assertThatThrownBy {
-                TilsynBarnVedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett(
+                validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett(
                     vilkårperioder = vilkårperioder,
                     vedtaksperioder = listOf(lagVedtaksperiode(fom = jan.atDay(1), tom = jan.atDay(15))),
                 )
@@ -517,7 +521,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 )
 
             assertThatThrownBy {
-                TilsynBarnVedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett(
+                validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett(
                     vilkårperioder = vilkårperioder,
                     vedtaksperioder = listOf(lagVedtaksperiode(fom = jan.atDay(15), tom = jan.atDay(15))),
                 )
@@ -566,7 +570,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                 )
 
             assertThatCode {
-                TilsynBarnVedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett(
+                validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett(
                     vilkårperioder = vilkårperioder,
                     vedtaksperioder = listOf(lagVedtaksperiode(fom = jan.atDay(10), tom = jan.atDay(20))),
                 )
@@ -585,13 +589,13 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             @Test
             fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er over 18 år`() {
                 assertThatCode {
-                    TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                    validerEnkeltperiode(
                         vedtaksperioder,
                         målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                         aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
                         dato18årGammel,
                     )
-                    TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                    validerEnkeltperiode(
                         vedtaksperioder,
                         målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                         aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
@@ -603,7 +607,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             @Test
             fun `skal kaste feil dersom nedsatt arbeidsevne og personen er under 18 år`() {
                 assertThatCode {
-                    TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                    validerEnkeltperiode(
                         vedtaksperioder,
                         målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                         aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
@@ -615,13 +619,13 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             @Test
             fun `skal kaste feil dersom nedsatt arbeidsevne og personen er over 67 år`() {
                 assertThatThrownBy {
-                    TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                    validerEnkeltperiode(
                         vedtaksperioder,
                         målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                         aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
                         dato67årGammel,
                     )
-                    TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                    validerEnkeltperiode(
                         vedtaksperioder,
                         målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                         aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
@@ -633,7 +637,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             @Test
             fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er under 67 år`() {
                 assertThatCode {
-                    TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                    validerEnkeltperiode(
                         vedtaksperioder,
                         målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                         aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
@@ -668,13 +672,13 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     )
 
                 assertThatCode {
-                    TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                    validerEnkeltperiode(
                         vedtaksperioder,
                         målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                         aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
                         dato18årGammel.minusYears(1),
                     )
-                    TilsynBarnVedtaksperiodeValideringUtils.validerEnkeltperiode(
+                    validerEnkeltperiode(
                         vedtaksperioder,
                         målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
                         aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
@@ -703,7 +707,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             @Test
             fun `kaster ikke feil når utgift hele vedtaksperioden`() {
                 assertDoesNotThrow {
-                    TilsynBarnVedtaksperiodeValideringUtils.validerUtgiftHeleVedtaksperioden(
+                    validerUtgiftHeleVedtaksperioden(
                         vedtaksperioder = listOf(vedtaksperiode),
                         utgifter = utgifter,
                     )
@@ -714,7 +718,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
             fun `kaster feil når det ikke finnes utgifter hele vedtaksperioden`() {
                 val feil =
                     assertThrows<ApiFeil> {
-                        TilsynBarnVedtaksperiodeValideringUtils.validerUtgiftHeleVedtaksperioden(
+                        validerUtgiftHeleVedtaksperioden(
                             vedtaksperioder = listOf(vedtaksperiode.copy(tom = LocalDate.of(2025, 2, 28))),
                             utgifter = utgifter,
                         )
@@ -742,7 +746,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     )
 
                 Assertions.assertDoesNotThrow {
-                    TilsynBarnVedtaksperiodeValideringUtils.validerUtgiftHeleVedtaksperioden(
+                    validerUtgiftHeleVedtaksperioden(
                         vedtaksperioder = listOf(vedtaksperiode.copy(tom = LocalDate.of(2025, 2, 28))),
                         utgifter = utgifter,
                     )
@@ -772,7 +776,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     )
 
                 Assertions.assertDoesNotThrow {
-                    TilsynBarnVedtaksperiodeValideringUtils.validerUtgiftHeleVedtaksperioden(
+                    validerUtgiftHeleVedtaksperioden(
                         vedtaksperioder = listOf(vedtaksperiode.copy(tom = LocalDate.of(2025, 2, 28))),
                         utgifter = utgifter,
                     )
@@ -799,7 +803,7 @@ class TilsynBarnVedtaksperiodeValidingerUtilsTest {
                     )
                 val feil =
                     assertThrows<ApiFeil> {
-                        TilsynBarnVedtaksperiodeValideringUtils.validerUtgiftHeleVedtaksperioden(
+                        validerUtgiftHeleVedtaksperioden(
                             vedtaksperioder = listOf(vedtaksperiode.copy(tom = LocalDate.of(2025, 3, 31))),
                             utgifter = utgifter,
                         )
