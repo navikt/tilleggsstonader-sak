@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
@@ -9,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
+import kotlin.math.min
 
 data class BeregningsresultatBoutgifter(
     val perioder: List<BeregningsresultatForLøpendeMåned>,
@@ -22,7 +24,6 @@ data class BeregningsresultatBoutgifter(
 }
 
 data class BeregningsresultatForLøpendeMåned(
-    val stønadsbeløp: Int,
     val grunnlag: Beregningsgrunnlag,
     val delAvTidligereUtbetaling: Boolean = false,
 ) : Periode<LocalDate>,
@@ -32,6 +33,9 @@ data class BeregningsresultatForLøpendeMåned(
 
     @get:JsonIgnore
     override val tom: LocalDate get() = grunnlag.tom
+
+    @get:JsonProperty("stønadsbeløp")
+    val stønadsbeløp get() = beregnBeløp()
 
     override fun medPeriode(
         fom: LocalDate,
@@ -43,18 +47,26 @@ data class BeregningsresultatForLøpendeMåned(
 
     fun markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling: Boolean) =
         this.copy(delAvTidligereUtbetaling = delAvTidligereUtbetaling)
+
+    private fun beregnBeløp(): Int {
+        val summerteUtgifter =
+            grunnlag.utgifter.values
+                .flatten()
+                .sumOf { it.utgift }
+        return min(summerteUtgifter, grunnlag.makssats)
+    }
 }
 
 data class Beregningsgrunnlag(
-    val fom: LocalDate,
-    val tom: LocalDate,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
     val utbetalingsdato: LocalDate,
     val utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
     val makssats: Int,
     val makssatsBekreftet: Boolean,
     val målgruppe: MålgruppeType,
     val aktivitet: AktivitetType,
-)
+) : Periode<LocalDate>
 
 // fun avkortBeregningsresultatVedOpphør(
 //    forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørBoutgifter>,
