@@ -111,8 +111,10 @@ object SøknadskjemaBoutgifterMapper {
 
     private fun mapAktivitet(skjemaBoutgifter: SkjemaBoutgifterKontrakt): AktivitetAvsnitt {
         val aktivitet = skjemaBoutgifter.aktiviteter.aktiviteterOgMaalgruppe.aktivitet
+        // Fyll ut setter aktivitetId til "ingenAktivitet" og vi har ellers mapping til ANNET som brukes i vår søknad
+        val id = if (aktivitet.aktivitetId == "ingenAktivitet") "ANNET" else aktivitet.aktivitetId
         return AktivitetAvsnitt(
-            aktiviteter = listOf(ValgtAktivitet(id = aktivitet.aktivitetId, label = aktivitet.text)),
+            aktiviteter = listOf(ValgtAktivitet(id = id, label = aktivitet.text)),
             annenAktivitet = mapAnnenAktivitet(skjemaBoutgifter.aktiviteter.arbeidsrettetAktivitet),
             lønnetAktivitet = null,
         )
