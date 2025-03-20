@@ -31,6 +31,8 @@ data class FagsakMedBehandlinger(
 data class BehandlingDetaljer(
     val id: BehandlingId,
     val forrigeIverksatteBehandlingId: BehandlingId?,
+    @Deprecated("Skal bruke forrgieIverksatteBehandlingId")
+    val forrigeBehandlingId: BehandlingId?,
     val fagsakId: FagsakId,
     val steg: StegType,
     val kategori: BehandlingKategori,
