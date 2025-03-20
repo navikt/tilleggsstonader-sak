@@ -12,9 +12,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAPLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevneLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurderinger
 import java.time.LocalDate
 import kotlin.contracts.ExperimentalContracts
@@ -130,6 +133,9 @@ object VilkårperiodeRevurderFraValidering {
             is VurderingNedsattArbeidsevne -> vurdering.copy(aldersvilkår = oppdatertAldersvilkår)
             is VurderingOmstillingsstønad -> vurdering.copy(aldersvilkår = oppdatertAldersvilkår)
             is VurderingUføretrygd -> vurdering.copy(aldersvilkår = oppdatertAldersvilkår)
+            is VurderingAAPLæremidler -> vurdering.copy(aldersvilkår = oppdatertAldersvilkår)
+            is VurderingUføretrygdLæremidler -> vurdering.copy(aldersvilkår = oppdatertAldersvilkår)
+            is VurderingNedsattArbeidsevneLæremidler -> vurdering.copy(aldersvilkår = oppdatertAldersvilkår)
         }
     }
 
