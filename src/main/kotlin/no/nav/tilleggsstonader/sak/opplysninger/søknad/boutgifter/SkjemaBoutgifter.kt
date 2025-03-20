@@ -9,6 +9,7 @@ data class SkjemaBoutgifter(
     val hovedytelse: HovedytelseAvsnitt,
     val aktivitet: AktivitetAvsnitt,
     val boutgifter: BoligEllerOvernattingAvsnitt,
+    val dokumentasjon: List<DokumentasjonBoutgifter>,
 )
 
 data class BoligEllerOvernattingAvsnitt(
@@ -16,6 +17,11 @@ data class BoligEllerOvernattingAvsnitt(
     val fasteUtgifter: FasteUtgifter?,
     val samling: UtgifterIForbindelseMedSamling?,
     val harSærligStoreUtgifterPgaFunksjonsnedsettelse: JaNei,
+)
+
+data class DokumentasjonBoutgifter(
+    val tittel: String,
+    val dokumentInfoId: String,
 )
 
 enum class TypeUtgifter {
