@@ -36,6 +36,7 @@ object SøknadskjemaLæremidlerMapper {
                 hovedytelse =
                     skjema.hovedytelse.hovedytelse.verdier
                         .map { it.verdi },
+                harNedsattArbeidsevne = null, // Finnes ikke i søknad ennå
                 arbeidOgOpphold = mapArbeidOgOpphold(skjema.hovedytelse.arbeidOgOpphold),
             ),
         utdanning =

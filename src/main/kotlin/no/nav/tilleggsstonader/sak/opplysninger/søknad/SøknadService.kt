@@ -61,6 +61,7 @@ class SøknadService(
                         journalpost,
                         skjema.skjema as SøknadsskjemaLæremidler,
                     )
+                else -> error("yolo")
             }
         val lagretSøknad =
             when (søknad) {

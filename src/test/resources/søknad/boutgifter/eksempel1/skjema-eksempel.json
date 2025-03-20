@@ -1,0 +1,104 @@
+{
+  "hovedytelse" : {
+    "arbeidsavklaringspenger" : true,
+    "overgangsstonad" : true,
+    "gjenlevendepensjon" : true,
+    "uforetrygd" : true,
+    "tiltakspenger" : true,
+    "dagpenger" : true,
+    "sykepenger" : true,
+    "kvalifiseringsstonad" : true,
+    "mottarIngenPengestotte" : true,
+    "ingenAvAlternativenePasserForMeg" : true
+  },
+  "harNedsattArbeidsevne" : "ja",
+  "arbeidOgOpphold" : {
+    "jobberIAnnetLand" : "ja",
+    "jobbAnnetLand" : {
+      "value" : "AF",
+      "label" : "Afghanistan"
+    },
+    "harPengestotteAnnetLand" : "ja",
+    "pengestotteAnnetLand" : {
+      "value" : "AF",
+      "label" : "Afghanistan"
+    },
+    "harOppholdUtenforNorgeSiste12mnd" : "ja",
+    "oppholdUtenforNorgeSiste12mnd" : {
+      "land" : {
+        "value" : "AF",
+        "label" : "Afghanistan"
+      },
+      "arsakOppholdUtenforNorge" : {
+        "jobbet" : true,
+        "studerte" : true,
+        "fikkMedisinskBehandling" : true,
+        "varPaFerie" : true,
+        "besokteFamilie" : true,
+        "annet" : true
+      },
+      "periode" : {
+        "fom" : "2025-01-01",
+        "tom" : "2025-01-01"
+      }
+    },
+    "harOppholdUtenforNorgeNeste12mnd" : "ja",
+    "oppholdUtenforNorgeNeste12mnd" : {
+      "land" : {
+        "value" : "AF",
+        "label" : "Afghanistan"
+      },
+      "arsakOppholdUtenforNorge" : {
+        "jobbet" : true,
+        "studerte" : true,
+        "fikkMedisinskBehandling" : true,
+        "varPaFerie" : true,
+        "besokteFamilie" : true,
+        "annet" : true
+      },
+      "periode" : {
+        "fom" : "2025-01-01",
+        "tom" : "2025-01-01"
+      }
+    }
+  },
+  "aktiviteter" : {
+    "aktiviteterOgMaalgruppe" : {
+      "aktivitet" : {
+        "aktivitetId" : "123",
+        "periode" : {
+          "fom" : "2025-01-01",
+          "tom" : "2025-01-01"
+        },
+        "maalgruppe" : {
+          "maalgruppetype" : "NEDSARBEVN",
+          "gyldighetsperiode" : {
+            "fom" : "2025-01-01",
+            "tom" : "2025-01-01"
+          },
+          "maalgruppenavn" : "maalgruppenavn"
+        },
+        "text" : "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
+      }
+    },
+    "arbeidsrettetAktivitet" : "tiltakArbeidsrettetUtredning"
+  },
+  "boligEllerOvernatting" : {
+    "typeUtgifter" : "fastUtgift",
+    "fasteUtgifter" : {
+      "harUtgifterTilBoligToSteder" : "ekstraBolig",
+      "harLeieinntekterSomDekkerUtgifteneTilBoligenPaHjemstedet" : "ja",
+      "harHoyereUtgifterPaNyttBosted" : "ja",
+      "mottarBostotte" : "ja"
+    },
+    "samling" : {
+      "periodeForSamling" : [ {
+        "fom" : "2025-01-01",
+        "tom" : "2025-01-01",
+        "trengteEkstraOvernatting" : "ja",
+        "utgifterTilOvernatting" : 100
+      } ]
+    },
+    "harSaerligStoreUtgifterPaGrunnAvFunksjonsnedsettelse" : "ja"
+  }
+}
