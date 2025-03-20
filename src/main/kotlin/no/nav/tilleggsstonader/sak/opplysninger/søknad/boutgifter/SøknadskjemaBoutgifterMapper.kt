@@ -142,7 +142,7 @@ object SøknadskjemaBoutgifterMapper {
             else -> error("Ukjent verdi $verdi")
         }
 
-    private fun mapHovedytelse(hovedytelse: HovedytelseKontrakt): List<Hovedytelse> =
+    fun mapHovedytelse(hovedytelse: HovedytelseKontrakt): List<Hovedytelse> =
         buildList {
             val list = this
             with(hovedytelse) {
@@ -159,7 +159,7 @@ object SøknadskjemaBoutgifterMapper {
             }
         }
 
-    private fun mapÅrsakOppholdUtenforNorge(arsakOppholdUtenforNorge: ArsakOppholdUtenforNorge): List<ÅrsakOppholdUtenforNorge> =
+    fun mapÅrsakOppholdUtenforNorge(arsakOppholdUtenforNorge: ArsakOppholdUtenforNorge): List<ÅrsakOppholdUtenforNorge> =
         buildList {
             val list = this
             with(arsakOppholdUtenforNorge) {
