@@ -14,13 +14,20 @@ sealed interface AldersvilkårVurdering : VurderingerMålgruppe {
     val aldersvilkår: VurderingAldersVilkår
 }
 
+sealed interface MottarSykepengerForFulltidsstillingVurdering : VurderingerMålgruppe {
+    val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling
+}
+
 data class VurderingAAP(
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
     override val aldersvilkår: VurderingAldersVilkår,
 ) : MedlemskapVurdering,
     DekketAvAnnetRegelverkVurdering,
-    AldersvilkårVurdering {
+    AldersvilkårVurdering,
+    MottarSykepengerForFulltidsstillingVurdering {
     override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
+    override val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling =
+        VurderingMottarSykepengerForFulltidsstilling.NEI_IMPLISITT
 }
 
 data class VurderingUføretrygd(
@@ -29,15 +36,21 @@ data class VurderingUføretrygd(
     override val aldersvilkår: VurderingAldersVilkår,
 ) : MedlemskapVurdering,
     DekketAvAnnetRegelverkVurdering,
-    AldersvilkårVurdering
+    AldersvilkårVurdering,
+    MottarSykepengerForFulltidsstillingVurdering {
+    override val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling =
+        VurderingMottarSykepengerForFulltidsstilling.NEI_IMPLISITT
+}
 
 data class VurderingNedsattArbeidsevne(
     override val medlemskap: VurderingMedlemskap,
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
     override val aldersvilkår: VurderingAldersVilkår,
+    override val mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling,
 ) : MedlemskapVurdering,
     DekketAvAnnetRegelverkVurdering,
-    AldersvilkårVurdering
+    AldersvilkårVurdering,
+    MottarSykepengerForFulltidsstillingVurdering
 
 data class VurderingOmstillingsstønad(
     override val medlemskap: VurderingMedlemskap,

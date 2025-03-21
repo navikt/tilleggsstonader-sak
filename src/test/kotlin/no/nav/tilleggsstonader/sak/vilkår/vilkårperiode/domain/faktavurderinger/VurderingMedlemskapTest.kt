@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurdering
 
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class VurderingMedlemskapTest {
@@ -35,5 +36,12 @@ class VurderingMedlemskapTest {
 
         assertThat(vurdering.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_VURDERT)
         assertThat(vurdering.svar).isNull()
+    }
+
+    @Test
+    fun `svar=NEI_IMPLISITT er ikke gyldig`() {
+        assertThatThrownBy {
+            vurderingMedlemskap(SvarJaNei.NEI_IMPLISITT)
+        }.hasMessageContaining("ugyldig")
     }
 }

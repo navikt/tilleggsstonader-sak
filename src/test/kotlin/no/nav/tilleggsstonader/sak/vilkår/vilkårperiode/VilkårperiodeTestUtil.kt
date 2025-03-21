@@ -35,6 +35,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
@@ -86,6 +87,7 @@ object VilkårperiodeTestUtil {
         medlemskap: VurderingMedlemskap = vurderingMedlemskap(),
         dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(),
         aldersvilkår: VurderingAldersVilkår = vurderingAldersVilkår(),
+        mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling = vurderingMottarSykepengerForFulltidsstilling(),
     ): MålgruppeFaktaOgVurdering =
         when (type) {
             MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
@@ -126,6 +128,7 @@ object VilkårperiodeTestUtil {
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
                             aldersvilkår = aldersvilkår,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerForFulltidsstilling,
                         ),
                 )
 
@@ -236,6 +239,9 @@ object VilkårperiodeTestUtil {
 
     fun vurderingAldersVilkår(svar: SvarJaNei = SvarJaNei.JA) =
         VurderingAldersVilkår(svar = svar, vurderingFaktaEtterlevelse = vurderingFaktaEtterlevelseAldersvilkår())
+
+    fun vurderingMottarSykepengerForFulltidsstilling(svar: SvarJaNei? = SvarJaNei.NEI) =
+        VurderingMottarSykepengerForFulltidsstilling(svar = svar)
 
     fun dummyVilkårperiodeMålgruppe(
         type: MålgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,
