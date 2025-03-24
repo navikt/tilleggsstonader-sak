@@ -44,11 +44,11 @@ class PersonopplysningerService(
             adressebeskyttelse = Adressebeskyttelse.fraPdl(pdlSøker.adressebeskyttelse.gradering()),
             erSkjermet = egenAnsattService.erEgenAnsatt(ident),
             dødsdato = pdlSøker.dødsfall.gjeldende()?.dødsdato,
-            erUtlandet = erUtlandet(ident),
+            harGeografiskTilknytningUtland = harGeografiskTilknytningUtland(ident),
         )
     }
 
-    private fun erUtlandet(ident: String): Boolean {
+    private fun harGeografiskTilknytningUtland(ident: String): Boolean {
         val geografiskTilknytning = personService.hentGeografiskTilknytning(ident)
         return geografiskTilknytning?.gtType == GeografiskTilknytningType.UTLAND
     }
