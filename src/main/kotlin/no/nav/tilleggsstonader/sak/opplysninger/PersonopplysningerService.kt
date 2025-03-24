@@ -44,7 +44,7 @@ class PersonopplysningerService(
             adressebeskyttelse = Adressebeskyttelse.fraPdl(pdlSøker.adressebeskyttelse.gradering()),
             erSkjermet = egenAnsattService.erEgenAnsatt(ident),
             dødsdato = pdlSøker.dødsfall.gjeldende()?.dødsdato,
-            erUtlandet = true,
+            erUtlandet = erUtlandet(ident),
         )
     }
 
