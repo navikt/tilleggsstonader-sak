@@ -3,16 +3,16 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20241112093526_694e258"
-val tilleggsstønaderLibsVersion = "2025.03.14-14.38.d650c79601e9"
-val tilleggsstønaderKontrakterVersion = "2025.03.17-10.34.19d9ad1090ff"
+val familieProsesseringVersion = "2.20250317161652_fe22655"
+val tilleggsstønaderLibsVersion = "2025.03.24-08.48.93a92ef744b9"
+val tilleggsstønaderKontrakterVersion = "2025.03.24-08.34.c5f84c4f3794"
 val avroVersion = "1.12.0"
 val confluentVersion = "7.9.0"
-val joarkHendelseVersion = "1.1.6"
-val tokenSupportVersion = "5.0.11"
-val wiremockVersion = "3.9.2"
-val mockkVersion = "1.13.12"
-val testcontainerVersion = "1.20.3"
+val joarkHendelseVersion = "08271806"
+val tokenSupportVersion = "5.0.20"
+val wiremockVersion = "3.12.1"
+val mockkVersion = "1.13.17"
+val testcontainerVersion = "1.20.6"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -20,18 +20,18 @@ version = "1.0.0"
 plugins {
     application
 
-    kotlin("jvm") version "2.0.21"
+    kotlin("jvm") version "2.1.20"
     id("com.diffplug.spotless") version "7.0.2"
-    id("com.github.ben-manes.versions") version "0.51.0"
+    id("com.github.ben-manes.versions") version "0.52.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
-    id("org.springframework.boot") version "3.3.5"
-    id("io.spring.dependency-management") version "1.1.6"
-    kotlin("plugin.spring") version "2.0.21"
+    id("org.springframework.boot") version "3.4.4"
+    id("io.spring.dependency-management") version "1.1.7"
+    kotlin("plugin.spring") version "2.1.20"
 
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
 
-    id("org.cyclonedx.bom") version "1.10.0"
+    id("org.cyclonedx.bom") version "2.2.0"
 }
 
 repositories {
@@ -108,7 +108,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.20.1"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.21.1"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 }
