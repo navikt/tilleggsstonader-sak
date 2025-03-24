@@ -65,7 +65,6 @@ class SøknadService(
                         journalpost,
                         søknadsskjema,
                     )
-                // TODO map vedlegg
                 is SøknadsskjemaBoutgifterFyllUtSendInn ->
                     SøknadskjemaBoutgifterMapper.map(
                         skjema.mottattTidspunkt,
