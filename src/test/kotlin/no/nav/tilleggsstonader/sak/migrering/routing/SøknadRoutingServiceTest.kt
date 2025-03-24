@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.migrering.routing
 
-import io.getunleash.Variant
+import io.getunleash.variant.Variant
 import io.mockk.called
 import io.mockk.every
 import io.mockk.mockk
