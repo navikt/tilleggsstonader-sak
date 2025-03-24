@@ -84,7 +84,7 @@ internal class OppdaterVilkårTest {
         inner class Boutgifter {
             @Nested
             inner class MidlertidigOvernatting {
-                val opprettVilkårDto =
+                val opprettMidlertidigOvernattingVilkårDto =
                     OpprettVilkårDto(
                         vilkårType = VilkårType.MIDLERTIDIG_OVERNATTING,
                         behandlingId = behandlingId,
@@ -94,7 +94,7 @@ internal class OppdaterVilkårTest {
                         utgift = 1,
                         erNullvedtak = false,
                     )
-                val vilkår =
+                val midlertidigOvernattingVilkår =
                     vilkår(
                         behandlingId = behandlingId,
                         type = VilkårType.MIDLERTIDIG_OVERNATTING,
@@ -104,40 +104,49 @@ internal class OppdaterVilkårTest {
                 @Test
                 fun `skal validere at man har med fom og tom for vilkår for midlertidig overnatting`() {
                     assertThatThrownBy {
-                        validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(fom = null))
+                        validerVilkårOgBeregnResultat(midlertidigOvernattingVilkår, opprettMidlertidigOvernattingVilkårDto.copy(fom = null))
                     }.hasMessageContaining("Mangler fra og med/til og med på vilkår")
 
                     assertThatThrownBy {
-                        validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(tom = null))
+                        validerVilkårOgBeregnResultat(midlertidigOvernattingVilkår, opprettMidlertidigOvernattingVilkårDto.copy(tom = null))
                     }.hasMessageContaining("Mangler fra og med/til og med på vilkår")
                 }
 
                 @Test
                 fun `skal kaste feil hvis innvilget midlertidig overnatting ikke inneholder beløp`() {
                     assertThatThrownBy {
-                        validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(utgift = null))
+                        validerVilkårOgBeregnResultat(
+                            midlertidigOvernattingVilkår,
+                            opprettMidlertidigOvernattingVilkårDto.copy(utgift = null),
+                        )
                     }.hasMessageContaining("Mangler utgift på vilkår")
                 }
 
                 @Test
                 fun `skal ikke kaste feil hvis ikke oppfylt midlertidig overnatting ikke inneholder beløp`() {
                     val dto =
-                        opprettVilkårDto.copy(
+                        opprettMidlertidigOvernattingVilkårDto.copy(
                             utgift = null,
                             delvilkårsett = ikkeOppfylteDelvilkårMidlertidigOvernattingDto(),
                         )
-                    validerVilkårOgBeregnResultat(vilkår, dto)
+                    validerVilkårOgBeregnResultat(midlertidigOvernattingVilkår, dto)
                 }
 
                 @Test
                 fun `oppfylt midlertidig overnatting kan mangle utgift når det er et nullvedtak`() {
-                    validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(utgift = null, erNullvedtak = true))
+                    validerVilkårOgBeregnResultat(
+                        midlertidigOvernattingVilkår,
+                        opprettMidlertidigOvernattingVilkårDto.copy(utgift = null, erNullvedtak = true),
+                    )
                 }
 
                 @Test
                 fun `skal ikke kaste feil hvis oppfylt midlertidig overnatting nullvedttak inneholder beløp`() {
                     assertThatThrownBy {
-                        validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(utgift = 1, erNullvedtak = true))
+                        validerVilkårOgBeregnResultat(
+                            midlertidigOvernattingVilkår,
+                            opprettMidlertidigOvernattingVilkårDto.copy(utgift = 1, erNullvedtak = true),
+                        )
                     }.hasMessageContaining("Kan ikke ha utgift på nullvedtak")
                 }
             }
