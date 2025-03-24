@@ -130,7 +130,7 @@ internal class OppdaterVilkårTest {
                 }
 
                 @Test
-                fun `skal ikke kaste feil hvis oppfylt midlertidig overnatting nullvedttak ikke inneholder beløp`() {
+                fun `oppfylt midlertidig overnatting kan mangle utgift når det er et nullvedtak`() {
                     validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(utgift = null, erNullvedtak = true))
                 }
 
@@ -228,7 +228,7 @@ internal class OppdaterVilkårTest {
                 }
 
                 @Test
-                fun `skal ikke kaste feil hvis ikke oppfylt faste utgifter to boliger ikke inneholder beløp`() {
+                fun `utgift kan mangle når midlertidig overnatting ikke er oppfylt`() {
                     val dto =
                         opprettVilkårDto.copy(
                             utgift = null,
