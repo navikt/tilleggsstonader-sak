@@ -60,7 +60,6 @@ object OppdaterVilkår {
                 VilkårType.FASTE_UTGIFTER_EN_BOLIG,
                 VilkårType.FASTE_UTGIFTER_TO_BOLIGER,
             )
-        val erNullvedtak = oppdatering.erNullvedtak
         brukerfeilHvis(fom == null || tom == null) {
             "Mangler fra og med/til og med på vilkår"
         }
@@ -69,13 +68,13 @@ object OppdaterVilkår {
         }
         brukerfeilHvis(
             vilkårType in vilkårMedUtgift &&
-                erNullvedtak != true &&
+                oppdatering.erNullvedtak != true &&
                 resultat == Vilkårsresultat.OPPFYLT &&
                 oppdatering.utgift == null,
         ) {
             "Mangler utgift på vilkår"
         }
-        brukerfeilHvis(erNullvedtak == true && oppdatering.utgift != null) {
+        brukerfeilHvis(oppdatering.erNullvedtak == true && oppdatering.utgift != null) {
             "Kan ikke ha utgift på nullvedtak"
         }
         feilHvis(vilkårType !in vilkårMedUtgift && oppdatering.utgift != null) {
