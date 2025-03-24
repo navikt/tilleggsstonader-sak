@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.unleash
 
-import io.getunleash.Variant
+import io.getunleash.variant.Variant
 import io.mockk.every
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.UnleashUtil.getVariantWithNameOrDefault
 import org.assertj.core.api.Assertions.assertThat

@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.unleash
 
-import io.getunleash.Variant
+import io.getunleash.variant.Variant
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.justRun
