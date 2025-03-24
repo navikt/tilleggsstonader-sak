@@ -8,8 +8,9 @@ import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
-import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArsakOppholdUtenforNorgeType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.BoligEllerOvernatting
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HovedytelseType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Samling
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
@@ -21,7 +22,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import java.time.LocalDateTime
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.FasteUtgifter as FasteUtgifterKontrakt
-import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Hovedytelse as HovedytelseKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.OppholdUtenforNorge as OppholdUtenforNorgeKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.SkjemaBoutgifter as SkjemaBoutgifterKontrakt
 
@@ -185,42 +185,35 @@ object SøknadskjemaBoutgifterMapper {
             else -> error("Ukjent verdi $verdi")
         }
 
-    fun mapHovedytelse(hovedytelse: HovedytelseKontrakt): List<Hovedytelse> =
-        buildList {
-            val list = this
-            with(hovedytelse) {
-                list.add(arbeidsavklaringspenger, Hovedytelse.AAP)
-                list.add(overgangsstonad, Hovedytelse.OVERGANGSSTØNAD)
-                list.add(gjenlevendepensjon, Hovedytelse.GJENLEVENDEPENSJON)
-                list.add(uforetrygd, Hovedytelse.UFØRETRYGD)
-                list.add(tiltakspenger, Hovedytelse.TILTAKSPENGER)
-                list.add(dagpenger, Hovedytelse.DAGPENGER)
-                list.add(sykepenger, Hovedytelse.SYKEPENGER)
-                list.add(kvalifiseringsstonad, Hovedytelse.KVALIFISERINGSSTØNAD)
-                list.add(mottarIngenPengestotte, Hovedytelse.INGEN_PENGESTØTTE)
-                list.add(ingenAvAlternativenePasserForMeg, Hovedytelse.INGEN_PASSENDE_ALTERNATIVER)
+    fun mapHovedytelse(hovedytelse: Map<HovedytelseType, Boolean>): List<Hovedytelse> =
+        hovedytelse
+            .filter { it.value }
+            .map {
+                when (it.key) {
+                    HovedytelseType.arbeidsavklaringspenger -> Hovedytelse.AAP
+                    HovedytelseType.overgangsstonad -> Hovedytelse.OVERGANGSSTØNAD
+                    HovedytelseType.gjenlevendepensjon -> Hovedytelse.GJENLEVENDEPENSJON
+                    HovedytelseType.uforetrygd -> Hovedytelse.UFØRETRYGD
+                    HovedytelseType.tiltakspenger -> Hovedytelse.TILTAKSPENGER
+                    HovedytelseType.dagpenger -> Hovedytelse.DAGPENGER
+                    HovedytelseType.sykepenger -> Hovedytelse.SYKEPENGER
+                    HovedytelseType.kvalifiseringsstonad -> Hovedytelse.KVALIFISERINGSSTØNAD
+                    HovedytelseType.mottarIngenPengestotte -> Hovedytelse.INGEN_PENGESTØTTE
+                    HovedytelseType.ingenAvAlternativenePasserForMeg -> Hovedytelse.INGEN_PASSENDE_ALTERNATIVER
+                }
             }
-        }
 
-    fun mapÅrsakOppholdUtenforNorge(arsakOppholdUtenforNorge: ArsakOppholdUtenforNorge): List<ÅrsakOppholdUtenforNorge> =
-        buildList {
-            val list = this
-            with(arsakOppholdUtenforNorge) {
-                list.add(jobbet, ÅrsakOppholdUtenforNorge.JOBB)
-                list.add(studerte, ÅrsakOppholdUtenforNorge.STUDIER)
-                list.add(fikkMedisinskBehandling, ÅrsakOppholdUtenforNorge.MEDISINSK_BEHANDLING)
-                list.add(varPaFerie, ÅrsakOppholdUtenforNorge.FERIE)
-                list.add(besokteFamilie, ÅrsakOppholdUtenforNorge.FAMILIE_BESØK)
-                list.add(annet, ÅrsakOppholdUtenforNorge.ANNET)
+    fun mapÅrsakOppholdUtenforNorge(arsakOppholdUtenforNorge: Map<ArsakOppholdUtenforNorgeType, Boolean>): List<ÅrsakOppholdUtenforNorge> =
+        arsakOppholdUtenforNorge
+            .filter { it.value }
+            .map {
+                when (it.key) {
+                    ArsakOppholdUtenforNorgeType.jobbet -> ÅrsakOppholdUtenforNorge.JOBB
+                    ArsakOppholdUtenforNorgeType.studerte -> ÅrsakOppholdUtenforNorge.STUDIER
+                    ArsakOppholdUtenforNorgeType.fikkMedisinskBehandling -> ÅrsakOppholdUtenforNorge.MEDISINSK_BEHANDLING
+                    ArsakOppholdUtenforNorgeType.varPaFerie -> ÅrsakOppholdUtenforNorge.FERIE
+                    ArsakOppholdUtenforNorgeType.besokteFamilie -> ÅrsakOppholdUtenforNorge.FAMILIE_BESØK
+                    ArsakOppholdUtenforNorgeType.annet -> ÅrsakOppholdUtenforNorge.ANNET
+                }
             }
-        }
-
-    private fun <T> MutableList<T>.add(
-        boolean: Boolean,
-        verdi: T,
-    ) {
-        if (boolean) {
-            add(verdi)
-        }
-    }
 }
