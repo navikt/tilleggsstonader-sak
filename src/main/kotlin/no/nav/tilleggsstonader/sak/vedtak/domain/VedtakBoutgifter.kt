@@ -28,13 +28,13 @@ enum class TypeBoutgift {
 sealed interface VedtakBoutgifter : Vedtaksdata
 
 sealed interface InnvilgelseEllerOpphørBoutgifter : VedtakBoutgifter {
-    val vedtaksperioder: List<Vedtaksperiode>
     val beregningsresultat: BeregningsresultatBoutgifter
+    val vedtaksperioder: List<Vedtaksperiode>?
 }
 
 data class InnvilgelseBoutgifter(
-    override val vedtaksperioder: List<Vedtaksperiode>,
     override val beregningsresultat: BeregningsresultatBoutgifter,
+    override val vedtaksperioder: List<Vedtaksperiode>?,
     val begrunnelse: String? = null,
 ) : InnvilgelseEllerOpphørBoutgifter,
     Innvilgelse {
