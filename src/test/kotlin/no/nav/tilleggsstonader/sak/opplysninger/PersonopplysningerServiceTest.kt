@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.opplysninger
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
+import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
@@ -43,6 +45,13 @@ class PersonopplysningerServiceTest {
         every { personService.hentSøker(any()) } returns pdlSøker()
         every { fullmaktService.hentFullmektige(any()) } returns emptyList()
         every { egenAnsattService.erEgenAnsatt(any<String>()) } returns true
+        every { personService.hentGeografiskTilknytning(any()) } returns
+            GeografiskTilknytningDto(
+                GeografiskTilknytningType.UTLAND,
+                null,
+                null,
+                null,
+            )
     }
 
     @Nested
