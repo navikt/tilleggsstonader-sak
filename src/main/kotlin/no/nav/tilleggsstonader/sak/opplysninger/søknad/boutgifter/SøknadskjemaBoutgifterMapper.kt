@@ -8,10 +8,14 @@ import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidsrettetAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArsakOppholdUtenforNorgeType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.BoligEllerOvernatting
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HarUtgifterTilBoligToStederType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HovedytelseType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.JaNeiType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Samling
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeUtgifterType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ArbeidOgOpphold
@@ -120,12 +124,12 @@ object SøknadskjemaBoutgifterMapper {
         )
     }
 
-    private fun mapAnnenAktivitet(verdi: String?): AnnenAktivitetType? =
+    private fun mapAnnenAktivitet(verdi: ArbeidsrettetAktivitetType?): AnnenAktivitetType? =
         when (verdi) {
             null -> null
-            "tiltakArbeidsrettetUtredning" -> AnnenAktivitetType.TILTAK
-            "utdanningGodkjentAvNav" -> AnnenAktivitetType.UTDANNING
-            "harIngenArbeidsrettetAktivitet" -> AnnenAktivitetType.INGEN_AKTIVITET
+            ArbeidsrettetAktivitetType.tiltakArbeidsrettetUtredning -> AnnenAktivitetType.TILTAK
+            ArbeidsrettetAktivitetType.utdanningGodkjentAvNav -> AnnenAktivitetType.UTDANNING
+            ArbeidsrettetAktivitetType.harIngenArbeidsrettetAktivitet -> AnnenAktivitetType.INGEN_AKTIVITET
             else -> error("Har ikke mapping av annenAktivitet=$verdi")
         }
 
@@ -138,10 +142,10 @@ object SøknadskjemaBoutgifterMapper {
                 mapJaNei(boligEllerOvernatting.harSaerligStoreUtgifterPaGrunnAvFunksjonsnedsettelse),
         )
 
-    private fun mapTypeUtgifter(verdi: String): TypeUtgifter =
+    private fun mapTypeUtgifter(verdi: TypeUtgifterType): TypeUtgifter =
         when (verdi) {
-            "fastUtgift" -> TypeUtgifter.FASTE
-            "midlertidigUtgift" -> TypeUtgifter.SAMLING
+            TypeUtgifterType.fastUtgift -> TypeUtgifter.FASTE
+            TypeUtgifterType.midlertidigUtgift -> TypeUtgifter.SAMLING
             else -> error("Ukjent verdi $verdi")
         }
 
@@ -156,10 +160,10 @@ object SøknadskjemaBoutgifterMapper {
             )
         }
 
-    private fun mapTypeFasteUtgifter(verdi: String): TypeFasteUtgifter =
+    private fun mapTypeFasteUtgifter(verdi: HarUtgifterTilBoligToStederType): TypeFasteUtgifter =
         when (verdi) {
-            "ekstraBolig" -> TypeFasteUtgifter.EKSTRA_BOLIG
-            "nyBolig" -> TypeFasteUtgifter.NY_BOLIG
+            HarUtgifterTilBoligToStederType.ekstraBolig -> TypeFasteUtgifter.EKSTRA_BOLIG
+            HarUtgifterTilBoligToStederType.nyBolig -> TypeFasteUtgifter.NY_BOLIG
             else -> error("Ukjent verdi $verdi")
         }
 
@@ -178,10 +182,10 @@ object SøknadskjemaBoutgifterMapper {
             )
         }
 
-    private fun mapJaNei(verdi: String): JaNei =
+    private fun mapJaNei(verdi: JaNeiType): JaNei =
         when (verdi) {
-            "ja" -> JaNei.JA
-            "nei" -> JaNei.NEI
+            JaNeiType.ja -> JaNei.JA
+            JaNeiType.nei -> JaNei.NEI
             else -> error("Ukjent verdi $verdi")
         }
 
