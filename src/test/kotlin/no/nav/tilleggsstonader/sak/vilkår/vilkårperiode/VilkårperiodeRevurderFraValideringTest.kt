@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerEndrePeriodeRevurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtKunTomErEndret
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -20,6 +20,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgSvarDto
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -283,10 +285,16 @@ class VilkårperiodeRevurderFraValideringTest {
             eksisterendeVilkårperiode: Vilkårperiode,
             oppdatertVilkårperiode: Vilkårperiode,
         ) {
-            validerEndrePeriodeRevurdering(
-                behandlingMedRevurderFra,
+            validerAtKunTomErEndret(
                 eksisterendeVilkårperiode,
-                oppdatertVilkårperiode,
+                LagreVilkårperiode(
+                    behandlingId = oppdatertVilkårperiode.behandlingId,
+                    type = oppdatertVilkårperiode.type,
+                    fom = oppdatertVilkårperiode.fom,
+                    tom = oppdatertVilkårperiode.tom,
+                    faktaOgSvar = oppdatertVilkårperiode.faktaOgVurdering.tilFaktaOgSvarDto(),
+                ),
+                behandlingMedRevurderFra.revurderFra!!,
             )
         }
     }
