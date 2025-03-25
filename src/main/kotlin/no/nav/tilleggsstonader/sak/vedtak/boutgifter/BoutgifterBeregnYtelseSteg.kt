@@ -226,7 +226,7 @@ class BoutgifterBeregnYtelseSteg(
     private fun lagInnvilgetVedtak(
         behandling: Saksbehandling,
         beregningsresultat: BeregningsresultatBoutgifter,
-        vedtaksperioder: List<Vedtaksperiode>?,
+        vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
     ): Vedtak =
         GeneriskVedtak(
