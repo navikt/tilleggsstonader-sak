@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.pdl
 
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
+import no.nav.tilleggsstonader.sak.infrastruktur.config.getNullable
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner
@@ -94,7 +95,10 @@ class PersonService(
             pdlClient.hentAktørIder(ident)
         }
 
-    fun hentGeografiskTilknytning(ident: String): GeografiskTilknytningDto? = pdlClient.hentGeografiskTilknytning(ident)
+    fun hentGeografiskTilknytning(ident: String): GeografiskTilknytningDto? =
+        cacheManager.getNullable("personService_geografiskTilknytning", ident) {
+            pdlClient.hentGeografiskTilknytning(ident)
+        }
 
     fun hentVisningsnavnForPerson(personIdent: String): String {
         val person = hentPersonKortBolk(listOf(personIdent))

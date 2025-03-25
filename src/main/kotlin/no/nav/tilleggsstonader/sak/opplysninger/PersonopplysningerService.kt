@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger
 
+import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -43,6 +44,12 @@ class PersonopplysningerService(
             adressebeskyttelse = Adressebeskyttelse.fraPdl(pdlSøker.adressebeskyttelse.gradering()),
             erSkjermet = egenAnsattService.erEgenAnsatt(ident),
             dødsdato = pdlSøker.dødsfall.gjeldende()?.dødsdato,
+            harGeografiskTilknytningUtland = harGeografiskTilknytningUtland(ident),
         )
+    }
+
+    private fun harGeografiskTilknytningUtland(ident: String): Boolean {
+        val geografiskTilknytning = personService.hentGeografiskTilknytning(ident)
+        return geografiskTilknytning?.gtType == GeografiskTilknytningType.UTLAND
     }
 }
