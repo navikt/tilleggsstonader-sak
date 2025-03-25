@@ -6,8 +6,12 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnR
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterResponse
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterResponse
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
@@ -16,7 +20,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
@@ -34,7 +38,7 @@ object VedtakDtoMapper {
         return when (data) {
             is VedtakTilsynBarn -> mapVedtakTilsynBarn(data, revurderFra)
             is VedtakLæremidler -> mapVedtakLæremidler(data, revurderFra)
-            is VedtakBoutgifter -> TODO("Henting av vedtak for boutgifter er ikke implementert enda")
+            is VedtakBoutgifter -> mapVedtakBoutgifter(data, revurderFra)
         }
     }
 
@@ -46,7 +50,7 @@ object VedtakDtoMapper {
             is InnvilgelseTilsynBarn ->
                 InnvilgelseTilsynBarnResponse(
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
-                    vedtaksperioder = data.vedtaksperioder?.tilDto(),
+                    vedtaksperioder = data.vedtaksperioder?.tilVedtaksperiodeDto(),
                     begrunnelse = data.begrunnelse,
                 )
 
@@ -55,7 +59,7 @@ object VedtakDtoMapper {
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
-                    vedtaksperioder = data.vedtaksperioder?.tilDto(),
+                    vedtaksperioder = data.vedtaksperioder?.tilVedtaksperiodeDto(),
                 )
 
             is AvslagTilsynBarn ->
@@ -91,5 +95,33 @@ object VedtakDtoMapper {
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder = data.vedtaksperioder.tilDto(),
                 )
+        }
+
+    private fun mapVedtakBoutgifter(
+        data: VedtakBoutgifter,
+        revurderFra: LocalDate?,
+    ): VedtakBoutgifterResponse =
+        when (data) {
+            is InnvilgelseBoutgifter ->
+                InnvilgelseBoutgifterResponse(
+                    vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(),
+                    beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
+                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).minOf { it.fom },
+                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).maxOf { it.tom },
+                    begrunnelse = data.begrunnelse,
+                )
+
+//            is AvslagLæremidler ->
+//                AvslagLæremidlerDto(
+//                    årsakerAvslag = data.årsaker,
+//                    begrunnelse = data.begrunnelse,
+//                )
+//
+//            is OpphørLæremidler ->
+//                OpphørLæremidlerResponse(
+//                    årsakerOpphør = data.årsaker,
+//                    begrunnelse = data.begrunnelse,
+//                    vedtaksperioder = data.vedtaksperioder.tilDto(),
+//                )
         }
 }

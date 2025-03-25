@@ -34,7 +34,7 @@ sealed interface InnvilgelseEllerOpphørBoutgifter : VedtakBoutgifter {
 
 data class InnvilgelseBoutgifter(
     override val beregningsresultat: BeregningsresultatBoutgifter,
-    override val vedtaksperioder: List<Vedtaksperiode>?,
+    override val vedtaksperioder: List<Vedtaksperiode>,
     val begrunnelse: String? = null,
 ) : InnvilgelseEllerOpphørBoutgifter,
     Innvilgelse {

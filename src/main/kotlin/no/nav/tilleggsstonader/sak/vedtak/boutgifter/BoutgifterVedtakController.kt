@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.BeregningsresultatBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
@@ -27,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController
 class BoutgifterVedtakController(
     private val beregningService: BoutgifterBeregningService,
     private val tilgangService: TilgangService,
-//    private val vedtakService: VedtakService,
+    private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
     private val stegService: StegService,
     private val steg: BoutgifterBeregnYtelseSteg,
@@ -83,10 +85,10 @@ class BoutgifterVedtakController(
         @PathVariable behandlingId: BehandlingId,
     ): VedtakResponse? {
         return null
-//        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-//        val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
-//        val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
-//        return VedtakDtoMapper.toDto(vedtak, revurderFra)
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
+        val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
+        return VedtakDtoMapper.toDto(vedtak, revurderFra)
     }
 
 //    @GetMapping("/fullstendig-oversikt/{behandlingId}")
