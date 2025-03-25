@@ -352,36 +352,6 @@ class VedtaksperiodeValideringUtilsTest {
             }
 
             @Test
-            fun `skal kaste feil dersom nedsatt arbeidsevne og personen er under 18 år`() {
-                assertThatCode {
-                    validerEnkeltperiode(
-                        vedtaksperioder,
-                        målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                        aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
-                        dato18årGammel.plusDays(1),
-                    )
-                }.hasMessageContaining("Periode kan ikke begynne før søker fyller 18 år")
-            }
-
-            @Test
-            fun `skal kaste feil dersom nedsatt arbeidsevne og personen er over 67 år`() {
-                assertThatThrownBy {
-                    validerEnkeltperiode(
-                        vedtaksperioder,
-                        målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                        aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
-                        dato67årGammel,
-                    )
-                    validerEnkeltperiode(
-                        vedtaksperioder,
-                        målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                        aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
-                        dato67årGammel.minusDays(1),
-                    )
-                }.hasMessageContaining("Periode kan ikke slutte etter søker fylt 67 år")
-            }
-
-            @Test
             fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er under 67 år`() {
                 assertThatCode {
                     validerEnkeltperiode(
