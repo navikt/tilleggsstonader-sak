@@ -476,7 +476,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `kan ikke oppdatere periode hvis periode begynner før revurderFra`() {
+        fun `kan ikke oppdatere fakta hvis periode begynner før revurderFra`() {
             val behandling =
                 testoppsettService.oppdater(
                     testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
@@ -494,7 +494,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                     id = aktivitet.id,
                     vilkårperiode = aktivitet.tilOppdatering(aktivitetsdager = 3),
                 )
-            }.hasMessageContaining("Kan ikke endre fakta på perioden")
+            }.hasMessageContaining("Kan ikke endre vurderinger eller fakta på perioden")
         }
     }
 
@@ -526,4 +526,3 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         )
     }
 }
-

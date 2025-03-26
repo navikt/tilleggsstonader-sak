@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -17,12 +16,14 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårspe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgSvarDto
@@ -176,7 +177,6 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             }.hasMessageContaining("Kan ikke opprette periode")
         }
     }
-
 
     @Nested
     inner class Oppdater {
@@ -349,59 +349,72 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
 
     @Nested
     inner class OppdaterRevurdering {
-
         @Test
         fun `endring av vilkårperioder opprettet kopiert fra tidligere behandling skal få status ENDRET`() {
-            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+            val revurdering = lagRevurderingMedKopiertMålgruppe()
 
-            val opprinneligVilkårperiode =
-                vilkårperiodeRepository.insert(
-                    målgruppe(
-                        behandlingId = revurdering.forrigeIverksatteBehandlingId!!,
-                    ),
-                )
-
-            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
-
-            val vilkårperiode = vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()
+            val opprinneligVilkårperiode = vilkårperiodeRepository.findByBehandlingId(revurdering.forrigeIverksatteBehandlingId!!).single()
+            val vilkårperiodeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()
             val oppdatertPeriode =
                 vilkårperiodeService.oppdaterVilkårperiode(
-                    vilkårperiode.id,
-                    vilkårperiode.tilOppdatering(),
+                    vilkårperiodeFørOppdatering.id,
+                    vilkårperiodeFørOppdatering.tilOppdatering(),
                 )
 
             assertThat(opprinneligVilkårperiode.status).isEqualTo(Vilkårstatus.NY)
-            assertThat(vilkårperiode.status).isEqualTo(Vilkårstatus.UENDRET)
+            assertThat(vilkårperiodeFørOppdatering.status).isEqualTo(Vilkårstatus.UENDRET)
             assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
         }
 
-
         @Test
         fun `kan ikke oppdatere vurdering hvis periode begynner før revurderFra`() {
-            val behandling =
-                testoppsettService.oppdater(
-                    testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
-                )
-
             val målgruppe =
                 målgruppe(
-                    behandlingId = behandling.id,
                     faktaOgVurdering = faktaOgVurderingMålgruppe(medlemskap = VurderingMedlemskap(svar = SvarJaNei.NEI)),
                     fom = now().minusMonths(1),
                     tom = now().plusMonths(1),
                 )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
+
+            val behandling = lagRevurderingMedKopiertMålgruppe(målgruppe)
+            val vilkårperiodeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
 
             assertThatThrownBy {
                 vilkårperiodeService.oppdaterVilkårperiode(
-                    periode.id,
-                    periode
+                    vilkårperiodeFørOppdatering.id,
+                    vilkårperiodeFørOppdatering
                         .tilOppdatering()
                         .copy(faktaOgSvar = FaktaOgSvarMålgruppeDto(svarMedlemskap = SvarJaNei.JA)),
                 )
             }.hasMessageContaining("Kan ikke endre vurderinger eller fakta på perioden.")
         }
-    }
+
+        @Test
+        fun `kan oppdatere tom-dato hvis periode krysser revurderFra dato`() {
+            val originalMålgruppe =
+                målgruppe(
+                    fom = now().minusMonths(1),
+                    tom = now().plusMonths(1),
+                )
+            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe)
+            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
+
+            val nyTom = now().plusMonths(2)
+
+            val oppdatertPeriode =
+                vilkårperiodeService.oppdaterVilkårperiode(
+                    målgruppeFørOppdatering.id,
+                    målgruppeFørOppdatering
+                        .tilOppdatering()
+                        .copy(tom = nyTom),
+                )
+
+            assertThat(oppdatertPeriode)
+                .usingRecursiveComparison()
+                .ignoringFields("sporbar", "tom")
+                .isEqualTo(målgruppeFørOppdatering)
+
+            assertThat(oppdatertPeriode.tom).isEqualTo(nyTom)
+        }
 
         @Test
         fun `kan ikke endre målgruppe dersom hele perioden er før revurderFra`() {
@@ -433,4 +446,19 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             begrunnelse = begrunnelse,
             type = type,
         )
+
+    private fun lagRevurderingMedKopiertMålgruppe(
+        opprinneligMålgruppe: VilkårperiodeMålgruppe = målgruppe(),
+        revurderFra: LocalDate = now(),
+    ): Behandling {
+        val revurdering = testoppsettService.lagBehandlingOgRevurdering(revurderFra = revurderFra)
+
+        vilkårperiodeRepository.insert(
+            opprinneligMålgruppe.copy(behandlingId = revurdering.forrigeIverksatteBehandlingId!!),
+        )
+
+        vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
+
+        return revurdering
+    }
 }
