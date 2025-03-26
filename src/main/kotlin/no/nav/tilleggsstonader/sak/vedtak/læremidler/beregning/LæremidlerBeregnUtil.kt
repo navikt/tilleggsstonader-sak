@@ -9,8 +9,11 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 
 object LæremidlerBeregnUtil {
     /**
-     * Grupperer vedtaksperioder innenfor en løpende måned
-     * Hvis en vedtaksperiode løper lengre enn første måned vil det bli en ny periode, med nytt utbetalingsdatum
+     * Splitter opp vedtaksperioder på løpende måneder
+     *
+     * Hvis en vedtaksperiode løper lengre enn første måned vil det bli en ny periode, med ny utbetalingsdato.
+     * Vi filterer bort perioder som ender opp som rene helger, som vil kunne skje den siste løpende måneden, og som
+     * ikke skal gi en helt ny periode med støtte
      */
     fun List<Vedtaksperiode>.splittTilLøpendeMåneder(): List<LøpendeMåned> =
         this
