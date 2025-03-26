@@ -80,8 +80,9 @@ class BoutgifterBeregningService(
             .sorted()
             .splittTilLøpendeMåneder()
             .map { UtbetalingPeriode(it) }
-            .validerIngenUtgifterKrysserUtbetalingsperioder(utgifter)
-            .map {
+            .validerIngenUtgifterKrysserUtbetalingsperioder(
+                utgifter[TypeBoutgift.MIDLERTIDIG_OVERNATTING] ?: emptyList(),
+            ).map {
                 BeregningsresultatForLøpendeMåned(
                     grunnlag = lagBeregningsGrunnlag(periode = it, utgifter = utgifter),
                 )
@@ -258,7 +259,16 @@ class BoutgifterBeregningService(
     private fun finnUtgiftForUtbetalingsperiode(
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
         periode: UtbetalingPeriode,
-    ) = utgifter.mapValues { it.value.filter { utgift -> periode.inneholder(utgift) } }
+    ) = utgifter.mapValues { (key, value) ->
+        value.filter { utgift ->
+            when (key) {
+                TypeBoutgift.MIDLERTIDIG_OVERNATTING -> periode.inneholder(utgift)
+                TypeBoutgift.FASTE_UTGIFTER_EN_BOLIG,
+                TypeBoutgift.FASTE_UTGIFTER_TO_BOLIGER,
+                -> periode.overlapper(utgift)
+            }
+        }
+    }
 }
 
 private fun validerUtgifterErInnenforVedtaksperiodene(
@@ -278,10 +288,9 @@ private fun validerUtgifterErInnenforVedtaksperiodene(
 }
 
 private fun List<UtbetalingPeriode>.validerIngenUtgifterKrysserUtbetalingsperioder(
-    utgifterPerBoutgiftstype: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    utgifter: List<UtgiftBeregningBoutgifter>,
 ): List<UtbetalingPeriode> {
     val utbetalingsperioder = this
-    val utgifter = utgifterPerBoutgiftstype.values.flatten()
 
     val detFinnesUtgiftSomKrysserUtbetalingsperioder =
         utgifter.any { utgift ->
