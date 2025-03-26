@@ -60,6 +60,15 @@ object VilkårperiodeRevurderFraValidering {
         }
     }
 
+    fun validerAtVilkårperiodeKanOppdateresIRevurdering(
+        eksisterendePeriode: Vilkårperiode,
+        revurderFra: LocalDate,
+    ) {
+        feilHvis(eksisterendePeriode.tom < revurderFra) {
+            "Kan ikke endre vilkårperiode som er ferdig før revurderingsdato. Kontakt utviklingsteamet."
+        }
+    }
+
     private fun logEndring(
         eksisterendePeriode: Vilkårperiode,
         oppdatertPeriode: LagreVilkårperiode,

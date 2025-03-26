@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiod
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtKunTomErEndret
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtVilkårperiodeKanOppdateresIRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerRevurderFraErSatt
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
@@ -156,6 +157,7 @@ class VilkårperiodeService(
     ): Vilkårperiode {
         val revurderFra = behandling.revurderFra
         validerRevurderFraErSatt(revurderFra)
+        validerAtVilkårperiodeKanOppdateresIRevurdering(eksisterendeVilkårperiode, revurderFra)
 
         // Håndter vilkårsperioder hvor alle felter kan oppdateres
         if (eksisterendeVilkårperiode.fom >= revurderFra) {
@@ -178,11 +180,11 @@ class VilkårperiodeService(
         eksisterendeVilkårperiode: Vilkårperiode,
         revurderFra: LocalDate,
     ): Vilkårperiode {
-        val finnesGammelData = vilkårperiode.faktaOgSvar?.inneholderGammelManglerData() ?: false
+        val finnesGammelData = eksisterendeVilkårperiode.faktaOgVurdering.vurderinger.inneholderGammelManglerData() ?: false
 
         if (finnesGammelData) {
             brukerfeilHvis(vilkårperiode.tom > eksisterendeVilkårperiode.tom) {
-                "Det har kommet nye vilkår som må vurderes, og denne perioden er ikke lenger mulig å gjøre endringer på.Det er ikke mulig å gjøre noe annet enn å korte ned tom på denne perioden fordi det har kommet nye vilkår som må vurderes."
+                "Det har kommet nye vilkår som må vurderes, og denne perioden er derfor ikke mulig å forlenge. Hvis du ønsker å forlenge perioden må du legge til en ny periode."
             }
         }
 

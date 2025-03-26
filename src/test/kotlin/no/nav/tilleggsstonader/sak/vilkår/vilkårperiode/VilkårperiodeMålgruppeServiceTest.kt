@@ -403,6 +403,26 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         }
     }
 
+        @Test
+        fun `kan ikke endre målgruppe dersom hele perioden er før revurderFra`() {
+            val originalMålgruppe =
+                målgruppe(
+                    fom = now().minusMonths(2),
+                    tom = now().minusMonths(1),
+                )
+            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe, revurderFra = now())
+            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
+
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(
+                    målgruppeFørOppdatering.id,
+                    målgruppeFørOppdatering
+                        .tilOppdatering()
+                        .copy(tom = målgruppeFørOppdatering.tom.plusMonths(1)),
+                )
+            }.hasMessageContaining("Kan ikke endre vilkårperiode som er ferdig før revurderingsdato.")
+        }
+    }
 
     private fun Vilkårperiode.tilOppdatering() =
         LagreVilkårperiode(
