@@ -6,5 +6,10 @@ import org.springframework.stereotype.Component
 
 @Component
 class UserIdProviderImpl : UserIdProvider {
-    override fun userId(): String = SikkerhetContext.hentSaksbehandler()
+    override fun userId(): String? =
+        if (SikkerhetContext.erSaksbehandler()) {
+            SikkerhetContext.hentSaksbehandler()
+        } else {
+            null
+        }
 }
