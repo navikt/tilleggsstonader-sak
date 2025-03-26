@@ -46,28 +46,6 @@ class BoutgifterBeregningServiceTest {
         )
 
     val behandling = saksbehandling()
-    val vedtaksperioder =
-        listOf(
-            Vedtaksperiode(
-                id = UUID.randomUUID(),
-                fom = LocalDate.of(2025, 1, 1),
-                tom = LocalDate.of(2025, 1, 31),
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
-            ),
-        )
-
-    val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
-        mapOf(
-            TypeBoutgift.UTGIFTER_OVERNATTING to
-                listOf(
-                    UtgiftBeregningBoutgifter(
-                        fom = LocalDate.of(2025, 1, 1),
-                        tom = LocalDate.of(2025, 1, 31),
-                        utgift = 3000,
-                    ),
-                ),
-        )
 
     val vilkårperioder =
         Vilkårperioder(
@@ -107,6 +85,17 @@ class BoutgifterBeregningServiceTest {
                             utgift = 3000,
                         ),
                     ),
+            )
+
+        val vedtaksperioder =
+            listOf(
+                Vedtaksperiode(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2025, 1, 1),
+                    tom = LocalDate.of(2025, 1, 31),
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                ),
             )
 
         every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
@@ -287,6 +276,28 @@ class BoutgifterBeregningServiceTest {
 
     @Nested
     inner class UtgifterOvernatting {
+        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+            mapOf(
+                TypeBoutgift.MIDLERTIDIG_OVERNATTING to
+                    listOf(
+                        UtgiftBeregningBoutgifter(
+                            fom = LocalDate.of(2025, 1, 1),
+                            tom = LocalDate.of(2025, 1, 31),
+                            utgift = 3000,
+                        ),
+                    ),
+            )
+
+        val vedtaksperioder =
+            listOf(
+                Vedtaksperiode(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2025, 1, 1),
+                    tom = LocalDate.of(2025, 1, 31),
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                ),
+            )
         @BeforeEach
         fun setup() {
             every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
