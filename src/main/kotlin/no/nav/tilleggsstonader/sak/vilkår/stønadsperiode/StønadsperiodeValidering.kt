@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
-import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -77,8 +76,6 @@ object StønadsperiodeValidering {
             ?: brukerfeil(
                 "Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.aktivitet} i perioden ${stønadsperiode.formatertPeriodeNorskFormat()}",
             )
-
-        validerStønadsperiodeErInnenfor18og67år(fødselsdato, stønadsperiode)
     }
 
     /**
@@ -107,22 +104,6 @@ object StønadsperiodeValidering {
                         "med ${it.type}(${it.formatertPeriodeNorskFormat()}) som ikke gir rett på stønad",
                 )
             }
-    }
-
-    private fun validerStønadsperiodeErInnenfor18og67år(
-        fødselsdato: LocalDate?,
-        stønadsperiode: StønadsperiodeDto,
-    ) {
-        if (fødselsdato != null && stønadsperiode.målgruppe.gjelderNedsattArbeidsevne()) {
-            val dato18år = fødselsdato.plusYears(18)
-            brukerfeilHvis(stønadsperiode.fom < dato18år) {
-                "Periode kan ikke begynne før søker fyller 18 år (${dato18år.norskFormat()})"
-            }
-            val dato67år = fødselsdato.plusYears(67)
-            brukerfeilHvis(stønadsperiode.tom >= dato67år) {
-                "Periode kan ikke slutte etter søker fylt 67 år (${dato67år.norskFormat()})"
-            }
-        }
     }
 }
 

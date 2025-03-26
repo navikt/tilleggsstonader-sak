@@ -213,28 +213,11 @@ internal class StønadsperiodeValideringTest {
         val dato67årGammel = tom.minusYears(67)
 
         @Test
-        fun `skal kaste feil dersom nedsatt arbeidsevne og personen er under 18 år`() {
-            assertThatThrownBy {
-                valider(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel.plusDays(1))
-            }.hasMessageContaining("Periode kan ikke begynne før søker fyller 18 år")
-        }
-
-        @Test
         fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er over 18 år`() {
             assertThatCode {
                 valider(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel)
                 valider(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel.minusDays(1))
             }.doesNotThrowAnyException()
-        }
-
-        @Test
-        fun `skal kaste feil dersom nedsatt arbeidsevne og personen er over 67 år`() {
-            assertThatThrownBy {
-                valider(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel)
-            }.hasMessageContaining("Periode kan ikke slutte etter søker fylt 67 år")
-            assertThatThrownBy {
-                valider(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel.minusDays(1))
-            }.hasMessageContaining("Periode kan ikke slutte etter søker fylt 67 år")
         }
 
         @Test

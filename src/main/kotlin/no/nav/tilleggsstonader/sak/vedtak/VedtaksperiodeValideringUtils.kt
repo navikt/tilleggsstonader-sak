@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
-import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -80,23 +79,5 @@ object VedtaksperiodeValideringUtils {
             ?: brukerfeil(
                 "Finnes ingen periode med oppfylte vilkår for ${vedtaksperiode.aktivitet} i perioden ${vedtaksperiode.formatertPeriodeNorskFormat()}",
             )
-
-        validerVedtaksperiodeErInnenfor18og67år(fødselsdato, vedtaksperiode)
-    }
-
-    private fun validerVedtaksperiodeErInnenfor18og67år(
-        fødselsdato: LocalDate?,
-        vedtaksperiode: Vedtaksperiode,
-    ) {
-        if (fødselsdato != null && vedtaksperiode.målgruppe.gjelderNedsattArbeidsevne()) {
-            val dato18år = fødselsdato.plusYears(18)
-            brukerfeilHvis(vedtaksperiode.fom < dato18år) {
-                "Periode kan ikke begynne før søker fyller 18 år (${dato18år.norskFormat()})"
-            }
-            val dato67år = fødselsdato.plusYears(67)
-            brukerfeilHvis(vedtaksperiode.tom >= dato67år) {
-                "Periode kan ikke slutte etter søker fylt 67 år (${dato67år.norskFormat()})"
-            }
-        }
     }
 }
