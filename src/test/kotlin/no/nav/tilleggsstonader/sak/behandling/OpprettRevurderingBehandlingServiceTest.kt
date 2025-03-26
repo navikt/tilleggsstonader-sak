@@ -372,5 +372,6 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         fagsakId = fagsakId,
         årsak = årsak,
         valgteBarn = valgteBarn,
+        kravMottatt = null,
     )
 }

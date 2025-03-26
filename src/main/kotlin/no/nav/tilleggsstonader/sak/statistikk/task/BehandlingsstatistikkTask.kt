@@ -40,7 +40,7 @@ class BehandlingsstatistikkTask(
     companion object {
         fun opprettMottattTask(
             behandlingId: BehandlingId,
-            hendelseTidspunkt: LocalDateTime = osloNow(),
+            hendelseTidspunkt: LocalDateTime,
             oppgaveId: Long?,
         ): Task =
             opprettTask(
