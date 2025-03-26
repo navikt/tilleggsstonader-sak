@@ -167,7 +167,7 @@ data class VurderingAldersVilkår(
     }
 }
 
-data class VurderingMottarSykepengerForFulltidsstilling private constructor(
+data class VurderingMottarSykepengerForFulltidsstilling constructor(
     override val svar: SvarJaNei?,
     override val resultat: ResultatDelvilkårperiode,
 ) : Vurdering {

@@ -435,6 +435,36 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                 )
             }.hasMessageContaining("Kan ikke endre vilkårperiode som er ferdig før revurderingsdato.")
         }
+
+        @Test
+        fun `kan ikke utvide målgruppe dersom den inneholder svar GAMMEL_MANGLER_DATA`() {
+            val originalMålgruppe =
+                målgruppe(
+                    fom = now().minusMonths(1),
+                    tom = now().plusMonths(1),
+                    begrunnelse = "Begrunnelse",
+                    faktaOgVurdering =
+                        faktaOgVurderingMålgruppe(
+                            type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                            mottarSykepengerForFulltidsstilling =
+                                VurderingMottarSykepengerForFulltidsstilling(
+                                    svar = SvarJaNei.GAMMEL_MANGLER_DATA,
+                                    resultat = ResultatDelvilkårperiode.IKKE_VURDERT,
+                                ),
+                        ),
+                )
+            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe)
+            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
+
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(
+                    målgruppeFørOppdatering.id,
+                    målgruppeFørOppdatering
+                        .tilOppdatering()
+                        .copy(tom = målgruppeFørOppdatering.tom.plusMonths(1)),
+                )
+            }.hasMessageContaining("Det har kommet nye vilkår som må vurderes")
+        }
     }
 
     private fun Vilkårperiode.tilOppdatering() =
