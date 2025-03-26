@@ -25,7 +25,7 @@ object BoutgifterBeregnUtil {
                     val håndterNyUtbetalingsperiode = vedtaksperiode.håndterNyUtbetalingsperiode(acc)
                     acc + håndterNyUtbetalingsperiode
                 }
-            }.filter { it.harDatoerIUkedager() }
+            }
 
     /**
      * Legger til periode som overlapper med forrige utbetalingsperiode
