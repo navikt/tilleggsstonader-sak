@@ -103,25 +103,7 @@ class VilkårperiodeRevurderFraValideringTest {
     }
 
     @Nested
-    inner class OppdateringAvPeriode {
-        @Test
-        fun `kan oppdatere periode hvis revurder-fra er satt`() {
-            assertDoesNotThrow {
-                val eksisterendeVilkårperiode =
-                    aktivitet(
-                        fom = revurderFra.plusDays(1),
-                        faktaOgVurdering =
-                            faktaOgVurderingAktivitetTilsynBarn(
-                                aktivitetsdager = 1,
-                            ),
-                    )
-                endringMedRevurderFra(
-                    eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.medAktivitetsdager(aktivitetsdager = 2),
-                )
-            }
-        }
-
+    inner class OppdateringAvPeriodeHvorKunTomKanEndres {
         @Test
         fun `kan oppdatere periodens tom-dato til og med dagen før revurder fra`() {
             val eksisterendeVilkårperiode =
@@ -131,7 +113,7 @@ class VilkårperiodeRevurderFraValideringTest {
                 )
             assertDoesNotThrow {
                 listOf(revurderFra.minusDays(1), revurderFra, revurderFra.plusDays(1)).forEach { nyttTom ->
-                    endringMedRevurderFra(
+                    validerEndringKunTomKanOppdates(
                         eksisterendeVilkårperiode,
                         eksisterendeVilkårperiode.copy(tom = nyttTom),
                     )
@@ -147,7 +129,7 @@ class VilkårperiodeRevurderFraValideringTest {
                     tom = revurderFra.plusMonths(1),
                 )
             assertThatThrownBy {
-                endringMedRevurderFra(
+                validerEndringKunTomKanOppdates(
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.copy(tom = revurderFra.minusDays(2)),
                 )
@@ -162,11 +144,11 @@ class VilkårperiodeRevurderFraValideringTest {
                     tom = revurderFra.plusMonths(1),
                 )
             assertThatThrownBy {
-                endringMedRevurderFra(
+                validerEndringKunTomKanOppdates(
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.copy(fom = revurderFra.minusDays(2)),
                 )
-            }.hasMessageContaining("Kan ikke sette fom før revurder-fra")
+            }.message().contains("Kan ikke endre fom til", "fordi revurder fra", "er før")
         }
 
         @Test
@@ -178,27 +160,11 @@ class VilkårperiodeRevurderFraValideringTest {
                 )
 
             assertDoesNotThrow {
-                endringMedRevurderFra(
+                validerEndringKunTomKanOppdates(
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.copy(begrunnelse = "en begrunnelse"),
                 )
             }
-        }
-
-        @Test
-        fun `skal ikke kunne oppdatere resultat`() {
-            val eksisterendeVilkårperiode =
-                aktivitet(
-                    fom = revurderFra.minusMonths(1),
-                    tom = revurderFra.plusMonths(1),
-                    resultat = ResultatVilkårperiode.OPPFYLT,
-                )
-            assertThatThrownBy {
-                endringMedRevurderFra(
-                    eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
-                )
-            }.hasMessageContaining("Resultat kan ikke endre seg")
         }
 
         @Test
@@ -215,11 +181,11 @@ class VilkårperiodeRevurderFraValideringTest {
                     resultat = ResultatVilkårperiode.OPPFYLT,
                 )
             assertThatThrownBy {
-                endringMedRevurderFra(
+                validerEndringKunTomKanOppdates(
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.medAktivitetsdager(5),
                 )
-            }.hasMessageContaining("Kan ikke endre fakta på perioden")
+            }.hasMessageContaining("Kan ikke endre vurderinger eller fakta på perioden")
         }
 
         @Test
@@ -244,11 +210,11 @@ class VilkårperiodeRevurderFraValideringTest {
                     it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(vurderinger = oppdaterteVurderinger))
                 }
             assertThatThrownBy {
-                endringMedRevurderFra(
+                validerEndringKunTomKanOppdates(
                     eksisterendeVilkårperiode,
                     oppdatert,
                 )
-            }.hasMessageContaining("Kan ikke endre vurderinger på perioden")
+            }.hasMessageContaining("Kan ikke endre vurderinger eller fakta på perioden")
         }
 
         @Test
@@ -274,14 +240,14 @@ class VilkårperiodeRevurderFraValideringTest {
                     it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(vurderinger = oppdaterteVurderinger))
                 }
             assertDoesNotThrow {
-                endringMedRevurderFra(
+                validerEndringKunTomKanOppdates(
                     eksisterendeVilkårperiode,
                     oppdatert,
                 )
             }
         }
 
-        private fun endringMedRevurderFra(
+        private fun validerEndringKunTomKanOppdates(
             eksisterendeVilkårperiode: Vilkårperiode,
             oppdatertVilkårperiode: Vilkårperiode,
         ) {
