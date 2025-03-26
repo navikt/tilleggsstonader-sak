@@ -12,7 +12,7 @@ object LæremidlerBeregnUtil {
      * Grupperer vedtaksperioder innenfor en løpende måned
      * Hvis en vedtaksperiode løper lengre enn første måned vil det bli en ny periode, med nytt utbetalingsdatum
      */
-    fun List<Vedtaksperiode>.grupperVedtaksperioderPerLøpendeMåned(): List<LøpendeMåned> =
+    fun List<Vedtaksperiode>.splittTilLøpendeMåneder(): List<LøpendeMåned> =
         this
             .sorted()
             .splitVedtaksperiodePerÅr()
