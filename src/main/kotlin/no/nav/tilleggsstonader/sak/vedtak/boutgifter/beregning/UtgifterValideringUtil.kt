@@ -13,6 +13,9 @@ object UtgifterValideringUtil {
      *
      */
     fun validerUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>) {
+        brukerfeilHvis(erMidlertidigOgFasteUtgifter(utgifter)) {
+            "Foreløbig støtter vi ikke faste- og midlertidig utgift i samme behandling"
+        }
         brukerfeilHvis(utgifter.values.flatten().isEmpty()) {
             "Kan ikke innvilge når det ikke finnes noen utgiftsperioder"
         }
@@ -26,5 +29,14 @@ object UtgifterValideringUtil {
                 "Utgiftsperioder inneholder ugyldig utgift: $ikkePositivUtgift"
             }
         }
+    }
+
+    private fun erMidlertidigOgFasteUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>): Boolean {
+        val erFasteUtgifter =
+            utgifter.keys.any {
+                it == TypeBoutgift.FASTE_UTGIFTER_EN_BOLIG || it == TypeBoutgift.FASTE_UTGIFTER_TO_BOLIGER
+            }
+        val erMidlertidigUtgifter = utgifter.keys.any { it == TypeBoutgift.MIDLERTIDIG_OVERNATTING }
+        return erFasteUtgifter && erMidlertidigUtgifter
     }
 }

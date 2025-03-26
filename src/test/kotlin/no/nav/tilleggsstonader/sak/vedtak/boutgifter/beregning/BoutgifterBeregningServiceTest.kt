@@ -87,6 +87,39 @@ class BoutgifterBeregningServiceTest {
                 ),
         )
 
+    @Test
+    fun `Kan ikke ha faste- og midlertidig utgifter i samme behandling`() {
+        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+            mapOf(
+                TypeBoutgift.FASTE_UTGIFTER_EN_BOLIG to
+                    listOf(
+                        UtgiftBeregningBoutgifter(
+                            fom = LocalDate.of(2025, 1, 1),
+                            tom = LocalDate.of(2025, 3, 31),
+                            utgift = 3000,
+                        ),
+                    ),
+                TypeBoutgift.MIDLERTIDIG_OVERNATTING to
+                    listOf(
+                        UtgiftBeregningBoutgifter(
+                            fom = LocalDate.of(2025, 1, 1),
+                            tom = LocalDate.of(2025, 1, 3),
+                            utgift = 3000,
+                        ),
+                    ),
+            )
+
+        every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
+
+        assertThatThrownBy {
+            boutgifterBeregningService.beregn(
+                behandling,
+                vedtaksperioder,
+                typeVedtak = TypeVedtak.INNVILGELSE,
+            )
+        }.hasMessage("Foreløbig støtter vi ikke faste- og midlertidig utgift i samme behandling")
+    }
+
     @Nested
     inner class FasteUtgifter {
         val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
