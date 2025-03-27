@@ -240,7 +240,7 @@ class BoutgifterBeregningService(
         periode: UtbetalingPeriode,
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
     ): Beregningsgrunnlag {
-        val sats = finnMakssatsForPeriode(periode)
+        val sats = finnMakssatsForPeriode(periode.fom)
 
         val utgifterIPerioden = finnUtgiftForUtbetalingsperiode(utgifter, periode)
 

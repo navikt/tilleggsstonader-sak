@@ -47,7 +47,7 @@ private val satser: List<MakssatsBoutgifter> =
         },
     ) + bekreftedeSatser
 
-fun finnMakssatsForPeriode(periode: Periode<LocalDate>): MakssatsBoutgifter =
+fun finnMakssatsForPeriode(dato: LocalDate): MakssatsBoutgifter =
     satser.find {
-        it.inneholder(periode)
-    } ?: error("Finner ikke satser for $periode")
+        dato >= it.fom && dato <= it.tom
+    } ?: error("Finner ikke satser for $dato")
