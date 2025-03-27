@@ -41,10 +41,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingAldersVilkår
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingHarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -110,6 +112,18 @@ object Testdata {
                         type = MålgruppeType.OVERGANGSSTØNAD,
                         medlemskap = vurderingMedlemskap(SvarJaNei.JA_IMPLISITT),
                         dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(svar = null),
+                    ),
+                fom = LocalDate.of(2024, 2, 5),
+                tom = LocalDate.of(2024, 2, 10),
+            ),
+            VilkårperiodeTestUtil.målgruppe(
+                begrunnelse = "målgruppe na",
+                faktaOgVurdering =
+                    faktaOgVurderingMålgruppe(
+                        type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                        medlemskap = vurderingMedlemskap(SvarJaNei.JA),
+                        dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(svar = null),
+                        mottarSykepengerForFulltidsstilling = vurderingMottarSykepengerForFulltidsstilling(SvarJaNei.NEI),
                     ),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
@@ -372,9 +386,35 @@ object Testdata {
                 ),
             )
 
+        private val målgrupperLæremidler: List<VilkårperiodeMålgruppe> =
+            listOf(
+                VilkårperiodeTestUtil.målgruppe(
+                    begrunnelse = "målgruppe aap",
+                    faktaOgVurdering =
+                        faktaOgVurderingMålgruppeLæremidler(
+                            type = MålgruppeType.AAP,
+                            medlemskap = vurderingMedlemskap(SvarJaNei.JA_IMPLISITT),
+                            dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(SvarJaNei.NEI),
+                        ),
+                    fom = LocalDate.of(2024, 2, 5),
+                    tom = LocalDate.of(2024, 2, 10),
+                ),
+                VilkårperiodeTestUtil.målgruppe(
+                    begrunnelse = "målgruppe os",
+                    faktaOgVurdering =
+                        faktaOgVurderingMålgruppeLæremidler(
+                            type = MålgruppeType.OVERGANGSSTØNAD,
+                            medlemskap = vurderingMedlemskap(SvarJaNei.JA_IMPLISITT),
+                            dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(svar = null),
+                        ),
+                    fom = LocalDate.of(2024, 2, 5),
+                    tom = LocalDate.of(2024, 2, 10),
+                ),
+            )
+
         val vilkårperioder =
             Vilkårperioder(
-                målgrupper = målgrupper,
+                målgrupper = målgrupperLæremidler,
                 aktiviteter = aktivitetererLæremidler,
             )
     }

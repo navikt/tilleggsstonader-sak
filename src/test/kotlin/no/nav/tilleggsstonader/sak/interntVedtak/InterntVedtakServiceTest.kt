@@ -101,7 +101,7 @@ class InterntVedtakServiceTest {
         @Test
         fun `målgruppefelter skal bli riktig mappet`() {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
-            assertThat(interntVedtak.målgrupper).hasSize(2)
+            assertThat(interntVedtak.målgrupper).hasSize(3)
 
             val målgruppe =
                 Testdata.TilsynBarn.vilkårperioder.målgrupper

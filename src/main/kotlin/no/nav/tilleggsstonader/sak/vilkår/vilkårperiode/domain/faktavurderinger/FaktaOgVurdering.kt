@@ -82,6 +82,9 @@ sealed interface Vurderinger {
         if (this is AldersvilkårVurdering) {
             resultater.add(aldersvilkår.resultat)
         }
+        if (this is MottarSykepengerForFulltidsstillingVurdering) {
+            resultater.add(mottarSykepengerForFulltidsstilling.resultat)
+        }
         return resultater
     }
 

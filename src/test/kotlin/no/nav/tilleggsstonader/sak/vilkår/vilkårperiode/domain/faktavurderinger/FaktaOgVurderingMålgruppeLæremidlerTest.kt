@@ -32,7 +32,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
         val aldersvilkårOppfylt = vurderingAldersVilkår()
 
         @Test
-        fun `resultat er IKKE_VURDERT hvis én vurdering ikke er vurdert og én er oppfylt`() {
+        fun `resultat er IKKE_VURDERT hvis én vurdering ikke er vurdert og resten er oppfylt`() {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
@@ -47,7 +47,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
         }
 
         @Test
-        fun `resultat er IKKE_VURDERT hvis én vurdering mangler vurdering og én ikke er oppfylt`() {
+        fun `resultat er IKKE_VURDERT hvis én vurdering mangler vurdering og resten ikke er oppfylt`() {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
@@ -62,7 +62,7 @@ class FaktaOgVurderingMålgruppeLæremidlerTest {
         }
 
         @Test
-        fun `resultat er IKKE_OPPFYKT hvis én vurdering er oppfylt og én er ikke oppfylt`() {
+        fun `resultat er IKKE_OPPFYLT hvis minst én er ikke oppfylt`() {
             val inngangsvilkår =
                 NedsattArbeidsevneLæremidler(
                     vurderinger =
