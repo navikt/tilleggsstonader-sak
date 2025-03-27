@@ -23,7 +23,7 @@ import java.time.Month.MAY
 
 class BoutgifterAndelTilkjentYtelseMapperTest {
     @Test
-    fun `fom og tom på andel tilkjent ytelse skal være første ukedag i måneden`() {
+    fun `fom og tom på andel tilkjent ytelse skal være første hverdag i måneden`() {
         val mandag10Mars = LocalDate.of(2025, MARCH, 10)
         val mandag17Mars = LocalDate.of(2025, MARCH, 17)
 
