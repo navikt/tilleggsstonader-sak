@@ -48,7 +48,7 @@ class LæremidlerBeregnYtelseSteg(
 ) : BeregnYtelseSteg<VedtakLæremidlerRequest>(
         stønadstype = Stønadstype.LÆREMIDLER,
         vedtakRepository = vedtakRepository,
-        tilkjentytelseService = tilkjentytelseService,
+        tilkjentYtelseService = tilkjentytelseService,
         simuleringService = simuleringService,
     ) {
     override fun lagreVedtak(
@@ -184,7 +184,7 @@ class LæremidlerBeregnYtelseSteg(
 
                     mapTilAndeler(perioder, saksbehandling, utbetalingsdato, satsBekreftet)
                 }
-        tilkjentytelseService.opprettTilkjentYtelse(saksbehandling, andeler)
+        tilkjentYtelseService.lagreTilkjentYtelse(saksbehandling, andeler)
     }
 
     /**

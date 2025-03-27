@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory
 abstract class BeregnYtelseSteg<DTO : Any>(
     private val stønadstype: Stønadstype,
     open val vedtakRepository: VedtakRepository,
-    open val tilkjentytelseService: TilkjentYtelseService,
+    open val tilkjentYtelseService: TilkjentYtelseService,
     open val simuleringService: SimuleringService,
 ) : BehandlingSteg<DTO> {
     val logger = LoggerFactory.getLogger(javaClass)
@@ -38,7 +38,7 @@ abstract class BeregnYtelseSteg<DTO : Any>(
 
     private fun nullstillEksisterendeVedtakPåBehandling(saksbehandling: Saksbehandling) {
         vedtakRepository.deleteById(saksbehandling.id)
-        tilkjentytelseService.slettTilkjentYtelseForBehandling(saksbehandling)
+        tilkjentYtelseService.slettTilkjentYtelseForBehandling(saksbehandling)
         simuleringService.slettSimuleringForBehandling(saksbehandling)
     }
 
