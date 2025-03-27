@@ -332,7 +332,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
     }
 
     @Nested
-    inner class OppdaterAktivitet {
+    inner class OppdaterAktivitetFørstegangsbehandling {
         @Test
         fun `skal oppdatere alle felter på aktivitet`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
@@ -377,27 +377,6 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `endring av ativiteter opprettet fra tidligere behandling skal få status ENDRET`() {
-            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
-            val opprinneligAktivitet =
-                vilkårperiodeRepository.insert(
-                    aktivitet(
-                        behandlingId = revurdering.forrigeIverksatteBehandlingId!!,
-                    ),
-                )
-            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
-            val vilkårperiode = vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()
-            val oppdatertPeriode =
-                aktivitetService.oppdaterVilkårperiode(
-                    id = vilkårperiode.id,
-                    vilkårperiode = vilkårperiode.tilOppdatering(),
-                )
-            assertThat(opprinneligAktivitet.status).isEqualTo(Vilkårstatus.NY)
-            assertThat(vilkårperiode.status).isEqualTo(Vilkårstatus.UENDRET)
-            assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
-        }
-
-        @Test
         fun `skal feile dersom manglende begrunnelse når lønnet endres til ja`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val tiltak =
@@ -435,6 +414,30 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 )
             }.hasMessageContaining("Kan ikke gjøre endringer på denne behandlingen fordi den er ferdigstilt.")
         }
+    }
+
+    @Nested
+    inner class OppdaterAktivitetRevurdering {
+        @Test
+        fun `endring av ativiteter opprettet fra tidligere behandling skal få status ENDRET`() {
+            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+            val opprinneligAktivitet =
+                vilkårperiodeRepository.insert(
+                    aktivitet(
+                        behandlingId = revurdering.forrigeIverksatteBehandlingId!!,
+                    ),
+                )
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
+            val vilkårperiode = vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()
+            val oppdatertPeriode =
+                aktivitetService.oppdaterVilkårperiode(
+                    id = vilkårperiode.id,
+                    vilkårperiode = vilkårperiode.tilOppdatering(),
+                )
+            assertThat(opprinneligAktivitet.status).isEqualTo(Vilkårstatus.NY)
+            assertThat(vilkårperiode.status).isEqualTo(Vilkårstatus.UENDRET)
+            assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
+        }
 
         @Test
         fun `skal ikke kunne oppdatere aktivitetstypen`() {
@@ -449,7 +452,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                     id = aktivitet.id,
                     vilkårperiode = aktivitet.tilOppdatering().copy(type = AktivitetType.REELL_ARBEIDSSØKER),
                 )
-            }.hasMessageContaining("Ugyldig kombinasjon")
+            }.hasMessageContaining("Kan ikke endre type på en eksisterende periode.")
         }
 
         @Test
@@ -473,7 +476,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `kan ikke oppdatere periode hvis periode begynner før revurderFra`() {
+        fun `kan ikke oppdatere fakta hvis periode begynner før revurderFra`() {
             val behandling =
                 testoppsettService.oppdater(
                     testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
@@ -491,35 +494,35 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                     id = aktivitet.id,
                     vilkårperiode = aktivitet.tilOppdatering(aktivitetsdager = 3),
                 )
-            }.hasMessageContaining("Kan ikke endre fakta på perioden")
+            }.hasMessageContaining("Kan ikke endre vurderinger eller fakta på perioden")
         }
+    }
 
-        private fun Vilkårperiode.tilOppdatering(
-            nyFom: LocalDate? = null,
-            nyTom: LocalDate? = null,
-            aktivitetsdager: Int? = null,
-            svarLønnet: SvarJaNei? = null,
-            nyBegrunnelse: String? = null,
-        ): LagreVilkårperiode {
-            val faktaOgSvarTilsynBarnDto =
-                FaktaOgSvarAktivitetBarnetilsynDto(
-                    svarLønnet =
-                        svarLønnet ?: faktaOgVurdering.vurderinger
-                            .takeIfVurderinger<LønnetVurdering>()
-                            ?.lønnet
-                            ?.svar,
-                    aktivitetsdager =
-                        aktivitetsdager
-                            ?: faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
-                )
-            return dummyVilkårperiodeAktivitet(
-                behandlingId = behandlingId,
-                type = type as AktivitetType,
-                fom = nyFom ?: fom,
-                tom = nyTom ?: tom,
-                faktaOgSvar = faktaOgSvarTilsynBarnDto,
-                begrunnelse = nyBegrunnelse ?: begrunnelse,
+    private fun Vilkårperiode.tilOppdatering(
+        nyFom: LocalDate? = null,
+        nyTom: LocalDate? = null,
+        aktivitetsdager: Int? = null,
+        svarLønnet: SvarJaNei? = null,
+        nyBegrunnelse: String? = null,
+    ): LagreVilkårperiode {
+        val faktaOgSvarTilsynBarnDto =
+            FaktaOgSvarAktivitetBarnetilsynDto(
+                svarLønnet =
+                    svarLønnet ?: faktaOgVurdering.vurderinger
+                        .takeIfVurderinger<LønnetVurdering>()
+                        ?.lønnet
+                        ?.svar,
+                aktivitetsdager =
+                    aktivitetsdager
+                        ?: faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
             )
-        }
+        return dummyVilkårperiodeAktivitet(
+            behandlingId = behandlingId,
+            type = type as AktivitetType,
+            fom = nyFom ?: fom,
+            tom = nyTom ?: tom,
+            faktaOgSvar = faktaOgSvarTilsynBarnDto,
+            begrunnelse = nyBegrunnelse ?: begrunnelse,
+        )
     }
 }

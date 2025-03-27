@@ -44,4 +44,11 @@ class VurderingMottarSykepengerForFulltidsstillingTest {
             vurderingMottarSykepengerForFulltidsstilling(SvarJaNei.JA_IMPLISITT)
         }.hasMessageContaining("ugyldig")
     }
+
+    @Test
+    fun `hvis svar=GAMMEL_MANGLER_DATA så skal det kastes feil`() {
+        assertThatThrownBy {
+            vurderingMottarSykepengerForFulltidsstilling(SvarJaNei.GAMMEL_MANGLER_DATA)
+        }.hasMessageContaining("GAMMEL_MANGLER_DATA er ugyldig for nye eller oppdaterte vurderinger")
+    }
 }

@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.HarUtgifterVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MottarSykepengerForFulltidsstillingVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 
 fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
@@ -25,6 +26,11 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                     vurderinger
                         .takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()
                         ?.dekketAvAnnetRegelverk
+                        ?.svar,
+                svarMottarSykepengerForFulltidsstilling =
+                    vurderinger
+                        .takeIfVurderinger<MottarSykepengerForFulltidsstillingVurdering>()
+                        ?.mottarSykepengerForFulltidsstilling
                         ?.svar,
             )
 

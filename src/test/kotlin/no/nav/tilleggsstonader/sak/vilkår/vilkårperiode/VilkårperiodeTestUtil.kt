@@ -168,7 +168,7 @@ object VilkårperiodeTestUtil {
             MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadLæremidler
             MålgruppeType.AAP ->
                 AAPLæremidler(
-                    vurderinger = VurderingAAPLæremidler(dekketAvAnnetRegelverk = dekketAvAnnetRegelverk, aldersvilkår = aldersvilkår,),
+                    vurderinger = VurderingAAPLæremidler(dekketAvAnnetRegelverk = dekketAvAnnetRegelverk, aldersvilkår = aldersvilkår),
                 )
 
             MålgruppeType.UFØRETRYGD ->
@@ -308,6 +308,7 @@ object VilkårperiodeTestUtil {
         tom: LocalDate = osloDateNow(),
         medlemskap: SvarJaNei? = null,
         dekkesAvAnnetRegelverk: SvarJaNei? = null,
+        mottarSykepengerForFulltidsstilling: SvarJaNei? = null,
         begrunnelse: String? = null,
         behandlingId: BehandlingId = BehandlingId.random(),
     ) = LagreVilkårperiode(
@@ -318,6 +319,7 @@ object VilkårperiodeTestUtil {
             FaktaOgSvarMålgruppeDto(
                 svarMedlemskap = medlemskap,
                 svarUtgifterDekketAvAnnetRegelverk = dekkesAvAnnetRegelverk,
+                svarMottarSykepengerForFulltidsstilling = mottarSykepengerForFulltidsstilling,
             ),
         begrunnelse = begrunnelse,
         behandlingId = behandlingId,
