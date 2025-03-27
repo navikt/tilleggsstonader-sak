@@ -65,8 +65,8 @@ data class Vilkår(
     ) {
         when (type) {
             VilkårType.PASS_BARN,
-            VilkårType.FASTE_UTGIFTER_EN_BOLIG,
-            VilkårType.FASTE_UTGIFTER_TO_BOLIGER,
+            VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+            VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
             -> {
                 validerFørsteOgSisteDagIValgtMåned(fom, tom)
                 validerPåkrevdBeløpHvisOppfylt()
@@ -214,8 +214,8 @@ enum class VilkårType(
 
     // Boutgifter
     UTGIFTER_OVERNATTING("Utgifter overnatting", listOf(Stønadstype.BOUTGIFTER)),
-    FASTE_UTGIFTER_EN_BOLIG("Faste utgifter en bolig", listOf(Stønadstype.BOUTGIFTER)),
-    FASTE_UTGIFTER_TO_BOLIGER("Faste utgifter to boliger", listOf(Stønadstype.BOUTGIFTER)),
+    LØPENDE_UTGIFTER_EN_BOLIG("Løpende utgifter en bolig", listOf(Stønadstype.BOUTGIFTER)),
+    LØPENDE_UTGIFTER_TO_BOLIGER("Løpende utgifter to boliger", listOf(Stønadstype.BOUTGIFTER)),
     ;
 
     fun gjelderFlereBarn(): Boolean = this == PASS_BARN

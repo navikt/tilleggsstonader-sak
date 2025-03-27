@@ -9,9 +9,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 
-class FasteUtgifterToBoligerRegel :
+class LøpendeUtgifterToBoligerRegel :
     Vilkårsregel(
-        vilkårType = VilkårType.FASTE_UTGIFTER_TO_BOLIGER,
+        vilkårType = VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
         regler =
             setOf(
                 NØDVENDING_Å_BO_NÆRMERE_AKTIVITET,

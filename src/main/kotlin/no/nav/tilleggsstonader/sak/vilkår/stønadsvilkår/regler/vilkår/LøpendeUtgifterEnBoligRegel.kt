@@ -9,9 +9,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 
-class FasteUtgifterEnBoligRegel :
+class LøpendeUtgifterEnBoligRegel :
     Vilkårsregel(
-        vilkårType = VilkårType.FASTE_UTGIFTER_EN_BOLIG,
+        vilkårType = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
         regler =
             setOf(
                 HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE,

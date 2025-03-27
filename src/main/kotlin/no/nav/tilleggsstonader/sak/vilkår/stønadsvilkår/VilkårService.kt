@@ -283,5 +283,5 @@ class VilkårService(
     fun hentBoutgiftVilkår(behandlingId: BehandlingId): List<Vilkår> =
         vilkårRepository
             .findByBehandlingId(behandlingId)
-            .filter { it.type == VilkårType.UTGIFTER_OVERNATTING } // TODO: Skal også hente faste utgifter
+            .filter { it.type == VilkårType.UTGIFTER_OVERNATTING } // TODO: Skal også hente løpende utgifter
 }
