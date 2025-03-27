@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -18,6 +19,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.Month.APRIL
+import java.time.Month.FEBRUARY
 import java.time.Month.MARCH
 import java.time.Month.MAY
 
@@ -96,18 +98,66 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
     }
 
     @Test
-    fun `skal splitte andeler i 2, en for høsten og en for våren som ikke har bekreftet sats ennå `() {
-        // Er det beregningen eller mappingen til andeler som fikser dette for læremidler?
+    fun `Utbetalingsperioder med AAP, UFØRETRYGD og NEDSATT_ARBEIDSEVNE summeres opp til én andel så lenge de har samme utbetalingsdato`() {
+        val mandag10Februar = LocalDate.of(2025, FEBRUARY, 10)
+        val torsdag27Feb = LocalDate.of(2025, FEBRUARY, 27)
+        val fredag7Mars = LocalDate.of(2025, MARCH, 7)
 
-//        service.lagreAndeler(saksbehandling, beregningsresultat)
+        val aap =
+            lagBeregningsgrunnlagMedEnkeltutgift(
+                fom = mandag10Februar,
+                utbetalingsdato = mandag10Februar,
+            ).copy(målgruppe = MålgruppeType.AAP)
+
+        val uføretrygd =
+            lagBeregningsgrunnlagMedEnkeltutgift(
+                fom = torsdag27Feb,
+                utbetalingsdato = mandag10Februar,
+            ).copy(målgruppe = MålgruppeType.UFØRETRYGD)
+
+        val nedsattArbeidsevne =
+            lagBeregningsgrunnlagMedEnkeltutgift(
+                fom = fredag7Mars,
+                utbetalingsdato = mandag10Februar,
+            ).copy(målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE)
+
+        val andel = finnAndelTilkjentYtelse(aap, uføretrygd, nedsattArbeidsevne)
+
+        with(andel.single()) {
+            assertThat { fom == mandag10Februar }
+            assertThat { tom == mandag10Februar }
+            assertThat { type == TypeAndel.BOUTGIFTER_AAP }
+            assertThat { beløp == 1000 * 3 }
+        }
     }
 
     @Test
-    fun `noe med at vi får ulike andeler hvis vi har ulike målgrupper`() {
-    }
+    fun `Utbetalingsperioder med AAP og OVERGANGSSTØNAD grupperes til to ulike andeler`() {
+        val mandag10Februar = LocalDate.of(2025, FEBRUARY, 10)
 
-    @Test
-    fun `beløpet som skal utbetales er sum av stønadsbeløpene`() {
+        val aap =
+            lagBeregningsgrunnlagMedEnkeltutgift(
+                fom = mandag10Februar,
+            ).copy(målgruppe = MålgruppeType.AAP)
+
+        val overgangsstønad =
+            lagBeregningsgrunnlagMedEnkeltutgift(
+                fom = mandag10Februar,
+            ).copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD)
+
+        val andel = finnAndelTilkjentYtelse(aap, overgangsstønad)
+
+        assertThat { andel.size == 2 }
+
+        with(andel.first()) {
+            assertThat { type == TypeAndel.BOUTGIFTER_AAP }
+            assertThat { beløp == 1000 }
+        }
+
+        with(andel.last()) {
+            assertThat { type == TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER }
+            assertThat { beløp == 1000 }
+        }
     }
 
     @Test
@@ -139,44 +189,44 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
         val andel = finnAndelTilkjentYtelse(beregningsgrunnlag)
         assertThat(andel.single().statusIverksetting).isEqualTo(StatusIverksetting.VENTER_PÅ_SATS_ENDRING)
     }
-
-    private fun finnAndelTilkjentYtelse(vararg beregningsgrunnlag: Beregningsgrunnlag): List<AndelTilkjentYtelse> {
-        val fagsak = fagsak(stønadstype = Stønadstype.BOUTGIFTER)
-        val behandling = behandling(fagsak = fagsak, steg = StegType.BEREGNE_YTELSE)
-        val saksbehandling = saksbehandling(fagsak = fagsak, behandling = behandling)
-
-        val beregningsresultat =
-            BeregningsresultatBoutgifter(
-                perioder =
-                    beregningsgrunnlag.map {
-                        BeregningsresultatForLøpendeMåned(grunnlag = it)
-                    },
-            )
-        return BoutgifterAndelTilkjentYtelseMapper.finnAndelTilkjentYtelse(saksbehandling, beregningsresultat)
-    }
-
-    private fun lagBeregningsgrunnlagMedEnkeltutgift(
-        fom: LocalDate,
-        tom: LocalDate,
-        utbetalingsdato: LocalDate = fom,
-    ) = Beregningsgrunnlag(
-        fom = fom,
-        tom = tom,
-        utbetalingsdato = utbetalingsdato,
-        utgifter =
-            mapOf(
-                TypeBoutgift.UTGIFTER_OVERNATTING to
-                    listOf(
-                        UtgiftBeregningBoutgifter(
-                            fom = fom,
-                            tom = tom,
-                            utgift = 1000,
-                        ),
-                    ),
-            ),
-        makssats = 4953,
-        makssatsBekreftet = true,
-        målgruppe = MålgruppeType.AAP,
-        aktivitet = AktivitetType.TILTAK,
-    )
 }
+
+private fun finnAndelTilkjentYtelse(vararg beregningsgrunnlag: Beregningsgrunnlag): List<AndelTilkjentYtelse> {
+    val fagsak = fagsak(stønadstype = Stønadstype.BOUTGIFTER)
+    val behandling = behandling(fagsak = fagsak, steg = StegType.BEREGNE_YTELSE)
+    val saksbehandling = saksbehandling(fagsak = fagsak, behandling = behandling)
+
+    val beregningsresultat =
+        BeregningsresultatBoutgifter(
+            perioder =
+                beregningsgrunnlag.map {
+                    BeregningsresultatForLøpendeMåned(grunnlag = it)
+                },
+        )
+    return BoutgifterAndelTilkjentYtelseMapper.finnAndelTilkjentYtelse(saksbehandling, beregningsresultat)
+}
+
+private fun lagBeregningsgrunnlagMedEnkeltutgift(
+    fom: LocalDate,
+    tom: LocalDate = fom,
+    utbetalingsdato: LocalDate = fom,
+) = Beregningsgrunnlag(
+    fom = fom,
+    tom = tom,
+    utbetalingsdato = utbetalingsdato,
+    utgifter =
+        mapOf(
+            TypeBoutgift.UTGIFTER_OVERNATTING to
+                listOf(
+                    UtgiftBeregningBoutgifter(
+                        fom = fom,
+                        tom = tom,
+                        utgift = 1000,
+                    ),
+                ),
+        ),
+    makssats = 4953,
+    makssatsBekreftet = true,
+    målgruppe = MålgruppeType.AAP,
+    aktivitet = AktivitetType.TILTAK,
+)
