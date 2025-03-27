@@ -18,7 +18,7 @@
           "tom": "2024-01-31",
           "utbetalingsdato": "2024-01-01",
           "utgifter": {
-            "MIDLERTIDIG_OVERNATTING": [
+            "UTGIFTER_OVERNATTING": [
               {
                 "fom": "2024-01-01",
                 "tom": "2024-01-20",

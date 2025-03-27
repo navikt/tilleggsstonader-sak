@@ -40,8 +40,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårMidlertidigOvernatting
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårMidlertidigOvernattingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårUtgifterOvernatting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernattingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import org.assertj.core.api.Assertions.assertThat
@@ -192,7 +192,7 @@ internal class VilkårServiceTest {
                 SvarPåVilkårDto(
                     id = vilkår.id,
                     behandlingId = behandlingId,
-                    delvilkårsett = oppfylteDelvilkårMidlertidigOvernattingDto(),
+                    delvilkårsett = oppfylteDelvilkårUtgifterOvernattingDto(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
                     utgift = null,
@@ -213,7 +213,7 @@ internal class VilkårServiceTest {
                     SvarPåVilkårDto(
                         id = vilkår.id,
                         behandlingId = behandlingId,
-                        delvilkårsett = oppfylteDelvilkårMidlertidigOvernattingDto(),
+                        delvilkårsett = oppfylteDelvilkårUtgifterOvernattingDto(),
                         fom = LocalDate.of(2024, 1, 1),
                         tom = LocalDate.of(2024, 1, 31),
                         utgift = 100,
@@ -441,8 +441,8 @@ internal class VilkårServiceTest {
             vilkår(
                 behandlingId = behandlingId,
                 resultat = Vilkårsresultat.IKKE_OPPFYLT,
-                delvilkår = ikkeOppfylteDelvilkårMidlertidigOvernatting(),
-                type = VilkårType.MIDLERTIDIG_OVERNATTING,
+                delvilkår = ikkeOppfylteDelvilkårUtgifterOvernatting(),
+                type = VilkårType.UTGIFTER_OVERNATTING,
             )
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(vilkår)

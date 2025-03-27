@@ -72,7 +72,7 @@ data class Vilkår(
                 validerPåkrevdBeløpHvisOppfylt()
             }
 
-            VilkårType.MIDLERTIDIG_OVERNATTING -> {
+            VilkårType.UTGIFTER_OVERNATTING -> {
                 validerPåkrevdBeløpHvisOppfylt()
             }
 
@@ -213,7 +213,7 @@ enum class VilkårType(
     PASS_BARN("Pass av barn", listOf(Stønadstype.BARNETILSYN)),
 
     // Boutgifter
-    MIDLERTIDIG_OVERNATTING("Midlertidig overnatting", listOf(Stønadstype.BOUTGIFTER)),
+    UTGIFTER_OVERNATTING("Utgifter overnatting", listOf(Stønadstype.BOUTGIFTER)),
     FASTE_UTGIFTER_EN_BOLIG("Faste utgifter en bolig", listOf(Stønadstype.BOUTGIFTER)),
     FASTE_UTGIFTER_TO_BOLIGER("Faste utgifter to boliger", listOf(Stønadstype.BOUTGIFTER)),
     ;

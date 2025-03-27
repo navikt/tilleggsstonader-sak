@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 
 object BoutgifterRegelTestUtil {
-    fun oppfylteDelvilkårMidlertidigOvernatting() =
+    fun oppfylteDelvilkårUtgifterOvernatting() =
         listOf(
             delvilkår(Vurdering(RegelId.NØDVENDIGE_MERUTGIFTER, SvarId.JA)),
         )
@@ -28,7 +28,7 @@ object BoutgifterRegelTestUtil {
             delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
         )
 
-    fun ikkeOppfylteDelvilkårMidlertidigOvernatting() =
+    fun ikkeOppfylteDelvilkårUtgifterOvernatting() =
         listOf(
             delvilkår(Vurdering(RegelId.NØDVENDIGE_MERUTGIFTER, SvarId.NEI, "begrunnelse")),
         )
@@ -48,13 +48,13 @@ object BoutgifterRegelTestUtil {
             delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
         )
 
-    fun oppfylteDelvilkårMidlertidigOvernattingDto() = oppfylteDelvilkårMidlertidigOvernatting().map { it.tilDto() }
+    fun oppfylteDelvilkårUtgifterOvernattingDto() = oppfylteDelvilkårUtgifterOvernatting().map { it.tilDto() }
 
     fun oppfylteDelvilkårFasteUtgifterEnBoligDto() = oppfylteDelvilkårFasteUtgifterEnBolig().map { it.tilDto() }
 
     fun oppfylteDelvilkårFasteUtgifterToBoligerDto() = oppfylteDelvilkårFasteUtgifterToBoliger().map { it.tilDto() }
 
-    fun ikkeOppfylteDelvilkårMidlertidigOvernattingDto() = ikkeOppfylteDelvilkårMidlertidigOvernatting().map { it.tilDto() }
+    fun ikkeOppfylteDelvilkårUtgifterOvernattingDto() = ikkeOppfylteDelvilkårUtgifterOvernatting().map { it.tilDto() }
 
     fun ikkeOppfylteDelvilkårFasteUtgifterEnBoligDto() = ikkeOppfylteDelvilkårFasteUtgifterEnBolig().map { it.tilDto() }
 

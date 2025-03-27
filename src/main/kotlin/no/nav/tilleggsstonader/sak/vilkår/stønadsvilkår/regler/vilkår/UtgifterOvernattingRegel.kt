@@ -8,9 +8,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 
-class MidlertidigOvernattingRegel :
+class UtgifterOvernattingRegel :
     Vilkårsregel(
-        vilkårType = VilkårType.MIDLERTIDIG_OVERNATTING,
+        vilkårType = VilkårType.UTGIFTER_OVERNATTING,
         regler =
             setOf(NØDVENDIGE_MERUTGIFTER),
     ) {

@@ -15,7 +15,7 @@ class BoutgifterUtgiftService(
         vilkårService
             .hentOppfylteBoutgiftVilkår(behandlingId)
 //            .groupBy { it.barnId ?: error("Vilkår=${it.id} type=${it.type} for tilsyn barn mangler barnId") }
-            .groupBy { TypeBoutgift.fraVilkårType(it.type) } // TODO: Splitt på FASTE_UTGIFTER og MIDLERTIDIG_OVERNATTING
+            .groupBy { TypeBoutgift.fraVilkårType(it.type) } // TODO: Splitt på FASTE_UTGIFTER og UTGIFTER_OVERNATTING
             .mapValues { (_, values) -> values.map { mapUtgiftBeregning(it) } }
 
     private fun mapUtgiftBeregning(it: Vilkår): UtgiftBeregningBoutgifter {

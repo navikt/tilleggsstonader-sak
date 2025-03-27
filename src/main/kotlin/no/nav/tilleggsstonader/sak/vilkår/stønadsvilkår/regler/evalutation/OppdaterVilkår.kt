@@ -56,7 +56,7 @@ object OppdaterVilkår {
         val vilkårMedUtgift =
             listOf(
                 VilkårType.PASS_BARN,
-                VilkårType.MIDLERTIDIG_OVERNATTING,
+                VilkårType.UTGIFTER_OVERNATTING,
                 VilkårType.FASTE_UTGIFTER_EN_BOLIG,
                 VilkårType.FASTE_UTGIFTER_TO_BOLIGER,
             )
@@ -119,7 +119,7 @@ object OppdaterVilkår {
                     it
                 }
 
-                VilkårType.MIDLERTIDIG_OVERNATTING -> {
+                VilkårType.UTGIFTER_OVERNATTING -> {
                     it
                 }
 
@@ -141,7 +141,7 @@ object OppdaterVilkår {
                     it
                 }
 
-                VilkårType.MIDLERTIDIG_OVERNATTING -> {
+                VilkårType.UTGIFTER_OVERNATTING -> {
                     it
                 }
 

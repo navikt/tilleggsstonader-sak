@@ -1,5 +1,5 @@
 {
-  "vilkårType" : "MIDLERTIDIG_OVERNATTING",
+  "vilkårType" : "UTGIFTER_OVERNATTING",
   "regler" : {
     "NØDVENDIGE_MERUTGIFTER" : {
       "regelId" : "NØDVENDIGE_MERUTGIFTER",

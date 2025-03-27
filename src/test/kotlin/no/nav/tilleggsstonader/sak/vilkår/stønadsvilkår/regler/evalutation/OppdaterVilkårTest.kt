@@ -14,13 +14,13 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.Op
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.validerVilkårOgBeregnResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårFasteUtgifterEnBoligDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårFasteUtgifterToBoligerDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårMidlertidigOvernattingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårUtgifterOvernattingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårFasteUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårFasteUtgifterEnBoligDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårFasteUtgifterToBoliger
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårFasteUtgifterToBoligerDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårMidlertidigOvernatting
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårMidlertidigOvernattingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernattingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
@@ -83,69 +83,69 @@ internal class OppdaterVilkårTest {
         @Nested
         inner class Boutgifter {
             @Nested
-            inner class MidlertidigOvernatting {
-                val opprettMidlertidigOvernattingVilkårDto =
+            inner class UtgifterOvernatting {
+                val opprettUtgifterOvernattingVilkårDto =
                     OpprettVilkårDto(
-                        vilkårType = VilkårType.MIDLERTIDIG_OVERNATTING,
+                        vilkårType = VilkårType.UTGIFTER_OVERNATTING,
                         behandlingId = behandlingId,
-                        delvilkårsett = oppfylteDelvilkårMidlertidigOvernattingDto(),
+                        delvilkårsett = oppfylteDelvilkårUtgifterOvernattingDto(),
                         fom = LocalDate.now(),
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
                         erNullvedtak = false,
                     )
-                val midlertidigOvernattingVilkår =
+                val utgifterOvernattingVilkår =
                     vilkår(
                         behandlingId = behandlingId,
-                        type = VilkårType.MIDLERTIDIG_OVERNATTING,
-                        delvilkår = oppfylteDelvilkårMidlertidigOvernatting(),
+                        type = VilkårType.UTGIFTER_OVERNATTING,
+                        delvilkår = oppfylteDelvilkårUtgifterOvernatting(),
                     )
 
                 @Test
-                fun `skal validere at man har med fom og tom for vilkår for midlertidig overnatting`() {
+                fun `skal validere at man har med fom og tom for vilkår for utgfiter overnatting`() {
                     assertThatThrownBy {
-                        validerVilkårOgBeregnResultat(midlertidigOvernattingVilkår, opprettMidlertidigOvernattingVilkårDto.copy(fom = null))
+                        validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, opprettUtgifterOvernattingVilkårDto.copy(fom = null))
                     }.hasMessageContaining("Mangler fra og med/til og med på vilkår")
 
                     assertThatThrownBy {
-                        validerVilkårOgBeregnResultat(midlertidigOvernattingVilkår, opprettMidlertidigOvernattingVilkårDto.copy(tom = null))
+                        validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, opprettUtgifterOvernattingVilkårDto.copy(tom = null))
                     }.hasMessageContaining("Mangler fra og med/til og med på vilkår")
                 }
 
                 @Test
-                fun `skal kaste feil hvis innvilget midlertidig overnatting ikke inneholder beløp`() {
+                fun `skal kaste feil hvis innvilget utgfiter overnatting ikke inneholder beløp`() {
                     assertThatThrownBy {
                         validerVilkårOgBeregnResultat(
-                            midlertidigOvernattingVilkår,
-                            opprettMidlertidigOvernattingVilkårDto.copy(utgift = null),
+                            utgifterOvernattingVilkår,
+                            opprettUtgifterOvernattingVilkårDto.copy(utgift = null),
                         )
                     }.hasMessageContaining("Mangler utgift på vilkår")
                 }
 
                 @Test
-                fun `skal ikke kaste feil hvis ikke oppfylt midlertidig overnatting ikke inneholder beløp`() {
+                fun `skal ikke kaste feil hvis ikke oppfylt utgfiter overnatting ikke inneholder beløp`() {
                     val dto =
-                        opprettMidlertidigOvernattingVilkårDto.copy(
+                        opprettUtgifterOvernattingVilkårDto.copy(
                             utgift = null,
-                            delvilkårsett = ikkeOppfylteDelvilkårMidlertidigOvernattingDto(),
+                            delvilkårsett = ikkeOppfylteDelvilkårUtgifterOvernattingDto(),
                         )
-                    validerVilkårOgBeregnResultat(midlertidigOvernattingVilkår, dto)
+                    validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, dto)
                 }
 
                 @Test
-                fun `oppfylt midlertidig overnatting kan mangle utgift når det er et nullvedtak`() {
+                fun `oppfylt utgfiter overnatting kan mangle utgift når det er et nullvedtak`() {
                     validerVilkårOgBeregnResultat(
-                        midlertidigOvernattingVilkår,
-                        opprettMidlertidigOvernattingVilkårDto.copy(utgift = null, erNullvedtak = true),
+                        utgifterOvernattingVilkår,
+                        opprettUtgifterOvernattingVilkårDto.copy(utgift = null, erNullvedtak = true),
                     )
                 }
 
                 @Test
-                fun `skal ikke kaste feil hvis oppfylt midlertidig overnatting nullvedttak inneholder beløp`() {
+                fun `skal ikke kaste feil hvis oppfylt utgfiter overnatting nullvedttak inneholder beløp`() {
                     assertThatThrownBy {
                         validerVilkårOgBeregnResultat(
-                            midlertidigOvernattingVilkår,
-                            opprettMidlertidigOvernattingVilkårDto.copy(utgift = 1, erNullvedtak = true),
+                            utgifterOvernattingVilkår,
+                            opprettUtgifterOvernattingVilkårDto.copy(utgift = 1, erNullvedtak = true),
                         )
                     }.hasMessageContaining("Kan ikke ha utgift på nullvedtak")
                 }
@@ -237,7 +237,7 @@ internal class OppdaterVilkårTest {
                 }
 
                 @Test
-                fun `utgift kan mangle når midlertidig overnatting ikke er oppfylt`() {
+                fun `utgift kan mangle når utgfiter overnatting ikke er oppfylt`() {
                     val dto =
                         opprettVilkårDto.copy(
                             utgift = null,

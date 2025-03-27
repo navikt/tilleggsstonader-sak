@@ -9,7 +9,7 @@ object UtgifterValideringUtil {
     /**
      * Antakelser:
      * - Det har allerede blitt validert at utgiftene ikke strekker seg lengre tilbake i tid fra søknadsdato enn det som
-     * gir rett på stønad (hhv. 3/6 mnd for midlertidig overnatting/faste utgifter).
+     * gir rett på stønad (hhv. 3/6 mnd for utgifter overnatting/faste utgifter).
      *
      */
     fun validerUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>) {

@@ -59,7 +59,7 @@ class BoutgifterBeregningServiceTest {
 
     val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
         mapOf(
-            TypeBoutgift.MIDLERTIDIG_OVERNATTING to
+            TypeBoutgift.UTGIFTER_OVERNATTING to
                 listOf(
                     UtgiftBeregningBoutgifter(
                         fom = LocalDate.of(2025, 1, 1),
@@ -88,7 +88,7 @@ class BoutgifterBeregningServiceTest {
         )
 
     @Nested
-    inner class MidlertidigUtgift {
+    inner class UtgifterOvernatting {
         @BeforeEach
         fun setup() {
             every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
@@ -97,7 +97,7 @@ class BoutgifterBeregningServiceTest {
         }
 
         @Test
-        fun `Kan beregne for midlertidig utgift`() {
+        fun `Kan beregne for utgift overnatting`() {
             val forventet =
                 listOf(
                     BeregningsresultatForLøpendeMåned(
@@ -144,7 +144,7 @@ class BoutgifterBeregningServiceTest {
         fun `Kaster feil hvis utgift delvis i vedtaksperiode`() {
             val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
                 mapOf(
-                    TypeBoutgift.MIDLERTIDIG_OVERNATTING to
+                    TypeBoutgift.UTGIFTER_OVERNATTING to
                         listOf(
                             UtgiftBeregningBoutgifter(
                                 fom = LocalDate.of(2025, 1, 15),
@@ -187,7 +187,7 @@ class BoutgifterBeregningServiceTest {
 
             val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
                 mapOf(
-                    TypeBoutgift.MIDLERTIDIG_OVERNATTING to
+                    TypeBoutgift.UTGIFTER_OVERNATTING to
                         listOf(
                             UtgiftBeregningBoutgifter(
                                 fom = LocalDate.of(2025, 1, 1),
