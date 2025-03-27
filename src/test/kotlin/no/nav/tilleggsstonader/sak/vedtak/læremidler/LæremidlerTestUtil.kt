@@ -105,6 +105,8 @@ object LæremidlerTestUtil {
         fom: LocalDate,
         tom: LocalDate,
         utbetalingsdato: LocalDate = fom,
+        målgruppe: MålgruppeType = MålgruppeType.AAP,
+        aktivitet: AktivitetType = AktivitetType.TILTAK,
     ): BeregningsresultatForMåned =
         BeregningsresultatForMåned(
             beløp = 875,
@@ -117,8 +119,8 @@ object LæremidlerTestUtil {
                     studieprosent = 100,
                     sats = 875,
                     satsBekreftet = true,
-                    målgruppe = MålgruppeType.AAP,
-                    aktivitet = AktivitetType.TILTAK,
+                    målgruppe = målgruppe,
+                    aktivitet = aktivitet,
                 ),
         )
 
