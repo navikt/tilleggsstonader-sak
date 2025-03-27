@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
@@ -218,7 +219,7 @@ object VilkårperiodeTestUtil {
                         ),
                 )
 
-            AktivitetType.INGEN_AKTIVITET -> IngenAktivitetTilsynBarn
+            AktivitetType.INGEN_AKTIVITET -> IngenAktivitetLæremidler
             else -> {
                 throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for læremidler")
             }

@@ -73,9 +73,14 @@ object IverksettDtoMapper {
             TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER -> StønadstypeIverksetting.TILSYN_BARN_ENSLIG_FORSØRGER
             TypeAndel.TILSYN_BARN_AAP -> StønadstypeIverksetting.TILSYN_BARN_AAP
             TypeAndel.TILSYN_BARN_ETTERLATTE -> StønadstypeIverksetting.TILSYN_BARN_ETTERLATTE
+
             TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER -> StønadstypeIverksetting.LÆREMIDLER_ENSLIG_FORSØRGER
             TypeAndel.LÆREMIDLER_AAP -> StønadstypeIverksetting.LÆREMIDLER_AAP
             TypeAndel.LÆREMIDLER_ETTERLATTE -> StønadstypeIverksetting.LÆREMIDLER_ETTERLATTE
+
+            TypeAndel.BOUTGIFTER_AAP -> StønadstypeIverksetting.BOUTGIFTER_AAP
+            TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER -> StønadstypeIverksetting.BOUTGIFTER_ENSLIG_FORSØRGER
+            TypeAndel.BOUTGIFTER_ETTERLATTE -> StønadstypeIverksetting.BOUTGIFTER_ETTERLATTE
 
             TypeAndel.UGYLDIG -> error("Ugyldig type andel. Skal ikke iverksettes")
         }

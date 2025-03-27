@@ -73,7 +73,12 @@ enum class MålgruppeType(
                 }
             }
             Stønadstype.BOUTGIFTER -> {
-                error("Mappingen til TypeAndel for stønadstype boutgifter er ikke implementert")
+                when (this) {
+                    AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE -> TypeAndel.BOUTGIFTER_AAP
+                    OVERGANGSSTØNAD -> TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER
+                    OMSTILLINGSSTØNAD -> TypeAndel.BOUTGIFTER_ETTERLATTE
+                    else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
+                }
             }
         }
 }

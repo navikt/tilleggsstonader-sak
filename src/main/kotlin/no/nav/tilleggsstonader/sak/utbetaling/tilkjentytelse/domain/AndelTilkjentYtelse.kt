@@ -74,6 +74,11 @@ data class AndelTilkjentYtelse(
             TypeAndel.LÆREMIDLER_ETTERLATTE,
             -> validerLæremidler()
 
+            TypeAndel.BOUTGIFTER_AAP,
+            TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER,
+            TypeAndel.BOUTGIFTER_ETTERLATTE,
+            -> validerBoutgifter()
+
             TypeAndel.UGYLDIG -> {}
         }
     }
@@ -85,6 +90,12 @@ data class AndelTilkjentYtelse(
     }
 
     private fun validerLæremidler() {
+        validerSatstype(Satstype.DAG)
+        validerLikFomOgTom()
+        validerFomIkkeLørdagEllerSøndag()
+    }
+
+    private fun validerBoutgifter() {
         validerSatstype(Satstype.DAG)
         validerLikFomOgTom()
         validerFomIkkeLørdagEllerSøndag()
@@ -137,6 +148,10 @@ enum class TypeAndel {
     LÆREMIDLER_ENSLIG_FORSØRGER,
     LÆREMIDLER_AAP,
     LÆREMIDLER_ETTERLATTE,
+
+    BOUTGIFTER_AAP,
+    BOUTGIFTER_ENSLIG_FORSØRGER,
+    BOUTGIFTER_ETTERLATTE,
 
     UGYLDIG,
 }

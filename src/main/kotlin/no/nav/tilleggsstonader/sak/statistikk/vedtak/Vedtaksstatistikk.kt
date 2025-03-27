@@ -111,6 +111,11 @@ enum class AndelstypeDvh {
     LÆREMIDLER_ENSLIG_FORSØRGER,
     LÆREMIDLER_AAP,
     LÆREMIDLER_ETTERLATTE,
+
+    BOUTGIFTER_AAP,
+    BOUTGIFTER_ETTERLATTE,
+    BOUTGIFTER_ENSLIG_FORSØRGER,
+
     ;
 
     companion object {
@@ -122,6 +127,9 @@ enum class AndelstypeDvh {
                 TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER -> LÆREMIDLER_ENSLIG_FORSØRGER
                 TypeAndel.LÆREMIDLER_AAP -> LÆREMIDLER_AAP
                 TypeAndel.LÆREMIDLER_ETTERLATTE -> LÆREMIDLER_ETTERLATTE
+                TypeAndel.BOUTGIFTER_AAP -> BOUTGIFTER_AAP
+                TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER -> BOUTGIFTER_ENSLIG_FORSØRGER
+                TypeAndel.BOUTGIFTER_ETTERLATTE -> BOUTGIFTER_ETTERLATTE
                 TypeAndel.UGYLDIG -> throw Error("Trenger ikke statistikk på ugyldige betalinger")
             }
     }
