@@ -11,7 +11,7 @@ import java.time.LocalDate
  * @param gjelderFraOgMed gjelder fra og med revurder-fra-dato, brukes til brevet for å vise fra når vedtaket gjelder fra
  */
 data class InnvilgelseBoutgifterResponse(
-    val vedtaksperioder: List<VedtaksperiodeDto>,
+    val vedtaksperioder: List<VedtaksperiodeDto>?,
     val beregningsresultat: BeregningsresultatBoutgifterDto,
     val gjelderFraOgMed: LocalDate,
     val gjelderTilOgMed: LocalDate,

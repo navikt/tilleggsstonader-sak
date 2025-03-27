@@ -10,10 +10,11 @@ import kotlin.collections.plus
 
 object BoutgifterBeregnUtil {
     /**
-     * Grupperer vedtaksperioder innenfor en løpende måned
-     * Hvis en vedtaksperiode løper lengre enn første måned vil det bli en ny periode, med nytt utbetalingsdatum
+     * Splitter opp vedtaksperioder på løpende måneder.
+     *
+     * Hvis en vedtaksperiode løper lengre enn første måned vil det bli en ny periode, med ny utbetalingsdato.
      */
-    fun List<VedtaksperiodeBeregning>.grupperVedtaksperioderPerLøpendeMåned(): List<LøpendeMåned> =
+    fun List<VedtaksperiodeBeregning>.splittTilLøpendeMåneder(): List<LøpendeMåned> =
         this
             .sorted()
             .splitVedtaksperiodePerÅr()
@@ -25,7 +26,7 @@ object BoutgifterBeregnUtil {
                     val håndterNyUtbetalingsperiode = vedtaksperiode.håndterNyUtbetalingsperiode(acc)
                     acc + håndterNyUtbetalingsperiode
                 }
-            }.filter { it.harDatoerIUkedager() }
+            }
 
     /**
      * Legger til periode som overlapper med forrige utbetalingsperiode

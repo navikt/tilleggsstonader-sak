@@ -2,10 +2,17 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
+import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.BeregningsresultatBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
@@ -21,19 +28,19 @@ import org.springframework.web.bind.annotation.RestController
 @ProtectedWithClaims(issuer = "azuread")
 class BoutgifterVedtakController(
     private val beregningService: BoutgifterBeregningService,
-//    private val tilgangService: TilgangService,
-//    private val vedtakService: VedtakService,
+    private val tilgangService: TilgangService,
+    private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
-//    private val stegService: StegService,
-//    private val steg: BoutgifterBeregnYtelseSteg,
+    private val stegService: StegService,
+    private val steg: BoutgifterBeregnYtelseSteg,
 ) {
-//    @PostMapping("{behandlingId}/innvilgelse")
-//    fun innvilge(
-//        @PathVariable behandlingId: BehandlingId,
-//        @RequestBody vedtak: InnvilgelseBoutgifterRequest,
-//    ) {
-//        lagreVedtak(behandlingId, vedtak)
-//    }
+    @PostMapping("{behandlingId}/innvilgelse")
+    fun innvilge(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: InnvilgelseBoutgifterRequest,
+    ) {
+        lagreVedtak(behandlingId, vedtak)
+    }
 
 //    @PostMapping("{behandlingId}/avslag")
 //    fun avslå(
@@ -51,13 +58,13 @@ class BoutgifterVedtakController(
 //        lagreVedtak(behandlingId, vedtak)
 //    }
 
-//    fun lagreVedtak(
-//        behandlingId: BehandlingId,
-//        vedtak: VedtakBoutgifterRequest,
-//    ) {
-//        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
-//        stegService.håndterSteg(behandlingId, steg, vedtak)
-//    }
+    fun lagreVedtak(
+        behandlingId: BehandlingId,
+        vedtak: VedtakBoutgifterRequest,
+    ) {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
+        stegService.håndterSteg(behandlingId, steg, vedtak)
+    }
 
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
@@ -66,8 +73,11 @@ class BoutgifterVedtakController(
     ): BeregningsresultatBoutgifterDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         return beregningService
-            .beregn(behandling, vedtak.vedtaksperioder.tilDomene())
-            .tilDto(revurderFra = behandling.revurderFra)
+            .beregn(
+                behandling = behandling,
+                vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
+                typeVedtak = TypeVedtak.INNVILGELSE,
+            ).tilDto(revurderFra = behandling.revurderFra)
     }
 
     @GetMapping("{behandlingId}")
@@ -75,10 +85,10 @@ class BoutgifterVedtakController(
         @PathVariable behandlingId: BehandlingId,
     ): VedtakResponse? {
         return null
-//        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-//        val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
-//        val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
-//        return VedtakDtoMapper.toDto(vedtak, revurderFra)
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
+        val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
+        return VedtakDtoMapper.toDto(vedtak, revurderFra)
     }
 
 //    @GetMapping("/fullstendig-oversikt/{behandlingId}")

@@ -18,7 +18,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.splittTilLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.LæremidlerVedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
@@ -115,7 +115,7 @@ class StepDefinitions {
 
     @Når("splitter vedtaksperioder for læremidler")
     fun `splitter vedtaksperioder for læremidler`() {
-        vedtaksperioderSplittet = vedtaksPerioder.grupperVedtaksperioderPerLøpendeMåned()
+        vedtaksperioderSplittet = vedtaksPerioder.splittTilLøpendeMåneder()
     }
 
     @Når("validerer vedtaksperiode for læremidler")

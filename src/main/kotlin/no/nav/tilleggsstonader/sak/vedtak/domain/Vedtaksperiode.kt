@@ -46,7 +46,7 @@ data class Vedtaksperiode(
         )
 }
 
-fun List<Vedtaksperiode>.tilDto() = map { it.tilDto() }
+fun List<Vedtaksperiode>.tilVedtaksperiodeDto() = map { it.tilDto() }
 
 fun List<Vedtaksperiode>.tilVedtaksperiodeBeregning() =
     map {

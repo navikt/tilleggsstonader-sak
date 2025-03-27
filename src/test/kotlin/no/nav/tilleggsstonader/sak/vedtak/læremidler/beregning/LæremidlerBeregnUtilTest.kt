@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.splittTilLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -20,7 +20,7 @@ class LæremidlerBeregnUtilTest {
                     tom = LocalDate.of(2025, 1, 4),
                 ),
             )
-        val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
+        val perioder = vedtaksperioder.splittTilLøpendeMåneder()
         assertThat(perioder).hasSize(2)
 
         with(perioder[0]) {
@@ -50,7 +50,7 @@ class LæremidlerBeregnUtilTest {
                         tom = LocalDate.of(2025, 2, 2),
                     ),
                 )
-            val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
+            val perioder = vedtaksperioder.splittTilLøpendeMåneder()
             assertThat(perioder).isEmpty()
         }
     }
@@ -66,7 +66,7 @@ class LæremidlerBeregnUtilTest {
                         tom = LocalDate.of(2024, 1, 15),
                     ),
                 )
-            val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
+            val perioder = vedtaksperioder.splittTilLøpendeMåneder()
             assertThat(perioder).hasSize(1)
             with(perioder.single()) {
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 5))
@@ -90,7 +90,7 @@ class LæremidlerBeregnUtilTest {
                         tom = LocalDate.of(2024, 3, 2),
                     ),
                 )
-            val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
+            val perioder = vedtaksperioder.splittTilLøpendeMåneder()
             assertThat(perioder).hasSize(2)
             with(perioder[0]) {
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 5))
@@ -121,7 +121,7 @@ class LæremidlerBeregnUtilTest {
                         tom = LocalDate.of(2024, 1, 7),
                     ),
                 )
-            val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
+            val perioder = vedtaksperioder.splittTilLøpendeMåneder()
             assertThat(perioder).hasSize(1)
             with(perioder.single()) {
                 assertThat(fom).isEqualTo(førsteJan2024)
@@ -145,7 +145,7 @@ class LæremidlerBeregnUtilTest {
                         tom = LocalDate.of(2024, 2, 4),
                     ),
                 )
-            val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
+            val perioder = vedtaksperioder.splittTilLøpendeMåneder()
             assertThat(perioder).hasSize(1)
             with(perioder.single()) {
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 5))
@@ -169,7 +169,7 @@ class LæremidlerBeregnUtilTest {
                         tom = LocalDate.of(2024, 2, 4),
                     ),
                 )
-            val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
+            val perioder = vedtaksperioder.splittTilLøpendeMåneder()
             assertThat(perioder).hasSize(1)
             with(perioder.single()) {
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 5))
@@ -193,7 +193,7 @@ class LæremidlerBeregnUtilTest {
                         tom = LocalDate.of(2024, 2, 28),
                     ),
                 )
-            val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
+            val perioder = vedtaksperioder.splittTilLøpendeMåneder()
             assertThat(perioder).hasSize(2)
             with(perioder[0]) {
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 5))

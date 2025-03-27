@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.splittTilLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
@@ -38,6 +38,7 @@ class BoutgifterBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
+        typeVedtak: TypeVedtak,
     ): BeregningsresultatBoutgifter {
 //        val forrigeVedtak = hentForrigeVedtak(behandling)
         // TODO: Deal med revurderFra-datoen
@@ -49,7 +50,7 @@ class BoutgifterBeregningService(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             utgifter = utgifterPerVilkårtype,
-            typeVedtak = TypeVedtak.INNVILGELSE,
+            typeVedtak = typeVedtak,
         )
 
         val vedtaksperioderBeregning =
@@ -77,7 +78,7 @@ class BoutgifterBeregningService(
     ): List<BeregningsresultatForLøpendeMåned> =
         vedtaksperioder
             .sorted()
-            .grupperVedtaksperioderPerLøpendeMåned()
+            .splittTilLøpendeMåneder()
             .map { UtbetalingPeriode(it) }
             .validerIngenUtgifterKrysserUtbetalingsperioder(utgifter)
             .map {
