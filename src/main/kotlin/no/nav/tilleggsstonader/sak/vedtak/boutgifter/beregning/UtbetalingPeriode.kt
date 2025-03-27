@@ -58,7 +58,7 @@ data class UtbetalingPeriode(
                 ?: brukerfeil(
                     "Det finnes flere ulike målgrupper i utbetalingsperioden ${løpendeMåned.formatertPeriodeNorskFormat()}. Dette er foreløpig ikke noe vi har støtte for.",
                 ),
-        utbetalingsdato = løpendeMåned.utbetalingsdato,
+        utbetalingsdato = løpendeMåned.fom,
     )
 }
 

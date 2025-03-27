@@ -46,28 +46,6 @@ class BoutgifterBeregningServiceTest {
         )
 
     val behandling = saksbehandling()
-    val vedtaksperioder =
-        listOf(
-            Vedtaksperiode(
-                id = UUID.randomUUID(),
-                fom = LocalDate.of(2025, 1, 1),
-                tom = LocalDate.of(2025, 1, 31),
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
-            ),
-        )
-
-    val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
-        mapOf(
-            TypeBoutgift.UTGIFTER_OVERNATTING to
-                listOf(
-                    UtgiftBeregningBoutgifter(
-                        fom = LocalDate.of(2025, 1, 1),
-                        tom = LocalDate.of(2025, 1, 31),
-                        utgift = 3000,
-                    ),
-                ),
-        )
 
     val vilkårperioder =
         Vilkårperioder(
@@ -75,20 +53,252 @@ class BoutgifterBeregningServiceTest {
                 listOf(
                     målgruppe(
                         fom = LocalDate.of(2025, 1, 1),
-                        tom = LocalDate.of(2025, 3, 31),
+                        tom = LocalDate.of(2025, 10, 31),
                     ),
                 ),
             aktiviteter =
                 listOf(
                     aktivitet(
                         fom = LocalDate.of(2025, 1, 1),
-                        tom = LocalDate.of(2025, 3, 31),
+                        tom = LocalDate.of(2025, 10, 31),
                     ),
                 ),
         )
 
+    @Test
+    fun `Kan ikke ha faste- og midlertidig utgifter i samme behandling`() {
+        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+            mapOf(
+                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
+                    listOf(
+                        UtgiftBeregningBoutgifter(
+                            fom = LocalDate.of(2025, 1, 1),
+                            tom = LocalDate.of(2025, 3, 31),
+                            utgift = 3000,
+                        ),
+                    ),
+                TypeBoutgift.UTGIFTER_OVERNATTING to
+                    listOf(
+                        UtgiftBeregningBoutgifter(
+                            fom = LocalDate.of(2025, 1, 1),
+                            tom = LocalDate.of(2025, 1, 3),
+                            utgift = 3000,
+                        ),
+                    ),
+            )
+
+        val vedtaksperioder =
+            listOf(
+                Vedtaksperiode(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2025, 1, 1),
+                    tom = LocalDate.of(2025, 1, 31),
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                ),
+            )
+
+        every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
+
+        assertThatThrownBy {
+            boutgifterBeregningService.beregn(
+                behandling,
+                vedtaksperioder,
+                typeVedtak = TypeVedtak.INNVILGELSE,
+            )
+        }.hasMessage("Foreløbig støtter vi ikke faste- og midlertidig utgift i samme behandling")
+    }
+
+    @Nested
+    inner class LøpendeUtgifter {
+        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+            mapOf(
+                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
+                    listOf(
+                        UtgiftBeregningBoutgifter(
+                            fom = LocalDate.of(2025, 1, 1),
+                            tom = LocalDate.of(2025, 3, 31),
+                            utgift = 3000,
+                        ),
+                    ),
+            )
+
+        val vedtaksperioder =
+            listOf(
+                Vedtaksperiode(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2025, 1, 1),
+                    tom = LocalDate.of(2025, 3, 31),
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                ),
+            )
+
+        @BeforeEach
+        fun setup() {
+            every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
+            every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
+            every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns grunnlagsdataDomain(behandlingId = behandling.id)
+        }
+
+        @Test
+        fun `Kan beregne for løpende utgifter en bolig`() {
+            val forventet =
+                listOf(
+                    BeregningsresultatForLøpendeMåned(
+                        grunnlag =
+                            Beregningsgrunnlag(
+                                fom = LocalDate.of(2025, 1, 1),
+                                tom = LocalDate.of(2025, 1, 31),
+                                utbetalingsdato = LocalDate.of(2025, 1, 1),
+                                utgifter = utgift,
+                                makssats = 4953,
+                                makssatsBekreftet = true,
+                                målgruppe = MålgruppeType.AAP,
+                                aktivitet = AktivitetType.TILTAK,
+                            ),
+                        delAvTidligereUtbetaling = false,
+                    ),
+                    BeregningsresultatForLøpendeMåned(
+                        grunnlag =
+                            Beregningsgrunnlag(
+                                fom = LocalDate.of(2025, 2, 1),
+                                tom = LocalDate.of(2025, 2, 28),
+                                utbetalingsdato = LocalDate.of(2025, 2, 1),
+                                utgifter = utgift,
+                                makssats = 4953,
+                                makssatsBekreftet = true,
+                                målgruppe = MålgruppeType.AAP,
+                                aktivitet = AktivitetType.TILTAK,
+                            ),
+                        delAvTidligereUtbetaling = false,
+                    ),
+                    BeregningsresultatForLøpendeMåned(
+                        grunnlag =
+                            Beregningsgrunnlag(
+                                fom = LocalDate.of(2025, 3, 1),
+                                tom = LocalDate.of(2025, 3, 31),
+                                utbetalingsdato = LocalDate.of(2025, 3, 1),
+                                utgifter = utgift,
+                                makssats = 4953,
+                                makssatsBekreftet = true,
+                                målgruppe = MålgruppeType.AAP,
+                                aktivitet = AktivitetType.TILTAK,
+                            ),
+                        delAvTidligereUtbetaling = false,
+                    ),
+                )
+
+            val res =
+                boutgifterBeregningService
+                    .beregn(
+                        behandling = behandling,
+                        vedtaksperioder = vedtaksperioder,
+                        typeVedtak = TypeVedtak.INNVILGELSE,
+                    ).perioder
+
+            assertThat(res).isEqualTo(forventet)
+        }
+
+        @Test
+        fun `Kan beregne for løpende utgifter to boliger`() {
+            val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+                mapOf(
+                    TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER to
+                        listOf(
+                            UtgiftBeregningBoutgifter(
+                                fom = LocalDate.of(2025, 1, 1),
+                                tom = LocalDate.of(2025, 3, 31),
+                                utgift = 3000,
+                            ),
+                        ),
+                )
+
+            every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
+
+            val forventet =
+                listOf(
+                    BeregningsresultatForLøpendeMåned(
+                        grunnlag =
+                            Beregningsgrunnlag(
+                                fom = LocalDate.of(2025, 1, 1),
+                                tom = LocalDate.of(2025, 1, 31),
+                                utbetalingsdato = LocalDate.of(2025, 1, 1),
+                                utgifter = utgift,
+                                makssats = 4953,
+                                makssatsBekreftet = true,
+                                målgruppe = MålgruppeType.AAP,
+                                aktivitet = AktivitetType.TILTAK,
+                            ),
+                        delAvTidligereUtbetaling = false,
+                    ),
+                    BeregningsresultatForLøpendeMåned(
+                        grunnlag =
+                            Beregningsgrunnlag(
+                                fom = LocalDate.of(2025, 2, 1),
+                                tom = LocalDate.of(2025, 2, 28),
+                                utbetalingsdato = LocalDate.of(2025, 2, 1),
+                                utgifter = utgift,
+                                makssats = 4953,
+                                makssatsBekreftet = true,
+                                målgruppe = MålgruppeType.AAP,
+                                aktivitet = AktivitetType.TILTAK,
+                            ),
+                        delAvTidligereUtbetaling = false,
+                    ),
+                    BeregningsresultatForLøpendeMåned(
+                        grunnlag =
+                            Beregningsgrunnlag(
+                                fom = LocalDate.of(2025, 3, 1),
+                                tom = LocalDate.of(2025, 3, 31),
+                                utbetalingsdato = LocalDate.of(2025, 3, 1),
+                                utgifter = utgift,
+                                makssats = 4953,
+                                makssatsBekreftet = true,
+                                målgruppe = MålgruppeType.AAP,
+                                aktivitet = AktivitetType.TILTAK,
+                            ),
+                        delAvTidligereUtbetaling = false,
+                    ),
+                )
+
+            val res =
+                boutgifterBeregningService
+                    .beregn(
+                        behandling = behandling,
+                        vedtaksperioder = vedtaksperioder,
+                        typeVedtak = TypeVedtak.INNVILGELSE,
+                    ).perioder
+
+            assertThat(res).isEqualTo(forventet)
+        }
+    }
+
     @Nested
     inner class UtgifterOvernatting {
+        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+            mapOf(
+                TypeBoutgift.UTGIFTER_OVERNATTING to
+                    listOf(
+                        UtgiftBeregningBoutgifter(
+                            fom = LocalDate.of(2025, 1, 1),
+                            tom = LocalDate.of(2025, 1, 31),
+                            utgift = 3000,
+                        ),
+                    ),
+            )
+
+        val vedtaksperioder =
+            listOf(
+                Vedtaksperiode(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2025, 1, 1),
+                    tom = LocalDate.of(2025, 1, 31),
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                ),
+            )
+
         @BeforeEach
         fun setup() {
             every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
