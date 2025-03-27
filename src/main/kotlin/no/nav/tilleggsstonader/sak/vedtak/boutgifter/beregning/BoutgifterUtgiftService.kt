@@ -23,10 +23,10 @@ class BoutgifterUtgiftService(
         feilHvis(fom == null || tom == null || utgift == null) {
             "Forventer at fra-dato, til-dato og utgift er satt. Gå tilbake til Vilkår-fanen, og legg til datoer og utgifter der. For utviklerteamet: dette gjelder vilkår=$id."
         }
-        feilHvis(type.erFasteUtgifterBo() && !fom.erFørsteDagIMåneden()) {
+        feilHvis(type.erLøpendeUtgifterBo() && !fom.erFørsteDagIMåneden()) {
             "Noe er feil. Fom skal være satt til første dagen i måneden"
         }
-        feilHvis(type.erFasteUtgifterBo() && !tom.erSisteDagIMåneden()) {
+        feilHvis(type.erLøpendeUtgifterBo() && !tom.erSisteDagIMåneden()) {
             "Noe er feil. Tom skal være satt til siste dagen i måneden"
         }
         return UtgiftBeregningBoutgifter(

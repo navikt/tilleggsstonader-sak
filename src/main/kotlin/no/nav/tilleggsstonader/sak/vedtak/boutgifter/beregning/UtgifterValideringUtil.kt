@@ -13,7 +13,7 @@ object UtgifterValideringUtil {
      *
      */
     fun validerUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>) {
-        brukerfeilHvis(erMidlertidigOgFasteUtgifter(utgifter)) {
+        brukerfeilHvis(erUtgifterOvernattingOgLøpendeUtgifter(utgifter)) {
             "Foreløbig støtter vi ikke faste- og midlertidig utgift i samme behandling"
         }
         brukerfeilHvis(utgifter.values.flatten().isEmpty()) {
@@ -31,12 +31,12 @@ object UtgifterValideringUtil {
         }
     }
 
-    private fun erMidlertidigOgFasteUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>): Boolean {
-        val erFasteUtgifter =
+    private fun erUtgifterOvernattingOgLøpendeUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>): Boolean {
+        val erLøpendeUtgifter =
             utgifter.keys.any {
-                it == TypeBoutgift.FASTE_UTGIFTER_EN_BOLIG || it == TypeBoutgift.FASTE_UTGIFTER_TO_BOLIGER
+                it == TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG || it == TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER
             }
-        val erMidlertidigUtgifter = utgifter.keys.any { it == TypeBoutgift.MIDLERTIDIG_OVERNATTING }
-        return erFasteUtgifter && erMidlertidigUtgifter
+        val erUtgifterOvernatting = utgifter.keys.any { it == TypeBoutgift.UTGIFTER_OVERNATTING }
+        return erLøpendeUtgifter && erUtgifterOvernatting
     }
 }

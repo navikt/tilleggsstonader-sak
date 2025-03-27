@@ -220,7 +220,7 @@ enum class VilkårType(
 
     fun gjelderFlereBarn(): Boolean = this == PASS_BARN
 
-    fun erFasteUtgifterBo(): Boolean = (this == FASTE_UTGIFTER_EN_BOLIG || this == FASTE_UTGIFTER_TO_BOLIGER)
+    fun erLøpendeUtgifterBo(): Boolean = (this == LØPENDE_UTGIFTER_EN_BOLIG || this == LØPENDE_UTGIFTER_TO_BOLIGER)
 
     companion object {
         fun hentVilkårForStønad(stønadstype: Stønadstype): List<VilkårType> =

@@ -81,7 +81,7 @@ class BoutgifterBeregningService(
             .splittTilLøpendeMåneder()
             .map { UtbetalingPeriode(it) }
             .validerIngenUtgifterKrysserUtbetalingsperioder(
-                utgifter[TypeBoutgift.MIDLERTIDIG_OVERNATTING] ?: emptyList(),
+                utgifter[TypeBoutgift.UTGIFTER_OVERNATTING] ?: emptyList(),
             ).map {
                 BeregningsresultatForLøpendeMåned(
                     grunnlag = lagBeregningsGrunnlag(periode = it, utgifter = utgifter),
@@ -262,9 +262,9 @@ class BoutgifterBeregningService(
     ) = utgifter.mapValues { (key, value) ->
         value.filter { utgift ->
             when (key) {
-                TypeBoutgift.MIDLERTIDIG_OVERNATTING -> periode.inneholder(utgift)
-                TypeBoutgift.FASTE_UTGIFTER_EN_BOLIG,
-                TypeBoutgift.FASTE_UTGIFTER_TO_BOLIGER,
+                TypeBoutgift.UTGIFTER_OVERNATTING -> periode.inneholder(utgift)
+                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG,
+                TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER,
                 -> periode.overlapper(utgift)
             }
         }

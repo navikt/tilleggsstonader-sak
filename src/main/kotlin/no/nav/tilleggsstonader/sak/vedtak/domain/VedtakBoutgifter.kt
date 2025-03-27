@@ -14,16 +14,16 @@ enum class TypeVedtakBoutgifter(
 
 enum class TypeBoutgift {
     UTGIFTER_OVERNATTING,
-    FASTE_UTGIFTER_EN_BOLIG,
-    FASTE_UTGIFTER_TO_BOLIGER,
+    LØPENDE_UTGIFTER_EN_BOLIG,
+    LØPENDE_UTGIFTER_TO_BOLIGER,
     ;
 
     companion object {
         fun fraVilkårType(vilkårType: VilkårType) =
             when (vilkårType) {
                 VilkårType.UTGIFTER_OVERNATTING -> UTGIFTER_OVERNATTING
-                VilkårType.FASTE_UTGIFTER_EN_BOLIG -> FASTE_UTGIFTER_EN_BOLIG
-                VilkårType.FASTE_UTGIFTER_TO_BOLIGER -> FASTE_UTGIFTER_TO_BOLIGER
+                VilkårType.LØPENDE_UTGIFTER_EN_BOLIG -> LØPENDE_UTGIFTER_EN_BOLIG
+                VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER -> LØPENDE_UTGIFTER_TO_BOLIGER
                 else -> error("$vilkårType er ikke en gyldig utgiftstype for boutgifter")
             }
     }

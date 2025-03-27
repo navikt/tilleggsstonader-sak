@@ -285,7 +285,7 @@ class VilkårService(
             .findByBehandlingId(behandlingId)
             .filter {
                 it.type == VilkårType.UTGIFTER_OVERNATTING ||
-                    it.type == VilkårType.FASTE_UTGIFTER_EN_BOLIG ||
-                    it.type == VilkårType.FASTE_UTGIFTER_TO_BOLIGER
+                    it.type == VilkårType.LØPENDE_UTGIFTER_EN_BOLIG ||
+                    it.type == VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER
             }
 }
