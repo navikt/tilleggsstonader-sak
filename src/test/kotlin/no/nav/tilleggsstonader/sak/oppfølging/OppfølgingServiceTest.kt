@@ -110,6 +110,16 @@ class OppfølgingServiceTest {
         }
 
         @Test
+        fun `skal ikke finne treff hvis det ikke finnes noen vedtaksperioder`() {
+            val ytelse = periodeAAP(fom = vedtaksperiode.fom.plusDays(3), tom = vedtaksperiode.tom)
+            every { ytelseService.hentYtelseForGrunnlag(any(), any(), any(), any()) } returns
+                ytelsePerioderDto(perioder = listOf(ytelse))
+            mockVedtakTilsynBarn()
+
+            assertThat(opprettOppfølging()).isNull()
+        }
+
+        @Test
         fun `skal finne treff hvis ytelsen slutter tidligere`() {
             val ytelse = periodeAAP(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom.minusDays(5))
             every { ytelseService.hentYtelseForGrunnlag(any(), any(), any(), any()) } returns

@@ -119,6 +119,9 @@ class OppfølgingService(
         fagsak: FagsakMetadata,
     ): List<PeriodeForKontroll> {
         val vedtaksperioder = hentVedtaksperioder(fagsak, behandling)
+        if (vedtaksperioder.isEmpty()) {
+            return emptyList()
+        }
 
         val fom = vedtaksperioder.minOf { it.fom }
         val tom = vedtaksperioder.maxOf { it.tom }
@@ -144,7 +147,12 @@ class OppfølgingService(
 
             // TODO Læremidler har ennå ikke vedtaksperioder
             Stønadstype.LÆREMIDLER ->
-                hentVedtak<InnvilgelseEllerOpphørLæremidler>(behandling).beregningsresultat.perioder.map { Vedtaksperiode(it) }
+                hentVedtak<InnvilgelseEllerOpphørLæremidler>(behandling).beregningsresultat.perioder.map {
+                    Vedtaksperiode(
+                        it,
+                    )
+                }
+
             Stønadstype.BOUTGIFTER -> TODO()
         }
 
