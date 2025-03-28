@@ -147,11 +147,17 @@ class OppfølgingService(
 
             // TODO Læremidler har ennå ikke vedtaksperioder
             Stønadstype.LÆREMIDLER ->
-                hentVedtak<InnvilgelseEllerOpphørLæremidler>(behandling).beregningsresultat.perioder.map {
-                    Vedtaksperiode(
-                        it,
+                hentVedtak<InnvilgelseEllerOpphørLæremidler>(behandling)
+                    .beregningsresultat.perioder
+                    .map { Vedtaksperiode(it) }
+                    .sorted()
+                    .mergeSammenhengende(
+                        { v1, v2 ->
+                            v1.overlapperEllerPåfølgesAv(v2) &&
+                                v1.målgruppe == v2.målgruppe && v1.aktivitet == v2.aktivitet
+                        },
+                        { v1, v2 -> v1.medPeriode(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
                     )
-                }
 
             Stønadstype.BOUTGIFTER -> TODO()
         }
