@@ -3,13 +3,13 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20250317161652_fe22655"
+val familieProsesseringVersion = "2.20250324083707_24007c5"
 val tilleggsstønaderLibsVersion = "2025.03.26-07.54.c2457e01a6c4"
 val tilleggsstønaderKontrakterVersion = "2025.03.24-08.34.c5f84c4f3794"
 val avroVersion = "1.12.0"
 val confluentVersion = "7.9.0"
 val joarkHendelseVersion = "08271806"
-val tokenSupportVersion = "5.0.20"
+val tokenSupportVersion = "5.0.24"
 val wiremockVersion = "3.12.1"
 val mockkVersion = "1.13.17"
 val testcontainerVersion = "1.20.6"
