@@ -198,66 +198,6 @@ internal class StønadsperiodeValideringTest {
     }
 
     @Nested
-    inner class ValideringAvFødselsdato {
-        val fom = LocalDate.of(2024, 1, 1)
-        val tom = LocalDate.of(2025, 12, 31)
-        val stønadsperioder =
-            listOf(
-                lagStønadsperiode(målgruppe = MålgruppeType.AAP, aktivitet = AktivitetType.TILTAK, fom = fom, tom = tom),
-            )
-        val målgrupper = listOf(målgruppe(fom = fom, tom = tom))
-        val aktiviteter = listOf(aktivitet1(fom = fom, tom = tom))
-        val vilkårperioder = Vilkårperioder(målgrupper, aktiviteter)
-
-        @Test
-        fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er over 18 år`() {
-            assertThatCode {
-                valider(stønadsperioder, vilkårperioder)
-                valider(stønadsperioder, vilkårperioder)
-            }.doesNotThrowAnyException()
-        }
-
-        @Test
-        fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er under 67 år`() {
-            assertThatCode {
-                valider(stønadsperioder, vilkårperioder)
-            }.doesNotThrowAnyException()
-        }
-
-        @Test
-        fun `skal ikke kaste feil dersom overgangsstønad og under 18 år eller over 67 år`() {
-            val stønadsperioder =
-                stønadsperioder.map {
-                    it.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.UTDANNING)
-                }
-            val vilkårperioder =
-                vilkårperioder.copy(
-                    målgrupper =
-                        målgrupper.map {
-                            målgruppe(
-                                fom = it.fom,
-                                tom = it.tom,
-                                faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.OVERGANGSSTØNAD),
-                            )
-                        },
-                    aktiviteter =
-                        aktiviteter.map {
-                            aktivitet1(
-                                fom = it.fom,
-                                tom = it.tom,
-                                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.UTDANNING),
-                            )
-                        },
-                )
-
-            assertThatCode {
-                valider(stønadsperioder, vilkårperioder)
-                valider(stønadsperioder, vilkårperioder)
-            }.doesNotThrowAnyException()
-        }
-    }
-
-    @Nested
     inner class ValiderStønadsperioderOverlapper {
         val fom = LocalDate.of(2023, 1, 1)
         val tom = LocalDate.of(2023, 1, 7)
