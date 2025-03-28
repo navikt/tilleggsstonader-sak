@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service
 @Service
 class TilsynBarnVedtaksperiodeValidingerService(
     private val vilkårperiodeService: VilkårperiodeService,
-    private val grunnlagsdataService: GrunnlagsdataService,
     private val vedtakRepository: VedtakRepository,
 ) {
     fun validerVedtaksperioder(
