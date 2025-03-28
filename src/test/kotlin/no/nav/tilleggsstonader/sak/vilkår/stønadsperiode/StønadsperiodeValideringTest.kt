@@ -209,21 +209,18 @@ internal class StønadsperiodeValideringTest {
         val aktiviteter = listOf(aktivitet1(fom = fom, tom = tom))
         val vilkårperioder = Vilkårperioder(målgrupper, aktiviteter)
 
-        val dato18årGammel = fom.minusYears(18)
-        val dato67årGammel = tom.minusYears(67)
-
         @Test
         fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er over 18 år`() {
             assertThatCode {
-                valider(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel)
-                valider(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel.minusDays(1))
+                valider(stønadsperioder, vilkårperioder)
+                valider(stønadsperioder, vilkårperioder)
             }.doesNotThrowAnyException()
         }
 
         @Test
         fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er under 67 år`() {
             assertThatCode {
-                valider(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel.plusDays(1))
+                valider(stønadsperioder, vilkårperioder)
             }.doesNotThrowAnyException()
         }
 
@@ -254,8 +251,8 @@ internal class StønadsperiodeValideringTest {
                 )
 
             assertThatCode {
-                valider(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel.minusYears(1))
-                valider(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel.plusYears(1))
+                valider(stønadsperioder, vilkårperioder)
+                valider(stønadsperioder, vilkårperioder)
             }.doesNotThrowAnyException()
         }
     }
@@ -743,23 +740,19 @@ internal class StønadsperiodeValideringTest {
     fun valider(
         stønadsperioder: List<StønadsperiodeDto>,
         vilkårperioder: Vilkårperioder,
-        fødselsdato: LocalDate? = null,
     ) = StønadsperiodeValidering.valider(
         stønadsperioder = stønadsperioder,
         vilkårperioder = vilkårperioder,
-        fødselsdato = fødselsdato,
     )
 
     fun validerEnkeltperiode(
         stønadsperiode: StønadsperiodeDto,
         målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
         aktivitetPerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
-        fødselsdato: LocalDate? = null,
     ) = StønadsperiodeValidering.validerEnkeltperiode(
         stønadsperiode = stønadsperiode,
         målgruppePerioderPerType = målgruppePerioderPerType,
         aktivitetPerioderPerType = aktivitetPerioderPerType,
-        fødselsdato = fødselsdato,
     )
 
     private fun feilmeldingIkkeOverlappendePeriode(

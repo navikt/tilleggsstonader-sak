@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
-import java.time.LocalDate
 
 object StønadsperiodeValidering {
     /**
@@ -21,7 +20,7 @@ object StønadsperiodeValidering {
     fun validerStønadsperioderVedEndringAvVilkårperiode(
         stønadsperioder: List<StønadsperiodeDto>,
         vilkårperioder: Vilkårperioder,
-    ) = valider(stønadsperioder, vilkårperioder, null)
+    ) = valider(stønadsperioder, vilkårperioder)
 
     /**
      * @param fødselsdato er nullable då alle behandlinger ikke har [fødselsdato] i grunnlagsdata fra før
@@ -29,14 +28,13 @@ object StønadsperiodeValidering {
     fun valider(
         stønadsperioder: List<StønadsperiodeDto>,
         vilkårperioder: Vilkårperioder,
-        fødselsdato: LocalDate?,
     ) {
         validerIkkeOverlappendeStønadsperioder(stønadsperioder)
         val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeOppfylteVilkårperioder()
         val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteVilkårperioder()
 
         validerAtStønadsperioderIkkeOverlapperMedVilkårPeriodeUtenRett(vilkårperioder, stønadsperioder)
-        stønadsperioder.forEach { validerEnkeltperiode(it, målgrupper, aktiviteter, fødselsdato) }
+        stønadsperioder.forEach { validerEnkeltperiode(it, målgrupper, aktiviteter) }
     }
 
     private fun validerIkkeOverlappendeStønadsperioder(stønadsperioder: List<StønadsperiodeDto>) {
@@ -55,7 +53,6 @@ object StønadsperiodeValidering {
         stønadsperiode: StønadsperiodeDto,
         målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
         aktivitetPerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
-        fødselsdato: LocalDate?,
     ) {
         brukerfeilHvisIkke(stønadsperiode.målgruppe.gyldigeAktiviter.contains(stønadsperiode.aktivitet)) {
             "Kombinasjonen av ${stønadsperiode.målgruppe} og ${stønadsperiode.aktivitet} er ikke gyldig"
