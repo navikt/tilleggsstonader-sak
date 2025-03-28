@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service
 @Service
 class BoutgifterVedtaksperiodeValideringService(
     private val vilkårperiodeService: VilkårperiodeService,
-    private val grunnlagsdataService: GrunnlagsdataService,
     private val vedtakRepository: VedtakRepository,
 ) {
     fun validerVedtaksperioder(
@@ -43,18 +41,11 @@ class BoutgifterVedtaksperiodeValideringService(
         val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeOppfylteVilkårperioder()
         val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteVilkårperioder()
 
-        val fødselsdato =
-            grunnlagsdataService
-                .hentGrunnlagsdata(behandling.id)
-                .grunnlag.fødsel
-                ?.fødselsdatoEller1JanForFødselsår()
-
         vedtaksperioder.forEach {
             validerEnkeltperiode(
                 vedtaksperiode = it,
                 målgruppePerioderPerType = målgrupper,
                 aktivitetPerioderPerType = aktiviteter,
-                fødselsdato = fødselsdato,
             )
         }
 

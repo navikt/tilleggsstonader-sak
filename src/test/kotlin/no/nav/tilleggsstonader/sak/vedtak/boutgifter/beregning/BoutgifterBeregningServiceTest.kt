@@ -34,7 +34,6 @@ class BoutgifterBeregningServiceTest {
     val vedtaksperiodeValideringService =
         BoutgifterVedtaksperiodeValideringService(
             vilkårperiodeService = vilkårperiodeService,
-            grunnlagsdataService = grunnlagsdataService,
             vedtakRepository = vedtakRepository,
         )
 

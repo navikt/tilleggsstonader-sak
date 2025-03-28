@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
-import java.time.LocalDate
 
 object VedtaksperiodeValideringUtils {
     fun validerVedtaksperioderEksisterer(vedtaksperioder: List<Vedtaksperiode>) {
@@ -58,7 +57,6 @@ object VedtaksperiodeValideringUtils {
         vedtaksperiode: Vedtaksperiode,
         målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
         aktivitetPerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
-        fødselsdato: LocalDate?,
     ) {
         brukerfeilHvisIkke(vedtaksperiode.målgruppe.gyldigeAktiviter.contains(vedtaksperiode.aktivitet)) {
             "Kombinasjonen av ${vedtaksperiode.målgruppe} og ${vedtaksperiode.aktivitet} er ikke gyldig"
