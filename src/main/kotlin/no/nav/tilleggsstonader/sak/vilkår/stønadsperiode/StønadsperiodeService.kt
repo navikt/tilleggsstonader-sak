@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurderFraValidering.validerEndrePeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurderFraValidering.validerNyPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
@@ -24,7 +23,6 @@ class StønadsperiodeService(
     private val behandlingService: BehandlingService,
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperiodeService: VilkårperiodeService,
-    private val grunnlagsdataService: GrunnlagsdataService,
 ) {
     fun hentStønadsperioder(behandlingId: BehandlingId): List<StønadsperiodeDto> =
         stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()

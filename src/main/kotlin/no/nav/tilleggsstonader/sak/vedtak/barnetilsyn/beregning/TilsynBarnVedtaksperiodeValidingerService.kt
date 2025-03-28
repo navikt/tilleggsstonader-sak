@@ -43,18 +43,11 @@ class TilsynBarnVedtaksperiodeValidingerService(
         val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeOppfylteVilkårperioder()
         val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteVilkårperioder()
 
-        val fødselsdato =
-            grunnlagsdataService
-                .hentGrunnlagsdata(behandling.id)
-                .grunnlag.fødsel
-                ?.fødselsdatoEller1JanForFødselsår()
-
         vedtaksperioder.forEach {
             validerEnkeltperiode(
                 vedtaksperiode = it,
                 målgruppePerioderPerType = målgrupper,
                 aktivitetPerioderPerType = aktiviteter,
-                fødselsdato = fødselsdato,
             )
         }
 
