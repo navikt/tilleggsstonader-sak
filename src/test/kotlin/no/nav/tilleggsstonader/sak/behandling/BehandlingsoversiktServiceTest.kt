@@ -13,9 +13,9 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregni
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -88,7 +88,7 @@ class BehandlingsoversiktServiceTest {
                 VedtaksperiodeBeregning(
                     fom = LocalDate.of(2024, 3, 1),
                     tom = LocalDate.of(2024, 3, 13),
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.AAP,
                     aktivitet = AktivitetType.TILTAK,
                 ),
                 emptyList(),
@@ -99,7 +99,7 @@ class BehandlingsoversiktServiceTest {
                 VedtaksperiodeBeregning(
                     fom = LocalDate.of(2024, 3, 2),
                     tom = LocalDate.of(2024, 3, 14),
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.AAP,
                     aktivitet = AktivitetType.TILTAK,
                 ),
                 emptyList(),

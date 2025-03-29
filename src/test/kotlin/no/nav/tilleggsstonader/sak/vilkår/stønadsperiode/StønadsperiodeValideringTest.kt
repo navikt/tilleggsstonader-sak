@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilDto
@@ -14,7 +15,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
@@ -29,9 +29,9 @@ import java.util.UUID
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet as aktivitet1
 
 internal class StønadsperiodeValideringTest {
-    val målgrupper: Map<MålgruppeType, List<Datoperiode>> =
+    val målgrupper: Map<FaktiskMålgruppe, List<Datoperiode>> =
         mapOf(
-            MålgruppeType.AAP to
+            FaktiskMålgruppe.AAP to
                 listOf(
                     Datoperiode(
                         fom = LocalDate.of(2023, 1, 1),
@@ -67,7 +67,7 @@ internal class StønadsperiodeValideringTest {
     @Test
     internal fun `skal kaste feil om kombinasjon av målgruppe og aktivitet er ugyldig`() {
         val stønadsperiode =
-            lagStønadsperiode(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.TILTAK)
+            lagStønadsperiode(målgruppe = FaktiskMålgruppe.OVERGANGSSTØNAD, aktivitet = AktivitetType.TILTAK)
 
         assertThatThrownBy {
             validerEnkeltperiode(
@@ -80,7 +80,7 @@ internal class StønadsperiodeValideringTest {
 
     @Test
     internal fun `skal kaste feil om ingen periode for målgruppe matcher`() {
-        val stønadsperiode = lagStønadsperiode(målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE)
+        val stønadsperiode = lagStønadsperiode(målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)
 
         assertThatThrownBy {
             validerEnkeltperiode(
@@ -203,7 +203,7 @@ internal class StønadsperiodeValideringTest {
         val tom = LocalDate.of(2025, 12, 31)
         val stønadsperioder =
             listOf(
-                lagStønadsperiode(målgruppe = MålgruppeType.AAP, aktivitet = AktivitetType.TILTAK, fom = fom, tom = tom),
+                lagStønadsperiode(målgruppe = FaktiskMålgruppe.AAP, aktivitet = AktivitetType.TILTAK, fom = fom, tom = tom),
             )
         val målgrupper = listOf(målgruppe(fom = fom, tom = tom))
         val aktiviteter = listOf(aktivitet1(fom = fom, tom = tom))
@@ -231,7 +231,7 @@ internal class StønadsperiodeValideringTest {
         fun `skal ikke kaste feil dersom overgangsstønad og under 18 år eller over 67 år`() {
             val stønadsperioder =
                 stønadsperioder.map {
-                    it.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.UTDANNING)
+                    it.copy(målgruppe = FaktiskMålgruppe.OVERGANGSSTØNAD, aktivitet = AktivitetType.UTDANNING)
                 }
             val vilkårperioder =
                 vilkårperioder.copy(
@@ -580,7 +580,7 @@ internal class StønadsperiodeValideringTest {
                     stønadsperiode(
                         behandlingId = behandlingId,
                         aktivitet = AktivitetType.TILTAK,
-                        målgruppe = MålgruppeType.AAP,
+                        målgruppe = FaktiskMålgruppe.AAP,
                         fom = fom,
                         tom = tom,
                     ).tilDto(),
@@ -752,7 +752,7 @@ internal class StønadsperiodeValideringTest {
 
     fun validerEnkeltperiode(
         stønadsperiode: StønadsperiodeDto,
-        målgruppePerioderPerType: Map<MålgruppeType, List<Datoperiode>>,
+        målgruppePerioderPerType: Map<FaktiskMålgruppe, List<Datoperiode>>,
         aktivitetPerioderPerType: Map<AktivitetType, List<Datoperiode>>,
         fødselsdato: LocalDate? = null,
     ) = StønadsperiodeValidering.validerEnkeltperiode(
@@ -762,16 +762,16 @@ internal class StønadsperiodeValideringTest {
         fødselsdato = fødselsdato,
     )
 
-    private fun feilmeldingIkkeOverlappendePeriode(
+    private fun <T : Enum<T>> feilmeldingIkkeOverlappendePeriode(
         stønadsperiode: StønadsperiodeDto,
-        type: VilkårperiodeType,
+        type: T,
     ) = "Finnes ingen periode med oppfylte vilkår for $type i perioden " +
         "${stønadsperiode.fom.norskFormat()} - ${stønadsperiode.tom.norskFormat()}"
 
     private fun lagStønadsperiode(
         fom: LocalDate = LocalDate.of(2023, 1, 4),
         tom: LocalDate = LocalDate.of(2023, 1, 10),
-        målgruppe: MålgruppeType = MålgruppeType.AAP,
+        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
         status: StønadsperiodeStatus = StønadsperiodeStatus.NY,
     ): StønadsperiodeDto =

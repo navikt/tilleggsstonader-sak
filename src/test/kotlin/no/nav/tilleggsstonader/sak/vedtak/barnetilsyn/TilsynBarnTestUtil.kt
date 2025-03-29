@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -23,7 +24,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
@@ -52,8 +52,8 @@ object TilsynBarnTestUtil {
 
     val beløpsperioderDefault =
         listOf(
-            Beløpsperiode(dato = LocalDate.now(), beløp = 1000, målgruppe = MålgruppeType.AAP),
-            Beløpsperiode(dato = LocalDate.now().plusDays(7), beløp = 2000, målgruppe = MålgruppeType.OVERGANGSSTØNAD),
+            Beløpsperiode(dato = LocalDate.now(), beløp = 1000, målgruppe = FaktiskMålgruppe.AAP),
+            Beløpsperiode(dato = LocalDate.now().plusDays(7), beløp = 2000, målgruppe = FaktiskMålgruppe.OVERGANGSSTØNAD),
         )
 
     val defaultVedtaksperiode =
@@ -61,14 +61,14 @@ object TilsynBarnTestUtil {
             id = defaultVedtaksperiodeId,
             fom = LocalDate.of(2024, 1, 1),
             tom = LocalDate.of(2024, 1, 31),
-            målgruppe = MålgruppeType.AAP,
+            målgruppe = FaktiskMålgruppe.AAP,
             aktivitet = AktivitetType.TILTAK,
         )
 
     fun vedtaksperiodeBeregning(
         fom: LocalDate = LocalDate.of(2024, 1, 1),
         tom: LocalDate = LocalDate.of(2024, 1, 31),
-        målgruppe: MålgruppeType = MålgruppeType.AAP,
+        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
     ) = VedtaksperiodeBeregning(
         fom = fom,

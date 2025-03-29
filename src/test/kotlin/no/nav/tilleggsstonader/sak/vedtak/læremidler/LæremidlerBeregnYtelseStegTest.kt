@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
@@ -29,7 +30,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -241,7 +241,7 @@ class LæremidlerBeregnYtelseStegTest(
                 behandlingId = behandling.id,
                 fom = førsteJan,
                 tom = sisteJan,
-                målgruppe = MålgruppeType.AAP,
+                målgruppe = FaktiskMålgruppe.AAP,
                 aktivitet = AktivitetType.UTDANNING,
             )
         val stønadsperiode2 =
@@ -249,7 +249,7 @@ class LæremidlerBeregnYtelseStegTest(
                 behandlingId = behandling.id,
                 fom = førsteFeb,
                 tom = sisteFeb,
-                målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                målgruppe = FaktiskMålgruppe.OVERGANGSSTØNAD,
                 aktivitet = AktivitetType.UTDANNING,
             )
         val aktivitet =
@@ -301,14 +301,14 @@ class LæremidlerBeregnYtelseStegTest(
                 behandlingId = behandling.id,
                 fom = førsteJan,
                 tom = sisteJan,
-                målgruppe = MålgruppeType.AAP,
+                målgruppe = FaktiskMålgruppe.AAP,
             )
         val stønadsperiode2 =
             stønadsperiode(
                 behandlingId = behandling.id,
                 fom = førsteFeb,
                 tom = sisteFeb,
-                målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
             )
         val aktivitet =
             aktivitet(

@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
@@ -121,7 +122,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 periode.copy(
                     fom = førsteJanuar.plusDays(1),
                     tom = førsteJanuar.plusDays(10),
-                    målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                    målgruppe = FaktiskMålgruppe.OVERGANGSSTØNAD,
                     aktivitet = AktivitetType.UTDANNING,
                 )
             val oppdatertePerioder =
@@ -133,7 +134,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
             with(stønadsperiodeRepository.findAllByBehandlingId(behandling.id).single()) {
                 assertThat(fom).isEqualTo(førsteJanuar.plusDays(1))
                 assertThat(tom).isEqualTo(førsteJanuar.plusDays(10))
-                assertThat(målgruppe).isEqualTo(MålgruppeType.OVERGANGSSTØNAD)
+                assertThat(målgruppe).isEqualTo(FaktiskMålgruppe.OVERGANGSSTØNAD)
                 assertThat(aktivitet).isEqualTo(AktivitetType.UTDANNING)
                 assertThat(status).isEqualTo(StønadsperiodeStatus.NY)
 
@@ -193,7 +194,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 førsteStønadsperiode.copy(
                     fom = førsteJanuar.plusDays(1),
                     tom = førsteJanuar.plusDays(1),
-                    målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                    målgruppe = FaktiskMålgruppe.OVERGANGSSTØNAD,
                     aktivitet = AktivitetType.UTDANNING,
                 )
             val nyPeriode = stønadsperiodeDto(fom = førsteJanuar.plusDays(10), tom = førsteJanuar.plusDays(10))
@@ -254,7 +255,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 behandlingId = behandling.id,
                 fom = enMånedSiden,
                 tom = enMånedFram,
-                målgruppe = MålgruppeType.AAP,
+                målgruppe = FaktiskMålgruppe.AAP,
                 aktivitet = AktivitetType.TILTAK,
                 status = StønadsperiodeStatus.UENDRET,
             )
@@ -345,7 +346,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                     StønadsperiodeDto(
                         fom = now().plusDays(1),
                         tom = now().plusMonths(1),
-                        målgruppe = MålgruppeType.AAP,
+                        målgruppe = FaktiskMålgruppe.AAP,
                         aktivitet = AktivitetType.TILTAK,
                         status = null,
                     )
@@ -369,14 +370,14 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                         behandlingId = revurdering.forrigeIverksatteBehandlingId!!,
                         fom = LocalDate.of(2024, 1, 1),
                         tom = LocalDate.of(2024, 1, 31),
-                        målgruppe = MålgruppeType.AAP,
+                        målgruppe = FaktiskMålgruppe.AAP,
                         aktivitet = AktivitetType.TILTAK,
                     ),
                     stønadsperiode(
                         behandlingId = revurdering.forrigeIverksatteBehandlingId,
                         fom = LocalDate.of(2024, 2, 1),
                         tom = LocalDate.of(2024, 1, 10),
-                        målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                        målgruppe = FaktiskMålgruppe.OVERGANGSSTØNAD,
                         aktivitet = AktivitetType.UTDANNING,
                     ),
                 )
@@ -412,7 +413,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 behandlingId = behandling.id,
                 fom = enMånedSiden,
                 tom = enMånedFram,
-                målgruppe = MålgruppeType.AAP,
+                målgruppe = FaktiskMålgruppe.AAP,
                 aktivitet = AktivitetType.TILTAK,
                 status = StønadsperiodeStatus.UENDRET,
             )
@@ -455,7 +456,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 StønadsperiodeDto(
                     fom = now().plusDays(1),
                     tom = now().plusMonths(1),
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.AAP,
                     aktivitet = AktivitetType.TILTAK,
                     status = null,
                 )
@@ -508,7 +509,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         id: UUID? = null,
         fom: LocalDate = this.førsteJanuar,
         tom: LocalDate = this.sisteJanuar,
-        målgruppeType: MålgruppeType = MålgruppeType.AAP,
+        målgruppeType: FaktiskMålgruppe = FaktiskMålgruppe.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
         status: StønadsperiodeStatus = StønadsperiodeStatus.NY,
     ) = StønadsperiodeDto(

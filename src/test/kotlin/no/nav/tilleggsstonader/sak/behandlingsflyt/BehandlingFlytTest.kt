@@ -31,6 +31,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringStegService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
@@ -310,7 +311,7 @@ class BehandlingFlytTest(
                 StønadsperiodeDto(
                     fom = fom,
                     tom = tom,
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.AAP,
                     aktivitet = AktivitetType.TILTAK,
                     status = StønadsperiodeStatus.NY,
                 ),
@@ -444,7 +445,7 @@ class BehandlingFlytTest(
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
-                    målgruppeType = MålgruppeType.AAP,
+                    målgruppeType = FaktiskMålgruppe.AAP,
                     aktivitetType = AktivitetType.TILTAK,
                 ),
             )

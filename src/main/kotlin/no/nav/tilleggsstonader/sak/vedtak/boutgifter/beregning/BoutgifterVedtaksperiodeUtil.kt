@@ -5,9 +5,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
 import no.nav.tilleggsstonader.sak.util.lørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.sisteDagenILøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
 object BoutgifterVedtaksperiodeUtil {
@@ -61,7 +61,7 @@ object BoutgifterVedtaksperiodeUtil {
 data class VedtaksperiodeInnenforÅr(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val målgruppe: MålgruppeType,
+    val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
 ) : Periode<LocalDate> {
     init {
@@ -78,7 +78,7 @@ data class VedtaksperiodeInnenforÅr(
 data class VedtaksperiodeInnenforLøpendeMåned(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val målgruppe: MålgruppeType,
+    val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
 ) : Periode<LocalDate> {
     init {

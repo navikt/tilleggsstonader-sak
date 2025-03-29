@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -325,7 +325,7 @@ class ValiderValiderIngenEndringerFørRevurderFraTest {
             val feil =
                 assertThrows<ApiFeil> {
                     validerIngenEndringerFørRevurderFra(
-                        innsendteVedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD)),
+                        innsendteVedtaksperioder = listOf(vedtaksperiodeJanFeb.copy(målgruppe = FaktiskMålgruppe.OVERGANGSSTØNAD)),
                         vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeJanFeb),
                         revurderFra = førsteMars,
                     )
@@ -401,7 +401,7 @@ class ValiderValiderIngenEndringerFørRevurderFraTest {
     private fun lagVedtaksperiode(
         fom: LocalDate = LocalDate.of(2025, 1, 1),
         tom: LocalDate = LocalDate.of(2025, 1, 31),
-        målgruppe: MålgruppeType = MålgruppeType.AAP,
+        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
     ) = Vedtaksperiode(
         id = UUID.randomUUID(),

@@ -4,12 +4,12 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurderFraValidering.validerEndrePeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurderFraValidering.validerNyPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -184,11 +184,11 @@ class StønadsperiodeRevurderFraValideringTest {
                 stønadsperiode(
                     fom = revurderFra.minusMonths(1),
                     tom = revurderFra.plusMonths(1),
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.AAP,
                     aktivitet = AktivitetType.TILTAK,
                 )
             listOf<(Stønadsperiode) -> Stønadsperiode>(
-                { it.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD) },
+                { it.copy(målgruppe = FaktiskMålgruppe.OVERGANGSSTØNAD) },
                 { it.copy(aktivitet = AktivitetType.UTDANNING) },
             ).forEach { endreVilkårperiode ->
                 assertThatThrownBy {
@@ -256,7 +256,7 @@ class StønadsperiodeRevurderFraValideringTest {
     private fun stønadsperiode(
         fom: LocalDate,
         tom: LocalDate = fom.plusMonths(1),
-        målgruppe: MålgruppeType = MålgruppeType.AAP,
+        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
     ) = stønadsperiode(
         behandlingId = BehandlingId.random(),

@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
@@ -303,6 +304,15 @@ enum class MålgruppeTypeDvh {
                 MålgruppeType.UFØRETRYGD -> UFØRETRYGD
                 MålgruppeType.INGEN_MÅLGRUPPE -> INGEN_MÅLGRUPPE
                 MålgruppeType.SYKEPENGER_100_PROSENT -> SYKEPENGER_100_PROSENT
+            }
+
+        fun fraDomene(målgruppeType: FaktiskMålgruppe) =
+            when (målgruppeType) {
+                FaktiskMålgruppe.AAP -> AAP
+                FaktiskMålgruppe.OMSTILLINGSSTØNAD -> OMSTILLINGSSTØNAD
+                FaktiskMålgruppe.OVERGANGSSTØNAD -> OVERGANGSSTØNAD
+                FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE -> NEDSATT_ARBEIDSEVNE
+                FaktiskMålgruppe.UFØRETRYGD -> UFØRETRYGD
             }
     }
 }

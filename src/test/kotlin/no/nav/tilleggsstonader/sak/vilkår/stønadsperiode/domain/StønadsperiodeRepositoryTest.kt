@@ -4,8 +4,8 @@ import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,7 +23,7 @@ internal class StønadsperiodeRepositoryTest : IntegrationTest() {
                     fom = osloDateNow(),
                     tom = osloDateNow().plusDays(5),
                     behandlingId = behandling.id,
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.AAP,
                     aktivitet = AktivitetType.TILTAK,
                     status = StønadsperiodeStatus.NY,
                 ),
@@ -42,7 +42,7 @@ internal class StønadsperiodeRepositoryTest : IntegrationTest() {
                     fom = osloDateNow(),
                     tom = osloDateNow().plusDays(5),
                     behandlingId = behandling.id,
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.AAP,
                     aktivitet = AktivitetType.TILTAK,
                     status = StønadsperiodeStatus.NY,
                 ),
@@ -54,7 +54,7 @@ internal class StønadsperiodeRepositoryTest : IntegrationTest() {
                     fom = osloDateNow(),
                     tom = osloDateNow().plusDays(5),
                     behandlingId = behandling.id,
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.AAP,
                     aktivitet = AktivitetType.TILTAK,
                     status = StønadsperiodeStatus.NY,
                 ),

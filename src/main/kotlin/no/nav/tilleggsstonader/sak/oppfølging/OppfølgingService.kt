@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
@@ -43,7 +44,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.YearMonth
 import java.util.UUID
 
 @Service
@@ -182,11 +182,12 @@ class OppfølgingService(
 
     private fun Vedtaksperiode.finnEndringIMålgruppe(ytelserPerMålgruppe: Map<MålgruppeType, List<Ytelsesperiode>>): List<Kontroll> =
         when (this.målgruppe) {
-            MålgruppeType.AAP,
-            MålgruppeType.OMSTILLINGSSTØNAD,
-            MålgruppeType.OVERGANGSSTØNAD,
+            FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+            FaktiskMålgruppe.OMSTILLINGSSTØNAD,
+            FaktiskMålgruppe.OVERGANGSSTØNAD,
             -> {
-                val ytelser = ytelserPerMålgruppe[this.målgruppe] ?: emptyList()
+                TODO()
+                /*val ytelser = ytelserPerMålgruppe[this.målgruppe] ?: emptyList()
                 val kontroller = finnKontroller(this, ytelser)
                 val enKontroll = kontroller.singleOrNull()
                 val førsteDagINestNesteMåned = YearMonth.now().plusMonths(1).atEndOfMonth()
@@ -200,6 +201,7 @@ class OppfølgingService(
                 } else {
                     kontroller
                 }
+                 */
             }
 
             else -> emptyList() // Sjekker kun målgrupper som vi henter fra andre systemer
@@ -378,7 +380,7 @@ class OppfølgingService(
     private data class Vedtaksperiode(
         override val fom: LocalDate,
         override val tom: LocalDate,
-        val målgruppe: MålgruppeType,
+        val målgruppe: FaktiskMålgruppe,
         val aktivitet: AktivitetType,
     ) : Periode<LocalDate>,
         KopierPeriode<Vedtaksperiode> {

@@ -9,13 +9,13 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -52,7 +52,7 @@ class BoutgifterBeregningServiceTest {
                 id = UUID.randomUUID(),
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 1, 31),
-                målgruppe = MålgruppeType.AAP,
+                målgruppe = FaktiskMålgruppe.AAP,
                 aktivitet = AktivitetType.TILTAK,
             ),
         )
@@ -109,7 +109,7 @@ class BoutgifterBeregningServiceTest {
                                 utgifter = utgift,
                                 makssats = 4953,
                                 makssatsBekreftet = true,
-                                målgruppe = MålgruppeType.AAP,
+                                målgruppe = FaktiskMålgruppe.AAP,
                                 aktivitet = AktivitetType.TILTAK,
                             ),
                         delAvTidligereUtbetaling = false,
@@ -173,14 +173,14 @@ class BoutgifterBeregningServiceTest {
                         id = UUID.randomUUID(),
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 10),
-                        målgruppe = MålgruppeType.AAP,
+                        målgruppe = FaktiskMålgruppe.AAP,
                         aktivitet = AktivitetType.TILTAK,
                     ),
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
                         fom = LocalDate.of(2025, 1, 25),
                         tom = LocalDate.of(2025, 2, 5),
-                        målgruppe = MålgruppeType.AAP,
+                        målgruppe = FaktiskMålgruppe.AAP,
                         aktivitet = AktivitetType.TILTAK,
                     ),
                 )

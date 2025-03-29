@@ -2,9 +2,9 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
@@ -20,7 +20,7 @@ data class Stønadsperiode(
     val fom: LocalDate,
     val tom: LocalDate,
     @Column("malgruppe")
-    val målgruppe: MålgruppeType,
+    val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
     val status: StønadsperiodeStatus,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)

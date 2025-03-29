@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
@@ -16,7 +17,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
 object LæremidlerTestUtil {
@@ -105,7 +105,7 @@ object LæremidlerTestUtil {
         fom: LocalDate,
         tom: LocalDate,
         utbetalingsdato: LocalDate = fom,
-        målgruppe: MålgruppeType = MålgruppeType.AAP,
+        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
     ): BeregningsresultatForMåned =
         BeregningsresultatForMåned(
@@ -140,7 +140,7 @@ object LæremidlerTestUtil {
             beløp = 875,
             stønadsbeløp = stønadsbeløp,
             utbetalingsdato = utbetalingsdato,
-            målgruppe = MålgruppeType.AAP,
+            målgruppe = FaktiskMålgruppe.AAP,
             aktivitet = AktivitetType.TILTAK,
             delAvTidligereUtbetaling = false,
         )
