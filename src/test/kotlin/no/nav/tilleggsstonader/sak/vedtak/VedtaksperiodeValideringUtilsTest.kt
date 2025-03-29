@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerE
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerIngenOverlappMellomVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.validerUtgiftHeleVedtaksperioden
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteAktiviteter
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteMålgrupper
@@ -368,7 +369,7 @@ class VedtaksperiodeValideringUtilsTest {
             fun `skal ikke kaste feil dersom overgangsstønad og under 18 år eller over 67 år`() {
                 val vedtaksperioder =
                     lagVedtaksperiode(
-                        målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                        målgruppe = FaktiskMålgruppe.OVERGANGSSTØNAD,
                         aktivitet = AktivitetType.UTDANNING,
                     )
 
@@ -536,7 +537,7 @@ class VedtaksperiodeValideringUtilsTest {
         @Test
         fun `skal kaste feil om kombinasjon av målgruppe og aktivitet er ugyldig`() {
             val vedtaksperiode =
-                lagVedtaksperiode(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.TILTAK)
+                lagVedtaksperiode(målgruppe = FaktiskMålgruppe.OVERGANGSSTØNAD, aktivitet = AktivitetType.TILTAK)
 
             assertThatThrownBy {
                 validerEnkeltperiode(
@@ -550,7 +551,7 @@ class VedtaksperiodeValideringUtilsTest {
 
         @Test
         fun `skal kaste feil om ingen periode for målgruppe matcher`() {
-            val vedtaksperiode = lagVedtaksperiode(målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE)
+            val vedtaksperiode = lagVedtaksperiode(målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)
 
             assertThatThrownBy {
                 validerEnkeltperiode(
@@ -741,7 +742,7 @@ class VedtaksperiodeValideringUtilsTest {
 private fun lagVedtaksperiode(
     fom: LocalDate = LocalDate.of(2025, 1, 1),
     tom: LocalDate = LocalDate.of(2025, 1, 31),
-    målgruppe: MålgruppeType = MålgruppeType.AAP,
+    målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.AAP,
     aktivitet: AktivitetType = AktivitetType.TILTAK,
 ) = Vedtaksperiode(
     id = UUID.randomUUID(),

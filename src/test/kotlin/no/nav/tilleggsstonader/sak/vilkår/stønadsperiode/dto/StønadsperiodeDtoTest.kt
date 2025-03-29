@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.util.UUID
@@ -16,7 +16,7 @@ class StønadsperiodeDtoTest {
                 id = UUID.randomUUID(),
                 fom = osloDateNow(),
                 tom = osloDateNow().minusDays(1),
-                målgruppe = MålgruppeType.AAP,
+                målgruppe = FaktiskMålgruppe.AAP,
                 aktivitet = AktivitetType.TILTAK,
                 status = StønadsperiodeStatus.NY,
             )

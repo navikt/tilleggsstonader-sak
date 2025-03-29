@@ -12,9 +12,9 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBo
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -107,19 +107,19 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
             lagBeregningsgrunnlagMedEnkeltutgift(
                 fom = mandag10Februar,
                 utbetalingsdato = mandag10Februar,
-            ).copy(målgruppe = MålgruppeType.AAP)
+            ).copy(målgruppe = FaktiskMålgruppe.AAP)
 
         val uføretrygd =
             lagBeregningsgrunnlagMedEnkeltutgift(
                 fom = torsdag27Feb,
                 utbetalingsdato = mandag10Februar,
-            ).copy(målgruppe = MålgruppeType.UFØRETRYGD)
+            ).copy(målgruppe = FaktiskMålgruppe.UFØRETRYGD)
 
         val nedsattArbeidsevne =
             lagBeregningsgrunnlagMedEnkeltutgift(
                 fom = fredag7Mars,
                 utbetalingsdato = mandag10Februar,
-            ).copy(målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE)
+            ).copy(målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)
 
         val andel = finnAndelTilkjentYtelse(aap, uføretrygd, nedsattArbeidsevne)
 
@@ -138,12 +138,12 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
         val aap =
             lagBeregningsgrunnlagMedEnkeltutgift(
                 fom = mandag10Februar,
-            ).copy(målgruppe = MålgruppeType.AAP)
+            ).copy(målgruppe = FaktiskMålgruppe.AAP)
 
         val overgangsstønad =
             lagBeregningsgrunnlagMedEnkeltutgift(
                 fom = mandag10Februar,
-            ).copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD)
+            ).copy(målgruppe = FaktiskMålgruppe.OVERGANGSSTØNAD)
 
         val andel = finnAndelTilkjentYtelse(aap, overgangsstønad)
 
@@ -227,6 +227,6 @@ private fun lagBeregningsgrunnlagMedEnkeltutgift(
         ),
     makssats = 4953,
     makssatsBekreftet = true,
-    målgruppe = MålgruppeType.AAP,
+    målgruppe = FaktiskMålgruppe.AAP,
     aktivitet = AktivitetType.TILTAK,
 )

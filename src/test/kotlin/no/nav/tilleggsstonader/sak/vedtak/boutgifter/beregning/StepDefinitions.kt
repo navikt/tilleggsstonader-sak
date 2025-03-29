@@ -20,12 +20,12 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BeregningNøkler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
@@ -109,8 +109,8 @@ class StepDefinitions {
                             makssats = parseInt(BoutgifterNøkler.MAKS_SATS, rad),
                             makssatsBekreftet = true,
                             målgruppe =
-                                parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad)
-                                    ?: MålgruppeType.AAP,
+                                parseValgfriEnum<FaktiskMålgruppe>(BeregningNøkler.MÅLGRUPPE, rad)
+                                    ?: FaktiskMålgruppe.AAP,
                             aktivitet =
                                 parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
                                     ?: AktivitetType.TILTAK,

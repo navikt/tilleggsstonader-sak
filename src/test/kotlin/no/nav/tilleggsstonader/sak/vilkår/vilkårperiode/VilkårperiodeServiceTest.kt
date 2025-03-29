@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.RegisterAktivitetClientCo
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
@@ -273,7 +274,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             id = null,
             fom = fom,
             tom = tom,
-            målgruppe = MålgruppeType.AAP,
+            målgruppe = FaktiskMålgruppe.AAP,
             aktivitet = AktivitetType.TILTAK,
             status = StønadsperiodeStatus.NY,
         )

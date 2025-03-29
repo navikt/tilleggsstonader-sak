@@ -6,9 +6,9 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
@@ -57,7 +57,7 @@ object VedtaksperiodeValideringUtils {
 
     fun validerEnkeltperiode(
         vedtaksperiode: Vedtaksperiode,
-        målgruppePerioderPerType: Map<MålgruppeType, List<Datoperiode>>,
+        målgruppePerioderPerType: Map<FaktiskMålgruppe, List<Datoperiode>>,
         aktivitetPerioderPerType: Map<AktivitetType, List<Datoperiode>>,
         fødselsdato: LocalDate?,
     ) {

@@ -46,7 +46,7 @@ object ForeslåStønadsperiode {
             StønadsperiodeDto(
                 fom = stønadsperiode.fom,
                 tom = stønadsperiode.tom,
-                målgruppe = sammenslåtteVilkårsperioder.målgrupper.first().type as MålgruppeType,
+                målgruppe = (sammenslåtteVilkårsperioder.målgrupper.first().type as MålgruppeType).faktiskMålgruppe(),
                 aktivitet = sammenslåtteVilkårsperioder.aktiviteter.first().type as AktivitetType,
                 status = null,
             ),

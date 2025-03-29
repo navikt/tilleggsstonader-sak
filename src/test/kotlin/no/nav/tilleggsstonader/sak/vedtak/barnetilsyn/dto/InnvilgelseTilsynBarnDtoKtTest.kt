@@ -5,9 +5,9 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -26,7 +26,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
                                 listOf(
                                     vedtaksperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
                                 ),
-                            beløpsperioder = listOf(Beløpsperiode(LocalDate.of(2024, 1, 1), 20, MålgruppeType.AAP)),
+                            beløpsperioder = listOf(Beløpsperiode(LocalDate.of(2024, 1, 1), 20, FaktiskMålgruppe.AAP)),
                         ),
                     ),
             ).tilDto(null)
@@ -87,9 +87,9 @@ class InnvilgelseTilsynBarnDtoKtTest {
                             beregningsresultatForMåned(
                                 beløpsperioder =
                                     listOf(
-                                        Beløpsperiode(revurderFra.minusDays(1), 10, MålgruppeType.AAP),
-                                        Beløpsperiode(revurderFra, 20, MålgruppeType.AAP),
-                                        Beløpsperiode(revurderFra.plusDays(1), 30, MålgruppeType.AAP),
+                                        Beløpsperiode(revurderFra.minusDays(1), 10, FaktiskMålgruppe.AAP),
+                                        Beløpsperiode(revurderFra, 20, FaktiskMålgruppe.AAP),
+                                        Beløpsperiode(revurderFra.plusDays(1), 30, FaktiskMålgruppe.AAP),
                                     ),
                             ),
                         ),
@@ -165,7 +165,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
             VedtaksperiodeBeregning(
                 fom = fom,
                 tom = tom,
-                målgruppe = MålgruppeType.AAP,
+                målgruppe = FaktiskMålgruppe.AAP,
                 aktivitet = AktivitetType.TILTAK,
             ),
         aktiviteter = emptyList(),

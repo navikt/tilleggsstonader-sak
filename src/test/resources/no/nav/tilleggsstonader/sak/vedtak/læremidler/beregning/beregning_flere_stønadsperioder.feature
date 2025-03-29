@@ -43,7 +43,7 @@ Egenskap: Beregning av læremidler - flere stønadsperioder
       | Fom        | Tom        | Målgruppe | Aktivitet |
       | 01.04.2024 | 31.04.2024 | AAP       | TILTAK    |
       | 01.05.2024 | 31.05.2024 | AAP       | TILTAK    |
-      | 01.08.2024 | 30.09.2024 | DAGPENGER | TILTAK    |
+      | 01.08.2024 | 30.09.2024 | UFØRETRYGD | TILTAK    |
 
 
     Når beregner stønad for læremidler
@@ -52,8 +52,8 @@ Egenskap: Beregning av læremidler - flere stønadsperioder
       | Fom        | Tom        | Beløp | Studienivå       | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
       | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE     | 100           | 438  | AAP       | 01.04.2024      |
       | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE     | 100           | 438  | AAP       | 01.04.2024      |
-      | 01.08.2024 | 31.08.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | DAGPENGER | 01.08.2024      |
-      | 01.09.2024 | 30.09.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | DAGPENGER | 01.08.2024      |
+      | 01.08.2024 | 31.08.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | UFØRETRYGD | 01.08.2024      |
+      | 01.09.2024 | 30.09.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | UFØRETRYGD | 01.08.2024      |
 
   Scenario: En vedtaksperiode som løper over flere løpende måneder med ulike målgrupper skal utbetales i fom for vedtaksperioden
     Gitt følgende vedtaksperioder for læremidler

@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -132,7 +133,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
                 id = UUID.randomUUID(),
                 fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
                 tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
-                målgruppe = parseValgfriEnum<MålgruppeType>(DomenenøkkelForeslåVedtaksperioder.MÅLGRUPPE, rad)!!,
+                målgruppe = parseValgfriEnum<FaktiskMålgruppe>(DomenenøkkelForeslåVedtaksperioder.MÅLGRUPPE, rad)!!,
                 aktivitet = parseValgfriEnum<AktivitetType>(DomenenøkkelForeslåVedtaksperioder.AKTIVITET, rad)!!,
             )
         }

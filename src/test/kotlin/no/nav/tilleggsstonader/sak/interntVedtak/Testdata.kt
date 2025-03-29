@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregni
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
@@ -66,7 +67,7 @@ object Testdata {
                 id = UUID.randomUUID(),
                 fom = LocalDate.of(2024, 2, 1),
                 tom = LocalDate.of(2024, 3, 31),
-                målgruppe = MålgruppeType.AAP,
+                målgruppe = FaktiskMålgruppe.AAP,
                 aktivitet = AktivitetType.TILTAK,
                 status = StønadsperiodeStatus.NY,
             ),
@@ -74,7 +75,7 @@ object Testdata {
                 id = UUID.randomUUID(),
                 fom = LocalDate.of(2024, 2, 1),
                 tom = LocalDate.of(2024, 3, 31),
-                målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 aktivitet = AktivitetType.REELL_ARBEIDSSØKER,
                 status = StønadsperiodeStatus.NY,
             ),
@@ -195,7 +196,7 @@ object Testdata {
             VedtaksperiodeBeregningsgrunnlag(
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 1),
-                målgruppe = MålgruppeType.AAP,
+                målgruppe = FaktiskMålgruppe.AAP,
                 aktivitet = AktivitetType.TILTAK,
             )
 
@@ -204,7 +205,7 @@ object Testdata {
                 id = UUID.randomUUID(),
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 1),
-                målgruppe = MålgruppeType.AAP,
+                målgruppe = FaktiskMålgruppe.AAP,
                 aktivitet = AktivitetType.TILTAK,
             )
 
@@ -305,7 +306,7 @@ object Testdata {
                                     studieprosent = 100,
                                     sats = 951,
                                     satsBekreftet = true,
-                                    målgruppe = MålgruppeType.AAP,
+                                    målgruppe = FaktiskMålgruppe.AAP,
                                     aktivitet = AktivitetType.TILTAK,
                                 ),
                         ),
@@ -320,7 +321,7 @@ object Testdata {
                                     studieprosent = 100,
                                     sats = 951,
                                     satsBekreftet = true,
-                                    målgruppe = MålgruppeType.AAP,
+                                    målgruppe = FaktiskMålgruppe.AAP,
                                     aktivitet = AktivitetType.TILTAK,
                                 ),
                         ),

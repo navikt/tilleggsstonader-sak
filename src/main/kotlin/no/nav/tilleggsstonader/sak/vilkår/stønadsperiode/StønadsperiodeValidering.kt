@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
+import no.nav.tilleggsstonader.sak.vedtak.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -56,7 +57,7 @@ object StønadsperiodeValidering {
 
     fun validerEnkeltperiode(
         stønadsperiode: StønadsperiodeDto,
-        målgruppePerioderPerType: Map<MålgruppeType, List<Datoperiode>>,
+        målgruppePerioderPerType: Map<FaktiskMålgruppe, List<Datoperiode>>,
         aktivitetPerioderPerType: Map<AktivitetType, List<Datoperiode>>,
         fødselsdato: LocalDate?,
     ) {
@@ -130,5 +131,9 @@ inline fun <reified T : VilkårperiodeType> List<Vilkårperiode>.mergeSammenheng
 fun List<Vilkårperiode>.mergeSammenhengendeOppfylteAktiviteter(): Map<AktivitetType, List<Datoperiode>> =
     this.mergeSammenhengendeOppfylte<AktivitetType>()
 
-fun List<Vilkårperiode>.mergeSammenhengendeOppfylteMålgrupper(): Map<MålgruppeType, List<Datoperiode>> =
-    this.mergeSammenhengendeOppfylte<MålgruppeType>()
+fun List<Vilkårperiode>.mergeSammenhengendeOppfylteMålgrupper(): Map<FaktiskMålgruppe, List<Datoperiode>> =
+    this
+        .mergeSammenhengendeOppfylte<MålgruppeType>()
+        .map { it.key.faktiskMålgruppe() to it.value }
+        .groupBy({ it.first }, { it.second })
+        .mapValues { it.value.flatten() }
