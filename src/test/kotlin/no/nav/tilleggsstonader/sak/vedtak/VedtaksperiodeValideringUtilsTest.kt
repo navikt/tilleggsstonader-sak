@@ -10,7 +10,8 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerI
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.validerUtgiftHeleVedtaksperioden
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteVilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteAktiviteter
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteMålgrupper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
@@ -338,14 +339,14 @@ class VedtaksperiodeValideringUtilsTest {
                 assertThatCode {
                     validerEnkeltperiode(
                         vedtaksperioder,
-                        målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                        aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
+                        målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
+                        aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                         dato18årGammel,
                     )
                     validerEnkeltperiode(
                         vedtaksperioder,
-                        målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                        aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
+                        målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
+                        aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                         dato18årGammel.minusDays(1),
                     )
                 }.doesNotThrowAnyException()
@@ -356,8 +357,8 @@ class VedtaksperiodeValideringUtilsTest {
                 assertThatCode {
                     validerEnkeltperiode(
                         vedtaksperioder,
-                        målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                        aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
+                        målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
+                        aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                         dato67årGammel.plusDays(1),
                     )
                 }.doesNotThrowAnyException()
@@ -391,14 +392,14 @@ class VedtaksperiodeValideringUtilsTest {
                 assertThatCode {
                     validerEnkeltperiode(
                         vedtaksperioder,
-                        målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                        aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
+                        målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
+                        aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                         dato18årGammel.minusYears(1),
                     )
                     validerEnkeltperiode(
                         vedtaksperioder,
-                        målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                        aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
+                        målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
+                        aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                         dato67årGammel.plusYears(1),
                     )
                 }.doesNotThrowAnyException()
@@ -540,8 +541,8 @@ class VedtaksperiodeValideringUtilsTest {
             assertThatThrownBy {
                 validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
-                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
+                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
+                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                     fødselsdato = null,
                 )
             }.hasMessageContaining("Kombinasjonen av OVERGANGSSTØNAD og TILTAK er ikke gyldig")
@@ -554,8 +555,8 @@ class VedtaksperiodeValideringUtilsTest {
             assertThatThrownBy {
                 validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
-                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
+                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
+                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                     fødselsdato = null,
                 )
             }.hasMessageContaining("Finner ingen perioder hvor vilkår for NEDSATT_ARBEIDSEVNE er oppfylt")
@@ -568,8 +569,8 @@ class VedtaksperiodeValideringUtilsTest {
             assertThatThrownBy {
                 validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
-                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
+                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
+                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                     fødselsdato = null,
                 )
             }.hasMessageContaining("Finner ingen perioder hvor vilkår for UTDANNING er oppfylt")
@@ -582,8 +583,8 @@ class VedtaksperiodeValideringUtilsTest {
             assertThatThrownBy {
                 validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
-                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
+                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
+                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                     fødselsdato = null,
                 )
             }.hasMessageContaining(
@@ -607,8 +608,8 @@ class VedtaksperiodeValideringUtilsTest {
             assertThatThrownBy {
                 validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
-                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
+                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
+                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                     fødselsdato = null,
                 )
             }.hasMessageContaining(
@@ -637,8 +638,8 @@ class VedtaksperiodeValideringUtilsTest {
             assertThatCode {
                 validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
-                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
+                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
+                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                     fødselsdato = null,
                 )
             }.doesNotThrowAnyException()
@@ -664,8 +665,8 @@ class VedtaksperiodeValideringUtilsTest {
             assertThatCode {
                 validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
-                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
+                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
+                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                     fødselsdato = null,
                 )
             }.doesNotThrowAnyException()
@@ -711,8 +712,8 @@ class VedtaksperiodeValideringUtilsTest {
             assertThatCode {
                 validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
-                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
+                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
+                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                     fødselsdato = null,
                 )
             }.doesNotThrowAnyException()
@@ -726,8 +727,8 @@ class VedtaksperiodeValideringUtilsTest {
             assertThatCode {
                 validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
-                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteVilkårperioder(),
-                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteVilkårperioder(),
+                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
+                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                     fødselsdato = null,
                 )
             }.hasMessageContaining(

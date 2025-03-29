@@ -2,11 +2,14 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
@@ -32,8 +35,8 @@ object StønadsperiodeValidering {
         fødselsdato: LocalDate?,
     ) {
         validerIkkeOverlappendeStønadsperioder(stønadsperioder)
-        val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeOppfylteVilkårperioder()
-        val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteVilkårperioder()
+        val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeOppfylteMålgrupper()
+        val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteAktiviteter()
 
         validerAtStønadsperioderIkkeOverlapperMedVilkårPeriodeUtenRett(vilkårperioder, stønadsperioder)
         stønadsperioder.forEach { validerEnkeltperiode(it, målgrupper, aktiviteter, fødselsdato) }
@@ -53,8 +56,8 @@ object StønadsperiodeValidering {
 
     fun validerEnkeltperiode(
         stønadsperiode: StønadsperiodeDto,
-        målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
-        aktivitetPerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
+        målgruppePerioderPerType: Map<MålgruppeType, List<Datoperiode>>,
+        aktivitetPerioderPerType: Map<AktivitetType, List<Datoperiode>>,
         fødselsdato: LocalDate?,
     ) {
         brukerfeilHvisIkke(stønadsperiode.målgruppe.gyldigeAktiviter.contains(stønadsperiode.aktivitet)) {
@@ -111,13 +114,21 @@ object StønadsperiodeValidering {
  *  @return En sortert map kategorisert på periodetype med de oppfylte vilkårsperiodene. Periodene slåes sammen dersom
  *  de er sammenhengende, også selv om de har overlapp.
  */
-fun List<Vilkårperiode>.mergeSammenhengendeOppfylteVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> =
+inline fun <reified T : VilkårperiodeType> List<Vilkårperiode>.mergeSammenhengendeOppfylte(): Map<T, List<Datoperiode>> =
     this
-        .sorted()
         .filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
-        .groupBy { it.type }
-        .mapValues {
+        .groupBy {
+            require(it.type is T) { "${it.type} er ikke av type ${T::class.simpleName}" }
+            it.type
+        }.mapValues {
             it.value
-                .map { Datoperiode(it.fom, it.tom) }
-                .mergeSammenhengende { a, b -> a.overlapper(b) || a.tom.plusDays(1) == b.fom }
+                .sorted()
+                .map { Datoperiode(fom = it.fom, tom = it.tom) }
+                .mergeSammenhengende { a, b -> a.overlapperEllerPåfølgesAv(b) }
         }
+
+fun List<Vilkårperiode>.mergeSammenhengendeOppfylteAktiviteter(): Map<AktivitetType, List<Datoperiode>> =
+    this.mergeSammenhengendeOppfylte<AktivitetType>()
+
+fun List<Vilkårperiode>.mergeSammenhengendeOppfylteMålgrupper(): Map<MålgruppeType, List<Datoperiode>> =
+    this.mergeSammenhengendeOppfylte<MålgruppeType>()
