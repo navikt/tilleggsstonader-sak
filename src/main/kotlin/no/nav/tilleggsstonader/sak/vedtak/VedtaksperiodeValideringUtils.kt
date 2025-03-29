@@ -7,9 +7,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
 
@@ -56,8 +57,8 @@ object VedtaksperiodeValideringUtils {
 
     fun validerEnkeltperiode(
         vedtaksperiode: Vedtaksperiode,
-        målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
-        aktivitetPerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
+        målgruppePerioderPerType: Map<MålgruppeType, List<Datoperiode>>,
+        aktivitetPerioderPerType: Map<AktivitetType, List<Datoperiode>>,
         fødselsdato: LocalDate?,
     ) {
         brukerfeilHvisIkke(vedtaksperiode.målgruppe.gyldigeAktiviter.contains(vedtaksperiode.aktivitet)) {

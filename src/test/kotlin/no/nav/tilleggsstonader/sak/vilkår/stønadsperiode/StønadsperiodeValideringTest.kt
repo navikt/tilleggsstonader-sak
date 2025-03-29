@@ -29,7 +29,7 @@ import java.util.UUID
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet as aktivitet1
 
 internal class StønadsperiodeValideringTest {
-    val målgrupper: Map<VilkårperiodeType, List<Datoperiode>> =
+    val målgrupper: Map<MålgruppeType, List<Datoperiode>> =
         mapOf(
             MålgruppeType.AAP to
                 listOf(
@@ -40,7 +40,7 @@ internal class StønadsperiodeValideringTest {
                 ),
         )
 
-    val aktiviteter: Map<VilkårperiodeType, List<Datoperiode>> =
+    val aktiviteter: Map<AktivitetType, List<Datoperiode>> =
         mapOf(
             AktivitetType.TILTAK to
                 listOf(
@@ -615,7 +615,7 @@ internal class StønadsperiodeValideringTest {
                     ),
                 )
 
-            assertThat(perioder.mergeSammenhengendeOppfylteVilkårperioder()[AktivitetType.TILTAK]!!.first()).isEqualTo(
+            assertThat(perioder.mergeSammenhengendeOppfylte<AktivitetType>()[AktivitetType.TILTAK]!!.first()).isEqualTo(
                 Datoperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 10)),
             )
         }
@@ -634,7 +634,7 @@ internal class StønadsperiodeValideringTest {
                     ),
                 )
 
-            assertThat(perioder.mergeSammenhengendeOppfylteVilkårperioder()[AktivitetType.TILTAK]!!.first()).isEqualTo(
+            assertThat(perioder.mergeSammenhengendeOppfylte<AktivitetType>()[AktivitetType.TILTAK]!!.first()).isEqualTo(
                 Datoperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 10)),
             )
         }
@@ -661,7 +661,7 @@ internal class StønadsperiodeValideringTest {
                     ),
                 )
 
-            val mergetPerioder = perioder.mergeSammenhengendeOppfylteVilkårperioder()[AktivitetType.TILTAK]!!
+            val mergetPerioder = perioder.mergeSammenhengendeOppfylte<AktivitetType>()[AktivitetType.TILTAK]!!
 
             assertThat(mergetPerioder.size).isEqualTo(2)
             assertThat(mergetPerioder[0]).isEqualTo(
@@ -697,7 +697,7 @@ internal class StønadsperiodeValideringTest {
                     ),
                 )
 
-            val mergetPerioder = perioder.mergeSammenhengendeOppfylteVilkårperioder()[AktivitetType.TILTAK]!!
+            val mergetPerioder = perioder.mergeSammenhengendeOppfylte<AktivitetType>()[AktivitetType.TILTAK]!!
 
             assertThat(mergetPerioder.size).isEqualTo(2)
             assertThat(mergetPerioder[0]).isEqualTo(
@@ -728,7 +728,7 @@ internal class StønadsperiodeValideringTest {
                     ),
                 )
 
-            val mergetPerioder = perioder.mergeSammenhengendeOppfylteVilkårperioder()[AktivitetType.TILTAK]!!
+            val mergetPerioder = perioder.mergeSammenhengendeOppfylte<AktivitetType>()[AktivitetType.TILTAK]!!
 
             assertThat(mergetPerioder.size).isEqualTo(1)
             assertThat(mergetPerioder[0]).isEqualTo(
@@ -752,8 +752,8 @@ internal class StønadsperiodeValideringTest {
 
     fun validerEnkeltperiode(
         stønadsperiode: StønadsperiodeDto,
-        målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
-        aktivitetPerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
+        målgruppePerioderPerType: Map<MålgruppeType, List<Datoperiode>>,
+        aktivitetPerioderPerType: Map<AktivitetType, List<Datoperiode>>,
         fødselsdato: LocalDate? = null,
     ) = StønadsperiodeValidering.validerEnkeltperiode(
         stønadsperiode = stønadsperiode,
