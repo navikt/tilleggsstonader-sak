@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.sisteDagIÅret
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.splitPerLøpendeMåneder
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.splitVedtaksperiodePerÅr
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import kotlin.collections.plus
 
@@ -17,7 +16,6 @@ object BoutgifterBeregnUtil {
     fun List<VedtaksperiodeBeregning>.splittTilLøpendeMåneder(): List<LøpendeMåned> =
         this
             .sorted()
-            .splitVedtaksperiodePerÅr()
             .fold(listOf<LøpendeMåned>()) { acc, vedtaksperiode ->
                 if (acc.isEmpty()) {
                     val nyeUtbetalingsperioder = vedtaksperiode.delTilUtbetalingPerioder()
@@ -32,14 +30,14 @@ object BoutgifterBeregnUtil {
      * Legger til periode som overlapper med forrige utbetalingsperiode
      * Returnerer utbetalingsperioder som løper etter forrige utbetalingsperiode
      */
-    private fun VedtaksperiodeInnenforÅr.håndterNyUtbetalingsperiode(acc: List<LøpendeMåned>): List<LøpendeMåned> {
+    private fun VedtaksperiodeBeregning.håndterNyUtbetalingsperiode(acc: List<LøpendeMåned>): List<LøpendeMåned> {
         val forrigeUtbetalingsperiode = acc.last()
         forrigeUtbetalingsperiode.leggTilOverlappendeDel(this)
 
         return lagUtbetalingPerioderEtterForrigeUtbetalingperiode(forrigeUtbetalingsperiode)
     }
 
-    private fun LøpendeMåned.leggTilOverlappendeDel(vedtaksperiode: VedtaksperiodeInnenforÅr) {
+    private fun LøpendeMåned.leggTilOverlappendeDel(vedtaksperiode: VedtaksperiodeBeregning) {
         if (vedtaksperiode.fom <= this.tom) {
             val overlappendeVedtaksperiode =
                 VedtaksperiodeInnenforLøpendeMåned(
@@ -52,7 +50,7 @@ object BoutgifterBeregnUtil {
         }
     }
 
-    private fun VedtaksperiodeInnenforÅr.lagUtbetalingPerioderEtterForrigeUtbetalingperiode(forrigeUtbetalingsperiode: LøpendeMåned) =
+    private fun VedtaksperiodeBeregning.lagUtbetalingPerioderEtterForrigeUtbetalingperiode(forrigeUtbetalingsperiode: LøpendeMåned) =
         this
             .delEtterUtbetalingsperiode(forrigeUtbetalingsperiode)
             .delTilUtbetalingPerioder()
@@ -60,7 +58,7 @@ object BoutgifterBeregnUtil {
     /**
      * Splitter vedtaksperiode som løper etter forrige utbetalingsperiode til nye vedtaksperioder
      */
-    private fun VedtaksperiodeInnenforÅr.delEtterUtbetalingsperiode(utbetalingPeriode: LøpendeMåned): VedtaksperiodeInnenforÅr? =
+    private fun VedtaksperiodeBeregning.delEtterUtbetalingsperiode(utbetalingPeriode: LøpendeMåned): VedtaksperiodeBeregning? =
         if (this.tom > utbetalingPeriode.tom) {
             this.copy(fom = maxOf(this.fom, utbetalingPeriode.tom.plusDays(1)))
         } else {
@@ -73,7 +71,7 @@ object BoutgifterBeregnUtil {
      * I tilfelle man har 2 ulike målgrupper innenfor et og samme år, så vil begge resultere i at man betaler ut begge samme dato
      * Men det vil gjøres som 2 ulike andeler då det skal regnskapsføres riktig mot økonomi.
      */
-    private fun VedtaksperiodeInnenforÅr?.delTilUtbetalingPerioder(): List<LøpendeMåned> {
+    private fun VedtaksperiodeBeregning?.delTilUtbetalingPerioder(): List<LøpendeMåned> {
         if (this == null) {
             return emptyList()
         }
