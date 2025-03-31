@@ -80,7 +80,7 @@ class BoutgifterBeregningService(
             .sorted()
             .splittTilLøpendeMåneder()
             .map { UtbetalingPeriode(it) }
-            .validerIngenUtgifterKrysserUtbetalingsperioder(utgifter)
+            .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
             .map {
                 BeregningsresultatForLøpendeMåned(
                     grunnlag = lagBeregningsGrunnlag(periode = it, utgifter = utgifter),
@@ -258,7 +258,11 @@ class BoutgifterBeregningService(
     private fun finnUtgiftForUtbetalingsperiode(
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
         periode: UtbetalingPeriode,
-    ) = utgifter.mapValues { it.value.filter { utgift -> periode.inneholder(utgift) } }
+    ) = utgifter.mapValues { (_, utgifter) ->
+        utgifter.filter {
+            periode.overlapper(it)
+        }
+    }
 }
 
 private fun validerUtgifterErInnenforVedtaksperiodene(
@@ -277,14 +281,14 @@ private fun validerUtgifterErInnenforVedtaksperiodene(
     }
 }
 
-private fun List<UtbetalingPeriode>.validerIngenUtgifterKrysserUtbetalingsperioder(
-    utgifterPerBoutgiftstype: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(
+    utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
 ): List<UtbetalingPeriode> {
+    val utgifterTilOvernatting = utgifter[TypeBoutgift.UTGIFTER_OVERNATTING] ?: emptyList()
     val utbetalingsperioder = this
-    val utgifter = utgifterPerBoutgiftstype.values.flatten()
 
     val detFinnesUtgiftSomKrysserUtbetalingsperioder =
-        utgifter.any { utgift ->
+        utgifterTilOvernatting.any { utgift ->
             utbetalingsperioder.none { it.inneholder(utgift) }
         }
 
@@ -292,7 +296,7 @@ private fun List<UtbetalingPeriode>.validerIngenUtgifterKrysserUtbetalingsperiod
         """
         Vi støtter foreløpig ikke at utgifter krysser ulike utbetalingsperioder. 
         Utbetalingsperioder for denne behandlingen er: ${utbetalingsperioder.map { it.formatertPeriodeNorskFormat() }}, 
-        mens utgiftsperiodene er: ${utgifter.map { it.formatertPeriodeNorskFormat() }}
+        mens utgiftsperiodene er: ${utgifterTilOvernatting.map { it.formatertPeriodeNorskFormat() }}
         """.trimIndent()
     }
 
