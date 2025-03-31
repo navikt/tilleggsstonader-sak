@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BeregningNøkler
@@ -28,7 +29,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
-import java.util.UUID
 
 @Suppress("ktlint:standard:function-naming")
 class StepDefinitions {
@@ -57,18 +57,7 @@ class StepDefinitions {
 
     @Gitt("følgende vedtaksperioder for boutgifter")
     fun `følgende vedtaksperioder for boutgifter`(dataTable: DataTable) {
-        vedtaksperioder =
-            dataTable.mapRad { rad ->
-                Vedtaksperiode(
-                    id = UUID.randomUUID(),
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
-                    aktivitet =
-                        parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
-                            ?: AktivitetType.TILTAK,
-                )
-            }
+        vedtaksperioder = mapVedtaksperioder(dataTable)
     }
 
     @Gitt("følgende utgifter for: {}")
