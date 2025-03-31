@@ -2,8 +2,8 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -13,7 +13,7 @@ class SatsLæremidlerTest {
     @Test
     fun `høyere utdanning 2024`() {
         val periode =
-            Vedtaksperiode(
+            vedtaksperiode(
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 1),
             )
@@ -28,7 +28,7 @@ class SatsLæremidlerTest {
     @Test
     fun `høyere utdanning 2023`() {
         val periode =
-            Vedtaksperiode(
+            vedtaksperiode(
                 fom = LocalDate.of(2023, 3, 1),
                 tom = LocalDate.of(2023, 5, 1),
             )
@@ -43,7 +43,7 @@ class SatsLæremidlerTest {
     @Test
     fun `videregående utdanning 2024`() {
         val periode =
-            Vedtaksperiode(
+            vedtaksperiode(
                 fom = LocalDate.of(2024, 11, 1),
                 tom = LocalDate.of(2024, 12, 1),
             )
@@ -58,7 +58,7 @@ class SatsLæremidlerTest {
     @Test
     fun `videregående utdanning 2023`() {
         val periode =
-            Vedtaksperiode(
+            vedtaksperiode(
                 fom = LocalDate.of(2023, 10, 1),
                 tom = LocalDate.of(2023, 12, 1),
             )

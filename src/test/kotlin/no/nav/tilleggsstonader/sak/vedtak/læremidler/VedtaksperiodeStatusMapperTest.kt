@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -10,7 +10,7 @@ class VedtaksperiodeStatusMapperTest {
     val førsteJan: LocalDate = LocalDate.of(2024, 1, 1)
     val trettiførsteJan: LocalDate = LocalDate.of(2024, 1, 31)
     val dummyVedtaksperiode =
-        Vedtaksperiode(
+        vedtaksperiode(
             fom = førsteJan,
             tom = trettiførsteJan,
         )

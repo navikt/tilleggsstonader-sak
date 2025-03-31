@@ -117,14 +117,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     ) {
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-        val vedtaksperioder =
-            dataTable.mapRad { rad ->
-                VedtaksperiodeLæremidlerDto(
-                    id = vedtaksperiodeId,
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                )
-            }
+        val vedtaksperioder = mapVedtaksperioderDto(dataTable)
         steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseLæremidlerRequest(vedtaksperioder))
     }
 
@@ -138,14 +131,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
 
-        val vedtaksperioder =
-            dataTable.mapRad { rad ->
-                VedtaksperiodeLæremidlerDto(
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    id = UUID.randomUUID(),
-                )
-            }
+        val vedtaksperioder = mapVedtaksperioderDto(dataTable)
         steg.utførSteg(dummyBehandling(behandlingId, revurderFra), InnvilgelseLæremidlerRequest(vedtaksperioder))
     }
 
@@ -169,15 +155,11 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
 
         val perioderBeregningsresultat = mapBeregningsresultat(dataTable)
-        val vedtaksperiode =
-            Vedtaksperiode(
-                fom = perioderBeregningsresultat.minOf { it.fom },
-                tom = perioderBeregningsresultat.maxOf { it.tom },
-            )
+        val vedtaksperiode = mapVedtaksperioder(dataTable)
         val vedtak =
             innvilgelse(
                 behandlingId = behandlingId,
-                vedtaksperioder = listOf(vedtaksperiode),
+                vedtaksperioder = vedtaksperiode,
                 beregningsresultat = BeregningsresultatLæremidler(perioderBeregningsresultat),
             )
         vedtakRepository.insert(vedtak)
@@ -283,14 +265,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
 
         val vedtaksperioder = hentVedtak(behandlingId).vedtaksperioder
 
-        val forventedeVedtaksperioder =
-            dataTable.mapRad { rad ->
-                Vedtaksperiode(
-                    id = vedtaksperiodeId,
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                )
-            }
+        val forventedeVedtaksperioder = mapVedtaksperioder(dataTable)
 
         forventedeVedtaksperioder.forEachIndexed { index, periode ->
             try {
@@ -303,6 +278,28 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         }
         assertThat(vedtaksperioder).hasSize(forventedeVedtaksperioder.size)
     }
+
+    private fun mapVedtaksperioder(dataTable: DataTable): List<Vedtaksperiode> =
+        dataTable.mapRad { rad ->
+            Vedtaksperiode(
+                id = vedtaksperiodeId,
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                målgruppe = null,
+                aktivitet = null,
+            )
+        }
+
+    private fun mapVedtaksperioderDto(dataTable: DataTable): List<VedtaksperiodeLæremidlerDto> =
+        dataTable.mapRad { rad ->
+            VedtaksperiodeLæremidlerDto(
+                id = vedtaksperiodeId,
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                målgruppe = null,
+                aktivitet = null,
+            )
+        }
 
     private fun hentVedtak(behandlingId: BehandlingId): InnvilgelseEllerOpphørLæremidler =
         vedtakRepository

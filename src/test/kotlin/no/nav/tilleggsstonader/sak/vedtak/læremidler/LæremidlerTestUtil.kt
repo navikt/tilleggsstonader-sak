@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
@@ -18,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatForP
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
+import java.util.UUID
 
 object LæremidlerTestUtil {
     val defaultVedtaksperioder =
@@ -25,6 +27,8 @@ object LæremidlerTestUtil {
             Vedtaksperiode(
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 1, 7),
+                målgruppe = null,
+                aktivitet = null,
             ),
         )
     val defaultBeregningsresultat =
@@ -144,4 +148,18 @@ object LæremidlerTestUtil {
             aktivitet = AktivitetType.TILTAK,
             delAvTidligereUtbetaling = false,
         )
+
+    fun vedtaksperiode(
+        id: UUID = UUID.randomUUID(),
+        fom: LocalDate = LocalDate.of(2025, 1, 1),
+        tom: LocalDate = LocalDate.of(2025, 1, 31),
+        målgruppe: FaktiskMålgruppe? = null,
+        aktivitet: AktivitetType? = null,
+    ) = Vedtaksperiode(
+        id = id,
+        fom = fom,
+        tom = tom,
+        målgruppe = målgruppe,
+        aktivitet = aktivitet,
+    )
 }

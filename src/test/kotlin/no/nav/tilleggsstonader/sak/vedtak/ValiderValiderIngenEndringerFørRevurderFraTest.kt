@@ -395,6 +395,8 @@ class ValiderValiderIngenEndringerFørRevurderFraTest {
         id = UUID.randomUUID(),
         fom = fom,
         tom = tom,
+        målgruppe = null,
+        aktivitet = null,
         status = status,
     )
 

@@ -18,4 +18,6 @@ enum class Toggle(
     KAN_BRUKE_VEDTAKSPERIODER_TILSYN_BARN("sak.kan-bruke-vedtaksperioder-tilsyn-barn"),
 
     SKAL_HENTE_GRUNNLAG_ANNEN_FORELDER("sak.skal-hente-grunnlag-annen-forelder"),
+
+    LÆREMIDLER_VEDTAKSPERIODER_V2("sak.laremidler-vedtaksperioder-v2"),
 }

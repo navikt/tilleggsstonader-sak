@@ -73,7 +73,8 @@ class LæremidlerBeregnYtelseStegTest(
     inner class Innvilgelse {
         @Test
         fun `skal lagre vedtak`() {
-            val vedtaksperiode = VedtaksperiodeLæremidlerDto(id = UUID.randomUUID(), fom = fom, tom = tom)
+            val vedtaksperiode =
+                VedtaksperiodeLæremidlerDto(id = UUID.randomUUID(), fom = fom, tom = tom, målgruppe = null, aktivitet = null)
             val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
 
             stønadsperiodeRepository.insert(stønadsperiode)
@@ -97,7 +98,8 @@ class LæremidlerBeregnYtelseStegTest(
     inner class Opphør {
         @Test
         fun `skal lagre vedtak`() {
-            val vedtaksperiode = VedtaksperiodeLæremidlerDto(id = UUID.randomUUID(), fom = fom, tom = tom)
+            val vedtaksperiode =
+                VedtaksperiodeLæremidlerDto(id = UUID.randomUUID(), fom = fom, tom = tom, målgruppe = null, aktivitet = null)
             val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
 
             vilkårperiodeRepository.insertAll(listOf(målgruppe, aktivitet))
@@ -167,7 +169,7 @@ class LæremidlerBeregnYtelseStegTest(
         lagreAktivitetOgStønadsperiode(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeLæremidlerDto(id = UUID.randomUUID(), fom = fom, tom = tom)
+        val vedtaksperiode = VedtaksperiodeLæremidlerDto(id = UUID.randomUUID(), fom = fom, tom = tom, målgruppe = null, aktivitet = null)
         val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
         steg.utførSteg(saksbehandling, innvilgelse)
 
@@ -210,6 +212,8 @@ class LæremidlerBeregnYtelseStegTest(
                 id = UUID.randomUUID(),
                 fom = LocalDate.of(2024, 12, 1),
                 tom = LocalDate.of(2024, 12, 31),
+                målgruppe = null,
+                aktivitet = null,
             )
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
@@ -230,7 +234,6 @@ class LæremidlerBeregnYtelseStegTest(
 
     @Test
     fun `en vedtaksperiode med 2 ulike målgrupper skal bli 2 ulike andeler med ulike typer som betales ut samtidig`() {
-        val vedtaksperiodeId = UUID.randomUUID()
         val førsteJan = LocalDate.of(2025, 1, 1)
         val sisteJan = LocalDate.of(2025, 1, 31)
         val førsteFeb = LocalDate.of(2025, 2, 1)
@@ -263,7 +266,8 @@ class LæremidlerBeregnYtelseStegTest(
         vilkårperiodeRepository.insert(aktivitet)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeLæremidlerDto(vedtaksperiodeId, fom = førsteJan, tom = sisteFeb)
+        val vedtaksperiode =
+            VedtaksperiodeLæremidlerDto(id = UUID.randomUUID(), fom = førsteJan, tom = sisteFeb, målgruppe = null, aktivitet = null)
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
@@ -326,6 +330,8 @@ class LæremidlerBeregnYtelseStegTest(
                 vedtaksperiodeStatus,
                 fom = førsteJan,
                 tom = sisteFeb,
+                målgruppe = null,
+                aktivitet = null,
             )
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
