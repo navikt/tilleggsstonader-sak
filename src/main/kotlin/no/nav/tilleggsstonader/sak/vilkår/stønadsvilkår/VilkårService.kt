@@ -283,9 +283,17 @@ class VilkårService(
     fun hentBoutgiftVilkår(behandlingId: BehandlingId): List<Vilkår> =
         vilkårRepository
             .findByBehandlingId(behandlingId)
-            .filter {
-                it.type == VilkårType.UTGIFTER_OVERNATTING ||
-                    it.type == VilkårType.LØPENDE_UTGIFTER_EN_BOLIG ||
-                    it.type == VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER
-            }
+            .also { it.kastFeilHvisTypeIkkeGjelderBoutgifter() }
+}
+
+private fun List<Vilkår>.kastFeilHvisTypeIkkeGjelderBoutgifter() {
+    feilHvis(
+        none {
+            it.type == VilkårType.UTGIFTER_OVERNATTING ||
+                it.type == VilkårType.LØPENDE_UTGIFTER_EN_BOLIG ||
+                it.type == VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER
+        },
+    ) {
+        "Forventet at vilkåret var av type boutgift, fikk i stedet ${map { it.type }}"
+    }
 }
