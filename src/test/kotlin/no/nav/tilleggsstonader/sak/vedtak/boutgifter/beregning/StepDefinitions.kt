@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -31,7 +30,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
-@Suppress("unused", "ktlint:standard:function-naming")
+@Suppress("ktlint:standard:function-naming")
 class StepDefinitions {
     val logger = LoggerFactory.getLogger(javaClass)
 
@@ -39,7 +38,6 @@ class StepDefinitions {
 
     val vedtakRepositroy = mockk<VedtakRepository>()
     val vilkårperiodeService = mockk<VilkårperiodeService>(relaxed = true)
-    val grunnlagsdataService = mockk<GrunnlagsdataService>(relaxed = true)
     val vedtaksperiodeValideringService = mockk<BoutgifterVedtaksperiodeValideringService>(relaxed = true)
 
     val beregningsService =
