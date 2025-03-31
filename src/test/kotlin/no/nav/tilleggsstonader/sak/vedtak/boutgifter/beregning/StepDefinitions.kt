@@ -117,6 +117,7 @@ class StepDefinitions {
                         ),
                 )
             }
+        assertThat(beregningsresultat!!.perioder).hasSize(forventetBeregningsresultat.size)
 
         forventetBeregningsresultat.forEachIndexed { index, periode ->
             try {
