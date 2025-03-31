@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatu
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.util.UUID
 

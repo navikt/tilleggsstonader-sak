@@ -5,6 +5,7 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
@@ -28,6 +29,7 @@ class VedtaksperiodeUtilTest {
         LæremidlerVedtaksperiodeValideringService(
             behandlingService = behandlingService,
             vedtakRepository = vedtakRepository,
+            unleashService = mockUnleashService(false),
         )
     val vedtaksperiodeJanuar =
         vedtaksperiode(
