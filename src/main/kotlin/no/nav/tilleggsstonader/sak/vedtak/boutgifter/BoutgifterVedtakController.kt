@@ -84,7 +84,6 @@ class BoutgifterVedtakController(
     fun hentVedtak(
         @PathVariable behandlingId: BehandlingId,
     ): VedtakResponse? {
-        return null
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
