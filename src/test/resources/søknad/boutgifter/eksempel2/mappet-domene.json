@@ -9,7 +9,7 @@
       "id" : "ANNET",
       "label" : "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
     } ],
-    "annenAktivitet" : "TILTAK",
+    "annenAktivitet" : null,
     "lønnetAktivitet" : null
   },
   "boutgifter" : {
@@ -17,13 +17,13 @@
     "fasteUtgifter" : null,
     "samling" : {
       "periodeForSamling" : [ {
-        "fom" : "2025-03-06",
-        "tom" : "2025-03-21",
+        "fom" : "2025-03-05",
+        "tom" : "2025-03-14",
         "trengteEkstraOvernatting" : "JA",
-        "utgifterTilOvernatting" : 100
+        "utgifterTilOvernatting" : 3000
       } ]
     },
-    "harSærligStoreUtgifterPgaFunksjonsnedsettelse" : "JA"
+    "harSærligStoreUtgifterPgaFunksjonsnedsettelse" : "NEI"
   },
   "dokumentasjon" : [ ]
 }

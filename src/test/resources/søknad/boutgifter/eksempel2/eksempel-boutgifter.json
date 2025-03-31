@@ -27,22 +27,21 @@
             "aktivitetId": "ingenAktivitet",
             "text": "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
           }
-        },
-        "arbeidsrettetAktivitet": "tiltakArbeidsrettetUtredning"
+        }
       },
       "boligEllerOvernatting": {
         "typeUtgifter": "midlertidigUtgift",
         "samling": {
           "periodeForSamling": [
             {
-              "utgifterTilOvernatting": 100,
-              "fom": "2025-03-06",
-              "tom": "2025-03-21",
+              "utgifterTilOvernatting": 3000,
+              "fom": "2025-03-05",
+              "tom": "2025-03-14",
               "trengteEkstraOvernatting": "ja"
             }
           ]
         },
-        "harSaerligStoreUtgifterPaGrunnAvFunksjonsnedsettelse": "ja"
+        "harSaerligStoreUtgifterPaGrunnAvFunksjonsnedsettelse": "nei"
       },
       "hovedytelse": {
         "arbeidsavklaringspenger": true,
@@ -59,7 +58,7 @@
     },
     "metadata": {
       "timezone": "Europe/Oslo",
-      "offset": 60,
+      "offset": 120,
       "origin": "https://skjemadelingslenke.ekstern.dev.nav.no",
       "referrer": "https://skjemadelingslenke.ekstern.dev.nav.no/fyllut/nav111219/paabegynt?sub=digital",
       "browserName": "Netscape",

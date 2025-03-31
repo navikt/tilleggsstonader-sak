@@ -34,10 +34,20 @@
   "boutgifter" : {
     "typeUtgifter" : "FASTE",
     "fasteUtgifter" : {
-      "harUtgifterTilBoligToSteder" : "EKSTRA_BOLIG",
-      "harLeieinntekterSomDekkerUtgifteneTilBoligenPaHjemstedet" : "JA",
-      "harHoyereUtgifterPaNyttBosted" : "JA",
-      "mottarBostotte" : "JA"
+      "typeFasteUtgifter" : "EKSTRA_BOLIG",
+      "utgifterFlereSteder" : {
+        "delerBoutgifter" : [ "HJEMSTED", "AKTIVITETSSTED", "NEI" ],
+        "andelUtgifterBoligHjemsted" : 100,
+        "andelUtgifterBoligAktivitetssted" : 100,
+        "harLeieinntekter" : "JA",
+        "leieinntekterPerManed" : 100
+      },
+      "utgifterNyBolig" : {
+        "delerBoutgifter" : "JA",
+        "andelUtgifterBolig" : 100,
+        "harHoyereUtgifterPaNyttBosted" : "JA",
+        "mottarBostotte" : "JA"
+      }
     },
     "samling" : {
       "periodeForSamling" : [ {

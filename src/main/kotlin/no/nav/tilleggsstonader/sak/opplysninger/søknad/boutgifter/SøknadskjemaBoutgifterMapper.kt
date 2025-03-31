@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidsrettetAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArsakOppholdUtenforNorgeType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.BoligEllerOvernatting
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.DelerBoutgifterType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HarUtgifterTilBoligToStederType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HovedytelseType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.JaNeiType
@@ -28,6 +29,8 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Arbei
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.FasteUtgifter as FasteUtgifterKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.OppholdUtenforNorge as OppholdUtenforNorgeKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.SkjemaBoutgifter as SkjemaBoutgifterKontrakt
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterFlereSteder as UtgifterFlereStederKontrakt
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterNyBolig as UtgifterNyBoligKontrakt
 
 /**
  * TODO burde mappe iso2landkoder til 3 her
@@ -146,17 +149,35 @@ object SøknadskjemaBoutgifterMapper {
         when (verdi) {
             TypeUtgifterType.fastUtgift -> TypeUtgifter.FASTE
             TypeUtgifterType.midlertidigUtgift -> TypeUtgifter.SAMLING
-            else -> error("Ukjent verdi $verdi")
         }
 
     private fun mapFasteUtgifter(fasteUtgifter: FasteUtgifterKontrakt?): FasteUtgifter? =
         fasteUtgifter?.let { utgifter ->
             FasteUtgifter(
-                harUtgifterTilBoligToSteder = mapTypeFasteUtgifter(utgifter.harUtgifterTilBoligToSteder),
-                harLeieinntekterSomDekkerUtgifteneTilBoligenPaHjemstedet =
-                    utgifter.harLeieinntekterSomDekkerUtgifteneTilBoligenPaHjemstedet?.let { mapJaNei(it) },
-                harHoyereUtgifterPaNyttBosted = utgifter.harHoyereUtgifterPaNyttBosted?.let { mapJaNei(it) },
-                mottarBostotte = utgifter.mottarBostotte?.let { mapJaNei(it) },
+                typeFasteUtgifter = mapTypeFasteUtgifter(utgifter.harUtgifterTilBoligToSteder),
+                utgifterFlereSteder = mapUtgifterFlereSteder(utgifter.utgifterFlereSteder),
+                utgifterNyBolig = mapUtgifterNyBolig(utgifter.utgifterNyBolig),
+            )
+        }
+
+    private fun mapUtgifterNyBolig(utgifterNyBolig: UtgifterNyBoligKontrakt?): UtgifterNyBolig? =
+        utgifterNyBolig?.let {
+            UtgifterNyBolig(
+                delerBoutgifter = mapJaNei(it.delerBoutgifter),
+                andelUtgifterBolig = it.andelUtgifterBolig,
+                harHoyereUtgifterPaNyttBosted = mapJaNei(it.harHoyereUtgifterPaNyttBosted),
+                mottarBostotte = it.mottarBostotte?.let(::mapJaNei),
+            )
+        }
+
+    private fun mapUtgifterFlereSteder(utgifterFlereSteder: UtgifterFlereStederKontrakt?): UtgifterFlereSteder? =
+        utgifterFlereSteder?.let {
+            UtgifterFlereSteder(
+                delerBoutgifter = mapDelerBoutgifterFlereSteder(it.delerBoutgifter),
+                andelUtgifterBoligHjemsted = it.andelUtgifterBoligHjemsted,
+                andelUtgifterBoligAktivitetssted = it.andelUtgifterBoligAktivitetssted,
+                harLeieinntekter = mapJaNei(it.harLeieinntekter),
+                leieinntekterPerManed = it.leieinntekterPerManed,
             )
         }
 
@@ -164,7 +185,6 @@ object SøknadskjemaBoutgifterMapper {
         when (verdi) {
             HarUtgifterTilBoligToStederType.ekstraBolig -> TypeFasteUtgifter.EKSTRA_BOLIG
             HarUtgifterTilBoligToStederType.nyBolig -> TypeFasteUtgifter.NY_BOLIG
-            else -> error("Ukjent verdi $verdi")
         }
 
     private fun mapSamling(samling: Samling?): UtgifterIForbindelseMedSamling? =
@@ -186,10 +206,20 @@ object SøknadskjemaBoutgifterMapper {
         when (verdi) {
             JaNeiType.ja -> JaNei.JA
             JaNeiType.nei -> JaNei.NEI
-            else -> error("Ukjent verdi $verdi")
         }
 
-    fun mapHovedytelse(hovedytelse: Map<HovedytelseType, Boolean>): List<Hovedytelse> =
+    private fun mapDelerBoutgifterFlereSteder(typer: Map<DelerBoutgifterType, Boolean>): List<DelerUtgifterFlereStederType> =
+        typer
+            .filter { it.value }
+            .map {
+                when (it.key) {
+                    DelerBoutgifterType.hjemsted -> DelerUtgifterFlereStederType.HJEMSTED
+                    DelerBoutgifterType.aktivitetssted -> DelerUtgifterFlereStederType.AKTIVITETSSTED
+                    DelerBoutgifterType.nei -> DelerUtgifterFlereStederType.NEI
+                }
+            }
+
+    private fun mapHovedytelse(hovedytelse: Map<HovedytelseType, Boolean>): List<Hovedytelse> =
         hovedytelse
             .filter { it.value }
             .map {
@@ -207,7 +237,9 @@ object SøknadskjemaBoutgifterMapper {
                 }
             }
 
-    fun mapÅrsakOppholdUtenforNorge(arsakOppholdUtenforNorge: Map<ArsakOppholdUtenforNorgeType, Boolean>): List<ÅrsakOppholdUtenforNorge> =
+    private fun mapÅrsakOppholdUtenforNorge(
+        arsakOppholdUtenforNorge: Map<ArsakOppholdUtenforNorgeType, Boolean>,
+    ): List<ÅrsakOppholdUtenforNorge> =
         arsakOppholdUtenforNorge
             .filter { it.value }
             .map {

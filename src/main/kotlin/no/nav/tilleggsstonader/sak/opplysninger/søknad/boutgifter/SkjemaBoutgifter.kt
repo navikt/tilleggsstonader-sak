@@ -35,11 +35,31 @@ enum class TypeFasteUtgifter {
 }
 
 data class FasteUtgifter(
-    val harUtgifterTilBoligToSteder: TypeFasteUtgifter,
-    val harLeieinntekterSomDekkerUtgifteneTilBoligenPaHjemstedet: JaNei?,
-    val harHoyereUtgifterPaNyttBosted: JaNei?,
+    val typeFasteUtgifter: TypeFasteUtgifter,
+    val utgifterFlereSteder: UtgifterFlereSteder?,
+    val utgifterNyBolig: UtgifterNyBolig?,
+)
+
+data class UtgifterNyBolig(
+    val delerBoutgifter: JaNei,
+    val andelUtgifterBolig: Int?,
+    val harHoyereUtgifterPaNyttBosted: JaNei,
     val mottarBostotte: JaNei?,
 )
+
+data class UtgifterFlereSteder(
+    val delerBoutgifter: List<DelerUtgifterFlereStederType>,
+    val andelUtgifterBoligHjemsted: Int?,
+    val andelUtgifterBoligAktivitetssted: Int?,
+    val harLeieinntekter: JaNei,
+    val leieinntekterPerManed: Int?,
+)
+
+enum class DelerUtgifterFlereStederType {
+    HJEMSTED,
+    AKTIVITETSSTED,
+    NEI,
+}
 
 data class UtgifterIForbindelseMedSamling(
     val periodeForSamling: List<PeriodeForSamling>,
