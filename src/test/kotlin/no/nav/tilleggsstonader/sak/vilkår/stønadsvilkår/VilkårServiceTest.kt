@@ -183,6 +183,7 @@ internal class VilkårServiceTest {
             assertThat(delvilkår.vurderinger.first().begrunnelse).isEqualTo("en begrunnelse")
         }
 
+        @Disabled
         @Test
         internal fun `Skal kunne oppdatere vilkår som nullvedtak`() {
             val lagretVilkår = slot<Vilkår>()
@@ -201,6 +202,26 @@ internal class VilkårServiceTest {
             )
 
             assertThat(lagretVilkår.captured.erNullvedtak).isTrue
+        }
+
+        @Test
+        internal fun `Skal ikke kunne oppdatere vilkår som nullvedtak`() {
+            val lagretVilkår = slot<Vilkår>()
+            val vilkår = initiererVilkårBoutgifter(lagretVilkår)
+
+            assertThatThrownBy {
+                vilkårService.oppdaterVilkår(
+                    SvarPåVilkårDto(
+                        id = vilkår.id,
+                        behandlingId = behandlingId,
+                        delvilkårsett = oppfylteDelvilkårUtgifterOvernattingDto(),
+                        fom = LocalDate.of(2024, 1, 1),
+                        tom = LocalDate.of(2024, 1, 31),
+                        utgift = null,
+                        erNullvedtak = true,
+                    ),
+                )
+            }.hasMessageContaining("Vi støtter foreløpig ikke nullvedtak")
         }
 
         @Test

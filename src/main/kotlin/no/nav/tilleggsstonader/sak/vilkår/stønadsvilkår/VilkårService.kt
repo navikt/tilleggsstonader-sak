@@ -55,7 +55,9 @@ class VilkårService(
 
         val oppdatertVilkår = flettVilkårOgVurderResultat(vilkår, svarPåVilkårDto)
         validerEndrePeriodeRevurdering(behandling, vilkår, oppdatertVilkår)
-        validerIngenUtgiftPåNullvedtak(svarPåVilkårDto)
+        // Venter på avklaring på hvordan og om vi skal støtte nullvedtak
+        validerIngenNullvedtak(svarPåVilkårDto)
+//        validerIngenUtgiftPåNullvedtak(svarPåVilkårDto)
 
         return vilkårRepository.update(oppdatertVilkår)
     }
@@ -81,7 +83,9 @@ class VilkårService(
             )
         val oppdatertVilkår = flettVilkårOgVurderResultat(nyttVilkår, opprettVilkårDto)
         validerNyPeriodeRevurdering(behandling, oppdatertVilkår)
-        validerIngenUtgiftPåNullvedtak(opprettVilkårDto)
+        // Venter på avklaring på hvordan og om vi skal støtte nullvedtak
+        validerIngenNullvedtak(opprettVilkårDto)
+//        validerIngenUtgiftPåNullvedtak(opprettVilkårDto)
 
         return vilkårRepository.insert(oppdatertVilkår)
     }
@@ -196,6 +200,12 @@ class VilkårService(
     private fun validerIngenUtgiftPåNullvedtak(lagreVilkårDto: LagreVilkårDto) {
         feilHvis(lagreVilkårDto.erNullvedtak == true && lagreVilkårDto.utgift !== null) {
             "Kan ikke ha utgift på nullvedtak"
+        }
+    }
+
+    private fun validerIngenNullvedtak(lagreVilkårDto: LagreVilkårDto) {
+        feilHvis(lagreVilkårDto.erNullvedtak == true) {
+            "Vi støtter foreløpig ikke nullvedtak"
         }
     }
 
