@@ -27,8 +27,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDate
 
 internal class OppdaterVilkårTest {
@@ -139,6 +141,7 @@ internal class OppdaterVilkårTest {
                     validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, dto)
                 }
 
+                @Disabled
                 @Test
                 fun `oppfylt utgfiter overnatting kan mangle utgift når det er et nullvedtak`() {
                     validerVilkårOgBeregnResultat(
@@ -155,6 +158,31 @@ internal class OppdaterVilkårTest {
                             opprettUtgifterOvernattingVilkårDto.copy(utgift = 1, erNullvedtak = true),
                         )
                     }.hasMessageContaining("Kan ikke ha utgift på nullvedtak")
+                }
+
+                @Disabled
+                @Test
+                internal fun `Skal kunne oppdatere vilkår som nullvedtak`() {
+                    val dto =
+                        opprettUtgifterOvernattingVilkårDto.copy(
+                            utgift = null,
+                            delvilkårsett = ikkeOppfylteDelvilkårUtgifterOvernattingDto(),
+                            erNullvedtak = true,
+                        )
+                    assertDoesNotThrow { validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, dto) }
+                }
+
+                @Test
+                internal fun `skal kaste feil når oppdatere vilkår som nullvedtak`() {
+                    val dto =
+                        opprettUtgifterOvernattingVilkårDto.copy(
+                            utgift = null,
+                            delvilkårsett = ikkeOppfylteDelvilkårUtgifterOvernattingDto(),
+                            erNullvedtak = true,
+                        )
+                    assertThatThrownBy {
+                        validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, dto)
+                    }.hasMessageContaining("Vi støtter foreløpig ikke nullvedtak")
                 }
             }
 

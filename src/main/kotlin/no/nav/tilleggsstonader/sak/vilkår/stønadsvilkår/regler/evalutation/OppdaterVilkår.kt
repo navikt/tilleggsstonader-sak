@@ -43,6 +43,10 @@ object OppdaterVilkår {
         val vilkårsresultat = utledResultat(vilkårsregel, oppdatering.delvilkårsett)
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
         validerPeriodeOgBeløp(oppdatering, vilkårsresultat)
+        validerIngenHøyereUtgifterGrunnetHelsemessigeÅrsaker(oppdatering)
+        // Venter på avklaring på hvordan og om vi skal støtte nullvedtak
+        validerIngenNullvedtak(oppdatering)
+//        validerIngenUtgiftPåNullvedtak(oppdatering)
 
         return vilkårsresultat
     }
@@ -82,7 +86,6 @@ object OppdaterVilkår {
         feilHvis(vilkårType !in vilkårMedUtgift && oppdatering.utgift != null) {
             "Kan ikke ha utgift på vilkårType=$vilkårType"
         }
-        validerIngenHøyereUtgifterGrunnetHelsemessigeÅrsaker(oppdatering)
     }
 
     private fun validerIngenHøyereUtgifterGrunnetHelsemessigeÅrsaker(lagreVilkårDto: LagreVilkårDto) {
@@ -96,6 +99,18 @@ object OppdaterVilkår {
             },
         ) {
             "Vi støtter ikke beregning med \"Høyere utgifter grunnet helsemessig årsaker\". Ta kontakt med Tilleggsstønader teamet."
+        }
+    }
+
+    private fun validerIngenUtgiftPåNullvedtak(lagreVilkårDto: LagreVilkårDto) {
+        feilHvis(lagreVilkårDto.erNullvedtak == true && lagreVilkårDto.utgift !== null) {
+            "Kan ikke ha utgift på nullvedtak"
+        }
+    }
+
+    private fun validerIngenNullvedtak(lagreVilkårDto: LagreVilkårDto) {
+        feilHvis(lagreVilkårDto.erNullvedtak == true) {
+            "Vi støtter foreløpig ikke nullvedtak"
         }
     }
 
