@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.Boutgi
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBoligDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoliger
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoligerDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsakerDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernattingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarnDto
@@ -104,11 +105,17 @@ internal class OppdaterVilkårTest {
                 @Test
                 fun `skal validere at man har med fom og tom for vilkår for utgfiter overnatting`() {
                     assertThatThrownBy {
-                        validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, opprettUtgifterOvernattingVilkårDto.copy(fom = null))
+                        validerVilkårOgBeregnResultat(
+                            utgifterOvernattingVilkår,
+                            opprettUtgifterOvernattingVilkårDto.copy(fom = null),
+                        )
                     }.hasMessageContaining("Mangler fra og med/til og med på vilkår")
 
                     assertThatThrownBy {
-                        validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, opprettUtgifterOvernattingVilkårDto.copy(tom = null))
+                        validerVilkårOgBeregnResultat(
+                            utgifterOvernattingVilkår,
+                            opprettUtgifterOvernattingVilkårDto.copy(tom = null),
+                        )
                     }.hasMessageContaining("Mangler fra og med/til og med på vilkår")
                 }
 
@@ -244,6 +251,21 @@ internal class OppdaterVilkårTest {
                             delvilkårsett = ikkeOppfylteDelvilkårLøpendeUtgifterToBoligerDto(),
                         )
                     validerVilkårOgBeregnResultat(vilkår, dto)
+                }
+
+                @Test
+                internal fun `Skal ikke kunne oppdatere vilkår som har Høyere utgifter grunnet helsemessig årsaker`() {
+                    val dto =
+                        opprettVilkårDto.copy(
+                            utgift = 500,
+                            delvilkårsett = oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsakerDto(),
+                        )
+
+                    assertThatThrownBy {
+                        validerVilkårOgBeregnResultat(vilkår, dto)
+                    }.hasMessageContaining(
+                        "Vi støtter ikke beregning med \"Høyere utgifter grunnet helsemessig årsaker\". Ta kontakt med Tilleggsstønader teamet.",
+                    )
                 }
             }
         }

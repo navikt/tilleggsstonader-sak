@@ -28,6 +28,13 @@ object BoutgifterRegelTestUtil {
             delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
         )
 
+    fun oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsaker() =
+        listOf(
+            delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.JA)),
+            delvilkår(Vurdering(RegelId.DOKUMENTERT_UTGIFTER_BOLIG, SvarId.JA)),
+            delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.JA, "begrunnelse")),
+        )
+
     fun ikkeOppfylteDelvilkårUtgifterOvernatting() =
         listOf(
             delvilkår(Vurdering(RegelId.NØDVENDIGE_MERUTGIFTER, SvarId.NEI, "begrunnelse")),
@@ -53,6 +60,11 @@ object BoutgifterRegelTestUtil {
     fun oppfylteDelvilkårLøpendeUtgifterEnBoligDto() = oppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() }
 
     fun oppfylteDelvilkårLøpendeUtgifterToBoligerDto() = oppfylteDelvilkårLøpendeUtgifterToBoliger().map { it.tilDto() }
+
+    fun oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsakerDto() =
+        oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsaker().map {
+            it.tilDto()
+        }
 
     fun ikkeOppfylteDelvilkårUtgifterOvernattingDto() = ikkeOppfylteDelvilkårUtgifterOvernatting().map { it.tilDto() }
 
