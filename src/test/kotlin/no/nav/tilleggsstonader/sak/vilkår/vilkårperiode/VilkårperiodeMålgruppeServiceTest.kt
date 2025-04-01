@@ -12,10 +12,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensio
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.tilOppdatering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
@@ -25,8 +25,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -465,17 +463,36 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                 )
             }.hasMessageContaining("Det har kommet nye vilkår som må vurderes")
         }
-    }
 
-    private fun Vilkårperiode.tilOppdatering() =
-        LagreVilkårperiode(
-            behandlingId = behandlingId,
-            fom = fom,
-            tom = tom,
-            faktaOgSvar = faktaOgVurdering.tilFaktaOgSvarDto(),
-            begrunnelse = begrunnelse,
-            type = type,
-        )
+        fun `kan ikke utvide målgruppe dersom den krysser aldersgrense`() {
+            val originalMålgruppe =
+                målgruppe(
+                    fom = now().minusMonths(1),
+                    tom = now().plusMonths(1),
+                    begrunnelse = "Begrunnelse",
+                    faktaOgVurdering =
+                        faktaOgVurderingMålgruppe(
+                            type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                            mottarSykepengerForFulltidsstilling =
+                                VurderingMottarSykepengerForFulltidsstilling(
+                                    svar = SvarJaNei.GAMMEL_MANGLER_DATA,
+                                    resultat = ResultatDelvilkårperiode.IKKE_VURDERT,
+                                ),
+                        ),
+                )
+            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe)
+            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
+
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(
+                    målgruppeFørOppdatering.id,
+                    målgruppeFørOppdatering
+                        .tilOppdatering()
+                        .copy(tom = målgruppeFørOppdatering.tom.plusMonths(1)),
+                )
+            }.hasMessageContaining("Det har kommet nye vilkår som må vurderes")
+        }
+    }
 
     private fun lagRevurderingMedKopiertMålgruppe(
         opprinneligMålgruppe: VilkårperiodeMålgruppe = målgruppe(),

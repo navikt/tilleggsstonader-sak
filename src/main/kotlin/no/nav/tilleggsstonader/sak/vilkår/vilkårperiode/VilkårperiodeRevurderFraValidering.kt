@@ -5,7 +5,10 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.util.norskFormat
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.AldersvilkårVurdering.vurderAldersvilkår
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgSvarDto
@@ -57,6 +60,24 @@ object VilkårperiodeRevurderFraValidering {
         feilHvis(eksisterendePeriode.faktaOgVurdering.tilFaktaOgSvarDto() != oppdatertPeriode.faktaOgSvar) {
             logEndring(eksisterendePeriode, oppdatertPeriode)
             "Kan ikke endre vurderinger eller fakta på perioden. Kontakt utviklingsteamet"
+        }
+    }
+
+    /**
+     * Brukes for å validere at målgruppen fortsatt har gyldig aldersvilkår dersom kun tom-utvides.
+     * Vil kun kaste feil dersom man i løpet av perioden krysser enten øvre eller nedre aldersbegrensning.
+     *
+     * Begrensning/mangler:
+     * Vil ikke varsle saksbehandler om at aldersvilkår ikke er oppfylt dersom tidligere vilkår inneholder GAMMEL_MANGLER_DATA
+     * Lagres ikke ned i internt vedtak at vi faktisk sjekker alderen i disse tilfellene
+     */
+    fun validerAtAldersvilkårErGyldig(
+        eksisterendePeriode: Vilkårperiode,
+        oppdatertPeriode: LagreVilkårperiode,
+        grunnlagsdata: Grunnlagsdata,
+    ) {
+        if (eksisterendePeriode.type is MålgruppeType) {
+            vurderAldersvilkår(oppdatertPeriode, grunnlagsdata)
         }
     }
 

@@ -57,6 +57,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivit
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import java.time.LocalDate
 import java.util.UUID
@@ -385,4 +386,14 @@ object VilkårperiodeTestUtil {
             else -> error("Har ikke mappet ${faktaOgVurdering1::class.simpleName}")
         }
     }
+
+    fun Vilkårperiode.tilOppdatering() =
+        LagreVilkårperiode(
+            behandlingId = behandlingId,
+            fom = fom,
+            tom = tom,
+            faktaOgSvar = faktaOgVurdering.tilFaktaOgSvarDto(),
+            begrunnelse = begrunnelse,
+            type = type,
+        )
 }
