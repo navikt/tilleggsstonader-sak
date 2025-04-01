@@ -6,6 +6,7 @@ import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
@@ -29,6 +30,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
+import java.time.LocalDate
 
 @Suppress("ktlint:standard:function-naming")
 class StepDefinitions {
@@ -99,13 +101,15 @@ class StepDefinitions {
         assertThat(exception).isNull()
         val forventetBeregningsresultat =
             dataTable.mapRad { rad ->
+                val fom = parseDato(DomenenøkkelFelles.FOM, rad)
+                val tom = parseDato(DomenenøkkelFelles.TOM, rad)
                 BeregningsresultatForLøpendeMåned(
                     grunnlag =
                         Beregningsgrunnlag(
-                            fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                            tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                            fom = fom,
+                            tom = tom,
                             utbetalingsdato = parseDato(BoutgifterNøkler.UTBETALINGSDATO, rad),
-                            utgifter = utgifter,
+                            utgifter = finnRelevanteUtgifter(utgifter = utgifter, fom = fom, tom = tom),
                             makssats = parseInt(BoutgifterNøkler.MAKS_SATS, rad),
                             makssatsBekreftet = true,
                             målgruppe =
@@ -129,6 +133,11 @@ class StepDefinitions {
             }
         }
     }
+
+    @Så("forvent følgende feil fra boutgifterberegning: {}")
+    fun `forvent følgende feil`(forventetFeil: String) {
+        assertThat(exception).hasMessageContaining(forventetFeil)
+    }
 }
 
 enum class BoutgifterNøkler(
@@ -138,3 +147,10 @@ enum class BoutgifterNøkler(
     UTGIFT("Utgift"),
     MAKS_SATS("Maks sats"),
 }
+
+private fun finnRelevanteUtgifter(
+    utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    fom: LocalDate,
+    tom: LocalDate,
+): Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+    utgifter.mapValues { (_, utgifterListe) -> utgifterListe.filter { it.overlapper(Datoperiode(fom, tom)) } }
