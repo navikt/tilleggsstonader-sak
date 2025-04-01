@@ -2,7 +2,7 @@
   "behandling" : {
     "behandlingId" : "001464ca-20dc-4f6c-b3e8-c83bd98b3e31",
     "eksternFagsakId" : 1673,
-    "stønadstype" : "LÆREMIDLER",
+    "stønadstype" : "BOUTGIFTER",
     "årsak" : "SØKNAD",
     "ident" : "15",
     "opprettetTidspunkt" : "2024-02-05T00:00:00",
@@ -10,7 +10,7 @@
     "vedtakstidspunkt" : "2024-01-01T00:00:00",
     "saksbehandler" : "saksbehandler",
     "beslutter" : "saksbeh2",
-    "revurderFra" : "2024-01-01"
+    "revurderFra" : null
   },
   "søknad" : {
     "mottattTidspunkt" : "2023-01-01T00:00:00"
@@ -61,14 +61,8 @@
     "fom" : "2024-12-10",
     "tom" : "2024-12-15",
     "faktaOgVurderinger" : {
-      "@type" : "AKTIVITET_LÆREMIDLER",
-      "prosent" : 80,
-      "studienivå" : "HØYERE_UTDANNING",
-      "harUtgifter" : {
-        "svar" : "JA",
-        "resultat" : "OPPFYLT"
-      },
-      "harRettTilUtstyrsstipend" : {
+      "@type" : "AKTIVITET_BOUTGIFTER",
+      "lønnet" : {
         "svar" : "NEI",
         "resultat" : "OPPFYLT"
       }
@@ -82,60 +76,47 @@
     "fom" : "2024-12-10",
     "tom" : "2024-12-15",
     "faktaOgVurderinger" : {
-      "@type" : "AKTIVITET_LÆREMIDLER",
-      "prosent" : 80,
-      "studienivå" : "VIDEREGÅENDE",
-      "harUtgifter" : {
-        "svar" : "JA",
-        "resultat" : "OPPFYLT"
-      },
-      "harRettTilUtstyrsstipend" : {
-        "svar" : "JA",
-        "resultat" : "IKKE_OPPFYLT"
-      }
+      "@type" : "AKTIVITET_BOUTGIFTER",
+      "lønnet" : null
     },
     "kilde" : "MANUELL",
     "resultat" : "IKKE_OPPFYLT",
-    "begrunnelse" : null,
+    "begrunnelse" : "ikke oppfylt",
     "slettetKommentar" : null
   } ],
-  "stønadsperioder" : [ {
-    "målgruppe" : "AAP",
-    "aktivitet" : "TILTAK",
-    "fom" : "2024-02-01",
-    "tom" : "2024-03-31"
-  }, {
-    "målgruppe" : "NEDSATT_ARBEIDSEVNE",
-    "aktivitet" : "REELL_ARBEIDSSØKER",
-    "fom" : "2024-02-01",
-    "tom" : "2024-03-31"
-  } ],
+  "stønadsperioder" : null,
   "vedtaksperioder" : [ {
     "fom" : "2024-01-01",
-    "tom" : "2024-03-31",
-    "målgruppe" : null,
-    "aktivitet" : null
+    "tom" : "2024-02-29",
+    "målgruppe" : "AAP",
+    "aktivitet" : "TILTAK"
   } ],
   "vilkår" : [ ],
   "vedtak" : {
-    "innvilgelseBegrunnelse" : "Sånn her vil en begrunnelse se ut",
+    "innvilgelseBegrunnelse" : "Sånn her vil en begrunnelse se ut i det interne vedtaket",
     "type" : "INNVILGELSE"
   },
   "beregningsresultat" : {
     "tilsynBarn" : null,
-    "læremidler" : [ {
+    "læremidler" : null,
+    "boutgifter" : [ {
       "fom" : "2024-01-01",
-      "tom" : "2024-02-29",
-      "antallMåneder" : 2,
-      "studienivå" : "HØYERE_UTDANNING",
-      "studieprosent" : 100,
-      "beløp" : 951,
-      "stønadsbeløp" : 1902,
+      "tom" : "2024-01-31",
+      "antallMåneder" : 1,
+      "stønadsbeløp" : 3000,
       "utbetalingsdato" : "2024-01-01",
       "målgruppe" : "AAP",
       "aktivitet" : "TILTAK",
       "delAvTidligereUtbetaling" : false
-    } ],
-    "boutgifter" : null
+    }, {
+      "fom" : "2024-02-01",
+      "tom" : "2024-02-29",
+      "antallMåneder" : 1,
+      "stønadsbeløp" : 4000,
+      "utbetalingsdato" : "2024-01-01",
+      "målgruppe" : "AAP",
+      "aktivitet" : "TILTAK",
+      "delAvTidligereUtbetaling" : false
+    } ]
   }
 }
