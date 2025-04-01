@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 
 /**
@@ -9,38 +10,47 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 enum class MålgruppeType(
     private val prioritet: Int?,
     val gyldigeAktiviter: Set<AktivitetType>,
+    private val faktiskMålgruppe: FaktiskMålgruppe?,
 ) : VilkårperiodeType {
     AAP(
         prioritet = 0,
         gyldigeAktiviter = setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING),
+        faktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
     ),
     DAGPENGER(
         prioritet = null, // Ikke satt prioritet ennå, ingen stønad gir rett på dagpenger ennå
         gyldigeAktiviter = setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING),
+        faktiskMålgruppe = null,
     ),
     OMSTILLINGSSTØNAD(
         prioritet = 5,
         gyldigeAktiviter = setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING),
+        faktiskMålgruppe = FaktiskMålgruppe.GJENLEVENDE,
     ),
     OVERGANGSSTØNAD(
         prioritet = 4,
         gyldigeAktiviter = setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING),
+        faktiskMålgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
     ),
     NEDSATT_ARBEIDSEVNE(
         prioritet = 1,
         gyldigeAktiviter = setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING),
+        faktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
     ),
     UFØRETRYGD(
         prioritet = 2,
         gyldigeAktiviter = setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING),
+        faktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
     ),
     SYKEPENGER_100_PROSENT(
         prioritet = NULL_IKKE_RETT_PÅ_STØNAD,
         gyldigeAktiviter = emptySet(),
+        faktiskMålgruppe = null,
     ),
     INGEN_MÅLGRUPPE(
         prioritet = NULL_IKKE_RETT_PÅ_STØNAD,
         gyldigeAktiviter = emptySet(),
+        faktiskMålgruppe = null,
     ),
     ;
 
@@ -49,6 +59,8 @@ enum class MålgruppeType(
     override fun tilDbType(): String = this.name
 
     fun gjelderNedsattArbeidsevne() = this == NEDSATT_ARBEIDSEVNE || this == UFØRETRYGD || this == AAP
+
+    fun faktiskMålgruppe() = this.faktiskMålgruppe ?: error("Mangler faktisk målgruppe for $this")
 
     override fun girIkkeRettPåStønadsperiode() =
         this == INGEN_MÅLGRUPPE ||

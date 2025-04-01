@@ -1,30 +1,19 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 
 enum class LovverketsMålgruppeDvh {
     NEDSATT_ARBEIDSEVNE,
     ENSLIG_FORSØRGER,
     GJENLEVENDE,
-    INGEN_MÅLGRUPPE,
     ;
 
     companion object {
-        fun fraDomene(målgruppe: MålgruppeType) =
+        fun fraDomene(målgruppe: FaktiskMålgruppe) =
             when (målgruppe) {
-                MålgruppeType.AAP,
-                MålgruppeType.NEDSATT_ARBEIDSEVNE,
-                MålgruppeType.UFØRETRYGD,
-                -> NEDSATT_ARBEIDSEVNE
-
-                MålgruppeType.OVERGANGSSTØNAD -> ENSLIG_FORSØRGER
-
-                MålgruppeType.OMSTILLINGSSTØNAD -> GJENLEVENDE
-
-                MålgruppeType.DAGPENGER,
-                MålgruppeType.SYKEPENGER_100_PROSENT,
-                MålgruppeType.INGEN_MÅLGRUPPE,
-                -> INGEN_MÅLGRUPPE
+                FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE -> NEDSATT_ARBEIDSEVNE
+                FaktiskMålgruppe.ENSLIG_FORSØRGER -> ENSLIG_FORSØRGER
+                FaktiskMålgruppe.GJENLEVENDE -> GJENLEVENDE
             }
     }
 }
