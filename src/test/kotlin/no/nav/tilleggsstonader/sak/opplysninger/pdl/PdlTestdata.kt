@@ -164,7 +164,6 @@ object PdlTestdata {
                             IdentifiserendeInformasjon(Personnavn("", "", "")),
                             "",
                             "",
-                            true,
                         ),
                     ),
                 ),

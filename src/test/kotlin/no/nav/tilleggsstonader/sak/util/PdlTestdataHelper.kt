@@ -158,11 +158,9 @@ object PdlTestdataHelper {
         motpartsPersonident: String? = "1",
         navn: Personnavn? = null,
         omfang: String? = "personligeOgOekonomiskeInteresser",
-        omfangetErInnenPersonligOmraade: Boolean = false,
     ) = VergeEllerFullmektig(
         motpartsPersonident = motpartsPersonident,
         identifiserendeInformasjon = IdentifiserendeInformasjon(navn = navn),
         omfang = omfang,
-        omfangetErInnenPersonligOmraade = omfangetErInnenPersonligOmraade,
     )
 }
