@@ -58,5 +58,5 @@ Egenskap: Beregning av læremidler - helg
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå       | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.02.2025 | 11.02.2025 | 901   | HØYERE_UTDANNING | 100           | 901  | AAP       | 03.02.2025      |
+      | Fom        | Tom        | Beløp | Studienivå       | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 01.02.2025 | 11.02.2025 | 901   | HØYERE_UTDANNING | 100           | 901  | NEDSATT_ARBEIDSEVNE | 03.02.2025      |

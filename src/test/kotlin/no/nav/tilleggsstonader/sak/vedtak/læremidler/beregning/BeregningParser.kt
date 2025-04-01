@@ -10,13 +10,13 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriBoolean
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
 fun mapAktiviteter(
     behandlingId: BehandlingId,
@@ -52,7 +52,7 @@ fun mapBeregningsresultat(dataTable: DataTable) =
                     sats = parseBigDecimal(BeregningNøkler.SATS, rad).toInt(),
                     satsBekreftet = parseValgfriBoolean(BeregningNøkler.BEKREFTET_SATS, rad) ?: true,
                     utbetalingsdato = parseDato(BeregningNøkler.UTBETALINGSDATO, rad),
-                    målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
+                    målgruppe = parseValgfriEnum<FaktiskMålgruppe>(BeregningNøkler.MÅLGRUPPE, rad) ?: FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitet = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad) ?: AktivitetType.TILTAK,
                 ),
             delAvTidligereUtbetaling = parseValgfriBoolean(BeregningNøkler.DEL_AV_TIDLIGERE_UTBETALING, rad) ?: false,

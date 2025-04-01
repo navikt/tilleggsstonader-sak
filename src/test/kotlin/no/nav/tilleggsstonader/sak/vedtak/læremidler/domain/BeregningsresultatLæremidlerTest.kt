@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -81,7 +81,7 @@ class BeregningsresultatLæremidlerTest {
                             studieprosent = 100,
                             sats = 875,
                             satsBekreftet = true,
-                            målgruppe = MålgruppeType.AAP,
+                            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                             aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
@@ -158,7 +158,7 @@ class BeregningsresultatLæremidlerTest {
                             studieprosent = 100,
                             sats = 875,
                             satsBekreftet = true,
-                            målgruppe = MålgruppeType.AAP,
+                            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                             aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
@@ -173,7 +173,7 @@ class BeregningsresultatLæremidlerTest {
                             studieprosent = 100,
                             sats = 875,
                             satsBekreftet = true,
-                            målgruppe = MålgruppeType.AAP,
+                            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                             aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
@@ -188,7 +188,7 @@ class BeregningsresultatLæremidlerTest {
                             studieprosent = 100,
                             sats = 875,
                             satsBekreftet = true,
-                            målgruppe = MålgruppeType.AAP,
+                            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                             aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
@@ -203,7 +203,7 @@ class BeregningsresultatLæremidlerTest {
                             studieprosent = 100,
                             sats = 875,
                             satsBekreftet = true,
-                            målgruppe = MålgruppeType.AAP,
+                            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                             aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
@@ -230,7 +230,7 @@ class BeregningsresultatLæremidlerTest {
                             studieprosent = 100,
                             sats = 875,
                             satsBekreftet = true,
-                            målgruppe = MålgruppeType.AAP,
+                            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                             aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
@@ -307,7 +307,7 @@ class BeregningsresultatLæremidlerTest {
                             studieprosent = 100,
                             sats = 875,
                             satsBekreftet = true,
-                            målgruppe = MålgruppeType.AAP,
+                            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                             aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
@@ -322,7 +322,7 @@ class BeregningsresultatLæremidlerTest {
                             studieprosent = 100,
                             sats = 875,
                             satsBekreftet = true,
-                            målgruppe = MålgruppeType.AAP,
+                            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                             aktivitet = AktivitetType.TILTAK,
                         ),
                 ),
