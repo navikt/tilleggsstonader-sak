@@ -12,12 +12,42 @@ class UtgifterOvernattingRegel :
     Vilkårsregel(
         vilkårType = VilkårType.UTGIFTER_OVERNATTING,
         regler =
-            setOf(NØDVENDIGE_MERUTGIFTER),
+            setOf(NØDVENDIGE_MERUTGIFTER, DOKUMENTERT_UTGIFTER_OVERNATTING, HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SØKER_DELTA_PÅ),
     ) {
     companion object {
+        private val SØKER_DELTA_PÅ =
+            RegelSteg(
+                regelId = RegelId.SØKER_DELTA_PÅ,
+                erHovedregel = true,
+                svarMapping =
+                    mapOf(
+                        SvarId.JA to OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                        SvarId.NEI to IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
+                    ),
+            )
+        private val DOKUMENTERT_UTGIFTER_OVERNATTING =
+            RegelSteg(
+                regelId = RegelId.DOKUMENTERT_UTGIFTER_OVERNATTING,
+                erHovedregel = true,
+                svarMapping =
+                    mapOf(
+                        SvarId.JA to OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                        SvarId.NEI to IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
+                    ),
+            )
         private val NØDVENDIGE_MERUTGIFTER =
             RegelSteg(
                 regelId = RegelId.NØDVENDIGE_MERUTGIFTER,
+                erHovedregel = true,
+                svarMapping =
+                    mapOf(
+                        SvarId.JA to OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                        SvarId.NEI to IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
+                    ),
+            )
+        private val HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER =
+            RegelSteg(
+                regelId = RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER,
                 erHovedregel = true,
                 svarMapping =
                     mapOf(
