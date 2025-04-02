@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 
 object VilkårPeriodeValidering {
     /**
@@ -17,14 +18,17 @@ object VilkårPeriodeValidering {
         values
             .groupBy { Pair(it.type, it.barnId) }
             .mapValues { (_, vilkårliste) -> vilkårTilDatoperiode(vilkårliste) }
-            .forEach { (_, vilkårliste) -> validerIkkeOverlappende(vilkårliste) }
+            .forEach { (vilkårType, vilkårliste) -> validerIkkeOverlappende(vilkårType.first, vilkårliste) }
     }
 
-    private fun validerIkkeOverlappende(vilkårliste: List<Datoperiode>) {
+    private fun validerIkkeOverlappende(
+        vilkårType: VilkårType,
+        vilkårliste: List<Datoperiode>,
+    ) {
         val overlappendePeriode = vilkårliste.førsteOverlappendePeriode()
         if (overlappendePeriode != null) {
             brukerfeil(
-                "Det er ikke gyldig med overlappende perioder for et barn. " +
+                "Det er ikke gyldig med overlappende perioder for ${vilkårType.tilFeilmeldingTekst()}. " +
                     "Periode ${overlappendePeriode.first.formatertPeriodeNorskFormat()} " +
                     "overlapper med ${overlappendePeriode.second.formatertPeriodeNorskFormat()}. ",
             )
@@ -38,5 +42,11 @@ object VilkårPeriodeValidering {
             } else {
                 Datoperiode(fom = it.fom, tom = it.tom)
             }
+        }
+
+    private fun VilkårType.tilFeilmeldingTekst(): String =
+        when (this) {
+            VilkårType.PASS_BARN -> "et barn"
+            else -> beskrivelse.lowercase()
         }
 }
