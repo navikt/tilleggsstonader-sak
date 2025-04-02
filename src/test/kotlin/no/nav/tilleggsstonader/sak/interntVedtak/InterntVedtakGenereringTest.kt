@@ -133,7 +133,7 @@ class InterntVedtakGenereringTest {
         every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.Boutgifter.vilkårperioder
         every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.Boutgifter.grunnlagsdata
         every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
-        every { vilkårService.hentVilkår(behandlingId) } returns emptyList()
+        every { vilkårService.hentVilkår(behandlingId) } returns Testdata.Boutgifter.vilkår
         every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Boutgifter.innvilgetVedtak
     }
 

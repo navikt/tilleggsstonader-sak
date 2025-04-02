@@ -10,7 +10,15 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 object BoutgifterRegelTestUtil {
     fun oppfylteDelvilkårUtgifterOvernatting() =
         listOf(
-            delvilkår(Vurdering(RegelId.NØDVENDIGE_MERUTGIFTER, SvarId.JA)),
+            delvilkår(
+                Vurdering(
+                    regelId = RegelId.NØDVENDIGE_MERUTGIFTER,
+                    svar = SvarId.JA,
+                    begrunnelse = "En begrunnelse på delvilkåret",
+                ),
+                Vurdering(regelId = RegelId.DOKUMENTERT_UTGIFTER_OVERNATTING, svar = SvarId.JA),
+                Vurdering(regelId = RegelId.SØKER_DELTA_PÅ, svar = SvarId.JA),
+            ),
         )
 
     fun oppfylteDelvilkårLøpendeUtgifterEnBolig() =
