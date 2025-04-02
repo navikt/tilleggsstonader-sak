@@ -73,7 +73,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         LæremidlerVedtaksperiodeValideringService(
             behandlingService = behandlingService,
             vedtakRepository = vedtakRepository,
-            unleashService = mockUnleashService(false),
         )
 
     val simuleringService =
@@ -93,6 +92,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             vedtakRepository = vedtakRepository,
             tilkjentytelseService = TilkjentYtelseService(tilkjentYtelseRepository),
             simuleringService = simuleringService,
+            unleashService = mockUnleashService(false),
         )
     val vedtaksperiodeId: UUID = UUID.randomUUID()
 

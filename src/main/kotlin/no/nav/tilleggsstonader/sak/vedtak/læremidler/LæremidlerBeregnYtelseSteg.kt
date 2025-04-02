@@ -1,11 +1,13 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -25,6 +27,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.VedtaksperiodeStatusMapper.settStatusPåVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BrukVedtaksperioderForBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
@@ -45,6 +48,7 @@ class LæremidlerBeregnYtelseSteg(
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
+    private val unleashService: UnleashService,
 ) : BeregnYtelseSteg<VedtakLæremidlerRequest>(
         stønadstype = Stønadstype.LÆREMIDLER,
         vedtakRepository = vedtakRepository,
@@ -93,7 +97,13 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
     ) {
-        val beregningsresultat = beregningService.beregn(saksbehandling, vedtaksperioder)
+        val brukVedtaksperioder = unleashService.isEnabled(Toggle.LÆREMIDLER_VEDTAKSPERIODER_V2)
+        val beregningsresultat =
+            beregningService.beregn(
+                saksbehandling,
+                vedtaksperioder,
+                brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(brukVedtaksperioder),
+            )
 
         vedtakRepository.insert(
             lagInnvilgetVedtak(
@@ -127,7 +137,12 @@ class LæremidlerBeregnYtelseSteg(
 
         val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
 
-        val beregningsresultat = beregningService.beregnForOpphør(saksbehandling, avkortetVedtaksperioder)
+        val beregningsresultat =
+            beregningService.beregnForOpphør(
+                saksbehandling,
+                avkortetVedtaksperioder,
+                BrukVedtaksperioderForBeregning(unleashService.isEnabled(Toggle.LÆREMIDLER_VEDTAKSPERIODER_V2)),
+            )
 
         vedtakRepository.insert(
             GeneriskVedtak(

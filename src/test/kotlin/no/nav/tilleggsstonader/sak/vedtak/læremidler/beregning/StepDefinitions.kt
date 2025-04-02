@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
@@ -57,7 +56,6 @@ class StepDefinitions {
         LæremidlerVedtaksperiodeValideringService(
             behandlingService = behandlingService,
             vedtakRepository = vedtakRepository,
-            unleashService = mockUnleashService(false),
         )
 
     val læremidlerBeregningService =
@@ -110,7 +108,12 @@ class StepDefinitions {
         val behandling = saksbehandling(behandling = behandling(id = behandlingId))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
         try {
-            resultat = læremidlerBeregningService.beregn(behandling, vedtaksPerioder)
+            resultat =
+                læremidlerBeregningService.beregn(
+                    behandling,
+                    vedtaksPerioder,
+                    brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(false),
+                )
         } catch (e: Exception) {
             beregningException = e
         }
@@ -135,6 +138,7 @@ class StepDefinitions {
             læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
                 vedtaksperioder = vedtaksPerioder,
                 behandlingId = behandlingId,
+                brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(false),
             )
         } catch (feil: Exception) {
             valideringException = feil

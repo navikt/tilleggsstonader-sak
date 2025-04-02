@@ -5,11 +5,11 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BrukVedtaksperioderForBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerIngenOverlappendeVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.vedtaksperioderInnenforLøpendeMåned
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -29,7 +29,6 @@ class VedtaksperiodeUtilTest {
         LæremidlerVedtaksperiodeValideringService(
             behandlingService = behandlingService,
             vedtakRepository = vedtakRepository,
-            unleashService = mockUnleashService(false),
         )
     val vedtaksperiodeJanuar =
         vedtaksperiode(
@@ -53,6 +52,7 @@ class VedtaksperiodeUtilTest {
                 læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
                     vedtaksperioder = vedtaksperioder,
                     behandlingId = behandlingId,
+                    brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(false),
                 )
             }
         }
@@ -67,6 +67,7 @@ class VedtaksperiodeUtilTest {
                 læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
                     vedtaksperioder = vedtaksperioder,
                     behandlingId = behandlingId,
+                    brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(false),
                 )
             }.hasMessageContaining("Kan ikke innvilge når det ikke finnes noen vedtaksperioder.")
         }

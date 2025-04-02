@@ -44,6 +44,7 @@ class LæremidlerBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
+        brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): BeregningsresultatLæremidler {
         val vedtaksperioderBeregningsgrunnlag = hentVedtaksperioderForBergningsgrunnlag(behandling.id, vedtaksperioder)
         val forrigeVedtak = hentForrigeVedtak(behandling)
@@ -51,6 +52,7 @@ class LæremidlerBeregningService(
         læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             behandlingId = behandling.id,
+            brukVedtaksperioderForBeregning = brukVedtaksperioderForBeregning,
         )
 
         val beregningsresultatForMåned = beregn(behandling, vedtaksperioderBeregningsgrunnlag)
@@ -73,6 +75,7 @@ class LæremidlerBeregningService(
     fun beregnForOpphør(
         behandling: Saksbehandling,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
+        brukVedtaksperioderForMålgruppeOgAktivitet: BrukVedtaksperioderForBeregning,
     ): BeregningsresultatLæremidler {
         feilHvis(behandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
@@ -87,6 +90,7 @@ class LæremidlerBeregningService(
             behandling = behandling,
             avkortetBeregningsresultat = avkortetBeregningsresultat,
             avkortetVedtaksperioder = avkortetVedtaksperioder,
+            brukVedtaksperioderForMålgruppeOgAktivitet,
         )
     }
 
@@ -99,6 +103,7 @@ class LæremidlerBeregningService(
         behandling: Saksbehandling,
         avkortetBeregningsresultat: AvkortResult<BeregningsresultatForMåned>,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
+        brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): BeregningsresultatLæremidler {
         if (!avkortetBeregningsresultat.harAvkortetPeriode) {
             return BeregningsresultatLæremidler(avkortetBeregningsresultat.perioder)
@@ -108,6 +113,7 @@ class LæremidlerBeregningService(
             behandling = behandling,
             avkortetBeregningsresultat = avkortetBeregningsresultat,
             avkortetVedtaksperioder = avkortetVedtaksperioder,
+            brukVedtaksperioderForBeregning = brukVedtaksperioderForBeregning,
         )
     }
 
@@ -115,6 +121,7 @@ class LæremidlerBeregningService(
         behandling: Saksbehandling,
         avkortetBeregningsresultat: AvkortResult<BeregningsresultatForMåned>,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
+        brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): BeregningsresultatLæremidler {
         val perioderSomBeholdes = avkortetBeregningsresultat.perioder.dropLast(1)
         val periodeTilReberegning = avkortetBeregningsresultat.perioder.last()
@@ -124,6 +131,7 @@ class LæremidlerBeregningService(
                 behandling = behandling,
                 avkortetVedtaksperioder = avkortetVedtaksperioder,
                 beregningsresultatTilReberegning = periodeTilReberegning,
+                brukVedtaksperioderForBeregning = brukVedtaksperioderForBeregning,
             )
 
         val nyePerioder =
@@ -140,6 +148,7 @@ class LæremidlerBeregningService(
         behandling: Saksbehandling,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
         beregningsresultatTilReberegning: BeregningsresultatForMåned,
+        brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): List<BeregningsresultatForMåned> {
         val vedtaksperioderForGrunnlag = hentVedtaksperioderForBergningsgrunnlag(behandling.id, avkortetVedtaksperioder)
         val vedtaksperioderSomOmregnes =
