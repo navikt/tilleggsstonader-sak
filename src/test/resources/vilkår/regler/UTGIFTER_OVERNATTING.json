@@ -48,11 +48,11 @@
       "erHovedregel" : true,
       "svarMapping" : {
         "JA" : {
-          "begrunnelseType" : "VALGFRI",
+          "begrunnelseType" : "PÅKREVD",
           "regelId" : "SLUTT_NODE"
         },
         "NEI" : {
-          "begrunnelseType" : "PÅKREVD",
+          "begrunnelseType" : "VALGFRI",
           "regelId" : "SLUTT_NODE"
         }
       }
