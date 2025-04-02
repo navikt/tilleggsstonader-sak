@@ -62,6 +62,21 @@ Egenskap: Beregning av faste utgifter
       | 15.01.2025 | 14.02.2025 | 1              | 4953         | 4953      | 15.01.2025      | AAP       | TILTAK    |
       | 15.02.2025 | 18.02.2025 | 1              | 4953         | 4953      | 15.02.2025      | AAP       | TILTAK    |
 
+  Scenario: To påfølgende vedtaksperioder som dekker utgiften
+    Gitt følgende vedtaksperioder for boutgifter
+      | Fom        | Tom        | Aktivitet | Målgruppe |
+      | 01.01.2025 | 31.01.2025 | TILTAK    | AAP       |
+      | 01.02.2025 | 28.02.2025 | TILTAK    | AAP       |
+
+    Gitt følgende utgifter for: LØPENDE_UTGIFTER_TO_BOLIGER
+      | Fom        | Tom        | Utgift |
+      | 01.01.2025 | 28.02.2025 | 1000   |
+
+    Så skal beregnet stønad for boutgifter være
+      | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe | Aktivitet |
+      | 01.01.2025 | 31.01.2025 | 1              | 1000         | 4953      | 01.01.2025      | AAP       | TILTAK    |
+      | 01.02.2025 | 28.02.2025 | 1              | 1000         | 4953      | 01.02.2025      | AAP       | TILTAK    |
+
   Scenario: Utgiftsperiodene er lengre enn vedtaksperiodene
   Regel: Når deler av en utgiftsperiode går inn i en ny løpende måned, skal hele utgiften utbetales (opp til makssats)
     Eksempel: Bruker tar utdanning fra 15. januar til 20. juni, og leier bolig på utdanningsstedet

@@ -86,3 +86,28 @@ Egenskap: Beregning av midlertidig overnatting
       | 09.02.2025 | 14.02.2025 | 1500   |
 
     Så forvent følgende feil når vi beregner boutgifter: Vi støtter foreløpig ikke at utgifter krysser ulike utbetalingsperioder.
+
+  Scenario: To påfølgende vedtaksperioder som dekker utgiften
+    Gitt følgende vedtaksperioder for boutgifter
+      | Fom        | Tom        | Aktivitet | Målgruppe |
+      | 01.01.2025 | 15.01.2025 | TILTAK    | AAP       |
+      | 16.01.2025 | 31.01.2025 | TILTAK    | AAP       |
+
+    Gitt følgende utgifter for: UTGIFTER_OVERNATTING
+      | Fom        | Tom        | Utgift |
+      | 01.01.2025 | 31.01.2025 | 1000   |
+
+    Så skal beregnet stønad for boutgifter være
+      | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe | Aktivitet |
+      | 01.01.2025 | 31.01.2025 | 1              | 1000         | 4953      | 01.01.2025      | AAP       | TILTAK    |
+
+  Scenario: Vedtaksperiode som ikke dekker utgift
+    Gitt følgende vedtaksperioder for boutgifter
+      | Fom        | Tom        | Aktivitet | Målgruppe |
+      | 01.01.2025 | 15.01.2025 | TILTAK    | AAP       |
+
+    Gitt følgende utgifter for: UTGIFTER_OVERNATTING
+      | Fom        | Tom        | Utgift |
+      | 01.01.2025 | 31.01.2025 | 1000   |
+
+    Så forvent følgende feil når vi beregner boutgifter: Du har lagt inn utgifter til midlertidig overnatting som ikke er inneholdt i en vedtaksperiode. Foreløpig støtter vi ikke dette.

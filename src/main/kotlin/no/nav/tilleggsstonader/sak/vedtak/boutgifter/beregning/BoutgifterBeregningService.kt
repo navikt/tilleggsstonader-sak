@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -56,7 +58,10 @@ class BoutgifterBeregningService(
         val vedtaksperioderBeregning =
             vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(behandling.revurderFra)
 
-        validerUtgifterTilMidlertidigOvernattingErInnenforVedtaksperiodene(utgifterPerVilkårtype, vedtaksperioderBeregning)
+        validerUtgifterTilMidlertidigOvernattingErInnenforVedtaksperiodene(
+            utgifterPerVilkårtype,
+            vedtaksperioderBeregning,
+        )
 
         val beregningsresultat =
             beregnAktuellePerioder(
@@ -270,13 +275,18 @@ private fun validerUtgifterTilMidlertidigOvernattingErInnenforVedtaksperiodene(
     vedtaksperioder: List<VedtaksperiodeBeregning>,
 ) {
     val utgifterMidlertidigOvernatting = utgifterPerType[TypeBoutgift.UTGIFTER_OVERNATTING].orEmpty()
+    val sammenslåtteVedtaksperioder =
+        vedtaksperioder.mergeSammenhengende(
+            { v1, v2 -> v1.overlapperEllerPåfølgesAv(v2) },
+            { v1, v2 -> v1.medPeriode(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
+        )
 
-    val alleUtgifterErInnenforEnVedtaksperiode =
+    val alleUtgifterErInnenforVedtaksperioder =
         utgifterMidlertidigOvernatting.all { utgiftsperiode ->
-            vedtaksperioder.any { it.inneholder(utgiftsperiode) }
+            sammenslåtteVedtaksperioder.any { it.inneholder(utgiftsperiode) }
         }
 
-    brukerfeilHvisIkke(alleUtgifterErInnenforEnVedtaksperiode) {
+    brukerfeilHvisIkke(alleUtgifterErInnenforVedtaksperioder) {
         "Du har lagt inn utgifter til midlertidig overnatting som ikke er inneholdt i en vedtaksperiode. Foreløpig støtter vi ikke dette."
     }
 }
