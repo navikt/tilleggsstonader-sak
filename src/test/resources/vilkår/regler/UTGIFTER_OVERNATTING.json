@@ -1,6 +1,34 @@
 {
   "vilkårType" : "UTGIFTER_OVERNATTING",
   "regler" : {
+    "SØKER_DELTA_PÅ" : {
+      "regelId" : "SØKER_DELTA_PÅ",
+      "erHovedregel" : true,
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "VALGFRI",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "PÅKREVD",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    },
+    "DOKUMENTERT_UTGIFTER_OVERNATTING" : {
+      "regelId" : "DOKUMENTERT_UTGIFTER_OVERNATTING",
+      "erHovedregel" : true,
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "VALGFRI",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "PÅKREVD",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    },
     "NØDVENDIGE_MERUTGIFTER" : {
       "regelId" : "NØDVENDIGE_MERUTGIFTER",
       "erHovedregel" : true,
@@ -11,6 +39,20 @@
         },
         "NEI" : {
           "begrunnelseType" : "PÅKREVD",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    },
+    "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER" : {
+      "regelId" : "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER",
+      "erHovedregel" : true,
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "PÅKREVD",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "VALGFRI",
           "regelId" : "SLUTT_NODE"
         }
       }

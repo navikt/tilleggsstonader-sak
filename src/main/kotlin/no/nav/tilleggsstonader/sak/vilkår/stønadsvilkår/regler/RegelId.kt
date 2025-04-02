@@ -18,6 +18,7 @@ enum class RegelId(
 
     // BOUTGIFTER
     NØDVENDIGE_MERUTGIFTER("Har søker nødvendige merutgifter til bolig eller overnatting?"),
+    DOKUMENTERT_UTGIFTER_OVERNATTING("Har søker dokumentert utgifter til overnatting tilfredsstillende?"),
     HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE(
         "Har søker dokumentert høyere boutgifter på aktivitetssted sammenlignet med tidligere bolig?",
     ),
@@ -25,4 +26,5 @@ enum class RegelId(
     RETT_TIL_BOSTØTTE("Har søker rett til bostøtte for boligen de søker om støtte til?"),
     HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER("Har søker høyere utgifter grunnet helsemessige årsaker?"),
     DOKUMENTERT_UTGIFTER_BOLIG("Har søker dokumentert utgifter til bolig tilfredsstillende?"),
+    SØKER_DELTA_PÅ("Har søker dokumentert at de har vært/skal de delta på samling/eksamen/opptaksprøve?"),
 }
