@@ -12,7 +12,7 @@ class UtgifterOvernattingRegel :
     Vilkårsregel(
         vilkårType = VilkårType.UTGIFTER_OVERNATTING,
         regler =
-            setOf(NØDVENDIGE_MERUTGIFTER, DOKUMENTERT_UTGIFTER_OVERNATTING, HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SØKER_DELTA_PÅ),
+            setOf(SØKER_DELTA_PÅ, DOKUMENTERT_UTGIFTER_OVERNATTING, NØDVENDIGE_MERUTGIFTER, HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER),
     ) {
     companion object {
         private val SØKER_DELTA_PÅ =
