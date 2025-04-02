@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
-import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
@@ -77,11 +76,6 @@ class StepDefinitions {
             }
     }
 
-    @Når("beregner stønad for boutgifter")
-    fun beregner() {
-        beregn()
-    }
-
     private fun beregn() {
         every { utgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
         try {
@@ -96,8 +90,9 @@ class StepDefinitions {
         }
     }
 
-    @Så("skal stønaden for boutgifter være")
-    fun `skal stønaden for boutgifter være`(dataTable: DataTable) {
+    @Så("skal beregnet stønad for boutgifter være")
+    fun `skal beregnet stønad for boutgifter være`(dataTable: DataTable) {
+        beregn()
         assertThat(exception).isNull()
         val forventetBeregningsresultat =
             dataTable.mapRad { rad ->
@@ -134,8 +129,9 @@ class StepDefinitions {
         }
     }
 
-    @Så("forvent følgende feil fra boutgifterberegning: {}")
+    @Så("forvent følgende feil når vi beregner boutgifter: {}")
     fun `forvent følgende feil`(forventetFeil: String) {
+        beregn()
         assertThat(exception).hasMessageContaining(forventetFeil)
     }
 }

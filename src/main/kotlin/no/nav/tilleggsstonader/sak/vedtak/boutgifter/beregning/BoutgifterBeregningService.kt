@@ -56,7 +56,7 @@ class BoutgifterBeregningService(
         val vedtaksperioderBeregning =
             vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(behandling.revurderFra)
 
-        validerUtgifterErInnenforVedtaksperiodene(utgifterPerVilkårtype, vedtaksperioderBeregning)
+        validerUtgifterTilMidlertidigOvernattingErInnenforVedtaksperiodene(utgifterPerVilkårtype, vedtaksperioderBeregning)
 
         val beregningsresultat =
             beregnAktuellePerioder(
@@ -265,19 +265,19 @@ class BoutgifterBeregningService(
     }
 }
 
-private fun validerUtgifterErInnenforVedtaksperiodene(
+private fun validerUtgifterTilMidlertidigOvernattingErInnenforVedtaksperiodene(
     utgifterPerType: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
     vedtaksperioder: List<VedtaksperiodeBeregning>,
 ) {
-    val utgifter = utgifterPerType.values.flatten()
+    val utgifterMidlertidigOvernatting = utgifterPerType[TypeBoutgift.UTGIFTER_OVERNATTING].orEmpty()
 
     val alleUtgifterErInnenforEnVedtaksperiode =
-        utgifter.all { utgiftsperiode ->
+        utgifterMidlertidigOvernatting.all { utgiftsperiode ->
             vedtaksperioder.any { it.inneholder(utgiftsperiode) }
         }
 
     brukerfeilHvisIkke(alleUtgifterErInnenforEnVedtaksperiode) {
-        "Du har lagt inn utgifter som er utenfor vedtaksperiodene. Foreløpig støtter vi ikke dette."
+        "Du har lagt inn utgifter til midlertidig overnatting som ikke er inneholdt i en vedtaksperiode. Foreløpig støtter vi ikke dette."
     }
 }
 
