@@ -14,15 +14,18 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatForPeriodeDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
+import java.util.UUID
 
 object LæremidlerTestUtil {
     val defaultVedtaksperioder =
         listOf(
-            Vedtaksperiode(
+            vedtaksperiode(
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 1, 7),
             ),
@@ -144,4 +147,26 @@ object LæremidlerTestUtil {
             aktivitet = AktivitetType.TILTAK,
             delAvTidligereUtbetaling = false,
         )
+
+    fun vedtaksperiode(
+        id: UUID = UUID.randomUUID(),
+        fom: LocalDate = LocalDate.of(2025, 1, 1),
+        tom: LocalDate = LocalDate.of(2025, 1, 31),
+        status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
+    ) = Vedtaksperiode(
+        id = id,
+        fom = fom,
+        tom = tom,
+        status = status,
+    )
+
+    fun vedtaksperiodeDto(
+        id: UUID = UUID.randomUUID(),
+        fom: LocalDate = LocalDate.of(2025, 1, 1),
+        tom: LocalDate = LocalDate.of(2025, 1, 31),
+    ) = VedtaksperiodeLæremidlerDto(
+        id = id,
+        fom = fom,
+        tom = tom,
+    )
 }

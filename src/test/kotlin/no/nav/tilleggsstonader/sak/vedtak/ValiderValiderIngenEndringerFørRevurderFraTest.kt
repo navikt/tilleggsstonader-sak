@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.util.UUID
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode as VedtaksperiodeLæremidler
 
 class ValiderValiderIngenEndringerFørRevurderFraTest {
     val vedtaksperiodeJanFeb =
@@ -391,7 +391,7 @@ class ValiderValiderIngenEndringerFørRevurderFraTest {
         fom: LocalDate = LocalDate.of(2025, 1, 1),
         tom: LocalDate = LocalDate.of(2025, 1, 31),
         status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
-    ) = VedtaksperiodeLæremidler(
+    ) = LæremidlerTestUtil.vedtaksperiode(
         id = UUID.randomUUID(),
         fom = fom,
         tom = tom,

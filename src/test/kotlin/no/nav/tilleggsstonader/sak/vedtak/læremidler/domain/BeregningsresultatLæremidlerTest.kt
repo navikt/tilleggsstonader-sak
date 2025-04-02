@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -94,19 +95,19 @@ class BeregningsresultatLæremidlerTest {
             InnvilgelseLæremidler(
                 vedtaksperioder =
                     listOf(
-                        Vedtaksperiode(
+                        vedtaksperiode(
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 1, 31),
                         ),
-                        Vedtaksperiode(
+                        vedtaksperiode(
                             fom = LocalDate.of(2024, 2, 1),
                             tom = LocalDate.of(2024, 2, 29),
                         ),
-                        Vedtaksperiode(
+                        vedtaksperiode(
                             fom = LocalDate.of(2024, 3, 1),
                             tom = LocalDate.of(2024, 3, 31),
                         ),
-                        Vedtaksperiode(
+                        vedtaksperiode(
                             fom = LocalDate.of(2024, 4, 1),
                             tom = LocalDate.of(2024, 4, 30),
                         ),
@@ -243,19 +244,19 @@ class BeregningsresultatLæremidlerTest {
             InnvilgelseLæremidler(
                 vedtaksperioder =
                     listOf(
-                        Vedtaksperiode(
+                        vedtaksperiode(
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 1, 31),
                         ),
-                        Vedtaksperiode(
+                        vedtaksperiode(
                             fom = LocalDate.of(2024, 2, 1),
                             tom = LocalDate.of(2024, 2, 29),
                         ),
-                        Vedtaksperiode(
+                        vedtaksperiode(
                             fom = LocalDate.of(2024, 3, 1),
                             tom = LocalDate.of(2024, 3, 31),
                         ),
-                        Vedtaksperiode(
+                        vedtaksperiode(
                             fom = LocalDate.of(2024, 4, 1),
                             tom = LocalDate.of(2024, 4, 30),
                         ),

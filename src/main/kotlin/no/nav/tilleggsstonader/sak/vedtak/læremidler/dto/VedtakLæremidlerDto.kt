@@ -37,6 +37,22 @@ data class VedtaksperiodeLæremidlerDto(
     val status: VedtaksperiodeStatus? = null,
 )
 
-fun List<Vedtaksperiode>.tilDto() = this.map { VedtaksperiodeLæremidlerDto(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }
+fun List<Vedtaksperiode>.tilDto() =
+    this.map {
+        VedtaksperiodeLæremidlerDto(
+            id = it.id,
+            fom = it.fom,
+            tom = it.tom,
+            status = it.status,
+        )
+    }
 
-fun List<VedtaksperiodeLæremidlerDto>.tilDomene() = this.map { Vedtaksperiode(id = it.id, fom = it.fom, tom = it.tom) }.sorted()
+fun List<VedtaksperiodeLæremidlerDto>.tilDomene() =
+    this
+        .map {
+            Vedtaksperiode(
+                id = it.id,
+                fom = it.fom,
+                tom = it.tom,
+            )
+        }.sorted()
