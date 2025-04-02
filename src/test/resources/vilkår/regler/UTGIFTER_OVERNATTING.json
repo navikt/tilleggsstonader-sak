@@ -1,8 +1,8 @@
 {
   "vilkårType" : "UTGIFTER_OVERNATTING",
   "regler" : {
-    "SØKER_DELTA_PÅ" : {
-      "regelId" : "SØKER_DELTA_PÅ",
+    "DOKUMENTERT_DELTAKELSE" : {
+      "regelId" : "DOKUMENTERT_DELTAKELSE",
       "erHovedregel" : true,
       "svarMapping" : {
         "JA" : {

@@ -17,7 +17,7 @@ object BoutgifterRegelTestUtil {
                     begrunnelse = "En begrunnelse på delvilkåret",
                 ),
                 Vurdering(regelId = RegelId.DOKUMENTERT_UTGIFTER_OVERNATTING, svar = SvarId.JA),
-                Vurdering(regelId = RegelId.SØKER_DELTA_PÅ, svar = SvarId.JA),
+                Vurdering(regelId = RegelId.DOKUMENTERT_DELTAKELSE, svar = SvarId.JA),
             ),
         )
 
