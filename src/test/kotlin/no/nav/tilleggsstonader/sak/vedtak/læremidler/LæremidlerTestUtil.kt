@@ -165,11 +165,15 @@ object LæremidlerTestUtil {
         id: UUID = UUID.randomUUID(),
         fom: LocalDate = LocalDate.of(2025, 1, 1),
         tom: LocalDate = LocalDate.of(2025, 1, 31),
+        målgruppe: FaktiskMålgruppe? = null,
+        aktivitet: AktivitetType? = null,
         status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
     ) = Vedtaksperiode(
         id = id,
         fom = fom,
         tom = tom,
+        målgruppe = målgruppe,
+        aktivitet = aktivitet,
         status = status,
     )
 
@@ -177,9 +181,13 @@ object LæremidlerTestUtil {
         id: UUID = UUID.randomUUID(),
         fom: LocalDate = LocalDate.of(2025, 1, 1),
         tom: LocalDate = LocalDate.of(2025, 1, 31),
+        målgruppe: FaktiskMålgruppe? = null,
+        aktivitet: AktivitetType? = null,
     ) = VedtaksperiodeLæremidlerDto(
         id = id,
         fom = fom,
         tom = tom,
+        målgruppeType = målgruppe,
+        aktivitetType = aktivitet,
     )
 }

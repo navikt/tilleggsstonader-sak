@@ -1,11 +1,14 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.PeriodeMedId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 import java.util.UUID
 
@@ -13,6 +16,11 @@ data class Vedtaksperiode(
     override val id: UUID = UUID.randomUUID(),
     override val fom: LocalDate,
     override val tom: LocalDate,
+    // TODO slett JsonInclude når målgruppe/Aktivitet blir not null
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val målgruppe: FaktiskMålgruppe?,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val aktivitet: AktivitetType?,
     val status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
 ) : Periode<LocalDate>,
     KopierPeriode<Vedtaksperiode>,
