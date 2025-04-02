@@ -81,3 +81,17 @@ Egenskap: Beregning av faste utgifter
         | 15.04.2025 | 14.05.2025 | 1              | 4000         | 4953      | 15.04.2025      | AAP       | UTDANNING |
         | 15.05.2025 | 14.06.2025 | 1              | 4000         | 4953      | 15.05.2025      | AAP       | UTDANNING |
         | 15.06.2025 | 20.06.2025 | 1              | 4000         | 4953      | 15.06.2025      | AAP       | UTDANNING |
+
+    Eksempel: Bruker leier ekstrabolig mye lengre enn hva som er nødvendig for utdanningen
+      Gitt følgende vedtaksperioder for boutgifter
+        | Fom        | Tom        | Aktivitet | Målgruppe |
+        | 15.01.2025 | 20.02.2025 | UTDANNING | AAP       |
+
+      Gitt følgende utgifter for: LØPENDE_UTGIFTER_TO_BOLIGER
+        | Fom        | Tom        | Utgift |
+        | 01.04.2024 | 01.06.2025 | 4000   |
+
+      Så skal beregnet stønad for boutgifter være
+        | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe | Aktivitet |
+        | 15.01.2025 | 14.02.2025 | 1              | 4000         | 4953      | 15.01.2025      | AAP       | UTDANNING |
+        | 15.02.2025 | 20.02.2025 | 1              | 4000         | 4953      | 15.02.2025      | AAP       | UTDANNING |
