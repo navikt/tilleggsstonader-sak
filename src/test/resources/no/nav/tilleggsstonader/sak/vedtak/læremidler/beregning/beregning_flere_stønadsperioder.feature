@@ -73,7 +73,7 @@ Egenskap: Beregning av læremidler - flere stønadsperioder
 
     Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en periode med overlapp mellom aktivitet og målgruppe.
 
-  Scenario: To ulike målgrupper av typen nedsatt arbeidsevne innenfor en vedtaksperiode men ulike løpende måneder skal feile
+  Scenario: To ulike målgrupper av typen nedsatt arbeidsevne innenfor en vedtaksperiode men ulike løpende måneder
     Gitt følgende vedtaksperioder for læremidler
       | Fom        | Tom        |
       | 01.04.2024 | 31.05.2024 |
@@ -89,7 +89,10 @@ Egenskap: Beregning av læremidler - flere stønadsperioder
 
     Når beregner stønad for læremidler
 
-    Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en periode med overlapp mellom aktivitet og målgruppe.
+    Så skal stønaden være
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 01.04.2024      |
+      | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 01.04.2024      |
 
   Scenario: To ulike målgrupper der målgruppe 1 løper inn i måneden for nr 2, samme aktivitet skal bruke målgruppen som har høyest prioritet
     Gitt følgende vedtaksperioder for læremidler

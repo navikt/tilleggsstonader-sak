@@ -2,8 +2,8 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
 /**
@@ -13,7 +13,7 @@ import java.time.LocalDate
 data class VedtaksperiodeBeregningsgrunnlagLæremidler(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val målgruppe: MålgruppeType,
+    val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
 ) : Periode<LocalDate>,
     KopierPeriode<VedtaksperiodeBeregningsgrunnlagLæremidler> {

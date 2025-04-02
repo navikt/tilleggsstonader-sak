@@ -46,7 +46,8 @@ class LæremidlerBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): BeregningsresultatLæremidler {
-        val vedtaksperioderBeregningsgrunnlag = hentVedtaksperioderForBergningsgrunnlag(behandling.id, vedtaksperioder)
+        val vedtaksperioderBeregningsgrunnlag =
+            hentVedtaksperioderForBergningsgrunnlag(behandling.id, vedtaksperioder, brukVedtaksperioder = brukVedtaksperioderForBeregning)
         val forrigeVedtak = hentForrigeVedtak(behandling)
 
         læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
@@ -150,7 +151,8 @@ class LæremidlerBeregningService(
         beregningsresultatTilReberegning: BeregningsresultatForMåned,
         brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): List<BeregningsresultatForMåned> {
-        val vedtaksperioderForGrunnlag = hentVedtaksperioderForBergningsgrunnlag(behandling.id, avkortetVedtaksperioder)
+        val vedtaksperioderForGrunnlag =
+            hentVedtaksperioderForBergningsgrunnlag(behandling.id, avkortetVedtaksperioder, brukVedtaksperioderForBeregning)
         val vedtaksperioderSomOmregnes =
             vedtaksperioderInnenforLøpendeMåned(vedtaksperioderForGrunnlag, beregningsresultatTilReberegning)
 
@@ -230,27 +232,40 @@ class LæremidlerBeregningService(
     private fun hentVedtaksperioderForBergningsgrunnlag(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
+        brukVedtaksperioder: BrukVedtaksperioderForBeregning,
     ): List<VedtaksperiodeBeregningsgrunnlagLæremidler> {
-        val stønadsperioder =
-            stønadsperiodeRepository
-                .findAllByBehandlingId(behandlingId)
-                .tilSortertStønadsperiodeBeregningsgrunnlag()
-                .slåSammenSammenhengende()
-        // TODO skal kontrollere inneholder + målgruppe + aktivitet når det er lagt til
-        return vedtaksperioder
-            .map { vedtaksperiode ->
-                val filtrerteStønadsperioder = stønadsperioder.filter { it.inneholder(vedtaksperiode) }
-                brukerfeilHvisIkke(filtrerteStønadsperioder.size == 1) {
-                    "Vedtaksperiode er ikke innenfor en periode med overlapp mellom aktivitet og målgruppe."
+        if (!brukVedtaksperioder.bruk) {
+            val stønadsperioder =
+                stønadsperiodeRepository
+                    .findAllByBehandlingId(behandlingId)
+                    .tilSortertStønadsperiodeBeregningsgrunnlag()
+                    .slåSammenSammenhengende()
+            // TODO skal kontrollere inneholder + målgruppe + aktivitet når det er lagt til
+            return vedtaksperioder
+                .map { vedtaksperiode ->
+                    val filtrerteStønadsperioder = stønadsperioder.filter { it.inneholder(vedtaksperiode) }
+                    brukerfeilHvisIkke(filtrerteStønadsperioder.size == 1) {
+                        "Vedtaksperiode er ikke innenfor en periode med overlapp mellom aktivitet og målgruppe."
+                    }
+                    val stønadsperiode = filtrerteStønadsperioder.single()
+                    VedtaksperiodeBeregningsgrunnlagLæremidler(
+                        fom = vedtaksperiode.fom,
+                        tom = vedtaksperiode.tom,
+                        målgruppe = stønadsperiode.målgruppe,
+                        aktivitet = stønadsperiode.aktivitet,
+                    )
                 }
-                val stønadsperiode = filtrerteStønadsperioder.single()
-                VedtaksperiodeBeregningsgrunnlagLæremidler(
-                    fom = vedtaksperiode.fom,
-                    tom = vedtaksperiode.tom,
-                    målgruppe = stønadsperiode.målgruppe,
-                    aktivitet = stønadsperiode.aktivitet,
-                )
-            }
+        } else {
+            return vedtaksperioder
+                .map {
+                    VedtaksperiodeBeregningsgrunnlagLæremidler(
+                        fom = it.fom,
+                        tom = it.tom,
+                        målgruppe = it.målgruppe!!,
+                        aktivitet = it.aktivitet!!,
+                    )
+                }.sorted()
+        }
     }
 
     private fun finnAktiviteter(behandlingId: BehandlingId): List<AktivitetLæremidlerBeregningGrunnlag> =

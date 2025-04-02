@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatu
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.util.UUID
 
@@ -153,7 +152,7 @@ object LæremidlerTestUtil {
     fun vedtaksperiodeBeregningsgrunnlag(
         fom: LocalDate = LocalDate.of(2025, 1, 1),
         tom: LocalDate = LocalDate.of(2025, 1, 31),
-        målgruppe: MålgruppeType = MålgruppeType.AAP,
+        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
     ) = VedtaksperiodeBeregningsgrunnlagLæremidler(
         fom = fom,
