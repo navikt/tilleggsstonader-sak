@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFraMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.brukPerioderFraOgMedRevurderFra
@@ -10,7 +11,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.til
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -149,7 +149,7 @@ class TilsynBeregningUtilTest {
                 vedtaksperiodeBeregningsgrunnlag(
                     fom = LocalDate.of(2025, 1, 1),
                     tom = LocalDate.of(2025, 2, 28),
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitet = AktivitetType.TILTAK,
                 ),
             )
@@ -205,7 +205,7 @@ class TilsynBeregningUtilTest {
                         vedtaksperiodeBeregningsgrunnlag(
                             fom = LocalDate.of(2025, 2, 1),
                             tom = LocalDate.of(2025, 2, 28),
-                            målgruppe = MålgruppeType.AAP,
+                            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                             aktivitet = AktivitetType.TILTAK,
                         ),
                     )

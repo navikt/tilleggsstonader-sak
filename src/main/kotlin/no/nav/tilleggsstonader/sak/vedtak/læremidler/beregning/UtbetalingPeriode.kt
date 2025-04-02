@@ -114,7 +114,7 @@ data class LøpendeMåned(
         .flatMap { stønadsperiode ->
             this
                 .finnSnittAvRelevanteAktiviteter(aktiviteter, stønadsperiode)
-                .map { aktivitet -> MålgruppeOgAktivitet(stønadsperiode.målgruppe.faktiskMålgruppe(), aktivitet) }
+                .map { aktivitet -> MålgruppeOgAktivitet(stønadsperiode.målgruppe, aktivitet) }
         }
 
     private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteAktiviteter(

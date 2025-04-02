@@ -47,7 +47,7 @@ class UtbetalingPeriodeTest {
         val utbetalingPeriode =
             UtbetalingPeriode(
                 løpendeMåned = grunnlagForUtbetalingPeriode.medVedtaksperiode(vedtaksperiode),
-                målgruppeOgAktivitet = MålgruppeOgAktivitet(stønadsperiode.målgruppe.faktiskMålgruppe(), aktivitet),
+                målgruppeOgAktivitet = MålgruppeOgAktivitet(stønadsperiode.målgruppe, aktivitet),
             )
 
         assertThat(utbetalingPeriode.fom).isEqualTo(førsteJanuar)
