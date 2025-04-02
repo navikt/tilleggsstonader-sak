@@ -3,10 +3,11 @@
 
 Egenskap: Beregning læremidler - flere målgrupper - flere aktiviteter
 
-  Scenario: Vedtaksperiode som overlapper med 2 ulike målgrupper og ulike aktiviteter
+  Scenario: 2 ulike målgrupper og ulike aktiviteter innenfor en løpende måned
     Gitt følgende vedtaksperioder for læremidler
       | Fom        | Tom        |
-      | 07.01.2025 | 08.01.2025 |
+      | 07.01.2025 | 07.01.2025 |
+      | 08.01.2025 | 08.01.2025 |
 
     Gitt følgende aktiviteter for læremidler
       | Fom        | Tom        | Aktivitet | Studienivå       | Studieprosent |
@@ -50,7 +51,9 @@ Egenskap: Beregning læremidler - flere målgrupper - flere aktiviteter
   Scenario: Flere målgrupper, skal prioritere målgruppe med høyest prioritet
     Gitt følgende vedtaksperioder for læremidler
       | Fom        | Tom        |
-      | 01.01.2024 | 15.01.2024 |
+      | 01.01.2024 | 04.01.2024 |
+      | 05.01.2024 | 07.01.2024 |
+      | 08.01.2024 | 15.01.2024 |
 
     Gitt følgende aktiviteter for læremidler
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |

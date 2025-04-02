@@ -83,7 +83,8 @@ Egenskap: Opphør av læremidler
 
     Når innvilger vedtaksperioder for behandling=1
       | Fom        | Tom        |
-      | 01.01.2025 | 31.01.2025 |
+      | 01.01.2025 | 14.01.2025 |
+      | 15.01.2025 | 31.01.2025 |
 
     Så forvent andeler for behandling=1
       | Fom        | Beløp | Type           | Utbetalingsdato |

@@ -8,9 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerIngenOverlappendeVedtaksperioder
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperiodeOmfattesAvStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.validerIngenEndringerFørRevurderFra
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -22,12 +20,10 @@ class LæremidlerVedtaksperiodeValideringService(
 ) {
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
         behandlingId: BehandlingId,
     ) {
         brukerfeilHvis(vedtaksperioder.isEmpty()) { "Kan ikke innvilge når det ikke finnes noen vedtaksperioder." }
         validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
-        validerVedtaksperiodeOmfattesAvStønadsperioder(vedtaksperioder, stønadsperioder)
 
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtaksperioderForrigeBehandling = hentForrigeVedtaksperioder(behandling)

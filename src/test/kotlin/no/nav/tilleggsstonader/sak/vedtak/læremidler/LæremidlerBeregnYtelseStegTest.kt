@@ -32,6 +32,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -229,7 +230,7 @@ class LæremidlerBeregnYtelseStegTest(
     }
 
     @Test
-    fun `en vedtaksperiode med 2 ulike målgrupper skal bli 2 ulike andeler med ulike typer som betales ut samtidig`() {
+    fun `en vedtaksperiode med 2 ulike målgrupper skal feile`() {
         val førsteJan = LocalDate.of(2025, 1, 1)
         val sisteJan = LocalDate.of(2025, 1, 31)
         val førsteFeb = LocalDate.of(2025, 2, 1)
@@ -264,81 +265,9 @@ class LæremidlerBeregnYtelseStegTest(
 
         val vedtaksperiode =
             vedtaksperiodeDto(id = UUID.randomUUID(), fom = førsteJan, tom = sisteFeb)
-        steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
-
-        val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
-        assertThat(andeler).hasSize(2)
-        with(andeler.single { it.type == TypeAndel.LÆREMIDLER_AAP }) {
-            assertThat(this.fom).isEqualTo(førsteJan)
-            assertThat(this.tom).isEqualTo(førsteJan)
-            assertThat(beløp).isEqualTo(901)
-            assertThat(type).isEqualTo(TypeAndel.LÆREMIDLER_AAP)
-            assertThat(statusIverksetting).isEqualTo(StatusIverksetting.UBEHANDLET)
-            assertThat(satstype).isEqualTo(Satstype.DAG)
-            assertThat(utbetalingsdato).isEqualTo(førsteJan)
-        }
-        with(andeler.single { it.type == TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER }) {
-            assertThat(this.fom).isEqualTo(førsteJan)
-            assertThat(this.tom).isEqualTo(førsteJan)
-            assertThat(beløp).isEqualTo(901)
-            assertThat(type).isEqualTo(TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER)
-            assertThat(statusIverksetting).isEqualTo(StatusIverksetting.UBEHANDLET)
-            assertThat(satstype).isEqualTo(Satstype.DAG)
-            assertThat(utbetalingsdato).isEqualTo(førsteJan)
-        }
-    }
-
-    @Test
-    fun `en vedtaksperiode med 2 ulike målgrupper men samme type andel skal bli 1 andel`() {
-        val vedtaksperiodeStatus = UUID.randomUUID()
-        val førsteJan = LocalDate.of(2025, 1, 1)
-        val sisteJan = LocalDate.of(2025, 1, 31)
-        val førsteFeb = LocalDate.of(2025, 2, 1)
-        val sisteFeb = LocalDate.of(2025, 2, 28)
-
-        val stønadsperiode =
-            stønadsperiode(
-                behandlingId = behandling.id,
-                fom = førsteJan,
-                tom = sisteJan,
-                målgruppe = MålgruppeType.AAP,
-            )
-        val stønadsperiode2 =
-            stønadsperiode(
-                behandlingId = behandling.id,
-                fom = førsteFeb,
-                tom = sisteFeb,
-                målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-            )
-        val aktivitet =
-            aktivitet(
-                behandlingId = behandling.id,
-                fom = førsteJan,
-                tom = sisteFeb,
-                faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(),
-            )
-        stønadsperiodeRepository.insertAll(listOf(stønadsperiode, stønadsperiode2))
-        vilkårperiodeRepository.insert(aktivitet)
-        val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
-
-        val vedtaksperiode =
-            vedtaksperiodeDto(
-                vedtaksperiodeStatus,
-                fom = førsteJan,
-                tom = sisteFeb,
-            )
-        steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
-
-        val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
-        with(andeler.single()) {
-            assertThat(this.fom).isEqualTo(førsteJan)
-            assertThat(this.tom).isEqualTo(førsteJan)
-            assertThat(beløp).isEqualTo(901 * 2)
-            assertThat(type).isEqualTo(TypeAndel.LÆREMIDLER_AAP)
-            assertThat(statusIverksetting).isEqualTo(StatusIverksetting.UBEHANDLET)
-            assertThat(satstype).isEqualTo(Satstype.DAG)
-            assertThat(utbetalingsdato).isEqualTo(førsteJan)
-        }
+        assertThatThrownBy {
+            steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
+        }.hasMessageMatching("Vedtaksperiode er ikke innenfor en periode med overlapp mellom aktivitet og målgruppe.")
     }
 
     @Test

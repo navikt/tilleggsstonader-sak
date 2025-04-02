@@ -5,9 +5,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFraMåned
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.brukPerioderFraOgMedRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.tilÅrMåned
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -146,7 +146,7 @@ class TilsynBeregningUtilTest {
     inner class ValideringAvStønadsperioderOgUtgifter {
         val stønadsperioder =
             listOf(
-                StønadsperiodeBeregningsgrunnlag(
+                vedtaksperiodeBeregningsgrunnlag(
                     fom = LocalDate.of(2025, 1, 1),
                     tom = LocalDate.of(2025, 2, 28),
                     målgruppe = MålgruppeType.AAP,
@@ -173,12 +173,6 @@ class TilsynBeregningUtilTest {
             UtgiftBeregning(
                 fom = YearMonth.of(2025, 1),
                 tom = YearMonth.of(2025, 2),
-                utgift = 1000,
-            )
-        val utgiftMars =
-            UtgiftBeregning(
-                fom = YearMonth.of(2025, 3),
-                tom = YearMonth.of(2025, 3),
                 utgift = 1000,
             )
 
@@ -208,7 +202,7 @@ class TilsynBeregningUtilTest {
 
                 val forventedeStønadsperioder =
                     listOf(
-                        StønadsperiodeBeregningsgrunnlag(
+                        vedtaksperiodeBeregningsgrunnlag(
                             fom = LocalDate.of(2025, 2, 1),
                             tom = LocalDate.of(2025, 2, 28),
                             målgruppe = MålgruppeType.AAP,

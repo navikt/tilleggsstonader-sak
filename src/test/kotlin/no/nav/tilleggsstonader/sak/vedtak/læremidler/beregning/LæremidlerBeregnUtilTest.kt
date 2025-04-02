@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningsgrunnlagLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.splittTilLøpendeMåneder
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -16,7 +16,7 @@ class LæremidlerBeregnUtilTest {
     fun `skal håndtere vedtaksperiode som løper over 2 år`() {
         val vedtaksperioder =
             listOf(
-                vedtaksperiode(
+                vedtaksperiodeBeregningsgrunnlag(
                     fom = LocalDate.of(2024, 12, 5),
                     tom = LocalDate.of(2025, 1, 4),
                 ),
@@ -46,7 +46,7 @@ class LæremidlerBeregnUtilTest {
         fun `skal lage løpende måned for vedtaksperiode som kun er under en helg`() {
             val vedtaksperioder =
                 listOf(
-                    vedtaksperiode(
+                    vedtaksperiodeBeregningsgrunnlag(
                         fom = LocalDate.of(2025, 2, 1),
                         tom = LocalDate.of(2025, 2, 2),
                     ),
@@ -62,7 +62,7 @@ class LæremidlerBeregnUtilTest {
         fun `skal håndtere en vedtaksperiode som løper innenfor en løpende måned`() {
             val vedtaksperioder =
                 listOf(
-                    vedtaksperiode(
+                    vedtaksperiodeBeregningsgrunnlag(
                         fom = LocalDate.of(2024, 1, 5),
                         tom = LocalDate.of(2024, 1, 15),
                     ),
@@ -82,11 +82,11 @@ class LæremidlerBeregnUtilTest {
         fun `skal håndtere to vedtaksperiode som løper i ulike løpende måneder`() {
             val vedtaksperioder =
                 listOf(
-                    vedtaksperiode(
+                    vedtaksperiodeBeregningsgrunnlag(
                         fom = LocalDate.of(2024, 1, 5),
                         tom = LocalDate.of(2024, 1, 15),
                     ),
-                    vedtaksperiode(
+                    vedtaksperiodeBeregningsgrunnlag(
                         fom = LocalDate.of(2024, 2, 7),
                         tom = LocalDate.of(2024, 3, 2),
                     ),
@@ -113,11 +113,11 @@ class LæremidlerBeregnUtilTest {
         fun `skal gruppere alle perioder som gjelder januar i januar`() {
             val vedtaksperioder =
                 listOf(
-                    vedtaksperiode(
+                    vedtaksperiodeBeregningsgrunnlag(
                         fom = førsteJan2024,
                         tom = LocalDate.of(2024, 1, 5),
                     ),
-                    vedtaksperiode(
+                    vedtaksperiodeBeregningsgrunnlag(
                         fom = LocalDate.of(2024, 1, 7),
                         tom = LocalDate.of(2024, 1, 7),
                     ),
@@ -137,11 +137,11 @@ class LæremidlerBeregnUtilTest {
         fun `skal gruppere alle perioder som gjelder fra med 5 januar til 4 februar`() {
             val vedtaksperioder =
                 listOf(
-                    vedtaksperiode(
+                    vedtaksperiodeBeregningsgrunnlag(
                         fom = LocalDate.of(2024, 1, 5),
                         tom = LocalDate.of(2024, 1, 5),
                     ),
-                    vedtaksperiode(
+                    vedtaksperiodeBeregningsgrunnlag(
                         fom = LocalDate.of(2024, 2, 1),
                         tom = LocalDate.of(2024, 2, 4),
                     ),
@@ -161,11 +161,11 @@ class LæremidlerBeregnUtilTest {
         fun `skal gruppere alle perioder som gjelder fra med 5 januar til 4 februar der periode 2 er siste dagen i forrige periode`() {
             val vedtaksperioder =
                 listOf(
-                    vedtaksperiode(
+                    vedtaksperiodeBeregningsgrunnlag(
                         fom = LocalDate.of(2024, 1, 5),
                         tom = LocalDate.of(2024, 1, 5),
                     ),
-                    vedtaksperiode(
+                    vedtaksperiodeBeregningsgrunnlag(
                         fom = LocalDate.of(2024, 2, 4),
                         tom = LocalDate.of(2024, 2, 4),
                     ),
@@ -185,11 +185,11 @@ class LæremidlerBeregnUtilTest {
         fun `skal splitte periode 2 som løper over 2 vedtaksperioder`() {
             val vedtaksperioder =
                 listOf(
-                    vedtaksperiode(
+                    vedtaksperiodeBeregningsgrunnlag(
                         fom = LocalDate.of(2024, 1, 5),
                         tom = LocalDate.of(2024, 1, 5),
                     ),
-                    vedtaksperiode(
+                    vedtaksperiodeBeregningsgrunnlag(
                         fom = LocalDate.of(2024, 2, 1),
                         tom = LocalDate.of(2024, 2, 28),
                     ),
@@ -217,7 +217,7 @@ class LæremidlerBeregnUtilTest {
         }
     }
 
-    private fun Vedtaksperiode.forLøpendeMåned() = VedtaksperiodeInnenforLøpendeMåned(fom = fom, tom = tom)
+    private fun VedtaksperiodeBeregningsgrunnlagLæremidler.forLøpendeMåned() = VedtaksperiodeInnenforLøpendeMåned(fom = fom, tom = tom)
 
-    private fun List<Vedtaksperiode>.forLøpendeMåned() = this.map { it.forLøpendeMåned() }
+    private fun List<VedtaksperiodeBeregningsgrunnlagLæremidler>.forLøpendeMåned() = this.map { it.forLøpendeMåned() }
 }

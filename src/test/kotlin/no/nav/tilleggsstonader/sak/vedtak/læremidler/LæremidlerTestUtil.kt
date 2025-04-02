@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningsgrunnlagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
@@ -147,6 +148,18 @@ object LæremidlerTestUtil {
             aktivitet = AktivitetType.TILTAK,
             delAvTidligereUtbetaling = false,
         )
+
+    fun vedtaksperiodeBeregningsgrunnlag(
+        fom: LocalDate = LocalDate.of(2025, 1, 1),
+        tom: LocalDate = LocalDate.of(2025, 1, 31),
+        målgruppe: MålgruppeType = MålgruppeType.AAP,
+        aktivitet: AktivitetType = AktivitetType.TILTAK,
+    ) = VedtaksperiodeBeregningsgrunnlagLæremidler(
+        fom = fom,
+        tom = tom,
+        målgruppe = målgruppe,
+        aktivitet = aktivitet,
+    )
 
     fun vedtaksperiode(
         id: UUID = UUID.randomUUID(),

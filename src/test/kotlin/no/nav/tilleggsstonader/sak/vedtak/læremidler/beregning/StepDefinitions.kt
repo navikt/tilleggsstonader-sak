@@ -17,8 +17,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepos
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.splittTilLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.LæremidlerVedtaksperiodeValideringService
@@ -116,7 +116,14 @@ class StepDefinitions {
 
     @Når("splitter vedtaksperioder for læremidler")
     fun `splitter vedtaksperioder for læremidler`() {
-        vedtaksperioderSplittet = vedtaksPerioder.splittTilLøpendeMåneder()
+        vedtaksperioderSplittet =
+            vedtaksPerioder
+                .map {
+                    vedtaksperiodeBeregningsgrunnlag(
+                        fom = it.fom,
+                        tom = it.tom,
+                    )
+                }.splittTilLøpendeMåneder()
     }
 
     @Når("validerer vedtaksperiode for læremidler")
@@ -125,7 +132,6 @@ class StepDefinitions {
         try {
             læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
                 vedtaksperioder = vedtaksPerioder,
-                stønadsperioder = stønadsperioder.tilSortertStønadsperiodeBeregningsgrunnlag(),
                 behandlingId = behandlingId,
             )
         } catch (feil: Exception) {
