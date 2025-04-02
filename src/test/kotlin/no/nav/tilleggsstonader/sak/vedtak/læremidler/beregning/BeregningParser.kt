@@ -16,7 +16,10 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
 fun mapAktiviteter(
     behandlingId: BehandlingId,
@@ -36,6 +39,22 @@ fun mapAktiviteter(
                     parseValgfriEnum<Studienivå>(BeregningNøkler.STUDIENIVÅ, rad)
                         ?: Studienivå.HØYERE_UTDANNING,
             ),
+    )
+}
+
+fun mapMålgrupper(
+    behandlingId: BehandlingId,
+    dataTable: DataTable,
+) = dataTable.mapRad { rad ->
+    målgruppe(
+        behandlingId = behandlingId,
+        fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
+        tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
+        faktaOgVurdering =
+            faktaOgVurderingMålgruppe(
+                type = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
+            ),
+        begrunnelse = "begrunnelse",
     )
 }
 

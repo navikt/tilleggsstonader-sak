@@ -46,15 +46,19 @@ class LæremidlerBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): BeregningsresultatLæremidler {
-        val vedtaksperioderBeregningsgrunnlag =
-            hentVedtaksperioderForBergningsgrunnlag(behandling.id, vedtaksperioder, brukVedtaksperioder = brukVedtaksperioderForBeregning)
-        val forrigeVedtak = hentForrigeVedtak(behandling)
-
         læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             behandlingId = behandling.id,
             brukVedtaksperioderForBeregning = brukVedtaksperioderForBeregning,
         )
+
+        val vedtaksperioderBeregningsgrunnlag =
+            hentVedtaksperioderForBergningsgrunnlag(
+                behandling.id,
+                vedtaksperioder,
+                brukVedtaksperioder = brukVedtaksperioderForBeregning,
+            )
+        val forrigeVedtak = hentForrigeVedtak(behandling)
 
         val beregningsresultatForMåned = beregn(behandling, vedtaksperioderBeregningsgrunnlag)
 
@@ -152,7 +156,11 @@ class LæremidlerBeregningService(
         brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): List<BeregningsresultatForMåned> {
         val vedtaksperioderForGrunnlag =
-            hentVedtaksperioderForBergningsgrunnlag(behandling.id, avkortetVedtaksperioder, brukVedtaksperioderForBeregning)
+            hentVedtaksperioderForBergningsgrunnlag(
+                behandling.id,
+                avkortetVedtaksperioder,
+                brukVedtaksperioderForBeregning,
+            )
         val vedtaksperioderSomOmregnes =
             vedtaksperioderInnenforLøpendeMåned(vedtaksperioderForGrunnlag, beregningsresultatTilReberegning)
 
