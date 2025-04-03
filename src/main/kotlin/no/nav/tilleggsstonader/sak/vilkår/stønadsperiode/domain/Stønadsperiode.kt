@@ -35,8 +35,6 @@ data class Stønadsperiode(
         )
 }
 
-fun List<Stønadsperiode>.tilVedtaksperiodeBeregning() = map { VedtaksperiodeBeregning(it) }
-
 enum class StønadsperiodeStatus {
     NY,
     ENDRET,

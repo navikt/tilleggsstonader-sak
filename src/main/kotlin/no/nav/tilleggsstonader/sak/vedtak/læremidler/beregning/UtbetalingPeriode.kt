@@ -88,7 +88,7 @@ data class LøpendeMåned(
     fun harDatoerIUkedager(): Boolean = vedtaksperioder.any { it.alleDatoer().any { !it.lørdagEllerSøndag() } }
 
     /**
-     * Finner hvilken stønadsperiode og aktivitet som skal brukes for den aktuelle utbetalingsperioden
+     * Finner hvilken vedtaksperiode og aktivitet som skal brukes for den aktuelle utbetalingsperioden
      */
     fun tilUtbetalingPeriode(
         vedtaksperioderBeregningsgrunnlag: List<VedtaksperiodeBeregningsgrunnlagLæremidler>,
@@ -111,10 +111,10 @@ data class LøpendeMåned(
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
     ) = this
         .finnSnittAvRelevanteVedtaksperioder(vedtaksperioderBeregningsgrunnlag)
-        .flatMap { stønadsperiode ->
+        .flatMap { vedtaksperiode ->
             this
-                .finnSnittAvRelevanteAktiviteter(aktiviteter, stønadsperiode)
-                .map { aktivitet -> MålgruppeOgAktivitet(stønadsperiode.målgruppe, aktivitet) }
+                .finnSnittAvRelevanteAktiviteter(aktiviteter, vedtaksperiode)
+                .map { aktivitet -> MålgruppeOgAktivitet(vedtaksperiode.målgruppe, aktivitet) }
         }
 
     private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteAktiviteter(
@@ -147,9 +147,9 @@ data class LøpendeMåned(
     }
 
     private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteVedtaksperioder(
-        stønadsperioder: List<VedtaksperiodeBeregningsgrunnlagLæremidler>,
+        vedtaksperioder: List<VedtaksperiodeBeregningsgrunnlagLæremidler>,
     ): List<VedtaksperiodeBeregningsgrunnlagLæremidler> {
-        val relevanteVedtaksperForPeriode = stønadsperioder.mapNotNull { it.beregnSnitt(this) }
+        val relevanteVedtaksperForPeriode = vedtaksperioder.mapNotNull { it.beregnSnitt(this) }
 
         feilHvis(relevanteVedtaksperForPeriode.isEmpty()) {
             "Det finnes ingen periode med overlapp mellom målgruppe og aktivitet for perioden ${this.formatertPeriodeNorskFormat()}"
