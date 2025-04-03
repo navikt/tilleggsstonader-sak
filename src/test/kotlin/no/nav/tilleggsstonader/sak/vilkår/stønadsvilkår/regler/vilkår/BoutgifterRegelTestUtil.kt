@@ -16,9 +16,9 @@ object BoutgifterRegelTestUtil {
                     svar = SvarId.JA,
                     begrunnelse = "En begrunnelse på delvilkåret",
                 ),
-                Vurdering(regelId = RegelId.DOKUMENTERT_UTGIFTER_OVERNATTING, svar = SvarId.JA),
-                Vurdering(regelId = RegelId.DOKUMENTERT_DELTAKELSE, svar = SvarId.JA),
             ),
+            delvilkår(Vurdering(regelId = RegelId.DOKUMENTERT_UTGIFTER_OVERNATTING, svar = SvarId.JA)),
+            delvilkår(Vurdering(regelId = RegelId.DOKUMENTERT_DELTAKELSE, svar = SvarId.JA)),
         )
 
     fun oppfylteDelvilkårLøpendeUtgifterEnBolig() =
@@ -46,6 +46,8 @@ object BoutgifterRegelTestUtil {
     fun ikkeOppfylteDelvilkårUtgifterOvernatting() =
         listOf(
             delvilkår(Vurdering(RegelId.NØDVENDIGE_MERUTGIFTER, SvarId.NEI, "begrunnelse")),
+            delvilkår(Vurdering(RegelId.DOKUMENTERT_DELTAKELSE, SvarId.JA)),
+            delvilkår(Vurdering(RegelId.DOKUMENTERT_UTGIFTER_OVERNATTING, SvarId.JA)),
         )
 
     fun ikkeOppfylteDelvilkårLøpendeUtgifterEnBolig() =
