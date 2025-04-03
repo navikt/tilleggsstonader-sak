@@ -34,7 +34,6 @@ class TilsynBarnVedtaksperiodeValidingerServiceTest {
     val tilsynBarnVedtaksperiodeValidingerService =
         TilsynBarnVedtaksperiodeValidingerService(
             vilkårperiodeService = vilkårperiodeService,
-            grunnlagsdataService = grunnlagsdataService,
             vedtakRepository = vedtakRepository,
         )
 

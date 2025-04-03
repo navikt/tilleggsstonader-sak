@@ -326,87 +326,6 @@ class VedtaksperiodeValideringUtilsTest {
         }
 
         @Nested
-        inner class ValideringAvFødselsdato {
-            val fom = LocalDate.of(2025, 1, 1)
-            val tom = LocalDate.of(2025, 1, 31)
-            val vedtaksperioder = lagVedtaksperiode()
-
-            val dato18årGammel = fom.minusYears(18)
-            val dato67årGammel = tom.minusYears(67)
-
-            @Test
-            fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er over 18 år`() {
-                assertThatCode {
-                    validerEnkeltperiode(
-                        vedtaksperioder,
-                        målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
-                        aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
-                        dato18årGammel,
-                    )
-                    validerEnkeltperiode(
-                        vedtaksperioder,
-                        målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
-                        aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
-                        dato18årGammel.minusDays(1),
-                    )
-                }.doesNotThrowAnyException()
-            }
-
-            @Test
-            fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er under 67 år`() {
-                assertThatCode {
-                    validerEnkeltperiode(
-                        vedtaksperioder,
-                        målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
-                        aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
-                        dato67årGammel.plusDays(1),
-                    )
-                }.doesNotThrowAnyException()
-            }
-
-            @Test
-            fun `skal ikke kaste feil dersom overgangsstønad og under 18 år eller over 67 år`() {
-                val vedtaksperioder =
-                    lagVedtaksperiode(
-                        målgruppe = MålgruppeType.OVERGANGSSTØNAD,
-                        aktivitet = AktivitetType.UTDANNING,
-                    )
-
-                val målgrupper =
-                    listOf(
-                        målgruppe(
-                            faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.OVERGANGSSTØNAD),
-                            fom = LocalDate.of(2025, 1, 1),
-                            tom = LocalDate.of(2025, 2, 28),
-                        ),
-                    )
-                val aktiviteter =
-                    listOf(
-                        aktivitet(
-                            faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.UTDANNING),
-                            fom = LocalDate.of(2025, 1, 1),
-                            tom = LocalDate.of(2025, 2, 28),
-                        ),
-                    )
-
-                assertThatCode {
-                    validerEnkeltperiode(
-                        vedtaksperioder,
-                        målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
-                        aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
-                        dato18årGammel.minusYears(1),
-                    )
-                    validerEnkeltperiode(
-                        vedtaksperioder,
-                        målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
-                        aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
-                        dato67årGammel.plusYears(1),
-                    )
-                }.doesNotThrowAnyException()
-            }
-        }
-
-        @Nested
         inner class ValiderUtgifterHeleVedtaksperioden {
             val vedtaksperiode = lagVedtaksperiode()
 
@@ -543,7 +462,6 @@ class VedtaksperiodeValideringUtilsTest {
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
-                    fødselsdato = null,
                 )
             }.hasMessageContaining("Kombinasjonen av OVERGANGSSTØNAD og TILTAK er ikke gyldig")
         }
@@ -557,7 +475,6 @@ class VedtaksperiodeValideringUtilsTest {
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
-                    fødselsdato = null,
                 )
             }.hasMessageContaining("Finner ingen perioder hvor vilkår for NEDSATT_ARBEIDSEVNE er oppfylt")
         }
@@ -571,7 +488,6 @@ class VedtaksperiodeValideringUtilsTest {
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
-                    fødselsdato = null,
                 )
             }.hasMessageContaining("Finner ingen perioder hvor vilkår for UTDANNING er oppfylt")
         }
@@ -585,7 +501,6 @@ class VedtaksperiodeValideringUtilsTest {
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
-                    fødselsdato = null,
                 )
             }.hasMessageContaining(
                 "Finnes ingen periode med oppfylte vilkår for AAP i perioden 01.12.2024 - 31.01.2025",
@@ -610,7 +525,6 @@ class VedtaksperiodeValideringUtilsTest {
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
-                    fødselsdato = null,
                 )
             }.hasMessageContaining(
                 "Finnes ingen periode med oppfylte vilkår for TILTAK i perioden 01.01.2025 - 31.01.2025",
@@ -640,7 +554,6 @@ class VedtaksperiodeValideringUtilsTest {
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
-                    fødselsdato = null,
                 )
             }.doesNotThrowAnyException()
         }
@@ -667,7 +580,6 @@ class VedtaksperiodeValideringUtilsTest {
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
-                    fødselsdato = null,
                 )
             }.doesNotThrowAnyException()
         }
@@ -714,7 +626,6 @@ class VedtaksperiodeValideringUtilsTest {
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
-                    fødselsdato = null,
                 )
             }.doesNotThrowAnyException()
         }
@@ -729,7 +640,6 @@ class VedtaksperiodeValideringUtilsTest {
                     vedtaksperiode = vedtaksperiode,
                     målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
-                    fødselsdato = null,
                 )
             }.hasMessageContaining(
                 "Finnes ingen periode med oppfylte vilkår for AAP i perioden 01.01.2025 - 21.01.2025",
