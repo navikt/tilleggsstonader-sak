@@ -11,20 +11,20 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
       | 01.12.2024 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
 
-    Gitt følgende stønadsperioder for læremidler behandling=1
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.12.2024 | 31.03.2025 | AAP       | TILTAK    |
+    Gitt følgende målgrupper for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe |
+      | 01.12.2024 | 31.03.2025 | AAP       |
 
     Når innvilger vedtaksperioder for behandling=1
-      | Fom        | Tom        |
-      | 01.01.2025 | 31.01.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
     Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
-      | Fom        | Tom        |
-      | 01.01.2025 | 31.01.2025 |
-      | 01.02.2025 | 28.02.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 01.02.2025 | 28.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |
@@ -43,13 +43,13 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
       | 01.12.2024 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
 
-    Gitt følgende stønadsperioder for læremidler behandling=1
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.12.2024 | 31.03.2025 | AAP       | TILTAK    |
+    Gitt følgende målgrupper for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe |
+      | 01.12.2024 | 31.03.2025 | AAP       |
 
     Når innvilger vedtaksperioder for behandling=1
-      | Fom        | Tom        |
-      | 01.01.2025 | 31.03.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Så forvent andeler for behandling=1
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -61,13 +61,13 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 01.12.2024 | 31.01.2025 | TILTAK    | VIDEREGÅENDE | 100           |
       | 01.02.2025 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 50            |
 
-    Gitt følgende stønadsperioder for læremidler behandling=2
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.12.2024 | 31.03.2025 | AAP       | TILTAK    |
+    Gitt følgende målgrupper for læremidler behandling=2
+      | Fom        | Tom        | Målgruppe |
+      | 01.12.2024 | 31.03.2025 | AAP       |
 
     Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
-      | Fom        | Tom        |
-      | 01.01.2025 | 31.03.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |
@@ -87,21 +87,21 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
       | 01.12.2024 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
 
-    Gitt følgende stønadsperioder for læremidler behandling=1
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.12.2024 | 31.03.2025 | AAP       | TILTAK    |
+    Gitt følgende målgrupper for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe |
+      | 01.12.2024 | 31.03.2025 | AAP       |
 
     Når innvilger vedtaksperioder for behandling=1
-      | Fom        | Tom        |
-      | 01.01.2025 | 10.02.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 10.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
     Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=20.02.2025
-      | Fom        | Tom        |
-      | 01.01.2025 | 10.02.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 10.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
       # Ny vedtaksperiode
-      | 20.02.2025 | 31.03.2025 |
+      | 20.02.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |
@@ -120,26 +120,27 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
       | 01.12.2024 | 31.03.2025 | UTDANNING | VIDEREGÅENDE | 100           |
 
-    Gitt følgende stønadsperioder for læremidler behandling=1
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.12.2024 | 31.03.2025 | AAP       | UTDANNING |
+    Gitt følgende målgrupper for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe |
+      | 01.12.2024 | 31.03.2025 | AAP       |
 
     Når innvilger vedtaksperioder for behandling=1
-      | Fom        | Tom        |
-      | 01.01.2025 | 28.02.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 28.02.2025 | NEDSATT_ARBEIDSEVNE | UTDANNING |
 
     Gitt følgende aktiviteter for læremidler behandling=2
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
       | 01.12.2024 | 31.03.2025 | UTDANNING | VIDEREGÅENDE | 100           |
 
-    Gitt følgende stønadsperioder for læremidler behandling=2
-      | Fom        | Tom        | Målgruppe       | Aktivitet |
-      | 01.12.2024 | 31.01.2025 | AAP             | UTDANNING |
-      | 01.02.2024 | 31.03.2025 | OVERGANGSSTØNAD | UTDANNING |
+    Gitt følgende målgrupper for læremidler behandling=2
+      | Fom        | Tom        | Målgruppe       |
+      | 01.12.2024 | 31.01.2025 | AAP             |
+      | 01.02.2024 | 31.03.2025 | OVERGANGSSTØNAD |
 
     Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
-      | Fom        | Tom        |
-      | 01.01.2025 | 28.02.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | UTDANNING |
+      | 01.02.2025 | 28.02.2025 | ENSLIG_FORSØRGER    | UTDANNING |
 
     # Endrer målgruppe fra februar
     Så forvent beregningsresultatet for behandling=2
@@ -160,21 +161,21 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
       | 01.12.2024 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
 
-    Gitt følgende stønadsperioder for læremidler behandling=1
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.12.2024 | 31.03.2025 | AAP       | TILTAK    |
+    Gitt følgende målgrupper for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe |
+      | 01.12.2024 | 31.03.2025 | AAP       |
 
     Når innvilger vedtaksperioder for behandling=1
-      | Fom        | Tom        |
-      | 20.12.2024 | 31.12.2024 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 20.12.2024 | 31.12.2024 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
     # Legger til ny vedtaksperiode etter nyttår
     Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.01.2025
-      | Fom        | Tom        |
-      | 20.12.2024 | 31.12.2024 |
-      | 01.01.2025 | 31.01.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 20.12.2024 | 31.12.2024 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 01.01.2025 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |
@@ -194,13 +195,13 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
       | 01.12.2024 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
 
-    Gitt følgende stønadsperioder for læremidler behandling=1
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.12.2024 | 31.03.2025 | AAP       | TILTAK    |
+    Gitt følgende målgrupper for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe |
+      | 01.12.2024 | 31.03.2025 | AAP       |
 
     Når innvilger vedtaksperioder for behandling=1
-      | Fom        | Tom        |
-      | 20.12.2024 | 31.01.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 20.12.2024 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     # Endrer prosent fra 1 januar
     Gitt følgende aktiviteter for læremidler behandling=2
@@ -208,13 +209,13 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 01.12.2024 | 31.12.2024 | TILTAK    | VIDEREGÅENDE | 100           |
       | 01.01.2025 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 50            |
 
-    Gitt følgende stønadsperioder for læremidler behandling=2
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.12.2024 | 31.03.2025 | AAP       | TILTAK    |
+    Gitt følgende målgrupper for læremidler behandling=2
+      | Fom        | Tom        | Målgruppe |
+      | 01.12.2024 | 31.03.2025 | AAP       |
 
     Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.01.2025
-      | Fom        | Tom        |
-      | 20.12.2024 | 31.01.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 20.12.2024 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |
@@ -234,20 +235,20 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
       | 01.12.2024 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 50            |
 
-    Gitt følgende stønadsperioder for læremidler behandling=1
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.12.2024 | 31.03.2025 | AAP       | TILTAK    |
+    Gitt følgende målgrupper for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe |
+      | 01.12.2024 | 31.03.2025 | AAP       |
 
     Når innvilger vedtaksperioder for behandling=1
-      | Fom        | Tom        |
-      | 01.01.2025 | 31.03.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt kopierer perioder fra forrige behandling for behandling=2
 
     Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
-      | Fom        | Tom        |
-      | 01.01.2025 | 31.01.2025 |
-      | 01.02.2025 | 31.03.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 01.02.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |
@@ -277,13 +278,13 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 01.01.2025 | 31.01.2025 | TILTAK    | VIDEREGÅENDE | 50            |
       | 01.02.2025 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
 
-    Gitt følgende stønadsperioder for læremidler behandling=2
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.01.2025 | 31.03.2025 | AAP       | TILTAK    |
+    Gitt følgende målgrupper for læremidler behandling=2
+      | Fom        | Tom        | Målgruppe |
+      | 01.01.2025 | 31.03.2025 | AAP       |
 
     Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
-      | Fom        | Tom        |
-      | 01.01.2025 | 31.03.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |
@@ -313,13 +314,13 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 01.01.2025 | 31.01.2025 | TILTAK    | VIDEREGÅENDE | 50            |
       | 01.02.2025 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
 
-    Gitt følgende stønadsperioder for læremidler behandling=2
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.01.2025 | 31.03.2025 | AAP       | TILTAK    |
+    Gitt følgende målgrupper for læremidler behandling=2
+      | Fom        | Tom        | Målgruppe |
+      | 01.01.2025 | 31.03.2025 | AAP       |
 
     Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=31.01.2025
-      | Fom        | Tom        |
-      | 01.01.2025 | 31.03.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |
@@ -338,19 +339,19 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
       | 01.01.2025 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
 
-    Gitt følgende stønadsperioder for læremidler behandling=1
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.01.2025 | 31.03.2025 | AAP       | TILTAK    |
+    Gitt følgende målgrupper for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe |
+      | 01.01.2025 | 31.03.2025 | AAP       |
 
     Når innvilger vedtaksperioder for behandling=1
-      | Fom        | Tom        |
-      | 10.02.2025 | 10.02.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 10.02.2025 | 10.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
     Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=06.01.2025
-      | Fom        | Tom        |
-      | 06.01.2025 | 10.02.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 06.01.2025 | 10.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |
@@ -369,20 +370,20 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
       | 01.01.2025 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
 
-    Gitt følgende stønadsperioder for læremidler behandling=1
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.01.2025 | 31.03.2025 | AAP       | TILTAK    |
+    Gitt følgende målgrupper for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe |
+      | 01.01.2025 | 31.03.2025 | AAP       |
 
     Når innvilger vedtaksperioder for behandling=1
-      | Fom        | Tom        |
-      | 10.02.2025 | 10.02.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 10.02.2025 | 10.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
     Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=06.01.2025
-      | Fom        | Tom        |
-      | 01.02.2025 | 09.02.2025 |
-      | 10.02.2025 | 10.02.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.02.2025 | 09.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 10.02.2025 | 10.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |
@@ -400,20 +401,20 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
       | 01.01.2025 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
 
-    Gitt følgende stønadsperioder for læremidler behandling=1
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.01.2025 | 31.03.2025 | AAP       | TILTAK    |
+    Gitt følgende målgrupper for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe |
+      | 01.01.2025 | 31.03.2025 | AAP       |
 
     Når innvilger vedtaksperioder for behandling=1
-      | Fom        | Tom        |
-      | 10.02.2025 | 31.03.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 10.02.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
     Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=06.01.2025
-      | Fom        | Tom        |
-      | 20.01.2025 | 09.02.2025 |
-      | 10.02.2025 | 31.03.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 20.01.2025 | 09.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 10.02.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |

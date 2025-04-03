@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.AktivitetTypeDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2.Companion.finnFødselsnumre
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh.Companion.finnFødselsnumre
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn1
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBehandling
@@ -27,7 +26,7 @@ class VedtaksperioderDvhV2Test {
     @Test
     fun `fraDomene kan mappe for InnvilgelseTilsynBarn`() {
         val resultat =
-            VedtaksperioderDvhV2
+            VedtaksperioderDvh
                 .fraDomene(
                     innvilgelseTilsynBarn(),
                     barn = barn1,
@@ -35,7 +34,7 @@ class VedtaksperioderDvhV2Test {
 
         val forventetResultat =
             listOf(
-                VedtaksperioderDvhV2(
+                VedtaksperioderDvh(
                     fom = fom,
                     tom = tom,
                     lovverketsMålgruppe = LovverketsMålgruppeDvh.NEDSATT_ARBEIDSEVNE,
@@ -51,16 +50,16 @@ class VedtaksperioderDvhV2Test {
     @Test
     fun `fraDomene kan mappe for InnvilgelseLæremidler`() {
         val resultat =
-            VedtaksperioderDvhV2.fraDomene(
+            VedtaksperioderDvh.fraDomene(
                 vedtak = innvilgelseLæremidler(),
                 barn = emptyList(),
             )
 
         val forventetResultat =
-            VedtaksperioderDvhV2.JsonWrapper(
+            VedtaksperioderDvh.JsonWrapper(
                 vedtaksperioder =
                     listOf(
-                        VedtaksperioderDvhV2(
+                        VedtaksperioderDvh(
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 1, 7),
                             aktivitet = AktivitetTypeDvh.TILTAK,
@@ -81,10 +80,10 @@ class VedtaksperioderDvhV2Test {
                 begrunnelse = "Begrunelse for avslag",
             )
 
-        val resultat = VedtaksperioderDvhV2.fraDomene(vedtak = avslag, barn = emptyList())
+        val resultat = VedtaksperioderDvh.fraDomene(vedtak = avslag, barn = emptyList())
 
         val forventetResultat =
-            VedtaksperioderDvhV2.JsonWrapper(
+            VedtaksperioderDvh.JsonWrapper(
                 vedtaksperioder = emptyList(),
             )
 

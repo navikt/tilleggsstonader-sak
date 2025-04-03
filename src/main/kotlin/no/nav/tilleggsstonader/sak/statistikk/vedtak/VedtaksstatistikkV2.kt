@@ -6,9 +6,9 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDv
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvhV2
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import org.springframework.data.annotation.Id
@@ -35,8 +35,8 @@ data class VedtaksstatistikkV2(
     @Column("behandling_arsak")
     val behandlingÅrsak: BehandlingÅrsakDvh,
     val vedtakResultat: VedtakResultatDvh,
-    val vedtaksperioder: VedtaksperioderDvhV2.JsonWrapper,
-    val utbetalinger: UtbetalingerDvhV2.JsonWrapper,
+    val vedtaksperioder: VedtaksperioderDvh.JsonWrapper,
+    val utbetalinger: UtbetalingerDvh.JsonWrapper,
     @Column("stonadstype")
     val stønadstype: StønadstypeDvh,
     @Column("arsaker_avslag")

@@ -61,7 +61,6 @@ object VedtaksperiodeValideringUtils {
         vedtaksperiode: Vedtaksperiode,
         målgruppePerioderPerType: Map<MålgruppeType, List<Datoperiode>>,
         aktivitetPerioderPerType: Map<AktivitetType, List<Datoperiode>>,
-        fødselsdato: LocalDate?,
     ) {
         brukerfeilHvisIkke(vedtaksperiode.målgruppe.gyldigeAktiviter.contains(vedtaksperiode.aktivitet)) {
             "Kombinasjonen av ${vedtaksperiode.målgruppe} og ${vedtaksperiode.aktivitet} er ikke gyldig"

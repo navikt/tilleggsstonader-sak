@@ -9,13 +9,13 @@ Egenskap: Innvilgelse av læremidler
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
       | 01.12.2024 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
 
-    Gitt følgende stønadsperioder for læremidler behandling=1
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.12.2024 | 31.03.2025 | AAP       | TILTAK    |
+    Gitt følgende målgrupper for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe |
+      | 01.12.2024 | 31.03.2025 | AAP       |
 
     Når innvilger vedtaksperioder for behandling=1
-      | Fom        | Tom        |
-      | 01.12.2024 | 31.03.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.12.2024 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Så forvent beregningsresultatet for behandling=1
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
@@ -30,5 +30,5 @@ Egenskap: Innvilgelse av læremidler
       | 01.01.2025 | 1353  | LÆREMIDLER_AAP | 01.01.2025      |
 
     Så forvent vedtaksperioder for behandling=1
-      | Fom        | Tom        |
-      | 01.12.2024 | 31.03.2025 |
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.12.2024 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |

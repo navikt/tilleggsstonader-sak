@@ -9,12 +9,19 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BrukVedtaksperioderForBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerIngenOverlappendeVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.vedtaksperioderInnenforLøpendeMåned
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -25,11 +32,12 @@ class VedtaksperiodeUtilTest {
     val behandlingId = BehandlingId(UUID.randomUUID())
     val behandlingService = mockk<BehandlingService>()
     val vedtakRepository = mockk<VedtakRepository>()
+    val vilkårperiodeService = mockk<VilkårperiodeService>()
     val læremidlerVedtaksperiodeValideringService =
         LæremidlerVedtaksperiodeValideringService(
             behandlingService = behandlingService,
             vedtakRepository = vedtakRepository,
-            vilkårperiodeService = mockk(),
+            vilkårperiodeService = vilkårperiodeService,
         )
     val vedtaksperiodeJanuar =
         vedtaksperiode(
@@ -42,6 +50,32 @@ class VedtaksperiodeUtilTest {
             tom = LocalDate.of(2024, 2, 28),
         )
 
+    val målgrupper =
+        listOf(
+            målgruppe(
+                faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.AAP),
+                fom = vedtaksperiodeJanuar.fom,
+                tom = vedtaksperiodeFebruar.tom,
+            ),
+        )
+    val aktiviteter =
+        listOf(
+            aktivitet(
+                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                fom = vedtaksperiodeJanuar.fom,
+                tom = vedtaksperiodeFebruar.tom,
+            ),
+        )
+
+    @BeforeEach
+    fun setUp() {
+        every { vilkårperiodeService.hentVilkårperioder(any()) } returns
+            Vilkårperioder(
+                målgrupper = målgrupper,
+                aktiviteter = aktiviteter,
+            )
+    }
+
     @Nested
     inner class ValiderVedtaksperioder {
         @Test
@@ -53,7 +87,6 @@ class VedtaksperiodeUtilTest {
                 læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
                     vedtaksperioder = vedtaksperioder,
                     behandlingId = behandlingId,
-                    brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(false),
                 )
             }
         }
@@ -68,7 +101,6 @@ class VedtaksperiodeUtilTest {
                 læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
                     vedtaksperioder = vedtaksperioder,
                     behandlingId = behandlingId,
-                    brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(false),
                 )
             }.hasMessageContaining("Kan ikke innvilge når det ikke finnes noen vedtaksperioder.")
         }

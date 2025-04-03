@@ -5,6 +5,7 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.behandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
@@ -176,7 +177,7 @@ class InterntVedtakServiceTest {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
             assertThat(interntVedtak.vedtaksperioder).hasSize(1)
-            with(interntVedtak.vedtaksperioder.single()) {
+            with(interntVedtak.vedtaksperioder.filterIsInstance<VedtaksperiodeInterntVedtakMålgruppe>().single()) {
                 assertThat(målgruppe).isEqualTo(MålgruppeType.AAP)
                 assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 1))
@@ -194,7 +195,7 @@ class InterntVedtakServiceTest {
             every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.Læremidler.grunnlagsdata
             every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
             every { vilkårService.hentVilkår(behandlingId) } returns emptyList()
-            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.avslåttVedtak
+            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.innvilgetVedtak
         }
 
         @Test
@@ -251,7 +252,8 @@ class InterntVedtakServiceTest {
         }
 
         @Test
-        fun `Vedtak skal mappes riktig`() {
+        fun `Vedtak avslag skal mappes riktig`() {
+            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.avslåttVedtak
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
             val dummyAvslåttVedtak = Testdata.Læremidler.avslåttVedtak.data
 
@@ -261,6 +263,19 @@ class InterntVedtakServiceTest {
                     avslagBegrunnelse = dummyAvslåttVedtak.begrunnelse,
                 ),
             )
+        }
+
+        @Test
+        fun `vedtaksperiodefelter skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+
+            assertThat(interntVedtak.vedtaksperioder).hasSize(1)
+            with(interntVedtak.vedtaksperioder.filterIsInstance<VedtaksperiodeInterntVedtakFaktiskMålgruppe>().single()) {
+                assertThat(målgruppe).isEqualTo(FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)
+                assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
+                assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 1))
+                assertThat(tom).isEqualTo(LocalDate.of(2024, 3, 31))
+            }
         }
 
         @Test
@@ -406,7 +421,7 @@ class InterntVedtakServiceTest {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
             assertThat(interntVedtak.vedtaksperioder).hasSize(1)
-            with(interntVedtak.vedtaksperioder.single()) {
+            with(interntVedtak.vedtaksperioder.filterIsInstance<VedtaksperiodeInterntVedtakMålgruppe>().single()) {
                 assertThat(målgruppe).isEqualTo(MålgruppeType.AAP)
                 assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
                 assertThat(fom).isEqualTo(LocalDate.of(2024, JANUARY, 1))

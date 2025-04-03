@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.mockk.every
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
@@ -24,8 +23,6 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPe
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.BrevController
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
@@ -35,7 +32,6 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -56,11 +52,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.slf4j.MDC
@@ -92,7 +85,6 @@ class BehandlingFlytTest(
     @AfterEach
     override fun tearDown() {
         super.tearDown()
-        resetMock(unleashService)
     }
 
     @Test
@@ -193,32 +185,6 @@ class BehandlingFlytTest(
         somBeslutter {
             godkjennTotrinnskontroll(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
-        }
-    }
-
-    @Test
-    fun `skal ikke kunne gå videre til vilkår-steg dersom inngangsvilkåren ikke validerer`() {
-        every { unleashService.isEnabled(Toggle.LÆREMIDLER_VEDTAKSPERIODER_V2) } returns false
-        somSaksbehandler {
-            val behandlingId = opprettBehandling(personIdent = personIdent, stønadstype = Stønadstype.LÆREMIDLER)
-            val faktaOgSvarLæremidler =
-                FaktaOgSvarAktivitetLæremidlerDto(
-                    prosent = 100,
-                    studienivå = Studienivå.HØYERE_UTDANNING,
-                    svarHarUtgifter = SvarJaNei.JA,
-                    svarHarRettTilUtstyrsstipend = SvarJaNei.JA,
-                )
-            vurderInngangsvilkår(behandlingId = behandlingId, aktivitetFaktaOgSvar = faktaOgSvarLæremidler)
-            stegService.resetSteg(behandlingId, StegType.INNGANGSVILKÅR)
-            with(vilkårperiodeService.hentVilkårperioder(behandlingId)) {
-                val slettVikårperiode = SlettVikårperiode(behandlingId, "kommentar")
-                (målgrupper + aktiviteter).forEach {
-                    vilkårperiodeService.slettVilkårperiode(it.id, slettVikårperiode)
-                }
-            }
-            assertThatThrownBy {
-                stegService.håndterSteg(behandlingId, StegType.INNGANGSVILKÅR)
-            }.hasMessageContaining("Finner ingen perioder hvor vilkår for AAP er oppfylt")
         }
     }
 

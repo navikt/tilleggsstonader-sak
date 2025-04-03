@@ -6,8 +6,8 @@ Egenskap: Validering av vedtaksperioder og stønadsperioder for læremidler
 
   Scenario: Vedtaksperioder er ikke innenfor en stønadsperiode - mangler dag i midten
     Gitt følgende vedtaksperioder for læremidler
-      | Fom        | Tom        |
-      | 01.01.2024 | 31.04.2024 |
+      | Fom        | Tom        | Målgruppe           |
+      | 01.01.2024 | 31.04.2024 | NEDSATT_ARBEIDSEVNE |
 
     Gitt følgende stønadsperioder for læremidler
       | Fom        | Tom        | Målgruppe | Aktivitet |
@@ -16,12 +16,12 @@ Egenskap: Validering av vedtaksperioder og stønadsperioder for læremidler
 
     Når beregner stønad for læremidler
 
-    Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en periode med overlapp mellom aktivitet og målgruppe.
+    Så forvent følgende feil fra læremidlerberegning: Finner ingen perioder hvor vilkår for NEDSATT_ARBEIDSEVNE er oppfylt
 
   Scenario: Vedtaksperioder er ikke innenfor en stønadsperiode - mangler dag i starten
     Gitt følgende vedtaksperioder for læremidler
-      | Fom        | Tom        |
-      | 01.01.2024 | 31.04.2024 |
+      | Fom        | Tom        | Målgruppe           |
+      | 01.01.2024 | 31.04.2024 | NEDSATT_ARBEIDSEVNE |
 
     Gitt følgende stønadsperioder for læremidler
       | Fom        | Tom        | Målgruppe | Aktivitet |
@@ -30,7 +30,7 @@ Egenskap: Validering av vedtaksperioder og stønadsperioder for læremidler
 
     Når beregner stønad for læremidler
 
-    Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en periode med overlapp mellom aktivitet og målgruppe.
+    Så forvent følgende feil fra læremidlerberegning: Finner ingen perioder hvor vilkår for NEDSATT_ARBEIDSEVNE er oppfylt
 
 
   Scenario: Vedtaksperioder er ikke innenfor en stønadsperiode - mangler dag i slutten
@@ -44,4 +44,4 @@ Egenskap: Validering av vedtaksperioder og stønadsperioder for læremidler
 
     Når beregner stønad for læremidler
 
-    Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en periode med overlapp mellom aktivitet og målgruppe.
+    Så forvent følgende feil fra læremidlerberegning: Finner ingen perioder hvor vilkår for NEDSATT_ARBEIDSEVNE er oppfylt

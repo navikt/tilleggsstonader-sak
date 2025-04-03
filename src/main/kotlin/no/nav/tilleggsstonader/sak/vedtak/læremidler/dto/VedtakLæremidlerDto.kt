@@ -36,8 +36,8 @@ data class VedtaksperiodeLæremidlerDto(
     val id: UUID,
     val fom: LocalDate,
     val tom: LocalDate,
-    val målgruppeType: FaktiskMålgruppe?,
-    val aktivitetType: AktivitetType?,
+    val målgruppeType: FaktiskMålgruppe,
+    val aktivitetType: AktivitetType,
     val status: VedtaksperiodeStatus? = null,
 )
 

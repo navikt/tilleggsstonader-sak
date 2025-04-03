@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvhV2
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AndelstypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvh
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultVedtaksperiode
@@ -34,13 +35,13 @@ class UtbetalingerDvhV2Test {
             )
         val andlelerTilkjentYtelse = listOf(andelTilkjentYtelse(fom = LocalDate.of(2024, 1, 1), beløp = 1000))
 
-        val resultat = UtbetalingerDvhV2.fraDomene(andlelerTilkjentYtelse, innvilgelse)
+        val resultat = UtbetalingerDvh.fraDomene(andlelerTilkjentYtelse, innvilgelse)
 
         val forventetResultat =
-            UtbetalingerDvhV2.JsonWrapper(
+            UtbetalingerDvh.JsonWrapper(
                 utbetalinger =
                     listOf(
-                        UtbetalingerDvhV2(
+                        UtbetalingerDvh(
                             fraOgMed = LocalDate.of(2024, 1, 1),
                             tilOgMed = LocalDate.of(2024, 1, 1),
                             type = AndelstypeDvh.TILSYN_BARN_AAP,
@@ -60,13 +61,13 @@ class UtbetalingerDvhV2Test {
 
         val andlelerTilkjentYtelse = listOf(andelTilkjentYtelse(fom = LocalDate.of(2024, 1, 1)))
 
-        val resultat = UtbetalingerDvhV2.fraDomene(andlelerTilkjentYtelse, innvilgelse)
+        val resultat = UtbetalingerDvh.fraDomene(andlelerTilkjentYtelse, innvilgelse)
 
         val forventetResultat =
-            UtbetalingerDvhV2.JsonWrapper(
+            UtbetalingerDvh.JsonWrapper(
                 utbetalinger =
                     listOf(
-                        UtbetalingerDvhV2(
+                        UtbetalingerDvh(
                             fraOgMed = LocalDate.of(2024, 1, 1),
                             tilOgMed = LocalDate.of(2024, 1, 1),
                             type = AndelstypeDvh.TILSYN_BARN_AAP,
@@ -85,13 +86,13 @@ class UtbetalingerDvhV2Test {
         val innvilgelse = innvilgelseLæremidler()
         val andlelerTilkjentYtelse = listOf(andelTilkjentYtelse(fom = LocalDate.of(2024, 1, 1)))
 
-        val resultat = UtbetalingerDvhV2.fraDomene(andlelerTilkjentYtelse, innvilgelse)
+        val resultat = UtbetalingerDvh.fraDomene(andlelerTilkjentYtelse, innvilgelse)
 
         val forventetResultat =
-            UtbetalingerDvhV2.JsonWrapper(
+            UtbetalingerDvh.JsonWrapper(
                 utbetalinger =
                     listOf(
-                        UtbetalingerDvhV2(
+                        UtbetalingerDvh(
                             fraOgMed = LocalDate.of(2024, 1, 1),
                             tilOgMed = LocalDate.of(2024, 1, 1),
                             type = AndelstypeDvh.TILSYN_BARN_AAP,
