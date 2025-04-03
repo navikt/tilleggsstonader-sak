@@ -9,9 +9,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeGrunnlagService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
 import org.slf4j.LoggerFactory
@@ -24,8 +22,6 @@ class NullstillBehandlingService(
     private val gjennbrukDataRevurderingService: GjennbrukDataRevurderingService,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
-    private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
-    private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårRepository: VilkårRepository,
     private val vedtakRepository: VedtakRepository,
     private val simuleringsresultatRepository: SimuleringsresultatRepository,
@@ -71,7 +67,6 @@ class NullstillBehandlingService(
      */
     private fun slettDataIBehandling(behandlingId: BehandlingId) {
         vilkårperiodeRepository.findByBehandlingId(behandlingId).let(vilkårperiodeRepository::deleteAll)
-        stønadsperiodeRepository.findAllByBehandlingId(behandlingId).let(stønadsperiodeRepository::deleteAll)
         vilkårRepository.findByBehandlingId(behandlingId).let(vilkårRepository::deleteAll)
 
         vedtakRepository.deleteById(behandlingId)
