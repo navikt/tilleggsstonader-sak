@@ -1,12 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -21,8 +19,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.slåSammenSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BrukVedtaksperioderForBeregning
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import org.slf4j.LoggerFactory
@@ -43,7 +39,6 @@ class AdminLæremidlerVedtakController(
     private val vedtakService: VedtakService,
     private val vedtakRepository: VedtakRepository,
     private val behandlingService: BehandlingService,
-    private val beregningService: LæremidlerBeregningService,
     private val transactionHandler: TransactionHandler,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -136,41 +131,10 @@ class AdminLæremidlerVedtakController(
                     }
                     vedtaksperiode.copy(målgruppe = stønadsperiode.målgruppe, aktivitet = stønadsperiode.aktivitet)
                 }.sorted()
-        val beregningOk =
-            kontrollerBeregning(behandling, vedtaksperioderMedMålgruppeOgAktivitet, vedtakdata, behandlingId)
-        if (beregningOk) {
-            logger.info("Oppdatering av vedtaksperioder læremidler behandling=$behandlingId result=OK")
-            if (oppdater) {
-                oppdaterVedtaksperioder(vedtak, vedtaksperioderMedMålgruppeOgAktivitet)
-            }
+        logger.info("Oppdatering av vedtaksperioder læremidler behandling=$behandlingId result=OK")
+        if (oppdater) {
+            oppdaterVedtaksperioder(vedtak, vedtaksperioderMedMålgruppeOgAktivitet)
         }
-    }
-
-    private fun kontrollerBeregning(
-        behandling: Saksbehandling,
-        vedtaksperioderMedMålgruppeOgAktivitet: List<Vedtaksperiode>,
-        vedtakdata: InnvilgelseEllerOpphørLæremidler,
-        behandlingId: BehandlingId,
-    ): Boolean {
-        if (vedtakdata is OpphørLæremidler || behandling.forrigeIverksatteBehandlingId != null) {
-            return true
-        }
-        val beregningsresultat =
-            beregningService.beregn(
-                behandling,
-                vedtaksperioderMedMålgruppeOgAktivitet,
-                brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(true),
-            )
-        val beregningsresultatErOk = beregningsresultat == vedtakdata.beregningsresultat
-        if (!beregningsresultatErOk) {
-            logger.warn("Oppdatering av vedtaksperioder læremidler behandling=$behandlingId result=FEIL se securelogs for mer info")
-            secureLogger.warn(
-                "Ulikt beregningsresultat for behandling=$behandlingId, " +
-                    "forrige=${objectMapper.writeValueAsString(vedtakdata.beregningsresultat)} " +
-                    "nytt=${objectMapper.writeValueAsString(beregningsresultat)}",
-            )
-        }
-        return beregningsresultatErOk
     }
 
     private fun oppdaterVedtaksperioder(
