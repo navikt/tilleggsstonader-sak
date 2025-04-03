@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AndelstypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvhV2
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned

@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.AktivitetTypeDvh
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
@@ -13,6 +12,9 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBa
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeLæremidlerMapper
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import java.time.LocalDate
 
 data class VedtaksperioderDvhV2(
@@ -88,6 +90,30 @@ data class VedtaksperioderDvhV2(
         fun List<BarnId>.finnFødselsnumre(barn: List<BehandlingBarn>) =
             this.mapNotNull { barnId ->
                 barn.find { barnId == it.id }?.ident
+            }
+    }
+}
+
+enum class AktivitetTypeDvh {
+    TILTAK,
+    UTDANNING,
+    REELL_ARBEIDSSØKER,
+    INGEN_AKTIVITET,
+    ;
+
+    companion object {
+        fun fraDomene(vilkårsperiodeType: VilkårperiodeType) =
+            when (vilkårsperiodeType) {
+                is AktivitetType -> fraDomene(aktivitetType = vilkårsperiodeType)
+                is MålgruppeType -> throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type aktivitet.")
+            }
+
+        fun fraDomene(aktivitetType: AktivitetType) =
+            when (aktivitetType) {
+                AktivitetType.TILTAK -> TILTAK
+                AktivitetType.UTDANNING -> UTDANNING
+                AktivitetType.REELL_ARBEIDSSØKER -> REELL_ARBEIDSSØKER
+                AktivitetType.INGEN_AKTIVITET -> INGEN_AKTIVITET
             }
     }
 }

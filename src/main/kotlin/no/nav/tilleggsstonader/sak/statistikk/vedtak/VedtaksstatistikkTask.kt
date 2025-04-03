@@ -22,18 +22,13 @@ class VedtaksstatistikkTask(
     private val vedtaksstatistikkService: VedtaksstatistikkService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val (behandlingId, fagsakId, hendelseTidspunkt) = objectMapper.readValue<VedtaksstatistikkTaskPayload>(task.payload)
+        val (behandlingId, fagsakId) = objectMapper.readValue<VedtaksstatistikkTaskPayload>(task.payload)
 
         vedtaksstatistikkService.lagreVedtaksstatistikkV2(
             behandlingId,
             fagsakId,
         )
 
-        vedtaksstatistikkService.lagreVedtaksstatistikk(
-            behandlingId,
-            fagsakId,
-            hendelseTidspunkt,
-        )
     }
 
     companion object {
@@ -50,7 +45,6 @@ class VedtaksstatistikkTask(
                         VedtaksstatistikkTaskPayload(
                             behandlingId = behandlingId,
                             fagsakId = fagsakId,
-                            hendelseTidspunkt = hendelseTidspunkt,
                         ),
                     ),
                 properties =
@@ -68,6 +62,5 @@ class VedtaksstatistikkTask(
     data class VedtaksstatistikkTaskPayload(
         val behandlingId: BehandlingId,
         val fagsakId: FagsakId,
-        val hendelseTidspunkt: LocalDateTime,
     )
 }
