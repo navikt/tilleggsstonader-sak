@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak
+package no.nav.tilleggsstonader.sak.vedtak.validering
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode

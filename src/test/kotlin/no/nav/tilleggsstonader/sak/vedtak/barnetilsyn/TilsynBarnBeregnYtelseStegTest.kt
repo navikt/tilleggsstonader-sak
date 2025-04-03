@@ -18,9 +18,9 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilg
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnUtgiftService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnVedtaksperiodeValidingerService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -43,7 +43,7 @@ class TilsynBarnBeregnYtelseStegTest {
     private val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>(relaxed = true)
     private val opphørValideringService = mockk<OpphørValideringService>(relaxed = true)
     private val tilsynBarnVedtaksperiodeValidingerService =
-        mockk<TilsynBarnVedtaksperiodeValidingerService>(relaxed = true)
+        mockk<VedtaksperiodeValideringService>(relaxed = true)
     private val vedtaksperiodeService = mockk<VedtaksperiodeService>(relaxed = true)
 
     val tilsynBarnBeregningService =
@@ -51,7 +51,7 @@ class TilsynBarnBeregnYtelseStegTest {
             vilkårperiodeRepository = vilkårperiodeRepository,
             tilsynBarnUtgiftService = tilsynBarnUtgiftService,
             vedtakRepository = repository,
-            tilsynBarnVedtaksperiodeValidingerService = tilsynBarnVedtaksperiodeValidingerService,
+            vedtaksperiodeValidingerService = tilsynBarnVedtaksperiodeValidingerService,
         )
 
     val steg =

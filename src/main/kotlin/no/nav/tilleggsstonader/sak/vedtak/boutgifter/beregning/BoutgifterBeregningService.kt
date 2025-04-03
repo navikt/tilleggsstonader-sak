@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.validerUtgiftHeleVedtaksperioden
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.splittTilLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
@@ -22,12 +23,13 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.splitFraRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import org.springframework.stereotype.Service
 
 @Service
 class BoutgifterBeregningService(
     private val boutgifterUtgiftService: BoutgifterUtgiftService,
-    private val vedtaksperiodeValideringService: BoutgifterVedtaksperiodeValideringService,
+    private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val vedtakRepository: VedtakRepository,
 ) {
     /**
@@ -48,10 +50,10 @@ class BoutgifterBeregningService(
         val utgifterPerVilkårtype = boutgifterUtgiftService.hentUtgifterTilBeregning(behandling.id)
         validerUtgifter(utgifterPerVilkårtype)
 
+        validerUtgiftHeleVedtaksperioden(vedtaksperioder, utgifterPerVilkårtype)
         vedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
-            utgifter = utgifterPerVilkårtype,
             typeVedtak = typeVedtak,
         )
 

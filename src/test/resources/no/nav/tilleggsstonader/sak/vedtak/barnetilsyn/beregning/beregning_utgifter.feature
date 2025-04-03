@@ -3,26 +3,7 @@
 
 Egenskap: Beregning - Utgifter
 
-  Scenario: Vedtaksperiode skal begrenses av perioder med utgifter:
-    # Mål: Beregningen skal ikke gi resultat for februar fordi det ikke er utgifter i denne perioden
 
-    Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe       |
-      | 01.01.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
-
-    Gitt følgende aktiviteter
-      | Fom        | Tom        | Aktivitet | Aktivitetsdager |
-      | 01.01.2023 | 28.02.2023 | UTDANNING | 5               |
-
-    Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 01.2023 | 1000   |
-
-    Når beregner
-
-    Så forvent følgende beregningsresultat
-      | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
-      | 01.2023 | 29.53   | 22           | 1000   | 650         |
 
   Scenario: Beregning skal ikke ta med utgifter utenfor vedtaksperiode
     # Mål: Beregningen skal ikke gi resultat for februar fordi det ikke er utgifter i denne perioden
@@ -111,7 +92,7 @@ Egenskap: Beregning - Utgifter
 
     Gitt følgende vedtaksperioder
       | Fom        | Tom        | Aktivitet | Målgruppe       |
-      | 01.01.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | 01.01.2023 | 31.01.2023 | UTDANNING | OVERGANGSSTØNAD |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
@@ -126,3 +107,21 @@ Egenskap: Beregning - Utgifter
     Så forvent følgende beregningsresultat
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
       | 01.2023 | 0.00    | 22           | 0      | 0           |
+
+  Scenario: Vedtaksperiode er lengere enn utgift:
+
+    Gitt følgende vedtaksperioder
+      | Fom        | Tom        | Aktivitet | Målgruppe       |
+      | 01.01.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
+
+    Gitt følgende aktiviteter
+      | Fom        | Tom        | Aktivitet | Aktivitetsdager |
+      | 01.01.2023 | 28.02.2023 | UTDANNING | 5               |
+
+    Gitt følgende utgifter for barn med id: 1
+      | Fom     | Tom     | Utgift |
+      | 01.2023 | 01.2023 | 1000   |
+
+    Når beregner
+
+    Så forvent følgende feil: Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden
