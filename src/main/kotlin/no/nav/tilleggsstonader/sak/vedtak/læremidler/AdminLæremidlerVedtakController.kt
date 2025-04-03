@@ -189,7 +189,7 @@ class AdminLæremidlerVedtakController(
                         data = vedtak.data.copy(vedtaksperioder = vedtaksperioderMedMålgruppeOgAktivitet),
                     )
 
-                else -> error("Feil type vedtak=${vedtak::class.simpleName}")
+                else -> error("Feil type vedtak=${vedtak.data::class.simpleName}")
             }
         vedtakRepository.update(oppdatertVedtak)
     }
