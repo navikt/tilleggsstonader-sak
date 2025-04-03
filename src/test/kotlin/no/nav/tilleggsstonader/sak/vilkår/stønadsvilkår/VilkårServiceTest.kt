@@ -370,7 +370,7 @@ internal class VilkårServiceTest {
     }
 
     @Nested
-    inner class EndringHvisStønadsperiodeBegynnerFørRevurderFra {
+    inner class EndringHvisStønadsvilkårBegynnerFørRevurderFra {
         val fom = YearMonth.now().minusMonths(1)
         val tom = YearMonth.now().plusMonths(1)
         val revurderFra = LocalDate.now()
