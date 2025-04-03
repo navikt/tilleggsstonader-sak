@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.util.stønadsperiode
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilStønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
@@ -21,12 +19,7 @@ class UtbetalingPeriodeTest {
             utbetalingsdato = førsteJanuar,
         )
 
-    val stønadsperiode =
-        stønadsperiode(
-            behandlingId = BehandlingId.random(),
-            fom = førsteJanuar,
-            tom = sisteJanuar,
-        ).tilStønadsperiodeBeregningsgrunnlag()
+    val målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
 
     val aktivitet =
         AktivitetLæremidlerBeregningGrunnlag(
@@ -47,7 +40,7 @@ class UtbetalingPeriodeTest {
         val utbetalingPeriode =
             UtbetalingPeriode(
                 løpendeMåned = grunnlagForUtbetalingPeriode.medVedtaksperiode(vedtaksperiode),
-                målgruppeOgAktivitet = MålgruppeOgAktivitet(stønadsperiode.målgruppe, aktivitet),
+                målgruppeOgAktivitet = MålgruppeOgAktivitet(målgruppe, aktivitet),
             )
 
         assertThat(utbetalingPeriode.fom).isEqualTo(førsteJanuar)

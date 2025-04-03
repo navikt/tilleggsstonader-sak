@@ -1,10 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeBeregning
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -43,22 +40,5 @@ class VedtaksperiodeTest {
             )
 
         assertThat(vedtaksperiodeDto.tilVedtaksperiodeBeregning()).isEqualTo(vedtaksperiode)
-    }
-
-    @Test
-    fun `mapper StønadsperiodeBeregningsgrunnlag til VedtaksperiodeBeregningsgrunnlag`() {
-        val stønadsperiodeBeregningsgrunnlag =
-            listOf(
-                stønadsperiode(
-                    behandlingId = BehandlingId.random(),
-                    fom = fom,
-                    tom = tom,
-                    målgruppe = målgruppe,
-                    aktivitet = aktivitet,
-                ),
-            )
-        assertThat(stønadsperiodeBeregningsgrunnlag.tilVedtaksperiodeBeregning()).isEqualTo(
-            vedtaksperiode,
-        )
     }
 }

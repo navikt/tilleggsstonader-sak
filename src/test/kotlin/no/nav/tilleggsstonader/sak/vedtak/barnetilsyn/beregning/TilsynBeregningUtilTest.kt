@@ -4,12 +4,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFraMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.brukPerioderFraOgMedRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -26,114 +25,108 @@ class TilsynBeregningUtilTest {
     val mars = YearMonth.of(2024, 3)
 
     @Nested
-    inner class SplitStønadsperioder {
+    inner class SplitVedtaksperioder {
         @Nested
-        inner class EnStønadsperiode {
+        inner class EnVedtaksperiode {
             @Test
-            fun `stønadsperiode innenfor en måned skal kun gi en måned ut`() {
-                val stønadsperiode =
-                    stønadsperiode(
-                        behandlingId = behandlingId,
+            fun `vedtaksperiode innenfor en måned skal kun gi en måned ut`() {
+                val vedtaksperiode =
+                    vedtaksperiodeBeregning(
                         fom = januar.atDay(3),
                         tom = januar.atDay(21),
                     )
-                val stønadsperioder =
+                val vedtaksperioder =
                     listOf(
-                        stønadsperiode,
-                    ).tilVedtaksperiodeBeregning().sorted()
+                        vedtaksperiode,
+                    ).sorted()
 
-                val resultat = stønadsperioder.tilÅrMåned()
+                val resultat = vedtaksperioder.tilÅrMåned()
 
                 assertThat(resultat.values).hasSize(1)
-                assertThat(resultat[januar]).isEqualTo(stønadsperioder)
+                assertThat(resultat[januar]).isEqualTo(vedtaksperioder)
             }
 
             @Test
-            fun `skal splitte en stønadsperiode over flere måneder`() {
-                val stønadsperiode =
-                    stønadsperiode(
-                        behandlingId = behandlingId,
+            fun `skal splitte en vedtaksperiode over flere måneder`() {
+                val vedtaksperiode =
+                    vedtaksperiodeBeregning(
                         fom = LocalDate.of(2024, 1, 1),
                         tom = LocalDate.of(2024, 3, 31),
                     )
 
-                val stønadsperioder = listOf(stønadsperiode).tilVedtaksperiodeBeregning().sorted()
+                val vedtaksperioder = listOf(vedtaksperiode).sorted()
 
-                val resultat = stønadsperioder.tilÅrMåned()
+                val resultat = vedtaksperioder.tilÅrMåned()
 
                 assertThat(resultat.values).hasSize(3)
                 resultat.values.forEach { assertThat(it).hasSize(1) }
 
-                resultat[januar]?.get(0)?.harVerdier(fom = stønadsperiode.fom, januar.atEndOfMonth())
+                resultat[januar]?.get(0)?.harVerdier(fom = vedtaksperiode.fom, januar.atEndOfMonth())
                 resultat[februar]?.get(0)?.harVerdier(fom = februar.atDay(1), februar.atEndOfMonth())
                 resultat[mars]?.get(0)?.harVerdier(fom = mars.atDay(1), mars.atEndOfMonth())
             }
         }
 
         @Nested
-        inner class FlereStønadsperioder {
+        inner class FlereVedtaksperioder {
             @Test
-            fun `flere stønadsperioder innenfor en måned`() {
-                val stønadsperiode1 =
-                    stønadsperiode(
-                        behandlingId = behandlingId,
+            fun `flere vedtaksperioder innenfor en måned`() {
+                val vedtaksperiode1 =
+                    vedtaksperiodeBeregning(
                         fom = LocalDate.of(2024, 1, 1),
                         tom = LocalDate.of(2024, 1, 10),
                     )
 
-                val stønadsperiode2 =
-                    stønadsperiode(
-                        behandlingId = behandlingId,
+                val vedtaksperiode2 =
+                    vedtaksperiodeBeregning(
                         fom = LocalDate.of(2024, 1, 20),
                         tom = LocalDate.of(2024, 1, 31),
                     )
 
-                val stønadsperioder =
+                val vedtaksperioder =
                     listOf(
-                        stønadsperiode1,
-                        stønadsperiode2,
-                    ).tilVedtaksperiodeBeregning().sorted()
+                        vedtaksperiode1,
+                        vedtaksperiode2,
+                    ).sorted()
 
-                val resultat = stønadsperioder.tilÅrMåned()
+                val resultat = vedtaksperioder.tilÅrMåned()
 
                 assertThat(resultat.values).hasSize(1)
 
                 val resultatJanuar = resultat[januar]!!
                 assertThat(resultatJanuar).hasSize(2)
 
-                resultatJanuar[0].harVerdier(fom = stønadsperiode1.fom, stønadsperiode1.tom)
-                resultatJanuar[1].harVerdier(fom = stønadsperiode2.fom, stønadsperiode2.tom)
+                resultatJanuar[0].harVerdier(fom = vedtaksperiode1.fom, vedtaksperiode1.tom)
+                resultatJanuar[1].harVerdier(fom = vedtaksperiode2.fom, vedtaksperiode2.tom)
             }
 
             @Test
-            fun `skal splitte flere stønadsperiode over flere måneder`() {
-                val stønadsperiode1 =
-                    stønadsperiode(
-                        behandlingId = behandlingId,
+            fun `skal splitte flere vedtaksperiode over flere måneder`() {
+                val vedtaksperiode1 =
+                    vedtaksperiodeBeregning(
                         fom = januar.atDay(1),
                         tom = februar.atDay(10),
                     )
-                val stønadsperiode2 =
-                    stønadsperiode(
-                        behandlingId = behandlingId,
+                val vedtaksperiode2 =
+                    vedtaksperiodeBeregning(
                         fom = februar.atDay(11),
                         tom = mars.atDay(20),
                     )
 
-                val stønadsperioder =
+                val vedtaksperioder =
                     listOf(
-                        stønadsperiode1,
-                        stønadsperiode2,
-                    ).tilVedtaksperiodeBeregning().sorted()
+                        vedtaksperiode1,
+                        vedtaksperiode2,
+                    ).sorted()
 
-                val resultat = stønadsperioder.tilÅrMåned()
+                val resultat = vedtaksperioder.tilÅrMåned()
 
                 assertThat(resultat.values).hasSize(3)
 
-                resultat[januar]?.get(0)?.harVerdier(fom = stønadsperiode1.fom, tom = januar.atEndOfMonth())
-                resultat[februar]?.get(0)?.harVerdier(fom = februar.atDay(1), tom = stønadsperiode1.tom)
-                resultat[februar]?.get(1)?.harVerdier(fom = stønadsperiode2.fom, tom = februar.atEndOfMonth())
-                resultat[mars]?.get(0)?.harVerdier(fom = mars.atDay(1), tom = stønadsperiode2.tom)
+                resultat[januar]?.get(0)?.harVerdier(fom = vedtaksperiode1.fom, tom = januar.atEndOfMonth())
+                resultat[februar]?.get(0)?.harVerdier(fom = februar.atDay(1), tom = vedtaksperiode1.tom)
+                resultat[februar]?.get(1)?.harVerdier(fom = vedtaksperiode2.fom, tom = februar.atEndOfMonth())
+                resultat[mars]?.get(0)?.harVerdier(fom = mars.atDay(1), tom = vedtaksperiode2.tom)
             }
         }
     }
@@ -143,8 +136,8 @@ class TilsynBeregningUtilTest {
     // TODO: Test for aktiviteter
 
     @Nested
-    inner class ValideringAvStønadsperioderOgUtgifter {
-        val stønadsperioder =
+    inner class ValideringAvVedtaksperioderOgUtgifter {
+        val vedtaksperioder =
             listOf(
                 vedtaksperiodeBeregningsgrunnlag(
                     fom = LocalDate.of(2025, 1, 1),
@@ -193,14 +186,14 @@ class TilsynBeregningUtilTest {
         inner class BrukPerioderFraOgMedRevurderFra {
             @Test
             fun `skal returnere orginal liste uten revurder fra`() {
-                assertThat(stønadsperioder.brukPerioderFraOgMedRevurderFra(null)).isEqualTo(stønadsperioder)
+                assertThat(vedtaksperioder.brukPerioderFraOgMedRevurderFra(null)).isEqualTo(vedtaksperioder)
             }
 
             @Test
             fun `skal returnere perioder etter revurder fra`() {
                 val revurderFra = LocalDate.of(2025, 2, 1)
 
-                val forventedeStønadsperioder =
+                val forventedeVedtaksperioder =
                     listOf(
                         vedtaksperiodeBeregningsgrunnlag(
                             fom = LocalDate.of(2025, 2, 1),
@@ -211,9 +204,9 @@ class TilsynBeregningUtilTest {
                     )
 
                 assertThat(
-                    stønadsperioder
+                    vedtaksperioder
                         .brukPerioderFraOgMedRevurderFra(revurderFra),
-                ).isEqualTo(forventedeStønadsperioder)
+                ).isEqualTo(forventedeVedtaksperioder)
             }
         }
 
