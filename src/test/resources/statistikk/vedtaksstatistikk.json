@@ -1,0 +1,19 @@
+[ {
+  "behandling_id" : "3bc11bf2-1421-4d2b-978d-c33a36870ce2",
+  "fagsak_id" : "76e6ea78-5abb-414b-85df-9387cc7db1f7",
+  "ekstern_fagsak_id" : "1722",
+  "ekstern_behandling_id" : "4005",
+  "relatert_behandling_id" : "1000",
+  "adressebeskyttelse" : "UGRADERT",
+  "tidspunkt_vedtak" : "2024-05-07 20:30:00",
+  "soker_ident" : "søkerIdent",
+  "behandling_type" : "FØRSTEGANGSBEHANDLING",
+  "behandling_arsak" : "MANUELT_OPPRETTET",
+  "vedtak_resultat" : "INNVILGET",
+  "vedtaksperioder" : "[{\"fom\":\"2025-01-01\",\"tom\":\"2025-01-02\",\"aktivitet\":\"TILTAK\",\"lovverketsMålgruppe\":\"NEDSATT_ARBEIDSEVNE\",\"antallBarn\":3,\"barn\":{\"barn\":[{\"fnr\":\"fnr\"}]},\"studienivå\":\"VIDEREGÅENDE\"}]",
+  "utbetalinger" : "[{\"fraOgMed\":\"2025-01-01\",\"tilOgMed\":\"2025-01-02\",\"type\":\"TILSYN_BARN_AAP\",\"beløp\":1,\"makssats\":100,\"beløpErBegrensetAvMakssats\":true}]",
+  "stonadstype" : "BARNETILSYN",
+  "arsaker_avslag" : "{\"årsaker\":[\"INGEN_AKTIVITET\"]}",
+  "arsaker_opphor" : "{\"årsaker\":[\"ENDRING_UTGIFTER\"]}",
+  "opprettet_tid" : "2024-01-07 20:30:00"
+} ]
