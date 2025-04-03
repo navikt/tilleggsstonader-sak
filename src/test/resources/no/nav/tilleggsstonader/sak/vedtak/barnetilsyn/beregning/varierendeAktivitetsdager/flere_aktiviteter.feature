@@ -7,13 +7,17 @@ Egenskap: Beregning - Flere aktiviteter med delvis aktivitet
     # Mål: Summen av antall dager skal inkludere alle aktiviteter
 
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe |
-      | 02.01.2023 | 08.01.2023 | TILTAK    | AAP       |
+      | Fom        | Tom        | Aktivitet | Målgruppe           |
+      | 02.01.2023 | 08.01.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 02.01.2023 | 08.01.2023 | TILTAK    | 3               |
       | 02.01.2023 | 08.01.2023 | TILTAK    | 1               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe |
+      | 02.01.2023 | 31.05.2023 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -29,13 +33,17 @@ Egenskap: Beregning - Flere aktiviteter med delvis aktivitet
     # Mål: Summen av antall dager skal maks bli 5
 
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe |
-      | 02.01.2023 | 08.01.2023 | TILTAK    | AAP       |
+      | Fom        | Tom        | Aktivitet | Målgruppe           |
+      | 02.01.2023 | 08.01.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 02.01.2023 | 08.01.2023 | TILTAK    | 3               |
       | 02.01.2023 | 08.01.2023 | TILTAK    | 3               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe |
+      | 02.01.2023 | 31.05.2023 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -51,13 +59,17 @@ Egenskap: Beregning - Flere aktiviteter med delvis aktivitet
     # Mål: Summen av antall dager skal maks bli 5
 
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe |
-      | 02.01.2023 | 08.01.2023 | TILTAK    | AAP       |
+      | Fom        | Tom        | Aktivitet | Målgruppe           |
+      | 02.01.2023 | 08.01.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 02.01.2023 | 08.01.2023 | TILTAK    | 3               |
       | 02.01.2023 | 08.01.2023 | TILTAK    | 3               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe |
+      | 02.01.2023 | 31.05.2023 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -73,13 +85,17 @@ Egenskap: Beregning - Flere aktiviteter med delvis aktivitet
     # Mål: Summen av antall dager skal ikke bli mer enn antall dager i uken som er innenfor måneden
 
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe |
-      | 30.01.2023 | 05.02.2023 | TILTAK    | AAP       |
+      | Fom        | Tom        | Aktivitet | Målgruppe           |
+      | 30.01.2023 | 05.02.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 30.01.2023 | 05.02.2023 | TILTAK    | 1               |
       | 30.01.2023 | 05.02.2023 | TILTAK    | 3               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe |
+      | 02.01.2023 | 31.05.2023 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -97,13 +113,17 @@ Egenskap: Beregning - Flere aktiviteter med delvis aktivitet
 
   Scenario: Vedtaksperiode skal bruke 1 dag fra aktivitet 1 og 1 fra aktivitet 2
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe |
-      | 05.02.2024 | 09.02.2024 | TILTAK    | AAP       |
+      | Fom        | Tom        | Aktivitet | Målgruppe           |
+      | 05.02.2024 | 09.02.2024 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 05.02.2024 | 08.02.2024 | TILTAK    | 1               |
       | 09.02.2024 | 09.02.2024 | TILTAK    | 5               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe |
+      | 02.01.2023 | 31.05.2023 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -117,14 +137,18 @@ Egenskap: Beregning - Flere aktiviteter med delvis aktivitet
 
   Scenario: Skal bruke 1 dag fra første aktivitet og 1 dag fra den andre aktiviteten
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe |
-      | 05.02.2024 | 05.02.2024 | TILTAK    | AAP       |
-      | 09.02.2024 | 09.02.2024 | TILTAK    | AAP       |
+      | Fom        | Tom        | Aktivitet | Målgruppe           |
+      | 05.02.2024 | 05.02.2024 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | 09.02.2024 | 09.02.2024 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 05.02.2024 | 09.02.2024 | TILTAK    | 1               |
       | 05.02.2024 | 05.02.2024 | TILTAK    | 1               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe |
+      | 02.01.2023 | 31.05.2023 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |

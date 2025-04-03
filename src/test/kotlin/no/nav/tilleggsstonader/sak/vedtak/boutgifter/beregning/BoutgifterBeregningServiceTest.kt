@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.grunnlagsdataDomain
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -16,7 +17,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -93,7 +93,7 @@ class BoutgifterBeregningServiceTest {
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2025, 1, 1),
                     tom = LocalDate.of(2025, 1, 31),
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitet = AktivitetType.TILTAK,
                 ),
             )
@@ -129,7 +129,7 @@ class BoutgifterBeregningServiceTest {
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2025, 1, 1),
                     tom = LocalDate.of(2025, 3, 31),
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitet = AktivitetType.TILTAK,
                 ),
             )
@@ -154,7 +154,7 @@ class BoutgifterBeregningServiceTest {
                                 utgifter = utgift,
                                 makssats = 4953,
                                 makssatsBekreftet = true,
-                                målgruppe = MålgruppeType.AAP,
+                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                 aktivitet = AktivitetType.TILTAK,
                             ),
                         delAvTidligereUtbetaling = false,
@@ -168,7 +168,7 @@ class BoutgifterBeregningServiceTest {
                                 utgifter = utgift,
                                 makssats = 4953,
                                 makssatsBekreftet = true,
-                                målgruppe = MålgruppeType.AAP,
+                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                 aktivitet = AktivitetType.TILTAK,
                             ),
                         delAvTidligereUtbetaling = false,
@@ -182,7 +182,7 @@ class BoutgifterBeregningServiceTest {
                                 utgifter = utgift,
                                 makssats = 4953,
                                 makssatsBekreftet = true,
-                                målgruppe = MålgruppeType.AAP,
+                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                 aktivitet = AktivitetType.TILTAK,
                             ),
                         delAvTidligereUtbetaling = false,
@@ -227,7 +227,7 @@ class BoutgifterBeregningServiceTest {
                                 utgifter = utgift,
                                 makssats = 4953,
                                 makssatsBekreftet = true,
-                                målgruppe = MålgruppeType.AAP,
+                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                 aktivitet = AktivitetType.TILTAK,
                             ),
                         delAvTidligereUtbetaling = false,
@@ -241,7 +241,7 @@ class BoutgifterBeregningServiceTest {
                                 utgifter = utgift,
                                 makssats = 4953,
                                 makssatsBekreftet = true,
-                                målgruppe = MålgruppeType.AAP,
+                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                 aktivitet = AktivitetType.TILTAK,
                             ),
                         delAvTidligereUtbetaling = false,
@@ -255,7 +255,7 @@ class BoutgifterBeregningServiceTest {
                                 utgifter = utgift,
                                 makssats = 4953,
                                 makssatsBekreftet = true,
-                                målgruppe = MålgruppeType.AAP,
+                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                 aktivitet = AktivitetType.TILTAK,
                             ),
                         delAvTidligereUtbetaling = false,
@@ -294,7 +294,7 @@ class BoutgifterBeregningServiceTest {
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2025, 1, 1),
                     tom = LocalDate.of(2025, 1, 31),
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitet = AktivitetType.TILTAK,
                 ),
             )
@@ -319,7 +319,7 @@ class BoutgifterBeregningServiceTest {
                                 utgifter = utgift,
                                 makssats = 4953,
                                 makssatsBekreftet = true,
-                                målgruppe = MålgruppeType.AAP,
+                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                 aktivitet = AktivitetType.TILTAK,
                             ),
                         delAvTidligereUtbetaling = false,
@@ -383,14 +383,14 @@ class BoutgifterBeregningServiceTest {
                         id = UUID.randomUUID(),
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 10),
-                        målgruppe = MålgruppeType.AAP,
+                        målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
                     ),
                     Vedtaksperiode(
                         id = UUID.randomUUID(),
                         fom = LocalDate.of(2025, 1, 25),
                         tom = LocalDate.of(2025, 2, 5),
-                        målgruppe = MålgruppeType.AAP,
+                        målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
                     ),
                 )

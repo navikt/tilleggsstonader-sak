@@ -198,7 +198,7 @@ object Testdata {
             VedtaksperiodeBeregningsgrunnlag(
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 1),
-                målgruppe = MålgruppeType.AAP,
+                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 aktivitet = AktivitetType.TILTAK,
             )
 
@@ -207,7 +207,7 @@ object Testdata {
                 id = UUID.randomUUID(),
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 1),
-                målgruppe = MålgruppeType.AAP,
+                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 aktivitet = AktivitetType.TILTAK,
             )
 
@@ -434,7 +434,7 @@ object Testdata {
                     fom = LocalDate.of(2024, JANUARY, 1),
                     tom = LocalDate.of(2024, FEBRUARY, 29),
                     aktivitet = AktivitetType.TILTAK,
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 ),
             )
         val beregningsresultat =
@@ -449,7 +449,7 @@ object Testdata {
                                     utbetalingsdato = LocalDate.of(2024, 1, 1),
                                     makssats = 4953,
                                     makssatsBekreftet = true,
-                                    målgruppe = MålgruppeType.AAP,
+                                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                     aktivitet = AktivitetType.TILTAK,
                                     utgifter =
                                         mapOf(
@@ -472,7 +472,7 @@ object Testdata {
                                     utbetalingsdato = LocalDate.of(2024, 1, 1),
                                     makssats = 4953,
                                     makssatsBekreftet = true,
-                                    målgruppe = MålgruppeType.AAP,
+                                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                     aktivitet = AktivitetType.TILTAK,
                                     utgifter =
                                         mapOf(

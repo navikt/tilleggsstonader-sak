@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
@@ -81,7 +83,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             id = UUID.randomUUID(),
             fom = LocalDate.of(2023, 1, 1),
             tom = LocalDate.of(2023, 1, 31),
-            målgruppeType = MålgruppeType.AAP,
+            målgruppeType = NEDSATT_ARBEIDSEVNE,
             aktivitetType = AktivitetType.TILTAK,
         )
     val aktivitet = aktivitet(behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
@@ -242,9 +244,9 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         @Test
         fun `skal lagre vedtak`() {
             val beløpsperioderJanuar =
-                listOf(Beløpsperiode(dato = LocalDate.of(2023, 1, 2), beløp = 1000, målgruppe = MålgruppeType.AAP))
+                listOf(Beløpsperiode(dato = LocalDate.of(2023, 1, 2), beløp = 1000, målgruppe = NEDSATT_ARBEIDSEVNE))
             val beløpsperiodeFebruar =
-                listOf(Beløpsperiode(dato = LocalDate.of(2023, 2, 1), beløp = 2000, målgruppe = MålgruppeType.AAP))
+                listOf(Beløpsperiode(dato = LocalDate.of(2023, 2, 1), beløp = 2000, målgruppe = NEDSATT_ARBEIDSEVNE))
             val beregningsresultatJanuar =
                 beregningsresultatForMåned(beløpsperioder = beløpsperioderJanuar, måned = YearMonth.of(2023, 1))
             val beregningsresultatFebruar =
@@ -264,7 +266,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2023, 1, 2),
                     tom = LocalDate.of(2023, 2, 28),
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = NEDSATT_ARBEIDSEVNE,
                     aktivitet = AktivitetType.TILTAK,
                 )
 
@@ -376,7 +378,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     id = UUID.randomUUID(),
                     fom = mars.atDay(15),
                     tom = mars.atEndOfMonth(),
-                    målgruppeType = MålgruppeType.AAP,
+                    målgruppeType = NEDSATT_ARBEIDSEVNE,
                     aktivitetType = AktivitetType.TILTAK,
                 )
             vilkårperiodeRepository.insert(aktivitet(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
@@ -481,9 +483,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         fun `skal mappe nedsatt arbeidsevne til riktig TypeAndel`() {
             val vedtaksperioder =
                 listOf(
-                    vedtaksperiode.copy(fom = januar.atDay(2), tom = januar.atDay(2), målgruppeType = MålgruppeType.AAP),
-                    vedtaksperiode.copy(fom = februar.atDay(1), tom = februar.atDay(1), målgruppeType = MålgruppeType.UFØRETRYGD),
-                    vedtaksperiode.copy(fom = mars.atDay(1), tom = mars.atDay(1), målgruppeType = MålgruppeType.NEDSATT_ARBEIDSEVNE),
+                    vedtaksperiode.copy(fom = januar.atDay(2), tom = januar.atDay(2), målgruppeType = NEDSATT_ARBEIDSEVNE),
                 )
 
             val vedtakDto = innvilgelseDto(vedtaksperioder)
@@ -512,7 +512,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     id = UUID.randomUUID(),
                     fom = januar.atDay(2),
                     tom = januar.atDay(2),
-                    målgruppeType = MålgruppeType.OVERGANGSSTØNAD,
+                    målgruppeType = FaktiskMålgruppe.ENSLIG_FORSØRGER,
                     aktivitetType = AktivitetType.UTDANNING,
                 )
 
@@ -551,13 +551,13 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         }
 
         @Test
-        fun `skal mappe omstillingsstønad til riktig TypeAndel`() {
+        fun `skal mappe gjenlevende til riktig TypeAndel`() {
             val vedtaksperiode =
                 VedtaksperiodeDto(
                     id = UUID.randomUUID(),
                     fom = januar.atDay(2),
                     tom = januar.atDay(2),
-                    målgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,
+                    målgruppeType = FaktiskMålgruppe.GJENLEVENDE,
                     aktivitetType = AktivitetType.UTDANNING,
                 )
 

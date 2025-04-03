@@ -124,7 +124,7 @@
   "vedtaksperioder" : [ {
     "fom" : "2024-01-01",
     "tom" : "2024-02-01",
-    "målgruppe" : "AAP",
+    "målgruppe" : "NEDSATT_ARBEIDSEVNE",
     "aktivitet" : "TILTAK"
   } ],
   "vilkår" : [ {

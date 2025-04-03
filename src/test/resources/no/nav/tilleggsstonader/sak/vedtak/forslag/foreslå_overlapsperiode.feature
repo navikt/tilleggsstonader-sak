@@ -17,8 +17,8 @@ Egenskap: Forslag av vedtaksperioder
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
       Så forvent følgende forslag fra vilkårperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 31.03.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Scenario: Det finnes ikke noen vilkårsperiode for aktivitet
       Gitt følgende vilkårsperioder med målgrupper
@@ -41,8 +41,8 @@ Egenskap: Forslag av vedtaksperioder
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
       Så forvent følgende forslag fra vilkårperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 15.02.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 15.02.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Scenario: Aktivitetsperioden er lengre enn målgruppeperioden
       Gitt følgende vilkårsperioder med aktiviteter
@@ -56,8 +56,8 @@ Egenskap: Forslag av vedtaksperioder
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
       Så forvent følgende forslag fra vilkårperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 15.02.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 15.02.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Scenario: Aktivitet omsluttes av målgruppe
       Gitt følgende vilkårsperioder med aktiviteter
@@ -71,8 +71,8 @@ Egenskap: Forslag av vedtaksperioder
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
       Så forvent følgende forslag fra vilkårperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.02.2023 | 31.02.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.02.2023 | 31.02.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Scenario: Ingen overlapp mellom målgruppe og aktivitet
       Gitt følgende vilkårsperioder med aktiviteter
@@ -115,8 +115,8 @@ Egenskap: Forslag av vedtaksperioder
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
       Så forvent følgende forslag fra vilkårperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 31.03.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Scenario: Én aktiviteter og flere målgrupper, men kun én gyldig kombinasjon
       Gitt følgende vilkårsperioder med aktiviteter
@@ -131,8 +131,8 @@ Egenskap: Forslag av vedtaksperioder
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
       Så forvent følgende forslag fra vilkårperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 31.03.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
   Regel: Vedtaksperioder skal foreslås for flere like aktiviteter eller målgrupper som er rett etter hverandre
     Scenario: To like aktiviter som er rett etter hverandre og en målgruppe
@@ -149,8 +149,8 @@ Egenskap: Forslag av vedtaksperioder
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
       Så forvent følgende forslag fra vilkårperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 01.03.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 01.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
 
     Scenario: En aktivitet og to like målgrupper som er rett etter hverandre
@@ -166,8 +166,8 @@ Egenskap: Forslag av vedtaksperioder
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
       Så forvent følgende forslag fra vilkårperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 01.03.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 01.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Scenario: To aktiviteter og to like målgrupper som er rett etter hverandre
       Gitt følgende vilkårsperioder med aktiviteter
@@ -183,8 +183,8 @@ Egenskap: Forslag av vedtaksperioder
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
       Så forvent følgende forslag fra vilkårperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 01.03.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 01.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Scenario: Tre aktiviteter og to like målgrupper som er rett etter hverandre
       Gitt følgende vilkårsperioder med aktiviteter
@@ -201,8 +201,8 @@ Egenskap: Forslag av vedtaksperioder
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
       Så forvent følgende forslag fra vilkårperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 01.04.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 01.04.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Scenario: En aktivitet og to like målgrupper som overlapper
       Gitt følgende vilkårsperioder med aktiviteter
@@ -217,8 +217,8 @@ Egenskap: Forslag av vedtaksperioder
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
       Så forvent følgende forslag fra vilkårperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 01.03.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 01.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Scenario: En aktivitet og to like målgrupper som ikke er rett etter hverandre
       Gitt følgende vilkårsperioder med aktiviteter
@@ -262,19 +262,3 @@ Egenskap: Forslag av vedtaksperioder
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
       Så forvent følgende beregningsfeil: Foreløpig klarer vi bare å foreslå perioder når målgruppe og aktivitet har ett sammenhengende overlapp. Du må i stedet legge inn periodene manuelt.
-
-    Scenario: Skal slå sammen målgrupper av samme type når man håndterer faktisk målgruppe
-      Gitt følgende vilkårsperioder med aktiviteter
-        | Fom        | Tom        | type   |
-        | 01.01.2023 | 31.01.2023 | TILTAK |
-
-      Gitt følgende vilkårsperioder med målgrupper
-        | Fom        | Tom        | type                |
-        | 01.01.2023 | 15.01.2023 | AAP                 |
-        | 10.01.2023 | 20.01.2023 | NEDSATT_ARBEIDSEVNE |
-
-      Når forslag til vedtaksperioder fra vilkårperioder lages faktisk målgruppe
-
-      Så forvent følgende forslag fra vilkårperioder faktisk målgruppe
-        | Fom        | Tom        | aktivitet | målgruppe           |
-        | 01.01.2023 | 20.01.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |

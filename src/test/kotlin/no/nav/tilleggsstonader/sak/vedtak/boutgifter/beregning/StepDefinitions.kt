@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -26,7 +27,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BeregningNøkler
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
@@ -109,8 +109,8 @@ class StepDefinitions {
                             makssats = parseInt(BoutgifterNøkler.MAKS_SATS, rad),
                             makssatsBekreftet = true,
                             målgruppe =
-                                parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad)
-                                    ?: MålgruppeType.AAP,
+                                parseValgfriEnum<FaktiskMålgruppe>(BeregningNøkler.MÅLGRUPPE, rad)
+                                    ?: FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                             aktivitet =
                                 parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
                                     ?: AktivitetType.TILTAK,

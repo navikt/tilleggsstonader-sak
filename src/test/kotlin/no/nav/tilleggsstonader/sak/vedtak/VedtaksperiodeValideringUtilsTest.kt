@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
@@ -455,26 +456,26 @@ class VedtaksperiodeValideringUtilsTest {
         @Test
         fun `skal kaste feil om kombinasjon av målgruppe og aktivitet er ugyldig`() {
             val vedtaksperiode =
-                lagVedtaksperiode(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.TILTAK)
+                lagVedtaksperiode(målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER, aktivitet = AktivitetType.TILTAK)
 
             assertThatThrownBy {
                 validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
-                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
-                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
+                    målgruppePerioderPerType = emptyMap(),
+                    aktivitetPerioderPerType = emptyMap(),
                 )
-            }.hasMessageContaining("Kombinasjonen av OVERGANGSSTØNAD og TILTAK er ikke gyldig")
+            }.hasMessageContaining("Kombinasjonen av ENSLIG_FORSØRGER og TILTAK er ikke gyldig")
         }
 
         @Test
         fun `skal kaste feil om ingen periode for målgruppe matcher`() {
-            val vedtaksperiode = lagVedtaksperiode(målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE)
+            val vedtaksperiode = lagVedtaksperiode(målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)
 
             assertThatThrownBy {
                 validerEnkeltperiode(
                     vedtaksperiode = vedtaksperiode,
-                    målgruppePerioderPerType = målgrupper.mergeSammenhengendeOppfylteMålgrupper(),
-                    aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
+                    målgruppePerioderPerType = emptyMap(),
+                    aktivitetPerioderPerType = emptyMap(),
                 )
             }.hasMessageContaining("Finner ingen perioder hvor vilkår for NEDSATT_ARBEIDSEVNE er oppfylt")
         }
@@ -503,7 +504,7 @@ class VedtaksperiodeValideringUtilsTest {
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                 )
             }.hasMessageContaining(
-                "Finnes ingen periode med oppfylte vilkår for AAP i perioden 01.12.2024 - 31.01.2025",
+                "Finnes ingen periode med oppfylte vilkår for NEDSATT_ARBEIDSEVNE i perioden 01.12.2024 - 31.01.2025",
             )
         }
 
@@ -642,7 +643,7 @@ class VedtaksperiodeValideringUtilsTest {
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                 )
             }.hasMessageContaining(
-                "Finnes ingen periode med oppfylte vilkår for AAP i perioden 01.01.2025 - 21.01.2025",
+                "Finnes ingen periode med oppfylte vilkår for NEDSATT_ARBEIDSEVNE i perioden 01.01.2025 - 21.01.2025",
             )
         }
     }
@@ -651,7 +652,7 @@ class VedtaksperiodeValideringUtilsTest {
 private fun lagVedtaksperiode(
     fom: LocalDate = LocalDate.of(2025, 1, 1),
     tom: LocalDate = LocalDate.of(2025, 1, 31),
-    målgruppe: MålgruppeType = MålgruppeType.AAP,
+    målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
     aktivitet: AktivitetType = AktivitetType.TILTAK,
 ) = Vedtaksperiode(
     id = UUID.randomUUID(),

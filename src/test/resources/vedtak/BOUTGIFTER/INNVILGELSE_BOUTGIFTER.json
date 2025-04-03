@@ -6,7 +6,7 @@
       "id": "550e8400-e29b-41d4-a716-446655440000",
       "fom": "2024-01-01",
       "tom": "2024-01-31",
-      "målgruppe": "AAP",
+      "målgruppe": "NEDSATT_ARBEIDSEVNE",
       "aktivitet": "TILTAK"
     }
   ],
@@ -28,7 +28,7 @@
           },
           "makssats": 4953,
           "makssatsBekreftet": true,
-          "målgruppe": "AAP",
+          "målgruppe": "NEDSATT_ARBEIDSEVNE",
           "aktivitet": "TILTAK"
         },
         "delAvTidligereUtbetaling": false,

@@ -125,18 +125,9 @@ data class VurderingInternt(
     val begrunnelse: String?,
 )
 
-sealed interface VedtaksperiodeInterntVedtak
-
-data class VedtaksperiodeInterntVedtakMålgruppe(
-    val fom: LocalDate,
-    val tom: LocalDate,
-    val målgruppe: MålgruppeType,
-    val aktivitet: AktivitetType,
-) : VedtaksperiodeInterntVedtak
-
-data class VedtaksperiodeInterntVedtakFaktiskMålgruppe(
+data class VedtaksperiodeInterntVedtak(
     val fom: LocalDate,
     val tom: LocalDate,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
-) : VedtaksperiodeInterntVedtak
+)

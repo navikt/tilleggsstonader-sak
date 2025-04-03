@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
 /**
@@ -18,6 +17,6 @@ data class ForslagVedtaksperiodeFraVilkårperioderGenerisk<MÅLGRUPPE>(
     val aktivitet: AktivitetType,
 ) : Periode<LocalDate>
 
-typealias ForslagVedtaksperiodeFraVilkårperioder = ForslagVedtaksperiodeFraVilkårperioderGenerisk<MålgruppeType>
+typealias ForslagVedtaksperiodeFraVilkårperioder = ForslagVedtaksperiodeFraVilkårperioderGenerisk<FaktiskMålgruppe>
 
 typealias ForslagVedtaksperiodeFraVilkårperioderFaktiskMålgruppe = ForslagVedtaksperiodeFraVilkårperioderGenerisk<FaktiskMålgruppe>

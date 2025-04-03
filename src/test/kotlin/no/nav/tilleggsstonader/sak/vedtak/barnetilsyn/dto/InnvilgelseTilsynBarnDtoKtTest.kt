@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto
 
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
@@ -7,7 +8,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -26,7 +26,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
                                 listOf(
                                     vedtaksperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
                                 ),
-                            beløpsperioder = listOf(Beløpsperiode(LocalDate.of(2024, 1, 1), 20, MålgruppeType.AAP)),
+                            beløpsperioder = listOf(Beløpsperiode(LocalDate.of(2024, 1, 1), 20, NEDSATT_ARBEIDSEVNE)),
                         ),
                     ),
             ).tilDto(null)
@@ -87,9 +87,9 @@ class InnvilgelseTilsynBarnDtoKtTest {
                             beregningsresultatForMåned(
                                 beløpsperioder =
                                     listOf(
-                                        Beløpsperiode(revurderFra.minusDays(1), 10, MålgruppeType.AAP),
-                                        Beløpsperiode(revurderFra, 20, MålgruppeType.AAP),
-                                        Beløpsperiode(revurderFra.plusDays(1), 30, MålgruppeType.AAP),
+                                        Beløpsperiode(revurderFra.minusDays(1), 10, NEDSATT_ARBEIDSEVNE),
+                                        Beløpsperiode(revurderFra, 20, NEDSATT_ARBEIDSEVNE),
+                                        Beløpsperiode(revurderFra.plusDays(1), 30, NEDSATT_ARBEIDSEVNE),
                                     ),
                             ),
                         ),
@@ -165,7 +165,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
             VedtaksperiodeBeregning(
                 fom = fom,
                 tom = tom,
-                målgruppe = MålgruppeType.AAP,
+                målgruppe = NEDSATT_ARBEIDSEVNE,
                 aktivitet = AktivitetType.TILTAK,
             ),
         aktiviteter = emptyList(),

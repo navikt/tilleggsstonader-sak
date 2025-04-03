@@ -16,7 +16,7 @@ import java.time.LocalDate
 
 object ForeslåVedtaksperiodeFraVilkårperioder {
     fun foreslåVedtaksperioder(vilkårperioder: Vilkårperioder): List<ForslagVedtaksperiodeFraVilkårperioder> =
-        foreslåVedtaksperioder(vilkårperioder) { it }
+        foreslåVedtaksperioderFaktiskMålgruppe(vilkårperioder)
 
     fun foreslåVedtaksperioderFaktiskMålgruppe(
         vilkårperioder: Vilkårperioder,
