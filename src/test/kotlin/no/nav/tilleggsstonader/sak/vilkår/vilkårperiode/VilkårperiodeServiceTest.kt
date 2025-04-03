@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.RegisterAktivitetClientCo
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -36,9 +35,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårperiodeRepository: VilkårperiodeRepository
-
-    @Autowired
-    lateinit var stønadsperiodeService: StønadsperiodeService
 
     @Autowired
     lateinit var registerAktivitetClient: RegisterAktivitetClient

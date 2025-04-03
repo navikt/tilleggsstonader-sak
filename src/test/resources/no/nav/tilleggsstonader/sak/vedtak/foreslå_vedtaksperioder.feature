@@ -54,7 +54,7 @@ Egenskap: Beregning av vedtaksperioder
 
       Så forvent følgende feil for vedtaksforsalg: Kunne ikke foreslå vedtaksperiode, ettersom det ikke er lagt inn noen utgiftsperioder der vilkårene er oppfylt.
 
-    Scenario: Vilkåret er kortere enn stønadsperioden
+    Scenario: Vilkåret er kortere enn vedtaksperioden
       Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag
         | Fom        | Tom        | type   |
         | 01.01.2023 | 15.02.2023 | TILTAK |
@@ -73,7 +73,7 @@ Egenskap: Beregning av vedtaksperioder
         | Fom        | Tom        | aktivitet | målgruppe |
         | 01.01.2023 | 31.01.2023 | TILTAK    | AAP       |
 
-    Scenario: Stønadsperioden er kortere enn vilkåret
+    Scenario: Vedtaksperioden er kortere enn vilkåret
       Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag
         | Fom        | Tom        | type   |
         | 01.01.2023 | 15.02.2023 | TILTAK |
@@ -93,7 +93,7 @@ Egenskap: Beregning av vedtaksperioder
         | 01.01.2023 | 15.02.2023 | TILTAK    | AAP       |
 
 
-    Scenario: Vedtaksperioden omsluttes av stønadsperioden
+    Scenario: Vedtaksperioden omsluttes av vedtaksperioden
       Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag
         | Fom        | Tom        | type   |
         | 01.01.2023 | 31.04.2023 | TILTAK |
@@ -113,7 +113,7 @@ Egenskap: Beregning av vedtaksperioder
         | 01.02.2023 | 31.03.2023 | TILTAK    | AAP       |
 
 
-    Scenario: Ingen overlapp mellom stønadsperiode og vilkår
+    Scenario: Ingen overlapp mellom vedtaksperiode og vilkår
       Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag
         | Fom        | Tom        | type   |
         | 01.01.2023 | 31.04.2023 | TILTAK |

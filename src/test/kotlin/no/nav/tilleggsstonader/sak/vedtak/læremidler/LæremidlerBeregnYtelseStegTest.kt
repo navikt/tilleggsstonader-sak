@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
@@ -24,15 +23,11 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtak
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -49,8 +44,6 @@ class LæremidlerBeregnYtelseStegTest(
     @Autowired
     val tilkjentYtelseRepository: TilkjentYtelseRepository,
     @Autowired
-    val stønadsperiodeRepository: StønadsperiodeRepository,
-    @Autowired
     val vilkårperiodeRepository: VilkårperiodeRepository,
 ) : IntegrationTest() {
     val fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER)
@@ -60,7 +53,6 @@ class LæremidlerBeregnYtelseStegTest(
     final val fom = LocalDate.of(2025, 1, 1)
     final val tom = LocalDate.of(2025, 4, 30)
 
-    val stønadsperiode = stønadsperiode(behandlingId = behandling.id, fom = fom, tom = tom)
     val aktivitet =
         aktivitet(behandling.id, fom = fom, tom = tom, faktaOgVurdering = faktaOgVurderingAktivitetLæremidler())
     val målgruppe = målgruppe(behandling.id, fom = fom, tom = tom)
@@ -83,7 +75,6 @@ class LæremidlerBeregnYtelseStegTest(
             val vedtaksperiode = vedtaksperiodeDto(id = UUID.randomUUID(), fom = fom, tom = tom)
             val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
 
-            stønadsperiodeRepository.insert(stønadsperiode)
             vilkårperiodeRepository.insert(aktivitet)
             vilkårperiodeRepository.insert(målgruppe)
 
@@ -108,7 +99,6 @@ class LæremidlerBeregnYtelseStegTest(
             val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
 
             vilkårperiodeRepository.insertAll(listOf(målgruppe, aktivitet))
-            stønadsperiodeRepository.insert(stønadsperiode)
 
             steg.utførSteg(saksbehandling, innvilgelse)
 
@@ -233,47 +223,6 @@ class LæremidlerBeregnYtelseStegTest(
             assertThat(statusIverksetting).isEqualTo(StatusIverksetting.UBEHANDLET)
             assertThat(satstype).isEqualTo(Satstype.DAG)
         }
-    }
-
-    @Test
-    fun `en vedtaksperiode med 2 ulike målgrupper skal feile`() {
-        val førsteJan = LocalDate.of(2025, 1, 1)
-        val sisteJan = LocalDate.of(2025, 1, 31)
-        val førsteFeb = LocalDate.of(2025, 2, 1)
-        val sisteFeb = LocalDate.of(2025, 2, 28)
-
-        val stønadsperiode =
-            stønadsperiode(
-                behandlingId = behandling.id,
-                fom = førsteJan,
-                tom = sisteJan,
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.UTDANNING,
-            )
-        val stønadsperiode2 =
-            stønadsperiode(
-                behandlingId = behandling.id,
-                fom = førsteFeb,
-                tom = sisteFeb,
-                målgruppe = MålgruppeType.OVERGANGSSTØNAD,
-                aktivitet = AktivitetType.UTDANNING,
-            )
-        val aktivitet =
-            aktivitet(
-                behandlingId = behandling.id,
-                fom = førsteJan,
-                tom = sisteFeb,
-                faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(type = AktivitetType.UTDANNING),
-            )
-        stønadsperiodeRepository.insertAll(listOf(stønadsperiode, stønadsperiode2))
-        vilkårperiodeRepository.insert(aktivitet)
-        val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
-
-        val vedtaksperiode =
-            vedtaksperiodeDto(id = UUID.randomUUID(), fom = førsteJan, tom = sisteFeb)
-        assertThatThrownBy {
-            steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
-        }.hasMessageMatching("Finner ingen perioder hvor vilkår for NEDSATT_ARBEIDSEVNE er oppfylt")
     }
 
     @Test

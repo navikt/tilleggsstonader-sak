@@ -17,7 +17,6 @@ data class VedtaksperiodeBeregning(
     val aktivitet: AktivitetType,
 ) : Periode<LocalDate>,
     KopierPeriode<VedtaksperiodeBeregning> {
-
     constructor(vedtaksperiodeDto: VedtaksperiodeDto) : this(
         fom = vedtaksperiodeDto.fom,
         tom = vedtaksperiodeDto.tom,

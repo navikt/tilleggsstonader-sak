@@ -38,9 +38,6 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårController
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
@@ -77,7 +74,6 @@ class BehandlingFlytTest(
     @Autowired val stegService: StegService,
     @Autowired val taskWorker: TaskWorker,
     @Autowired val vilkårperiodeService: VilkårperiodeService,
-    @Autowired val stønadsperiodeService: StønadsperiodeService,
     @Autowired val simuleringStegService: SimuleringStegService,
 ) : IntegrationTest() {
     val personIdent = FnrGenerator.generer(år = 2000)
@@ -279,18 +275,6 @@ class BehandlingFlytTest(
                 tom = tom,
                 type = AktivitetType.TILTAK,
                 faktaOgSvar = aktivitetFaktaOgSvar,
-            ),
-        )
-        stønadsperiodeService.lagreStønadsperioder(
-            behandlingId,
-            listOf(
-                StønadsperiodeDto(
-                    fom = fom,
-                    tom = tom,
-                    målgruppe = MålgruppeType.AAP,
-                    aktivitet = AktivitetType.TILTAK,
-                    status = StønadsperiodeStatus.NY,
-                ),
             ),
         )
         stegService.håndterSteg(behandlingId, StegType.INNGANGSVILKÅR)

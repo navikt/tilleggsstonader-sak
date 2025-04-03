@@ -617,7 +617,7 @@ class VedtaksperiodeValideringUtilsTest {
             }
 
         @Test
-        fun `skal godta stønadsperiode på tvers av 2 godkjente sammenhengende vilkårsperioder`() {
+        fun `skal godta vedtaksperiode på tvers av 2 godkjente sammenhengende vilkårsperioder`() {
             val vedtaksperiode =
                 lagVedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 10))
 
@@ -631,7 +631,7 @@ class VedtaksperiodeValideringUtilsTest {
         }
 
         @Test
-        fun `skal ikke godta stønadsperiode på tvers av 2 godkjente, men ikke sammenhengende vilkårsperioder`() {
+        fun `skal ikke godta vedtaksperiode på tvers av 2 godkjente, men ikke sammenhengende vilkårsperioder`() {
             val vedtaksperiode =
                 lagVedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 21))
 

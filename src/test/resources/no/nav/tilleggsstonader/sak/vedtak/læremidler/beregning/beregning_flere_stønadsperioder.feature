@@ -1,9 +1,9 @@
 # language: no
 # encoding: UTF-8
 
-Egenskap: Beregning av læremidler - flere stønadsperioder
+Egenskap: Beregning av læremidler - flere vedtaksperioder
 
-  Scenario: Flere stønadsperioder
+  Scenario: Flere vedtalsperioder
     Gitt følgende målgrupper for læremidler
       | Fom        | Tom        |
       | 01.01.2024 | 30.04.2024 |
@@ -28,7 +28,7 @@ Egenskap: Beregning av læremidler - flere stønadsperioder
       | 01.03.2024 | 31.03.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 01.03.2024      |
       | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 01.04.2024      |
 
-  Scenario: Flere stønadsperioder og vedtaksperioder med opphold
+  Scenario: Flere vedtalsperioder og vedtaksperioder med opphold
     Gitt følgende målgrupper for læremidler
       | Fom        | Tom        | Målgruppe         |
       | 01.04.2024 | 31.05.2024 | AAP               |

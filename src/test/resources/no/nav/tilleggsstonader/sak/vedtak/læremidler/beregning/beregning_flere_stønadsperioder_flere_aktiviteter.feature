@@ -11,7 +11,7 @@ Egenskap: Beregning læremidler - flere målgrupper - flere aktiviteter
 
     Gitt følgende aktiviteter for læremidler
       | Fom        | Tom        | Aktivitet | Studienivå       | Studieprosent |
-      # Overlapper ikke med stønadsperiode, med med vedtaksperiode
+      # Overlapper ikke med vedtaksperiode, med med vedtaksperiode
       | 01.01.2025 | 07.01.2025 | TILTAK    | HØYERE_UTDANNING | 100           |
       | 01.01.2025 | 07.01.2025 | UTDANNING | VIDEREGÅENDE     | 50            |
       | 08.01.2025 | 08.01.2025 | TILTAK    | VIDEREGÅENDE     | 50            |
@@ -35,7 +35,7 @@ Egenskap: Beregning læremidler - flere målgrupper - flere aktiviteter
     Gitt følgende aktiviteter for læremidler
       | Fom        | Tom        | Aktivitet | Studienivå       | Studieprosent |
       | 15.08.2024 | 15.08.2024 | TILTAK    | VIDEREGÅENDE     | 50            |
-      # aktivitet 2 er innenfor løpende måned, men ikke overlapp med vedtaksperiode, men overlapp med stønadsperiode
+      # aktivitet 2 er innenfor løpende måned, men ikke overlapp med vedtaksperiode, men overlapp med vedtaksperiode
       | 20.08.2024 | 25.08.2024 | TILTAK    | HØYERE_UTDANNING | 100           |
 
     Gitt følgende vedtaksperioder for læremidler

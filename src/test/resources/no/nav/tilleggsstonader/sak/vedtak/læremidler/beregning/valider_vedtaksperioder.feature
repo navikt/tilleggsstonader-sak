@@ -33,7 +33,7 @@ Egenskap: Validering av vedtaksperioder for læremidler
 
     Så forvent følgende feil fra vedtaksperiode validering: Vedtaksperiode 01.01.2024 - 31.01.2024 overlapper med INGEN_MÅLGRUPPE(20.01.2024 - 25.01.2024) som ikke gir rett på stønad
 
-  Scenario: Skal kunne lage en vedtaksperiode som stekker seg over flere stønadsperioder
+  Scenario: Skal kunne lage en vedtaksperiode som stekker seg over flere vedtaksperioder
 
     Gitt følgende målgrupper for læremidler
       | Fom        | Tom        | Målgruppe       |

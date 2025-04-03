@@ -45,7 +45,7 @@ class VedtaksperiodeTilsynBarnMapperTest {
     }
 
     /**
-     * I tilfelle man har stønadsperioder i ulike måneder får man en [BeregningsresultatForMåned] per måned
+     * I tilfelle man har vedtaksperioder i ulike måneder får man en [BeregningsresultatForMåned] per måned
      */
     @Test
     fun `skal slå sammen perioder tvers ulike måneder`() {
