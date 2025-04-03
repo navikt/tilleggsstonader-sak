@@ -91,7 +91,65 @@
     "målgruppe" : "AAP",
     "aktivitet" : "TILTAK"
   } ],
-  "vilkår" : [ ],
+  "vilkår" : [ {
+    "type" : "UTGIFTER_OVERNATTING",
+    "resultat" : "OPPFYLT",
+    "delvilkår" : [ {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har søker nødvendige merutgifter til bolig eller overnatting?",
+        "svar" : "Ja",
+        "begrunnelse" : "En begrunnelse på delvilkåret"
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har søker dokumentert utgifter til overnatting tilfredsstillende?",
+        "svar" : "Ja",
+        "begrunnelse" : null
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har søker dokumentert at de har vært/skal de delta på samling/eksamen/opptaksprøve?",
+        "svar" : "Ja",
+        "begrunnelse" : null
+      } ]
+    } ],
+    "fødselsdatoBarn" : null,
+    "fom" : "2024-02-01",
+    "tom" : "2024-02-02",
+    "utgift" : 3000
+  }, {
+    "type" : "UTGIFTER_OVERNATTING",
+    "resultat" : "OPPFYLT",
+    "delvilkår" : [ {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har søker nødvendige merutgifter til bolig eller overnatting?",
+        "svar" : "Ja",
+        "begrunnelse" : "En begrunnelse på delvilkåret"
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har søker dokumentert utgifter til overnatting tilfredsstillende?",
+        "svar" : "Ja",
+        "begrunnelse" : null
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har søker dokumentert at de har vært/skal de delta på samling/eksamen/opptaksprøve?",
+        "svar" : "Ja",
+        "begrunnelse" : null
+      } ]
+    } ],
+    "fødselsdatoBarn" : null,
+    "fom" : "2024-02-26",
+    "tom" : "2024-02-29",
+    "utgift" : 4000
+  } ],
   "vedtak" : {
     "innvilgelseBegrunnelse" : "Sånn her vil en begrunnelse se ut i det interne vedtaket",
     "type" : "INNVILGELSE"
