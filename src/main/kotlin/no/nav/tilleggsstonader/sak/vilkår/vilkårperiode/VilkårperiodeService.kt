@@ -189,8 +189,8 @@ class VilkårperiodeService(
         revurderFra: LocalDate,
         grunnlagsdata: Grunnlagsdata,
     ): Vilkårperiode {
-        val vurderingerMedGammelManglerData = eksisterendeVilkårperiode.faktaOgVurdering.vurderinger.inneholderGammelManglerData()
-        val finnesGammelDataUtenomAldersVilkår = vurderingerMedGammelManglerData.filterNot { it is VurderingAldersVilkår }.isNotEmpty()
+        val vurderingerMedGammelManglerData = eksisterendeVilkårperiode.faktaOgVurdering.vurderinger.vurderingerMedSvarGammelManglerData()
+        val finnesGammelDataUtenomAldersVilkår = vurderingerMedGammelManglerData.any { it !is VurderingAldersVilkår }
 
         if (finnesGammelDataUtenomAldersVilkår) {
             brukerfeilHvis(vilkårperiode.tom > eksisterendeVilkårperiode.tom) {

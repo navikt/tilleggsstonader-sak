@@ -62,7 +62,7 @@ sealed interface Vurderinger {
         return utledResultat(resultater)
     }
 
-    fun inneholderGammelManglerData(): List<Vurdering> = finnVurderinger().filter { it.svar == SvarJaNei.GAMMEL_MANGLER_DATA }
+    fun vurderingerMedSvarGammelManglerData(): List<Vurdering> = finnVurderinger().filter { it.svar == SvarJaNei.GAMMEL_MANGLER_DATA }
 
     private fun finnVurderinger(): MutableList<Vurdering> {
         val vurderinger = mutableListOf<Vurdering>()
