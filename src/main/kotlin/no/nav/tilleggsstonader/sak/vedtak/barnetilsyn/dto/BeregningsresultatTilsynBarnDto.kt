@@ -53,7 +53,7 @@ fun BeregningsresultatTilsynBarn.tilDto(revurderFra: LocalDate?): Beregningsresu
     val vedtaksperioder =
         VedtaksperiodeTilsynBarnMapper
             .mapTilVedtaksperiode(this.perioder)
-            .filtrerStønadsperioderFra(revurderFra)
+            .filtrerVedtaksperioderFra(revurderFra)
             .map { it.tilDto() }
 
     return BeregningsresultatTilsynBarnDto(
@@ -103,10 +103,10 @@ private fun List<Beløpsperiode>.filtrerBeløpsperioderFra(revurderFra: LocalDat
     }
 
 /**
- * Skal kun ha med stønadsperioder som er etter [revurderFra]
- * Dersom stønadsperioden overlapper med [revurderFra] så skal den avkortes fra og med revurderFra-dato
+ * Skal kun ha med vedtaksperioden som er etter [revurderFra]
+ * Dersom vedtaksperioden overlapper med [revurderFra] så skal den avkortes fra og med revurderFra-dato
  */
-private fun List<VedtaksperiodeTilsynBarn>.filtrerStønadsperioderFra(revurderFra: LocalDate?): List<VedtaksperiodeTilsynBarn> =
+private fun List<VedtaksperiodeTilsynBarn>.filtrerVedtaksperioderFra(revurderFra: LocalDate?): List<VedtaksperiodeTilsynBarn> =
     mapNotNull {
         when {
             revurderFra == null -> it
