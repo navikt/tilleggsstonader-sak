@@ -14,8 +14,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import java.time.LocalDate
 
-object ForeslåStønadsperiode {
-    fun finnStønadsperioder(vilkårperioder: Vilkårperioder): List<StønadsperiodeDto> {
+object ForeslåVedtaksperiodeFraVilkårperioder {
+    fun foreslåVedtaksperioder(vilkårperioder: Vilkårperioder): List<StønadsperiodeDto> {
         val oppfylteVilkårsperioder = filtrerOppfylteVilkårsperioder(vilkårperioder)
 
         val filtrerteVilkårperioder = filterKombinasjonerAvMålgruppeOgAktivitet(oppfylteVilkårsperioder)

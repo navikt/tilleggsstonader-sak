@@ -22,7 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 
 @Suppress("ktlint:standard:function-naming", "unused")
-class ForeslåStønadsperioderStepDefinitions {
+class ForeslåVedtaksperiodeFraVilkårperioderStepDefinitions {
     var aktiviteter: List<VilkårperiodeAktivitet> = emptyList()
     var målgrupper: List<VilkårperiodeMålgruppe> = emptyList()
     var resultat: List<StønadsperiodeDto> = emptyList()
@@ -62,7 +62,7 @@ class ForeslåStønadsperioderStepDefinitions {
     fun `forslag til stønadsperioder lages`() {
         try {
             resultat =
-                ForeslåStønadsperiode.finnStønadsperioder(
+                ForeslåVedtaksperiodeFraVilkårperioder.foreslåVedtaksperioder(
                     Vilkårperioder(
                         målgrupper = målgrupper,
                         aktiviteter = aktiviteter,
