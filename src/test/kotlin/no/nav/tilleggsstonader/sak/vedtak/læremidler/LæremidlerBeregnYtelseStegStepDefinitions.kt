@@ -73,6 +73,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         LæremidlerVedtaksperiodeValideringService(
             behandlingService = behandlingService,
             vedtakRepository = vedtakRepository,
+            vilkårperiodeService = mockk(),
         )
 
     val simuleringService =

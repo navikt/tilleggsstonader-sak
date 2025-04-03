@@ -33,7 +33,7 @@ Egenskap: Beregning av læremidler - flere aktiviteter v2
 
     Gitt følgende aktiviteter for læremidler
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
-      | 01.01.2024 | 01.01.2024 | TILTAK    | VIDEREGÅENDE | 30            |
+      | 01.01.2024 | 05.01.2024 | TILTAK    | VIDEREGÅENDE | 30            |
       | 08.01.2024 | 12.01.2024 | TILTAK    | VIDEREGÅENDE | 100           |
 
     Gitt følgende vedtaksperioder for læremidler

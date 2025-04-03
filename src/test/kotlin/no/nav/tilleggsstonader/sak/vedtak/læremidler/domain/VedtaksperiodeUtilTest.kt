@@ -29,6 +29,7 @@ class VedtaksperiodeUtilTest {
         LæremidlerVedtaksperiodeValideringService(
             behandlingService = behandlingService,
             vedtakRepository = vedtakRepository,
+            vilkårperiodeService = mockk(),
         )
     val vedtaksperiodeJanuar =
         vedtaksperiode(

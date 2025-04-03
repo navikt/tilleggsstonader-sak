@@ -50,7 +50,7 @@ Egenskap: Beregning læremidler - flere målgrupper - flere aktiviteter v2
 
   Scenario: Flere målgrupper, skal prioritere målgruppe med høyest prioritet
     Gitt følgende målgrupper for læremidler
-      | Fom        | Tom        | Målgruope       |
+      | Fom        | Tom        | Målgruppe       |
       | 01.01.2024 | 04.01.2024 | OVERGANGSSTØNAD |
       | 05.01.2024 | 07.01.2024 | AAP             |
       | 08.01.2024 | 15.01.2024 | OVERGANGSSTØNAD |
@@ -63,7 +63,7 @@ Egenskap: Beregning læremidler - flere målgrupper - flere aktiviteter v2
 
     Gitt følgende vedtaksperioder for læremidler
       | Fom        | Tom        | Målgruppe           | Aktivitet |
-      | 01.01.2024 | 04.01.2024 | ENSLIG_FORSØRGER    | UTDANNING |
+      | 01.01.2024 | 03.01.2024 | ENSLIG_FORSØRGER    | UTDANNING |
       | 05.01.2024 | 07.01.2024 | NEDSATT_ARBEIDSEVNE | TILTAK    |
       | 08.01.2024 | 15.01.2024 | ENSLIG_FORSØRGER    | UTDANNING |
 

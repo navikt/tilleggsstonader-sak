@@ -28,7 +28,12 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.LæremidlerVedtaksp
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.util.UUID
@@ -55,10 +60,23 @@ class StepDefinitions {
     val behandlingService = mockk<BehandlingService>()
     val vedtakRepository = VedtakRepositoryFake()
 
+    val vilkårperiodeService =
+        mockk<VilkårperiodeService>().apply {
+            val mock = this
+            every { mock.hentVilkårperioder(any()) } answers {
+                val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(BehandlingId(firstArg<UUID>())).sorted()
+
+                Vilkårperioder(
+                    målgrupper = vilkårsperioder.ofType<MålgruppeFaktaOgVurdering>(),
+                    aktiviteter = vilkårsperioder.ofType<AktivitetFaktaOgVurdering>(),
+                )
+            }
+        }
     val læremidlerVedtaksperiodeValideringService =
         LæremidlerVedtaksperiodeValideringService(
             behandlingService = behandlingService,
             vedtakRepository = vedtakRepository,
+            vilkårperiodeService = vilkårperiodeService,
         )
 
     val læremidlerBeregningService =

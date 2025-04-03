@@ -6,12 +6,17 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerEnkeltperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BrukVedtaksperioderForBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerIngenOverlappendeVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.validerIngenEndringerFørRevurderFra
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteAktiviteter
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteFaktiskeMålgrupper
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -19,6 +24,7 @@ import org.springframework.stereotype.Service
 class LæremidlerVedtaksperiodeValideringService(
     val behandlingService: BehandlingService,
     val vedtakRepository: VedtakRepository,
+    val vilkårperiodeService: VilkårperiodeService,
 ) {
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -31,6 +37,10 @@ class LæremidlerVedtaksperiodeValideringService(
 
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtaksperioderForrigeBehandling = hentForrigeVedtaksperioder(behandling)
+
+        if (brukVedtaksperioderForBeregning.bruk) {
+            validerVedtaksperioderMotStønadsperioder(behandlingId, vedtaksperioder)
+        }
 
         validerIngenEndringerFørRevurderFra(
             innsendteVedtaksperioder = vedtaksperioder,
@@ -51,6 +61,24 @@ class LæremidlerVedtaksperiodeValideringService(
             feilHvis(vedtaksperioder.any { it.målgruppe != null && it.aktivitet != null }) {
                 "Refresh siden. Må ikke sette målgruppe og aktivitet på vedtaksperioder."
             }
+        }
+    }
+
+    private fun validerVedtaksperioderMotStønadsperioder(
+        behandlingId: BehandlingId,
+        vedtaksperioder: List<Vedtaksperiode>,
+    ) {
+        val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
+        validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett(vilkårperioder, vedtaksperioder)
+
+        val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeOppfylteFaktiskeMålgrupper()
+        val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteAktiviteter()
+        vedtaksperioder.forEach {
+            validerEnkeltperiode(
+                vedtaksperiode = it,
+                målgruppePerioderPerType = målgrupper,
+                aktivitetPerioderPerType = aktiviteter,
+            )
         }
     }
 
