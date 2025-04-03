@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.forslag
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import java.time.LocalDate
 
 object ForeslåVedtaksperiodeFraVilkårperioder {
-    fun foreslåVedtaksperioder(vilkårperioder: Vilkårperioder): List<StønadsperiodeDto> {
+    fun foreslåVedtaksperioder(vilkårperioder: Vilkårperioder): List<ForslagVedtaksperiodeFraVilkårperioder> {
         val oppfylteVilkårsperioder = filtrerOppfylteVilkårsperioder(vilkårperioder)
 
         val filtrerteVilkårperioder = filterKombinasjonerAvMålgruppeOgAktivitet(oppfylteVilkårsperioder)
@@ -43,12 +43,11 @@ object ForeslåVedtaksperiodeFraVilkårperioder {
             )
 
         return listOf(
-            StønadsperiodeDto(
+            ForslagVedtaksperiodeFraVilkårperioder(
                 fom = stønadsperiode.fom,
                 tom = stønadsperiode.tom,
                 målgruppe = sammenslåtteVilkårsperioder.målgrupper.first().type as MålgruppeType,
                 aktivitet = sammenslåtteVilkårsperioder.aktiviteter.first().type as AktivitetType,
-                status = null,
             ),
         )
     }
@@ -88,9 +87,9 @@ object ForeslåVedtaksperiodeFraVilkårperioder {
     private fun finnOverlapp(
         aktivitet: Periode<LocalDate>,
         målgruppe: Periode<LocalDate>,
-    ): Stønadsperiode =
+    ): Datoperiode =
         if (aktivitet.overlapper(målgruppe)) {
-            Stønadsperiode(
+            Datoperiode(
                 fom = maxOf(aktivitet.fom, målgruppe.fom),
                 tom = minOf(aktivitet.tom, målgruppe.tom),
             )
@@ -107,9 +106,4 @@ object ForeslåVedtaksperiodeFraVilkårperioder {
                 skalMerges = { v1, v2 -> v1.type == v2.type && v1.overlapperEllerPåfølgesAv(v2) },
                 merge = { v1, v2 -> v1.copy(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
             )
-
-    private data class Stønadsperiode(
-        val fom: LocalDate,
-        val tom: LocalDate,
-    )
 }

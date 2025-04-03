@@ -177,9 +177,19 @@ class StønadsperiodeService(
 
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
 
-        return ForeslåVedtaksperiodeFraVilkårperioder.foreslåVedtaksperioder(
-            vilkårperioder = vilkårsperioder,
-        )
+        return ForeslåVedtaksperiodeFraVilkårperioder
+            .foreslåVedtaksperioder(
+                vilkårperioder = vilkårsperioder,
+            ).map {
+                StønadsperiodeDto(
+                    id = null,
+                    fom = it.fom,
+                    tom = it.tom,
+                    målgruppe = it.målgruppe,
+                    aktivitet = it.aktivitet,
+                    status = null,
+                )
+            }
     }
 
     private fun detFinnesStønadsperioder(behandlingId: BehandlingId) =
