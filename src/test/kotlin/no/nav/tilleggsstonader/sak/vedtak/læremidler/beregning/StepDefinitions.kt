@@ -105,8 +105,8 @@ class StepDefinitions {
                 vedtaksperiode(
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    målgruppe = parseValgfriEnum<FaktiskMålgruppe>(BeregningNøkler.MÅLGRUPPE, rad),
-                    aktivitet = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad),
+                    målgruppe = parseValgfriEnum<FaktiskMålgruppe>(BeregningNøkler.MÅLGRUPPE, rad) ?: FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                    aktivitet = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad) ?: AktivitetType.TILTAK,
                 )
             }
     }

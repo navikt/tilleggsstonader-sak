@@ -298,8 +298,6 @@ object Testdata {
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 3, 31),
-                    målgruppe = null,
-                    aktivitet = null,
                 ),
             )
         val beregningsresultat =

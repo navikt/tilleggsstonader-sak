@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerEnkeltperiode
@@ -32,7 +31,6 @@ class LæremidlerVedtaksperiodeValideringService(
         brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ) {
         brukerfeilHvis(vedtaksperioder.isEmpty()) { "Kan ikke innvilge når det ikke finnes noen vedtaksperioder." }
-        validerMålgruppeAktivitetErSatt(vedtaksperioder, brukVedtaksperioderForBeregning)
         validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
 
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
@@ -47,21 +45,6 @@ class LæremidlerVedtaksperiodeValideringService(
             vedtaksperioderForrigeBehandling = vedtaksperioderForrigeBehandling,
             revurderFra = behandling.revurderFra,
         )
-    }
-
-    private fun validerMålgruppeAktivitetErSatt(
-        vedtaksperioder: List<Vedtaksperiode>,
-        brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
-    ) {
-        if (brukVedtaksperioderForBeregning.bruk) {
-            feilHvis(vedtaksperioder.any { it.målgruppe == null && it.aktivitet == null }) {
-                "Refresh siden. Må sette målgruppe og aktivitet på vedtaksperioder."
-            }
-        } else {
-            feilHvis(vedtaksperioder.any { it.målgruppe != null && it.aktivitet != null }) {
-                "Refresh siden. Må ikke sette målgruppe og aktivitet på vedtaksperioder."
-            }
-        }
     }
 
     private fun validerVedtaksperioderMotStønadsperioder(
