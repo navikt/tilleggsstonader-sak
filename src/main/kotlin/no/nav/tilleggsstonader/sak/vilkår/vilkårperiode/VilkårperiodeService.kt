@@ -2,19 +2,26 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValidering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerEndrePeriodeRevurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtAldersvilkårErGyldig
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtKunTomErEndret
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtVilkårperiodeKanOppdateresIRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerRevurderFraErSatt
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -26,6 +33,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeU
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mapFaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
@@ -38,6 +46,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.Vilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.util.UUID
 
 @Service
@@ -134,15 +143,74 @@ class VilkårperiodeService(
         val behandling = behandlingService.hentSaksbehandling(eksisterendeVilkårperiode.behandlingId)
         validerBehandlingIdErLik(vilkårperiode.behandlingId, eksisterendeVilkårperiode.behandlingId)
         validerBehandling(behandling)
-
-        feilHvis(eksisterendeVilkårperiode.kildeId != vilkårperiode.kildeId) {
-            "Kan ikke oppdatere kildeId på en allerede eksisterende vilkårperiode"
-        }
+        validerKildeIdOgType(vilkårperiode, eksisterendeVilkårperiode)
 
         val grunnlagsdata =
             grunnlagsdataService
                 .hentGrunnlagsdata(behandling.id)
 
+        if (behandling.type != BehandlingType.REVURDERING) {
+            return oppdaterVilkårperiodeHvorAltKanEndres(eksisterendeVilkårperiode, vilkårperiode, behandling, grunnlagsdata)
+        }
+
+        return oppdaterVilkårperiodeIRevurdering(vilkårperiode, eksisterendeVilkårperiode, behandling, grunnlagsdata)
+    }
+
+    @Transactional
+    fun oppdaterVilkårperiodeIRevurdering(
+        vilkårperiode: LagreVilkårperiode,
+        eksisterendeVilkårperiode: Vilkårperiode,
+        behandling: Saksbehandling,
+        grunnlagsdata: Grunnlagsdata,
+    ): Vilkårperiode {
+        val revurderFra = behandling.revurderFra
+        validerRevurderFraErSatt(revurderFra)
+        validerAtVilkårperiodeKanOppdateresIRevurdering(eksisterendeVilkårperiode, revurderFra)
+
+        // Håndter vilkårsperioder hvor alle felter kan oppdateres
+        if (eksisterendeVilkårperiode.fom >= revurderFra) {
+            feilHvis(vilkårperiode.fom < revurderFra) {
+                "Kan ikke sette fom før revurder-fra(${revurderFra.norskFormat()})"
+            }
+            return oppdaterVilkårperiodeHvorAltKanEndres(eksisterendeVilkårperiode, vilkårperiode, behandling, grunnlagsdata)
+        }
+
+        return oppdaterVilkårperiodeFørRevurderFra(vilkårperiode, eksisterendeVilkårperiode, revurderFra, grunnlagsdata)
+    }
+
+    /**
+     * Håndterer alle perioder som enten er helt før eller krysser revurder fra datoen, dvs. perioder hvor kun tom kan endres.
+     * Dersom perioden inneholder vurderinger med svar GAMMEL_MANGLER_DATA får man kun lov å korte ned tom.
+     */
+    @Transactional
+    fun oppdaterVilkårperiodeFørRevurderFra(
+        vilkårperiode: LagreVilkårperiode,
+        eksisterendeVilkårperiode: Vilkårperiode,
+        revurderFra: LocalDate,
+        grunnlagsdata: Grunnlagsdata,
+    ): Vilkårperiode {
+        val vurderingerMedGammelManglerData = eksisterendeVilkårperiode.faktaOgVurdering.vurderinger.vurderingerMedSvarGammelManglerData()
+        val finnesGammelDataUtenomAldersVilkår = vurderingerMedGammelManglerData.any { it !is VurderingAldersVilkår }
+
+        if (finnesGammelDataUtenomAldersVilkår) {
+            brukerfeilHvis(vilkårperiode.tom > eksisterendeVilkårperiode.tom) {
+                "Det har kommet nye vilkår som må vurderes, og denne perioden er derfor ikke mulig å forlenge. Hvis du ønsker å forlenge perioden må du legge til en ny periode."
+            }
+        }
+
+        validerAtKunTomErEndret(eksisterendeVilkårperiode, vilkårperiode, revurderFra)
+        validerAtAldersvilkårErGyldig(eksisterendeVilkårperiode, vilkårperiode, grunnlagsdata)
+
+        return vilkårperiodeRepository.update(eksisterendeVilkårperiode.copy(tom = vilkårperiode.tom))
+    }
+
+    @Transactional
+    fun oppdaterVilkårperiodeHvorAltKanEndres(
+        eksisterendeVilkårperiode: Vilkårperiode,
+        vilkårperiode: LagreVilkårperiode,
+        behandling: Saksbehandling,
+        grunnlagsdata: Grunnlagsdata,
+    ): Vilkårperiode {
         val oppdatert =
             eksisterendeVilkårperiode.medVilkårOgVurdering(
                 fom = vilkårperiode.fom,
@@ -156,8 +224,9 @@ class VilkårperiodeService(
                     ),
             )
 
-        validerEndrePeriodeRevurdering(behandling, eksisterendeVilkårperiode, oppdatert)
-        return vilkårperiodeRepository.update(oppdatert)
+        return vilkårperiodeRepository.update(
+            oppdatert,
+        )
     }
 
     fun slettVilkårperiode(
@@ -217,6 +286,19 @@ class VilkårperiodeService(
         behandling.status.validerKanBehandlingRedigeres()
         feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
             "Kan ikke opprette eller endre periode når behandling ikke er på steg ${StegType.INNGANGSVILKÅR}"
+        }
+    }
+
+    private fun validerKildeIdOgType(
+        vilkårperiode: LagreVilkårperiode,
+        eksisterendeVilkårperiode: Vilkårperiode,
+    ) {
+        feilHvis(eksisterendeVilkårperiode.kildeId != vilkårperiode.kildeId) {
+            "Kan ikke oppdatere kildeId på en eksisterende periode. Kontakt utviklingsteamet"
+        }
+
+        feilHvis(eksisterendeVilkårperiode.type != vilkårperiode.type) {
+            "Kan ikke endre type på en eksisterende periode. Kontakt utviklingsteamet"
         }
     }
 

@@ -167,7 +167,7 @@ data class VurderingAldersVilkår(
     }
 }
 
-data class VurderingMottarSykepengerForFulltidsstilling private constructor(
+data class VurderingMottarSykepengerForFulltidsstilling constructor(
     override val svar: SvarJaNei?,
     override val resultat: ResultatDelvilkårperiode,
 ) : Vurdering {
@@ -183,7 +183,7 @@ data class VurderingMottarSykepengerForFulltidsstilling private constructor(
                 SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingMottarSykepengerForFulltidsstilling::class.simpleName}")
                 SvarJaNei.GAMMEL_MANGLER_DATA ->
                     error(
-                        "$svar er ugyldig for nye eller oppdaterte vurderinger av typen: ${VurderingAldersVilkår::class.simpleName}",
+                        "$svar er ugyldig for nye eller oppdaterte vurderinger av typen: ${VurderingMottarSykepengerForFulltidsstilling::class.simpleName}",
                     )
             }
 
