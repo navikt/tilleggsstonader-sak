@@ -104,13 +104,6 @@ data class VurderingVilkårperiode(
     val resultat: ResultatDelvilkårperiode,
 )
 
-data class Stønadsperiode(
-    val målgruppe: MålgruppeType,
-    val aktivitet: AktivitetType,
-    val fom: LocalDate,
-    val tom: LocalDate,
-)
-
 data class VilkårInternt(
     val type: VilkårType,
     val resultat: Vilkårsresultat,
