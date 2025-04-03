@@ -21,7 +21,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.slf4j.LoggerFactory
@@ -34,7 +33,6 @@ class OpprettRevurderingBehandlingService(
     val behandlingService: BehandlingService,
     val barnService: BarnService,
     val vilkårperiodeService: VilkårperiodeService,
-    val stønadsperiodeService: StønadsperiodeService,
     val vilkårService: VilkårService,
     val unleashService: UnleashService,
     val gjenbrukDataRevurderingService: GjennbrukDataRevurderingService,
