@@ -11,9 +11,9 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDv
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvhV2
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
@@ -32,7 +32,6 @@ class VedtaksstatistikkService(
     private val vedtakService: VedtakService,
     private val barnRepository: BarnRepository,
 ) {
-
     fun lagreVedtaksstatistikkV2(
         behandlingId: BehandlingId,
         fagsakId: FagsakId,
@@ -62,8 +61,8 @@ class VedtaksstatistikkService(
                 behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
                 behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandling.årsak),
                 vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),
-                vedtaksperioder = VedtaksperioderDvhV2.fraDomene(vedtak, barn),
-                utbetalinger = UtbetalingerDvhV2.fraDomene(andelTilkjentYtelse, vedtak),
+                vedtaksperioder = VedtaksperioderDvh.fraDomene(vedtak, barn),
+                utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse, vedtak),
                 årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak.takeIfType<Avslag>()?.data?.årsaker),
                 årsakerOpphør = ÅrsakOpphørDvh.fraDomene(vedtak.takeIfType<Opphør>()?.data?.årsaker),
             ),

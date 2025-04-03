@@ -28,7 +28,6 @@ class VedtaksstatistikkTask(
             behandlingId,
             fagsakId,
         )
-
     }
 
     companion object {

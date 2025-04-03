@@ -16,7 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import java.time.LocalDate
 import java.time.YearMonth
 
-data class UtbetalingerDvhV2(
+data class UtbetalingerDvh(
     val fraOgMed: LocalDate,
     val tilOgMed: LocalDate,
     val type: AndelstypeDvh,
@@ -25,7 +25,7 @@ data class UtbetalingerDvhV2(
     val beløpErBegrensetAvMakssats: Boolean? = null,
 ) {
     data class JsonWrapper(
-        val utbetalinger: List<UtbetalingerDvhV2>,
+        val utbetalinger: List<UtbetalingerDvh>,
     )
 
     companion object {
@@ -37,7 +37,7 @@ data class UtbetalingerDvhV2(
 
                 val beregningsgrunnlag = andelTilkjentYtelse.finnGrunnlag(vedtak)
 
-                UtbetalingerDvhV2(
+                UtbetalingerDvh(
                     fraOgMed = andelTilkjentYtelse.fom,
                     tilOgMed = andelTilkjentYtelse.tom,
                     type = AndelstypeDvh.fraDomene(andelTilkjentYtelse.type),

@@ -17,7 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import java.time.LocalDate
 
-data class VedtaksperioderDvhV2(
+data class VedtaksperioderDvh(
     val fom: LocalDate,
     val tom: LocalDate,
     val aktivitet: AktivitetTypeDvh,
@@ -29,7 +29,7 @@ data class VedtaksperioderDvhV2(
     val studienivå: StudienivåDvh? = null,
 ) {
     data class JsonWrapper(
-        val vedtaksperioder: List<VedtaksperioderDvhV2>,
+        val vedtaksperioder: List<VedtaksperioderDvh>,
     )
 
     companion object {
@@ -58,7 +58,7 @@ data class VedtaksperioderDvhV2(
                     VedtaksperiodeLæremidlerMapper
                         .mapTilVedtaksperiode(beregningsresultat.perioder)
                         .map {
-                            VedtaksperioderDvhV2(
+                            VedtaksperioderDvh(
                                 fom = it.fom,
                                 tom = it.tom,
                                 aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
@@ -76,7 +76,7 @@ data class VedtaksperioderDvhV2(
                 VedtaksperiodeTilsynBarnMapper
                     .mapTilVedtaksperiode(beregningsresultat.perioder)
                     .map {
-                        VedtaksperioderDvhV2(
+                        VedtaksperioderDvh(
                             fom = it.fom,
                             tom = it.tom,
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe.faktiskMålgruppe()),

@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database
 
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvhV2
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import org.postgresql.util.PGobject
@@ -19,8 +19,8 @@ val alleVedtaksstatistikkJsonConverters =
     )
 
 @WritingConverter
-private class VedtaksperioderDvhV2Writer : Converter<VedtaksperioderDvhV2.JsonWrapper, PGobject> {
-    override fun convert(data: VedtaksperioderDvhV2.JsonWrapper) =
+private class VedtaksperioderDvhV2Writer : Converter<VedtaksperioderDvh.JsonWrapper, PGobject> {
+    override fun convert(data: VedtaksperioderDvh.JsonWrapper) =
         PGobject().apply {
             type = "json"
             value = objectMapper.writeValueAsString(data.vedtaksperioder)
@@ -28,8 +28,8 @@ private class VedtaksperioderDvhV2Writer : Converter<VedtaksperioderDvhV2.JsonWr
 }
 
 @WritingConverter
-private class UtbetalingerDvhV2Writer : Converter<UtbetalingerDvhV2.JsonWrapper, PGobject> {
-    override fun convert(data: UtbetalingerDvhV2.JsonWrapper) =
+private class UtbetalingerDvhV2Writer : Converter<UtbetalingerDvh.JsonWrapper, PGobject> {
+    override fun convert(data: UtbetalingerDvh.JsonWrapper) =
         PGobject().apply {
             type = "json"
             value = objectMapper.writeValueAsString(data.utbetalinger)
@@ -39,6 +39,5 @@ private class UtbetalingerDvhV2Writer : Converter<UtbetalingerDvhV2.JsonWrapper,
 private class ÅrsakerAvslagDvhWriter : DatabaseConfiguration.JsonWriter<ÅrsakAvslagDvh.JsonWrapper>()
 
 private class ÅrsakerOpphørDvhWriter : DatabaseConfiguration.JsonWriter<ÅrsakOpphørDvh.JsonWrapper>()
-
 
 private class ÅrsakerAvslagDvhReader : DatabaseConfiguration.JsonReader<ÅrsakAvslagDvh.JsonWrapper>(ÅrsakAvslagDvh.JsonWrapper::class)

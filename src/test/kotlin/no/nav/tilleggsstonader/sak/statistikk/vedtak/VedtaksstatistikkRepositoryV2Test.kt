@@ -13,9 +13,9 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.LovverketsMålgruppeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StudienivåDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvhV2
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
@@ -72,11 +72,11 @@ class VedtaksstatistikkRepositoryV2Test : IntegrationTest() {
             endretTid = LocalDateTime.of(2024, Month.FEBRUARY, 7, 20, 30),
         )
 
-    private fun vedtaksperioderDvhV2JsonWrapper(): VedtaksperioderDvhV2.JsonWrapper =
-        VedtaksperioderDvhV2.JsonWrapper(
+    private fun vedtaksperioderDvhV2JsonWrapper(): VedtaksperioderDvh.JsonWrapper =
+        VedtaksperioderDvh.JsonWrapper(
             vedtaksperioder =
                 listOf(
-                    VedtaksperioderDvhV2(
+                    VedtaksperioderDvh(
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 2),
                         aktivitet = AktivitetTypeDvh.TILTAK,
@@ -88,11 +88,11 @@ class VedtaksstatistikkRepositoryV2Test : IntegrationTest() {
                 ),
         )
 
-    private fun utbetalinger(): UtbetalingerDvhV2.JsonWrapper =
-        UtbetalingerDvhV2.JsonWrapper(
+    private fun utbetalinger(): UtbetalingerDvh.JsonWrapper =
+        UtbetalingerDvh.JsonWrapper(
             utbetalinger =
                 listOf(
-                    UtbetalingerDvhV2(
+                    UtbetalingerDvh(
                         fraOgMed = LocalDate.of(2025, 1, 1),
                         tilOgMed = LocalDate.of(2025, 1, 2),
                         type = AndelstypeDvh.TILSYN_BARN_AAP,
