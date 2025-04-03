@@ -7,8 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.TilsynBarn.barnId
-import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.TilsynBarn.barnId2
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil
@@ -299,6 +298,8 @@ object Testdata {
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 3, 31),
+                    målgruppe = null,
+                    aktivitet = null,
                 ),
             )
         val beregningsresultat =
@@ -316,7 +317,7 @@ object Testdata {
                                     studieprosent = 100,
                                     sats = 951,
                                     satsBekreftet = true,
-                                    målgruppe = MålgruppeType.AAP,
+                                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                     aktivitet = AktivitetType.TILTAK,
                                 ),
                         ),
@@ -331,7 +332,7 @@ object Testdata {
                                     studieprosent = 100,
                                     sats = 951,
                                     satsBekreftet = true,
-                                    målgruppe = MålgruppeType.AAP,
+                                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                     aktivitet = AktivitetType.TILTAK,
                                 ),
                         ),

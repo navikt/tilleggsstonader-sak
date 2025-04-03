@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
@@ -19,7 +20,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatu
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.util.UUID
 
@@ -109,7 +109,7 @@ object LæremidlerTestUtil {
         fom: LocalDate,
         tom: LocalDate,
         utbetalingsdato: LocalDate = fom,
-        målgruppe: MålgruppeType = MålgruppeType.AAP,
+        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
     ): BeregningsresultatForMåned =
         BeregningsresultatForMåned(
@@ -144,7 +144,7 @@ object LæremidlerTestUtil {
             beløp = 875,
             stønadsbeløp = stønadsbeløp,
             utbetalingsdato = utbetalingsdato,
-            målgruppe = MålgruppeType.AAP,
+            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
             aktivitet = AktivitetType.TILTAK,
             delAvTidligereUtbetaling = false,
         )
@@ -152,7 +152,7 @@ object LæremidlerTestUtil {
     fun vedtaksperiodeBeregningsgrunnlag(
         fom: LocalDate = LocalDate.of(2025, 1, 1),
         tom: LocalDate = LocalDate.of(2025, 1, 31),
-        målgruppe: MålgruppeType = MålgruppeType.AAP,
+        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
     ) = VedtaksperiodeBeregningsgrunnlagLæremidler(
         fom = fom,
@@ -165,11 +165,15 @@ object LæremidlerTestUtil {
         id: UUID = UUID.randomUUID(),
         fom: LocalDate = LocalDate.of(2025, 1, 1),
         tom: LocalDate = LocalDate.of(2025, 1, 31),
+        målgruppe: FaktiskMålgruppe? = null,
+        aktivitet: AktivitetType? = null,
         status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
     ) = Vedtaksperiode(
         id = id,
         fom = fom,
         tom = tom,
+        målgruppe = målgruppe,
+        aktivitet = aktivitet,
         status = status,
     )
 
@@ -177,9 +181,13 @@ object LæremidlerTestUtil {
         id: UUID = UUID.randomUUID(),
         fom: LocalDate = LocalDate.of(2025, 1, 1),
         tom: LocalDate = LocalDate.of(2025, 1, 31),
+        målgruppe: FaktiskMålgruppe? = null,
+        aktivitet: AktivitetType? = null,
     ) = VedtaksperiodeLæremidlerDto(
         id = id,
         fom = fom,
         tom = tom,
+        målgruppeType = målgruppe,
+        aktivitetType = aktivitet,
     )
 }

@@ -60,7 +60,7 @@ data class VedtaksperioderDvhV2(
                                 fom = it.fom,
                                 tom = it.tom,
                                 aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
-                                lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe.faktiskMålgruppe()),
+                                lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                                 studienivå = StudienivåDvh.fraDomene(it.studienivå),
                             )
                         },

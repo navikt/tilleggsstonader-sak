@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
@@ -132,3 +133,16 @@ fun List<Vilkårperiode>.mergeSammenhengendeOppfylteAktiviteter(): Map<Aktivitet
 
 fun List<Vilkårperiode>.mergeSammenhengendeOppfylteMålgrupper(): Map<MålgruppeType, List<Datoperiode>> =
     this.mergeSammenhengendeOppfylte<MålgruppeType>()
+
+fun List<Vilkårperiode>.mergeSammenhengendeOppfylteFaktiskeMålgrupper(): Map<FaktiskMålgruppe, List<Datoperiode>> =
+    this
+        .filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
+        .groupBy {
+            require(it.type is MålgruppeType) { "${it.type} er ikke av type ${MålgruppeType::class.simpleName}" }
+            it.type.faktiskMålgruppe()
+        }.mapValues {
+            it.value
+                .sorted()
+                .map { Datoperiode(fom = it.fom, tom = it.tom) }
+                .mergeSammenhengende { a, b -> a.overlapperEllerPåfølgesAv(b) }
+        }

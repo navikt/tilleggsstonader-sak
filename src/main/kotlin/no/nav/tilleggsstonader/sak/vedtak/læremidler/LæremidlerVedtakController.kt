@@ -1,14 +1,17 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BrukVedtaksperioderForBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatLæremidlerDto
@@ -35,6 +38,8 @@ class LæremidlerVedtakController(
     private val behandlingService: BehandlingService,
     private val stegService: StegService,
     private val steg: LæremidlerBeregnYtelseSteg,
+    private val unleashService: UnleashService,
+    private val vedtaksperiodeService: VedtaksperiodeLæremidlerService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -74,9 +79,13 @@ class LæremidlerVedtakController(
         @RequestBody vedtaksperioder: List<VedtaksperiodeLæremidlerDto>,
     ): BeregningsresultatLæremidlerDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        val brukVedtaksperioder = unleashService.isEnabled(Toggle.LÆREMIDLER_VEDTAKSPERIODER_V2)
         return beregningService
-            .beregn(behandling, vedtaksperioder.tilDomene())
-            .tilDto(revurderFra = behandling.revurderFra)
+            .beregn(
+                behandling,
+                vedtaksperioder.tilDomene(),
+                brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(brukVedtaksperioder),
+            ).tilDto(revurderFra = behandling.revurderFra)
     }
 
     /**
@@ -100,5 +109,15 @@ class LæremidlerVedtakController(
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
         return VedtakDtoMapper.toDto(vedtak, null)
+    }
+
+    @GetMapping("{behandlingId}/foresla")
+    fun foreslåVedtaksperioder(
+        @PathVariable behandlingId: BehandlingId,
+    ): List<VedtaksperiodeLæremidlerDto> {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        return vedtaksperiodeService.foreslåPerioder(behandlingId).tilDto()
     }
 }

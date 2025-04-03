@@ -12,8 +12,11 @@ import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
+import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
@@ -25,7 +28,12 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.LæremidlerVedtaksp
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.util.UUID
@@ -47,15 +55,28 @@ enum class BeregningNøkler(
 class StepDefinitions {
     val logger = LoggerFactory.getLogger(javaClass)
 
-    val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
+    val vilkårperiodeRepository = VilkårperiodeRepositoryFake()
     val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
     val behandlingService = mockk<BehandlingService>()
     val vedtakRepository = VedtakRepositoryFake()
 
+    val vilkårperiodeService =
+        mockk<VilkårperiodeService>().apply {
+            val mock = this
+            every { mock.hentVilkårperioder(any()) } answers {
+                val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(BehandlingId(firstArg<UUID>())).sorted()
+
+                Vilkårperioder(
+                    målgrupper = vilkårsperioder.ofType<MålgruppeFaktaOgVurdering>(),
+                    aktiviteter = vilkårsperioder.ofType<AktivitetFaktaOgVurdering>(),
+                )
+            }
+        }
     val læremidlerVedtaksperiodeValideringService =
         LæremidlerVedtaksperiodeValideringService(
             behandlingService = behandlingService,
             vedtakRepository = vedtakRepository,
+            vilkårperiodeService = vilkårperiodeService,
         )
 
     val læremidlerBeregningService =
@@ -84,15 +105,20 @@ class StepDefinitions {
                 vedtaksperiode(
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    målgruppe = parseValgfriEnum<FaktiskMålgruppe>(BeregningNøkler.MÅLGRUPPE, rad),
+                    aktivitet = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad),
                 )
             }
     }
 
     @Gitt("følgende aktiviteter for læremidler")
     fun `følgende aktiviteter`(dataTable: DataTable) {
-        every {
-            vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any())
-        } returns mapAktiviteter(behandlingId, dataTable)
+        vilkårperiodeRepository.insertAll(mapAktiviteter(behandlingId, dataTable))
+    }
+
+    @Gitt("følgende målgrupper for læremidler")
+    fun `følgende målgrupper`(dataTable: DataTable) {
+        vilkårperiodeRepository.insertAll(mapMålgrupper(behandlingId, dataTable))
     }
 
     @Gitt("følgende stønadsperioder for læremidler")
@@ -108,7 +134,28 @@ class StepDefinitions {
         val behandling = saksbehandling(behandling = behandling(id = behandlingId))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
         try {
-            resultat = læremidlerBeregningService.beregn(behandling, vedtaksPerioder)
+            resultat =
+                læremidlerBeregningService.beregn(
+                    behandling,
+                    vedtaksPerioder,
+                    brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(false),
+                )
+        } catch (e: Exception) {
+            beregningException = e
+        }
+    }
+
+    @Når("beregner stønad for læremidler uten overlappsperiode")
+    fun `beregner stønad for læremidler uten overlappsperiode`() {
+        val behandling = saksbehandling(behandling = behandling(id = behandlingId))
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
+        try {
+            resultat =
+                læremidlerBeregningService.beregn(
+                    behandling,
+                    vedtaksPerioder,
+                    brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(true),
+                )
         } catch (e: Exception) {
             beregningException = e
         }
@@ -133,6 +180,21 @@ class StepDefinitions {
             læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
                 vedtaksperioder = vedtaksPerioder,
                 behandlingId = behandlingId,
+                brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(false),
+            )
+        } catch (feil: Exception) {
+            valideringException = feil
+        }
+    }
+
+    @Når("validerer vedtaksperiode for læremidler uten overlappsperiode")
+    fun `validerer vedtaksperiode for læremidler uten overlappsperiode`() {
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
+        try {
+            læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
+                vedtaksperioder = vedtaksPerioder,
+                behandlingId = behandlingId,
+                brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(true),
             )
         } catch (feil: Exception) {
             valideringException = feil

@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeLæremidlerMapper.VedtaksperiodeLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -55,7 +55,7 @@ class VedtaksperiodeLæremidlerMapperTest {
                     listOf(
                         beregningsresultatPeriode1,
                         beregningsresultatPeriode2.copy(
-                            grunnlag = beregningsresultatPeriode2.grunnlag.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD),
+                            grunnlag = beregningsresultatPeriode2.grunnlag.copy(målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER),
                         ),
                     ),
             )

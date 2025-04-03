@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYte
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -43,6 +44,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremid
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapAktiviteter
@@ -71,6 +73,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         LæremidlerVedtaksperiodeValideringService(
             behandlingService = behandlingService,
             vedtakRepository = vedtakRepository,
+            vilkårperiodeService = mockk(),
         )
 
     val simuleringService =
@@ -90,6 +93,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             vedtakRepository = vedtakRepository,
             tilkjentytelseService = TilkjentYtelseService(tilkjentYtelseRepository),
             simuleringService = simuleringService,
+            unleashService = mockUnleashService(false),
         )
     val vedtaksperiodeId: UUID = UUID.randomUUID()
 
@@ -282,7 +286,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
 
     private fun mapVedtaksperioder(dataTable: DataTable): List<Vedtaksperiode> =
         dataTable.mapRad { rad ->
-            Vedtaksperiode(
+            vedtaksperiode(
                 id = vedtaksperiodeId,
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),

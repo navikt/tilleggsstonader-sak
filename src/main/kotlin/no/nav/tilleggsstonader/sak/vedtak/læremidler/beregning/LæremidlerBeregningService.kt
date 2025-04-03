@@ -44,14 +44,21 @@ class LæremidlerBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
+        brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): BeregningsresultatLæremidler {
-        val vedtaksperioderBeregningsgrunnlag = hentVedtaksperioderForBergningsgrunnlag(behandling.id, vedtaksperioder)
-        val forrigeVedtak = hentForrigeVedtak(behandling)
-
         læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             behandlingId = behandling.id,
+            brukVedtaksperioderForBeregning = brukVedtaksperioderForBeregning,
         )
+
+        val vedtaksperioderBeregningsgrunnlag =
+            hentVedtaksperioderForBergningsgrunnlag(
+                behandling.id,
+                vedtaksperioder,
+                brukVedtaksperioder = brukVedtaksperioderForBeregning,
+            )
+        val forrigeVedtak = hentForrigeVedtak(behandling)
 
         val beregningsresultatForMåned = beregn(behandling, vedtaksperioderBeregningsgrunnlag)
 
@@ -73,6 +80,7 @@ class LæremidlerBeregningService(
     fun beregnForOpphør(
         behandling: Saksbehandling,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
+        brukVedtaksperioderForMålgruppeOgAktivitet: BrukVedtaksperioderForBeregning,
     ): BeregningsresultatLæremidler {
         feilHvis(behandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
@@ -87,6 +95,7 @@ class LæremidlerBeregningService(
             behandling = behandling,
             avkortetBeregningsresultat = avkortetBeregningsresultat,
             avkortetVedtaksperioder = avkortetVedtaksperioder,
+            brukVedtaksperioderForMålgruppeOgAktivitet,
         )
     }
 
@@ -99,6 +108,7 @@ class LæremidlerBeregningService(
         behandling: Saksbehandling,
         avkortetBeregningsresultat: AvkortResult<BeregningsresultatForMåned>,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
+        brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): BeregningsresultatLæremidler {
         if (!avkortetBeregningsresultat.harAvkortetPeriode) {
             return BeregningsresultatLæremidler(avkortetBeregningsresultat.perioder)
@@ -108,6 +118,7 @@ class LæremidlerBeregningService(
             behandling = behandling,
             avkortetBeregningsresultat = avkortetBeregningsresultat,
             avkortetVedtaksperioder = avkortetVedtaksperioder,
+            brukVedtaksperioderForBeregning = brukVedtaksperioderForBeregning,
         )
     }
 
@@ -115,6 +126,7 @@ class LæremidlerBeregningService(
         behandling: Saksbehandling,
         avkortetBeregningsresultat: AvkortResult<BeregningsresultatForMåned>,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
+        brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): BeregningsresultatLæremidler {
         val perioderSomBeholdes = avkortetBeregningsresultat.perioder.dropLast(1)
         val periodeTilReberegning = avkortetBeregningsresultat.perioder.last()
@@ -124,6 +136,7 @@ class LæremidlerBeregningService(
                 behandling = behandling,
                 avkortetVedtaksperioder = avkortetVedtaksperioder,
                 beregningsresultatTilReberegning = periodeTilReberegning,
+                brukVedtaksperioderForBeregning = brukVedtaksperioderForBeregning,
             )
 
         val nyePerioder =
@@ -140,8 +153,14 @@ class LæremidlerBeregningService(
         behandling: Saksbehandling,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
         beregningsresultatTilReberegning: BeregningsresultatForMåned,
+        brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): List<BeregningsresultatForMåned> {
-        val vedtaksperioderForGrunnlag = hentVedtaksperioderForBergningsgrunnlag(behandling.id, avkortetVedtaksperioder)
+        val vedtaksperioderForGrunnlag =
+            hentVedtaksperioderForBergningsgrunnlag(
+                behandling.id,
+                avkortetVedtaksperioder,
+                brukVedtaksperioderForBeregning,
+            )
         val vedtaksperioderSomOmregnes =
             vedtaksperioderInnenforLøpendeMåned(vedtaksperioderForGrunnlag, beregningsresultatTilReberegning)
 
@@ -221,27 +240,40 @@ class LæremidlerBeregningService(
     private fun hentVedtaksperioderForBergningsgrunnlag(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
+        brukVedtaksperioder: BrukVedtaksperioderForBeregning,
     ): List<VedtaksperiodeBeregningsgrunnlagLæremidler> {
-        val stønadsperioder =
-            stønadsperiodeRepository
-                .findAllByBehandlingId(behandlingId)
-                .tilSortertStønadsperiodeBeregningsgrunnlag()
-                .slåSammenSammenhengende()
-        // TODO skal kontrollere inneholder + målgruppe + aktivitet når det er lagt til
-        return vedtaksperioder
-            .map { vedtaksperiode ->
-                val filtrerteStønadsperioder = stønadsperioder.filter { it.inneholder(vedtaksperiode) }
-                brukerfeilHvisIkke(filtrerteStønadsperioder.size == 1) {
-                    "Vedtaksperiode er ikke innenfor en periode med overlapp mellom aktivitet og målgruppe."
+        if (!brukVedtaksperioder.bruk) {
+            val stønadsperioder =
+                stønadsperiodeRepository
+                    .findAllByBehandlingId(behandlingId)
+                    .tilSortertStønadsperiodeBeregningsgrunnlag()
+                    .slåSammenSammenhengende()
+            // TODO skal kontrollere inneholder + målgruppe + aktivitet når det er lagt til
+            return vedtaksperioder
+                .map { vedtaksperiode ->
+                    val filtrerteStønadsperioder = stønadsperioder.filter { it.inneholder(vedtaksperiode) }
+                    brukerfeilHvisIkke(filtrerteStønadsperioder.size == 1) {
+                        "Vedtaksperiode er ikke innenfor en periode med overlapp mellom aktivitet og målgruppe."
+                    }
+                    val stønadsperiode = filtrerteStønadsperioder.single()
+                    VedtaksperiodeBeregningsgrunnlagLæremidler(
+                        fom = vedtaksperiode.fom,
+                        tom = vedtaksperiode.tom,
+                        målgruppe = stønadsperiode.målgruppe,
+                        aktivitet = stønadsperiode.aktivitet,
+                    )
                 }
-                val stønadsperiode = filtrerteStønadsperioder.single()
-                VedtaksperiodeBeregningsgrunnlagLæremidler(
-                    fom = vedtaksperiode.fom,
-                    tom = vedtaksperiode.tom,
-                    målgruppe = stønadsperiode.målgruppe,
-                    aktivitet = stønadsperiode.aktivitet,
-                )
-            }
+        } else {
+            return vedtaksperioder
+                .map {
+                    VedtaksperiodeBeregningsgrunnlagLæremidler(
+                        fom = it.fom,
+                        tom = it.tom,
+                        målgruppe = it.målgruppe!!,
+                        aktivitet = it.aktivitet!!,
+                    )
+                }.sorted()
+        }
     }
 
     private fun finnAktiviteter(behandlingId: BehandlingId): List<AktivitetLæremidlerBeregningGrunnlag> =

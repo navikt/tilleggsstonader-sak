@@ -7,6 +7,6 @@ fun <T> DataTable.mapRad(mapper: (Map<String, String>) -> T): List<T> =
         try {
             mapper(row)
         } catch (e: Exception) {
-            throw RuntimeException("Feilet parsing av rad $index", e)
+            throw RuntimeException("Feilet parsing av rad $index - \"$row\"", e)
         }
     }

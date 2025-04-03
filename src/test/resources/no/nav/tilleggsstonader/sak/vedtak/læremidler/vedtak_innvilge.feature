@@ -18,11 +18,11 @@ Egenskap: Innvilgelse av læremidler
       | 01.12.2024 | 31.03.2025 |
 
     Så forvent beregningsresultatet for behandling=1
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.12.2024 | 31.12.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 02.12.2024      |
-      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
-      | 01.02.2025 | 31.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
-      | 01.03.2025 | 31.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 01.12.2024 | 31.12.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 02.12.2024      |
+      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      |
+      | 01.02.2025 | 31.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      |
+      | 01.03.2025 | 31.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      |
 
     Så forvent andeler for behandling=1
       | Fom        | Beløp | Type           | Utbetalingsdato |

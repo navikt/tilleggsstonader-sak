@@ -23,7 +23,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
@@ -147,6 +146,9 @@ class OppfølgingService(
 
             // TODO Læremidler har ennå ikke vedtaksperioder
             Stønadstype.LÆREMIDLER ->
+                // TODO håndterer ikke læremidler ennå etter endring til faktisk målgruppe
+                emptyList()
+                /*
                 hentVedtak<InnvilgelseEllerOpphørLæremidler>(behandling)
                     .beregningsresultat.perioder
                     .map { Vedtaksperiode(it) }
@@ -159,6 +161,7 @@ class OppfølgingService(
                         },
                         { v1, v2 -> v1.medPeriode(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
                     )
+                 */
 
             Stønadstype.BOUTGIFTER -> TODO()
         }
@@ -385,7 +388,7 @@ class OppfølgingService(
         constructor(beregningsresultat: BeregningsresultatForMåned) : this(
             fom = beregningsresultat.grunnlag.fom,
             tom = beregningsresultat.grunnlag.tom,
-            målgruppe = beregningsresultat.grunnlag.målgruppe,
+            målgruppe = TODO(), // beregningsresultat.grunnlag.målgruppe,
             aktivitet = beregningsresultat.grunnlag.aktivitet,
         )
 

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.mockk.every
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
@@ -23,6 +24,8 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPe
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.BrevController
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
@@ -58,6 +61,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
@@ -84,6 +88,12 @@ class BehandlingFlytTest(
     @Autowired val simuleringStegService: SimuleringStegService,
 ) : IntegrationTest() {
     val personIdent = FnrGenerator.generer(år = 2000)
+
+    @AfterEach
+    override fun tearDown() {
+        super.tearDown()
+        resetMock(unleashService)
+    }
 
     @Test
     fun `saksbehandler innvilger vedtak og beslutter godkjenner vedtak`() {
@@ -188,6 +198,7 @@ class BehandlingFlytTest(
 
     @Test
     fun `skal ikke kunne gå videre til vilkår-steg dersom inngangsvilkåren ikke validerer`() {
+        every { unleashService.isEnabled(Toggle.LÆREMIDLER_VEDTAKSPERIODER_V2) } returns false
         somSaksbehandler {
             val behandlingId = opprettBehandling(personIdent = personIdent, stønadstype = Stønadstype.LÆREMIDLER)
             val faktaOgSvarLæremidler =

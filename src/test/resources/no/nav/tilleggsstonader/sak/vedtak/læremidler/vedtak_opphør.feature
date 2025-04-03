@@ -25,9 +25,9 @@ Egenskap: Opphør av læremidler
     Når opphør behandling=2 med revurderFra=15.02.2025
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
-      | 01.02.2025 | 14.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      |
+      | 01.02.2025 | 14.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -60,8 +60,8 @@ Egenskap: Opphør av læremidler
     Når opphør behandling=2 med revurderFra=15.01.2025
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2025 | 14.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 01.01.2025 | 14.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -95,8 +95,8 @@ Egenskap: Opphør av læremidler
     Når opphør behandling=2 med revurderFra=10.01.2025
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe       | Aktivitet | Utbetalingsdato |
-      | 01.01.2025 | 09.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | OVERGANGSSTØNAD | UTDANNING | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe        | Aktivitet | Utbetalingsdato |
+      | 01.01.2025 | 09.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | ENSLIG_FORSØRGER | UTDANNING | 01.01.2025      |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type                        | Utbetalingsdato |
@@ -129,9 +129,9 @@ Egenskap: Opphør av læremidler
     Når opphør behandling=2 med revurderFra=15.02.2025
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2025 | 31.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
-      | 01.02.2025 | 14.02.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 01.01.2025 | 31.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      |
+      | 01.02.2025 | 14.02.2025 | 226   | VIDEREGÅENDE | 50            | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -163,8 +163,8 @@ Egenskap: Opphør av læremidler
     Når opphør behandling=2 med revurderFra=03.02.2025
 
     Så forvent beregningsresultatet for behandling=2
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |

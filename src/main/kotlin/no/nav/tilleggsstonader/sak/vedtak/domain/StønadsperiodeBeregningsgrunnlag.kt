@@ -4,9 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
 /**
@@ -15,7 +15,7 @@ import java.time.LocalDate
 data class StønadsperiodeBeregningsgrunnlag(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val målgruppe: MålgruppeType,
+    val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
 ) : Periode<LocalDate>,
     KopierPeriode<StønadsperiodeBeregningsgrunnlag> {
@@ -33,7 +33,7 @@ fun Stønadsperiode.tilStønadsperiodeBeregningsgrunnlag() =
     StønadsperiodeBeregningsgrunnlag(
         fom = this.fom,
         tom = this.tom,
-        målgruppe = this.målgruppe,
+        målgruppe = this.målgruppe.faktiskMålgruppe(),
         aktivitet = this.aktivitet,
     )
 

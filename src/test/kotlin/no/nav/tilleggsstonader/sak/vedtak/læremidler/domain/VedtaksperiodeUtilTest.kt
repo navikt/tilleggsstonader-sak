@@ -4,14 +4,15 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BrukVedtaksperioderForBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerIngenOverlappendeVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.vedtaksperioderInnenforLøpendeMåned
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -28,6 +29,7 @@ class VedtaksperiodeUtilTest {
         LæremidlerVedtaksperiodeValideringService(
             behandlingService = behandlingService,
             vedtakRepository = vedtakRepository,
+            vilkårperiodeService = mockk(),
         )
     val vedtaksperiodeJanuar =
         vedtaksperiode(
@@ -51,6 +53,7 @@ class VedtaksperiodeUtilTest {
                 læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
                     vedtaksperioder = vedtaksperioder,
                     behandlingId = behandlingId,
+                    brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(false),
                 )
             }
         }
@@ -65,6 +68,7 @@ class VedtaksperiodeUtilTest {
                 læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
                     vedtaksperioder = vedtaksperioder,
                     behandlingId = behandlingId,
+                    brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(false),
                 )
             }.hasMessageContaining("Kan ikke innvilge når det ikke finnes noen vedtaksperioder.")
         }
@@ -191,7 +195,7 @@ class VedtaksperiodeUtilTest {
                     studieprosent = 100,
                     sats = 100,
                     satsBekreftet = true,
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitet = AktivitetType.TILTAK,
                 ),
         )
