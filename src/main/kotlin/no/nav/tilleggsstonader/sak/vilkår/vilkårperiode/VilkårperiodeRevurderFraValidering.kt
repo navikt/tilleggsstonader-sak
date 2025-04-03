@@ -76,7 +76,7 @@ object VilkårperiodeRevurderFraValidering {
         oppdatertPeriode: LagreVilkårperiode,
         grunnlagsdata: Grunnlagsdata,
     ) {
-        if (eksisterendePeriode.type is MålgruppeType) {
+        if (eksisterendePeriode.type is MålgruppeType && eksisterendePeriode.type.skalVurdereAldersvilkår()) {
             vurderAldersvilkår(oppdatertPeriode, grunnlagsdata)
         }
     }
