@@ -23,12 +23,11 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriDato
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.StønadsperiodeRepositoryFake
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYtelseRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -39,22 +38,29 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BeregningNøkler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapAktiviteter
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapBeregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapMålgrupper
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.LæremidlerVedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeLæremidlerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
@@ -65,15 +71,26 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     val logger = LoggerFactory.getLogger(javaClass)
 
     val vilkårperiodeRepository = VilkårperiodeRepositoryFake()
-    val stønadsperiodeRepository = StønadsperiodeRepositoryFake()
     val vedtakRepository = VedtakRepositoryFake()
     val tilkjentYtelseRepository = TilkjentYtelseRepositoryFake()
     val behandlingService = mockk<BehandlingService>()
+    val vilkårperiodeService =
+        mockk<VilkårperiodeService>().apply {
+            val mock = this
+            every { mock.hentVilkårperioder(any()) } answers {
+                val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(BehandlingId(firstArg<UUID>())).sorted()
+
+                Vilkårperioder(
+                    målgrupper = vilkårsperioder.ofType<MålgruppeFaktaOgVurdering>(),
+                    aktiviteter = vilkårsperioder.ofType<AktivitetFaktaOgVurdering>(),
+                )
+            }
+        }
     val læremidlerVedtaksperiodeValideringService =
         LæremidlerVedtaksperiodeValideringService(
             behandlingService = behandlingService,
             vedtakRepository = vedtakRepository,
-            vilkårperiodeService = mockk(),
+            vilkårperiodeService = vilkårperiodeService,
         )
 
     val simuleringService =
@@ -85,7 +102,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             beregningService =
                 LæremidlerBeregningService(
                     vilkårperiodeRepository = vilkårperiodeRepository,
-                    stønadsperiodeRepository = stønadsperiodeRepository,
                     læremidlerVedtaksperiodeValideringService = læremidlerVedtaksperiodeValideringService,
                     vedtakRepository = vedtakRepository,
                 ),
@@ -93,7 +109,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             vedtakRepository = vedtakRepository,
             tilkjentytelseService = TilkjentYtelseService(tilkjentYtelseRepository),
             simuleringService = simuleringService,
-            unleashService = mockUnleashService(false),
         )
     val vedtaksperiodeId: UUID = UUID.randomUUID()
 
@@ -106,13 +121,13 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         vilkårperiodeRepository.insertAll(mapAktiviteter(behandlingId, dataTable))
     }
 
-    @Gitt("følgende stønadsperioder for læremidler behandling={}")
-    fun `følgende stønadsperioder`(
+    @Gitt("følgende målgrupper for læremidler behandling={}")
+    fun `følgende målgrupper`(
         behandlingIdTall: Int,
         dataTable: DataTable,
     ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-        stønadsperiodeRepository.insertAll(mapStønadsperioder(behandlingId, dataTable))
+        vilkårperiodeRepository.insertAll(mapMålgrupper(behandlingId, dataTable))
     }
 
     @Når("innvilger vedtaksperioder for behandling={}")
@@ -146,9 +161,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val forrigeIverksatteBehandlingId =
             forrigeIverksatteBehandlingId(behandlingId) ?: error("Forventer å finne forrigeIverksatteBehandlingId")
 
-        val tidligereStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(forrigeIverksatteBehandlingId)
         val tidligereVilkårsperioder = vilkårperiodeRepository.findByBehandlingId(forrigeIverksatteBehandlingId)
-        stønadsperiodeRepository.insertAll(tidligereStønadsperioder.map { it.kopierTilBehandling(behandlingId) })
         vilkårperiodeRepository.insertAll(tidligereVilkårsperioder.map { it.kopierTilBehandling(behandlingId) })
     }
 
@@ -290,6 +303,10 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                 id = vedtaksperiodeId,
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                målgruppe =
+                    parseValgfriEnum<FaktiskMålgruppe>(BeregningNøkler.MÅLGRUPPE, rad)
+                        ?: FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                aktivitet = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad) ?: AktivitetType.TILTAK,
             )
         }
 
@@ -299,6 +316,10 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                 id = vedtaksperiodeId,
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                målgruppe =
+                    parseValgfriEnum<FaktiskMålgruppe>(BeregningNøkler.MÅLGRUPPE, rad)
+                        ?: FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                aktivitet = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad) ?: AktivitetType.TILTAK,
             )
         }
 

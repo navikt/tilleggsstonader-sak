@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeValideringUtils.validerE
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BrukVedtaksperioderForBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerIngenOverlappendeVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.validerIngenEndringerFørRevurderFra
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteAktiviteter
@@ -28,17 +27,14 @@ class LæremidlerVedtaksperiodeValideringService(
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
         behandlingId: BehandlingId,
-        brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ) {
         brukerfeilHvis(vedtaksperioder.isEmpty()) { "Kan ikke innvilge når det ikke finnes noen vedtaksperioder." }
         validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
 
+        validerVedtaksperioderMotStønadsperioder(behandlingId, vedtaksperioder)
+
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtaksperioderForrigeBehandling = hentForrigeVedtaksperioder(behandling)
-
-        if (brukVedtaksperioderForBeregning.bruk) {
-            validerVedtaksperioderMotStønadsperioder(behandlingId, vedtaksperioder)
-        }
 
         validerIngenEndringerFørRevurderFra(
             innsendteVedtaksperioder = vedtaksperioder,

@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.periode.AvkortResult
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.toYearMonth
@@ -12,8 +11,6 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningsgrunnlagLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.slåSammenSammenhengende
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnBeløpUtil.beregnBeløp
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.splittTilLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
@@ -24,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.LæremidlerVedtaksp
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.vedtaksperioderInnenforLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.avkortBeregningsresultatVedOpphør
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.springframework.stereotype.Service
@@ -32,7 +28,6 @@ import org.springframework.stereotype.Service
 @Service
 class LæremidlerBeregningService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
-    private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val læremidlerVedtaksperiodeValideringService: LæremidlerVedtaksperiodeValideringService,
     private val vedtakRepository: VedtakRepository,
 ) {
@@ -44,20 +39,13 @@ class LæremidlerBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
-        brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): BeregningsresultatLæremidler {
         læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             behandlingId = behandling.id,
-            brukVedtaksperioderForBeregning = brukVedtaksperioderForBeregning,
         )
 
-        val vedtaksperioderBeregningsgrunnlag =
-            hentVedtaksperioderForBergningsgrunnlag(
-                behandling.id,
-                vedtaksperioder,
-                brukVedtaksperioder = brukVedtaksperioderForBeregning,
-            )
+        val vedtaksperioderBeregningsgrunnlag = vedtaksperioder.tilBeregningsgrunnlag()
         val forrigeVedtak = hentForrigeVedtak(behandling)
 
         val beregningsresultatForMåned = beregn(behandling, vedtaksperioderBeregningsgrunnlag)
@@ -80,7 +68,6 @@ class LæremidlerBeregningService(
     fun beregnForOpphør(
         behandling: Saksbehandling,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
-        brukVedtaksperioderForMålgruppeOgAktivitet: BrukVedtaksperioderForBeregning,
     ): BeregningsresultatLæremidler {
         feilHvis(behandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
@@ -95,7 +82,6 @@ class LæremidlerBeregningService(
             behandling = behandling,
             avkortetBeregningsresultat = avkortetBeregningsresultat,
             avkortetVedtaksperioder = avkortetVedtaksperioder,
-            brukVedtaksperioderForMålgruppeOgAktivitet,
         )
     }
 
@@ -108,7 +94,6 @@ class LæremidlerBeregningService(
         behandling: Saksbehandling,
         avkortetBeregningsresultat: AvkortResult<BeregningsresultatForMåned>,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
-        brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): BeregningsresultatLæremidler {
         if (!avkortetBeregningsresultat.harAvkortetPeriode) {
             return BeregningsresultatLæremidler(avkortetBeregningsresultat.perioder)
@@ -118,7 +103,6 @@ class LæremidlerBeregningService(
             behandling = behandling,
             avkortetBeregningsresultat = avkortetBeregningsresultat,
             avkortetVedtaksperioder = avkortetVedtaksperioder,
-            brukVedtaksperioderForBeregning = brukVedtaksperioderForBeregning,
         )
     }
 
@@ -126,7 +110,6 @@ class LæremidlerBeregningService(
         behandling: Saksbehandling,
         avkortetBeregningsresultat: AvkortResult<BeregningsresultatForMåned>,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
-        brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): BeregningsresultatLæremidler {
         val perioderSomBeholdes = avkortetBeregningsresultat.perioder.dropLast(1)
         val periodeTilReberegning = avkortetBeregningsresultat.perioder.last()
@@ -136,7 +119,6 @@ class LæremidlerBeregningService(
                 behandling = behandling,
                 avkortetVedtaksperioder = avkortetVedtaksperioder,
                 beregningsresultatTilReberegning = periodeTilReberegning,
-                brukVedtaksperioderForBeregning = brukVedtaksperioderForBeregning,
             )
 
         val nyePerioder =
@@ -153,14 +135,8 @@ class LæremidlerBeregningService(
         behandling: Saksbehandling,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
         beregningsresultatTilReberegning: BeregningsresultatForMåned,
-        brukVedtaksperioderForBeregning: BrukVedtaksperioderForBeregning,
     ): List<BeregningsresultatForMåned> {
-        val vedtaksperioderForGrunnlag =
-            hentVedtaksperioderForBergningsgrunnlag(
-                behandling.id,
-                avkortetVedtaksperioder,
-                brukVedtaksperioderForBeregning,
-            )
+        val vedtaksperioderForGrunnlag = avkortetVedtaksperioder.tilBeregningsgrunnlag()
         val vedtaksperioderSomOmregnes =
             vedtaksperioderInnenforLøpendeMåned(vedtaksperioderForGrunnlag, beregningsresultatTilReberegning)
 
@@ -237,44 +213,16 @@ class LæremidlerBeregningService(
             .findByIdOrThrow(behandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørLæremidler>()
 
-    private fun hentVedtaksperioderForBergningsgrunnlag(
-        behandlingId: BehandlingId,
-        vedtaksperioder: List<Vedtaksperiode>,
-        brukVedtaksperioder: BrukVedtaksperioderForBeregning,
-    ): List<VedtaksperiodeBeregningsgrunnlagLæremidler> {
-        if (!brukVedtaksperioder.bruk) {
-            val stønadsperioder =
-                stønadsperiodeRepository
-                    .findAllByBehandlingId(behandlingId)
-                    .tilSortertStønadsperiodeBeregningsgrunnlag()
-                    .slåSammenSammenhengende()
-            // TODO skal kontrollere inneholder + målgruppe + aktivitet når det er lagt til
-            return vedtaksperioder
-                .map { vedtaksperiode ->
-                    val filtrerteStønadsperioder = stønadsperioder.filter { it.inneholder(vedtaksperiode) }
-                    brukerfeilHvisIkke(filtrerteStønadsperioder.size == 1) {
-                        "Vedtaksperiode er ikke innenfor en periode med overlapp mellom aktivitet og målgruppe."
-                    }
-                    val stønadsperiode = filtrerteStønadsperioder.single()
-                    VedtaksperiodeBeregningsgrunnlagLæremidler(
-                        fom = vedtaksperiode.fom,
-                        tom = vedtaksperiode.tom,
-                        målgruppe = stønadsperiode.målgruppe,
-                        aktivitet = stønadsperiode.aktivitet,
-                    )
-                }
-        } else {
-            return vedtaksperioder
-                .map {
-                    VedtaksperiodeBeregningsgrunnlagLæremidler(
-                        fom = it.fom,
-                        tom = it.tom,
-                        målgruppe = it.målgruppe!!,
-                        aktivitet = it.aktivitet!!,
-                    )
-                }.sorted()
-        }
-    }
+    private fun List<Vedtaksperiode>.tilBeregningsgrunnlag() =
+        this
+            .map {
+                VedtaksperiodeBeregningsgrunnlagLæremidler(
+                    fom = it.fom,
+                    tom = it.tom,
+                    målgruppe = it.målgruppe!!,
+                    aktivitet = it.aktivitet!!,
+                )
+            }.sorted()
 
     private fun finnAktiviteter(behandlingId: BehandlingId): List<AktivitetLæremidlerBeregningGrunnlag> =
         vilkårperiodeRepository

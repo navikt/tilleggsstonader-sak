@@ -1,11 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
-import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -70,7 +67,6 @@ class LæremidlerBeregnYtelseStegTest(
 
     @BeforeEach
     fun setUp() {
-        every { unleashService.isEnabled(Toggle.LÆREMIDLER_VEDTAKSPERIODER_V2) } returns false
         testoppsettService.lagreFagsak(fagsak)
         testoppsettService.lagre(behandling, opprettGrunnlagsdata = false)
     }
@@ -78,7 +74,6 @@ class LæremidlerBeregnYtelseStegTest(
     @AfterEach
     override fun tearDown() {
         super.tearDown()
-        resetMock(unleashService)
     }
 
     @Nested
@@ -176,7 +171,7 @@ class LæremidlerBeregnYtelseStegTest(
         val datoUtbetalingDel1 = LocalDate.of(2025, 8, 15)
         val datoUtbetalingDel2 = LocalDate.of(2026, 1, 1)
 
-        lagreAktivitetOgStønadsperiode(fom, tom)
+        lagreMålgruppeOgAktivitet(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
         val vedtaksperiode = vedtaksperiodeDto(id = UUID.randomUUID(), fom = fom, tom = tom)
@@ -214,7 +209,7 @@ class LæremidlerBeregnYtelseStegTest(
         val tom = LocalDate.of(2025, 4, 30)
         val mandagEtterFom = LocalDate.of(2024, 12, 2)
 
-        lagreAktivitetOgStønadsperiode(fom, tom)
+        lagreMålgruppeOgAktivitet(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
         val vedtaksperiode =
@@ -278,19 +273,19 @@ class LæremidlerBeregnYtelseStegTest(
             vedtaksperiodeDto(id = UUID.randomUUID(), fom = førsteJan, tom = sisteFeb)
         assertThatThrownBy {
             steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
-        }.hasMessageMatching("Vedtaksperiode er ikke innenfor en periode med overlapp mellom aktivitet og målgruppe.")
+        }.hasMessageMatching("Finner ingen perioder hvor vilkår for NEDSATT_ARBEIDSEVNE er oppfylt")
     }
 
     @Test
     fun `skal ikke lagre vedtak hvis revurdering ikke har forrige behandling`() {
     }
 
-    fun lagreAktivitetOgStønadsperiode(
+    fun lagreMålgruppeOgAktivitet(
         fom: LocalDate,
         tom: LocalDate,
     ) {
-        val stønadsperiode =
-            stønadsperiode(
+        val målgruppe =
+            målgruppe(
                 behandlingId = behandling.id,
                 fom = fom,
                 tom = tom,
@@ -302,7 +297,7 @@ class LæremidlerBeregnYtelseStegTest(
                 tom = tom,
                 faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(),
             )
-        stønadsperiodeRepository.insert(stønadsperiode)
         vilkårperiodeRepository.insert(aktivitet)
+        vilkårperiodeRepository.insert(målgruppe)
     }
 }

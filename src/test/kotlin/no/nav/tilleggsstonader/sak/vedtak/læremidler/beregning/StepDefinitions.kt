@@ -82,7 +82,6 @@ class StepDefinitions {
     val læremidlerBeregningService =
         LæremidlerBeregningService(
             vilkårperiodeRepository = vilkårperiodeRepository,
-            stønadsperiodeRepository = stønadsperiodeRepository,
             læremidlerVedtaksperiodeValideringService = læremidlerVedtaksperiodeValideringService,
             vedtakRepository = VedtakRepositoryFake(),
         )
@@ -138,23 +137,6 @@ class StepDefinitions {
                 læremidlerBeregningService.beregn(
                     behandling,
                     vedtaksPerioder,
-                    brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(false),
-                )
-        } catch (e: Exception) {
-            beregningException = e
-        }
-    }
-
-    @Når("beregner stønad for læremidler uten overlappsperiode")
-    fun `beregner stønad for læremidler uten overlappsperiode`() {
-        val behandling = saksbehandling(behandling = behandling(id = behandlingId))
-        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
-        try {
-            resultat =
-                læremidlerBeregningService.beregn(
-                    behandling,
-                    vedtaksPerioder,
-                    brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(true),
                 )
         } catch (e: Exception) {
             beregningException = e
@@ -180,21 +162,6 @@ class StepDefinitions {
             læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
                 vedtaksperioder = vedtaksPerioder,
                 behandlingId = behandlingId,
-                brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(false),
-            )
-        } catch (feil: Exception) {
-            valideringException = feil
-        }
-    }
-
-    @Når("validerer vedtaksperiode for læremidler uten overlappsperiode")
-    fun `validerer vedtaksperiode for læremidler uten overlappsperiode`() {
-        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
-        try {
-            læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
-                vedtaksperioder = vedtaksPerioder,
-                behandlingId = behandlingId,
-                brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(true),
             )
         } catch (feil: Exception) {
             valideringException = feil
