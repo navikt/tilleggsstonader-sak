@@ -14,7 +14,7 @@ sealed interface FaktaOgVurdering : FaktaOgVurderingJson {
     val vurderinger: Vurderinger
 
     fun utledResultat(): ResultatVilkårperiode {
-        if (type.vilkårperiodeType.girIkkeRettPåStønadsperiode()) {
+        if (type.vilkårperiodeType.girIkkeRettPåVedtaksperiode()) {
             return ResultatVilkårperiode.IKKE_OPPFYLT
         }
         return this.vurderinger.resultatVurderinger()

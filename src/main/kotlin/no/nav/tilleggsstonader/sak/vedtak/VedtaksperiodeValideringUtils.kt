@@ -39,7 +39,7 @@ object VedtaksperiodeValideringUtils {
     ) {
         val perioderSomIkkeGirRett =
             (vilkårperioder.målgrupper + vilkårperioder.aktiviteter)
-                .filter { it.type.girIkkeRettPåStønadsperiode() && it.resultat != ResultatVilkårperiode.SLETTET }
+                .filter { it.type.girIkkeRettPåVedtaksperiode() && it.resultat != ResultatVilkårperiode.SLETTET }
         vedtaksperioder.forEach { validerIkkeOverlapperMedPeriodeSomIkkeGirRettPåStønad(perioderSomIkkeGirRett, it) }
     }
 

@@ -214,7 +214,7 @@ enum class ResultatVilkårperiode {
 sealed interface VilkårperiodeType {
     fun tilDbType(): String
 
-    fun girIkkeRettPåStønadsperiode(): Boolean
+    fun girIkkeRettPåVedtaksperiode(): Boolean
 }
 
 val vilkårperiodetyper: Map<String, VilkårperiodeType> =

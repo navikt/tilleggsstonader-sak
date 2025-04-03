@@ -89,7 +89,7 @@ object StønadsperiodeValidering {
     ) {
         val perioderSomIkkeGirRett =
             (vilkårperioder.målgrupper + vilkårperioder.aktiviteter)
-                .filter { it.type.girIkkeRettPåStønadsperiode() && it.resultat != ResultatVilkårperiode.SLETTET }
+                .filter { it.type.girIkkeRettPåVedtaksperiode() && it.resultat != ResultatVilkårperiode.SLETTET }
         stønadsperioder.forEach { validerIkkeOverlapperMedPeriodeSomIkkeGirRettPåStønad(perioderSomIkkeGirRett, it) }
     }
 
