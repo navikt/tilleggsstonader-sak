@@ -18,7 +18,12 @@
       "value" : "AF",
       "label" : "Afghanistan"
     },
-    "harPengestotteAnnetLand" : "ja",
+    "harPengestotteAnnetLand" : {
+      "sykepenger" : true,
+      "pensjon" : false,
+      "annenPengestotte" : true,
+      "mottarIkkePengestotte" : false
+    },,
     "pengestotteAnnetLand" : {
       "value" : "AF",
       "label" : "Afghanistan"

@@ -12,11 +12,13 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Arbei
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArsakOppholdUtenforNorgeType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.BoligEllerOvernatting
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.DelerBoutgifterType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HarPengestotteAnnetLandType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HarUtgifterTilBoligToStederType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HovedytelseType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.JaNeiType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Samling
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeUtgifterType
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ArbeidOgOpphold
@@ -95,7 +97,7 @@ object SøknadskjemaBoutgifterMapper {
             ArbeidOgOpphold(
                 jobberIAnnetLand = mapJaNei(it.jobberIAnnetLand),
                 jobbAnnetLand = it.jobbAnnetLand?.value,
-                harPengestøtteAnnetLand = null, // = mapJaNei(it.harPengestotteAnnetLand), TODO endre til checkbox?
+                harPengestøtteAnnetLand = mapPengestøtteAnnetLand(it.harPengestotteAnnetLand),
                 pengestøtteAnnetLand = it.pengestotteAnnetLand?.label,
                 harOppholdUtenforNorgeSiste12mnd = mapJaNei(it.harOppholdUtenforNorgeSiste12mnd),
                 oppholdUtenforNorgeSiste12mnd = mapOpphold(it.oppholdUtenforNorgeSiste12mnd),
@@ -103,6 +105,18 @@ object SøknadskjemaBoutgifterMapper {
                 oppholdUtenforNorgeNeste12mnd = mapOpphold(it.oppholdUtenforNorgeNeste12mnd),
             )
         }
+
+    private fun mapPengestøtteAnnetLand(pengestøtteAnnetLand: Map<HarPengestotteAnnetLandType, Boolean>): List<TypePengestøtte> =
+        pengestøtteAnnetLand
+            .filter { it.value }
+            .map {
+                when (it.key) {
+                    HarPengestotteAnnetLandType.sykepenger -> TypePengestøtte.SYKEPENGER
+                    HarPengestotteAnnetLandType.pensjon -> TypePengestøtte.PENSJON
+                    HarPengestotteAnnetLandType.annenPengestotte -> TypePengestøtte.ANNEN_PENGESTØTTE
+                    HarPengestotteAnnetLandType.mottarIkkePengestotte -> TypePengestøtte.MOTTAR_IKKE
+                }
+            }
 
     private fun mapOpphold(opphold: OppholdUtenforNorgeKontrakt?): List<OppholdUtenforNorge> =
         opphold?.let {

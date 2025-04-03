@@ -5,7 +5,12 @@
     "arbeidOgOpphold" : {
       "jobberIAnnetLand" : "JA",
       "jobbAnnetLand" : "AF",
-      "harPengestøtteAnnetLand" : null,
+      "harPengestotteAnnetLand" : {
+        "sykepenger" : true,
+        "pensjon" : true,
+        "annenPengestotte" : true,
+        "mottarIkkePengestotte" : false
+      },
       "pengestøtteAnnetLand" : "Afghanistan",
       "harOppholdUtenforNorgeSiste12mnd" : "JA",
       "oppholdUtenforNorgeSiste12mnd" : [ {
