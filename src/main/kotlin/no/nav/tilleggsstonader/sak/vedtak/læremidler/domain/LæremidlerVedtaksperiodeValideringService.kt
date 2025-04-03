@@ -31,7 +31,7 @@ class LæremidlerVedtaksperiodeValideringService(
         brukerfeilHvis(vedtaksperioder.isEmpty()) { "Kan ikke innvilge når det ikke finnes noen vedtaksperioder." }
         validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
 
-        validerVedtaksperioderMotStønadsperioder(behandlingId, vedtaksperioder)
+        validerVedtaksperioderMotVilkårperioder(behandlingId, vedtaksperioder)
 
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtaksperioderForrigeBehandling = hentForrigeVedtaksperioder(behandling)
@@ -43,7 +43,7 @@ class LæremidlerVedtaksperiodeValideringService(
         )
     }
 
-    private fun validerVedtaksperioderMotStønadsperioder(
+    private fun validerVedtaksperioderMotVilkårperioder(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
     ) {
