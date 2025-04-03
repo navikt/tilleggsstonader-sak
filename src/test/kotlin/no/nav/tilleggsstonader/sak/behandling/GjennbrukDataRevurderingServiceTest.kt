@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThat
@@ -21,7 +20,6 @@ class GjennbrukDataRevurderingServiceTest {
     val behandlingService = mockk<BehandlingService>()
     val barnService = mockk<BarnService>()
     val vilkårperiodeService = mockk<VilkårperiodeService>()
-    val stønadsperiodeService = mockk<StønadsperiodeService>()
     val vilkårService = mockk<VilkårService>()
 
     val service =
@@ -29,7 +27,6 @@ class GjennbrukDataRevurderingServiceTest {
             behandlingService = behandlingService,
             barnService = barnService,
             vilkårperiodeService = vilkårperiodeService,
-            stønadsperiodeService = stønadsperiodeService,
             vilkårService = vilkårService,
         )
 

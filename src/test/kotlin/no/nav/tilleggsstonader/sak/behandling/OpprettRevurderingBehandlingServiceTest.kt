@@ -12,9 +12,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
-import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -38,9 +36,6 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårperiodeRepository: VilkårperiodeRepository
-
-    @Autowired
-    lateinit var stønadsperiodeRepository: StønadsperiodeRepository
 
     @Autowired
     lateinit var vilkårRepository: VilkårRepository
@@ -177,14 +172,6 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 ),
             )
 
-            stønadsperiodeRepository.insert(
-                stønadsperiode(
-                    behandlingId = tidligereBehandling!!.id,
-                    fom = fom,
-                    tom = tom,
-                ),
-            )
-
             vilkårRepository.insertAll(
                 barn.map {
                     vilkår(
@@ -219,7 +206,6 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 service.opprettBehandling(opprettBehandlingDto(fagsakId = tidligereBehandling!!.fagsakId))
 
             assertThat(vilkårperiodeRepository.findByBehandlingId(revurderingId)).hasSize(2)
-            assertThat(stønadsperiodeRepository.findAllByBehandlingId(revurderingId)).hasSize(1)
             assertThat(vilkårRepository.findByBehandlingId(revurderingId)).hasSize(1)
         }
     }

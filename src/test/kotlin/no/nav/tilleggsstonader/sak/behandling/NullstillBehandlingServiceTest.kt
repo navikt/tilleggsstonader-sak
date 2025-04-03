@@ -15,14 +15,10 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vedtaksbrev
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -42,7 +38,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
-import java.time.LocalDate
 
 class NullstillBehandlingServiceTest : IntegrationTest() {
     @Autowired
@@ -56,9 +51,6 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService
-
-    @Autowired
-    lateinit var stønadsperiodeRepository: StønadsperiodeRepository
 
     @Autowired
     lateinit var vilkårRepository: VilkårRepository
@@ -95,23 +87,21 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
 
     @Test
     fun `skal fjerne alt dersom forrigeBehandling ikke har noe`() {
-        opprettVilkårperiodeOgStønadsperiode(revurdering.id)
+        opprettVilkårperiode(revurdering.id)
 
         nullstillBehandlingService.nullstillBehandling(revurdering.id)
 
         assertThat(vilkårperiodeRepository.findByBehandlingId(revurdering.id)).isEmpty()
-        assertThat(stønadsperiodeRepository.findAllByBehandlingId(revurdering.id)).isEmpty()
         assertThat(vilkårRepository.findByBehandlingId(revurdering.id)).isEmpty()
     }
 
     @Test
     fun `skal legge inn data fra forrige behandling på nytt`() {
         opprettBarn()
-        opprettVilkårperiodeOgStønadsperiode(behandling.id)
+        opprettVilkårperiode(behandling.id)
         opprettVilkår(behandling.id, barnId = behandlingBarn1.id)
 
         val vilkårperiode = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
-        val stønadsperiode = stønadsperiodeRepository.findAllByBehandlingId(behandling.id).single()
         val vilkår = vilkårRepository.findByBehandlingId(behandling.id).single()
 
         assertIngenDataPåRevurdering()
@@ -119,7 +109,6 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
         nullstillBehandlingService.nullstillBehandling(revurdering.id)
 
         assertVilkårPeriodeErGjenbrukt(vilkårperiode)
-        assertStønadsperiodeErGjenbrukt(stønadsperiode)
         assertVilkårErGjenbrukt(vilkår)
     }
 
@@ -231,24 +220,6 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
         }
     }
 
-    private fun assertStønadsperiodeErGjenbrukt(stønadsperiode: Stønadsperiode) {
-        with(stønadsperiodeRepository.findAllByBehandlingId(revurdering.id).single()) {
-            // TODO "nullstiller" felter fordi usingRecursiveComparison ikke virker som forventet
-            val oppdatertVilkårMedNullstilteFelter =
-                this.copy(
-                    id = stønadsperiode.id,
-                    sporbar = stønadsperiode.sporbar,
-                    behandlingId = stønadsperiode.behandlingId,
-                    status = stønadsperiode.status,
-                )
-            assertThat(oppdatertVilkårMedNullstilteFelter)
-                .usingRecursiveComparison()
-                .ignoringFields("id", "sporbar", "behandlingId", "status")
-                .isEqualTo(stønadsperiode)
-            assertThat(this.status).isEqualTo(StønadsperiodeStatus.UENDRET)
-        }
-    }
-
     private fun assertVilkårErGjenbrukt(vilkår: Vilkår) {
         with(vilkårRepository.findByBehandlingId(revurdering.id).single()) {
             // TODO "nullstiller" felter fordi usingRecursiveComparison ikke virker som forventet
@@ -273,7 +244,6 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
 
     private fun assertIngenDataPåRevurdering() {
         assertThat(vilkårperiodeRepository.findByBehandlingId(revurdering.id)).isEmpty()
-        assertThat(stønadsperiodeRepository.findAllByBehandlingId(revurdering.id)).isEmpty()
         assertThat(vilkårRepository.findByBehandlingId(revurdering.id)).isEmpty()
     }
 
@@ -282,15 +252,8 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
         barnService.opprettBarn(listOf(revurderingBarn1, revurderingBarn2))
     }
 
-    private fun opprettVilkårperiodeOgStønadsperiode(behandlingId: BehandlingId) {
+    private fun opprettVilkårperiode(behandlingId: BehandlingId) {
         vilkårperiodeRepository.insert(målgruppe(behandlingId = behandlingId))
-        stønadsperiodeRepository.insert(
-            stønadsperiode(
-                behandlingId = behandlingId,
-                fom = LocalDate.now(),
-                tom = LocalDate.now(),
-            ),
-        )
     }
 
     private fun opprettVilkår(
