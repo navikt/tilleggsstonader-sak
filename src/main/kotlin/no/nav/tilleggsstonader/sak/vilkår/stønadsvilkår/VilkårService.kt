@@ -55,7 +55,6 @@ class VilkårService(
 
         val oppdatertVilkår = flettVilkårOgVurderResultat(vilkår, svarPåVilkårDto)
         validerEndrePeriodeRevurdering(behandling, vilkår, oppdatertVilkår)
-        validerIngenUtgiftPåNullvedtak(svarPåVilkårDto)
 
         return vilkårRepository.update(oppdatertVilkår)
     }
@@ -81,7 +80,6 @@ class VilkårService(
             )
         val oppdatertVilkår = flettVilkårOgVurderResultat(nyttVilkår, opprettVilkårDto)
         validerNyPeriodeRevurdering(behandling, oppdatertVilkår)
-        validerIngenUtgiftPåNullvedtak(opprettVilkårDto)
 
         return vilkårRepository.insert(oppdatertVilkår)
     }
@@ -193,12 +191,6 @@ class VilkårService(
         behandling.status.validerKanBehandlingRedigeres()
     }
 
-    private fun validerIngenUtgiftPåNullvedtak(lagreVilkårDto: LagreVilkårDto) {
-        feilHvis(lagreVilkårDto.erNullvedtak == true && lagreVilkårDto.utgift !== null) {
-            "Kan ikke ha utgift på nullvedtak"
-        }
-    }
-
     /**
      * Tilgangskontroll sjekker att man har tilgang til behandlingId som blir sendt inn, men det er mulig å sende inn
      * en annen behandlingId enn den som er på vilkåret
@@ -283,5 +275,17 @@ class VilkårService(
     fun hentBoutgiftVilkår(behandlingId: BehandlingId): List<Vilkår> =
         vilkårRepository
             .findByBehandlingId(behandlingId)
-            .filter { it.type == VilkårType.MIDLERTIDIG_OVERNATTING } // TODO: Skal også hente faste utgifter
+            .also { it.kastFeilHvisTypeIkkeGjelderBoutgifter() }
+}
+
+private fun List<Vilkår>.kastFeilHvisTypeIkkeGjelderBoutgifter() {
+    feilHvis(
+        none {
+            it.type == VilkårType.UTGIFTER_OVERNATTING ||
+                it.type == VilkårType.LØPENDE_UTGIFTER_EN_BOLIG ||
+                it.type == VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER
+        },
+    ) {
+        "Forventet at vilkåret var av type boutgift, fikk i stedet ${map { it.type }}"
+    }
 }

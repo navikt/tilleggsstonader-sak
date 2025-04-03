@@ -7,8 +7,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.ForeslåStønadsperiode.finnStønadsperioder
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeFraVilkårperioder.foreslåVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.forslag.ForslagVedtaksperiodeFraVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
@@ -20,7 +20,7 @@ object ForeslåVedtaksperiode {
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
     ): List<Vedtaksperiode> {
-        val stønadsperiode = finnStønadsperioder(vilkårperioder).single()
+        val forslagVedtaksperiode = foreslåVedtaksperioder(vilkårperioder).single()
         val oppfylteVilkår = vilkår.finnOppfylte()
 
         brukerfeilHvis(oppfylteVilkår.isEmpty()) {
@@ -34,8 +34,7 @@ object ForeslåVedtaksperiode {
             "Foreløpig klarer vi bare å foreslå perioder når vilkår har ett sammenhengende overlapp. Du må i stedet legge inn periodene manuelt."
         }
 
-        val vedtaksperiode =
-            finnOverlapp(stønadsperiode, sammenslåtteVilkår.first())
+        val vedtaksperiode = finnOverlapp(forslagVedtaksperiode, sammenslåtteVilkår.first())
 
         return listOf(vedtaksperiode)
     }
@@ -52,16 +51,16 @@ object ForeslåVedtaksperiode {
         }
 
     private fun finnOverlapp(
-        stønadsperiode: StønadsperiodeDto,
+        forslagVedtaksperiode: ForslagVedtaksperiodeFraVilkårperioder,
         vilkår: Periode<LocalDate>,
     ): Vedtaksperiode =
-        if (stønadsperiode.overlapper(vilkår)) {
+        if (forslagVedtaksperiode.overlapper(vilkår)) {
             Vedtaksperiode(
                 id = UUID.randomUUID(),
-                fom = maxOf(stønadsperiode.fom, vilkår.fom),
-                tom = minOf(stønadsperiode.tom, vilkår.tom),
-                målgruppe = stønadsperiode.målgruppe,
-                aktivitet = stønadsperiode.aktivitet,
+                fom = maxOf(forslagVedtaksperiode.fom, vilkår.fom),
+                tom = minOf(forslagVedtaksperiode.tom, vilkår.tom),
+                målgruppe = forslagVedtaksperiode.målgruppe,
+                aktivitet = forslagVedtaksperiode.aktivitet,
             )
         } else {
             brukerfeil("Fant ingen gyldig overlapp mellom gitte aktiviteter, målgrupper og vilkår")

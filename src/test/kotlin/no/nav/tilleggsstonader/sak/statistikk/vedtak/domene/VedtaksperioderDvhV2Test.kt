@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.AktivitetTypeDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.MålgruppeTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2.Companion.finnFødselsnumre
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn1
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn2
@@ -39,7 +38,6 @@ class VedtaksperioderDvhV2Test {
                 VedtaksperioderDvhV2(
                     fom = fom,
                     tom = tom,
-                    målgruppe = MålgruppeTypeDvh.AAP,
                     lovverketsMålgruppe = LovverketsMålgruppeDvh.NEDSATT_ARBEIDSEVNE,
                     aktivitet = AktivitetTypeDvh.TILTAK,
                     antallBarn = 1,
@@ -65,7 +63,6 @@ class VedtaksperioderDvhV2Test {
                         VedtaksperioderDvhV2(
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 1, 7),
-                            målgruppe = MålgruppeTypeDvh.AAP,
                             aktivitet = AktivitetTypeDvh.TILTAK,
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.NEDSATT_ARBEIDSEVNE,
                             studienivå = StudienivåDvh.HØYERE_UTDANNING,

@@ -4,8 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
 import no.nav.tilleggsstonader.sak.util.lørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningsgrunnlagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import java.time.LocalDate
 
 object LæremidlerVedtaksperiodeUtil {
@@ -13,7 +13,7 @@ object LæremidlerVedtaksperiodeUtil {
      * Vedtaksperiode deles i ulike år då nytt år betyr ny termine og ikke skal utbetales direkte
      * For å innvilge høst og vår i 2 ulike perioder og der vårterminen får en ny sats
      */
-    fun List<Vedtaksperiode>.splitVedtaksperiodePerÅr(): List<VedtaksperiodeInnenforÅr> =
+    fun List<VedtaksperiodeBeregningsgrunnlagLæremidler>.splitVedtaksperiodePerÅr(): List<VedtaksperiodeInnenforÅr> =
         this
             .map { it.splitPerÅr { fom, tom -> VedtaksperiodeInnenforÅr(fom, tom) } }
             .flatten()

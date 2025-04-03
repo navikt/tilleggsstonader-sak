@@ -5,15 +5,15 @@ import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.kontrakter.periode.mergeOverlappende
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.lørdagEllerSøndag
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningsgrunnlagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
 /**
@@ -31,7 +31,7 @@ import java.time.LocalDate
 data class UtbetalingPeriode(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val målgruppe: MålgruppeType,
+    val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
     val studienivå: Studienivå,
     val prosent: Int,
@@ -91,7 +91,7 @@ data class LøpendeMåned(
      * Finner hvilken stønadsperiode og aktivitet som skal brukes for den aktuelle utbetalingsperioden
      */
     fun tilUtbetalingPeriode(
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
+        vedtaksperioderBeregningsgrunnlag: List<VedtaksperiodeBeregningsgrunnlagLæremidler>,
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
     ): UtbetalingPeriode {
         require(vedtaksperioder.isNotEmpty()) {
@@ -100,17 +100,17 @@ data class LøpendeMåned(
         val sorterteMålgruppeOgAktivitet =
             vedtaksperioder
                 .flatMap { vedtaksperiode ->
-                    vedtaksperiode.finnRelevantMålgruppeOgAktivitet(stønadsperioder, aktiviteter)
+                    vedtaksperiode.finnRelevantMålgruppeOgAktivitet(vedtaksperioderBeregningsgrunnlag, aktiviteter)
                 }.sorted()
 
         return UtbetalingPeriode(this, sorterteMålgruppeOgAktivitet.first())
     }
 
     private fun VedtaksperiodeInnenforLøpendeMåned.finnRelevantMålgruppeOgAktivitet(
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
+        vedtaksperioderBeregningsgrunnlag: List<VedtaksperiodeBeregningsgrunnlagLæremidler>,
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
     ) = this
-        .finnSnittAvRelevanteStønadsperioder(stønadsperioder)
+        .finnSnittAvRelevanteVedtaksperioder(vedtaksperioderBeregningsgrunnlag)
         .flatMap { stønadsperiode ->
             this
                 .finnSnittAvRelevanteAktiviteter(aktiviteter, stønadsperiode)
@@ -119,12 +119,12 @@ data class LøpendeMåned(
 
     private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteAktiviteter(
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
-        stønadsperiode: StønadsperiodeBeregningsgrunnlag,
+        vedtaksperioderBeregningsgrunnlag: VedtaksperiodeBeregningsgrunnlagLæremidler,
     ): List<AktivitetLæremidlerBeregningGrunnlag> {
         val relevanteAktiviteter =
             aktiviteter
-                .filter { it.type == stønadsperiode.aktivitet }
-                .mapNotNull { it.beregnSnitt(stønadsperiode) }
+                .filter { it.type == vedtaksperioderBeregningsgrunnlag.aktivitet }
+                .mapNotNull { it.beregnSnitt(vedtaksperioderBeregningsgrunnlag) }
                 .mapNotNull { it.beregnSnitt(this) }
                 .mergeOverlappende(
                     erLike = { aktivitet1, aktivitet2 -> aktivitet1.studienivå == aktivitet2.studienivå },
@@ -134,7 +134,7 @@ data class LøpendeMåned(
                 )
 
         brukerfeilHvis(relevanteAktiviteter.isEmpty()) {
-            "Det finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som varer i hele perioden ${this.formatertPeriodeNorskFormat()}}"
+            "Det finnes ingen aktiviteter av type ${vedtaksperioderBeregningsgrunnlag.aktivitet} som varer i hele perioden ${this.formatertPeriodeNorskFormat()}}"
         }
 
         feilHvis(relevanteAktiviteter.overlapper()) {
@@ -146,23 +146,21 @@ data class LøpendeMåned(
         return relevanteAktiviteter
     }
 
-    private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteStønadsperioder(
-        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
-    ): List<StønadsperiodeBeregningsgrunnlag> {
-        val relevanteStønadsperioderForPeriode =
-            stønadsperioder
-                .mapNotNull { it.beregnSnitt(this) }
+    private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteVedtaksperioder(
+        stønadsperioder: List<VedtaksperiodeBeregningsgrunnlagLæremidler>,
+    ): List<VedtaksperiodeBeregningsgrunnlagLæremidler> {
+        val relevanteVedtaksperForPeriode = stønadsperioder.mapNotNull { it.beregnSnitt(this) }
 
-        feilHvis(relevanteStønadsperioderForPeriode.isEmpty()) {
+        feilHvis(relevanteVedtaksperForPeriode.isEmpty()) {
             "Det finnes ingen periode med overlapp mellom målgruppe og aktivitet for perioden ${this.formatertPeriodeNorskFormat()}"
         }
 
-        return relevanteStønadsperioderForPeriode
+        return relevanteVedtaksperForPeriode
     }
 }
 
 data class MålgruppeOgAktivitet(
-    val målgruppe: MålgruppeType,
+    val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetLæremidlerBeregningGrunnlag,
 ) : Comparable<MålgruppeOgAktivitet> {
     override fun compareTo(other: MålgruppeOgAktivitet): Int = COMPARE_BY.compare(this, other)

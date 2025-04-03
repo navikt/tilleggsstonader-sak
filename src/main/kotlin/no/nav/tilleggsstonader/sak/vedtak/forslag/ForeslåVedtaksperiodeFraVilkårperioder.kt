@@ -1,21 +1,31 @@
-package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
+package no.nav.tilleggsstonader.sak.vedtak.forslag
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import java.time.LocalDate
 
-object ForeslåStønadsperiode {
-    fun finnStønadsperioder(vilkårperioder: Vilkårperioder): List<StønadsperiodeDto> {
+object ForeslåVedtaksperiodeFraVilkårperioder {
+    fun foreslåVedtaksperioder(vilkårperioder: Vilkårperioder): List<ForslagVedtaksperiodeFraVilkårperioder> =
+        foreslåVedtaksperioder(vilkårperioder) { it }
+
+    fun foreslåVedtaksperioderFaktiskMålgruppe(
+        vilkårperioder: Vilkårperioder,
+    ): List<ForslagVedtaksperiodeFraVilkårperioderFaktiskMålgruppe> = foreslåVedtaksperioder(vilkårperioder) { it.faktiskMålgruppe() }
+
+    private inline fun <reified T : Enum<T>> foreslåVedtaksperioder(
+        vilkårperioder: Vilkårperioder,
+        mapMålgruppe: (MålgruppeType) -> T,
+    ): List<ForslagVedtaksperiodeFraVilkårperioderGenerisk<T>> {
         val oppfylteVilkårsperioder = filtrerOppfylteVilkårsperioder(vilkårperioder)
 
         val filtrerteVilkårperioder = filterKombinasjonerAvMålgruppeOgAktivitet(oppfylteVilkårsperioder)
@@ -25,9 +35,9 @@ object ForeslåStønadsperiode {
         }
 
         val sammenslåtteVilkårsperioder =
-            Vilkårperioder(
-                aktiviteter = slåSammenVilkårsperioderSomErLikeEtterHverandre(filtrerteVilkårperioder.aktiviteter),
-                målgrupper = slåSammenVilkårsperioderSomErLikeEtterHverandre(filtrerteVilkårperioder.målgrupper),
+            Sammenslåtte<T>(
+                aktiviteter = mergeSammenhengende(filtrerteVilkårperioder.aktiviteter.forenklet()),
+                målgrupper = mergeSammenhengende(filtrerteVilkårperioder.målgrupper.forenklet(mapMålgruppe)),
             )
 
         brukerfeilHvis(
@@ -36,19 +46,18 @@ object ForeslåStønadsperiode {
             "Foreløpig klarer vi bare å foreslå perioder når målgruppe og aktivitet har ett sammenhengende overlapp. Du må i stedet legge inn periodene manuelt."
         }
 
-        val stønadsperiode =
+        val overlapp =
             finnOverlapp(
                 sammenslåtteVilkårsperioder.aktiviteter.first(),
                 sammenslåtteVilkårsperioder.målgrupper.first(),
             )
 
         return listOf(
-            StønadsperiodeDto(
-                fom = stønadsperiode.fom,
-                tom = stønadsperiode.tom,
-                målgruppe = sammenslåtteVilkårsperioder.målgrupper.first().type as MålgruppeType,
-                aktivitet = sammenslåtteVilkårsperioder.aktiviteter.first().type as AktivitetType,
-                status = null,
+            ForslagVedtaksperiodeFraVilkårperioderGenerisk<T>(
+                fom = overlapp.fom,
+                tom = overlapp.tom,
+                målgruppe = sammenslåtteVilkårsperioder.målgrupper.first().type,
+                aktivitet = sammenslåtteVilkårsperioder.aktiviteter.first().type,
             ),
         )
     }
@@ -74,23 +83,17 @@ object ForeslåStønadsperiode {
     }
 
     private fun filtrerOppfylteVilkårsperioder(vilkårperioder: Vilkårperioder): Vilkårperioder {
-        val oppfylteAktiviter =
-            vilkårperioder.aktiviteter.filter {
-                it.resultat == ResultatVilkårperiode.OPPFYLT
-            }
-        val oppfylteMålgrupper =
-            vilkårperioder.målgrupper.filter {
-                it.resultat == ResultatVilkårperiode.OPPFYLT
-            }
+        val oppfylteAktiviter = vilkårperioder.aktiviteter.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
+        val oppfylteMålgrupper = vilkårperioder.målgrupper.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
         return Vilkårperioder(aktiviteter = oppfylteAktiviter, målgrupper = oppfylteMålgrupper)
     }
 
     private fun finnOverlapp(
         aktivitet: Periode<LocalDate>,
         målgruppe: Periode<LocalDate>,
-    ): Stønadsperiode =
+    ): Datoperiode =
         if (aktivitet.overlapper(målgruppe)) {
-            Stønadsperiode(
+            Datoperiode(
                 fom = maxOf(aktivitet.fom, målgruppe.fom),
                 tom = minOf(aktivitet.tom, målgruppe.tom),
             )
@@ -98,9 +101,7 @@ object ForeslåStønadsperiode {
             brukerfeil("Fant ingen gyldig overlapp mellom gitte aktiviteter og målgrupper")
         }
 
-    private fun <T : FaktaOgVurdering> slåSammenVilkårsperioderSomErLikeEtterHverandre(
-        vilkårperioder: List<GeneriskVilkårperiode<T>>,
-    ): List<GeneriskVilkårperiode<T>> =
+    private fun <T : Enum<T>> mergeSammenhengende(vilkårperioder: List<ForenkletVilkårperiode<T>>): List<ForenkletVilkårperiode<T>> =
         vilkårperioder
             .sorted()
             .mergeSammenhengende(
@@ -108,8 +109,30 @@ object ForeslåStønadsperiode {
                 merge = { v1, v2 -> v1.copy(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
             )
 
-    private data class Stønadsperiode(
-        val fom: LocalDate,
-        val tom: LocalDate,
+    private fun List<VilkårperiodeAktivitet>.forenklet() =
+        this.map { ForenkletVilkårperiode<AktivitetType>(fom = it.fom, tom = it.tom, type = it.type as AktivitetType) }
+
+    private inline fun <reified T : Enum<T>> List<VilkårperiodeMålgruppe>.forenklet(mapMålgruppe: (MålgruppeType) -> T) =
+        this.map {
+            ForenkletVilkårperiode<T>(
+                fom = it.fom,
+                tom = it.tom,
+                type = mapMålgruppe(it.type as MålgruppeType),
+            )
+        }
+
+    private data class Sammenslåtte<MÅLGRUPPE_TYPE>(
+        val aktiviteter: List<ForenkletVilkårperiode<AktivitetType>>,
+        val målgrupper: List<ForenkletVilkårperiode<MÅLGRUPPE_TYPE>>,
     )
+
+    private data class ForenkletVilkårperiode<TYPE>(
+        override val fom: LocalDate,
+        override val tom: LocalDate,
+        val type: TYPE,
+    ) : Periode<LocalDate> {
+        init {
+            validatePeriode()
+        }
+    }
 }

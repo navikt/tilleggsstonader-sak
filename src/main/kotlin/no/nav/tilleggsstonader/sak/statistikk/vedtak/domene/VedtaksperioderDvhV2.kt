@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.AktivitetTypeDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.MålgruppeTypeDvh
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
@@ -19,7 +18,6 @@ import java.time.LocalDate
 data class VedtaksperioderDvhV2(
     val fom: LocalDate,
     val tom: LocalDate,
-    val målgruppe: MålgruppeTypeDvh,
     val aktivitet: AktivitetTypeDvh,
     val lovverketsMålgruppe: LovverketsMålgruppeDvh,
     // Tilsyn barn
@@ -61,7 +59,6 @@ data class VedtaksperioderDvhV2(
                             VedtaksperioderDvhV2(
                                 fom = it.fom,
                                 tom = it.tom,
-                                målgruppe = MålgruppeTypeDvh.fraDomene(it.målgruppe),
                                 aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                                 lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                                 studienivå = StudienivåDvh.fraDomene(it.studienivå),
@@ -80,8 +77,7 @@ data class VedtaksperioderDvhV2(
                         VedtaksperioderDvhV2(
                             fom = it.fom,
                             tom = it.tom,
-                            målgruppe = MålgruppeTypeDvh.fraDomene(it.målgruppe),
-                            lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
+                            lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe.faktiskMålgruppe()),
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                             antallBarn = it.antallBarn,
                             barn = BarnDvh.fraDomene(it.barn.finnFødselsnumre(barnIBehandlingen)),

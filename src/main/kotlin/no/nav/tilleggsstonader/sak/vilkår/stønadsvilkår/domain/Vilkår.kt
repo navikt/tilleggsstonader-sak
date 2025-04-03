@@ -65,14 +65,14 @@ data class Vilkår(
     ) {
         when (type) {
             VilkårType.PASS_BARN,
-            VilkårType.FASTE_UTGIFTER_EN_BOLIG,
-            VilkårType.FASTE_UTGIFTER_TO_BOLIGER,
+            VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+            VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
             -> {
                 validerFørsteOgSisteDagIValgtMåned(fom, tom)
                 validerPåkrevdBeløpHvisOppfylt()
             }
 
-            VilkårType.MIDLERTIDIG_OVERNATTING -> {
+            VilkårType.UTGIFTER_OVERNATTING -> {
                 validerPåkrevdBeløpHvisOppfylt()
             }
 
@@ -213,12 +213,14 @@ enum class VilkårType(
     PASS_BARN("Pass av barn", listOf(Stønadstype.BARNETILSYN)),
 
     // Boutgifter
-    MIDLERTIDIG_OVERNATTING("Midlertidig overnatting", listOf(Stønadstype.BOUTGIFTER)),
-    FASTE_UTGIFTER_EN_BOLIG("Faste utgifter en bolig", listOf(Stønadstype.BOUTGIFTER)),
-    FASTE_UTGIFTER_TO_BOLIGER("Faste utgifter to boliger", listOf(Stønadstype.BOUTGIFTER)),
+    UTGIFTER_OVERNATTING("Utgifter overnatting", listOf(Stønadstype.BOUTGIFTER)),
+    LØPENDE_UTGIFTER_EN_BOLIG("Løpende utgifter en bolig", listOf(Stønadstype.BOUTGIFTER)),
+    LØPENDE_UTGIFTER_TO_BOLIGER("Løpende utgifter to boliger", listOf(Stønadstype.BOUTGIFTER)),
     ;
 
     fun gjelderFlereBarn(): Boolean = this == PASS_BARN
+
+    fun erLøpendeUtgifterBo(): Boolean = (this == LØPENDE_UTGIFTER_EN_BOLIG || this == LØPENDE_UTGIFTER_TO_BOLIGER)
 
     companion object {
         fun hentVilkårForStønad(stønadstype: Stønadstype): List<VilkårType> =

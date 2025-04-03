@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYte
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -43,6 +44,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremid
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapAktiviteter
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapBeregningsresultat
@@ -70,6 +73,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         LæremidlerVedtaksperiodeValideringService(
             behandlingService = behandlingService,
             vedtakRepository = vedtakRepository,
+            vilkårperiodeService = mockk(),
         )
 
     val simuleringService =
@@ -89,6 +93,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             vedtakRepository = vedtakRepository,
             tilkjentytelseService = TilkjentYtelseService(tilkjentYtelseRepository),
             simuleringService = simuleringService,
+            unleashService = mockUnleashService(false),
         )
     val vedtaksperiodeId: UUID = UUID.randomUUID()
 
@@ -117,14 +122,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     ) {
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-        val vedtaksperioder =
-            dataTable.mapRad { rad ->
-                VedtaksperiodeLæremidlerDto(
-                    id = vedtaksperiodeId,
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                )
-            }
+        val vedtaksperioder = mapVedtaksperioderDto(dataTable)
         steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseLæremidlerRequest(vedtaksperioder))
     }
 
@@ -138,14 +136,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
 
-        val vedtaksperioder =
-            dataTable.mapRad { rad ->
-                VedtaksperiodeLæremidlerDto(
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    id = UUID.randomUUID(),
-                )
-            }
+        val vedtaksperioder = mapVedtaksperioderDto(dataTable)
         steg.utførSteg(dummyBehandling(behandlingId, revurderFra), InnvilgelseLæremidlerRequest(vedtaksperioder))
     }
 
@@ -169,15 +160,11 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
 
         val perioderBeregningsresultat = mapBeregningsresultat(dataTable)
-        val vedtaksperiode =
-            Vedtaksperiode(
-                fom = perioderBeregningsresultat.minOf { it.fom },
-                tom = perioderBeregningsresultat.maxOf { it.tom },
-            )
+        val vedtaksperiode = mapVedtaksperioder(dataTable)
         val vedtak =
             innvilgelse(
                 behandlingId = behandlingId,
-                vedtaksperioder = listOf(vedtaksperiode),
+                vedtaksperioder = vedtaksperiode,
                 beregningsresultat = BeregningsresultatLæremidler(perioderBeregningsresultat),
             )
         vedtakRepository.insert(vedtak)
@@ -283,14 +270,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
 
         val vedtaksperioder = hentVedtak(behandlingId).vedtaksperioder
 
-        val forventedeVedtaksperioder =
-            dataTable.mapRad { rad ->
-                Vedtaksperiode(
-                    id = vedtaksperiodeId,
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                )
-            }
+        val forventedeVedtaksperioder = mapVedtaksperioder(dataTable)
 
         forventedeVedtaksperioder.forEachIndexed { index, periode ->
             try {
@@ -303,6 +283,24 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         }
         assertThat(vedtaksperioder).hasSize(forventedeVedtaksperioder.size)
     }
+
+    private fun mapVedtaksperioder(dataTable: DataTable): List<Vedtaksperiode> =
+        dataTable.mapRad { rad ->
+            vedtaksperiode(
+                id = vedtaksperiodeId,
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseDato(DomenenøkkelFelles.TOM, rad),
+            )
+        }
+
+    private fun mapVedtaksperioderDto(dataTable: DataTable): List<VedtaksperiodeLæremidlerDto> =
+        dataTable.mapRad { rad ->
+            vedtaksperiodeDto(
+                id = vedtaksperiodeId,
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseDato(DomenenøkkelFelles.TOM, rad),
+            )
+        }
 
     private fun hentVedtak(behandlingId: BehandlingId): InnvilgelseEllerOpphørLæremidler =
         vedtakRepository

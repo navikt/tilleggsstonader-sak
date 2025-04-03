@@ -80,4 +80,19 @@ class VilkårPeriodeValideringTest {
 
         validerIkkeOverlappendeVilkår(listOf(vilkår, vilkår2))
     }
+
+    @Test
+    fun `skal kaste feil hvis 2 perioder for løpende utgifter overlapper`() {
+        val vilkår =
+            vilkår(
+                behandlingId = behandlingId,
+                type = VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
+                fom = fom,
+                tom = tom,
+                utgift = 1,
+            )
+        assertThatThrownBy {
+            validerIkkeOverlappendeVilkår(listOf(vilkår, vilkår))
+        }.hasMessageContaining(" overlapper")
+    }
 }

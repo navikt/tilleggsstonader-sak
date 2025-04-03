@@ -1,8 +1,8 @@
 {
-  "vilkårType" : "FASTE_UTGIFTER_EN_BOLIG",
+  "vilkårType" : "UTGIFTER_OVERNATTING",
   "regler" : {
-    "HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE" : {
-      "regelId" : "HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE",
+    "DOKUMENTERT_DELTAKELSE" : {
+      "regelId" : "DOKUMENTERT_DELTAKELSE",
       "erHovedregel" : true,
       "svarMapping" : {
         "JA" : {
@@ -15,8 +15,8 @@
         }
       }
     },
-    "NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET" : {
-      "regelId" : "NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET",
+    "DOKUMENTERT_UTGIFTER_OVERNATTING" : {
+      "regelId" : "DOKUMENTERT_UTGIFTER_OVERNATTING",
       "erHovedregel" : true,
       "svarMapping" : {
         "JA" : {
@@ -29,16 +29,16 @@
         }
       }
     },
-    "RETT_TIL_BOSTØTTE" : {
-      "regelId" : "RETT_TIL_BOSTØTTE",
+    "NØDVENDIGE_MERUTGIFTER" : {
+      "regelId" : "NØDVENDIGE_MERUTGIFTER",
       "erHovedregel" : true,
       "svarMapping" : {
         "JA" : {
-          "begrunnelseType" : "PÅKREVD",
+          "begrunnelseType" : "VALGFRI",
           "regelId" : "SLUTT_NODE"
         },
         "NEI" : {
-          "begrunnelseType" : "VALGFRI",
+          "begrunnelseType" : "PÅKREVD",
           "regelId" : "SLUTT_NODE"
         }
       }

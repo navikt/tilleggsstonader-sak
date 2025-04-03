@@ -22,8 +22,11 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -45,8 +48,8 @@ import java.util.UUID
 @Service
 class OppfølgingService(
     private val behandlingRepository: BehandlingRepository,
-    private val stønadsperiodeService: StønadsperiodeService,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
+    private val vedtakRepository: VedtakRepository,
     private val registerAktivitetService: RegisterAktivitetService,
     private val ytelseService: YtelseService,
     private val fagsakService: FagsakService,
@@ -114,19 +117,57 @@ class OppfølgingService(
         behandling: Behandling,
         fagsak: FagsakMetadata,
     ): List<PeriodeForKontroll> {
-        val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandling.id)
+        val vedtaksperioder = hentVedtaksperioder(fagsak, behandling)
+        if (vedtaksperioder.isEmpty()) {
+            return emptyList()
+        }
 
-        val fom = stønadsperioder.minOf { it.fom }
-        val tom = stønadsperioder.maxOf { it.tom }
+        val fom = vedtaksperioder.minOf { it.fom }
+        val tom = vedtaksperioder.maxOf { it.tom }
         val registerAktiviteter = hentAktiviteter(fagsak, fom, tom)
         val registerYtelser = hentYtelser(fagsak, fom, tom)
         val aktiviteter = hentInngangsvilkårAktiviteter(behandling, registerAktiviteter)
 
-        return stønadsperioder
-            .map { Vedtaksperiode(it) }
+        return vedtaksperioder
             .map { it.finnEndringer(registerYtelser, registerAktiviteter, aktiviteter) }
             .filter { it.trengerKontroll() }
     }
+
+    private fun hentVedtaksperioder(
+        fagsak: FagsakMetadata,
+        behandling: Behandling,
+    ): List<Vedtaksperiode> =
+        when (fagsak.stønadstype) {
+            Stønadstype.BARNETILSYN ->
+                hentVedtak<InnvilgelseEllerOpphørTilsynBarn>(behandling)
+                    .vedtaksperioder
+                    ?.map { Vedtaksperiode(it) }
+                    ?: emptyList()
+
+            // TODO Læremidler har ennå ikke vedtaksperioder
+            Stønadstype.LÆREMIDLER ->
+                // TODO håndterer ikke læremidler ennå etter endring til faktisk målgruppe
+                emptyList()
+                /*
+                hentVedtak<InnvilgelseEllerOpphørLæremidler>(behandling)
+                    .beregningsresultat.perioder
+                    .map { Vedtaksperiode(it) }
+                    .sorted()
+                    .mergeSammenhengende(
+                        { v1, v2 ->
+                            v1.overlapperEllerPåfølgesAv(v2) &&
+                                v1.målgruppe == v2.målgruppe &&
+                                v1.aktivitet == v2.aktivitet
+                        },
+                        { v1, v2 -> v1.medPeriode(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
+                    )
+                 */
+
+            Stønadstype.BOUTGIFTER -> TODO()
+        }
+
+    private inline fun <reified T : Vedtaksdata> hentVedtak(behandling: Behandling) =
+        vedtakRepository.findByIdOrThrow(behandling.id).withTypeOrThrow<T>().data
 
     private fun Vedtaksperiode.finnEndringer(
         registerYtelser: Map<MålgruppeType, List<Ytelsesperiode>>,
@@ -344,11 +385,18 @@ class OppfølgingService(
         val aktivitet: AktivitetType,
     ) : Periode<LocalDate>,
         KopierPeriode<Vedtaksperiode> {
-        constructor(stønadsperiode: StønadsperiodeDto) : this(
-            fom = stønadsperiode.fom,
-            tom = stønadsperiode.tom,
-            målgruppe = stønadsperiode.målgruppe,
-            aktivitet = stønadsperiode.aktivitet,
+        constructor(beregningsresultat: BeregningsresultatForMåned) : this(
+            fom = beregningsresultat.grunnlag.fom,
+            tom = beregningsresultat.grunnlag.tom,
+            målgruppe = TODO(), // beregningsresultat.grunnlag.målgruppe,
+            aktivitet = beregningsresultat.grunnlag.aktivitet,
+        )
+
+        constructor(vedtaksperiode: no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode) : this(
+            fom = vedtaksperiode.fom,
+            tom = vedtaksperiode.tom,
+            målgruppe = vedtaksperiode.målgruppe,
+            aktivitet = vedtaksperiode.aktivitet,
         )
 
         override fun medPeriode(

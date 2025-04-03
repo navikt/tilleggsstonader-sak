@@ -205,7 +205,15 @@ class OppgaveService(
                 behandlesAvApplikasjon = utledBehandlesAvApplikasjon(oppgave.oppgavetype),
             )
 
-        return oppgaveClient.opprettOppgave(opprettOppgave)
+        try {
+            return oppgaveClient.opprettOppgave(opprettOppgave)
+        } catch (e: Exception) {
+            secureLogger.warn(
+                "Feilet opprettelse av oppgave til tilordnetRessurs=${oppgave.tilordnetNavIdent} " +
+                    "enhetsnummer=$enhetsnummer oppgavetype=${oppgave.oppgavetype}",
+            )
+            throw e
+        }
     }
 
     /**

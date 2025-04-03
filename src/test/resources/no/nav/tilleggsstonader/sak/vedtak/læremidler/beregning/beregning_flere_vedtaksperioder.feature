@@ -21,11 +21,11 @@ Egenskap: Beregning av læremidler - flere vedtaksperioder
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024      |
-      | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024      |
-      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024      |
-      | 15.09.2024 | 30.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 01.04.2024      |
+      | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 01.04.2024      |
+      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 15.08.2024      |
+      | 15.09.2024 | 30.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 15.08.2024      |
 
   Scenario: Flere vedtaksperioder innenfor den samme løpende måneden
     Gitt følgende vedtaksperioder for læremidler
@@ -44,8 +44,8 @@ Egenskap: Beregning av læremidler - flere vedtaksperioder
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 06.01.2025 | 05.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 06.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 06.01.2025 | 05.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 06.01.2025      |
 
   Scenario: Flere vedtaksperioder der vedtaksperiode 2 løper i den første og flere andre måneder
     Gitt følgende vedtaksperioder for læremidler
@@ -65,8 +65,8 @@ Egenskap: Beregning av læremidler - flere vedtaksperioder
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 06.01.2025 | 05.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 06.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 06.01.2025 | 05.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 06.01.2025      |
       # Utbetalingsdato for februar og mars får utbetalingsdato 6 feb fordi det er då den nye vedtaksperioden "begynner da"
-      | 06.02.2025 | 05.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 06.02.2025      |
-      | 06.03.2025 | 15.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 06.02.2025      |
+      | 06.02.2025 | 05.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 06.02.2025      |
+      | 06.03.2025 | 15.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 06.02.2025      |

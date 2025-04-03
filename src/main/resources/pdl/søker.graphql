@@ -102,7 +102,6 @@ query($ident: ID!){
                 }
                 motpartsPersonident
                 omfang
-                omfangetErInnenPersonligOmraade
             }
         }
         kontaktadresse(historikk: true){

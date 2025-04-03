@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatForMånedDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -20,6 +19,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerDto
 import java.time.LocalDate
 import java.time.LocalDateTime
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.BeregningsresultatForPeriodeDto as BeregningsresultatDtoBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatForPeriodeDto as BeregningsresultatDtoLæremidler
 
 data class InterntVedtak(
     val behandling: Behandlinginfo,
@@ -35,7 +36,8 @@ data class InterntVedtak(
 
 data class BeregningsresultatInterntVedtakDto(
     val tilsynBarn: List<BeregningsresultatForMånedDto>? = null,
-    val læremidler: List<BeregningsresultatForPeriodeDto>? = null,
+    val læremidler: List<BeregningsresultatDtoLæremidler>? = null,
+    val boutgifter: List<BeregningsresultatDtoBoutgifter>? = null,
 )
 
 data class Behandlinginfo(

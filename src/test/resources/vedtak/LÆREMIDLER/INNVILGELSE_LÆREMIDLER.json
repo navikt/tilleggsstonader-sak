@@ -21,7 +21,7 @@
           "studieprosent": 100,
           "sats": 875,
           "satsBekreftet": true,
-          "målgruppe": "AAP",
+          "målgruppe": "NEDSATT_ARBEIDSEVNE",
           "aktivitet": "TILTAK"
         },
         "delAvTidligereUtbetaling": false

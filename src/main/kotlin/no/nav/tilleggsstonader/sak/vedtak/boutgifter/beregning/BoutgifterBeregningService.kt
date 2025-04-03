@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -56,7 +58,10 @@ class BoutgifterBeregningService(
         val vedtaksperioderBeregning =
             vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(behandling.revurderFra)
 
-        validerUtgifterErInnenforVedtaksperiodene(utgifterPerVilkårtype, vedtaksperioderBeregning)
+        validerUtgifterTilMidlertidigOvernattingErInnenforVedtaksperiodene(
+            utgifterPerVilkårtype,
+            vedtaksperioderBeregning,
+        )
 
         val beregningsresultat =
             beregnAktuellePerioder(
@@ -80,7 +85,7 @@ class BoutgifterBeregningService(
             .sorted()
             .splittTilLøpendeMåneder()
             .map { UtbetalingPeriode(it) }
-            .validerIngenUtgifterKrysserUtbetalingsperioder(utgifter)
+            .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
             .map {
                 BeregningsresultatForLøpendeMåned(
                     grunnlag = lagBeregningsGrunnlag(periode = it, utgifter = utgifter),
@@ -239,7 +244,7 @@ class BoutgifterBeregningService(
         periode: UtbetalingPeriode,
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
     ): Beregningsgrunnlag {
-        val sats = finnMakssatsForPeriode(periode)
+        val sats = finnMakssats(periode.fom)
 
         val utgifterIPerioden = finnUtgiftForUtbetalingsperiode(utgifter, periode)
 
@@ -258,33 +263,42 @@ class BoutgifterBeregningService(
     private fun finnUtgiftForUtbetalingsperiode(
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
         periode: UtbetalingPeriode,
-    ) = utgifter.mapValues { it.value.filter { utgift -> periode.inneholder(utgift) } }
-}
-
-private fun validerUtgifterErInnenforVedtaksperiodene(
-    utgifterPerType: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
-    vedtaksperioder: List<VedtaksperiodeBeregning>,
-) {
-    val utgifter = utgifterPerType.values.flatten()
-
-    val alleUtgifterErInnenforEnVedtaksperiode =
-        utgifter.all { utgiftsperiode ->
-            vedtaksperioder.any { it.inneholder(utgiftsperiode) }
+    ) = utgifter.mapValues { (_, utgifter) ->
+        utgifter.filter {
+            periode.overlapper(it)
         }
-
-    brukerfeilHvisIkke(alleUtgifterErInnenforEnVedtaksperiode) {
-        "Du har lagt inn utgifter som er utenfor vedtaksperiodene. Foreløpig støtter vi ikke dette."
     }
 }
 
-private fun List<UtbetalingPeriode>.validerIngenUtgifterKrysserUtbetalingsperioder(
-    utgifterPerBoutgiftstype: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+private fun validerUtgifterTilMidlertidigOvernattingErInnenforVedtaksperiodene(
+    utgifterPerType: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    vedtaksperioder: List<VedtaksperiodeBeregning>,
+) {
+    val utgifterMidlertidigOvernatting = utgifterPerType[TypeBoutgift.UTGIFTER_OVERNATTING].orEmpty()
+    val sammenslåtteVedtaksperioder =
+        vedtaksperioder.mergeSammenhengende(
+            { v1, v2 -> v1.overlapperEllerPåfølgesAv(v2) },
+            { v1, v2 -> v1.medPeriode(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
+        )
+
+    val alleUtgifterErInnenforVedtaksperioder =
+        utgifterMidlertidigOvernatting.all { utgiftsperiode ->
+            sammenslåtteVedtaksperioder.any { it.inneholder(utgiftsperiode) }
+        }
+
+    brukerfeilHvisIkke(alleUtgifterErInnenforVedtaksperioder) {
+        "Du har lagt inn utgifter til midlertidig overnatting som ikke er inneholdt i en vedtaksperiode. Foreløpig støtter vi ikke dette."
+    }
+}
+
+private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(
+    utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
 ): List<UtbetalingPeriode> {
+    val utgifterTilOvernatting = utgifter[TypeBoutgift.UTGIFTER_OVERNATTING] ?: emptyList()
     val utbetalingsperioder = this
-    val utgifter = utgifterPerBoutgiftstype.values.flatten()
 
     val detFinnesUtgiftSomKrysserUtbetalingsperioder =
-        utgifter.any { utgift ->
+        utgifterTilOvernatting.any { utgift ->
             utbetalingsperioder.none { it.inneholder(utgift) }
         }
 
@@ -292,7 +306,7 @@ private fun List<UtbetalingPeriode>.validerIngenUtgifterKrysserUtbetalingsperiod
         """
         Vi støtter foreløpig ikke at utgifter krysser ulike utbetalingsperioder. 
         Utbetalingsperioder for denne behandlingen er: ${utbetalingsperioder.map { it.formatertPeriodeNorskFormat() }}, 
-        mens utgiftsperiodene er: ${utgifter.map { it.formatertPeriodeNorskFormat() }}
+        mens utgiftsperiodene er: ${utgifterTilOvernatting.map { it.formatertPeriodeNorskFormat() }}
         """.trimIndent()
     }
 

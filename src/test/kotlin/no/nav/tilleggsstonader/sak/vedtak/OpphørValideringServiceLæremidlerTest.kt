@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
 import io.mockk.mockk
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThatCode
@@ -22,8 +22,8 @@ class OpphørValideringServiceLæremidlerTest {
     private val førsteFebruar = YearMonth.of(2025, 2).atDay(1)
     private val sisteFebruar = YearMonth.of(2025, 2).atEndOfMonth()
 
-    private val vedtaksperiodeJanuar = Vedtaksperiode(fom = førsteJanuar, tom = sisteJanuar)
-    private val vedtaksperiodeFebruar = Vedtaksperiode(fom = førsteFebruar, tom = sisteFebruar)
+    private val vedtaksperiodeJanuar = vedtaksperiode(fom = førsteJanuar, tom = sisteJanuar)
+    private val vedtaksperiodeFebruar = vedtaksperiode(fom = førsteFebruar, tom = sisteFebruar)
 
     private val førsteMars = YearMonth.of(2025, 3).atDay(1)
 

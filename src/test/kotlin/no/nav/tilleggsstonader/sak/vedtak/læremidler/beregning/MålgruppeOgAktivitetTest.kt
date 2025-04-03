@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -14,8 +14,8 @@ class MålgruppeOgAktivitetTest {
     inner class Sortering {
         @Test
         fun `prioritet på målgruppe trumfer`() {
-            val aap = målgruppeOgAktivitet(målgruppe = MålgruppeType.AAP)
-            val overgangsstønad = målgruppeOgAktivitet(målgruppe = MålgruppeType.OVERGANGSSTØNAD)
+            val aap = målgruppeOgAktivitet(målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)
+            val overgangsstønad = målgruppeOgAktivitet(målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER)
 
             val aktiviteter = listOf(aap, overgangsstønad)
 
@@ -58,24 +58,24 @@ class MålgruppeOgAktivitetTest {
                 målgruppeOgAktivitet(
                     prosent = 61,
                     studienivå = Studienivå.HØYERE_UTDANNING,
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 )
             val aktiviteter =
                 listOf(
                     målgruppeOgAktivitet(
                         prosent = 100,
                         studienivå = Studienivå.VIDEREGÅENDE,
-                        målgruppe = MålgruppeType.AAP,
+                        målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     ),
                     målgruppeOgAktivitet(
                         prosent = 51,
                         studienivå = Studienivå.HØYERE_UTDANNING,
-                        målgruppe = MålgruppeType.AAP,
+                        målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     ),
                     målgruppeOgAktivitet(
                         prosent = 61,
                         studienivå = Studienivå.HØYERE_UTDANNING,
-                        målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                        målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
                     ),
                     forventetTreff,
                 )
@@ -89,7 +89,7 @@ class MålgruppeOgAktivitetTest {
     }
 
     private fun målgruppeOgAktivitet(
-        målgruppe: MålgruppeType = MålgruppeType.AAP,
+        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
         studienivå: Studienivå = Studienivå.HØYERE_UTDANNING,
         prosent: Int = 100,

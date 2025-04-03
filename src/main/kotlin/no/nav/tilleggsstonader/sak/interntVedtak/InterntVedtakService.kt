@@ -12,9 +12,12 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
@@ -51,7 +54,6 @@ class InterntVedtakService(
 ) {
     fun lagInterntVedtak(behandlingId: BehandlingId): InterntVedtak {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        validerStønadstype(behandling.stønadstype)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandling.id)
         val vedtak = vedtakService.hentVedtak(behandling.id)
 
@@ -69,14 +71,6 @@ class InterntVedtakService(
             vedtak = mapVedtak(vedtak),
             beregningsresultat = mapBeregningsresultatForStønadstype(vedtak, behandling),
         )
-    }
-
-    private fun validerStønadstype(stønadstype: Stønadstype) {
-        when (stønadstype) {
-            Stønadstype.BARNETILSYN -> {}
-            Stønadstype.LÆREMIDLER -> {}
-            else -> error("Internt vedtak håndterer ikke stønadstype=$stønadstype ennå")
-        }
     }
 
     private fun mapBeregningsresultatForStønadstype(
@@ -97,6 +91,13 @@ class InterntVedtakService(
                                 .tilDto(behandling.revurderFra)
                                 .perioder,
                     )
+
+                is InnvilgelseBoutgifter ->
+                    BeregningsresultatInterntVedtakDto(
+                        boutgifter = data.beregningsresultat.tilDto(behandling.revurderFra).perioder,
+                    )
+
+                is Innvilgelse -> error("Mangler mapping av beregningsresultat for ${data.type}")
 
                 else -> null
             }
@@ -172,9 +173,11 @@ class InterntVedtakService(
 
     private fun mapVedtaksperioder(vedtak: Vedtak?): List<VedtaksperiodeInterntVedtak> =
         when (vedtak?.data) {
-            is InnvilgelseTilsynBarn -> mapVedtaksperioderTilsynBarn(vedtak.data.vedtaksperioder)
+            is InnvilgelseTilsynBarn -> mapVedtaksperioderTilsynBarnOgBoutgifter(vedtak.data.vedtaksperioder)
 
             is InnvilgelseLæremidler -> mapVedtaksperioderLæremidler(vedtak.data.vedtaksperioder)
+
+            is InnvilgelseBoutgifter -> mapVedtaksperioderTilsynBarnOgBoutgifter(vedtak.data.vedtaksperioder)
 
             is Avslag, is Opphør -> emptyList()
 
@@ -183,7 +186,7 @@ class InterntVedtakService(
             }
         }
 
-    private fun mapVedtaksperioderTilsynBarn(vedtaksperioder: List<Vedtaksperiode>?): List<VedtaksperiodeInterntVedtak> =
+    private fun mapVedtaksperioderTilsynBarnOgBoutgifter(vedtaksperioder: List<Vedtaksperiode>?): List<VedtaksperiodeInterntVedtak> =
         vedtaksperioder?.map {
             VedtaksperiodeInterntVedtak(
                 målgruppe = it.målgruppe,
@@ -241,7 +244,7 @@ class InterntVedtakService(
 
                 is VedtakLæremidler -> mapVedtakLæremidler(vedtak.data)
 
-                is VedtakBoutgifter -> TODO("Internt vedtak for boutgifter er ikke implementert")
+                is VedtakBoutgifter -> mapVedtakBoutgifter(vedtak.data)
             }
         }
 
@@ -277,6 +280,23 @@ class InterntVedtakService(
                     årsakerOpphør = vedtak.årsaker,
                     opphørBegrunnelse = vedtak.begrunnelse,
                 )
+        }
+
+    private fun mapVedtakBoutgifter(vedtak: VedtakBoutgifter) =
+        when (vedtak) {
+            is InnvilgelseBoutgifter -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
+
+//            is AvslagBoutgifter ->
+//                VedtakAvslagInternt(
+//                    årsakerAvslag = vedtak.årsaker,
+//                    avslagBegrunnelse = vedtak.begrunnelse,
+//                )
+//
+//            is OpphørBoutgifter ->
+//                VedtakOpphørInternt(
+//                    årsakerOpphør = vedtak.årsaker,
+//                    opphørBegrunnelse = vedtak.begrunnelse,
+//                )
         }
 
     private fun Map<BarnId, GrunnlagBarn>.finnFødselsdato(barnId: BarnId): LocalDate {

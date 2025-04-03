@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil
@@ -20,12 +21,18 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
@@ -35,8 +42,10 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
@@ -54,10 +63,11 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeM
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import java.time.LocalDate
+import java.time.Month.FEBRUARY
+import java.time.Month.JANUARY
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning as VedtaksperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode as VedtaksperiodeLæremidler
 
 object Testdata {
     val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")
@@ -298,10 +308,12 @@ object Testdata {
 
         val vedtaksperioder =
             listOf(
-                VedtaksperiodeLæremidler(
+                LæremidlerTestUtil.vedtaksperiode(
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 3, 31),
+                    målgruppe = null,
+                    aktivitet = null,
                 ),
             )
         val beregningsresultat =
@@ -319,7 +331,7 @@ object Testdata {
                                     studieprosent = 100,
                                     sats = 951,
                                     satsBekreftet = true,
-                                    målgruppe = MålgruppeType.AAP,
+                                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                     aktivitet = AktivitetType.TILTAK,
                                 ),
                         ),
@@ -334,7 +346,7 @@ object Testdata {
                                     studieprosent = 100,
                                     sats = 951,
                                     satsBekreftet = true,
-                                    målgruppe = MålgruppeType.AAP,
+                                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                     aktivitet = AktivitetType.TILTAK,
                                 ),
                         ),
@@ -416,6 +428,152 @@ object Testdata {
             Vilkårperioder(
                 målgrupper = målgrupperLæremidler,
                 aktiviteter = aktivitetererLæremidler,
+            )
+    }
+
+    object Boutgifter {
+        val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.BOUTGIFTER)
+
+        val behandling =
+            saksbehandling(
+                behandling =
+                    behandling(
+                        id = behandlingId,
+                        vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay(),
+                        opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
+                        fagsak = fagsak,
+                        resultat = BehandlingResultat.INNVILGET,
+                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    ),
+                fagsak = fagsak,
+            )
+
+        val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = emptyList()))
+
+        val vedtaksperioder =
+            listOf(
+                Vedtaksperiode(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2024, JANUARY, 1),
+                    tom = LocalDate.of(2024, FEBRUARY, 29),
+                    aktivitet = AktivitetType.TILTAK,
+                    målgruppe = MålgruppeType.AAP,
+                ),
+            )
+        val beregningsresultat =
+            BeregningsresultatBoutgifter(
+                perioder =
+                    listOf(
+                        BeregningsresultatForLøpendeMåned(
+                            grunnlag =
+                                no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag(
+                                    fom = LocalDate.of(2024, 1, 1),
+                                    tom = LocalDate.of(2024, 1, 31),
+                                    utbetalingsdato = LocalDate.of(2024, 1, 1),
+                                    makssats = 4953,
+                                    makssatsBekreftet = true,
+                                    målgruppe = MålgruppeType.AAP,
+                                    aktivitet = AktivitetType.TILTAK,
+                                    utgifter =
+                                        mapOf(
+                                            TypeBoutgift.UTGIFTER_OVERNATTING to
+                                                listOf(
+                                                    UtgiftBeregningBoutgifter(
+                                                        fom = LocalDate.of(2024, 1, 1),
+                                                        tom = LocalDate.of(2024, 1, 31),
+                                                        utgift = 3000,
+                                                    ),
+                                                ),
+                                        ),
+                                ),
+                        ),
+                        BeregningsresultatForLøpendeMåned(
+                            grunnlag =
+                                no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag(
+                                    fom = LocalDate.of(2024, 2, 1),
+                                    tom = LocalDate.of(2024, 2, 29),
+                                    utbetalingsdato = LocalDate.of(2024, 1, 1),
+                                    makssats = 4953,
+                                    makssatsBekreftet = true,
+                                    målgruppe = MålgruppeType.AAP,
+                                    aktivitet = AktivitetType.TILTAK,
+                                    utgifter =
+                                        mapOf(
+                                            TypeBoutgift.UTGIFTER_OVERNATTING to
+                                                listOf(
+                                                    UtgiftBeregningBoutgifter(
+                                                        fom = LocalDate.of(2024, FEBRUARY, 1),
+                                                        tom = LocalDate.of(2024, FEBRUARY, 2),
+                                                        utgift = 3000,
+                                                    ),
+                                                ),
+                                            TypeBoutgift.UTGIFTER_OVERNATTING to
+                                                listOf(
+                                                    UtgiftBeregningBoutgifter(
+                                                        fom = LocalDate.of(2024, FEBRUARY, 26),
+                                                        tom = LocalDate.of(2024, FEBRUARY, 29),
+                                                        utgift = 4000,
+                                                    ),
+                                                ),
+                                        ),
+                                ),
+                        ),
+                    ),
+            )
+
+        val vilkår =
+            listOf(
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.UTGIFTER_OVERNATTING,
+                    delvilkår = oppfylteDelvilkårUtgifterOvernatting(),
+                    fom = LocalDate.of(2024, FEBRUARY, 1),
+                    tom = LocalDate.of(2024, FEBRUARY, 2),
+                    utgift = 3000,
+                ),
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.UTGIFTER_OVERNATTING,
+                    delvilkår = oppfylteDelvilkårUtgifterOvernatting(),
+                    fom = LocalDate.of(2024, FEBRUARY, 26),
+                    tom = LocalDate.of(2024, FEBRUARY, 29),
+                    utgift = 4000,
+                ),
+            )
+
+        val innvilgetVedtak =
+            GeneriskVedtak(
+                behandlingId = behandlingId,
+                type = TypeVedtak.INNVILGELSE,
+                data =
+                    InnvilgelseBoutgifter(
+                        vedtaksperioder = vedtaksperioder,
+                        beregningsresultat = beregningsresultat,
+                        begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+            )
+
+        private val aktivitetererBoutgifter =
+            listOf(
+                VilkårperiodeTestUtil.aktivitet(
+                    fom = LocalDate.of(2024, 12, 10),
+                    tom = LocalDate.of(2024, 12, 15),
+                    faktaOgVurdering = faktaOgVurderingAktivitetBoutgifter(),
+                ),
+                VilkårperiodeTestUtil.aktivitet(
+                    fom = LocalDate.of(2024, 12, 10),
+                    tom = LocalDate.of(2024, 12, 15),
+                    resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
+                    begrunnelse = "ikke oppfylt",
+                    faktaOgVurdering = faktaOgVurderingAktivitetBoutgifter(type = AktivitetType.UTDANNING),
+                ),
+            )
+
+        val vilkårperioder =
+            Vilkårperioder(
+                målgrupper = målgrupper,
+                aktiviteter = aktivitetererBoutgifter,
             )
     }
 }

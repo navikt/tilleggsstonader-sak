@@ -132,9 +132,10 @@
       "beløp" : 951,
       "stønadsbeløp" : 1902,
       "utbetalingsdato" : "2024-01-01",
-      "målgruppe" : "AAP",
+      "målgruppe" : "NEDSATT_ARBEIDSEVNE",
       "aktivitet" : "TILTAK",
       "delAvTidligereUtbetaling" : false
-    } ]
+    } ],
+    "boutgifter" : null
   }
 }

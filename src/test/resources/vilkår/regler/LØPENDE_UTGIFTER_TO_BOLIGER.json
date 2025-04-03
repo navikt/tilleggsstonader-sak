@@ -1,5 +1,5 @@
 {
-  "vilkårType" : "FASTE_UTGIFTER_TO_BOLIGER",
+  "vilkårType" : "LØPENDE_UTGIFTER_TO_BOLIGER",
   "regler" : {
     "NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET" : {
       "regelId" : "NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET",

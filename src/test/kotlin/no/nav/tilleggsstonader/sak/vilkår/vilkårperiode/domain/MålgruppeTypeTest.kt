@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -123,6 +124,37 @@ class MålgruppeTypeTest {
                     MålgruppeType.SYKEPENGER_100_PROSENT.tilTypeAndel(Stønadstype.LÆREMIDLER)
                 }.isInstanceOf(IllegalStateException::class.java)
                     .hasMessageContaining("Kan ikke opprette andel tilkjent ytelse for målgruppe SYKEPENGER_100_PROSENT")
+            }
+        }
+    }
+
+    @Nested
+    inner class MappingTilFaktiskMålgruppe {
+        @Test
+        fun `skal mappe verdier til faktiskMålgruppe`() {
+            val mappings =
+                MålgruppeType.entries.map {
+                    it to
+                        when (it) {
+                            MålgruppeType.AAP -> FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
+                            MålgruppeType.DAGPENGER -> null
+                            MålgruppeType.OMSTILLINGSSTØNAD -> FaktiskMålgruppe.GJENLEVENDE
+                            MålgruppeType.OVERGANGSSTØNAD -> FaktiskMålgruppe.ENSLIG_FORSØRGER
+                            MålgruppeType.NEDSATT_ARBEIDSEVNE -> FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
+                            MålgruppeType.UFØRETRYGD -> FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
+                            MålgruppeType.SYKEPENGER_100_PROSENT -> null
+                            MålgruppeType.INGEN_MÅLGRUPPE -> null
+                        }
+                }
+
+            mappings.filter { it.second != null }.forEach {
+                assertThat(it.first.faktiskMålgruppe()).isEqualTo(it.second!!)
+            }
+
+            mappings.filter { it.second == null }.forEach {
+                assertThatThrownBy {
+                    it.first.faktiskMålgruppe()
+                }.hasMessageContaining("Mangler faktisk målgruppe")
             }
         }
     }

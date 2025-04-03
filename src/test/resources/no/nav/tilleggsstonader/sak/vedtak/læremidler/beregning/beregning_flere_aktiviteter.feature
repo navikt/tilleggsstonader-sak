@@ -20,11 +20,11 @@ Egenskap: Beregning av læremidler - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå       | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2024 | 31.01.2024 | 438   | VIDEREGÅENDE     | 100           | 438  | AAP       | 01.01.2024      |
-      | 01.02.2024 | 29.02.2024 | 438   | VIDEREGÅENDE     | 100           | 438  | AAP       | 01.01.2024      |
-      | 01.03.2024 | 31.03.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | AAP       | 01.01.2024      |
-      | 01.04.2024 | 30.04.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | AAP       | 01.01.2024      |
+      | Fom        | Tom        | Beløp | Studienivå       | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 01.01.2024 | 31.01.2024 | 438   | VIDEREGÅENDE     | 100           | 438  | NEDSATT_ARBEIDSEVNE | 01.01.2024      |
+      | 01.02.2024 | 29.02.2024 | 438   | VIDEREGÅENDE     | 100           | 438  | NEDSATT_ARBEIDSEVNE | 01.01.2024      |
+      | 01.03.2024 | 31.03.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | NEDSATT_ARBEIDSEVNE | 01.01.2024      |
+      | 01.04.2024 | 30.04.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | NEDSATT_ARBEIDSEVNE | 01.01.2024      |
 
   Scenario: Flere aktiviteter, kun en per vedtaksperiode innenfor en måned
     Gitt følgende vedtaksperioder for læremidler
@@ -44,8 +44,8 @@ Egenskap: Beregning av læremidler - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2024 | 12.01.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.01.2024      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 01.01.2024 | 12.01.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 01.01.2024      |
 
   Scenario: Flere aktiviteter i samme måned - overlappende hele måneden
     Gitt følgende vedtaksperioder for læremidler
@@ -64,9 +64,9 @@ Egenskap: Beregning av læremidler - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 70            | 438  | AAP       | 15.08.2024      |
-      | 15.09.2024 | 30.09.2024 | 438   | VIDEREGÅENDE | 70            | 438  | AAP       | 15.08.2024      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 70            | 438  | NEDSATT_ARBEIDSEVNE | 15.08.2024      |
+      | 15.09.2024 | 30.09.2024 | 438   | VIDEREGÅENDE | 70            | 438  | NEDSATT_ARBEIDSEVNE | 15.08.2024      |
 
   Scenario: Flere aktiviteter som overlapper av samme type studienivå, der en aktivitet løper lengre enn den andre
     Gitt følgende vedtaksperioder for læremidler
@@ -85,9 +85,9 @@ Egenskap: Beregning av læremidler - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 70            | 438  | AAP       | 15.08.2024      |
-      | 15.09.2024 | 30.09.2024 | 219   | VIDEREGÅENDE | 40            | 438  | AAP       | 15.08.2024      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 70            | 438  | NEDSATT_ARBEIDSEVNE | 15.08.2024      |
+      | 15.09.2024 | 30.09.2024 | 219   | VIDEREGÅENDE | 40            | 438  | NEDSATT_ARBEIDSEVNE | 15.08.2024      |
 
   Scenario: Flere aktiviteter i samme måned - ingen dekker hele måneden som skal beregnes
     Gitt følgende vedtaksperioder for læremidler
@@ -106,9 +106,9 @@ Egenskap: Beregning av læremidler - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024      |
-      | 15.09.2024 | 30.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 15.08.2024      |
+      | 15.09.2024 | 30.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 15.08.2024      |
 
   Scenario: Flere aktiviteter i samme måned - kun en gyldig type
     Gitt følgende vedtaksperioder for læremidler
@@ -127,9 +127,9 @@ Egenskap: Beregning av læremidler - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024      |
-      | 15.09.2024 | 30.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 15.08.2024      |
+      | 15.09.2024 | 30.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 15.08.2024      |
 
   Scenario: Flere aktiviteter med ulike studieprosent og studienivå
     Gitt følgende vedtaksperioder for læremidler
@@ -167,8 +167,8 @@ Egenskap: Beregning av læremidler - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 15.08.2024      |
 
   Scenario: Flere aktiviteter med ulike datoer innenfor løpende måned men utenfor vedtaksperiode
     Gitt følgende vedtaksperioder for læremidler
@@ -188,8 +188,8 @@ Egenskap: Beregning av læremidler - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 15.08.2024 | 15.08.2024 | 219   | VIDEREGÅENDE | 50            | 438  | AAP       | 15.08.2024      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 15.08.2024 | 15.08.2024 | 219   | VIDEREGÅENDE | 50            | 438  | NEDSATT_ARBEIDSEVNE | 15.08.2024      |
 
   Scenario: Flere aktiviteter med ulike datoer innenfor en og samme vedtaksperiode
     Gitt følgende vedtaksperioder for læremidler
@@ -208,5 +208,5 @@ Egenskap: Beregning av læremidler - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå       | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2025 | 31.01.2025 | 901   | HØYERE_UTDANNING | 100           | 901  | AAP       | 01.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå       | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 01.01.2025 | 31.01.2025 | 901   | HØYERE_UTDANNING | 100           | 901  | NEDSATT_ARBEIDSEVNE | 01.01.2025      |

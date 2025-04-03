@@ -106,7 +106,7 @@ class InterntVedtakGenereringTest {
         when (type.stønadstype) {
             Stønadstype.BARNETILSYN -> mockTilsynBarn()
             Stønadstype.LÆREMIDLER -> mockLæremidler()
-            else -> error("Har ikke mapping for ${type.stønadstype}")
+            Stønadstype.BOUTGIFTER -> mockBoutgifter()
         }
     }
 
@@ -126,6 +126,15 @@ class InterntVedtakGenereringTest {
         every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
         every { vilkårService.hentVilkår(behandlingId) } returns emptyList()
         every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.innvilgetVedtak
+    }
+
+    private fun mockBoutgifter() {
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.Boutgifter.behandling
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.Boutgifter.vilkårperioder
+        every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.Boutgifter.grunnlagsdata
+        every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
+        every { vilkårService.hentVilkår(behandlingId) } returns Testdata.Boutgifter.vilkår
+        every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Boutgifter.innvilgetVedtak
     }
 
     @Test
@@ -176,8 +185,8 @@ class InterntVedtakGenereringTest {
                 when (it) {
                     Stønadstype.BARNETILSYN,
                     Stønadstype.LÆREMIDLER,
+                    Stønadstype.BOUTGIFTER,
                     -> it.håndteres()
-                    Stønadstype.BOUTGIFTER -> it.håndteresIkke()
                 }
             }
 

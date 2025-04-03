@@ -1,0 +1,180 @@
+{
+  "behandling" : {
+    "behandlingId" : "001464ca-20dc-4f6c-b3e8-c83bd98b3e31",
+    "eksternFagsakId" : 1673,
+    "stønadstype" : "BOUTGIFTER",
+    "årsak" : "SØKNAD",
+    "ident" : "15",
+    "opprettetTidspunkt" : "2024-02-05T00:00:00",
+    "resultat" : "INNVILGET",
+    "vedtakstidspunkt" : "2024-01-01T00:00:00",
+    "saksbehandler" : "saksbehandler",
+    "beslutter" : "saksbeh2",
+    "revurderFra" : null
+  },
+  "søknad" : {
+    "mottattTidspunkt" : "2023-01-01T00:00:00"
+  },
+  "målgrupper" : [ {
+    "type" : "AAP",
+    "fom" : "2024-02-05",
+    "tom" : "2024-02-10",
+    "faktaOgVurderinger" : {
+      "@type" : "MÅLGRUPPE",
+      "medlemskap" : {
+        "svar" : "JA_IMPLISITT",
+        "resultat" : "OPPFYLT"
+      },
+      "utgifterDekketAvAnnetRegelverk" : {
+        "svar" : "NEI",
+        "resultat" : "OPPFYLT"
+      },
+      "aldersvilkår" : {
+        "svar" : "JA",
+        "resultat" : "OPPFYLT"
+      }
+    },
+    "kilde" : "MANUELL",
+    "resultat" : "OPPFYLT",
+    "begrunnelse" : "målgruppe aap",
+    "slettetKommentar" : null
+  }, {
+    "type" : "OVERGANGSSTØNAD",
+    "fom" : "2024-02-05",
+    "tom" : "2024-02-10",
+    "faktaOgVurderinger" : {
+      "@type" : "MÅLGRUPPE",
+      "medlemskap" : {
+        "svar" : "JA_IMPLISITT",
+        "resultat" : "OPPFYLT"
+      },
+      "utgifterDekketAvAnnetRegelverk" : null,
+      "aldersvilkår" : null
+    },
+    "kilde" : "MANUELL",
+    "resultat" : "OPPFYLT",
+    "begrunnelse" : "målgruppe os",
+    "slettetKommentar" : null
+  } ],
+  "aktiviteter" : [ {
+    "type" : "TILTAK",
+    "fom" : "2024-12-10",
+    "tom" : "2024-12-15",
+    "faktaOgVurderinger" : {
+      "@type" : "AKTIVITET_BOUTGIFTER",
+      "lønnet" : {
+        "svar" : "NEI",
+        "resultat" : "OPPFYLT"
+      }
+    },
+    "kilde" : "MANUELL",
+    "resultat" : "OPPFYLT",
+    "begrunnelse" : null,
+    "slettetKommentar" : null
+  }, {
+    "type" : "UTDANNING",
+    "fom" : "2024-12-10",
+    "tom" : "2024-12-15",
+    "faktaOgVurderinger" : {
+      "@type" : "AKTIVITET_BOUTGIFTER",
+      "lønnet" : null
+    },
+    "kilde" : "MANUELL",
+    "resultat" : "IKKE_OPPFYLT",
+    "begrunnelse" : "ikke oppfylt",
+    "slettetKommentar" : null
+  } ],
+  "stønadsperioder" : null,
+  "vedtaksperioder" : [ {
+    "fom" : "2024-01-01",
+    "tom" : "2024-02-29",
+    "målgruppe" : "AAP",
+    "aktivitet" : "TILTAK"
+  } ],
+  "vilkår" : [ {
+    "type" : "UTGIFTER_OVERNATTING",
+    "resultat" : "OPPFYLT",
+    "delvilkår" : [ {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har søker nødvendige merutgifter til bolig eller overnatting?",
+        "svar" : "Ja",
+        "begrunnelse" : "En begrunnelse på delvilkåret"
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har søker dokumentert utgifter til overnatting tilfredsstillende?",
+        "svar" : "Ja",
+        "begrunnelse" : null
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har søker dokumentert at de har vært/skal de delta på samling/eksamen/opptaksprøve?",
+        "svar" : "Ja",
+        "begrunnelse" : null
+      } ]
+    } ],
+    "fødselsdatoBarn" : null,
+    "fom" : "2024-02-01",
+    "tom" : "2024-02-02",
+    "utgift" : 3000
+  }, {
+    "type" : "UTGIFTER_OVERNATTING",
+    "resultat" : "OPPFYLT",
+    "delvilkår" : [ {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har søker nødvendige merutgifter til bolig eller overnatting?",
+        "svar" : "Ja",
+        "begrunnelse" : "En begrunnelse på delvilkåret"
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har søker dokumentert utgifter til overnatting tilfredsstillende?",
+        "svar" : "Ja",
+        "begrunnelse" : null
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har søker dokumentert at de har vært/skal de delta på samling/eksamen/opptaksprøve?",
+        "svar" : "Ja",
+        "begrunnelse" : null
+      } ]
+    } ],
+    "fødselsdatoBarn" : null,
+    "fom" : "2024-02-26",
+    "tom" : "2024-02-29",
+    "utgift" : 4000
+  } ],
+  "vedtak" : {
+    "innvilgelseBegrunnelse" : "Sånn her vil en begrunnelse se ut i det interne vedtaket",
+    "type" : "INNVILGELSE"
+  },
+  "beregningsresultat" : {
+    "tilsynBarn" : null,
+    "læremidler" : null,
+    "boutgifter" : [ {
+      "fom" : "2024-01-01",
+      "tom" : "2024-01-31",
+      "antallMåneder" : 1,
+      "stønadsbeløp" : 3000,
+      "utbetalingsdato" : "2024-01-01",
+      "målgruppe" : "AAP",
+      "aktivitet" : "TILTAK",
+      "delAvTidligereUtbetaling" : false
+    }, {
+      "fom" : "2024-02-01",
+      "tom" : "2024-02-29",
+      "antallMåneder" : 1,
+      "stønadsbeløp" : 4000,
+      "utbetalingsdato" : "2024-01-01",
+      "målgruppe" : "AAP",
+      "aktivitet" : "TILTAK",
+      "delAvTidligereUtbetaling" : false
+    } ]
+  }
+}

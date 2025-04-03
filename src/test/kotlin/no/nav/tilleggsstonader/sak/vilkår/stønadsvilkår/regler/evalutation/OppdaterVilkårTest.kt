@@ -12,22 +12,25 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.oppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.validerVilkårOgBeregnResultat
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårFasteUtgifterEnBoligDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårFasteUtgifterToBoligerDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårMidlertidigOvernattingDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårFasteUtgifterEnBolig
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårFasteUtgifterEnBoligDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårFasteUtgifterToBoliger
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårFasteUtgifterToBoligerDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårMidlertidigOvernatting
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårMidlertidigOvernattingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårLøpendeUtgifterEnBoligDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårLøpendeUtgifterToBoligerDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårUtgifterOvernattingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBoligDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoliger
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoligerDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsakerDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernattingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDate
 
 internal class OppdaterVilkårTest {
@@ -83,81 +86,113 @@ internal class OppdaterVilkårTest {
         @Nested
         inner class Boutgifter {
             @Nested
-            inner class MidlertidigOvernatting {
-                val opprettMidlertidigOvernattingVilkårDto =
+            inner class UtgifterOvernatting {
+                val opprettUtgifterOvernattingVilkårDto =
                     OpprettVilkårDto(
-                        vilkårType = VilkårType.MIDLERTIDIG_OVERNATTING,
+                        vilkårType = VilkårType.UTGIFTER_OVERNATTING,
                         behandlingId = behandlingId,
-                        delvilkårsett = oppfylteDelvilkårMidlertidigOvernattingDto(),
+                        delvilkårsett = oppfylteDelvilkårUtgifterOvernattingDto(),
                         fom = LocalDate.now(),
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
                         erNullvedtak = false,
                     )
-                val midlertidigOvernattingVilkår =
+                val utgifterOvernattingVilkår =
                     vilkår(
                         behandlingId = behandlingId,
-                        type = VilkårType.MIDLERTIDIG_OVERNATTING,
-                        delvilkår = oppfylteDelvilkårMidlertidigOvernatting(),
+                        type = VilkårType.UTGIFTER_OVERNATTING,
+                        delvilkår = oppfylteDelvilkårUtgifterOvernatting(),
                     )
 
                 @Test
-                fun `skal validere at man har med fom og tom for vilkår for midlertidig overnatting`() {
+                fun `skal validere at man har med fom og tom for vilkår for utgfiter overnatting`() {
                     assertThatThrownBy {
-                        validerVilkårOgBeregnResultat(midlertidigOvernattingVilkår, opprettMidlertidigOvernattingVilkårDto.copy(fom = null))
+                        validerVilkårOgBeregnResultat(
+                            utgifterOvernattingVilkår,
+                            opprettUtgifterOvernattingVilkårDto.copy(fom = null),
+                        )
                     }.hasMessageContaining("Mangler fra og med/til og med på vilkår")
 
                     assertThatThrownBy {
-                        validerVilkårOgBeregnResultat(midlertidigOvernattingVilkår, opprettMidlertidigOvernattingVilkårDto.copy(tom = null))
+                        validerVilkårOgBeregnResultat(
+                            utgifterOvernattingVilkår,
+                            opprettUtgifterOvernattingVilkårDto.copy(tom = null),
+                        )
                     }.hasMessageContaining("Mangler fra og med/til og med på vilkår")
                 }
 
                 @Test
-                fun `skal kaste feil hvis innvilget midlertidig overnatting ikke inneholder beløp`() {
+                fun `skal kaste feil hvis innvilget utgfiter overnatting ikke inneholder beløp`() {
                     assertThatThrownBy {
                         validerVilkårOgBeregnResultat(
-                            midlertidigOvernattingVilkår,
-                            opprettMidlertidigOvernattingVilkårDto.copy(utgift = null),
+                            utgifterOvernattingVilkår,
+                            opprettUtgifterOvernattingVilkårDto.copy(utgift = null),
                         )
                     }.hasMessageContaining("Mangler utgift på vilkår")
                 }
 
                 @Test
-                fun `skal ikke kaste feil hvis ikke oppfylt midlertidig overnatting ikke inneholder beløp`() {
+                fun `skal ikke kaste feil hvis ikke oppfylt utgfiter overnatting ikke inneholder beløp`() {
                     val dto =
-                        opprettMidlertidigOvernattingVilkårDto.copy(
+                        opprettUtgifterOvernattingVilkårDto.copy(
                             utgift = null,
-                            delvilkårsett = ikkeOppfylteDelvilkårMidlertidigOvernattingDto(),
+                            delvilkårsett = ikkeOppfylteDelvilkårUtgifterOvernattingDto(),
                         )
-                    validerVilkårOgBeregnResultat(midlertidigOvernattingVilkår, dto)
+                    validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, dto)
                 }
 
+                @Disabled
                 @Test
-                fun `oppfylt midlertidig overnatting kan mangle utgift når det er et nullvedtak`() {
+                fun `oppfylt utgfiter overnatting kan mangle utgift når det er et nullvedtak`() {
                     validerVilkårOgBeregnResultat(
-                        midlertidigOvernattingVilkår,
-                        opprettMidlertidigOvernattingVilkårDto.copy(utgift = null, erNullvedtak = true),
+                        utgifterOvernattingVilkår,
+                        opprettUtgifterOvernattingVilkårDto.copy(utgift = null, erNullvedtak = true),
                     )
                 }
 
                 @Test
-                fun `skal ikke kaste feil hvis oppfylt midlertidig overnatting nullvedttak inneholder beløp`() {
+                fun `skal ikke kaste feil hvis oppfylt utgfiter overnatting nullvedttak inneholder beløp`() {
                     assertThatThrownBy {
                         validerVilkårOgBeregnResultat(
-                            midlertidigOvernattingVilkår,
-                            opprettMidlertidigOvernattingVilkårDto.copy(utgift = 1, erNullvedtak = true),
+                            utgifterOvernattingVilkår,
+                            opprettUtgifterOvernattingVilkårDto.copy(utgift = 1, erNullvedtak = true),
                         )
                     }.hasMessageContaining("Kan ikke ha utgift på nullvedtak")
                 }
+
+                @Disabled
+                @Test
+                internal fun `Skal kunne oppdatere vilkår som nullvedtak`() {
+                    val dto =
+                        opprettUtgifterOvernattingVilkårDto.copy(
+                            utgift = null,
+                            delvilkårsett = ikkeOppfylteDelvilkårUtgifterOvernattingDto(),
+                            erNullvedtak = true,
+                        )
+                    assertDoesNotThrow { validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, dto) }
+                }
+
+                @Test
+                internal fun `skal kaste feil når oppdatere vilkår som nullvedtak`() {
+                    val dto =
+                        opprettUtgifterOvernattingVilkårDto.copy(
+                            utgift = null,
+                            delvilkårsett = ikkeOppfylteDelvilkårUtgifterOvernattingDto(),
+                            erNullvedtak = true,
+                        )
+                    assertThatThrownBy {
+                        validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, dto)
+                    }.hasMessageContaining("Vi støtter foreløpig ikke nullvedtak")
+                }
             }
 
             @Nested
-            inner class FasteUtgifterEnBolig {
+            inner class LøpendeUtgifterEnBolig {
                 val opprettVilkårDto =
                     OpprettVilkårDto(
-                        vilkårType = VilkårType.FASTE_UTGIFTER_EN_BOLIG,
+                        vilkårType = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
                         behandlingId = behandlingId,
-                        delvilkårsett = oppfylteDelvilkårFasteUtgifterEnBoligDto(),
+                        delvilkårsett = oppfylteDelvilkårLøpendeUtgifterEnBoligDto(),
                         fom = LocalDate.now(),
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
@@ -166,12 +201,12 @@ internal class OppdaterVilkårTest {
                 val vilkår =
                     vilkår(
                         behandlingId = behandlingId,
-                        type = VilkårType.FASTE_UTGIFTER_EN_BOLIG,
-                        delvilkår = oppfylteDelvilkårFasteUtgifterEnBolig(),
+                        type = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+                        delvilkår = oppfylteDelvilkårLøpendeUtgifterEnBolig(),
                     )
 
                 @Test
-                fun `skal validere at man har med fom og tom for vilkår for faste utgifter en bolig`() {
+                fun `skal validere at man har med fom og tom for vilkår for løpende utgifter en bolig`() {
                     assertThatThrownBy {
                         validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(fom = null))
                     }.hasMessageContaining("Mangler fra og med/til og med på vilkår")
@@ -182,30 +217,30 @@ internal class OppdaterVilkårTest {
                 }
 
                 @Test
-                fun `skal kaste feil hvis innvilget faste utgifter en bolig ikke inneholder beløp`() {
+                fun `skal kaste feil hvis innvilget løpende utgifter en bolig ikke inneholder beløp`() {
                     assertThatThrownBy {
                         validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(utgift = null))
                     }.hasMessageContaining("Mangler utgift på vilkår")
                 }
 
                 @Test
-                fun `skal ikke kaste feil hvis ikke oppfylt faste utgifter en bolig ikke inneholder beløp`() {
+                fun `skal ikke kaste feil hvis ikke oppfylt løpende utgifter en bolig ikke inneholder beløp`() {
                     val dto =
                         opprettVilkårDto.copy(
                             utgift = null,
-                            delvilkårsett = ikkeOppfylteDelvilkårFasteUtgifterEnBoligDto(),
+                            delvilkårsett = ikkeOppfylteDelvilkårLøpendeUtgifterEnBoligDto(),
                         )
                     validerVilkårOgBeregnResultat(vilkår, dto)
                 }
             }
 
             @Nested
-            inner class FasteUtgifterToBoliger {
+            inner class LøpendeUtgifterToBoliger {
                 val opprettVilkårDto =
                     OpprettVilkårDto(
-                        vilkårType = VilkårType.FASTE_UTGIFTER_TO_BOLIGER,
+                        vilkårType = VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
                         behandlingId = behandlingId,
-                        delvilkårsett = oppfylteDelvilkårFasteUtgifterToBoligerDto(),
+                        delvilkårsett = oppfylteDelvilkårLøpendeUtgifterToBoligerDto(),
                         fom = LocalDate.now(),
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
@@ -214,12 +249,12 @@ internal class OppdaterVilkårTest {
                 val vilkår =
                     vilkår(
                         behandlingId = behandlingId,
-                        type = VilkårType.FASTE_UTGIFTER_TO_BOLIGER,
-                        delvilkår = oppfylteDelvilkårFasteUtgifterToBoliger(),
+                        type = VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
+                        delvilkår = oppfylteDelvilkårLøpendeUtgifterToBoliger(),
                     )
 
                 @Test
-                fun `skal validere at man har med fom og tom for vilkår for faste utgifter to boliger`() {
+                fun `skal validere at man har med fom og tom for vilkår for løpende utgifter to boliger`() {
                     assertThatThrownBy {
                         validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(fom = null))
                     }.hasMessageContaining("Mangler fra og med/til og med på vilkår")
@@ -230,20 +265,35 @@ internal class OppdaterVilkårTest {
                 }
 
                 @Test
-                fun `skal kaste feil hvis innvilget faste utgifter to boliger ikke inneholder beløp`() {
+                fun `skal kaste feil hvis innvilget løpende utgifter to boliger ikke inneholder beløp`() {
                     assertThatThrownBy {
                         validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(utgift = null))
                     }.hasMessageContaining("Mangler utgift på vilkår")
                 }
 
                 @Test
-                fun `utgift kan mangle når midlertidig overnatting ikke er oppfylt`() {
+                fun `utgift kan mangle når utgfiter overnatting ikke er oppfylt`() {
                     val dto =
                         opprettVilkårDto.copy(
                             utgift = null,
-                            delvilkårsett = ikkeOppfylteDelvilkårFasteUtgifterToBoligerDto(),
+                            delvilkårsett = ikkeOppfylteDelvilkårLøpendeUtgifterToBoligerDto(),
                         )
                     validerVilkårOgBeregnResultat(vilkår, dto)
+                }
+
+                @Test
+                internal fun `Skal ikke kunne oppdatere vilkår som har Høyere utgifter grunnet helsemessig årsaker`() {
+                    val dto =
+                        opprettVilkårDto.copy(
+                            utgift = 500,
+                            delvilkårsett = oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsakerDto(),
+                        )
+
+                    assertThatThrownBy {
+                        validerVilkårOgBeregnResultat(vilkår, dto)
+                    }.hasMessageContaining(
+                        "Vi støtter ikke beregning med \"Høyere utgifter grunnet helsemessig årsaker\". Ta kontakt med Tilleggsstønader teamet.",
+                    )
                 }
             }
         }

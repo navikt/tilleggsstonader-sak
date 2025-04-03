@@ -19,6 +19,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.svarTilDomene
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering.utledResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelValidering.validerVilkår
@@ -41,6 +43,10 @@ object OppdaterVilkår {
         val vilkårsresultat = utledResultat(vilkårsregel, oppdatering.delvilkårsett)
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
         validerPeriodeOgBeløp(oppdatering, vilkårsresultat)
+        validerIngenHøyereUtgifterGrunnetHelsemessigeÅrsaker(oppdatering)
+        // Venter på avklaring på hvordan og om vi skal støtte nullvedtak
+        validerIngenNullvedtak(oppdatering)
+//        validerIngenUtgiftPåNullvedtak(oppdatering)
 
         return vilkårsresultat
     }
@@ -56,9 +62,9 @@ object OppdaterVilkår {
         val vilkårMedUtgift =
             listOf(
                 VilkårType.PASS_BARN,
-                VilkårType.MIDLERTIDIG_OVERNATTING,
-                VilkårType.FASTE_UTGIFTER_EN_BOLIG,
-                VilkårType.FASTE_UTGIFTER_TO_BOLIGER,
+                VilkårType.UTGIFTER_OVERNATTING,
+                VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+                VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
             )
         brukerfeilHvis(fom == null || tom == null) {
             "Mangler fra og med/til og med på vilkår"
@@ -79,6 +85,32 @@ object OppdaterVilkår {
         }
         feilHvis(vilkårType !in vilkårMedUtgift && oppdatering.utgift != null) {
             "Kan ikke ha utgift på vilkårType=$vilkårType"
+        }
+    }
+
+    private fun validerIngenHøyereUtgifterGrunnetHelsemessigeÅrsaker(lagreVilkårDto: LagreVilkårDto) {
+        feilHvis(
+            lagreVilkårDto.delvilkårsett.any { delvilkår ->
+                delvilkår.vurderinger.any {
+                    it.regelId ==
+                        RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER &&
+                        it.svar == SvarId.JA
+                }
+            },
+        ) {
+            "Vi støtter ikke beregning med \"Høyere utgifter grunnet helsemessig årsaker\". Ta kontakt med Tilleggsstønader teamet."
+        }
+    }
+
+    private fun validerIngenUtgiftPåNullvedtak(lagreVilkårDto: LagreVilkårDto) {
+        feilHvis(lagreVilkårDto.erNullvedtak == true && lagreVilkårDto.utgift !== null) {
+            "Kan ikke ha utgift på nullvedtak"
+        }
+    }
+
+    private fun validerIngenNullvedtak(lagreVilkårDto: LagreVilkårDto) {
+        feilHvis(lagreVilkårDto.erNullvedtak == true) {
+            "Vi støtter foreløpig ikke nullvedtak"
         }
     }
 
@@ -112,14 +144,14 @@ object OppdaterVilkår {
         oppdatering.fom?.let {
             when (vilkår.type) {
                 VilkårType.PASS_BARN,
-                VilkårType.FASTE_UTGIFTER_EN_BOLIG,
-                VilkårType.FASTE_UTGIFTER_TO_BOLIGER,
+                VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+                VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
                 -> {
                     validerErFørsteDagIMåned(it)
                     it
                 }
 
-                VilkårType.MIDLERTIDIG_OVERNATTING -> {
+                VilkårType.UTGIFTER_OVERNATTING -> {
                     it
                 }
 
@@ -134,14 +166,14 @@ object OppdaterVilkår {
         oppdatering.tom?.let {
             when (vilkår.type) {
                 VilkårType.PASS_BARN,
-                VilkårType.FASTE_UTGIFTER_EN_BOLIG,
-                VilkårType.FASTE_UTGIFTER_TO_BOLIGER,
+                VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+                VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
                 -> {
                     validerErSisteDagIMåned(it)
                     it
                 }
 
-                VilkårType.MIDLERTIDIG_OVERNATTING -> {
+                VilkårType.UTGIFTER_OVERNATTING -> {
                     it
                 }
 

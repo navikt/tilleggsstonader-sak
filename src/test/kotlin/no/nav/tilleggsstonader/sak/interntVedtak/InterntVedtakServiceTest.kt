@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetBarnetilsynFaktaOgVurderingerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetBoutgifterFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetLæremidlerFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.MålgruppeFaktaOgVurderingerDto
 import org.assertj.core.api.Assertions.assertThat
@@ -29,6 +30,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.time.Month.FEBRUARY
+import java.time.Month.JANUARY
 
 class InterntVedtakServiceTest {
     private val behandlingService = mockk<BehandlingService>()
@@ -276,6 +279,138 @@ class InterntVedtakServiceTest {
                 assertThat(aktivitet).isEqualTo(AktivitetType.REELL_ARBEIDSSØKER)
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 2, 1))
                 assertThat(tom).isEqualTo(LocalDate.of(2024, 3, 31))
+            }
+        }
+    }
+
+    @Nested
+    inner class Boutgifter {
+        @BeforeEach
+        fun setUp() {
+            every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.Boutgifter.behandling
+            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.Boutgifter.vilkårperioder
+            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.Boutgifter.grunnlagsdata
+            every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
+            every { vilkårService.hentVilkår(behandlingId) } returns Testdata.Boutgifter.vilkår
+            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Boutgifter.innvilgetVedtak
+        }
+
+        @Test
+        fun `behandlingsfelter skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId)
+
+            with(interntVedtak.behandling) {
+                assertThat(behandlingId).isEqualTo(Testdata.behandlingId)
+                assertThat(eksternFagsakId).isEqualTo(1673L)
+                assertThat(stønadstype).isEqualTo(Stønadstype.BOUTGIFTER)
+                assertThat(årsak).isEqualTo(Testdata.Boutgifter.behandling.årsak)
+                assertThat(ident).isEqualTo(Testdata.Boutgifter.behandling.ident)
+                assertThat(opprettetTidspunkt).isEqualTo(Testdata.Boutgifter.behandling.opprettetTid)
+                assertThat(resultat).isEqualTo(Testdata.Boutgifter.behandling.resultat)
+                assertThat(vedtakstidspunkt).isEqualTo(vedtakstidspunkt)
+                assertThat(saksbehandler).isEqualTo("saksbehandler")
+                assertThat(beslutter).isEqualTo("saksbeh2")
+            }
+        }
+
+        @Test
+        fun `søknadsfelter skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId)
+
+            assertThat(interntVedtak.søknad!!.mottattTidspunkt).isEqualTo(Testdata.søknadMetadata.mottattTidspunkt)
+        }
+
+        @Test
+        fun `målgruppefelter skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            assertThat(interntVedtak.målgrupper).hasSize(2)
+
+            val målgruppe =
+                Testdata.Boutgifter.vilkårperioder.målgrupper
+                    .single { it.type == MålgruppeType.AAP }
+
+            with(interntVedtak.målgrupper.single { it.type == MålgruppeType.AAP }) {
+                assertThat(type).isEqualTo(MålgruppeType.AAP)
+                assertThat(fom).isEqualTo(målgruppe.fom)
+                assertThat(tom).isEqualTo(målgruppe.tom)
+                assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
+                assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+                assertThat(begrunnelse).isEqualTo("målgruppe aap")
+                with((faktaOgVurderinger as MålgruppeFaktaOgVurderingerDto).medlemskap!!) {
+                    assertThat(svar).isEqualTo(SvarJaNei.JA_IMPLISITT)
+                    assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+                }
+            }
+        }
+
+        @Test
+        fun `aktivitetsfelter skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            assertThat(interntVedtak.aktiviteter).hasSize(2)
+
+            val oppfyltAktivitet =
+                Testdata.Boutgifter.vilkårperioder.aktiviteter
+                    .single { it.resultat == ResultatVilkårperiode.OPPFYLT }
+
+            with(interntVedtak.aktiviteter.single { it.resultat == ResultatVilkårperiode.OPPFYLT }) {
+                assertThat(type).isEqualTo(AktivitetType.TILTAK)
+                assertThat(fom).isEqualTo(oppfyltAktivitet.fom)
+                assertThat(tom).isEqualTo(oppfyltAktivitet.tom)
+                assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
+                assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+                assertThat(begrunnelse).isNull()
+                with((faktaOgVurderinger as AktivitetBoutgifterFaktaOgVurderingerDto).lønnet!!) {
+                    assertThat(svar).isEqualTo(SvarJaNei.NEI)
+                    assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+                }
+            }
+
+            val ikkeOppfyltAktivitet =
+                Testdata.Boutgifter.vilkårperioder.aktiviteter
+                    .single { it.resultat == ResultatVilkårperiode.IKKE_OPPFYLT }
+            with(interntVedtak.aktiviteter.single { it.resultat == ResultatVilkårperiode.IKKE_OPPFYLT }) {
+                assertThat(type).isEqualTo(AktivitetType.UTDANNING)
+                assertThat(fom).isEqualTo(ikkeOppfyltAktivitet.fom)
+                assertThat(tom).isEqualTo(ikkeOppfyltAktivitet.tom)
+                assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
+                assertThat(resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
+                assertThat(begrunnelse).isEqualTo("ikke oppfylt")
+                with((faktaOgVurderinger as AktivitetBoutgifterFaktaOgVurderingerDto).lønnet) {
+                    assertThat(resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
+                }
+            }
+        }
+
+        @Test
+        fun `beregningsfelter skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+
+            assertThat(interntVedtak.beregningsresultat!!.boutgifter!!.size).isEqualTo(2)
+
+            val forventet =
+                Testdata.Boutgifter.innvilgetVedtak.data.beregningsresultat.perioder
+                    .first()
+
+            with(interntVedtak.beregningsresultat.boutgifter.first()) {
+                assertThat(fom).isEqualTo(forventet.fom)
+                assertThat(tom).isEqualTo(forventet.tom)
+                assertThat(antallMåneder).isEqualTo(1)
+                assertThat(utbetalingsdato).isEqualTo(forventet.grunnlag.utbetalingsdato)
+                assertThat(målgruppe).isEqualTo(forventet.grunnlag.målgruppe)
+                assertThat(aktivitet).isEqualTo(forventet.grunnlag.aktivitet)
+            }
+        }
+
+        @Test
+        fun `vedtaksperiodefelter skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+
+            assertThat(interntVedtak.vedtaksperioder).hasSize(1)
+            with(interntVedtak.vedtaksperioder.single()) {
+                assertThat(målgruppe).isEqualTo(MålgruppeType.AAP)
+                assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
+                assertThat(fom).isEqualTo(LocalDate.of(2024, JANUARY, 1))
+                assertThat(tom).isEqualTo(LocalDate.of(2024, FEBRUARY, 29))
             }
         }
     }

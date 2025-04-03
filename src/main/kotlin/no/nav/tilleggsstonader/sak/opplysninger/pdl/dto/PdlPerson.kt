@@ -375,7 +375,6 @@ data class VergeEllerFullmektig(
     val identifiserendeInformasjon: IdentifiserendeInformasjon?,
     val motpartsPersonident: String?,
     val omfang: String?,
-    val omfangetErInnenPersonligOmraade: Boolean,
 )
 
 data class IdentifiserendeInformasjon(

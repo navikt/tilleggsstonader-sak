@@ -4,15 +4,15 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilStønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BrukVedtaksperioderForBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerIngenOverlappendeVedtaksperioder
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperiodeOmfattesAvStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.vedtaksperioderInnenforLøpendeMåned
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -29,24 +29,18 @@ class VedtaksperiodeUtilTest {
         LæremidlerVedtaksperiodeValideringService(
             behandlingService = behandlingService,
             vedtakRepository = vedtakRepository,
+            vilkårperiodeService = mockk(),
         )
     val vedtaksperiodeJanuar =
-        Vedtaksperiode(
+        vedtaksperiode(
             fom = LocalDate.of(2024, 1, 1),
             tom = LocalDate.of(2024, 1, 31),
         )
     val vedtaksperiodeFebruar =
-        Vedtaksperiode(
+        vedtaksperiode(
             fom = LocalDate.of(2024, 2, 1),
             tom = LocalDate.of(2024, 2, 28),
         )
-
-    val stønadsperiodeJanTilFeb =
-        stønadsperiode(
-            behandlingId = behandlingId,
-            fom = LocalDate.of(2024, 1, 1),
-            tom = LocalDate.of(2024, 2, 28),
-        ).tilStønadsperiodeBeregningsgrunnlag()
 
     @Nested
     inner class ValiderVedtaksperioder {
@@ -54,13 +48,12 @@ class VedtaksperiodeUtilTest {
         fun `Kaster ikke feil ved gyldig data`() {
             every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
             val vedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar)
-            val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
 
             assertDoesNotThrow {
                 læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
                     vedtaksperioder = vedtaksperioder,
-                    stønadsperioder = stønadsperioder,
                     behandlingId = behandlingId,
+                    brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(false),
                 )
             }
         }
@@ -70,13 +63,12 @@ class VedtaksperiodeUtilTest {
             every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
 
             val vedtaksperioder = emptyList<Vedtaksperiode>()
-            val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
 
             assertThatThrownBy {
                 læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
                     vedtaksperioder = vedtaksperioder,
-                    stønadsperioder = stønadsperioder,
                     behandlingId = behandlingId,
+                    brukVedtaksperioderForBeregning = BrukVedtaksperioderForBeregning(false),
                 )
             }.hasMessageContaining("Kan ikke innvilge når det ikke finnes noen vedtaksperioder.")
         }
@@ -88,7 +80,6 @@ class VedtaksperiodeUtilTest {
                     vedtaksperiodeJanuar,
                     vedtaksperiodeFebruar.copy(fom = LocalDate.of(2024, 1, 31)),
                 )
-            val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
 
             assertThatThrownBy {
                 validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
@@ -99,39 +90,19 @@ class VedtaksperiodeUtilTest {
         fun `Flere vedtaksperioder i samme kalendermåned men forskjellig løpende måned`() {
             val vedtaksperioder =
                 listOf(
-                    Vedtaksperiode(
+                    vedtaksperiode(
                         fom = LocalDate.of(2024, 1, 15),
                         tom = LocalDate.of(2024, 2, 14),
                     ),
-                    Vedtaksperiode(
+                    vedtaksperiode(
                         fom = LocalDate.of(2024, 2, 15),
                         tom = LocalDate.of(2024, 2, 28),
                     ),
                 )
-            val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
 
             assertDoesNotThrow {
                 validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
-                validerVedtaksperiodeOmfattesAvStønadsperioder(vedtaksperioder, stønadsperioder)
             }
-        }
-
-        @Test
-        fun `Vedtaksperiode ikke innenfor en stønadsperiode kaster feil`() {
-            val behandlingId = BehandlingId(UUID.randomUUID())
-            val vedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar)
-            val stønadsperioder =
-                listOf(
-                    stønadsperiode(
-                        behandlingId = behandlingId,
-                        fom = LocalDate.of(2024, 1, 2),
-                        tom = LocalDate.of(2024, 1, 31),
-                    ).tilStønadsperiodeBeregningsgrunnlag(),
-                )
-
-            assertThatThrownBy {
-                validerVedtaksperiodeOmfattesAvStønadsperioder(vedtaksperioder, stønadsperioder)
-            }.hasMessageContaining("Vedtaksperiode er ikke innenfor en periode med overlapp")
         }
     }
 
@@ -139,12 +110,10 @@ class VedtaksperiodeUtilTest {
     inner class VedtaksperioderInnenforLøpendeMåned {
         @Test
         fun `skal ikke avkorte vedtaksperiode hvis den omslutes av beregningsgrunnlag`() {
-            val vedtaksperiodeId = UUID.randomUUID()
             val vedtaksperioder =
                 vedtaksperioderInnenforLøpendeMåned(
                     listOf(
-                        Vedtaksperiode(
-                            id = vedtaksperiodeId,
+                        vedtaksperiodeBeregningsgrunnlag(
                             fom = LocalDate.of(2024, 1, 5),
                             tom = LocalDate.of(2024, 1, 10),
                         ),
@@ -153,8 +122,7 @@ class VedtaksperiodeUtilTest {
                 )
 
             assertThat(vedtaksperioder).containsExactly(
-                Vedtaksperiode(
-                    id = vedtaksperiodeId,
+                vedtaksperiodeBeregningsgrunnlag(
                     fom = LocalDate.of(2024, 1, 5),
                     tom = LocalDate.of(2024, 1, 10),
                 ),
@@ -163,12 +131,10 @@ class VedtaksperiodeUtilTest {
 
         @Test
         fun `skal avkorte vedtaksperiode hvis den er lengre enn beregningsgrunnlag`() {
-            val vedtaksperiodeId = UUID.randomUUID()
             val vedtaksperioder =
                 vedtaksperioderInnenforLøpendeMåned(
                     listOf(
-                        Vedtaksperiode(
-                            id = vedtaksperiodeId,
+                        vedtaksperiodeBeregningsgrunnlag(
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 2, 29),
                         ),
@@ -177,8 +143,7 @@ class VedtaksperiodeUtilTest {
                 )
 
             assertThat(vedtaksperioder).containsExactly(
-                Vedtaksperiode(
-                    id = vedtaksperiodeId,
+                vedtaksperiodeBeregningsgrunnlag(
                     fom = LocalDate.of(2024, 1, 15),
                     tom = LocalDate.of(2024, 2, 14),
                 ),
@@ -187,26 +152,22 @@ class VedtaksperiodeUtilTest {
 
         @Test
         fun `skal returnere alle perioder innenfor et beregningsgrunnlag`() {
-            val id1 = UUID.randomUUID()
-            val id2 = UUID.randomUUID()
             val vedtaksperioder =
                 vedtaksperioderInnenforLøpendeMåned(
                     listOf(
-                        Vedtaksperiode(
+                        vedtaksperiodeBeregningsgrunnlag(
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 1, 1),
                         ),
-                        Vedtaksperiode(
-                            id = id1,
+                        vedtaksperiodeBeregningsgrunnlag(
                             fom = LocalDate.of(2024, 1, 2),
                             tom = LocalDate.of(2024, 1, 2),
                         ),
-                        Vedtaksperiode(
-                            id = id2,
+                        vedtaksperiodeBeregningsgrunnlag(
                             fom = LocalDate.of(2024, 1, 3),
                             tom = LocalDate.of(2024, 1, 3),
                         ),
-                        Vedtaksperiode(
+                        vedtaksperiodeBeregningsgrunnlag(
                             fom = LocalDate.of(2024, 1, 4),
                             tom = LocalDate.of(2024, 1, 4),
                         ),
@@ -215,8 +176,8 @@ class VedtaksperiodeUtilTest {
                 )
 
             assertThat(vedtaksperioder).containsExactly(
-                Vedtaksperiode(id = id1, fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 2)),
-                Vedtaksperiode(id = id2, fom = LocalDate.of(2024, 1, 3), tom = LocalDate.of(2024, 1, 3)),
+                vedtaksperiodeBeregningsgrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 2)),
+                vedtaksperiodeBeregningsgrunnlag(fom = LocalDate.of(2024, 1, 3), tom = LocalDate.of(2024, 1, 3)),
             )
         }
 
@@ -234,7 +195,7 @@ class VedtaksperiodeUtilTest {
                     studieprosent = 100,
                     sats = 100,
                     satsBekreftet = true,
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitet = AktivitetType.TILTAK,
                 ),
         )

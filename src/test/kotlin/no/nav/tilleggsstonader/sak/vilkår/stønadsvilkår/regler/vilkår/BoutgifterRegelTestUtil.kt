@@ -8,12 +8,20 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 
 object BoutgifterRegelTestUtil {
-    fun oppfylteDelvilkårMidlertidigOvernatting() =
+    fun oppfylteDelvilkårUtgifterOvernatting() =
         listOf(
-            delvilkår(Vurdering(RegelId.NØDVENDIGE_MERUTGIFTER, SvarId.JA)),
+            delvilkår(
+                Vurdering(
+                    regelId = RegelId.NØDVENDIGE_MERUTGIFTER,
+                    svar = SvarId.JA,
+                    begrunnelse = "En begrunnelse på delvilkåret",
+                ),
+            ),
+            delvilkår(Vurdering(regelId = RegelId.DOKUMENTERT_UTGIFTER_OVERNATTING, svar = SvarId.JA)),
+            delvilkår(Vurdering(regelId = RegelId.DOKUMENTERT_DELTAKELSE, svar = SvarId.JA)),
         )
 
-    fun oppfylteDelvilkårFasteUtgifterEnBolig() =
+    fun oppfylteDelvilkårLøpendeUtgifterEnBolig() =
         listOf(
             delvilkår(Vurdering(RegelId.HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE, SvarId.JA)),
             delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.JA)),
@@ -21,19 +29,28 @@ object BoutgifterRegelTestUtil {
             delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
         )
 
-    fun oppfylteDelvilkårFasteUtgifterToBoliger() =
+    fun oppfylteDelvilkårLøpendeUtgifterToBoliger() =
         listOf(
             delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.JA)),
             delvilkår(Vurdering(RegelId.DOKUMENTERT_UTGIFTER_BOLIG, SvarId.JA)),
             delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
         )
 
-    fun ikkeOppfylteDelvilkårMidlertidigOvernatting() =
+    fun oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsaker() =
         listOf(
-            delvilkår(Vurdering(RegelId.NØDVENDIGE_MERUTGIFTER, SvarId.NEI, "begrunnelse")),
+            delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.JA)),
+            delvilkår(Vurdering(RegelId.DOKUMENTERT_UTGIFTER_BOLIG, SvarId.JA)),
+            delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.JA, "begrunnelse")),
         )
 
-    fun ikkeOppfylteDelvilkårFasteUtgifterEnBolig() =
+    fun ikkeOppfylteDelvilkårUtgifterOvernatting() =
+        listOf(
+            delvilkår(Vurdering(RegelId.NØDVENDIGE_MERUTGIFTER, SvarId.NEI, "begrunnelse")),
+            delvilkår(Vurdering(RegelId.DOKUMENTERT_DELTAKELSE, SvarId.JA)),
+            delvilkår(Vurdering(RegelId.DOKUMENTERT_UTGIFTER_OVERNATTING, SvarId.JA)),
+        )
+
+    fun ikkeOppfylteDelvilkårLøpendeUtgifterEnBolig() =
         listOf(
             delvilkår(Vurdering(RegelId.HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE, SvarId.NEI, "begrunnelse")),
             delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.JA)),
@@ -41,24 +58,29 @@ object BoutgifterRegelTestUtil {
             delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
         )
 
-    fun ikkeOppfylteDelvilkårFasteUtgifterToBoliger() =
+    fun ikkeOppfylteDelvilkårLøpendeUtgifterToBoliger() =
         listOf(
             delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.NEI, "begrunnelse")),
             delvilkår(Vurdering(RegelId.DOKUMENTERT_UTGIFTER_BOLIG, SvarId.JA)),
             delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
         )
 
-    fun oppfylteDelvilkårMidlertidigOvernattingDto() = oppfylteDelvilkårMidlertidigOvernatting().map { it.tilDto() }
+    fun oppfylteDelvilkårUtgifterOvernattingDto() = oppfylteDelvilkårUtgifterOvernatting().map { it.tilDto() }
 
-    fun oppfylteDelvilkårFasteUtgifterEnBoligDto() = oppfylteDelvilkårFasteUtgifterEnBolig().map { it.tilDto() }
+    fun oppfylteDelvilkårLøpendeUtgifterEnBoligDto() = oppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() }
 
-    fun oppfylteDelvilkårFasteUtgifterToBoligerDto() = oppfylteDelvilkårFasteUtgifterToBoliger().map { it.tilDto() }
+    fun oppfylteDelvilkårLøpendeUtgifterToBoligerDto() = oppfylteDelvilkårLøpendeUtgifterToBoliger().map { it.tilDto() }
 
-    fun ikkeOppfylteDelvilkårMidlertidigOvernattingDto() = ikkeOppfylteDelvilkårMidlertidigOvernatting().map { it.tilDto() }
+    fun oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsakerDto() =
+        oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsaker().map {
+            it.tilDto()
+        }
 
-    fun ikkeOppfylteDelvilkårFasteUtgifterEnBoligDto() = ikkeOppfylteDelvilkårFasteUtgifterEnBolig().map { it.tilDto() }
+    fun ikkeOppfylteDelvilkårUtgifterOvernattingDto() = ikkeOppfylteDelvilkårUtgifterOvernatting().map { it.tilDto() }
 
-    fun ikkeOppfylteDelvilkårFasteUtgifterToBoligerDto() = ikkeOppfylteDelvilkårFasteUtgifterToBoliger().map { it.tilDto() }
+    fun ikkeOppfylteDelvilkårLøpendeUtgifterEnBoligDto() = ikkeOppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() }
+
+    fun ikkeOppfylteDelvilkårLøpendeUtgifterToBoligerDto() = ikkeOppfylteDelvilkårLøpendeUtgifterToBoliger().map { it.tilDto() }
 
     private fun delvilkår(vararg vurderinger: Vurdering) =
         Delvilkår(

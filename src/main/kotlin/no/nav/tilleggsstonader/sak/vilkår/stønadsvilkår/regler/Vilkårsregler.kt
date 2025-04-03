@@ -2,10 +2,10 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FasteUtgifterEnBoligRegel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FasteUtgifterToBoligerRegel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.MidlertidigOvernattingRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.LøpendeUtgifterEnBoligRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.LøpendeUtgifterToBoligerRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.UtgifterOvernattingRegel
 
 /**
  * Singleton for å holde på alle regler
@@ -30,9 +30,9 @@ fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
         Stønadstype.LÆREMIDLER -> emptyList()
         Stønadstype.BOUTGIFTER ->
             listOf(
-                MidlertidigOvernattingRegel(),
-                FasteUtgifterEnBoligRegel(),
-                FasteUtgifterToBoligerRegel(),
+                UtgifterOvernattingRegel(),
+                LøpendeUtgifterEnBoligRegel(),
+                LøpendeUtgifterToBoligerRegel(),
             )
     }
 

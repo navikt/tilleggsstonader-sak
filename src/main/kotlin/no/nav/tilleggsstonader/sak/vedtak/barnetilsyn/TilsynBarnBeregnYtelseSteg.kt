@@ -42,7 +42,7 @@ class TilsynBarnBeregnYtelseSteg(
 ) : BeregnYtelseSteg<VedtakTilsynBarnRequest>(
         stønadstype = Stønadstype.BARNETILSYN,
         vedtakRepository = vedtakRepository,
-        tilkjentytelseService = tilkjentytelseService,
+        tilkjentYtelseService = tilkjentytelseService,
         simuleringService = simuleringService,
     ) {
     override fun lagreVedtak(
@@ -164,7 +164,7 @@ class TilsynBarnBeregnYtelseSteg(
                 }
             }
 
-        tilkjentytelseService.opprettTilkjentYtelse(saksbehandling, andelerTilkjentYtelse)
+        tilkjentYtelseService.lagreTilkjentYtelse(saksbehandling, andelerTilkjentYtelse)
     }
 
     private fun lagInnvilgetVedtak(

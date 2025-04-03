@@ -3,10 +3,11 @@
 
 Egenskap: Beregning læremidler - flere målgrupper - flere aktiviteter
 
-  Scenario: Vedtaksperiode som overlapper med 2 ulike målgrupper og ulike aktiviteter
+  Scenario: 2 ulike målgrupper og ulike aktiviteter innenfor en løpende måned
     Gitt følgende vedtaksperioder for læremidler
       | Fom        | Tom        |
-      | 07.01.2025 | 08.01.2025 |
+      | 07.01.2025 | 07.01.2025 |
+      | 08.01.2025 | 08.01.2025 |
 
     Gitt følgende aktiviteter for læremidler
       | Fom        | Tom        | Aktivitet | Studienivå       | Studieprosent |
@@ -23,8 +24,8 @@ Egenskap: Beregning læremidler - flere målgrupper - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 07.01.2025 | 08.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 07.01.2025      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 07.01.2025 | 08.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | NEDSATT_ARBEIDSEVNE | 07.01.2025      |
 
   Scenario: Flere aktiviteter med ulike datoer innenfor løpende måned men utenfor vedtaksperiode
     Gitt følgende vedtaksperioder for læremidler
@@ -44,13 +45,15 @@ Egenskap: Beregning læremidler - flere målgrupper - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 15.08.2024 | 15.08.2024 | 219   | VIDEREGÅENDE | 50            | 438  | AAP       | 15.08.2024      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 15.08.2024 | 15.08.2024 | 219   | VIDEREGÅENDE | 50            | 438  | NEDSATT_ARBEIDSEVNE | 15.08.2024      |
 
   Scenario: Flere målgrupper, skal prioritere målgruppe med høyest prioritet
     Gitt følgende vedtaksperioder for læremidler
       | Fom        | Tom        |
-      | 01.01.2024 | 15.01.2024 |
+      | 01.01.2024 | 04.01.2024 |
+      | 05.01.2024 | 07.01.2024 |
+      | 08.01.2024 | 15.01.2024 |
 
     Gitt følgende aktiviteter for læremidler
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
@@ -67,5 +70,5 @@ Egenskap: Beregning læremidler - flere målgrupper - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2024 | 15.01.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.01.2024      |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+      | 01.01.2024 | 15.01.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 01.01.2024      |

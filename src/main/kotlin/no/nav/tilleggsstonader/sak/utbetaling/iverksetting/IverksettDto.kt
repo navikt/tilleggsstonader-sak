@@ -61,6 +61,10 @@ enum class StønadstypeIverksetting {
     LÆREMIDLER_ENSLIG_FORSØRGER,
     LÆREMIDLER_AAP,
     LÆREMIDLER_ETTERLATTE,
+
+    BOUTGIFTER_ENSLIG_FORSØRGER,
+    BOUTGIFTER_AAP,
+    BOUTGIFTER_ETTERLATTE,
 }
 
 @Suppress("unused")
