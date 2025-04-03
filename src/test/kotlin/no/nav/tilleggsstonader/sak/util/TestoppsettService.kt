@@ -151,7 +151,7 @@ class TestoppsettService(
             ),
         )
 
-    fun lagBehandlingOgRevurdering(): Behandling {
+    fun lagBehandlingOgRevurdering(revurderFra: LocalDate = now()): Behandling {
         val fagsak = fagsak()
         lagreFagsak(fagsak)
         val førsteBehandling =
@@ -161,7 +161,7 @@ class TestoppsettService(
                 fagsak = fagsak,
                 forrigeIverksatteBehandlingId = førsteBehandling.id,
                 type = BehandlingType.REVURDERING,
-                revurderFra = now(),
+                revurderFra = revurderFra,
             )
         return lagre(revurdering)
     }

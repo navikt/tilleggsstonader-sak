@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.HarUtgifterVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MottarSykepengerForFulltidsstillingVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
@@ -98,6 +99,7 @@ data class MålgruppeFaktaOgVurderingerDto(
     val medlemskap: VurderingDto? = null,
     val utgifterDekketAvAnnetRegelverk: VurderingDto? = null,
     val aldersvilkår: VurderingDto? = null,
+    val mottarSykepengerForFulltidsstilling: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
 data class MålgruppeLæremidlerFaktaOgVurderingerDto(
@@ -148,6 +150,12 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                             vurderinger
                                 .takeIfVurderinger<AldersvilkårVurdering>()
                                 ?.aldersvilkår
+                                ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
+                                ?.tilDto(),
+                        mottarSykepengerForFulltidsstilling =
+                            vurderinger
+                                .takeIfVurderinger<MottarSykepengerForFulltidsstillingVurdering>()
+                                ?.mottarSykepengerForFulltidsstilling
                                 ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
                                 ?.tilDto(),
                     )

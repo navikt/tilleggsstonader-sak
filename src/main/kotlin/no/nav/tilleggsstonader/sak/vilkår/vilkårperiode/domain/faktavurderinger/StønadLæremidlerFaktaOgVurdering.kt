@@ -107,12 +107,6 @@ data class UtdanningLæremidler(
     }
 }
 
-data object IngenAktivitetLæremidler : AktivitetLæremidler {
-    override val type: AktivitetLæremidlerType = AktivitetLæremidlerType.INGEN_AKTIVITET_LÆREMIDLER
-    override val fakta: Fakta = IngenFakta
-    override val vurderinger: Vurderinger = IngenVurderinger
-}
-
 data class VurderingAAPLæremidler(
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
     override val aldersvilkår: VurderingAldersVilkår,
@@ -137,6 +131,12 @@ data class VurderingNedsattArbeidsevneLæremidler(
 ) : MedlemskapVurdering,
     DekketAvAnnetRegelverkVurdering,
     AldersvilkårVurdering
+
+data object IngenAktivitetLæremidler : AktivitetLæremidler {
+    override val type: AktivitetLæremidlerType = AktivitetLæremidlerType.INGEN_AKTIVITET_LÆREMIDLER
+    override val fakta: Fakta = IngenFakta
+    override val vurderinger: Vurderinger = IngenVurderinger
+}
 
 data class VurderingTiltakLæremidler(
     override val harUtgifter: VurderingHarUtgifter,

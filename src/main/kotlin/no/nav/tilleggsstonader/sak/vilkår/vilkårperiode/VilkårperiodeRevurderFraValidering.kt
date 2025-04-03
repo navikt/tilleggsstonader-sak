@@ -5,20 +5,13 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.util.norskFormat
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.AldersvilkårVurdering.vurderAldersvilkår
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AldersvilkårVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderingOrThrow
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAPLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevneLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurderinger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgSvarDto
 import java.time.LocalDate
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -48,26 +41,15 @@ object VilkårperiodeRevurderFraValidering {
         }
     }
 
-    fun validerEndrePeriodeRevurdering(
-        behandling: Saksbehandling,
+    /**
+     * Valider at det ikke er gjort noen endringer på vilkårperiode
+     * Antar at resultatet ikke er endret dersom ingen svar er endret
+     */
+    fun validerAtKunTomErEndret(
         eksisterendePeriode: Vilkårperiode,
-        oppdatertPeriode: Vilkårperiode,
+        oppdatertPeriode: LagreVilkårperiode,
+        revurderFra: LocalDate,
     ) {
-        if (behandling.type != BehandlingType.REVURDERING) {
-            return
-        }
-
-        val revurderFra = behandling.revurderFra
-
-        validerRevurderFraErSatt(revurderFra)
-
-        if (eksisterendePeriode.fom >= revurderFra) {
-            feilHvis(oppdatertPeriode.fom < revurderFra) {
-                "Kan ikke sette fom før revurder-fra(${revurderFra.norskFormat()})"
-            }
-            return
-        }
-
         feilHvis(eksisterendePeriode.fom != oppdatertPeriode.fom) {
             "Kan ikke endre fom til ${oppdatertPeriode.fom.norskFormat()} fordi " +
                 "revurder fra(${revurderFra.norskFormat()}) er før. Kontakt utviklingsteamet"
@@ -75,28 +57,42 @@ object VilkårperiodeRevurderFraValidering {
         feilHvis(oppdatertPeriode.tom < revurderFra.minusDays(1)) {
             "Kan ikke sette tom tidligere enn dagen før revurder-fra(${revurderFra.norskFormat()})"
         }
-        feilHvis(eksisterendePeriode.faktaOgVurdering.type != oppdatertPeriode.faktaOgVurdering.type) {
+        feilHvis(eksisterendePeriode.faktaOgVurdering.tilFaktaOgSvarDto() != oppdatertPeriode.faktaOgSvar) {
             logEndring(eksisterendePeriode, oppdatertPeriode)
-            "Kan ikke endre type på perioden. Kontakt utviklingsteamet"
+            "Kan ikke endre vurderinger eller fakta på perioden. Kontakt utviklingsteamet"
         }
-        feilHvis(eksisterendePeriode.faktaOgVurdering.fakta != oppdatertPeriode.faktaOgVurdering.fakta) {
-            logEndring(eksisterendePeriode, oppdatertPeriode)
-            "Kan ikke endre fakta på perioden. Kontakt utviklingsteamet"
+    }
+
+    /**
+     * Brukes for å validere at målgruppen fortsatt har gyldig aldersvilkår dersom kun tom-utvides.
+     * Vil kun kaste feil dersom man i løpet av perioden krysser enten øvre eller nedre aldersbegrensning.
+     *
+     * Begrensning/mangler:
+     * Vil ikke varsle saksbehandler om at aldersvilkår ikke er oppfylt dersom tidligere vilkår inneholder GAMMEL_MANGLER_DATA
+     * Lagres ikke ned i internt vedtak at vi faktisk sjekker alderen i disse tilfellene
+     */
+    fun validerAtAldersvilkårErGyldig(
+        eksisterendePeriode: Vilkårperiode,
+        oppdatertPeriode: LagreVilkårperiode,
+        grunnlagsdata: Grunnlagsdata,
+    ) {
+        if (eksisterendePeriode.type is MålgruppeType && eksisterendePeriode.type.skalVurdereAldersvilkår()) {
+            vurderAldersvilkår(oppdatertPeriode, grunnlagsdata)
         }
-        val eksisterendeVurderinger = eksisterendeVurderinger(eksisterendePeriode, oppdatertPeriode)
-        feilHvis(eksisterendeVurderinger != oppdatertPeriode.faktaOgVurdering.vurderinger) {
-            logEndring(eksisterendePeriode, oppdatertPeriode)
-            "Kan ikke endre vurderinger på perioden. Kontakt utviklingsteamet"
-        }
-        feilHvis(eksisterendePeriode.resultat != oppdatertPeriode.resultat) {
-            logEndring(eksisterendePeriode, oppdatertPeriode)
-            "Resultat kan ikke endre seg. Kontakt utviklingsteamet"
+    }
+
+    fun validerAtVilkårperiodeKanOppdateresIRevurdering(
+        eksisterendePeriode: Vilkårperiode,
+        revurderFra: LocalDate,
+    ) {
+        feilHvis(eksisterendePeriode.tom < revurderFra) {
+            "Kan ikke endre vilkårperiode som er ferdig før revurderingsdato. Kontakt utviklingsteamet."
         }
     }
 
     private fun logEndring(
         eksisterendePeriode: Vilkårperiode,
-        oppdatertPeriode: Vilkårperiode,
+        oppdatertPeriode: LagreVilkårperiode,
     ) {
         secureLogger.info(
             "Ugyldig endring på vilkårperiode " +
@@ -104,43 +100,8 @@ object VilkårperiodeRevurderFraValidering {
         )
     }
 
-    private fun eksisterendeVurderinger(
-        eksisterendePeriode: Vilkårperiode,
-        oppdatertPeriode: Vilkårperiode,
-    ): Vurderinger =
-        eksisterendePeriode.faktaOgVurdering.vurderinger.let { vurderinger ->
-            if (vurderinger is AldersvilkårVurdering) {
-                brukNyttAldersvilkår(vurderinger, oppdatertPeriode)
-            } else {
-                vurderinger
-            }
-        }
-
-    /**
-     * Overskriver aldersvilkår med oppdatert informasjon då aldervilkåret automatisk vurderes og skal kunne gå fra
-     * [SvarJaNei.GAMMEL_MANGLER_DATA] til [SvarJaNei.JA] uten at man kaster feil
-     */
-    private fun brukNyttAldersvilkår(
-        vurdering: AldersvilkårVurdering,
-        oppdatertPeriode: Vilkårperiode,
-    ): MedlemskapVurdering {
-        val oppdatertAldersvilkår =
-            oppdatertPeriode.faktaOgVurdering.vurderinger
-                .takeIfVurderingOrThrow<AldersvilkårVurdering>()
-                .aldersvilkår
-        return when (vurdering) {
-            is VurderingAAP -> vurdering.copy(aldersvilkår = oppdatertAldersvilkår)
-            is VurderingNedsattArbeidsevne -> vurdering.copy(aldersvilkår = oppdatertAldersvilkår)
-            is VurderingOmstillingsstønad -> vurdering.copy(aldersvilkår = oppdatertAldersvilkår)
-            is VurderingUføretrygd -> vurdering.copy(aldersvilkår = oppdatertAldersvilkår)
-            is VurderingAAPLæremidler -> vurdering.copy(aldersvilkår = oppdatertAldersvilkår)
-            is VurderingUføretrygdLæremidler -> vurdering.copy(aldersvilkår = oppdatertAldersvilkår)
-            is VurderingNedsattArbeidsevneLæremidler -> vurdering.copy(aldersvilkår = oppdatertAldersvilkår)
-        }
-    }
-
     @OptIn(ExperimentalContracts::class)
-    private fun validerRevurderFraErSatt(revurderFra: LocalDate?) {
+    fun validerRevurderFraErSatt(revurderFra: LocalDate?) {
         contract {
             returns() implies (revurderFra != null)
         }

@@ -1,8 +1,13 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Fødsel
+import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.grunnlagsdataDomain
+import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerEndrePeriodeRevurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtAldersvilkårErGyldig
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtKunTomErEndret
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -10,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.tilOppdatering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingLønnet
@@ -20,6 +26,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgSvarDto
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -101,25 +109,7 @@ class VilkårperiodeRevurderFraValideringTest {
     }
 
     @Nested
-    inner class OppdateringAvPeriode {
-        @Test
-        fun `kan oppdatere periode hvis revurder-fra er satt`() {
-            assertDoesNotThrow {
-                val eksisterendeVilkårperiode =
-                    aktivitet(
-                        fom = revurderFra.plusDays(1),
-                        faktaOgVurdering =
-                            faktaOgVurderingAktivitetTilsynBarn(
-                                aktivitetsdager = 1,
-                            ),
-                    )
-                endringMedRevurderFra(
-                    eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.medAktivitetsdager(aktivitetsdager = 2),
-                )
-            }
-        }
-
+    inner class OppdateringAvPeriodeHvorKunTomKanEndres {
         @Test
         fun `kan oppdatere periodens tom-dato til og med dagen før revurder fra`() {
             val eksisterendeVilkårperiode =
@@ -129,7 +119,7 @@ class VilkårperiodeRevurderFraValideringTest {
                 )
             assertDoesNotThrow {
                 listOf(revurderFra.minusDays(1), revurderFra, revurderFra.plusDays(1)).forEach { nyttTom ->
-                    endringMedRevurderFra(
+                    validerEndringKunTomKanOppdates(
                         eksisterendeVilkårperiode,
                         eksisterendeVilkårperiode.copy(tom = nyttTom),
                     )
@@ -145,7 +135,7 @@ class VilkårperiodeRevurderFraValideringTest {
                     tom = revurderFra.plusMonths(1),
                 )
             assertThatThrownBy {
-                endringMedRevurderFra(
+                validerEndringKunTomKanOppdates(
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.copy(tom = revurderFra.minusDays(2)),
                 )
@@ -160,11 +150,11 @@ class VilkårperiodeRevurderFraValideringTest {
                     tom = revurderFra.plusMonths(1),
                 )
             assertThatThrownBy {
-                endringMedRevurderFra(
+                validerEndringKunTomKanOppdates(
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.copy(fom = revurderFra.minusDays(2)),
                 )
-            }.hasMessageContaining("Kan ikke sette fom før revurder-fra")
+            }.message().contains("Kan ikke endre fom til", "fordi revurder fra", "er før")
         }
 
         @Test
@@ -176,27 +166,11 @@ class VilkårperiodeRevurderFraValideringTest {
                 )
 
             assertDoesNotThrow {
-                endringMedRevurderFra(
+                validerEndringKunTomKanOppdates(
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.copy(begrunnelse = "en begrunnelse"),
                 )
             }
-        }
-
-        @Test
-        fun `skal ikke kunne oppdatere resultat`() {
-            val eksisterendeVilkårperiode =
-                aktivitet(
-                    fom = revurderFra.minusMonths(1),
-                    tom = revurderFra.plusMonths(1),
-                    resultat = ResultatVilkårperiode.OPPFYLT,
-                )
-            assertThatThrownBy {
-                endringMedRevurderFra(
-                    eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
-                )
-            }.hasMessageContaining("Resultat kan ikke endre seg")
         }
 
         @Test
@@ -213,11 +187,11 @@ class VilkårperiodeRevurderFraValideringTest {
                     resultat = ResultatVilkårperiode.OPPFYLT,
                 )
             assertThatThrownBy {
-                endringMedRevurderFra(
+                validerEndringKunTomKanOppdates(
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.medAktivitetsdager(5),
                 )
-            }.hasMessageContaining("Kan ikke endre fakta på perioden")
+            }.hasMessageContaining("Kan ikke endre vurderinger eller fakta på perioden")
         }
 
         @Test
@@ -242,11 +216,11 @@ class VilkårperiodeRevurderFraValideringTest {
                     it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(vurderinger = oppdaterteVurderinger))
                 }
             assertThatThrownBy {
-                endringMedRevurderFra(
+                validerEndringKunTomKanOppdates(
                     eksisterendeVilkårperiode,
                     oppdatert,
                 )
-            }.hasMessageContaining("Kan ikke endre vurderinger på perioden")
+            }.hasMessageContaining("Kan ikke endre vurderinger eller fakta på perioden")
         }
 
         @Test
@@ -272,22 +246,109 @@ class VilkårperiodeRevurderFraValideringTest {
                     it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(vurderinger = oppdaterteVurderinger))
                 }
             assertDoesNotThrow {
-                endringMedRevurderFra(
+                validerEndringKunTomKanOppdates(
                     eksisterendeVilkårperiode,
                     oppdatert,
                 )
             }
         }
 
-        private fun endringMedRevurderFra(
+        private fun validerEndringKunTomKanOppdates(
             eksisterendeVilkårperiode: Vilkårperiode,
             oppdatertVilkårperiode: Vilkårperiode,
         ) {
-            validerEndrePeriodeRevurdering(
-                behandlingMedRevurderFra,
+            validerAtKunTomErEndret(
                 eksisterendeVilkårperiode,
-                oppdatertVilkårperiode,
+                LagreVilkårperiode(
+                    behandlingId = oppdatertVilkårperiode.behandlingId,
+                    type = oppdatertVilkårperiode.type,
+                    fom = oppdatertVilkårperiode.fom,
+                    tom = oppdatertVilkårperiode.tom,
+                    faktaOgSvar = oppdatertVilkårperiode.faktaOgVurdering.tilFaktaOgSvarDto(),
+                ),
+                behandlingMedRevurderFra.revurderFra!!,
             )
+        }
+    }
+
+    @Nested
+    inner class ValiderGyldigAldersvilkår {
+        @Test
+        fun `Skal kaste feil dersom vilkårperiode utvides utover aldersbegrensning`() {
+            val fødselsdato = osloDateNow().minusYears(67)
+            val grunnlagdata =
+                grunnlagsdataDomain(
+                    grunnlag =
+                        lagGrunnlagsdata(
+                            fødsel =
+                                Fødsel(
+                                    fødselsdato = fødselsdato,
+                                    fødselsår = fødselsdato.year,
+                                ),
+                        ),
+                )
+            val eksisterendeVilkårperiode =
+                målgruppe(fom = osloDateNow().minusYears(2), tom = osloDateNow().minusYears(1))
+
+            assertThatThrownBy {
+                validerAtAldersvilkårErGyldig(
+                    eksisterendePeriode = eksisterendeVilkårperiode,
+                    oppdatertPeriode = eksisterendeVilkårperiode.tilOppdatering().copy(tom = osloDateNow().plusYears(2)),
+                    grunnlagsdata = grunnlagdata,
+                )
+            }.hasMessageContaining("Brukeren fyller 67 år i løpet av vilkårsperioden")
+        }
+
+        @Test
+        fun `Skal ikke kaste feil dersom hele vilkårperioden er innenfor 18 og 67 år`() {
+            val fødselsdato = osloDateNow().minusYears(30)
+            val grunnlagdata =
+                grunnlagsdataDomain(
+                    grunnlag =
+                        lagGrunnlagsdata(
+                            fødsel =
+                                Fødsel(
+                                    fødselsdato = fødselsdato,
+                                    fødselsår = fødselsdato.year,
+                                ),
+                        ),
+                )
+            val eksisterendeVilkårperiode =
+                målgruppe(fom = osloDateNow().minusYears(2), tom = osloDateNow().minusYears(1))
+
+            assertDoesNotThrow {
+                validerAtAldersvilkårErGyldig(
+                    eksisterendePeriode = eksisterendeVilkårperiode,
+                    oppdatertPeriode = eksisterendeVilkårperiode.tilOppdatering().copy(tom = osloDateNow().plusYears(2)),
+                    grunnlagsdata = grunnlagdata,
+                )
+            }
+        }
+
+        @Test
+        fun `Skal ikke kaste feil dersom hele vilkårperioden er før bruker fyller 18 år`() {
+            val fødselsdato = osloDateNow().minusYears(10)
+            val grunnlagdata =
+                grunnlagsdataDomain(
+                    grunnlag =
+                        lagGrunnlagsdata(
+                            fødsel =
+                                Fødsel(
+                                    fødselsdato = fødselsdato,
+                                    fødselsår = fødselsdato.year,
+                                ),
+                        ),
+                )
+            val eksisterendeVilkårperiode =
+                målgruppe(fom = osloDateNow(), tom = osloDateNow().plusYears(1))
+
+            assertDoesNotThrow {
+                validerAtAldersvilkårErGyldig(
+                    eksisterendePeriode = eksisterendeVilkårperiode,
+                    oppdatertPeriode = eksisterendeVilkårperiode.tilOppdatering().copy(tom = osloDateNow().plusYears(2)),
+                    grunnlagsdata = grunnlagdata,
+                )
+            }
         }
     }
 }

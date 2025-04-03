@@ -58,31 +58,36 @@ data object IngenFakta : Fakta
  */
 sealed interface Vurderinger {
     fun resultatVurderinger(): ResultatVilkårperiode {
-        val resultater = finnResultatetFraVurderinger()
+        val resultater = finnVurderinger().map { it.resultat }
         return utledResultat(resultater)
     }
 
-    private fun finnResultatetFraVurderinger(): MutableList<ResultatDelvilkårperiode> {
-        val resultater = mutableListOf<ResultatDelvilkårperiode>()
+    fun vurderingerMedSvarGammelManglerData(): List<Vurdering> = finnVurderinger().filter { it.svar == SvarJaNei.GAMMEL_MANGLER_DATA }
+
+    private fun finnVurderinger(): MutableList<Vurdering> {
+        val vurderinger = mutableListOf<Vurdering>()
         if (this is LønnetVurdering) {
-            resultater.add(lønnet.resultat)
+            vurderinger.add(lønnet)
         }
         if (this is MedlemskapVurdering) {
-            resultater.add(medlemskap.resultat)
+            vurderinger.add(medlemskap)
         }
         if (this is DekketAvAnnetRegelverkVurdering) {
-            resultater.add(dekketAvAnnetRegelverk.resultat)
+            vurderinger.add(dekketAvAnnetRegelverk)
         }
         if (this is HarUtgifterVurdering) {
-            resultater.add(harUtgifter.resultat)
+            vurderinger.add(harUtgifter)
         }
         if (this is HarRettTilUtstyrsstipendVurdering) {
-            resultater.add(harRettTilUtstyrsstipend.resultat)
+            vurderinger.add(harRettTilUtstyrsstipend)
         }
         if (this is AldersvilkårVurdering) {
-            resultater.add(aldersvilkår.resultat)
+            vurderinger.add(aldersvilkår)
         }
-        return resultater
+        if (this is MottarSykepengerForFulltidsstillingVurdering) {
+            vurderinger.add(mottarSykepengerForFulltidsstilling)
+        }
+        return vurderinger
     }
 
     private fun utledResultat(resultater: List<ResultatDelvilkårperiode>) =

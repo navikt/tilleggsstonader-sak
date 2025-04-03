@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -11,19 +12,19 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensio
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.tilOppdatering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -176,7 +177,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
     }
 
     @Nested
-    inner class OppdaterMålgruppe {
+    inner class Oppdater {
         @Test
         fun `skal oppdatere alle felter på målgruppe`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
@@ -301,31 +302,6 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `endring av vilkårperioder opprettet kopiert fra tidligere behandling skal få status ENDRET`() {
-            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
-
-            val opprinneligVilkårperiode =
-                vilkårperiodeRepository.insert(
-                    målgruppe(
-                        behandlingId = revurdering.forrigeIverksatteBehandlingId!!,
-                    ),
-                )
-
-            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
-
-            val vilkårperiode = vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()
-            val oppdatertPeriode =
-                vilkårperiodeService.oppdaterVilkårperiode(
-                    vilkårperiode.id,
-                    vilkårperiode.tilOppdatering(),
-                )
-
-            assertThat(opprinneligVilkårperiode.status).isEqualTo(Vilkårstatus.NY)
-            assertThat(vilkårperiode.status).isEqualTo(Vilkårstatus.UENDRET)
-            assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
-        }
-
-        @Test
         fun `skal feile dersom manglende begrunnelse når dekket av annet regelverk endres til ja`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
@@ -367,41 +343,169 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                 )
             }.hasMessageContaining("Kan ikke gjøre endringer på denne behandlingen fordi den er ferdigstilt.")
         }
+    }
 
+    @Nested
+    inner class OppdaterRevurdering {
         @Test
-        fun `kan ikke oppdatere målgruppe hvis periode begynner før revurderFra`() {
-            val behandling =
-                testoppsettService.oppdater(
-                    testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
+        fun `endring av vilkårperioder opprettet kopiert fra tidligere behandling skal få status ENDRET`() {
+            val revurdering = lagRevurderingMedKopiertMålgruppe()
+
+            val opprinneligVilkårperiode = vilkårperiodeRepository.findByBehandlingId(revurdering.forrigeIverksatteBehandlingId!!).single()
+            val vilkårperiodeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()
+            val oppdatertPeriode =
+                vilkårperiodeService.oppdaterVilkårperiode(
+                    vilkårperiodeFørOppdatering.id,
+                    vilkårperiodeFørOppdatering.tilOppdatering(),
                 )
 
+            assertThat(opprinneligVilkårperiode.status).isEqualTo(Vilkårstatus.NY)
+            assertThat(vilkårperiodeFørOppdatering.status).isEqualTo(Vilkårstatus.UENDRET)
+            assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
+        }
+
+        @Test
+        fun `kan ikke oppdatere vurdering hvis periode begynner før revurderFra`() {
             val målgruppe =
                 målgruppe(
-                    behandlingId = behandling.id,
                     faktaOgVurdering = faktaOgVurderingMålgruppe(medlemskap = VurderingMedlemskap(svar = SvarJaNei.NEI)),
                     fom = now().minusMonths(1),
                     tom = now().plusMonths(1),
                 )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
+
+            val behandling = lagRevurderingMedKopiertMålgruppe(målgruppe)
+            val vilkårperiodeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
 
             assertThatThrownBy {
                 vilkårperiodeService.oppdaterVilkårperiode(
-                    periode.id,
-                    periode
+                    vilkårperiodeFørOppdatering.id,
+                    vilkårperiodeFørOppdatering
                         .tilOppdatering()
                         .copy(faktaOgSvar = FaktaOgSvarMålgruppeDto(svarMedlemskap = SvarJaNei.JA)),
                 )
-            }.hasMessageContaining("Kan ikke endre vurderinger på perioden.")
+            }.hasMessageContaining("Kan ikke endre vurderinger eller fakta på perioden.")
         }
 
-        private fun Vilkårperiode.tilOppdatering() =
-            LagreVilkårperiode(
-                behandlingId = behandlingId,
-                fom = fom,
-                tom = tom,
-                faktaOgSvar = faktaOgVurdering.tilFaktaOgSvarDto(),
-                begrunnelse = begrunnelse,
-                type = type,
-            )
+        @Test
+        fun `kan oppdatere tom-dato hvis periode krysser revurderFra dato`() {
+            val originalMålgruppe =
+                målgruppe(
+                    fom = now().minusMonths(1),
+                    tom = now().plusMonths(1),
+                )
+            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe)
+            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
+
+            val nyTom = now().plusMonths(2)
+
+            val oppdatertPeriode =
+                vilkårperiodeService.oppdaterVilkårperiode(
+                    målgruppeFørOppdatering.id,
+                    målgruppeFørOppdatering
+                        .tilOppdatering()
+                        .copy(tom = nyTom),
+                )
+
+            assertThat(oppdatertPeriode)
+                .usingRecursiveComparison()
+                .ignoringFields("sporbar", "tom")
+                .isEqualTo(målgruppeFørOppdatering)
+
+            assertThat(oppdatertPeriode.tom).isEqualTo(nyTom)
+        }
+
+        @Test
+        fun `kan ikke endre målgruppe dersom hele perioden er før revurderFra`() {
+            val originalMålgruppe =
+                målgruppe(
+                    fom = now().minusMonths(2),
+                    tom = now().minusMonths(1),
+                )
+            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe, revurderFra = now())
+            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
+
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(
+                    målgruppeFørOppdatering.id,
+                    målgruppeFørOppdatering
+                        .tilOppdatering()
+                        .copy(tom = målgruppeFørOppdatering.tom.plusMonths(1)),
+                )
+            }.hasMessageContaining("Kan ikke endre vilkårperiode som er ferdig før revurderingsdato.")
+        }
+
+        @Test
+        fun `kan ikke utvide målgruppe dersom den inneholder svar GAMMEL_MANGLER_DATA`() {
+            val originalMålgruppe =
+                målgruppe(
+                    fom = now().minusMonths(1),
+                    tom = now().plusMonths(1),
+                    begrunnelse = "Begrunnelse",
+                    faktaOgVurdering =
+                        faktaOgVurderingMålgruppe(
+                            type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                            mottarSykepengerForFulltidsstilling =
+                                VurderingMottarSykepengerForFulltidsstilling(
+                                    svar = SvarJaNei.GAMMEL_MANGLER_DATA,
+                                    resultat = ResultatDelvilkårperiode.IKKE_VURDERT,
+                                ),
+                        ),
+                )
+            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe)
+            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
+
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(
+                    målgruppeFørOppdatering.id,
+                    målgruppeFørOppdatering
+                        .tilOppdatering()
+                        .copy(tom = målgruppeFørOppdatering.tom.plusMonths(1)),
+                )
+            }.hasMessageContaining("Det har kommet nye vilkår som må vurderes")
+        }
+
+        fun `kan ikke utvide målgruppe dersom den krysser aldersgrense`() {
+            val originalMålgruppe =
+                målgruppe(
+                    fom = now().minusMonths(1),
+                    tom = now().plusMonths(1),
+                    begrunnelse = "Begrunnelse",
+                    faktaOgVurdering =
+                        faktaOgVurderingMålgruppe(
+                            type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                            mottarSykepengerForFulltidsstilling =
+                                VurderingMottarSykepengerForFulltidsstilling(
+                                    svar = SvarJaNei.GAMMEL_MANGLER_DATA,
+                                    resultat = ResultatDelvilkårperiode.IKKE_VURDERT,
+                                ),
+                        ),
+                )
+            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe)
+            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
+
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(
+                    målgruppeFørOppdatering.id,
+                    målgruppeFørOppdatering
+                        .tilOppdatering()
+                        .copy(tom = målgruppeFørOppdatering.tom.plusMonths(1)),
+                )
+            }.hasMessageContaining("Det har kommet nye vilkår som må vurderes")
+        }
+    }
+
+    private fun lagRevurderingMedKopiertMålgruppe(
+        opprinneligMålgruppe: VilkårperiodeMålgruppe = målgruppe(),
+        revurderFra: LocalDate = now(),
+    ): Behandling {
+        val revurdering = testoppsettService.lagBehandlingOgRevurdering(revurderFra = revurderFra)
+
+        vilkårperiodeRepository.insert(
+            opprinneligMålgruppe.copy(behandlingId = revurdering.forrigeIverksatteBehandlingId!!),
+        )
+
+        vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
+
+        return revurdering
     }
 }

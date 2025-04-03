@@ -16,6 +16,10 @@
     "medlemskap": {
       "svar": "JA",
       "resultat": "OPPFYLT"
+    },
+    "mottarSykepengerForFulltidsstilling": {
+      "resultat": "OPPFYLT",
+      "svar": "NEI"
     }
   }
 }

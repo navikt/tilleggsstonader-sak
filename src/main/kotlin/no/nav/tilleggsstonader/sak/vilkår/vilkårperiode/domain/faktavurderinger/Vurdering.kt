@@ -16,6 +16,7 @@ enum class SvarJaNei {
     JA_IMPLISITT,
     NEI,
     GAMMEL_MANGLER_DATA,
+    NEI_IMPLISITT,
     ;
 
     fun harVurdert(): Boolean = this != JA_IMPLISITT
@@ -40,7 +41,7 @@ data class VurderingLønnet private constructor(
                 null -> ResultatDelvilkårperiode.IKKE_VURDERT
                 SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
-                SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingLønnet::class.simpleName}")
+                SvarJaNei.JA_IMPLISITT, SvarJaNei.NEI_IMPLISITT -> error("$svar er ugyldig for ${VurderingLønnet::class.simpleName}")
                 SvarJaNei.GAMMEL_MANGLER_DATA -> error("$svar er ugyldig for ${VurderingLønnet::class.simpleName}")
             }
     }
@@ -58,7 +59,7 @@ data class VurderingHarUtgifter private constructor(
                 null -> ResultatDelvilkårperiode.IKKE_VURDERT
                 SvarJaNei.JA -> ResultatDelvilkårperiode.OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
-                SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingHarUtgifter::class.simpleName}")
+                SvarJaNei.JA_IMPLISITT, SvarJaNei.NEI_IMPLISITT -> error("$svar er ugyldig for ${VurderingHarUtgifter::class.simpleName}")
                 SvarJaNei.GAMMEL_MANGLER_DATA -> error("$svar er ugyldig for ${VurderingHarUtgifter::class.simpleName}")
             }
     }
@@ -76,7 +77,11 @@ data class VurderingHarRettTilUtstyrsstipend private constructor(
                 null -> ResultatDelvilkårperiode.IKKE_VURDERT
                 SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
-                SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingHarRettTilUtstyrsstipend::class.simpleName}")
+                SvarJaNei.JA_IMPLISITT, SvarJaNei.NEI_IMPLISITT ->
+                    error(
+                        "$svar er ugyldig for ${VurderingHarRettTilUtstyrsstipend::class.simpleName}",
+                    )
+
                 SvarJaNei.GAMMEL_MANGLER_DATA -> error("$svar er ugyldig for ${VurderingHarRettTilUtstyrsstipend::class.simpleName}")
             }
     }
@@ -97,6 +102,7 @@ data class VurderingMedlemskap private constructor(
                 -> ResultatDelvilkårperiode.OPPFYLT
 
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+                SvarJaNei.NEI_IMPLISITT -> error("$svar er ugyldig for ${VurderingMedlemskap::class.simpleName}")
                 SvarJaNei.GAMMEL_MANGLER_DATA -> error("$svar er ugyldig for ${VurderingMedlemskap::class.simpleName}")
             }
 
@@ -116,7 +122,11 @@ data class VurderingDekketAvAnnetRegelverk private constructor(
                 null -> ResultatDelvilkårperiode.IKKE_VURDERT
                 SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
-                SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingDekketAvAnnetRegelverk::class.simpleName}")
+                SvarJaNei.JA_IMPLISITT, SvarJaNei.NEI_IMPLISITT ->
+                    error(
+                        "$svar er ugyldig for ${VurderingDekketAvAnnetRegelverk::class.simpleName}",
+                    )
+
                 SvarJaNei.GAMMEL_MANGLER_DATA -> error("$svar er ugyldig for ${VurderingDekketAvAnnetRegelverk::class.simpleName}")
             }
     }
@@ -148,11 +158,35 @@ data class VurderingAldersVilkår(
             when (svar) {
                 SvarJaNei.JA -> ResultatDelvilkårperiode.OPPFYLT
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
-                SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingAldersVilkår::class.simpleName}")
+                SvarJaNei.JA_IMPLISITT, SvarJaNei.NEI_IMPLISITT -> error("$svar er ugyldig for ${VurderingAldersVilkår::class.simpleName}")
                 SvarJaNei.GAMMEL_MANGLER_DATA ->
                     error(
                         "$svar er ugyldig for nye eller oppdaterte vurderinger av typen: ${VurderingAldersVilkår::class.simpleName}",
                     )
             }
+    }
+}
+
+data class VurderingMottarSykepengerForFulltidsstilling constructor(
+    override val svar: SvarJaNei?,
+    override val resultat: ResultatDelvilkårperiode,
+) : Vurdering {
+    constructor(svar: SvarJaNei?) : this(svar, utledResultat(svar))
+
+    companion object {
+        private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =
+            when (svar) {
+                null -> ResultatDelvilkårperiode.IKKE_VURDERT
+                SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+                SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
+                SvarJaNei.NEI_IMPLISITT -> ResultatDelvilkårperiode.OPPFYLT
+                SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingMottarSykepengerForFulltidsstilling::class.simpleName}")
+                SvarJaNei.GAMMEL_MANGLER_DATA ->
+                    error(
+                        "$svar er ugyldig for nye eller oppdaterte vurderinger av typen: ${VurderingMottarSykepengerForFulltidsstilling::class.simpleName}",
+                    )
+            }
+
+        val NEI_IMPLISITT = VurderingMottarSykepengerForFulltidsstilling(SvarJaNei.NEI_IMPLISITT)
     }
 }

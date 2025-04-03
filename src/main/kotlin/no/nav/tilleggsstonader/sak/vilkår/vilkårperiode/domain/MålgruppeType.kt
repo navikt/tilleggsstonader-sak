@@ -76,6 +76,7 @@ enum class MålgruppeType(
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
                 }
             }
+
             Stønadstype.LÆREMIDLER -> {
                 when (this) {
                     AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE -> TypeAndel.LÆREMIDLER_AAP
@@ -84,6 +85,7 @@ enum class MålgruppeType(
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
                 }
             }
+
             Stønadstype.BOUTGIFTER -> {
                 when (this) {
                     AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE -> TypeAndel.BOUTGIFTER_AAP
@@ -92,6 +94,12 @@ enum class MålgruppeType(
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
                 }
             }
+        }
+
+    fun skalVurdereAldersvilkår() =
+        when (this) {
+            AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE, OMSTILLINGSSTØNAD, DAGPENGER -> true
+            OVERGANGSSTØNAD, INGEN_MÅLGRUPPE, SYKEPENGER_100_PROSENT -> false
         }
 }
 

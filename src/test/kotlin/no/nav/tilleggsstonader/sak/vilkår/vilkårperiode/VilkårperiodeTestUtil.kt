@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -10,45 +11,57 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAPLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevneLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import java.time.LocalDate
 import java.util.UUID
@@ -64,6 +77,7 @@ object VilkårperiodeTestUtil {
         slettetKommentar: String? = null,
         forrigeVilkårperiodeId: UUID? = null,
         status: Vilkårstatus = Vilkårstatus.NY,
+        stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     ): GeneriskVilkårperiode<MålgruppeFaktaOgVurdering> =
         GeneriskVilkårperiode(
             behandlingId = behandlingId,
@@ -90,6 +104,7 @@ object VilkårperiodeTestUtil {
         medlemskap: VurderingMedlemskap = vurderingMedlemskap(),
         dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(),
         aldersvilkår: VurderingAldersVilkår = vurderingAldersVilkår(),
+        mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling = vurderingMottarSykepengerForFulltidsstilling(),
     ): MålgruppeFaktaOgVurdering =
         when (type) {
             MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
@@ -127,6 +142,54 @@ object VilkårperiodeTestUtil {
                 NedsattArbeidsevneTilsynBarn(
                     vurderinger =
                         VurderingNedsattArbeidsevne(
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
+                            medlemskap = medlemskap,
+                            aldersvilkår = aldersvilkår,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerForFulltidsstilling,
+                        ),
+                )
+
+            MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
+        }
+
+    fun faktaOgVurderingMålgruppeLæremidler(
+        type: MålgruppeType = MålgruppeType.AAP,
+        medlemskap: VurderingMedlemskap = vurderingMedlemskap(),
+        dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(),
+        aldersvilkår: VurderingAldersVilkår = vurderingAldersVilkår(),
+    ): MålgruppeFaktaOgVurdering =
+        when (type) {
+            MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeLæremidler
+            MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerLæremidler
+            MålgruppeType.OMSTILLINGSSTØNAD ->
+                OmstillingsstønadLæremidler(
+                    vurderinger =
+                        VurderingOmstillingsstønad(
+                            medlemskap = medlemskap,
+                            aldersvilkår = aldersvilkår,
+                        ),
+                )
+
+            MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadLæremidler
+            MålgruppeType.AAP ->
+                AAPLæremidler(
+                    vurderinger = VurderingAAPLæremidler(dekketAvAnnetRegelverk = dekketAvAnnetRegelverk, aldersvilkår = aldersvilkår),
+                )
+
+            MålgruppeType.UFØRETRYGD ->
+                UføretrygdLæremidler(
+                    vurderinger =
+                        VurderingUføretrygdLæremidler(
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
+                            medlemskap = medlemskap,
+                            aldersvilkår = aldersvilkår,
+                        ),
+                )
+
+            MålgruppeType.NEDSATT_ARBEIDSEVNE ->
+                NedsattArbeidsevneLæremidler(
+                    vurderinger =
+                        VurderingNedsattArbeidsevneLæremidler(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
                             medlemskap = medlemskap,
                             aldersvilkår = aldersvilkår,
@@ -262,12 +325,16 @@ object VilkårperiodeTestUtil {
     fun vurderingAldersVilkår(svar: SvarJaNei = SvarJaNei.JA) =
         VurderingAldersVilkår(svar = svar, vurderingFaktaEtterlevelse = vurderingFaktaEtterlevelseAldersvilkår())
 
+    fun vurderingMottarSykepengerForFulltidsstilling(svar: SvarJaNei? = SvarJaNei.NEI) =
+        VurderingMottarSykepengerForFulltidsstilling(svar = svar)
+
     fun dummyVilkårperiodeMålgruppe(
         type: MålgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,
         fom: LocalDate = osloDateNow(),
         tom: LocalDate = osloDateNow(),
         medlemskap: SvarJaNei? = null,
         dekkesAvAnnetRegelverk: SvarJaNei? = null,
+        mottarSykepengerForFulltidsstilling: SvarJaNei? = null,
         begrunnelse: String? = null,
         behandlingId: BehandlingId = BehandlingId.random(),
     ) = LagreVilkårperiode(
@@ -278,6 +345,7 @@ object VilkårperiodeTestUtil {
             FaktaOgSvarMålgruppeDto(
                 svarMedlemskap = medlemskap,
                 svarUtgifterDekketAvAnnetRegelverk = dekkesAvAnnetRegelverk,
+                svarMottarSykepengerForFulltidsstilling = mottarSykepengerForFulltidsstilling,
             ),
         begrunnelse = begrunnelse,
         behandlingId = behandlingId,
@@ -343,4 +411,14 @@ object VilkårperiodeTestUtil {
             else -> error("Har ikke mappet ${faktaOgVurdering1::class.simpleName}")
         }
     }
+
+    fun Vilkårperiode.tilOppdatering() =
+        LagreVilkårperiode(
+            behandlingId = behandlingId,
+            fom = fom,
+            tom = tom,
+            faktaOgSvar = faktaOgVurdering.tilFaktaOgSvarDto(),
+            begrunnelse = begrunnelse,
+            type = type,
+        )
 }

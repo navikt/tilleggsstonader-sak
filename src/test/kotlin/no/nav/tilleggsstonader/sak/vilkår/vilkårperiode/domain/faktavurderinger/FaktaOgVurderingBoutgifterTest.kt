@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -37,6 +38,7 @@ class FaktaOgVurderingBoutgifterTest {
         val dekketAvAnnetRegelverkOppfylt = vurderingDekketAvAnnetRegelverk()
 
         val aldersvilkårOppfylt = vurderingAldersVilkår()
+        val mottarSykepengerOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.NEI)
 
         @Test
         fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og en er oppfylt`() {
@@ -47,6 +49,7 @@ class FaktaOgVurderingBoutgifterTest {
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
                             aldersvilkår = aldersvilkårOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 
@@ -62,6 +65,7 @@ class FaktaOgVurderingBoutgifterTest {
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
                             aldersvilkår = aldersvilkårOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 
@@ -77,6 +81,7 @@ class FaktaOgVurderingBoutgifterTest {
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
                             aldersvilkår = aldersvilkårOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 
@@ -92,6 +97,7 @@ class FaktaOgVurderingBoutgifterTest {
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
                             aldersvilkår = aldersvilkårOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 

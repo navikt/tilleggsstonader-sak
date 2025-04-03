@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -38,8 +39,11 @@ class FaktaOgVurderingTilsynBarnTest {
 
         val aldersvilkårOppfylt = vurderingAldersVilkår()
 
+        val mottarSykepengerOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.NEI)
+        val mottarSykepengerIkkeOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.JA)
+
         @Test
-        fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og en er oppfylt`() {
+        fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og resten er oppfylt`() {
             val inngangsvilkår =
                 NedsattArbeidsevneTilsynBarn(
                     vurderinger =
@@ -47,6 +51,7 @@ class FaktaOgVurderingTilsynBarnTest {
                             medlemskap = medlemskapIkkeVurdert,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
                             aldersvilkår = aldersvilkårOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 
@@ -54,7 +59,7 @@ class FaktaOgVurderingTilsynBarnTest {
         }
 
         @Test
-        fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og en er ikke oppfylt`() {
+        fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og resten er ikke oppfylt`() {
             val inngangsvilkår =
                 NedsattArbeidsevneTilsynBarn(
                     vurderinger =
@@ -62,6 +67,7 @@ class FaktaOgVurderingTilsynBarnTest {
                             medlemskap = medlemskapIkkeOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
                             aldersvilkår = aldersvilkårOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerIkkeOppfylt,
                         ),
                 )
 
@@ -69,7 +75,7 @@ class FaktaOgVurderingTilsynBarnTest {
         }
 
         @Test
-        fun `resultat er IKKE_OPPFYKT hvis en vurdering er oppfylt og en er ikke oppfylt`() {
+        fun `resultat er IKKE_OPPFYLT hvis minst en vurdering er ikke oppfylt`() {
             val inngangsvilkår =
                 NedsattArbeidsevneTilsynBarn(
                     vurderinger =
@@ -77,6 +83,7 @@ class FaktaOgVurderingTilsynBarnTest {
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
                             aldersvilkår = aldersvilkårOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerIkkeOppfylt,
                         ),
                 )
 
@@ -92,6 +99,7 @@ class FaktaOgVurderingTilsynBarnTest {
                             medlemskap = medlemskapOppfylt,
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
                             aldersvilkår = aldersvilkårOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
                         ),
                 )
 
