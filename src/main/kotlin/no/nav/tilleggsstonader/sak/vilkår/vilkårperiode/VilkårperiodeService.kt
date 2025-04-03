@@ -13,9 +13,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.norskFormat
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValidering
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtAldersvilkårErGyldig
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtKunTomErEndret
@@ -36,9 +33,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mapFaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
@@ -53,7 +48,6 @@ import java.util.UUID
 class VilkårperiodeService(
     private val behandlingService: BehandlingService,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
-    private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
     private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
     private val grunnlagsdataService: GrunnlagsdataService,
@@ -75,19 +69,6 @@ class VilkårperiodeService(
         return VilkårperioderResponse(
             vilkårperioder = vilkårperioder.tilDto(),
             grunnlag = grunnlagsdataVilkårsperioder?.tilDto(),
-        )
-    }
-
-    fun validerOgLagResponse(
-        behandlingId: BehandlingId,
-        periode: Vilkårperiode? = null,
-    ): LagreVilkårperiodeResponse {
-        val valideringsresultat = validerStønadsperioder(behandlingId)
-
-        return LagreVilkårperiodeResponse(
-            periode = periode?.tilDto(),
-            stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.OK else Stønadsperiodestatus.FEIL,
-            stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
         )
     }
 
@@ -150,7 +131,12 @@ class VilkårperiodeService(
                 .hentGrunnlagsdata(behandling.id)
 
         if (behandling.type != BehandlingType.REVURDERING) {
-            return oppdaterVilkårperiodeHvorAltKanEndres(eksisterendeVilkårperiode, vilkårperiode, behandling, grunnlagsdata)
+            return oppdaterVilkårperiodeHvorAltKanEndres(
+                eksisterendeVilkårperiode,
+                vilkårperiode,
+                behandling,
+                grunnlagsdata,
+            )
         }
 
         return oppdaterVilkårperiodeIRevurdering(vilkårperiode, eksisterendeVilkårperiode, behandling, grunnlagsdata)
@@ -172,7 +158,12 @@ class VilkårperiodeService(
             feilHvis(vilkårperiode.fom < revurderFra) {
                 "Kan ikke sette fom før revurder-fra(${revurderFra.norskFormat()})"
             }
-            return oppdaterVilkårperiodeHvorAltKanEndres(eksisterendeVilkårperiode, vilkårperiode, behandling, grunnlagsdata)
+            return oppdaterVilkårperiodeHvorAltKanEndres(
+                eksisterendeVilkårperiode,
+                vilkårperiode,
+                behandling,
+                grunnlagsdata,
+            )
         }
 
         return oppdaterVilkårperiodeFørRevurderFra(vilkårperiode, eksisterendeVilkårperiode, revurderFra, grunnlagsdata)
@@ -189,7 +180,8 @@ class VilkårperiodeService(
         revurderFra: LocalDate,
         grunnlagsdata: Grunnlagsdata,
     ): Vilkårperiode {
-        val vurderingerMedGammelManglerData = eksisterendeVilkårperiode.faktaOgVurdering.vurderinger.vurderingerMedSvarGammelManglerData()
+        val vurderingerMedGammelManglerData =
+            eksisterendeVilkårperiode.faktaOgVurdering.vurderinger.vurderingerMedSvarGammelManglerData()
         val finnesGammelDataUtenomAldersVilkår = vurderingerMedGammelManglerData.any { it !is VurderingAldersVilkår }
 
         if (finnesGammelDataUtenomAldersVilkår) {
@@ -254,7 +246,10 @@ class VilkårperiodeService(
         nyBehandlingId: BehandlingId,
     ) {
         val eksisterendeVilkårperioder =
-            vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeIverksatteBehandlingId, ResultatVilkårperiode.SLETTET)
+            vilkårperiodeRepository.findByBehandlingIdAndResultatNot(
+                forrigeIverksatteBehandlingId,
+                ResultatVilkårperiode.SLETTET,
+            )
 
         val kopiertePerioderMedReferanse = eksisterendeVilkårperioder.map { it.kopierTilBehandling(nyBehandlingId) }
         vilkårperiodeRepository.insertAll(kopiertePerioderMedReferanse)
@@ -299,18 +294,6 @@ class VilkårperiodeService(
 
         feilHvis(eksisterendeVilkårperiode.type != vilkårperiode.type) {
             "Kan ikke endre type på en eksisterende periode. Kontakt utviklingsteamet"
-        }
-    }
-
-    private fun validerStønadsperioder(behandlingId: BehandlingId): Result<Unit> {
-        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
-        val vilkårperioder = hentVilkårperioder(behandlingId)
-
-        return kotlin.runCatching {
-            StønadsperiodeValidering.validerStønadsperioderVedEndringAvVilkårperiode(
-                stønadsperioder,
-                vilkårperioder,
-            )
         }
     }
 }

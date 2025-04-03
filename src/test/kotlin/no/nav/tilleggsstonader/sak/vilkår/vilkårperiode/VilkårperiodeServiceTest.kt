@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -11,20 +10,12 @@ import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClien
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -33,7 +24,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDate
 import java.time.LocalDate.now
 import java.util.UUID
 
@@ -171,112 +161,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 }.hasMessageContaining("Kan ikke slette periode")
             }
         }
-    }
-
-    @Nested
-    inner class Validering {
-        @Test
-        fun `skal validere stønadsperioder ved opprettelse av vilkårperiode - ingen stønadsperioder`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-
-            val periode =
-                vilkårperiodeService.opprettVilkårperiode(
-                    dummyVilkårperiodeMålgruppe(
-                        type = MålgruppeType.AAP,
-                        fom = osloDateNow(),
-                        tom = osloDateNow(),
-                        medlemskap = SvarJaNei.JA_IMPLISITT,
-                        dekkesAvAnnetRegelverk = SvarJaNei.NEI,
-                        behandlingId = behandling.id,
-                    ),
-                )
-
-            val response =
-                vilkårperiodeService.validerOgLagResponse(behandlingId = behandling.id, periode = periode)
-
-            assertThat(response.stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.OK)
-            assertThat(response.stønadsperiodeFeil).isNull()
-        }
-
-        @Test
-        fun `skal validere stønadsperioder ved oppdatering av vilkårperioder`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-
-            val fom1 = LocalDate.of(2024, 1, 1)
-            val tom1 = LocalDate.of(2024, 2, 1)
-
-            val fom2 = LocalDate.of(2024, 2, 1)
-            val tom2 = LocalDate.of(2024, 3, 1)
-
-            val opprettetMålgruppe =
-                vilkårperiodeService.opprettVilkårperiode(
-                    dummyVilkårperiodeMålgruppe(
-                        type = MålgruppeType.AAP,
-                        fom = fom1,
-                        tom = tom1,
-                        medlemskap = SvarJaNei.JA_IMPLISITT,
-                        dekkesAvAnnetRegelverk = SvarJaNei.NEI,
-                        behandlingId = behandling.id,
-                    ),
-                )
-
-            assertThat(
-                vilkårperiodeService
-                    .validerOgLagResponse(
-                        behandlingId = behandling.id,
-                        periode = opprettetMålgruppe,
-                    ).stønadsperiodeStatus,
-            ).isEqualTo(
-                Stønadsperiodestatus.OK,
-            )
-
-            val ulønnetTiltak =
-                dummyVilkårperiodeAktivitet(
-                    type = AktivitetType.TILTAK,
-                    fom = fom1,
-                    tom = tom1,
-                    behandlingId = behandling.id,
-                )
-            val opprettetTiltakPeriode = vilkårperiodeService.opprettVilkårperiode(ulønnetTiltak)
-            assertThat(
-                vilkårperiodeService
-                    .validerOgLagResponse(
-                        behandlingId = behandling.id,
-                        periode = opprettetTiltakPeriode,
-                    ).stønadsperiodeStatus,
-            ).isEqualTo(
-                Stønadsperiodestatus.OK,
-            )
-            stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(nyStønadsperiode(fom1, tom1)))
-
-            vilkårperiodeService.oppdaterVilkårperiode(
-                id = opprettetTiltakPeriode.id,
-                vilkårperiode = ulønnetTiltak.copy(fom = fom2, tom = tom2),
-            )
-            vilkårperiodeService.validerOgLagResponse(behandlingId = behandling.id, periode = opprettetMålgruppe)
-
-            assertThat(
-                vilkårperiodeService
-                    .validerOgLagResponse(
-                        behandlingId = behandling.id,
-                        periode = opprettetMålgruppe,
-                    ).stønadsperiodeStatus,
-            ).isEqualTo(
-                Stønadsperiodestatus.FEIL,
-            )
-        }
-
-        private fun nyStønadsperiode(
-            fom: LocalDate = osloDateNow(),
-            tom: LocalDate = osloDateNow(),
-        ) = StønadsperiodeDto(
-            id = null,
-            fom = fom,
-            tom = tom,
-            målgruppe = MålgruppeType.AAP,
-            aktivitet = AktivitetType.TILTAK,
-            status = StønadsperiodeStatus.NY,
-        )
     }
 
     @Nested

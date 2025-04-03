@@ -18,15 +18,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 
 object StønadsperiodeValidering {
     /**
-     * Validering av stønadsperioder som kjøres når man endrer vilkårperiode trenger ikke å validere fødselsdatoet.
-     * Det er tilstrekkelig at det gjøres vid validering av stønadsperioder.
-     */
-    fun validerStønadsperioderVedEndringAvVilkårperiode(
-        stønadsperioder: List<StønadsperiodeDto>,
-        vilkårperioder: Vilkårperioder,
-    ) = valider(stønadsperioder, vilkårperioder)
-
-    /**
      * @param fødselsdato er nullable då alle behandlinger ikke har [fødselsdato] i grunnlagsdata fra før
      */
     fun valider(

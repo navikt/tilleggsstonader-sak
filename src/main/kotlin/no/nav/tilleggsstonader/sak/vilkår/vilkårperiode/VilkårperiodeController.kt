@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.OppdaterGrunnlagDto
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -56,7 +57,7 @@ class VilkårperiodeController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.opprettVilkårperiode(vilkårperiode)
-        return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.behandlingId, periode = periode)
+        return LagreVilkårperiodeResponse(periode = periode.tilDto())
     }
 
     @PostMapping("/v2/{id}", "/{id}")
@@ -68,7 +69,7 @@ class VilkårperiodeController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.oppdaterVilkårperiode(id, vilkårperiode)
-        return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.behandlingId, periode = periode)
+        return LagreVilkårperiodeResponse(periode = periode.tilDto())
     }
 
     @DeleteMapping("{id}")
@@ -81,9 +82,6 @@ class VilkårperiodeController(
 
         val periode = vilkårperiodeService.slettVilkårperiode(id, slettVikårperiode)
 
-        return vilkårperiodeService.validerOgLagResponse(
-            behandlingId = slettVikårperiode.behandlingId,
-            periode = periode,
-        )
+        return LagreVilkårperiodeResponse(periode = periode?.tilDto())
     }
 }

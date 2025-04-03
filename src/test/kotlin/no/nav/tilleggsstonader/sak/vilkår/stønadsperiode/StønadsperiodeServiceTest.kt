@@ -19,7 +19,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -520,11 +519,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         status = status,
     )
 
-    private fun opprettVilkårperiode(periode: LagreVilkårperiode): LagreVilkårperiodeResponse {
-        val oppdatertPeriode = vilkårperiodeService.opprettVilkårperiode(periode)
-        return vilkårperiodeService.validerOgLagResponse(
-            behandlingId = oppdatertPeriode.behandlingId,
-            periode = oppdatertPeriode,
-        )
+    private fun opprettVilkårperiode(periode: LagreVilkårperiode) {
+        vilkårperiodeService.opprettVilkårperiode(periode)
     }
 }
