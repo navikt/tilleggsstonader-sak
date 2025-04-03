@@ -111,7 +111,7 @@ object Testdata {
                         medlemskap = vurderingMedlemskap(SvarJaNei.JA_IMPLISITT),
                         dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(SvarJaNei.NEI),
                         aldersvilkår = vurderingAldersVilkår(),
-                        mottarSykepengerForFulltidsstilling = vurderingMottarSykepengerForFulltidsstilling(SvarJaNei.NEI_IMPLISITT)
+                        mottarSykepengerForFulltidsstilling = vurderingMottarSykepengerForFulltidsstilling(SvarJaNei.NEI_IMPLISITT),
                     ),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
