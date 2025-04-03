@@ -251,14 +251,30 @@ Egenskap: Forslag av vedtaksperioder
 
     Scenario: En aktivitet og to ulike målgrupper som overlapper - skal ikke slå sammen perioder tvers ulike typer
       Gitt følgende vilkårsperioder med aktiviteter
-        | Fom        | Tom        | type   |
+        | Fom        | Tom        | type      |
         | 01.01.2023 | 01.03.2023 | UTDANNING |
 
       Gitt følgende vilkårsperioder med målgrupper
-        | Fom        | Tom        | type |
-        | 01.01.2023 | 31.01.2023 | AAP  |
-        | 01.02.2023 | 01.04.2023 | OVERGANGSSTØNAD  |
+        | Fom        | Tom        | type            |
+        | 01.01.2023 | 31.01.2023 | AAP             |
+        | 01.02.2023 | 01.04.2023 | OVERGANGSSTØNAD |
 
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
       Så forvent følgende beregningsfeil: Foreløpig klarer vi bare å foreslå perioder når målgruppe og aktivitet har ett sammenhengende overlapp. Du må i stedet legge inn periodene manuelt.
+
+    Scenario: Skal slå sammen målgrupper av samme type når man håndterer faktisk målgruppe
+      Gitt følgende vilkårsperioder med aktiviteter
+        | Fom        | Tom        | type   |
+        | 01.01.2023 | 31.01.2023 | TILTAK |
+
+      Gitt følgende vilkårsperioder med målgrupper
+        | Fom        | Tom        | type                |
+        | 01.01.2023 | 15.01.2023 | AAP                 |
+        | 10.01.2023 | 20.01.2023 | NEDSATT_ARBEIDSEVNE |
+
+      Når forslag til vedtaksperioder fra vilkårperioder lages faktisk målgruppe
+
+      Så forvent følgende forslag fra vilkårperioder faktisk målgruppe
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 20.01.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
