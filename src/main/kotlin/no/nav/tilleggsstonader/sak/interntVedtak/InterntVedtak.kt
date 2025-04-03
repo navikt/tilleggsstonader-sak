@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatForMånedDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
@@ -132,9 +133,18 @@ data class VurderingInternt(
     val begrunnelse: String?,
 )
 
-data class VedtaksperiodeInterntVedtak(
+sealed interface VedtaksperiodeInterntVedtak
+
+data class VedtaksperiodeInterntVedtakMålgruppe(
     val fom: LocalDate,
     val tom: LocalDate,
-    val målgruppe: MålgruppeType?,
-    val aktivitet: AktivitetType?,
-)
+    val målgruppe: MålgruppeType,
+    val aktivitet: AktivitetType,
+) : VedtaksperiodeInterntVedtak
+
+data class VedtaksperiodeInterntVedtakFaktiskMålgruppe(
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val målgruppe: FaktiskMålgruppe,
+    val aktivitet: AktivitetType,
+) : VedtaksperiodeInterntVedtak

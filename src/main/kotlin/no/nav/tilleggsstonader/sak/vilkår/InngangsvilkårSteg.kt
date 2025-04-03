@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import org.springframework.stereotype.Service
 
 @Service
@@ -30,7 +29,7 @@ class InngangsvilkårSteg(
     }
 
     /**
-     * håndteres av [StønadsperiodeService]
+     * håndteres av [BehandlingService.oppdaterStatusPåBehandling]
      */
     override fun settInnHistorikk() = false
 
