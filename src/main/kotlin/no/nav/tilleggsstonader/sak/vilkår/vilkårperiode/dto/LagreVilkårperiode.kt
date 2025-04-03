@@ -41,17 +41,13 @@ data class LagreVilkårperiode(
     JsonSubTypes.Type(FaktaOgSvarAktivitetLæremidlerDto::class, name = "AKTIVITET_LÆREMIDLER"),
     JsonSubTypes.Type(FaktaOgSvarAktivitetBoutgifterDto::class, name = "AKTIVITET_BOUTGIFTER"),
 )
-sealed class FaktaOgSvarDto {
-    open fun inneholderGammelManglerData(): Boolean = false
-}
+sealed class FaktaOgSvarDto
 
 data class FaktaOgSvarMålgruppeDto(
     val svarMedlemskap: SvarJaNei? = null,
     val svarUtgifterDekketAvAnnetRegelverk: SvarJaNei? = null,
     val svarMottarSykepengerForFulltidsstilling: SvarJaNei? = null,
-) : FaktaOgSvarDto() {
-    override fun inneholderGammelManglerData(): Boolean = svarMottarSykepengerForFulltidsstilling == SvarJaNei.GAMMEL_MANGLER_DATA
-}
+) : FaktaOgSvarDto()
 
 data class FaktaOgSvarAktivitetBarnetilsynDto(
     val aktivitetsdager: Int? = null,
