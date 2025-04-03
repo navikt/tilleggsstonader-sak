@@ -39,6 +39,7 @@ class LæremidlerVedtakController(
     private val stegService: StegService,
     private val steg: LæremidlerBeregnYtelseSteg,
     private val unleashService: UnleashService,
+    private val vedtaksperiodeService: VedtaksperiodeLæremidlerService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -108,5 +109,15 @@ class LæremidlerVedtakController(
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
         return VedtakDtoMapper.toDto(vedtak, null)
+    }
+
+    @GetMapping("{behandlingId}/foresla")
+    fun foreslåVedtaksperioder(
+        @PathVariable behandlingId: BehandlingId,
+    ): List<VedtaksperiodeLæremidlerDto> {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        return vedtaksperiodeService.foreslåPerioder(behandlingId).tilDto()
     }
 }
