@@ -148,7 +148,7 @@ class InterntVedtakService(
                 type = it.type,
                 fom = it.fom,
                 tom = it.tom,
-                faktaOgVurderinger = it.faktaOgVurdering.tilFaktaOgVurderingDto(skalInkludereManuelleGamleSvar = false),
+                faktaOgVurderinger = it.faktaOgVurdering.tilFaktaOgVurderingDto(),
                 kilde = it.kilde,
                 resultat = it.resultat,
                 begrunnelse = it.begrunnelse,

@@ -124,7 +124,7 @@ data class AktivitetBoutgifterFaktaOgVurderingerDto(
     val lønnet: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
-fun FaktaOgVurdering.tilFaktaOgVurderingDto(skalInkludereManuelleGamleSvar: Boolean = true): FaktaOgVurderingerDto =
+fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
     when (this) {
         is MålgruppeFaktaOgVurdering ->
             when (this) {
@@ -156,7 +156,7 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(skalInkludereManuelleGamleSvar: Bool
                             vurderinger
                                 .takeIfVurderinger<MottarSykepengerForFulltidsstillingVurdering>()
                                 ?.mottarSykepengerForFulltidsstilling
-                                ?.takeIf { skalInkludereManuelleGamleSvar || it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
+                                ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
                                 ?.tilDto(),
                     )
             }
