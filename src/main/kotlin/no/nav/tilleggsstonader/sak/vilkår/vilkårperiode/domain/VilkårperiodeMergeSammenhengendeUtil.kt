@@ -25,8 +25,8 @@ inline fun <reified T : VilkårperiodeType> List<Vilkårperiode>.mergeSammenheng
 fun List<Vilkårperiode>.mergeSammenhengendeOppfylteAktiviteter(): Map<AktivitetType, List<Datoperiode>> =
     this.mergeSammenhengendeOppfylte<AktivitetType>()
 
-fun List<Vilkårperiode>.mergeSammenhengendeOppfylteMålgrupper(): Map<MålgruppeType, List<Datoperiode>> =
-    this.mergeSammenhengendeOppfylte<MålgruppeType>()
+fun List<Vilkårperiode>.mergeSammenhengendeOppfylteMålgrupper(): Map<FaktiskMålgruppe, List<Datoperiode>> =
+    this.mergeSammenhengendeOppfylteFaktiskeMålgrupper()
 
 fun List<Vilkårperiode>.mergeSammenhengendeOppfylteFaktiskeMålgrupper(): Map<FaktiskMålgruppe, List<Datoperiode>> =
     this

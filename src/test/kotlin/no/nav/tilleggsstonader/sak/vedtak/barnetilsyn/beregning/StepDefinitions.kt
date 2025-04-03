@@ -21,6 +21,8 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -35,9 +37,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
@@ -47,7 +46,7 @@ import java.time.YearMonth
 @Suppress("unused", "ktlint:standard:function-naming")
 class StepDefinitions {
     private val logger = LoggerFactory.getLogger(javaClass)
-    val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
+    val vilkårperiodeRepository = VilkårperiodeRepositoryFake()
     val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>()
     val repository = mockk<VedtakRepository>(relaxed = true)
     val vedtaksperiodeValidingerService = mockk<VedtaksperiodeValideringService>(relaxed = true)
@@ -80,12 +79,12 @@ class StepDefinitions {
 
     @Gitt("følgende aktiviteter")
     fun `følgende aktiviteter`(dataTable: DataTable) {
-        every {
-            vilkårperiodeRepository.findByBehandlingIdAndResultat(
-                behandlingId,
-                ResultatVilkårperiode.OPPFYLT,
-            )
-        } returns mapAktiviteter(behandlingId, dataTable)
+        vilkårperiodeRepository.insertAll(mapAktiviteter(behandlingId, dataTable))
+    }
+
+    @Gitt("følgende målgrupper")
+    fun `følgende målgrupper`(dataTable: DataTable) {
+        vilkårperiodeRepository.insertAll(mapMålgrupper(behandlingId, dataTable))
     }
 
     @Gitt("følgende utgifter for barn med id: {}")
@@ -339,7 +338,7 @@ class StepDefinitions {
             ForventedeVedtaksperioder(
                 fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
                 tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
-                målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
+                målgruppe = parseValgfriEnum<FaktiskMålgruppe>(BeregningNøkler.MÅLGRUPPE, rad) ?: FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 aktivitet =
                     parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
                         ?: AktivitetType.TILTAK,
@@ -352,7 +351,7 @@ class StepDefinitions {
         dataTable.mapRad { rad ->
             Beløpsperiode(
                 dato = parseÅrMånedEllerDato(BeregningNøkler.DATO, rad).datoEllerFørsteDagenIMåneden(),
-                målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
+                målgruppe = parseValgfriEnum<FaktiskMålgruppe>(BeregningNøkler.MÅLGRUPPE, rad) ?: FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 beløp = parseInt(BeregningNøkler.BELØP, rad),
             )
         }
@@ -375,7 +374,7 @@ data class ForventetBeregningsgrunnlag(
 data class ForventedeVedtaksperioder(
     val fom: LocalDate,
     val tom: LocalDate,
-    val målgruppe: MålgruppeType,
+    val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
     val antallAktiviteter: Int?,
     val antallDager: Int?,

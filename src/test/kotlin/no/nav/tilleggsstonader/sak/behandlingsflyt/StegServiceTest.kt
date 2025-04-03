@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
@@ -29,7 +30,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchIllegalStateException
@@ -311,7 +311,7 @@ class StegServiceTest(
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2023, 1, 1),
                     tom = LocalDate.of(2023, 1, 31),
-                    målgruppeType = MålgruppeType.AAP,
+                    målgruppeType = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitetType = AktivitetType.TILTAK,
                 ),
             )

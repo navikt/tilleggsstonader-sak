@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import kotlin.math.min
 
@@ -64,7 +64,7 @@ data class Beregningsgrunnlag(
     val utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
     val makssats: Int,
     val makssatsBekreftet: Boolean,
-    val målgruppe: MålgruppeType,
+    val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
 ) : Periode<LocalDate>
 

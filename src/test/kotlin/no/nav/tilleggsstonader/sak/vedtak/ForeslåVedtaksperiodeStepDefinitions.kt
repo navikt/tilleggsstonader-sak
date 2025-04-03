@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
+import no.nav.tilleggsstonader.sak.cucumber.parseEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -16,13 +17,11 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
@@ -110,7 +109,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 faktaOgVurdering =
                     faktaOgVurderingMålgruppe(
-                        type = parseValgfriEnum<MålgruppeType>(DomenenøkkelForeslåVedtaksperioder.TYPE, rad)!!,
+                        type = parseEnum(DomenenøkkelForeslåVedtaksperioder.TYPE, rad),
                     ),
             )
         }
@@ -121,7 +120,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
                 behandlingId = BehandlingId.random(),
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                resultat = parseValgfriEnum<Vilkårsresultat>(DomenenøkkelForeslåVedtaksperioder.RESULTAT, rad)!!,
+                resultat = parseEnum(DomenenøkkelForeslåVedtaksperioder.RESULTAT, rad),
                 type = VilkårType.PASS_BARN,
             )
         }
@@ -132,8 +131,8 @@ class ForeslåVedtaksperiodeStepDefinitions {
                 id = UUID.randomUUID(),
                 fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
                 tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
-                målgruppe = parseValgfriEnum<MålgruppeType>(DomenenøkkelForeslåVedtaksperioder.MÅLGRUPPE, rad)!!,
-                aktivitet = parseValgfriEnum<AktivitetType>(DomenenøkkelForeslåVedtaksperioder.AKTIVITET, rad)!!,
+                målgruppe = parseEnum(DomenenøkkelForeslåVedtaksperioder.MÅLGRUPPE, rad),
+                aktivitet = parseEnum(DomenenøkkelForeslåVedtaksperioder.AKTIVITET, rad),
             )
         }
 }

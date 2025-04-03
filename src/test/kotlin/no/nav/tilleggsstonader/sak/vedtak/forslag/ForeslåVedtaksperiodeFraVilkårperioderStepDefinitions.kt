@@ -75,21 +75,6 @@ class ForeslåVedtaksperiodeFraVilkårperioderStepDefinitions {
         }
     }
 
-    @Når("forslag til vedtaksperioder fra vilkårperioder lages faktisk målgruppe")
-    fun `forslag til vedtaksperioder fra vilkårperioder lages faktisk målgruppe`() {
-        try {
-            resultatFaktiskMålgruppe =
-                ForeslåVedtaksperiodeFraVilkårperioder.foreslåVedtaksperioderFaktiskMålgruppe(
-                    Vilkårperioder(
-                        målgrupper = målgrupper,
-                        aktiviteter = aktiviteter,
-                    ),
-                )
-        } catch (e: ApiFeil) {
-            feil = e
-        }
-    }
-
     @Så("forvent følgende beregningsfeil: {}")
     fun `forvent følgende beregningsfeil`(feil: String) {
         assertThat(this.feil).isNotNull
@@ -103,26 +88,11 @@ class ForeslåVedtaksperiodeFraVilkårperioderStepDefinitions {
                 ForslagVedtaksperiodeFraVilkårperioder(
                     fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
                     tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
-                    målgruppe = MålgruppeType.valueOf(rad["målgruppe"]!!),
-                    aktivitet = AktivitetType.valueOf(rad["aktivitet"]!!),
-                )
-            }
-
-        assertThat(resultat).isEqualTo(forventedeVedtaksperioder)
-    }
-
-    @Så("forvent følgende forslag fra vilkårperioder faktisk målgruppe")
-    fun `forvent følgende forslag faktisk målgruppe`(dataTable: DataTable) {
-        val forventedeVedtaksperioder =
-            dataTable.mapRad { rad ->
-                ForslagVedtaksperiodeFraVilkårperioderFaktiskMålgruppe(
-                    fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
-                    tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
                     målgruppe = FaktiskMålgruppe.valueOf(rad["målgruppe"]!!),
                     aktivitet = AktivitetType.valueOf(rad["aktivitet"]!!),
                 )
             }
 
-        assertThat(resultatFaktiskMålgruppe).isEqualTo(forventedeVedtaksperioder)
+        assertThat(resultat).isEqualTo(forventedeVedtaksperioder)
     }
 }

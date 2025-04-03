@@ -173,8 +173,8 @@ class InterntVedtakServiceTest {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
             assertThat(interntVedtak.vedtaksperioder).hasSize(1)
-            with(interntVedtak.vedtaksperioder.filterIsInstance<VedtaksperiodeInterntVedtakMålgruppe>().single()) {
-                assertThat(målgruppe).isEqualTo(MålgruppeType.AAP)
+            with(interntVedtak.vedtaksperioder.single()) {
+                assertThat(målgruppe).isEqualTo(FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)
                 assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 1))
                 assertThat(tom).isEqualTo(LocalDate.of(2024, 2, 1))
@@ -266,7 +266,7 @@ class InterntVedtakServiceTest {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
             assertThat(interntVedtak.vedtaksperioder).hasSize(1)
-            with(interntVedtak.vedtaksperioder.filterIsInstance<VedtaksperiodeInterntVedtakFaktiskMålgruppe>().single()) {
+            with(interntVedtak.vedtaksperioder.single()) {
                 assertThat(målgruppe).isEqualTo(FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)
                 assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 1))
@@ -398,8 +398,8 @@ class InterntVedtakServiceTest {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
             assertThat(interntVedtak.vedtaksperioder).hasSize(1)
-            with(interntVedtak.vedtaksperioder.filterIsInstance<VedtaksperiodeInterntVedtakMålgruppe>().single()) {
-                assertThat(målgruppe).isEqualTo(MålgruppeType.AAP)
+            with(interntVedtak.vedtaksperioder.single()) {
+                assertThat(målgruppe).isEqualTo(FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)
                 assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
                 assertThat(fom).isEqualTo(LocalDate.of(2024, JANUARY, 1))
                 assertThat(tom).isEqualTo(LocalDate.of(2024, FEBRUARY, 29))

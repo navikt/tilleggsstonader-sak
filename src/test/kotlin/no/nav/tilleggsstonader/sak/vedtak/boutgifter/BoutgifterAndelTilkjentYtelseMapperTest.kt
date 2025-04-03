@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -14,7 +16,6 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBo
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -98,7 +99,7 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
     }
 
     @Test
-    fun `Utbetalingsperioder med AAP, UFØRETRYGD og NEDSATT_ARBEIDSEVNE summeres opp til én andel så lenge de har samme utbetalingsdato`() {
+    fun `Utbetalingsperioder med NEDSATT_ARBEIDSEVNE summeres opp til én andel så lenge de har samme utbetalingsdato`() {
         val mandag10Februar = LocalDate.of(2025, FEBRUARY, 10)
         val torsdag27Feb = LocalDate.of(2025, FEBRUARY, 27)
         val fredag7Mars = LocalDate.of(2025, MARCH, 7)
@@ -107,19 +108,19 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
             lagBeregningsgrunnlagMedEnkeltutgift(
                 fom = mandag10Februar,
                 utbetalingsdato = mandag10Februar,
-            ).copy(målgruppe = MålgruppeType.AAP)
+            ).copy(målgruppe = NEDSATT_ARBEIDSEVNE)
 
         val uføretrygd =
             lagBeregningsgrunnlagMedEnkeltutgift(
                 fom = torsdag27Feb,
                 utbetalingsdato = mandag10Februar,
-            ).copy(målgruppe = MålgruppeType.UFØRETRYGD)
+            ).copy(målgruppe = NEDSATT_ARBEIDSEVNE)
 
         val nedsattArbeidsevne =
             lagBeregningsgrunnlagMedEnkeltutgift(
                 fom = fredag7Mars,
                 utbetalingsdato = mandag10Februar,
-            ).copy(målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE)
+            ).copy(målgruppe = NEDSATT_ARBEIDSEVNE)
 
         val andel = finnAndelTilkjentYtelse(aap, uføretrygd, nedsattArbeidsevne)
 
@@ -138,12 +139,12 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
         val aap =
             lagBeregningsgrunnlagMedEnkeltutgift(
                 fom = mandag10Februar,
-            ).copy(målgruppe = MålgruppeType.AAP)
+            ).copy(målgruppe = NEDSATT_ARBEIDSEVNE)
 
         val overgangsstønad =
             lagBeregningsgrunnlagMedEnkeltutgift(
                 fom = mandag10Februar,
-            ).copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD)
+            ).copy(målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER)
 
         val andel = finnAndelTilkjentYtelse(aap, overgangsstønad)
 
@@ -227,6 +228,6 @@ private fun lagBeregningsgrunnlagMedEnkeltutgift(
         ),
     makssats = 4953,
     makssatsBekreftet = true,
-    målgruppe = MålgruppeType.AAP,
+    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
     aktivitet = AktivitetType.TILTAK,
 )

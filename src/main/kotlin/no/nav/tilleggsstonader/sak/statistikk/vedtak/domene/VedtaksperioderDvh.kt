@@ -79,7 +79,7 @@ data class VedtaksperioderDvh(
                         VedtaksperioderDvh(
                             fom = it.fom,
                             tom = it.tom,
-                            lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe.faktiskMålgruppe()),
+                            lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                             antallBarn = it.antallBarn,
                             barn = BarnDvh.fraDomene(it.barn.finnFødselsnumre(barnIBehandlingen)),

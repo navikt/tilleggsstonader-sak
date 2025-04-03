@@ -21,8 +21,8 @@ Egenskap: Beregning av vedtaksperioder
       Når forslag til vedtaksperioder lages
 
       Så forvent følgende vedtaksperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 31.03.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Scenario: Det finnes ikke noen vilkår
       Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag
@@ -70,8 +70,8 @@ Egenskap: Beregning av vedtaksperioder
       Når forslag til vedtaksperioder lages
 
       Så forvent følgende vedtaksperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 31.01.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 31.01.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Scenario: Vedtaksperioden er kortere enn vilkåret
       Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag
@@ -89,8 +89,8 @@ Egenskap: Beregning av vedtaksperioder
       Når forslag til vedtaksperioder lages
 
       Så forvent følgende vedtaksperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 15.02.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 15.02.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
 
     Scenario: Vedtaksperioden omsluttes av vedtaksperioden
@@ -109,8 +109,8 @@ Egenskap: Beregning av vedtaksperioder
       Når forslag til vedtaksperioder lages
 
       Så forvent følgende vedtaksperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.02.2023 | 31.03.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.02.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
 
     Scenario: Ingen overlapp mellom vedtaksperiode og vilkår
@@ -148,8 +148,8 @@ Egenskap: Beregning av vedtaksperioder
       Når forslag til vedtaksperioder lages
 
       Så forvent følgende vedtaksperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 31.03.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
   Regel: Vedtaksperiode skal foreslås for flere oppfylte vilkår som er rett etter hverandre
     Scenario: To oppfylte vilkår som er rett etter hverandre
@@ -170,8 +170,8 @@ Egenskap: Beregning av vedtaksperioder
       Når forslag til vedtaksperioder lages
 
       Så forvent følgende vedtaksperioder
-        | Fom        | Tom        | aktivitet | målgruppe |
-        | 01.01.2023 | 31.03.2023 | TILTAK    | AAP       |
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Scenario: To oppfylte vilkår som ikke er rett etter hverandre
       Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag

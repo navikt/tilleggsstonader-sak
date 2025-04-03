@@ -8,12 +8,16 @@ Egenskap: Feilhåndtering i beregning
 
   Scenario: Ingen aktiviteter i samme periode som vedtaksperiode
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe       |
-      | 01.01.2023 | 31.01.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | Fom        | Tom        | Aktivitet | Målgruppe        |
+      | 01.01.2023 | 31.01.2023 | UTDANNING | ENSLIG_FORSØRGER |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 01.02.2023 | 28.02.2023 | UTDANNING | 5               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe       |
+      | 01.01.2023 | 28.04.2023 | OVERGANGSSTØNAD |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -25,12 +29,16 @@ Egenskap: Feilhåndtering i beregning
 
   Scenario: Ingen aktiviteter i deler en av månedene strekker seg over
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe       |
-      | 01.01.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | Fom        | Tom        | Aktivitet | Målgruppe        |
+      | 01.01.2023 | 28.02.2023 | UTDANNING | ENSLIG_FORSØRGER |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 01.01.2023 | 31.01.2023 | UTDANNING | 5               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe       |
+      | 01.01.2023 | 28.04.2023 | OVERGANGSSTØNAD |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -42,12 +50,16 @@ Egenskap: Feilhåndtering i beregning
 
   Scenario: Ingen aktivitet av riktig type
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe       |
-      | 02.01.2023 | 15.01.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | Fom        | Tom        | Aktivitet | Målgruppe        |
+      | 02.01.2023 | 15.01.2023 | UTDANNING | ENSLIG_FORSØRGER |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 02.01.2023 | 08.01.2023 | TILTAK    | 5               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe       |
+      | 01.01.2023 | 28.04.2023 | OVERGANGSSTØNAD |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -59,12 +71,16 @@ Egenskap: Feilhåndtering i beregning
 
   Scenario: Ingen aktiviteter i en uke vedtaksperiode strekker seg over
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe       |
-      | 02.01.2023 | 15.01.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | Fom        | Tom        | Aktivitet | Målgruppe        |
+      | 02.01.2023 | 15.01.2023 | UTDANNING | ENSLIG_FORSØRGER |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 02.01.2023 | 08.01.2023 | UTDANNING | 5               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe       |
+      | 01.01.2023 | 28.04.2023 | OVERGANGSSTØNAD |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |

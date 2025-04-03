@@ -6,12 +6,16 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
   Scenario: Sender inn tomme utgifter
 
     Gitt følgende vedtaksperioder
-      | Fom     | Tom     | Målgruppe | Aktivitet |
-      | 01.2023 | 02.2023 | AAP       | TILTAK    |
+      | Fom     | Tom     | Målgruppe           | Aktivitet |
+      | 01.2023 | 02.2023 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende aktiviteter
       | Fom     | Tom     | Aktivitet | Aktivitetsdager |
       | 01.2023 | 02.2023 | TILTAK    | 5               |
+
+    Gitt følgende målgrupper
+      | Fom     | Tom     | Målgruppe |
+      | 01.2023 | 02.2023 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom | Tom | Utgift |
@@ -23,12 +27,16 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
   Scenario: Sender inn overlappende utgiftsperioder
 
     Gitt følgende vedtaksperioder
-      | Fom     | Tom     | Målgruppe | Aktivitet |
-      | 01.2023 | 03.2023 | AAP       | TILTAK    |
+      | Fom     | Tom     | Målgruppe           | Aktivitet |
+      | 01.2023 | 03.2023 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende aktiviteter
       | Fom     | Tom     | Aktivitet | Aktivitetsdager |
       | 01.2023 | 03.2023 | TILTAK    | 5               |
+
+    Gitt følgende målgrupper
+      | Fom     | Tom     | Målgruppe |
+      | 01.2023 | 03.2023 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -42,12 +50,16 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
   Scenario: Sender inn negativ utgift
 
     Gitt følgende vedtaksperioder
-      | Fom     | Tom     | Målgruppe | Aktivitet |
-      | 01.2023 | 03.2023 | AAP       | TILTAK    |
+      | Fom     | Tom     | Målgruppe           | Aktivitet |
+      | 01.2023 | 03.2023 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende aktiviteter
       | Fom     | Tom     | Aktivitet | Aktivitetsdager |
       | 01.2023 | 03.2023 | TILTAK    | 5               |
+
+    Gitt følgende målgrupper
+      | Fom     | Tom     | Målgruppe |
+      | 01.2023 | 03.2023 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |

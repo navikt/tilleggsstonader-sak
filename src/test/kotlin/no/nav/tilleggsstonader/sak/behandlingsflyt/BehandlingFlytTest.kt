@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPe
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.BrevController
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
@@ -405,7 +406,7 @@ class BehandlingFlytTest(
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
-                    målgruppeType = MålgruppeType.AAP,
+                    målgruppeType = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitetType = AktivitetType.TILTAK,
                 ),
             )

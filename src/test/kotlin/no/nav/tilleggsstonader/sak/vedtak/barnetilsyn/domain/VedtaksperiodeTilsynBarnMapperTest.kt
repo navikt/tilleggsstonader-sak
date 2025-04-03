@@ -1,12 +1,12 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn1
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper.VedtaksperiodeTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -16,7 +16,7 @@ class VedtaksperiodeTilsynBarnMapperTest {
         VedtaksperiodeBeregning(
             fom = LocalDate.of(2024, 1, 1),
             tom = LocalDate.of(2024, 1, 1),
-            målgruppe = MålgruppeType.AAP,
+            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
             aktivitet = AktivitetType.TILTAK,
         )
 
@@ -24,7 +24,7 @@ class VedtaksperiodeTilsynBarnMapperTest {
         VedtaksperiodeBeregning(
             fom = LocalDate.of(2024, 1, 2),
             tom = LocalDate.of(2024, 1, 2),
-            målgruppe = MålgruppeType.AAP,
+            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
             aktivitet = AktivitetType.TILTAK,
         )
 
@@ -77,7 +77,7 @@ class VedtaksperiodeTilsynBarnMapperTest {
                 listOf(
                     beregningsresultat(
                         periode1,
-                        periode2.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD),
+                        periode2.copy(målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER),
                     ),
                 ),
             )

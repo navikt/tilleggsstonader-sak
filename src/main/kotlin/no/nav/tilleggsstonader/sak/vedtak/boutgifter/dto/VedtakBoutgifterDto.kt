@@ -2,12 +2,12 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.util.UUID
 
@@ -36,7 +36,7 @@ data class VedtaksperiodeBoutgifterDto(
     val fom: LocalDate,
     val tom: LocalDate,
 //    val status: VedtaksperiodeStatus? = null,
-    val målgruppe: MålgruppeType,
+    val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
 )
 

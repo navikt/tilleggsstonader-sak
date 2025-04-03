@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -15,7 +16,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -88,7 +88,7 @@ class BehandlingsoversiktServiceTest {
                 VedtaksperiodeBeregning(
                     fom = LocalDate.of(2024, 3, 1),
                     tom = LocalDate.of(2024, 3, 13),
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitet = AktivitetType.TILTAK,
                 ),
                 emptyList(),
@@ -99,7 +99,7 @@ class BehandlingsoversiktServiceTest {
                 VedtaksperiodeBeregning(
                     fom = LocalDate.of(2024, 3, 2),
                     tom = LocalDate.of(2024, 3, 14),
-                    målgruppe = MålgruppeType.AAP,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitet = AktivitetType.TILTAK,
                 ),
                 emptyList(),

@@ -4,9 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
 object VedtaksperiodeTilsynBarnMapper {
@@ -26,7 +26,7 @@ object VedtaksperiodeTilsynBarnMapper {
     data class VedtaksperiodeTilsynBarn(
         override val fom: LocalDate,
         override val tom: LocalDate,
-        val målgruppe: MålgruppeType,
+        val målgruppe: FaktiskMålgruppe,
         val aktivitet: AktivitetType,
         val antallBarn: Int,
         val barn: List<BarnId>,

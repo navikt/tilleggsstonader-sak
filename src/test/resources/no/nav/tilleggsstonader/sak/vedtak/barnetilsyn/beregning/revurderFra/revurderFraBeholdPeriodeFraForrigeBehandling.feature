@@ -12,12 +12,16 @@ Egenskap: Beregning - med revurderFra - behold perioder fra forrige behandling
       | 03.2024 |
 
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe |
-      | 05.02.2024 | 08.02.2024 | TILTAK    | AAP       |
+      | Fom        | Tom        | Aktivitet | Målgruppe           |
+      | 05.02.2024 | 08.02.2024 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 05.02.2024 | 08.02.2024 | TILTAK    | 3               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe |
+      | 02.01.2024 | 31.05.2024 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -40,12 +44,16 @@ Egenskap: Beregning - med revurderFra - behold perioder fra forrige behandling
       | 03.2024 |
 
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe |
-      | 05.02.2024 | 08.02.2024 | TILTAK    | AAP       |
+      | Fom        | Tom        | Aktivitet | Målgruppe           |
+      | 05.02.2024 | 08.02.2024 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 05.02.2024 | 08.02.2024 | TILTAK    | 3               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe |
+      | 02.01.2024 | 31.05.2024 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |

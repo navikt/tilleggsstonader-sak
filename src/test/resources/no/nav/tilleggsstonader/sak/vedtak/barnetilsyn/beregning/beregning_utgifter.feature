@@ -4,17 +4,20 @@
 Egenskap: Beregning - Utgifter
 
 
-
   Scenario: Beregning skal ikke ta med utgifter utenfor vedtaksperiode
     # Mål: Beregningen skal ikke gi resultat for februar fordi det ikke er utgifter i denne perioden
 
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe       |
-      | 01.02.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | Fom        | Tom        | Aktivitet | Målgruppe        |
+      | 01.02.2023 | 28.02.2023 | UTDANNING | ENSLIG_FORSØRGER |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 01.02.2023 | 28.02.2023 | UTDANNING | 5               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe       |
+      | 01.01.2023 | 28.02.2023 | OVERGANGSSTØNAD |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -30,12 +33,16 @@ Egenskap: Beregning - Utgifter
     # Mål: Beregning skal kun inkludere utgifter for barn med utgift den måneden
 
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe       |
-      | 01.01.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | Fom        | Tom        | Aktivitet | Målgruppe        |
+      | 01.01.2023 | 28.02.2023 | UTDANNING | ENSLIG_FORSØRGER |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 01.01.2023 | 28.02.2023 | UTDANNING | 5               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe       |
+      | 01.01.2023 | 28.02.2023 | OVERGANGSSTØNAD |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -53,24 +60,28 @@ Egenskap: Beregning - Utgifter
       | 02.2023 | 29.53   | 20           | 1000   | 591         |
 
     Så forvent følgende vedtaksperioder for: 01.2023
-      | Fom        | Tom        | Aktivitet | Målgruppe       |
-      | 01.01.2023 | 31.01.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | Fom        | Tom        | Aktivitet | Målgruppe        |
+      | 01.01.2023 | 31.01.2023 | UTDANNING | ENSLIG_FORSØRGER |
 
     Så forvent følgende vedtaksperioder for: 02.2023
-      | Fom        | Tom        | Aktivitet | Målgruppe       |
-      | 01.02.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | Fom        | Tom        | Aktivitet | Målgruppe        |
+      | 01.02.2023 | 28.02.2023 | UTDANNING | ENSLIG_FORSØRGER |
 
   Scenario: Skal avrunde månedsbeløpet
 
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe |
-      | 02.01.2023 | 03.01.2023 | TILTAK    | AAP       |
-      | 06.02.2023 | 07.02.2023 | TILTAK    | AAP       |
-      | 06.03.2023 | 07.03.2023 | TILTAK    | AAP       |
+      | Fom        | Tom        | Aktivitet | Målgruppe           |
+      | 02.01.2023 | 03.01.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | 06.02.2023 | 07.02.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | 06.03.2023 | 07.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Type   | Aktivitetsdager |
       | 01.01.2023 | 07.03.2023 | TILTAK | 5               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe |
+      | 01.01.2023 | 28.04.2023 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -91,12 +102,16 @@ Egenskap: Beregning - Utgifter
   Scenario: 0 i utgifter:
 
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe       |
-      | 01.01.2023 | 31.01.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | Fom        | Tom        | Aktivitet | Målgruppe        |
+      | 01.01.2023 | 31.01.2023 | UTDANNING | ENSLIG_FORSØRGER |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 01.01.2023 | 28.02.2023 | UTDANNING | 5               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe       |
+      | 01.01.2023 | 28.02.2023 | OVERGANGSSTØNAD |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -111,12 +126,16 @@ Egenskap: Beregning - Utgifter
   Scenario: Vedtaksperiode er lengere enn utgift:
 
     Gitt følgende vedtaksperioder
-      | Fom        | Tom        | Aktivitet | Målgruppe       |
-      | 01.01.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | Fom        | Tom        | Aktivitet | Målgruppe        |
+      | 01.01.2023 | 28.02.2023 | UTDANNING | ENSLIG_FORSØRGER |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
       | 01.01.2023 | 28.02.2023 | UTDANNING | 5               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe       |
+      | 01.01.2023 | 28.02.2023 | OVERGANGSSTØNAD |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |

@@ -11,7 +11,7 @@
           "vedtaksperiode" : {
             "fom" : "2024-01-01",
             "tom" : "2024-01-02",
-            "målgruppe" : "AAP",
+            "målgruppe" : "NEDSATT_ARBEIDSEVNE",
             "aktivitet" : "TILTAK"
           },
           "aktiviteter" : [ {
@@ -33,7 +33,7 @@
       "beløpsperioder" : [ {
         "dato" : "2024-01-01",
         "beløp" : 10,
-        "målgruppe" : "AAP"
+        "målgruppe" : "NEDSATT_ARBEIDSEVNE"
       } ]
     } ]
   },
@@ -42,7 +42,7 @@
     "id" : "3580eb48-b676-49f1-9650-8b5062c2c604",
     "fom" : "2024-01-01",
     "tom" : "2024-01-02",
-    "målgruppe" : "AAP",
+    "målgruppe" : "NEDSATT_ARBEIDSEVNE",
     "aktivitet" : "TILTAK"
   } ]
 }

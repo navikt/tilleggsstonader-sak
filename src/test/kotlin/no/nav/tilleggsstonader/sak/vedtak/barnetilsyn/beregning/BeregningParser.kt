@@ -10,7 +10,10 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
 enum class BeregningNøkler(
     override val nøkkel: String,
@@ -47,5 +50,21 @@ fun mapAktiviteter(
                         ?: AktivitetType.TILTAK,
                 aktivitetsdager = parseInt(BeregningNøkler.AKTIVITETSDAGER, rad),
             ),
+    )
+}
+
+fun mapMålgrupper(
+    behandlingId: BehandlingId,
+    dataTable: DataTable,
+) = dataTable.mapRad { rad ->
+    målgruppe(
+        behandlingId = behandlingId,
+        fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
+        tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
+        faktaOgVurdering =
+            faktaOgVurderingMålgruppe(
+                type = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
+            ),
+        begrunnelse = "begrunnelse",
     )
 }

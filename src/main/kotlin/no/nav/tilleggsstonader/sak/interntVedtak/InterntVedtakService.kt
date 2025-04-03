@@ -169,7 +169,7 @@ class InterntVedtakService(
 
     private fun mapVedtaksperioderTilsynBarnOgBoutgifter(vedtaksperioder: List<Vedtaksperiode>?): List<VedtaksperiodeInterntVedtak> =
         vedtaksperioder?.map {
-            VedtaksperiodeInterntVedtakMålgruppe(
+            VedtaksperiodeInterntVedtak(
                 målgruppe = it.målgruppe,
                 aktivitet = it.aktivitet,
                 fom = it.fom,
@@ -179,7 +179,7 @@ class InterntVedtakService(
 
     private fun mapVedtaksperioderLæremidler(vedtaksperioder: List<VedtaksperiodeLæremidler>?): List<VedtaksperiodeInterntVedtak> =
         vedtaksperioder?.map {
-            VedtaksperiodeInterntVedtakFaktiskMålgruppe(
+            VedtaksperiodeInterntVedtak(
                 målgruppe = it.målgruppe,
                 aktivitet = it.aktivitet,
                 fom = it.fom,
