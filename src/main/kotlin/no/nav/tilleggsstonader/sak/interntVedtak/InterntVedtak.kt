@@ -28,7 +28,6 @@ data class InterntVedtak(
     val søknad: Søknadsinformasjon?,
     val målgrupper: List<VilkårperiodeInterntVedtak>,
     val aktiviteter: List<VilkårperiodeInterntVedtak>,
-    val stønadsperioder: List<Stønadsperiode>?,
     val vedtaksperioder: List<VedtaksperiodeInterntVedtak>,
     val vilkår: List<VilkårInternt>,
     val vedtak: VedtakInternt?,

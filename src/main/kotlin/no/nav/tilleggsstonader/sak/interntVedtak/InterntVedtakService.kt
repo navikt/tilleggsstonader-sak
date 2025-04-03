@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.interntVedtak
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -30,7 +29,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -47,7 +45,6 @@ class InterntVedtakService(
     private val grunnlagsdataService: GrunnlagsdataService,
     private val totrinnskontrollService: TotrinnskontrollService,
     private val vilkårperiodeService: VilkårperiodeService,
-    private val stønadsperiodeService: StønadsperiodeService,
     private val søknadService: SøknadService,
     private val vilkårService: VilkårService,
     private val vedtakService: VedtakService,
@@ -65,7 +62,6 @@ class InterntVedtakService(
             søknad = mapSøknadsinformasjon(behandling),
             målgrupper = mapVilkårperioder(vilkårsperioder.målgrupper),
             aktiviteter = mapVilkårperioder(vilkårsperioder.aktiviteter),
-            stønadsperioder = mapStønadsperioder(behandling),
             vedtaksperioder = mapVedtaksperioder(vedtak),
             vilkår = mapVilkår(behandling.id, behandlingbarn),
             vedtak = mapVedtak(vedtak),
@@ -155,21 +151,6 @@ class InterntVedtakService(
                 slettetKommentar = it.slettetKommentar,
             )
         }
-
-    private fun mapStønadsperioder(behandling: Saksbehandling): List<Stønadsperiode>? {
-        if (behandling.stønadstype == Stønadstype.LÆREMIDLER) {
-            val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandling.id)
-            return stønadsperioder.map {
-                Stønadsperiode(
-                    målgruppe = it.målgruppe,
-                    aktivitet = it.aktivitet,
-                    fom = it.fom,
-                    tom = it.tom,
-                )
-            }
-        }
-        return null
-    }
 
     private fun mapVedtaksperioder(vedtak: Vedtak?): List<VedtaksperiodeInterntVedtak> =
         when (vedtak?.data) {

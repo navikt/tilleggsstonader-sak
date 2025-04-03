@@ -116,7 +116,6 @@
     "begrunnelse" : "ikke oppfylt",
     "slettetKommentar" : null
   } ],
-  "stønadsperioder" : null,
   "vedtaksperioder" : [ {
     "fom" : "2024-01-01",
     "tom" : "2024-02-29",
