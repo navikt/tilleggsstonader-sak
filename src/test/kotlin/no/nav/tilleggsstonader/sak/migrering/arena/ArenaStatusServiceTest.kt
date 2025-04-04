@@ -35,7 +35,7 @@ class ArenaStatusServiceTest {
     val ident = "ident"
     val fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER, identer = setOf(PersonIdent(ident)))
 
-    val request = ArenaFinnesPersonRequest(ident, Rettighet.LÆREMIDLER.kodeArena)
+    val request = ArenaFinnesPersonRequest(ident, Rettighet.BOUTGIFTER.kodeArena)
 
     @BeforeEach
     fun setUp() {

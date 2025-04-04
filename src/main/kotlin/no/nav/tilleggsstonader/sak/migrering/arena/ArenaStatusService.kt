@@ -63,7 +63,7 @@ class ArenaStatusService(
 
     private fun skalKunneOppretteSakIArenaForPerson(fagsak: Fagsak?): Boolean {
         val fagsakId = fagsak?.id
-        return fagsakId in setOf(FagsakId.fromString("cae26abb-19c7-41b0-88c1-021d7312b55f"))
+        return fagsakId in setOf<FagsakId>()
     }
 
     /**
@@ -73,13 +73,13 @@ class ArenaStatusService(
     private fun skalBehandlesITsSak(stønadstype: Stønadstype): Boolean =
         when (stønadstype) {
             Stønadstype.BARNETILSYN -> true
-            else -> false
+            Stønadstype.LÆREMIDLER -> true
+            Stønadstype.BOUTGIFTER -> false
         }
 
     private fun harBehandling(fagsak: Fagsak?): Boolean =
         fagsak
-            ?.let { behandlingService.finnesBehandlingForFagsak(it.id) }
-            ?: false
+            ?.let { behandlingService.finnesBehandlingForFagsak(it.id) } == true
 
     private fun harRouting(
         identer: Set<String>,
