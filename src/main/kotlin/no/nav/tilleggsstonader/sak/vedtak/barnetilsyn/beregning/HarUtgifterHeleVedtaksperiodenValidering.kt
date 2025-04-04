@@ -5,12 +5,12 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
-import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregning
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 
 fun validerUtgiftHeleVedtaksperioden(
     vedtaksperioder: List<Vedtaksperiode>,
-    utgifter: Map<BarnId, List<UtgiftBeregning>>,
+    utgifter: Map<BarnId, List<UtgiftBeregningMåned>>,
 ) {
     if (vedtaksperioder.isEmpty()) {
         return
@@ -27,7 +27,7 @@ fun validerUtgiftHeleVedtaksperioden(
 
 private fun erUtgiftperiodeSomInneholderVedtaksperiode(
     vedtaksperioder: List<Vedtaksperiode>,
-    utgifter: Map<BarnId, List<UtgiftBeregning>>,
+    utgifter: Map<BarnId, List<UtgiftBeregningMåned>>,
 ): Boolean {
     val sammenslåtteUtgiftPerioder =
         utgifter.values

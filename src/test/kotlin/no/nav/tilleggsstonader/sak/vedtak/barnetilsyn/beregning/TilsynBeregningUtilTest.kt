@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregning
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.brukPerioderFraOgMedRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.tilÅrMåned
@@ -151,19 +151,19 @@ class TilsynBeregningUtilTest {
         val barn2 = BarnId.random()
 
         val utgiftJanuar =
-            UtgiftBeregning(
+            UtgiftBeregningMåned(
                 fom = YearMonth.of(2025, 1),
                 tom = YearMonth.of(2025, 1),
                 utgift = 1000,
             )
         val utgiftFebruar =
-            UtgiftBeregning(
+            UtgiftBeregningMåned(
                 fom = YearMonth.of(2025, 2),
                 tom = YearMonth.of(2025, 2),
                 utgift = 1000,
             )
         val utgiftJanuarTilFebruar =
-            UtgiftBeregning(
+            UtgiftBeregningMåned(
                 fom = YearMonth.of(2025, 1),
                 tom = YearMonth.of(2025, 2),
                 utgift = 1000,

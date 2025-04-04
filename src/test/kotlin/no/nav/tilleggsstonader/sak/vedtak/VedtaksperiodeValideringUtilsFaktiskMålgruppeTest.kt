@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregning
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUtils.validerEnkeltperiode
@@ -47,11 +47,11 @@ class VedtaksperiodeValideringUtilsFaktiskMålgruppeTest {
             ),
         )
 
-    val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+    val utgifter: Map<BarnId, List<UtgiftBeregningMåned>> =
         mapOf(
             BarnId.random() to
                 listOf(
-                    UtgiftBeregning(
+                    UtgiftBeregningMåned(
                         fom = YearMonth.of(2025, 1),
                         tom = YearMonth.of(2025, 2),
                         utgift = 1000,

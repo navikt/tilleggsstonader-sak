@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregning
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.PeriodeMedDager
@@ -19,7 +19,7 @@ object TilsynBeregningUtil {
      * Resultatet gir en map med måned som key og en liste av utgifter.
      * Listen med utgifter består av utgiften knyttet til et barn for gitt måned.
      */
-    fun Map<BarnId, List<UtgiftBeregning>>.tilÅrMåned(): Map<YearMonth, List<UtgiftBarn>> =
+    fun Map<BarnId, List<UtgiftBeregningMåned>>.tilÅrMåned(): Map<YearMonth, List<UtgiftBarn>> =
         this.entries
             .flatMap { (barnId, utgifter) ->
                 utgifter.flatMap { utgift -> utgift.splitPerMåned { _, periode -> UtgiftBarn(barnId, periode.utgift) } }

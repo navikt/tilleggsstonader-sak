@@ -5,13 +5,13 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregning
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 
 object TilsynBarnBeregningValideringUtil {
     fun validerPerioderForInnvilgelse(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
-        utgifter: Map<BarnId, List<UtgiftBeregning>>,
+        utgifter: Map<BarnId, List<UtgiftBeregningMåned>>,
         typeVedtak: TypeVedtak,
     ) {
         if (typeVedtak == TypeVedtak.OPPHØR) {
@@ -27,7 +27,7 @@ object TilsynBarnBeregningValideringUtil {
         }
     }
 
-    private fun validerUtgifter(utgifter: Map<BarnId, List<UtgiftBeregning>>) {
+    private fun validerUtgifter(utgifter: Map<BarnId, List<UtgiftBeregningMåned>>) {
         brukerfeilHvis(utgifter.values.flatten().isEmpty()) {
             "Kan ikke innvilge når det ikke finnes noen utgiftsperioder"
         }

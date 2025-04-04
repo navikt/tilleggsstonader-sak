@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregning
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningMåned
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningValideringUtil.validerPerioderForInnvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
@@ -172,7 +172,7 @@ class TilsynBarnBeregningService(
     private fun lagBeregningsgrunnlagPerMåned(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
         aktiviteter: List<Aktivitet>,
-        utgifterPerBarn: Map<BarnId, List<UtgiftBeregning>>,
+        utgifterPerBarn: Map<BarnId, List<UtgiftBeregningMåned>>,
     ): List<Beregningsgrunnlag> {
         val vedtaksperioderPerMåned = vedtaksperioder.tilÅrMåned()
         val utgifterPerMåned = utgifterPerBarn.tilÅrMåned()

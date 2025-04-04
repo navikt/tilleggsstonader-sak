@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregning
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.validerUtgiftHeleVedtaksperioden
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett
@@ -55,11 +55,11 @@ class VedtaksperiodeValideringUtilsTest {
             ),
         )
 
-    val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+    val utgifter: Map<BarnId, List<UtgiftBeregningMåned>> =
         mapOf(
             BarnId.random() to
                 listOf(
-                    UtgiftBeregning(
+                    UtgiftBeregningMåned(
                         fom = YearMonth.of(2025, 1),
                         tom = YearMonth.of(2025, 2),
                         utgift = 1000,
@@ -330,11 +330,11 @@ class VedtaksperiodeValideringUtilsTest {
         inner class ValiderUtgifterHeleVedtaksperioden {
             val vedtaksperiode = lagVedtaksperiode()
 
-            val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+            val utgifter: Map<BarnId, List<UtgiftBeregningMåned>> =
                 mapOf(
                     BarnId.random() to
                         listOf(
-                            UtgiftBeregning(
+                            UtgiftBeregningMåned(
                                 fom = YearMonth.of(2025, 1),
                                 tom = YearMonth.of(2025, 1),
                                 utgift = 1000,
@@ -366,16 +366,16 @@ class VedtaksperiodeValideringUtilsTest {
 
             @Test
             fun `kaster ikke feil når det utgifter hele vedtaksperioden fordelt i flere perioder`() {
-                val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+                val utgifter: Map<BarnId, List<UtgiftBeregningMåned>> =
                     mapOf(
                         BarnId.random() to
                             listOf(
-                                UtgiftBeregning(
+                                UtgiftBeregningMåned(
                                     fom = YearMonth.of(2025, 1),
                                     tom = YearMonth.of(2025, 1),
                                     utgift = 1000,
                                 ),
-                                UtgiftBeregning(
+                                UtgiftBeregningMåned(
                                     fom = YearMonth.of(2025, 2),
                                     tom = YearMonth.of(2025, 2),
                                     utgift = 1000,
@@ -393,11 +393,11 @@ class VedtaksperiodeValideringUtilsTest {
 
             @Test
             fun `kaster ikke feil når det utgifter hele vedtaksperioden fordelt på flere barn`() {
-                val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+                val utgifter: Map<BarnId, List<UtgiftBeregningMåned>> =
                     mapOf(
                         BarnId.random() to
                             listOf(
-                                UtgiftBeregning(
+                                UtgiftBeregningMåned(
                                     fom = YearMonth.of(2025, 1),
                                     tom = YearMonth.of(2025, 1),
                                     utgift = 1000,
@@ -405,7 +405,7 @@ class VedtaksperiodeValideringUtilsTest {
                             ),
                         BarnId.random() to
                             listOf(
-                                UtgiftBeregning(
+                                UtgiftBeregningMåned(
                                     fom = YearMonth.of(2025, 2),
                                     tom = YearMonth.of(2025, 2),
                                     utgift = 1000,
@@ -423,16 +423,16 @@ class VedtaksperiodeValideringUtilsTest {
 
             @Test
             fun `kaster feil når det ikke finnes utgifter hele vedtaksperioden pga pause mellom utgiftene`() {
-                val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+                val utgifter: Map<BarnId, List<UtgiftBeregningMåned>> =
                     mapOf(
                         BarnId.random() to
                             listOf(
-                                UtgiftBeregning(
+                                UtgiftBeregningMåned(
                                     fom = YearMonth.of(2025, 1),
                                     tom = YearMonth.of(2025, 1),
                                     utgift = 1000,
                                 ),
-                                UtgiftBeregning(
+                                UtgiftBeregningMåned(
                                     fom = YearMonth.of(2025, 3),
                                     tom = YearMonth.of(2025, 3),
                                     utgift = 1000,
