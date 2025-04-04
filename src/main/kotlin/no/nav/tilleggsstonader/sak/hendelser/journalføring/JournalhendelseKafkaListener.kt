@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.hendelser.journalføring
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.libs.log.IdUtils
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
 import no.nav.tilleggsstonader.sak.hendelser.Hendelse
 import no.nav.tilleggsstonader.sak.hendelser.HendelseRepository
@@ -46,7 +47,8 @@ class JournalhendelseKafkaListener(
             prosesserHendelse(hendelseRecord)
             ack.acknowledge()
         } catch (e: Exception) {
-            logger.error("Feil ved prosessering av journalhendelser ", e)
+            logger.error("Feil ved prosessering av journalhendelser. Se secure logg for detaljer.")
+            secureLogger.error("Feil ved prosessering av journalhendelser.", e)
             throw e
         } finally {
             MDC.clear()
