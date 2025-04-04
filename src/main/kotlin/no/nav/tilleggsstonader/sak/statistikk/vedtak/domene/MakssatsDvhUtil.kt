@@ -11,15 +11,15 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import java.time.LocalDate
 
-data class MakssatsDvh(
+data class MakssatsDvhUtil(
     val makssats: Int?,
     val beløpErBegrensetAvMakssats: Boolean?,
 ) {
     companion object {
-        fun finnMakssatsDvh(
+        fun finnMakssats(
             andelTilkjentYtelse: AndelTilkjentYtelse,
             vedtaksdata: Vedtaksdata,
-        ): MakssatsDvh =
+        ): MakssatsDvhUtil =
             when (vedtaksdata) {
                 is Avslag, is VedtakLæremidler -> ikkeRelevant
 
@@ -37,12 +37,12 @@ data class MakssatsDvh(
                     )
             }
 
-        private val ikkeRelevant = MakssatsDvh(makssats = null, beløpErBegrensetAvMakssats = null)
+        private val ikkeRelevant = MakssatsDvhUtil(makssats = null, beløpErBegrensetAvMakssats = null)
 
         private fun finnMakssatsTilsynBarn(
             vedtaksdata: InnvilgelseEllerOpphørTilsynBarn,
             andelFom: LocalDate,
-        ): MakssatsDvh {
+        ): MakssatsDvhUtil {
             val beregningsgrunnlagSomGjelder =
                 vedtaksdata.beregningsresultat.perioder
                     .find { it.grunnlag.måned == andelFom.toYearMonth() }
@@ -58,7 +58,7 @@ data class MakssatsDvh(
                     utgifterSomDekkes > beregningsgrunnlagSomGjelder.makssats.toBigDecimal()
                 }
 
-            return MakssatsDvh(
+            return MakssatsDvhUtil(
                 makssats = beregningsgrunnlagSomGjelder.makssats,
                 beløpErBegrensetAvMakssats = erBeløpBegrensetAvMakssats,
             )
@@ -68,7 +68,7 @@ data class MakssatsDvh(
             vedtaksdata: InnvilgelseEllerOpphørBoutgifter,
             andelFom: LocalDate,
             andelsbeløp: Int,
-        ): MakssatsDvh {
+        ): MakssatsDvhUtil {
             val beregningsgrunnlagSomGjelder =
                 vedtaksdata.beregningsresultat.perioder
                     .find { it.fom.toYearMonth() == andelFom.toYearMonth() }
@@ -77,7 +77,7 @@ data class MakssatsDvh(
 
             val makssats = beregningsgrunnlagSomGjelder.makssats
 
-            return MakssatsDvh(makssats = makssats, beløpErBegrensetAvMakssats = andelsbeløp == makssats)
+            return MakssatsDvhUtil(makssats = makssats, beløpErBegrensetAvMakssats = andelsbeløp == makssats)
         }
     }
 }

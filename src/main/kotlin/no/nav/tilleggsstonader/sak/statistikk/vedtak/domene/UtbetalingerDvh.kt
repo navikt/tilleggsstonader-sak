@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.MakssatsDvh.Companion.finnMakssatsDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.MakssatsDvhUtil.Companion.finnMakssats
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
@@ -28,7 +28,7 @@ data class UtbetalingerDvh(
                 utbetalinger =
                     gyldigeAndeler.map {
                         val (makssats, beløpErBegrensetAvMakssats) =
-                            finnMakssatsDvh(andelTilkjentYtelse = it, vedtaksdata = vedtak.data)
+                            finnMakssats(andelTilkjentYtelse = it, vedtaksdata = vedtak.data)
 
                         UtbetalingerDvh(
                             fraOgMed = it.fom,
