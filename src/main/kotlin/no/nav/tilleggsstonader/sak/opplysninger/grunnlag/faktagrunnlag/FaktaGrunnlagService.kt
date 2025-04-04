@@ -29,13 +29,9 @@ class FaktaGrunnlagService(
     private val barnService: BarnService,
     private val personService: PersonService,
     private val vedtakRepository: VedtakRepository,
-    private val unleashService: UnleashService,
 ) {
     @Transactional
     fun opprettGrunnlag(behandlingId: BehandlingId) {
-        if (!unleashService.isEnabled(Toggle.SKAL_HENTE_GRUNNLAG_ANNEN_FORELDER)) {
-            return
-        }
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         // TODO dette burde kun gjøres hvis behandlingen er redigerbar men akkurat nå gjøres dette fra BehandlingController som er greit
         opprettGrunnlagBarnAnnenForelder(behandling)
