@@ -88,6 +88,7 @@ class FagsakService(
         return Fagsaker(
             barnetilsyn = fagsaker[Stønadstype.BARNETILSYN],
             læremidler = fagsaker[Stønadstype.LÆREMIDLER],
+            boUtgifter = fagsaker[Stønadstype.BOUTGIFTER],
         )
     }
 
