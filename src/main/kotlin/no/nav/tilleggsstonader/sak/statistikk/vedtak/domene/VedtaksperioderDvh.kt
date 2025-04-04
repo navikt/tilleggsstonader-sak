@@ -37,19 +37,21 @@ data class VedtaksperioderDvh(
             vedtak: Vedtak,
             barn: List<BehandlingBarn>,
         ): JsonWrapper =
-            when (val data = vedtak.data) {
+            when (val vedtaksdata = vedtak.data) {
                 is InnvilgelseEllerOpphørTilsynBarn ->
                     mapVedtaksperioderTilsynBarn(
-                        beregningsresultat = data.beregningsresultat,
+                        beregningsresultat = vedtaksdata.beregningsresultat,
                         barnIBehandlingen = barn,
                     )
+
                 is InnvilgelseEllerOpphørLæremidler ->
                     mapVedtaksperioderLæremidler(
-                        beregningsresultat = data.beregningsresultat,
+                        beregningsresultat = vedtaksdata.beregningsresultat,
                     )
-                is AvslagLæremidler, is AvslagTilsynBarn -> JsonWrapper(vedtaksperioder = emptyList())
 
-                is InnvilgelseBoutgifter -> TODO("Vedtaksstatistikk for boutgifter er ikke implementert enda")
+                is InnvilgelseBoutgifter -> mapVedtaksperioderBoutgifter(vedtaksdata)
+
+                is AvslagLæremidler, is AvslagTilsynBarn -> JsonWrapper(vedtaksperioder = emptyList())
             }
 
         private fun mapVedtaksperioderLæremidler(beregningsresultat: BeregningsresultatLæremidler): JsonWrapper =
@@ -86,6 +88,19 @@ data class VedtaksperioderDvh(
                         )
                     },
         )
+
+        private fun mapVedtaksperioderBoutgifter(vedtaksdata: InnvilgelseBoutgifter) =
+            JsonWrapper(
+                vedtaksperioder =
+                    vedtaksdata.vedtaksperioder.map {
+                        VedtaksperioderDvh(
+                            fom = it.fom,
+                            tom = it.tom,
+                            aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                            lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe.faktiskMålgruppe()),
+                        )
+                    },
+            )
 
         fun List<BarnId>.finnFødselsnumre(barn: List<BehandlingBarn>) =
             this.mapNotNull { barnId ->
