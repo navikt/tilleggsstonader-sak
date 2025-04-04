@@ -23,7 +23,7 @@ fun lagBoutgifterInnvilgelseMedBeløp(
     makssats: Int,
     utgift: Int,
 ): Pair<InnvilgelseBoutgifter, AndelTilkjentYtelse> {
-    val aap = MålgruppeType.AAP
+    val aap = MålgruppeType.AAP.faktiskMålgruppe()
     val tiltak = AktivitetType.TILTAK
 
     val vedtaksperiode =

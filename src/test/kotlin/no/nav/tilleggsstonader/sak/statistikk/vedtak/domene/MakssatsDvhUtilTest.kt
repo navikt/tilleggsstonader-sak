@@ -93,7 +93,6 @@ class MakssatsDvhUtilTest {
     @Test
     fun `støtte til boutgifter som blir begrenset av makssatsen, skal vises riktig i statistikken`() {
         val førsteJanuar = LocalDate.of(2025, JANUARY, 1)
-        val sisteJanuar = LocalDate.of(2025, JANUARY, 31)
         val makssats = 4953
         val støtteJanuar = makssats
         val utgiftJanuar = 7000

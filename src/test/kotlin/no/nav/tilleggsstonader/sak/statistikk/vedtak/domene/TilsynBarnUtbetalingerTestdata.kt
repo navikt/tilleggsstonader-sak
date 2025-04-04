@@ -29,7 +29,7 @@ fun lagTilsynBarnInnvilgelseMedBeløp(
     makssats: Int,
     utgift: Int,
 ): Pair<InnvilgelseTilsynBarn, AndelTilkjentYtelse> {
-    val målgruppe = MålgruppeType.AAP
+    val målgruppe = MålgruppeType.AAP.faktiskMålgruppe()
 
     val vedtaksperiode =
         Vedtaksperiode(
