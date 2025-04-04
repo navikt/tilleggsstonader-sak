@@ -26,6 +26,16 @@ class KodeverkClientConfig {
                 listOf(
                     "SWE" to "Sverige",
                     "FIN" to "Finland",
+                    "NOR" to "Norge",
+                ).tilBetydninger(),
+            )
+
+        every { client.hentLandkoderIso2() } returns
+            KodeverkDto(
+                listOf(
+                    "SE" to "Sverige",
+                    "FI" to "Finland",
+                    "NO" to "Norge",
                 ).tilBetydninger(),
             )
         return client

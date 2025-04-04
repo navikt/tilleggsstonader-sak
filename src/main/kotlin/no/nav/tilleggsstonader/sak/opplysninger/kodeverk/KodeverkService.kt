@@ -22,9 +22,20 @@ class KodeverkService(
             cachedKodeverkService.hentPoststed().hentGjeldende(it)
         }
 
-    fun hentLandkode(landkode: String?) =
-        hentKodeverdi("landkode", landkode) {
+    /**
+     * Henter land basert ISO3-landkode
+     */
+    fun hentLandkode(landkodeIso3: String?) =
+        hentKodeverdi("landkode", landkodeIso3) {
             cachedKodeverkService.hentLandkoder().hentGjeldende(it)
+        }
+
+    /**
+     * Henter land basert ISO2-landkode
+     */
+    fun hentLandkodeIso2(landkodeIso2: String?) =
+        hentKodeverdi("landkode", landkodeIso2) {
+            cachedKodeverkService.hentLandkoderIso2().hentGjeldende(it)
         }
 
     private fun hentKodeverdi(
@@ -51,4 +62,7 @@ class CachedKodeverkService(
 
     @Cacheable("landkoder", sync = true)
     fun hentLandkoder(): KodeverkDto = kodeverkClient.hentLandkoder()
+
+    @Cacheable("landkoderIso2", sync = true)
+    fun hentLandkoderIso2(): KodeverkDto = kodeverkClient.hentLandkoderIso2()
 }

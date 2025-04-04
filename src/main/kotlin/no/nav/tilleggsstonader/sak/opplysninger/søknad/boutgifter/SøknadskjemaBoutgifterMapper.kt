@@ -21,12 +21,14 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Samli
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeUtgifterType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.sak.opplysninger.kodeverk.KodeverkService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.OppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
+import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.FasteUtgifter as FasteUtgifterKontrakt
@@ -35,10 +37,10 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Skjem
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterFlereSteder as UtgifterFlereStederKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterNyBolig as UtgifterNyBoligKontrakt
 
-/**
- * TODO burde mappe iso2landkoder til 3 her
- */
-object SøknadskjemaBoutgifterMapper {
+@Service
+class SøknadskjemaBoutgifterMapper(
+    private val kodeverkService: KodeverkService,
+) {
     fun map(
         mottattTidspunkt: LocalDateTime,
         språk: Språkkode,
@@ -52,7 +54,7 @@ object SøknadskjemaBoutgifterMapper {
             data = mapSkjema(skjema, mapDokumentasjon(journalpost.dokumenter)),
         )
 
-    fun mapDokumentasjon(dokumenter: List<DokumentInfo>?): List<DokumentasjonBoutgifter> {
+    private fun mapDokumentasjon(dokumenter: List<DokumentInfo>?): List<DokumentasjonBoutgifter> {
         if (dokumenter == null) return emptyList()
         return dokumenter
             .filter { it.brevkode != DokumentBrevkode.BOUTGIFTER.verdi }
@@ -93,7 +95,7 @@ object SøknadskjemaBoutgifterMapper {
                         adresse = it.adresse,
                         postnummer = it.postnummer,
                         poststed = it.bySted,
-                        landkode = it.landkode,
+                        landkode = kodeverkService.hentLandkodeIso2(it.land.value),
                     )
                 },
         )
@@ -112,9 +114,9 @@ object SøknadskjemaBoutgifterMapper {
         arbeidOgOpphold?.let {
             ArbeidOgOpphold(
                 jobberIAnnetLand = mapJaNei(it.jobberIAnnetLand),
-                jobbAnnetLand = it.jobbAnnetLand?.value,
+                jobbAnnetLand = it.jobbAnnetLand?.value?.let { kodeverkService.hentLandkodeIso2(it) },
                 harPengestøtteAnnetLand = mapPengestøtteAnnetLand(it.harPengestotteAnnetLand),
-                pengestøtteAnnetLand = it.pengestotteAnnetLand?.value,
+                pengestøtteAnnetLand = it.pengestotteAnnetLand?.value?.let { kodeverkService.hentLandkodeIso2(it) },
                 harOppholdUtenforNorgeSiste12mnd = mapJaNei(it.harOppholdUtenforNorgeSiste12mnd),
                 oppholdUtenforNorgeSiste12mnd = mapOpphold(it.oppholdUtenforNorgeSiste12mnd),
                 harOppholdUtenforNorgeNeste12mnd = it.harOppholdUtenforNorgeNeste12mnd?.let { mapJaNei(it) },

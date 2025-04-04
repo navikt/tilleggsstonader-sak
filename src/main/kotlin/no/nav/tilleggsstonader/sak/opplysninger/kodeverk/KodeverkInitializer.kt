@@ -39,6 +39,7 @@ class KodeverkInitializer(
     private fun sync() {
         syncKodeverk("Poststed", kodeverkService::hentPoststed)
         syncKodeverk("Landkoder", kodeverkService::hentLandkoder)
+        syncKodeverk("LandkoderIso2", kodeverkService::hentLandkoderIso2)
     }
 
     private fun syncKodeverk(

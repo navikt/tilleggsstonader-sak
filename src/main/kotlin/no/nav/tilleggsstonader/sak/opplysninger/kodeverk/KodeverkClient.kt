@@ -19,6 +19,8 @@ class KodeverkClient(
 
     fun hentLandkoder(): KodeverkDto = getForEntity(kodeverkUri, null, mapOf("kodeverksnavn" to "Landkoder"))
 
+    fun hentLandkoderIso2(): KodeverkDto = getForEntity(kodeverkUri, null, mapOf("kodeverksnavn" to "LandkoderISO2"))
+
     private val kodeverkUri =
         UriComponentsBuilder
             .fromUri(uri)

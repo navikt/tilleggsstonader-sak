@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.opplysninger.kodeverk.CachedKodeverkService
+import no.nav.tilleggsstonader.sak.opplysninger.kodeverk.KodeverkService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.SøknadskjemaBoutgifterMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknad
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
@@ -29,7 +29,8 @@ class SøknadService(
     private val søknadBehandlingRepository: SøknadBehandlingRepository,
     private val søknadBarnetilsynRepository: SøknadBarnetilsynRepository,
     private val søknadLæremidlerRepository: SøknadLæremidlerRepository,
-    private val kodeverkService: CachedKodeverkService,
+    private val kodeverkService: KodeverkService,
+    private val søknadskjemaBoutgifterMapper: SøknadskjemaBoutgifterMapper,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -68,7 +69,7 @@ class SøknadService(
                         søknadsskjema,
                     )
                 is SøknadsskjemaBoutgifterFyllUtSendInn ->
-                    SøknadskjemaBoutgifterMapper.map(
+                    søknadskjemaBoutgifterMapper.map(
                         skjema.mottattTidspunkt,
                         skjema.språk,
                         journalpost,

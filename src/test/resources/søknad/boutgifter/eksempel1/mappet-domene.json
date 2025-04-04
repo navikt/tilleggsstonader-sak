@@ -5,7 +5,7 @@
       "adresse" : "En vei 2",
       "postnummer" : "2069",
       "poststed" : "JESSHEIM",
-      "landkode" : "NOR"
+      "landkode" : "Land1"
     }
   },
   "hovedytelse" : {
@@ -13,9 +13,9 @@
     "harNedsattArbeidsevne" : "JA",
     "arbeidOgOpphold" : {
       "jobberIAnnetLand" : "JA",
-      "jobbAnnetLand" : "AF",
+      "jobbAnnetLand" : "Land1",
       "harPengestøtteAnnetLand" : [ "SYKEPENGER", "ANNEN_PENGESTØTTE" ],
-      "pengestøtteAnnetLand" : "AF",
+      "pengestøtteAnnetLand" : "Land1",
       "harOppholdUtenforNorgeSiste12mnd" : "JA",
       "oppholdUtenforNorgeSiste12mnd" : [ {
         "land" : "AF",
