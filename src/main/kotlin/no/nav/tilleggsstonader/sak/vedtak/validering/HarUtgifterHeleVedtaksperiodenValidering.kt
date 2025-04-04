@@ -1,17 +1,16 @@
-package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
+package no.nav.tilleggsstonader.sak.vedtak.validering
 
-import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
-import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
-import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningType
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import java.time.temporal.Temporal
 
-fun validerUtgiftHeleVedtaksperioden(
+fun <T> validerUtgiftHeleVedtaksperioden(
     vedtaksperioder: List<Vedtaksperiode>,
-    utgifter: Map<TypeBoutgift, List<UtgiftBeregningDato>>,
-) {
+    utgifter: Map<*, List<UtgiftBeregningType<T>>>,
+) where T : Comparable<T>, T : Temporal {
     if (vedtaksperioder.isEmpty()) {
         return
     }
@@ -25,15 +24,14 @@ fun validerUtgiftHeleVedtaksperioden(
     }
 }
 
-private fun erUtgiftperiodeSomInneholderVedtaksperiode(
+private fun <T> erUtgiftperiodeSomInneholderVedtaksperiode(
     vedtaksperioder: List<Vedtaksperiode>,
-    utgifter: Map<TypeBoutgift, List<UtgiftBeregningDato>>,
-): Boolean {
+    utgifter: Map<*, List<UtgiftBeregningType<T>>>,
+): Boolean where T : Comparable<T>, T : Temporal {
     val sammenslåtteUtgiftPerioder =
         utgifter.values
-            .flatMap {
-                it.map { Datoperiode(fom = it.fom, tom = it.tom) }
-            }.sorted()
+            .flatMap { it.map { it.tilDatoPeriode() } }
+            .sorted()
             .mergeSammenhengende { p1, p2 -> p1.overlapperEllerPåfølgesAv(p2) }
 
     return vedtaksperioder.any { vedtaksperiode ->
