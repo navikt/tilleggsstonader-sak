@@ -15,9 +15,11 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.journalføring.JournalpostDatoUtil.mestRelevanteDato
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
@@ -136,7 +138,8 @@ class JournalpostService(
                 dokumentInfoId = dokumentinfo.dokumentInfoId,
                 Dokumentvariantformat.ORIGINAL,
             )
-        return SøknadsskjemaUtil.parseSøknadsskjema(stønadstype, data)
+        val mottattTidspunkt = mestRelevanteDato(søknadJournalpost) ?: osloNow()
+        return SøknadsskjemaUtil.parseSøknadsskjema(stønadstype, data, mottattTidspunkt = mottattTidspunkt)
     }
 
     fun finnJournalpostOgPersonIdent(journalpostId: String): Pair<Journalpost, String> {
