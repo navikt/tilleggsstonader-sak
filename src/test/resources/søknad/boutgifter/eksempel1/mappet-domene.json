@@ -1,17 +1,21 @@
 {
+  "personopplysninger" : {
+    "adresse" : {
+      "gyldigFraOgMed" : "2004-10-29",
+      "adresse" : "En vei 2",
+      "postnummer" : "2069",
+      "poststed" : "JESSHEIM",
+      "landkode" : "NOR"
+    }
+  },
   "hovedytelse" : {
     "hovedytelse" : [ "AAP", "OVERGANGSSTØNAD", "GJENLEVENDEPENSJON", "UFØRETRYGD", "TILTAKSPENGER", "DAGPENGER", "SYKEPENGER", "KVALIFISERINGSSTØNAD", "INGEN_PENGESTØTTE", "INGEN_PASSENDE_ALTERNATIVER" ],
     "harNedsattArbeidsevne" : "JA",
     "arbeidOgOpphold" : {
       "jobberIAnnetLand" : "JA",
       "jobbAnnetLand" : "AF",
-      "harPengestotteAnnetLand" : {
-        "sykepenger" : true,
-        "pensjon" : true,
-        "annenPengestotte" : true,
-        "mottarIkkePengestotte" : false
-      },
-      "pengestøtteAnnetLand" : "Afghanistan",
+      "harPengestøtteAnnetLand" : [ "SYKEPENGER", "ANNEN_PENGESTØTTE" ],
+      "pengestøtteAnnetLand" : "AF",
       "harOppholdUtenforNorgeSiste12mnd" : "JA",
       "oppholdUtenforNorgeSiste12mnd" : [ {
         "land" : "AF",

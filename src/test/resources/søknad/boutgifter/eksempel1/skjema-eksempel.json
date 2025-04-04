@@ -1,4 +1,19 @@
 {
+  "dineOpplysninger" : {
+    "fornavn" : "Fornavn",
+    "etternavn" : "Etternavn",
+    "adresse" : {
+      "gyldigFraOgMed" : "2004-10-29",
+      "adresse" : "En vei 2",
+      "postnummer" : "2069",
+      "bySted" : "JESSHEIM",
+      "landkode" : "NOR",
+      "land" : {
+        "label" : "Norge",
+        "value" : "NO"
+      }
+    }
+  },
   "hovedytelse" : {
     "arbeidsavklaringspenger" : true,
     "overgangsstonad" : true,
@@ -23,7 +38,7 @@
       "pensjon" : false,
       "annenPengestotte" : true,
       "mottarIkkePengestotte" : false
-    },,
+    },
     "pengestotteAnnetLand" : {
       "value" : "AF",
       "label" : "Afghanistan"

@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Arbei
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArsakOppholdUtenforNorgeType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.BoligEllerOvernatting
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.DelerBoutgifterType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.DineOpplysninger
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HarPengestotteAnnetLandType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HarUtgifterTilBoligToStederType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HovedytelseType
@@ -76,10 +77,25 @@ object SøknadskjemaBoutgifterMapper {
         dokumentasjon: List<DokumentasjonBoutgifter>,
     ): SkjemaBoutgifter =
         SkjemaBoutgifter(
+            personopplysninger = mapPersonopplysninger(skjemaBoutgifter.dineOpplysninger),
             hovedytelse = mapHovedytelse(skjemaBoutgifter),
             aktivitet = mapAktivitet(skjemaBoutgifter),
             boutgifter = mapBoutgifter(skjemaBoutgifter.boligEllerOvernatting),
             dokumentasjon = dokumentasjon,
+        )
+
+    private fun mapPersonopplysninger(opplysninger: DineOpplysninger): Personopplysninger =
+        Personopplysninger(
+            adresse =
+                opplysninger.adresse?.let {
+                    Adresse(
+                        gyldigFraOgMed = it.gyldigFraOgMed,
+                        adresse = it.adresse,
+                        postnummer = it.postnummer,
+                        poststed = it.bySted,
+                        landkode = it.landkode,
+                    )
+                },
         )
 
     private fun mapHovedytelse(skjemaBoutgifter: SkjemaBoutgifterKontrakt) =
@@ -98,7 +114,7 @@ object SøknadskjemaBoutgifterMapper {
                 jobberIAnnetLand = mapJaNei(it.jobberIAnnetLand),
                 jobbAnnetLand = it.jobbAnnetLand?.value,
                 harPengestøtteAnnetLand = mapPengestøtteAnnetLand(it.harPengestotteAnnetLand),
-                pengestøtteAnnetLand = it.pengestotteAnnetLand?.label,
+                pengestøtteAnnetLand = it.pengestotteAnnetLand?.value,
                 harOppholdUtenforNorgeSiste12mnd = mapJaNei(it.harOppholdUtenforNorgeSiste12mnd),
                 oppholdUtenforNorgeSiste12mnd = mapOpphold(it.oppholdUtenforNorgeSiste12mnd),
                 harOppholdUtenforNorgeNeste12mnd = it.harOppholdUtenforNorgeNeste12mnd?.let { mapJaNei(it) },
@@ -147,7 +163,6 @@ object SøknadskjemaBoutgifterMapper {
             ArbeidsrettetAktivitetType.tiltakArbeidsrettetUtredning -> AnnenAktivitetType.TILTAK
             ArbeidsrettetAktivitetType.utdanningGodkjentAvNav -> AnnenAktivitetType.UTDANNING
             ArbeidsrettetAktivitetType.harIngenArbeidsrettetAktivitet -> AnnenAktivitetType.INGEN_AKTIVITET
-            else -> error("Har ikke mapping av annenAktivitet=$verdi")
         }
 
     private fun mapBoutgifter(boligEllerOvernatting: BoligEllerOvernatting): BoligEllerOvernattingAvsnitt =

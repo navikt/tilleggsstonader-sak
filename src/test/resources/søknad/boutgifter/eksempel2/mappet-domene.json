@@ -1,4 +1,13 @@
 {
+  "personopplysninger" : {
+    "adresse" : {
+      "gyldigFraOgMed" : "2004-10-29",
+      "adresse" : "Hestehagen 2",
+      "postnummer" : "2069",
+      "poststed" : "JESSHEIM",
+      "landkode" : "NOR"
+    }
+  },
   "hovedytelse" : {
     "hovedytelse" : [ "AAP" ],
     "harNedsattArbeidsevne" : null,

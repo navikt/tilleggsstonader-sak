@@ -6,10 +6,23 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnit
 import java.time.LocalDate
 
 data class SkjemaBoutgifter(
+    val personopplysninger: Personopplysninger,
     val hovedytelse: HovedytelseAvsnitt,
     val aktivitet: AktivitetAvsnitt,
     val boutgifter: BoligEllerOvernattingAvsnitt,
     val dokumentasjon: List<DokumentasjonBoutgifter>,
+)
+
+data class Personopplysninger(
+    val adresse: Adresse?,
+)
+
+data class Adresse(
+    val gyldigFraOgMed: LocalDate,
+    val adresse: String,
+    val postnummer: String,
+    val poststed: String,
+    val landkode: String,
 )
 
 data class BoligEllerOvernattingAvsnitt(
