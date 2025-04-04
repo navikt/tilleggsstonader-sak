@@ -59,7 +59,7 @@ class SøknadskjemaBoutgifterMapper(
         if (dokumenter == null) return emptyList()
         return dokumenter
             .filter { it.brevkode != DokumentBrevkode.BOUTGIFTER.verdi }
-            .filter { it.brevkode != "L7" || it.tittel == "Innsendingskvittering" } // Innsendingskvittering
+            .filter { it.brevkode != "L7" && it.tittel != "Innsendingskvittering" } // Innsendingskvittering
             .mapNotNull { dokument ->
                 dokument.tittel?.let {
                     DokumentasjonBoutgifter(tittel = it, dokumentInfoId = dokument.dokumentInfoId)
