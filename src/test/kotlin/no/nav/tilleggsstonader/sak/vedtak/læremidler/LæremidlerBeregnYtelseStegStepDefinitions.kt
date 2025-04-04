@@ -50,11 +50,11 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapAktiviteter
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapBeregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapMålgrupper
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.LæremidlerVedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeLæremidlerDto
+import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
@@ -86,9 +86,8 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                 )
             }
         }
-    val læremidlerVedtaksperiodeValideringService =
-        LæremidlerVedtaksperiodeValideringService(
-            behandlingService = behandlingService,
+    val vedtaksperiodeValideringService =
+        VedtaksperiodeValideringService(
             vedtakRepository = vedtakRepository,
             vilkårperiodeService = vilkårperiodeService,
         )
@@ -102,7 +101,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             beregningService =
                 LæremidlerBeregningService(
                     vilkårperiodeRepository = vilkårperiodeRepository,
-                    læremidlerVedtaksperiodeValideringService = læremidlerVedtaksperiodeValideringService,
+                    vedtaksperiodeValideringService = vedtaksperiodeValideringService,
                     vedtakRepository = vedtakRepository,
                 ),
             opphørValideringService = mockk<OpphørValideringService>(relaxed = true),

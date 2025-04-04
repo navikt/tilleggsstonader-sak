@@ -23,8 +23,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.splittTilLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.LæremidlerVedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
@@ -68,9 +68,8 @@ class StepDefinitions {
                 )
             }
         }
-    val læremidlerVedtaksperiodeValideringService =
-        LæremidlerVedtaksperiodeValideringService(
-            behandlingService = behandlingService,
+    val vedtaksperiodeValideringService =
+        VedtaksperiodeValideringService(
             vedtakRepository = vedtakRepository,
             vilkårperiodeService = vilkårperiodeService,
         )
@@ -78,7 +77,7 @@ class StepDefinitions {
     val læremidlerBeregningService =
         LæremidlerBeregningService(
             vilkårperiodeRepository = vilkårperiodeRepository,
-            læremidlerVedtaksperiodeValideringService = læremidlerVedtaksperiodeValideringService,
+            vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = VedtakRepositoryFake(),
         )
 
@@ -88,7 +87,6 @@ class StepDefinitions {
     var resultat: BeregningsresultatLæremidler? = null
 
     var beregningException: Exception? = null
-    var valideringException: Exception? = null
 
     var vedtaksperioderSplittet: List<LøpendeMåned> = emptyList()
 
@@ -142,19 +140,6 @@ class StepDefinitions {
                 }.splittTilLøpendeMåneder()
     }
 
-    @Når("validerer vedtaksperiode for læremidler")
-    fun `validerer vedtaksperiode for læremidler`() {
-        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
-        try {
-            læremidlerVedtaksperiodeValideringService.validerVedtaksperioder(
-                vedtaksperioder = vedtaksPerioder,
-                behandlingId = behandlingId,
-            )
-        } catch (feil: Exception) {
-            valideringException = feil
-        }
-    }
-
     @Så("skal stønaden være")
     fun `skal stønaden være`(dataTable: DataTable) {
         val forventedeBeregningsperioder = mapBeregningsresultat(dataTable)
@@ -176,16 +161,6 @@ class StepDefinitions {
     @Så("forvent følgende feil fra læremidlerberegning: {}")
     fun `forvent følgende feil`(forventetFeil: String) {
         assertThat(beregningException).hasMessageContaining(forventetFeil)
-    }
-
-    @Så("forvent følgende feil fra vedtaksperiode validering: {}")
-    fun `skal resultat fra validering være`(forventetFeil: String) {
-        assertThat(valideringException).hasMessageContaining(forventetFeil)
-    }
-
-    @Så("forvent ingen feil fra vedtaksperiode validering")
-    fun `forvent ingen feil fra vedtaksperiode validering`() {
-        assertThat(valideringException).isNull()
     }
 
     @Så("forvent følgende utbetalingsperioder")
