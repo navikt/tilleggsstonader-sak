@@ -31,9 +31,9 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
       | 01.2023 | 03.2023 | TILTAK    | 5               |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 02.2023 | 100    |
-      | 02.2023 | 03.2023 | 100    |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 29.02.2023 | 100    |
+      | 01.02.2023 | 31.03.2023 | 100    |
 
     Når beregner
 
@@ -50,8 +50,8 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
       | 01.2023 | 03.2023 | TILTAK    | 5               |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 03.2023 | -100   |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.03.2023 | -100   |
 
     Når beregner
 

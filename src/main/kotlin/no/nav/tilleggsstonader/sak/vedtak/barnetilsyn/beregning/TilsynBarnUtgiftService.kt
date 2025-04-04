@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import org.springframework.stereotype.Service
-import java.time.YearMonth
 
 @Service
 class TilsynBarnUtgiftService(
@@ -35,8 +34,8 @@ class TilsynBarnUtgiftService(
             "Noe er feil. Tom skal være satt til siste dagen i måneden"
         }
         return UtgiftBeregning(
-            fom = YearMonth.from(fom),
-            tom = YearMonth.from(tom),
+            fom = fom,
+            tom = tom,
             utgift = utgift,
         )
     }

@@ -84,7 +84,7 @@ class TilsynBarnBeregnYtelseStegTest {
         every { repository.insert(any()) } answers { firstArg() }
         mockVilkårperioder(fom, tom, saksbehandling.id)
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns
-            mapOf(barn.id to listOf(UtgiftBeregning(YearMonth.of(2023, 1), YearMonth.of(2023, 1), 1)))
+            mapOf(barn.id to listOf(UtgiftBeregning(LocalDate.of(2023, 1, 1), LocalDate.of(2023, 1, 31), 1)))
     }
 
     @Test

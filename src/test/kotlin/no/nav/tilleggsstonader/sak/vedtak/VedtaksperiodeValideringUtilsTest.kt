@@ -59,8 +59,8 @@ class VedtaksperiodeValideringUtilsTest {
             BarnId.random() to
                 listOf(
                     UtgiftBeregning(
-                        fom = YearMonth.of(2025, 1),
-                        tom = YearMonth.of(2025, 2),
+                        fom = LocalDate.of(2025, 1, 1),
+                        tom = LocalDate.of(2025, 2, 28),
                         utgift = 1000,
                     ),
                 ),
@@ -334,8 +334,8 @@ class VedtaksperiodeValideringUtilsTest {
                     BarnId.random() to
                         listOf(
                             UtgiftBeregning(
-                                fom = YearMonth.of(2025, 1),
-                                tom = YearMonth.of(2025, 1),
+                                fom = LocalDate.of(2025, 1, 1),
+                                tom = LocalDate.of(2025, 1, 31),
                                 utgift = 1000,
                             ),
                         ),
@@ -370,13 +370,13 @@ class VedtaksperiodeValideringUtilsTest {
                         BarnId.random() to
                             listOf(
                                 UtgiftBeregning(
-                                    fom = YearMonth.of(2025, 1),
-                                    tom = YearMonth.of(2025, 1),
+                                    fom = LocalDate.of(2025, 1, 1),
+                                    tom = LocalDate.of(2025, 1, 31),
                                     utgift = 1000,
                                 ),
                                 UtgiftBeregning(
-                                    fom = YearMonth.of(2025, 2),
-                                    tom = YearMonth.of(2025, 2),
+                                    fom = LocalDate.of(2025, 2, 1),
+                                    tom = LocalDate.of(2025, 2, 28),
                                     utgift = 1000,
                                 ),
                             ),
@@ -397,16 +397,16 @@ class VedtaksperiodeValideringUtilsTest {
                         BarnId.random() to
                             listOf(
                                 UtgiftBeregning(
-                                    fom = YearMonth.of(2025, 1),
-                                    tom = YearMonth.of(2025, 1),
+                                    fom = LocalDate.of(2025, 1, 1),
+                                    tom = LocalDate.of(2025, 1, 31),
                                     utgift = 1000,
                                 ),
                             ),
                         BarnId.random() to
                             listOf(
                                 UtgiftBeregning(
-                                    fom = YearMonth.of(2025, 2),
-                                    tom = YearMonth.of(2025, 2),
+                                    fom = LocalDate.of(2025, 2, 1),
+                                    tom = LocalDate.of(2025, 2, 28),
                                     utgift = 1000,
                                 ),
                             ),
@@ -427,13 +427,13 @@ class VedtaksperiodeValideringUtilsTest {
                         BarnId.random() to
                             listOf(
                                 UtgiftBeregning(
-                                    fom = YearMonth.of(2025, 1),
-                                    tom = YearMonth.of(2025, 1),
+                                    fom = LocalDate.of(2025, 1, 1),
+                                    tom = LocalDate.of(2025, 1, 31),
                                     utgift = 1000,
                                 ),
                                 UtgiftBeregning(
-                                    fom = YearMonth.of(2025, 3),
-                                    tom = YearMonth.of(2025, 3),
+                                    fom = LocalDate.of(2025, 3, 1),
+                                    tom = LocalDate.of(2025, 3, 31),
                                     utgift = 1000,
                                 ),
                             ),

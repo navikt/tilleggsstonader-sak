@@ -21,12 +21,12 @@ Egenskap: Beregning - Komplisert scenario
       | 19.06.2023 | 30.06.2023 | TILTAK    | 2               |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 06.2023 | 1000   |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 30.06.2023 | 1000   |
 
     Gitt følgende utgifter for barn med id: 2
-      | Fom     | Tom     | Utgift |
-      | 04.2023 | 06.2023 | 1000   |
+      | Fom        | Tom        | Utgift |
+      | 01.04.2023 | 30.06.2023 | 1000   |
 
     Når beregner
 

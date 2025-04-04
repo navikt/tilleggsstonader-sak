@@ -98,8 +98,8 @@ class StepDefinitions {
         utgifter[barnUuid] =
             dataTable.mapRad { rad ->
                 UtgiftBeregning(
-                    fom = parseÅrMåned(DomenenøkkelFelles.FOM, rad),
-                    tom = parseÅrMåned(DomenenøkkelFelles.TOM, rad),
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
                     utgift = parseInt(BeregningNøkler.UTGIFT, rad),
                 )
             }

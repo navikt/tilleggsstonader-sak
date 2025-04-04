@@ -13,8 +13,8 @@ Egenskap: Beregning med vedtaksperioder for februar med 3 aktivitetsdager. Hele 
       | 01.02.2024 | 29.02.2024 | TILTAK    | 3               |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 02.2024 | 02.2024 | 1000   |
+      | Fom        | Tom        | Utgift |
+      | 01.02.2024 | 29.02.2024 | 1000   |
 
     Når beregner
 
@@ -33,8 +33,8 @@ Egenskap: Beregning med vedtaksperioder for februar med 3 aktivitetsdager. Hele 
       | 01.02.2024 | 29.02.2024 | TILTAK    | 3               |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 02.2024 | 02.2024 | 1000   |
+      | Fom        | Tom        | Utgift |
+      | 01.02.2024 | 29.02.2024 | 1000   |
 
     Når beregner
 
@@ -54,8 +54,8 @@ Egenskap: Beregning med vedtaksperioder for februar med 3 aktivitetsdager. Hele 
       | 07.02.2024 | 08.02.2024 | TILTAK    | 3               |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 02.2024 | 02.2024 | 1000   |
+      | Fom        | Tom        | Utgift |
+      | 01.02.2024 | 29.02.2024 | 1000   |
 
     Når beregner
 

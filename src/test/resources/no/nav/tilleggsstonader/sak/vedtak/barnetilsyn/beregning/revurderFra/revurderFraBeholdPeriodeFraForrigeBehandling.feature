@@ -21,7 +21,7 @@ Egenskap: Beregning - med revurderFra - behold perioder fra forrige behandling
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
-      | 02.2024 | 02.2024 | 1000   |
+      | 01.02.2024 | 29.02.2024 | 1000   |
 
     Når beregner med revurderFra=2024-02-05
 
@@ -49,7 +49,7 @@ Egenskap: Beregning - med revurderFra - behold perioder fra forrige behandling
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
-      | 02.2024 | 02.2024 | 1000   |
+      | 01.02.2024 | 29.02.2024 | 1000   |
 
     Når beregner med revurderFra=2024-02-05
 

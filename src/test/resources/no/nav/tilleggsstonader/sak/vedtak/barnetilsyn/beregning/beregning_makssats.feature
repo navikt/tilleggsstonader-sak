@@ -15,8 +15,8 @@ Egenskap: Verifisering av makssats
       | 01.01.2023 | 30.07.2023 | UTDANNING | 5               |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 12.2023 | 10000  |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.12.2023 | 10000  |
 
     Når beregner
 
@@ -37,12 +37,12 @@ Egenskap: Verifisering av makssats
       | 01.01.2023 | 30.07.2023 | UTDANNING | 5               |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 12.2023 | 10000  |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.12.2023 | 10000  |
 
     Gitt følgende utgifter for barn med id: 2
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 12.2023 | 10000  |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.12.2023 | 10000  |
 
     Når beregner
 
@@ -63,16 +63,16 @@ Egenskap: Verifisering av makssats
       | 01.01.2023 | 30.07.2023 | UTDANNING | 5               |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 12.2023 | 10000  |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.12.2023 | 10000  |
 
     Gitt følgende utgifter for barn med id: 2
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 12.2023 | 10000  |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.12.2023 | 10000  |
 
     Gitt følgende utgifter for barn med id: 3
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 12.2023 | 10000  |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.12.2023 | 10000  |
 
     Når beregner
 
@@ -93,20 +93,20 @@ Egenskap: Verifisering av makssats
       | 01.01.2023 | 30.07.2023 | UTDANNING | 5               |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 12.2023 | 10000  |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.12.2023 | 10000  |
 
     Gitt følgende utgifter for barn med id: 2
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 12.2023 | 10000  |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.12.2023 | 10000  |
 
     Gitt følgende utgifter for barn med id: 3
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 12.2023 | 10000  |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.12.2023 | 10000  |
 
     Gitt følgende utgifter for barn med id: 4
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 12.2023 | 10000  |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.12.2023 | 10000  |
 
     Når beregner
 

@@ -21,7 +21,6 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.time.YearMonth
 import java.util.UUID
 
 class VedtaksperiodeValidingerServiceTest {
@@ -58,8 +57,8 @@ class VedtaksperiodeValidingerServiceTest {
             BarnId.Companion.random() to
                 listOf(
                     UtgiftBeregning(
-                        fom = YearMonth.of(2025, 1),
-                        tom = YearMonth.of(2025, 2),
+                        fom = LocalDate.of(2025, 1, 1),
+                        tom = LocalDate.of(2025, 2, 28),
                         utgift = 1000,
                     ),
                 ),

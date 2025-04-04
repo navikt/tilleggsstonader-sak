@@ -151,20 +151,20 @@ class TilsynBeregningUtilTest {
 
         val utgiftJanuar =
             UtgiftBeregning(
-                fom = YearMonth.of(2025, 1),
-                tom = YearMonth.of(2025, 1),
+                fom = LocalDate.of(2025, 1, 1),
+                tom = LocalDate.of(2025, 1, 31),
                 utgift = 1000,
             )
         val utgiftFebruar =
             UtgiftBeregning(
-                fom = YearMonth.of(2025, 2),
-                tom = YearMonth.of(2025, 2),
+                fom = LocalDate.of(2025, 2, 1),
+                tom = LocalDate.of(2025, 2, 28),
                 utgift = 1000,
             )
         val utgiftJanuarTilFebruar =
             UtgiftBeregning(
-                fom = YearMonth.of(2025, 1),
-                tom = YearMonth.of(2025, 2),
+                fom = LocalDate.of(2025, 1, 31),
+                tom = LocalDate.of(2025, 2, 28),
                 utgift = 1000,
             )
 
