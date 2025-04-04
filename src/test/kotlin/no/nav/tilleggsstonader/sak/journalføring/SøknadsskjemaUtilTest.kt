@@ -42,19 +42,19 @@ class SøknadsskjemaUtilTest {
     inner class ParsingBoutgifter {
         @Test
         fun `Skal kunne parse søknad av type BOUTGIFTER`() {
-            val skjema = SøknadBoutgifterUtil.søknadskjemaBoutgifter()
+            val skjema = SøknadBoutgifterUtil.søknadBoutgifter()
             val parsetSkjema =
                 SøknadsskjemaUtil.parseSøknadsskjema(
                     Stønadstype.BOUTGIFTER,
                     data = objectMapper.writeValueAsBytes(skjema),
                     mottattTidspunkt = LocalDateTime.now(),
                 )
-            assertThat(parsetSkjema).isEqualTo(skjema)
+            assertThat(parsetSkjema.skjema).isEqualTo(skjema)
         }
 
         @Test
         fun `Skal feile hvis et ukjent felt finnes i skjemaet`() {
-            val skjema = SøknadBoutgifterUtil.søknadskjemaBoutgifter()
+            val skjema = SøknadBoutgifterUtil.søknadBoutgifter()
             val json =
                 objectMapper.readTree(objectMapper.writeValueAsBytes(skjema)).apply {
                     (this as ObjectNode).put("ukjentFelt", "test")
@@ -65,7 +65,7 @@ class SøknadsskjemaUtilTest {
                     data = objectMapper.writeValueAsBytes(json),
                     mottattTidspunkt = LocalDateTime.now(),
                 )
-            }.hasMessageContaining("yolo")
+            }.hasMessageContaining("Unrecognized field \"ukjentFelt\"")
         }
     }
 }
