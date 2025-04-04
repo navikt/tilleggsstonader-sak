@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.IdConverters.alleValue
 import no.nav.tilleggsstonader.sak.oppfølging.OppfølgingData
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagData
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.SkjemaBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaLæremidler
@@ -89,6 +90,10 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 ÅrsakerWriter(),
                 SkjemaBarnetilsynReader(),
                 SkjemaBarnetilsynWriter(),
+                SkjemaLæremidlerReader(),
+                SkjemaLæremidlerWriter(),
+                SkjemaBoutgifterReader(),
+                SkjemaBoutgifterWriter(),
                 BarnMedBarnepassReader(),
                 BarnMedBarnepassWriter(),
                 FilTilBytearrayConverter(),
@@ -99,8 +104,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 VilkårperiodeTypeTilStringConverter(),
                 VilkårperioderGrunnlagReader(),
                 VilkårperioderGrunnlagWriter(),
-                SkjemaLæremidlerReader(),
-                SkjemaLæremidlerWriter(),
                 FaktaOgVurderingReader(),
                 FaktaOgVurderingWriter(),
                 OppfølgingDataReader(),
@@ -193,6 +196,14 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     class SkjemaBarnetilsynWriter : JsonWriter<SkjemaBarnetilsyn>()
 
+    class SkjemaLæremidlerReader : JsonReader<SkjemaLæremidler>(SkjemaLæremidler::class)
+
+    class SkjemaLæremidlerWriter : JsonWriter<SkjemaLæremidler>()
+
+    class SkjemaBoutgifterReader : JsonReader<SkjemaBoutgifter>(SkjemaBoutgifter::class)
+
+    class SkjemaBoutgifterWriter : JsonWriter<SkjemaBoutgifter>()
+
     class BarnMedBarnepassReader : JsonReader<BarnMedBarnepass>(BarnMedBarnepass::class)
 
     class BarnMedBarnepassWriter : JsonWriter<BarnMedBarnepass>()
@@ -204,10 +215,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class VilkårperioderGrunnlagReader : JsonReader<VilkårperioderGrunnlag>(VilkårperioderGrunnlag::class)
 
     class VilkårperioderGrunnlagWriter : JsonWriter<VilkårperioderGrunnlag>()
-
-    class SkjemaLæremidlerReader : JsonReader<SkjemaLæremidler>(SkjemaLæremidler::class)
-
-    class SkjemaLæremidlerWriter : JsonWriter<SkjemaLæremidler>()
 
     class FaktaOgVurderingReader : JsonReader<FaktaOgVurdering>(FaktaOgVurdering::class)
 
