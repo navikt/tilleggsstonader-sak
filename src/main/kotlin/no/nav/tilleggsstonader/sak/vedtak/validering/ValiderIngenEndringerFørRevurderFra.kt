@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak
+package no.nav.tilleggsstonader.sak.vedtak.validering
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.PeriodeMedId

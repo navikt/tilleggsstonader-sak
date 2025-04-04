@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak
+package no.nav.tilleggsstonader.sak.vedtak.validering
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.ENSLIG_FORSØRGER
@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatus
+import no.nav.tilleggsstonader.sak.vedtak.validering.validerIngenEndringerFørRevurderFra
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested

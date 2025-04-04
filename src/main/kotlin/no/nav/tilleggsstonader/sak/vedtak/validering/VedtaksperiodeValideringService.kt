@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.validerIngenEndringerFørRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUtils.validerEnkeltperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUtils.validerIngenOverlappMellomVedtaksperioder
