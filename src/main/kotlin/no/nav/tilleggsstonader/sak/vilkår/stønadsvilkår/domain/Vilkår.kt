@@ -76,10 +76,6 @@ data class Vilkår(
                 validerPåkrevdBeløpHvisOppfylt()
             }
 
-            VilkårType.EKSEMPEL -> {
-                // Dette er kun for tester foreløpig
-            }
-
             else -> error("Må ta stilling til validering av fom/tom. Eks om vilkåret bruker dato eller månedsvelger")
         }
     }
@@ -206,9 +202,6 @@ enum class VilkårType(
     val beskrivelse: String,
     val gjelderStønader: List<Stønadstype>,
 ) {
-    EKSEMPEL("Eksempel", listOf()),
-    EKSEMPEL2("Eksempel 2", listOf()),
-
     // Barnetilsyn
     PASS_BARN("Pass av barn", listOf(Stønadstype.BARNETILSYN)),
 
@@ -220,7 +213,7 @@ enum class VilkårType(
 
     fun gjelderFlereBarn(): Boolean = this == PASS_BARN
 
-    fun erLøpendeUtgifterBo(): Boolean = (this == LØPENDE_UTGIFTER_EN_BOLIG || this == LØPENDE_UTGIFTER_TO_BOLIGER)
+    fun erLøpendeBoutgifter(): Boolean = (this == LØPENDE_UTGIFTER_EN_BOLIG || this == LØPENDE_UTGIFTER_TO_BOLIGER)
 
     companion object {
         fun hentVilkårForStønad(stønadstype: Stønadstype): List<VilkårType> =

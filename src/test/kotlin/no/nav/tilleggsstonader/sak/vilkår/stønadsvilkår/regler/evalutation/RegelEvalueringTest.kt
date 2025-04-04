@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.EksempelRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegel
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -47,14 +47,14 @@ internal class RegelEvalueringTest {
 
     @Test
     fun `utledVilkårResultat - utledResultat skal gi OPPFYLT når delvilkår er AUTOMATISK_OPPFYLT`() {
-        val vurderingDto = VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "begrunnelse")
+        val vurderingDto = VurderingDto(RegelId.UTGIFTER_DOKUMENTERT, SvarId.JA, "begrunnelse")
         val delvilkår = DelvilkårDto(Vilkårsresultat.AUTOMATISK_OPPFYLT, listOf(vurderingDto))
 
-        val regelResultat = RegelEvaluering.utledResultat(EksempelRegel(), listOf(delvilkår))
+        val regelResultat = RegelEvaluering.utledResultat(PassBarnRegel(), listOf(delvilkår))
         assertThat(regelResultat.vilkår).isEqualTo(Vilkårsresultat.OPPFYLT)
 
         assertThat(regelResultat.delvilkår.keys.size).isEqualTo(1)
-        assertThat(regelResultat.delvilkår.keys.first()).isEqualTo(RegelId.HAR_ET_NAVN)
+        assertThat(regelResultat.delvilkår.keys.first()).isEqualTo(RegelId.UTGIFTER_DOKUMENTERT)
         assertThat(regelResultat.delvilkår.values.size).isEqualTo(1)
         assertThat(regelResultat.delvilkår.values.first()).isEqualTo(Vilkårsresultat.OPPFYLT)
     }
