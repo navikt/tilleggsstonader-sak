@@ -7,9 +7,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 
-/**
- * TODO denne kan erstatte VedtaksperiodeBeregningsgrunnlag når denne har tatt i bruk faktisk målgruppe
- */
 data class VedtaksperiodeBeregning(
     override val fom: LocalDate,
     override val tom: LocalDate,

@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.sisteDagIÅret
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningsgrunnlagLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.splitPerLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.splitVedtaksperiodePerÅr
@@ -15,7 +15,7 @@ object LæremidlerBeregnUtil {
      * Vi filterer bort perioder som ender opp som rene helger, som vil kunne skje den siste løpende måneden, og som
      * ikke skal gi en helt ny periode med støtte
      */
-    fun List<VedtaksperiodeBeregningsgrunnlagLæremidler>.splittTilLøpendeMåneder(): List<LøpendeMåned> =
+    fun List<VedtaksperiodeBeregning>.splittTilLøpendeMåneder(): List<LøpendeMåned> =
         this
             .sorted()
             .splitVedtaksperiodePerÅr()

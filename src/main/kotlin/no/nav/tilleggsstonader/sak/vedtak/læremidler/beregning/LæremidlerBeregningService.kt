@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningsgrunnlagLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnBeløpUtil.beregnBeløp
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.splittTilLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
@@ -59,7 +59,7 @@ class LæremidlerBeregningService(
 
     private fun beregn(
         behandling: Saksbehandling,
-        vedtaksperioderBeregningsgrunnlag: List<VedtaksperiodeBeregningsgrunnlagLæremidler>,
+        vedtaksperioderBeregningsgrunnlag: List<VedtaksperiodeBeregning>,
     ): List<BeregningsresultatForMåned> {
         val aktiviteter = finnAktiviteter(behandling.id)
         return beregnLæremidlerPerMåned(vedtaksperioderBeregningsgrunnlag, aktiviteter)
@@ -216,11 +216,11 @@ class LæremidlerBeregningService(
     private fun List<Vedtaksperiode>.tilBeregningsgrunnlag() =
         this
             .map {
-                VedtaksperiodeBeregningsgrunnlagLæremidler(
+                VedtaksperiodeBeregning(
                     fom = it.fom,
                     tom = it.tom,
-                    målgruppe = it.målgruppe!!,
-                    aktivitet = it.aktivitet!!,
+                    målgruppe = it.målgruppe,
+                    aktivitet = it.aktivitet,
                 )
             }.sorted()
 
@@ -230,7 +230,7 @@ class LæremidlerBeregningService(
             .tilAktiviteter()
 
     private fun beregnLæremidlerPerMåned(
-        vedtaksperioderBeregningsgrunnlag: List<VedtaksperiodeBeregningsgrunnlagLæremidler>,
+        vedtaksperioderBeregningsgrunnlag: List<VedtaksperiodeBeregning>,
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
     ): List<BeregningsresultatForMåned> =
         vedtaksperioderBeregningsgrunnlag

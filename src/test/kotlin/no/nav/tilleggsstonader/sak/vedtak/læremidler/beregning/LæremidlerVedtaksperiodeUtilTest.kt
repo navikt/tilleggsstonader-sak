@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningTestUtil.vedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.splitPerLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.splitVedtaksperiodePerÅr
@@ -24,7 +24,7 @@ class LæremidlerVedtaksperiodeUtilTest {
     inner class SplitVedtaksperiodePerÅr {
         @Test
         fun `skal ikke splitte periode som er innenfor samme år`() {
-            val periode = vedtaksperiodeBeregningsgrunnlag(fom = førsteJan2024, tom = sisteDes2024)
+            val periode = vedtaksperiodeBeregning(fom = førsteJan2024, tom = sisteDes2024)
 
             assertThat(listOf(periode).splitVedtaksperiodePerÅr()).containsExactly(
                 VedtaksperiodeInnenforÅr(førsteJan2024, sisteDes2024),
@@ -33,7 +33,7 @@ class LæremidlerVedtaksperiodeUtilTest {
 
         @Test
         fun `skal splitte periode som løper over 2 år`() {
-            val periode = vedtaksperiodeBeregningsgrunnlag(fom = sisteDes2024, tom = sisteDes2024.plusDays(1))
+            val periode = vedtaksperiodeBeregning(fom = sisteDes2024, tom = sisteDes2024.plusDays(1))
             assertThat(listOf(periode).splitVedtaksperiodePerÅr()).containsExactly(
                 VedtaksperiodeInnenforÅr(sisteDes2024, sisteDes2024),
                 VedtaksperiodeInnenforÅr(sisteDes2024.plusDays(1), sisteDes2024.plusDays(1)),
@@ -42,7 +42,7 @@ class LæremidlerVedtaksperiodeUtilTest {
 
         @Test
         fun `skal splitte periode som løper over 3 år`() {
-            val periode = vedtaksperiodeBeregningsgrunnlag(fom = sisteDes2024, tom = LocalDate.of(2026, 2, 3))
+            val periode = vedtaksperiodeBeregning(fom = sisteDes2024, tom = LocalDate.of(2026, 2, 3))
 
             assertThat(listOf(periode).splitVedtaksperiodePerÅr()).containsExactly(
                 VedtaksperiodeInnenforÅr(sisteDes2024, sisteDes2024),

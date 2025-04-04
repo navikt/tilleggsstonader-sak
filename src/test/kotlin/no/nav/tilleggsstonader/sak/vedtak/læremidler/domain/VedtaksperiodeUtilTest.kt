@@ -7,8 +7,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningTestUtil.vedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerIngenOverlappendeVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.vedtaksperioderInnenforLøpendeMåned
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -145,7 +145,7 @@ class VedtaksperiodeUtilTest {
             val vedtaksperioder =
                 vedtaksperioderInnenforLøpendeMåned(
                     listOf(
-                        vedtaksperiodeBeregningsgrunnlag(
+                        vedtaksperiodeBeregning(
                             fom = LocalDate.of(2024, 1, 5),
                             tom = LocalDate.of(2024, 1, 10),
                         ),
@@ -154,7 +154,7 @@ class VedtaksperiodeUtilTest {
                 )
 
             assertThat(vedtaksperioder).containsExactly(
-                vedtaksperiodeBeregningsgrunnlag(
+                vedtaksperiodeBeregning(
                     fom = LocalDate.of(2024, 1, 5),
                     tom = LocalDate.of(2024, 1, 10),
                 ),
@@ -166,7 +166,7 @@ class VedtaksperiodeUtilTest {
             val vedtaksperioder =
                 vedtaksperioderInnenforLøpendeMåned(
                     listOf(
-                        vedtaksperiodeBeregningsgrunnlag(
+                        vedtaksperiodeBeregning(
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 2, 29),
                         ),
@@ -175,7 +175,7 @@ class VedtaksperiodeUtilTest {
                 )
 
             assertThat(vedtaksperioder).containsExactly(
-                vedtaksperiodeBeregningsgrunnlag(
+                vedtaksperiodeBeregning(
                     fom = LocalDate.of(2024, 1, 15),
                     tom = LocalDate.of(2024, 2, 14),
                 ),
@@ -187,19 +187,19 @@ class VedtaksperiodeUtilTest {
             val vedtaksperioder =
                 vedtaksperioderInnenforLøpendeMåned(
                     listOf(
-                        vedtaksperiodeBeregningsgrunnlag(
+                        vedtaksperiodeBeregning(
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 1, 1),
                         ),
-                        vedtaksperiodeBeregningsgrunnlag(
+                        vedtaksperiodeBeregning(
                             fom = LocalDate.of(2024, 1, 2),
                             tom = LocalDate.of(2024, 1, 2),
                         ),
-                        vedtaksperiodeBeregningsgrunnlag(
+                        vedtaksperiodeBeregning(
                             fom = LocalDate.of(2024, 1, 3),
                             tom = LocalDate.of(2024, 1, 3),
                         ),
-                        vedtaksperiodeBeregningsgrunnlag(
+                        vedtaksperiodeBeregning(
                             fom = LocalDate.of(2024, 1, 4),
                             tom = LocalDate.of(2024, 1, 4),
                         ),
@@ -208,8 +208,8 @@ class VedtaksperiodeUtilTest {
                 )
 
             assertThat(vedtaksperioder).containsExactly(
-                vedtaksperiodeBeregningsgrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 2)),
-                vedtaksperiodeBeregningsgrunnlag(fom = LocalDate.of(2024, 1, 3), tom = LocalDate.of(2024, 1, 3)),
+                vedtaksperiodeBeregning(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 2)),
+                vedtaksperiodeBeregning(fom = LocalDate.of(2024, 1, 3), tom = LocalDate.of(2024, 1, 3)),
             )
         }
 

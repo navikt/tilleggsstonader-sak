@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.lørdagEllerSøndag
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningsgrunnlagLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -91,7 +91,7 @@ data class LøpendeMåned(
      * Finner hvilken vedtaksperiode og aktivitet som skal brukes for den aktuelle utbetalingsperioden
      */
     fun tilUtbetalingPeriode(
-        vedtaksperioderBeregningsgrunnlag: List<VedtaksperiodeBeregningsgrunnlagLæremidler>,
+        vedtaksperioderBeregningsgrunnlag: List<VedtaksperiodeBeregning>,
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
     ): UtbetalingPeriode {
         require(vedtaksperioder.isNotEmpty()) {
@@ -107,7 +107,7 @@ data class LøpendeMåned(
     }
 
     private fun VedtaksperiodeInnenforLøpendeMåned.finnRelevantMålgruppeOgAktivitet(
-        vedtaksperioderBeregningsgrunnlag: List<VedtaksperiodeBeregningsgrunnlagLæremidler>,
+        vedtaksperioderBeregningsgrunnlag: List<VedtaksperiodeBeregning>,
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
     ) = this
         .finnSnittAvRelevanteVedtaksperioder(vedtaksperioderBeregningsgrunnlag)
@@ -119,7 +119,7 @@ data class LøpendeMåned(
 
     private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteAktiviteter(
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
-        vedtaksperioderBeregningsgrunnlag: VedtaksperiodeBeregningsgrunnlagLæremidler,
+        vedtaksperioderBeregningsgrunnlag: VedtaksperiodeBeregning,
     ): List<AktivitetLæremidlerBeregningGrunnlag> {
         val relevanteAktiviteter =
             aktiviteter
@@ -147,8 +147,8 @@ data class LøpendeMåned(
     }
 
     private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteVedtaksperioder(
-        vedtaksperioder: List<VedtaksperiodeBeregningsgrunnlagLæremidler>,
-    ): List<VedtaksperiodeBeregningsgrunnlagLæremidler> {
+        vedtaksperioder: List<VedtaksperiodeBeregning>,
+    ): List<VedtaksperiodeBeregning> {
         val relevanteVedtaksperForPeriode = vedtaksperioder.mapNotNull { it.beregnSnitt(this) }
 
         feilHvis(relevanteVedtaksperForPeriode.isEmpty()) {

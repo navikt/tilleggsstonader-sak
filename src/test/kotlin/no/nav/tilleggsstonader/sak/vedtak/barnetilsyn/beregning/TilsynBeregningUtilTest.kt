@@ -4,10 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningTestUtil.vedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.brukPerioderFraOgMedRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.tilÅrMåned
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -138,7 +137,7 @@ class TilsynBeregningUtilTest {
     inner class ValideringAvVedtaksperioderOgUtgifter {
         val vedtaksperioder =
             listOf(
-                vedtaksperiodeBeregningsgrunnlag(
+                vedtaksperiodeBeregning(
                     fom = LocalDate.of(2025, 1, 1),
                     tom = LocalDate.of(2025, 2, 28),
                     målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
@@ -194,7 +193,7 @@ class TilsynBeregningUtilTest {
 
                 val forventedeVedtaksperioder =
                     listOf(
-                        vedtaksperiodeBeregningsgrunnlag(
+                        vedtaksperiodeBeregning(
                             fom = LocalDate.of(2025, 2, 1),
                             tom = LocalDate.of(2025, 2, 28),
                             målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,

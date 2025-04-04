@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningTestUtil.vedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
@@ -64,18 +65,6 @@ object TilsynBarnTestUtil {
             målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
             aktivitet = AktivitetType.TILTAK,
         )
-
-    fun vedtaksperiodeBeregning(
-        fom: LocalDate = LocalDate.of(2024, 1, 1),
-        tom: LocalDate = LocalDate.of(2024, 1, 31),
-        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-        aktivitet: AktivitetType = AktivitetType.TILTAK,
-    ) = VedtaksperiodeBeregning(
-        fom = fom,
-        tom = tom,
-        målgruppe = målgruppe,
-        aktivitet = aktivitet,
-    )
 
     val defaultInnvilgelseTilsynBarn =
         InnvilgelseTilsynBarn(

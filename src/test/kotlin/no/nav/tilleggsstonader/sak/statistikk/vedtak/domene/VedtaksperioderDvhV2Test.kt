@@ -14,8 +14,8 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse as innvilgelseLæremidler
 
 class VedtaksperioderDvhV2Test {
-    val fom: LocalDate = LocalDate.of(2024, 1, 1)
-    val tom: LocalDate = LocalDate.of(2024, 1, 31)
+    val fom: LocalDate = LocalDate.of(2025, 1, 1)
+    val tom: LocalDate = LocalDate.of(2025, 1, 31)
 
     val behandling = defaultBehandling
 

@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningsgrunnlagLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 
 object VedtaksperiodeUtil {
     fun validerIngenOverlappendeVedtaksperioder(vedtaksperioder: List<Vedtaksperiode>) {
@@ -20,9 +20,9 @@ object VedtaksperiodeUtil {
      * Finner
      */
     fun vedtaksperioderInnenforLøpendeMåned(
-        vedtaksperioder: List<VedtaksperiodeBeregningsgrunnlagLæremidler>,
+        vedtaksperioder: List<VedtaksperiodeBeregning>,
         beregningsresultatTilReberegning: BeregningsresultatForMåned,
-    ): List<VedtaksperiodeBeregningsgrunnlagLæremidler> =
+    ): List<VedtaksperiodeBeregning> =
         vedtaksperioder
             .mapNotNull { vedtaksperiode ->
                 vedtaksperiode.beregnSnitt(beregningsresultatTilReberegning)
