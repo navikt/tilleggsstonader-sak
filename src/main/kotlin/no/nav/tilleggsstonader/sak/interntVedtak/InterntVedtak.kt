@@ -28,7 +28,6 @@ data class InterntVedtak(
     val søknad: Søknadsinformasjon?,
     val målgrupper: List<VilkårperiodeInterntVedtak>,
     val aktiviteter: List<VilkårperiodeInterntVedtak>,
-    val stønadsperioder: List<Stønadsperiode>?,
     val vedtaksperioder: List<VedtaksperiodeInterntVedtak>,
     val vilkår: List<VilkårInternt>,
     val vedtak: VedtakInternt?,
@@ -103,13 +102,6 @@ data class DelvilkårVilkårperiode(
 data class VurderingVilkårperiode(
     val svar: String?,
     val resultat: ResultatDelvilkårperiode,
-)
-
-data class Stønadsperiode(
-    val målgruppe: MålgruppeType,
-    val aktivitet: AktivitetType,
-    val fom: LocalDate,
-    val tom: LocalDate,
 )
 
 data class VilkårInternt(

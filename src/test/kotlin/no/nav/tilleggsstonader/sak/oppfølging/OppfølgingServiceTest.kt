@@ -562,11 +562,11 @@ class OppfølgingServiceTest {
     private fun Oppfølging?.assertIngenEndringForAktiviteter() = assertThat(endringAktivitet()).isEmpty()
 
     private fun Oppfølging?.endringAktivitet(): List<Kontroll> =
-        this?.let { it.data.perioderTilKontroll.flatMap { stønadsperiode -> stønadsperiode.endringAktivitet } }
+        this?.let { it.data.perioderTilKontroll.flatMap { periode -> periode.endringAktivitet } }
             ?: emptyList()
 
     private fun Oppfølging?.endringMålgruppe(): List<Kontroll> =
-        this?.let { it.data.perioderTilKontroll.flatMap { stønadsperiode -> stønadsperiode.endringMålgruppe } }
+        this?.let { it.data.perioderTilKontroll.flatMap { periode -> periode.endringMålgruppe } }
             ?: emptyList()
 
     private fun mockVedtakTilsynBarn(vararg vedtaksperioder: Vedtaksperiode) {

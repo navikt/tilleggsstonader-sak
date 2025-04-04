@@ -24,7 +24,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnR
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -56,8 +55,6 @@ class StegServiceTest(
     val tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
     @Autowired
     val inngangsvilkårSteg: InngangsvilkårSteg,
-    @Autowired
-    val stønadsperiodeRepository: StønadsperiodeRepository,
     @Autowired
     val vilkårperiodeRepository: VilkårperiodeRepository,
     @Autowired

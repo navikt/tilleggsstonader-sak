@@ -31,8 +31,8 @@ object TilsynBeregningUtil {
      */
     fun List<Aktivitet>.tilAktiviteterPerMånedPerType(): Map<YearMonth, Map<AktivitetType, List<Aktivitet>>> =
         this
-            .flatMap { stønadsperiode ->
-                stønadsperiode.splitPerMåned { måned, periode ->
+            .flatMap { aktivitet ->
+                aktivitet.splitPerMåned { måned, periode ->
                     periode.copy(
                         fom = maxOf(periode.fom, måned.atDay(1)),
                         tom = minOf(periode.tom, måned.atEndOfMonth()),

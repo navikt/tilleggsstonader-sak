@@ -62,7 +62,7 @@ enum class MålgruppeType(
 
     fun faktiskMålgruppe() = this.faktiskMålgruppe ?: error("Mangler faktisk målgruppe for $this")
 
-    override fun girIkkeRettPåStønadsperiode() =
+    override fun girIkkeRettPåVedtaksperiode() =
         this == INGEN_MÅLGRUPPE ||
             this == SYKEPENGER_100_PROSENT
 

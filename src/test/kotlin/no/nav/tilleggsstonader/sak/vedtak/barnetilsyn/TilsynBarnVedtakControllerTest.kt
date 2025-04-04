@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
@@ -24,7 +23,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRespon
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -50,8 +48,6 @@ class TilsynBarnVedtakControllerTest(
     @Autowired
     val barnRepository: BarnRepository,
     @Autowired
-    val stønadsperiodeRepository: StønadsperiodeRepository,
-    @Autowired
     val vilkårperiodeRepository: VilkårperiodeRepository,
     @Autowired
     val vilkårRepository: VilkårRepository,
@@ -59,8 +55,6 @@ class TilsynBarnVedtakControllerTest(
     val fagsak = fagsak()
     val behandling = behandling(fagsak = fagsak, steg = StegType.BEREGNE_YTELSE, status = BehandlingStatus.UTREDES)
     val barn = BehandlingBarn(behandlingId = behandling.id, ident = "123")
-    val stønadsperiode =
-        stønadsperiode(behandlingId = behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
     val vedtaksperiodeDto =
         VedtaksperiodeDto(
             id = UUID.randomUUID(),
@@ -87,7 +81,6 @@ class TilsynBarnVedtakControllerTest(
         headers.setBearerAuth(onBehalfOfToken())
         testoppsettService.opprettBehandlingMedFagsak(behandling)
         barnRepository.insert(barn)
-        stønadsperiodeRepository.insert(stønadsperiode)
         vilkårperiodeRepository.insert(aktivitet)
         vilkårperiodeRepository.insert(målgruppe)
         vilkårRepository.insert(vilkår)

@@ -37,8 +37,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
@@ -46,8 +44,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -229,23 +225,6 @@ fun Fagsak.tilFagsakDomain() =
         fagsakPersonId = fagsakPersonId,
         stønadstype = stønadstype,
         sporbar = sporbar,
-    )
-
-fun stønadsperiode(
-    behandlingId: BehandlingId,
-    fom: LocalDate,
-    tom: LocalDate,
-    målgruppe: MålgruppeType = MålgruppeType.AAP,
-    aktivitet: AktivitetType = AktivitetType.TILTAK,
-    status: StønadsperiodeStatus = StønadsperiodeStatus.NY,
-): Stønadsperiode =
-    Stønadsperiode(
-        behandlingId = behandlingId,
-        fom = fom,
-        tom = tom,
-        målgruppe = målgruppe,
-        aktivitet = aktivitet,
-        status = status,
     )
 
 fun vilkår(

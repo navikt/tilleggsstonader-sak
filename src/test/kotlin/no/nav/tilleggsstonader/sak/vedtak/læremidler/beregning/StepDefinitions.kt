@@ -19,15 +19,12 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepos
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.splittTilLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.LæremidlerVedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
@@ -56,7 +53,6 @@ class StepDefinitions {
     val logger = LoggerFactory.getLogger(javaClass)
 
     val vilkårperiodeRepository = VilkårperiodeRepositoryFake()
-    val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
     val behandlingService = mockk<BehandlingService>()
     val vedtakRepository = VedtakRepositoryFake()
 
@@ -89,7 +85,6 @@ class StepDefinitions {
     val behandlingId = BehandlingId(UUID.randomUUID())
 
     var vedtaksPerioder: List<Vedtaksperiode> = emptyList()
-    var stønadsperioder: List<Stønadsperiode> = emptyList()
     var resultat: BeregningsresultatLæremidler? = null
 
     var beregningException: Exception? = null
@@ -118,14 +113,6 @@ class StepDefinitions {
     @Gitt("følgende målgrupper for læremidler")
     fun `følgende målgrupper`(dataTable: DataTable) {
         vilkårperiodeRepository.insertAll(mapMålgrupper(behandlingId, dataTable))
-    }
-
-    @Gitt("følgende stønadsperioder for læremidler")
-    fun `følgende stønadsperioder`(dataTable: DataTable) {
-        every {
-            stønadsperiodeRepository.findAllByBehandlingId(any())
-        } returns mapStønadsperioder(behandlingId, dataTable)
-        stønadsperioder = mapStønadsperioder(behandlingId, dataTable)
     }
 
     @Når("beregner stønad for læremidler")

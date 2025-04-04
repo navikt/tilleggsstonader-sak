@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -38,7 +37,6 @@ class InterntVedtakServiceTest {
     private val behandlingService = mockk<BehandlingService>()
     private val totrinnskontrollService = mockk<TotrinnskontrollService>()
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
-    private val stønadsperiodeService = mockk<StønadsperiodeService>()
     private val søknadService = mockk<SøknadService>()
     private val grunnlagsdataService = mockk<GrunnlagsdataService>()
     private val barnService = mockk<BarnService>()
@@ -50,7 +48,6 @@ class InterntVedtakServiceTest {
             behandlingService = behandlingService,
             totrinnskontrollService = totrinnskontrollService,
             vilkårperiodeService = vilkårperiodeService,
-            stønadsperiodeService = stønadsperiodeService,
             søknadService = søknadService,
             grunnlagsdataService = grunnlagsdataService,
             barnService = barnService,
@@ -60,7 +57,6 @@ class InterntVedtakServiceTest {
 
     @BeforeEach
     fun setUp() {
-        every { stønadsperiodeService.hentStønadsperioder(behandlingId) } returns Testdata.stønadsperioder
         every { totrinnskontrollService.hentTotrinnskontroll(behandlingId) } returns Testdata.totrinnskontroll
         every { søknadService.hentSøknadMetadata(behandlingId) } returns Testdata.søknadMetadata
     }
@@ -274,25 +270,6 @@ class InterntVedtakServiceTest {
                 assertThat(målgruppe).isEqualTo(FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)
                 assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 1))
-                assertThat(tom).isEqualTo(LocalDate.of(2024, 3, 31))
-            }
-        }
-
-        @Test
-        fun `stønadsperiodefelter skal bli riktig mappet`() {
-            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
-
-            assertThat(interntVedtak.stønadsperioder).hasSize(2)
-            with(interntVedtak.stønadsperioder!!.first()) {
-                assertThat(målgruppe).isEqualTo(MålgruppeType.AAP)
-                assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
-                assertThat(fom).isEqualTo(LocalDate.of(2024, 2, 1))
-                assertThat(tom).isEqualTo(LocalDate.of(2024, 3, 31))
-            }
-            with(interntVedtak.stønadsperioder.last()) {
-                assertThat(målgruppe).isEqualTo(MålgruppeType.NEDSATT_ARBEIDSEVNE)
-                assertThat(aktivitet).isEqualTo(AktivitetType.REELL_ARBEIDSSØKER)
-                assertThat(fom).isEqualTo(LocalDate.of(2024, 2, 1))
                 assertThat(tom).isEqualTo(LocalDate.of(2024, 3, 31))
             }
         }

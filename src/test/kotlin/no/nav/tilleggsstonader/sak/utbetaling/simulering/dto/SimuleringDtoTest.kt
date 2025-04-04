@@ -13,7 +13,7 @@ import java.time.YearMonth
 class SimuleringDtoTest {
     /**
      * Perioder fra simulering er ikke gruppert per måned
-     * Hvis vi har en stønadsperiode for 2.1-14.1 og 25.1-31.1
+     * Hvis vi har en vedtaksperiode for 2.1-14.1 og 25.1-31.1
      * så vil det være 2 andeler med fom 2.1 og 25.1 som kommer tilbake fra simulering som 2 ulike perioder
      */
     @Test

@@ -98,7 +98,7 @@ class ForeslåVedtaksperiodeFraVilkårperioderStepDefinitions {
 
     @Så("forvent følgende forslag fra vilkårperioder")
     fun `forvent følgende forslag`(dataTable: DataTable) {
-        val forventetStønadsperioder =
+        val forventedeVedtaksperioder =
             dataTable.mapRad { rad ->
                 ForslagVedtaksperiodeFraVilkårperioder(
                     fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
@@ -108,12 +108,12 @@ class ForeslåVedtaksperiodeFraVilkårperioderStepDefinitions {
                 )
             }
 
-        assertThat(resultat).isEqualTo(forventetStønadsperioder)
+        assertThat(resultat).isEqualTo(forventedeVedtaksperioder)
     }
 
     @Så("forvent følgende forslag fra vilkårperioder faktisk målgruppe")
     fun `forvent følgende forslag faktisk målgruppe`(dataTable: DataTable) {
-        val forventetStønadsperioder =
+        val forventedeVedtaksperioder =
             dataTable.mapRad { rad ->
                 ForslagVedtaksperiodeFraVilkårperioderFaktiskMålgruppe(
                     fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
@@ -123,6 +123,6 @@ class ForeslåVedtaksperiodeFraVilkårperioderStepDefinitions {
                 )
             }
 
-        assertThat(resultatFaktiskMålgruppe).isEqualTo(forventetStønadsperioder)
+        assertThat(resultatFaktiskMålgruppe).isEqualTo(forventedeVedtaksperioder)
     }
 }

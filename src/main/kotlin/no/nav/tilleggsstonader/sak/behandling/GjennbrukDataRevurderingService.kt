@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
@@ -19,7 +18,6 @@ class GjennbrukDataRevurderingService(
     private val behandlingService: BehandlingService,
     private val barnService: BarnService,
     private val vilkårperiodeService: VilkårperiodeService,
-    private val stønadsperiodeService: StønadsperiodeService,
     private val vilkårService: VilkårService,
 ) {
     @Transactional
@@ -42,11 +40,6 @@ class GjennbrukDataRevurderingService(
         barnIder: Map<TidligereBarnId, NyttBarnId>,
     ) {
         vilkårperiodeService.gjenbrukVilkårperioder(
-            forrigeIverksatteBehandlingId = behandlingIdForGjenbruk,
-            nyBehandlingId = behandling.id,
-        )
-
-        stønadsperiodeService.gjenbrukStønadsperioder(
             forrigeIverksatteBehandlingId = behandlingIdForGjenbruk,
             nyBehandlingId = behandling.id,
         )

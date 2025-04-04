@@ -12,9 +12,9 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerIngenOverlappendeVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.validerIngenEndringerFørRevurderFra
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteAktiviteter
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.mergeSammenhengendeOppfylteFaktiskeMålgrupper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mergeSammenhengendeOppfylteAktiviteter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mergeSammenhengendeOppfylteFaktiskeMålgrupper
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -31,7 +31,7 @@ class LæremidlerVedtaksperiodeValideringService(
         brukerfeilHvis(vedtaksperioder.isEmpty()) { "Kan ikke innvilge når det ikke finnes noen vedtaksperioder." }
         validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
 
-        validerVedtaksperioderMotStønadsperioder(behandlingId, vedtaksperioder)
+        validerVedtaksperioderMotVilkårperioder(behandlingId, vedtaksperioder)
 
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtaksperioderForrigeBehandling = hentForrigeVedtaksperioder(behandling)
@@ -43,7 +43,7 @@ class LæremidlerVedtaksperiodeValideringService(
         )
     }
 
-    private fun validerVedtaksperioderMotStønadsperioder(
+    private fun validerVedtaksperioderMotVilkårperioder(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
     ) {

@@ -37,7 +37,7 @@ object VedtaksperiodeLæremidlerMapper {
             )
 
         /**
-         * Ettersom stønadsperiode ikke overlapper er det tilstrekkelig å kun merge TOM
+         * Ettersom vedtaksperiode ikke overlapper er det tilstrekkelig å kun merge TOM
          */
         override fun merge(other: VedtaksperiodeLæremidler): VedtaksperiodeLæremidler = this.copy(tom = other.tom)
 

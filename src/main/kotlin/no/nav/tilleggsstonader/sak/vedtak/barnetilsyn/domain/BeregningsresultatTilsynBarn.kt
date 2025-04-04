@@ -27,7 +27,7 @@ data class BeregningsresultatForMåned(
 )
 
 /**
- * @param dato tilsvarer fom datoen på en stønadsperiode
+ * @param dato tilsvarer fom datoen på en vedtaksperiode
  * og er den datoen hele beløpet samlet iversettes på
  */
 data class Beløpsperiode(

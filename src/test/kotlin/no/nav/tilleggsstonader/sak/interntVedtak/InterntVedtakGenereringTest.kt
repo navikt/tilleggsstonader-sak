@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThat
@@ -39,7 +38,6 @@ class InterntVedtakGenereringTest {
     private val behandlingService = mockk<BehandlingService>()
     private val totrinnskontrollService = mockk<TotrinnskontrollService>()
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
-    private val stønadsperiodeService = mockk<StønadsperiodeService>()
     private val søknadService = mockk<SøknadService>()
     private val grunnlagsdataService = mockk<GrunnlagsdataService>()
     private val barnService = mockk<BarnService>()
@@ -51,7 +49,6 @@ class InterntVedtakGenereringTest {
             behandlingService = behandlingService,
             totrinnskontrollService = totrinnskontrollService,
             vilkårperiodeService = vilkårperiodeService,
-            stønadsperiodeService = stønadsperiodeService,
             søknadService = søknadService,
             grunnlagsdataService = grunnlagsdataService,
             barnService = barnService,
@@ -61,7 +58,6 @@ class InterntVedtakGenereringTest {
 
     @BeforeEach
     fun setUp() {
-        every { stønadsperiodeService.hentStønadsperioder(behandlingId) } returns Testdata.stønadsperioder
         every { totrinnskontrollService.hentTotrinnskontroll(behandlingId) } returns Testdata.totrinnskontroll
         every { søknadService.hentSøknadMetadata(behandlingId) } returns Testdata.søknadMetadata
     }

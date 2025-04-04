@@ -82,7 +82,7 @@ class TilsynBarnBeregningService(
 
     /**
      * Dersom behandling er en revurdering beregnes perioder fra og med måneden for revurderFra
-     * Ellers beregnes perioder for hele perioden som man har stønadsperioder og utgifter
+     * Ellers beregnes perioder for hele perioden som man har vedtaksperiode og utgifter
      */
     private fun beregnAktuellePerioder(
         behandling: Saksbehandling,
@@ -224,12 +224,12 @@ class TilsynBarnBeregningService(
         vedtaksperiode: VedtaksperiodeBeregning,
         aktiviteterPerType: Map<AktivitetType, Map<Uke, List<PeriodeMedDager>>>,
     ): Int {
-        val stønadsperioderUker = vedtaksperiode.tilUke()
+        val vedtaksperioderUker = vedtaksperiode.tilUke()
         val aktiviteterPerUke =
             aktiviteterPerType[vedtaksperiode.aktivitet]
                 ?: error("Finner ikke aktiviteter for ${vedtaksperiode.aktivitet}")
 
-        return stønadsperioderUker
+        return vedtaksperioderUker
             .map { (uke, periode) ->
                 val aktiviteterForUke =
                     aktiviteterPerUke[uke]

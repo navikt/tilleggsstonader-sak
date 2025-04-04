@@ -39,8 +39,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatL
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
@@ -71,26 +69,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning as Vedt
 
 object Testdata {
     val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")
-
-    val stønadsperioder =
-        listOf(
-            StønadsperiodeDto(
-                id = UUID.randomUUID(),
-                fom = LocalDate.of(2024, 2, 1),
-                tom = LocalDate.of(2024, 3, 31),
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
-                status = StønadsperiodeStatus.NY,
-            ),
-            StønadsperiodeDto(
-                id = UUID.randomUUID(),
-                fom = LocalDate.of(2024, 2, 1),
-                tom = LocalDate.of(2024, 3, 31),
-                målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-                aktivitet = AktivitetType.REELL_ARBEIDSSØKER,
-                status = StønadsperiodeStatus.NY,
-            ),
-        )
 
     val totrinnskontroll = TotrinnskontrollUtil.totrinnskontroll(TotrinnInternStatus.GODKJENT, beslutter = "saksbeh2")
 

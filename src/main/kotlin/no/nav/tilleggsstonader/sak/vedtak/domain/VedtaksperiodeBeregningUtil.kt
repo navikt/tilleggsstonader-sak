@@ -11,15 +11,15 @@ import java.time.temporal.TemporalAdjusters
 
 object VedtaksperiodeBeregningUtil {
     /**
-     * Deler opp  stønadsperioder i atomiske deler (mnd).
+     * Deler opp vedtaksperiode i atomiske deler (mnd).
      *
      * Eksempel 1:
-     * listOf(StønadsperiodeDto(fom = 01.01.24, tom=31.03.24)) deles opp i 3:
-     * jan -> listOf(StønadsperiodeDto(jan), feb -> StønadsperiodeDto(feb), mar -> StønadsperiodeDto(mars))
+     * listOf(Periode(fom = 01.01.24, tom=31.03.24)) deles opp i 3:
+     * jan -> listOf(Periode(jan), feb -> Periode(feb), mar -> Periode(mars))
      *
      * Eksempel 2:
-     * listOf(StønadsperiodeDto(fom = 01.01.24, tom=10.01.24), StønadsperiodeDto(fom = 20.01.24, tom=31.01.24)) deles opp i 2 innenfor samme måned:
-     * jan -> listOf(StønadsperiodeDto(fom = 01.01.24, tom = 10.01.24), StønadsperiodeDto(fom = 20.01.24, tom = 31.01.24))
+     * listOf(Periode(fom = 01.01.24, tom=10.01.24), Periode(fom = 20.01.24, tom=31.01.24)) deles opp i 2 innenfor samme måned:
+     * jan -> listOf(Periode(fom = 01.01.24, tom = 10.01.24), Periode(fom = 20.01.24, tom = 31.01.24))
      */
     fun List<VedtaksperiodeBeregning>.tilÅrMåned(): Map<YearMonth, List<VedtaksperiodeBeregning>> =
         this
@@ -69,8 +69,8 @@ object VedtaksperiodeBeregningUtil {
     }
 
     /**
-     * Splitter en stønadsperiode opp i uker (kun hverdager inkludert)
-     * Antall dager i uken er oppad begrenset til antall dager i stønadsperioden som er innenfor uken
+     * Splitter en vedtaksperiode opp i uker (kun hverdager inkludert)
+     * Antall dager i uken er oppad begrenset til antall dager i vedtaksperioden som er innenfor uken
      */
     fun VedtaksperiodeBeregning.tilUke(): Map<Uke, PeriodeMedDager> =
         this.splitPerUke { fom, tom ->

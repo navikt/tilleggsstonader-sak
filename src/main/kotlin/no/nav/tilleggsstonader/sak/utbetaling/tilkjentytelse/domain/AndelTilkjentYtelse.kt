@@ -136,7 +136,7 @@ data class Iverksetting(
 
 /**
  * Det er ønskelig at ulike typer brukes for ulike periodetyper.
- * Disse mappes fra stønadsperioden sin type målgruppe
+ * Disse mappes fra vedtaksperiode sin type målgruppe
  * [TypeAndel.UGYLDIG] Brukes for å lagre ned andeler med nullbeløp. Disse skal ikke iverksettes,
  *  men nødvendige for å iverksette første gang og ved opphør tilbake i tid.
  */
