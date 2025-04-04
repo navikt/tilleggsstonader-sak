@@ -401,7 +401,8 @@ class JournalføringServiceTest {
         val journalpostMedSøknadBoutgifter = journalpost.copy(dokumenter = listOf(dokumentSøknadTilsynBarn))
 
         @Test
-        fun `skal foreløpig ikke lagre søknaden`() {
+        fun `skal lagre søknaden`() {
+            every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()
             every {
                 behandlingService.opprettBehandling(
                     fagsakId = fagsak.id,
@@ -425,7 +426,7 @@ class JournalføringServiceTest {
                 )
             }
             verifyOppdaterOgFerdigstilJournalpost(1)
-            verify(exactly = 0) { søknadService.lagreSøknad(any(), any(), any()) }
+            verify(exactly = 1) { søknadService.lagreSøknad(any(), any(), any()) }
 
             assertThat(taskSlot.captured.type).isEqualTo(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
         }
