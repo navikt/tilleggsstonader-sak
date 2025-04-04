@@ -14,5 +14,4 @@ enum class Toggle(
 
     SØKNAD_ROUTING_LÆREMIDLER("sak.soknad-routing.laremidler"),
     SØKNAD_ROUTING_BOUTGIFTER("sak.soknad-routing.boutgifter"),
-
 }
