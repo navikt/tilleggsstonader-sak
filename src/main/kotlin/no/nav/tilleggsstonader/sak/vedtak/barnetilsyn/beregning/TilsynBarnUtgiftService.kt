@@ -18,14 +18,11 @@ class TilsynBarnUtgiftService(
         vilkårService
             .hentOppfyltePassBarnVilkår(behandlingId)
             .groupBy { it.barnId ?: error("Vilkår=${it.id} type=${it.type} for tilsyn barn mangler barnId") }
-            .mapValues { (_, values) -> values.map { mapUtgiftBeregning(it) } }
+            .mapValues { (_, values) -> values.map { it.tilUtgiftBeregning() } }
 
-    private fun mapUtgiftBeregning(it: Vilkår): UtgiftBeregning {
-        val fom = it.fom
-        val tom = it.tom
-        val utgift = it.utgift
+    private fun Vilkår.tilUtgiftBeregning(): UtgiftBeregning {
         feilHvis(fom == null || tom == null || utgift == null) {
-            "Forventer at fra-dato, til-dato og utgift er satt. Gå tilbake til Pass barn-fanen, og legg til datoer og utgifter der. For utviklerteamet: dette gjelder vilkår=${it.id}."
+            "Forventer at fra-dato, til-dato og utgift er satt. Gå tilbake til Pass barn-fanen, og legg til datoer og utgifter der. For utviklerteamet: dette gjelder vilkår=$id."
         }
         feilHvisIkke(fom.erFørsteDagIMåneden()) {
             "Noe er feil. Fom skal være satt til første dagen i måneden"
