@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.PeriodeMedDager
@@ -10,7 +9,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Uke
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.antallDagerIPeriodeInklusiv
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.splitPerUke
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import java.time.LocalDate
 import java.time.YearMonth
 import kotlin.math.min
 
@@ -55,15 +53,4 @@ object TilsynBeregningUtil {
             }.flatMap { it.entries }
             .groupBy({ it.key }, { it.value })
             .mapValues { it.value.sorted() }
-
-    fun Map<BarnId, List<UtgiftBeregning>>.brukPerioderFraOgMedRevurderFraMåned(
-        revurderFra: LocalDate?,
-    ): Map<BarnId, List<UtgiftBeregning>> {
-        val revurderFraMåned = revurderFra?.toYearMonth() ?: return this
-
-        return this
-            .mapValues { (_, utgifter) ->
-                utgifter.splitFraRevurderFra(revurderFra).filter { it.fom >= revurderFraMåned }
-            }.filterValues { it.isNotEmpty() }
-    }
 }

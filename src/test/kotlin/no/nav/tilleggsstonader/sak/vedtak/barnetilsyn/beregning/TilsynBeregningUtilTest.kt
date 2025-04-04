@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeBeregning
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFraMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.brukPerioderFraOgMedRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeBeregningsgrunnlag
@@ -207,35 +206,6 @@ class TilsynBeregningUtilTest {
                     vedtaksperioder
                         .brukPerioderFraOgMedRevurderFra(revurderFra),
                 ).isEqualTo(forventedeVedtaksperioder)
-            }
-        }
-
-        @Nested
-        inner class BrukPerioderFraOgMedRevurderFraMåned {
-            @Test
-            fun `skal returnere orginal map uten revurder fra`() {
-                assertThat(utgifter.brukPerioderFraOgMedRevurderFraMåned(null)).isEqualTo(utgifter)
-            }
-
-            @Test
-            fun `skal returnere perioder etter revurder fra`() {
-                val revurderFra = LocalDate.of(2025, 2, 1)
-
-                val forventedeUtgifter =
-                    mapOf(
-                        barn1 to
-                            listOf(
-                                utgiftFebruar,
-                            ),
-                        barn2 to
-                            listOf(
-                                utgiftFebruar,
-                            ),
-                    )
-                assertThat(
-                    utgifter
-                        .brukPerioderFraOgMedRevurderFraMåned(revurderFra),
-                ).isEqualTo(forventedeUtgifter)
             }
         }
     }
