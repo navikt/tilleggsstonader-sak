@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Aktiviteter
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidsrettetAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArsakOppholdUtenforNorgeType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.BoligEllerOvernatting
@@ -81,7 +82,7 @@ class SøknadskjemaBoutgifterMapper(
         SkjemaBoutgifter(
             personopplysninger = mapPersonopplysninger(skjemaBoutgifter.dineOpplysninger),
             hovedytelse = mapHovedytelse(skjemaBoutgifter),
-            aktivitet = mapAktivitet(skjemaBoutgifter),
+            aktivitet = mapAktivitet(skjemaBoutgifter.aktiviteter),
             boutgifter = mapBoutgifter(skjemaBoutgifter.boligEllerOvernatting),
             dokumentasjon = dokumentasjon,
         )
@@ -148,14 +149,14 @@ class SøknadskjemaBoutgifterMapper(
             )
         } ?: emptyList()
 
-    private fun mapAktivitet(skjemaBoutgifter: SkjemaBoutgifterKontrakt): AktivitetAvsnitt {
-        val aktivitet = skjemaBoutgifter.aktiviteter.aktiviteterOgMaalgruppe.aktivitet
+    private fun mapAktivitet(aktiviteter: Aktiviteter): AktivitetAvsnitt {
+        val aktivitet = aktiviteter.aktiviteterOgMaalgruppe.aktivitet
         // Fyll ut setter aktivitetId til "ingenAktivitet" og vi har ellers mapping til ANNET som brukes i vår søknad
         val id = if (aktivitet.aktivitetId == "ingenAktivitet") "ANNET" else aktivitet.aktivitetId
         return AktivitetAvsnitt(
             aktiviteter = listOf(ValgtAktivitet(id = id, label = aktivitet.text)),
-            annenAktivitet = mapAnnenAktivitet(skjemaBoutgifter.aktiviteter.arbeidsrettetAktivitet),
-            lønnetAktivitet = null,
+            annenAktivitet = mapAnnenAktivitet(aktiviteter.arbeidsrettetAktivitet),
+            lønnetAktivitet = aktiviteter.mottarLonnGjennomTiltak?.let(::mapJaNei),
         )
     }
 

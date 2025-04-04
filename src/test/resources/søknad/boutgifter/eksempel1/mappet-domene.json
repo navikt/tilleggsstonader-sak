@@ -38,7 +38,7 @@
       "label" : "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
     } ],
     "annenAktivitet" : "TILTAK",
-    "lønnetAktivitet" : null
+    "lønnetAktivitet" : "JA"
   },
   "boutgifter" : {
     "typeUtgifter" : "FASTE",

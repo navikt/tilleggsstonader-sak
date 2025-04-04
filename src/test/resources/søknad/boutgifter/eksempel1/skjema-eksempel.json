@@ -101,7 +101,8 @@
         "text" : "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
       }
     },
-    "arbeidsrettetAktivitet" : "tiltakArbeidsrettetUtredning"
+    "arbeidsrettetAktivitet" : "tiltakArbeidsrettetUtredning",
+    "mottarLonnGjennomTiltak" : "ja"
   },
   "boligEllerOvernatting" : {
     "typeUtgifter" : "fastUtgift",
