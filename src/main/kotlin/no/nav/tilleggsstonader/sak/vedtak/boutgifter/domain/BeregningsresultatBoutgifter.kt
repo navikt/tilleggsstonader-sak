@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
@@ -61,7 +61,7 @@ data class Beregningsgrunnlag(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val utbetalingsdato: LocalDate,
-    val utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    val utgifter: Map<TypeBoutgift, List<UtgiftBeregningDato>>,
     val makssats: Int,
     val makssatsBekreftet: Boolean,
     val målgruppe: FaktiskMålgruppe,

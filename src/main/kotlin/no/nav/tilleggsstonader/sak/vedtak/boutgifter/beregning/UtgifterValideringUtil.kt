@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 
 object UtgifterValideringUtil {
@@ -12,7 +13,7 @@ object UtgifterValideringUtil {
      * gir rett på stønad (hhv. 3/6 mnd for utgifter overnatting/løpende utgifter).
      *
      */
-    fun validerUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>) {
+    fun validerUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningDato>>) {
         brukerfeilHvis(erUtgifterOvernattingOgLøpendeUtgifter(utgifter)) {
             "Foreløbig støtter vi ikke faste- og midlertidig utgift i samme behandling"
         }
@@ -31,7 +32,7 @@ object UtgifterValideringUtil {
         }
     }
 
-    private fun erUtgifterOvernattingOgLøpendeUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>): Boolean {
+    private fun erUtgifterOvernattingOgLøpendeUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningDato>>): Boolean {
         val erLøpendeUtgifter =
             utgifter.keys.any {
                 it == TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG || it == TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER

@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.grunnlagsdataDomain
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -67,11 +68,11 @@ class BoutgifterBeregningServiceTest {
 
     @Test
     fun `Kan ikke ha faste- og midlertidig utgifter i samme behandling`() {
-        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgift: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
             mapOf(
                 TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 1, 1),
                             tom = LocalDate.of(2025, 3, 31),
                             utgift = 3000,
@@ -79,7 +80,7 @@ class BoutgifterBeregningServiceTest {
                     ),
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 1, 1),
                             tom = LocalDate.of(2025, 1, 3),
                             utgift = 3000,
@@ -111,11 +112,11 @@ class BoutgifterBeregningServiceTest {
 
     @Nested
     inner class LøpendeUtgifter {
-        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgift: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
             mapOf(
                 TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 1, 1),
                             tom = LocalDate.of(2025, 3, 31),
                             utgift = 3000,
@@ -202,11 +203,11 @@ class BoutgifterBeregningServiceTest {
 
         @Test
         fun `Kan beregne for løpende utgifter to boliger`() {
-            val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+            val utgift: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
                 mapOf(
                     TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER to
                         listOf(
-                            UtgiftBeregningBoutgifter(
+                            UtgiftBeregningDato(
                                 fom = LocalDate.of(2025, 1, 1),
                                 tom = LocalDate.of(2025, 3, 31),
                                 utgift = 3000,
@@ -276,11 +277,11 @@ class BoutgifterBeregningServiceTest {
 
     @Nested
     inner class UtgifterOvernatting {
-        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgift: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 1, 1),
                             tom = LocalDate.of(2025, 1, 31),
                             utgift = 3000,
@@ -352,11 +353,11 @@ class BoutgifterBeregningServiceTest {
 
         @Test
         fun `Kaster feil hvis utgift delvis i vedtaksperiode`() {
-            val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+            val utgift: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
                 mapOf(
                     TypeBoutgift.UTGIFTER_OVERNATTING to
                         listOf(
-                            UtgiftBeregningBoutgifter(
+                            UtgiftBeregningDato(
                                 fom = LocalDate.of(2025, 1, 15),
                                 tom = LocalDate.of(2025, 2, 14),
                                 utgift = 3000,
@@ -395,16 +396,16 @@ class BoutgifterBeregningServiceTest {
                     ),
                 )
 
-            val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+            val utgift: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
                 mapOf(
                     TypeBoutgift.UTGIFTER_OVERNATTING to
                         listOf(
-                            UtgiftBeregningBoutgifter(
+                            UtgiftBeregningDato(
                                 fom = LocalDate.of(2025, 1, 1),
                                 tom = LocalDate.of(2025, 1, 10),
                                 utgift = 3000,
                             ),
-                            UtgiftBeregningBoutgifter(
+                            UtgiftBeregningDato(
                                 fom = LocalDate.of(2025, 1, 25),
                                 tom = LocalDate.of(2025, 2, 5),
                                 utgift = 3000,
