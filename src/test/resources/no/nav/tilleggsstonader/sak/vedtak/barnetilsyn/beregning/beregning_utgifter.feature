@@ -20,8 +20,8 @@ Egenskap: Beregning - Utgifter
       | 01.01.2023 | 28.02.2023 | OVERGANGSSTØNAD |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 03.2023 | 1000   |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.03.2023 | 1000   |
 
     Når beregner
 
@@ -45,12 +45,12 @@ Egenskap: Beregning - Utgifter
       | 01.01.2023 | 28.02.2023 | OVERGANGSSTØNAD |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 01.2023 | 1000   |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.01.2023 | 1000   |
 
     Gitt følgende utgifter for barn med id: 2
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 02.2023 | 1000   |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 28.02.2023 | 1000   |
 
     Når beregner
 
@@ -84,10 +84,10 @@ Egenskap: Beregning - Utgifter
       | 01.01.2023 | 28.04.2023 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 01.2023 | 144    |
-      | 02.2023 | 02.2023 | 136    |
-      | 03.2023 | 03.2023 | 131    |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.01.2023 | 144    |
+      | 01.02.2023 | 28.02.2023 | 136    |
+      | 01.03.2023 | 31.03.2023 | 131    |
 
     Når beregner
 
@@ -114,8 +114,8 @@ Egenskap: Beregning - Utgifter
       | 01.01.2023 | 28.02.2023 | OVERGANGSSTØNAD |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 01.2023 | 0      |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.01.2023 | 0      |
 
     Når beregner
 
@@ -138,8 +138,8 @@ Egenskap: Beregning - Utgifter
       | 01.01.2023 | 28.02.2023 | OVERGANGSSTØNAD |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 01.2023 | 1000   |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.01.2023 | 1000   |
 
     Når beregner
 

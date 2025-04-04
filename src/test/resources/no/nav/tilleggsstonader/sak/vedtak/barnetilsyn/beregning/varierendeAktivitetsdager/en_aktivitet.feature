@@ -19,8 +19,8 @@ Egenskap: Beregning - En aktivitet med delvisaktivitet
       | 02.01.2023 | 31.05.2023 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 01.2023 | 1000   |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.01.2023 | 1000   |
 
     Når beregner
 
@@ -43,8 +43,8 @@ Egenskap: Beregning - En aktivitet med delvisaktivitet
       | 02.01.2023 | 31.05.2023 | AAP       |
 
     Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 01.2023 | 1000   |
+      | Fom        | Tom        | Utgift |
+      | 01.01.2023 | 31.01.2023 | 1000   |
 
     Når beregner
 

@@ -52,8 +52,8 @@ class VedtaksperiodeValideringUtilsFaktiskMålgruppeTest {
             BarnId.random() to
                 listOf(
                     UtgiftBeregning(
-                        fom = YearMonth.of(2025, 1),
-                        tom = YearMonth.of(2025, 2),
+                        fom = LocalDate.of(2025, 1, 1),
+                        tom = LocalDate.of(2025, 2, 28),
                         utgift = 1000,
                     ),
                 ),

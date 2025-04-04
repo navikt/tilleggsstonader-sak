@@ -18,7 +18,7 @@ Egenskap: Beregning - med revurderFra
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
-      | 01.2024 | 02.2024 | 1000   |
+      | 01.01.2024 | 28.02.2024 | 1000   |
 
     Når beregner med revurderFra=2024-02-15
 
@@ -41,7 +41,7 @@ Egenskap: Beregning - med revurderFra
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
-      | 01.2024 | 01.2024 | 1000   |
+      | 01.01.2024 | 31.01.2024 | 1000   |
 
     Når beregner med revurderFra=2023-12-15
 
@@ -64,7 +64,7 @@ Egenskap: Beregning - med revurderFra
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
-      | 01.2024 | 03.2024 | 1000   |
+      | 01.01.2024 | 31.03.2024 | 1000   |
 
     Når beregner
 
@@ -115,7 +115,7 @@ Egenskap: Beregning - med revurderFra
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
-      | 01.2024 | 01.2024 | 1000   |
+      | 01.01.2024 | 31.01.2024 | 1000   |
 
     Når beregner med revurderFra=2024-01-15
 
@@ -140,7 +140,7 @@ Egenskap: Beregning - med revurderFra
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
-      | 01.2024 | 01.2024 | 1000   |
+      | 01.01.2024 | 31.01.2024 | 1000   |
 
     Når beregner med revurderFra=2024-01-15
 
@@ -170,7 +170,7 @@ Egenskap: Beregning - med revurderFra
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
-      | 01.2024 | 01.2024 | 1000   |
+      | 01.01.2024 | 31.01.2024 | 1000   |
 
     Når beregner med revurderFra=2024-01-15
 
