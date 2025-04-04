@@ -1,34 +1,44 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårsoppsummering
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårsoppsummering.VilkårsoppsummeringUtil.harBarnUnder2ÅrIStønadsperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårsoppsummering.VilkårsoppsummeringUtil.harBarnUnder2ÅrIAktivitetsperiode
 import org.springframework.stereotype.Service
 
 @Service
 class VilkårsoppsummeringService(
-    private val stønadsperiodeService: StønadsperiodeService,
+    private val vilkårperiodeService: VilkårperiodeService,
     private val grunnlagsdataService: GrunnlagsdataService,
 ) {
     fun hentVilkårsoppsummering(behandlingId: BehandlingId): VilkårsoppsummeringDto {
-        val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandlingId)
+        val vilkårperioder = finnPerioderForOppfylteAktiviteter(behandlingId)
 
         return VilkårsoppsummeringDto(
-            stønadsperioder = stønadsperioder,
-            visVarselKontantstøtte = visVarselForKontantstøtte(behandlingId, stønadsperioder),
+            visVarselKontantstøtte = visVarselForKontantstøtte(behandlingId, vilkårperioder),
         )
     }
 
     private fun visVarselForKontantstøtte(
         behandlingId: BehandlingId,
-        stønadsperioder: List<StønadsperiodeDto>,
+        aktivitetsperioder: List<Datoperiode>,
     ): Boolean {
-        if (stønadsperioder.isEmpty()) {
+        if (aktivitetsperioder.isEmpty()) {
             return false
         }
         val barn = grunnlagsdataService.hentGrunnlagsdata(behandlingId).grunnlag.barn
-        return harBarnUnder2ÅrIStønadsperiode(barn, stønadsperioder)
+        return harBarnUnder2ÅrIAktivitetsperiode(barn, aktivitetsperioder)
     }
+
+    private fun finnPerioderForOppfylteAktiviteter(behandlingId: BehandlingId): List<Datoperiode> =
+        vilkårperiodeService
+            .hentVilkårperioder(behandlingId)
+            .aktiviteter
+            .ofType<AktivitetTilsynBarn>()
+            .filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
+            .map { Datoperiode(fom = it.fom, tom = it.tom) }
 }

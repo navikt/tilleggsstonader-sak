@@ -1,23 +1,23 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårsoppsummering
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import java.time.LocalDate
 
 object VilkårsoppsummeringUtil {
-    fun harBarnUnder2ÅrIStønadsperiode(
+    fun harBarnUnder2ÅrIAktivitetsperiode(
         barn: List<GrunnlagBarn>,
-        stønadsperioder: List<StønadsperiodeDto>,
+        aktivitetsperioder: List<Datoperiode>,
     ) = barn.any { barn ->
         val fødselsdato = barn.fødselsdato
-        fødselsdato == null || erUnder2ÅrIEnStønadsperiode(stønadsperioder, fødselsdato)
+        fødselsdato == null || erUnder2ÅrIEnAktivitetsperiode(aktivitetsperioder, fødselsdato)
     }
 
-    private fun erUnder2ÅrIEnStønadsperiode(
-        stønadsperioder: List<StønadsperiodeDto>,
+    private fun erUnder2ÅrIEnAktivitetsperiode(
+        aktivitetsperioder: List<Datoperiode>,
         fødselsdato: LocalDate,
-    ) = stønadsperioder.any { stønadsperiode ->
-        stønadsperiode.fom <= fødselsdato.plusYears(2) &&
-            stønadsperiode.tom >= fødselsdato
+    ) = aktivitetsperioder.any { aktivitetsperiode ->
+        aktivitetsperiode.fom <= fødselsdato.plusYears(2) &&
+            aktivitetsperiode.tom >= fødselsdato
     }
 }
