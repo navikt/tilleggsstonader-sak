@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BeregningNøkler
+import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -39,7 +40,7 @@ class StepDefinitions {
 
     val vedtakRepositroy = mockk<VedtakRepository>()
     val vilkårperiodeService = mockk<VilkårperiodeService>(relaxed = true)
-    val vedtaksperiodeValideringService = mockk<BoutgifterVedtaksperiodeValideringService>(relaxed = true)
+    val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>(relaxed = true)
 
     val beregningsService =
         BoutgifterBeregningService(

@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
@@ -32,7 +33,7 @@ class BoutgifterBeregningServiceTest {
     val grunnlagsdataService = mockk<GrunnlagsdataService>()
 
     val vedtaksperiodeValideringService =
-        BoutgifterVedtaksperiodeValideringService(
+        VedtaksperiodeValideringService(
             vilkårperiodeService = vilkårperiodeService,
             vedtakRepository = vedtakRepository,
         )

@@ -32,6 +32,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.spl
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.tilUke
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
@@ -51,7 +52,7 @@ class TilsynBarnBeregningService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val vedtakRepository: VedtakRepository,
     private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
-    private val tilsynBarnVedtaksperiodeValidingerService: TilsynBarnVedtaksperiodeValidingerService,
+    private val vedtaksperiodeValidingerService: VedtaksperiodeValideringService,
 ) {
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -63,11 +64,11 @@ class TilsynBarnBeregningService(
         }
 
         val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandling.id)
+        validerUtgiftHeleVedtaksperioden(vedtaksperioder, utgifterPerBarn)
 
-        tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
+        vedtaksperiodeValidingerService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
-            utgifter = utgifterPerBarn,
             typeVedtak = typeVedtak,
         )
 

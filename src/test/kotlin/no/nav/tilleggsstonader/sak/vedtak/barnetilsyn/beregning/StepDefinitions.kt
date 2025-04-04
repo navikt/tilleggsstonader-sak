@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -49,14 +50,14 @@ class StepDefinitions {
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>()
     val repository = mockk<VedtakRepository>(relaxed = true)
-    val tilsynBarnVedtaksperiodeValidingerService = mockk<TilsynBarnVedtaksperiodeValidingerService>(relaxed = true)
+    val vedtaksperiodeValidingerService = mockk<VedtaksperiodeValideringService>(relaxed = true)
 
     val service =
         TilsynBarnBeregningService(
             vilkårperiodeRepository = vilkårperiodeRepository,
             tilsynBarnUtgiftService = tilsynBarnUtgiftService,
             vedtakRepository = repository,
-            tilsynBarnVedtaksperiodeValidingerService = tilsynBarnVedtaksperiodeValidingerService,
+            vedtaksperiodeValidingerService = vedtaksperiodeValidingerService,
         )
 
     var exception: Exception? = null

@@ -18,7 +18,7 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
 
     Når beregner
 
-    Så forvent følgende feil: Kan ikke innvilge når det ikke finnes noen utgiftsperioder
+    Så forvent følgende feil: Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden
 
   Scenario: Sender inn overlappende utgiftsperioder
 
@@ -51,7 +51,7 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
-      | 01.2023 | 02.2023 | -100   |
+      | 01.2023 | 03.2023 | -100   |
 
     Når beregner
 

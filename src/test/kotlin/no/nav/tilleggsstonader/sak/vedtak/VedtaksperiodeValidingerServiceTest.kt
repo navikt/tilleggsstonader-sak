@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
+package no.nav.tilleggsstonader.sak.vedtak
 
 import io.mockk.every
 import io.mockk.mockk
@@ -9,30 +9,27 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Navn
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
-import org.assertj.core.api.Assertions.assertThatCode
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
 
-class TilsynBarnVedtaksperiodeValidingerServiceTest {
+class VedtaksperiodeValidingerServiceTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
     val grunnlagsdataService = mockk<GrunnlagsdataService>()
     val vedtakRepository = mockk<VedtakRepository>()
-    val tilsynBarnVedtaksperiodeValidingerService =
-        TilsynBarnVedtaksperiodeValidingerService(
+    val vedtaksperiodeValidingerService =
+        VedtaksperiodeValideringService(
             vilkårperiodeService = vilkårperiodeService,
             vedtakRepository = vedtakRepository,
         )
@@ -41,16 +38,16 @@ class TilsynBarnVedtaksperiodeValidingerServiceTest {
 
     val målgrupper =
         listOf(
-            målgruppe(
-                faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.AAP),
+            VilkårperiodeTestUtil.målgruppe(
+                faktaOgVurdering = VilkårperiodeTestUtil.faktaOgVurderingMålgruppe(type = MålgruppeType.AAP),
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 2, 28),
             ),
         )
     val aktiviteter =
         listOf(
-            aktivitet(
-                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+            VilkårperiodeTestUtil.aktivitet(
+                faktaOgVurdering = VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 2, 28),
             ),
@@ -58,7 +55,7 @@ class TilsynBarnVedtaksperiodeValidingerServiceTest {
 
     val utgifter: Map<BarnId, List<UtgiftBeregning>> =
         mapOf(
-            BarnId.random() to
+            BarnId.Companion.random() to
                 listOf(
                     UtgiftBeregning(
                         fom = YearMonth.of(2025, 1),
@@ -82,14 +79,14 @@ class TilsynBarnVedtaksperiodeValidingerServiceTest {
     fun `skal ikke kaste feil for gyldig vedtaksperiode`() {
         val vedtaksperiode = lagVedtaksperiode()
 
-        assertThatCode {
-            tilsynBarnVedtaksperiodeValidingerService.validerVedtaksperioder(
-                vedtaksperioder = listOf(vedtaksperiode),
-                behandling = behandling,
-                utgifter = utgifter,
-                typeVedtak = TypeVedtak.INNVILGELSE,
-            )
-        }.doesNotThrowAnyException()
+        Assertions
+            .assertThatCode {
+                vedtaksperiodeValidingerService.validerVedtaksperioder(
+                    vedtaksperioder = listOf(vedtaksperiode),
+                    behandling = behandling,
+                    typeVedtak = TypeVedtak.INNVILGELSE,
+                )
+            }.doesNotThrowAnyException()
     }
 
     private fun lagGrunnlagsdata(fødeslsdato: LocalDate = LocalDate.of(1990, 1, 1)) =
