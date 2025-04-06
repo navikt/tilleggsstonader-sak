@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20250324083707_24007c5"
+val familieProsesseringVersion = "2.20250331103528_ed988de"
 val tilleggsstønaderLibsVersion = "2025.03.28-12.05.78567a42f6ae"
 val tilleggsstønaderKontrakterVersion = "2025.04.04-11.57.4d5d45684538"
 val avroVersion = "1.12.0"
@@ -76,7 +76,7 @@ dependencies {
     implementation("no.nav.teamdokumenthandtering:teamdokumenthandtering-avro-schemas:$joarkHendelseVersion")
 
     // Logging
-    implementation("net.logstash.logback:logstash-logback-encoder:8.0")
+    implementation("net.logstash.logback:logstash-logback-encoder:8.1")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
 
@@ -108,7 +108,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.21.1"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.22.0"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 }
