@@ -52,6 +52,17 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.UUID
 
+/**
+ * Vi har nå oppfølginger som går på vedtaksperiode som inneholder målgruppe og aktivitet
+ * Men så har vi endret til at man har faktisk målgruppe på vedtaksperioden
+ *
+ * Alternativer:
+ *  * Ikke utgå fra vedtaksperiode
+ *  * Kontrollere målgruppe/aktivitet uten å forholde seg til vedtaksperiode
+ *    * Hvis det er endring, sjekk om det påvirker vedtaksperioden
+ *  * Endre oppfølging-kontroll til å være per type, dvs aktivitet/målgruppe med endring
+ *   * Må håndtere tidligere oppfølginger for å ikke behandle ignorerte på nytt
+ */
 @Service
 class OppfølgingService(
     private val behandlingRepository: BehandlingRepository,
