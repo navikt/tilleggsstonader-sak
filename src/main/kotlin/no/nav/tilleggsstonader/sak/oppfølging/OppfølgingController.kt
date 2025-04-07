@@ -26,19 +26,18 @@ class OppfølgingController(
     private val tilgangService: TilgangService,
     private val oppfølgingService: OppfølgingService,
     private val unleashService: UnleashService,
-    private val oppfølgingRepository: OppfølgingRepository,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @GetMapping
-    fun hentAktiveOppfølginger(): List<OppfølgingMedDetaljer> {
+    fun hentAktiveOppfølginger(): List<KontrollerOppfølgingResponse> {
         tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
 
         feilHvisIkke(unleashService.isEnabled(Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING)) {
             "Feature toggle ${Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING} er ikke aktivert"
         }
 
-        return oppfølgingService.hentAktiveOppfølginger()
+        return oppfølgingService.hentAktiveOppfølginger().tilDto()
     }
 
     @GetMapping("/v2")
