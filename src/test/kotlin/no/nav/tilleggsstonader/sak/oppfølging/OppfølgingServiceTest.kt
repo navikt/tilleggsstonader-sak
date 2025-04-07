@@ -27,7 +27,9 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregn
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -562,13 +564,16 @@ class OppfølgingServiceTest {
 
     private fun Oppfølging?.assertIngenEndringForAktiviteter() = assertThat(endringAktivitet()).isEmpty()
 
-    private fun Oppfølging?.endringAktivitet(): List<Kontroll> =
-        this?.let { it.data.perioderTilKontroll.flatMap { periode -> periode.endringAktivitet!! } }
-            ?: emptyList()
+    private fun Oppfølging?.endringAktivitet(): List<Kontroll> = endringer<AktivitetType>()
 
-    private fun Oppfølging?.endringMålgruppe(): List<Kontroll> =
-        this?.let { it.data.perioderTilKontroll.flatMap { periode -> periode.endringMålgruppe!! } }
-            ?: emptyList()
+    private fun Oppfølging?.endringMålgruppe(): List<Kontroll> = endringer<MålgruppeType>()
+
+    private inline fun <reified TYPE : VilkårperiodeType> Oppfølging?.endringer(): List<Kontroll> =
+        this?.let {
+            it.data.perioderTilKontroll
+                .filter { it.type is TYPE }
+                .flatMap { periode -> periode.endringer }
+        } ?: emptyList()
 
     private fun mockVedtakTilsynBarn(vararg vedtaksperioder: Vedtaksperiode) {
         every { vedtakRepository.findByIdOrThrow(behandling.id) } returns

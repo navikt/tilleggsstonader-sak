@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
-import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
@@ -8,8 +7,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
@@ -113,18 +110,13 @@ enum class KontrollertUtfall {
     UNDER_ARBEID,
 }
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 data class PeriodeForKontroll(
     val fom: LocalDate,
     val tom: LocalDate,
-    val målgruppe: MålgruppeType? = null,
-    val aktivitet: AktivitetType? = null,
-    val endringAktivitet: List<Kontroll>? = null,
-    val endringMålgruppe: List<Kontroll>? = null,
-    val type: VilkårperiodeType?,
-    val endringer: List<Kontroll>?,
+    val type: VilkårperiodeType,
+    val endringer: List<Kontroll>,
 ) {
-    fun trengerKontroll(): Boolean = !endringAktivitet.isNullOrEmpty() || !endringMålgruppe.isNullOrEmpty() || !endringer.isNullOrEmpty()
+    fun trengerKontroll(): Boolean = endringer.isNotEmpty()
 }
 
 data class Kontroll(
