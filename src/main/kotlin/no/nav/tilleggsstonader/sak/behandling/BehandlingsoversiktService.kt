@@ -37,7 +37,7 @@ class BehandlingsoversiktService(
             fagsakPersonId = fagsakPersonId,
             tilsynBarn = hentFagsakMedBehandlinger(fagsak.barnetilsyn),
             læremidler = hentFagsakMedBehandlinger(fagsak.læremidler),
-            boUtgifter = hentFagsakMedBehandlinger(fagsak.boUtgifter),
+            boutgifter = hentFagsakMedBehandlinger(fagsak.boutgifter),
         )
     }
 

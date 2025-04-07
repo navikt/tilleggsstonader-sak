@@ -18,7 +18,7 @@ data class BehandlingsoversiktDto(
     val fagsakPersonId: FagsakPersonId,
     val tilsynBarn: FagsakMedBehandlinger?,
     val læremidler: FagsakMedBehandlinger?,
-    val boUtgifter: FagsakMedBehandlinger?,
+    val boutgifter: FagsakMedBehandlinger?,
 )
 
 data class FagsakMedBehandlinger(

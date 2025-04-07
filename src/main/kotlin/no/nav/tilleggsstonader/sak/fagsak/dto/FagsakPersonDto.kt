@@ -7,5 +7,5 @@ class FagsakPersonDto(
     val id: FagsakPersonId,
     val tilsynBarn: FagsakId?,
     val læremidler: FagsakId?,
-    val boUtgifterr: FagsakId?,
+    val boutgifter: FagsakId?,
 )
