@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.oppfølging
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
@@ -11,7 +10,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HovedytelseType
 import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -19,7 +17,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakMetadata
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -124,7 +121,7 @@ class OppfølgingService(
             } else {
                 logger.warn(
                     "Ingen endring for behandling=$behandlingId siden oppfølging=${sisteForFagsak.id} " +
-                            "ble kontrollert forrige gang, oppretter ikke ny oppfølging",
+                        "ble kontrollert forrige gang, oppretter ikke ny oppfølging",
                 )
             }
         }
@@ -146,10 +143,31 @@ class OppfølgingService(
         val inngangsvilkår = hentInngangsvilkår(behandling, registerAktiviteter)
         val registerYtelser = hentYtelser(fagsak, inngangsvilkår.målgrupper)
 
-        return vedtaksperioder
-            .map { it.finnEndringer(registerYtelser, registerAktiviteter, inngangsvilkår) }
-            .filter { it.trengerKontroll() }
+        val kontrollerAktivitet = vedtaksperioder.map { it.finnEndringer(registerAktiviteter, inngangsvilkår) }
+        val kontrollerMålgrupper = finnKontrollerMålgrupper(vedtaksperioder, inngangsvilkår, registerYtelser)
+        return (kontrollerAktivitet + kontrollerMålgrupper).filter { it.trengerKontroll() }
     }
+
+    private fun finnKontrollerMålgrupper(
+        vedtaksperiodes: List<Vedtaksperiode>,
+        vilkårperioder: Vilkårperioder,
+        registerytelser: Map<MålgruppeType, List<Datoperiode>>,
+    ): List<PeriodeForKontroll> =
+        vilkårperioder.målgrupper
+            .filter { it.skalKontrolleres() }
+            .map {
+                val endringer =
+                    it
+                        .finnEndringer(vedtaksperiodes, registerytelser)
+                        .utenAAPSomGjelderFraOgMedNesteMåned(målgruppe = it.målgruppe)
+
+                PeriodeForKontroll(
+                    fom = it.fom,
+                    tom = it.tom,
+                    type = it.målgruppe,
+                    endringer = endringer,
+                )
+            }
 
     private fun hentVedtaksperioder(
         fagsak: FagsakMetadata,
@@ -167,17 +185,18 @@ class OppfølgingService(
                         .vedtaksperioder
                         .tilFellesFormat()
 
-                Stønadstype.BOUTGIFTER -> hentVedtak<InnvilgelseEllerOpphørBoutgifter>(behandling)
-                    .vedtaksperioder
-                    ?: emptyList()
+                Stønadstype.BOUTGIFTER ->
+                    hentVedtak<InnvilgelseEllerOpphørBoutgifter>(behandling)
+                        .vedtaksperioder
+                        ?: emptyList()
             }
         return vedtaksperioder
             .sorted()
             .mergeSammenhengende(
                 { v1, v2 ->
                     v1.overlapperEllerPåfølgesAv(v2) &&
-                            v1.målgruppe == v2.målgruppe &&
-                            v1.aktivitet == v2.aktivitet
+                        v1.målgruppe == v2.målgruppe &&
+                        v1.aktivitet == v2.aktivitet
                 },
                 { v1, v2 -> v1.medPeriode(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
             )
@@ -187,7 +206,6 @@ class OppfølgingService(
         vedtakRepository.findByIdOrThrow(behandling.id).withTypeOrThrow<T>().data
 
     private fun Vedtaksperiode.finnEndringer(
-        registerYtelser: Map<MålgruppeType, List<Datoperiode>>,
         registerAktiviteter: RegisterAktiviteter,
         inngangsvilkår: Vilkårperioder,
     ): PeriodeForKontroll {
@@ -201,54 +219,58 @@ class OppfølgingService(
         )
     }
 
-    private fun Vedtaksperiode.finnEndringIMålgruppe(
-        målgrupper: List<InngangsvilkårMålgruppe>,
-        ytelserPerMålgruppe: Map<MålgruppeType, List<Datoperiode>>
+    /**
+     * Ønsker å finne om et inngangsvilkår fortsatt er gyldig
+     * Om snittet av inngangsvilkåret og registerinfo er kortere enn inngangsvilkåret og om dette påvirker vedtaksperioden
+     *
+     * Hvis et inngangsvilkår slutter før en vedtaksperiode, er det kun snittet av disse som er interessant
+     */
+    @Suppress("SimplifiableCallChain")
+    private fun InngangsvilkårMålgruppe.finnEndringer(
+        vedtaksperioder: List<Vedtaksperiode>,
+        ytelserPerMålgruppe: Map<MålgruppeType, List<Datoperiode>>,
     ): List<Kontroll> {
-        målgrupper.map { inngangsvilkår ->
-            val perioderFraRegisteret = when (inngangsvilkår.målgruppe) {
-                MålgruppeType.AAP,
-                MålgruppeType.OMSTILLINGSSTØNAD,
-                MålgruppeType.OVERGANGSSTØNAD -> ytelserPerMålgruppe[inngangsvilkår.målgruppe] ?: emptyList()
+        val snittInngangsvilkårVedtaksperiode =
+            vedtaksperioder
+                .filter { it.målgruppe == this.målgruppe.faktiskMålgruppe() }
+                .mapNotNull { it.beregnSnitt(this) }
 
-                MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger ennå")
-                MålgruppeType.NEDSATT_ARBEIDSEVNE -> null
-                MålgruppeType.UFØRETRYGD -> null
-                MålgruppeType.SYKEPENGER_100_PROSENT -> null
-                MålgruppeType.INGEN_MÅLGRUPPE -> null
-            }
-            if (perioderFraRegisteret == null) {
+        val ytelserFraRegister = ytelserPerMålgruppe[this.målgruppe] ?: emptyList()
 
+        return snittInngangsvilkårVedtaksperiode.flatMap { vedtaksperiode ->
+            val snitt = ytelserFraRegister.mapNotNull { it.beregnSnitt(vedtaksperiode) }.firstOrNull()
+            if (snitt == null) {
+                listOf(Kontroll(ÅrsakKontroll.INGEN_TREFF))
             } else {
-                val snitt = perioderFraRegisteret.mapNotNull { it.beregnSnitt(inngangsvilkår) }
+                this@OppfølgingService.finnEndringFomTom(vedtaksperiode, snitt)
             }
-        }
-        val ytelserPerFaktiskMålgruppe = ytelserPerMålgruppe.entries.groupBy { it.key.faktiskMålgruppe() }
-            .mapValues { it.value.flatMap { it.value } }
-        return when (this.målgruppe) {
-            FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-            FaktiskMålgruppe.GJENLEVENDE,
-            FaktiskMålgruppe.ENSLIG_FORSØRGER,
-                -> {
-                val ytelser = ytelserPerMålgruppe[this.målgruppe] ?: emptyList()
-                val kontroller = finnKontroller(this, ytelser)
-                val enKontroll = kontroller.singleOrNull()
-                val førsteDagINestNesteMåned = YearMonth.now().plusMonths(1).atEndOfMonth()
-                if (
-                    målgruppe == MålgruppeType.AAP &&
-                    enKontroll?.årsak == ÅrsakKontroll.TOM_ENDRET &&
-                    enKontroll.tom!! >= førsteDagINestNesteMåned
-                ) {
-                    // AAP slutter før vedtaksperiode
-                    emptyList()
-                } else {
-                    kontroller
-                }
-            }
-
-            else -> emptyList() // Sjekker kun målgrupper som vi henter fra andre systemer
         }
     }
+
+    // Filtrerer vekk kontroller hvis det kun gjelder AAP som påvirkes etter neste måned
+    private fun List<Kontroll>.utenAAPSomGjelderFraOgMedNesteMåned(målgruppe: MålgruppeType): List<Kontroll> {
+        val førsteDagINestNesteMåned = YearMonth.now().plusMonths(1).atEndOfMonth()
+        return this.filterNot {
+            målgruppe == MålgruppeType.AAP &&
+                it.årsak == ÅrsakKontroll.TOM_ENDRET &&
+                it.tom!! >= førsteDagINestNesteMåned
+        }
+    }
+
+    private fun InngangsvilkårMålgruppe.skalKontrolleres() =
+        when (this.målgruppe) {
+            MålgruppeType.AAP,
+            MålgruppeType.OMSTILLINGSSTØNAD,
+            MålgruppeType.OVERGANGSSTØNAD,
+            -> true
+
+            MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger ennå")
+            MålgruppeType.NEDSATT_ARBEIDSEVNE,
+            MålgruppeType.UFØRETRYGD,
+            MålgruppeType.SYKEPENGER_100_PROSENT,
+            MålgruppeType.INGEN_MÅLGRUPPE,
+            -> false
+        }
 
     private fun Vedtaksperiode.finnEndringIAktivitet(
         registerAktiviteter: RegisterAktiviteter,
@@ -413,8 +435,8 @@ class OppfølgingService(
             .map { it.type.tilMålgruppe() to Datoperiode(fom = it.fom, tom = it.tom!!) }
             .groupBy { it.first }
             .mapValues {
-
-                it.value.map { it.second }
+                it.value
+                    .map { it.second }
                     .sorted()
                     .mergeSammenhengende { y1, y2 -> y1.overlapperEllerPåfølgesAv(y2) }
                     .map { Datoperiode(fom = it.fom, tom = it.tom) }
@@ -439,7 +461,6 @@ class OppfølgingService(
             MålgruppeType.SYKEPENGER_100_PROSENT -> null
             MålgruppeType.INGEN_MÅLGRUPPE -> null
         }
-
 }
 
 private fun List<no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode>.tilFellesFormat() =
@@ -465,11 +486,11 @@ private data class InngangsvilkårMålgruppe(
 ) : Periode<LocalDate>,
     Mergeable<LocalDate, InngangsvilkårMålgruppe> {
     constructor(vilkårperiode: VilkårperiodeMålgruppe) :
-            this(
-                fom = vilkårperiode.fom,
-                tom = vilkårperiode.tom,
-                målgruppe = vilkårperiode.faktaOgVurdering.type.vilkårperiodeType,
-            )
+        this(
+            fom = vilkårperiode.fom,
+            tom = vilkårperiode.tom,
+            målgruppe = vilkårperiode.faktaOgVurdering.type.vilkårperiodeType,
+        )
 
     override fun merge(other: InngangsvilkårMålgruppe): InngangsvilkårMålgruppe =
         this.copy(fom = minOf(fom, other.fom), tom = maxOf(tom, other.tom))
