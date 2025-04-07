@@ -5,12 +5,14 @@ import no.nav.tilleggsstonader.kontrakter.klage.KlagebehandlingDto
 data class KlagebehandlingerDto(
     val tilsynBarn: List<KlagebehandlingDto>,
     val læremidler: List<KlagebehandlingDto>,
+    val boutgifter: List<KlagebehandlingDto>,
 ) {
     companion object {
         fun empty() =
             KlagebehandlingerDto(
                 tilsynBarn = emptyList(),
                 læremidler = emptyList(),
+                boutgifter = emptyList(),
             )
     }
 }

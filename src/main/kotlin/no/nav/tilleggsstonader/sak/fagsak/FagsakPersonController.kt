@@ -45,6 +45,7 @@ class FagsakPersonController(
             id = person.id,
             tilsynBarn = fagsaker.barnetilsyn?.id,
             læremidler = fagsaker.læremidler?.id,
+            boutgifter = fagsaker.boutgifter?.id,
         )
     }
 }

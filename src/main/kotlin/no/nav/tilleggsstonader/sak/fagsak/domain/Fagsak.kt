@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.mapping.Table
 data class Fagsaker(
     val barnetilsyn: Fagsak?,
     val læremidler: Fagsak?,
+    val boutgifter: Fagsak?,
 )
 
 data class Fagsak(

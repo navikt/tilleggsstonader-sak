@@ -138,7 +138,7 @@ internal class KlageServiceTest {
 
         @Test
         internal fun `skal returnere tomme lister dersom eksternFagsakId ikke eksisterer`() {
-            every { fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId) } returns Fagsaker(null, null)
+            every { fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId) } returns Fagsaker(null, null, null)
 
             val klager = klageService.hentBehandlinger(fagsakPersonId)
 
@@ -273,7 +273,7 @@ internal class KlageServiceTest {
             )
         }
 
-        private fun fagsaker() = Fagsaker(fagsak, null)
+        private fun fagsaker() = Fagsaker(fagsak, null, null)
 
         private fun klageBehandlingDto(
             resultat: BehandlingResultat? = null,
