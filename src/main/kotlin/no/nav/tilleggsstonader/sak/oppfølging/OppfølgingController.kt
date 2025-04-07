@@ -41,6 +41,17 @@ class OppfølgingController(
         return oppfølgingService.hentAktiveOppfølginger()
     }
 
+    @GetMapping("/v2")
+    fun hentAktiveOppfølgingerV2(): List<KontrollerOppfølgingResponse> {
+        tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
+
+        feilHvisIkke(unleashService.isEnabled(Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING)) {
+            "Feature toggle ${Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING} er ikke aktivert"
+        }
+
+        return oppfølgingService.hentAktiveOppfølginger().tilDto()
+    }
+
     @PostMapping("kontroller")
     fun kontrollerBehandling(
         @RequestBody request: KontrollerOppfølgingRequest,
