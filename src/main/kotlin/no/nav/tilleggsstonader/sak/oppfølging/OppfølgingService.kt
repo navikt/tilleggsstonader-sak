@@ -107,296 +107,296 @@ class OppfølgingService(
         TODO("Fix")
         return emptyList()
     }
-        /*
+    /*
 
-            val vedtaksperioder = hentVedtaksperioder(fagsak, behandling)
-            if (vedtaksperioder.isEmpty()) {
-                return emptyList()
-            }
-
-            val fom = vedtaksperioder.minOf { it.fom }
-            val tom = vedtaksperioder.maxOf { it.tom }
-            val registerAktiviteter = hentAktiviteter(fagsak, fom, tom)
-            val registerYtelser = hentYtelser(fagsak, fom, tom)
-            val aktiviteter = hentInngangsvilkårAktiviteter(behandling, registerAktiviteter)
-
-            return vedtaksperioder
-                .map { it.finnEndringer(registerYtelser, registerAktiviteter, aktiviteter) }
-                .filter { it.trengerKontroll() }
-        }
-
-        private fun hentVedtaksperioder(
-            fagsak: FagsakMetadata,
-            behandling: Behandling,
-        ): List<Vedtaksperiode> =
-            when (fagsak.stønadstype) {
-                Stønadstype.BARNETILSYN ->
-                    hentVedtak<InnvilgelseEllerOpphørTilsynBarn>(behandling)
-                        .vedtaksperioder
-                        ?.map { Vedtaksperiode(it) }
-                        ?: emptyList()
-
-                // TODO Læremidler har ennå ikke vedtaksperioder
-                Stønadstype.LÆREMIDLER ->
-                    // TODO håndterer ikke læremidler ennå etter endring til faktisk målgruppe
-                    emptyList()
-                    /*
-                    hentVedtak<InnvilgelseEllerOpphørLæremidler>(behandling)
-                        .beregningsresultat.perioder
-                        .map { Vedtaksperiode(it) }
-                        .sorted()
-                        .mergeSammenhengende(
-                            { v1, v2 ->
-                                v1.overlapperEllerPåfølgesAv(v2) &&
-                                    v1.målgruppe == v2.målgruppe &&
-                                    v1.aktivitet == v2.aktivitet
-                            },
-                            { v1, v2 -> v1.medPeriode(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
-                        )
-         */
-
-                Stønadstype.BOUTGIFTER -> TODO()
-            }
-
-        private inline fun <reified T : Vedtaksdata> hentVedtak(behandling: Behandling) =
-            vedtakRepository.findByIdOrThrow(behandling.id).withTypeOrThrow<T>().data
-
-        private fun Vedtaksperiode.finnEndringer(
-            registerYtelser: Map<MålgruppeType, List<Ytelsesperiode>>,
-            registerAktiviteter: RegisterAktiviteter,
-            aktiviteter: List<InngangsvilkårAktivitet>,
-        ): PeriodeForKontroll =
-            PeriodeForKontroll(
-                fom = this.fom,
-                tom = this.tom,
-                målgruppe = this.målgruppe,
-                aktivitet = this.aktivitet,
-                endringAktivitet = finnEndringIAktivitet(registerAktiviteter, aktiviteter),
-                endringMålgruppe = finnEndringIMålgruppe(registerYtelser),
-            )
-
-        private fun Vedtaksperiode.finnEndringIMålgruppe(ytelserPerMålgruppe: Map<MålgruppeType, List<Ytelsesperiode>>): List<Kontroll> =
-            when (this.målgruppe) {
-                MålgruppeType.AAP,
-                MålgruppeType.OMSTILLINGSSTØNAD,
-                MålgruppeType.OVERGANGSSTØNAD,
-                -> {
-                    val ytelser = ytelserPerMålgruppe[this.målgruppe] ?: emptyList()
-                    val kontroller = finnKontroller(this, ytelser)
-                    val enKontroll = kontroller.singleOrNull()
-                    val førsteDagINestNesteMåned = YearMonth.now().plusMonths(1).atEndOfMonth()
-                    if (
-                        målgruppe == MålgruppeType.AAP &&
-                        enKontroll?.årsak == ÅrsakKontroll.TOM_ENDRET &&
-                        enKontroll.tom!! >= førsteDagINestNesteMåned
-                    ) {
-                        // AAP slutter før vedtaksperiode
-                        emptyList()
-                    } else {
-                        kontroller
-                    }
-                }
-
-                else -> emptyList() // Sjekker kun målgrupper som vi henter fra andre systemer
-            }
-
-        private fun Vedtaksperiode.finnEndringIAktivitet(
-            registerAktiviteter: RegisterAktiviteter,
-            aktiviteter: List<InngangsvilkårAktivitet>,
-        ): List<Kontroll> {
-            val kontroller =
-                when (this.aktivitet) {
-                    AktivitetType.REELL_ARBEIDSSØKER -> mutableListOf() // Skal ikke kontrolleres
-                    AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
-                    AktivitetType.TILTAK ->
-                        finnEndringIRegisteraktivitetEllerAlle(this, aktiviteter, registerAktiviteter.tiltak)
-
-                    AktivitetType.UTDANNING ->
-                        finnEndringIRegisteraktivitetEllerAlle(this, aktiviteter, registerAktiviteter.utdanningstiltak)
-                }
-
-            val ingenTreff = kontroller.any { it.årsak == ÅrsakKontroll.INGEN_TREFF }
-            if (ingenTreff && registerAktiviteter.alleAktiviteter.any { it.inneholder(this) }) {
-                return kontroller + Kontroll(ÅrsakKontroll.TREFF_MEN_FEIL_TYPE)
-            }
-            return kontroller
-        }
-
-        /**
-         * Kontrollerer om det er endringer i registeraktivitet
-         * * Kontrollerer om en registeraktivitet inneholder hele vedtaksperioden
-         * * Kontrollerer om
-         */
-        private fun finnEndringIRegisteraktivitetEllerAlle(
-            vedtaksperiode: Vedtaksperiode,
-            aktiviteter: List<InngangsvilkårAktivitet>,
-            registerperioder: List<Periode<LocalDate>>,
-        ): List<Kontroll> {
-            val kontroller = mutableListOf<Kontroll>()
-
-            aktiviteter.forEach { aktivitet ->
-                val register = aktivitet.datoperiodeAktivitet
-                if (register != null && register.inneholder(vedtaksperiode)) {
-                    // Har overlapp mellom register-data og vedtaksperiode
-                    // returnerer tom liste for finnKontrollerAktivitet
-                    return mutableListOf()
-                }
-                kontroller.addAll(kontrollerEndringerMotRegisterAktivitet(vedtaksperiode, aktivitet, register))
-            }
-            val kontrollMotAlleRegisterperioder = finnKontroller(vedtaksperiode, registerperioder)
-            kontroller.addAll(kontrollMotAlleRegisterperioder)
-            return kontroller.distinct()
-        }
-
-        /**
-         * Kontrollerer om endring i registeraktivitet påvirker snittet av en [Vedtaksperiode] og [InngangsvilkårAktivitet]
-         * En registeraktivitet kan ha endret seg, men det er ikke sikkert endringen påvirker vedtaksperioden
-         * Hvis man har flere aktiviteter som løper parallellt og en av de
-         *
-         * @param registerperiode er trukket ut fra [aktivitet] men er not null
-         */
-        private fun kontrollerEndringerMotRegisterAktivitet(
-            vedtaksperiode: Vedtaksperiode,
-            aktivitet: InngangsvilkårAktivitet,
-            registerperiode: Datoperiode?,
-        ): List<Kontroll> {
-            val snitt = vedtaksperiode.beregnSnitt(aktivitet)
-            if (registerperiode != null && snitt != null) {
-                // Kontrollerer om registeraktiviteten endret seg mott snittet av vedtaksperioden og aktiviteten
-                return finnEndringFomTom(snitt, registerperiode)
-            }
-            val finnerSnittMenManglerRegisteraktivitet =
-                registerperiode == null && snitt != null && aktivitet.kildeId != null
-            if (finnerSnittMenManglerRegisteraktivitet) {
-                return listOf(Kontroll(ÅrsakKontroll.FINNER_IKKE_REGISTERAKTIVITET))
-            }
+        val vedtaksperioder = hentVedtaksperioder(fagsak, behandling)
+        if (vedtaksperioder.isEmpty()) {
             return emptyList()
         }
 
-        private fun finnKontroller(
-            vedtaksperiode: Vedtaksperiode,
-            registerperioder: List<Periode<LocalDate>>,
-        ): List<Kontroll> {
-            val snitt = registerperioder.mapNotNull { vedtaksperiode.beregnSnitt(it) }.singleOrNull()
+        val fom = vedtaksperioder.minOf { it.fom }
+        val tom = vedtaksperioder.maxOf { it.tom }
+        val registerAktiviteter = hentAktiviteter(fagsak, fom, tom)
+        val registerYtelser = hentYtelser(fagsak, fom, tom)
+        val aktiviteter = hentInngangsvilkårAktiviteter(behandling, registerAktiviteter)
 
-            if (snitt == null) {
-                return listOf(Kontroll(ÅrsakKontroll.INGEN_TREFF))
-            }
-            if (snitt.fom == vedtaksperiode.fom && snitt.tom == vedtaksperiode.tom) {
-                return emptyList() // Snitt er lik vedtaksperiode -> skal ikke kontrolleres
-            }
-            return finnEndringFomTom(vedtaksperiode, snitt)
-        }
+        return vedtaksperioder
+            .map { it.finnEndringer(registerYtelser, registerAktiviteter, aktiviteter) }
+            .filter { it.trengerKontroll() }
+    }
 
-        private fun finnEndringFomTom(
-            vedtaksperiode: Vedtaksperiode,
-            register: Periode<LocalDate>,
-        ): MutableList<Kontroll> =
-            mutableListOf<Kontroll>().apply {
-                if (register.fom > vedtaksperiode.fom) {
-                    add(Kontroll(ÅrsakKontroll.FOM_ENDRET, fom = register.fom))
-                }
-                if (register.tom < vedtaksperiode.tom) {
-                    add(Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = register.tom))
-                }
-            }
+    private fun hentVedtaksperioder(
+        fagsak: FagsakMetadata,
+        behandling: Behandling,
+    ): List<Vedtaksperiode> =
+        when (fagsak.stønadstype) {
+            Stønadstype.BARNETILSYN ->
+                hentVedtak<InnvilgelseEllerOpphørTilsynBarn>(behandling)
+                    .vedtaksperioder
+                    ?.map { Vedtaksperiode(it) }
+                    ?: emptyList()
 
-        private fun hentInngangsvilkårAktiviteter(
-            behandling: Behandling,
-            registerAktiviteter: RegisterAktiviteter,
-        ): List<InngangsvilkårAktivitet> =
-            vilkårperiodeRepository
-                .findByBehandlingIdAndResultat(behandling.id, ResultatVilkårperiode.OPPFYLT)
-                .ofType<AktivitetFaktaOgVurdering>()
-                .map { vilkår -> InngangsvilkårAktivitet(vilkår, registerAktiviteter.forId(vilkår.kildeId)) }
-                .sorted()
-
-        private fun hentAktiviteter(
-            fagsak: FagsakMetadata,
-            fom: LocalDate,
-            tom: LocalDate,
-        ) = registerAktivitetService
-            .hentAktiviteterForGrunnlagsdata(
-                ident = fagsak.ident,
-                fom = fom,
-                tom = tom,
-            ).let { RegisterAktiviteter(it) }
-
-        private fun hentYtelser(
-            fagsak: FagsakMetadata,
-            fom: LocalDate,
-            tom: LocalDate,
-        ): Map<MålgruppeType, List<Ytelsesperiode>> {
-            val ytelseForGrunnlag =
-                ytelseService
-                    .hentYtelseForGrunnlag(
-                        stønadstype = fagsak.stønadstype,
-                        ident = fagsak.ident,
-                        fom = fom,
-                        tom = tom,
+            // TODO Læremidler har ennå ikke vedtaksperioder
+            Stønadstype.LÆREMIDLER ->
+                // TODO håndterer ikke læremidler ennå etter endring til faktisk målgruppe
+                emptyList()
+                /*
+                hentVedtak<InnvilgelseEllerOpphørLæremidler>(behandling)
+                    .beregningsresultat.perioder
+                    .map { Vedtaksperiode(it) }
+                    .sorted()
+                    .mergeSammenhengende(
+                        { v1, v2 ->
+                            v1.overlapperEllerPåfølgesAv(v2) &&
+                                v1.målgruppe == v2.målgruppe &&
+                                v1.aktivitet == v2.aktivitet
+                        },
+                        { v1, v2 -> v1.medPeriode(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
                     )
-            val hentetInformasjon = ytelseForGrunnlag.hentetInformasjon.filter { it.status != StatusHentetInformasjon.OK }
-            if (hentetInformasjon.isNotEmpty()) {
-                error("Feilet henting av ytelser=${hentetInformasjon.map { it.type }}")
-            }
-            return ytelseForGrunnlag.perioder
-                .filter { it.aapErFerdigAvklart != true }
-                .filter { it.tom != null }
-                .map { Ytelsesperiode(fom = it.fom, tom = it.tom!!, målgruppe = it.type.tilMålgruppe()) }
-                .groupBy { it.målgruppe }
-                .mapValues {
-                    it.value
-                        .sorted()
-                        .mergeSammenhengende(
-                            { y1, y2 -> y1.målgruppe == y2.målgruppe && y1.overlapperEllerPåfølgesAv(y2) },
-                            { y1, y2 -> y1.copy(fom = minOf(y1.fom, y2.fom), tom = maxOf(y1.tom, y2.tom)) },
-                        )
+     */
+
+            Stønadstype.BOUTGIFTER -> TODO()
+        }
+
+    private inline fun <reified T : Vedtaksdata> hentVedtak(behandling: Behandling) =
+        vedtakRepository.findByIdOrThrow(behandling.id).withTypeOrThrow<T>().data
+
+    private fun Vedtaksperiode.finnEndringer(
+        registerYtelser: Map<MålgruppeType, List<Ytelsesperiode>>,
+        registerAktiviteter: RegisterAktiviteter,
+        aktiviteter: List<InngangsvilkårAktivitet>,
+    ): PeriodeForKontroll =
+        PeriodeForKontroll(
+            fom = this.fom,
+            tom = this.tom,
+            målgruppe = this.målgruppe,
+            aktivitet = this.aktivitet,
+            endringAktivitet = finnEndringIAktivitet(registerAktiviteter, aktiviteter),
+            endringMålgruppe = finnEndringIMålgruppe(registerYtelser),
+        )
+
+    private fun Vedtaksperiode.finnEndringIMålgruppe(ytelserPerMålgruppe: Map<MålgruppeType, List<Ytelsesperiode>>): List<Kontroll> =
+        when (this.målgruppe) {
+            MålgruppeType.AAP,
+            MålgruppeType.OMSTILLINGSSTØNAD,
+            MålgruppeType.OVERGANGSSTØNAD,
+            -> {
+                val ytelser = ytelserPerMålgruppe[this.målgruppe] ?: emptyList()
+                val kontroller = finnKontroller(this, ytelser)
+                val enKontroll = kontroller.singleOrNull()
+                val førsteDagINestNesteMåned = YearMonth.now().plusMonths(1).atEndOfMonth()
+                if (
+                    målgruppe == MålgruppeType.AAP &&
+                    enKontroll?.årsak == ÅrsakKontroll.TOM_ENDRET &&
+                    enKontroll.tom!! >= førsteDagINestNesteMåned
+                ) {
+                    // AAP slutter før vedtaksperiode
+                    emptyList()
+                } else {
+                    kontroller
                 }
-        }
-
-        private fun TypeYtelsePeriode.tilMålgruppe() =
-            when (this) {
-                TypeYtelsePeriode.AAP -> MålgruppeType.AAP
-                TypeYtelsePeriode.ENSLIG_FORSØRGER -> MålgruppeType.OVERGANGSSTØNAD
-                TypeYtelsePeriode.OMSTILLINGSSTØNAD -> MålgruppeType.OMSTILLINGSSTØNAD
             }
 
-        private data class Ytelsesperiode(
-            override val fom: LocalDate,
-            override val tom: LocalDate,
-            val målgruppe: MålgruppeType,
-        ) : Periode<LocalDate>
-
-        /**
-         * Foreløpig mappes stønadsperiode til vedtaksperiode for å sjekke om det er diff mot stønadsperiode
-         */
-        private data class Vedtaksperiode(
-            override val fom: LocalDate,
-            override val tom: LocalDate,
-            val målgruppe: MålgruppeType,
-            val aktivitet: AktivitetType,
-        ) : Periode<LocalDate>,
-            KopierPeriode<Vedtaksperiode> {
-            constructor(beregningsresultat: BeregningsresultatForMåned) : this(
-                fom = beregningsresultat.grunnlag.fom,
-                tom = beregningsresultat.grunnlag.tom,
-                målgruppe = TODO(), // beregningsresultat.grunnlag.målgruppe,
-                aktivitet = beregningsresultat.grunnlag.aktivitet,
-            )
-
-            constructor(vedtaksperiode: no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode) : this(
-                fom = vedtaksperiode.fom,
-                tom = vedtaksperiode.tom,
-                målgruppe = vedtaksperiode.målgruppe,
-                aktivitet = vedtaksperiode.aktivitet,
-            )
-
-            override fun medPeriode(
-                fom: LocalDate,
-                tom: LocalDate,
-            ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
+            else -> emptyList() // Sjekker kun målgrupper som vi henter fra andre systemer
         }
-         */
+
+    private fun Vedtaksperiode.finnEndringIAktivitet(
+        registerAktiviteter: RegisterAktiviteter,
+        aktiviteter: List<InngangsvilkårAktivitet>,
+    ): List<Kontroll> {
+        val kontroller =
+            when (this.aktivitet) {
+                AktivitetType.REELL_ARBEIDSSØKER -> mutableListOf() // Skal ikke kontrolleres
+                AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
+                AktivitetType.TILTAK ->
+                    finnEndringIRegisteraktivitetEllerAlle(this, aktiviteter, registerAktiviteter.tiltak)
+
+                AktivitetType.UTDANNING ->
+                    finnEndringIRegisteraktivitetEllerAlle(this, aktiviteter, registerAktiviteter.utdanningstiltak)
+            }
+
+        val ingenTreff = kontroller.any { it.årsak == ÅrsakKontroll.INGEN_TREFF }
+        if (ingenTreff && registerAktiviteter.alleAktiviteter.any { it.inneholder(this) }) {
+            return kontroller + Kontroll(ÅrsakKontroll.TREFF_MEN_FEIL_TYPE)
+        }
+        return kontroller
+    }
+
+    /**
+     * Kontrollerer om det er endringer i registeraktivitet
+     * * Kontrollerer om en registeraktivitet inneholder hele vedtaksperioden
+     * * Kontrollerer om
+     */
+    private fun finnEndringIRegisteraktivitetEllerAlle(
+        vedtaksperiode: Vedtaksperiode,
+        aktiviteter: List<InngangsvilkårAktivitet>,
+        registerperioder: List<Periode<LocalDate>>,
+    ): List<Kontroll> {
+        val kontroller = mutableListOf<Kontroll>()
+
+        aktiviteter.forEach { aktivitet ->
+            val register = aktivitet.datoperiodeAktivitet
+            if (register != null && register.inneholder(vedtaksperiode)) {
+                // Har overlapp mellom register-data og vedtaksperiode
+                // returnerer tom liste for finnKontrollerAktivitet
+                return mutableListOf()
+            }
+            kontroller.addAll(kontrollerEndringerMotRegisterAktivitet(vedtaksperiode, aktivitet, register))
+        }
+        val kontrollMotAlleRegisterperioder = finnKontroller(vedtaksperiode, registerperioder)
+        kontroller.addAll(kontrollMotAlleRegisterperioder)
+        return kontroller.distinct()
+    }
+
+    /**
+     * Kontrollerer om endring i registeraktivitet påvirker snittet av en [Vedtaksperiode] og [InngangsvilkårAktivitet]
+     * En registeraktivitet kan ha endret seg, men det er ikke sikkert endringen påvirker vedtaksperioden
+     * Hvis man har flere aktiviteter som løper parallellt og en av de
+     *
+     * @param registerperiode er trukket ut fra [aktivitet] men er not null
+     */
+    private fun kontrollerEndringerMotRegisterAktivitet(
+        vedtaksperiode: Vedtaksperiode,
+        aktivitet: InngangsvilkårAktivitet,
+        registerperiode: Datoperiode?,
+    ): List<Kontroll> {
+        val snitt = vedtaksperiode.beregnSnitt(aktivitet)
+        if (registerperiode != null && snitt != null) {
+            // Kontrollerer om registeraktiviteten endret seg mott snittet av vedtaksperioden og aktiviteten
+            return finnEndringFomTom(snitt, registerperiode)
+        }
+        val finnerSnittMenManglerRegisteraktivitet =
+            registerperiode == null && snitt != null && aktivitet.kildeId != null
+        if (finnerSnittMenManglerRegisteraktivitet) {
+            return listOf(Kontroll(ÅrsakKontroll.FINNER_IKKE_REGISTERAKTIVITET))
+        }
+        return emptyList()
+    }
+
+    private fun finnKontroller(
+        vedtaksperiode: Vedtaksperiode,
+        registerperioder: List<Periode<LocalDate>>,
+    ): List<Kontroll> {
+        val snitt = registerperioder.mapNotNull { vedtaksperiode.beregnSnitt(it) }.singleOrNull()
+
+        if (snitt == null) {
+            return listOf(Kontroll(ÅrsakKontroll.INGEN_TREFF))
+        }
+        if (snitt.fom == vedtaksperiode.fom && snitt.tom == vedtaksperiode.tom) {
+            return emptyList() // Snitt er lik vedtaksperiode -> skal ikke kontrolleres
+        }
+        return finnEndringFomTom(vedtaksperiode, snitt)
+    }
+
+    private fun finnEndringFomTom(
+        vedtaksperiode: Vedtaksperiode,
+        register: Periode<LocalDate>,
+    ): MutableList<Kontroll> =
+        mutableListOf<Kontroll>().apply {
+            if (register.fom > vedtaksperiode.fom) {
+                add(Kontroll(ÅrsakKontroll.FOM_ENDRET, fom = register.fom))
+            }
+            if (register.tom < vedtaksperiode.tom) {
+                add(Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = register.tom))
+            }
+        }
+
+    private fun hentInngangsvilkårAktiviteter(
+        behandling: Behandling,
+        registerAktiviteter: RegisterAktiviteter,
+    ): List<InngangsvilkårAktivitet> =
+        vilkårperiodeRepository
+            .findByBehandlingIdAndResultat(behandling.id, ResultatVilkårperiode.OPPFYLT)
+            .ofType<AktivitetFaktaOgVurdering>()
+            .map { vilkår -> InngangsvilkårAktivitet(vilkår, registerAktiviteter.forId(vilkår.kildeId)) }
+            .sorted()
+
+    private fun hentAktiviteter(
+        fagsak: FagsakMetadata,
+        fom: LocalDate,
+        tom: LocalDate,
+    ) = registerAktivitetService
+        .hentAktiviteterForGrunnlagsdata(
+            ident = fagsak.ident,
+            fom = fom,
+            tom = tom,
+        ).let { RegisterAktiviteter(it) }
+
+    private fun hentYtelser(
+        fagsak: FagsakMetadata,
+        fom: LocalDate,
+        tom: LocalDate,
+    ): Map<MålgruppeType, List<Ytelsesperiode>> {
+        val ytelseForGrunnlag =
+            ytelseService
+                .hentYtelseForGrunnlag(
+                    stønadstype = fagsak.stønadstype,
+                    ident = fagsak.ident,
+                    fom = fom,
+                    tom = tom,
+                )
+        val hentetInformasjon = ytelseForGrunnlag.hentetInformasjon.filter { it.status != StatusHentetInformasjon.OK }
+        if (hentetInformasjon.isNotEmpty()) {
+            error("Feilet henting av ytelser=${hentetInformasjon.map { it.type }}")
+        }
+        return ytelseForGrunnlag.perioder
+            .filter { it.aapErFerdigAvklart != true }
+            .filter { it.tom != null }
+            .map { Ytelsesperiode(fom = it.fom, tom = it.tom!!, målgruppe = it.type.tilMålgruppe()) }
+            .groupBy { it.målgruppe }
+            .mapValues {
+                it.value
+                    .sorted()
+                    .mergeSammenhengende(
+                        { y1, y2 -> y1.målgruppe == y2.målgruppe && y1.overlapperEllerPåfølgesAv(y2) },
+                        { y1, y2 -> y1.copy(fom = minOf(y1.fom, y2.fom), tom = maxOf(y1.tom, y2.tom)) },
+                    )
+            }
+    }
+
+    private fun TypeYtelsePeriode.tilMålgruppe() =
+        when (this) {
+            TypeYtelsePeriode.AAP -> MålgruppeType.AAP
+            TypeYtelsePeriode.ENSLIG_FORSØRGER -> MålgruppeType.OVERGANGSSTØNAD
+            TypeYtelsePeriode.OMSTILLINGSSTØNAD -> MålgruppeType.OMSTILLINGSSTØNAD
+        }
+
+    private data class Ytelsesperiode(
+        override val fom: LocalDate,
+        override val tom: LocalDate,
+        val målgruppe: MålgruppeType,
+    ) : Periode<LocalDate>
+
+    /**
+     * Foreløpig mappes stønadsperiode til vedtaksperiode for å sjekke om det er diff mot stønadsperiode
+     */
+    private data class Vedtaksperiode(
+        override val fom: LocalDate,
+        override val tom: LocalDate,
+        val målgruppe: MålgruppeType,
+        val aktivitet: AktivitetType,
+    ) : Periode<LocalDate>,
+        KopierPeriode<Vedtaksperiode> {
+        constructor(beregningsresultat: BeregningsresultatForMåned) : this(
+            fom = beregningsresultat.grunnlag.fom,
+            tom = beregningsresultat.grunnlag.tom,
+            målgruppe = TODO(), // beregningsresultat.grunnlag.målgruppe,
+            aktivitet = beregningsresultat.grunnlag.aktivitet,
+        )
+
+        constructor(vedtaksperiode: no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode) : this(
+            fom = vedtaksperiode.fom,
+            tom = vedtaksperiode.tom,
+            målgruppe = vedtaksperiode.målgruppe,
+            aktivitet = vedtaksperiode.aktivitet,
+        )
+
+        override fun medPeriode(
+            fom: LocalDate,
+            tom: LocalDate,
+        ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
+    }
+     */
 }
 
 private data class InngangsvilkårAktivitet(

@@ -40,24 +40,33 @@ fun List<OppfølgingMedDetaljer>.tilDto() =
             perioderTilKontroll =
                 it.data.perioderTilKontroll.flatMap { periode ->
                     val endringAktivitet =
-                        periode.endringAktivitet.takeIf { it.isNotEmpty() }?.let {
+                        periode.endringAktivitet?.takeIf { it.isNotEmpty() }?.let {
                             PeriodeForKontrollDto(
                                 fom = periode.fom,
                                 tom = periode.tom,
-                                type = periode.aktivitet,
+                                type = periode.aktivitet!!,
                                 endringer = it,
                             )
                         }
                     val endringMålgruppe =
-                        periode.endringMålgruppe.takeIf { it.isNotEmpty() }?.let {
+                        periode.endringMålgruppe?.takeIf { it.isNotEmpty() }?.let {
                             PeriodeForKontrollDto(
                                 fom = periode.fom,
                                 tom = periode.tom,
-                                type = periode.målgruppe,
+                                type = periode.målgruppe!!,
                                 endringer = it,
                             )
                         }
-                    listOfNotNull(endringAktivitet, endringMålgruppe)
+                    val endringerEllers =
+                        periode.endringer?.takeIf { it.isNotEmpty() }?.let {
+                            PeriodeForKontrollDto(
+                                fom = periode.fom,
+                                tom = periode.tom,
+                                type = periode.type!!,
+                                endringer = it,
+                            )
+                        }
+                    listOfNotNull(endringAktivitet, endringMålgruppe, endringerEllers)
                 },
             kontrollert = it.kontrollert,
             behandlingsdetaljer = it.behandlingsdetaljer,
