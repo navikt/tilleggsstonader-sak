@@ -15,11 +15,11 @@ import java.time.LocalDateTime
     beskrivelse = "Oppretter oppfølging for behandling",
 )
 class OppfølgingTask(
-    private val oppfølgingService: OppfølgingService,
+    private val oppfølgingOpprettKontrollerService: OppfølgingOpprettKontrollerService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
         val data = objectMapper.readValue<OppfølgingTaskData>(task.payload)
-        oppfølgingService.opprettOppfølging(data.behandlingId)
+        oppfølgingOpprettKontrollerService.opprettOppfølging(data.behandlingId)
     }
 
     companion object {

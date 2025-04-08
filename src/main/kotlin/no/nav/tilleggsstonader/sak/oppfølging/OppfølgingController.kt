@@ -25,6 +25,7 @@ import java.util.concurrent.Executors
 class OppfølgingController(
     private val tilgangService: TilgangService,
     private val oppfølgingService: OppfølgingService,
+    private val oppfølgingOpprettKontrollerService: OppfølgingOpprettKontrollerService,
     private val unleashService: UnleashService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -60,7 +61,7 @@ class OppfølgingController(
         Executors.newVirtualThreadPerTaskExecutor().submit {
             try {
                 MDC.put(MDCConstants.MDC_CALL_ID, callId)
-                oppfølgingService.opprettTaskerForOppfølging()
+                oppfølgingOpprettKontrollerService.opprettTaskerForOppfølging()
             } catch (e: Exception) {
                 logger.warn("Feilet start av oppfølgingjobb, se secure logs for flere detaljer")
                 secureLogger.error("Feilet start av oppfølgingjobb", e)

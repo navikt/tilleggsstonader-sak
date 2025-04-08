@@ -49,17 +49,19 @@ class YtelseService(
         tom: LocalDate,
     ): YtelsePerioderDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        return hentYtelseForGrunnlag(behandling.stønadstype, behandling.ident, fom, tom)
+        val typer = finnRelevanteYtelsesTyper(behandling.stønadstype)
+        return hentYtelser(behandling.ident, fom, tom, typer)
     }
 
-    fun hentYtelseForGrunnlag(
-        stønadstype: Stønadstype,
+    fun hentYtelser(
         ident: String,
         fom: LocalDate,
         tom: LocalDate,
+        typer: List<TypeYtelsePeriode>,
     ): YtelsePerioderDto {
-        val typer = finnRelevanteYtelsesTyper(stønadstype)
-
+        feilHvis(typer.isEmpty()) {
+            "Kan ikke hente ytelser uten å definiere typer"
+        }
         val ytelsePerioder =
             ytelseClient.hentYtelser(
                 YtelsePerioderRequest(
