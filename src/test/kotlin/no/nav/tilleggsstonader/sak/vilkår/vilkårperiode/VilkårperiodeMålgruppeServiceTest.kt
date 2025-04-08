@@ -408,10 +408,11 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
 
             assertThat(oppdatertPeriode)
                 .usingRecursiveComparison()
-                .ignoringFields("sporbar", "tom")
+                .ignoringFields("sporbar", "tom", "status")
                 .isEqualTo(målgruppeFørOppdatering)
 
             assertThat(oppdatertPeriode.tom).isEqualTo(nyTom)
+            assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
         }
 
         @Test
@@ -464,6 +465,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             }.hasMessageContaining("Det har kommet nye vilkår som må vurderes")
         }
 
+        @Test
         fun `kan ikke utvide målgruppe dersom den krysser aldersgrense`() {
             val originalMålgruppe =
                 målgruppe(
