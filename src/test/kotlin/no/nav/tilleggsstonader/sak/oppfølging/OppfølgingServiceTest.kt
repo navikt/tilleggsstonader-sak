@@ -57,8 +57,8 @@ class OppfølgingServiceTest {
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     val vedtakRepository = mockk<VedtakRepository>()
 
-    val oppfølgingService =
-        OppfølgingService(
+    val oppfølgingOpprettKontrollerService =
+        OppfølgingOpprettKontrollerService(
             behandlingRepository = behandlingRepository,
             vedtakRepository = vedtakRepository,
             vilkårperiodeRepository = vilkårperiodeRepository,
@@ -341,26 +341,26 @@ class OppfølgingServiceTest {
 
         @Test
         fun `skal lagre ny hvis det finnes en fra før men som ikke er kontrollert`() {
-            val førsteOppfølging = oppfølgingService.opprettOppfølging(behandling.id)
+            val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
             assertThat(førsteOppfølging).isNotNull
 
-            assertThat(oppfølgingService.opprettOppfølging(behandling.id)).isNotNull
+            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNotNull
         }
 
         @Test
         fun `skal lagre på nytt hvis dataen endret seg`() {
-            val førsteOppfølging = oppfølgingService.opprettOppfølging(behandling.id)
+            val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
             assertThat(førsteOppfølging).isNotNull
             val oppfølgingMedFjernedePerioder =
                 førsteOppfølging!!.copy(data = førsteOppfølging.data.copy(perioderTilKontroll = emptyList()))
             oppfølgingRepository.update(oppfølgingMedFjernedePerioder)
 
-            assertThat(oppfølgingService.opprettOppfølging(behandling.id)).isNotNull
+            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNotNull
         }
 
         @Test
         fun `skal lagre på nytt hvis forrige ble håndtert og dataen endret seg`() {
-            val førsteOppfølging = oppfølgingService.opprettOppfølging(behandling.id)
+            val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
             assertThat(førsteOppfølging).isNotNull
             val oppfølgingMedFjernedePerioder =
                 førsteOppfølging!!.copy(
@@ -369,12 +369,12 @@ class OppfølgingServiceTest {
                 )
             oppfølgingRepository.update(oppfølgingMedFjernedePerioder)
 
-            assertThat(oppfølgingService.opprettOppfølging(behandling.id)).isNotNull()
+            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNotNull()
         }
 
         @Test
         fun `skal lagre på nytt hvis forrige skal ignoreres og dataen endret seg`() {
-            val førsteOppfølging = oppfølgingService.opprettOppfølging(behandling.id)
+            val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
             assertThat(førsteOppfølging).isNotNull
             val oppfølgingMedFjernedePerioder =
                 førsteOppfølging!!.copy(
@@ -383,17 +383,17 @@ class OppfølgingServiceTest {
                 )
             oppfølgingRepository.update(oppfølgingMedFjernedePerioder)
 
-            assertThat(oppfølgingService.opprettOppfølging(behandling.id)).isNotNull()
+            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNotNull()
         }
 
         @Test
         fun `skal ikke lagre på nytt hvis forrige skal ignoreres og dataen ikke endret seg`() {
-            val førsteOppfølging = oppfølgingService.opprettOppfølging(behandling.id)
+            val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
             assertThat(førsteOppfølging).isNotNull
             val oppfølgingMedFjernedePerioder = førsteOppfølging!!.copy(kontrollert = ignoreres)
             oppfølgingRepository.update(oppfølgingMedFjernedePerioder)
 
-            assertThat(oppfølgingService.opprettOppfølging(behandling.id)).isNull()
+            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNull()
         }
     }
 
@@ -502,7 +502,7 @@ class OppfølgingServiceTest {
                 )
 
             assertThatThrownBy {
-                oppfølgingService.kontroller(
+                oppfølgingOpprettKontrollerService.kontroller(
                     KontrollerOppfølgingRequest(
                         oppfølging.id,
                         oppfølging.version,
@@ -514,7 +514,7 @@ class OppfølgingServiceTest {
         }
     }
 
-    private fun opprettOppfølging(): Oppfølging? = oppfølgingService.opprettOppfølging(behandling.id)
+    private fun opprettOppfølging(): Oppfølging? = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
 
     private fun Oppfølging?.assertIngenEndringForMålgrupper() = assertThat(endringMålgruppe()).isEmpty()
 
