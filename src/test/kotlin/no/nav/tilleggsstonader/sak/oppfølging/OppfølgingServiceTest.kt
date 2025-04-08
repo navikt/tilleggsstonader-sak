@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.oppfølging
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -23,10 +24,8 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForMåned
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -35,7 +34,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeT
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -74,20 +72,27 @@ class OppfølgingServiceTest {
     val vedtaksperiode =
         Vedtaksperiode(
             id = UUID.randomUUID(),
-            fom = LocalDate.of(2025, 1, 1),
-            tom = LocalDate.of(2025, 1, 31),
+            fom = YearMonth.now().minusMonths(1).atDay(1),
+            tom = YearMonth.now().plusMonths(2).atDay(1),
             målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
             aktivitet = AktivitetType.TILTAK,
         )
 
     val målgruppe = målgruppe(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom)
+    val målgruppeNedsattArbeidsevne =
+        målgruppe(
+            fom = vedtaksperiode.fom,
+            tom = vedtaksperiode.tom,
+            faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.NEDSATT_ARBEIDSEVNE),
+            begrunnelse = "Begrunnelse",
+        )
     val aktivitet = aktivitet(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom)
 
     @BeforeEach
     fun setUp() {
         oppfølgingRepository.deleteAll()
         every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
-                listOf(målgruppe, aktivitet)
+            listOf(målgruppe, aktivitet)
         every { behandlingRepository.findByIdOrThrow(behandling.id) } returns behandling
         every { fagsakService.hentMetadata(any()) } answers {
             val fagsakIds = firstArg<List<FagsakId>>()
@@ -96,16 +101,15 @@ class OppfølgingServiceTest {
 
         mockVedtakTilsynBarn(vedtaksperiode)
         mockHentYtelser()
-        every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-            emptyList()
+        mockHentAktiviteter()
+        mockHentAktiviteter()
     }
 
     @Nested
     inner class EndringIMålgruppe {
         @BeforeEach
         fun setUp() {
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom))
+            mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom))
         }
 
         @Test
@@ -127,7 +131,11 @@ class OppfølgingServiceTest {
 
         @Test
         fun `skal ikke finne treff hvis endring ikke påvirker vedtaksperiode`() {
-            TODO("Not yet implemented")
+            mockVedtakTilsynBarn(vedtaksperiode.copy(fom = LocalDate.now(), tom = LocalDate.now()))
+            mockHentYtelser(periodeAAP(fom = vedtaksperiode.fom, tom = LocalDate.now()))
+            mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = LocalDate.now()))
+
+            assertThat(opprettOppfølging()).isNull()
         }
 
         @Test
@@ -185,7 +193,8 @@ class OppfølgingServiceTest {
 
         @Test
         fun `skal ikke finne treff hvis det gjelder målgruppe som vi ikke henter fra annet system`() {
-            mockVedtakTilsynBarn(vedtaksperiode.copy(målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE))
+            every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
+                listOf(målgruppeNedsattArbeidsevne, aktivitet)
 
             assertThat(opprettOppfølging()).isNull()
         }
@@ -194,10 +203,8 @@ class OppfølgingServiceTest {
         fun `skal ikke finne treff hvis det gjelder gjelder endring i AAP som gjelder fra og med siste dagen i neste måneden`() {
             val tom = YearMonth.now().plusMonths(2).atDay(1)
             mockVedtakTilsynBarn(vedtaksperiode.copy(tom = tom))
-            val ytelse = periodeAAP(fom = vedtaksperiode.fom, tom = tom.minusDays(1))
-            mockHentYtelser(ytelse)
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = tom))
+            mockHentYtelser(periodeAAP(fom = vedtaksperiode.fom, tom = tom.minusDays(1)))
+            mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = tom))
 
             assertThat(opprettOppfølging()).isNull()
         }
@@ -206,10 +213,8 @@ class OppfølgingServiceTest {
         fun `skal finne treff hvis det gjelder gjelder endring i AAP som gjelder neste måned`() {
             val tom = YearMonth.now().plusMonths(1).atEndOfMonth()
             mockVedtakTilsynBarn(vedtaksperiode.copy(tom = tom))
-            val ytelse = periodeAAP(fom = vedtaksperiode.fom, tom = tom.minusDays(1))
-            mockHentYtelser(ytelse)
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = tom))
+            mockHentYtelser(periodeAAP(fom = vedtaksperiode.fom, tom = tom.minusDays(1)))
+            mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = tom))
 
             with(opprettOppfølging()) {
                 assertThat(this).isNotNull
@@ -229,8 +234,7 @@ class OppfølgingServiceTest {
 
         @Test
         fun `skal ikke finne treff hvis aktiviteten blitt forlenget`() {
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom.plusMonths(1)))
+            mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom.plusMonths(1)))
 
             assertThat(opprettOppfølging()).isNull()
         }
@@ -238,8 +242,7 @@ class OppfølgingServiceTest {
         @Test
         fun `skal finne treff hvis aktiviteten slutter tidligere`() {
             val tom = vedtaksperiode.tom.minusDays(5)
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = tom))
+            mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = tom))
 
             with(opprettOppfølging()) {
                 assertThat(this).isNotNull
@@ -251,8 +254,7 @@ class OppfølgingServiceTest {
         @Test
         fun `skal finne treff hvis aktiviteten begynner senere`() {
             val fom = vedtaksperiode.fom.plusDays(3)
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(aktivitetArenaDto(fom = fom, tom = vedtaksperiode.tom))
+            mockHentAktiviteter(aktivitetArenaDto(fom = fom, tom = vedtaksperiode.tom))
 
             with(opprettOppfølging()) {
                 assertThat(this).isNotNull
@@ -265,8 +267,7 @@ class OppfølgingServiceTest {
         fun `skal finne treff hvis aktiviteten begynner senere og slutter tidligere`() {
             val aktivitet =
                 aktivitetArenaDto(fom = vedtaksperiode.fom.plusDays(3), tom = vedtaksperiode.tom.minusDays(3))
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(aktivitet)
+            mockHentAktiviteter(aktivitet)
 
             with(opprettOppfølging()) {
                 assertThat(this).isNotNull
@@ -280,10 +281,7 @@ class OppfølgingServiceTest {
 
         @Test
         fun `skal finne treff hvis man har en aktivitet men er av feil type`() {
-            val aktivitet =
-                aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom, erUtdanning = true)
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(aktivitet)
+            mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom, erUtdanning = true))
 
             with(opprettOppfølging()) {
                 assertThat(this).isNotNull
@@ -298,19 +296,16 @@ class OppfølgingServiceTest {
         @Test
         fun `skal ikke finne treff hvis det gjelder aktivitet som vi ikke henter fra annet system`() {
             mockVedtakTilsynBarn(vedtaksperiode.copy(aktivitet = AktivitetType.REELL_ARBEIDSSØKER))
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                emptyList()
 
             assertThat(opprettOppfølging()).isNull()
         }
 
         @Test
         fun `gir ingen treff hvis man har 2 aktiviteter som løper innenfor en periode der begge delvis matcher`() {
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(
-                    aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.fom.plusDays(1)),
-                    aktivitetArenaDto(fom = vedtaksperiode.tom.minusDays(1), tom = vedtaksperiode.tom.minusDays(1)),
-                )
+            mockHentAktiviteter(
+                aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.fom.plusDays(1)),
+                aktivitetArenaDto(fom = vedtaksperiode.tom.minusDays(1), tom = vedtaksperiode.tom.minusDays(1)),
+            )
 
             every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
                 listOf(aktivitet(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom))
@@ -326,12 +321,11 @@ class OppfølgingServiceTest {
 
     @Test
     fun `endring i både målgruppe og aktivitet`() {
-        val ytelse = periodeAAP(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom.minusDays(1))
+        val ytelse = periodeAAP(fom = vedtaksperiode.fom, tom = vedtaksperiode.fom)
         mockHentYtelser(ytelse)
 
         val aktivitet = aktivitetArenaDto(fom = vedtaksperiode.fom.plusDays(1), tom = vedtaksperiode.tom)
-        every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-            listOf(aktivitet)
+        mockHentAktiviteter(aktivitet)
 
         with(opprettOppfølging()) {
             assertThat(this).isNotNull
@@ -413,11 +407,10 @@ class OppfølgingServiceTest {
 
         @Test
         fun `fom har endret seg i vilkårsperiode sin aktivitet har endret seg, finnes en annen aktivitet som dekker hele perioden`() {
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(
-                    aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom.minusDays(1), id = "1"),
-                    aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom),
-                )
+            mockHentAktiviteter(
+                aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom.minusDays(1), id = "1"),
+                aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom),
+            )
 
             every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
                 listOf(aktivitet(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom, kildeId = "1"))
@@ -432,11 +425,10 @@ class OppfølgingServiceTest {
 
         @Test
         fun `tom har endret seg i vilkårsperiode sin aktivitet har endret seg, finnes en annen aktivitet som dekker hele perioden`() {
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(
-                    aktivitetArenaDto(fom = vedtaksperiode.fom.plusDays(1), tom = vedtaksperiode.tom, id = "1"),
-                    aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom),
-                )
+            mockHentAktiviteter(
+                aktivitetArenaDto(fom = vedtaksperiode.fom.plusDays(1), tom = vedtaksperiode.tom, id = "1"),
+                aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom),
+            )
 
             every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
                 listOf(aktivitet(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom, kildeId = "1"))
@@ -451,11 +443,10 @@ class OppfølgingServiceTest {
 
         @Test
         fun `skal ikke gi doble treff av samme dato hvis det finnes annen aktivitet i registeret som dekker perioden`() {
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(
-                    aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom.minusDays(1), id = "1"),
-                    aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom.minusDays(1)),
-                )
+            mockHentAktiviteter(
+                aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom.minusDays(1), id = "1"),
+                aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom.minusDays(1)),
+            )
 
             every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
                 listOf(aktivitet(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom, kildeId = "1"))
@@ -471,11 +462,10 @@ class OppfølgingServiceTest {
         @Test
         fun `skal ikke gi treff hvis endring i registeraktivitet ikke påvirker overlappsperiode`() {
             val vilkårTom = vedtaksperiode.tom.plusMonths(4)
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(
-                    aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vilkårTom.minusMonths(1), id = "1"),
-                    aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom.minusDays(1)),
-                )
+            mockHentAktiviteter(
+                aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vilkårTom.minusMonths(1), id = "1"),
+                aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom.minusDays(1)),
+            )
             every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
                 listOf(aktivitet(fom = vedtaksperiode.fom, tom = vilkårTom, kildeId = "1"))
 
@@ -485,10 +475,7 @@ class OppfølgingServiceTest {
         @Test
         fun `finner ikke registeraktivitet`() {
             val vilkårTom = vedtaksperiode.tom.plusMonths(4)
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(
-                    aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom),
-                )
+            mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom))
             every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
                 listOf(aktivitet(fom = vedtaksperiode.fom, tom = vilkårTom, kildeId = "1"))
 
@@ -497,35 +484,6 @@ class OppfølgingServiceTest {
                 val kontroll = Kontroll(ÅrsakKontroll.FINNER_IKKE_REGISTERAKTIVITET)
                 assertThat(this.endringAktivitet()).containsExactly(kontroll)
                 assertIngenEndringForMålgrupper()
-            }
-        }
-    }
-
-    @Disabled // TODO fikse
-    @Nested
-    inner class EndringForLæremidlerSomBrukerBeregningsresultat {
-        @BeforeEach
-        fun setUp() {
-            every { fagsakService.hentMetadata(any()) } answers {
-                val fagsakIds = firstArg<List<FagsakId>>()
-                fagsakIds.associateWith { FagsakMetadata(it, 1, Stønadstype.LÆREMIDLER, "1") }
-            }
-            every { registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any()) } returns
-                listOf(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom))
-        }
-
-        @Test
-        fun `skal finne treff hvis ytelsen slutter tidligere`() {
-            val ytelse = periodeAAP(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom.minusDays(5))
-            mockHentYtelser(ytelse)
-
-            mockVedtakLæremidler(vedtaksperiode)
-
-            with(opprettOppfølging()) {
-                assertThat(this).isNotNull
-                assertThat(this.endringMålgruppe())
-                    .containsExactly(Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = ytelse.tom))
-                this.assertIngenEndringForAktiviteter()
             }
         }
     }
@@ -580,26 +538,15 @@ class OppfølgingServiceTest {
             )
     }
 
-    private fun mockVedtakLæremidler(vararg perioder: Vedtaksperiode) {
-        every { vedtakRepository.findByIdOrThrow(behandling.id) } returns
-            LæremidlerTestUtil.innvilgelse(
-                beregningsresultat =
-                    BeregningsresultatLæremidler(
-                        perioder.map {
-                            beregningsresultatForMåned(
-                                fom = it.fom,
-                                tom = it.tom,
-                                målgruppe = it.målgruppe,
-                                aktivitet = it.aktivitet,
-                            )
-                        },
-                    ),
-            )
-    }
-
     private fun mockHentYtelser(vararg perioder: YtelsePeriode) {
         every {
             ytelseService.hentYtelser(any(), any(), any(), any())
         } returns ytelsePerioderDto(perioder = perioder.toList())
+    }
+
+    private fun mockHentAktiviteter(vararg perioder: AktivitetArenaDto) {
+        every {
+            registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any())
+        } returns perioder.toList()
     }
 }

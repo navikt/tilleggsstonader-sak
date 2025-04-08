@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -77,7 +76,6 @@ object VilkårperiodeTestUtil {
         slettetKommentar: String? = null,
         forrigeVilkårperiodeId: UUID? = null,
         status: Vilkårstatus = Vilkårstatus.NY,
-        stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     ): GeneriskVilkårperiode<MålgruppeFaktaOgVurdering> =
         GeneriskVilkårperiode(
             behandlingId = behandlingId,
