@@ -209,7 +209,6 @@ class OppfølgingService(
         registerAktiviteter: RegisterAktiviteter,
         inngangsvilkår: Vilkårperioder,
     ): PeriodeForKontroll {
-        // TODO ta med målgruppe
         val endringerAktivitet = finnEndringIAktivitet(registerAktiviteter, inngangsvilkår.aktiviteter)
         return PeriodeForKontroll(
             fom = this.fom,
@@ -378,8 +377,7 @@ class OppfølgingService(
         registerAktiviteter: RegisterAktiviteter,
     ): Vilkårperioder {
         val vilkårperioder =
-            vilkårperiodeRepository
-                .findByBehandlingIdAndResultat(behandling.id, ResultatVilkårperiode.OPPFYLT)
+            vilkårperiodeRepository.findByBehandlingIdAndResultat(behandling.id, ResultatVilkårperiode.OPPFYLT)
 
         val aktiviteter =
             vilkårperioder
