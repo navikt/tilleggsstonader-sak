@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
@@ -398,21 +399,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
 
             val nyTom = now().plusMonths(2)
 
-            val oppdatertPeriode =
-                vilkårperiodeService.oppdaterVilkårperiode(
-                    målgruppeFørOppdatering.id,
-                    målgruppeFørOppdatering
-                        .tilOppdatering()
-                        .copy(tom = nyTom),
-                )
-
-            assertThat(oppdatertPeriode)
-                .usingRecursiveComparison()
-                .ignoringFields("sporbar", "tom", "status")
-                .isEqualTo(målgruppeFørOppdatering)
-
-            assertThat(oppdatertPeriode.tom).isEqualTo(nyTom)
-            assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
+            validerHarEndretTom(målgruppeFørOppdatering, nyTom)
         }
 
         @Test
@@ -433,6 +420,48 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                         .copy(tom = målgruppeFørOppdatering.tom.plusMonths(1)),
                 )
             }.hasMessageContaining("Kan ikke endre vilkårperiode som er ferdig før revurderingsdato.")
+        }
+
+        @Test
+        fun `kan endre tom på målgruppe til et senere dato dersom eksisterende tom er dagen før før revurderFra`() {
+            val revurderFra = now()
+            val originalMålgruppe =
+                målgruppe(
+                    fom = revurderFra.minusMonths(2),
+                    tom = revurderFra.minusDays(1),
+                )
+            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe, revurderFra = revurderFra)
+            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
+
+            vilkårperiodeService.oppdaterVilkårperiode(
+                målgruppeFørOppdatering.id,
+                målgruppeFørOppdatering
+                    .tilOppdatering()
+                    .copy(tom = revurderFra),
+            )
+
+            validerHarEndretTom(målgruppeFørOppdatering, målgruppeFørOppdatering.tom.plusMonths(1))
+        }
+
+        @Test
+        fun `kan ikke endre tom på målgruppe til et tidligere dato dersom eksisterende tom er dagen før før revurderFra`() {
+            val revurderFra = now()
+            val originalMålgruppe =
+                målgruppe(
+                    fom = revurderFra.minusMonths(2),
+                    tom = revurderFra.minusDays(1),
+                )
+            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe, revurderFra = revurderFra)
+            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
+
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(
+                    målgruppeFørOppdatering.id,
+                    målgruppeFørOppdatering
+                        .tilOppdatering()
+                        .copy(tom = revurderFra.minusDays(2)),
+                )
+            }.hasMessageContaining("Kan ikke sette tom tidligere enn dagen før revurder-fra")
         }
 
         @Test
@@ -494,6 +523,27 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                 )
             }.hasMessageContaining("Det har kommet nye vilkår som må vurderes")
         }
+    }
+
+    private fun validerHarEndretTom(
+        målgruppeFørOppdatering: Vilkårperiode,
+        nyTom: LocalDate,
+    ) {
+        val oppdatertPeriode =
+            vilkårperiodeService.oppdaterVilkårperiode(
+                målgruppeFørOppdatering.id,
+                målgruppeFørOppdatering
+                    .tilOppdatering()
+                    .copy(tom = nyTom),
+            )
+
+        assertThat(oppdatertPeriode)
+            .usingRecursiveComparison()
+            .ignoringFields("sporbar", "tom", "status")
+            .isEqualTo(målgruppeFørOppdatering)
+
+        assertThat(oppdatertPeriode.tom).isEqualTo(nyTom)
+        assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
     }
 
     private fun lagRevurderingMedKopiertMålgruppe(

@@ -85,7 +85,7 @@ object VilkårperiodeRevurderFraValidering {
         eksisterendePeriode: Vilkårperiode,
         revurderFra: LocalDate,
     ) {
-        feilHvis(eksisterendePeriode.tom < revurderFra) {
+        feilHvis(eksisterendePeriode.tom < revurderFra.minusDays(1)) {
             "Kan ikke endre vilkårperiode som er ferdig før revurderingsdato. Kontakt utviklingsteamet."
         }
     }
