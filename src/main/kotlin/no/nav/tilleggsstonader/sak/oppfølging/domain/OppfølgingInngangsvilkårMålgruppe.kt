@@ -11,12 +11,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeU
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import java.time.LocalDate
 
-data class OppfølgingMålgruppe(
+data class OppfølgingInngangsvilkårMålgruppe(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppe: MålgruppeType,
 ) : Periode<LocalDate>,
-    Mergeable<LocalDate, OppfølgingMålgruppe> {
+    Mergeable<LocalDate, OppfølgingInngangsvilkårMålgruppe> {
     constructor(vilkårperiode: VilkårperiodeMålgruppe) :
         this(
             fom = vilkårperiode.fom,
@@ -24,7 +24,7 @@ data class OppfølgingMålgruppe(
             målgruppe = vilkårperiode.faktaOgVurdering.type.vilkårperiodeType,
         )
 
-    override fun merge(other: OppfølgingMålgruppe): OppfølgingMålgruppe =
+    override fun merge(other: OppfølgingInngangsvilkårMålgruppe): OppfølgingInngangsvilkårMålgruppe =
         this.copy(fom = minOf(fom, other.fom), tom = maxOf(tom, other.tom))
 
     fun skalKontrolleres() =
@@ -43,10 +43,10 @@ data class OppfølgingMålgruppe(
         }
 
     companion object {
-        fun fraVilkårperioder(vilkårperioder: List<Vilkårperiode>): List<OppfølgingMålgruppe> =
+        fun fraVilkårperioder(vilkårperioder: List<Vilkårperiode>): List<OppfølgingInngangsvilkårMålgruppe> =
             vilkårperioder
                 .ofType<MålgruppeFaktaOgVurdering>()
-                .map { OppfølgingMålgruppe(it) }
+                .map { OppfølgingInngangsvilkårMålgruppe(it) }
                 .filter { it.skalKontrolleres() }
                 .groupBy { it.målgruppe }
                 .mapValues {

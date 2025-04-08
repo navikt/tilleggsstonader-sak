@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.util.UUID
 
-data class OppfølgingAktivitet(
+data class OppfølgingInngangsvilkårAktivitet(
     val id: UUID,
     override val fom: LocalDate,
     override val tom: LocalDate,
@@ -81,15 +81,15 @@ data class OppfølgingAktivitet(
     )
 
     companion object {
-        private val logger = LoggerFactory.getLogger(OppfølgingAktivitet::class.java)
+        private val logger = LoggerFactory.getLogger(OppfølgingInngangsvilkårAktivitet::class.java)
 
         fun fraVilkårperioder(
             vilkårperioder: List<Vilkårperiode>,
             registerAktiviteter: OppfølgingRegisterAktiviteter,
-        ): List<OppfølgingAktivitet> =
+        ): List<OppfølgingInngangsvilkårAktivitet> =
             vilkårperioder
                 .ofType<AktivitetFaktaOgVurdering>()
-                .map { vilkår -> OppfølgingAktivitet(vilkår, registerAktiviteter.forId(vilkår.kildeId)) }
+                .map { vilkår -> OppfølgingInngangsvilkårAktivitet(vilkår, registerAktiviteter.forId(vilkår.kildeId)) }
                 .sorted()
     }
 }

@@ -1,12 +1,12 @@
 package no.nav.tilleggsstonader.sak.oppfølging.domain
 
-import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingAktivitet.Companion.fraVilkårperioder
-import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingMålgruppe.Companion.fraVilkårperioder
+import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårAktivitet.Companion.fraVilkårperioder
+import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårMålgruppe.Companion.fraVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 
 data class OppfølgingVilkårperioder(
-    val aktiviteter: List<OppfølgingAktivitet>,
-    val målgrupper: List<OppfølgingMålgruppe>,
+    val aktiviteter: List<OppfølgingInngangsvilkårAktivitet>,
+    val målgrupper: List<OppfølgingInngangsvilkårMålgruppe>,
 ) {
     companion object {
         fun fraVilkårperider(
