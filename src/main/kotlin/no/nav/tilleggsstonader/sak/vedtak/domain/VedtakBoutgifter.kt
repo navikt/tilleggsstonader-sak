@@ -8,7 +8,7 @@ enum class TypeVedtakBoutgifter(
     override val typeVedtak: TypeVedtak,
 ) : TypeVedtaksdata {
     INNVILGELSE_BOUTGIFTER(TypeVedtak.INNVILGELSE),
-//    AVSLAG_BOUTGIFTER(TypeVedtak.AVSLAG),
+    AVSLAG_BOUTGIFTER(TypeVedtak.AVSLAG),
 //    OPPHØR_BOUTGIFTER(TypeVedtak.OPPHØR),
 }
 
@@ -45,17 +45,17 @@ data class InnvilgelseBoutgifter(
     override val type: TypeVedtaksdata = TypeVedtakBoutgifter.INNVILGELSE_BOUTGIFTER
 }
 
-// data class AvslagBoutgifter(
-//    override val årsaker: List<ÅrsakAvslag>,
-//    override val begrunnelse: String,
-// ) : VedtakBoutgifter,
-//    Avslag {
-//    override val type: TypeVedtaksdata = TypeVedtakBoutgifter.AVSLAG_BOUTGIFTER
-//
-//    init {
-//        this.validerÅrsakerOgBegrunnelse()
-//    }
-// }
+data class AvslagBoutgifter(
+    override val årsaker: List<ÅrsakAvslag>,
+    override val begrunnelse: String,
+) : VedtakBoutgifter,
+    Avslag {
+    override val type: TypeVedtaksdata = TypeVedtakBoutgifter.AVSLAG_BOUTGIFTER
+
+    init {
+        this.validerÅrsakerOgBegrunnelse()
+    }
+}
 
 // data class OpphørBoutgifter(
 //    override val vedtaksperioder: List<Vedtaksperiode>,
