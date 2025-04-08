@@ -142,8 +142,7 @@ class VilkårperiodeService(
         return oppdaterVilkårperiodeIRevurdering(vilkårperiode, eksisterendeVilkårperiode, behandling, grunnlagsdata)
     }
 
-    @Transactional
-    fun oppdaterVilkårperiodeIRevurdering(
+    private fun oppdaterVilkårperiodeIRevurdering(
         vilkårperiode: LagreVilkårperiode,
         eksisterendeVilkårperiode: Vilkårperiode,
         behandling: Saksbehandling,
@@ -173,8 +172,7 @@ class VilkårperiodeService(
      * Håndterer alle perioder som enten er helt før eller krysser revurder fra datoen, dvs. perioder hvor kun tom kan endres.
      * Dersom perioden inneholder vurderinger med svar GAMMEL_MANGLER_DATA får man kun lov å korte ned tom.
      */
-    @Transactional
-    fun oppdaterVilkårperiodeFørRevurderFra(
+    private fun oppdaterVilkårperiodeFørRevurderFra(
         vilkårperiode: LagreVilkårperiode,
         eksisterendeVilkårperiode: Vilkårperiode,
         revurderFra: LocalDate,
@@ -193,7 +191,7 @@ class VilkårperiodeService(
         validerAtKunTomErEndret(eksisterendeVilkårperiode, vilkårperiode, revurderFra)
         validerAtAldersvilkårErGyldig(eksisterendeVilkårperiode, vilkårperiode, grunnlagsdata)
 
-        return vilkårperiodeRepository.update(eksisterendeVilkårperiode.copy(tom = vilkårperiode.tom))
+        return vilkårperiodeRepository.update(eksisterendeVilkårperiode.medNyTom(tom = vilkårperiode.tom))
     }
 
     @Transactional
