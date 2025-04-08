@@ -204,9 +204,9 @@ class InterntVedtakServiceTest {
                 assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
                 with(faktaOgVurderinger as AktivitetLæremidlerFaktaOgVurderingerDto) {
                     assertThat(harUtgifter!!.svar).isEqualTo(SvarJaNei.JA)
-                    assertThat(harUtgifter!!.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+                    assertThat(harUtgifter.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
                     assertThat(harRettTilUtstyrsstipend!!.svar).isEqualTo(SvarJaNei.NEI)
-                    assertThat(harRettTilUtstyrsstipend!!.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+                    assertThat(harRettTilUtstyrsstipend.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
                     assertThat(prosent).isEqualTo(80)
                     assertThat(studienivå).isEqualTo(Studienivå.HØYERE_UTDANNING)
                 }
@@ -216,9 +216,9 @@ class InterntVedtakServiceTest {
                 assertThat(type).isEqualTo(AktivitetType.UTDANNING)
                 with(faktaOgVurderinger as AktivitetLæremidlerFaktaOgVurderingerDto) {
                     assertThat(harRettTilUtstyrsstipend!!.svar).isEqualTo(SvarJaNei.JA)
-                    assertThat(harRettTilUtstyrsstipend!!.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
+                    assertThat(harRettTilUtstyrsstipend.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
                     assertThat(harUtgifter!!.svar).isEqualTo(SvarJaNei.JA)
-                    assertThat(harUtgifter!!.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+                    assertThat(harUtgifter.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
                     assertThat(prosent).isEqualTo(80)
                     assertThat(studienivå).isEqualTo(Studienivå.VIDEREGÅENDE)
                 }
@@ -386,7 +386,6 @@ class InterntVedtakServiceTest {
             with(interntVedtak.beregningsresultat.boutgifter.first()) {
                 assertThat(fom).isEqualTo(forventet.fom)
                 assertThat(tom).isEqualTo(forventet.tom)
-                assertThat(antallMåneder).isEqualTo(1)
                 assertThat(utbetalingsdato).isEqualTo(forventet.grunnlag.utbetalingsdato)
                 assertThat(målgruppe).isEqualTo(forventet.grunnlag.målgruppe)
                 assertThat(aktivitet).isEqualTo(forventet.grunnlag.aktivitet)

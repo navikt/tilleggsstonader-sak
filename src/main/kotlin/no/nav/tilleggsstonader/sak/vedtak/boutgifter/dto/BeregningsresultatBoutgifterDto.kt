@@ -16,8 +16,10 @@ data class BeregningsresultatForPeriodeDto(
     override val tom: LocalDate,
     val stønadsbeløp: Int,
     val utbetalingsdato: LocalDate,
+    val sumUtgifter: Int,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
+    val makssatsBekreftet: Boolean,
     val delAvTidligereUtbetaling: Boolean,
 ) : Periode<LocalDate>
 
@@ -35,7 +37,9 @@ fun BeregningsresultatForLøpendeMåned.tilDto(): BeregningsresultatForPeriodeDt
         tom = grunnlag.tom,
         stønadsbeløp = stønadsbeløp,
         utbetalingsdato = grunnlag.utbetalingsdato,
+        sumUtgifter = summerUtgifter(),
         målgruppe = grunnlag.målgruppe,
         aktivitet = grunnlag.aktivitet,
+        makssatsBekreftet = grunnlag.makssatsBekreftet,
         delAvTidligereUtbetaling = delAvTidligereUtbetaling,
     )

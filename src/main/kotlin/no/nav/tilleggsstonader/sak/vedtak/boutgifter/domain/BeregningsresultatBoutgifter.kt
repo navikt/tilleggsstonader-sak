@@ -34,27 +34,26 @@ data class BeregningsresultatForLøpendeMåned(
     @get:JsonIgnore
     override val tom: LocalDate get() = grunnlag.tom
 
-    @get:JsonProperty("stønadsbeløp")
-    val stønadsbeløp get() = beregnBeløp()
+    @JsonProperty("stønadsbeløp")
+    val stønadsbeløp = summerUtgifter().begrensTilMakssats()
 
     override fun medPeriode(
         fom: LocalDate,
         tom: LocalDate,
     ): BeregningsresultatForLøpendeMåned = this.copy(grunnlag = this.grunnlag.copy(fom = fom, tom = tom))
 
-    fun medKorrigertUtbetalingsdato(utbetalingsdato: LocalDate): BeregningsresultatForLøpendeMåned =
-        this.copy(grunnlag = grunnlag.copy(utbetalingsdato = utbetalingsdato))
+//    fun medKorrigertUtbetalingsdato(utbetalingsdato: LocalDate): BeregningsresultatForLøpendeMåned =
+//        this.copy(grunnlag = grunnlag.copy(utbetalingsdato = utbetalingsdato))
+//
+//    fun markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling: Boolean) =
+//        this.copy(delAvTidligereUtbetaling = delAvTidligereUtbetaling)
 
-    fun markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling: Boolean) =
-        this.copy(delAvTidligereUtbetaling = delAvTidligereUtbetaling)
+    fun summerUtgifter(): Int =
+        grunnlag.utgifter.values
+            .flatten()
+            .sumOf { it.utgift }
 
-    private fun beregnBeløp(): Int {
-        val summerteUtgifter =
-            grunnlag.utgifter.values
-                .flatten()
-                .sumOf { it.utgift }
-        return min(summerteUtgifter, grunnlag.makssats)
-    }
+    private fun Int.begrensTilMakssats() = min(this, grunnlag.makssats)
 }
 
 data class Beregningsgrunnlag(
