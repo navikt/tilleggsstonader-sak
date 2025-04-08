@@ -530,6 +530,17 @@ object Testdata {
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
             )
+        val avslåttVedtak =
+            GeneriskVedtak(
+                behandlingId = behandlingId,
+                type = TypeVedtak.AVSLAG,
+                data =
+                    AvslagLæremidler(
+                        årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND),
+                        begrunnelse = "Begrunelse for avslag",
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+            )
 
         private val aktivitetererBoutgifter =
             listOf(
