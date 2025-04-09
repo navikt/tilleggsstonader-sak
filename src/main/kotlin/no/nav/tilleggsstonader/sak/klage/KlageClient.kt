@@ -34,7 +34,7 @@ class KlageClient(
         val uri =
             UriComponentsBuilder
                 .fromUri(klageUri)
-                .path("api/ekstern/behandling/{fagsystem}/v2")
+                .path("api/ekstern/behandling/{fagsystem}")
                 .queryParam("eksternFagsakId", "{eksternFagsakId}")
                 .encode()
                 .toUriString()
@@ -53,7 +53,7 @@ class KlageClient(
         val uri =
             UriComponentsBuilder
                 .fromUri(klageUri)
-                .path("api/ekstern/behandling/finn-oppgaver/v2")
+                .path("api/ekstern/behandling/finn-oppgaver")
                 .build()
                 .toUriString()
         val request = OppgaverBehandlingerRequest(oppgaveIder)
