@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.klage
 
-import no.nav.familie.prosessering.rest.Ressurs
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.klage.FagsystemVedtak
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -54,24 +53,9 @@ class KlageController(
     /**
      * Kalles på av klage-backend for å populere listen over vedtak som det kan klages på
      */
-    @GetMapping("/ekstern-fagsak/{eksternFagsakId}/vedtak")
+    @GetMapping(path = ["/ekstern-fagsak/{eksternFagsakId}/vedtak/v2", "/ekstern-fagsak/{eksternFagsakId}/vedtak"])
     @ProtectedWithClaims(issuer = "azuread")
     fun hentVedtak(
-        @PathVariable eksternFagsakId: Long,
-    ): Ressurs<List<FagsystemVedtak>> {
-        if (!SikkerhetContext.erMaskinTilMaskinToken()) {
-            tilgangService.validerTilgangTilEksternFagsak(eksternFagsakId, AuditLoggerEvent.ACCESS)
-        }
-
-        return Ressurs.success(eksternVedtakService.hentVedtak(eksternFagsakId))
-    }
-
-    /**
-     * Kalles på av klage-backend for å populere listen over vedtak som det kan klages på
-     */
-    @GetMapping("/ekstern-fagsak/{eksternFagsakId}/vedtak/v2")
-    @ProtectedWithClaims(issuer = "azuread")
-    fun hentVedtakv2(
         @PathVariable eksternFagsakId: Long,
     ): List<FagsystemVedtak> {
         if (!SikkerhetContext.erMaskinTilMaskinToken()) {
