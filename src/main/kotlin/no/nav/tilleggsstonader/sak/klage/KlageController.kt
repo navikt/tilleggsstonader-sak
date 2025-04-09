@@ -53,7 +53,7 @@ class KlageController(
     /**
      * Kalles på av klage-backend for å populere listen over vedtak som det kan klages på
      */
-    @GetMapping(path = ["/ekstern-fagsak/{eksternFagsakId}/vedtak/v2", "/ekstern-fagsak/{eksternFagsakId}/vedtak"])
+    @GetMapping(path = ["/ekstern-fagsak/{eksternFagsakId}/vedtak"])
     @ProtectedWithClaims(issuer = "azuread")
     fun hentVedtak(
         @PathVariable eksternFagsakId: Long,
