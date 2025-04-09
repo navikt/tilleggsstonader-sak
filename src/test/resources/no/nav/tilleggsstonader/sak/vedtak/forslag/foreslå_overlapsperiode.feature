@@ -232,7 +232,7 @@ Egenskap: Forslag av vedtaksperioder
 
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
-      Så forvent følgende beregningsfeil: Foreløpig klarer vi bare å foreslå perioder når målgruppe og aktivitet har ett sammenhengende overlapp. Du må i stedet legge inn periodene manuelt.
+      Så forvent følgende beregningsfeil: Foreløpig klarer vi bare å foreslå perioder når målgruppe og aktivitet har ett sammenhengende overlapp. Her må du i stedet legge inn periodene manuelt.
 
     Scenario: En aktivitet og tre like målgrupper hvor to er like etter hverandre, men den siste er med opphold
       Gitt følgende vilkårsperioder med aktiviteter
@@ -247,7 +247,7 @@ Egenskap: Forslag av vedtaksperioder
 
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
-      Så forvent følgende beregningsfeil: Foreløpig klarer vi bare å foreslå perioder når målgruppe og aktivitet har ett sammenhengende overlapp. Du må i stedet legge inn periodene manuelt.
+      Så forvent følgende beregningsfeil: Foreløpig klarer vi bare å foreslå perioder når målgruppe og aktivitet har ett sammenhengende overlapp. Her må du i stedet legge inn periodene manuelt.
 
     Scenario: En aktivitet og to ulike målgrupper som overlapper - skal ikke slå sammen perioder tvers ulike typer
       Gitt følgende vilkårsperioder med aktiviteter
@@ -261,4 +261,4 @@ Egenskap: Forslag av vedtaksperioder
 
       Når forslag til vedtaksperioder fra vilkårperioder lages
 
-      Så forvent følgende beregningsfeil: Foreløpig klarer vi bare å foreslå perioder når målgruppe og aktivitet har ett sammenhengende overlapp. Du må i stedet legge inn periodene manuelt.
+      Så forvent følgende beregningsfeil: Foreløpig klarer vi bare å foreslå perioder når målgruppe og aktivitet har ett sammenhengende overlapp. Her må du i stedet legge inn periodene manuelt.

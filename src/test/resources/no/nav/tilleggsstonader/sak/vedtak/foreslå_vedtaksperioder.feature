@@ -189,4 +189,4 @@ Egenskap: Beregning av vedtaksperioder
 
       Når forslag til vedtaksperioder lages
 
-      Så forvent følgende feil for vedtaksforsalg: Foreløpig klarer vi bare å foreslå perioder når vilkår har ett sammenhengende overlapp. Du må i stedet legge inn periodene manuelt.
+      Så forvent følgende feil for vedtaksforsalg: Foreløpig klarer vi bare å foreslå vedtaksperioder når utgifter, aktiviteter og målgrupper har ett sammenhengende overlapp. Her må du i stedet legge inn periodene manuelt

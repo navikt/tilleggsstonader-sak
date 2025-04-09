@@ -31,7 +31,7 @@ object ForeslåVedtaksperiode {
             oppfylteVilkår.tilDatoPeriode().sorted().mergeSammenhengende { a, b -> a.overlapperEllerPåfølgesAv(b) }
 
         brukerfeilHvis(sammenslåtteVilkår.size > 1) {
-            "Foreløpig klarer vi bare å foreslå vedtaksperioder når utgifter, aktiviteter og målgrupper har ett sammenhengende overlapp. I mer kompliserte situasjoner må du i stedet legge inn periodene manuelt"
+            "Foreløpig klarer vi bare å foreslå vedtaksperioder når utgifter, aktiviteter og målgrupper har ett sammenhengende overlapp. Her må du i stedet legge inn periodene manuelt"
         }
 
         val vedtaksperiode = finnOverlapp(forslagVedtaksperiode, sammenslåtteVilkår.first())

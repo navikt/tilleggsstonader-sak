@@ -43,7 +43,7 @@ object ForeslåVedtaksperiodeFraVilkårperioder {
         brukerfeilHvis(
             sammenslåtteVilkårsperioder.aktiviteter.size > 1 || sammenslåtteVilkårsperioder.målgrupper.size > 1,
         ) {
-            "Foreløpig klarer vi bare å foreslå perioder når målgruppe og aktivitet har ett sammenhengende overlapp. Du må i stedet legge inn periodene manuelt."
+            "Foreløpig klarer vi bare å foreslå perioder når målgruppe og aktivitet har ett sammenhengende overlapp. Her må du i stedet legge inn periodene manuelt."
         }
 
         val overlapp =
