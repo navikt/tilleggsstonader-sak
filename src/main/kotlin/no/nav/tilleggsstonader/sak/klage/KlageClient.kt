@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.klage
 
-import no.nav.familie.prosessering.rest.Ressurs
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.kontrakter.klage.KlagebehandlingDto
 import no.nav.tilleggsstonader.kontrakter.klage.OppgaverBehandlingerRequest
@@ -23,7 +22,7 @@ class KlageClient(
     private val opprettKlage =
         UriComponentsBuilder
             .fromUri(klageUri)
-            .pathSegment("api/ekstern/behandling/opprett")
+            .path("api/ekstern/behandling/opprett")
             .build()
             .toUriString()
 
@@ -35,35 +34,29 @@ class KlageClient(
         val uri =
             UriComponentsBuilder
                 .fromUri(klageUri)
-                .pathSegment("api", "ekstern", "behandling", "{fagsystem}")
+                .path("api/ekstern/behandling/{fagsystem}/v2")
                 .queryParam("eksternFagsakId", "{eksternFagsakId}")
                 .encode()
                 .toUriString()
 
-        return getForEntity<Ressurs<Map<Long, List<KlagebehandlingDto>>>>(
+        return getForEntity<Map<Long, List<KlagebehandlingDto>>>(
             uri = uri,
             uriVariables =
                 mapOf(
                     "fagsystem" to Fagsystem.TILLEGGSSTONADER,
                     "eksternFagsakId" to eksternIder.joinToString(","),
                 ),
-        ).getDataOrThrow()
+        )
     }
 
     fun hentBehandlingerForOppgaveIder(oppgaveIder: List<Long>): Map<Long, UUID> {
         val uri =
             UriComponentsBuilder
                 .fromUri(klageUri)
-                .pathSegment("api/ekstern/behandling/finn-oppgaver")
+                .path("api/ekstern/behandling/finn-oppgaver/v2")
                 .build()
                 .toUriString()
         val request = OppgaverBehandlingerRequest(oppgaveIder)
-        return postForEntity<Ressurs<OppgaverBehandlingerResponse>>(uri, request).getDataOrThrow().oppgaver
+        return postForEntity<OppgaverBehandlingerResponse>(uri, request).oppgaver
     }
 }
-
-private fun <T> Ressurs<T>.getDataOrThrow(): T =
-    when (this.status) {
-        Ressurs.Status.SUKSESS -> data ?: error("Data er null")
-        else -> error(melding)
-    }
