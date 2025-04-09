@@ -6,6 +6,9 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import org.slf4j.LoggerFactory
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 
@@ -71,6 +74,30 @@ object OppgaveUtil {
                 logger.warn("Har ikke håndtering av $oppgavetype for behandling=${saksbehandling.id}")
                 return false
             }
+        }
+    }
+
+    fun lagFristForOppgave(gjeldendeTid: LocalDateTime): LocalDate {
+        val frist =
+            when (gjeldendeTid.dayOfWeek) {
+                DayOfWeek.FRIDAY -> fristBasertPåKlokkeslett(gjeldendeTid.plusDays(2))
+                DayOfWeek.SATURDAY -> fristBasertPåKlokkeslett(gjeldendeTid.plusDays(2).withHour(8))
+                DayOfWeek.SUNDAY -> fristBasertPåKlokkeslett(gjeldendeTid.plusDays(1).withHour(8))
+                else -> fristBasertPåKlokkeslett(gjeldendeTid)
+            }
+
+        return when (frist.dayOfWeek) {
+            DayOfWeek.SATURDAY -> frist.plusDays(2)
+            DayOfWeek.SUNDAY -> frist.plusDays(1)
+            else -> frist
+        }
+    }
+
+    private fun fristBasertPåKlokkeslett(gjeldendeTid: LocalDateTime): LocalDate {
+        return if (gjeldendeTid.hour >= 12) {
+            return gjeldendeTid.plusDays(2).toLocalDate()
+        } else {
+            gjeldendeTid.plusDays(1).toLocalDate()
         }
     }
 }

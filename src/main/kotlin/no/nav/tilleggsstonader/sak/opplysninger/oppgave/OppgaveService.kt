@@ -2,19 +2,15 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
-import no.nav.tilleggsstonader.kontrakter.felles.tilBehandlingstema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
-import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -23,7 +19,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalPlasseresIKlarMappe
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandlesAvApplikasjon
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.FinnOppgaveresultatMedMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMedMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMetadata
@@ -33,13 +28,9 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.util.FnrUtil
-import no.nav.tilleggsstonader.sak.util.medGosysTid
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Service
 class OppgaveService(
@@ -196,20 +187,14 @@ class OppgaveService(
         val enhetsnummer =
             oppgave.enhetsnummer ?: arbeidsfordelingService.hentNavEnhetId(personIdent, oppgave.oppgavetype)
 
+        val mappeId = utledMappeId(personIdent, oppgave, enhetsnummer)
         val opprettOppgave =
-            OpprettOppgaveRequest(
-                ident = OppgaveIdentV2(ident = personIdent, gruppe = IdentGruppe.FOLKEREGISTERIDENT),
-                tema = Tema.TSO,
-                journalpostId = oppgave.journalpostId,
-                oppgavetype = oppgave.oppgavetype,
-                fristFerdigstillelse = oppgave.fristFerdigstillelse ?: lagFristForOppgave(osloNow()),
-                beskrivelse = lagOppgaveTekst(oppgave.beskrivelse),
+            tilOpprettOppgaveRequest(
+                oppgave = oppgave,
+                personIdent = personIdent,
+                stønadstype,
                 enhetsnummer = enhetsnummer,
-                behandlingstema = stønadstype.tilBehandlingstema().value,
-                tilordnetRessurs = oppgave.tilordnetNavIdent,
-                mappeId = utledMappeId(personIdent, oppgave, enhetsnummer),
-                prioritet = oppgave.prioritet,
-                behandlesAvApplikasjon = utledBehandlesAvApplikasjon(oppgave.oppgavetype),
+                mappeId = mappeId,
             )
 
         try {
@@ -314,36 +299,6 @@ class OppgaveService(
     fun finnSisteOppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
         oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandlingId)
 
-    private fun lagOppgaveTekst(beskrivelse: String? = null): String {
-        val tidspunkt = osloNow().medGosysTid()
-        val prefix = "----- Opprettet av tilleggsstonader-sak $tidspunkt ---"
-        val beskrivelseMedNewLine = beskrivelse?.let { "\n$it" } ?: ""
-        return prefix + beskrivelseMedNewLine
-    }
-
-    /**
-     * Frist skal være 1 dag hvis den opprettes før kl. 12
-     * og 2 dager hvis den opprettes etter kl. 12
-     *
-     * Helgedager må ekskluderes
-     *
-     */
-    fun lagFristForOppgave(gjeldendeTid: LocalDateTime): LocalDate {
-        val frist =
-            when (gjeldendeTid.dayOfWeek) {
-                DayOfWeek.FRIDAY -> fristBasertPåKlokkeslett(gjeldendeTid.plusDays(2))
-                DayOfWeek.SATURDAY -> fristBasertPåKlokkeslett(gjeldendeTid.plusDays(2).withHour(8))
-                DayOfWeek.SUNDAY -> fristBasertPåKlokkeslett(gjeldendeTid.plusDays(1).withHour(8))
-                else -> fristBasertPåKlokkeslett(gjeldendeTid)
-            }
-
-        return when (frist.dayOfWeek) {
-            DayOfWeek.SATURDAY -> frist.plusDays(2)
-            DayOfWeek.SUNDAY -> frist.plusDays(1)
-            else -> frist
-        }
-    }
-
     fun finnMappe(
         enhet: String,
         oppgaveMappe: OppgaveMappe,
@@ -378,14 +333,6 @@ class OppgaveService(
             }
             mappeRespons.mapper
         }
-
-    private fun fristBasertPåKlokkeslett(gjeldendeTid: LocalDateTime): LocalDate {
-        return if (gjeldendeTid.hour >= 12) {
-            return gjeldendeTid.plusDays(2).toLocalDate()
-        } else {
-            gjeldendeTid.plusDays(1).toLocalDate()
-        }
-    }
 
     private fun Map<String, PdlPersonKort>.visningsnavnFor(oppgave: Oppgave) =
         oppgave.ident
