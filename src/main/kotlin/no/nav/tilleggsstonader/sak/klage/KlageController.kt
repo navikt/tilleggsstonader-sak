@@ -33,11 +33,11 @@ class KlageController(
     fun opprettKlage(
         @PathVariable fagsakId: FagsakId,
         @RequestBody opprettKlageDto: OpprettKlageDto,
-    ): Ressurs<FagsakId> {
+    ): FagsakId {
         tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.CREATE)
         tilgangService.validerHarSaksbehandlerrolle()
         klageService.opprettKlage(fagsakId, opprettKlageDto)
-        return Ressurs.success(fagsakId)
+        return fagsakId
     }
 
     /**
