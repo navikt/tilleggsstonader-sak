@@ -26,6 +26,9 @@ class KlageController(
     private val klageService: KlageService,
     private val eksternVedtakService: EksternKlageVedtakService,
 ) {
+    /**
+     * Brukes av "Opprett behandling"-modalen i sak-frontend
+     */
     @PostMapping("/fagsak/{fagsakId}")
     fun opprettKlage(
         @PathVariable fagsakId: FagsakId,
@@ -37,6 +40,9 @@ class KlageController(
         return Ressurs.success(fagsakId)
     }
 
+    /**
+     * Brukes av sak-frontend for å hente klagebehandlinger som listes opp i personoversikten
+     */
     @GetMapping("/fagsak-person/{fagsakPersonId}")
     fun hentKlagebehandlinger(
         @PathVariable fagsakPersonId: FagsakPersonId,
@@ -45,6 +51,9 @@ class KlageController(
         return klageService.hentBehandlinger(fagsakPersonId)
     }
 
+    /**
+     * Kalles på av klage-backend for å populere listen over vedtak som det kan klages på
+     */
     @GetMapping("/ekstern-fagsak/{eksternFagsakId}/vedtak")
     @ProtectedWithClaims(issuer = "azuread")
     fun hentVedtak(
