@@ -48,7 +48,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import no.nav.tilleggsstonader.kontrakter.journalpost.AvsenderMottaker as AvsenderMottakerKontrakt
@@ -401,7 +400,6 @@ class JournalføringServiceTest {
             )
         val journalpostMedSøknadBoutgifter = journalpost.copy(dokumenter = listOf(dokumentSøknadTilsynBarn))
 
-        @Disabled
         @Test
         fun `skal lagre søknaden`() {
             every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()

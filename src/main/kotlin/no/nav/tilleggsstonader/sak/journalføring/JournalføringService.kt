@@ -128,7 +128,7 @@ class JournalføringService(
             gjennbrukDataRevurderingService.gjenbrukData(behandling, behandlingIdForGjenbruk)
         }
 
-        if (journalpost.harStrukturertSøknad() && stønadstype != Stønadstype.BOUTGIFTER) {
+        if (journalpost.harStrukturertSøknad()) {
             lagreSøknadOgNyeBarn(journalpost, behandling, stønadstype)
         }
 
