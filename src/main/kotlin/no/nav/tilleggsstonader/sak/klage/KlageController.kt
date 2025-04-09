@@ -65,4 +65,19 @@ class KlageController(
 
         return Ressurs.success(eksternVedtakService.hentVedtak(eksternFagsakId))
     }
+
+    /**
+     * Kalles på av klage-backend for å populere listen over vedtak som det kan klages på
+     */
+    @GetMapping("/ekstern-fagsak/{eksternFagsakId}/vedtak/v2")
+    @ProtectedWithClaims(issuer = "azuread")
+    fun hentVedtakv2(
+        @PathVariable eksternFagsakId: Long,
+    ): List<FagsystemVedtak> {
+        if (!SikkerhetContext.erMaskinTilMaskinToken()) {
+            tilgangService.validerTilgangTilEksternFagsak(eksternFagsakId, AuditLoggerEvent.ACCESS)
+        }
+
+        return eksternVedtakService.hentVedtak(eksternFagsakId)
+    }
 }
