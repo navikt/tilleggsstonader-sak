@@ -9,6 +9,7 @@ import io.mockk.runs
 import io.mockk.slot
 import io.mockk.unmockkObject
 import io.mockk.verify
+import junit.runner.Version.id
 import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
@@ -34,6 +35,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.IntegrasjonException
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMedMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
@@ -191,7 +193,11 @@ internal class OppgaveServiceTest {
         val respons = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, enhet = ENHET_NR_NAY))
 
         assertThat(respons.antallTreffTotalt).isEqualTo(1)
-        assertThat(respons.oppgaver.first().id).isEqualTo(GSAK_OPPGAVE_ID)
+        assertThat(
+            respons.oppgaver
+                .first()
+                .oppgave.id,
+        ).isEqualTo(GSAK_OPPGAVE_ID)
     }
 
     @Test
@@ -333,8 +339,8 @@ internal class OppgaveServiceTest {
             oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = "01010172272", enhet = ENHET_NR_NAY)).oppgaver
 
         verify(exactly = 1) { personService.hentPersonKortBolk(eq(listOf("1"))) }
-        assertThat(oppgaver.single { it.id == oppgaveIdMedNavn }.navn).contains("fornavn1 ")
-        assertThat(oppgaver.filterNot { it.id == oppgaveIdMedNavn }.map { it.navn }).containsOnly("Mangler navn")
+        assertThat(oppgaver.single { it.oppgave.id == oppgaveIdMedNavn }.navn).contains("fornavn1 ")
+        assertThat(oppgaver.filterNot { it.oppgave.id == oppgaveIdMedNavn }.map { it.navn }).containsOnly("Mangler navn")
     }
 
     @Test
@@ -353,13 +359,13 @@ internal class OppgaveServiceTest {
         every { oppgaveRepository.finnOppgaveMetadata(any()) } answers {
             firstArg<List<Long>>()
                 .filter { it == oppgaveIdMedBehandling }
-                .map { OppgaveMetadata(it, behandlingId.id, null) }
+                .map { OppgaveBehandlingMetadata(it, behandlingId.id, null) }
         }
 
         val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, enhet = ENHET_NR_NAY)).oppgaver
 
-        assertThat(oppgaver.single { it.id == oppgaveIdMedBehandling }.behandlingId).isEqualTo(behandlingId.id)
-        assertThat(oppgaver.single { it.id != oppgaveIdMedBehandling }.behandlingId).isNull()
+        assertThat(oppgaver.single { it.oppgave.id == oppgaveIdMedBehandling }.behandlingId).isEqualTo(behandlingId.id)
+        assertThat(oppgaver.single { it.oppgave.id != oppgaveIdMedBehandling }.behandlingId).isNull()
     }
 
     @Test
@@ -376,7 +382,7 @@ internal class OppgaveServiceTest {
 
         val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, enhet = ENHET_NR_NAY)).oppgaver
 
-        assertThat(oppgaver.single { it.id == oppgaveIdMedBehandling }.behandlingId).isEqualTo(behandlingIdKlage)
+        assertThat(oppgaver.single { it.oppgave.id == oppgaveIdMedBehandling }.behandlingId).isEqualTo(behandlingIdKlage)
     }
 
     @Test
@@ -436,6 +442,9 @@ internal class OppgaveServiceTest {
             antallTreffTotalt = 1,
             oppgaver = listOf(lagEksternTestOppgave()),
         )
+
+    private val OppgaveMedMetadata.behandlingId get() = this.metadata?.behandlingMetadata?.behandlingId
+    private val OppgaveMedMetadata.navn get() = this.metadata?.navn
 
     companion object {
         private val FAGSAK_ID = FagsakId.fromString("1242f220-cad3-4640-95c1-190ec814c91e")

@@ -24,9 +24,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalPlasseresIKlarMappe
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandlesAvApplikasjon
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.FinnOppgaveresultatMedMetadata
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMedMetadata
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
@@ -52,7 +53,7 @@ class OppgaveService(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun hentOppgaver(finnOppgaveRequest: FinnOppgaveRequestDto): FinnOppgaveResponseDto {
+    fun hentOppgaver(finnOppgaveRequest: FinnOppgaveRequestDto): FinnOppgaveresultatMedMetadata {
         FnrUtil.validerOptionalIdent(finnOppgaveRequest.ident)
 
         val aktørId =
@@ -70,48 +71,53 @@ class OppgaveService(
         return finnOppgaver(request)
     }
 
-    fun hentOppgaverForPerson(personIdent: String): FinnOppgaveResponseDto {
+    fun hentOppgaverForPerson(personIdent: String): FinnOppgaveresultatMedMetadata {
         val aktørId = personService.hentAktørId(personIdent)
         val oppgaveRequest = FinnOppgaveRequest(aktørId = aktørId, tema = Tema.TSO)
 
         return finnOppgaver(oppgaveRequest)
     }
 
-    private fun finnOppgaver(request: FinnOppgaveRequest): FinnOppgaveResponseDto {
+    private fun finnOppgaver(request: FinnOppgaveRequest): FinnOppgaveresultatMedMetadata {
         val oppgaveResponse = oppgaveClient.hentOppgaver(request)
 
-        val personer = personService.hentPersonKortBolk(oppgaveResponse.oppgaver.mapNotNull { it.ident }.distinct())
-        val oppgaveMetadata = finnOppgaveMetadata(oppgaveResponse.oppgaver)
-
-        return FinnOppgaveResponseDto(
+        val metadata = finnOppgaveMetadata(oppgaveResponse.oppgaver)
+        return FinnOppgaveresultatMedMetadata(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
-            oppgaver =
-                oppgaveResponse.oppgaver.map { oppgave ->
-                    OppgaveDto(
-                        oppgave = oppgave,
-                        navn = personer.visningsnavnFor(oppgave),
-                        oppgaveMetadata = oppgaveMetadata[oppgave.id],
-                    )
-                },
+            oppgaver = oppgaveResponse.oppgaver.map { OppgaveMedMetadata(it, metadata[it.id]) },
         )
     }
 
-    private fun finnOppgaveMetadata(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> =
+    private fun finnOppgaveMetadata(oppgave: Oppgave): OppgaveMetadata = finnOppgaveMetadata(listOf(oppgave)).values.single()
+
+    private fun finnOppgaveMetadata(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> {
+        val personer = personService.hentPersonKortBolk(oppgaver.mapNotNull { it.ident }.distinct())
+        val behandlingMetadata = finnOppgaveBehandlingMetadata(oppgaver)
+        return oppgaver.associate {
+            it.id to
+                OppgaveMetadata(
+                    navn = personer.visningsnavnFor(it),
+                    behandlingMetadata = behandlingMetadata[it.id],
+                )
+        }
+    }
+
+    private fun finnOppgaveBehandlingMetadata(oppgaver: List<Oppgave>): Map<Long, OppgaveBehandlingMetadata> =
         finnOppgaveMetadataSak(oppgaver) + finnOppgaveMetadataKlage(oppgaver)
 
-    private fun finnOppgaveMetadataSak(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> {
+    private fun finnOppgaveMetadataSak(oppgaver: List<Oppgave>): Map<Long, OppgaveBehandlingMetadata> {
         val oppgaveIder = oppgaver.filter { it.behandlingstype != Behandlingstype.Klage.value }.map { it.id }
         return cacheManager.getCachedOrLoad("oppgaveMetadata", oppgaveIder) {
             oppgaveRepository.finnOppgaveMetadata(oppgaveIder).associateBy { it.gsakOppgaveId }
         }
     }
 
-    private fun finnOppgaveMetadataKlage(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> {
+    private fun finnOppgaveMetadataKlage(oppgaver: List<Oppgave>): Map<Long, OppgaveBehandlingMetadata> {
         val oppgaveIder = oppgaver.filter { it.behandlingstype == Behandlingstype.Klage.value }.map { it.id }
         return cacheManager.getCachedOrLoad("oppgaveMetadataKlage", oppgaveIder) {
             klageService
                 .hentBehandlingIderForOppgaveIder(oppgaveIder)
-                .map { it.key to OppgaveMetadata(gsakOppgaveId = it.key, behandlingId = it.value) }
+                .map { it.key to OppgaveBehandlingMetadata(gsakOppgaveId = it.key, behandlingId = it.value) }
                 .toMap()
         }
     }
@@ -123,20 +129,21 @@ class OppgaveService(
         gsakOppgaveId: Long,
         saksbehandler: String?,
         versjon: Int,
-    ): OppgaveDto {
+    ): OppgaveMedMetadata {
         val oppdatertOppgave =
             oppgaveClient.fordelOppgave(
                 oppgaveId = gsakOppgaveId,
                 saksbehandler = saksbehandler,
                 versjon = versjon,
             )
-        val personer = personService.hentPersonKortBolk(listOfNotNull(oppdatertOppgave.ident))
-        return OppgaveDto(
-            oppgave = oppdatertOppgave,
-            navn = personer.visningsnavnFor(oppdatertOppgave),
-            oppgaveMetadata = finnOppgaveMetadata(listOf(oppdatertOppgave))[oppdatertOppgave.id],
-        )
+        return medMetadata(oppdatertOppgave)
     }
+
+    private fun medMetadata(oppdatertOppgave: Oppgave): OppgaveMedMetadata =
+        OppgaveMedMetadata(
+            oppgave = oppdatertOppgave,
+            metadata = finnOppgaveMetadata(oppdatertOppgave),
+        )
 
     fun opprettOppgave(
         behandlingId: BehandlingId,

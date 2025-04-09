@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_STR
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.tilDto
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.validation.annotation.Validated
@@ -34,7 +35,7 @@ class OppgaveController(
     @PostMapping("/soek")
     fun hentOppgaver(
         @RequestBody finnOppgaveRequest: FinnOppgaveRequestDto,
-    ): FinnOppgaveResponseDto = oppgaveService.hentOppgaver(finnOppgaveRequest)
+    ): FinnOppgaveResponseDto = oppgaveService.hentOppgaver(finnOppgaveRequest).tilDto()
 
     @GetMapping("/soek/person/{fagsakPersonId}")
     fun hentOppgaverForPerson(
@@ -43,7 +44,7 @@ class OppgaveController(
         val personIdent = fagsakPersonService.hentAktivIdent(fagsakPersonId)
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
 
-        return oppgaveService.hentOppgaverForPerson(personIdent)
+        return oppgaveService.hentOppgaverForPerson(personIdent).tilDto()
     }
 
     @PostMapping(path = ["/{oppgaveId}/fordel"])
@@ -54,7 +55,7 @@ class OppgaveController(
     ): OppgaveDto {
         tilgangService.validerHarSaksbehandlerrolle()
         val tildeltSaksbehandler = if (tilbakestill) null else SikkerhetContext.hentSaksbehandler()
-        return oppgaveService.fordelOppgave(oppgaveId, tildeltSaksbehandler, versjon)
+        return oppgaveService.fordelOppgave(oppgaveId, tildeltSaksbehandler, versjon).tilDto()
     }
 
     @GetMapping("/mapper")

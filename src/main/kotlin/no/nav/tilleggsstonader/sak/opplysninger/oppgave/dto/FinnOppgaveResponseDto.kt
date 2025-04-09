@@ -7,7 +7,9 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveMetadata
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.FinnOppgaveresultatMedMetadata
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMedMetadata
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMetadata
 import java.time.LocalDate
 import java.util.Optional
 import java.util.UUID
@@ -16,6 +18,12 @@ data class FinnOppgaveResponseDto(
     val antallTreffTotalt: Long,
     val oppgaver: List<OppgaveDto>,
 )
+
+fun FinnOppgaveresultatMedMetadata.tilDto() =
+    FinnOppgaveResponseDto(
+        antallTreffTotalt = antallTreffTotalt,
+        oppgaver = this.oppgaver.map(OppgaveMedMetadata::tilDto),
+    )
 
 /**
  * Kopi av [no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave] med ekstrafelt
@@ -66,8 +74,7 @@ data class OppgaveDto(
 ) {
     constructor(
         oppgave: Oppgave,
-        navn: String?,
-        oppgaveMetadata: OppgaveMetadata?,
+        metadata: OppgaveMetadata?,
     ) : this(
         id = oppgave.id,
         versjon = oppgave.versjon,
@@ -101,9 +108,11 @@ data class OppgaveDto(
         endretTidspunkt = oppgave.endretTidspunkt,
         prioritet = oppgave.prioritet,
         status = oppgave.status,
-        navn = navn,
-        behandlingId = oppgaveMetadata?.behandlingId,
-        sendtTilTotrinnskontrollAv = oppgaveMetadata?.sendtTilTotrinnskontrollAv,
-        erOpphør = oppgaveMetadata?.erOpphor,
+        navn = metadata?.navn,
+        behandlingId = metadata?.behandlingMetadata?.behandlingId,
+        sendtTilTotrinnskontrollAv = metadata?.behandlingMetadata?.sendtTilTotrinnskontrollAv,
+        erOpphør = metadata?.behandlingMetadata?.erOpphor,
     )
 }
+
+fun OppgaveMedMetadata.tilDto() = OppgaveDto(oppgave = this.oppgave, metadata = this.metadata)
