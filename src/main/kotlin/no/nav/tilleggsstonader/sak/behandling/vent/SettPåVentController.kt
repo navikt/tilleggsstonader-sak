@@ -48,11 +48,10 @@ class SettPåVentController(
         return settPåVentService.oppdaterSettPåVent(behandlingId, dto)
     }
 
-    // TODO: Fjern at dto er nullable
     @DeleteMapping("{behandlingId}")
     fun taAvVent(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody taAvVentDto: TaAvVentDto?,
+        @RequestBody taAvVentDto: TaAvVentDto,
     ) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()

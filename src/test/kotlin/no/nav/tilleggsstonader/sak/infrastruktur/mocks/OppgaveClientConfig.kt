@@ -16,15 +16,22 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.libs.utils.osloNow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
@@ -123,11 +130,67 @@ class OppgaveClientConfig {
                             fristFerdigstillelse = it.fristFerdigstillelse ?: eksisterendeOppgave.fristFerdigstillelse,
                         )
                     }
-                oppgavelager[oppdaterOppgave.id] =
-                    oppdaterOppgave // Forenklet, dette er ikke det som skje ri integrasjoner
+                oppgavelager[oppdaterOppgave.id] = oppdaterOppgave // Forenklet, dette er ikke det som skje ri integrasjoner
                 OppdatertOppgaveResponse(oppdaterOppgave.id, oppdaterOppgave.versjonEllerFeil())
             }
             mockFordeling(oppgaveClient, oppgavelager)
+
+            every { oppgaveClient.settPåVent(any()) } answers {
+                val request = firstArg<SettPåVentRequest>()
+                val oppgave = oppgavelager.getValue(request.oppgaveId)
+                brukerfeilHvis(oppgave.tilordnetRessurs != SikkerhetContext.hentSaksbehandler()) {
+                    "Kan ikke sette behandling på vent når man ikke er eier av oppgaven."
+                }
+                val versjon = oppgave.versjon + 1
+                oppgavelager[request.oppgaveId] =
+                    oppgave.copy(
+                        versjon = versjon,
+                        beskrivelse = request.kommentar + "\n" + oppgave.beskrivelse,
+                        fristFerdigstillelse = request.frist,
+                        mappeId = Optional.of(MAPPE_ID_PÅ_VENT),
+                        tilordnetRessurs = if (request.beholdOppgave) SikkerhetContext.hentSaksbehandler() else null,
+                    )
+                SettPåVentResponse(oppgaveId = request.oppgaveId, oppgaveVersjon = versjon)
+            }
+
+            every { oppgaveClient.oppdaterPåVent(any()) } answers {
+                val request = firstArg<OppdaterPåVentRequest>()
+                val oppgave = oppgavelager.getValue(request.oppgaveId)
+                brukerfeilHvis(oppgave.tilordnetRessurs != SikkerhetContext.hentSaksbehandler()) {
+                    "Kan ikke oppdatere behandling på vent når man ikke er eier av oppgaven."
+                }
+                brukerfeilHvis(oppgave.versjon != request.oppgaveVersjon) {
+                    "Versjon er feil"
+                }
+                val versjon = oppgave.versjon + 1
+                oppgavelager[request.oppgaveId] =
+                    oppgave.copy(
+                        versjon = versjon,
+                        beskrivelse = request.kommentar + "\n" + oppgave.beskrivelse,
+                        fristFerdigstillelse = request.frist,
+                        tilordnetRessurs = if (request.beholdOppgave) SikkerhetContext.hentSaksbehandler() else null,
+                    )
+                SettPåVentResponse(oppgaveId = request.oppgaveId, oppgaveVersjon = versjon)
+            }
+
+            every { oppgaveClient.taAvVent(any()) } answers {
+                val request = firstArg<TaAvVentRequest>()
+                val oppgave = oppgavelager.getValue(request.oppgaveId)
+                brukerfeilHvis(oppgave.tilordnetRessurs != SikkerhetContext.hentSaksbehandler()) {
+                    "Kan ikke ta behandling av vent når man ikke er eier av oppgaven."
+                }
+
+                val versjon = oppgave.versjon + 1
+                oppgavelager[request.oppgaveId] =
+                    oppgave.copy(
+                        versjon = versjon,
+                        beskrivelse = request.kommentar + "\n Tatt av vent\n" + oppgave.beskrivelse,
+                        fristFerdigstillelse = LocalDate.now(),
+                        tilordnetRessurs = if (request.beholdOppgave) SikkerhetContext.hentSaksbehandler() else null,
+                        mappeId = Optional.of(MAPPE_ID_KLAR),
+                    )
+                SettPåVentResponse(oppgaveId = request.oppgaveId, oppgaveVersjon = versjon)
+            }
         }
 
         private fun mockFordeling(

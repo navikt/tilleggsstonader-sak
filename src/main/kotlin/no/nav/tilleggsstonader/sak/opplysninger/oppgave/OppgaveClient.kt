@@ -7,6 +7,10 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
@@ -29,6 +33,13 @@ class OppgaveClient(
         UriComponentsBuilder
             .fromUri(integrasjonerBaseUrl)
             .pathSegment("api/oppgave")
+            .build()
+            .toUri()
+
+    private val oppgaveVentUri =
+        UriComponentsBuilder
+            .fromUri(integrasjonerBaseUrl)
+            .pathSegment("api/oppgave/vent")
             .build()
             .toUri()
 
@@ -154,6 +165,36 @@ class OppgaveClient(
                 .toUriString()
         val uriVariables = mapOf("enhetsnr" to enhetsnummer, "limit" to limit)
         return getForEntity<FinnMappeResponseDto>(uri, uriVariables = uriVariables)
+    }
+
+    fun settPåVent(settPåVent: SettPåVentRequest): SettPåVentResponse {
+        val uri =
+            UriComponentsBuilder
+                .fromUri(oppgaveUri)
+                .pathSegment("sett-pa-vent")
+                .encode()
+                .toUriString()
+        return postForEntity<SettPåVentResponse>(uri, settPåVent)
+    }
+
+    fun oppdaterPåVent(oppdaterPåVent: OppdaterPåVentRequest): SettPåVentResponse {
+        val uri =
+            UriComponentsBuilder
+                .fromUri(oppgaveUri)
+                .pathSegment("oppdater-pa-vent")
+                .encode()
+                .toUriString()
+        return postForEntity<SettPåVentResponse>(uri, oppdaterPåVent)
+    }
+
+    fun taAvVent(taAvVent: TaAvVentRequest): SettPåVentResponse {
+        val uri =
+            UriComponentsBuilder
+                .fromUri(oppgaveUri)
+                .pathSegment("ta-av-vent")
+                .encode()
+                .toUriString()
+        return postForEntity<SettPåVentResponse>(uri, taAvVent)
     }
 
     private fun oppgaveIdUriVariables(oppgaveId: Long): Map<String, String> = mapOf("id" to oppgaveId.toString())

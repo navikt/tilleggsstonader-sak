@@ -219,11 +219,11 @@ class SettPåVentServiceTest : IntegrationTest() {
             testWithBrukerContext(dummySaksbehandler) {
                 settPåVentService.taAvVent(
                     behandling.id,
-                    TaAvVentDto(skalTilordnesRessurs = true, kommentar = "kommentar"),
+                    TaAvVentDto(skalTilordnesRessurs = true, kommentar = "årsak av vent"),
                 )
             }
 
-            validerTattAvVent(behandling.id, kommentar = "kommentar")
+            validerTattAvVent(behandling.id, kommentar = "årsak av vent")
             validerOppdatertOppgave(oppgaveId!!, tilordnetRessurs = dummySaksbehandler)
             validerHistorikkInnslag(behandling.id, skalHaMetadata = true)
         }
@@ -244,11 +244,11 @@ class SettPåVentServiceTest : IntegrationTest() {
             testWithBrukerContext(dummySaksbehandler) {
                 settPåVentService.taAvVent(
                     behandling.id,
-                    TaAvVentDto(skalTilordnesRessurs = false, kommentar = "kommentar"),
+                    TaAvVentDto(skalTilordnesRessurs = false, kommentar = "årsak av vent"),
                 )
             }
 
-            validerTattAvVent(behandling.id, kommentar = "kommentar")
+            validerTattAvVent(behandling.id, kommentar = "årsak av vent")
             validerOppdatertOppgave(oppgaveId!!, tilordnetRessurs = dummySaksbehandler)
             validerHistorikkInnslag(behandling.id, skalHaMetadata = true)
         }
@@ -259,7 +259,7 @@ class SettPåVentServiceTest : IntegrationTest() {
                 assertThatThrownBy {
                     settPåVentService.taAvVent(
                         behandling.id,
-                        TaAvVentDto(skalTilordnesRessurs = false, kommentar = "kommentar"),
+                        TaAvVentDto(skalTilordnesRessurs = false, kommentar = "årsak av vent"),
                     )
                 }.hasMessageContaining("Kan ikke ta behandling av vent når man ikke er eier av oppgaven.")
             }
