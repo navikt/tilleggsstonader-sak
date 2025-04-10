@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeFraVilkårperioder.foreslåVedtaksperioder
@@ -30,13 +29,13 @@ object ForeslåVedtaksperiode {
         val sammenslåtteVilkår =
             oppfylteVilkår.tilDatoPeriode().sorted().mergeSammenhengende { a, b -> a.overlapperEllerPåfølgesAv(b) }
 
-        brukerfeilHvis(sammenslåtteVilkår.size > 1) {
-            "Foreløpig klarer vi bare å foreslå vedtaksperioder når utgifter, aktiviteter og målgrupper har ett sammenhengende overlapp. Her må du i stedet legge inn periodene manuelt"
+        val vedtaksperioder = finnOverlapp(forslagVedtaksperiode, sammenslåtteVilkår)
+
+        brukerfeilHvis(vedtaksperioder.isEmpty()) {
+            "Fant ingen gyldig overlapp mellom aktivitet, målgruppe og utgiftsperiodene"
         }
 
-        val vedtaksperiode = finnOverlapp(forslagVedtaksperiode, sammenslåtteVilkår.first())
-
-        return listOf(vedtaksperiode)
+        return vedtaksperioder
     }
 
     private fun List<Vilkår>.finnOppfylte() = filter { it.resultat === Vilkårsresultat.OPPFYLT }
@@ -52,17 +51,15 @@ object ForeslåVedtaksperiode {
 
     private fun finnOverlapp(
         forslagVedtaksperiode: ForslagVedtaksperiodeFraVilkårperioder,
-        vilkår: Periode<LocalDate>,
-    ): Vedtaksperiode =
-        if (forslagVedtaksperiode.overlapper(vilkår)) {
+        vilkår: List<Periode<LocalDate>>,
+    ): List<Vedtaksperiode> =
+        vilkår.filter { it.overlapper(forslagVedtaksperiode) }.map {
             Vedtaksperiode(
                 id = UUID.randomUUID(),
-                fom = maxOf(forslagVedtaksperiode.fom, vilkår.fom),
-                tom = minOf(forslagVedtaksperiode.tom, vilkår.tom),
+                fom = maxOf(forslagVedtaksperiode.fom, it.fom),
+                tom = minOf(forslagVedtaksperiode.tom, it.tom),
                 målgruppe = forslagVedtaksperiode.målgruppe,
                 aktivitet = forslagVedtaksperiode.aktivitet,
             )
-        } else {
-            brukerfeil("Fant ingen gyldig overlapp mellom gitte aktiviteter, målgrupper og vilkår")
         }
 }

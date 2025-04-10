@@ -128,7 +128,7 @@ Egenskap: Beregning av vedtaksperioder
 
       Når forslag til vedtaksperioder lages
 
-      Så forvent følgende feil for vedtaksforsalg: Fant ingen gyldig overlapp mellom gitte aktiviteter, målgrupper og vilkår
+      Så forvent følgende feil for vedtaksforsalg: Fant ingen gyldig overlapp mellom aktivitet, målgruppe og utgiftsperiodene
 
     Scenario: Vilkårsperiodene er ikke sortert
       Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag
@@ -189,4 +189,7 @@ Egenskap: Beregning av vedtaksperioder
 
       Når forslag til vedtaksperioder lages
 
-      Så forvent følgende feil for vedtaksforsalg: Foreløpig klarer vi bare å foreslå vedtaksperioder når utgifter, aktiviteter og målgrupper har ett sammenhengende overlapp. Her må du i stedet legge inn periodene manuelt
+      Så forvent følgende vedtaksperioder
+        | Fom        | Tom        | aktivitet | målgruppe           |
+        | 01.01.2023 | 31.01.2023 | TILTAK   | NEDSATT_ARBEIDSEVNE |
+        | 01.03.2023 | 31.03.2023 | TILTAK   | NEDSATT_ARBEIDSEVNE |
