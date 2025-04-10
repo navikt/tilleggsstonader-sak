@@ -105,12 +105,8 @@ class OppgaveClient(
                     "Oppgaven med id=$oppgaveId er allerede ferdigstilt. Prøv å hente oppgaver på nytt.",
                     HttpStatus.BAD_REQUEST,
                 )
-            } else if (e.httpStatus == HttpStatus.CONFLICT) {
-                throw ApiFeil(
-                    "Oppgaven har endret seg siden du sist hentet oppgaver. For å kunne gjøre endringer må du hente oppgaver på nytt.",
-                    HttpStatus.CONFLICT,
-                )
             }
+            sjekkOgHåndtertConflict(e)
             throw e
         }
     }
@@ -142,12 +138,7 @@ class OppgaveClient(
                 )
             return response
         } catch (e: ProblemDetailException) {
-            if (e.httpStatus == HttpStatus.CONFLICT) {
-                throw ApiFeil(
-                    "Oppgaven har endret seg siden du sist hentet oppgaver. For å kunne gjøre endringer må du laste inn siden på nytt",
-                    HttpStatus.CONFLICT,
-                )
-            }
+            sjekkOgHåndtertConflict(e)
             throw e
         }
     }
@@ -202,12 +193,22 @@ class OppgaveClient(
         try {
             fn()
         } catch (e: ProblemDetailException) {
+            sjekkOgHåndtertConflict(e)
             val detail = e.detail.detail
             brukerfeilHvis(e.httpStatus == HttpStatus.BAD_REQUEST && detail != null) {
                 detail ?: "Ukjent feil"
             }
             throw e
         }
+
+    private fun sjekkOgHåndtertConflict(e: ProblemDetailException) {
+        if (e.httpStatus == HttpStatus.CONFLICT) {
+            throw ApiFeil(
+                "Oppgaven har endret seg siden du sist hentet oppgaver. For å kunne gjøre endringer må du laste inn siden på nytt",
+                HttpStatus.CONFLICT,
+            )
+        }
+    }
 
     private fun oppgaveIdUriVariables(oppgaveId: Long): Map<String, String> = mapOf("id" to oppgaveId.toString())
 }
