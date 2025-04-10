@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.util.medContentTypeJsonUTF8
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -174,7 +175,7 @@ class OppgaveClient(
                 .pathSegment("sett-pa-vent")
                 .encode()
                 .toUriString()
-        return postForEntity<SettPåVentResponse>(uri, settPåVent)
+        return kastBrukerFeilHvisBadRequest { postForEntity<SettPåVentResponse>(uri, settPåVent) }
     }
 
     fun oppdaterPåVent(oppdaterPåVent: OppdaterPåVentRequest): SettPåVentResponse {
@@ -184,7 +185,7 @@ class OppgaveClient(
                 .pathSegment("oppdater-pa-vent")
                 .encode()
                 .toUriString()
-        return postForEntity<SettPåVentResponse>(uri, oppdaterPåVent)
+        return kastBrukerFeilHvisBadRequest { postForEntity<SettPåVentResponse>(uri, oppdaterPåVent) }
     }
 
     fun taAvVent(taAvVent: TaAvVentRequest): SettPåVentResponse {
@@ -194,8 +195,19 @@ class OppgaveClient(
                 .pathSegment("ta-av-vent")
                 .encode()
                 .toUriString()
-        return postForEntity<SettPåVentResponse>(uri, taAvVent)
+        return kastBrukerFeilHvisBadRequest { postForEntity<SettPåVentResponse>(uri, taAvVent) }
     }
+
+    private fun <T> kastBrukerFeilHvisBadRequest(fn: () -> T): T =
+        try {
+            fn()
+        } catch (e: ProblemDetailException) {
+            val detail = e.detail.detail
+            brukerfeilHvis(e.httpStatus == HttpStatus.BAD_REQUEST && detail != null) {
+                detail ?: "Ukjent feil"
+            }
+            throw e
+        }
 
     private fun oppgaveIdUriVariables(oppgaveId: Long): Map<String, String> = mapOf("id" to oppgaveId.toString())
 }
