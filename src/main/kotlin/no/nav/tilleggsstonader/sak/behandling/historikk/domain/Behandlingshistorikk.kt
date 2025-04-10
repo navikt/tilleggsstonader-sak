@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -29,17 +28,6 @@ data class Behandlingshistorikk(
     val endretTid: LocalDateTime = osloNow().truncatedTo(ChronoUnit.MILLIS),
     val gitVersjon: String?,
 )
-
-fun Behandlingshistorikk.tilDto(): BehandlingshistorikkDto =
-    BehandlingshistorikkDto(
-        behandlingId = this.behandlingId,
-        steg = this.steg,
-        endretAvNavn = this.opprettetAvNavn,
-        endretAv = this.opprettetAv,
-        endretTid = this.endretTid,
-        utfall = this.utfall,
-        metadata = this.metadata.tilJson(),
-    )
 
 fun Behandlingshistorikk.tilHendelseshistorikkDto(saksbehandling: Saksbehandling): HendelseshistorikkDto {
     val hendelse: Hendelse = mapUtfallTilHendelse() ?: mapStegTilHendelse(saksbehandling)
