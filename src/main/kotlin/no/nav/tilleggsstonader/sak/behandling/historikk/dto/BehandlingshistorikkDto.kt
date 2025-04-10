@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.historikk.dto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import java.time.LocalDateTime
 
-data class HendelseshistorikkDto(
+data class BehandlingshistorikkDto(
     val behandlingId: BehandlingId,
     var hendelse: Hendelse,
     val endretAvNavn: String,

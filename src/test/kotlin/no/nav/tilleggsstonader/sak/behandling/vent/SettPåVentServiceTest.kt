@@ -6,8 +6,8 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
+import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
-import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_KLAR
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_PÅ_VENT
@@ -356,9 +356,9 @@ class SettPåVentServiceTest : IntegrationTest() {
             historikk.finnMetadata(Hendelse.TATT_AV_VENT).assertMetadataInneholderEksakt(emptyMap())
         }
 
-        private fun List<HendelseshistorikkDto>.finnMetadata(hendelse: Hendelse) = this.single { it.hendelse == hendelse }
+        private fun List<BehandlingshistorikkDto>.finnMetadata(hendelse: Hendelse) = this.single { it.hendelse == hendelse }
 
-        private fun HendelseshistorikkDto.assertMetadataInneholderEksakt(map: Map<String, Any>) {
+        private fun BehandlingshistorikkDto.assertMetadataInneholderEksakt(map: Map<String, Any>) {
             assertThat(this.metadata).containsExactlyInAnyOrderEntriesOf(map)
         }
     }
