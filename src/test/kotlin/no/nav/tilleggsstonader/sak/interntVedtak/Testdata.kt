@@ -537,7 +537,7 @@ object Testdata {
                 type = TypeVedtak.AVSLAG,
                 data =
                     AvslagBoutgifter(
-                        årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND),
+                        årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_BOSTØTTE),
                         begrunnelse = "Begrunelse for avslag",
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
