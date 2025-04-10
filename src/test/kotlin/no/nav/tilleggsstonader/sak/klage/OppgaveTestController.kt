@@ -72,5 +72,4 @@ class OppgaveTestController(
     fun taAvVent(
         @RequestBody taAvVentRequest: TaAvVentRequest,
     ): SettPåVentResponse = oppgaveClient.taAvVent(taAvVentRequest)
-
 }
