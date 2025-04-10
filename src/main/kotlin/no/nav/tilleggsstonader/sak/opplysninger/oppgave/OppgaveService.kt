@@ -12,11 +12,11 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.libs.spring.cache.getCachedOrLoad
+import no.nav.tilleggsstonader.libs.spring.cache.getValue
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
-import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalPlasseresIKlarMappe

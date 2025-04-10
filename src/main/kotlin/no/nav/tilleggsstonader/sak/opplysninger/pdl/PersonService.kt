@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.opplysninger.pdl
 
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
-import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
-import no.nav.tilleggsstonader.sak.infrastruktur.config.getNullable
-import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
+import no.nav.tilleggsstonader.libs.spring.cache.getCachedOrLoad
+import no.nav.tilleggsstonader.libs.spring.cache.getNullable
+import no.nav.tilleggsstonader.libs.spring.cache.getValue
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.PersonMedAdresseBeskyttelse

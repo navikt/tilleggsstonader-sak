@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
-import no.nav.tilleggsstonader.sak.infrastruktur.config.getNullable
+import no.nav.tilleggsstonader.libs.spring.cache.getNullable
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.tilgang
 
+import no.nav.tilleggsstonader.libs.spring.cache.getValue
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -7,7 +8,6 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
-import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ManglerTilgang
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
