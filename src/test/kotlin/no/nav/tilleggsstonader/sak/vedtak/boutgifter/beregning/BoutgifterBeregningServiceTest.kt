@@ -106,7 +106,7 @@ class BoutgifterBeregningServiceTest {
                 vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
             )
-        }.hasMessage("Foreløbig støtter vi ikke faste- og midlertidig utgift i samme behandling")
+        }.hasMessage("Foreløpig støtter vi ikke løpende og midlertidige utgifter i samme behandling")
     }
 
     @Nested

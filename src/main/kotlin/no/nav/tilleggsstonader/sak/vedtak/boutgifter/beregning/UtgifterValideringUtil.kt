@@ -13,11 +13,11 @@ object UtgifterValideringUtil {
      *
      */
     fun validerUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>) {
-        brukerfeilHvis(erUtgifterOvernattingOgLøpendeUtgifter(utgifter)) {
-            "Foreløbig støtter vi ikke faste- og midlertidig utgift i samme behandling"
-        }
         brukerfeilHvis(utgifter.values.flatten().isEmpty()) {
-            "Kan ikke innvilge når det ikke finnes noen utgiftsperioder"
+            "Det er ikke lagt inn noen oppfylte utgiftsperioder"
+        }
+        brukerfeilHvis(detFinnesBådeLøpendeOgMidlertidigeUtgifter(utgifter)) {
+            "Foreløpig støtter vi ikke løpende og midlertidige utgifter i samme behandling"
         }
         utgifter.entries.forEach { (type, utgiftsperioderAvGittType) ->
             feilHvis(utgiftsperioderAvGittType.overlapper()) {
@@ -31,12 +31,12 @@ object UtgifterValideringUtil {
         }
     }
 
-    private fun erUtgifterOvernattingOgLøpendeUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>): Boolean {
-        val erLøpendeUtgifter =
+    private fun detFinnesBådeLøpendeOgMidlertidigeUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>): Boolean {
+        val finnesLøpendeUtgifter =
             utgifter.keys.any {
                 it == TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG || it == TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER
             }
-        val erUtgifterOvernatting = utgifter.keys.any { it == TypeBoutgift.UTGIFTER_OVERNATTING }
-        return erLøpendeUtgifter && erUtgifterOvernatting
+        val finnesUtgifterOvernatting = utgifter.keys.any { it == TypeBoutgift.UTGIFTER_OVERNATTING }
+        return finnesLøpendeUtgifter && finnesUtgifterOvernatting
     }
 }
