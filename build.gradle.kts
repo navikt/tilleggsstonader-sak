@@ -4,8 +4,8 @@ import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20250331103528_ed988de"
-val tilleggsstønaderLibsVersion = "2025.03.28-12.05.78567a42f6ae"
-val tilleggsstønaderKontrakterVersion = "2025.04.08-10.58.c71d0ba92534"
+val tilleggsstønaderLibsVersion = "2025.04.10-07.55.017316591c99"
+val tilleggsstønaderKontrakterVersion = "2025.04.10-07.27.a44013d01b7e"
 val avroVersion = "1.12.0"
 val confluentVersion = "7.9.0"
 val joarkHendelseVersion = "08271806"
@@ -89,6 +89,7 @@ dependencies {
     implementation("no.nav.tilleggsstonader-libs:sikkerhet:$tilleggsstønaderLibsVersion")
     implementation("no.nav.tilleggsstonader-libs:unleash:$tilleggsstønaderLibsVersion")
     implementation("no.nav.tilleggsstonader-libs:kafka:$tilleggsstønaderLibsVersion")
+    implementation("no.nav.tilleggsstonader-libs:spring:$tilleggsstønaderLibsVersion")
 
     implementation("no.nav.tilleggsstonader.kontrakter:tilleggsstonader-kontrakter:$tilleggsstønaderKontrakterVersion")
 

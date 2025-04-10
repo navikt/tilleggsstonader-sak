@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.egenansatt
 
-import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
+import no.nav.tilleggsstonader.libs.spring.cache.getCachedOrLoad
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
 

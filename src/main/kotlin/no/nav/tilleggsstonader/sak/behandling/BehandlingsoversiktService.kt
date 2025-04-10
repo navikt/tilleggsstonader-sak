@@ -14,13 +14,10 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -112,13 +109,10 @@ class BehandlingsoversiktService(
         revurdererFra: LocalDate?,
     ): Vedtaksperiode? =
         when (vedtak.data) {
-            is InnvilgelseTilsynBarn -> vedtak.data.beregningsresultat.vedtaksperiode(revurdererFra)
-            is OpphørTilsynBarn -> vedtak.data.beregningsresultat.vedtaksperiode(revurdererFra)
-            is AvslagTilsynBarn -> null
+            is InnvilgelseEllerOpphørTilsynBarn -> vedtak.data.beregningsresultat.vedtaksperiode(revurdererFra)
             is InnvilgelseEllerOpphørLæremidler -> vedtak.data.vedtaksperiode(revurdererFra)
-            is AvslagLæremidler -> null
-            is AvslagBoutgifter -> null
-            is InnvilgelseEllerOpphørBoutgifter -> TODO("Behandlingsoversikt for boutgifter er ikke implementert")
+            is InnvilgelseEllerOpphørBoutgifter -> null
+            is Avslag -> null
         }
 
     private fun BeregningsresultatTilsynBarn.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {

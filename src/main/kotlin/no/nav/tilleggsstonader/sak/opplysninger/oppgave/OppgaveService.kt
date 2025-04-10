@@ -2,43 +2,36 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
-import no.nav.tilleggsstonader.kontrakter.felles.tilBehandlingstema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
-import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
-import no.nav.tilleggsstonader.libs.utils.osloNow
+import no.nav.tilleggsstonader.libs.spring.cache.getCachedOrLoad
+import no.nav.tilleggsstonader.libs.spring.cache.getValue
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
-import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalPlasseresIKlarMappe
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandlesAvApplikasjon
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.FinnOppgaveresultatMedMetadata
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMedMetadata
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.util.FnrUtil
-import no.nav.tilleggsstonader.sak.util.medGosysTid
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Service
 class OppgaveService(
@@ -52,7 +45,7 @@ class OppgaveService(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun hentOppgaver(finnOppgaveRequest: FinnOppgaveRequestDto): FinnOppgaveResponseDto {
+    fun hentOppgaver(finnOppgaveRequest: FinnOppgaveRequestDto): FinnOppgaveresultatMedMetadata {
         FnrUtil.validerOptionalIdent(finnOppgaveRequest.ident)
 
         val aktørId =
@@ -70,48 +63,53 @@ class OppgaveService(
         return finnOppgaver(request)
     }
 
-    fun hentOppgaverForPerson(personIdent: String): FinnOppgaveResponseDto {
+    fun hentOppgaverForPerson(personIdent: String): FinnOppgaveresultatMedMetadata {
         val aktørId = personService.hentAktørId(personIdent)
         val oppgaveRequest = FinnOppgaveRequest(aktørId = aktørId, tema = Tema.TSO)
 
         return finnOppgaver(oppgaveRequest)
     }
 
-    private fun finnOppgaver(request: FinnOppgaveRequest): FinnOppgaveResponseDto {
+    private fun finnOppgaver(request: FinnOppgaveRequest): FinnOppgaveresultatMedMetadata {
         val oppgaveResponse = oppgaveClient.hentOppgaver(request)
 
-        val personer = personService.hentPersonKortBolk(oppgaveResponse.oppgaver.mapNotNull { it.ident }.distinct())
-        val oppgaveMetadata = finnOppgaveMetadata(oppgaveResponse.oppgaver)
-
-        return FinnOppgaveResponseDto(
+        val metadata = finnOppgaveMetadata(oppgaveResponse.oppgaver)
+        return FinnOppgaveresultatMedMetadata(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
-            oppgaver =
-                oppgaveResponse.oppgaver.map { oppgave ->
-                    OppgaveDto(
-                        oppgave = oppgave,
-                        navn = personer.visningsnavnFor(oppgave),
-                        oppgaveMetadata = oppgaveMetadata[oppgave.id],
-                    )
-                },
+            oppgaver = oppgaveResponse.oppgaver.map { OppgaveMedMetadata(it, metadata[it.id]) },
         )
     }
 
-    private fun finnOppgaveMetadata(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> =
+    private fun finnOppgaveMetadata(oppgave: Oppgave): OppgaveMetadata = finnOppgaveMetadata(listOf(oppgave)).values.single()
+
+    private fun finnOppgaveMetadata(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> {
+        val personer = personService.hentPersonKortBolk(oppgaver.mapNotNull { it.ident }.distinct())
+        val behandlingMetadata = finnOppgaveBehandlingMetadata(oppgaver)
+        return oppgaver.associate {
+            it.id to
+                OppgaveMetadata(
+                    navn = personer.visningsnavnFor(it),
+                    behandlingMetadata = behandlingMetadata[it.id],
+                )
+        }
+    }
+
+    private fun finnOppgaveBehandlingMetadata(oppgaver: List<Oppgave>): Map<Long, OppgaveBehandlingMetadata> =
         finnOppgaveMetadataSak(oppgaver) + finnOppgaveMetadataKlage(oppgaver)
 
-    private fun finnOppgaveMetadataSak(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> {
+    private fun finnOppgaveMetadataSak(oppgaver: List<Oppgave>): Map<Long, OppgaveBehandlingMetadata> {
         val oppgaveIder = oppgaver.filter { it.behandlingstype != Behandlingstype.Klage.value }.map { it.id }
         return cacheManager.getCachedOrLoad("oppgaveMetadata", oppgaveIder) {
             oppgaveRepository.finnOppgaveMetadata(oppgaveIder).associateBy { it.gsakOppgaveId }
         }
     }
 
-    private fun finnOppgaveMetadataKlage(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> {
+    private fun finnOppgaveMetadataKlage(oppgaver: List<Oppgave>): Map<Long, OppgaveBehandlingMetadata> {
         val oppgaveIder = oppgaver.filter { it.behandlingstype == Behandlingstype.Klage.value }.map { it.id }
         return cacheManager.getCachedOrLoad("oppgaveMetadataKlage", oppgaveIder) {
             klageService
                 .hentBehandlingIderForOppgaveIder(oppgaveIder)
-                .map { it.key to OppgaveMetadata(gsakOppgaveId = it.key, behandlingId = it.value) }
+                .map { it.key to OppgaveBehandlingMetadata(gsakOppgaveId = it.key, behandlingId = it.value) }
                 .toMap()
         }
     }
@@ -123,20 +121,21 @@ class OppgaveService(
         gsakOppgaveId: Long,
         saksbehandler: String?,
         versjon: Int,
-    ): OppgaveDto {
+    ): OppgaveMedMetadata {
         val oppdatertOppgave =
             oppgaveClient.fordelOppgave(
                 oppgaveId = gsakOppgaveId,
                 saksbehandler = saksbehandler,
                 versjon = versjon,
             )
-        val personer = personService.hentPersonKortBolk(listOfNotNull(oppdatertOppgave.ident))
-        return OppgaveDto(
-            oppgave = oppdatertOppgave,
-            navn = personer.visningsnavnFor(oppdatertOppgave),
-            oppgaveMetadata = finnOppgaveMetadata(listOf(oppdatertOppgave))[oppdatertOppgave.id],
-        )
+        return medMetadata(oppdatertOppgave)
     }
+
+    private fun medMetadata(oppdatertOppgave: Oppgave): OppgaveMedMetadata =
+        OppgaveMedMetadata(
+            oppgave = oppdatertOppgave,
+            metadata = finnOppgaveMetadata(oppdatertOppgave),
+        )
 
     fun opprettOppgave(
         behandlingId: BehandlingId,
@@ -189,20 +188,14 @@ class OppgaveService(
         val enhetsnummer =
             oppgave.enhetsnummer ?: arbeidsfordelingService.hentNavEnhetId(personIdent, oppgave.oppgavetype)
 
+        val mappeId = utledMappeId(personIdent, oppgave, enhetsnummer)
         val opprettOppgave =
-            OpprettOppgaveRequest(
-                ident = OppgaveIdentV2(ident = personIdent, gruppe = IdentGruppe.FOLKEREGISTERIDENT),
-                tema = Tema.TSO,
-                journalpostId = oppgave.journalpostId,
-                oppgavetype = oppgave.oppgavetype,
-                fristFerdigstillelse = oppgave.fristFerdigstillelse ?: lagFristForOppgave(osloNow()),
-                beskrivelse = lagOppgaveTekst(oppgave.beskrivelse),
+            tilOpprettOppgaveRequest(
+                oppgave = oppgave,
+                personIdent = personIdent,
+                stønadstype,
                 enhetsnummer = enhetsnummer,
-                behandlingstema = stønadstype.tilBehandlingstema().value,
-                tilordnetRessurs = oppgave.tilordnetNavIdent,
-                mappeId = utledMappeId(personIdent, oppgave, enhetsnummer),
-                prioritet = oppgave.prioritet,
-                behandlesAvApplikasjon = utledBehandlesAvApplikasjon(oppgave.oppgavetype),
+                mappeId = mappeId,
             )
 
         try {
@@ -307,36 +300,6 @@ class OppgaveService(
     fun finnSisteOppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
         oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandlingId)
 
-    private fun lagOppgaveTekst(beskrivelse: String? = null): String {
-        val tidspunkt = osloNow().medGosysTid()
-        val prefix = "----- Opprettet av tilleggsstonader-sak $tidspunkt ---"
-        val beskrivelseMedNewLine = beskrivelse?.let { "\n$it" } ?: ""
-        return prefix + beskrivelseMedNewLine
-    }
-
-    /**
-     * Frist skal være 1 dag hvis den opprettes før kl. 12
-     * og 2 dager hvis den opprettes etter kl. 12
-     *
-     * Helgedager må ekskluderes
-     *
-     */
-    fun lagFristForOppgave(gjeldendeTid: LocalDateTime): LocalDate {
-        val frist =
-            when (gjeldendeTid.dayOfWeek) {
-                DayOfWeek.FRIDAY -> fristBasertPåKlokkeslett(gjeldendeTid.plusDays(2))
-                DayOfWeek.SATURDAY -> fristBasertPåKlokkeslett(gjeldendeTid.plusDays(2).withHour(8))
-                DayOfWeek.SUNDAY -> fristBasertPåKlokkeslett(gjeldendeTid.plusDays(1).withHour(8))
-                else -> fristBasertPåKlokkeslett(gjeldendeTid)
-            }
-
-        return when (frist.dayOfWeek) {
-            DayOfWeek.SATURDAY -> frist.plusDays(2)
-            DayOfWeek.SUNDAY -> frist.plusDays(1)
-            else -> frist
-        }
-    }
-
     fun finnMappe(
         enhet: String,
         oppgaveMappe: OppgaveMappe,
@@ -371,14 +334,6 @@ class OppgaveService(
             }
             mappeRespons.mapper
         }
-
-    private fun fristBasertPåKlokkeslett(gjeldendeTid: LocalDateTime): LocalDate {
-        return if (gjeldendeTid.hour >= 12) {
-            return gjeldendeTid.plusDays(2).toLocalDate()
-        } else {
-            gjeldendeTid.plusDays(1).toLocalDate()
-        }
-    }
 
     private fun Map<String, PdlPersonKort>.visningsnavnFor(oppgave: Oppgave) =
         oppgave.ident

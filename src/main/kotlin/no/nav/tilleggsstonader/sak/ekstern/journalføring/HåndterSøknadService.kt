@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.HåndterSøknadRequest
-import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -28,7 +27,6 @@ class HåndterSøknadService(
     private val journalføringService: JournalføringService,
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
-    private val arbeidsfordelingService: ArbeidsfordelingService,
 ) {
     @Transactional
     fun håndterSøknad(request: HåndterSøknadRequest) {
@@ -60,7 +58,7 @@ class HåndterSøknadService(
                 stønadstype = stønadstype,
                 behandlingÅrsak = BehandlingÅrsak.SØKNAD,
                 oppgaveBeskrivelse = "Automatisk journalført søknad. Skal saksbehandles i ny løsning.",
-                journalførendeEnhet = arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(personIdent),
+                journalførendeEnhet = MASKINELL_JOURNALFOERENDE_ENHET,
             )
         } else {
             håndterSøknadSomIkkeKanAutomatiskJournalføres(

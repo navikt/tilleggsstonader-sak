@@ -27,7 +27,7 @@ data class OppgaveDomain(
  * !!NOTER: Denne blir cachet i [OppgaveService.finnOppgaveMetadata]
  * så hvis noe legges til som kan endre seg, eks en status, så må cache fjernes
  */
-data class OppgaveMetadata(
+data class OppgaveBehandlingMetadata(
     val gsakOppgaveId: Long,
     val behandlingId: UUID,
     val sendtTilTotrinnskontrollAv: String? = null,

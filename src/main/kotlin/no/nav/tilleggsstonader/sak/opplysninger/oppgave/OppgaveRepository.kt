@@ -53,5 +53,5 @@ interface OppgaveRepository :
         AND o.behandling_id IS NOT NULL
         """,
     )
-    fun finnOppgaveMetadata(oppgaveIder: Collection<Long>): List<OppgaveMetadata>
+    fun finnOppgaveMetadata(oppgaveIder: Collection<Long>): List<OppgaveBehandlingMetadata>
 }

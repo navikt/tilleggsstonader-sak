@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.HåndterSøknadRequest
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
-import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -48,7 +47,6 @@ internal class HåndterSøknadServiceTest {
     val behandlingService: BehandlingService = mockk()
     val fagsakService: FagsakService = mockk()
     val personService: PersonService = mockk()
-    val arbeidsfordelingService: ArbeidsfordelingService = mockk()
     val journalpostService: JournalpostService = mockk()
     val søknadService: SøknadService = mockk()
     val taskService: TaskService = mockk()
@@ -63,10 +61,9 @@ internal class HåndterSøknadServiceTest {
             journalføringService = journalføringService,
             fagsakService = fagsakService,
             behandlingService = behandlingService,
-            arbeidsfordelingService = arbeidsfordelingService,
         )
 
-    val enhet = ArbeidsfordelingTestUtil.ENHET_NASJONAL_NAY.enhetNr
+    val enhet = ArbeidsfordelingService.MASKINELL_JOURNALFOERENDE_ENHET
     val personIdent = "123456789"
     val aktørId = "9876543210127"
     val tidligerePersonIdent = "9123456789"
@@ -96,7 +93,6 @@ internal class HåndterSøknadServiceTest {
                     ),
             )
         every { fagsakService.hentEllerOpprettFagsak(any(), any()) } returns fagsak
-        every { arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(any()) } returns enhet
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
         every { søknadService.hentSøknadBarnetilsyn(any()) } returns
             SøknadBarnetilsyn(

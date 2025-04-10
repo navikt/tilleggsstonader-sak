@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.klage
 
-import no.nav.familie.prosessering.rest.Ressurs
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.klage.FagsystemVedtak
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -26,17 +25,23 @@ class KlageController(
     private val klageService: KlageService,
     private val eksternVedtakService: EksternKlageVedtakService,
 ) {
+    /**
+     * Brukes av "Opprett behandling"-modalen i sak-frontend
+     */
     @PostMapping("/fagsak/{fagsakId}")
     fun opprettKlage(
         @PathVariable fagsakId: FagsakId,
         @RequestBody opprettKlageDto: OpprettKlageDto,
-    ): Ressurs<FagsakId> {
+    ): FagsakId {
         tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.CREATE)
         tilgangService.validerHarSaksbehandlerrolle()
         klageService.opprettKlage(fagsakId, opprettKlageDto)
-        return Ressurs.success(fagsakId)
+        return fagsakId
     }
 
+    /**
+     * Brukes av sak-frontend for å hente klagebehandlinger som listes opp i personoversikten
+     */
     @GetMapping("/fagsak-person/{fagsakPersonId}")
     fun hentKlagebehandlinger(
         @PathVariable fagsakPersonId: FagsakPersonId,
@@ -45,15 +50,18 @@ class KlageController(
         return klageService.hentBehandlinger(fagsakPersonId)
     }
 
-    @GetMapping("/ekstern-fagsak/{eksternFagsakId}/vedtak")
+    /**
+     * Kalles på av klage-backend for å populere listen over vedtak som det kan klages på
+     */
+    @GetMapping(path = ["/ekstern-fagsak/{eksternFagsakId}/vedtak"])
     @ProtectedWithClaims(issuer = "azuread")
     fun hentVedtak(
         @PathVariable eksternFagsakId: Long,
-    ): Ressurs<List<FagsystemVedtak>> {
+    ): List<FagsystemVedtak> {
         if (!SikkerhetContext.erMaskinTilMaskinToken()) {
             tilgangService.validerTilgangTilEksternFagsak(eksternFagsakId, AuditLoggerEvent.ACCESS)
         }
 
-        return Ressurs.success(eksternVedtakService.hentVedtak(eksternFagsakId))
+        return eksternVedtakService.hentVedtak(eksternFagsakId)
     }
 }

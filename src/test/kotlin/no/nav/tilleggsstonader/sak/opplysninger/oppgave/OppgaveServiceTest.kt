@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
@@ -34,6 +35,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.IntegrasjonException
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMedMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
@@ -49,8 +51,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 
 internal class OppgaveServiceTest {
@@ -191,7 +191,11 @@ internal class OppgaveServiceTest {
         val respons = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, enhet = ENHET_NR_NAY))
 
         assertThat(respons.antallTreffTotalt).isEqualTo(1)
-        assertThat(respons.oppgaver.first().id).isEqualTo(GSAK_OPPGAVE_ID)
+        assertThat(
+            respons.oppgaver
+                .first()
+                .oppgave.id,
+        ).isEqualTo(GSAK_OPPGAVE_ID)
     }
 
     @Test
@@ -289,27 +293,6 @@ internal class OppgaveServiceTest {
     }
 
     @Test
-    fun `Skal sette frist for oppgave`() {
-        val frister =
-            listOf<Pair<LocalDateTime, LocalDate>>(
-                Pair(torsdag.morgen(), fredagFrist),
-                Pair(torsdag.kveld(), mandagFrist),
-                Pair(fredag.morgen(), mandagFrist),
-                Pair(fredag.kveld(), tirsdagFrist),
-                Pair(lørdag.morgen(), tirsdagFrist),
-                Pair(lørdag.kveld(), tirsdagFrist),
-                Pair(søndag.morgen(), tirsdagFrist),
-                Pair(søndag.kveld(), tirsdagFrist),
-                Pair(mandag.morgen(), tirsdagFrist),
-                Pair(mandag.kveld(), onsdagFrist),
-            )
-
-        frister.forEach {
-            assertThat(oppgaveService.lagFristForOppgave(it.first)).isEqualTo(it.second)
-        }
-    }
-
-    @Test
     fun `skal legge til navn på oppgave hvis oppgaven har folkeregisterident`() {
         val oppgaveIdMedNavn = 1L
 
@@ -333,8 +316,8 @@ internal class OppgaveServiceTest {
             oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = "01010172272", enhet = ENHET_NR_NAY)).oppgaver
 
         verify(exactly = 1) { personService.hentPersonKortBolk(eq(listOf("1"))) }
-        assertThat(oppgaver.single { it.id == oppgaveIdMedNavn }.navn).contains("fornavn1 ")
-        assertThat(oppgaver.filterNot { it.id == oppgaveIdMedNavn }.map { it.navn }).containsOnly("Mangler navn")
+        assertThat(oppgaver.single { it.oppgave.id == oppgaveIdMedNavn }.navn).contains("fornavn1 ")
+        assertThat(oppgaver.filterNot { it.oppgave.id == oppgaveIdMedNavn }.map { it.navn }).containsOnly("Mangler navn")
     }
 
     @Test
@@ -353,13 +336,13 @@ internal class OppgaveServiceTest {
         every { oppgaveRepository.finnOppgaveMetadata(any()) } answers {
             firstArg<List<Long>>()
                 .filter { it == oppgaveIdMedBehandling }
-                .map { OppgaveMetadata(it, behandlingId.id, null) }
+                .map { OppgaveBehandlingMetadata(it, behandlingId.id, null) }
         }
 
         val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, enhet = ENHET_NR_NAY)).oppgaver
 
-        assertThat(oppgaver.single { it.id == oppgaveIdMedBehandling }.behandlingId).isEqualTo(behandlingId.id)
-        assertThat(oppgaver.single { it.id != oppgaveIdMedBehandling }.behandlingId).isNull()
+        assertThat(oppgaver.single { it.oppgave.id == oppgaveIdMedBehandling }.behandlingId).isEqualTo(behandlingId.id)
+        assertThat(oppgaver.single { it.oppgave.id != oppgaveIdMedBehandling }.behandlingId).isNull()
     }
 
     @Test
@@ -376,7 +359,7 @@ internal class OppgaveServiceTest {
 
         val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, enhet = ENHET_NR_NAY)).oppgaver
 
-        assertThat(oppgaver.single { it.id == oppgaveIdMedBehandling }.behandlingId).isEqualTo(behandlingIdKlage)
+        assertThat(oppgaver.single { it.oppgave.id == oppgaveIdMedBehandling }.behandlingId).isEqualTo(behandlingIdKlage)
     }
 
     @Test
@@ -437,6 +420,9 @@ internal class OppgaveServiceTest {
             oppgaver = listOf(lagEksternTestOppgave()),
         )
 
+    private val OppgaveMedMetadata.behandlingId get() = this.metadata?.behandlingMetadata?.behandlingId
+    private val OppgaveMedMetadata.navn get() = this.metadata?.navn
+
     companion object {
         private val FAGSAK_ID = FagsakId.fromString("1242f220-cad3-4640-95c1-190ec814c91e")
         private const val FAGSAK_EKSTERN_ID = 98765L
@@ -447,18 +433,3 @@ internal class OppgaveServiceTest {
         private const val SAKSBEHANDLER_ID = "Z999999"
     }
 }
-
-private fun LocalDateTime.kveld(): LocalDateTime = this.withHour(20)
-
-private fun LocalDateTime.morgen(): LocalDateTime = this.withHour(8)
-
-private val torsdag = LocalDateTime.of(2021, 4, 1, 12, 0)
-private val fredag = LocalDateTime.of(2021, 4, 2, 12, 0)
-private val lørdag = LocalDateTime.of(2021, 4, 3, 12, 0)
-private val søndag = LocalDateTime.of(2021, 4, 4, 12, 0)
-private val mandag = LocalDateTime.of(2021, 4, 5, 12, 0)
-
-private val fredagFrist = LocalDate.of(2021, 4, 2)
-private val mandagFrist = LocalDate.of(2021, 4, 5)
-private val tirsdagFrist = LocalDate.of(2021, 4, 6)
-private val onsdagFrist = LocalDate.of(2021, 4, 7)
