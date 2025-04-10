@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 data class BehandlingshistorikkDto(
     val behandlingId: BehandlingId,
-    var hendelse: Hendelse,
+    val hendelse: Hendelse,
     val endretAvNavn: String,
     val endretTid: LocalDateTime,
     val metadata: Map<String, Any>? = null,
