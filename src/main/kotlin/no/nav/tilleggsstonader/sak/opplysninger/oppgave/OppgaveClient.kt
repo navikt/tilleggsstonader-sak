@@ -171,7 +171,7 @@ class OppgaveClient(
     fun settPåVent(settPåVent: SettPåVentRequest): SettPåVentResponse {
         val uri =
             UriComponentsBuilder
-                .fromUri(oppgaveUri)
+                .fromUri(oppgaveVentUri)
                 .pathSegment("sett-pa-vent")
                 .encode()
                 .toUriString()
@@ -181,7 +181,7 @@ class OppgaveClient(
     fun oppdaterPåVent(oppdaterPåVent: OppdaterPåVentRequest): SettPåVentResponse {
         val uri =
             UriComponentsBuilder
-                .fromUri(oppgaveUri)
+                .fromUri(oppgaveVentUri)
                 .pathSegment("oppdater-pa-vent")
                 .encode()
                 .toUriString()
@@ -191,7 +191,7 @@ class OppgaveClient(
     fun taAvVent(taAvVent: TaAvVentRequest): SettPåVentResponse {
         val uri =
             UriComponentsBuilder
-                .fromUri(oppgaveUri)
+                .fromUri(oppgaveVentUri)
                 .pathSegment("ta-av-vent")
                 .encode()
                 .toUriString()
