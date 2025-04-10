@@ -119,4 +119,4 @@ fun LocalDate.tilSisteDagenIÅret() = this.toYearMonth().withMonth(12).atEndOfMo
 
 fun LocalDate.lørdagEllerSøndag() = this.dayOfWeek == DayOfWeek.SATURDAY || this.dayOfWeek == DayOfWeek.SUNDAY
 
-fun Periode<LocalDate>.formatertPeriodeNorskFormat() = "${this.fom.norskFormat()} - ${this.tom.norskFormat()}"
+fun Periode<LocalDate>.formatertPeriodeNorskFormat() = "${this.fom.norskFormat()}–${this.tom.norskFormat()}"

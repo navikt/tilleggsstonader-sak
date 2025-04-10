@@ -202,7 +202,7 @@ class VedtaksperiodeValideringServiceTest {
             assertThatThrownBy {
                 validerInnvilgelse(listOf(vedtaksperiodeJanuar))
             }.hasMessageContaining(
-                "Vedtaksperiode 01.01.2025 - 31.01.2025 overlapper med INGEN_MÅLGRUPPE(01.01.2025 - 28.02.2025) " +
+                "Vedtaksperiode 01.01.2025–31.01.2025 overlapper med INGEN_MÅLGRUPPE(01.01.2025–28.02.2025) " +
                     "som ikke gir rett på stønad",
             )
         }
