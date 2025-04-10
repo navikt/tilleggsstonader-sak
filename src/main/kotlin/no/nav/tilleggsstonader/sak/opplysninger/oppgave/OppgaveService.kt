@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
