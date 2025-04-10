@@ -3,22 +3,16 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.validerUtgiftHeleVedtaksperioden
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.splittTilLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.splitFraRevurderFra
@@ -30,7 +24,7 @@ import org.springframework.stereotype.Service
 class BoutgifterBeregningService(
     private val boutgifterUtgiftService: BoutgifterUtgiftService,
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
-    private val vedtakRepository: VedtakRepository,
+//    private val vedtakRepository: VedtakRepository,
 ) {
     /**
      * Kjente begrensninger i beregningen (programmet kaster feil dersom antagelsene ikke stemmer):
@@ -48,9 +42,11 @@ class BoutgifterBeregningService(
         // TODO: Deal med revurderFra-datoen
 
         val utgifterPerVilkårtype = boutgifterUtgiftService.hentUtgifterTilBeregning(behandling.id)
+
         validerUtgifter(utgifterPerVilkårtype)
 
         validerUtgiftHeleVedtaksperioden(vedtaksperioder, utgifterPerVilkårtype)
+
         vedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
@@ -234,13 +230,13 @@ class BoutgifterBeregningService(
 //            }
 //    }
 
-    private fun hentForrigeVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørBoutgifter? =
-        behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
+//    private fun hentForrigeVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørBoutgifter? =
+//        behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
 
-    private fun hentVedtak(behandlingId: BehandlingId) =
-        vedtakRepository
-            .findByIdOrThrow(behandlingId)
-            .withTypeOrThrow<InnvilgelseEllerOpphørBoutgifter>()
+//    private fun hentVedtak(behandlingId: BehandlingId) =
+//        vedtakRepository
+//            .findByIdOrThrow(behandlingId)
+//            .withTypeOrThrow<InnvilgelseEllerOpphørBoutgifter>()
 
     private fun lagBeregningsGrunnlag(
         periode: UtbetalingPeriode,

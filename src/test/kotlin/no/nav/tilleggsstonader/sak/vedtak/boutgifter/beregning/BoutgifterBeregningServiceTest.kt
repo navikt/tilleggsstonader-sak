@@ -42,7 +42,7 @@ class BoutgifterBeregningServiceTest {
         BoutgifterBeregningService(
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
-            vedtakRepository = vedtakRepository,
+//            vedtakRepository = vedtakRepository,
         )
 
     val behandling = saksbehandling()
