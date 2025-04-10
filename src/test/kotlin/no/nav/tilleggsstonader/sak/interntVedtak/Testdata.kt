@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
@@ -527,6 +528,17 @@ object Testdata {
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = beregningsresultat,
                         begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+            )
+        val avslåttVedtak =
+            GeneriskVedtak(
+                behandlingId = behandlingId,
+                type = TypeVedtak.AVSLAG,
+                data =
+                    AvslagBoutgifter(
+                        årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_BOSTØTTE),
+                        begrunnelse = "Begrunelse for avslag",
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
             )

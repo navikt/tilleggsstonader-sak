@@ -9,6 +9,8 @@ enum class ÅrsakAvslagDvh {
     MANGELFULL_DOKUMENTASJON,
     HAR_IKKE_UTGIFTER,
     RETT_TIL_UTSTYRSSTIPEND,
+    HAR_IKKE_MERUTGIFTER,
+    RETT_TIL_BOSTØTTE,
     ANNET,
     ;
 
@@ -32,6 +34,8 @@ enum class ÅrsakAvslagDvh {
                 ÅrsakAvslag.MANGELFULL_DOKUMENTASJON -> MANGELFULL_DOKUMENTASJON
                 ÅrsakAvslag.HAR_IKKE_UTGIFTER -> HAR_IKKE_UTGIFTER
                 ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND -> RETT_TIL_UTSTYRSSTIPEND
+                ÅrsakAvslag.HAR_IKKE_MERUTGIFTER -> HAR_IKKE_MERUTGIFTER
+                ÅrsakAvslag.RETT_TIL_BOSTØTTE -> RETT_TIL_BOSTØTTE
                 ÅrsakAvslag.ANNET -> ANNET
             }
     }

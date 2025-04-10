@@ -404,5 +404,19 @@ class InterntVedtakServiceTest {
                 assertThat(tom).isEqualTo(LocalDate.of(2024, FEBRUARY, 29))
             }
         }
+
+        @Test
+        fun `Vedtak avslag skal mappes riktig`() {
+            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Boutgifter.avslåttVedtak
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            val dummyAvslåttVedtak = Testdata.Boutgifter.avslåttVedtak.data
+
+            assertThat(interntVedtak.vedtak!!).isEqualTo(
+                VedtakAvslagInternt(
+                    årsakerAvslag = dummyAvslåttVedtak.årsaker,
+                    avslagBegrunnelse = dummyAvslåttVedtak.begrunnelse,
+                ),
+            )
+        }
     }
 }
