@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20250331103528_ed988de"
 val tilleggsstønaderLibsVersion = "2025.04.10-07.55.017316591c99"
-val tilleggsstønaderKontrakterVersion = "2025.04.10-07.27.a44013d01b7e"
+val tilleggsstønaderKontrakterVersion = "2025.04.10-11.48.be6850253087"
 val avroVersion = "1.12.0"
 val confluentVersion = "7.9.0"
 val joarkHendelseVersion = "08271806"
