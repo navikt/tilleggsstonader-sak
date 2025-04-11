@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnit
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.OppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
+import no.nav.tilleggsstonader.sak.vedlegg.BrevkodeVedlegg
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdKontrakt
@@ -59,7 +60,7 @@ class SøknadskjemaBoutgifterMapper(
         if (dokumenter == null) return emptyList()
         return dokumenter
             .filter { it.brevkode != DokumentBrevkode.BOUTGIFTER.verdi }
-            .filter { it.brevkode != "L7" && it.tittel != "Innsendingskvittering" } // Innsendingskvittering
+            .filter { it.brevkode != BrevkodeVedlegg.INNSENDINGSKVITTERING.kode }
             .mapNotNull { dokument ->
                 dokument.tittel?.let {
                     DokumentasjonBoutgifter(tittel = it, dokumentInfoId = dokument.dokumentInfoId)
