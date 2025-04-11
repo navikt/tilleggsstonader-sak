@@ -34,6 +34,7 @@ data class BeregningsresultatForLøpendeMåned(
     @get:JsonIgnore
     override val tom: LocalDate get() = grunnlag.tom
 
+    // TODO dett eburde være en del av resultatet?
     @JsonProperty("stønadsbeløp")
     val stønadsbeløp = summerUtgifter().begrensTilMakssats()
 

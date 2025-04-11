@@ -22,7 +22,7 @@ object BoutgifterAndelTilkjentYtelseMapper {
     ): List<AndelTilkjentYtelse> {
         val andeler =
             beregningsresultat.perioder
-                .groupBy { it.grunnlag.utbetalingsdato }
+                .groupBy { it.grunnlag.utbetalingsdato } // TODO Hvorfor gjøres dette?
                 .entries
                 .sortedBy { (utbetalingsdato, _) -> utbetalingsdato }
                 .flatMap { (utbetalingsdato, perioder) ->
@@ -55,7 +55,7 @@ object BoutgifterAndelTilkjentYtelseMapper {
             .groupBy { it.grunnlag.målgruppe.tilTypeAndel(Stønadstype.BOUTGIFTER) }
             .map { (typeAndel, perioder) ->
                 AndelTilkjentYtelse(
-                    beløp = perioder.sumOf { it.stønadsbeløp },
+                    beløp = perioder.sumOf { it.stønadsbeløp }, // TODO hvorfor gjøres dette? Kan det være flere BeregningsresultatForLøpendeMåned per måned?
                     fom = førsteUkedagIMåneden,
                     tom = førsteUkedagIMåneden,
                     satstype = Satstype.DAG,
@@ -68,6 +68,7 @@ object BoutgifterAndelTilkjentYtelseMapper {
     }
 
     /**
+     * TODO Er dette ønskelig? Det er ikke noe vi har på tilsyn barn (men kunde/burde haft det der)
      * Hvis utbetalingsmåneden er fremover i tid og det er nytt år så skal det ventes på satsendring før iverksetting.
      */
     private fun statusIverksettingForSatsBekreftet(satsBekreftet: Boolean): StatusIverksetting {
