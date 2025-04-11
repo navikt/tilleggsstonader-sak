@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 
 /**
  * @param prioritet lavest er den som har høyest prioritet
@@ -65,36 +63,6 @@ enum class MålgruppeType(
     override fun girIkkeRettPåVedtaksperiode() =
         this == INGEN_MÅLGRUPPE ||
             this == SYKEPENGER_100_PROSENT
-
-    fun tilTypeAndel(stønadstype: Stønadstype): TypeAndel =
-        when (stønadstype) {
-            Stønadstype.BARNETILSYN -> {
-                when (this) {
-                    AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE -> TypeAndel.TILSYN_BARN_AAP
-                    OVERGANGSSTØNAD -> TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER
-                    OMSTILLINGSSTØNAD -> TypeAndel.TILSYN_BARN_ETTERLATTE
-                    else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
-                }
-            }
-
-            Stønadstype.LÆREMIDLER -> {
-                when (this) {
-                    AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE -> TypeAndel.LÆREMIDLER_AAP
-                    OVERGANGSSTØNAD -> TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER
-                    OMSTILLINGSSTØNAD -> TypeAndel.LÆREMIDLER_ETTERLATTE
-                    else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
-                }
-            }
-
-            Stønadstype.BOUTGIFTER -> {
-                when (this) {
-                    AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE -> TypeAndel.BOUTGIFTER_AAP
-                    OVERGANGSSTØNAD -> TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER
-                    OMSTILLINGSSTØNAD -> TypeAndel.BOUTGIFTER_ETTERLATTE
-                    else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
-                }
-            }
-        }
 
     fun skalVurdereAldersvilkår() =
         when (this) {
