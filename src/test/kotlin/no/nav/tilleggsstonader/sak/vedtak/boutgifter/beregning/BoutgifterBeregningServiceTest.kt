@@ -372,7 +372,7 @@ class BoutgifterBeregningServiceTest {
                     vedtaksperioder = vedtaksperioder,
                     typeVedtak = TypeVedtak.INNVILGELSE,
                 )
-            }.hasMessage("Vedtaksperioden 01.01.2025–31.01.2025 mangler utgift hele eller deler av perioden.")
+            }.hasMessage("Vedtaksperioden 01.01.2025–31.01.2025 mangler oppfylt utgift hele eller deler av perioden.")
         }
 
         @Test
