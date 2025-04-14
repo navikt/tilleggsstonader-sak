@@ -45,6 +45,11 @@ class SøknadService(
             .findByIdOrNull(behandlingId)
             ?.let { søknadLæremidlerRepository.findByIdOrThrow(it.søknadId) }
 
+    fun hentSøknadBoutgifter(behandlingId: BehandlingId): SøknadBoutgifter? =
+        søknadBehandlingRepository
+            .findByIdOrNull(behandlingId)
+            ?.let { søknadBoutgifterRepository.findByIdOrThrow(it.søknadId) }
+
     fun lagreSøknad(
         behandlingId: BehandlingId,
         journalpost: Journalpost,
