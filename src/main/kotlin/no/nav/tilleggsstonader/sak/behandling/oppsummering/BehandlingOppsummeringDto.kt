@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -16,18 +17,21 @@ data class BehandlingOppsummeringDto private constructor(
     val aktiviteter: List<OppsummertVilkårperiode>,
     val målgrupper: List<OppsummertVilkårperiode>,
     val vilkår: List<Stønadsvilkår>,
+    val vedtaksresultat: TypeVedtak?,
     val finnesDataÅOppsummere: Boolean,
 ) {
     constructor(
         aktiviteter: List<OppsummertVilkårperiode>,
         målgrupper: List<OppsummertVilkårperiode>,
         vilkår: List<Stønadsvilkår>,
+        vedtaksresultat: TypeVedtak?,
     ) :
         this(
             aktiviteter = aktiviteter,
             målgrupper = målgrupper,
             vilkår = vilkår,
-            finnesDataÅOppsummere = finnesDataÅOppsummere(aktiviteter, målgrupper, vilkår),
+            vedtaksresultat = vedtaksresultat,
+            finnesDataÅOppsummere = finnesDataÅOppsummere(aktiviteter, målgrupper, vilkår, vedtaksresultat),
         )
 
     companion object {
@@ -35,7 +39,8 @@ data class BehandlingOppsummeringDto private constructor(
             aktiviteter: List<OppsummertVilkårperiode>,
             målgrupper: List<OppsummertVilkårperiode>,
             vilkår: List<Stønadsvilkår>,
-        ): Boolean = aktiviteter.isNotEmpty() || målgrupper.isNotEmpty() || vilkår.isNotEmpty()
+            vedtaksresultat: TypeVedtak?,
+        ): Boolean = aktiviteter.isNotEmpty() || målgrupper.isNotEmpty() || vilkår.isNotEmpty() || vedtaksresultat != null
     }
 }
 

@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.oppsummering.BehandlingOppsummeringUtil.filtrerOgDelFraRevurderFra
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårUtil.finnPerioderEtterRevurderFra
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårUtil.slåSammenSammenhengende
@@ -18,15 +19,18 @@ class BehandlingOppsummeringService(
     private val behandlingService: BehandlingService,
     private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
+    private val vedtaksresultatService: VedtaksresultatService,
 ) {
     fun hentBehandlingOppsummering(behandlingId: BehandlingId): BehandlingOppsummeringDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
+        val vedtaksresultat = vedtaksresultatService.hentVedtaksresultatHvisFinnes(behandlingId)
 
         return BehandlingOppsummeringDto(
             aktiviteter = vilkårperioder.aktiviteter.oppsummer(behandling.revurderFra),
             målgrupper = vilkårperioder.målgrupper.oppsummer(behandling.revurderFra),
             vilkår = oppsummerStønadsvilkår(behandlingId),
+            vedtaksresultat = vedtaksresultat,
         )
     }
 
