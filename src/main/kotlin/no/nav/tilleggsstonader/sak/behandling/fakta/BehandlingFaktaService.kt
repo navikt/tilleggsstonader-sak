@@ -161,8 +161,6 @@ class BehandlingFaktaService(
             delerBoutgifter = mapDelerBoutgifterFlereSteder(utgifterFlereSteder!!.delerBoutgifter),
             andelUtgifterBoligHjemsted = utgifterFlereSteder.andelUtgifterBoligHjemsted,
             andelUtgifterBoligAktivitetssted = utgifterFlereSteder.andelUtgifterBoligAktivitetssted,
-            harLeieinntekter = mapJaNei(utgifterFlereSteder.harLeieinntekter),
-            leieinntekterPerManed = utgifterFlereSteder.leieinntekterPerManed,
         )
 
     fun mapDelerBoutgifterFlereSteder(typer: List<DelerUtgifterFlereStederType>): Map<DelerBoutgifterType, Boolean> =

@@ -297,8 +297,6 @@ class OpprettTestBehandlingController(
                                                     delerBoutgifter = mapOf(DelerBoutgifterType.aktivitetssted to true),
                                                     andelUtgifterBoligHjemsted = 1300,
                                                     andelUtgifterBoligAktivitetssted = 1000,
-                                                    harLeieinntekter = JaNeiType.ja,
-                                                    leieinntekterPerManed = 1000,
                                                 ),
                                             utgifterNyBolig =
                                                 UtgifterNyBolig(

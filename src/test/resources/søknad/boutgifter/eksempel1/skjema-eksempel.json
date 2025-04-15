@@ -118,9 +118,7 @@
           "nei" : true
         },
         "andelUtgifterBoligHjemsted" : 100,
-        "andelUtgifterBoligAktivitetssted" : 100,
-        "harLeieinntekter" : "ja",
-        "leieinntekterPerManed" : 100
+        "andelUtgifterBoligAktivitetssted" : 100
       },
       "utgifterNyBolig" : {
         "delerBoutgifter" : "ja",

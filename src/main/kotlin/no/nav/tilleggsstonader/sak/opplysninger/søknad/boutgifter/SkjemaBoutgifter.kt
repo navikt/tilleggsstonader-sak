@@ -64,8 +64,6 @@ data class UtgifterFlereSteder(
     val delerBoutgifter: List<DelerUtgifterFlereStederType>,
     val andelUtgifterBoligHjemsted: Int,
     val andelUtgifterBoligAktivitetssted: Int,
-    val harLeieinntekter: JaNei,
-    val leieinntekterPerManed: Int?,
 )
 
 enum class DelerUtgifterFlereStederType {

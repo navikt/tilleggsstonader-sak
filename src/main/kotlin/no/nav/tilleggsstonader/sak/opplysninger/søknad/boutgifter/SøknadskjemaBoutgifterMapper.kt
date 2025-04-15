@@ -208,8 +208,6 @@ class SøknadskjemaBoutgifterMapper(
                 delerBoutgifter = mapDelerBoutgifterFlereSteder(it.delerBoutgifter),
                 andelUtgifterBoligHjemsted = it.andelUtgifterBoligHjemsted,
                 andelUtgifterBoligAktivitetssted = it.andelUtgifterBoligAktivitetssted,
-                harLeieinntekter = mapJaNei(it.harLeieinntekter),
-                leieinntekterPerManed = it.leieinntekterPerManed,
             )
         }
 

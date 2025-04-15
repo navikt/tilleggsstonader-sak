@@ -47,9 +47,7 @@
       "utgifterFlereSteder" : {
         "delerBoutgifter" : [ "HJEMSTED", "AKTIVITETSSTED", "NEI" ],
         "andelUtgifterBoligHjemsted" : 100,
-        "andelUtgifterBoligAktivitetssted" : 100,
-        "harLeieinntekter" : "JA",
-        "leieinntekterPerManed" : 100
+        "andelUtgifterBoligAktivitetssted" : 100
       },
       "utgifterNyBolig" : {
         "delerBoutgifter" : "JA",
