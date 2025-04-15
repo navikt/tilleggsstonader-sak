@@ -28,17 +28,20 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Aktiv
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Aktiviteter
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.AktiviteterOgMålgruppe
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidsrettetAktivitetType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArsakOppholdUtenforNorgeType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.BoligEllerOvernatting
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.BoutgifterFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.DelerBoutgifterType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.DineOpplysninger
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.FasteUtgifter
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HarPengestotteAnnetLandType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HarUtgifterTilBoligToStederType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HovedytelseType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Identitet
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.JaNeiType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Landvelger
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.NavAdresse
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Periode
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.PeriodeForSamling
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Samling
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.SkjemaBoutgifter
@@ -76,6 +79,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 import java.time.LocalDateTime
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdBoutgifter
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.OppholdUtenforNorge as OppholdUtenforNorgeBoutgifter
 
 @RestController
 @RequestMapping(path = ["/api/test/opprett-behandling"])
@@ -270,7 +275,7 @@ class OpprettTestBehandlingController(
                                 ),
                             hovedytelse = mapOf(HovedytelseType.arbeidsavklaringspenger to true),
                             harNedsattArbeidsevne = JaNeiType.ja,
-                            arbeidOgOpphold = null,
+                            arbeidOgOpphold = arbeidOgOppholdBoutgifter(),
                             aktiviteter =
                                 Aktiviteter(
                                     aktiviteterOgMaalgruppe =
@@ -368,6 +373,28 @@ class OpprettTestBehandlingController(
                     emptyList(),
                 ),
             oppholdUtenforNorgeNeste12mnd = listOf(oppholdUtenforNorge()),
+        )
+
+    private fun arbeidOgOppholdBoutgifter() =
+        ArbeidOgOppholdBoutgifter(
+            jobberIAnnetLand = JaNeiType.ja,
+            jobbAnnetLand = Landvelger("SWE", "Sverige"),
+            harPengestotteAnnetLand = mapOf(HarPengestotteAnnetLandType.sykepenger to true),
+            pengestotteAnnetLand = Landvelger("SWE", "Sverige"),
+            harOppholdUtenforNorgeSiste12mnd = JaNeiType.ja,
+            oppholdUtenforNorgeSiste12mnd =
+                OppholdUtenforNorgeBoutgifter(
+                    Landvelger("SWE", "Sverige"),
+                    mapOf(ArsakOppholdUtenforNorgeType.besokteFamilie to true),
+                    Periode(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 1, 1)),
+                ),
+            harOppholdUtenforNorgeNeste12mnd = JaNeiType.ja,
+            oppholdUtenforNorgeNeste12mnd =
+                OppholdUtenforNorgeBoutgifter(
+                    Landvelger("SWE", "Sverige"),
+                    mapOf(ArsakOppholdUtenforNorgeType.besokteFamilie to true),
+                    Periode(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 1, 1)),
+                ),
         )
 
     private fun oppholdUtenforNorge() =

@@ -100,7 +100,7 @@ class BehandlingFaktaService(
             hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
             aktiviteter = mapAktivitet(søknad?.data?.aktivitet),
             boligEllerOvernatting = søknad?.data?.boutgifter.let { mapBoligEllerOvernatting(it) },
-            harNedsattArbeidsevne = null,
+            harNedsattArbeidsevne = søknad?.data?.harNedsattArbeidsevne?.let { mapJaNei(it) },
             arena = arenaFakta(grunnlagsdata),
             dineOpplysninger = søknad?.data?.personopplysninger.let { mapDineOpplysninger(it) },
         )

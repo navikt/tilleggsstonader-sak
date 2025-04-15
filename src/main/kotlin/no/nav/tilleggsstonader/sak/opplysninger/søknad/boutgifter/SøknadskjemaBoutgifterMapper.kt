@@ -84,6 +84,7 @@ class SøknadskjemaBoutgifterMapper(
             hovedytelse = mapHovedytelse(skjemaBoutgifter),
             aktivitet = mapAktivitet(skjemaBoutgifter.aktiviteter),
             boutgifter = mapBoutgifter(skjemaBoutgifter.boligEllerOvernatting),
+            harNedsattArbeidsevne = mapJaNei(skjemaBoutgifter.harNedsattArbeidsevne!!),
             dokumentasjon = dokumentasjon,
         )
 
