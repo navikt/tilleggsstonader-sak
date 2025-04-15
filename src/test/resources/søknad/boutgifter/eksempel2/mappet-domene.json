@@ -34,5 +34,6 @@
     },
     "harSærligStoreUtgifterPgaFunksjonsnedsettelse" : "NEI"
   },
-  "dokumentasjon" : [ ]
+  "dokumentasjon" : [ ],
+  "harNedsattArbeidsevne" : null
 }

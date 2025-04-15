@@ -66,5 +66,6 @@
     },
     "harSærligStoreUtgifterPgaFunksjonsnedsettelse" : "JA"
   },
-  "dokumentasjon" : [ ]
+  "dokumentasjon" : [ ],
+  "harNedsattArbeidsevne" : "JA"
 }

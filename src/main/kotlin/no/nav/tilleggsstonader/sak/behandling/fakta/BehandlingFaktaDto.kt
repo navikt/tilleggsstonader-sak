@@ -9,10 +9,13 @@ import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.BoligEllerOvernatting
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.JaNeiType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.Personopplysninger
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Utgifter
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -51,11 +54,16 @@ data class BehandlingFaktaLæremidlerDto(
 /**
  * Dummy-objekt fordi vi ikke har en søknad ennå
  */
+
 data class BehandlingFaktaBoutgifterDto(
-    override val søknadMottattTidspunkt: LocalDateTime? = null,
+    override val søknadMottattTidspunkt: LocalDateTime?,
     override val hovedytelse: FaktaHovedytelse? = null,
     override val dokumentasjon: FaktaDokumentasjon? = null,
     override val arena: ArenaFakta?,
+    val dineOpplysninger: Personopplysninger,
+    val boligEllerOvernatting: BoligEllerOvernatting,
+    val aktiviteter: FaktaAktivtet,
+    val harNedsattArbeidsevne: JaNeiType?,
 ) : BehandlingFaktaDto
 
 data class FaktaHovedytelse(
