@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -166,6 +167,26 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             assertThat(behandlingOppsummering.finnesDataÅOppsummere).isTrue()
             assertThat(behandlingOppsummering.vilkår).hasSize(2)
+        }
+    }
+
+    @Nested
+    inner class AvkortVedRevurderFra {
+        @Test
+        fun `skal kutte perioder fra revurderFra datoen`() {
+            val behandling = testoppsettService.lagBehandlingOgRevurdering(revurderFra = LocalDate.of(2025, 1, 1))
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandlingId = behandling.id,
+                    fom = LocalDate.of(2024, 8, 1),
+                    tom = LocalDate.of(2025, 6, 30),
+                ),
+            )
+
+            val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
+            assertThat(oppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(oppsummering.aktiviteter).hasSize(1)
+            assertThat(oppsummering.aktiviteter[0].fom).isEqualTo(LocalDate.of(2025, 1, 1))
         }
     }
 }

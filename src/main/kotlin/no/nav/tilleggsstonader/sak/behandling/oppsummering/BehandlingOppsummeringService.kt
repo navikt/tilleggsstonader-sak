@@ -2,8 +2,8 @@ package no.nav.tilleggsstonader.sak.behandling.oppsummering
 
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
+import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.oppsummering.BehandlingOppsummeringUtil.filtrerOgDelFraRevurderFra
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -29,7 +29,7 @@ class BehandlingOppsummeringService(
         return BehandlingOppsummeringDto(
             aktiviteter = vilkårperioder.aktiviteter.oppsummer(behandling.revurderFra),
             målgrupper = vilkårperioder.målgrupper.oppsummer(behandling.revurderFra),
-            vilkår = oppsummerStønadsvilkår(behandlingId),
+            vilkår = oppsummerStønadsvilkår(behandlingId, behandling.revurderFra),
             vedtaksresultat = vedtaksresultat,
         )
     }
@@ -42,13 +42,20 @@ class BehandlingOppsummeringService(
             .map { it.tilOppsummertVilkårperiode() }
             .sortedBy { it.fom }
             .mergeSammenhengende(
-                skalMerges = { v1, v2 -> v1.type == v2.type && v1.resultat == v2.resultat && v1.overlapperEllerPåfølgesAv(v2) },
+                skalMerges = { v1, v2 ->
+                    v1.type == v2.type &&
+                        v1.resultat == v2.resultat &&
+                        v1.overlapperEllerPåfølgesAv(
+                            v2,
+                        )
+                },
                 merge = { v1, v2 -> v1.copy(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
-            ).filtrerOgDelFraRevurderFra(
-                revurderFra = revurderFra,
-            )
+            ).avkortPerioderFør(revurderFra)
 
-    private fun oppsummerStønadsvilkår(behandlingId: BehandlingId): List<Stønadsvilkår> {
+    private fun oppsummerStønadsvilkår(
+        behandlingId: BehandlingId,
+        revurderFra: LocalDate?,
+    ): List<Stønadsvilkår> {
         val vilkår = vilkårService.hentVilkår(behandlingId)
 
         // Lager en map per type slik at sammenhendende vilkår kan slås sammen ved like verdier
@@ -65,7 +72,7 @@ class BehandlingOppsummeringService(
                 vilkår =
                     it.value
                         .slåSammenSammenhengende()
-                        .finnPerioderEtterRevurderFra()
+                        .finnPerioderEtterRevurderFra(revurderFra)
                         .map { it.tilOppsummertVilkår() },
             )
         }

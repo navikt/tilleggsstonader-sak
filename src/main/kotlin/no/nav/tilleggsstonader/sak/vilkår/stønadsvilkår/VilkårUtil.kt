@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
-import no.nav.tilleggsstonader.sak.behandling.oppsummering.BehandlingOppsummeringUtil.filtrerOgDelFraRevurderFra
+import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import java.time.LocalDate
 
@@ -24,12 +24,11 @@ object VilkårUtil {
         return (sammenslåttePerioder + perioderUtenTom).sortedBy { it.fom }
     }
 
-    fun List<Vilkår>.finnPerioderEtterRevurderFra(): List<Vilkår> =
+    fun List<Vilkår>.finnPerioderEtterRevurderFra(revurderFra: LocalDate?): List<Vilkår> =
         this
             .map { VilkårHolder(it) }
-            .filtrerOgDelFraRevurderFra(
-                revurderFra = null,
-            ).map { it.vilkår }
+            .avkortPerioderFør(revurderFra)
+            .map { it.vilkår }
 
     /**
      * Hjelpeklasse for å kunne bruke funksjonene som finnes på Periode<T>
