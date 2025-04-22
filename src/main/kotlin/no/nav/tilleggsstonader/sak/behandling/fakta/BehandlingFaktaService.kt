@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.UtdanningAvsnitt
 import no.nav.tilleggsstonader.sak.util.antallÅrSiden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
@@ -99,12 +100,24 @@ class BehandlingFaktaService(
             søknadMottattTidspunkt = søknad?.mottattTidspunkt,
             hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
             aktiviteter = mapAktivitet(søknad?.data?.aktivitet),
-            boligEllerOvernatting = søknad?.data?.boutgifter.let { mapBoligEllerOvernatting(it) },
-            harNedsattArbeidsevne = søknad?.data?.harNedsattArbeidsevne?.let { mapJaNei(it) },
             arena = arenaFakta(grunnlagsdata),
-            dineOpplysninger = søknad?.data?.personopplysninger.let { mapDineOpplysninger(it) },
+            boligEllerOvernatting =
+                FaktaBoligEllerOvernatting(
+                    søknadsgrunnlag = søknad?.data?.boutgifter?.tilFakta(),
+                ),
+            personopplysninger = mapPersonopplysninger(søknad),
         )
     }
+
+    private fun mapPersonopplysninger(søknad: SøknadBoutgifter?): FaktaPersonopplysninger =
+        FaktaPersonopplysninger(
+            søknadsgrunnlag =
+                søknad?.data?.personopplysninger?.adresse?.let {
+                    FaktaPersonopplysningerSøknadsgrunnlag(
+                        adresse = listOfNotNull(it.adresse, it.postnummer, it.poststed).joinToString(", "),
+                    )
+                },
+        )
 
     private fun arenaFakta(grunnlagsdata: Grunnlagsdata): ArenaFakta? =
         grunnlagsdata.grunnlag.arena?.let {
@@ -183,7 +196,7 @@ class BehandlingFaktaService(
                     SøknadsgrunnlagHovedytelse(
                         hovedytelse = it.hovedytelse,
                         arbeidOgOpphold = faktaArbeidOgOppholdMapper.mapArbeidOgOpphold(hovedytelseAvsnitt.arbeidOgOpphold),
-                        harNedsattArbeidsevne = it.harNedsattArbeidsevne
+                        harNedsattArbeidsevne = it.harNedsattArbeidsevne,
                     )
                 },
         )
@@ -266,7 +279,11 @@ class BehandlingFaktaService(
                         fødselsdato = barnGrunnlagsdata.fødselsdato,
                         alder = barnGrunnlagsdata.alder,
                         dødsdato = barnGrunnlagsdata.dødsdato,
-                        saksinformasjonAndreForeldre = mapSaksinformasjonAndreForeldre(behandlingBarn, faktaGrunnlagPerBarn),
+                        saksinformasjonAndreForeldre =
+                            mapSaksinformasjonAndreForeldre(
+                                behandlingBarn,
+                                faktaGrunnlagPerBarn,
+                            ),
                     ),
                 søknadgrunnlag = søknadgrunnlag,
                 vilkårFakta =
