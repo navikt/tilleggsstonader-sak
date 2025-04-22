@@ -183,6 +183,7 @@ class BehandlingFaktaService(
                     SøknadsgrunnlagHovedytelse(
                         hovedytelse = it.hovedytelse,
                         arbeidOgOpphold = faktaArbeidOgOppholdMapper.mapArbeidOgOpphold(hovedytelseAvsnitt.arbeidOgOpphold),
+                        harNedsattArbeidsevne = it.harNedsattArbeidsevne
                     )
                 },
         )

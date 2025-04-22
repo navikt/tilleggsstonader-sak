@@ -77,6 +77,7 @@ data class FaktaUtdanning(
 data class SøknadsgrunnlagHovedytelse(
     val hovedytelse: List<Hovedytelse>,
     val arbeidOgOpphold: FaktaArbeidOgOpphold?,
+    val harNedsattArbeidsevne: JaNei?,
 )
 
 data class SøknadsgrunnlagUtdanning(
