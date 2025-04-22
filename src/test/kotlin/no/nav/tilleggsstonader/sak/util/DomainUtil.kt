@@ -251,7 +251,7 @@ fun vilkår(
         fom = fom,
         tom = tom,
         utgift = utgift,
-        erNullvedtak = erNullvedtak,
+        erFremtidigUtgift = erNullvedtak,
         gitVersjon = Applikasjonsversjon.versjon,
     )
 

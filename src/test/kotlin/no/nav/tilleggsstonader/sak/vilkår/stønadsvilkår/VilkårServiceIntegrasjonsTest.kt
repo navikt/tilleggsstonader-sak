@@ -159,7 +159,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 1, 31),
                 utgift = 1,
-                erNullvedtak = false,
+                erFremtidigUtgift = false,
             )
 
         @BeforeEach
@@ -235,7 +235,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 1, 31),
                 utgift = 1,
-                erNullvedtak = false,
+                erFremtidigUtgift = false,
             )
 
         @BeforeEach
@@ -258,7 +258,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
                     fom = LocalDate.of(2025, 1, 1),
                     tom = LocalDate.of(2025, 1, 31),
                     utgift = 1000,
-                    erNullvedtak = false,
+                    erFremtidigUtgift = false,
                 ),
             )
 

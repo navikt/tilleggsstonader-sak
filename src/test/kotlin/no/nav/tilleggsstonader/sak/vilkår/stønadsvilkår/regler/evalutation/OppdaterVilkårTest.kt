@@ -55,7 +55,7 @@ internal class OppdaterVilkårTest {
                     fom = LocalDate.now(),
                     tom = LocalDate.now().plusDays(1),
                     utgift = 1,
-                    erNullvedtak = false,
+                    erFremtidigUtgift = false,
                 )
 
             @Test
@@ -95,7 +95,7 @@ internal class OppdaterVilkårTest {
                         fom = LocalDate.now(),
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
-                        erNullvedtak = false,
+                        erFremtidigUtgift = false,
                     )
                 val utgifterOvernattingVilkår =
                     vilkår(
@@ -146,7 +146,7 @@ internal class OppdaterVilkårTest {
                 fun `oppfylt utgfiter overnatting kan mangle utgift når det er et nullvedtak`() {
                     validerVilkårOgBeregnResultat(
                         utgifterOvernattingVilkår,
-                        opprettUtgifterOvernattingVilkårDto.copy(utgift = null, erNullvedtak = true),
+                        opprettUtgifterOvernattingVilkårDto.copy(utgift = null, erFremtidigUtgift = true),
                     )
                 }
 
@@ -155,7 +155,7 @@ internal class OppdaterVilkårTest {
                     assertThatThrownBy {
                         validerVilkårOgBeregnResultat(
                             utgifterOvernattingVilkår,
-                            opprettUtgifterOvernattingVilkårDto.copy(utgift = 1, erNullvedtak = true),
+                            opprettUtgifterOvernattingVilkårDto.copy(utgift = 1, erFremtidigUtgift = true),
                         )
                     }.hasMessageContaining("Kan ikke ha utgift på nullvedtak")
                 }
@@ -167,7 +167,7 @@ internal class OppdaterVilkårTest {
                         opprettUtgifterOvernattingVilkårDto.copy(
                             utgift = null,
                             delvilkårsett = ikkeOppfylteDelvilkårUtgifterOvernattingDto(),
-                            erNullvedtak = true,
+                            erFremtidigUtgift = true,
                         )
                     assertDoesNotThrow { validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, dto) }
                 }
@@ -178,7 +178,7 @@ internal class OppdaterVilkårTest {
                         opprettUtgifterOvernattingVilkårDto.copy(
                             utgift = null,
                             delvilkårsett = ikkeOppfylteDelvilkårUtgifterOvernattingDto(),
-                            erNullvedtak = true,
+                            erFremtidigUtgift = true,
                         )
                     assertThatThrownBy {
                         validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, dto)
@@ -196,7 +196,7 @@ internal class OppdaterVilkårTest {
                         fom = LocalDate.now(),
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
-                        erNullvedtak = false,
+                        erFremtidigUtgift = false,
                     )
                 val vilkår =
                     vilkår(
@@ -244,7 +244,7 @@ internal class OppdaterVilkårTest {
                         fom = LocalDate.now(),
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
-                        erNullvedtak = false,
+                        erFremtidigUtgift = false,
                     )
                 val vilkår =
                     vilkår(
@@ -350,7 +350,7 @@ internal class OppdaterVilkårTest {
                 fom = originaltVilkår.fom,
                 tom = originaltVilkår.tom,
                 utgift = 100,
-                erNullvedtak = false,
+                erFremtidigUtgift = false,
             )
     }
 }

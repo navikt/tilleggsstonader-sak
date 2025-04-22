@@ -142,7 +142,7 @@ internal class VilkårServiceTest {
                             fom = null,
                             tom = null,
                             utgift = null,
-                            erNullvedtak = false,
+                            erFremtidigUtgift = false,
                         ),
                     )
                 },
@@ -162,7 +162,7 @@ internal class VilkårServiceTest {
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
                     utgift = 1,
-                    erNullvedtak = false,
+                    erFremtidigUtgift = false,
                 ),
             )
 
@@ -197,11 +197,11 @@ internal class VilkårServiceTest {
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
                     utgift = null,
-                    erNullvedtak = true,
+                    erFremtidigUtgift = true,
                 ),
             )
 
-            assertThat(lagretVilkår.captured.erNullvedtak).isTrue
+            assertThat(lagretVilkår.captured.erFremtidigUtgift).isTrue
         }
 
         @Test
@@ -218,7 +218,7 @@ internal class VilkårServiceTest {
                         fom = LocalDate.of(2024, 1, 1),
                         tom = LocalDate.of(2024, 1, 31),
                         utgift = null,
-                        erNullvedtak = true,
+                        erFremtidigUtgift = true,
                     ),
                 )
             }.hasMessageContaining("Vi støtter foreløpig ikke nullvedtak")
@@ -238,7 +238,7 @@ internal class VilkårServiceTest {
                         fom = LocalDate.of(2024, 1, 1),
                         tom = LocalDate.of(2024, 1, 31),
                         utgift = 100,
-                        erNullvedtak = true,
+                        erFremtidigUtgift = true,
                     ),
                 )
             }.hasMessageContaining("Kan ikke ha utgift på nullvedtak")
@@ -324,7 +324,7 @@ internal class VilkårServiceTest {
                         fom = null,
                         tom = null,
                         utgift = null,
-                        erNullvedtak = false,
+                        erFremtidigUtgift = false,
                     ),
                 )
             },
@@ -360,7 +360,7 @@ internal class VilkårServiceTest {
                         fom = null,
                         tom = null,
                         utgift = null,
-                        erNullvedtak = false,
+                        erFremtidigUtgift = false,
                     ),
                 )
             },
@@ -391,7 +391,7 @@ internal class VilkårServiceTest {
                     fom = fom.atDay(1),
                     tom = tom.atEndOfMonth(),
                     utgift = 1,
-                    erNullvedtak = false,
+                    erFremtidigUtgift = false,
                 )
 
             assertThatThrownBy {
@@ -419,7 +419,7 @@ internal class VilkårServiceTest {
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
                     utgift = 1,
-                    erNullvedtak = false,
+                    erFremtidigUtgift = false,
                 )
             assertThatThrownBy {
                 vilkårService.oppdaterVilkår(svarPåVilkårDto)

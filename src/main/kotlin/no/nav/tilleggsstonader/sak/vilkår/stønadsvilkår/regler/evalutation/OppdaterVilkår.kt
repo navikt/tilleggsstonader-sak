@@ -44,9 +44,8 @@ object OppdaterVilkår {
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
         validerPeriodeOgBeløp(oppdatering, vilkårsresultat)
         validerIngenHøyereUtgifterGrunnetHelsemessigeÅrsaker(oppdatering)
-        // Venter på avklaring på hvordan og om vi skal støtte nullvedtak
-        validerIngenNullvedtak(oppdatering)
-//        validerIngenUtgiftPåNullvedtak(oppdatering)
+        // Venter på avklaring på hvordan og om vi skal støtte fremtidig utgift
+        validerIngenFremtidigUtgift(oppdatering)
 
         return vilkårsresultat
     }
@@ -74,14 +73,14 @@ object OppdaterVilkår {
         }
         brukerfeilHvis(
             vilkårType in vilkårMedUtgift &&
-                oppdatering.erNullvedtak != true &&
+                oppdatering.erFremtidigUtgift != true &&
                 resultat == Vilkårsresultat.OPPFYLT &&
                 oppdatering.utgift == null,
         ) {
             "Mangler utgift på vilkår"
         }
-        brukerfeilHvis(oppdatering.erNullvedtak == true && oppdatering.utgift != null) {
-            "Kan ikke ha utgift på nullvedtak"
+        brukerfeilHvis(oppdatering.erFremtidigUtgift == true && oppdatering.utgift != null) {
+            "Kan ikke ha utgift på fremtidig utgift"
         }
         feilHvis(vilkårType !in vilkårMedUtgift && oppdatering.utgift != null) {
             "Kan ikke ha utgift på vilkårType=$vilkårType"
@@ -102,15 +101,15 @@ object OppdaterVilkår {
         }
     }
 
-    private fun validerIngenUtgiftPåNullvedtak(lagreVilkårDto: LagreVilkårDto) {
-        feilHvis(lagreVilkårDto.erNullvedtak == true && lagreVilkårDto.utgift !== null) {
-            "Kan ikke ha utgift på nullvedtak"
+    private fun validerIngenUtgiftPåFremtidigUtgift(lagreVilkårDto: LagreVilkårDto) {
+        feilHvis(lagreVilkårDto.erFremtidigUtgift == true && lagreVilkårDto.utgift !== null) {
+            "Kan ikke ha utgift på fremtidig utgift"
         }
     }
 
-    private fun validerIngenNullvedtak(lagreVilkårDto: LagreVilkårDto) {
-        feilHvis(lagreVilkårDto.erNullvedtak == true) {
-            "Vi støtter foreløpig ikke nullvedtak"
+    private fun validerIngenFremtidigUtgift(lagreVilkårDto: LagreVilkårDto) {
+        feilHvis(lagreVilkårDto.erFremtidigUtgift == true) {
+            "Vi støtter foreløpig ikke fremtidige utgifter"
         }
     }
 
@@ -132,7 +131,7 @@ object OppdaterVilkår {
             fom = utledFom(vilkår, oppdatering),
             tom = utledTom(vilkår, oppdatering),
             utgift = oppdatering.utgift,
-            erNullvedtak = oppdatering.erNullvedtak == true,
+            erFremtidigUtgift = oppdatering.erFremtidigUtgift == true,
             gitVersjon = Applikasjonsversjon.versjon,
         )
     }
@@ -251,7 +250,7 @@ object OppdaterVilkår {
             behandlingId = behandlingId,
             type = vilkårsregel.vilkårType,
             barnId = barnId,
-            erNullvedtak = false,
+            erFremtidigUtgift = false,
             delvilkårwrapper = DelvilkårWrapper(delvilkårsett),
             resultat = utledResultat(vilkårsregel, delvilkårsett.map { it.tilDto() }).vilkår,
             status = VilkårStatus.NY,
