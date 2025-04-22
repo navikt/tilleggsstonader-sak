@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.PeriodeMedId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 import java.util.UUID
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode as FellesDomeneVedtaksperiode
 
 data class Vedtaksperiode(
     override val id: UUID = UUID.randomUUID(),
@@ -34,6 +35,15 @@ data class Vedtaksperiode(
         fom: LocalDate,
         tom: LocalDate,
     ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
+
+    fun tilFellesDomeneVedtaksperiode(): FellesDomeneVedtaksperiode =
+        FellesDomeneVedtaksperiode(
+            id = id,
+            fom = fom,
+            tom = tom,
+            målgruppe = målgruppe,
+            aktivitet = aktivitet,
+        )
 }
 
 enum class VedtaksperiodeStatus {

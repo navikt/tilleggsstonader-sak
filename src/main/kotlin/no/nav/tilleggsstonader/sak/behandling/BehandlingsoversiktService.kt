@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling
 
-import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -12,13 +11,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -26,7 +19,7 @@ import java.time.LocalDate
 class BehandlingsoversiktService(
     private val fagsakService: FagsakService,
     private val behandlingRepository: BehandlingRepository,
-    private val vedtakRepository: VedtakRepository,
+    private val vedtaksperiodeService: VedtaksperiodeService,
 ) {
     fun hentOversikt(fagsakPersonId: FagsakPersonId): BehandlingsoversiktDto {
         val fagsak = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
@@ -86,52 +79,25 @@ class BehandlingsoversiktService(
             behandlinger
                 .filter { it.resultat != BehandlingResultat.HENLAGT }
                 .associate { it.id to it.revurderFra }
-        return vedtakRepository
-            .findAllById(behandlinger.map { it.id })
-            .associateBy { it.behandlingId }
-            .mapValues { (behandlingId, vedtak) ->
-                utledVedstaksperiodeForBehandling(vedtak, revurderFraPåBehandlingId[behandlingId])
-            }
+
+        return revurderFraPåBehandlingId.mapValues { (behandlingId, revurderFra) ->
+            slåSammenVedtaksperioderForBehandling(behandlingId, revurderFra)
+        }
     }
 
     /**
-     * Alle vedtaksperioder i beregningsreulatet blir lagret ned i en revurdering.
-     * Dvs hvis jag revurderer fra 15 april, så lagrer vi ned perioder før det og.
-     *
-     * Av den grunnen hentes min(it.fom) og bruker max(minFom, revurderFra),
-     * då revurderFra egentlige gjøres etter minFom på vedtaksperioden
-     *
-     * I tilfelle man kun har opphørt perioder, så vil revurderFra kunne være etter maksTom,
-     * av den grunnen settes tom=max(maksTom, revurderFra)
+     * Slår sammen alle vedtaksperioder som finnes i en behandling slik at oversikten kun viser en periode.
+     * Hvis det er innvilget flere vedtaksperioder med mellomrom i samme behandling, vil disse vises
+     * som en sammenhengende periode, med en fom = første fom-dato og tom = siste tom-dato.
      */
-    private fun utledVedstaksperiodeForBehandling(
-        vedtak: Vedtak,
+    private fun slåSammenVedtaksperioderForBehandling(
+        behandlingId: BehandlingId,
         revurdererFra: LocalDate?,
-    ): Vedtaksperiode? =
-        when (vedtak.data) {
-            is InnvilgelseEllerOpphørTilsynBarn -> vedtak.data.beregningsresultat.vedtaksperiode(revurdererFra)
-            is InnvilgelseEllerOpphørLæremidler -> vedtak.data.vedtaksperiode(revurdererFra)
-            is InnvilgelseEllerOpphørBoutgifter -> null
-            is Avslag -> null
-        }
-
-    private fun BeregningsresultatTilsynBarn.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {
-        val vedtaksperioder =
-            perioder
-                .flatMap { it.grunnlag.vedtaksperiodeGrunnlag }
-                .map { it.vedtaksperiode }
-                .avkortPerioderFør(revurdererFra)
+    ): Vedtaksperiode {
+        val vedtaksperioder = vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, revurdererFra)
         val minFom = vedtaksperioder.minOfOrNull { it.fom }
         val maksTom = vedtaksperioder.maxOfOrNull { it.tom }
-        return Vedtaksperiode(fom = minFom, tom = maksTom)
-    }
 
-    private fun InnvilgelseEllerOpphørLæremidler.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {
-        val avkortedePerioder =
-            vedtaksperioder
-                .avkortPerioderFør(revurdererFra)
-        val minFom = avkortedePerioder.minOfOrNull { it.fom }
-        val maksTom = avkortedePerioder.maxOfOrNull { it.tom }
         return Vedtaksperiode(fom = minFom, tom = maksTom)
     }
 }
