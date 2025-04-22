@@ -217,7 +217,13 @@ class OpprettTestBehandlingController(
                             ),
                         harRettTilUtstyrsstipend =
                             HarRettTilUtstyrsstipend(
-                                erLærlingEllerLiknende = EnumFelt("Er lærling eller liknende?", JaNei.JA, "Ja", emptyList()),
+                                erLærlingEllerLiknende =
+                                    EnumFelt(
+                                        "Er lærling eller liknende?",
+                                        JaNei.JA,
+                                        "Ja",
+                                        emptyList(),
+                                    ),
                                 harTidligereFullførtVgs =
                                     EnumFelt(
                                         "Har du tidligere fullført videregående skole?",
@@ -245,86 +251,79 @@ class OpprettTestBehandlingController(
         fagsak: Fagsak,
         behandling: Behandling,
     ) {
+        val dineOpplysninger =
+            DineOpplysninger(
+                fornavn = "Fornavn",
+                etternavn = "Etternavn",
+                identitet = Identitet(identitetsnummer = "11111122222"),
+                adresse =
+                    NavAdresse(
+                        gyldigFraOgMed = LocalDate.of(2025, 1, 1),
+                        adresse = "Nisseveien 3",
+                        postnummer = "0011",
+                        bySted = "OSLO",
+                        landkode = "NO",
+                        land = Landvelger(value = "Norge", label = "NO"),
+                    ),
+            )
+        val aktiviteter =
+            Aktiviteter(
+                aktiviteterOgMaalgruppe =
+                    AktiviteterOgMålgruppe(
+                        aktivitet =
+                            Aktivitet(
+                                aktivitetId = "ingenAktivitet",
+                                text = "",
+                                periode = null,
+                                maalgruppe = null,
+                            ),
+                    ),
+                arbeidsrettetAktivitet = ArbeidsrettetAktivitetType.tiltakArbeidsrettetUtredning,
+                mottarLonnGjennomTiltak = JaNeiType.nei,
+            )
+        val periodeForSamling =
+            PeriodeForSamling(
+                fom = LocalDate.of(2025, 1, 1),
+                tom = LocalDate.of(2025, 1, 1),
+                trengteEkstraOvernatting = JaNeiType.nei,
+                utgifterTilOvernatting = 1000,
+            )
+        val boligEllerOvernatting =
+            BoligEllerOvernatting(
+                typeUtgifter = TypeUtgifterType.fastUtgift,
+                fasteUtgifter =
+                    FasteUtgifter(
+                        harUtgifterTilBoligToSteder = HarUtgifterTilBoligToStederType.ekstraBolig,
+                        utgifterFlereSteder =
+                            UtgifterFlereSteder(
+                                delerBoutgifter = mapOf(DelerBoutgifterType.aktivitetssted to true),
+                                andelUtgifterBoligHjemsted = 1300,
+                                andelUtgifterBoligAktivitetssted = 1000,
+                            ),
+                        utgifterNyBolig =
+                            UtgifterNyBolig(
+                                delerBoutgifter = JaNeiType.ja,
+                                andelUtgifterBolig = 900,
+                                harHoyereUtgifterPaNyttBosted = JaNeiType.ja,
+                                mottarBostotte = JaNeiType.nei,
+                            ),
+                    ),
+                samling =
+                    Samling(periodeForSamling = listOf(periodeForSamling)),
+                harSaerligStoreUtgifterPaGrunnAvFunksjonsnedsettelse = JaNeiType.nei,
+            )
         val skjemaBoutgifter =
             SøknadsskjemaBoutgifterFyllUtSendInn(
                 language = "nb-NO",
                 data =
                     BoutgifterFyllUtSendInnData(
                         SkjemaBoutgifter(
-                            dineOpplysninger =
-                                DineOpplysninger(
-                                    fornavn = "Fornavn",
-                                    etternavn = "Etternavn",
-                                    identitet =
-                                        Identitet(
-                                            identitetsnummer = "11111122222",
-                                        ),
-                                    adresse =
-                                        NavAdresse(
-                                            gyldigFraOgMed = LocalDate.of(2025, 1, 1),
-                                            adresse = "Nisseveien 3",
-                                            postnummer = "0011",
-                                            bySted = "OSLO",
-                                            landkode = "NO",
-                                            land =
-                                                Landvelger(
-                                                    value = "Norge",
-                                                    label = "NO",
-                                                ),
-                                        ),
-                                ),
+                            dineOpplysninger = dineOpplysninger,
                             hovedytelse = mapOf(HovedytelseType.arbeidsavklaringspenger to true),
                             harNedsattArbeidsevne = JaNeiType.ja,
                             arbeidOgOpphold = arbeidOgOppholdBoutgifter(),
-                            aktiviteter =
-                                Aktiviteter(
-                                    aktiviteterOgMaalgruppe =
-                                        AktiviteterOgMålgruppe(
-                                            aktivitet =
-                                                Aktivitet(
-                                                    aktivitetId = "ingenAktivitet",
-                                                    text = "",
-                                                    periode = null,
-                                                    maalgruppe = null,
-                                                ),
-                                        ),
-                                    arbeidsrettetAktivitet = ArbeidsrettetAktivitetType.tiltakArbeidsrettetUtredning,
-                                    mottarLonnGjennomTiltak = JaNeiType.nei,
-                                ),
-                            boligEllerOvernatting =
-                                BoligEllerOvernatting(
-                                    typeUtgifter = TypeUtgifterType.fastUtgift,
-                                    fasteUtgifter =
-                                        FasteUtgifter(
-                                            harUtgifterTilBoligToSteder = HarUtgifterTilBoligToStederType.ekstraBolig,
-                                            utgifterFlereSteder =
-                                                UtgifterFlereSteder(
-                                                    delerBoutgifter = mapOf(DelerBoutgifterType.aktivitetssted to true),
-                                                    andelUtgifterBoligHjemsted = 1300,
-                                                    andelUtgifterBoligAktivitetssted = 1000,
-                                                ),
-                                            utgifterNyBolig =
-                                                UtgifterNyBolig(
-                                                    delerBoutgifter = JaNeiType.ja,
-                                                    andelUtgifterBolig = 900,
-                                                    harHoyereUtgifterPaNyttBosted = JaNeiType.ja,
-                                                    mottarBostotte = JaNeiType.nei,
-                                                ),
-                                        ),
-                                    samling =
-                                        Samling(
-                                            periodeForSamling =
-                                                listOf(
-                                                    PeriodeForSamling(
-                                                        fom = LocalDate.of(2025, 1, 1),
-                                                        tom = LocalDate.of(2025, 1, 1),
-                                                        trengteEkstraOvernatting = JaNeiType.nei,
-                                                        utgifterTilOvernatting = 1000,
-                                                    ),
-                                                ),
-                                        ),
-                                    harSaerligStoreUtgifterPaGrunnAvFunksjonsnedsettelse = JaNeiType.nei,
-                                ),
+                            aktiviteter = aktiviteter,
+                            boligEllerOvernatting = boligEllerOvernatting,
                         ),
                     ),
                 dokumentasjon = emptyList(),
