@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.BeregningsresultatBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterRequest
@@ -45,13 +46,13 @@ class BoutgifterVedtakController(
         lagreVedtak(behandlingId, vedtak)
     }
 
-//    @PostMapping("{behandlingId}/avslag")
-//    fun avslå(
-//        @PathVariable behandlingId: BehandlingId,
-//        @RequestBody vedtak: AvslagBoutgifterDto,
-//    ) {
-//        lagreVedtak(behandlingId, vedtak)
-//    }
+    @PostMapping("{behandlingId}/avslag")
+    fun avslå(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: AvslagBoutgifterDto,
+    ) {
+        lagreVedtak(behandlingId, vedtak)
+    }
 
 //    @PostMapping("{behandlingId}/opphor")
 //    fun opphør(

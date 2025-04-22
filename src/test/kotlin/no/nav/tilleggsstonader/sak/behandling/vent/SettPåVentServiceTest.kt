@@ -6,8 +6,8 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
+import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
-import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_KLAR
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_PÅ_VENT
@@ -219,11 +219,11 @@ class SettPåVentServiceTest : IntegrationTest() {
             testWithBrukerContext(dummySaksbehandler) {
                 settPåVentService.taAvVent(
                     behandling.id,
-                    TaAvVentDto(skalTilordnesRessurs = true, kommentar = "kommentar"),
+                    TaAvVentDto(skalTilordnesRessurs = true, kommentar = "årsak av vent"),
                 )
             }
 
-            validerTattAvVent(behandling.id, kommentar = "kommentar")
+            validerTattAvVent(behandling.id, kommentar = "årsak av vent")
             validerOppdatertOppgave(oppgaveId!!, tilordnetRessurs = dummySaksbehandler)
             validerHistorikkInnslag(behandling.id, skalHaMetadata = true)
         }
@@ -244,11 +244,11 @@ class SettPåVentServiceTest : IntegrationTest() {
             testWithBrukerContext(dummySaksbehandler) {
                 settPåVentService.taAvVent(
                     behandling.id,
-                    TaAvVentDto(skalTilordnesRessurs = false, kommentar = "kommentar"),
+                    TaAvVentDto(skalTilordnesRessurs = false, kommentar = "årsak av vent"),
                 )
             }
 
-            validerTattAvVent(behandling.id, kommentar = "kommentar")
+            validerTattAvVent(behandling.id, kommentar = "årsak av vent")
             validerOppdatertOppgave(oppgaveId!!, tilordnetRessurs = dummySaksbehandler)
             validerHistorikkInnslag(behandling.id, skalHaMetadata = true)
         }
@@ -259,7 +259,7 @@ class SettPåVentServiceTest : IntegrationTest() {
                 assertThatThrownBy {
                     settPåVentService.taAvVent(
                         behandling.id,
-                        TaAvVentDto(skalTilordnesRessurs = false, kommentar = "kommentar"),
+                        TaAvVentDto(skalTilordnesRessurs = false, kommentar = "årsak av vent"),
                     )
                 }.hasMessageContaining("Kan ikke ta behandling av vent når man ikke er eier av oppgaven.")
             }
@@ -356,9 +356,9 @@ class SettPåVentServiceTest : IntegrationTest() {
             historikk.finnMetadata(Hendelse.TATT_AV_VENT).assertMetadataInneholderEksakt(emptyMap())
         }
 
-        private fun List<HendelseshistorikkDto>.finnMetadata(hendelse: Hendelse) = this.single { it.hendelse == hendelse }
+        private fun List<BehandlingshistorikkDto>.finnMetadata(hendelse: Hendelse) = this.single { it.hendelse == hendelse }
 
-        private fun HendelseshistorikkDto.assertMetadataInneholderEksakt(map: Map<String, Any>) {
+        private fun BehandlingshistorikkDto.assertMetadataInneholderEksakt(map: Map<String, Any>) {
             assertThat(this.metadata).containsExactlyInAnyOrderEntriesOf(map)
         }
     }

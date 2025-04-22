@@ -219,7 +219,7 @@ class VedtaksperiodeValideringUtilsTest {
                     vedtaksperioder = listOf(lagVedtaksperiode(fom = jan.atDay(1), tom = jan.atEndOfMonth())),
                 )
             }.hasMessage(
-                "Vedtaksperiode 01.01.2025 - 31.01.2025 overlapper med SYKEPENGER_100_PROSENT(10.01.2025 - 20.01.2025) som ikke gir rett på stønad",
+                "Vedtaksperiode 01.01.2025–31.01.2025 overlapper med SYKEPENGER_100_PROSENT(10.01.2025–20.01.2025) som ikke gir rett på stønad",
             )
         }
 
@@ -247,7 +247,7 @@ class VedtaksperiodeValideringUtilsTest {
                     vedtaksperioder = listOf(lagVedtaksperiode(fom = jan.atDay(1), tom = jan.atDay(15))),
                 )
             }.hasMessage(
-                "Vedtaksperiode 01.01.2025 - 15.01.2025 overlapper med INGEN_MÅLGRUPPE(10.01.2025 - 20.01.2025) som ikke gir rett på stønad",
+                "Vedtaksperiode 01.01.2025–15.01.2025 overlapper med INGEN_MÅLGRUPPE(10.01.2025–20.01.2025) som ikke gir rett på stønad",
             )
         }
 
@@ -275,7 +275,7 @@ class VedtaksperiodeValideringUtilsTest {
                     vedtaksperioder = listOf(lagVedtaksperiode(fom = jan.atDay(15), tom = jan.atDay(15))),
                 )
             }.hasMessage(
-                "Vedtaksperiode 15.01.2025 - 15.01.2025 overlapper med INGEN_AKTIVITET(10.01.2025 - 20.01.2025) som ikke gir rett på stønad",
+                "Vedtaksperiode 15.01.2025–15.01.2025 overlapper med INGEN_AKTIVITET(10.01.2025–20.01.2025) som ikke gir rett på stønad",
             )
         }
 
@@ -504,7 +504,7 @@ class VedtaksperiodeValideringUtilsTest {
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                 )
             }.hasMessageContaining(
-                "Finnes ingen periode med oppfylte vilkår for NEDSATT_ARBEIDSEVNE i perioden 01.12.2024 - 31.01.2025",
+                "Finnes ingen periode med oppfylte vilkår for NEDSATT_ARBEIDSEVNE i perioden 01.12.2024–31.01.2025",
             )
         }
 
@@ -528,7 +528,7 @@ class VedtaksperiodeValideringUtilsTest {
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                 )
             }.hasMessageContaining(
-                "Finnes ingen periode med oppfylte vilkår for TILTAK i perioden 01.01.2025 - 31.01.2025",
+                "Finnes ingen periode med oppfylte vilkår for TILTAK i perioden 01.01.2025–31.01.2025",
             )
         }
 
@@ -643,7 +643,7 @@ class VedtaksperiodeValideringUtilsTest {
                     aktivitetPerioderPerType = aktiviteter.mergeSammenhengendeOppfylteAktiviteter(),
                 )
             }.hasMessageContaining(
-                "Finnes ingen periode med oppfylte vilkår for NEDSATT_ARBEIDSEVNE i perioden 01.01.2025 - 21.01.2025",
+                "Finnes ingen periode med oppfylte vilkår for NEDSATT_ARBEIDSEVNE i perioden 01.01.2025–21.01.2025",
             )
         }
     }

@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling.historikk
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDto
+import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -22,7 +22,7 @@ class BehandlingshistorikkController(
     @GetMapping("{behandlingId}")
     fun hentBehandlingshistorikk(
         @PathVariable behandlingId: BehandlingId,
-    ): List<HendelseshistorikkDto> {
+    ): List<BehandlingshistorikkDto> {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.ACCESS)
         val behandlingHistorikk = behandlingshistorikkService.finnHendelseshistorikk(saksbehandling)

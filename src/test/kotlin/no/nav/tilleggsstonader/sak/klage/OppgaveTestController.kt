@@ -5,6 +5,10 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -53,4 +57,19 @@ class OppgaveTestController(
         @RequestParam enhetsnr: String,
         @RequestParam limit: Int,
     ): FinnMappeResponseDto = oppgaveClient.finnMapper(enhetsnr, limit)
+
+    @PostMapping("/vent/sett-pa-vent")
+    fun settPåVent(
+        @RequestBody settPåVentRequest: SettPåVentRequest,
+    ): SettPåVentResponse = oppgaveClient.settPåVent(settPåVentRequest)
+
+    @PostMapping("/vent/oppdater-pa-vent")
+    fun oppdaterPåVent(
+        @RequestBody oppdaterPåVentRequest: OppdaterPåVentRequest,
+    ): SettPåVentResponse = oppgaveClient.oppdaterPåVent(oppdaterPåVentRequest)
+
+    @PostMapping("/vent/ta-av-vent")
+    fun taAvVent(
+        @RequestBody taAvVentRequest: TaAvVentRequest,
+    ): SettPåVentResponse = oppgaveClient.taAvVent(taAvVentRequest)
 }

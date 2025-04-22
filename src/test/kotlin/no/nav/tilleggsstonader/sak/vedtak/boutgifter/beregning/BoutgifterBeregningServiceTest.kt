@@ -42,7 +42,7 @@ class BoutgifterBeregningServiceTest {
         BoutgifterBeregningService(
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
-            vedtakRepository = vedtakRepository,
+//            vedtakRepository = vedtakRepository,
         )
 
     val behandling = saksbehandling()
@@ -106,7 +106,7 @@ class BoutgifterBeregningServiceTest {
                 vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
             )
-        }.hasMessage("Foreløbig støtter vi ikke faste- og midlertidig utgift i samme behandling")
+        }.hasMessage("Foreløpig støtter vi ikke løpende og midlertidige utgifter i samme behandling")
     }
 
     @Nested
@@ -347,7 +347,7 @@ class BoutgifterBeregningServiceTest {
                     vedtaksperioder,
                     typeVedtak = TypeVedtak.INNVILGELSE,
                 )
-            }.hasMessage("Kan ikke innvilge når det ikke finnes noen utgiftsperioder")
+            }.hasMessage("Det er ikke lagt inn noen oppfylte utgiftsperioder")
         }
 
         @Test
@@ -372,7 +372,7 @@ class BoutgifterBeregningServiceTest {
                     vedtaksperioder = vedtaksperioder,
                     typeVedtak = TypeVedtak.INNVILGELSE,
                 )
-            }.hasMessage("Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden")
+            }.hasMessage("Vedtaksperioden 01.01.2025–31.01.2025 mangler oppfylt utgift hele eller deler av perioden.")
         }
 
         @Test

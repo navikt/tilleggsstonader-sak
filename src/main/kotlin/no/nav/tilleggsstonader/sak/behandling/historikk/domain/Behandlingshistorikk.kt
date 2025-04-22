@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
-import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
@@ -30,18 +29,7 @@ data class Behandlingshistorikk(
     val gitVersjon: String?,
 )
 
-fun Behandlingshistorikk.tilDto(): BehandlingshistorikkDto =
-    BehandlingshistorikkDto(
-        behandlingId = this.behandlingId,
-        steg = this.steg,
-        endretAvNavn = this.opprettetAvNavn,
-        endretAv = this.opprettetAv,
-        endretTid = this.endretTid,
-        utfall = this.utfall,
-        metadata = this.metadata.tilJson(),
-    )
-
-fun Behandlingshistorikk.tilHendelseshistorikkDto(saksbehandling: Saksbehandling): HendelseshistorikkDto {
+fun Behandlingshistorikk.tilHendelseshistorikkDto(saksbehandling: Saksbehandling): BehandlingshistorikkDto {
     val hendelse: Hendelse = mapUtfallTilHendelse() ?: mapStegTilHendelse(saksbehandling)
 
     val metadata =
@@ -51,7 +39,7 @@ fun Behandlingshistorikk.tilHendelseshistorikkDto(saksbehandling: Saksbehandling
                 this.remove("kommentar")
             }
         }
-    return HendelseshistorikkDto(
+    return BehandlingshistorikkDto(
         behandlingId = this.behandlingId,
         hendelse = hendelse,
         endretAvNavn = this.opprettetAvNavn,

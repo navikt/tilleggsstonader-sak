@@ -11,8 +11,10 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterAndelTilkjentYtelseMapper.finnAndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterRequest
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
@@ -40,7 +42,7 @@ class BoutgifterBeregnYtelseSteg(
     ) {
         when (vedtak) {
             is InnvilgelseBoutgifterRequest -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
-//            is AvslagTilsynBarnDto -> lagreAvslag(saksbehandling, vedtak)
+            is AvslagBoutgifterDto -> lagreAvslag(saksbehandling, vedtak)
 //            is OpphørTilsynBarnRequest -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }
     }
@@ -113,23 +115,23 @@ class BoutgifterBeregnYtelseSteg(
 //        lagreAndeler(saksbehandling, beregningsresultat)
 //    }
 
-//    private fun lagreAvslag(
-//        saksbehandling: Saksbehandling,
-//        vedtak: AvslagTilsynBarnDto,
-//    ) {
-//        vedtakRepository.insert(
-//            GeneriskVedtak(
-//                behandlingId = saksbehandling.id,
-//                type = TypeVedtak.AVSLAG,
-//                data =
-//                    AvslagTilsynBarn(
-//                        årsaker = vedtak.årsakerAvslag,
-//                        begrunnelse = vedtak.begrunnelse,
-//                    ),
-//                gitVersjon = Applikasjonsversjon.versjon,
-//            ),
-//        )
-//    }
+    private fun lagreAvslag(
+        saksbehandling: Saksbehandling,
+        vedtak: AvslagBoutgifterDto,
+    ) {
+        vedtakRepository.insert(
+            GeneriskVedtak(
+                behandlingId = saksbehandling.id,
+                type = TypeVedtak.AVSLAG,
+                data =
+                    AvslagBoutgifter(
+                        årsaker = vedtak.årsakerAvslag,
+                        begrunnelse = vedtak.begrunnelse,
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+            ),
+        )
+    }
 
 //    private fun lagreAndeler(
 //        saksbehandling: Saksbehandling,

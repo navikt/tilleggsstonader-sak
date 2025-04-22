@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
@@ -267,11 +268,11 @@ class InterntVedtakService(
         when (vedtak) {
             is InnvilgelseBoutgifter -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
 
-//            is AvslagBoutgifter ->
-//                VedtakAvslagInternt(
-//                    årsakerAvslag = vedtak.årsaker,
-//                    avslagBegrunnelse = vedtak.begrunnelse,
-//                )
+            is AvslagBoutgifter ->
+                VedtakAvslagInternt(
+                    årsakerAvslag = vedtak.årsaker,
+                    avslagBegrunnelse = vedtak.begrunnelse,
+                )
 //
 //            is OpphørBoutgifter ->
 //                VedtakOpphørInternt(

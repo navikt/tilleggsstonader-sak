@@ -7,9 +7,14 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
+import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.util.medContentTypeJsonUTF8
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -29,6 +34,13 @@ class OppgaveClient(
         UriComponentsBuilder
             .fromUri(integrasjonerBaseUrl)
             .pathSegment("api/oppgave")
+            .build()
+            .toUri()
+
+    private val oppgaveVentUri =
+        UriComponentsBuilder
+            .fromUri(integrasjonerBaseUrl)
+            .pathSegment("api/oppgave/vent")
             .build()
             .toUri()
 
@@ -93,12 +105,8 @@ class OppgaveClient(
                     "Oppgaven med id=$oppgaveId er allerede ferdigstilt. Prøv å hente oppgaver på nytt.",
                     HttpStatus.BAD_REQUEST,
                 )
-            } else if (e.httpStatus == HttpStatus.CONFLICT) {
-                throw ApiFeil(
-                    "Oppgaven har endret seg siden du sist hentet oppgaver. For å kunne gjøre endringer må du hente oppgaver på nytt.",
-                    HttpStatus.CONFLICT,
-                )
             }
+            sjekkOgHåndtertConflict(e)
             throw e
         }
     }
@@ -130,12 +138,7 @@ class OppgaveClient(
                 )
             return response
         } catch (e: ProblemDetailException) {
-            if (e.httpStatus == HttpStatus.CONFLICT) {
-                throw ApiFeil(
-                    "Oppgaven har endret seg siden du sist hentet oppgaver. For å kunne gjøre endringer må du laste inn siden på nytt",
-                    HttpStatus.CONFLICT,
-                )
-            }
+            sjekkOgHåndtertConflict(e)
             throw e
         }
     }
@@ -154,6 +157,57 @@ class OppgaveClient(
                 .toUriString()
         val uriVariables = mapOf("enhetsnr" to enhetsnummer, "limit" to limit)
         return getForEntity<FinnMappeResponseDto>(uri, uriVariables = uriVariables)
+    }
+
+    fun settPåVent(settPåVent: SettPåVentRequest): SettPåVentResponse {
+        val uri =
+            UriComponentsBuilder
+                .fromUri(oppgaveVentUri)
+                .pathSegment("sett-pa-vent")
+                .encode()
+                .toUriString()
+        return kastBrukerFeilHvisBadRequest { postForEntity<SettPåVentResponse>(uri, settPåVent) }
+    }
+
+    fun oppdaterPåVent(oppdaterPåVent: OppdaterPåVentRequest): SettPåVentResponse {
+        val uri =
+            UriComponentsBuilder
+                .fromUri(oppgaveVentUri)
+                .pathSegment("oppdater-pa-vent")
+                .encode()
+                .toUriString()
+        return kastBrukerFeilHvisBadRequest { postForEntity<SettPåVentResponse>(uri, oppdaterPåVent) }
+    }
+
+    fun taAvVent(taAvVent: TaAvVentRequest): SettPåVentResponse {
+        val uri =
+            UriComponentsBuilder
+                .fromUri(oppgaveVentUri)
+                .pathSegment("ta-av-vent")
+                .encode()
+                .toUriString()
+        return kastBrukerFeilHvisBadRequest { postForEntity<SettPåVentResponse>(uri, taAvVent) }
+    }
+
+    private fun <T> kastBrukerFeilHvisBadRequest(fn: () -> T): T =
+        try {
+            fn()
+        } catch (e: ProblemDetailException) {
+            sjekkOgHåndtertConflict(e)
+            val detail = e.detail.detail
+            brukerfeilHvis(e.httpStatus == HttpStatus.BAD_REQUEST && detail != null) {
+                detail ?: "Ukjent feil"
+            }
+            throw e
+        }
+
+    private fun sjekkOgHåndtertConflict(e: ProblemDetailException) {
+        if (e.httpStatus == HttpStatus.CONFLICT) {
+            throw ApiFeil(
+                "Oppgaven har endret seg siden du sist hentet oppgaver. For å kunne gjøre endringer må du laste inn siden på nytt",
+                HttpStatus.CONFLICT,
+            )
+        }
     }
 
     private fun oppgaveIdUriVariables(oppgaveId: Long): Map<String, String> = mapOf("id" to oppgaveId.toString())

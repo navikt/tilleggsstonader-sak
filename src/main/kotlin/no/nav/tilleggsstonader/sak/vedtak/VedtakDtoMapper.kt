@@ -6,9 +6,11 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnR
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
@@ -111,11 +113,11 @@ object VedtakDtoMapper {
                     begrunnelse = data.begrunnelse,
                 )
 
-//            is AvslagLæremidler ->
-//                AvslagLæremidlerDto(
-//                    årsakerAvslag = data.årsaker,
-//                    begrunnelse = data.begrunnelse,
-//                )
+            is AvslagBoutgifter ->
+                AvslagBoutgifterDto(
+                    årsakerAvslag = data.årsaker,
+                    begrunnelse = data.begrunnelse,
+                )
 //
 //            is OpphørLæremidler ->
 //                OpphørLæremidlerResponse(

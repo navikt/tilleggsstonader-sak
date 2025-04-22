@@ -9,8 +9,8 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistor
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.tilHendelseshistorikkDto
+import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
-import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -52,7 +52,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
         val hendelseshistorikkDto = behandlingHistorikk.tilHendelseshistorikkDto(saksbehandling(fagsak, behandling))
 
         /** Hent */
-        val innslag: HendelseshistorikkDto =
+        val innslag: BehandlingshistorikkDto =
             behandlingshistorikkService.finnHendelseshistorikk(saksbehandling(fagsak, behandling))[0]
 
         assertThat(innslag).isEqualTo(hendelseshistorikkDto)

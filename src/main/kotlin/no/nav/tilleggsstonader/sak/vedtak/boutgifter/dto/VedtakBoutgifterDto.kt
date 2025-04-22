@@ -18,7 +18,7 @@ import java.util.UUID
     visible = true,
 )
 @JsonSubTypes(
-//    JsonSubTypes.Type(AvslagBoutgifterDto::class, name = "AVSLAG"),
+    JsonSubTypes.Type(AvslagBoutgifterDto::class, name = "AVSLAG"),
     JsonSubTypes.Type(InnvilgelseBoutgifterRequest::class, name = "INNVILGELSE"),
 //    JsonSubTypes.Type(OpphørBoutgifterRequest::class, name = "OPPHØR"),
     failOnRepeatedNames = true,

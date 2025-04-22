@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
-import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDto
+import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -196,7 +196,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
         )
     }
 
-    private fun hentHistorikk(id: BehandlingId): ResponseEntity<List<HendelseshistorikkDto>> =
+    private fun hentHistorikk(id: BehandlingId): ResponseEntity<List<BehandlingshistorikkDto>> =
         restTemplate.exchange(
             localhost("/api/behandlingshistorikk/$id"),
             HttpMethod.GET,

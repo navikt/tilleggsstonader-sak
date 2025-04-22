@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -38,7 +37,7 @@ class StepDefinitions {
 
     val utgiftService = mockk<BoutgifterUtgiftService>()
 
-    val vedtakRepositroy = mockk<VedtakRepository>()
+//    val vedtakRepositroy = mockk<VedtakRepository>()
     val vilkårperiodeService = mockk<VilkårperiodeService>(relaxed = true)
     val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>(relaxed = true)
 
@@ -46,7 +45,7 @@ class StepDefinitions {
         BoutgifterBeregningService(
             boutgifterUtgiftService = utgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
-            vedtakRepository = vedtakRepositroy,
+//            vedtakRepository = vedtakRepositroy,
         )
 
     val behandling = saksbehandling()

@@ -19,6 +19,7 @@ class VedleggService(
 
         return journalposter.flatMap { journalpost ->
             journalpost.dokumenter
+                ?.filter { it.brevkode != BrevkodeVedlegg.INNSENDINGSKVITTERING.kode }
                 ?.map { tilDokumentInfoDto(it, journalpost) }
                 ?: emptyList()
         }
