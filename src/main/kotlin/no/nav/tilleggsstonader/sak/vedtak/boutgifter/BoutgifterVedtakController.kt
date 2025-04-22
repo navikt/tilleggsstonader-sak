@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksperiodeService
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.BeregningsresultatBoutgifterDto
