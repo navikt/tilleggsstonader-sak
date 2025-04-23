@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.svarTilDomene
@@ -41,6 +42,12 @@ object OppdaterVilkår {
         validerVilkår(vilkårsregel, oppdatering.delvilkårsett, vilkår.delvilkårsett)
 
         val vilkårsresultat = utledResultat(vilkårsregel, oppdatering.delvilkårsett)
+
+        if (oppdatering.erFremtidigUtgift == true) {
+            valilderIngenSvarPåFremtidigUtgift(oppdatering)
+            return vilkårsresultat
+        }
+
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
         validerPeriodeOgBeløp(oppdatering, vilkårsresultat)
         validerIngenHøyereUtgifterGrunnetHelsemessigeÅrsaker(oppdatering)
@@ -101,9 +108,16 @@ object OppdaterVilkår {
         }
     }
 
-    private fun validerIngenUtgiftPåFremtidigUtgift(lagreVilkårDto: LagreVilkårDto) {
-        feilHvis(lagreVilkårDto.erFremtidigUtgift == true && lagreVilkårDto.utgift !== null) {
-            "Kan ikke ha utgift på fremtidig utgift"
+    private fun valilderIngenSvarPåFremtidigUtgift(lagreVilkårDto: LagreVilkårDto) {
+        feilHvis(
+            lagreVilkårDto.delvilkårsett.any { delvilkår ->
+                delvilkår.vurderinger.any { vurdering ->
+                    vurdering.svar !== null ||
+                        vurdering.begrunnelse !== null
+                }
+            },
+        ) {
+            "Kan ikke ha svar på vilkår når fremtidig utgift er valgt"
         }
     }
 
@@ -122,7 +136,7 @@ object OppdaterVilkår {
             oppdaterDelvilkår(
                 vilkår = vilkår,
                 vilkårsresultat = vilkårsresultat,
-                validerteDelvilkårsett = oppdatering.delvilkårsett,
+                oppdatering = oppdatering,
             )
         return vilkår.copy(
             resultat = vilkårsresultat.vilkår,
@@ -213,9 +227,9 @@ object OppdaterVilkår {
     private fun oppdaterDelvilkår(
         vilkår: Vilkår,
         vilkårsresultat: RegelResultat,
-        validerteDelvilkårsett: List<DelvilkårDto>,
+        oppdatering: LagreVilkårDto,
     ): DelvilkårWrapper {
-        val vurderingerPåType = validerteDelvilkårsett.associateBy { it.vurderinger.first().regelId }
+        val vurderingerPåType = oppdatering.delvilkårsett.associateBy { it.vurderinger.first().regelId }
         val delvilkårsett =
             vilkår.delvilkårsett
                 .map {
@@ -226,7 +240,12 @@ object OppdaterVilkår {
                         val resultat = vilkårsresultat.resultatHovedregel(hovedregel)
                         val svar = vurderingerPåType[hovedregel] ?: throw Feil("Savner svar for hovedregel=$hovedregel")
 
-                        if (resultat.oppfyltEllerIkkeOppfylt()) {
+                        if (oppdatering.erFremtidigUtgift == true) {
+                            it.copy(
+                                resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
+                                vurderinger = svar.tilTomVurdering(),
+                            )
+                        } else if (resultat.oppfyltEllerIkkeOppfylt()) {
                             it.copy(
                                 resultat = resultat,
                                 vurderinger = svar.svarTilDomene(),
@@ -258,4 +277,13 @@ object OppdaterVilkår {
             gitVersjon = Applikasjonsversjon.versjon,
         )
     }
+
+    private fun DelvilkårDto.tilTomVurdering(): List<Vurdering> =
+        this.vurderinger.map {
+            Vurdering(
+                regelId = it.regelId,
+                svar = null,
+                begrunnelse = null,
+            )
+        }
 }
