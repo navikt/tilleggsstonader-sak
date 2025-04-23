@@ -200,7 +200,7 @@ class SøknadskjemaBoutgifterMapper(
                 delerBoutgifter = mapJaNei(it.delerBoutgifter),
                 andelUtgifterBolig = it.andelUtgifterBolig,
                 harHoyereUtgifterPaNyttBosted = mapJaNei(it.harHoyereUtgifterPaNyttBosted),
-                mottarBostotte = it.mottarBostotte?.let(::mapJaNei),
+                mottarBostotte = mapJaNei(it.mottarBostotte),
             )
         }
 

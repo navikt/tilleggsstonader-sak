@@ -206,7 +206,7 @@ class BehandlingFaktaService(
             delerBoutgifter = mapJaNei(utgifterNyBolig!!.delerBoutgifter),
             andelUtgifterBolig = utgifterNyBolig.andelUtgifterBolig,
             harHoyereUtgifterPaNyttBosted = mapJaNei(utgifterNyBolig.harHoyereUtgifterPaNyttBosted),
-            mottarBostotte = utgifterNyBolig.mottarBostotte?.let { mapJaNei(it) },
+            mottarBostotte = mapJaNei(utgifterNyBolig.mottarBostotte),
         )
 
     private fun mapSamling(samling: UtgifterIForbindelseMedSamling?): Samling? =

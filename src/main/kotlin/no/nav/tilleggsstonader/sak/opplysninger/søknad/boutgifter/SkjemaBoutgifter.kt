@@ -58,7 +58,7 @@ data class UtgifterNyBolig(
     val delerBoutgifter: JaNei,
     val andelUtgifterBolig: Int?,
     val harHoyereUtgifterPaNyttBosted: JaNei,
-    val mottarBostotte: JaNei?,
+    val mottarBostotte: JaNei,
 )
 
 data class UtgifterFlereSteder(
