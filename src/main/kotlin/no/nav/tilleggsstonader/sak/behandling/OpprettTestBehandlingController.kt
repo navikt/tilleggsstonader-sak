@@ -288,6 +288,13 @@ class OpprettTestBehandlingController(
                 trengteEkstraOvernatting = JaNeiType.nei,
                 utgifterTilOvernatting = 1000,
             )
+        val periodeForSamling2 =
+            PeriodeForSamling(
+                fom = LocalDate.of(2025, 2, 1),
+                tom = LocalDate.of(2025, 2, 1),
+                trengteEkstraOvernatting = JaNeiType.ja,
+                utgifterTilOvernatting = 1000,
+            )
         val boligEllerOvernatting =
             BoligEllerOvernatting(
                 typeUtgifter = TypeUtgifterType.fastUtgift,
@@ -308,8 +315,7 @@ class OpprettTestBehandlingController(
                                 mottarBostotte = JaNeiType.nei,
                             ),
                     ),
-                samling =
-                    Samling(periodeForSamling = listOf(periodeForSamling)),
+                samling = Samling(periodeForSamling = listOf(periodeForSamling, periodeForSamling2)),
                 harSaerligStoreUtgifterPaGrunnAvFunksjonsnedsettelse = JaNeiType.nei,
             )
         val skjemaBoutgifter =
