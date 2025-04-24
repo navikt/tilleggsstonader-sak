@@ -36,8 +36,6 @@ data class Vilkår(
     val tom: LocalDate? = null,
     val utgift: Int? = null,
     val barnId: BarnId? = null,
-    // TODO rename til er_fremtidig_utgift i database
-    @Column("er_nullvedtak")
     val erFremtidigUtgift: Boolean,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
