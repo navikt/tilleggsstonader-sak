@@ -48,14 +48,14 @@ data class BehandlingFaktaLæremidlerDto(
     val alder: Int?,
 ) : BehandlingFaktaDto
 
-/**
- * Dummy-objekt fordi vi ikke har en søknad ennå
- */
 data class BehandlingFaktaBoutgifterDto(
-    override val søknadMottattTidspunkt: LocalDateTime? = null,
+    override val søknadMottattTidspunkt: LocalDateTime?,
     override val hovedytelse: FaktaHovedytelse? = null,
     override val dokumentasjon: FaktaDokumentasjon? = null,
     override val arena: ArenaFakta?,
+    val aktiviteter: FaktaAktivtet,
+    val personopplysninger: FaktaPersonopplysninger,
+    val boligEllerOvernatting: FaktaBoligEllerOvernatting?,
 ) : BehandlingFaktaDto
 
 data class FaktaHovedytelse(
@@ -66,9 +66,18 @@ data class FaktaUtdanning(
     val søknadsgrunnlag: SøknadsgrunnlagUtdanning?,
 )
 
+data class FaktaPersonopplysninger(
+    val søknadsgrunnlag: FaktaPersonopplysningerSøknadsgrunnlag?,
+)
+
+data class FaktaPersonopplysningerSøknadsgrunnlag(
+    val adresse: String,
+)
+
 data class SøknadsgrunnlagHovedytelse(
     val hovedytelse: List<Hovedytelse>,
     val arbeidOgOpphold: FaktaArbeidOgOpphold?,
+    val harNedsattArbeidsevne: JaNei?,
 )
 
 data class SøknadsgrunnlagUtdanning(
