@@ -51,8 +51,6 @@ object OppdaterVilkår {
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
         validerPeriodeOgBeløp(oppdatering, vilkårsresultat)
         validerIngenHøyereUtgifterGrunnetHelsemessigeÅrsaker(oppdatering)
-        // Venter på avklaring på hvordan og om vi skal støtte fremtidig utgift
-        validerIngenFremtidigUtgift(oppdatering)
 
         return vilkårsresultat
     }
@@ -118,12 +116,6 @@ object OppdaterVilkår {
             },
         ) {
             "Kan ikke ha svar på vilkår når fremtidig utgift er valgt"
-        }
-    }
-
-    private fun validerIngenFremtidigUtgift(lagreVilkårDto: LagreVilkårDto) {
-        feilHvis(lagreVilkårDto.erFremtidigUtgift == true) {
-            "Vi støtter foreløpig ikke fremtidige utgifter"
         }
     }
 

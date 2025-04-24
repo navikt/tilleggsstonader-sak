@@ -238,7 +238,7 @@ fun vilkår(
     fom: LocalDate? = YearMonth.now().atDay(1),
     tom: LocalDate? = YearMonth.now().atEndOfMonth(),
     utgift: Int? = 100,
-    erNullvedtak: Boolean = false,
+    erFremtidigUtgift: Boolean = false,
 ): Vilkår =
     Vilkår(
         behandlingId = behandlingId,
@@ -251,7 +251,7 @@ fun vilkår(
         fom = fom,
         tom = tom,
         utgift = utgift,
-        erFremtidigUtgift = erNullvedtak,
+        erFremtidigUtgift = erFremtidigUtgift,
         gitVersjon = Applikasjonsversjon.versjon,
     )
 

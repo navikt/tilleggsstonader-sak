@@ -21,6 +21,13 @@ object BoutgifterRegelTestUtil {
             delvilkår(Vurdering(regelId = RegelId.DOKUMENTERT_DELTAKELSE, svar = SvarId.JA)),
         )
 
+    fun delvilkårFremtidigeUtgifter() =
+        listOf(
+            delvilkår(Vurdering(regelId = RegelId.NØDVENDIGE_MERUTGIFTER, svar = null)),
+            delvilkår(Vurdering(regelId = RegelId.DOKUMENTERT_UTGIFTER_OVERNATTING, svar = null)),
+            delvilkår(Vurdering(regelId = RegelId.DOKUMENTERT_DELTAKELSE, svar = null)),
+        )
+
     fun oppfylteDelvilkårLøpendeUtgifterEnBolig() =
         listOf(
             delvilkår(Vurdering(RegelId.HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE, SvarId.JA)),
@@ -66,6 +73,8 @@ object BoutgifterRegelTestUtil {
         )
 
     fun oppfylteDelvilkårUtgifterOvernattingDto() = oppfylteDelvilkårUtgifterOvernatting().map { it.tilDto() }
+
+    fun delvilkårFremtidigeUtgifterDto() = delvilkårFremtidigeUtgifter().map { it.tilDto() }
 
     fun oppfylteDelvilkårLøpendeUtgifterEnBoligDto() = oppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() }
 

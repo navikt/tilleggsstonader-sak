@@ -12,6 +12,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.oppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.validerVilkårOgBeregnResultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.delvilkårFremtidigeUtgifter
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.delvilkårFremtidigeUtgifterDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårLøpendeUtgifterEnBoligDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårLøpendeUtgifterToBoligerDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårUtgifterOvernattingDto
@@ -27,7 +29,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -103,6 +104,22 @@ internal class OppdaterVilkårTest {
                         type = VilkårType.UTGIFTER_OVERNATTING,
                         delvilkår = oppfylteDelvilkårUtgifterOvernatting(),
                     )
+                val opprettUtgifterFremtidigUtgiftDto =
+                    OpprettVilkårDto(
+                        vilkårType = VilkårType.UTGIFTER_OVERNATTING,
+                        behandlingId = behandlingId,
+                        delvilkårsett = delvilkårFremtidigeUtgifterDto(),
+                        fom = LocalDate.now(),
+                        tom = LocalDate.now().plusDays(1),
+                        utgift = 1,
+                        erFremtidigUtgift = false,
+                    )
+                val utgifterFremtidigUtgiftVilkår =
+                    vilkår(
+                        behandlingId = behandlingId,
+                        type = VilkårType.UTGIFTER_OVERNATTING,
+                        delvilkår = delvilkårFremtidigeUtgifter(),
+                    )
 
                 @Test
                 fun `skal validere at man har med fom og tom for vilkår for utgfiter overnatting`() {
@@ -141,48 +158,39 @@ internal class OppdaterVilkårTest {
                     validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, dto)
                 }
 
-                @Disabled
                 @Test
-                fun `oppfylt utgfiter overnatting kan mangle utgift når det er et nullvedtak`() {
+                fun `oppfylt utgfiter overnatting kan mangle utgift når det er fremtidig utgift`() {
                     validerVilkårOgBeregnResultat(
-                        utgifterOvernattingVilkår,
-                        opprettUtgifterOvernattingVilkårDto.copy(utgift = null, erFremtidigUtgift = true),
+                        utgifterFremtidigUtgiftVilkår,
+                        opprettUtgifterFremtidigUtgiftDto.copy(utgift = null, erFremtidigUtgift = true),
                     )
                 }
 
                 @Test
-                fun `skal ikke kaste feil hvis oppfylt utgfiter overnatting nullvedttak inneholder beløp`() {
-                    assertThatThrownBy {
-                        validerVilkårOgBeregnResultat(
-                            utgifterOvernattingVilkår,
-                            opprettUtgifterOvernattingVilkårDto.copy(utgift = 1, erFremtidigUtgift = true),
-                        )
-                    }.hasMessageContaining("Kan ikke ha utgift på nullvedtak")
-                }
-
-                @Disabled
-                @Test
-                internal fun `Skal kunne oppdatere vilkår som nullvedtak`() {
+                internal fun `Skal kunne oppdatere vilkår som fremtidig utgift`() {
                     val dto =
                         opprettUtgifterOvernattingVilkårDto.copy(
-                            utgift = null,
-                            delvilkårsett = ikkeOppfylteDelvilkårUtgifterOvernattingDto(),
+                            utgift = 1000,
+                            delvilkårsett = delvilkårFremtidigeUtgifterDto(),
                             erFremtidigUtgift = true,
                         )
                     assertDoesNotThrow { validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, dto) }
                 }
 
                 @Test
-                internal fun `skal kaste feil når oppdatere vilkår som nullvedtak`() {
+                internal fun `Skal ikke ha vilkårsvurdert når fremtidig utgift`() {
                     val dto =
                         opprettUtgifterOvernattingVilkårDto.copy(
-                            utgift = null,
-                            delvilkårsett = ikkeOppfylteDelvilkårUtgifterOvernattingDto(),
+                            utgift = 1000,
+                            delvilkårsett = oppfylteDelvilkårUtgifterOvernattingDto(),
                             erFremtidigUtgift = true,
                         )
                     assertThatThrownBy {
-                        validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, dto)
-                    }.hasMessageContaining("Vi støtter foreløpig ikke nullvedtak")
+                        validerVilkårOgBeregnResultat(
+                            utgifterOvernattingVilkår,
+                            dto,
+                        )
+                    }.hasMessageContaining("Kan ikke ha svar på vilkår når fremtidig utgift er valgt")
                 }
             }
 

@@ -40,8 +40,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.delvilkårFremtidigeUtgifterDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårUtgifterOvernatting
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernattingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import org.assertj.core.api.Assertions.assertThat
@@ -183,9 +183,8 @@ internal class VilkårServiceTest {
             assertThat(delvilkår.vurderinger.first().begrunnelse).isEqualTo("en begrunnelse")
         }
 
-        @Disabled
         @Test
-        internal fun `Skal kunne oppdatere vilkår som nullvedtak`() {
+        internal fun `Skal kunne oppdatere vilkår som fremtidig utgift`() {
             val lagretVilkår = slot<Vilkår>()
             val vilkår = initiererVilkårBoutgifter(lagretVilkår)
 
@@ -193,55 +192,15 @@ internal class VilkårServiceTest {
                 SvarPåVilkårDto(
                     id = vilkår.id,
                     behandlingId = behandlingId,
-                    delvilkårsett = oppfylteDelvilkårUtgifterOvernattingDto(),
+                    delvilkårsett = delvilkårFremtidigeUtgifterDto(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
-                    utgift = null,
+                    utgift = 100,
                     erFremtidigUtgift = true,
                 ),
             )
 
             assertThat(lagretVilkår.captured.erFremtidigUtgift).isTrue
-        }
-
-        @Test
-        internal fun `Skal ikke kunne oppdatere vilkår som nullvedtak`() {
-            val lagretVilkår = slot<Vilkår>()
-            val vilkår = initiererVilkårBoutgifter(lagretVilkår)
-
-            assertThatThrownBy {
-                vilkårService.oppdaterVilkår(
-                    SvarPåVilkårDto(
-                        id = vilkår.id,
-                        behandlingId = behandlingId,
-                        delvilkårsett = oppfylteDelvilkårUtgifterOvernattingDto(),
-                        fom = LocalDate.of(2024, 1, 1),
-                        tom = LocalDate.of(2024, 1, 31),
-                        utgift = null,
-                        erFremtidigUtgift = true,
-                    ),
-                )
-            }.hasMessageContaining("Vi støtter foreløpig ikke nullvedtak")
-        }
-
-        @Test
-        internal fun `Skal ikke kunne oppdatere vilkår som nullvedtak og har utgift`() {
-            val lagretVilkår = slot<Vilkår>()
-            val vilkår = initiererVilkårBoutgifter(lagretVilkår)
-
-            assertThatThrownBy {
-                vilkårService.oppdaterVilkår(
-                    SvarPåVilkårDto(
-                        id = vilkår.id,
-                        behandlingId = behandlingId,
-                        delvilkårsett = oppfylteDelvilkårUtgifterOvernattingDto(),
-                        fom = LocalDate.of(2024, 1, 1),
-                        tom = LocalDate.of(2024, 1, 31),
-                        utgift = 100,
-                        erFremtidigUtgift = true,
-                    ),
-                )
-            }.hasMessageContaining("Kan ikke ha utgift på nullvedtak")
         }
     }
 
