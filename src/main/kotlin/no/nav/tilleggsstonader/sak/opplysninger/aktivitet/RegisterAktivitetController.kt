@@ -42,6 +42,7 @@ class RegisterAktivitetController(
     fun hentAktivitetForBehandling(
         @PathVariable behandlingId: BehandlingId,
     ): List<AktivitetArenaDto> {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         return registerAktivitetService.hentAktiviteter(saksbehandling.fagsakPersonId)

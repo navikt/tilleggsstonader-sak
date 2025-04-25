@@ -24,6 +24,7 @@ class SettPåVentController(
     fun hentStatusSettPåVent(
         @PathVariable behandlingId: BehandlingId,
     ): StatusPåVentDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return settPåVentService.hentStatusSettPåVent(behandlingId)
     }
@@ -33,6 +34,7 @@ class SettPåVentController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody dto: SettPåVentDto,
     ): StatusPåVentDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return settPåVentService.settPåVent(behandlingId, dto)
@@ -43,6 +45,7 @@ class SettPåVentController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody dto: OppdaterSettPåVentDto,
     ): StatusPåVentDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return settPåVentService.oppdaterSettPåVent(behandlingId, dto)
@@ -53,6 +56,7 @@ class SettPåVentController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody taAvVentDto: TaAvVentDto,
     ) {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         settPåVentService.taAvVent(behandlingId, taAvVentDto)

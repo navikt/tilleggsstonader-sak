@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.libs.http.config.RestTemplateConfiguration
 import no.nav.tilleggsstonader.libs.log.filter.LogFilterConfiguration
 import no.nav.tilleggsstonader.libs.unleash.UnleashConfiguration
 import no.nav.tilleggsstonader.sak.infrastruktur.filter.NAVIdentFilter
+import no.nav.tilleggsstonader.sak.infrastruktur.logging.BehandlingLogFilter
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import org.slf4j.LoggerFactory
 import org.springframework.boot.SpringBootConfiguration
@@ -28,6 +29,14 @@ class ApplicationConfig {
 
     init {
         logger.info("Starter versjon=${Applikasjonsversjon.versjon}")
+    }
+
+    @Bean
+    fun behandlingLoggingFilter(): FilterRegistrationBean<BehandlingLogFilter> {
+        val filterRegistration = FilterRegistrationBean<BehandlingLogFilter>()
+        filterRegistration.filter = BehandlingLogFilter()
+        filterRegistration.order = 1 // Samme nivå som LogFilter sånn at navIdent blir med på RequestTimeFilter
+        return filterRegistration
     }
 
     @Bean

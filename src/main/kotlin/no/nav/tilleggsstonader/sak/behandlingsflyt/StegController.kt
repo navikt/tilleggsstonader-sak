@@ -22,6 +22,7 @@ class StegController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody request: FerdigstillStegRequest,
     ): BehandlingId {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
@@ -33,6 +34,7 @@ class StegController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody request: ResetStegRequest,
     ) {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 

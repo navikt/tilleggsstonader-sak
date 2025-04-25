@@ -45,6 +45,7 @@ class BehandlingController(
     fun hentBehandling(
         @PathVariable behandlingId: BehandlingId,
     ): BehandlingDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
@@ -101,6 +102,7 @@ class BehandlingController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody henlagt: HenlagtDto,
     ): BehandlingDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         val henlagtBehandling = henleggService.henleggBehandling(behandlingId, henlagt)
@@ -122,6 +124,7 @@ class BehandlingController(
         @PathVariable behandlingId: BehandlingId,
         @PathVariable revurderFra: LocalDate,
     ): BehandlingDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         return revurderFraService.oppdaterRevurderFra(behandlingId, revurderFra).tilDto()
     }

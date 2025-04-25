@@ -25,6 +25,7 @@ class SimuleringController(
     fun simulerForBehandling(
         @PathVariable behandlingId: BehandlingId,
     ): SimuleringDto? {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
 
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)

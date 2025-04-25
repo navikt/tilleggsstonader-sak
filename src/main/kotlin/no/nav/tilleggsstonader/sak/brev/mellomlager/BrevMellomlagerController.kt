@@ -24,6 +24,7 @@ class BrevMellomlagerController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody mellomlagretBrev: MellomlagreBrevDto,
     ): BehandlingId {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
@@ -38,6 +39,7 @@ class BrevMellomlagerController(
     fun hentMellomlagretBrevverdier(
         @PathVariable behandlingId: BehandlingId,
     ): MellomlagreBrevDto? {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
         return mellomlagringBrevService.hentMellomlagretBrev(
