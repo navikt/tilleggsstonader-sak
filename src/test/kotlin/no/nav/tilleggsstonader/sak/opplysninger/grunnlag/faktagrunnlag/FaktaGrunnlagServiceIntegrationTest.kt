@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
-class FaktaGrunnlagServiceTest : IntegrationTest() {
+class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
     @Autowired
     lateinit var faktaGrunnlagService: FaktaGrunnlagService
 
