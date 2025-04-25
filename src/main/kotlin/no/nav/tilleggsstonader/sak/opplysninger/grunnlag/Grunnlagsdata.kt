@@ -2,6 +2,9 @@ package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.Fødsel
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GrunnlagBarn
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.Navn
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import java.time.LocalDate
@@ -24,25 +27,3 @@ data class Grunnlag(
 data class GrunnlagArena(
     val vedtakTom: LocalDate?,
 )
-
-data class Fødsel(
-    val fødselsdato: LocalDate?,
-    val fødselsår: Int,
-) {
-    fun fødselsdatoEller1JanForFødselsår() =
-        fødselsdato
-            ?: LocalDate.of(fødselsår, 1, 1)
-}
-
-data class Navn(
-    val fornavn: String,
-    val mellomnavn: String?,
-    val etternavn: String,
-) {
-    fun visningsnavn(): String =
-        if (mellomnavn == null) {
-            "$fornavn $etternavn"
-        } else {
-            "$fornavn $mellomnavn $etternavn"
-        }
-}

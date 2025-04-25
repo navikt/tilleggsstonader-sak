@@ -40,6 +40,7 @@ sealed interface FaktaGrunnlagData : FaktaGrunnlagDataJson {
 enum class TypeFaktaGrunnlag(
     val kClass: KClass<out FaktaGrunnlagData>,
 ) {
+    PERSONOPPLYSNINGER(FaktaGrunnlagPersonopplysninger::class),
     BARN_ANDRE_FORELDRE_SAKSINFORMASJON(FaktaGrunnlagBarnAndreForeldreSaksinformasjon::class),
     ARENA_VEDTAK_TOM(FaktaGrunnlagArenaVedtak::class),
     ;

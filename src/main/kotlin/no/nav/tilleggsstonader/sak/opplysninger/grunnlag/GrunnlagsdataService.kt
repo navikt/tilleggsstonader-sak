@@ -10,6 +10,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.Fødsel
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GrunnlagBarn
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.tilGrunnlagsdataBarn
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.tilNavn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import org.slf4j.LoggerFactory

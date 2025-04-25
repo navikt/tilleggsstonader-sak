@@ -6,8 +6,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto

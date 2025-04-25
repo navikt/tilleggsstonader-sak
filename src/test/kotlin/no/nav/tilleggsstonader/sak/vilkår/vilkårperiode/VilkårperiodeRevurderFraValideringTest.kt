@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Fødsel
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.Fødsel
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.grunnlagsdataDomain
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.saksbehandling

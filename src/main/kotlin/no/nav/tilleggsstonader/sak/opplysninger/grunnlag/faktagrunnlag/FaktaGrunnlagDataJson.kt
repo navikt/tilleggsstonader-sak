@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     visible = true,
 )
 @JsonSubTypes(
+    JsonSubTypes.Type(FaktaGrunnlagPersonopplysninger::class, name = "PERSONOPPLYSNINGER"),
     JsonSubTypes.Type(FaktaGrunnlagBarnAndreForeldreSaksinformasjon::class, name = "BARN_ANDRE_FORELDRE_SAKSINFORMASJON"),
     JsonSubTypes.Type(FaktaGrunnlagArenaVedtak::class, name = "ARENA_VEDTAK_TOM"),
     failOnRepeatedNames = true,

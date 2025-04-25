@@ -1,12 +1,12 @@
 package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Fødsel
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagArena
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Navn
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.Fødsel
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GrunnlagBarn
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.Navn
 import java.time.LocalDate
 
 object GrunnlagsdataUtil {
