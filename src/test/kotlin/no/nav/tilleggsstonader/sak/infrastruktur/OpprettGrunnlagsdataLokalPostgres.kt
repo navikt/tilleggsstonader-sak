@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 
@@ -17,14 +17,14 @@ import org.springframework.context.annotation.Profile
 @Suppress("SpringJavaInjectionPointsAutowiringInspection")
 class OpprettGrunnlagsdataLokalPostgres(
     behandlingRepository: BehandlingRepository,
-    grunnlagsdataService: GrunnlagsdataService,
+    faktaGrunnlagService: FaktaGrunnlagService,
 ) {
     init {
         var antallFeilet = 0
         behandlingRepository.findAll().forEach {
             if (it.status != BehandlingStatus.OPPRETTET) {
                 try {
-                    grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(it.id)
+                    faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(it.id)
                 } catch (e: Exception) {
                     antallFeilet++
                     secureLogger.warn("Feilet opprettelse av grunnlagsdata til behandling=${it.id}", e)

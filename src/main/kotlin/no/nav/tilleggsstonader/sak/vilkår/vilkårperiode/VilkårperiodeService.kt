@@ -9,7 +9,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagPersonopplysninger
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.norskFormat
@@ -50,7 +51,7 @@ class VilkårperiodeService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
     private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
-    private val grunnlagsdataService: GrunnlagsdataService,
+    private val faktaGrunnlagService: FaktaGrunnlagService,
 ) {
     fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
         val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
@@ -88,7 +89,10 @@ class VilkårperiodeService(
             kildeId = vilkårperiode.kildeId,
         )
 
-        val fødselFaktaGrunnlag = grunnlagsdataService.hentGrunnlagsdata(behandling.id).fødsel
+        val fødselFaktaGrunnlag =
+            faktaGrunnlagService
+                .hentEnkeltGrunnlag<FaktaGrunnlagPersonopplysninger>(behandling.id)
+                .data.fødsel
 
         val faktaOgVurdering =
             mapFaktaOgSvarDto(
@@ -125,9 +129,9 @@ class VilkårperiodeService(
         validerKildeIdOgType(vilkårperiode, eksisterendeVilkårperiode)
 
         val fødselFaktaGrunnlag =
-            grunnlagsdataService
-                .hentGrunnlagsdata(behandling.id)
-                .fødsel
+            faktaGrunnlagService
+                .hentEnkeltGrunnlag<FaktaGrunnlagPersonopplysninger>(behandling.id)
+                .data.fødsel
 
         if (behandling.type != BehandlingType.REVURDERING) {
             return oppdaterVilkårperiodeHvorAltKanEndres(
@@ -138,7 +142,12 @@ class VilkårperiodeService(
             )
         }
 
-        return oppdaterVilkårperiodeIRevurdering(vilkårperiode, eksisterendeVilkårperiode, behandling, fødselFaktaGrunnlag)
+        return oppdaterVilkårperiodeIRevurdering(
+            vilkårperiode,
+            eksisterendeVilkårperiode,
+            behandling,
+            fødselFaktaGrunnlag,
+        )
     }
 
     private fun oppdaterVilkårperiodeIRevurdering(
@@ -164,7 +173,12 @@ class VilkårperiodeService(
             )
         }
 
-        return oppdaterVilkårperiodeFørRevurderFra(vilkårperiode, eksisterendeVilkårperiode, revurderFra, fødselFaktaGrunnlag)
+        return oppdaterVilkårperiodeFørRevurderFra(
+            vilkårperiode,
+            eksisterendeVilkårperiode,
+            revurderFra,
+            fødselFaktaGrunnlag,
+        )
     }
 
     /**

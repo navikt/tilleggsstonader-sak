@@ -22,7 +22,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.tilFagsakMedPerson
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtakBeregningsresultat
@@ -45,7 +45,7 @@ class TestoppsettService(
     private val eksternFagsakIdRepository: EksternFagsakIdRepository,
     private val behandlingRepository: BehandlingRepository,
     private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
-    private val grunnlagsdataService: GrunnlagsdataService,
+    private val faktaGrunnlagService: FaktaGrunnlagService,
     private val repository: VedtakRepository,
 ) {
     fun hentFagsak(fagsakId: FagsakId) = fagsakService.hentFagsak(fagsakId)
@@ -96,7 +96,7 @@ class TestoppsettService(
     fun oppdater(behandling: Behandling): Behandling = behandlingRepository.update(behandling)
 
     fun opprettGrunnlagsdata(behandlingId: BehandlingId) {
-        grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId)
+        faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId)
     }
 
     fun lagreFagsak(fagsak: Fagsak): Fagsak {

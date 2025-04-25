@@ -3,8 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
-import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -30,7 +28,6 @@ class BoutgifterBeregningServiceTest {
     val boutgifterUtgiftService = mockk<BoutgifterUtgiftService>()
     val vedtakRepository = mockk<VedtakRepository>()
     val vilkårperiodeService = mockk<VilkårperiodeService>()
-    val grunnlagsdataService = mockk<GrunnlagsdataService>()
 
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
@@ -138,7 +135,6 @@ class BoutgifterBeregningServiceTest {
         fun setup() {
             every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
             every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
-            every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns lagGrunnlagsdata()
         }
 
         @Test
@@ -303,7 +299,6 @@ class BoutgifterBeregningServiceTest {
         fun setup() {
             every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
             every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
-            every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns lagGrunnlagsdata()
         }
 
         @Test

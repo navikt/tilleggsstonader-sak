@@ -10,8 +10,11 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagArenaMapper
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapper.mapBarnAndreForeldreSaksinformasjon
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagUtil.ofType
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagUtil.singleOfType
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
@@ -19,6 +22,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.collections.component1
@@ -34,11 +38,15 @@ class FaktaGrunnlagService(
     private val vedtakRepository: VedtakRepository,
     private val arenaService: ArenaService,
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     @Transactional
-    fun opprettGrunnlag(behandlingId: BehandlingId): FaktaGrunnlagOpprettResultat {
+    fun opprettGrunnlagHvisDetIkkeEksisterer(behandlingId: BehandlingId): FaktaGrunnlagOpprettResultat {
         if (faktaGrunnlagRepository.existsByBehandlingId(behandlingId)) {
             return FaktaGrunnlagOpprettResultat.IkkeOpprettet
         }
+        logger.info("Oppretter faktaGrunnlag for behandling=$behandlingId")
+
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         // TODO dette burde kun gjøres hvis behandlingen er redigerbar men akkurat nå gjøres dette fra BehandlingController som er greit
         opprettGrunnlagPersonopplysninger(behandling)
@@ -47,9 +55,29 @@ class FaktaGrunnlagService(
         return FaktaGrunnlagOpprettResultat.Opprettet
     }
 
+    fun hentGrunnlagsdata(behandlingId: BehandlingId): Grunnlag {
+        val typer =
+            listOf(
+                TypeFaktaGrunnlag.PERSONOPPLYSNINGER,
+                TypeFaktaGrunnlag.ARENA_VEDTAK_TOM,
+                TypeFaktaGrunnlag.BARN_ANDRE_FORELDRE_SAKSINFORMASJON,
+            )
+        val grunnlag = hentGrunnlag(behandlingId, typer)
+        return Grunnlag(
+            personopplysninger = grunnlag.singleOfType<FaktaGrunnlagPersonopplysninger>().data,
+            arenaVedtak = grunnlag.singleOfType<FaktaGrunnlagArenaVedtak>().data,
+            saksinformasjonAndreForeldre = grunnlag.ofType<FaktaGrunnlagBarnAndreForeldreSaksinformasjon>(),
+        )
+    }
+
     final inline fun <reified TYPE : FaktaGrunnlagData> hentGrunnlag(behandlingId: BehandlingId): List<GeneriskFaktaGrunnlag<TYPE>> =
         hentGrunnlag(behandlingId, TypeFaktaGrunnlag.finnType(TYPE::class))
             .map { faktaGrunnlag -> faktaGrunnlag.withTypeOrThrow<TYPE>() }
+
+    final inline fun <reified TYPE : FaktaGrunnlagData> hentEnkeltGrunnlag(behandlingId: BehandlingId): GeneriskFaktaGrunnlag<TYPE> =
+        hentGrunnlag(behandlingId, TypeFaktaGrunnlag.finnType(TYPE::class))
+            .map { faktaGrunnlag -> faktaGrunnlag.withTypeOrThrow<TYPE>() }
+            .single()
 
     fun hentGrunnlag(
         behandlingId: BehandlingId,
@@ -94,7 +122,7 @@ class FaktaGrunnlagService(
     private fun opprettGrunnlagArenaVedtak(behandling: Saksbehandling) {
         val statusArena = arenaService.hentStatus(behandling.ident, behandling.stønadstype)
         val vedtakArena = GrunnlagArenaMapper.mapFaktaArena(statusArena, behandling.stønadstype)
-        lagreFaktaGrunnlag(behandling.id, FaktaGrunnlagArenaVedtak(vedtakTom = vedtakArena.vedtakTom))
+        lagreFaktaGrunnlag(behandling.id, vedtakArena)
     }
 
     private fun lagreFaktaGrunnlag(

@@ -2,7 +2,8 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårsoppsummering
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagPersonopplysninger
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service
 @Service
 class VilkårsoppsummeringService(
     private val vilkårperiodeService: VilkårperiodeService,
-    private val grunnlagsdataService: GrunnlagsdataService,
+    private val faktaGrunnlagService: FaktaGrunnlagService,
 ) {
     fun hentVilkårsoppsummering(behandlingId: BehandlingId): VilkårsoppsummeringDto {
         val vilkårperioder = finnPerioderForOppfylteAktiviteter(behandlingId)
@@ -30,7 +31,7 @@ class VilkårsoppsummeringService(
         if (aktivitetsperioder.isEmpty()) {
             return false
         }
-        val barn = grunnlagsdataService.hentGrunnlagsdata(behandlingId).barn
+        val barn = faktaGrunnlagService.hentEnkeltGrunnlag<FaktaGrunnlagPersonopplysninger>(behandlingId).data.barn
         return harBarnUnder2ÅrIAktivitetsperiode(barn, aktivitetsperioder)
     }
 

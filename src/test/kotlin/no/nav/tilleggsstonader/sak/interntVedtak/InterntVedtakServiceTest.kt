@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.behandlingId
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
@@ -38,7 +38,7 @@ class InterntVedtakServiceTest {
     private val totrinnskontrollService = mockk<TotrinnskontrollService>()
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
     private val søknadService = mockk<SøknadService>()
-    private val grunnlagsdataService = mockk<GrunnlagsdataService>()
+    private val faktaGrunnlagService = mockk<FaktaGrunnlagService>()
     private val barnService = mockk<BarnService>()
     private val vilkårService = mockk<VilkårService>()
     private val vedtakService = mockk<VedtakService>()
@@ -49,7 +49,7 @@ class InterntVedtakServiceTest {
             totrinnskontrollService = totrinnskontrollService,
             vilkårperiodeService = vilkårperiodeService,
             søknadService = søknadService,
-            grunnlagsdataService = grunnlagsdataService,
+            faktaGrunnlagService = faktaGrunnlagService,
             barnService = barnService,
             vilkårService = vilkårService,
             vedtakService = vedtakService,
@@ -67,7 +67,7 @@ class InterntVedtakServiceTest {
         fun setUp() {
             every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.TilsynBarn.behandling
             every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.TilsynBarn.vilkårperioder
-            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.TilsynBarn.grunnlagsdata
+            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.TilsynBarn.grunnlagsdata
             every { barnService.finnBarnPåBehandling(behandlingId) } returns Testdata.TilsynBarn.behandlingBarn
             every { vilkårService.hentVilkår(behandlingId) } returns Testdata.TilsynBarn.vilkår
             every { vedtakService.hentVedtak(behandlingId) } returns Testdata.TilsynBarn.vedtak
@@ -188,7 +188,7 @@ class InterntVedtakServiceTest {
         fun setUp() {
             every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.Læremidler.behandling
             every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.Læremidler.vilkårperioder
-            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.Læremidler.grunnlagsdata
+            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.Læremidler.grunnlagsdata
             every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
             every { vilkårService.hentVilkår(behandlingId) } returns emptyList()
             every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.innvilgetVedtak
@@ -281,7 +281,7 @@ class InterntVedtakServiceTest {
         fun setUp() {
             every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.Boutgifter.behandling
             every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.Boutgifter.vilkårperioder
-            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.Boutgifter.grunnlagsdata
+            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.Boutgifter.grunnlagsdata
             every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
             every { vilkårService.hentVilkår(behandlingId) } returns Testdata.Boutgifter.vilkår
             every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Boutgifter.innvilgetVedtak

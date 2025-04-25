@@ -17,7 +17,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -36,7 +36,7 @@ class BehandlingController(
     private val behandlingsoversiktService: BehandlingsoversiktService,
     private val opprettRevurderingBehandlingService: OpprettRevurderingBehandlingService,
     private val revurderFraService: RevurderFraService,
-    private val grunnlagsdataService: GrunnlagsdataService,
+    private val faktaGrunnlagService: FaktaGrunnlagService,
     private val fagsakService: FagsakService,
     private val henleggService: HenleggService,
     private val tilgangService: TilgangService,
@@ -52,7 +52,7 @@ class BehandlingController(
             brukerfeilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
                 "Behandlingen er ikke påbegynt. En saksbehandler må påbegynne behandlingen før du kan gå inn."
             }
-            grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId)
+            faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId)
         }
         return saksbehandling.tilDto()
     }

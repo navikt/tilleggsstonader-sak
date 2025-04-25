@@ -5,8 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -43,7 +42,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode as V
 class InterntVedtakService(
     private val behandlingService: BehandlingService,
     private val barnService: BarnService,
-    private val grunnlagsdataService: GrunnlagsdataService,
+    private val faktaGrunnlagService: FaktaGrunnlagService,
     private val totrinnskontrollService: TotrinnskontrollService,
     private val vilkårperiodeService: VilkårperiodeService,
     private val søknadService: SøknadService,
@@ -55,8 +54,8 @@ class InterntVedtakService(
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandling.id)
         val vedtak = vedtakService.hentVedtak(behandling.id)
 
-        val grunnlag = grunnlagsdataService.hentGrunnlagsdata(behandling.id)
-        val behandlingbarn = mapBarnPåBarnId(behandling.id, grunnlag)
+        val grunnlag = faktaGrunnlagService.hentGrunnlagsdata(behandling.id)
+        val behandlingbarn = mapBarnPåBarnId(behandling.id, grunnlag.personopplysninger.barn)
 
         return InterntVedtak(
             behandling = mapBehandlingsinformasjon(behandling),
@@ -102,10 +101,10 @@ class InterntVedtakService(
 
     private fun mapBarnPåBarnId(
         behandlingId: BehandlingId,
-        grunnlag: Grunnlag,
+        grunnlag: List<GrunnlagBarn>,
     ): Map<BarnId, GrunnlagBarn> {
         val behandlingbarn = barnService.finnBarnPåBehandling(behandlingId).associateBy { it.ident }
-        return grunnlag.barn.associateBy {
+        return grunnlag.associateBy {
             val barn =
                 behandlingbarn[it.ident] ?: error("Finner ikke barn med ident=${it.ident} på behandling=$behandlingId")
             barn.id

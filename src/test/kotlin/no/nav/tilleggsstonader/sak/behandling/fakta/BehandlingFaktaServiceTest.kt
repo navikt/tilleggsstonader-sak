@@ -9,12 +9,11 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KodeverkServiceUtil.mockedKodeverkService
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GeneriskFaktaGrunnlagTestUtil
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.TypeFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
+import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFaktaGrunnlagPersonopplysninger
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdataBarn
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagNavn
@@ -33,7 +32,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 internal class BehandlingFaktaServiceTest {
-    val grunnlagsdataService = mockk<GrunnlagsdataService>()
     val søknadService = mockk<SøknadService>()
     val barnService = mockk<BarnService>()
     val faktaArbeidOgOppholdMapper = FaktaArbeidOgOppholdMapper(mockedKodeverkService())
@@ -42,7 +40,6 @@ internal class BehandlingFaktaServiceTest {
 
     val service =
         BehandlingFaktaService(
-            grunnlagsdataService,
             søknadService,
             barnService,
             faktaArbeidOgOppholdMapper,
@@ -55,29 +52,17 @@ internal class BehandlingFaktaServiceTest {
     @BeforeEach
     fun setUp() {
         every { barnService.finnBarnPåBehandling(any()) } returns emptyList()
-        every {
-            faktaGrunnlagService.hentGrunnlag(
-                behandlingId,
-                TypeFaktaGrunnlag.BARN_ANDRE_FORELDRE_SAKSINFORMASJON,
-            )
-        } returns
-            emptyList()
     }
 
     @Test
     fun `skal mappe søknad og grunnlag`() {
-        every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
+        val saksinformasjonAndreForeldre = GeneriskFaktaGrunnlagTestUtil.faktaGrunnlagBarnAnnenForelder(identBarn = "1")
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns
+            lagGrunnlagsdata(saksinformasjonAndreForeldre = listOf(saksinformasjonAndreForeldre))
         every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn()
         val behandlingBarn =
             behandlingBarn(personIdent = "1", id = BarnId.fromString("60921c76-f8ef-4000-9824-f127a50a575e"))
         every { barnService.finnBarnPåBehandling(any()) } returns listOf(behandlingBarn)
-        every {
-            faktaGrunnlagService.hentGrunnlag(
-                behandlingId,
-                TypeFaktaGrunnlag.BARN_ANDRE_FORELDRE_SAKSINFORMASJON,
-            )
-        } returns
-            listOf(GeneriskFaktaGrunnlagTestUtil.faktaGrunnlagBarnAnnenForelder(identBarn = "1"))
 
         val fagsak = fagsak(stønadstype = Stønadstype.BARNETILSYN)
 
@@ -91,9 +76,14 @@ internal class BehandlingFaktaServiceTest {
     inner class FaktaBarnTest {
         @Test
         fun `skal mappe søknadsgrunnlag for de barn som fantes i søknaden`() {
-            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns
+            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns
                 lagGrunnlagsdata(
-                    barn = listOf(lagGrunnlagsdataBarn("1"), lagGrunnlagsdataBarn("2")),
+                    personopplysninger =
+                        lagFaktaGrunnlagPersonopplysninger(
+                            barn = listOf(lagGrunnlagsdataBarn("1"), lagGrunnlagsdataBarn("2")),
+                        ),
+                    saksinformasjonAndreForeldre =
+                        listOf(GeneriskFaktaGrunnlagTestUtil.faktaGrunnlagBarnAnnenForelder(identBarn = "1")),
                 )
             every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
                 søknadBarnetilsyn(
@@ -105,13 +95,6 @@ internal class BehandlingFaktaServiceTest {
                     behandlingBarn(personIdent = "1"),
                     behandlingBarn(personIdent = "2"),
                 )
-            every {
-                faktaGrunnlagService.hentGrunnlag(
-                    behandlingId,
-                    TypeFaktaGrunnlag.BARN_ANDRE_FORELDRE_SAKSINFORMASJON,
-                )
-            } returns
-                listOf(GeneriskFaktaGrunnlagTestUtil.faktaGrunnlagBarnAnnenForelder(identBarn = "1"))
 
             val fagsak = fagsak(stønadstype = Stønadstype.BARNETILSYN)
 
@@ -132,9 +115,12 @@ internal class BehandlingFaktaServiceTest {
 
         @Test
         fun `skal kaste feil hvis ikke alle barnen fra søknaden har grunnlagsdata`() {
-            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns
+            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns
                 lagGrunnlagsdata(
-                    barn = listOf(lagGrunnlagsdataBarn("1")),
+                    personopplysninger =
+                        lagFaktaGrunnlagPersonopplysninger(
+                            barn = listOf(lagGrunnlagsdataBarn("1")),
+                        ),
                 )
             every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
                 søknadBarnetilsyn(
@@ -157,8 +143,13 @@ internal class BehandlingFaktaServiceTest {
 
         @Test
         fun `hvis barnet er under 9 år så har man ikke fullført fjerdetrinn for å kunne automatisk prefylle delvilkår i frontend`() {
-            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns
-                lagGrunnlagsdata(barn = listOf(lagGrunnlagsdataBarn("1")))
+            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns
+                lagGrunnlagsdata(
+                    personopplysninger =
+                        lagFaktaGrunnlagPersonopplysninger(
+                            barn = listOf(lagGrunnlagsdataBarn("1")),
+                        ),
+                )
             val barnMedBarnepass = lagBarnMedBarnepass(startetIFemte = null, årsak = null)
             every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
                 søknadBarnetilsyn(
@@ -184,9 +175,12 @@ internal class BehandlingFaktaServiceTest {
 
         @Test
         fun `hvis barnet er over 11 år så vet man ikke om barnet fullført fjerdetrinn`() {
-            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns
+            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns
                 lagGrunnlagsdata(
-                    barn = listOf(lagGrunnlagsdataBarn("1", fødselsdato = LocalDate.now().minusYears(11))),
+                    personopplysninger =
+                        lagFaktaGrunnlagPersonopplysninger(
+                            barn = listOf(lagGrunnlagsdataBarn("1", fødselsdato = LocalDate.now().minusYears(11))),
+                        ),
                 )
             every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
                 søknadBarnetilsyn(
@@ -216,8 +210,13 @@ internal class BehandlingFaktaServiceTest {
         @Test
         fun `skal mappe dokumentasjon`() {
             val dokumentasjon = lagDokumentasjon()
-            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns
-                lagGrunnlagsdata(barn = emptyList())
+            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns
+                lagGrunnlagsdata(
+                    personopplysninger =
+                        lagFaktaGrunnlagPersonopplysninger(
+                            barn = emptyList(),
+                        ),
+                )
             every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
                 søknadBarnetilsyn(
                     journalpostId = "journalpostId2",
@@ -243,8 +242,13 @@ internal class BehandlingFaktaServiceTest {
         @Test
         fun `skal returnere returnere navnet på barnet hvis barnIdent finnes`() {
             val navn = lagNavn("Fornavn barn1")
-            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns
-                lagGrunnlagsdata(barn = listOf(lagGrunnlagsdataBarn("1", navn = navn)))
+            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns
+                lagGrunnlagsdata(
+                    personopplysninger =
+                        lagFaktaGrunnlagPersonopplysninger(
+                            barn = listOf(lagGrunnlagsdataBarn("1", navn = navn)),
+                        ),
+                )
             val dokumentasjon = lagDokumentasjon(identBarn = "1")
             every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
                 søknadBarnetilsyn(

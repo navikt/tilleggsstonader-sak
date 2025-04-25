@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -25,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningTestUtil.vedtaksperiodeBeregning
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -33,6 +35,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
 class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
+    @Autowired
+    private lateinit var barnRepository: BarnRepository
+
     @Autowired
     lateinit var faktaGrunnlagService: FaktaGrunnlagService
 
@@ -53,6 +58,8 @@ class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
 
     @BeforeEach
     fun setUp() {
+        testoppsettService.lagreFagsak(fagsak)
+        testoppsettService.lagre(behandling, opprettGrunnlagsdata = false)
         every { pdlClient.hentBarn(any()) } returns
             mapOf(
                 PdlClientConfig.BARN_FNR to pdlBarn(forelderBarnRelasjon = familierelasjonerBarn()),
@@ -67,12 +74,38 @@ class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
 
     @Test
     fun `skal ikke opprette grunnlag hvis det allerede finnes`() {
-        testoppsettService.opprettBehandlingMedFagsak(behandling)
         faktaGrunnlagRepository.insert(faktaGrunnlagBarnAnnenForelder(behandlingId = behandling.id))
 
-        val resultat = faktaGrunnlagService.opprettGrunnlag(behandlingId = behandling.id)
+        val resultat = faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId = behandling.id)
 
         assertThat(resultat).isEqualTo(FaktaGrunnlagOpprettResultat.IkkeOpprettet)
+    }
+
+    @Nested
+    inner class FaktaGrunnlagPersonopplysningerTest {
+        @Test
+        fun `skal opprette grunnlag til behandlingBarn`() {
+            barnRepository.insert(behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.BARN_FNR))
+
+            faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandling.id)
+
+            val grunnlagsdata =
+                faktaGrunnlagService
+                    .hentGrunnlag<FaktaGrunnlagPersonopplysninger>(behandling.id)
+                    .single()
+                    .data
+
+            assertThat(grunnlagsdata.barn).hasSize(1)
+        }
+
+        @Test
+        fun `skal kaste feil hvis man ikke finner barn i PDL - då er det noe som er feil med barn på behandlingen`() {
+            barnRepository.insert(behandlingBarn(behandlingId = behandling.id))
+
+            assertThatThrownBy {
+                faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandling.id)
+            }.hasMessageContaining("Finner ikke grunnlag for barn")
+        }
     }
 
     @Nested
@@ -89,8 +122,6 @@ class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
 
         @BeforeEach
         fun setUp() {
-            testoppsettService.lagreFagsak(fagsak)
-            testoppsettService.lagre(behandling, opprettGrunnlagsdata = false)
             val barn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.BARN_FNR)
             barnService.opprettBarn(listOf(barn))
         }
@@ -109,7 +140,7 @@ class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
         fun `skal opprette grunnlag for annen forelder`() {
             opprettVedtakAnnenForelder()
 
-            faktaGrunnlagService.opprettGrunnlag(behandlingId = behandling.id)
+            faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId = behandling.id)
 
             val grunnlagAndreForeldre = hentGrunnlag()
             assertThat(grunnlagAndreForeldre).hasSize(1)
@@ -128,7 +159,7 @@ class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
                     PdlClientConfig.BARN_FNR to pdlBarn(),
                 )
 
-            faktaGrunnlagService.opprettGrunnlag(behandlingId = behandling.id)
+            faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId = behandling.id)
 
             val grunnlagAndreForeldre = hentGrunnlag()
 

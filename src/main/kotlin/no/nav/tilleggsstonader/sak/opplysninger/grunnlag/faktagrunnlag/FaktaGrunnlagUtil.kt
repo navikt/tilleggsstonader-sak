@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag
 
+import no.nav.tilleggsstonader.libs.utils.CollectionUtil.singleOrNullOrError
+
 object FaktaGrunnlagUtil {
     inline fun <reified T : FaktaGrunnlagData> GeneriskFaktaGrunnlag<*>.takeIfType(): GeneriskFaktaGrunnlag<T>? {
         @Suppress("UNCHECKED_CAST")
@@ -13,6 +15,14 @@ object FaktaGrunnlagUtil {
         @Suppress("UNCHECKED_CAST")
         return this as GeneriskFaktaGrunnlag<T>
     }
+
+    inline fun <reified T : FaktaGrunnlagData> List<GeneriskFaktaGrunnlag<*>>.ofType(): List<GeneriskFaktaGrunnlag<T>> {
+        @Suppress("UNCHECKED_CAST")
+        return this.filter { it.data is T } as List<GeneriskFaktaGrunnlag<T>>
+    }
+
+    inline fun <reified T : FaktaGrunnlagData> List<GeneriskFaktaGrunnlag<*>>.singleOfType(): GeneriskFaktaGrunnlag<T> =
+        ofType<T>().singleOrNullOrError() ?: error("Finner ikke fakta av type ${T::class.simpleName}")
 }
 
 sealed interface FaktaGrunnlagOpprettResultat {
