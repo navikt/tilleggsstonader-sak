@@ -12,6 +12,8 @@ Egenskap: Beregning av faste utgifter
       | Fom        | Tom        | Utgift |
       | 01.01.2025 | 31.01.2025 | 1000   |
 
+    Når beregner boutgifter
+
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
       | 01.01.2025 | 31.01.2025 | 1              | 1000         | 4953      | 01.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
@@ -25,6 +27,8 @@ Egenskap: Beregning av faste utgifter
       | Fom        | Tom        | Utgift |
       | 01.01.2025 | 31.01.2025 | 1000   |
 
+    Når beregner boutgifter
+
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
       | 01.01.2025 | 31.01.2025 | 1              | 1000         | 4953      | 01.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
@@ -37,6 +41,8 @@ Egenskap: Beregning av faste utgifter
     Gitt følgende utgifter for: LØPENDE_UTGIFTER_TO_BOLIGER
       | Fom        | Tom        | Utgift |
       | 01.01.2025 | 30.04.2025 | 1000   |
+
+    Når beregner boutgifter
 
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
@@ -55,6 +61,8 @@ Egenskap: Beregning av faste utgifter
       | Fom        | Tom        | Utgift |
       | 15.11.2024 | 18.02.2025 | 9000   |
 
+    Når beregner boutgifter
+
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
       | 15.11.2024 | 14.12.2024 | 1              | 4809         | 4809      | 15.11.2024      | NEDSATT_ARBEIDSEVNE | TILTAK    |
@@ -72,6 +80,8 @@ Egenskap: Beregning av faste utgifter
       | Fom        | Tom        | Utgift |
       | 01.01.2025 | 28.02.2025 | 1000   |
 
+    Når beregner boutgifter
+
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
       | 01.01.2025 | 31.01.2025 | 1              | 1000         | 4953      | 01.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
@@ -87,6 +97,8 @@ Egenskap: Beregning av faste utgifter
       Gitt følgende utgifter for: LØPENDE_UTGIFTER_EN_BOLIG
         | Fom        | Tom        | Utgift |
         | 01.01.2025 | 20.06.2025 | 4000   |
+
+      Når beregner boutgifter
 
       Så skal beregnet stønad for boutgifter være
         | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
@@ -105,6 +117,8 @@ Egenskap: Beregning av faste utgifter
       Gitt følgende utgifter for: LØPENDE_UTGIFTER_TO_BOLIGER
         | Fom        | Tom        | Utgift |
         | 01.04.2024 | 01.06.2025 | 4000   |
+
+      Når beregner boutgifter
 
       Så skal beregnet stønad for boutgifter være
         | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |

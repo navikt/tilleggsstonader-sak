@@ -12,6 +12,8 @@ Egenskap: Beregning av midlertidig overnatting
       | Fom        | Tom        | Utgift |
       | 07.01.2025 | 09.01.2025 | 1000   |
 
+    Når beregner boutgifter
+
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
       | 07.01.2025 | 09.01.2025 | 1              | 1000         | 4953      | 07.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
@@ -24,6 +26,8 @@ Egenskap: Beregning av midlertidig overnatting
     Gitt følgende utgifter for: UTGIFTER_OVERNATTING
       | Fom        | Tom        | Utgift |
       | 30.12.2024 | 02.01.2025 | 8000   |
+
+    Når beregner boutgifter
 
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
@@ -39,6 +43,8 @@ Egenskap: Beregning av midlertidig overnatting
       | Fom        | Tom        | Utgift |
       | 07.01.2025 | 09.01.2025 | 1000   |
       | 12.03.2025 | 15.03.2025 | 8000   |
+
+    Når beregner boutgifter
 
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
@@ -57,6 +63,8 @@ Egenskap: Beregning av midlertidig overnatting
       | 07.01.2025 | 09.01.2025 | 1000   |
       | 21.01.2025 | 24.01.2025 | 1000   |
 
+    Når beregner boutgifter
+
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
       | 07.01.2025 | 24.01.2025 | 1              | 2000         | 4953      | 07.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
@@ -69,6 +77,8 @@ Egenskap: Beregning av midlertidig overnatting
     Gitt følgende utgifter for: UTGIFTER_OVERNATTING
       | Fom        | Tom        | Utgift |
       | 11.01.2025 | 12.01.2025 | 1500   |
+
+    Når beregner boutgifter
 
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
@@ -85,7 +95,9 @@ Egenskap: Beregning av midlertidig overnatting
       | 11.01.2025 | 12.01.2025 | 1500   |
       | 09.02.2025 | 14.02.2025 | 1500   |
 
-    Så forvent følgende feil når vi beregner boutgifter: Vi støtter foreløpig ikke at utgifter krysser ulike utbetalingsperioder.
+    Når beregner boutgifter
+
+    Så forvent følgende feil for boutgifter: Vi støtter foreløpig ikke at utgifter krysser ulike utbetalingsperioder.
 
   Scenario: To påfølgende vedtaksperioder som dekker utgiften
     Gitt følgende vedtaksperioder for boutgifter
@@ -96,6 +108,8 @@ Egenskap: Beregning av midlertidig overnatting
     Gitt følgende utgifter for: UTGIFTER_OVERNATTING
       | Fom        | Tom        | Utgift |
       | 01.01.2025 | 31.01.2025 | 1000   |
+
+    Når beregner boutgifter
 
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
@@ -110,4 +124,6 @@ Egenskap: Beregning av midlertidig overnatting
       | Fom        | Tom        | Utgift |
       | 01.01.2025 | 31.01.2025 | 1000   |
 
-    Så forvent følgende feil når vi beregner boutgifter: Du har lagt inn utgifter til midlertidig overnatting som ikke er inneholdt i en vedtaksperiode. Foreløpig støtter vi ikke dette.
+    Når beregner boutgifter
+
+    Så forvent følgende feil for boutgifter: Du har lagt inn utgifter til midlertidig overnatting som ikke er inneholdt i en vedtaksperiode. Foreløpig støtter vi ikke dette.
