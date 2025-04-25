@@ -20,6 +20,7 @@ class BehandlingFaktaController(
     fun hentBehandlingFakta(
         @PathVariable behandlingId: BehandlingId,
     ): BehandlingFaktaDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return behandlingFaktaService.hentFakta(behandlingId)
     }

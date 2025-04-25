@@ -22,6 +22,7 @@ class PersonopplysningController(
     fun hentPersonopplysninger(
         @PathVariable behandlingId: BehandlingId,
     ): PersonopplysningerDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return personopplysningerService.hentPersonopplysninger(behandlingId)
     }

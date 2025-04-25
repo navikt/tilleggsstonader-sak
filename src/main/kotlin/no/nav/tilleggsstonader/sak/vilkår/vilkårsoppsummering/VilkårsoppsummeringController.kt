@@ -22,6 +22,7 @@ class VilkårsoppsummeringController(
     fun hentVilkårsoppsummering(
         @PathVariable behandlingId: BehandlingId,
     ): VilkårsoppsummeringDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
         return vilkårsoppsummeringService.hentVilkårsoppsummering(behandlingId)

@@ -50,6 +50,7 @@ internal class TilgangServiceTest {
             rolleConfig = rolleConfig,
             cacheManager = cacheManager,
             auditLogger = mockk(relaxed = true),
+            mockk(),
         )
     private val mocketPersonIdent = "12345"
 

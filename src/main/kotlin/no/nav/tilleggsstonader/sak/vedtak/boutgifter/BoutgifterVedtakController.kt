@@ -66,6 +66,7 @@ class BoutgifterVedtakController(
         behandlingId: BehandlingId,
         vedtak: VedtakBoutgifterRequest,
     ) {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         stegService.håndterSteg(behandlingId, steg, vedtak)
     }
@@ -75,6 +76,7 @@ class BoutgifterVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseBoutgifterRequest,
     ): BeregningsresultatBoutgifterDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         return beregningService
             .beregn(
@@ -88,6 +90,7 @@ class BoutgifterVedtakController(
     fun hentVedtak(
         @PathVariable behandlingId: BehandlingId,
     ): VedtakResponse? {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
@@ -107,6 +110,7 @@ class BoutgifterVedtakController(
     fun foreslåVedtaksperioder(
         @PathVariable behandlingId: BehandlingId,
     ): List<VedtaksperiodeDto> {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
 

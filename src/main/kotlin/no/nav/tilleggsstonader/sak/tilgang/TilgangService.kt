@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ManglerTilgang
+import no.nav.tilleggsstonader.sak.infrastruktur.logging.BehandlingLogService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -32,7 +33,12 @@ class TilgangService(
     private val rolleConfig: RolleConfig,
     private val cacheManager: CacheManager,
     private val auditLogger: AuditLogger,
+    private val behandlingLogService: BehandlingLogService,
 ) {
+    fun settBehandlingsdetaljerForRequest(behandlingId: BehandlingId) {
+        behandlingLogService.settBehandlingsdetaljerForRequest(behandlingId)
+    }
+
     /**
      * Kun ved tilgangskontroll for enkeltperson (eks når man skal søke etter brevmottaker)
      * Ellers bruk [validerTilgangTilPersonMedRelasjoner]

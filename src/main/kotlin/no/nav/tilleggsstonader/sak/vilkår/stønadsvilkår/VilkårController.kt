@@ -39,6 +39,7 @@ class VilkårController(
     fun oppdaterVilkår(
         @RequestBody svarPåVilkårDto: SvarPåVilkårDto,
     ): VilkårDto {
+        tilgangService.settBehandlingsdetaljerForRequest(svarPåVilkårDto.behandlingId)
         tilgangService.validerTilgangTilBehandling(svarPåVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         try {
@@ -58,6 +59,7 @@ class VilkårController(
     fun opprettVilkår(
         @RequestBody opprettVilkårDto: OpprettVilkårDto,
     ): VilkårDto {
+        tilgangService.settBehandlingsdetaljerForRequest(opprettVilkårDto.behandlingId)
         tilgangService.validerTilgangTilBehandling(opprettVilkårDto.behandlingId, AuditLoggerEvent.CREATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
@@ -68,6 +70,7 @@ class VilkårController(
     fun slettVilkår(
         @RequestBody request: OppdaterVilkårDto,
     ) {
+        tilgangService.settBehandlingsdetaljerForRequest(request.behandlingId)
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.DELETE)
         tilgangService.validerHarSaksbehandlerrolle()
 
@@ -78,6 +81,7 @@ class VilkårController(
     fun settVilkårTilSkalIkkeVurderes(
         @RequestBody request: OppdaterVilkårDto,
     ): VilkårDto {
+        tilgangService.settBehandlingsdetaljerForRequest(request.behandlingId)
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårService.settVilkårTilSkalIkkeVurderes(request)
@@ -87,6 +91,7 @@ class VilkårController(
     fun getVilkår(
         @PathVariable behandlingId: BehandlingId,
     ): VilkårsvurderingDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return VilkårsvurderingDto(vilkårService.hentVilkår(behandlingId).map { it.tilDto() })
     }
