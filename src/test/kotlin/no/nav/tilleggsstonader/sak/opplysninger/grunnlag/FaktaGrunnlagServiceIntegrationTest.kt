@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag
+package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
@@ -10,6 +10,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig.Companion.familierelasjonerBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig.Companion.resetMock
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAndreForeldreSaksinformasjon
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagPersonopplysninger
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GeneriskFaktaGrunnlagTestUtil.faktaGrunnlagBarnAnnenForelder
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlClient
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlBarn

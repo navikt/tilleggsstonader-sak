@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag
+package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -10,11 +10,16 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapper.mapBarnAndreForeldreSaksinformasjon
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagUtil.ofType
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagUtil.singleOfType
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagUtil.ofType
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagUtil.singleOfType
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.BehandlingsinformasjonAnnenForelder
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagArenaVedtak
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAndreForeldreSaksinformasjon
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapper
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagData
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagPersonopplysninger
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.TypeFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
@@ -24,8 +29,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 @Service
 class FaktaGrunnlagService(
@@ -70,11 +73,11 @@ class FaktaGrunnlagService(
     }
 
     final inline fun <reified TYPE : FaktaGrunnlagData> hentGrunnlag(behandlingId: BehandlingId): List<GeneriskFaktaGrunnlag<TYPE>> =
-        hentGrunnlag(behandlingId, TypeFaktaGrunnlag.finnType(TYPE::class))
+        hentGrunnlag(behandlingId, TypeFaktaGrunnlag.Companion.finnType(TYPE::class))
             .map { faktaGrunnlag -> faktaGrunnlag.withTypeOrThrow<TYPE>() }
 
     final inline fun <reified TYPE : FaktaGrunnlagData> hentEnkeltGrunnlag(behandlingId: BehandlingId): GeneriskFaktaGrunnlag<TYPE> =
-        hentGrunnlag(behandlingId, TypeFaktaGrunnlag.finnType(TYPE::class))
+        hentGrunnlag(behandlingId, TypeFaktaGrunnlag.Companion.finnType(TYPE::class))
             .map { faktaGrunnlag -> faktaGrunnlag.withTypeOrThrow<TYPE>() }
             .single()
 
@@ -93,7 +96,7 @@ class FaktaGrunnlagService(
         val behandlingBarn = barnService.finnBarnPåBehandling(behandling.id)
         lagreFaktaGrunnlag(
             behandling.id,
-            FaktaGrunnlagPersonopplysninger.fraSøkerMedBarn(person, behandlingBarn),
+            FaktaGrunnlagPersonopplysninger.Companion.fraSøkerMedBarn(person, behandlingBarn),
         )
     }
 
@@ -114,13 +117,17 @@ class FaktaGrunnlagService(
         val behandlingsinformasjonAnnenForelder = finnBehandlingsinformasjonAnnenForelder(barnAnnenForelder)
 
         faktaGrunnlagRepository.insertAll(
-            mapBarnAndreForeldreSaksinformasjon(behandling.id, barnAnnenForelder, behandlingsinformasjonAnnenForelder),
+            FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapper.mapBarnAndreForeldreSaksinformasjon(
+                behandling.id,
+                barnAnnenForelder,
+                behandlingsinformasjonAnnenForelder,
+            ),
         )
     }
 
     private fun opprettGrunnlagArenaVedtak(behandling: Saksbehandling) {
         val statusArena = arenaService.hentStatus(behandling.ident, behandling.stønadstype)
-        val vedtakArena = FaktaGrunnlagArenaVedtak.map(statusArena, behandling.stønadstype)
+        val vedtakArena = FaktaGrunnlagArenaVedtak.Companion.map(statusArena, behandling.stønadstype)
         lagreFaktaGrunnlag(behandling.id, vedtakArena)
     }
 

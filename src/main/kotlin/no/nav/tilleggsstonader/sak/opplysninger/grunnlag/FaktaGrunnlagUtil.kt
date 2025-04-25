@@ -1,6 +1,7 @@
-package no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag
+package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 
 import no.nav.tilleggsstonader.libs.utils.CollectionUtil.singleOrNullOrError
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagData
 
 object FaktaGrunnlagUtil {
     inline fun <reified T : FaktaGrunnlagData> GeneriskFaktaGrunnlag<*>.takeIfType(): GeneriskFaktaGrunnlag<T>? {

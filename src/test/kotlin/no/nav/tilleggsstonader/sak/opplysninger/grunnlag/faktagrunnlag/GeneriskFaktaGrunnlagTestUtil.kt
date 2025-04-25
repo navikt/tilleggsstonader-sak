@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GeneriskFaktaGrunnlag
 import java.time.LocalDate
 
 object GeneriskFaktaGrunnlagTestUtil {
