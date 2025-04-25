@@ -30,7 +30,7 @@ class VilkårsoppsummeringService(
         if (aktivitetsperioder.isEmpty()) {
             return false
         }
-        val barn = grunnlagsdataService.hentGrunnlagsdata(behandlingId).grunnlag.barn
+        val barn = grunnlagsdataService.hentGrunnlagsdata(behandlingId).barn
         return harBarnUnder2ÅrIAktivitetsperiode(barn, aktivitetsperioder)
     }
 

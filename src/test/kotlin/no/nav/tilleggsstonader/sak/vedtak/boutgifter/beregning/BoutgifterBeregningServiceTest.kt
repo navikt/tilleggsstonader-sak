@@ -4,7 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
-import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.grunnlagsdataDomain
+import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -138,7 +138,7 @@ class BoutgifterBeregningServiceTest {
         fun setup() {
             every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
             every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
-            every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns grunnlagsdataDomain(behandlingId = behandling.id)
+            every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns lagGrunnlagsdata()
         }
 
         @Test
@@ -303,7 +303,7 @@ class BoutgifterBeregningServiceTest {
         fun setup() {
             every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
             every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
-            every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns grunnlagsdataDomain(behandlingId = behandling.id)
+            every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns lagGrunnlagsdata()
         }
 
         @Test

@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.Fødsel
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.Navn
 import org.springframework.data.annotation.Id
@@ -19,7 +19,7 @@ data class Grunnlagsdata(
 
 data class Grunnlag(
     val navn: Navn,
-    val fødsel: Fødsel?,
+    val fødsel: FødselFaktaGrunnlag?,
     val barn: List<GrunnlagBarn>,
     val arena: GrunnlagArena? = null,
 )

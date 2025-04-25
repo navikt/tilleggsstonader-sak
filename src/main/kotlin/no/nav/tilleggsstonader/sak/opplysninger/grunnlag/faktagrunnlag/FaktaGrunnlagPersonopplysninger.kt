@@ -9,7 +9,7 @@ import java.time.LocalDate
 
 data class FaktaGrunnlagPersonopplysninger(
     val navn: Navn,
-    val fødsel: Fødsel?,
+    val fødsel: FødselFaktaGrunnlag?,
     val barn: List<GrunnlagBarn>,
 ) : FaktaGrunnlagData {
     override val type: TypeFaktaGrunnlag = TypeFaktaGrunnlag.PERSONOPPLYSNINGER
@@ -24,13 +24,13 @@ data class FaktaGrunnlagPersonopplysninger(
                     person.søker.navn
                         .gjeldende()
                         .tilNavn(),
-                fødsel = Fødsel.fraSøkerMedBarn(person),
+                fødsel = FødselFaktaGrunnlag.fraSøkerMedBarn(person),
                 barn = GrunnlagBarn.fraSøkerMedBarn(person, barnPåBehandling),
             )
     }
 }
 
-data class Fødsel(
+data class FødselFaktaGrunnlag(
     val fødselsdato: LocalDate?,
     val fødselsår: Int,
 ) {
@@ -39,9 +39,9 @@ data class Fødsel(
             ?: LocalDate.of(fødselsår, 1, 1)
 
     companion object {
-        fun fraSøkerMedBarn(person: SøkerMedBarn): Fødsel {
+        fun fraSøkerMedBarn(person: SøkerMedBarn): FødselFaktaGrunnlag {
             val fødsel = person.søker.fødselsdato.gjeldende()
-            return Fødsel(
+            return FødselFaktaGrunnlag(
                 fødselsdato = fødsel.fødselsdato,
                 fødselsår = fødsel.fødselsår ?: error("Forventer at fødselsår skal finnes på alle brukere"),
             )

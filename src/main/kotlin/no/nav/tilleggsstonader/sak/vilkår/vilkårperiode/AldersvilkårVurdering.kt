@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -11,9 +11,9 @@ import java.time.LocalDate
 object AldersvilkårVurdering {
     fun vurderAldersvilkår(
         vilkårperiode: LagreVilkårperiode,
-        grunnlagsData: Grunnlagsdata,
+        fødselFaktaGrunnlag: FødselFaktaGrunnlag?,
     ): SvarJaNei {
-        val fødselsdato = grunnlagsData.grunnlag.fødsel?.fødselsdato
+        val fødselsdato = fødselFaktaGrunnlag?.fødselsdato
 
         feilHvis(fødselsdato == null) { "Kan ikke vurdere aldersvilkår uten å vite fødselsdato til bruker" }
 

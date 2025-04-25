@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.Fødsel
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.tilNavn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -28,7 +28,7 @@ class GrunnlagsdataService(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun hentGrunnlagsdata(behandlingId: BehandlingId): Grunnlagsdata = grunnlagsdataRepository.findByIdOrThrow(behandlingId)
+    fun hentGrunnlagsdata(behandlingId: BehandlingId): Grunnlag = grunnlagsdataRepository.findByIdOrThrow(behandlingId).grunnlag
 
     @Transactional
     fun opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId: BehandlingId) {
@@ -61,7 +61,7 @@ class GrunnlagsdataService(
                 person.søker.navn
                     .gjeldende()
                     .tilNavn(),
-            fødsel = Fødsel.fraSøkerMedBarn(person),
+            fødsel = FødselFaktaGrunnlag.fraSøkerMedBarn(person),
             barn = GrunnlagBarn.fraSøkerMedBarn(person, behandlingBarn),
             arena = hentGrunnlagArena(behandling),
         )

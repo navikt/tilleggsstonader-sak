@@ -1,26 +1,16 @@
 package no.nav.tilleggsstonader.sak.util
 
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagArena
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.Fødsel
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.Navn
 import java.time.LocalDate
 
 object GrunnlagsdataUtil {
-    fun grunnlagsdataDomain(
-        behandlingId: BehandlingId = BehandlingId.random(),
-        grunnlag: Grunnlag = lagGrunnlagsdata(),
-    ) = Grunnlagsdata(
-        behandlingId = behandlingId,
-        grunnlag = grunnlag,
-    )
-
     fun lagGrunnlagsdata(
         navn: Navn = lagNavn(),
-        fødsel: Fødsel? = Fødsel(fødselsdato = LocalDate.of(2000, 1, 1), fødselsår = 2000),
+        fødsel: FødselFaktaGrunnlag? = FødselFaktaGrunnlag(fødselsdato = LocalDate.of(2000, 1, 1), fødselsår = 2000),
         barn: List<GrunnlagBarn> = listOf(lagGrunnlagsdataBarn()),
         arena: GrunnlagArena? = GrunnlagArena(vedtakTom = LocalDate.of(2024, 1, 1)),
     ) = Grunnlag(
@@ -29,6 +19,9 @@ object GrunnlagsdataUtil {
         barn = barn,
         arena = arena,
     )
+
+    fun lagFødselFaktaGrunnlag(fødselsdato: LocalDate? = LocalDate.of(2000, 1, 1)) =
+        FødselFaktaGrunnlag(fødselsdato = fødselsdato, fødselsår = fødselsdato?.year ?: 2000)
 
     fun lagGrunnlagsdataBarn(
         ident: String = "1",

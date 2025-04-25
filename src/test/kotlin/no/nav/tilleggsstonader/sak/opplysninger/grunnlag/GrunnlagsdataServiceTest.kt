@@ -85,8 +85,8 @@ class GrunnlagsdataServiceTest {
 
             val grunnlagsdata = service.hentGrunnlagsdata(behandling.id)
 
-            assertThat(grunnlagsdata.grunnlag.barn).isEmpty()
-            assertThat(grunnlagsdata.grunnlag.navn.fornavn).isEqualTo("Fornavn")
+            assertThat(grunnlagsdata.barn).isEmpty()
+            assertThat(grunnlagsdata.navn.fornavn).isEqualTo("Fornavn")
             verify(exactly = 1) { grunnlagsdataRepository.insert(any()) }
             verify(exactly = 1) { faktaGrunnlagService.opprettGrunnlag(behandling.id) }
         }
@@ -110,7 +110,7 @@ class GrunnlagsdataServiceTest {
 
             val grunnlagsdata = service.hentGrunnlagsdata(behandling.id)
 
-            assertThat(grunnlagsdata.grunnlag.barn).hasSize(1)
+            assertThat(grunnlagsdata.barn).hasSize(1)
         }
 
         @Test

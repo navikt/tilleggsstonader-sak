@@ -15,5 +15,10 @@ interface FaktaGrunnlagRepository :
         type: TypeFaktaGrunnlag,
     ): List<FaktaGrunnlag>
 
+    fun findByBehandlingIdAndTypeIn(
+        behandlingId: BehandlingId,
+        typer: List<TypeFaktaGrunnlag>,
+    ): List<FaktaGrunnlag>
+
     fun existsByBehandlingId(behandlingId: BehandlingId): Boolean
 }

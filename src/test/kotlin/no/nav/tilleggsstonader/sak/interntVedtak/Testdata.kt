@@ -144,21 +144,15 @@ object Testdata {
                 GrunnlagsdataUtil.lagGrunnlagsdataBarn(ident = "2", fødselsdato = LocalDate.of(2024, 10, 15)),
             )
 
-        val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = barn))
+        val grunnlagsdata = lagGrunnlagsdata(barn = barn)
 
         val behandlingBarn =
             listOf(
                 behandlingBarn(
-                    personIdent =
-                        grunnlagsdata.grunnlag.barn
-                            .first()
-                            .ident,
+                    personIdent = grunnlagsdata.barn.first().ident,
                 ),
                 behandlingBarn(
-                    personIdent =
-                        grunnlagsdata.grunnlag.barn
-                            .last()
-                            .ident,
+                    personIdent = grunnlagsdata.barn.last().ident,
                 ),
             )
         val barnId = behandlingBarn[0].id
@@ -284,7 +278,7 @@ object Testdata {
                 fagsak = fagsak,
             )
 
-        val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = emptyList()))
+        val grunnlagsdata = lagGrunnlagsdata(barn = emptyList())
 
         val vedtaksperioder =
             listOf(
@@ -426,7 +420,7 @@ object Testdata {
                 fagsak = fagsak,
             )
 
-        val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = emptyList()))
+        val grunnlagsdata = lagGrunnlagsdata(barn = emptyList())
 
         val vedtaksperioder =
             listOf(

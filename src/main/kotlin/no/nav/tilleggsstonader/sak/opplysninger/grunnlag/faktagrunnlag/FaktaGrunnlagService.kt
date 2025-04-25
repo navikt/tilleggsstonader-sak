@@ -56,6 +56,11 @@ class FaktaGrunnlagService(
         type: TypeFaktaGrunnlag,
     ): List<GeneriskFaktaGrunnlag<out FaktaGrunnlagData>> = faktaGrunnlagRepository.findByBehandlingIdAndType(behandlingId, type)
 
+    fun hentGrunnlag(
+        behandlingId: BehandlingId,
+        typer: List<TypeFaktaGrunnlag>,
+    ): List<GeneriskFaktaGrunnlag<out FaktaGrunnlagData>> = faktaGrunnlagRepository.findByBehandlingIdAndTypeIn(behandlingId, typer)
+
     private fun opprettGrunnlagPersonopplysninger(behandling: Saksbehandling) {
         val person = hentPerson(behandling)
         val behandlingBarn = barnService.finnBarnPåBehandling(behandling.id)

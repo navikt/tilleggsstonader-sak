@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.AldersvilkårVurdering.vurderAldersvilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -74,10 +74,10 @@ object VilkårperiodeRevurderFraValidering {
     fun validerAtAldersvilkårErGyldig(
         eksisterendePeriode: Vilkårperiode,
         oppdatertPeriode: LagreVilkårperiode,
-        grunnlagsdata: Grunnlagsdata,
+        fødselFaktaGrunnlag: FødselFaktaGrunnlag?,
     ) {
         if (eksisterendePeriode.type is MålgruppeType && eksisterendePeriode.type.skalVurdereAldersvilkår()) {
-            vurderAldersvilkår(oppdatertPeriode, grunnlagsdata)
+            vurderAldersvilkår(oppdatertPeriode, fødselFaktaGrunnlag)
         }
     }
 

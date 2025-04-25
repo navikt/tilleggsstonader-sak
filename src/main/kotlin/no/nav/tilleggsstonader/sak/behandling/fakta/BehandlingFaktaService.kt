@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAndreForeldreSaksinformasjon
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
@@ -82,7 +82,7 @@ class BehandlingFaktaService(
     fun hentFaktaDTOForLæremidler(behandlingId: BehandlingId): BehandlingFaktaLæremidlerDto {
         val søknad = søknadService.hentSøknadLæremidler(behandlingId)
         val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandlingId)
-        val fødselsdato = grunnlagsdata.grunnlag.fødsel?.fødselsdatoEller1JanForFødselsår()
+        val fødselsdato = grunnlagsdata.fødsel?.fødselsdatoEller1JanForFødselsår()
         return BehandlingFaktaLæremidlerDto(
             søknadMottattTidspunkt = søknad?.mottattTidspunkt,
             hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
@@ -119,8 +119,8 @@ class BehandlingFaktaService(
                 },
         )
 
-    private fun arenaFakta(grunnlagsdata: Grunnlagsdata): ArenaFakta? =
-        grunnlagsdata.grunnlag.arena?.let {
+    private fun arenaFakta(grunnlagsdata: Grunnlag): ArenaFakta? =
+        grunnlagsdata.arena?.let {
             ArenaFakta(
                 vedtakTom = it.vedtakTom,
             )
@@ -244,7 +244,7 @@ class BehandlingFaktaService(
         )
 
     private fun mapBarn(
-        grunnlagsdata: Grunnlagsdata,
+        grunnlagsdata: Grunnlag,
         søknad: SøknadBarnetilsyn?,
         behandlingId: BehandlingId,
         faktaGrunnlagAnnenForelder: List<GeneriskFaktaGrunnlag<FaktaGrunnlagBarnAndreForeldreSaksinformasjon>>,
@@ -253,7 +253,7 @@ class BehandlingFaktaService(
         if (søknad != null) {
             validerFinnesGrunnlagsdataForAlleBarnISøknad(grunnlagsdata, søknadBarnPåIdent)
         }
-        val grunnlagsdataBarn = grunnlagsdata.grunnlag.barn.associateBy { it.ident }
+        val grunnlagsdataBarn = grunnlagsdata.barn.associateBy { it.ident }
         val faktaGrunnlagPerBarn = faktaGrunnlagAnnenForelder.associateBy { it.data.identBarn }
 
         return barnService.finnBarnPåBehandling(behandlingId).map { behandlingBarn ->
@@ -327,9 +327,9 @@ class BehandlingFaktaService(
     private fun mapDokumentasjon(
         dokumentasjonListe: List<no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon>,
         journalpostId: String,
-        grunnlagsdata: Grunnlagsdata,
+        grunnlagsdata: Grunnlag,
     ): FaktaDokumentasjon {
-        val navn = grunnlagsdata.grunnlag.barn.associate { it.ident to it.navn.fornavn }
+        val navn = grunnlagsdata.barn.associate { it.ident to it.navn.fornavn }
         val dokumentasjon =
             dokumentasjonListe.map { dokumentasjon ->
                 val navnBarn = dokumentasjon.identBarn?.let { navn[it] }?.let { " - $it" } ?: ""
@@ -343,11 +343,11 @@ class BehandlingFaktaService(
     }
 
     private fun validerFinnesGrunnlagsdataForAlleBarnISøknad(
-        grunnlagsdata: Grunnlagsdata,
+        grunnlagsdata: Grunnlag,
         søknadBarnPåIdent: Map<String, SøknadBarn>,
     ) {
         val identerIGrunnlagsdata =
-            grunnlagsdata.grunnlag.barn
+            grunnlagsdata.barn
                 .map { it.ident }
                 .toSet()
         val identerSomManglerGrunnlagsdata = søknadBarnPåIdent.keys.filterNot { identerIGrunnlagsdata.contains(it) }

@@ -55,7 +55,7 @@ class InterntVedtakService(
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandling.id)
         val vedtak = vedtakService.hentVedtak(behandling.id)
 
-        val grunnlag = grunnlagsdataService.hentGrunnlagsdata(behandling.id).grunnlag
+        val grunnlag = grunnlagsdataService.hentGrunnlagsdata(behandling.id)
         val behandlingbarn = mapBarnPåBarnId(behandling.id, grunnlag)
 
         return InterntVedtak(
