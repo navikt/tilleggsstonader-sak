@@ -41,6 +41,7 @@ enum class TypeFaktaGrunnlag(
     val kClass: KClass<out FaktaGrunnlagData>,
 ) {
     BARN_ANDRE_FORELDRE_SAKSINFORMASJON(FaktaGrunnlagBarnAndreForeldreSaksinformasjon::class),
+    ARENA_VEDTAK_TOM(FaktaGrunnlagArenaVedtak::class),
     ;
 
     companion object {

@@ -8,6 +8,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagArenaMapper
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapper.mapBarnAndreForeldreSaksinformasjon
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -27,12 +29,14 @@ class FaktaGrunnlagService(
     private val barnService: BarnService,
     private val personService: PersonService,
     private val vedtakRepository: VedtakRepository,
+    private val arenaService: ArenaService,
 ) {
     @Transactional
     fun opprettGrunnlag(behandlingId: BehandlingId) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         // TODO dette burde kun gjøres hvis behandlingen er redigerbar men akkurat nå gjøres dette fra BehandlingController som er greit
         opprettGrunnlagBarnAnnenForelder(behandling)
+        opprettGrunnlagArenaVedtak(behandling)
     }
 
     final inline fun <reified TYPE : FaktaGrunnlagData> hentGrunnlag(behandlingId: BehandlingId): List<GeneriskFaktaGrunnlag<TYPE>> =
@@ -57,6 +61,25 @@ class FaktaGrunnlagService(
         faktaGrunnlagRepository.insertAll(
             mapBarnAndreForeldreSaksinformasjon(behandling.id, barnAnnenForelder, behandlingsinformasjonAnnenForelder),
         )
+    }
+
+    private fun opprettGrunnlagArenaVedtak(behandling: Saksbehandling) {
+        val statusArena = arenaService.hentStatus(behandling.ident, behandling.stønadstype)
+        val vedtakArena = GrunnlagArenaMapper.mapFaktaArena(statusArena, behandling.stønadstype)
+        lagreFaktaGrunnlag(behandling.id, FaktaGrunnlagArenaVedtak(vedtakTom = vedtakArena.vedtakTom))
+    }
+
+    private fun lagreFaktaGrunnlag(
+        behandlingId: BehandlingId,
+        data: FaktaGrunnlagData,
+    ) {
+        val grunnlag =
+            GeneriskFaktaGrunnlag(
+                behandlingId = behandlingId,
+                data = data,
+                typeId = null,
+            )
+        faktaGrunnlagRepository.insert(grunnlag)
     }
 
     private fun finnBehandlingsinformasjonAnnenForelder(barnAnnenForelder: Map<String, List<String>>) =

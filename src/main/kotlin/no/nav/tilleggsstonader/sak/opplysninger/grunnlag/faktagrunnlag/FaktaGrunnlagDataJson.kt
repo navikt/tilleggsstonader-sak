@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 )
 @JsonSubTypes(
     JsonSubTypes.Type(FaktaGrunnlagBarnAndreForeldreSaksinformasjon::class, name = "BARN_ANDRE_FORELDRE_SAKSINFORMASJON"),
+    JsonSubTypes.Type(FaktaGrunnlagArenaVedtak::class, name = "ARENA_VEDTAK_TOM"),
     failOnRepeatedNames = true,
 )
 sealed interface FaktaGrunnlagDataJson
