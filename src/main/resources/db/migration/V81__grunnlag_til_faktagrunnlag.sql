@@ -17,7 +17,7 @@ INSERT INTO fakta_grunnlag (id, behandling_id, data, type, type_id, opprettet_av
             behandling_id,
             ('{
               "type": "ARENA_VEDTAK_TOM"
-            }'::jsonb || (grunnlag::jsonb -> 'arena')),
+            }'::jsonb || coalesce(grunnlag::jsonb -> 'arena', '{"vedtakTom": null}'::jsonb)),
             'ARENA_VEDTAK_TOM',
             null,
             opprettet_av,
