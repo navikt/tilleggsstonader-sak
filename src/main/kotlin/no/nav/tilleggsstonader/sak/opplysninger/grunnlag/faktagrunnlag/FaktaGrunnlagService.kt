@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagArenaMapper
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapper.mapBarnAndreForeldreSaksinformasjon
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagUtil.ofType
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagUtil.singleOfType
@@ -121,7 +120,7 @@ class FaktaGrunnlagService(
 
     private fun opprettGrunnlagArenaVedtak(behandling: Saksbehandling) {
         val statusArena = arenaService.hentStatus(behandling.ident, behandling.stønadstype)
-        val vedtakArena = GrunnlagArenaMapper.mapFaktaArena(statusArena, behandling.stønadstype)
+        val vedtakArena = FaktaGrunnlagArenaVedtak.map(statusArena, behandling.stønadstype)
         lagreFaktaGrunnlag(behandling.id, vedtakArena)
     }
 
