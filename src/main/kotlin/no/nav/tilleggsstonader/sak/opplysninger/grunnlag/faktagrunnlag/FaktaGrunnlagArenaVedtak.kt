@@ -1,16 +1,20 @@
-package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
+package no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag
 
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.util.isEqualOrAfter
 import java.time.LocalDate
 
-object GrunnlagArenaMapper {
-    fun mapFaktaArena(
-        status: ArenaStatusDto,
-        stønadstype: Stønadstype,
-    ): GrunnlagArena =
-        with(status.vedtak) {
+data class FaktaGrunnlagArenaVedtak(
+    val vedtakTom: LocalDate?,
+) : FaktaGrunnlagData {
+    override val type: TypeFaktaGrunnlag = TypeFaktaGrunnlag.ARENA_VEDTAK_TOM
+
+    companion object {
+        fun map(
+            status: ArenaStatusDto,
+            stønadstype: Stønadstype,
+        ) = with(status.vedtak) {
             val vedtakTom =
                 vedtakTom?.takeIf {
                     val datoFraOgMed =
@@ -20,6 +24,7 @@ object GrunnlagArenaMapper {
                             .minusMonths(2)
                     it.isEqualOrAfter(datoFraOgMed)
                 }
-            GrunnlagArena(vedtakTom = vedtakTom)
+            FaktaGrunnlagArenaVedtak(vedtakTom = vedtakTom)
         }
+    }
 }

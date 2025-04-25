@@ -9,8 +9,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagPersonopplysninger
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
@@ -50,7 +51,7 @@ class VilkårperiodeService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
     private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
-    private val grunnlagsdataService: GrunnlagsdataService,
+    private val faktaGrunnlagService: FaktaGrunnlagService,
 ) {
     fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
         val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
@@ -88,15 +89,16 @@ class VilkårperiodeService(
             kildeId = vilkårperiode.kildeId,
         )
 
-        val grunnlagsdata =
-            grunnlagsdataService
-                .hentGrunnlagsdata(behandling.id)
+        val fødselFaktaGrunnlag =
+            faktaGrunnlagService
+                .hentEnkeltGrunnlag<FaktaGrunnlagPersonopplysninger>(behandling.id)
+                .data.fødsel
 
         val faktaOgVurdering =
             mapFaktaOgSvarDto(
                 stønadstype = behandling.stønadstype,
                 vilkårperiode = vilkårperiode,
-                grunnlagsData = grunnlagsdata,
+                fødselFaktaGrunnlag = fødselFaktaGrunnlag,
             )
         return vilkårperiodeRepository.insert(
             GeneriskVilkårperiode(
@@ -126,27 +128,33 @@ class VilkårperiodeService(
         validerBehandling(behandling)
         validerKildeIdOgType(vilkårperiode, eksisterendeVilkårperiode)
 
-        val grunnlagsdata =
-            grunnlagsdataService
-                .hentGrunnlagsdata(behandling.id)
+        val fødselFaktaGrunnlag =
+            faktaGrunnlagService
+                .hentEnkeltGrunnlag<FaktaGrunnlagPersonopplysninger>(behandling.id)
+                .data.fødsel
 
         if (behandling.type != BehandlingType.REVURDERING) {
             return oppdaterVilkårperiodeHvorAltKanEndres(
                 eksisterendeVilkårperiode,
                 vilkårperiode,
                 behandling,
-                grunnlagsdata,
+                fødselFaktaGrunnlag,
             )
         }
 
-        return oppdaterVilkårperiodeIRevurdering(vilkårperiode, eksisterendeVilkårperiode, behandling, grunnlagsdata)
+        return oppdaterVilkårperiodeIRevurdering(
+            vilkårperiode,
+            eksisterendeVilkårperiode,
+            behandling,
+            fødselFaktaGrunnlag,
+        )
     }
 
     private fun oppdaterVilkårperiodeIRevurdering(
         vilkårperiode: LagreVilkårperiode,
         eksisterendeVilkårperiode: Vilkårperiode,
         behandling: Saksbehandling,
-        grunnlagsdata: Grunnlagsdata,
+        fødselFaktaGrunnlag: FødselFaktaGrunnlag?,
     ): Vilkårperiode {
         val revurderFra = behandling.revurderFra
         validerRevurderFraErSatt(revurderFra)
@@ -161,11 +169,16 @@ class VilkårperiodeService(
                 eksisterendeVilkårperiode,
                 vilkårperiode,
                 behandling,
-                grunnlagsdata,
+                fødselFaktaGrunnlag,
             )
         }
 
-        return oppdaterVilkårperiodeFørRevurderFra(vilkårperiode, eksisterendeVilkårperiode, revurderFra, grunnlagsdata)
+        return oppdaterVilkårperiodeFørRevurderFra(
+            vilkårperiode,
+            eksisterendeVilkårperiode,
+            revurderFra,
+            fødselFaktaGrunnlag,
+        )
     }
 
     /**
@@ -176,7 +189,7 @@ class VilkårperiodeService(
         vilkårperiode: LagreVilkårperiode,
         eksisterendeVilkårperiode: Vilkårperiode,
         revurderFra: LocalDate,
-        grunnlagsdata: Grunnlagsdata,
+        fødselFaktaGrunnlag: FødselFaktaGrunnlag?,
     ): Vilkårperiode {
         val vurderingerMedGammelManglerData =
             eksisterendeVilkårperiode.faktaOgVurdering.vurderinger.vurderingerMedSvarGammelManglerData()
@@ -189,7 +202,7 @@ class VilkårperiodeService(
         }
 
         validerAtKunTomErEndret(eksisterendeVilkårperiode, vilkårperiode, revurderFra)
-        validerAtAldersvilkårErGyldig(eksisterendeVilkårperiode, vilkårperiode, grunnlagsdata)
+        validerAtAldersvilkårErGyldig(eksisterendeVilkårperiode, vilkårperiode, fødselFaktaGrunnlag)
 
         return vilkårperiodeRepository.update(eksisterendeVilkårperiode.medNyTom(tom = vilkårperiode.tom))
     }
@@ -199,7 +212,7 @@ class VilkårperiodeService(
         eksisterendeVilkårperiode: Vilkårperiode,
         vilkårperiode: LagreVilkårperiode,
         behandling: Saksbehandling,
-        grunnlagsdata: Grunnlagsdata,
+        fødselFaktaGrunnlag: FødselFaktaGrunnlag?,
     ): Vilkårperiode {
         val oppdatert =
             eksisterendeVilkårperiode.medVilkårOgVurdering(
@@ -210,7 +223,7 @@ class VilkårperiodeService(
                     mapFaktaOgSvarDto(
                         stønadstype = behandling.stønadstype,
                         vilkårperiode = vilkårperiode,
-                        grunnlagsData = grunnlagsdata,
+                        fødselFaktaGrunnlag = fødselFaktaGrunnlag,
                     ),
             )
 

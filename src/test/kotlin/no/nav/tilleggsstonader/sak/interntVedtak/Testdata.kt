@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil
+import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFaktaGrunnlagPersonopplysninger
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
@@ -144,19 +145,20 @@ object Testdata {
                 GrunnlagsdataUtil.lagGrunnlagsdataBarn(ident = "2", fødselsdato = LocalDate.of(2024, 10, 15)),
             )
 
-        val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = barn))
+        val grunnlagsdata =
+            lagGrunnlagsdata(personopplysninger = lagFaktaGrunnlagPersonopplysninger(barn = barn))
 
         val behandlingBarn =
             listOf(
                 behandlingBarn(
                     personIdent =
-                        grunnlagsdata.grunnlag.barn
+                        grunnlagsdata.personopplysninger.barn
                             .first()
                             .ident,
                 ),
                 behandlingBarn(
                     personIdent =
-                        grunnlagsdata.grunnlag.barn
+                        grunnlagsdata.personopplysninger.barn
                             .last()
                             .ident,
                 ),
@@ -284,7 +286,8 @@ object Testdata {
                 fagsak = fagsak,
             )
 
-        val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = emptyList()))
+        val grunnlagsdata =
+            lagGrunnlagsdata(personopplysninger = lagFaktaGrunnlagPersonopplysninger(barn = emptyList()))
 
         val vedtaksperioder =
             listOf(
@@ -426,7 +429,8 @@ object Testdata {
                 fagsak = fagsak,
             )
 
-        val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = emptyList()))
+        val grunnlagsdata =
+            lagGrunnlagsdata(personopplysninger = lagFaktaGrunnlagPersonopplysninger(barn = emptyList()))
 
         val vedtaksperioder =
             listOf(

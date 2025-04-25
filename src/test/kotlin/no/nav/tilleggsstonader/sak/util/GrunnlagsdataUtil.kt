@@ -1,34 +1,43 @@
 package no.nav.tilleggsstonader.sak.util
 
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Fødsel
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GeneriskFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagArena
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Navn
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagArenaVedtak
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAndreForeldreSaksinformasjon
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagPersonopplysninger
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GrunnlagBarn
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.Navn
 import java.time.LocalDate
 
 object GrunnlagsdataUtil {
-    fun grunnlagsdataDomain(
-        behandlingId: BehandlingId = BehandlingId.random(),
-        grunnlag: Grunnlag = lagGrunnlagsdata(),
-    ) = Grunnlagsdata(
-        behandlingId = behandlingId,
-        grunnlag = grunnlag,
+    fun lagGrunnlagsdata(
+        personopplysninger: FaktaGrunnlagPersonopplysninger = lagFaktaGrunnlagPersonopplysninger(),
+        arenaVedtak: FaktaGrunnlagArenaVedtak = lagFaktaGrunnlagArenaVedtak(),
+        saksinformasjonAndreForeldre: List<GeneriskFaktaGrunnlag<FaktaGrunnlagBarnAndreForeldreSaksinformasjon>> = emptyList(),
+    ) = Grunnlag(
+        personopplysninger = personopplysninger,
+        arenaVedtak = arenaVedtak,
+        saksinformasjonAndreForeldre = saksinformasjonAndreForeldre,
     )
 
-    fun lagGrunnlagsdata(
+    fun lagFaktaGrunnlagPersonopplysninger(
         navn: Navn = lagNavn(),
-        fødsel: Fødsel? = Fødsel(fødselsdato = LocalDate.of(2000, 1, 1), fødselsår = 2000),
+        fødsel: FødselFaktaGrunnlag? = FødselFaktaGrunnlag(fødselsdato = LocalDate.of(2000, 1, 1), fødselsår = 2000),
         barn: List<GrunnlagBarn> = listOf(lagGrunnlagsdataBarn()),
-        arena: GrunnlagArena? = GrunnlagArena(vedtakTom = LocalDate.of(2024, 1, 1)),
-    ) = Grunnlag(
+    ) = FaktaGrunnlagPersonopplysninger(
         navn = navn,
         fødsel = fødsel,
         barn = barn,
-        arena = arena,
     )
+
+    fun lagFaktaGrunnlagArenaVedtak(vedtakTom: LocalDate? = LocalDate.of(2024, 1, 1)) =
+        FaktaGrunnlagArenaVedtak(
+            vedtakTom = vedtakTom,
+        )
+
+    fun lagFødselFaktaGrunnlag(fødselsdato: LocalDate? = LocalDate.of(2000, 1, 1)) =
+        FødselFaktaGrunnlag(fødselsdato = fødselsdato, fødselsår = fødselsdato?.year ?: 2000)
 
     fun lagGrunnlagsdataBarn(
         ident: String = "1",
