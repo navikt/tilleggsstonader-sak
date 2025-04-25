@@ -65,6 +65,16 @@ class FaktaGrunnlagServiceTest : IntegrationTest() {
         resetMock(pdlClient)
     }
 
+    @Test
+    fun `skal ikke opprette grunnlag hvis det allerede finnes`() {
+        testoppsettService.opprettBehandlingMedFagsak(behandling)
+        faktaGrunnlagRepository.insert(faktaGrunnlagBarnAnnenForelder(behandlingId = behandling.id))
+
+        val resultat = faktaGrunnlagService.opprettGrunnlag(behandlingId = behandling.id)
+
+        assertThat(resultat).isEqualTo(FaktaGrunnlagOpprettResultat.IkkeOpprettet)
+    }
+
     @Nested
     inner class FaktaGrunnlagBarnAndreForeldreSaksinformasjonTest {
         val fagsakAnnenForelder = fagsak(identer = fagsakpersoner(PdlClientConfig.ANNEN_FORELDER_FNR))

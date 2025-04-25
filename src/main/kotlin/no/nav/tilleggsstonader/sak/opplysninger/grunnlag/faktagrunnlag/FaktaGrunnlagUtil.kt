@@ -14,3 +14,9 @@ object FaktaGrunnlagUtil {
         return this as GeneriskFaktaGrunnlag<T>
     }
 }
+
+sealed interface FaktaGrunnlagOpprettResultat {
+    data object Opprettet : FaktaGrunnlagOpprettResultat
+
+    data object IkkeOpprettet : FaktaGrunnlagOpprettResultat
+}

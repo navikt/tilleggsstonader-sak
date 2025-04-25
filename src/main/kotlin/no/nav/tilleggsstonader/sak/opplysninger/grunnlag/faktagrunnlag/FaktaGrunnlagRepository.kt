@@ -14,4 +14,6 @@ interface FaktaGrunnlagRepository :
         behandlingId: BehandlingId,
         type: TypeFaktaGrunnlag,
     ): List<FaktaGrunnlag>
+
+    fun existsByBehandlingId(behandlingId: BehandlingId): Boolean
 }

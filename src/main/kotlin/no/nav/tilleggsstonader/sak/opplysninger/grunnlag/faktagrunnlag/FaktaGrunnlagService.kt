@@ -35,12 +35,16 @@ class FaktaGrunnlagService(
     private val arenaService: ArenaService,
 ) {
     @Transactional
-    fun opprettGrunnlag(behandlingId: BehandlingId) {
+    fun opprettGrunnlag(behandlingId: BehandlingId): FaktaGrunnlagOpprettResultat {
+        if (faktaGrunnlagRepository.existsByBehandlingId(behandlingId)) {
+            return FaktaGrunnlagOpprettResultat.IkkeOpprettet
+        }
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         // TODO dette burde kun gjøres hvis behandlingen er redigerbar men akkurat nå gjøres dette fra BehandlingController som er greit
         opprettGrunnlagPersonopplysninger(behandling)
         opprettGrunnlagBarnAnnenForelder(behandling)
         opprettGrunnlagArenaVedtak(behandling)
+        return FaktaGrunnlagOpprettResultat.Opprettet
     }
 
     final inline fun <reified TYPE : FaktaGrunnlagData> hentGrunnlag(behandlingId: BehandlingId): List<GeneriskFaktaGrunnlag<TYPE>> =

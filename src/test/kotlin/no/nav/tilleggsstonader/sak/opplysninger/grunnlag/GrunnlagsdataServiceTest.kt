@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 
 import io.mockk.every
-import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -10,6 +9,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaStatusDtoUtil.arenaStatusDto
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagOpprettResultat
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.TypeFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -74,7 +74,7 @@ class GrunnlagsdataServiceTest {
         every { personService.hentPersonMedBarn(behandling.ident) } returns søkerMedBarn
         every { arenaService.hentStatus(any(), any()) } returns arenaStatusDto()
         every { faktaGrunnlagService.hentGrunnlag(any(), TypeFaktaGrunnlag.BARN_ANDRE_FORELDRE_SAKSINFORMASJON) } returns emptyList()
-        justRun { faktaGrunnlagService.opprettGrunnlag(any()) }
+        every { faktaGrunnlagService.opprettGrunnlag(any()) } returns FaktaGrunnlagOpprettResultat.Opprettet
     }
 
     @Nested
