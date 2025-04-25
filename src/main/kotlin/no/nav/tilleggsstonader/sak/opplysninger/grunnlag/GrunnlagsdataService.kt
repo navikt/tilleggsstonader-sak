@@ -6,13 +6,10 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
-import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.Fødsel
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GrunnlagBarn
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.tilGrunnlagsdataBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.tilNavn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
@@ -58,13 +55,14 @@ class GrunnlagsdataService(
 
     private fun hentGrunnlagFraRegister(behandling: Saksbehandling): Grunnlag {
         val person = hentPerson(behandling)
+        val behandlingBarn = barnService.finnBarnPåBehandling(behandling.id)
         return Grunnlag(
             navn =
                 person.søker.navn
                     .gjeldende()
                     .tilNavn(),
-            fødsel = mapFødsel(person),
-            barn = mapBarn(behandling, person),
+            fødsel = Fødsel.fraSøkerMedBarn(person),
+            barn = GrunnlagBarn.fraSøkerMedBarn(person, behandlingBarn),
             arena = hentGrunnlagArena(behandling),
         )
     }
@@ -72,31 +70,6 @@ class GrunnlagsdataService(
     private fun hentGrunnlagArena(behandling: Saksbehandling): GrunnlagArena {
         val statusArena = arenaService.hentStatus(behandling.ident, behandling.stønadstype)
         return GrunnlagArenaMapper.mapFaktaArena(statusArena, behandling.stønadstype)
-    }
-
-    private fun mapFødsel(person: SøkerMedBarn): Fødsel {
-        val fødsel = person.søker.fødselsdato.gjeldende()
-        return Fødsel(
-            fødselsdato = fødsel.fødselsdato,
-            fødselsår = fødsel.fødselsår ?: error("Forventer at fødselsår skal finnes på alle brukere"),
-        )
-    }
-
-    private fun mapBarn(
-        behandling: Saksbehandling,
-        person: SøkerMedBarn,
-    ): List<GrunnlagBarn> {
-        val barnIdenter = barnService.finnBarnPåBehandling(behandling.id).map { it.ident }.toSet()
-        val barn = person.barn.filter { (ident, _) -> barnIdenter.contains(ident) }
-
-        feilHvis(
-            !barn.keys.containsAll(barnIdenter),
-            sensitivFeilmelding = { "Finner ikke grunnlag for barn. behandlingBarn=$barnIdenter pdlBarn=${barn.keys}" },
-        ) {
-            "Finner ikke grunnlag for barn. Se securelogs for detaljer."
-        }
-
-        return barn.tilGrunnlagsdataBarn()
     }
 
     private fun hentPerson(behandling: Saksbehandling) =

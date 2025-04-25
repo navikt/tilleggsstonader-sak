@@ -48,6 +48,9 @@ class FaktaGrunnlagServiceTest : IntegrationTest() {
     @Autowired
     lateinit var pdlClient: PdlClient
 
+    val fagsak = fagsak(identer = fagsakpersoner(PdlClientConfig.SØKER_FNR))
+    val behandling = behandling(fagsak)
+
     @BeforeEach
     fun setUp() {
         every { pdlClient.hentBarn(any()) } returns
@@ -72,9 +75,6 @@ class FaktaGrunnlagServiceTest : IntegrationTest() {
                 status = BehandlingStatus.FERDIGSTILT,
             )
 
-        val fagsak = fagsak(identer = fagsakpersoner(PdlClientConfig.SØKER_FNR))
-        val behandling = behandling(fagsak)
-
         val vedtakperiode = Datoperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 10))
 
         @BeforeEach
@@ -82,8 +82,7 @@ class FaktaGrunnlagServiceTest : IntegrationTest() {
             testoppsettService.lagreFagsak(fagsak)
             testoppsettService.lagre(behandling, opprettGrunnlagsdata = false)
             val barn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.BARN_FNR)
-            val barn2 = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.BARN2_FNR)
-            barnService.opprettBarn(listOf(barn, barn2))
+            barnService.opprettBarn(listOf(barn))
         }
 
         @Test

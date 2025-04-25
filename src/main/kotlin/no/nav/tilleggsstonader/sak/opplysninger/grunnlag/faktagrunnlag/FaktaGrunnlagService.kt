@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagArenaMapper
@@ -20,6 +21,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBa
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 @Service
 class FaktaGrunnlagService(
@@ -35,6 +38,7 @@ class FaktaGrunnlagService(
     fun opprettGrunnlag(behandlingId: BehandlingId) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         // TODO dette burde kun gjøres hvis behandlingen er redigerbar men akkurat nå gjøres dette fra BehandlingController som er greit
+        opprettGrunnlagPersonopplysninger(behandling)
         opprettGrunnlagBarnAnnenForelder(behandling)
         opprettGrunnlagArenaVedtak(behandling)
     }
@@ -47,6 +51,21 @@ class FaktaGrunnlagService(
         behandlingId: BehandlingId,
         type: TypeFaktaGrunnlag,
     ): List<GeneriskFaktaGrunnlag<out FaktaGrunnlagData>> = faktaGrunnlagRepository.findByBehandlingIdAndType(behandlingId, type)
+
+    private fun opprettGrunnlagPersonopplysninger(behandling: Saksbehandling) {
+        val person = hentPerson(behandling)
+        val behandlingBarn = barnService.finnBarnPåBehandling(behandling.id)
+        lagreFaktaGrunnlag(
+            behandling.id,
+            FaktaGrunnlagPersonopplysninger.fraSøkerMedBarn(person, behandlingBarn),
+        )
+    }
+
+    private fun hentPerson(behandling: Saksbehandling) =
+        when (behandling.stønadstype.gjelderBarn()) {
+            true -> personService.hentPersonMedBarn(behandling.ident)
+            false -> personService.hentPersonUtenBarn(behandling.ident)
+        }
 
     private fun opprettGrunnlagBarnAnnenForelder(behandling: Saksbehandling) {
         if (behandling.stønadstype != Stønadstype.BARNETILSYN) {
