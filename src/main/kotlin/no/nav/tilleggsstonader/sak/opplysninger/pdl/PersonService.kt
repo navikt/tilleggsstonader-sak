@@ -6,9 +6,9 @@ import no.nav.tilleggsstonader.libs.spring.cache.getNullable
 import no.nav.tilleggsstonader.libs.spring.cache.getValue
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonUtenRelasjoner
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.PersonMedAdresseBeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.tilPersonMedAdresseBeskyttelse
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlAnnenForelder
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
@@ -44,12 +44,16 @@ class PersonService(
         return SøkerMedBarn(ident, søker, hentBarn(barnIdentifikatorer))
     }
 
-    fun hentAdressebeskyttelse(ident: String): AdressebeskyttelseGradering =
+    fun hentAdressebeskyttelse(ident: String): AdressebeskyttelseForPersonUtenRelasjoner =
         hentPersonKortBolk(listOf(ident))
             .values
             .single()
             .adressebeskyttelse
             .gradering()
+            .let {
+                val søker = PersonMedAdresseBeskyttelse(ident, it)
+                AdressebeskyttelseForPersonUtenRelasjoner(søker = søker)
+            }
 
     fun hentAdressebeskyttelseForPersonOgRelasjoner(ident: String): AdressebeskyttelseForPersonMedRelasjoner {
         val søkerMedBarn = hentPersonMedBarn(ident)

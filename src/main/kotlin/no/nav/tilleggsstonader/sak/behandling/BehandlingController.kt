@@ -89,7 +89,7 @@ class BehandlingController(
     fun hentBehandlingerForPersonOgStønadstype(
         @RequestBody identStønadstype: IdentStønadstype,
     ): List<BehandlingDto> {
-        tilgangService.validerTilgangTilPersonMedRelasjoner(identStønadstype.ident, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilStønadstype(identStønadstype.ident, identStønadstype.stønadstype, AuditLoggerEvent.ACCESS)
 
         return fagsakService.hentBehandlingerForPersonOgStønadstype(
             identStønadstype.ident,

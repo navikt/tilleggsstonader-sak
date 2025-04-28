@@ -28,7 +28,7 @@ class FagsakPersonController(
     fun hentEllerOpprettFagsakPerson(
         @RequestBody identRequest: IdentRequest,
     ): FagsakPersonId {
-        tilgangService.validerTilgangTilPersonMedRelasjoner(identRequest.ident, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilPerson(identRequest.ident, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
 
         return fagsakPersonService.hentEllerOpprettPerson(identRequest.ident).id

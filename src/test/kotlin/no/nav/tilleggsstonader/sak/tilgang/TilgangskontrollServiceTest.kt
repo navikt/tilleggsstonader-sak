@@ -6,11 +6,13 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.security.token.support.core.jwt.JwtTokenClaims
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsatt
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonUtenRelasjoner
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.PersonMedAdresseBeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import org.assertj.core.api.Assertions.assertThat
@@ -57,7 +59,7 @@ internal class TilgangskontrollServiceTest {
         every { jwtToken.jwtTokenClaims } returns jwtTokenClaims
         every { jwtTokenClaims.get("preferred_username") }.returns(listOf("bob"))
         every { jwtTokenClaims.getAsList(any()) }.returns(emptyList())
-        every { personService.hentAdressebeskyttelse(any()) } returns AdressebeskyttelseGradering.UGRADERT
+        mockHentAdressebeskyttelse(AdressebeskyttelseGradering.UGRADERT)
         every { egenAnsattService.erEgenAnsatt(any<String>()) } returns false
         every { egenAnsattService.erEgenAnsatt(capture(slotEgenAnsatt)) } answers
             { firstArg<Set<String>>().associateWith { EgenAnsatt(it, false) } }
@@ -74,7 +76,7 @@ internal class TilgangskontrollServiceTest {
 
         @Test
         internal fun `har ikke tilgang når det finnes adressebeskyttelser for enskild person`() {
-            every { personService.hentAdressebeskyttelse(any()) } returns AdressebeskyttelseGradering.FORTROLIG
+            mockHentAdressebeskyttelse(AdressebeskyttelseGradering.FORTROLIG)
             assertThat(sjekkTilgangTilPerson()).isFalse
             verify(exactly = 0) { egenAnsattService.erEgenAnsatt(any<String>()) }
         }
@@ -87,6 +89,29 @@ internal class TilgangskontrollServiceTest {
         }
 
         private fun sjekkTilgangTilPerson() = tilgangskontrollService.sjekkTilgang(søkerIdent, jwtToken).harTilgang
+    }
+
+    @Nested
+    inner class SjekkTilgangTilStønadstype {
+        @Test
+        fun `skal hente adressebeskyttelse for person med barn hvis det gjelder stønad som gjelder barn`() {
+            every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns lagPersonMedRelasjoner()
+
+            tilgangskontrollService.sjekkTilgangTilStønadstype(søkerIdent, Stønadstype.BARNETILSYN, jwtToken)
+
+            verify(exactly = 1) { personService.hentAdressebeskyttelseForPersonOgRelasjoner(søkerIdent) }
+            verify(exactly = 0) { personService.hentAdressebeskyttelse(any()) }
+        }
+
+        @Test
+        fun `skal kun hente adressebeskyttelse for søker hvis det gjelder stønad som ikke gjelder barn`() {
+            every { personService.hentAdressebeskyttelse(any()) } returns lagAdressebeskyttelse()
+
+            tilgangskontrollService.sjekkTilgangTilStønadstype(søkerIdent, Stønadstype.LÆREMIDLER, jwtToken)
+
+            verify(exactly = 0) { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) }
+            verify(exactly = 1) { personService.hentAdressebeskyttelse(søkerIdent) }
+        }
     }
 
     /**
@@ -182,4 +207,19 @@ internal class TilgangskontrollServiceTest {
             barn = listOf(PersonMedAdresseBeskyttelse(barnIdent, graderingBarn)),
             andreForeldre = listOf(PersonMedAdresseBeskyttelse(annenForeldreIdent, graderingAnnenForelder)),
         )
+
+    private fun lagAdressebeskyttelse(
+        graderingSøker: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT,
+    ): AdressebeskyttelseForPersonUtenRelasjoner =
+        AdressebeskyttelseForPersonUtenRelasjoner(
+            søker = PersonMedAdresseBeskyttelse(søkerIdent, graderingSøker),
+        )
+
+    private fun mockHentAdressebeskyttelse(
+        gradering: AdressebeskyttelseGradering,
+        ident: String = søkerIdent,
+    ) {
+        val søker = PersonMedAdresseBeskyttelse(ident, gradering)
+        every { personService.hentAdressebeskyttelse(ident) } returns AdressebeskyttelseForPersonUtenRelasjoner(søker)
+    }
 }

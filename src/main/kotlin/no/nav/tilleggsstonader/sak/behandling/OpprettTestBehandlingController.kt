@@ -100,7 +100,11 @@ class OpprettTestBehandlingController(
     fun opprettBehandling(
         @RequestBody testBehandlingRequest: TestBehandlingRequest,
     ): BehandlingId {
-        tilgangService.validerTilgangTilPersonMedRelasjoner(testBehandlingRequest.personIdent, AuditLoggerEvent.CREATE)
+        tilgangService.validerTilgangTilStønadstype(
+            testBehandlingRequest.personIdent,
+            testBehandlingRequest.stønadstype,
+            AuditLoggerEvent.CREATE,
+        )
 
         val fagsak: Fagsak = lagFagsak(testBehandlingRequest)
         val behandling = lagBehandling(fagsak)
