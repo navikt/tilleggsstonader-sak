@@ -52,3 +52,20 @@ Egenskap: Beregning - med revurderFra
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
       | 07.01.2025 | 25.01.2025 | 1              | 2000         | 4953      | 07.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
+
+  Scenario: Skal ta med perioder fra den utbetalingsperioden man revurder dersom de overlapper - beløpet når maks sats
+    Gitt følgende vedtaksperioder for boutgifter
+      | Fom        | Tom        | Aktivitet | Målgruppe           |
+      | 07.01.2025 | 09.01.2025 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | 20.01.2025 | 25.01.2025 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+
+    Gitt følgende utgifter for: UTGIFTER_OVERNATTING
+      | Fom        | Tom        | Utgift |
+      | 07.01.2025 | 09.01.2025 | 3000   |
+      | 20.01.2025 | 25.01.2025 | 4000   |
+
+    Når beregner boutgifter med revurderFra=2025-01-22
+
+    Så skal beregnet stønad for boutgifter være
+      | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
+      | 07.01.2025 | 25.01.2025 | 1              | 4953         | 4953      | 07.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
