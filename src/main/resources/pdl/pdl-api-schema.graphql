@@ -175,15 +175,6 @@ type Foreldreansvar {
     metadata: Metadata!
 }
 
-type Fullmakt {
-    gyldigFraOgMed: Date!
-    gyldigTilOgMed: Date!
-    metadata: Metadata!
-    motpartsPersonident: String!
-    motpartsRolle: FullmaktsRolle!
-    omraader: [String!]!
-}
-
 type GeografiskTilknytning {
     gtBydel: String
     gtKommune: String
@@ -432,6 +423,11 @@ type Navn {
     originaltNavn: OriginaltNavn
 }
 
+type Navspersonidentifikator {
+    identifikasjonsnummer: String!
+    metadata: Metadata!
+}
+
 type Opphold {
     folkeregistermetadata: Folkeregistermetadata!
     metadata: Metadata!
@@ -472,13 +468,13 @@ type Person {
     folkeregisterpersonstatus(historikk: Boolean = false): [Folkeregisterpersonstatus!]!
     forelderBarnRelasjon: [ForelderBarnRelasjon!]!
     foreldreansvar(historikk: Boolean = false): [Foreldreansvar!]!
-    fullmakt(historikk: Boolean = false): [Fullmakt!]!
     identitetsgrunnlag(historikk: Boolean = false): [Identitetsgrunnlag!]!
     innflyttingTilNorge: [InnflyttingTilNorge!]!
     kjoenn(historikk: Boolean = false): [Kjoenn!]!
     kontaktadresse(historikk: Boolean = false): [Kontaktadresse!]!
     kontaktinformasjonForDoedsbo(historikk: Boolean = false): [KontaktinformasjonForDoedsbo!]!
     navn(historikk: Boolean = false): [Navn!]!
+    navspersonidentifikator(historikk: Boolean = false): [Navspersonidentifikator!]!
     opphold(historikk: Boolean = false): [Opphold!]!
     oppholdsadresse(historikk: Boolean = false): [Oppholdsadresse!]!
     rettsligHandleevne(historikk: Boolean = false): [RettsligHandleevne!]!
@@ -768,11 +764,6 @@ enum ForelderBarnRelasjonRolle {
     MOR
 }
 
-enum FullmaktsRolle {
-    FULLMAKTSGIVER
-    FULLMEKTIG
-}
-
 enum GtType {
     BYDEL
     KOMMUNE
@@ -884,8 +875,6 @@ input SearchRule {
     before: String
     " Boost brukes til å gi ett søkekriterie høyere eller lavere vektlegging en de andre søke kriteriene."
     boost: Float
-    " [Flag] Kan brukes til å overstyre standard oppførsellen for søk i felter (standard er case insensitive)"
-    caseSensitive: Boolean
     " Gir treff når opgitt felt inneholder en eller flere ord fra input verdien."
     contains: String
     " [Flag] Brukes til å deaktivere fonetisk søk feltene som har dette som standard (Navn)"
@@ -893,7 +882,7 @@ input SearchRule {
     " Begrenser treff til kun de hvor felt har input verdi"
     equals: String
     " Sjekker om feltet finnes / at det ikke har en null verdi."
-    exists: String
+    exists: Boolean
     """
 
     Søk fra og med (se fromExcluding for bare fra men ikke med)
@@ -915,7 +904,7 @@ input SearchRule {
     " Filtrerer bort treff hvor felt inneholder input verdi"
     notEquals: String
     " Søk som gir tilfeldig poengsum til hvert treff (kun ment til generering av testdata)"
-    random: String
+    random: Float
     " Regex søk for spesielle situasjoner (Dette er en treg opprasjon og bør ikke brukes)"
     regex: String
     " Gir treff når opgitt feltstarter med opgitt verdi."
