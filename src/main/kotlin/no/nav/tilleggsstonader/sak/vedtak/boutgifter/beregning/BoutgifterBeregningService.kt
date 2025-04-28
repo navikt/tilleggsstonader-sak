@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
-import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.splittTilLøpendeMåneder
@@ -126,37 +125,9 @@ class BoutgifterBeregningService(
             beregningsresultat
                 .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() >= revurderFra }
 
-        val nyePerioderMedKorrigertUtbetalingsdato =
-            korrigerUtbetalingsdato(
-                nyePerioder = nyePerioder,
-                forrigeBeregningsresultat = forrigeBeregningsresultat,
-            )
-
         return BeregningsresultatBoutgifter(
-            perioder = perioderFraForrigeVedtakSomSkalBeholdes + nyePerioderMedKorrigertUtbetalingsdato,
+            perioder = perioderFraForrigeVedtakSomSkalBeholdes + nyePerioder,
         )
-    }
-
-    private fun korrigerUtbetalingsdato(
-        nyePerioder: List<BeregningsresultatForLøpendeMåned>,
-        forrigeBeregningsresultat: BeregningsresultatBoutgifter,
-    ): List<BeregningsresultatForLøpendeMåned> {
-        val utbetalingsdatoPerMåned =
-            forrigeBeregningsresultat
-                .perioder
-                .associate { it.grunnlag.fom.toYearMonth() to it.grunnlag.utbetalingsdato }
-
-        return nyePerioder
-            .map {
-                val utbetalingsdato = utbetalingsdatoPerMåned[it.fom.toYearMonth()]
-                if (utbetalingsdato != null) {
-                    it
-                        .medKorrigertUtbetalingsdato(utbetalingsdato)
-                        .markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling = true)
-                } else {
-                    it
-                }
-            }
     }
 
     private fun hentForrigeVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørBoutgifter? =
