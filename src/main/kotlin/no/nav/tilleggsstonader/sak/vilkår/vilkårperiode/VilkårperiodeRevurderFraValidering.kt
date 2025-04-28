@@ -9,7 +9,9 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFa
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.AldersvilkårVurdering.vurderAldersvilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgSvarDto
 import java.time.LocalDate
@@ -65,11 +67,13 @@ object VilkårperiodeRevurderFraValidering {
 
     /**
      * Brukes for å validere at målgruppen fortsatt har gyldig aldersvilkår dersom kun tom-utvides.
-     * Vil kun kaste feil dersom man i løpet av perioden krysser enten øvre eller nedre aldersbegrensning.
+     * Hvis resultat på eksisterende periode er oppfylt, men svaret på aldersvilkåret nå blir NEI betyr
+     * det at alder ikke ble vurdert da denne ble laget. Denne må saksbehandler slette for å rydde opp.
+     * Antar at dette sjeldent vil skje.
      *
-     * Begrensning/mangler:
-     * Vil ikke varsle saksbehandler om at aldersvilkår ikke er oppfylt dersom tidligere vilkår inneholder GAMMEL_MANGLER_DATA
-     * Lagres ikke ned i internt vedtak at vi faktisk sjekker alderen i disse tilfellene
+     * Vil også kaste feil dersom man i løpet av perioden krysser enten øvre eller nedre aldersbegrensning.
+     * Det lagres ikke ned i internt vedtak at vi faktisk sjekker at alderen er oppfylt dersom vurderingen
+     * ikke ligger inne på perioden fra tidligere.
      */
     fun validerAtAldersvilkårErGyldig(
         eksisterendePeriode: Vilkårperiode,
@@ -77,7 +81,16 @@ object VilkårperiodeRevurderFraValidering {
         fødselFaktaGrunnlag: FødselFaktaGrunnlag?,
     ) {
         if (eksisterendePeriode.type is MålgruppeType && eksisterendePeriode.type.skalVurdereAldersvilkår()) {
-            vurderAldersvilkår(oppdatertPeriode, fødselFaktaGrunnlag)
+            val nyttSvarPåAldersvilkår = vurderAldersvilkår(oppdatertPeriode, fødselFaktaGrunnlag)
+
+            feilHvis(
+                nyttSvarPåAldersvilkår == SvarJaNei.NEI &&
+                    eksisterendePeriode.resultat == ResultatVilkårperiode.OPPFYLT,
+            ) {
+                "Aldersvilkår er ikke oppfylt i perioden fra " +
+                    "${oppdatertPeriode.fom.norskFormat()} til ${oppdatertPeriode.tom.norskFormat()}. " +
+                    "For å rette opp denne feilen må du revurdere fra ${oppdatertPeriode.fom.norskFormat()} eller tidligere."
+            }
         }
     }
 
@@ -95,8 +108,7 @@ object VilkårperiodeRevurderFraValidering {
         oppdatertPeriode: LagreVilkårperiode,
     ) {
         secureLogger.info(
-            "Ugyldig endring på vilkårperiode " +
-                "eksisterendePeriode=$eksisterendePeriode oppdatertPeriode=$oppdatertPeriode",
+            "Ugyldig endring på vilkårperiode " + "eksisterendePeriode=$eksisterendePeriode oppdatertPeriode=$oppdatertPeriode",
         )
     }
 

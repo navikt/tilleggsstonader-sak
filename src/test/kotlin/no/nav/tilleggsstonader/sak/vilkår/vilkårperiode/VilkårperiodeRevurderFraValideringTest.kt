@@ -310,11 +310,15 @@ class VilkårperiodeRevurderFraValideringTest {
         }
 
         @Test
-        fun `Skal ikke kaste feil dersom hele vilkårperioden er før bruker fyller 18 år`() {
+        fun `Skal ikke kaste feil dersom hele vilkårperioden er før bruker fyller 18 år, hvis forrige periode var IKKE_OPPFYLT`() {
             val fødselsdato = osloDateNow().minusYears(10)
             val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato)
             val eksisterendeVilkårperiode =
-                målgruppe(fom = osloDateNow(), tom = osloDateNow().plusYears(1))
+                målgruppe(
+                    fom = osloDateNow(),
+                    tom = osloDateNow().plusYears(1),
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(aldersvilkår = vurderingAldersVilkår(SvarJaNei.NEI)),
+                )
 
             assertDoesNotThrow {
                 validerAtAldersvilkårErGyldig(
@@ -326,6 +330,30 @@ class VilkårperiodeRevurderFraValideringTest {
                     fødselFaktaGrunnlag = fødselFaktaGrunnlag,
                 )
             }
+        }
+
+        /**
+         * Vil kun skje dersom målgruppen ble lagt til før aldersvurdering ble flyttet til vilkårperioden.
+         * Periode kan da eksistere som oppfylt fordi alderen først ble vurdert senere.
+         * OBS: i testen er ikke svaret GAMMEL_MANGLER_DATA på aldersvilkåret, som ville vært tilfelle i virkeligheten.
+         */
+        @Test
+        fun `Skal kaste feil dersom hele vilkårperioden er før bruker fyller 18 år, hvis forrige periode var OPPFYLT`() {
+            val fødselsdato = osloDateNow().minusYears(10)
+            val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato)
+            val eksisterendeVilkårperiode =
+                målgruppe(fom = osloDateNow(), tom = osloDateNow().plusYears(1))
+
+            assertThatThrownBy {
+                validerAtAldersvilkårErGyldig(
+                    eksisterendePeriode = eksisterendeVilkårperiode,
+                    oppdatertPeriode =
+                        eksisterendeVilkårperiode
+                            .tilOppdatering()
+                            .copy(tom = osloDateNow().plusYears(2)),
+                    fødselFaktaGrunnlag = fødselFaktaGrunnlag,
+                )
+            }.hasMessageContaining("Aldersvilkår er ikke oppfylt i perioden")
         }
     }
 }
