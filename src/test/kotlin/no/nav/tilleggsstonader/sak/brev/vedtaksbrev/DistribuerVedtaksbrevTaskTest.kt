@@ -3,7 +3,12 @@ package no.nav.tilleggsstonader.sak.brev.vedtaksbrev
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.domene.TaskLogg
+import no.nav.familie.prosessering.error.MaxAntallRekjøringerException
+import no.nav.familie.prosessering.error.RekjørSenereException
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
@@ -14,19 +19,34 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.catchThrowable
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.web.client.HttpClientErrorException
+import java.time.LocalDateTime
 
 class DistribuerVedtaksbrevTaskTest {
     val brevmottakerVedtaksbrevRepository = mockk<BrevmottakerVedtaksbrevRepository>()
     val journalpostClient = mockk<JournalpostClient>()
     val stegService = mockk<StegService>()
     val brevSteg = mockk<BrevSteg>()
+    val taskService = mockk<TaskService>(relaxed = true)
 
     val saksbehandling = saksbehandling()
     val distribuerVedtaksbrevTask =
-        DistribuerVedtaksbrevTask(brevmottakerVedtaksbrevRepository, journalpostClient, stegService, brevSteg, TransactionHandler())
+        DistribuerVedtaksbrevTask(
+            brevmottakerVedtaksbrevRepository,
+            journalpostClient,
+            stegService,
+            brevSteg,
+            TransactionHandler(),
+            taskService,
+        )
     val task = Task(type = DistribuerVedtaksbrevTask.TYPE, payload = saksbehandling.id.toString())
 
     @BeforeEach
@@ -121,5 +141,79 @@ class DistribuerVedtaksbrevTaskTest {
         assertThat(distribuerrequestSlots.size).isEqualTo(1)
         assertThat(brevmottakereSlots.size).isEqualTo(1)
         assertThat(brevmottakereSlots[0].bestillingId).isEqualTo(bestillingIdA)
+    }
+
+    @Nested
+    inner class `Mottaker er død og mangler adresse` {
+        @Test
+        internal fun `skal rekjøre senere hvis man får GONE fra dokdist`() {
+            val distribuerrequestSlots = mutableListOf<DistribuerJournalpostRequest>()
+            val journalpostIdA = "journalpostIdA"
+
+            every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns
+                listOf(
+                    BrevmottakerVedtaksbrev(
+                        behandlingId = saksbehandling.id,
+                        mottaker = mottakerPerson(ident = saksbehandling.ident),
+                        journalpostId = journalpostIdA,
+                        bestillingId = null,
+                    ),
+                )
+
+            every {
+                journalpostClient.distribuerJournalpost(
+                    capture(distribuerrequestSlots),
+                    null,
+                )
+            } throws HttpClientErrorException.create(HttpStatus.GONE, "", HttpHeaders(), byteArrayOf(), null)
+
+            val throwable = catchThrowable { distribuerVedtaksbrevTask.doTask(task) }
+
+            Assertions.assertThat(throwable).isInstanceOf(RekjørSenereException::class.java)
+            val rekjørSenereException = throwable as RekjørSenereException
+            Assertions
+                .assertThat(rekjørSenereException.triggerTid)
+                .isBetween(LocalDateTime.now().plusDays(6), LocalDateTime.now().plusDays(8))
+            Assertions.assertThat(rekjørSenereException.årsak).startsWith("Mottaker er død")
+
+            verify(exactly = 1) { journalpostClient.distribuerJournalpost(any(), any()) }
+            verify(exactly = 0) { brevmottakerVedtaksbrevRepository.update(any()) }
+        }
+
+        @Test
+        internal fun `skal feile hvis man har blitt kjørt fler enn 26 ganger`() {
+            val distribuerrequestSlots = mutableListOf<DistribuerJournalpostRequest>()
+            val journalpostIdA = "journalpostIdA"
+
+            every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns
+                listOf(
+                    BrevmottakerVedtaksbrev(
+                        behandlingId = saksbehandling.id,
+                        mottaker = mottakerPerson(ident = saksbehandling.ident),
+                        journalpostId = journalpostIdA,
+                        bestillingId = null,
+                    ),
+                )
+
+            every {
+                journalpostClient.distribuerJournalpost(
+                    capture(distribuerrequestSlots),
+                    null,
+                )
+            } throws HttpClientErrorException.create(HttpStatus.GONE, "", HttpHeaders(), byteArrayOf(), null)
+
+            val taskLogg =
+                IntRange(1, 27)
+                    .map { TaskLogg(taskId = task.id, type = Loggtype.KLAR_TIL_PLUKK, melding = "Mottaker er død: 410 Gone") }
+
+            every { taskService.findTaskLoggByTaskId(any()) } returns taskLogg
+
+            val throwable = catchThrowable { distribuerVedtaksbrevTask.doTask(task) }
+            Assertions.assertThat(throwable).isInstanceOf(MaxAntallRekjøringerException::class.java)
+            Assertions.assertThat(throwable).hasMessageStartingWith("Nådd max antall rekjøring - 26")
+
+            verify(exactly = 1) { journalpostClient.distribuerJournalpost(any(), any()) }
+            verify(exactly = 0) { brevmottakerVedtaksbrevRepository.update(any()) }
+        }
     }
 }
