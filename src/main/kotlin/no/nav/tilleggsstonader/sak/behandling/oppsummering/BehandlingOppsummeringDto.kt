@@ -4,9 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -99,17 +96,3 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
         resultat = this.resultat,
         utgift = this.utgift,
     )
-
-sealed class OppsummertVedtak(
-    val resultat: TypeVedtak,
-)
-
-data class OppsummertVedtakInnvilgelse(
-    val vedtaksperioder: List<VedtaksperiodeDto>,
-) : OppsummertVedtak(resultat = TypeVedtak.INNVILGELSE)
-
-data class OppsummertVedtakAvslag(
-    val årsaker: List<ÅrsakAvslag>,
-) : OppsummertVedtak(resultat = TypeVedtak.AVSLAG)
-
-object OppsummertVedtakOpphør : OppsummertVedtak(resultat = TypeVedtak.OPPHØR)
