@@ -5,7 +5,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
+import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
+import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
+import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårUtil.finnPerioderEtterRevurderFra
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårUtil.slåSammenSammenhengende
@@ -19,18 +23,19 @@ class BehandlingOppsummeringService(
     private val behandlingService: BehandlingService,
     private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
-    private val vedtaksresultatService: VedtaksresultatService,
+    private val vedtaksperiodeService: VedtaksperiodeService,
+    private val vedtakService: VedtakService,
 ) {
     fun hentBehandlingOppsummering(behandlingId: BehandlingId): BehandlingOppsummeringDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
-        val vedtaksresultat = vedtaksresultatService.hentVedtaksresultatHvisFinnes(behandlingId)
+        val vedtak = oppsummerVedtak(behandlingId, behandling.revurderFra)
 
         return BehandlingOppsummeringDto(
             aktiviteter = vilkårperioder.aktiviteter.oppsummer(behandling.revurderFra),
             målgrupper = vilkårperioder.målgrupper.oppsummer(behandling.revurderFra),
             vilkår = oppsummerStønadsvilkår(behandlingId, behandling.revurderFra),
-            vedtaksresultat = vedtaksresultat,
+            vedtak = vedtak,
         )
     }
 
@@ -75,6 +80,32 @@ class BehandlingOppsummeringService(
                         .finnPerioderEtterRevurderFra(revurderFra)
                         .map { it.tilOppsummertVilkår() },
             )
+        }
+    }
+
+    private fun oppsummerVedtak(
+        behandlingId: BehandlingId,
+        revurderFra: LocalDate?,
+    ): OppsummertVedtak? {
+        val vedtak = vedtakService.hentVedtak(behandlingId)
+
+        return vedtak?.data.let { data ->
+            when (data) {
+                is Avslag -> OppsummertVedtakAvslag(årsaker = data.årsaker)
+
+                is Innvilgelse -> {
+                    val vedtaksperioder =
+                        vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, revurderFra)
+
+                    OppsummertVedtakInnvilgelse(
+                        vedtaksperioder = vedtaksperioder.map { it.tilDto() },
+                    )
+                }
+
+                is Opphør -> OppsummertVedtakOpphør
+
+                else -> null
+            }
         }
     }
 }

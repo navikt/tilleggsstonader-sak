@@ -5,6 +5,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -17,21 +19,27 @@ data class BehandlingOppsummeringDto private constructor(
     val aktiviteter: List<OppsummertVilkårperiode>,
     val målgrupper: List<OppsummertVilkårperiode>,
     val vilkår: List<Stønadsvilkår>,
-    val vedtaksresultat: TypeVedtak?,
+    val vedtak: OppsummertVedtak?,
     val finnesDataÅOppsummere: Boolean,
 ) {
     constructor(
         aktiviteter: List<OppsummertVilkårperiode>,
         målgrupper: List<OppsummertVilkårperiode>,
         vilkår: List<Stønadsvilkår>,
-        vedtaksresultat: TypeVedtak?,
+        vedtak: OppsummertVedtak?,
     ) :
         this(
             aktiviteter = aktiviteter,
             målgrupper = målgrupper,
             vilkår = vilkår,
-            vedtaksresultat = vedtaksresultat,
-            finnesDataÅOppsummere = finnesDataÅOppsummere(aktiviteter, målgrupper, vilkår, vedtaksresultat),
+            vedtak = vedtak,
+            finnesDataÅOppsummere =
+                finnesDataÅOppsummere(
+                    aktiviteter,
+                    målgrupper,
+                    vilkår,
+                    vedtak,
+                ),
         )
 
     companion object {
@@ -39,8 +47,12 @@ data class BehandlingOppsummeringDto private constructor(
             aktiviteter: List<OppsummertVilkårperiode>,
             målgrupper: List<OppsummertVilkårperiode>,
             vilkår: List<Stønadsvilkår>,
-            vedtaksresultat: TypeVedtak?,
-        ): Boolean = aktiviteter.isNotEmpty() || målgrupper.isNotEmpty() || vilkår.isNotEmpty() || vedtaksresultat != null
+            vedtak: OppsummertVedtak?,
+        ): Boolean =
+            aktiviteter.isNotEmpty() ||
+                målgrupper.isNotEmpty() ||
+                vilkår.isNotEmpty() ||
+                vedtak != null
     }
 }
 
@@ -87,3 +99,17 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
         resultat = this.resultat,
         utgift = this.utgift,
     )
+
+sealed class OppsummertVedtak(
+    val resultat: TypeVedtak,
+)
+
+data class OppsummertVedtakInnvilgelse(
+    val vedtaksperioder: List<VedtaksperiodeDto>,
+) : OppsummertVedtak(resultat = TypeVedtak.INNVILGELSE)
+
+data class OppsummertVedtakAvslag(
+    val årsaker: List<ÅrsakAvslag>,
+) : OppsummertVedtak(resultat = TypeVedtak.AVSLAG)
+
+object OppsummertVedtakOpphør : OppsummertVedtak(resultat = TypeVedtak.OPPHØR)
