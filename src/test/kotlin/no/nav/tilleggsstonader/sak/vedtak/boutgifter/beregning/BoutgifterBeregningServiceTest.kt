@@ -2,12 +2,23 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.beregningsresultatFørstegangsbehandlingLøpendeUtgifterEnBolig
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.beregningsresultatFørstegangsbehandlingLøpendeUtgifterToBoliger
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.beregningsresultatFørstegangsbehandlingMidlertidigOvernatting
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagBeregningsresultatMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.løpendeUtgifterEnBolig
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.løpendeUtgifterToBoliger
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.utgiftMidlertidigOvernatting
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
@@ -39,7 +50,7 @@ class BoutgifterBeregningServiceTest {
         BoutgifterBeregningService(
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
-//            vedtakRepository = vedtakRepository,
+            vedtakRepository = vedtakRepository,
         )
 
     val behandling = saksbehandling()
@@ -108,97 +119,143 @@ class BoutgifterBeregningServiceTest {
 
     @Nested
     inner class LøpendeUtgifter {
-        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
-            mapOf(
-                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
-                    listOf(
-                        UtgiftBeregningBoutgifter(
-                            fom = LocalDate.of(2025, 1, 1),
-                            tom = LocalDate.of(2025, 3, 31),
-                            utgift = 3000,
-                        ),
-                    ),
-            )
-
-        val vedtaksperioder =
-            listOf(
-                Vedtaksperiode(
-                    id = UUID.randomUUID(),
-                    fom = LocalDate.of(2025, 1, 1),
-                    tom = LocalDate.of(2025, 3, 31),
-                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                    aktivitet = AktivitetType.TILTAK,
-                ),
-            )
+        val vedtaksperioderFørstegangsbehandling =
+            listOf(vedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 3, 31)))
 
         @BeforeEach
         fun setup() {
-            every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
             every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
         }
 
         @Test
         fun `Kan beregne for løpende utgifter en bolig`() {
-            val forventet =
-                listOf(
-                    BeregningsresultatForLøpendeMåned(
-                        grunnlag =
-                            Beregningsgrunnlag(
+            every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns løpendeUtgifterEnBolig
+
+            val beregningsresultat =
+                boutgifterBeregningService
+                    .beregn(
+                        behandling = behandling,
+                        vedtaksperioder = vedtaksperioderFørstegangsbehandling,
+                        typeVedtak = TypeVedtak.INNVILGELSE,
+                    ).perioder
+
+            assertThat(beregningsresultat).isEqualTo(beregningsresultatFørstegangsbehandlingLøpendeUtgifterEnBolig)
+        }
+
+        @Test
+        fun `Kan beregne revurderinog for løpende utgifter en bolig`() {
+            val utgifterRevurdering: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+                mapOf(
+                    TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
+                        listOf(
+                            UtgiftBeregningBoutgifter(
                                 fom = LocalDate.of(2025, 1, 1),
-                                tom = LocalDate.of(2025, 1, 31),
-                                utbetalingsdato = LocalDate.of(2025, 1, 1),
-                                utgifter = utgift,
-                                makssats = 4953,
-                                makssatsBekreftet = true,
-                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                                aktivitet = AktivitetType.TILTAK,
-                            ),
-                        delAvTidligereUtbetaling = false,
-                    ),
-                    BeregningsresultatForLøpendeMåned(
-                        grunnlag =
-                            Beregningsgrunnlag(
-                                fom = LocalDate.of(2025, 2, 1),
-                                tom = LocalDate.of(2025, 2, 28),
-                                utbetalingsdato = LocalDate.of(2025, 2, 1),
-                                utgifter = utgift,
-                                makssats = 4953,
-                                makssatsBekreftet = true,
-                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                                aktivitet = AktivitetType.TILTAK,
-                            ),
-                        delAvTidligereUtbetaling = false,
-                    ),
-                    BeregningsresultatForLøpendeMåned(
-                        grunnlag =
-                            Beregningsgrunnlag(
-                                fom = LocalDate.of(2025, 3, 1),
                                 tom = LocalDate.of(2025, 3, 31),
-                                utbetalingsdato = LocalDate.of(2025, 3, 1),
-                                utgifter = utgift,
-                                makssats = 4953,
-                                makssatsBekreftet = true,
-                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                                aktivitet = AktivitetType.TILTAK,
+                                utgift = 3000,
                             ),
-                        delAvTidligereUtbetaling = false,
+                            UtgiftBeregningBoutgifter(
+                                fom = LocalDate.of(2025, 4, 1),
+                                tom = LocalDate.of(2025, 4, 30),
+                                utgift = 6000,
+                            ),
+                        ),
+                )
+
+            val vedtaksperioderRevurdering =
+                listOf(
+                    vedtaksperiode(
+                        fom = LocalDate.of(2025, 1, 1),
+                        tom = LocalDate.of(2025, 3, 31),
+                    ),
+                    vedtaksperiode(
+                        fom = LocalDate.of(2025, 4, 1),
+                        tom = LocalDate.of(2025, 4, 30),
                     ),
                 )
+
+            val innvilgelseBoutgifter =
+                innvilgelseBoutgifter(
+                    beregningsresultat =
+                        BeregningsresultatBoutgifter(
+                            beregningsresultatFørstegangsbehandlingLøpendeUtgifterEnBolig,
+                        ),
+                    vedtaksperioder = vedtaksperioderFørstegangsbehandling,
+                )
+
+            val utgifterEtterRevuderFra: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+                mapOf(
+                    TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
+                        listOf(
+                            UtgiftBeregningBoutgifter(
+                                fom = LocalDate.of(2025, 4, 1),
+                                tom = LocalDate.of(2025, 4, 30),
+                                utgift = 6000,
+                            ),
+                        ),
+                )
+
+            val forventet =
+                listOf(
+                    lagBeregningsresultatMåned(
+                        fom = LocalDate.of(2025, 1, 1),
+                        utgifter = løpendeUtgifterEnBolig,
+                        delAvTidligere = true,
+                    ),
+                    lagBeregningsresultatMåned(
+                        fom = LocalDate.of(2025, 2, 1),
+                        utgifter = løpendeUtgifterEnBolig,
+                        delAvTidligere = true,
+                    ),
+                    lagBeregningsresultatMåned(
+                        fom = LocalDate.of(2025, 3, 1),
+                        utgifter = løpendeUtgifterEnBolig,
+                        delAvTidligere = true,
+                    ),
+                    lagBeregningsresultatMåned(
+                        fom = LocalDate.of(2025, 4, 1),
+                        utgifter = utgifterEtterRevuderFra,
+                        delAvTidligere = false,
+                    ),
+                )
+
+            every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifterRevurdering
+            every { vedtakRepository.findByIdOrThrow(any()) } returns innvilgelseBoutgifter
 
             val res =
                 boutgifterBeregningService
                     .beregn(
-                        behandling = behandling,
-                        vedtaksperioder = vedtaksperioder,
+                        behandling =
+                            saksbehandling(
+                                revurderFra = LocalDate.of(2025, 4, 1),
+                                forrigeIverksatteBehandlingId = BehandlingId.random(),
+                                type = BehandlingType.REVURDERING,
+                            ),
+                        vedtaksperioder = vedtaksperioderRevurdering,
                         typeVedtak = TypeVedtak.INNVILGELSE,
                     ).perioder
 
+            assertThat(res.size).isEqualTo(4)
             assertThat(res).isEqualTo(forventet)
         }
 
         @Test
         fun `Kan beregne for løpende utgifter to boliger`() {
-            val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+            every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns løpendeUtgifterToBoliger
+
+            val res =
+                boutgifterBeregningService
+                    .beregn(
+                        behandling = behandling,
+                        vedtaksperioder = vedtaksperioderFørstegangsbehandling,
+                        typeVedtak = TypeVedtak.INNVILGELSE,
+                    ).perioder
+
+            assertThat(res).isEqualTo(beregningsresultatFørstegangsbehandlingLøpendeUtgifterToBoliger)
+        }
+
+        @Test
+        fun `Kan beregne revurderinog for løpende utgifter to boliger`() {
+            val utgifterRevurdering: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
                 mapOf(
                     TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER to
                         listOf(
@@ -207,119 +264,108 @@ class BoutgifterBeregningServiceTest {
                                 tom = LocalDate.of(2025, 3, 31),
                                 utgift = 3000,
                             ),
+                            UtgiftBeregningBoutgifter(
+                                fom = LocalDate.of(2025, 4, 1),
+                                tom = LocalDate.of(2025, 4, 30),
+                                utgift = 6000,
+                            ),
                         ),
                 )
+            val innvilgelseBoutgifter =
+                innvilgelseBoutgifter(
+                    beregningsresultat =
+                        BeregningsresultatBoutgifter(
+                            beregningsresultatFørstegangsbehandlingLøpendeUtgifterToBoliger,
+                        ),
+                    vedtaksperioder = vedtaksperioderFørstegangsbehandling,
+                )
 
-            every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
-
-            val forventet =
+            val vedtaksperioderRevurdering =
                 listOf(
-                    BeregningsresultatForLøpendeMåned(
-                        grunnlag =
-                            Beregningsgrunnlag(
-                                fom = LocalDate.of(2025, 1, 1),
-                                tom = LocalDate.of(2025, 1, 31),
-                                utbetalingsdato = LocalDate.of(2025, 1, 1),
-                                utgifter = utgift,
-                                makssats = 4953,
-                                makssatsBekreftet = true,
-                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                                aktivitet = AktivitetType.TILTAK,
-                            ),
-                        delAvTidligereUtbetaling = false,
+                    vedtaksperiode(
+                        fom = LocalDate.of(2025, 1, 1),
+                        tom = LocalDate.of(2025, 3, 31),
                     ),
-                    BeregningsresultatForLøpendeMåned(
-                        grunnlag =
-                            Beregningsgrunnlag(
-                                fom = LocalDate.of(2025, 2, 1),
-                                tom = LocalDate.of(2025, 2, 28),
-                                utbetalingsdato = LocalDate.of(2025, 2, 1),
-                                utgifter = utgift,
-                                makssats = 4953,
-                                makssatsBekreftet = true,
-                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                                aktivitet = AktivitetType.TILTAK,
-                            ),
-                        delAvTidligereUtbetaling = false,
-                    ),
-                    BeregningsresultatForLøpendeMåned(
-                        grunnlag =
-                            Beregningsgrunnlag(
-                                fom = LocalDate.of(2025, 3, 1),
-                                tom = LocalDate.of(2025, 3, 31),
-                                utbetalingsdato = LocalDate.of(2025, 3, 1),
-                                utgifter = utgift,
-                                makssats = 4953,
-                                makssatsBekreftet = true,
-                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                                aktivitet = AktivitetType.TILTAK,
-                            ),
-                        delAvTidligereUtbetaling = false,
+                    vedtaksperiode(
+                        fom = LocalDate.of(2025, 4, 1),
+                        tom = LocalDate.of(2025, 4, 30),
                     ),
                 )
+
+            val utgifterEtterRevuderFra: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+                mapOf(
+                    TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER to
+                        listOf(
+                            UtgiftBeregningBoutgifter(
+                                fom = LocalDate.of(2025, 4, 1),
+                                tom = LocalDate.of(2025, 4, 30),
+                                utgift = 6000,
+                            ),
+                        ),
+                )
+            val forventet =
+                listOf(
+                    lagBeregningsresultatMåned(
+                        fom = LocalDate.of(2025, 1, 1),
+                        utgifter = løpendeUtgifterToBoliger,
+                        delAvTidligere = true,
+                    ),
+                    lagBeregningsresultatMåned(
+                        fom = LocalDate.of(2025, 2, 1),
+                        utgifter = løpendeUtgifterToBoliger,
+                        delAvTidligere = true,
+                    ),
+                    lagBeregningsresultatMåned(
+                        fom = LocalDate.of(2025, 3, 1),
+                        utgifter = løpendeUtgifterToBoliger,
+                        delAvTidligere = true,
+                    ),
+                    lagBeregningsresultatMåned(
+                        fom = LocalDate.of(2025, 4, 1),
+                        utgifter = utgifterEtterRevuderFra,
+                        delAvTidligere = false,
+                    ),
+                )
+
+            every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifterRevurdering
+            every { vedtakRepository.findByIdOrThrow(any()) } returns innvilgelseBoutgifter
 
             val res =
                 boutgifterBeregningService
                     .beregn(
-                        behandling = behandling,
-                        vedtaksperioder = vedtaksperioder,
+                        behandling =
+                            saksbehandling(
+                                revurderFra = LocalDate.of(2025, 4, 1),
+                                forrigeIverksatteBehandlingId = BehandlingId.random(),
+                                type = BehandlingType.REVURDERING,
+                            ),
+                        vedtaksperioder = vedtaksperioderRevurdering,
                         typeVedtak = TypeVedtak.INNVILGELSE,
                     ).perioder
 
+            assertThat(res.size).isEqualTo(4)
             assertThat(res).isEqualTo(forventet)
         }
     }
 
     @Nested
     inner class UtgifterOvernatting {
-        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
-            mapOf(
-                TypeBoutgift.UTGIFTER_OVERNATTING to
-                    listOf(
-                        UtgiftBeregningBoutgifter(
-                            fom = LocalDate.of(2025, 1, 1),
-                            tom = LocalDate.of(2025, 1, 31),
-                            utgift = 3000,
-                        ),
-                    ),
-            )
-
         val vedtaksperioder =
             listOf(
-                Vedtaksperiode(
-                    id = UUID.randomUUID(),
+                vedtaksperiode(
                     fom = LocalDate.of(2025, 1, 1),
                     tom = LocalDate.of(2025, 1, 31),
-                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                    aktivitet = AktivitetType.TILTAK,
                 ),
             )
 
         @BeforeEach
         fun setup() {
-            every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
             every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
         }
 
         @Test
         fun `Kan beregne for utgift overnatting`() {
-            val forventet =
-                listOf(
-                    BeregningsresultatForLøpendeMåned(
-                        grunnlag =
-                            Beregningsgrunnlag(
-                                fom = LocalDate.of(2025, 1, 1),
-                                tom = LocalDate.of(2025, 1, 31),
-                                utbetalingsdato = LocalDate.of(2025, 1, 1),
-                                utgifter = utgift,
-                                makssats = 4953,
-                                makssatsBekreftet = true,
-                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                                aktivitet = AktivitetType.TILTAK,
-                            ),
-                        delAvTidligereUtbetaling = false,
-                    ),
-                )
+            every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgiftMidlertidigOvernatting
 
             val res =
                 boutgifterBeregningService
@@ -329,6 +375,84 @@ class BoutgifterBeregningServiceTest {
                         typeVedtak = TypeVedtak.INNVILGELSE,
                     ).perioder
 
+            assertThat(res).isEqualTo(beregningsresultatFørstegangsbehandlingMidlertidigOvernatting)
+        }
+
+        @Test
+        fun `Kan revurdere med tidligere vedtaksperioder for utgift overnatting`() {
+            val utgifterRevurdering: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+                mapOf(
+                    TypeBoutgift.UTGIFTER_OVERNATTING to
+                        listOf(
+                            UtgiftBeregningBoutgifter(
+                                fom = LocalDate.of(2025, 1, 1),
+                                tom = LocalDate.of(2025, 1, 31),
+                                utgift = 3000,
+                            ),
+                            UtgiftBeregningBoutgifter(
+                                fom = LocalDate.of(2025, 3, 10),
+                                tom = LocalDate.of(2025, 3, 12),
+                                utgift = 6000,
+                            ),
+                        ),
+                )
+
+            val vedtaksperioderRevurdering =
+                listOf(
+                    vedtaksperiode(
+                        fom = LocalDate.of(2025, 1, 1),
+                        tom = LocalDate.of(2025, 1, 31),
+                    ),
+                    vedtaksperiode(
+                        fom = LocalDate.of(2025, 3, 10),
+                        tom = LocalDate.of(2025, 3, 12),
+                    ),
+                )
+
+            val utgiftEtterRevurderFra: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+                mapOf(
+                    TypeBoutgift.UTGIFTER_OVERNATTING to
+                        listOf(
+                            UtgiftBeregningBoutgifter(
+                                fom = LocalDate.of(2025, 3, 10),
+                                tom = LocalDate.of(2025, 3, 12),
+                                utgift = 6000,
+                            ),
+                        ),
+                )
+
+            val forventet =
+                listOf(
+                    lagBeregningsresultatMåned(
+                        fom = LocalDate.of(2025, 1, 1),
+                        utgifter = utgiftMidlertidigOvernatting,
+                        delAvTidligere = true,
+                    ),
+                    lagBeregningsresultatMåned(
+                        fom = LocalDate.of(2025, 3, 10),
+                        tom = LocalDate.of(2025, 3, 12),
+                        utgifter = utgiftEtterRevurderFra,
+                        delAvTidligere = false,
+                    ),
+                )
+
+            every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifterRevurdering
+            every { vedtakRepository.findByIdOrThrow(any()) } returns innvilgelseBoutgifter(vedtaksperioder = vedtaksperioder)
+
+            val res =
+                boutgifterBeregningService
+                    .beregn(
+                        behandling =
+                            saksbehandling(
+                                revurderFra = LocalDate.of(2025, 3, 10),
+                                forrigeIverksatteBehandlingId = BehandlingId.random(),
+                                type = BehandlingType.REVURDERING,
+                            ),
+                        vedtaksperioder = vedtaksperioderRevurdering,
+                        typeVedtak = TypeVedtak.INNVILGELSE,
+                    ).perioder
+
+            assertThat(res.size).isEqualTo(2)
             assertThat(res).isEqualTo(forventet)
         }
 
@@ -374,19 +498,13 @@ class BoutgifterBeregningServiceTest {
         fun `Kaster feil hvis utgift krysser utbetaling`() {
             val vedtaksperioder =
                 listOf(
-                    Vedtaksperiode(
-                        id = UUID.randomUUID(),
+                    vedtaksperiode(
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 10),
-                        målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                        aktivitet = AktivitetType.TILTAK,
                     ),
-                    Vedtaksperiode(
-                        id = UUID.randomUUID(),
+                    vedtaksperiode(
                         fom = LocalDate.of(2025, 1, 25),
                         tom = LocalDate.of(2025, 2, 5),
-                        målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                        aktivitet = AktivitetType.TILTAK,
                     ),
                 )
 
