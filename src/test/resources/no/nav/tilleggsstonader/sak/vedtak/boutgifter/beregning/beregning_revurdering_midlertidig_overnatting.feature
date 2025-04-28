@@ -47,7 +47,7 @@ Egenskap: Beregning - med revurderFra
       | 07.01.2025 | 09.01.2025 | 1000   |
       | 20.01.2025 | 25.01.2025 | 1000   |
 
-    Når beregner boutgifter med revurderFra=2025-01-20
+    Når beregner boutgifter med revurderFra=2025-01-22
 
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
