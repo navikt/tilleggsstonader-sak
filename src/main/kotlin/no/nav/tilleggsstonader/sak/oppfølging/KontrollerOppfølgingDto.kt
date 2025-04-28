@@ -21,15 +21,13 @@ data class KontrollerOppfølgingResponse(
     val behandlingsdetaljer: Behandlingsdetaljer,
 )
 
-fun List<OppfølgingMedDetaljer>.tilDto() =
-    this.map {
-        KontrollerOppfølgingResponse(
-            id = it.id,
-            behandlingId = it.behandlingId,
-            version = it.version,
-            opprettetTidspunkt = it.opprettetTidspunkt,
-            perioderTilKontroll = it.data.perioderTilKontroll,
-            kontrollert = it.kontrollert,
-            behandlingsdetaljer = it.behandlingsdetaljer,
-        )
-    }
+fun OppfølgingMedDetaljer.tilDto(): KontrollerOppfølgingResponse =
+    KontrollerOppfølgingResponse(
+        id = id,
+        behandlingId = behandlingId,
+        version = version,
+        opprettetTidspunkt = opprettetTidspunkt,
+        perioderTilKontroll = data.perioderTilKontroll,
+        kontrollert = kontrollert,
+        behandlingsdetaljer = behandlingsdetaljer,
+    )
