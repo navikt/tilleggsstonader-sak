@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.tilgang
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.IdentRequest
+import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import org.springframework.http.MediaType
@@ -28,6 +29,16 @@ class TilgangController(
     ): Tilgang =
         tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(
             personIdent = identRequest.ident,
+            jwtToken = SikkerhetContext.hentToken(),
+        )
+
+    @PostMapping("person/sjekk-tilgang")
+    fun sjekkTilgangTilPerson(
+        @RequestBody request: IdentStønadstype,
+    ): Tilgang =
+        tilgangskontrollService.sjekkTilgangTilStønadstype(
+            personIdent = request.ident,
+            stønadstype = request.stønadstype,
             jwtToken = SikkerhetContext.hentToken(),
         )
 }
