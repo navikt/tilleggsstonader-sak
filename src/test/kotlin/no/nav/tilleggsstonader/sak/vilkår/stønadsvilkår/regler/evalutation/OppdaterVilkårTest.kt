@@ -350,6 +350,17 @@ internal class OppdaterVilkårTest {
             assertThat(oppdaterVilkår.status).isEqualTo(VilkårStatus.ENDRET)
         }
 
+        @Test
+        fun `Vilkår som er fremtidig utgift skal få status ny når de gjøres om til vanlig vilkår`() {
+            val vilkår = vilkår(behandling.id, type = VilkårType.PASS_BARN, status = VilkårStatus.UENDRET, erFremtidigUtgift = true)
+            val innsendtOppdatering = innsendtOppdatering(vilkår.copy(erFremtidigUtgift = false))
+
+            val oppdaterVilkår =
+                oppdaterVilkår(vilkår = vilkår, oppdatering = innsendtOppdatering, vilkårsresultat = regelResultat)
+
+            assertThat(oppdaterVilkår.status).isEqualTo(VilkårStatus.NY)
+        }
+
         private fun innsendtOppdatering(originaltVilkår: Vilkår) =
             SvarPåVilkårDto(
                 id = originaltVilkår.id,

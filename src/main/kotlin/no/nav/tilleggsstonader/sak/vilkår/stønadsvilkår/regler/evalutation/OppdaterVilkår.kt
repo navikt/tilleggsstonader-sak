@@ -132,7 +132,7 @@ object OppdaterVilkår {
             )
         return vilkår.copy(
             resultat = vilkårsresultat.vilkår,
-            status = utledStatus(vilkår),
+            status = utledStatus(vilkår, oppdatering),
             delvilkårwrapper = oppdaterteDelvilkår,
             fom = utledFom(vilkår, oppdatering),
             tom = utledTom(vilkår, oppdatering),
@@ -186,9 +186,13 @@ object OppdaterVilkår {
             }
         }
 
-    private fun utledStatus(eksisterendeVilkår: Vilkår): VilkårStatus? =
-        when (eksisterendeVilkår.status) {
-            VilkårStatus.UENDRET -> VilkårStatus.ENDRET
+    private fun utledStatus(
+        eksisterendeVilkår: Vilkår,
+        lagreVilkårDto: LagreVilkårDto,
+    ): VilkårStatus? =
+        when {
+            eksisterendeVilkår.erFremtidigUtgift && lagreVilkårDto.erFremtidigUtgift != true -> VilkårStatus.NY
+            eksisterendeVilkår.status == VilkårStatus.UENDRET -> VilkårStatus.ENDRET
             else -> eksisterendeVilkår.status
         }
 
