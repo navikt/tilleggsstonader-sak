@@ -152,7 +152,7 @@ class JournalpostService(
         journalpost.bruker?.let {
             when (it.type) {
                 BrukerIdType.FNR -> it.id
-                BrukerIdType.AKTOERID -> personService.hentPersonIdenter(it.id).gjeldende().ident
+                BrukerIdType.AKTOERID -> personService.hentFolkeregisterIdenter(it.id).gjeldende().ident
                 BrukerIdType.ORGNR -> error("Kan ikke hente journalpost=${journalpost.journalpostId} for orgnr")
             }
         } ?: error("Kan ikke hente journalpost=${journalpost.journalpostId} uten bruker")

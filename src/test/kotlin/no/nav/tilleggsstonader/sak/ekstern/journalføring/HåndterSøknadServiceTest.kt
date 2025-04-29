@@ -84,7 +84,7 @@ internal class HåndterSøknadServiceTest {
     @BeforeEach
     internal fun setUp() {
         taskSlot.clear()
-        every { personService.hentPersonIdenter(any()) } returns
+        every { personService.hentFolkeregisterIdenter(any()) } returns
             PdlIdenter(
                 identer =
                     listOf(

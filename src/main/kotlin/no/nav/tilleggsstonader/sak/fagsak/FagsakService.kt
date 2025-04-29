@@ -39,7 +39,7 @@ class FagsakService(
         personIdent: String,
         stønadstype: Stønadstype,
     ): Fagsak {
-        val personIdenter = personService.hentPersonIdenter(personIdent)
+        val personIdenter = personService.hentFolkeregisterIdenter(personIdent)
         val gjeldendePersonIdent = personIdenter.gjeldende()
         val person = fagsakPersonService.hentEllerOpprettPerson(personIdenter.identer(), gjeldendePersonIdent.ident)
         val oppdatertPerson = oppdatertPerson(person, gjeldendePersonIdent)
@@ -54,7 +54,7 @@ class FagsakService(
         personIdent: String,
         stønadstype: Stønadstype,
     ): List<BehandlingDto> =
-        finnFagsak(personService.hentPersonIdenter(personIdent).identer(), stønadstype)?.let { fagsak ->
+        finnFagsak(personService.hentFolkeregisterIdenter(personIdent).identer(), stønadstype)?.let { fagsak ->
             behandlingService.hentBehandlinger(fagsak.id).map {
                 it.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId)
             }
@@ -99,7 +99,7 @@ class FagsakService(
     fun fagsakMedOppdatertPersonIdent(fagsakId: FagsakId): Fagsak {
         val fagsak = fagsakRepository.findByIdOrThrow(fagsakId)
         val person = fagsakPersonService.hentPerson(fagsak.fagsakPersonId)
-        val gjeldendeIdent = personService.hentPersonIdenter(person.hentAktivIdent()).gjeldende()
+        val gjeldendeIdent = personService.hentFolkeregisterIdenter(person.hentAktivIdent()).gjeldende()
         val oppdatertPerson = oppdatertPerson(person, gjeldendeIdent)
         return fagsak.tilFagsakMedPerson(oppdatertPerson.identer)
     }

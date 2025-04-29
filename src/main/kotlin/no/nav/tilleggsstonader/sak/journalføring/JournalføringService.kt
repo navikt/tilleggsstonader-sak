@@ -296,7 +296,7 @@ class JournalføringService(
         }
 
         journalpost.bruker?.let {
-            val allePersonIdenter = personService.hentPersonIdenter(personIdent).identer()
+            val allePersonIdenter = personService.hentFolkeregisterIdenter(personIdent).identer()
             feilHvisIkke(fagsakPersonOgJournalpostBrukerErSammePerson(allePersonIdenter, personIdent, it)) {
                 "Ikke samsvar mellom personident på journalposten og personen vi forsøker å opprette behandling for. Kan ikke journalføre ${journalpost.journalpostId}"
             }

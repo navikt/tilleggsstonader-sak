@@ -80,7 +80,7 @@ class PersonService(
     fun hentAndreForeldre(personIdenter: List<String>): Map<String, PdlAnnenForelder> = pdlClient.hentAndreForeldre(personIdenter)
 
     @Cacheable("personidenter")
-    fun hentPersonIdenter(ident: String): PdlIdenter = pdlClient.hentPersonidenter(ident = ident)
+    fun hentFolkeregisterIdenter(ident: String): PdlIdenter = pdlClient.hentPersonidenter(ident = ident)
 
     fun hentIdenterBolk(identer: List<String>): Map<String, PdlIdent> = pdlClient.hentIdenterBolk(identer)
 

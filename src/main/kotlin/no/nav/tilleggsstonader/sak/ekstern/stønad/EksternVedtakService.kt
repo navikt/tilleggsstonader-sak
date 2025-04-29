@@ -28,7 +28,7 @@ class EksternVedtakService(
         )
 
     private fun harVedtak(request: IdentRequest): Boolean {
-        val identer = personService.hentPersonIdenter(request.ident).identer()
+        val identer = personService.hentFolkeregisterIdenter(request.ident).identer()
         val sisteIverksatteBehandling =
             fagsakService
                 .finnFagsak(identer, stønadstype = Stønadstype.BARNETILSYN)

@@ -40,7 +40,7 @@ class ArenaStatusServiceTest {
     @BeforeEach
     fun setUp() {
         mockFinnFagsak(fagsak)
-        every { personService.hentPersonIdenter(ident) } returns PdlIdenter(listOf(PdlIdent(ident, false)))
+        every { personService.hentFolkeregisterIdenter(ident) } returns PdlIdenter(listOf(PdlIdent(ident, false)))
         mockSøknadRouting(false)
     }
 

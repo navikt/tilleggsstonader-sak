@@ -114,7 +114,7 @@ class JournalføringServiceTest {
         every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
 
         every { taskService.save(capture(taskSlot)) } returns mockk()
-        every { personService.hentPersonIdenter(personIdent) } returns PdlIdenter(listOf(PdlIdent(personIdent, false)))
+        every { personService.hentFolkeregisterIdenter(personIdent) } returns PdlIdenter(listOf(PdlIdent(personIdent, false)))
         justRun { oppgaveService.ferdigstillOppgave(any()) }
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
         every { journalpostService.hentIdentFraJournalpost(any()) } returns personIdent

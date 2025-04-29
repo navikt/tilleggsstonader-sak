@@ -33,7 +33,7 @@ class FagsakPersonService(
     @Transactional
     fun hentEllerOpprettPerson(ident: String): FagsakPerson {
         // En person kan ha flere personnummer, så vi må spørre PDL om det gjeldende.
-        val personIdenter = personService.hentPersonIdenter(ident)
+        val personIdenter = personService.hentFolkeregisterIdenter(ident)
         val gjeldendePersonIdent = personIdenter.gjeldende().ident
         return hentEllerOpprettPerson(personIdenter.identer(), gjeldendePersonIdent)
     }

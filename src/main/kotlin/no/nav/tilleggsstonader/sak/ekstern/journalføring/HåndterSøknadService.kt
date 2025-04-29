@@ -73,7 +73,7 @@ class HåndterSøknadService(
         personIdent: String,
         stønadstype: Stønadstype,
     ): Boolean {
-        val allePersonIdenter = personService.hentPersonIdenter(personIdent).identer()
+        val allePersonIdenter = personService.hentFolkeregisterIdenter(personIdent).identer()
         val fagsak = fagsakService.finnFagsak(allePersonIdenter, stønadstype)
 
         return if (fagsak == null) {
