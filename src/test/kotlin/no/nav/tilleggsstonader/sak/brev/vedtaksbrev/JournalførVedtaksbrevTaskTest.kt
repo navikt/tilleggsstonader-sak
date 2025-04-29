@@ -57,7 +57,7 @@ class JournalførVedtaksbrevTaskTest {
     @BeforeEach
     fun setUp() {
         every { brevService.hentBesluttetBrev(saksbehandling.id) } returns vedtaksbrev(behandlingId = saksbehandling.id)
-        every { arbeidsfordelingService.hentNavEnhet(any()) } returns ArbeidsfordelingTestUtil.ENHET_NASJONAL_NAY
+        every { arbeidsfordelingService.hentNavEnhet(any(), any()) } returns ArbeidsfordelingTestUtil.ENHET_NASJONAL_NAY
         every { brevmottakerVedtaksbrevRepository.insert(any()) } returns mockk()
         every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns
             listOf(

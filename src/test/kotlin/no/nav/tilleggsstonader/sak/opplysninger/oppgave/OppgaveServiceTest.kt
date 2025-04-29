@@ -386,7 +386,7 @@ internal class OppgaveServiceTest {
         every {
             oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(any(), any())
         } returns null
-        every { arbeidsfordelingService.hentNavEnhetId(any(), any()) } returns ENHETSNUMMER
+        every { arbeidsfordelingService.hentNavEnhetId(any(), any(), any()) } returns ENHETSNUMMER
         every { oppgaveClient.opprettOppgave(capture(slot)) } answers {
             val oppgaveRequest: OpprettOppgaveRequest = firstArg()
             if (oppgaveRequest.enhetsnummer == null) {

@@ -61,7 +61,7 @@ internal class KlageServiceTest {
         opprettKlageSlot.clear()
         every { fagsakService.hentFagsak(fagsak.id) } returns fagsak
         every { fagsakService.hentAktivIdent(fagsak.id) } returns personIdent
-        every { arbeidsfordelingService.hentNavEnhet(any()) } returns
+        every { arbeidsfordelingService.hentNavEnhet(any(), any()) } returns
             Arbeidsfordelingsenhet(
                 arbeidsfordelingEnhetNr,
                 "Nav arbeid og ytelser",
@@ -101,7 +101,7 @@ internal class KlageServiceTest {
         internal fun `skal ikke kunne opprette dersom enhetId ikke finnes`() {
             val opprettKlageDto = OpprettKlageDto(mottattDato = LocalDate.now())
 
-            every { arbeidsfordelingService.hentNavEnhet(any()) } returns null
+            every { arbeidsfordelingService.hentNavEnhet(any(), any()) } returns null
 
             val feil = assertThrows<ApiFeil> { klageService.opprettKlage(fagsak.id, opprettKlageDto) }
 
