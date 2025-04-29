@@ -9,11 +9,14 @@ import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsatt
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_STRENGT_FORTROLIG
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonUtenRelasjoner
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.PersonMedAdresseBeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.tilDiskresjonskode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -47,8 +50,15 @@ class ArbeidsfordelingServiceTest {
         kritierieSlot.clear()
         slotEgenAnsatt.clear()
 
-        every { arbeidsfordelingClient.finnArbeidsfordelingsenhet(capture(kritierieSlot)) } returns
-            listOf(Arbeidsfordelingsenhet("enhetNr", "navn"))
+        every { arbeidsfordelingClient.finnArbeidsfordelingsenhet(capture(kritierieSlot)) } answers {
+            val diskresjonskodeStrengtFortrolig = AdressebeskyttelseGradering.STRENGT_FORTROLIG.tilDiskresjonskode()
+            val kriterie = firstArg<ArbeidsfordelingKriterie>()
+            if (kriterie.diskresjonskode == diskresjonskodeStrengtFortrolig) {
+                listOf(Arbeidsfordelingsenhet(ENHET_NR_STRENGT_FORTROLIG, "vikafossen"))
+            } else {
+                listOf(Arbeidsfordelingsenhet(ENHET_NR_NAY, "nay"))
+            }
+        }
         val geografiskTilknytning =
             GeografiskTilknytningDto(GeografiskTilknytningType.KOMMUNE, "kommune", "bydel", "land")
         every { personService.hentGeografiskTilknytning(søkerIdent) } returns geografiskTilknytning
@@ -113,6 +123,34 @@ class ArbeidsfordelingServiceTest {
 
             verify(exactly = 0) { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) }
             verify(exactly = 1) { personService.hentAdressebeskyttelse(any()) }
+        }
+    }
+
+    @Nested
+    inner class HentNavEnhetCache {
+        @Test
+        fun `skal cachea svar fra arbeidsfordeling`() {
+            every { personService.hentAdressebeskyttelse(søkerIdent) } returns lagPersonUtenRelasjoner()
+
+            service.hentNavEnhet(søkerIdent, Stønadstype.LÆREMIDLER)
+            service.hentNavEnhet(søkerIdent, Stønadstype.LÆREMIDLER)
+
+            verify(exactly = 1) { arbeidsfordelingClient.finnArbeidsfordelingsenhet(any()) }
+        }
+
+        @Test
+        fun `skal ikke bruke cache for ny stønadstype`() {
+            every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(søkerIdent) } returns
+                lagPersonMedRelasjoner(graderingBarn = AdressebeskyttelseGradering.STRENGT_FORTROLIG)
+            every { personService.hentAdressebeskyttelse(søkerIdent) } returns lagPersonUtenRelasjoner()
+
+            val arbeidsfordelingTilsynBarn = service.hentNavEnhet(søkerIdent, Stønadstype.BARNETILSYN)
+            val arbeidsfordelingLæremidler = service.hentNavEnhet(søkerIdent, Stønadstype.LÆREMIDLER)
+
+            assertThat(arbeidsfordelingTilsynBarn?.enhetNr).isEqualTo(ENHET_NR_STRENGT_FORTROLIG)
+            assertThat(arbeidsfordelingLæremidler?.enhetNr).isEqualTo(ENHET_NR_NAY)
+
+            verify(exactly = 2) { arbeidsfordelingClient.finnArbeidsfordelingsenhet(any()) }
         }
     }
 

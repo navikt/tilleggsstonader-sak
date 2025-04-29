@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
-import no.nav.tilleggsstonader.libs.spring.cache.getNullable
+import no.nav.tilleggsstonader.libs.spring.cache.getValue
 import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -47,33 +47,36 @@ class ArbeidsfordelingService(
         ident: String,
         stønadstype: Stønadstype,
         tema: Tema = Tema.TSO,
-    ): Arbeidsfordelingsenhet? =
-        cacheManager.getNullable("navEnhet", ident) {
-            val kriterie = lagArbeidsfordelingKritierieForPerson(ident, stønadstype, tema)
-            val enheter = arbeidsfordelingClient.finnArbeidsfordelingsenhet(kriterie)
-            if (enheter.size != 1) {
-                logger.warn("Fant enheter=$enheter for $kriterie")
-            }
-            enheter.firstOrNull()
-        }
+    ): Arbeidsfordelingsenhet? {
+        val kriterie = lagArbeidsfordelingKritierieForPerson(ident, stønadstype, tema)
+        val enheter = finnArbeidsfordelingsenhet(kriterie)
+        return enheter.firstOrNull()
+    }
 
     fun hentNavEnhetForOppfølging(
         ident: String,
         stønadstype: Stønadstype,
         oppgavetype: Oppgavetype,
         tema: Tema = Tema.TSO,
-    ): Arbeidsfordelingsenhet? =
-        cacheManager.getNullable("navEnhetForOppfølging", ident) {
-            val arbeidsfordelingskriterie =
-                lagArbeidsfordelingKritierieForPerson(
-                    personIdent = ident,
-                    stønadstype = stønadstype,
-                    arbeidsfordelingstema = tema,
-                    oppgavetype = oppgavetype,
-                )
-            arbeidsfordelingClient
-                .finnArbeidsfordelingsenhet(arbeidsfordelingskriterie)
-                .firstOrNull() ?: error("Fant ikke Nav-enhet for oppgave av type $oppgavetype")
+    ): Arbeidsfordelingsenhet? {
+        val arbeidsfordelingskriterie =
+            lagArbeidsfordelingKritierieForPerson(
+                personIdent = ident,
+                stønadstype = stønadstype,
+                arbeidsfordelingstema = tema,
+                oppgavetype = oppgavetype,
+            )
+        return finnArbeidsfordelingsenhet(arbeidsfordelingskriterie)
+            .firstOrNull() ?: error("Fant ikke Nav-enhet for oppgave av type $oppgavetype")
+    }
+
+    private fun finnArbeidsfordelingsenhet(arbeidsfordelingskriterie: ArbeidsfordelingKriterie): List<Arbeidsfordelingsenhet> =
+        cacheManager.getValue("arbeidsfordeling", arbeidsfordelingskriterie) {
+            val enheter = arbeidsfordelingClient.finnArbeidsfordelingsenhet(arbeidsfordelingskriterie)
+            if (enheter.size != 1) {
+                logger.warn("Fant enheter=$enheter for $arbeidsfordelingskriterie")
+            }
+            enheter
         }
 
     fun hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(
@@ -130,3 +133,11 @@ class ArbeidsfordelingService(
             }
         }
 }
+
+/**
+ * Brukes for å cachea data for
+ */
+private data class IdentStønad(
+    val ident: String,
+    val stønadstype: Stønadstype,
+)
