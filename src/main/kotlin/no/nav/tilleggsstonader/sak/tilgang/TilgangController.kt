@@ -32,13 +32,22 @@ class TilgangController(
             jwtToken = SikkerhetContext.hentToken(),
         )
 
-    @PostMapping("person/sjekk-tilgang")
-    fun sjekkTilgangTilPerson(
+    @PostMapping("person-stonad")
+    fun sjekkTilgangTilPersonOgStønadstype(
         @RequestBody request: IdentStønadstype,
     ): Tilgang =
         tilgangskontrollService.sjekkTilgangTilStønadstype(
             personIdent = request.ident,
             stønadstype = request.stønadstype,
+            jwtToken = SikkerhetContext.hentToken(),
+        )
+
+    @PostMapping("person")
+    fun sjekkTilgangTilPerson(
+        @RequestBody request: IdentRequest,
+    ): Tilgang =
+        tilgangskontrollService.sjekkTilgang(
+            personIdent = request.ident,
             jwtToken = SikkerhetContext.hentToken(),
         )
 }
