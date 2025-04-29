@@ -32,7 +32,7 @@ fun TaskService.stoppTaskOgRekjørSenere(
     if (antallRekjøringer < totaltAntallRekjøringerFørFeiling) {
         logger.info(
             """
-            Setter opp rekjøring nummer ${antallRekjøringer + 1}/$totaltAntallRekjøringerFørFeiling av task "${task.type}". 
+            Setter opp rekjøring nummer ${antallRekjøringer + 1}/$totaltAntallRekjøringerFørFeiling av task "${task.type}: ${task.id}". 
             Årsak til rekjøring: "$årsak" - "$melding"
             Prøver å kjøre task på nytt om $antallDagerTilNesteRekjøring dager
             """.trimIndent(),

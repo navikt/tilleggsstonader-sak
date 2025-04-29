@@ -26,9 +26,9 @@ import java.util.Properties
 @Service
 @TaskStepBeskrivelse(
     taskStepType = DistribuerVedtaksbrevTask.TYPE,
-    maxAntallFeil = 50,
+    maxAntallFeil = 75,
     settTilManuellOppfølgning = true,
-    triggerTidVedFeilISekunder = 31L,
+    triggerTidVedFeilISekunder = 3 * 60L,
     beskrivelse = "Distribuerer vedtaksbrev etter journalføring",
 )
 class DistribuerVedtaksbrevTask(
