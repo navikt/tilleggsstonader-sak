@@ -10,6 +10,8 @@ import no.nav.familie.prosessering.error.MaxAntallRekjøringerException
 import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
+import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
@@ -19,7 +21,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.catchThrowable
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -28,7 +29,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.web.client.HttpClientErrorException
-import java.time.LocalDateTime
 
 class DistribuerVedtaksbrevTaskTest {
     val brevmottakerVedtaksbrevRepository = mockk<BrevmottakerVedtaksbrevRepository>()
@@ -165,23 +165,20 @@ class DistribuerVedtaksbrevTaskTest {
                     capture(distribuerrequestSlots),
                     null,
                 )
-            } throws HttpClientErrorException.create(HttpStatus.GONE, "", HttpHeaders(), byteArrayOf(), null)
+            } throws HttpStatus.GONE.clientErrorException()
 
-            val throwable = catchThrowable { distribuerVedtaksbrevTask.doTask(task) }
+            val rekjørSenereException = catchThrowableOfType<RekjørSenereException> { distribuerVedtaksbrevTask.doTask(task) }
 
-            Assertions.assertThat(throwable).isInstanceOf(RekjørSenereException::class.java)
-            val rekjørSenereException = throwable as RekjørSenereException
-            Assertions
-                .assertThat(rekjørSenereException.triggerTid)
-                .isBetween(LocalDateTime.now().plusDays(6), LocalDateTime.now().plusDays(8))
-            Assertions.assertThat(rekjørSenereException.årsak).startsWith("Mottaker er død")
+            assertThat(rekjørSenereException.triggerTid)
+                .isBetween(osloNow().plusDays(6), osloNow().plusDays(8))
+            assertThat(rekjørSenereException.årsak).startsWith("Mottaker er død")
 
             verify(exactly = 1) { journalpostClient.distribuerJournalpost(any(), any()) }
             verify(exactly = 0) { brevmottakerVedtaksbrevRepository.update(any()) }
         }
 
         @Test
-        internal fun `skal feile hvis man har blitt kjørt fler enn 26 ganger`() {
+        internal fun `skal feile hvis tasken har kjørt over 26 ganger`() {
             val distribuerrequestSlots = mutableListOf<DistribuerJournalpostRequest>()
             val journalpostIdA = "journalpostIdA"
 
@@ -200,20 +197,20 @@ class DistribuerVedtaksbrevTaskTest {
                     capture(distribuerrequestSlots),
                     null,
                 )
-            } throws HttpClientErrorException.create(HttpStatus.GONE, "", HttpHeaders(), byteArrayOf(), null)
+            } throws HttpStatus.GONE.clientErrorException()
 
-            val taskLogg =
-                IntRange(1, 27)
-                    .map { TaskLogg(taskId = task.id, type = Loggtype.KLAR_TIL_PLUKK, melding = "Mottaker er død: 410 Gone") }
+            val taskLogg = (1..27).map { TaskLogg(taskId = task.id, type = Loggtype.KLAR_TIL_PLUKK, melding = "Mottaker er død: 410 Gone") }
 
             every { taskService.findTaskLoggByTaskId(any()) } returns taskLogg
 
             val throwable = catchThrowable { distribuerVedtaksbrevTask.doTask(task) }
-            Assertions.assertThat(throwable).isInstanceOf(MaxAntallRekjøringerException::class.java)
-            Assertions.assertThat(throwable).hasMessageStartingWith("Nådd max antall rekjøring - 26")
+            assertThat(throwable).isInstanceOf(MaxAntallRekjøringerException::class.java)
+            assertThat(throwable).hasMessageStartingWith("Nådd max antall rekjøring - 26")
 
             verify(exactly = 1) { journalpostClient.distribuerJournalpost(any(), any()) }
             verify(exactly = 0) { brevmottakerVedtaksbrevRepository.update(any()) }
         }
     }
+
+    private fun HttpStatus.clientErrorException() = HttpClientErrorException.create(this, "", HttpHeaders(), byteArrayOf(), null)
 }
