@@ -6,8 +6,8 @@ import io.mockk.verify
 import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskLogg
-import no.nav.familie.prosessering.error.MaxAntallRekjøringerException
 import no.nav.familie.prosessering.error.RekjørSenereException
+import no.nav.familie.prosessering.error.TaskExceptionUtenStackTrace
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
@@ -204,8 +204,8 @@ class DistribuerVedtaksbrevTaskTest {
             every { taskService.findTaskLoggByTaskId(any()) } returns taskLogg
 
             val throwable = catchThrowable { distribuerVedtaksbrevTask.doTask(task) }
-            assertThat(throwable).isInstanceOf(MaxAntallRekjøringerException::class.java)
-            assertThat(throwable).hasMessageStartingWith("Nådd max antall rekjøring - 26")
+            assertThat(throwable).isInstanceOf(TaskExceptionUtenStackTrace::class.java)
+            assertThat(throwable).hasMessageStartingWith("Nådd max antall rekjøringer - 26")
 
             verify(exactly = 1) { journalpostClient.distribuerJournalpost(any(), any()) }
             verify(exactly = 0) { brevmottakerVedtaksbrevRepository.update(any()) }
