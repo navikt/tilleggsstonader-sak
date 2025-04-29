@@ -2,9 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Fødsel
-import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.grunnlagsdataDomain
-import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
+import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtAldersvilkårErGyldig
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtKunTomErEndret
@@ -276,25 +274,18 @@ class VilkårperiodeRevurderFraValideringTest {
         @Test
         fun `Skal kaste feil dersom vilkårperiode utvides utover aldersbegrensning`() {
             val fødselsdato = osloDateNow().minusYears(67)
-            val grunnlagdata =
-                grunnlagsdataDomain(
-                    grunnlag =
-                        lagGrunnlagsdata(
-                            fødsel =
-                                Fødsel(
-                                    fødselsdato = fødselsdato,
-                                    fødselsår = fødselsdato.year,
-                                ),
-                        ),
-                )
+            val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato)
             val eksisterendeVilkårperiode =
                 målgruppe(fom = osloDateNow().minusYears(2), tom = osloDateNow().minusYears(1))
 
             assertThatThrownBy {
                 validerAtAldersvilkårErGyldig(
                     eksisterendePeriode = eksisterendeVilkårperiode,
-                    oppdatertPeriode = eksisterendeVilkårperiode.tilOppdatering().copy(tom = osloDateNow().plusYears(2)),
-                    grunnlagsdata = grunnlagdata,
+                    oppdatertPeriode =
+                        eksisterendeVilkårperiode
+                            .tilOppdatering()
+                            .copy(tom = osloDateNow().plusYears(2)),
+                    fødselFaktaGrunnlag = fødselFaktaGrunnlag,
                 )
             }.hasMessageContaining("Brukeren fyller 67 år i løpet av vilkårsperioden")
         }
@@ -302,25 +293,18 @@ class VilkårperiodeRevurderFraValideringTest {
         @Test
         fun `Skal ikke kaste feil dersom hele vilkårperioden er innenfor 18 og 67 år`() {
             val fødselsdato = osloDateNow().minusYears(30)
-            val grunnlagdata =
-                grunnlagsdataDomain(
-                    grunnlag =
-                        lagGrunnlagsdata(
-                            fødsel =
-                                Fødsel(
-                                    fødselsdato = fødselsdato,
-                                    fødselsår = fødselsdato.year,
-                                ),
-                        ),
-                )
+            val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato)
             val eksisterendeVilkårperiode =
                 målgruppe(fom = osloDateNow().minusYears(2), tom = osloDateNow().minusYears(1))
 
             assertDoesNotThrow {
                 validerAtAldersvilkårErGyldig(
                     eksisterendePeriode = eksisterendeVilkårperiode,
-                    oppdatertPeriode = eksisterendeVilkårperiode.tilOppdatering().copy(tom = osloDateNow().plusYears(2)),
-                    grunnlagsdata = grunnlagdata,
+                    oppdatertPeriode =
+                        eksisterendeVilkårperiode
+                            .tilOppdatering()
+                            .copy(tom = osloDateNow().plusYears(2)),
+                    fødselFaktaGrunnlag = fødselFaktaGrunnlag,
                 )
             }
         }
@@ -328,25 +312,18 @@ class VilkårperiodeRevurderFraValideringTest {
         @Test
         fun `Skal ikke kaste feil dersom hele vilkårperioden er før bruker fyller 18 år`() {
             val fødselsdato = osloDateNow().minusYears(10)
-            val grunnlagdata =
-                grunnlagsdataDomain(
-                    grunnlag =
-                        lagGrunnlagsdata(
-                            fødsel =
-                                Fødsel(
-                                    fødselsdato = fødselsdato,
-                                    fødselsår = fødselsdato.year,
-                                ),
-                        ),
-                )
+            val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato)
             val eksisterendeVilkårperiode =
                 målgruppe(fom = osloDateNow(), tom = osloDateNow().plusYears(1))
 
             assertDoesNotThrow {
                 validerAtAldersvilkårErGyldig(
                     eksisterendePeriode = eksisterendeVilkårperiode,
-                    oppdatertPeriode = eksisterendeVilkårperiode.tilOppdatering().copy(tom = osloDateNow().plusYears(2)),
-                    grunnlagsdata = grunnlagdata,
+                    oppdatertPeriode =
+                        eksisterendeVilkårperiode
+                            .tilOppdatering()
+                            .copy(tom = osloDateNow().plusYears(2)),
+                    fødselFaktaGrunnlag = fødselFaktaGrunnlag,
                 )
             }
         }

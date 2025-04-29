@@ -190,7 +190,8 @@ class OppgaveService(
         oppgave: OpprettOppgave,
     ): Long {
         val enhetsnummer =
-            oppgave.enhetsnummer ?: arbeidsfordelingService.hentNavEnhetId(personIdent, oppgave.oppgavetype)
+            oppgave.enhetsnummer
+                ?: arbeidsfordelingService.hentNavEnhetId(personIdent, stønadstype, oppgave.oppgavetype)
 
         val mappeId = utledMappeId(personIdent, oppgave, enhetsnummer)
         val opprettOppgave =

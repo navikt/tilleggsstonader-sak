@@ -23,6 +23,7 @@ class BehandlingshistorikkController(
     fun hentBehandlingshistorikk(
         @PathVariable behandlingId: BehandlingId,
     ): List<BehandlingshistorikkDto> {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.ACCESS)
         val behandlingHistorikk = behandlingshistorikkService.finnHendelseshistorikk(saksbehandling)

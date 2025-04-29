@@ -41,7 +41,7 @@ class InterntVedtakTask(
         val behandlingId = behandlingInfo.behandlingId
         val stønadstype = behandlingInfo.stønadstype
         val enhet =
-            arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(behandlingInfo.ident)
+            arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(behandlingInfo.ident, stønadstype)
         journalpostService.opprettJournalpost(
             ArkiverDokumentRequest(
                 fnr = behandlingInfo.ident,

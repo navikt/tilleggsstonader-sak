@@ -33,6 +33,7 @@ class VilkårperiodeController(
     fun hentVilkårperioder(
         @PathVariable behandlingId: BehandlingId,
     ): VilkårperioderResponse {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
         return vilkårperiodeService.hentVilkårperioderResponse(behandlingId)
@@ -43,6 +44,7 @@ class VilkårperiodeController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody oppdaterGrunnlag: OppdaterGrunnlagDto?,
     ) {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
@@ -53,6 +55,7 @@ class VilkårperiodeController(
     fun opprettVilkårperiode(
         @RequestBody vilkårperiode: LagreVilkårperiode,
     ): LagreVilkårperiodeResponse {
+        tilgangService.settBehandlingsdetaljerForRequest(vilkårperiode.behandlingId)
         tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
@@ -65,6 +68,7 @@ class VilkårperiodeController(
         @PathVariable("id") id: UUID,
         @RequestBody vilkårperiode: LagreVilkårperiode,
     ): LagreVilkårperiodeResponse {
+        tilgangService.settBehandlingsdetaljerForRequest(vilkårperiode.behandlingId)
         tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
@@ -77,6 +81,7 @@ class VilkårperiodeController(
         @PathVariable("id") id: UUID,
         @RequestBody slettVikårperiode: SlettVikårperiode,
     ): LagreVilkårperiodeResponse {
+        tilgangService.settBehandlingsdetaljerForRequest(slettVikårperiode.behandlingId)
         tilgangService.validerTilgangTilBehandling(slettVikårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 

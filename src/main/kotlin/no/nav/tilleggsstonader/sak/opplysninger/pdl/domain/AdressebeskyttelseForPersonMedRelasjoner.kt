@@ -8,14 +8,28 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 
+sealed interface AdressebeskyttelseForPerson {
+    fun identerForEgenAnsattKontroll(): Set<String>
+
+    fun adressebeskyttelser(): List<AdressebeskyttelseGradering>
+}
+
 data class AdressebeskyttelseForPersonMedRelasjoner(
     val søker: PersonMedAdresseBeskyttelse,
     val barn: List<PersonMedAdresseBeskyttelse>,
     val andreForeldre: List<PersonMedAdresseBeskyttelse>,
-) {
-    fun identerForEgenAnsattKontroll(): Set<String> = (andreForeldre + søker).map { it.personIdent }.toSet()
+) : AdressebeskyttelseForPerson {
+    override fun identerForEgenAnsattKontroll(): Set<String> = (andreForeldre + søker).map { it.personIdent }.toSet()
 
-    fun adressebeskyttelser(): List<AdressebeskyttelseGradering> = (barn + andreForeldre + søker).map { it.adressebeskyttelse }
+    override fun adressebeskyttelser(): List<AdressebeskyttelseGradering> = (barn + andreForeldre + søker).map { it.adressebeskyttelse }
+}
+
+data class AdressebeskyttelseForPersonUtenRelasjoner(
+    val søker: PersonMedAdresseBeskyttelse,
+) : AdressebeskyttelseForPerson {
+    override fun identerForEgenAnsattKontroll(): Set<String> = setOf(søker.personIdent)
+
+    override fun adressebeskyttelser(): List<AdressebeskyttelseGradering> = listOf(søker.adressebeskyttelse)
 }
 
 data class PersonMedAdresseBeskyttelse(

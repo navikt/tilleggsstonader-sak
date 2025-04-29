@@ -292,7 +292,7 @@ class BehandlingFlytTest(
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 1, 31),
                 utgift = 1000,
-                erNullvedtak = false,
+                erFremtidigUtgift = false,
             ),
         )
         stegService.håndterSteg(behandlingId, StegType.VILKÅR)

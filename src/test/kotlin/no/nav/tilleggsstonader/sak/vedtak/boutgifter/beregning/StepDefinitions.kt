@@ -2,24 +2,32 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
+import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BeregningNøkler
@@ -37,7 +45,7 @@ class StepDefinitions {
 
     val utgiftService = mockk<BoutgifterUtgiftService>()
 
-//    val vedtakRepositroy = mockk<VedtakRepository>()
+    val vedtakRepositroy = mockk<VedtakRepository>(relaxed = true)
     val vilkårperiodeService = mockk<VilkårperiodeService>(relaxed = true)
     val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>(relaxed = true)
 
@@ -45,16 +53,28 @@ class StepDefinitions {
         BoutgifterBeregningService(
             boutgifterUtgiftService = utgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
-//            vedtakRepository = vedtakRepositroy,
+            vedtakRepository = vedtakRepositroy,
         )
-
-    val behandling = saksbehandling()
 
     var vilkårperioder: Vilkårperioder? = null
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
     var utgifter = mutableMapOf<TypeBoutgift, List<UtgiftBeregningBoutgifter>>()
     var beregningsresultat: BeregningsresultatBoutgifter? = null
     var exception: Exception? = null
+
+    init {
+        every { vedtakRepositroy.findByIdOrThrow(any()) } returns
+            GeneriskVedtak(
+                behandlingId = BehandlingId.random(),
+                type = TypeVedtak.INNVILGELSE,
+                data =
+                    InnvilgelseBoutgifter(
+                        beregningsresultat = BeregningsresultatBoutgifter(emptyList()),
+                        vedtaksperioder = emptyList(),
+                    ),
+                gitVersjon = "versjon-test",
+            )
+    }
 
     @Gitt("følgende vedtaksperioder for boutgifter")
     fun `følgende vedtaksperioder for boutgifter`(dataTable: DataTable) {
@@ -76,12 +96,12 @@ class StepDefinitions {
             }
     }
 
-    private fun beregn() {
+    private fun beregn(saksbehandling: Saksbehandling) {
         every { utgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
         try {
             beregningsresultat =
                 beregningsService.beregn(
-                    behandling = behandling,
+                    behandling = saksbehandling,
                     vedtaksperioder = vedtaksperioder,
                     typeVedtak = TypeVedtak.INNVILGELSE,
                 )
@@ -90,9 +110,25 @@ class StepDefinitions {
         }
     }
 
+    @Når("beregner boutgifter")
+    fun `beregner boutgifter`() {
+        beregn(saksbehandling())
+    }
+
+    @Når("beregner boutgifter med revurderFra={}")
+    fun `beregner boutgifter med revurder fra`(revurderFraStr: String) {
+        val revurderFra = parseDato(revurderFraStr)
+        beregn(
+            saksbehandling(
+                type = BehandlingType.REVURDERING,
+                revurderFra = revurderFra,
+                forrigeIverksatteBehandlingId = BehandlingId.random(),
+            ),
+        )
+    }
+
     @Så("skal beregnet stønad for boutgifter være")
     fun `skal beregnet stønad for boutgifter være`(dataTable: DataTable) {
-        beregn()
         assertThat(exception).isNull()
         val forventetBeregningsresultat =
             dataTable.mapRad { rad ->
@@ -116,11 +152,14 @@ class StepDefinitions {
                         ),
                 )
             }
+        val forventedeStønadsbeløp = dataTable.mapRad { rad -> parseInt(BoutgifterNøkler.STØNADSBELØP, rad) }
+
         assertThat(beregningsresultat!!.perioder).hasSize(forventetBeregningsresultat.size)
 
         forventetBeregningsresultat.forEachIndexed { index, periode ->
             try {
                 assertThat(beregningsresultat!!.perioder[index]).isEqualTo(periode)
+                assertThat(beregningsresultat!!.perioder[index].stønadsbeløp).isEqualTo(forventedeStønadsbeløp[index])
             } catch (e: Throwable) {
                 val actual = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(periode)
                 logger.error("Feilet validering av rad ${index + 1} $actual")
@@ -129,9 +168,8 @@ class StepDefinitions {
         }
     }
 
-    @Så("forvent følgende feil når vi beregner boutgifter: {}")
+    @Så("forvent følgende feil for boutgifter: {}")
     fun `forvent følgende feil`(forventetFeil: String) {
-        beregn()
         assertThat(exception).hasMessageContaining(forventetFeil)
     }
 }
@@ -142,6 +180,7 @@ enum class BoutgifterNøkler(
     UTBETALINGSDATO("Utbetalingsdato"),
     UTGIFT("Utgift"),
     MAKS_SATS("Maks sats"),
+    STØNADSBELØP("Stønadsbeløp"),
 }
 
 private fun finnRelevanteUtgifter(

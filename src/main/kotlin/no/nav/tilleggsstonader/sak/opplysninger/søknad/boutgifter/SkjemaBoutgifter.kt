@@ -11,6 +11,7 @@ data class SkjemaBoutgifter(
     val aktivitet: AktivitetAvsnitt,
     val boutgifter: BoligEllerOvernattingAvsnitt,
     val dokumentasjon: List<DokumentasjonBoutgifter>,
+    val harNedsattArbeidsevne: JaNei?,
 )
 
 data class Personopplysninger(
@@ -57,7 +58,7 @@ data class UtgifterNyBolig(
     val delerBoutgifter: JaNei,
     val andelUtgifterBolig: Int?,
     val harHoyereUtgifterPaNyttBosted: JaNei,
-    val mottarBostotte: JaNei?,
+    val mottarBostotte: JaNei,
 )
 
 data class UtgifterFlereSteder(

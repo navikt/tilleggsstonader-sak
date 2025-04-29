@@ -65,6 +65,7 @@ class LæremidlerVedtakController(
         behandlingId: BehandlingId,
         vedtak: VedtakLæremidlerRequest,
     ) {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         stegService.håndterSteg(behandlingId, steg, vedtak)
     }
@@ -74,6 +75,7 @@ class LæremidlerVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtaksperioder: List<VedtaksperiodeLæremidlerDto>,
     ): BeregningsresultatLæremidlerDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         return beregningService
             .beregn(
@@ -90,6 +92,7 @@ class LæremidlerVedtakController(
     fun hentVedtak(
         @PathVariable behandlingId: BehandlingId,
     ): VedtakResponse? {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
@@ -100,6 +103,7 @@ class LæremidlerVedtakController(
     fun hentFullstendigVedtaksoversikt(
         @PathVariable behandlingId: BehandlingId,
     ): VedtakResponse? {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
         return VedtakDtoMapper.toDto(vedtak, null)
@@ -109,6 +113,7 @@ class LæremidlerVedtakController(
     fun foreslåVedtaksperioder(
         @PathVariable behandlingId: BehandlingId,
     ): List<VedtaksperiodeLæremidlerDto> {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
 

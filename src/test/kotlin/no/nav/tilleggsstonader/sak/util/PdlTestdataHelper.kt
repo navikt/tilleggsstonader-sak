@@ -83,7 +83,12 @@ object PdlTestdataHelper {
         bostedsadresse: List<Bostedsadresse> = emptyList(),
         dødsfall: List<Dødsfall> = emptyList(),
         forelderBarnRelasjon: List<ForelderBarnRelasjon> = emptyList(),
-        fødselsdato: Fødselsdato? = null,
+        fødselsdato: Fødselsdato? =
+            Fødselsdato(
+                fødselsår = 2025,
+                fødselsdato = LocalDate.of(2025, 1, 1),
+                metadata = metadataGjeldende,
+            ),
         navn: Navn = lagNavn(),
     ) = PdlBarn(
         adressebeskyttelse = adressebeskyttelse,

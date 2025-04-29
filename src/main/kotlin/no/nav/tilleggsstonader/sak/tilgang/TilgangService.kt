@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.tilgang
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.spring.cache.getValue
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -9,6 +10,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ManglerTilgang
+import no.nav.tilleggsstonader.sak.infrastruktur.logging.BehandlingLogService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -21,7 +23,8 @@ import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
 
 /**
- * Det blir kanskje litt mye cache med cache her og i [TilgangskontrollService]
+ * TilgangsService kontrollerer tilgangen til en behandling og auditlogger oppslag.
+ *
  */
 @Service
 class TilgangService(
@@ -32,10 +35,15 @@ class TilgangService(
     private val rolleConfig: RolleConfig,
     private val cacheManager: CacheManager,
     private val auditLogger: AuditLogger,
+    private val behandlingLogService: BehandlingLogService,
 ) {
+    fun settBehandlingsdetaljerForRequest(behandlingId: BehandlingId) {
+        behandlingLogService.settBehandlingsdetaljerForRequest(behandlingId)
+    }
+
     /**
      * Kun ved tilgangskontroll for enkeltperson (eks når man skal søke etter brevmottaker)
-     * Ellers bruk [validerTilgangTilPersonMedRelasjoner]
+     * Ellers bruk [validerTilgangTilStønadstype]
      */
     fun validerTilgangTilPerson(
         personIdent: String,
@@ -46,12 +54,17 @@ class TilgangService(
         kastFeilHvisIkkeTilgang(tilgang, "person", personIdent)
     }
 
-    fun validerTilgangTilPersonMedRelasjoner(
+    fun validerTilgangTilStønadstype(
         personIdent: String,
+        stønadstype: Stønadstype,
         event: AuditLoggerEvent,
     ) {
         val tilgang =
-            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(personIdent, SikkerhetContext.hentToken())
+            tilgangskontrollService.sjekkTilgangTilStønadstype(
+                personIdent = personIdent,
+                stønadstype = stønadstype,
+                SikkerhetContext.hentToken(),
+            )
         auditLogger.log(Sporingsdata(event, personIdent, tilgang))
         kastFeilHvisIkkeTilgang(tilgang, "person", personIdent)
     }
@@ -68,8 +81,9 @@ class TilgangService(
                 behandlingService.hentSaksbehandling(behandlingId)
             }
         val tilgang =
-            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(
+            tilgangskontrollService.sjekkTilgangTilStønadstype(
                 personIdent = saksbehandling.ident,
+                stønadstype = saksbehandling.stønadstype,
                 jwtToken = SikkerhetContext.hentToken(),
             )
         val key = CustomKeyValue("behandling", behandlingId.id)
@@ -111,8 +125,9 @@ class TilgangService(
     ) {
         val fagsakId = fagsak.id
         val tilgang =
-            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(
+            tilgangskontrollService.sjekkTilgangTilStønadstype(
                 personIdent = fagsak.hentAktivIdent(),
+                stønadstype = fagsak.stønadstype,
                 SikkerhetContext.hentToken(),
             )
         val custom1 = CustomKeyValue("fagsak", fagsakId.id)
@@ -129,7 +144,7 @@ class TilgangService(
                 fagsakPersonService.hentAktivIdent(fagsakPersonId)
             }
         val tilgang =
-            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(
+            tilgangskontrollService.sjekkTilgang(
                 personIdent = personIdent,
                 jwtToken = SikkerhetContext.hentToken(),
             )
@@ -197,23 +212,4 @@ class TilgangService(
             }
         }
     }
-
-    /**
-     * Sjekker cache om tilgangen finnes siden tidligere, hvis ikke hentes verdiet med [hentVerdi]
-     * Resultatet caches sammen med identen for saksbehandleren på gitt [cacheName]
-     * @param cacheName navnet på cachen
-     * @param verdi verdiet som man ønsket å hente cache for, eks behandlingId, eller personIdent
-     */
-    private fun <T> harSaksbehandlerTilgang(
-        cacheName: String,
-        verdi: T,
-        hentVerdi: () -> Tilgang,
-    ): Tilgang {
-        val cache = cacheManager.getCache(cacheName) ?: error("Finner ikke cache=$cacheName")
-        return cache.get(Pair(verdi, SikkerhetContext.hentSaksbehandler())) {
-            hentVerdi()
-        } ?: error("Finner ikke verdi fra cache=$cacheName")
-    }
-
-    fun validerSaksbehandler(saksbehandler: String): Boolean = SikkerhetContext.hentSaksbehandlerEllerSystembruker() == saksbehandler
 }

@@ -17,7 +17,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -36,7 +36,7 @@ class BehandlingController(
     private val behandlingsoversiktService: BehandlingsoversiktService,
     private val opprettRevurderingBehandlingService: OpprettRevurderingBehandlingService,
     private val revurderFraService: RevurderFraService,
-    private val grunnlagsdataService: GrunnlagsdataService,
+    private val faktaGrunnlagService: FaktaGrunnlagService,
     private val fagsakService: FagsakService,
     private val henleggService: HenleggService,
     private val tilgangService: TilgangService,
@@ -45,13 +45,14 @@ class BehandlingController(
     fun hentBehandling(
         @PathVariable behandlingId: BehandlingId,
     ): BehandlingDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
             brukerfeilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
                 "Behandlingen er ikke påbegynt. En saksbehandler må påbegynne behandlingen før du kan gå inn."
             }
-            grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId)
+            faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId)
         }
         return saksbehandling.tilDto()
     }
@@ -88,7 +89,7 @@ class BehandlingController(
     fun hentBehandlingerForPersonOgStønadstype(
         @RequestBody identStønadstype: IdentStønadstype,
     ): List<BehandlingDto> {
-        tilgangService.validerTilgangTilPersonMedRelasjoner(identStønadstype.ident, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilStønadstype(identStønadstype.ident, identStønadstype.stønadstype, AuditLoggerEvent.ACCESS)
 
         return fagsakService.hentBehandlingerForPersonOgStønadstype(
             identStønadstype.ident,
@@ -101,6 +102,7 @@ class BehandlingController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody henlagt: HenlagtDto,
     ): BehandlingDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         val henlagtBehandling = henleggService.henleggBehandling(behandlingId, henlagt)
@@ -122,6 +124,7 @@ class BehandlingController(
         @PathVariable behandlingId: BehandlingId,
         @PathVariable revurderFra: LocalDate,
     ): BehandlingDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         return revurderFraService.oppdaterRevurderFra(behandlingId, revurderFra).tilDto()
     }

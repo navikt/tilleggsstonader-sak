@@ -18,4 +18,6 @@ data class BrevmottakerVedtaksbrev(
     val bestillingId: String? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
-)
+) {
+    fun harIkkeFåttBrevet() = bestillingId == null
+}

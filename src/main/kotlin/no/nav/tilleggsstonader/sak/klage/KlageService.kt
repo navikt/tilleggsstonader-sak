@@ -63,7 +63,7 @@ class KlageService(
         klageMottatt: LocalDate,
     ) {
         val aktivIdent = fagsak.hentAktivIdent()
-        val enhetId = arbeidsfordelingService.hentNavEnhet(aktivIdent)?.enhetNr
+        val enhetId = arbeidsfordelingService.hentNavEnhet(aktivIdent, fagsak.stønadstype)?.enhetNr
         brukerfeilHvis(enhetId == null) {
             "Finner ikke behandlende enhet for personen"
         }

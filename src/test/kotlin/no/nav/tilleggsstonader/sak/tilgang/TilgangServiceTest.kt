@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.tilgang
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -50,13 +51,13 @@ internal class TilgangServiceTest {
             rolleConfig = rolleConfig,
             cacheManager = cacheManager,
             auditLogger = mockk(relaxed = true),
+            mockk(),
         )
     private val mocketPersonIdent = "12345"
 
     private val fagsak = fagsak(fagsakpersoner(setOf(mocketPersonIdent)))
     private val behandling: Behandling = behandling(fagsak)
     private val olaIdent = "4567"
-    private val kariIdent = "98765"
 
     @BeforeEach
     internal fun setUp() {
@@ -72,29 +73,29 @@ internal class TilgangServiceTest {
     }
 
     @Nested
-    inner class ValiderTilgangTilAdressebeskyttelseForPersonMedRelasjoner {
+    inner class ValiderTilgangTilStønadstype {
         @Test
         internal fun `skal kaste ManglerTilgang dersom saksbehandler ikke har tilgang til person eller dets barn`() {
-            every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(false)
+            every { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) } returns Tilgang(false)
 
             val assertThatThrownBy =
                 assertThatThrownBy {
-                    tilgangService.validerTilgangTilPersonMedRelasjoner(mocketPersonIdent, AuditLoggerEvent.ACCESS)
+                    tilgangService.validerTilgangTilStønadstype(mocketPersonIdent, Stønadstype.BARNETILSYN, AuditLoggerEvent.ACCESS)
                 }
             assertThatThrownBy.isInstanceOf(ManglerTilgang::class.java)
         }
 
         @Test
         internal fun `skal ikke feile når saksbehandler har tilgang til person og dets barn`() {
-            every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
+            every { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) } returns Tilgang(true)
 
-            tilgangService.validerTilgangTilPersonMedRelasjoner(mocketPersonIdent, AuditLoggerEvent.ACCESS)
+            tilgangService.validerTilgangTilStønadstype(mocketPersonIdent, Stønadstype.BARNETILSYN, AuditLoggerEvent.ACCESS)
         }
 
         @Test
         internal fun `skal kaste ManglerTilgang dersom saksbehandler ikke har tilgang til behandling`() {
             val tilgangsfeilNavAnsatt = Tilgang(false, "Nav-ansatt")
-            every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns tilgangsfeilNavAnsatt
+            every { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) } returns tilgangsfeilNavAnsatt
 
             val feil =
                 catchThrowableOfType<ManglerTilgang> {
@@ -111,7 +112,7 @@ internal class TilgangServiceTest {
         @Test
         internal fun `skal ikke feile når saksbehandler har tilgang til behandling`() {
             every {
-                tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any())
+                tilgangskontrollService.sjekkTilgangTilStønadstype(any(), stønadstype = Stønadstype.BARNETILSYN, any())
             } returns Tilgang(true)
 
             assertDoesNotThrow {
@@ -122,28 +123,28 @@ internal class TilgangServiceTest {
         @Test
         internal fun `validerTilgangTilPersonMedBarn - cachear ikke svaret då pdl allikevel er cachet`() {
             every {
-                tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any())
+                tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any())
             } returns Tilgang(true)
 
             mockBrukerContext("A")
-            tilgangService.validerTilgangTilPersonMedRelasjoner(olaIdent, AuditLoggerEvent.ACCESS)
-            tilgangService.validerTilgangTilPersonMedRelasjoner(olaIdent, AuditLoggerEvent.ACCESS)
+            tilgangService.validerTilgangTilStønadstype(olaIdent, Stønadstype.BARNETILSYN, AuditLoggerEvent.ACCESS)
+            tilgangService.validerTilgangTilStønadstype(olaIdent, Stønadstype.BARNETILSYN, AuditLoggerEvent.ACCESS)
             verify(exactly = 2) {
-                tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any())
+                tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any())
             }
         }
 
         @Test
         internal fun `validerTilgangTilPersonMedBarn - hvis to ulike saksbehandler kaller skal den sjekke tilgang på nytt`() {
-            every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
+            every { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) } returns Tilgang(true)
 
             mockBrukerContext("A")
-            tilgangService.validerTilgangTilPersonMedRelasjoner(olaIdent, AuditLoggerEvent.ACCESS)
+            tilgangService.validerTilgangTilStønadstype(olaIdent, Stønadstype.BARNETILSYN, AuditLoggerEvent.ACCESS)
             mockBrukerContext("B")
-            tilgangService.validerTilgangTilPersonMedRelasjoner(olaIdent, AuditLoggerEvent.ACCESS)
+            tilgangService.validerTilgangTilStønadstype(olaIdent, Stønadstype.BARNETILSYN, AuditLoggerEvent.ACCESS)
 
             verify(exactly = 2) {
-                tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any())
+                tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any())
             }
         }
     }
@@ -152,7 +153,7 @@ internal class TilgangServiceTest {
     inner class ValiderTilgangTilBehandling {
         @Test
         internal fun `validerTilgangTilBehandling - hvis samme saksbehandler kaller skal den ha cachet`() {
-            every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
+            every { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) } returns Tilgang(true)
 
             mockBrukerContext("A")
 
@@ -160,12 +161,12 @@ internal class TilgangServiceTest {
             tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
 
             verify(exactly = 1) { behandlingService.hentSaksbehandling(behandling.id) }
-            verify(exactly = 2) { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) }
+            verify(exactly = 2) { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) }
         }
 
         @Test
         internal fun `validerTilgangTilBehandling - hvis to ulike saksbehandler kaller skal den sjekke tilgang på nytt`() {
-            every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
+            every { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) } returns Tilgang(true)
 
             mockBrukerContext("A")
             tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
@@ -173,7 +174,7 @@ internal class TilgangServiceTest {
             tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
 
             verify(exactly = 1) { behandlingService.hentSaksbehandling(behandling.id) }
-            verify(exactly = 2) { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) }
+            verify(exactly = 2) { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) }
         }
     }
 
@@ -215,7 +216,7 @@ internal class TilgangServiceTest {
 
     @Test
     internal fun `validerTilgangTilEksternFagsak `() {
-        every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
+        every { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) } returns Tilgang(true)
         every { fagsakService.hentFagsakPåEksternId(any()) } returns fagsak
 
         tilgangService.validerTilgangTilEksternFagsak(fagsak.eksternId.id, AuditLoggerEvent.ACCESS)

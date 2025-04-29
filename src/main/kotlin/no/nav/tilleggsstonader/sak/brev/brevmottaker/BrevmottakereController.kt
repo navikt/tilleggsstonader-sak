@@ -24,6 +24,7 @@ class BrevmottakereController(
     fun hentBrevmottakere(
         @PathVariable behandlingId: BehandlingId,
     ): BrevmottakereDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
         return brevmottakereService.hentEllerOpprettBrevmottakere(behandlingId)
@@ -34,6 +35,7 @@ class BrevmottakereController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody brevmottakere: BrevmottakereDto,
     ) {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 

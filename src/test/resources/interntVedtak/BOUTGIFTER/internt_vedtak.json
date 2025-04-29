@@ -142,7 +142,7 @@
     }, {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Har søker dokumentert at de har vært/skal de delta på samling/eksamen/opptaksprøve?",
+        "regel" : "Har søker dokumentert at de har samling/eksamen/opptaksprøve/kurs på datoene for overnatting?",
         "svar" : "Ja",
         "begrunnelse" : null
       } ]
@@ -171,7 +171,7 @@
     }, {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Har søker dokumentert at de har vært/skal de delta på samling/eksamen/opptaksprøve?",
+        "regel" : "Har søker dokumentert at de har samling/eksamen/opptaksprøve/kurs på datoene for overnatting?",
         "svar" : "Ja",
         "begrunnelse" : null
       } ]

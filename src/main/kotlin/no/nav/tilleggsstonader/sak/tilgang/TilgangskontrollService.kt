@@ -1,12 +1,14 @@
 package no.nav.tilleggsstonader.sak.tilgang
 
 import no.nav.security.token.support.core.jwt.JwtToken
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.AdRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPerson
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import org.springframework.stereotype.Service
 
@@ -31,10 +33,42 @@ class TilgangskontrollService(
         personIdent: String,
         jwtToken: JwtToken,
     ): Tilgang {
-        val adressebeskyttelse = personService.hentAdressebeskyttelse(personIdent)
+        val adressebeskyttelse = personService.hentAdressebeskyttelse(personIdent).søker.adressebeskyttelse
         secureLogger.info("Sjekker tilgang til $personIdent")
         return hentTilgang(adressebeskyttelse, jwtToken, personIdent) { egenAnsattService.erEgenAnsatt(personIdent) }
     }
+
+    /**
+     * Tilgangsstyring avhengig av stønadstype
+     * Då det kun er en stønadstype som har kobling til barn er det kun
+     *
+     * For tilsyn barn kontrolleres alle barnen og alle andre foreldre. Eks i
+     *
+     * For andre stønadstyper kontrolleres kun søker
+     * Når vi sjekker tilgang til person med relasjoner vet vi ikke hvilke barn som er relevante
+     * Då kontrolleres alle barnen til bruker og alle andre foreldre
+     */
+    fun sjekkTilgangTilStønadstype(
+        personIdent: String,
+        stønadstype: Stønadstype,
+        jwtToken: JwtToken,
+    ): Tilgang {
+        val personMedRelasjoner = hentAdressebeskyttelse(personIdent, stønadstype)
+        secureLogger.info("Sjekker tilgang til $personMedRelasjoner")
+
+        val høyesteGraderingen = TilgangskontrollUtil.høyesteGraderingen(personMedRelasjoner)
+        return hentTilgang(høyesteGraderingen, jwtToken, personIdent) { erEgenAnsatt(personMedRelasjoner) }
+    }
+
+    private fun hentAdressebeskyttelse(
+        personIdent: String,
+        stønadstype: Stønadstype,
+    ): AdressebeskyttelseForPerson =
+        if (stønadstype.gjelderBarn()) {
+            personService.hentAdressebeskyttelseForPersonOgRelasjoner(personIdent)
+        } else {
+            personService.hentAdressebeskyttelse(personIdent)
+        }
 
     /**
      * Når vi sjekker tilgang til person med relasjoner vet vi ikke hvilke barn som er relevante
@@ -77,8 +111,8 @@ class TilgangskontrollService(
     /**
      * Trenger ikke å sjekke barn, men muligens andre forelderen
      */
-    private fun erEgenAnsatt(adressebeskyttelseForPersonMedRelasjoner: AdressebeskyttelseForPersonMedRelasjoner): Boolean {
-        val relevanteIdenter = adressebeskyttelseForPersonMedRelasjoner.identerForEgenAnsattKontroll()
+    private fun erEgenAnsatt(adressebeskyttelseForPerson: AdressebeskyttelseForPerson): Boolean {
+        val relevanteIdenter = adressebeskyttelseForPerson.identerForEgenAnsattKontroll()
 
         return egenAnsattService.erEgenAnsatt(relevanteIdenter).any { it.value.erEgenAnsatt }
     }

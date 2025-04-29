@@ -64,6 +64,7 @@ class TilsynBarnVedtakController(
         behandlingId: BehandlingId,
         vedtak: VedtakTilsynBarnRequest,
     ) {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         vedtakService.håndterSteg(behandlingId, vedtak)
     }
@@ -73,6 +74,7 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ): BeregningsresultatTilsynBarnDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         return beregningService
             .beregn(
@@ -90,6 +92,7 @@ class TilsynBarnVedtakController(
     fun hentVedtak(
         @PathVariable behandlingId: BehandlingId,
     ): VedtakResponse? {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
@@ -100,6 +103,7 @@ class TilsynBarnVedtakController(
     fun hentFullstendigVedtaksoversikt(
         @PathVariable behandlingId: BehandlingId,
     ): VedtakResponse? {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
         return VedtakDtoMapper.toDto(vedtak, null)
@@ -109,6 +113,7 @@ class TilsynBarnVedtakController(
     fun foreslåVedtaksperioder(
         @PathVariable behandlingId: BehandlingId,
     ): List<VedtaksperiodeDto> {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
 

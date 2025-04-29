@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
@@ -23,6 +24,30 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnMedBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Aktivitet
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Aktiviteter
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.AktiviteterOgMålgruppe
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidsrettetAktivitetType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArsakOppholdUtenforNorgeType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.BoligEllerOvernatting
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.BoutgifterFyllUtSendInnData
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.DelerBoutgifterType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.DineOpplysninger
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.FasteUtgifter
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HarPengestotteAnnetLandType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HarUtgifterTilBoligToStederType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HovedytelseType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Identitet
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.JaNeiType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Landvelger
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.NavAdresse
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Periode
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.PeriodeForSamling
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Samling
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.SkjemaBoutgifter
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeUtgifterType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterFlereSteder
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterNyBolig
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOpphold
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.OppholdUtenforNorge
@@ -53,6 +78,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
+import java.time.LocalDateTime
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdBoutgifter
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.OppholdUtenforNorge as OppholdUtenforNorgeBoutgifter
 
 @RestController
 @RequestMapping(path = ["/api/test/opprett-behandling"])
@@ -72,7 +100,11 @@ class OpprettTestBehandlingController(
     fun opprettBehandling(
         @RequestBody testBehandlingRequest: TestBehandlingRequest,
     ): BehandlingId {
-        tilgangService.validerTilgangTilPersonMedRelasjoner(testBehandlingRequest.personIdent, AuditLoggerEvent.CREATE)
+        tilgangService.validerTilgangTilStønadstype(
+            testBehandlingRequest.personIdent,
+            testBehandlingRequest.stønadstype,
+            AuditLoggerEvent.CREATE,
+        )
 
         val fagsak: Fagsak = lagFagsak(testBehandlingRequest)
         val behandling = lagBehandling(fagsak)
@@ -95,7 +127,7 @@ class OpprettTestBehandlingController(
         when (fagsak.stønadstype) {
             Stønadstype.BARNETILSYN -> opprettSøknadBarnetilsyn(fagsak, behandling)
             Stønadstype.LÆREMIDLER -> opprettSøknadLæremidler(fagsak, behandling)
-            Stønadstype.BOUTGIFTER -> { /* Oppretter foreløpig ikke søknad for boutgifter*/ }
+            Stønadstype.BOUTGIFTER -> opprettSøknadBoutgifter(fagsak, behandling)
         }
     }
 
@@ -189,7 +221,13 @@ class OpprettTestBehandlingController(
                             ),
                         harRettTilUtstyrsstipend =
                             HarRettTilUtstyrsstipend(
-                                erLærlingEllerLiknende = EnumFelt("Er lærling eller liknende?", JaNei.JA, "Ja", emptyList()),
+                                erLærlingEllerLiknende =
+                                    EnumFelt(
+                                        "Er lærling eller liknende?",
+                                        JaNei.JA,
+                                        "Ja",
+                                        emptyList(),
+                                    ),
                                 harTidligereFullførtVgs =
                                     EnumFelt(
                                         "Har du tidligere fullført videregående skole?",
@@ -205,9 +243,108 @@ class OpprettTestBehandlingController(
         val skjema =
             Søknadsskjema(
                 ident = fagsak.hentAktivIdent(),
-                mottattTidspunkt = osloNow(),
+                mottattTidspunkt = LocalDateTime.of(2020, 1, 1, 0, 0),
                 språk = Språkkode.NB,
                 skjema = skjemaLæremidler,
+            )
+        val journalpost = Journalpost("TESTJPID", Journalposttype.I, Journalstatus.FERDIGSTILT)
+        søknadService.lagreSøknad(behandling.id, journalpost, skjema)
+    }
+
+    private fun opprettSøknadBoutgifter(
+        fagsak: Fagsak,
+        behandling: Behandling,
+    ) {
+        val dineOpplysninger =
+            DineOpplysninger(
+                fornavn = "Fornavn",
+                etternavn = "Etternavn",
+                identitet = Identitet(identitetsnummer = "11111122222"),
+                adresse =
+                    NavAdresse(
+                        gyldigFraOgMed = LocalDate.of(2025, 1, 1),
+                        adresse = "Nisseveien 3",
+                        postnummer = "0011",
+                        bySted = "OSLO",
+                        landkode = "NO",
+                        land = Landvelger(value = "Norge", label = "NO"),
+                    ),
+            )
+        val aktiviteter =
+            Aktiviteter(
+                aktiviteterOgMaalgruppe =
+                    AktiviteterOgMålgruppe(
+                        aktivitet =
+                            Aktivitet(
+                                aktivitetId = "ingenAktivitet",
+                                text = "",
+                                periode = null,
+                                maalgruppe = null,
+                            ),
+                    ),
+                arbeidsrettetAktivitet = ArbeidsrettetAktivitetType.tiltakArbeidsrettetUtredning,
+                mottarLonnGjennomTiltak = JaNeiType.nei,
+            )
+        val periodeForSamling =
+            PeriodeForSamling(
+                fom = LocalDate.of(2025, 1, 1),
+                tom = LocalDate.of(2025, 1, 1),
+                trengteEkstraOvernatting = JaNeiType.nei,
+                utgifterTilOvernatting = 1000,
+            )
+        val periodeForSamling2 =
+            PeriodeForSamling(
+                fom = LocalDate.of(2025, 2, 1),
+                tom = LocalDate.of(2025, 2, 1),
+                trengteEkstraOvernatting = JaNeiType.ja,
+                utgifterTilOvernatting = 1000,
+            )
+        val boligEllerOvernatting =
+            BoligEllerOvernatting(
+                typeUtgifter = TypeUtgifterType.fastUtgift,
+                fasteUtgifter =
+                    FasteUtgifter(
+                        harUtgifterTilBoligToSteder = HarUtgifterTilBoligToStederType.ekstraBolig,
+                        utgifterFlereSteder =
+                            UtgifterFlereSteder(
+                                delerBoutgifter = mapOf(DelerBoutgifterType.aktivitetssted to true),
+                                andelUtgifterBoligHjemsted = 1300,
+                                andelUtgifterBoligAktivitetssted = 1000,
+                            ),
+                        utgifterNyBolig =
+                            UtgifterNyBolig(
+                                delerBoutgifter = JaNeiType.ja,
+                                andelUtgifterBolig = 900,
+                                harHoyereUtgifterPaNyttBosted = JaNeiType.ja,
+                                mottarBostotte = JaNeiType.nei,
+                            ),
+                    ),
+                samling = Samling(periodeForSamling = listOf(periodeForSamling, periodeForSamling2)),
+                harSaerligStoreUtgifterPaGrunnAvFunksjonsnedsettelse = JaNeiType.nei,
+            )
+        val skjemaBoutgifter =
+            SøknadsskjemaBoutgifterFyllUtSendInn(
+                language = "nb-NO",
+                data =
+                    BoutgifterFyllUtSendInnData(
+                        SkjemaBoutgifter(
+                            dineOpplysninger = dineOpplysninger,
+                            hovedytelse = mapOf(HovedytelseType.arbeidsavklaringspenger to true),
+                            harNedsattArbeidsevne = JaNeiType.ja,
+                            arbeidOgOpphold = arbeidOgOppholdBoutgifter(),
+                            aktiviteter = aktiviteter,
+                            boligEllerOvernatting = boligEllerOvernatting,
+                        ),
+                    ),
+                dokumentasjon = emptyList(),
+            )
+
+        val skjema =
+            Søknadsskjema(
+                ident = fagsak.hentAktivIdent(),
+                mottattTidspunkt = osloNow(),
+                språk = Språkkode.NB,
+                skjema = skjemaBoutgifter,
             )
         val journalpost = Journalpost("TESTJPID", Journalposttype.I, Journalstatus.FERDIGSTILT)
         søknadService.lagreSøknad(behandling.id, journalpost, skjema)
@@ -245,6 +382,28 @@ class OpprettTestBehandlingController(
                     emptyList(),
                 ),
             oppholdUtenforNorgeNeste12mnd = listOf(oppholdUtenforNorge()),
+        )
+
+    private fun arbeidOgOppholdBoutgifter() =
+        ArbeidOgOppholdBoutgifter(
+            jobberIAnnetLand = JaNeiType.ja,
+            jobbAnnetLand = Landvelger("SWE", "Sverige"),
+            harPengestotteAnnetLand = mapOf(HarPengestotteAnnetLandType.sykepenger to true),
+            pengestotteAnnetLand = Landvelger("SWE", "Sverige"),
+            harOppholdUtenforNorgeSiste12mnd = JaNeiType.ja,
+            oppholdUtenforNorgeSiste12mnd =
+                OppholdUtenforNorgeBoutgifter(
+                    Landvelger("SWE", "Sverige"),
+                    mapOf(ArsakOppholdUtenforNorgeType.besokteFamilie to true),
+                    Periode(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 1, 1)),
+                ),
+            harOppholdUtenforNorgeNeste12mnd = JaNeiType.ja,
+            oppholdUtenforNorgeNeste12mnd =
+                OppholdUtenforNorgeBoutgifter(
+                    Landvelger("SWE", "Sverige"),
+                    mapOf(ArsakOppholdUtenforNorgeType.besokteFamilie to true),
+                    Periode(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 1, 1)),
+                ),
         )
 
     private fun oppholdUtenforNorge() =

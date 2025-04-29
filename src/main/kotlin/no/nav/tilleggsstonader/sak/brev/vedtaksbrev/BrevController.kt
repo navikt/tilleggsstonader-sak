@@ -27,6 +27,7 @@ class BrevController(
         @RequestBody request: GenererPdfRequest,
         @PathVariable behandlingId: BehandlingId,
     ): ByteArray {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
         tilgangService.validerTilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.UPDATE)
@@ -39,6 +40,7 @@ class BrevController(
     fun hentBrev(
         @PathVariable behandlingId: BehandlingId,
     ): ByteArray {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
 
         return Base64.getEncoder().encode(brevService.hentBeslutterbrevEllerRekonstruerSaksbehandlerBrev(behandlingId))
@@ -48,6 +50,7 @@ class BrevController(
     fun forhåndsvisBeslutterbrev(
         @PathVariable behandlingId: BehandlingId,
     ): ByteArray {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.ACCESS)
 

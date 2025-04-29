@@ -85,6 +85,7 @@ class SøknadskjemaBoutgifterMapper(
             hovedytelse = mapHovedytelse(skjemaBoutgifter),
             aktivitet = mapAktivitet(skjemaBoutgifter.aktiviteter),
             boutgifter = mapBoutgifter(skjemaBoutgifter.boligEllerOvernatting),
+            harNedsattArbeidsevne = skjemaBoutgifter.harNedsattArbeidsevne?.let { mapJaNei(it) },
             dokumentasjon = dokumentasjon,
         )
 
@@ -199,7 +200,7 @@ class SøknadskjemaBoutgifterMapper(
                 delerBoutgifter = mapJaNei(it.delerBoutgifter),
                 andelUtgifterBolig = it.andelUtgifterBolig,
                 harHoyereUtgifterPaNyttBosted = mapJaNei(it.harHoyereUtgifterPaNyttBosted),
-                mottarBostotte = it.mottarBostotte?.let(::mapJaNei),
+                mottarBostotte = mapJaNei(it.mottarBostotte),
             )
         }
 
