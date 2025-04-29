@@ -102,7 +102,10 @@ class BehandlingOppsummeringService(
                     )
                 }
 
-                is Opphør -> OppsummertVedtakOpphør
+                is Opphør ->
+                    OppsummertVedtakOpphør(
+                        årsaker = data.årsaker,
+                    )
 
                 else -> null
             }
