@@ -42,11 +42,8 @@ data class BeregningsresultatForLøpendeMåned(
         tom: LocalDate,
     ): BeregningsresultatForLøpendeMåned = this.copy(grunnlag = this.grunnlag.copy(fom = fom, tom = tom))
 
-//    fun medKorrigertUtbetalingsdato(utbetalingsdato: LocalDate): BeregningsresultatForLøpendeMåned =
-//        this.copy(grunnlag = grunnlag.copy(utbetalingsdato = utbetalingsdato))
-//
-//    fun markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling: Boolean) =
-//        this.copy(delAvTidligereUtbetaling = delAvTidligereUtbetaling)
+    fun markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling: Boolean) =
+        this.copy(delAvTidligereUtbetaling = delAvTidligereUtbetaling)
 
     fun summerUtgifter(): Int =
         grunnlag.utgifter.values
