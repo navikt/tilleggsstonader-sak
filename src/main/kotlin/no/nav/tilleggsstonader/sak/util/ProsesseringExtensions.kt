@@ -16,12 +16,13 @@ val logger: Logger = LoggerFactory.getLogger(TaskService::class.java)
  *
  * Etter at maks antall tillatte forsøk har blitt brukt opp, blir tasken satt til feilet.
  *
- * @param årsak brukes til å telle antall rekjøringer, så det er fint om verdien ikke endrer seg
- * mellom hver kjøring.
+ * @param årsak brukes til å telle antall rekjøringer, så det er fint om verdien ikke endrer seg mellom hver kjøring.
+ * @param melding valfri tekst med mer utfyllende info
  */
-fun TaskService.rekjørTaskSenere(
+fun TaskService.stoppTaskOgRekjørSenere(
     task: Task,
     årsak: String,
+    melding: String?,
     antallDagerTilNesteRekjøring: Long = 7L,
     totaltAntallRekjøringerFørFeiling: Int = 26,
 ) {
@@ -31,8 +32,8 @@ fun TaskService.rekjørTaskSenere(
     if (antallRekjøringer < totaltAntallRekjøringerFørFeiling) {
         logger.info(
             """
-            Setter opp rekjøring nummer $antallRekjøringer/$totaltAntallRekjøringerFørFeiling av task "${task.type}". 
-            Årsak til rekjøring: "$årsak." 
+            Setter opp rekjøring nummer ${antallRekjøringer + 1}/$totaltAntallRekjøringerFørFeiling av task "${task.type}". 
+            Årsak til rekjøring: "$årsak" - "$melding"
             Prøver å kjøre task på nytt om $antallDagerTilNesteRekjøring dager
             """.trimIndent(),
         )

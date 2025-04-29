@@ -10,6 +10,7 @@ import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.familie.prosessering.error.TaskExceptionUtenStackTrace
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
+import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
@@ -21,13 +22,13 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import org.assertj.core.api.Assertions.catchThrowable
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
 import org.springframework.web.client.HttpClientErrorException
 
 class DistribuerVedtaksbrevTaskTest {
@@ -49,6 +50,9 @@ class DistribuerVedtaksbrevTaskTest {
         )
     val task = Task(type = DistribuerVedtaksbrevTask.TYPE, payload = saksbehandling.id.toString())
 
+    val journalpostIdA = "journalpostIdA"
+    val journalpostIdB = "journalpostIdB"
+
     @BeforeEach
     fun setUp() {
         every { stegService.håndterSteg(any<BehandlingId>(), brevSteg) } returns mockk()
@@ -59,8 +63,6 @@ class DistribuerVedtaksbrevTaskTest {
         val distribuerrequestSlots = mutableListOf<DistribuerJournalpostRequest>()
         val brevmottakereSlots = mutableListOf<BrevmottakerVedtaksbrev>()
 
-        val journalpostIdA = "journalpostIdA"
-        val journalpostIdB = "journalpostIdB"
         every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns
             listOf(
                 BrevmottakerVedtaksbrev(
@@ -107,8 +109,6 @@ class DistribuerVedtaksbrevTaskTest {
         val distribuerrequestSlots = mutableListOf<DistribuerJournalpostRequest>()
         val brevmottakereSlots = mutableListOf<BrevmottakerVedtaksbrev>()
 
-        val journalpostIdA = "journalpostIdA"
-        val journalpostIdB = "journalpostIdB"
         every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns
             listOf(
                 BrevmottakerVedtaksbrev(
@@ -148,7 +148,6 @@ class DistribuerVedtaksbrevTaskTest {
         @Test
         internal fun `skal rekjøre senere hvis man får GONE fra dokdist`() {
             val distribuerrequestSlots = mutableListOf<DistribuerJournalpostRequest>()
-            val journalpostIdA = "journalpostIdA"
 
             every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns
                 listOf(
@@ -165,7 +164,7 @@ class DistribuerVedtaksbrevTaskTest {
                     capture(distribuerrequestSlots),
                     null,
                 )
-            } throws HttpStatus.GONE.clientErrorException()
+            } throws HttpStatus.GONE.problemDetailException()
 
             val rekjørSenereException = catchThrowableOfType<RekjørSenereException> { distribuerVedtaksbrevTask.doTask(task) }
 
@@ -180,7 +179,6 @@ class DistribuerVedtaksbrevTaskTest {
         @Test
         internal fun `skal feile hvis tasken har kjørt over 26 ganger`() {
             val distribuerrequestSlots = mutableListOf<DistribuerJournalpostRequest>()
-            val journalpostIdA = "journalpostIdA"
 
             every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns
                 listOf(
@@ -197,20 +195,24 @@ class DistribuerVedtaksbrevTaskTest {
                     capture(distribuerrequestSlots),
                     null,
                 )
-            } throws HttpStatus.GONE.clientErrorException()
+            } throws HttpStatus.GONE.problemDetailException()
 
-            val taskLogg = (1..27).map { TaskLogg(taskId = task.id, type = Loggtype.KLAR_TIL_PLUKK, melding = "Mottaker er død: 410 Gone") }
-
+            val taskLogg = (1..27).map { TaskLogg(taskId = task.id, type = Loggtype.KLAR_TIL_PLUKK, melding = "Mottaker er død") }
             every { taskService.findTaskLoggByTaskId(any()) } returns taskLogg
 
-            val throwable = catchThrowable { distribuerVedtaksbrevTask.doTask(task) }
-            assertThat(throwable).isInstanceOf(TaskExceptionUtenStackTrace::class.java)
-            assertThat(throwable).hasMessageStartingWith("Nådd max antall rekjøringer - 26")
+            val taskExceptionUtenStackTrace = catchThrowableOfType<TaskExceptionUtenStackTrace> { distribuerVedtaksbrevTask.doTask(task) }
+
+            assertThat(taskExceptionUtenStackTrace).hasMessageStartingWith("Nådd max antall rekjøringer - 26")
 
             verify(exactly = 1) { journalpostClient.distribuerJournalpost(any(), any()) }
             verify(exactly = 0) { brevmottakerVedtaksbrevRepository.update(any()) }
         }
     }
 
-    private fun HttpStatus.clientErrorException() = HttpClientErrorException.create(this, "", HttpHeaders(), byteArrayOf(), null)
+    private fun HttpStatus.problemDetailException() =
+        ProblemDetailException(
+            detail = ProblemDetail.forStatus(this),
+            responseException = HttpClientErrorException.create(this, "", HttpHeaders(), byteArrayOf(), null),
+            httpStatus = this,
+        )
 }

@@ -7,6 +7,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokdist.Distribusjonstype
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
+import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
@@ -15,7 +16,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
-import no.nav.tilleggsstonader.sak.util.rekjørTaskSenere
+import no.nav.tilleggsstonader.sak.util.stoppTaskOgRekjørSenere
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -68,9 +69,13 @@ class DistribuerVedtaksbrevTask(
             val bestillingId = distribuerVedtaksbrev(mottaker.journalpostId)
             mottaker.lagreDistribusjonGjennomført(bestillingId)
             return ResultatBrevutsendelse.BrevDistribuert
-        } catch (ex: HttpClientErrorException.Gone) {
+        } catch (ex: ProblemDetailException) {
             logger.warn("Distribusjon av vedtaksbrev for journalpost ${mottaker.journalpostId} feilet: ${ex.message}")
-            return ResultatBrevutsendelse.FeiletFordiMottakerErDød(ex.message)
+            if (ex.responseException is HttpClientErrorException.Gone) {
+                return ResultatBrevutsendelse.FeiletFordiMottakerErDød(ex.message)
+            } else {
+                throw ex
+            }
         }
     }
 
@@ -96,7 +101,7 @@ class DistribuerVedtaksbrevTask(
     private fun List<ResultatBrevutsendelse>.håndterRekjøringSenereHvisMottakerErDød(task: Task) {
         filterIsInstance<ResultatBrevutsendelse.FeiletFordiMottakerErDød>()
             .firstOrNull()
-            ?.let { taskService.rekjørTaskSenere(task, årsak = "Mottaker er død: ${it.feilmelding}") }
+            ?.let { taskService.stoppTaskOgRekjørSenere(task, årsak = "Mottaker er død", melding = it.feilmelding) }
     }
 
     companion object {
