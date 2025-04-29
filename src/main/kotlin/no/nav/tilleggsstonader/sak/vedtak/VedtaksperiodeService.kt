@@ -11,8 +11,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -68,11 +66,11 @@ class VedtaksperiodeService(
         val vedtak = vedtakRepository.findByIdOrNull(behandlingId)?.data
         return when (vedtak) {
             null -> null
-            is InnvilgelseTilsynBarn -> vedtak.vedtaksperioder
-            is OpphørTilsynBarn -> vedtak.vedtaksperioder
+            is InnvilgelseEllerOpphørTilsynBarn -> vedtak.vedtaksperioder
+            is InnvilgelseEllerOpphørBoutgifter -> vedtak.vedtaksperioder
             else ->
                 error(
-                    "Kan ikke hente vedtaksperioder for tilsyn barn når vedtak var ${vedtak.type}",
+                    "Kan ikke hente vedtaksperioder når vedtak var ${vedtak.type}",
                 )
         }
     }
