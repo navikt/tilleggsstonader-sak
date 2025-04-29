@@ -10,29 +10,39 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.UUID
 
 class BehandlingsoversiktServiceTest {
     val fagsakService = mockk<FagsakService>()
     val behandlingRepository = mockk<BehandlingRepository>()
     val vedtakRepository = mockk<VedtakRepository>()
+    val vilkårperiodeService = mockk<VilkårperiodeService>()
+    val vilkårService = mockk<VilkårService>()
+    val behandlingService = mockk<BehandlingService>()
+    val vedtaksperiodeService = VedtaksperiodeService(vilkårperiodeService, vilkårService, vedtakRepository, behandlingService)
 
     val service =
         BehandlingsoversiktService(
             fagsakService = fagsakService,
             behandlingRepository = behandlingRepository,
-            vedtakRepository = vedtakRepository,
+            vedtaksperiodeService = vedtaksperiodeService,
         )
 
     val fagsak = fagsak()
@@ -84,6 +94,15 @@ class BehandlingsoversiktServiceTest {
     }
 
     private fun mockVedtakRepository() {
+        val vedtaksperiode =
+            Vedtaksperiode(
+                id = UUID.randomUUID(),
+                fom = LocalDate.of(2024, 3, 1),
+                tom = LocalDate.of(2024, 3, 14),
+                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                aktivitet = AktivitetType.TILTAK,
+            )
+
         val vedtaksperiodeGrunnlag =
             VedtaksperiodeGrunnlag(
                 VedtaksperiodeBeregning(
@@ -113,9 +132,7 @@ class BehandlingsoversiktServiceTest {
             )
         val beregningsresultat = BeregningsresultatTilsynBarn(perioder = listOf(beregningsresultatForMåned))
 
-        every { vedtakRepository.findAllById(any()) } returns
-            listOf(
-                innvilgetVedtak(beregningsresultat = beregningsresultat, behandlingId = behandling.id),
-            )
+        every { vedtakRepository.findByIdOrNull(any()) } returns
+            innvilgetVedtak(beregningsresultat = beregningsresultat, behandlingId = behandling.id, vedtaksperioder = listOf(vedtaksperiode))
     }
 }

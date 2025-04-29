@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnReque
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningTestUtil.vedtaksperiodeBeregning
@@ -181,6 +182,23 @@ object TilsynBarnTestUtil {
             AvslagTilsynBarn(
                 årsaker = årsaker,
                 begrunnelse = begrunnelse,
+            ),
+        gitVersjon = Applikasjonsversjon.versjon,
+    )
+
+    fun opphørVedtak(
+        behandlingId: BehandlingId = defaultBehandling.id,
+        årsaker: List<ÅrsakOpphør>,
+        beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
+        begrunnelse: String,
+    ) = GeneriskVedtak(
+        behandlingId = behandlingId,
+        type = TypeVedtak.OPPHØR,
+        data =
+            OpphørTilsynBarn(
+                årsaker = årsaker,
+                begrunnelse = begrunnelse,
+                beregningsresultat = beregningsresultat,
             ),
         gitVersjon = Applikasjonsversjon.versjon,
     )

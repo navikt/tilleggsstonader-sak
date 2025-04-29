@@ -2,13 +2,22 @@ package no.nav.tilleggsstonader.sak.behandling.oppsummering
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.avslagVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
@@ -17,6 +26,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.util.UUID
 
 class BehandlingOppsummeringServiceTest : IntegrationTest() {
     @Autowired
@@ -27,6 +37,9 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårRepository: VilkårRepository
+
+    @Autowired
+    lateinit var vedtakRepository: VedtakRepository
 
     @Test
     fun `skal returnere false på at det finnes data å oppsummere om behandling ikke inneholder noe data`() {
@@ -167,6 +180,72 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             assertThat(behandlingOppsummering.finnesDataÅOppsummere).isTrue()
             assertThat(behandlingOppsummering.vilkår).hasSize(2)
+        }
+    }
+
+    @Nested
+    inner class OppsummerVedtak {
+        @Test
+        fun `skal inneholde vedtaksperioder dersom det er en innvilgelse`() {
+            val vedtaksperioder =
+                listOf(
+                    Vedtaksperiode(
+                        id = UUID.randomUUID(),
+                        fom = LocalDate.of(2025, 1, 1),
+                        tom = LocalDate.of(2025, 1, 31),
+                        målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                        aktivitet = AktivitetType.TILTAK,
+                    ),
+                    Vedtaksperiode(
+                        id = UUID.randomUUID(),
+                        fom = LocalDate.of(2025, 2, 1),
+                        tom = LocalDate.of(2025, 2, 28),
+                        målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
+                        aktivitet = AktivitetType.UTDANNING,
+                    ),
+                )
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            vedtakRepository.insert(
+                innvilgetVedtak(behandlingId = behandling.id, vedtaksperioder = vedtaksperioder),
+            )
+
+            val behandlingsoppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
+
+            assertThat(behandlingsoppsummering.vedtak).isInstanceOf(OppsummertVedtakInnvilgelse::class.java)
+
+            val oppsummertInnvilgelse = behandlingsoppsummering.vedtak as OppsummertVedtakInnvilgelse
+
+            assertThat(oppsummertInnvilgelse.vedtaksperioder).isEqualTo(vedtaksperioder.map { it.tilDto() })
+        }
+
+        @Test
+        fun `skal inneholde årsaker dersom det er et avslag`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val årsakerAvslag = listOf(ÅrsakAvslag.INGEN_AKTIVITET, ÅrsakAvslag.IKKE_I_MÅLGRUPPE)
+
+            vedtakRepository.insert(
+                avslagVedtak(behandlingId = behandling.id, årsaker = årsakerAvslag, begrunnelse = "begrunnelse"),
+            )
+
+            val behandlingsoppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
+
+            assertThat(behandlingsoppsummering.vedtak).isInstanceOf(OppsummertVedtakAvslag::class.java)
+            assertThat((behandlingsoppsummering.vedtak as OppsummertVedtakAvslag).årsaker).isEqualTo(årsakerAvslag)
+        }
+
+        @Test
+        fun `skal inneholde årsaker dersom det er et opphør`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_AKTIVITET)
+
+            vedtakRepository.insert(
+                opphørVedtak(behandlingId = behandling.id, årsaker = årsakerOpphør, begrunnelse = "begrunnelse"),
+            )
+
+            val behandlingsoppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
+
+            assertThat(behandlingsoppsummering.vedtak).isInstanceOf(OppsummertVedtakOpphør::class.java)
+            assertThat((behandlingsoppsummering.vedtak as OppsummertVedtakOpphør).årsaker).isEqualTo(årsakerOpphør)
         }
     }
 
