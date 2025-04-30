@@ -31,7 +31,7 @@ class ArenaService(
     @Cacheable("arena-vedtak", cacheManager = "5secCache")
     fun hentVedtak(fagsakPersonId: FagsakPersonId): ArenaSakOgVedtakDto {
         val aktivIdent = fagsakPersonService.hentAktivIdent(fagsakPersonId)
-        val identer = personService.hentFolkeregisterIdenter(aktivIdent).identer()
+        val identer = personService.hentFolkeregisterOgNpidIdenter(aktivIdent).identer()
         return arenaClient.hentVedtak(IdenterRequest(identer))
     }
 

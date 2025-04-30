@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlAnnenForelder
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdentGruppe
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
@@ -79,6 +80,9 @@ class PersonService(
     fun hentAndreForeldre(personIdenter: List<String>): Map<String, PdlAnnenForelder> = pdlClient.hentAndreForeldre(personIdenter)
 
     fun hentFolkeregisterIdenter(ident: String): PdlIdenter = pdlClient.hentPersonidenter(ident = ident).folkeregisteridenter()
+
+    fun hentFolkeregisterOgNpidIdenter(ident: String): PdlIdenter =
+        pdlClient.hentPersonidenter(ident).medIdentgrupper(PdlIdentGruppe.FOLKEREGISTERIDENT.name, PdlIdentGruppe.NPID.name)
 
     fun hentIdenterBolk(identer: List<String>): Map<String, PdlIdent> = pdlClient.hentIdenterBolk(identer)
 
