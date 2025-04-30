@@ -33,7 +33,7 @@ sealed interface VedtakBoutgifter : Vedtaksdata
 
 sealed interface InnvilgelseEllerOpphørBoutgifter : VedtakBoutgifter {
     val beregningsresultat: BeregningsresultatBoutgifter
-    val vedtaksperioder: List<Vedtaksperiode>?
+    val vedtaksperioder: List<Vedtaksperiode>
 }
 
 data class InnvilgelseBoutgifter(
