@@ -114,16 +114,13 @@ internal class TilgangskontrollServiceTest {
         }
     }
 
-    /**
-     * Når man sjekker tilgang på ident og sjekker alle relasjoner vet vi ikke hvilke barn som kan være relevante
-     */
     @Nested
-    inner class SjekkTilgangTilPersonMedRelasjonerFagsakAdressebeskyttelseForPersonIdent {
+    inner class SjekkTilgangTilStønadstypeMedBarn {
         @Test
         fun `skal hente ut barn koblet til fagsakPerson og kontrollere barn og andre foreldre`() {
             every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns lagPersonMedRelasjoner()
 
-            val tilgang = sjekkTilgangTilPersonMedRelasjoner()
+            val tilgang = sjekkTilgangTilTilsynBarn()
 
             assertThat(tilgang).isTrue
             assertThat(slotEgenAnsatt.captured).containsExactlyInAnyOrder(søkerIdent, annenForeldreIdent)
@@ -132,7 +129,7 @@ internal class TilgangskontrollServiceTest {
         @Test
         internal fun `har tilgang når det ikke finnes noen adressebeskyttelser`() {
             every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns lagPersonMedRelasjoner()
-            assertThat(sjekkTilgangTilPersonMedRelasjoner()).isTrue
+            assertThat(sjekkTilgangTilTilsynBarn()).isTrue
         }
 
         @Test
@@ -140,7 +137,7 @@ internal class TilgangskontrollServiceTest {
             mockHarKode7()
             every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns
                 lagPersonMedRelasjoner(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
-            assertThat(sjekkTilgangTilPersonMedRelasjoner()).isFalse
+            assertThat(sjekkTilgangTilTilsynBarn()).isFalse
         }
 
         @Test
@@ -148,21 +145,21 @@ internal class TilgangskontrollServiceTest {
             mockHarKode6()
             every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns
                 lagPersonMedRelasjoner(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
-            assertThat(sjekkTilgangTilPersonMedRelasjoner()).isTrue
+            assertThat(sjekkTilgangTilTilsynBarn()).isTrue
         }
 
         @Test
         internal fun `har ikke tilgang når det finnes adressebeskyttelse for søkeren`() {
             every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns
                 lagPersonMedRelasjoner(graderingSøker = AdressebeskyttelseGradering.FORTROLIG)
-            assertThat(sjekkTilgangTilPersonMedRelasjoner()).isFalse
+            assertThat(sjekkTilgangTilTilsynBarn()).isFalse
         }
 
         @Test
         internal fun `har ikke tilgang når barn inneholder FORTROLIG`() {
             every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(any()) } returns
                 lagPersonMedRelasjoner(graderingBarn = AdressebeskyttelseGradering.FORTROLIG)
-            assertThat(sjekkTilgangTilPersonMedRelasjoner()).isFalse
+            assertThat(sjekkTilgangTilTilsynBarn()).isFalse
         }
 
         @Test
@@ -171,7 +168,7 @@ internal class TilgangskontrollServiceTest {
             every { egenAnsattService.erEgenAnsatt(any<Set<String>>()) } answers {
                 firstArg<Set<String>>().associateWith { EgenAnsatt(it, it == søkerIdent) }
             }
-            assertThat(sjekkTilgangTilPersonMedRelasjoner()).isFalse
+            assertThat(sjekkTilgangTilTilsynBarn()).isFalse
         }
 
         @Test
@@ -181,12 +178,12 @@ internal class TilgangskontrollServiceTest {
             every { egenAnsattService.erEgenAnsatt(capture(slot)) } answers {
                 firstArg<Set<String>>().associateWith { EgenAnsatt(it, false) }
             }
-            sjekkTilgangTilPersonMedRelasjoner()
+            sjekkTilgangTilTilsynBarn()
             assertThat(slot.captured).containsOnly(søkerIdent, annenForeldreIdent)
         }
 
-        private fun sjekkTilgangTilPersonMedRelasjoner() =
-            tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(søkerIdent, jwtToken).harTilgang
+        private fun sjekkTilgangTilTilsynBarn() =
+            tilgangskontrollService.sjekkTilgangTilStønadstype(søkerIdent, Stønadstype.BARNETILSYN, jwtToken).harTilgang
     }
 
     private fun mockHarKode7() {
