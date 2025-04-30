@@ -65,7 +65,8 @@ class SøknadRoutingServiceTest {
         every { fagsakService.finnFagsak(any(), any()) } returns null
         every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns emptyList()
         every { arenaService.hentStatus(any(), any()) } returns arenaStatusAktivtVedtak()
-        every { personService.hentFolkeregisterIdenter(any()) } answers { PdlIdenter(listOf(PdlIdent(firstArg(), false))) }
+        every { personService.hentFolkeregisterIdenter(any()) } answers
+            { PdlIdenter(listOf(PdlIdent(firstArg(), false, "FOLKEREGISTERIDENT"))) }
         unmockkObject(unleashService)
     }
 

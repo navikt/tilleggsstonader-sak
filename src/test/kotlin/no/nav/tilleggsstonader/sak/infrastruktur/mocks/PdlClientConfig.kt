@@ -82,45 +82,44 @@ class PdlClientConfig {
 
             every { pdlClient.hentAndreForeldre(any()) } returns mapOf(ANNEN_FORELDER_FNR to annenForelder())
 
-            every { pdlClient.hentAktørIder(any()) } answers {
-                val ident = firstArg<String>()
-                if (ident == "19117313797") {
-                    throw PdlNotFoundException()
-                } else {
-                    PdlIdenter(listOf(PdlIdent("00$ident", false)))
-                }
-            }
-
             val personIdent = slot<String>()
             every { pdlClient.hentPersonidenter(capture(personIdent)) } answers {
+                val capturedIdent = personIdent.captured
                 if (personIdent.captured == "19117313797") {
                     throw PdlNotFoundException()
                 } else {
-                    PdlIdenter(listOf(PdlIdent(firstArg(), false), PdlIdent("98765432109", true)))
+                    PdlIdenter(
+                        identer =
+                            listOf(
+                                PdlIdent(capturedIdent, false, "FOLKEREGISTERIDENT"),
+                                PdlIdent("98765432109", true, "FOLKEREGISTERIDENT"),
+                                PdlIdent("00$capturedIdent", false, "AKTORID"),
+                            ),
+                    )
                 }
             }
 
             every { pdlClient.hentIdenterBolk(listOf("123", "456")) }
                 .returns(
                     mapOf(
-                        "123" to PdlIdent("ny123", false),
-                        "456" to PdlIdent("ny456", false),
+                        "123" to PdlIdent("ny123", false, "FOLKEREGISTERIDENT"),
+                        "456" to PdlIdent("ny456", false, "FOLKEREGISTERIDENT"),
                     ),
                 )
 
             every { pdlClient.hentIdenterBolk(listOf("456", "123")) }
                 .returns(
                     mapOf(
-                        "123" to PdlIdent("ny123", false),
-                        "456" to PdlIdent("ny456", false),
+                        "123" to PdlIdent("ny123", false, "FOLKEREGISTERIDENT"),
+                        "456" to PdlIdent("ny456", false, "FOLKEREGISTERIDENT"),
                     ),
                 )
 
             every { pdlClient.hentIdenterBolk(listOf("111", "222")) }
                 .returns(
                     mapOf(
-                        "111" to PdlIdent("111", false),
-                        "222" to PdlIdent("222", false),
+                        "111" to PdlIdent("111", false, "FOLKEREGISTERIDENT"),
+                        "222" to PdlIdent("222", false, "FOLKEREGISTERIDENT"),
                     ),
                 )
 

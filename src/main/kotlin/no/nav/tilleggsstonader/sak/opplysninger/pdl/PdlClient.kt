@@ -89,20 +89,6 @@ class PdlClient(
 
     /**
      * @param ident Ident til personen, samme hvilke type (Folkeregisterident, aktørid eller npid)
-     * @return liste med aktørider
-     */
-    fun hentAktørIder(ident: String): PdlIdenter { // TODO fjern til fordel for den under
-        val request =
-            PdlIdentRequest(
-                variables = PdlIdentRequestVariables(ident),
-                query = PdlConfig.hentIdentQuery,
-            )
-        val pdlResponse = postForEntity<PdlResponse<PdlHentIdenter>>(pdlUri, request, PdlUtil.httpHeaders)
-        return feilsjekkOgReturnerData(ident, pdlResponse) { it.hentIdenter }
-    }
-
-    /**
-     * @param ident Ident til personen, samme hvilke type (Folkeregisterident, aktørid eller npid)
      * @return liste med personidenter (Folkeregisterident, aktørid eller npid)
      */
     fun hentPersonidenter(ident: String): PdlIdenter {

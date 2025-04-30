@@ -296,7 +296,7 @@ internal class OppgaveServiceTest {
     fun `skal legge til navn på oppgave hvis oppgaven har folkeregisterident`() {
         val oppgaveIdMedNavn = 1L
 
-        every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent("1", false)))
+        every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent("1", false, "FOLKEREGISTERIDENT")))
         every { personService.hentPersonKortBolk(any()) } answers {
             firstArg<List<String>>().associateWith { pdlPersonKort(navn = lagNavn(fornavn = "fornavn$it")) }
         }

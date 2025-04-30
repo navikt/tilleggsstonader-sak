@@ -41,7 +41,7 @@ class JournalpostServiceTest {
         internal fun `skal hente journalpost med personident utledet fra pdl`() {
             every {
                 personService.hentFolkeregisterIdenter(aktørId)
-            } returns PdlIdenter(listOf(PdlIdent(personIdentFraPdl, false)))
+            } returns PdlIdenter(listOf(PdlIdent(personIdentFraPdl, false, "FOLKEREGISTERIDENT")))
 
             every { journalpostClient.hentJournalpost(any()) } returns
                 journalpost(
