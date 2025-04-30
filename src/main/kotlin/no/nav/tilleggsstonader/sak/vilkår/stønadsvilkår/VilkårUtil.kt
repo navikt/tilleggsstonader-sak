@@ -41,37 +41,37 @@ object VilkårUtil {
 
         return revurderFra.tilFørsteDagIMåneden()
     }
-}
 
-/**
- * Hjelpeklasse for å kunne bruke funksjonene som finnes på Periode<T>
- */
-private data class VilkårHolder(
-    val vilkår: Vilkår,
-) : Periode<LocalDate>,
-    KopierPeriode<VilkårHolder> {
-    override val fom: LocalDate
-        get() = vilkår.fom ?: error("Mangler tom")
-    override val tom: LocalDate
-        get() = vilkår.tom ?: error("Mangler tom")
+    /**
+     * Hjelpeklasse for å kunne bruke funksjonene som finnes på Periode<T>
+     */
+    private data class VilkårHolder(
+        val vilkår: Vilkår,
+    ) : Periode<LocalDate>,
+        KopierPeriode<VilkårHolder> {
+        override val fom: LocalDate
+            get() = vilkår.fom ?: error("Mangler tom")
+        override val tom: LocalDate
+            get() = vilkår.tom ?: error("Mangler tom")
 
-    override fun medPeriode(
-        fom: LocalDate,
-        tom: LocalDate,
-    ): VilkårHolder = VilkårHolder(vilkår.copy(fom = fom, tom = tom))
+        override fun medPeriode(
+            fom: LocalDate,
+            tom: LocalDate,
+        ): VilkårHolder = VilkårHolder(vilkår.copy(fom = fom, tom = tom))
 
-    fun slåSammen(other: VilkårHolder): VilkårHolder =
-        VilkårHolder(
-            vilkår.copy(
-                fom = minOf(vilkår.fom!!, other.vilkår.fom!!),
-                tom = maxOf(vilkår.tom!!, other.vilkår.tom!!),
-            ),
-        )
+        fun slåSammen(other: VilkårHolder): VilkårHolder =
+            VilkårHolder(
+                vilkår.copy(
+                    fom = minOf(vilkår.fom!!, other.vilkår.fom!!),
+                    tom = maxOf(vilkår.tom!!, other.vilkår.tom!!),
+                ),
+            )
 
-    fun kanSlåsSammen(other: VilkårHolder): Boolean =
-        vilkår.type == other.vilkår.type &&
-            vilkår.resultat == other.vilkår.resultat &&
-            vilkår.utgift == other.vilkår.utgift &&
-            vilkår.barnId == other.vilkår.barnId &&
-            overlapperEllerPåfølgesAv(other)
+        fun kanSlåsSammen(other: VilkårHolder): Boolean =
+            vilkår.type == other.vilkår.type &&
+                vilkår.resultat == other.vilkår.resultat &&
+                vilkår.utgift == other.vilkår.utgift &&
+                vilkår.barnId == other.vilkår.barnId &&
+                overlapperEllerPåfølgesAv(other)
+    }
 }
