@@ -27,7 +27,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregning
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningMåned
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
@@ -63,7 +63,7 @@ class StepDefinitions {
     var exception: Exception? = null
 
     var vedtaksperioder = emptyList<Vedtaksperiode>()
-    var utgifter = mutableMapOf<BarnId, List<UtgiftBeregning>>()
+    var utgifter = mutableMapOf<BarnId, List<UtgiftBeregningMåned>>()
     var beregningsresultat: BeregningsresultatTilsynBarn? = null
     var behandlingId = BehandlingId.random()
     var behandling = behandling(id = behandlingId)
@@ -97,7 +97,7 @@ class StepDefinitions {
         assertThat(utgifter).doesNotContainKey(barnUuid)
         utgifter[barnUuid] =
             dataTable.mapRad { rad ->
-                UtgiftBeregning(
+                UtgiftBeregningMåned(
                     fom = parseÅrMåned(DomenenøkkelFelles.FOM, rad),
                     tom = parseÅrMåned(DomenenøkkelFelles.TOM, rad),
                     utgift = parseInt(BeregningNøkler.UTGIFT, rad),

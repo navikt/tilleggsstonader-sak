@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregning
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningMåned
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -70,11 +70,11 @@ class VedtaksperiodeValideringServiceTest {
             ),
         )
 
-    val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+    val utgifter: Map<BarnId, List<UtgiftBeregningMåned>> =
         mapOf(
             BarnId.random() to
                 listOf(
-                    UtgiftBeregning(
+                    UtgiftBeregningMåned(
                         fom = YearMonth.of(2025, 1),
                         tom = YearMonth.of(2025, 2),
                         utgift = 1000,
