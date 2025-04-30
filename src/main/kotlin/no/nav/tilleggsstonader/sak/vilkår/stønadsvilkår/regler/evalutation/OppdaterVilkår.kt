@@ -188,10 +188,10 @@ object OppdaterVilkår {
 
     private fun utledStatus(
         eksisterendeVilkår: Vilkår,
-        lagreVilkårDto: LagreVilkårDto,
+        oppdatering: LagreVilkårDto,
     ): VilkårStatus? =
         when {
-            eksisterendeVilkår.erFremtidigUtgift && lagreVilkårDto.erFremtidigUtgift != true -> VilkårStatus.NY
+            eksisterendeVilkår.erFremtidigUtgift && oppdatering.erFremtidigUtgift != true -> VilkårStatus.NY
             eksisterendeVilkår.status == VilkårStatus.UENDRET -> VilkårStatus.ENDRET
             else -> eksisterendeVilkår.status
         }
