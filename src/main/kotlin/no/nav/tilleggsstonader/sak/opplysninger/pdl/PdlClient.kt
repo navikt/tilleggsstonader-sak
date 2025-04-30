@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøkerData
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
@@ -91,6 +92,7 @@ class PdlClient(
      * @param ident Ident til personen, samme hvilke type (Folkeregisterident, aktørid eller npid)
      * @return liste med personidenter (Folkeregisterident, aktørid eller npid)
      */
+    @Cacheable("personidenter")
     fun hentPersonidenter(ident: String): PdlIdenter {
         val request =
             PdlIdentRequest(

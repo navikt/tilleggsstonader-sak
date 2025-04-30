@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import org.springframework.cache.CacheManager
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 @Service
@@ -79,7 +78,6 @@ class PersonService(
 
     fun hentAndreForeldre(personIdenter: List<String>): Map<String, PdlAnnenForelder> = pdlClient.hentAndreForeldre(personIdenter)
 
-    @Cacheable("personidenter")
     fun hentFolkeregisterIdenter(ident: String): PdlIdenter = pdlClient.hentPersonidenter(ident = ident).folkeregisteridenter()
 
     fun hentIdenterBolk(identer: List<String>): Map<String, PdlIdent> = pdlClient.hentIdenterBolk(identer)
