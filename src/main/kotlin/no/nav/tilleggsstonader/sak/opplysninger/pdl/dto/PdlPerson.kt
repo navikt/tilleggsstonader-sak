@@ -89,12 +89,15 @@ data class IdentBolk(
 data class PdlIdent(
     val ident: String,
     val historisk: Boolean,
+    val gruppe: String,
 )
 
 data class PdlIdenter(
     val identer: List<PdlIdent>,
 ) {
     fun gjeldende(): PdlIdent = this.identer.first { !it.historisk }
+
+    fun folkeregisteridenter() = copy(identer = this.identer.filter { it.gruppe == PdlIdentGruppe.FOLKEREGISTERIDENT.name })
 }
 
 data class PdlHentIdenter(

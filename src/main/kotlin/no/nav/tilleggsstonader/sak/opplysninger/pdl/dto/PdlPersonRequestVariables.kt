@@ -6,7 +6,6 @@ data class PdlPersonRequestVariables(
 
 data class PdlIdentRequestVariables(
     val ident: String,
-    val gruppe: String,
     val historikk: Boolean = false,
 )
 
@@ -44,3 +43,9 @@ data class SearchRuleEquals(
 data class SearchRuleExists(
     val exists: Boolean,
 ) : SearchRule
+
+enum class PdlIdentGruppe {
+    AKTORID,
+    FOLKEREGISTERIDENT,
+    NPID,
+}
