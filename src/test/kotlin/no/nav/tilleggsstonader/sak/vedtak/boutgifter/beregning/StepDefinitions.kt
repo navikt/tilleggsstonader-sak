@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
@@ -58,7 +59,7 @@ class StepDefinitions {
 
     var vilkårperioder: Vilkårperioder? = null
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
-    var utgifter = mutableMapOf<TypeBoutgift, List<UtgiftBeregningBoutgifter>>()
+    var utgifter = mutableMapOf<TypeBoutgift, List<UtgiftBeregningDato>>()
     var beregningsresultat: BeregningsresultatBoutgifter? = null
     var exception: Exception? = null
 
@@ -88,7 +89,7 @@ class StepDefinitions {
     ) {
         utgifter[typeBoutgift] =
             dataTable.mapRad { rad ->
-                UtgiftBeregningBoutgifter(
+                UtgiftBeregningDato(
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
                     utgift = parseInt(BoutgifterNøkler.UTGIFT, rad),
@@ -184,8 +185,8 @@ enum class BoutgifterNøkler(
 }
 
 private fun finnRelevanteUtgifter(
-    utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    utgifter: Map<TypeBoutgift, List<UtgiftBeregningDato>>,
     fom: LocalDate,
     tom: LocalDate,
-): Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+): Map<TypeBoutgift, List<UtgiftBeregningDato>> =
     utgifter.mapValues { (_, utgifterListe) -> utgifterListe.filter { it.overlapper(Datoperiode(fom, tom)) } }

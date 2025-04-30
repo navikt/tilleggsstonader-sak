@@ -5,12 +5,13 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 
 fun validerUtgiftHeleVedtaksperioden(
     vedtaksperioder: List<Vedtaksperiode>,
-    utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    utgifter: Map<TypeBoutgift, List<UtgiftBeregningDato>>,
 ) {
     val vedtaksperioderUtenOppfylteUtgifter =
         vedtaksperioder.filter { vedtaksperiode ->
@@ -22,7 +23,7 @@ fun validerUtgiftHeleVedtaksperioden(
     }
 }
 
-private fun Map<TypeBoutgift, Collection<UtgiftBeregningBoutgifter>>.slåSammenPåfølgende(): List<Datoperiode> =
+private fun Map<TypeBoutgift, Collection<UtgiftBeregningDato>>.slåSammenPåfølgende(): List<Datoperiode> =
     values
         .flatMap {
             it.map { Datoperiode(fom = it.fom, tom = it.tom) }

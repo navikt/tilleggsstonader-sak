@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
@@ -35,11 +36,11 @@ class BoutgifterBeregningServiceTest {
 
     @Test
     fun `Kan ikke ha faste- og midlertidig utgifter i samme behandling`() {
-        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgift: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
             mapOf(
                 TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 1, 1),
                             tom = LocalDate.of(2025, 3, 31),
                             utgift = 3000,
@@ -47,7 +48,7 @@ class BoutgifterBeregningServiceTest {
                     ),
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 1, 1),
                             tom = LocalDate.of(2025, 1, 3),
                             utgift = 3000,

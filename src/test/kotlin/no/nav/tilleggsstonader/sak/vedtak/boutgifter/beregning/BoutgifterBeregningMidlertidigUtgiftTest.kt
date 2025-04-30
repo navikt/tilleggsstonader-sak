@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagBeregningsresultatMåned
@@ -44,11 +45,11 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
             vedtakRepository = vedtakRepository,
         )
 
-    val utgiftMidlertidigOvernatting: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+    val utgiftMidlertidigOvernatting: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
         mapOf(
             TypeBoutgift.UTGIFTER_OVERNATTING to
                 listOf(
-                    UtgiftBeregningBoutgifter(
+                    UtgiftBeregningDato(
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 31),
                         utgift = 3000,
@@ -116,11 +117,11 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
 
     @Test
     fun `Kaster feil hvis utgift delvis i vedtaksperiode`() {
-        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgift: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 1, 15),
                             tom = LocalDate.of(2025, 2, 14),
                             utgift = 3000,
@@ -153,16 +154,16 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 ),
             )
 
-        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgift: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 1, 1),
                             tom = LocalDate.of(2025, 1, 10),
                             utgift = 3000,
                         ),
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 1, 25),
                             tom = LocalDate.of(2025, 2, 5),
                             utgift = 3000,
@@ -183,16 +184,16 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
 
     @Test
     fun `Beholder perioder fra før revuderFra, og beregner nye perioder ved revurdering`() {
-        val utgifterRevurdering: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgifterRevurdering: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 1, 1),
                             tom = LocalDate.of(2025, 1, 31),
                             utgift = 3000,
                         ),
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 3, 10),
                             tom = LocalDate.of(2025, 3, 12),
                             utgift = 6000,
@@ -212,11 +213,11 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 ),
             )
 
-        val utgiftEtterRevurderFra: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgiftEtterRevurderFra: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 3, 10),
                             tom = LocalDate.of(2025, 3, 12),
                             utgift = 6000,

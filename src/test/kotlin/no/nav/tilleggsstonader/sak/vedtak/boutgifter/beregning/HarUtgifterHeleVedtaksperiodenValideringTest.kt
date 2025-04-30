@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift.UTGIFTER_OVERNATTING
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -17,7 +18,7 @@ class HarUtgifterHeleVedtaksperiodenValideringTest {
     val andreJanuar: LocalDate = førsteJanuar.plusDays(1)
     val tiendeJanuar: LocalDate = førsteJanuar.plusDays(9)
 
-    val ingenUtgifter = emptyMap<TypeBoutgift, List<UtgiftBeregningBoutgifter>>()
+    val ingenUtgifter = emptyMap<TypeBoutgift, List<UtgiftBeregningDato>>()
 
     @Nested
     inner class HappyCase {
@@ -154,7 +155,7 @@ private fun lagDummyVedtaksperiode(
 private fun lagDummyUtgift(
     fom: LocalDate,
     tom: LocalDate = fom,
-) = UtgiftBeregningBoutgifter(
+) = UtgiftBeregningDato(
     fom = fom,
     tom = tom,
     utgift = 1000,

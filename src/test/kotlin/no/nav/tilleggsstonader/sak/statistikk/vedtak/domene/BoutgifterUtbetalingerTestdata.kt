@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -36,7 +36,7 @@ fun lagBoutgifterInnvilgelseMedBeløp(
         )
 
     val løpendeUtgift =
-        UtgiftBeregningBoutgifter(
+        UtgiftBeregningDato(
             fom = fom,
             tom = tom,
             utgift = utgift,
