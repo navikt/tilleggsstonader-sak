@@ -1,12 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
-import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
+import no.nav.tilleggsstonader.sak.vedtak.validering.UtgifterValideringUtil
 
-object UtgifterValideringUtil {
+object BoutgifterUtgifterValideringUtil {
     /**
      * Antakelser:
      * - Det har allerede blitt validert at utgiftene ikke strekker seg lengre tilbake i tid fra søknadsdato enn det som
@@ -14,22 +13,10 @@ object UtgifterValideringUtil {
      *
      */
     fun validerUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningDato>>) {
-        brukerfeilHvis(utgifter.values.flatten().isEmpty()) {
-            "Det er ikke lagt inn noen oppfylte utgiftsperioder"
-        }
         brukerfeilHvis(detFinnesBådeLøpendeOgMidlertidigeUtgifter(utgifter)) {
             "Foreløpig støtter vi ikke løpende og midlertidige utgifter i samme behandling"
         }
-        utgifter.entries.forEach { (type, utgiftsperioderAvGittType) ->
-            feilHvis(utgiftsperioderAvGittType.overlapper()) {
-                "Utgiftsperioder av type $type overlapper"
-            }
-
-            val ikkePositivUtgift = utgiftsperioderAvGittType.firstOrNull { it.utgift < 0 }?.utgift
-            feilHvis(ikkePositivUtgift != null) {
-                "Utgiftsperioder inneholder ugyldig utgift: $ikkePositivUtgift"
-            }
-        }
+        UtgifterValideringUtil.validerUtgifter(utgifter)
     }
 
     private fun detFinnesBådeLøpendeOgMidlertidigeUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningDato>>): Boolean {
