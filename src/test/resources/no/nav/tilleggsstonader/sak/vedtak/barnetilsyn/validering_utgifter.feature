@@ -22,7 +22,7 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
 
     Når beregner
 
-    Så forvent følgende feil: Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden
+    Så forvent følgende feil: Vedtaksperioden 01.01.2023–28.02.2023 mangler oppfylt utgift hele eller deler av perioden.
 
   Scenario: Sender inn overlappende utgiftsperioder
 

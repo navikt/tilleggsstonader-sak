@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.validerUtgiftHeleVedtaksperioden
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUtils.validerEnkeltperiode
@@ -361,7 +360,7 @@ class VedtaksperiodeValideringUtilsTest {
                             utgifter = utgifter,
                         )
                     }
-                assertThat(feil.feil).contains("Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden")
+                assertThat(feil.feil).contains("Vedtaksperioden 01.01.2025–28.02.2025 mangler oppfylt utgift hele eller deler av perioden.")
             }
 
             @Test
@@ -446,7 +445,7 @@ class VedtaksperiodeValideringUtilsTest {
                             utgifter = utgifter,
                         )
                     }
-                assertThat(feil.feil).contains("Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden")
+                assertThat(feil.feil).contains("Vedtaksperioden 01.01.2025–31.03.2025 mangler oppfylt utgift hele eller deler av perioden.")
             }
         }
     }
