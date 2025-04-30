@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.EksempelRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegel
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -27,7 +27,8 @@ object VilkårTestUtils {
                 barn = barn,
                 behandling = mockk(),
             )
-        val delvilkårsett = EksempelRegel().initiereDelvilkår(hovedregelMetadata)
+        val delvilkårsett =
+            PassBarnRegel().initiereDelvilkår(hovedregelMetadata, barnId = barn.first().id)
         return listOf(
             vilkår(
                 fom = fom,

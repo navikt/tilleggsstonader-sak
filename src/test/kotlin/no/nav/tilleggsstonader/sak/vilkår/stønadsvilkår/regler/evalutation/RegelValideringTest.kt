@@ -17,7 +17,7 @@ internal class RegelValideringTest {
 
         assertThatThrownBy {
             valider(regel, *emptyArray<VurderingDto>())
-        }.hasMessage("Savner svar for en av delvilkåren for vilkår=EKSEMPEL")
+        }.hasMessage("Savner svar for en av delvilkåren for vilkår=PASS_BARN")
             .isInstanceOf(Feil::class.java)
     }
 
@@ -45,7 +45,7 @@ internal class RegelValideringTest {
                 VurderingDto(RegelId.HAR_ET_NAVN2),
             )
         }.hasMessage(
-            "Mangler svar på ett spørsmål som ikke er siste besvarte spørsmålet vilkårType=EKSEMPEL " +
+            "Mangler svar på ett spørsmål som ikke er siste besvarte spørsmålet vilkårType=PASS_BARN " +
                 "regelId=HAR_ET_NAVN",
         ).isInstanceOf(Feil::class.java)
     }
@@ -75,7 +75,7 @@ internal class RegelValideringTest {
                 VurderingDto(RegelId.HAR_ET_NAVN, SvarId.NEI),
                 VurderingDto(RegelId.HAR_ET_NAVN3, SvarId.JA),
             )
-        }.hasMessage("Finner ikke regelId=HAR_ET_NAVN3 for vilkårType=EKSEMPEL")
+        }.hasMessage("Finner ikke regelId=HAR_ET_NAVN3 for vilkårType=PASS_BARN")
             .isInstanceOf(Feil::class.java)
     }
 
@@ -89,7 +89,7 @@ internal class RegelValideringTest {
                 VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "b"),
             )
         }.hasMessage(
-            "Begrunnelse for vilkårType=EKSEMPEL regelId=HAR_ET_NAVN " +
+            "Begrunnelse for vilkårType=PASS_BARN regelId=HAR_ET_NAVN " +
                 "svarId=JA skal ikke ha begrunnelse",
         ).isInstanceOf(Feil::class.java)
     }
@@ -104,7 +104,7 @@ internal class RegelValideringTest {
                 VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "      "),
             )
         }.hasMessage(
-            "Begrunnelse for vilkårType=EKSEMPEL regelId=HAR_ET_NAVN " +
+            "Begrunnelse for vilkårType=PASS_BARN regelId=HAR_ET_NAVN " +
                 "svarId=JA skal ikke ha begrunnelse",
         ).isInstanceOf(Feil::class.java)
     }
