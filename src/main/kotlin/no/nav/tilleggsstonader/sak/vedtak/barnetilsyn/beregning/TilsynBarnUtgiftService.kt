@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import org.springframework.stereotype.Service

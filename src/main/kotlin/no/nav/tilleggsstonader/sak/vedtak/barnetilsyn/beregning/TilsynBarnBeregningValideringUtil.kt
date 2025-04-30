@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 
 object TilsynBarnBeregningValideringUtil {
