@@ -20,7 +20,7 @@ import java.util.UUID
 @JsonSubTypes(
     JsonSubTypes.Type(AvslagBoutgifterDto::class, name = "AVSLAG"),
     JsonSubTypes.Type(InnvilgelseBoutgifterRequest::class, name = "INNVILGELSE"),
-//    JsonSubTypes.Type(OpphørBoutgifterRequest::class, name = "OPPHØR"),
+    JsonSubTypes.Type(OpphørBoutgifterRequest::class, name = "OPPHØR"),
     failOnRepeatedNames = true,
 )
 sealed class VedtakBoutgifterDto(

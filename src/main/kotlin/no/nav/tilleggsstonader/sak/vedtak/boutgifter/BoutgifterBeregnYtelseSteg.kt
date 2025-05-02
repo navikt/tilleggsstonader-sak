@@ -1,11 +1,16 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterAndelTilkjentYtelseMapper.finnAndelTilkjentYtelse
@@ -13,20 +18,24 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregni
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class BoutgifterBeregnYtelseSteg(
     private val beregningService: BoutgifterBeregningService,
-//    private val opphørValideringService: OpphørValideringService,
-//    private val vedtaksperiodeService: VedtaksperiodeService,
+    private val opphørValideringService: OpphørValideringService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -43,7 +52,7 @@ class BoutgifterBeregnYtelseSteg(
         when (vedtak) {
             is InnvilgelseBoutgifterRequest -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
             is AvslagBoutgifterDto -> lagreAvslag(saksbehandling, vedtak)
-//            is OpphørTilsynBarnRequest -> beregnOgLagreOpphør(saksbehandling, vedtak)
+            is OpphørBoutgifterRequest -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }
     }
 
@@ -75,45 +84,64 @@ class BoutgifterBeregnYtelseSteg(
         )
     }
 
-//    private fun beregnOgLagreOpphør(
-//        saksbehandling: Saksbehandling,
-//        vedtak: OpphørTilsynBarnRequest,
-//    ) {
-//        brukerfeilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
-//            "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
-//        }
-//
-//        opphørValideringService.validerVilkårperioder(saksbehandling)
-//
-//        val vedtaksperioder = vedtaksperiodeService.finnNyeVedtaksperioderForOpphør(saksbehandling)
-//
-//        val beregningsresultat =
-//            beregningService.beregn(
-//                vedtaksperioder = vedtaksperioder,
-//                behandling = saksbehandling,
-//                typeVedtak = TypeVedtak.OPPHØR,
-//            )
-//        opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
-//            beregningsresultat,
-//            saksbehandling.revurderFra,
-//        )
-//        vedtakRepository.insert(
-//            GeneriskVedtak(
-//                behandlingId = saksbehandling.id,
-//                type = TypeVedtak.OPPHØR,
-//                data =
-//                    OpphørTilsynBarn(
-//                        beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
-//                        årsaker = vedtak.årsakerOpphør,
-//                        begrunnelse = vedtak.begrunnelse,
-//                        vedtaksperioder = vedtaksperioder,
-//                    ),
-//                gitVersjon = Applikasjonsversjon.versjon,
-//            ),
-//        )
-//
-//        lagreAndeler(saksbehandling, beregningsresultat)
-//    }
+    private fun beregnOgLagreOpphør(
+        saksbehandling: Saksbehandling,
+        vedtak: OpphørBoutgifterRequest,
+    ) {
+        feilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
+            "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
+        }
+        feilHvis(saksbehandling.revurderFra == null) {
+            "revurderFra-dato er påkrevd for opphør"
+        }
+        val forrigeVedtak = hentVedtak(saksbehandling.forrigeIverksatteBehandlingId)
+
+        opphørValideringService.validerVilkårperioder(saksbehandling)
+
+        opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
+            forrigeBehandlingsVedtaksperioder = forrigeVedtak.data.vedtaksperioder,
+            revurderFraDato = saksbehandling.revurderFra,
+        )
+
+        val avkortedeVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
+
+        val beregningsresultat = beregningService.beregn(saksbehandling, avkortedeVedtaksperioder, TypeVedtak.OPPHØR)
+
+        vedtakRepository.insert(
+            GeneriskVedtak(
+                behandlingId = saksbehandling.id,
+                type = TypeVedtak.OPPHØR,
+                data =
+                    OpphørBoutgifter(
+                        vedtaksperioder = avkortedeVedtaksperioder,
+                        beregningsresultat = beregningsresultat,
+                        årsaker = vedtak.årsakerOpphør,
+                        begrunnelse = vedtak.begrunnelse,
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+            ),
+        )
+
+        // TODO: Denne kan gjenbrukes
+        tilkjentYtelseService.lagreTilkjentYtelse(
+            saksbehandling = saksbehandling,
+            andeler =
+                finnAndelTilkjentYtelse(
+                    saksbehandling,
+                    beregningsresultat,
+                ),
+        )
+    }
+
+    private fun avkortVedtaksperiodeVedOpphør(
+        forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørBoutgifter>,
+        revurderFra: LocalDate,
+    ): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(revurderFra.minusDays(1))
+
+    private fun hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørBoutgifter> =
+        vedtakRepository
+            .findByIdOrThrow(behandlingId)
+            .withTypeOrThrow<InnvilgelseEllerOpphørBoutgifter>()
 
     private fun lagreAvslag(
         saksbehandling: Saksbehandling,
@@ -133,37 +161,9 @@ class BoutgifterBeregnYtelseSteg(
         )
     }
 
-//    private fun lagreAndeler(
-//        saksbehandling: Saksbehandling,
-//        beregningsresultat: BeregningsresultatTilsynBarn,
-//    ) {
-//        val andelerTilkjentYtelse =
-//            beregningsresultat.perioder.flatMap {
-//                it.beløpsperioder.map { beløpsperiode ->
-//                    val satstype = Satstype.DAG
-//                    val ukedag = beløpsperiode.dato.dayOfWeek
-//                    feilHvis(ukedag == DayOfWeek.SATURDAY || ukedag == DayOfWeek.SUNDAY) {
-//                        "Skal ikke opprette perioder som begynner på en helgdag for satstype=$satstype"
-//                    }
-//                    val førsteDagIMåneden =
-//                        beløpsperiode.dato
-//                            .toYearMonth()
-//                            .atDay(1)
-//                            .datoEllerNesteMandagHvisLørdagEllerSøndag()
-//                    AndelTilkjentYtelse(
-//                        beløp = beløpsperiode.beløp,
-//                        fom = beløpsperiode.dato,
-//                        tom = beløpsperiode.dato,
-//                        satstype = satstype,
-//                        type = beløpsperiode.målgruppe.tilTypeAndel(Stønadstype.BARNETILSYN),
-//                        kildeBehandlingId = saksbehandling.id,
-//                        utbetalingsdato = førsteDagIMåneden,
-//                    )
-//                }
-//            }
-//
-//        tilkjentytelseService.opprettTilkjentYtelse(saksbehandling, andelerTilkjentYtelse)
-//    }
+    // TYDO private fun lagreAndelTilkjentYtelse(
+    // saksbehandling: Saksbehandling,
+    ////        beregningsresultat: BeregningsresultatBoutgifter,)
 
     private fun lagInnvilgetVedtak(
         behandling: Saksbehandling,

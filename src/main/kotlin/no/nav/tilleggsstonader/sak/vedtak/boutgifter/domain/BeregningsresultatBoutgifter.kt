@@ -55,15 +55,3 @@ data class Beregningsgrunnlag(
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
 ) : Periode<LocalDate>
-
-// fun avkortBeregningsresultatVedOpphør(
-//    forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørBoutgifter>,
-//    revurderFra: LocalDate,
-// ): AvkortResult<BeregningsresultatForMåned> =
-//    forrigeVedtak
-//        .data
-//        .beregningsresultat
-//        .perioder
-//        .avkortFraOgMed(revurderFra.minusDays(1)) { periode, nyttTom ->
-//            periode.copy(grunnlag = periode.grunnlag.copy(tom = nyttTom))
-//        }
