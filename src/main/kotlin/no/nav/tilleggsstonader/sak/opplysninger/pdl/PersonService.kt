@@ -79,10 +79,15 @@ class PersonService(
 
     fun hentAndreForeldre(personIdenter: List<String>): Map<String, PdlAnnenForelder> = pdlClient.hentAndreForeldre(personIdenter)
 
-    fun hentFolkeregisterIdenter(ident: String): PdlIdenter = pdlClient.hentPersonidenter(ident = ident).folkeregisteridenter()
+    fun hentFolkeregisterIdenter(ident: String): PdlIdenter = hentIdenterCached(ident).folkeregisteridenter()
 
     fun hentFolkeregisterOgNpidIdenter(ident: String): PdlIdenter =
-        pdlClient.hentPersonidenter(ident).medIdentgrupper(PdlIdentGruppe.FOLKEREGISTERIDENT.name, PdlIdentGruppe.NPID.name)
+        hentIdenterCached(ident).medIdentgrupper(PdlIdentGruppe.FOLKEREGISTERIDENT.name, PdlIdentGruppe.NPID.name)
+
+    private fun hentIdenterCached(ident: String): PdlIdenter =
+        cacheManager.getValue("personidenter", ident) {
+            pdlClient.hentPersonidenter(ident)
+        }
 
     fun hentIdenterBolk(identer: List<String>): Map<String, PdlIdent> = pdlClient.hentIdenterBolk(identer)
 
