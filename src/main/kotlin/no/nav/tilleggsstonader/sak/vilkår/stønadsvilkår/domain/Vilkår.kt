@@ -122,6 +122,8 @@ data class Vilkår(
             opphavsvilkår = opphavsvilkårForKopiertVilkår(),
         )
 
+    fun kanSlettes() = status == VilkårStatus.NY || erFremtidigUtgift
+
     /**
      * Brukes når man skal gjenbruke denne vilkårsvurderingen i en annan vilkårsvurdering
      * Hvis vilkåret er uendret skal gjenbruke det forrige opphavsvilkåret då vilkåret er uendret
