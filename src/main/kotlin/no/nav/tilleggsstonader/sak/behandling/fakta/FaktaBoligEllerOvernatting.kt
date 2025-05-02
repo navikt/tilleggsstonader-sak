@@ -38,7 +38,7 @@ data class FaktaPeriodeForSamling(
     val fom: LocalDate,
     val tom: LocalDate,
     val trengteEkstraOvernatting: JaNei,
-    val utgifterTilOvernatting: Int,
+    val utgifterTilOvernatting: Int?,
 )
 
 data class FaktaUtgifterNyBolig(

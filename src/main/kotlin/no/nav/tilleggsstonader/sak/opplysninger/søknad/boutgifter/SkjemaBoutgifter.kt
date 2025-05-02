@@ -81,5 +81,5 @@ data class PeriodeForSamling(
     val fom: LocalDate,
     val tom: LocalDate,
     val trengteEkstraOvernatting: JaNei,
-    val utgifterTilOvernatting: Int,
+    val utgifterTilOvernatting: Int?,
 )
