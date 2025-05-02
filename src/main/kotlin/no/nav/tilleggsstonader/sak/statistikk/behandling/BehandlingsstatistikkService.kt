@@ -194,8 +194,9 @@ class BehandlingsstatistikkService(
             relatertBehandlingId = relatertBehandlingId,
             versjon = Applikasjonsversjon.versjon,
             vilkårsprøving = emptyList(),
-            revurderingÅrsak = saksbehandling.nyeOpplysningerMetadata?.endringer?.joinToString(","),
-            revurderingOpplysningskilde = saksbehandling.nyeOpplysningerMetadata?.kilde?.name,
+            // FIXME: dvh har ikke kapasitet til å ta i mot endringer. Skal settes til nyeOpplysningerMetadata.endringer og kilde
+            revurderingÅrsak = null,
+            revurderingOpplysningskilde = null,
             venteAarsak = null,
             papirSøknad = null,
         )

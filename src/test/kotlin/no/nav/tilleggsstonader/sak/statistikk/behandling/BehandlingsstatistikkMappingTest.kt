@@ -329,7 +329,6 @@ class BehandlingsstatistikkMappingTest {
                 type = BehandlingType.REVURDERING,
                 kategori = BehandlingKategori.NASJONAL,
                 resultat = BehandlingResultat.INNVILGET,
-                nyeOpplysningerMetadata = nyeOpplysningerMetadata(),
             )
 
         val actual =
@@ -376,8 +375,6 @@ class BehandlingsstatistikkMappingTest {
                 vilkårsprøving = emptyList(),
                 venteAarsak = null,
                 behandlingBegrunnelse = null,
-                revurderingOpplysningskilde = saksbehandling.nyeOpplysningerMetadata?.kilde?.name,
-                revurderingÅrsak = saksbehandling.nyeOpplysningerMetadata?.endringer?.joinToString(","),
                 behandlingÅrsak = "SØKNAD",
             )
 
@@ -549,6 +546,7 @@ class BehandlingsstatistikkMappingTest {
         steg = StegType.INNGANGSVILKÅR,
         kategori = kategori,
         årsak = BehandlingÅrsak.SØKNAD,
+        nyeOpplysningerMetadata = nyeOpplysningerMetadata,
         kravMottatt = null,
         resultat = resultat,
         vedtakstidspunkt = null,
