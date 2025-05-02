@@ -23,15 +23,6 @@ class TilgangController(
         @RequestBody identRequest: IdentRequest,
     ): EgenAnsattResponse = EgenAnsattResponse(erEgenAnsatt = egenAnsattService.erEgenAnsatt(identRequest.ident))
 
-    @PostMapping("person/sjekkTilgangTilPersonMedRelasjoner")
-    fun sjekkTilgangTilPersonMedRelasjoner(
-        @RequestBody identRequest: IdentRequest,
-    ): Tilgang =
-        tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(
-            personIdent = identRequest.ident,
-            jwtToken = SikkerhetContext.hentToken(),
-        )
-
     @PostMapping("person-stonad")
     fun sjekkTilgangTilPersonOgStønadstype(
         @RequestBody request: IdentStønadstype,

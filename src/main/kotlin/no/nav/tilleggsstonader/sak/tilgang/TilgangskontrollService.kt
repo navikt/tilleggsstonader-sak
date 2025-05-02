@@ -26,7 +26,7 @@ class TilgangskontrollService(
 
     /**
      * Sjekker tilgang til person.
-     * Noter at denne ikke skal brukes per default. Bruk [sjekkTilgangTilPersonMedRelasjoner]
+     * Noter at denne ikke skal brukes per default. Bruk [sjekkTilgangTilStønadstype]
      * Bruk kun denne hvis man skal sjekke tilgang person
      */
     fun sjekkTilgang(
@@ -69,21 +69,6 @@ class TilgangskontrollService(
         } else {
             personService.hentAdressebeskyttelse(personIdent)
         }
-
-    /**
-     * Når vi sjekker tilgang til person med relasjoner vet vi ikke hvilke barn som er relevante
-     * Då kontrolleres alle barnen til bruker og alle andre foreldre
-     */
-    fun sjekkTilgangTilPersonMedRelasjoner(
-        personIdent: String,
-        jwtToken: JwtToken,
-    ): Tilgang {
-        val personMedRelasjoner = personService.hentAdressebeskyttelseForPersonOgRelasjoner(personIdent)
-        secureLogger.info("Sjekker tilgang til $personMedRelasjoner")
-
-        val høyesteGraderingen = TilgangskontrollUtil.høyesteGraderingen(personMedRelasjoner)
-        return hentTilgang(høyesteGraderingen, jwtToken, personIdent) { erEgenAnsatt(personMedRelasjoner) }
-    }
 
     private fun hentTilgang(
         adressebeskyttelsegradering: AdressebeskyttelseGradering,

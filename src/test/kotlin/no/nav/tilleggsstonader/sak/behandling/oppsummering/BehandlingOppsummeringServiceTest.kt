@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.tilFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.avslagVedtak
@@ -266,6 +267,66 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
             assertThat(oppsummering.finnesDataÅOppsummere).isTrue()
             assertThat(oppsummering.aktiviteter).hasSize(1)
             assertThat(oppsummering.aktiviteter[0].fom).isEqualTo(LocalDate.of(2025, 1, 1))
+        }
+
+        @Test
+        fun `skal kutte vilkår av type PASSS_BARN fra første dag i samme måned som revurderFra`() {
+            val revurderFra = LocalDate.of(2025, 1, 3)
+            val behandling = testoppsettService.lagBehandlingOgRevurdering(revurderFra = revurderFra)
+            val barn1 = BarnId.random()
+
+            vilkårRepository.insertAll(
+                listOf(
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.PASS_BARN,
+                        barnId = barn1,
+                        fom = LocalDate.of(2025, 1, 1),
+                        tom = LocalDate.of(2025, 1, 31),
+                    ),
+                ),
+            )
+
+            val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
+            assertThat(oppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(oppsummering.vilkår).hasSize(1)
+            assertThat(oppsummering.vilkår[0].vilkår[0].fom).isEqualTo(revurderFra.tilFørsteDagIMåneden())
+        }
+
+        @Test
+        fun `skal kutte vilkår for boutgifter enten fra starten av måneden eller revurder fra`() {
+            val revurderFra = LocalDate.of(2025, 1, 14)
+            val behandling = testoppsettService.lagBehandlingOgRevurdering(revurderFra = revurderFra)
+            val barn1 = BarnId.random()
+
+            vilkårRepository.insertAll(
+                listOf(
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.UTGIFTER_OVERNATTING,
+                        barnId = barn1,
+                        fom = LocalDate.of(2025, 1, 12),
+                        tom = LocalDate.of(2025, 1, 15),
+                    ),
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+                        barnId = barn1,
+                        fom = LocalDate.of(2025, 1, 1),
+                        tom = LocalDate.of(2025, 1, 31),
+                    ),
+                ),
+            )
+
+            val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
+            assertThat(oppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(oppsummering.vilkår).hasSize(2)
+
+            val overnattingVilkår = oppsummering.vilkår.find { it.type == VilkårType.UTGIFTER_OVERNATTING }
+            val løpendeUtgifterEnBoligVilkår = oppsummering.vilkår.find { it.type == VilkårType.LØPENDE_UTGIFTER_EN_BOLIG }
+
+            assertThat(overnattingVilkår!!.vilkår[0].fom).isEqualTo(revurderFra)
+            assertThat(løpendeUtgifterEnBoligVilkår!!.vilkår[0].fom).isEqualTo(revurderFra.tilFørsteDagIMåneden())
         }
     }
 }
