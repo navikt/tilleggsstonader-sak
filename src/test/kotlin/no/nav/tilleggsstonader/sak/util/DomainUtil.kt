@@ -19,6 +19,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_SIGNATUR_PLACEHOLDER
@@ -85,6 +88,7 @@ fun behandling(
     vedtakstidspunkt: LocalDateTime? = null,
     kravMottatt: LocalDate? = null,
     revurderFra: LocalDate? = null,
+    nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
 ): Behandling =
     Behandling(
         fagsakId = fagsak.id,
@@ -104,6 +108,7 @@ fun behandling(
                 ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
         kravMottatt = kravMottatt,
         revurderFra = revurderFra,
+        nyeOpplysningerMetadata = nyeOpplysningerMetadata,
     )
 
 fun saksbehandling(
@@ -323,4 +328,14 @@ fun dokumentvariant(
     variantformat = variantformat,
     saksbehandlerHarTilgang = saksbehandlerHarTilgang,
     filnavn = filnavn,
+)
+
+fun nyeOpplysningerMetadata(
+    kilde: NyeOpplysningerKilde = NyeOpplysningerKilde.ETTERSENDING,
+    endringer: List<NyeOpplysningerEndring> = listOf(NyeOpplysningerEndring.AKTIVITET),
+    beskrivelse: String? = "tralala",
+) = NyeOpplysningerMetadata(
+    kilde = kilde,
+    endringer = endringer,
+    beskrivelse = beskrivelse,
 )
