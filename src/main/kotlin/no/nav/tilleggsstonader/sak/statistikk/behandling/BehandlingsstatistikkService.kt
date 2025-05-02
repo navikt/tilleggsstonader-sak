@@ -194,8 +194,8 @@ class BehandlingsstatistikkService(
             relatertBehandlingId = relatertBehandlingId,
             versjon = Applikasjonsversjon.versjon,
             vilkårsprøving = emptyList(),
-            revurderingÅrsak = null,
-            revurderingOpplysningskilde = null,
+            revurderingÅrsak = saksbehandling.nyeOpplysningerMetadata?.endringer?.joinToString(","),
+            revurderingOpplysningskilde = saksbehandling.nyeOpplysningerMetadata?.kilde?.name,
             venteAarsak = null,
             papirSøknad = null,
         )

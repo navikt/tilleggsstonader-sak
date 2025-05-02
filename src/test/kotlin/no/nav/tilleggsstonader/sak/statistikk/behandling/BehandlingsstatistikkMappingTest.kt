@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -19,6 +20,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.util.nyeOpplysningerMetadata
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -327,6 +329,7 @@ class BehandlingsstatistikkMappingTest {
                 type = BehandlingType.REVURDERING,
                 kategori = BehandlingKategori.NASJONAL,
                 resultat = BehandlingResultat.INNVILGET,
+                nyeOpplysningerMetadata = nyeOpplysningerMetadata(),
             )
 
         val actual =
@@ -373,8 +376,8 @@ class BehandlingsstatistikkMappingTest {
                 vilkårsprøving = emptyList(),
                 venteAarsak = null,
                 behandlingBegrunnelse = null,
-                revurderingOpplysningskilde = null,
-                revurderingÅrsak = null,
+                revurderingOpplysningskilde = saksbehandling.nyeOpplysningerMetadata?.kilde?.name,
+                revurderingÅrsak = saksbehandling.nyeOpplysningerMetadata?.endringer?.joinToString(","),
                 behandlingÅrsak = "SØKNAD",
             )
 
@@ -536,6 +539,7 @@ class BehandlingsstatistikkMappingTest {
         kategori: BehandlingKategori = BehandlingKategori.NASJONAL,
         resultat: BehandlingResultat = BehandlingResultat.IKKE_SATT,
         henlagtÅrsak: HenlagtÅrsak? = null,
+        nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
     ) = Saksbehandling(
         id = behandlingId,
         eksternId = eksternId,
