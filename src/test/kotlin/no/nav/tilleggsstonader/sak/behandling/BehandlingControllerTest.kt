@@ -6,7 +6,11 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
@@ -44,7 +48,8 @@ internal class BehandlingControllerTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("12345678901"))))
         val behandling = testoppsettService.lagre(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
         val henlagtBegrunnelse = "Registert feil"
-        val respons = henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
+        val respons =
+            henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
 
         assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(respons.body!!.resultat).isEqualTo(BehandlingResultat.HENLAGT)
@@ -57,12 +62,37 @@ internal class BehandlingControllerTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("12345678901"))))
         val behandling = testoppsettService.lagre(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
         val henlagtBegrunnelse = "Registert feil"
-        val respons = henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
+        val respons =
+            henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
 
         assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(respons.body!!.resultat).isEqualTo(BehandlingResultat.HENLAGT)
         assertThat(respons.body!!.henlagtÅrsak).isEqualTo(HenlagtÅrsak.FEILREGISTRERT)
         assertThat(respons.body!!.henlagtBegrunnelse).isEqualTo(henlagtBegrunnelse)
+    }
+
+    @Test
+    fun `viser nyeOpplysningerMetadata på behandling`() {
+        val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("12345678901"))))
+        val behandling =
+            testoppsettService.lagre(
+                behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING).copy(
+                    årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
+                    nyeOpplysningerMetadata =
+                        NyeOpplysningerMetadata(
+                            kilde = NyeOpplysningerKilde.ETTERSENDING,
+                            endringer = listOf(NyeOpplysningerEndring.MÅLGRUPPE),
+                            beskrivelse = "Hello world",
+                        ),
+                ),
+            )
+        val response = hentBehandling(behandling.id)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body?.nyeOpplysningerMetadata).isNotNull
+        assertThat(response.body?.nyeOpplysningerMetadata?.kilde).isEqualTo(NyeOpplysningerKilde.ETTERSENDING)
+        assertThat(response.body?.nyeOpplysningerMetadata?.endringer).containsExactly(NyeOpplysningerEndring.MÅLGRUPPE)
+        assertThat(response.body?.nyeOpplysningerMetadata?.beskrivelse).isEqualTo("Hello world")
     }
 
     @Nested
