@@ -122,7 +122,7 @@ data class Vilkår(
             opphavsvilkår = opphavsvilkårForKopiertVilkår(),
         )
 
-    fun kanSlettes() = opphavsvilkår == null || status == VilkårStatus.NY || erFremtidigUtgift
+    fun kanSlettes() = status == VilkårStatus.NY || erFremtidigUtgift
 
     /**
      * Brukes når man skal gjenbruke denne vilkårsvurderingen i en annan vilkårsvurdering
