@@ -74,14 +74,7 @@ class BoutgifterBeregnYtelseSteg(
                 begrunnelse = vedtak.begrunnelse,
             ),
         )
-        tilkjentYtelseService.lagreTilkjentYtelse(
-            saksbehandling = saksbehandling,
-            andeler =
-                finnAndelTilkjentYtelse(
-                    saksbehandling,
-                    beregningsresultat,
-                ),
-        )
+        lagreTilkjentYtelse(saksbehandling, beregningsresultat)
     }
 
     private fun beregnOgLagreOpphør(
@@ -121,16 +114,7 @@ class BoutgifterBeregnYtelseSteg(
                 gitVersjon = Applikasjonsversjon.versjon,
             ),
         )
-
-        // TODO: Denne kan gjenbrukes
-        tilkjentYtelseService.lagreTilkjentYtelse(
-            saksbehandling = saksbehandling,
-            andeler =
-                finnAndelTilkjentYtelse(
-                    saksbehandling,
-                    beregningsresultat,
-                ),
-        )
+        lagreTilkjentYtelse(saksbehandling, beregningsresultat)
     }
 
     private fun avkortVedtaksperiodeVedOpphør(
@@ -161,10 +145,6 @@ class BoutgifterBeregnYtelseSteg(
         )
     }
 
-    // TYDO private fun lagreAndelTilkjentYtelse(
-    // saksbehandling: Saksbehandling,
-    ////        beregningsresultat: BeregningsresultatBoutgifter,)
-
     private fun lagInnvilgetVedtak(
         behandling: Saksbehandling,
         beregningsresultat: BeregningsresultatBoutgifter,
@@ -182,4 +162,18 @@ class BoutgifterBeregnYtelseSteg(
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
         )
+
+    private fun lagreTilkjentYtelse(
+        saksbehandling: Saksbehandling,
+        beregningsresultat: BeregningsresultatBoutgifter,
+    ) {
+        tilkjentYtelseService.lagreTilkjentYtelse(
+            saksbehandling = saksbehandling,
+            andeler =
+                finnAndelTilkjentYtelse(
+                    saksbehandling,
+                    beregningsresultat,
+                ),
+        )
+    }
 }
