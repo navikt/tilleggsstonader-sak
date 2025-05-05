@@ -47,7 +47,7 @@ class OpphørValideringServiceLæremidlerTest {
                     revurderFraDato = førsteMars,
                 )
             }.hasMessage(
-                "Opphør er et ugyldig vedtaksresultat fordi ønsket opphørsdato ikke fører til at noen ekisterende vedtaksperioder blir opphørt.",
+                "Opphør er et ugyldig vedtaksresultat fordi ønsket opphørsdato ikke korter ned vedtaket.",
             )
         }
     }
