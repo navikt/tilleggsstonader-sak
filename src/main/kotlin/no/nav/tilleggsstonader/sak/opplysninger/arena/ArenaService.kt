@@ -24,26 +24,26 @@ class ArenaService(
         ident: String,
         stønadstype: Stønadstype,
     ): ArenaStatusDto {
-        val identer = personService.hentPersonIdenter(ident).identer()
+        val identer = personService.hentFolkeregisterOgNpidIdenter(ident).identer()
         return arenaClient.hentStatus(IdenterStønadstype(identer, stønadstype))
     }
 
     @Cacheable("arena-vedtak", cacheManager = "5secCache")
     fun hentVedtak(fagsakPersonId: FagsakPersonId): ArenaSakOgVedtakDto {
         val aktivIdent = fagsakPersonService.hentAktivIdent(fagsakPersonId)
-        val identer = personService.hentPersonIdenter(aktivIdent).identer()
+        val identer = personService.hentFolkeregisterIdenter(aktivIdent).identer()
         return arenaClient.hentVedtak(IdenterRequest(identer))
     }
 
     fun harSaker(ident: String): Boolean {
-        val identer = personService.hentPersonIdenter(ident).identer()
+        val identer = personService.hentFolkeregisterIdenter(ident).identer()
         return arenaClient.harSaker(IdenterRequest(identer)).harSaker
     }
 
     @Cacheable("arena-oppgaver", cacheManager = "5secCache")
     fun hentOppgaver(fagsakPersonId: FagsakPersonId): List<ArenaOppgaveDto> {
         val aktivIdent = fagsakPersonService.hentAktivIdent(fagsakPersonId)
-        val identer = personService.hentPersonIdenter(aktivIdent).identer()
+        val identer = personService.hentFolkeregisterIdenter(aktivIdent).identer()
         return arenaClient.hentOppgaver(IdenterRequest(identer))
     }
 }

@@ -84,12 +84,12 @@ internal class HåndterSøknadServiceTest {
     @BeforeEach
     internal fun setUp() {
         taskSlot.clear()
-        every { personService.hentPersonIdenter(any()) } returns
+        every { personService.hentFolkeregisterIdenter(any()) } returns
             PdlIdenter(
                 identer =
                     listOf(
-                        PdlIdent(personIdent, false),
-                        PdlIdent(tidligerePersonIdent, false),
+                        PdlIdent(personIdent, false, "FOLKEREGISTERIDENT"),
+                        PdlIdent(tidligerePersonIdent, false, "FOLKEREGISTERIDENT"),
                     ),
             )
         every { fagsakService.hentEllerOpprettFagsak(any(), any()) } returns fagsak
@@ -103,7 +103,7 @@ internal class HåndterSøknadServiceTest {
                 språk = Språkkode.NB,
             )
         every { barnService.opprettBarn(any()) } returns mockk()
-        every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent(aktørId, false)))
+        every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent(aktørId, false, "AKTOERID")))
         every { taskService.save(capture(taskSlot)) } returns mockk()
         every { behandlingService.utledNesteBehandlingstype(fagsak.id) } returns BehandlingType.FØRSTEGANGSBEHANDLING
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpost

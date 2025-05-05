@@ -134,7 +134,7 @@ class AdminOpprettBehandlingService(
         stønadstype: Stønadstype,
         ident: String,
     ) {
-        val personIdenter = personService.hentPersonIdenter(ident)
+        val personIdenter = personService.hentFolkeregisterIdenter(ident)
         val fagsak = fagsakService.finnFagsak(personIdenter.identer(), stønadstype)
         val behandlinger = fagsak?.let { behandlingService.hentBehandlinger(it.id) } ?: emptyList()
         brukerfeilHvis(behandlinger.isNotEmpty()) {

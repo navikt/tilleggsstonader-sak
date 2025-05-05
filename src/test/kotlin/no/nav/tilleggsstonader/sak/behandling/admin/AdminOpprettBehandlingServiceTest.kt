@@ -53,7 +53,7 @@ class AdminOpprettBehandlingServiceTest {
 
     @BeforeEach
     fun setUp() {
-        every { personService.hentPersonIdenter(ident) } returns PdlIdenter(listOf(PdlIdent(ident, false)))
+        every { personService.hentFolkeregisterIdenter(ident) } returns PdlIdenter(listOf(PdlIdent(ident, false, "FOLKEREGISTERIDENT")))
         every { personService.hentPersonMedBarn(ident) } returns
             SøkerMedBarn(ident, mockk(), barn = mapOf(identBarn to mockk()))
 

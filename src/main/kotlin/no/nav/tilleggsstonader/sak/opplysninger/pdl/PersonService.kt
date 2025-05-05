@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlAnnenForelder
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdentGruppe
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
@@ -20,7 +21,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import org.springframework.cache.CacheManager
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 @Service
@@ -79,8 +79,15 @@ class PersonService(
 
     fun hentAndreForeldre(personIdenter: List<String>): Map<String, PdlAnnenForelder> = pdlClient.hentAndreForeldre(personIdenter)
 
-    @Cacheable("personidenter")
-    fun hentPersonIdenter(ident: String): PdlIdenter = pdlClient.hentPersonidenter(ident = ident)
+    fun hentFolkeregisterIdenter(ident: String): PdlIdenter = hentIdenterCached(ident).folkeregisteridenter()
+
+    fun hentFolkeregisterOgNpidIdenter(ident: String): PdlIdenter =
+        hentIdenterCached(ident).medIdentgrupper(PdlIdentGruppe.FOLKEREGISTERIDENT, PdlIdentGruppe.NPID)
+
+    private fun hentIdenterCached(ident: String): PdlIdenter =
+        cacheManager.getValue("personidenter", ident) {
+            pdlClient.hentPersonidenter(ident)
+        }
 
     fun hentIdenterBolk(identer: List<String>): Map<String, PdlIdent> = pdlClient.hentIdenterBolk(identer)
 
@@ -96,7 +103,7 @@ class PersonService(
 
     fun hentAktørIder(ident: String): PdlIdenter =
         cacheManager.getValue("pdl-aktørId", ident) {
-            pdlClient.hentAktørIder(ident)
+            pdlClient.hentPersonidenter(ident).aktørIder()
         }
 
     fun hentGeografiskTilknytning(ident: String): GeografiskTilknytningDto? =

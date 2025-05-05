@@ -50,5 +50,5 @@ class SøkController(
     }
 
     private fun hentOgValiderAtIdentEksisterer(personIdentRequest: PersonIdentDto): PdlIdenter =
-        personService.hentPersonIdenter(personIdentRequest.personIdent)
+        personService.hentFolkeregisterIdenter(personIdentRequest.personIdent)
 }

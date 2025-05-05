@@ -79,7 +79,7 @@ data class PdlIdenterBolk(
     val ident: String,
     val identer: List<PdlIdent>?,
 ) {
-    fun gjeldende(): PdlIdent = this.identer?.first { !it.historisk } ?: PdlIdent(ident, false)
+    fun gjeldende(): PdlIdent = this.identer?.first { !it.historisk } ?: PdlIdent(ident, false, "FOLKEREGISTERIDENT")
 }
 
 data class IdentBolk(
@@ -89,12 +89,21 @@ data class IdentBolk(
 data class PdlIdent(
     val ident: String,
     val historisk: Boolean,
+    val gruppe: String,
 )
 
 data class PdlIdenter(
     val identer: List<PdlIdent>,
 ) {
     fun gjeldende(): PdlIdent = this.identer.first { !it.historisk }
+
+    fun folkeregisteridenter() = medIdentgrupper(PdlIdentGruppe.FOLKEREGISTERIDENT)
+
+    fun aktørIder() = medIdentgrupper(PdlIdentGruppe.AKTORID)
+
+    fun medIdentgrupper(vararg identgrupper: PdlIdentGruppe) = medIdentgrupper(identgrupper.map { it.name })
+
+    private fun medIdentgrupper(identgrupper: List<String>) = copy(identer = this.identer.filter { identgrupper.contains(it.gruppe) })
 }
 
 data class PdlHentIdenter(

@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
@@ -103,8 +104,11 @@ class PdlClientTest {
             post(urlEqualTo("/${PdlConfig.PATH_GRAPHQL}"))
                 .willReturn(okJson(readFile("pdl/hent_identer.json"))),
         )
-        val response = pdlClient.hentAktørIder("12345")
-        assertThat(response.identer.first().ident).isEqualTo("12345678901")
+        val response = pdlClient.hentPersonidenter("12345")
+        assertThat(response.identer).containsExactlyInAnyOrder(
+            PdlIdent("10987654321", false, "FOLKEREGISTERIDENT"),
+            PdlIdent("12345678901", false, "AKTORID"),
+        )
     }
 
     @Test

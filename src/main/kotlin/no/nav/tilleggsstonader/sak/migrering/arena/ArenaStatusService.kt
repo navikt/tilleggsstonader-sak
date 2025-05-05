@@ -31,7 +31,7 @@ class ArenaStatusService(
         ArenaFinnesPersonResponse(request.ident, finnesPerson(request))
 
     private fun finnesPerson(request: ArenaFinnesPersonRequest): Boolean {
-        val identer = personService.hentPersonIdenter(request.ident).identer().toSet()
+        val identer = personService.hentFolkeregisterIdenter(request.ident).identer().toSet()
 
         val fagsak = fagsakService.finnFagsak(identer, request.stønadstype)
         val eksternFagsakId = fagsak?.eksternId?.id
