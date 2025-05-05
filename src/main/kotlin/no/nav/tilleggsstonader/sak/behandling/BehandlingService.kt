@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.Journalposttype
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
@@ -95,6 +96,7 @@ class BehandlingService(
         stegType: StegType = StegType.INNGANGSVILKÅR,
         behandlingsårsak: BehandlingÅrsak,
         kravMottatt: LocalDate? = null,
+        nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
     ): Behandling {
         brukerfeilHvis(kravMottatt != null && kravMottatt.isAfter(osloDateNow())) {
             "Kan ikke sette krav mottattdato frem i tid"
@@ -121,6 +123,7 @@ class BehandlingService(
                     årsak = behandlingsårsak,
                     kravMottatt = kravMottatt,
                     kategori = BehandlingKategori.NASJONAL,
+                    nyeOpplysningerMetadata = nyeOpplysningerMetadata,
                 ),
             )
         eksternBehandlingIdRepository.insert(EksternBehandlingId(behandlingId = behandling.id))

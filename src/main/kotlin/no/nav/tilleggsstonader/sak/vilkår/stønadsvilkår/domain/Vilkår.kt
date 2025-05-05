@@ -122,6 +122,8 @@ data class Vilkår(
             opphavsvilkår = opphavsvilkårForKopiertVilkår(),
         )
 
+    fun kanSlettes() = status == VilkårStatus.NY || erFremtidigUtgift
+
     /**
      * Brukes når man skal gjenbruke denne vilkårsvurderingen i en annan vilkårsvurdering
      * Hvis vilkåret er uendret skal gjenbruke det forrige opphavsvilkåret då vilkåret er uendret
@@ -228,6 +230,8 @@ enum class VilkårType(
                 it.gjelderStønader.contains(stønadstype)
             }
     }
+
+    fun kreverYearMonthDatoer(): Boolean = this == LØPENDE_UTGIFTER_EN_BOLIG || this == LØPENDE_UTGIFTER_TO_BOLIGER || this == PASS_BARN
 }
 
 enum class VilkårStatus {

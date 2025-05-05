@@ -108,8 +108,8 @@ class VilkårService(
         val vilkår = vilkårRepository.findByIdOrThrow(vilkårId)
         val behandlingId = vilkår.behandlingId
 
-        // TODO burde slettemarkeres hvis opprettet i tidligere behandling?
-        feilHvis(vilkår.opphavsvilkår != null) {
+        // TODO burde slettemarkeres hvis opprettet i tidligere behandling og ikke er fremtidig utgift?
+        feilHvis(!vilkår.kanSlettes()) {
             "Kan ikke slette vilkår opprettet i tidligere behandling"
         }
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)

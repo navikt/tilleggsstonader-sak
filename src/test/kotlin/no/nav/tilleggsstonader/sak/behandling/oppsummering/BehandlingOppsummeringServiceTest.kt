@@ -249,14 +249,6 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
         }
     }
 
-    val tiltakJanTilJuni =
-        listOf(
-            aktivitet(
-                fom = LocalDate.of(2025, 1, 1),
-                tom = LocalDate.of(2025, 6, 30),
-            ),
-        )
-
     @Nested
     inner class AvkortVedRevurderFra {
         @Test

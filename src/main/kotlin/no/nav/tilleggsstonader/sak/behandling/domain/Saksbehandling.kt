@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import org.springframework.data.relational.core.mapping.Column
+import org.springframework.data.relational.core.mapping.Embedded
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -22,6 +23,8 @@ data class Saksbehandling(
     val kategori: BehandlingKategori,
     @Column("arsak")
     val årsak: BehandlingÅrsak,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+    val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
     val kravMottatt: LocalDate? = null,
     val resultat: BehandlingResultat,
     val vedtakstidspunkt: LocalDateTime?,

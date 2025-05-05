@@ -48,12 +48,19 @@ class OpprettRevurderingBehandlingService(
         }
         logger.info("Oppretter revurdering for fagsak=${request.fagsakId}")
 
+        if (request.årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) {
+            feilHvis(request.nyeOpplysningerMetadata == null) {
+                "Krever metadata ved behandlingsårsak NYE_OPPLYSNINGER"
+            }
+        }
+
         val fagsakId = request.fagsakId
         val behandling =
             behandlingService.opprettBehandling(
                 fagsakId = fagsakId,
                 behandlingsårsak = request.årsak,
                 kravMottatt = request.kravMottatt,
+                nyeOpplysningerMetadata = request.nyeOpplysningerMetadata?.tilDomene(),
             )
 
         val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)

@@ -30,6 +30,7 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.IKKE_TATT_STILLING_TIL
@@ -246,12 +247,30 @@ internal class VilkårServiceTest {
                     behandlingId = behandlingId,
                     type = VilkårType.PASS_BARN,
                     opphavsvilkår = Opphavsvilkår(BehandlingId.random(), LocalDateTime.now()),
+                    status = VilkårStatus.UENDRET,
                 )
             every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
             assertThatThrownBy {
                 vilkårService.slettVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
             }.hasMessageContaining("Kan ikke slette vilkår opprettet i tidligere behandling")
+        }
+
+        @Test
+        internal fun `skal kunne slette vilkår opprettet i tidligere behandling hvis det er fremtidig utgift`() {
+            val vilkår =
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.PASS_BARN,
+                    opphavsvilkår = Opphavsvilkår(BehandlingId.random(), LocalDateTime.now()),
+                    status = VilkårStatus.UENDRET,
+                    erFremtidigUtgift = true,
+                )
+            every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
+
+            vilkårService.slettVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
+
+            verify { vilkårRepository.deleteById(vilkår.id) }
         }
     }
 
