@@ -55,7 +55,7 @@ class OpphørValideringService(
         val senesteTomIForrigeVedtaksperioder = forrigeBehandlingsVedtaksperioder.maxOf { it.tom }
 
         brukerfeilHvis(senesteTomIForrigeVedtaksperioder < revurderFraDato) {
-            "Opphør er et ugyldig vedtaksresultat fordi ønsket opphørsdato ikke korter ned vedtaket."
+            "Opphør er et ugyldig valg fordi ønsket opphørsdato ikke korter ned vedtaket."
         }
     }
 

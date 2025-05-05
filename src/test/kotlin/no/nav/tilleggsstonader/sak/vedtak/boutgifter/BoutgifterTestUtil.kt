@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
+import java.time.Month.JANUARY
 import java.util.UUID
 
 object BoutgifterTestUtil {
@@ -67,6 +68,47 @@ object BoutgifterTestUtil {
         målgruppe = målgruppe,
         aktivitet = aktivitet,
     )
+
+    val vedtakBesregningsresultat = BeregningsresultatBoutgifter(
+        perioder = listOf(
+            lagBeregningsresultatMåned(
+                fom = LocalDate.of(2025, 1, 1),
+                tom = LocalDate.of(2025, 10, 31),
+                utgifter = mapOf(
+                    TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
+                            listOf(
+                                UtgiftBeregningBoutgifter(
+                                    fom = LocalDate.of(2025, 1, 1),
+                                    tom = LocalDate.of(2025, 3, 31),
+                                    utgift = 3000,
+                                ),
+                            ),
+                ),
+                delAvTidligere = false,
+            )
+        )
+    )
+
+    fun beregningsresultat(fom: LocalDate = LocalDate.of(2025, JANUARY, 1), tom: LocalDate = fom) =
+        BeregningsresultatBoutgifter(
+            perioder = listOf(
+                lagBeregningsresultatMåned(
+                    fom = fom,
+                    tom = tom,
+                    utgifter = mapOf(
+                        TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
+                                listOf(
+                                    UtgiftBeregningBoutgifter(
+                                        fom = fom,
+                                        tom = tom,
+                                        utgift = 3000,
+                                    ),
+                                ),
+                    ),
+                    delAvTidligere = false,
+                )
+            )
+        )
 
     fun lagBeregningsresultatMåned(
         fom: LocalDate,

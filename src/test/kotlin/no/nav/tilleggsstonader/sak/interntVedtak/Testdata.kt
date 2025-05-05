@@ -31,9 +31,11 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
@@ -546,6 +548,19 @@ object Testdata {
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
             )
+        val opphørtVedtak = GeneriskVedtak(
+            behandlingId = behandlingId,
+            type = TypeVedtak.OPPHØR,
+            data =
+                OpphørBoutgifter(
+                    årsaker = listOf(ÅrsakOpphør.ENDRING_UTGIFTER, ÅrsakOpphør.ENDRING_MÅLGRUPPE),
+                    begrunnelse = "Begrunelse for avslag",
+                    vedtaksperioder = vedtaksperioder,
+                    beregningsresultat = beregningsresultat,
+                ),
+            gitVersjon = Applikasjonsversjon.versjon,
+        )
+
 
         private val aktivitetererBoutgifter =
             listOf(
