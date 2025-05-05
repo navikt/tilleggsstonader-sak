@@ -82,7 +82,7 @@ class PersonService(
     fun hentFolkeregisterIdenter(ident: String): PdlIdenter = hentIdenterCached(ident).folkeregisteridenter()
 
     fun hentFolkeregisterOgNpidIdenter(ident: String): PdlIdenter =
-        hentIdenterCached(ident).medIdentgrupper(PdlIdentGruppe.FOLKEREGISTERIDENT.name, PdlIdentGruppe.NPID.name)
+        hentIdenterCached(ident).medIdentgrupper(PdlIdentGruppe.FOLKEREGISTERIDENT, PdlIdentGruppe.NPID)
 
     private fun hentIdenterCached(ident: String): PdlIdenter =
         cacheManager.getValue("personidenter", ident) {

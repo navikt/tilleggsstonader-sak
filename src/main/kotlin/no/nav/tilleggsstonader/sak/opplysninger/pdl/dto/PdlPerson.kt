@@ -97,11 +97,13 @@ data class PdlIdenter(
 ) {
     fun gjeldende(): PdlIdent = this.identer.first { !it.historisk }
 
-    fun folkeregisteridenter() = medIdentgrupper(PdlIdentGruppe.FOLKEREGISTERIDENT.name)
+    fun folkeregisteridenter() = medIdentgrupper(PdlIdentGruppe.FOLKEREGISTERIDENT)
 
-    fun aktørIder() = medIdentgrupper(PdlIdentGruppe.AKTORID.name)
+    fun aktørIder() = medIdentgrupper(PdlIdentGruppe.AKTORID)
 
-    fun medIdentgrupper(vararg identgrupper: String) = copy(identer = this.identer.filter { identgrupper.contains(it.gruppe) })
+    fun medIdentgrupper(vararg identgrupper: PdlIdentGruppe) = medIdentgrupper(identgrupper.map { it.name })
+
+    private fun medIdentgrupper(identgrupper: List<String>) = copy(identer = this.identer.filter { identgrupper.contains(it.gruppe) })
 }
 
 data class PdlHentIdenter(
