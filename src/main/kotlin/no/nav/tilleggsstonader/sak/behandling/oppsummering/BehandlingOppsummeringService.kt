@@ -44,7 +44,7 @@ class BehandlingOppsummeringService(
         this
             .map { it.tilOppsummertVilkårperiode() }
             .sortedBy { it.fom }
-            .filter { periodeOverlapperRevurderFra(revurderFra = revurderFra, tom = it.tom) }
+            .filter { tomLikEllerEtterRevurderFra(revurderFra = revurderFra, tom = it.tom) }
             .mergeSammenhengende(
                 skalMerges = { v1, v2 ->
                     v1.type == v2.type &&
@@ -64,7 +64,7 @@ class BehandlingOppsummeringService(
 
         // Tar kun med vilkår som overlapper eller er etter revurderFra
         val relevanteVilkårIRevurdering =
-            vilkår.filter { periodeOverlapperRevurderFra(revurderFra = revurderFra, tom = it.tom) }
+            vilkår.filter { tomLikEllerEtterRevurderFra(revurderFra = revurderFra, tom = it.tom) }
 
         // Lager en map per type slik at sammenhendende vilkår kan slås sammen ved like verdier
         // Grupperes også på barnId slik at PASS_BARN vilkår ikke slås sammen på tvers av barn.
@@ -80,7 +80,6 @@ class BehandlingOppsummeringService(
                 vilkår =
                     it.value
                         .slåSammenSammenhengende()
-                        .filter { periodeOverlapperRevurderFra(revurderFra = revurderFra, tom = it.tom) }
                         .map { it.tilOppsummertVilkår() },
             )
         }
@@ -115,7 +114,7 @@ class BehandlingOppsummeringService(
         }
     }
 
-    private fun periodeOverlapperRevurderFra(
+    private fun tomLikEllerEtterRevurderFra(
         revurderFra: LocalDate?,
         tom: LocalDate?,
     ): Boolean {
