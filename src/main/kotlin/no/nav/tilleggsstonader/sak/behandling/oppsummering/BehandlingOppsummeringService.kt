@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.behandling.oppsummering
 
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
-import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -11,7 +10,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårUtil.finnPerioderEtterRevurderFra
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårUtil.slåSammenSammenhengende
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -46,6 +44,7 @@ class BehandlingOppsummeringService(
         this
             .map { it.tilOppsummertVilkårperiode() }
             .sortedBy { it.fom }
+            .filter { periodeOverlapperRevurderFra(revurderFra = revurderFra, tom = it.tom) }
             .mergeSammenhengende(
                 skalMerges = { v1, v2 ->
                     v1.type == v2.type &&
@@ -55,7 +54,7 @@ class BehandlingOppsummeringService(
                         )
                 },
                 merge = { v1, v2 -> v1.copy(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
-            ).avkortPerioderFør(revurderFra)
+            )
 
     private fun oppsummerStønadsvilkår(
         behandlingId: BehandlingId,
@@ -63,10 +62,14 @@ class BehandlingOppsummeringService(
     ): List<Stønadsvilkår> {
         val vilkår = vilkårService.hentVilkår(behandlingId)
 
+        // Tar kun med vilkår som overlapper eller er etter revurderFra
+        val relevanteVilkårIRevurdering =
+            vilkår.filter { periodeOverlapperRevurderFra(revurderFra = revurderFra, tom = it.tom) }
+
         // Lager en map per type slik at sammenhendende vilkår kan slås sammen ved like verdier
         // Grupperes også på barnId slik at PASS_BARN vilkår ikke slås sammen på tvers av barn.
         val mapPerTypeOgBarnId =
-            vilkår
+            relevanteVilkårIRevurdering
                 .filter { it.fom != null && it.tom != null }
                 .groupBy { it.type to it.barnId }
 
@@ -77,7 +80,7 @@ class BehandlingOppsummeringService(
                 vilkår =
                     it.value
                         .slåSammenSammenhengende()
-                        .finnPerioderEtterRevurderFra(revurderFra)
+                        .filter { periodeOverlapperRevurderFra(revurderFra = revurderFra, tom = it.tom) }
                         .map { it.tilOppsummertVilkår() },
             )
         }
@@ -110,5 +113,15 @@ class BehandlingOppsummeringService(
                 else -> null
             }
         }
+    }
+
+    private fun periodeOverlapperRevurderFra(
+        revurderFra: LocalDate?,
+        tom: LocalDate?,
+    ): Boolean {
+        if (revurderFra == null || tom == null) {
+            return true
+        }
+        return revurderFra <= tom
     }
 }

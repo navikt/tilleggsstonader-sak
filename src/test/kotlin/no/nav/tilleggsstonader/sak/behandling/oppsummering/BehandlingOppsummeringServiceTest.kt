@@ -249,10 +249,18 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
         }
     }
 
+    val tiltakJanTilJuni =
+        listOf(
+            aktivitet(
+                fom = LocalDate.of(2025, 1, 1),
+                tom = LocalDate.of(2025, 6, 30),
+            ),
+        )
+
     @Nested
     inner class AvkortVedRevurderFra {
         @Test
-        fun `skal kutte perioder fra revurderFra datoen`() {
+        fun `skal beholde hele perioden om den overlapper med revurderFra datoen`() {
             val behandling = testoppsettService.lagBehandlingOgRevurdering(revurderFra = LocalDate.of(2025, 1, 1))
             vilkårperiodeRepository.insert(
                 aktivitet(
@@ -265,7 +273,67 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
             val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
             assertThat(oppsummering.finnesDataÅOppsummere).isTrue()
             assertThat(oppsummering.aktiviteter).hasSize(1)
-            assertThat(oppsummering.aktiviteter[0].fom).isEqualTo(LocalDate.of(2025, 1, 1))
+            assertThat(oppsummering.aktiviteter[0].fom).isEqualTo(LocalDate.of(2024, 8, 1))
+        }
+
+        @Test
+        fun `stønadsvilkår skal fjernes helt fra oppsummeringen om det er før revurderFra`() {
+            val behandling = testoppsettService.lagBehandlingOgRevurdering(revurderFra = LocalDate.of(2025, 1, 1))
+
+            vilkårRepository.insertAll(
+                listOf(
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+                        barnId = null,
+                        fom = LocalDate.of(2024, 12, 1),
+                        tom = LocalDate.of(2025, 1, 31),
+                    ),
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
+                        barnId = null,
+                        fom = LocalDate.of(2024, 10, 1),
+                        tom = LocalDate.of(2024, 11, 30),
+                    ),
+                ),
+            )
+
+            val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
+            assertThat(oppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(oppsummering.vilkår).hasSize(1)
+            assertThat(oppsummering.vilkår[0].type).isEqualTo(VilkårType.LØPENDE_UTGIFTER_EN_BOLIG)
+
+            // Dato skal ikke kuttes
+            assertThat(oppsummering.vilkår[0].vilkår[0].fom).isEqualTo(LocalDate.of(2024, 12, 1))
+        }
+
+        @Test
+        fun `stønadsvilkår skal ikke slås sammen om annen periode er før revurderFra`() {
+            val behandling = testoppsettService.lagBehandlingOgRevurdering(revurderFra = LocalDate.of(2025, 1, 1))
+
+            vilkårRepository.insertAll(
+                listOf(
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+                        barnId = null,
+                        fom = LocalDate.of(2024, 12, 1),
+                        tom = LocalDate.of(2024, 12, 31),
+                    ),
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+                        barnId = null,
+                        fom = LocalDate.of(2025, 1, 1),
+                        tom = LocalDate.of(2025, 1, 31),
+                    ),
+                ),
+            )
+
+            val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
+            assertThat(oppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(oppsummering.vilkår[0].vilkår[0].fom).isEqualTo(LocalDate.of(2025, 1, 1))
         }
     }
 }
