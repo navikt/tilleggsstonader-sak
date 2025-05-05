@@ -255,6 +255,23 @@ internal class VilkårServiceTest {
                 vilkårService.slettVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
             }.hasMessageContaining("Kan ikke slette vilkår opprettet i tidligere behandling")
         }
+
+        @Test
+        internal fun `skal kunne slette vilkår opprettet i tidligere behandling hvis det er fremtidig utgift`() {
+            val vilkår =
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.PASS_BARN,
+                    opphavsvilkår = Opphavsvilkår(BehandlingId.random(), LocalDateTime.now()),
+                    status = VilkårStatus.UENDRET,
+                    erFremtidigUtgift = true,
+                )
+            every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
+
+            vilkårService.slettVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
+
+            verify { vilkårRepository.deleteById(vilkår.id) }
+        }
     }
 
     @Test

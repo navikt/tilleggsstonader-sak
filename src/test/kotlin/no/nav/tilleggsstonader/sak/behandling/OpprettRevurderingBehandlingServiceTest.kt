@@ -1,11 +1,16 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
+import no.nav.tilleggsstonader.sak.behandling.dto.NyeOpplysningerMetadataDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
@@ -134,6 +139,57 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
             assertThat(nyBehandling.forrigeIverksatteBehandlingId).isNull()
+        }
+
+        @Test
+        fun `ny behandling med årsak NYE_OPPLYSNINGER skal kreve kilde og endringer`() {
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.FERDIGSTILT,
+                        resultat = BehandlingResultat.HENLAGT,
+                    ),
+                    stønadstype = Stønadstype.LÆREMIDLER,
+                    opprettGrunnlagsdata = false,
+                )
+
+            assertThatThrownBy {
+                service.opprettBehandling(
+                    opprettBehandlingDto(
+                        fagsakId = behandling.fagsakId,
+                        årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
+                    ).copy(nyeOpplysningerMetadata = null),
+                )
+            }.hasMessage("Krever metadata ved behandlingsårsak NYE_OPPLYSNINGER")
+        }
+
+        @Test
+        fun `ny behandling med årsak NYE_OPPLYSNINGER med metadata blir lagret korrekt`() {
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.FERDIGSTILT,
+                        resultat = BehandlingResultat.HENLAGT,
+                    ),
+                    stønadstype = Stønadstype.LÆREMIDLER,
+                    opprettGrunnlagsdata = false,
+                )
+
+            val opprettBehandlingDto =
+                opprettBehandlingDto(
+                    fagsakId = behandling.fagsakId,
+                    årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
+                )
+            val nyBehandlingId = service.opprettBehandling(opprettBehandlingDto)
+
+            val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
+            assertThat(nyBehandling.nyeOpplysningerMetadata).isEqualTo(
+                NyeOpplysningerMetadata(
+                    kilde = opprettBehandlingDto.nyeOpplysningerMetadata!!.kilde,
+                    endringer = opprettBehandlingDto.nyeOpplysningerMetadata.endringer,
+                    beskrivelse = opprettBehandlingDto.nyeOpplysningerMetadata.beskrivelse,
+                ),
+            )
         }
     }
 
@@ -359,5 +415,14 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         årsak = årsak,
         valgteBarn = valgteBarn,
         kravMottatt = null,
+        nyeOpplysningerMetadata =
+            if (årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) opprettNyeOpplysningerMetadata() else null,
     )
+
+    private fun opprettNyeOpplysningerMetadata() =
+        NyeOpplysningerMetadataDto(
+            kilde = NyeOpplysningerKilde.ETTERSENDING,
+            endringer = listOf(NyeOpplysningerEndring.AKTIVITET, NyeOpplysningerEndring.MÅLGRUPPE),
+            beskrivelse = "Tittei",
+        )
 }

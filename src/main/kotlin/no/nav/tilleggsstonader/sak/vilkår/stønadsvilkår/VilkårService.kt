@@ -21,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårRevurderFraVal
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
@@ -109,8 +108,8 @@ class VilkårService(
         val vilkår = vilkårRepository.findByIdOrThrow(vilkårId)
         val behandlingId = vilkår.behandlingId
 
-        // TODO burde slettemarkeres hvis opprettet i tidligere behandling?
-        feilHvis(vilkår.opphavsvilkår != null || vilkår.status != VilkårStatus.NY) {
+        // TODO burde slettemarkeres hvis opprettet i tidligere behandling og ikke er fremtidig utgift?
+        feilHvis(!vilkår.kanSlettes()) {
             "Kan ikke slette vilkår opprettet i tidligere behandling"
         }
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)

@@ -194,6 +194,7 @@ class BehandlingsstatistikkService(
             relatertBehandlingId = relatertBehandlingId,
             versjon = Applikasjonsversjon.versjon,
             vilkårsprøving = emptyList(),
+            // FIXME: dvh har ikke kapasitet til å ta i mot endringer. Skal settes til nyeOpplysningerMetadata.endringer og kilde
             revurderingÅrsak = null,
             revurderingOpplysningskilde = null,
             venteAarsak = null,

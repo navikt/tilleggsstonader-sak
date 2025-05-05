@@ -37,6 +37,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.annotation.EnableTransactionManagement
+import org.springframework.transaction.annotation.RollbackOn
 import java.util.Optional
 import javax.sql.DataSource
 import kotlin.reflect.KClass
@@ -44,6 +46,7 @@ import kotlin.reflect.KClass
 @Configuration
 @EnableJdbcAuditing
 @EnableJdbcRepositories("no.nav.tilleggsstonader.sak", "no.nav.familie.prosessering")
+@EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
 class DatabaseConfiguration : AbstractJdbcConfiguration() {
     @Bean
     fun operations(dataSource: DataSource): NamedParameterJdbcOperations = NamedParameterJdbcTemplate(dataSource)
