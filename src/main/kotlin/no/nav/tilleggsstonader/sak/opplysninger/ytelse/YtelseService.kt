@@ -2,8 +2,6 @@ package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
-import no.nav.tilleggsstonader.kontrakter.ytelse.HentetInformasjon
-import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderRequest
@@ -72,21 +70,11 @@ class YtelseService(
                 ),
             )
 
-        validerResultat(ytelsePerioder.hentetInformasjon)
-
         return ytelsePerioder.copy(
             perioder =
                 ytelsePerioder.perioder
                     .filter { it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN },
         )
-    }
-
-    private fun validerResultat(hentetInformasjon: List<HentetInformasjon>) {
-        val test = hentetInformasjon.filter { it.status != StatusHentetInformasjon.OK }
-
-        feilHvis(test.isNotEmpty()) {
-            "Feil ved henting av ytelser fra andre systemer: ${test.joinToString(", ") { it.type.name }}. Prøv å laste inn siden på nytt."
-        }
     }
 
     private fun finnRelevanteYtelsesTyper(type: Stønadstype) =
