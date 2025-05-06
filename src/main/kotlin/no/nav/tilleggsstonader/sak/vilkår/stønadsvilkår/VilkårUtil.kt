@@ -4,10 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
-import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
-import no.nav.tilleggsstonader.sak.util.tilFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import java.time.LocalDate
 
 object VilkårUtil {
@@ -24,22 +21,6 @@ object VilkårUtil {
                 ).map { it.vilkår }
 
         return (sammenslåttePerioder + perioderUtenTom).sortedBy { it.fom }
-    }
-
-    fun List<Vilkår>.finnPerioderEtterRevurderFra(revurderFra: LocalDate?): List<Vilkår> =
-        this
-            .map { VilkårHolder(it).avkortPerioderFør(revurderFraEllerFørsteIMåneden(it.type, revurderFra)) }
-            .mapNotNull { it?.vilkår }
-
-    private fun revurderFraEllerFørsteIMåneden(
-        vilkårType: VilkårType,
-        revurderFra: LocalDate?,
-    ): LocalDate? {
-        if (revurderFra == null || !vilkårType.kreverYearMonthDatoer()) {
-            return revurderFra
-        }
-
-        return revurderFra.tilFørsteDagIMåneden()
     }
 
     /**
