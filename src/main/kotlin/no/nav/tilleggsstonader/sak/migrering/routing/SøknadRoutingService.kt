@@ -86,7 +86,7 @@ class SøknadRoutingService(
     private fun skalStoppesPgaFeatureToggle(stønadstype: Stønadstype): Boolean =
         when (stønadstype) {
             Stønadstype.BARNETILSYN -> false // tilsyn barn skal ikke stoppes med feature toggle
-            Stønadstype.LÆREMIDLER -> maksAntallErNådd(stønadstype)
+            Stønadstype.LÆREMIDLER -> false // læremidler skal ikke stoppes med feature toggle
             Stønadstype.BOUTGIFTER -> maksAntallErNådd(stønadstype)
         }
 
@@ -102,7 +102,6 @@ class SøknadRoutingService(
 
     private fun Stønadstype.maksAntallToggle() =
         when (this) {
-            Stønadstype.LÆREMIDLER -> Toggle.SØKNAD_ROUTING_LÆREMIDLER
             Stønadstype.BOUTGIFTER -> Toggle.SØKNAD_ROUTING_BOUTGIFTER
             else -> error("Har ikke maksAntalLToggle for stønadstype=$this")
         }
@@ -118,8 +117,8 @@ class SøknadRoutingService(
 
         val harGyldigStatus =
             when (stønadstype) {
-                Stønadstype.BARNETILSYN -> !harAktivtVedtak
-                Stønadstype.LÆREMIDLER -> !harAktivtVedtak
+                Stønadstype.BARNETILSYN -> true
+                Stønadstype.LÆREMIDLER -> true
                 Stønadstype.BOUTGIFTER -> !harAktivtVedtak
             }
 

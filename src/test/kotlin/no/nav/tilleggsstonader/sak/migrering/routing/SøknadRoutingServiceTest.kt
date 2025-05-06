@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle.SØKNAD_ROUTING_LÆREMIDLER
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle.SØKNAD_ROUTING_BOUTGIFTER
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockGetVariant
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
@@ -180,7 +180,7 @@ class SøknadRoutingServiceTest {
 
         @Test
         fun `skal ikke route læremidler dersom det finnes noe aktivt vedtak`() {
-            unleashService.mockGetVariant(SØKNAD_ROUTING_LÆREMIDLER, søknadRoutingVariant(10))
+            unleashService.mockGetVariant(SØKNAD_ROUTING_BOUTGIFTER, søknadRoutingVariant(10))
             every { arenaService.hentStatus(any(), any()) } returns arenaStatusAktivtVedtak()
             every { søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER) } returns 0
 
@@ -199,14 +199,14 @@ class SøknadRoutingServiceTest {
     inner class Toggle {
         @Test
         fun `skal behandles i ny løsning dersom maks antall ikke er nådd`() {
-            unleashService.mockGetVariant(SØKNAD_ROUTING_LÆREMIDLER, søknadRoutingVariant(10))
+            unleashService.mockGetVariant(SØKNAD_ROUTING_BOUTGIFTER, søknadRoutingVariant(10))
             every { søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER) } returns 0
             every { arenaService.hentStatus(any(), any()) } returns arenaStatusKanRoutes()
 
             assertThat(skalBehandlesINyLøsning(IdentStønadstype(ident, Stønadstype.LÆREMIDLER))).isTrue
 
             verify {
-                unleashService.getVariant(SØKNAD_ROUTING_LÆREMIDLER)
+                unleashService.getVariant(SØKNAD_ROUTING_BOUTGIFTER)
                 søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER)
                 søknadRoutingRepository.insert(any())
             }
@@ -214,14 +214,14 @@ class SøknadRoutingServiceTest {
 
         @Test
         fun `skal ikke behandles i ny løsning dersom maks antall er nådd`() {
-            unleashService.mockGetVariant(SØKNAD_ROUTING_LÆREMIDLER, søknadRoutingVariant(0))
+            unleashService.mockGetVariant(SØKNAD_ROUTING_BOUTGIFTER, søknadRoutingVariant(0))
             every { søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER) } returns 0
             every { arenaService.hentStatus(any(), any()) } returns arenaStatusKanRoutes()
 
             assertThat(skalBehandlesINyLøsning(IdentStønadstype(ident, Stønadstype.LÆREMIDLER))).isFalse
 
             verify {
-                unleashService.getVariant(SØKNAD_ROUTING_LÆREMIDLER)
+                unleashService.getVariant(SØKNAD_ROUTING_BOUTGIFTER)
                 søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER)
             }
             verify(exactly = 0) { søknadRoutingRepository.insert(any()) }
