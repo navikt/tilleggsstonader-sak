@@ -16,7 +16,7 @@ Egenskap: Beregning av midlertidig overnatting
 
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
-      | 07.01.2025 | 09.01.2025 | 1              | 1000         | 4953      | 07.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 07.01.2025 | 06.02.2025 | 1              | 1000         | 4953      | 07.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
   Scenario: Vedtaksperiode krysser nyttår
     Gitt følgende vedtaksperioder for boutgifter
@@ -31,7 +31,7 @@ Egenskap: Beregning av midlertidig overnatting
 
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
-      | 30.12.2024 | 02.01.2025 | 1              | 4809         | 4809      | 30.12.2024      | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 30.12.2024 | 29.01.2025 | 1              | 4809         | 4809      | 30.12.2024      | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
   Scenario: Flere vedtaksperioder med ulik utbetalingsperiode
     Gitt følgende vedtaksperioder for boutgifter
@@ -48,8 +48,8 @@ Egenskap: Beregning av midlertidig overnatting
 
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
-      | 07.01.2025 | 09.01.2025 | 1              | 1000         | 4953      | 07.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
-      | 12.03.2025 | 15.03.2025 | 1              | 4953         | 4953      | 12.03.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 07.01.2025 | 06.02.2025 | 1              | 1000         | 4953      | 07.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 12.03.2025 | 11.04.2025 | 1              | 4953         | 4953      | 12.03.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
 
   Scenario: Flere vedtaksperioder med samme utbetalingsperiode
@@ -67,7 +67,7 @@ Egenskap: Beregning av midlertidig overnatting
 
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
-      | 07.01.2025 | 24.01.2025 | 1              | 2000         | 4953      | 07.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 07.01.2025 | 06.02.2025 | 1              | 2000         | 4953      | 07.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
   Scenario: Vedtaksperiode kun i helg
     Gitt følgende vedtaksperioder for boutgifter
@@ -82,7 +82,7 @@ Egenskap: Beregning av midlertidig overnatting
 
     Så skal beregnet stønad for boutgifter være
       | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
-      | 11.01.2025 | 12.01.2025 | 1              | 1500         | 4953      | 11.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 11.01.2025 | 10.02.2025 | 1              | 1500         | 4953      | 11.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
   Scenario: Vedtaksperiode krysser utbetalingsperiode
     Gitt følgende vedtaksperioder for boutgifter
