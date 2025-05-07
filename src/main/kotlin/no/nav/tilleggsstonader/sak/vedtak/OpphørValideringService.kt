@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -49,7 +49,7 @@ class OpphørValideringService(
     }
 
     fun validerVedtaksperioderAvkortetVedOpphør(
-        forrigeBehandlingsVedtaksperioder: List<Periode<LocalDate>>,
+        forrigeBehandlingsVedtaksperioder: List<Vedtaksperiode>,
         revurderFraDato: LocalDate,
     ) {
         val senesteTomIForrigeVedtaksperioder = forrigeBehandlingsVedtaksperioder.maxOf { it.tom }
@@ -57,6 +57,17 @@ class OpphørValideringService(
         brukerfeilHvis(senesteTomIForrigeVedtaksperioder < revurderFraDato) {
             "Opphør er et ugyldig valg fordi ønsket opphørsdato ikke korter ned vedtaket."
         }
+    }
+
+    // TODO: Fjern når læremidler er over på felles vedtaksperiode
+    fun validerVedtaksperioderAvkortetVedOpphørLæremidler(
+        forrigeBehandlingsVedtaksperioder: List<no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode>,
+        revurderFraDato: LocalDate,
+    ) {
+        validerVedtaksperioderAvkortetVedOpphør(
+            forrigeBehandlingsVedtaksperioder.map { it.tilFellesDomeneVedtaksperiode() },
+            revurderFraDato,
+        )
     }
 
     private fun validerIngenNyeOppfylteVilkårEllerVilkårperioder(

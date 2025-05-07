@@ -32,7 +32,7 @@ class OpphørValideringServiceLæremidlerTest {
         @Test
         fun `Kaster ikke feil når vedtaksperioden er avkortet`() {
             assertThatCode {
-                opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
+                opphørValideringService.validerVedtaksperioderAvkortetVedOpphørLæremidler(
                     forrigeBehandlingsVedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
                     revurderFraDato = sisteFebruar,
                 )
@@ -42,7 +42,7 @@ class OpphørValideringServiceLæremidlerTest {
         @Test
         fun `Kaster feil når vedtaksperioden ikke er avkortet`() {
             assertThatThrownBy {
-                opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
+                opphørValideringService.validerVedtaksperioderAvkortetVedOpphørLæremidler(
                     forrigeBehandlingsVedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
                     revurderFraDato = førsteMars,
                 )
