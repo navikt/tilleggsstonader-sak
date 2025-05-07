@@ -40,7 +40,7 @@ data class UtbetalingPeriode(
         løpendeMåned: LøpendeMåned,
     ) : this(
         fom = løpendeMåned.fom,
-        tom = løpendeMåned.vedtaksperioder.maxOf { it.tom },
+        tom = løpendeMåned.tom,
         // TODO: Prioriter hvilken målgruppe+aktivitet som skal være gjeldende til økonomi hvis ulike målgrupper havner innenfor samme løpende måned
         målgruppe =
             løpendeMåned.vedtaksperioder
