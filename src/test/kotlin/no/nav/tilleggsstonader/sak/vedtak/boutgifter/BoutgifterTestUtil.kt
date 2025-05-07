@@ -69,34 +69,18 @@ object BoutgifterTestUtil {
         aktivitet = aktivitet,
     )
 
-    val vedtakBesregningsresultat = BeregningsresultatBoutgifter(
-        perioder = listOf(
-            lagBeregningsresultatMåned(
-                fom = LocalDate.of(2025, 1, 1),
-                tom = LocalDate.of(2025, 10, 31),
-                utgifter = mapOf(
-                    TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
-                            listOf(
-                                UtgiftBeregningBoutgifter(
-                                    fom = LocalDate.of(2025, 1, 1),
-                                    tom = LocalDate.of(2025, 3, 31),
-                                    utgift = 3000,
-                                ),
-                            ),
-                ),
-                delAvTidligere = false,
-            )
-        )
-    )
-
-    fun beregningsresultat(fom: LocalDate = LocalDate.of(2025, JANUARY, 1), tom: LocalDate = fom) =
-        BeregningsresultatBoutgifter(
-            perioder = listOf(
+    fun beregningsresultat(
+        fom: LocalDate = LocalDate.of(2025, JANUARY, 1),
+        tom: LocalDate = fom,
+    ) = BeregningsresultatBoutgifter(
+        perioder =
+            listOf(
                 lagBeregningsresultatMåned(
                     fom = fom,
                     tom = tom,
-                    utgifter = mapOf(
-                        TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
+                    utgifter =
+                        mapOf(
+                            TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                                 listOf(
                                     UtgiftBeregningBoutgifter(
                                         fom = fom,
@@ -104,11 +88,11 @@ object BoutgifterTestUtil {
                                         utgift = 3000,
                                     ),
                                 ),
-                    ),
+                        ),
                     delAvTidligere = false,
-                )
-            )
-        )
+                ),
+            ),
+    )
 
     fun lagBeregningsresultatMåned(
         fom: LocalDate,
