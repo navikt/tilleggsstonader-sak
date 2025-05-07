@@ -5,11 +5,13 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 
 data class BeregningsresultatBoutgifterDto(
     val perioder: List<BeregningsresultatForPeriodeDto>,
+    val skalBrukeDetaljertVisning: Boolean,
 )
 
 data class BeregningsresultatForPeriodeDto(
@@ -31,6 +33,7 @@ fun BeregningsresultatBoutgifter.tilDto(revurderFra: LocalDate?): Beregningsresu
             filtrerFraOgMed(revurderFra)
                 .perioder
                 .map { it.tilDto() },
+        skalBrukeDetaljertVisning = skalBrukeDetaljertVisning(),
     )
 
 private fun BeregningsresultatBoutgifter.filtrerFraOgMed(dato: LocalDate?): BeregningsresultatBoutgifter {
@@ -39,6 +42,12 @@ private fun BeregningsresultatBoutgifter.filtrerFraOgMed(dato: LocalDate?): Bere
     }
     return BeregningsresultatBoutgifter(perioder.filter { it.tom >= dato })
 }
+
+private fun BeregningsresultatBoutgifter.skalBrukeDetaljertVisning(): Boolean =
+    perioder.any {
+        it.grunnlag.utgifter.keys
+            .contains(TypeBoutgift.UTGIFTER_OVERNATTING)
+    }
 
 fun BeregningsresultatForLøpendeMåned.tilDto(): BeregningsresultatForPeriodeDto =
     BeregningsresultatForPeriodeDto(
