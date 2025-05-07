@@ -548,19 +548,19 @@ object Testdata {
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
             )
-        val opphørtVedtak = GeneriskVedtak(
-            behandlingId = behandlingId,
-            type = TypeVedtak.OPPHØR,
-            data =
-                OpphørBoutgifter(
-                    årsaker = listOf(ÅrsakOpphør.ENDRING_UTGIFTER, ÅrsakOpphør.ENDRING_MÅLGRUPPE),
-                    begrunnelse = "Begrunelse for avslag",
-                    vedtaksperioder = vedtaksperioder,
-                    beregningsresultat = beregningsresultat,
-                ),
-            gitVersjon = Applikasjonsversjon.versjon,
-        )
-
+        val opphørtVedtak =
+            GeneriskVedtak(
+                behandlingId = behandlingId,
+                type = TypeVedtak.OPPHØR,
+                data =
+                    OpphørBoutgifter(
+                        årsaker = listOf(ÅrsakOpphør.ENDRING_UTGIFTER, ÅrsakOpphør.ENDRING_MÅLGRUPPE),
+                        begrunnelse = "Begrunelse for avslag",
+                        vedtaksperioder = vedtaksperioder,
+                        beregningsresultat = beregningsresultat,
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+            )
 
         private val aktivitetererBoutgifter =
             listOf(
