@@ -11,7 +11,6 @@ import java.time.LocalDate
 
 data class BeregningsresultatBoutgifterDto(
     val perioder: List<BeregningsresultatForPeriodeDto>,
-    val skalBrukeDetaljertVisning: Boolean,
 )
 
 data class BeregningsresultatForPeriodeDto(
@@ -19,7 +18,7 @@ data class BeregningsresultatForPeriodeDto(
     override val tom: LocalDate,
     val stønadsbeløp: Int,
     val utbetalingsdato: LocalDate,
-    val utgifter: List<UtgiftBeregningBoutgifter>,
+    val utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
     val sumUtgifter: Int,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
@@ -33,7 +32,6 @@ fun BeregningsresultatBoutgifter.tilDto(revurderFra: LocalDate?): Beregningsresu
             filtrerFraOgMed(revurderFra)
                 .perioder
                 .map { it.tilDto() },
-        skalBrukeDetaljertVisning = skalBrukeDetaljertVisning(),
     )
 
 private fun BeregningsresultatBoutgifter.filtrerFraOgMed(dato: LocalDate?): BeregningsresultatBoutgifter {
@@ -56,7 +54,7 @@ fun BeregningsresultatForLøpendeMåned.tilDto(): BeregningsresultatForPeriodeDt
         stønadsbeløp = stønadsbeløp,
         utbetalingsdato = grunnlag.utbetalingsdato,
         sumUtgifter = summerUtgifter(),
-        utgifter = grunnlag.utgifter.values.flatten(),
+        utgifter = grunnlag.utgifter,
         målgruppe = grunnlag.målgruppe,
         aktivitet = grunnlag.aktivitet,
         makssatsBekreftet = grunnlag.makssatsBekreftet,
