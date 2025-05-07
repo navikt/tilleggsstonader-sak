@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
@@ -12,6 +11,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserRegisterDtoMapper.tilDto
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserUtil.finnRelevanteYtelsesTyper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -76,16 +76,4 @@ class YtelseService(
                     .filter { it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN },
         )
     }
-
-    private fun finnRelevanteYtelsesTyper(type: Stønadstype) =
-        when (type) {
-            Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER, Stønadstype.BOUTGIFTER ->
-                listOf(
-                    TypeYtelsePeriode.AAP,
-                    TypeYtelsePeriode.ENSLIG_FORSØRGER,
-                    TypeYtelsePeriode.OMSTILLINGSSTØNAD,
-                )
-
-            else -> error("Finner ikke relevante ytelser for stønadstype $type")
-        }
 }
