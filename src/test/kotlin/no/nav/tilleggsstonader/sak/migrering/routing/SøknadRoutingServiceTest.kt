@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.migrering.routing
 
 import io.getunleash.variant.Variant
 import io.mockk.called
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -50,7 +51,7 @@ class SøknadRoutingServiceTest {
         )
 
     private val ident = "1"
-    private val stønadstype = Stønadstype.BARNETILSYN
+    private val stønadstype = Stønadstype.BOUTGIFTER
 
     private val søknadRouting = SøknadRouting(ident = ident, type = stønadstype, detaljer = JsonWrapper(""))
 
@@ -67,12 +68,12 @@ class SøknadRoutingServiceTest {
         every { arenaService.hentStatus(any(), any()) } returns arenaStatusAktivtVedtak()
         every { personService.hentFolkeregisterIdenter(any()) } answers
             { PdlIdenter(listOf(PdlIdent(firstArg(), false, "FOLKEREGISTERIDENT"))) }
-        unmockkObject(unleashService)
     }
 
     @AfterEach
     fun tearDown() {
         unmockkObject(EnvUtil)
+        clearMocks(unleashService)
     }
 
     @Test
@@ -96,8 +97,9 @@ class SøknadRoutingServiceTest {
     @Nested
     inner class HarBehandling {
         @Test
-        fun `skal sjekke om det finnes behandling hvis det ikke innslag i databasen`() {
-            assertThat(skalBehandlesINyLøsning()).isFalse
+        fun `skal sjekke om det finnes behandling hvis det ikke finnes innslag i databasen`() {
+            unleashService.mockGetVariant(SØKNAD_ROUTING_BOUTGIFTER, søknadRoutingVariant(0))
+            assertThat(skalBehandlesINyLøsning(IdentStønadstype(ident, Stønadstype.BOUTGIFTER))).isFalse
 
             verify {
                 fagsakService.finnFagsak(any(), any())
@@ -127,6 +129,11 @@ class SøknadRoutingServiceTest {
 
     @Nested
     inner class ArenaStatus {
+        @BeforeEach
+        fun setUp() {
+            unleashService.mockGetVariant(SØKNAD_ROUTING_BOUTGIFTER, søknadRoutingVariant(20))
+        }
+
         @Test
         fun `skal sjekke arenstatus hvis det ikke finnes innslag i databasen eller behandlinger`() {
             assertThat(skalBehandlesINyLøsning()).isFalse
@@ -179,12 +186,12 @@ class SøknadRoutingServiceTest {
         }
 
         @Test
-        fun `skal ikke route læremidler dersom det finnes noe aktivt vedtak`() {
+        fun `skal ikke route boutgifter dersom det finnes noe aktivt vedtak`() {
             unleashService.mockGetVariant(SØKNAD_ROUTING_BOUTGIFTER, søknadRoutingVariant(10))
             every { arenaService.hentStatus(any(), any()) } returns arenaStatusAktivtVedtak()
-            every { søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER) } returns 0
+            every { søknadRoutingRepository.countByType(Stønadstype.BOUTGIFTER) } returns 0
 
-            assertThat(skalBehandlesINyLøsning(IdentStønadstype(ident, Stønadstype.LÆREMIDLER))).isFalse
+            assertThat(skalBehandlesINyLøsning(IdentStønadstype(ident, Stønadstype.BOUTGIFTER))).isFalse
 
             verify(exactly = 0) {
                 søknadRoutingRepository.insert(any())
@@ -200,14 +207,14 @@ class SøknadRoutingServiceTest {
         @Test
         fun `skal behandles i ny løsning dersom maks antall ikke er nådd`() {
             unleashService.mockGetVariant(SØKNAD_ROUTING_BOUTGIFTER, søknadRoutingVariant(10))
-            every { søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER) } returns 0
+            every { søknadRoutingRepository.countByType(Stønadstype.BOUTGIFTER) } returns 0
             every { arenaService.hentStatus(any(), any()) } returns arenaStatusKanRoutes()
 
-            assertThat(skalBehandlesINyLøsning(IdentStønadstype(ident, Stønadstype.LÆREMIDLER))).isTrue
+            assertThat(skalBehandlesINyLøsning(IdentStønadstype(ident, Stønadstype.BOUTGIFTER))).isTrue
 
             verify {
                 unleashService.getVariant(SØKNAD_ROUTING_BOUTGIFTER)
-                søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER)
+                søknadRoutingRepository.countByType(Stønadstype.BOUTGIFTER)
                 søknadRoutingRepository.insert(any())
             }
         }
@@ -215,21 +222,21 @@ class SøknadRoutingServiceTest {
         @Test
         fun `skal ikke behandles i ny løsning dersom maks antall er nådd`() {
             unleashService.mockGetVariant(SØKNAD_ROUTING_BOUTGIFTER, søknadRoutingVariant(0))
-            every { søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER) } returns 0
+            every { søknadRoutingRepository.countByType(Stønadstype.BOUTGIFTER) } returns 0
             every { arenaService.hentStatus(any(), any()) } returns arenaStatusKanRoutes()
 
-            assertThat(skalBehandlesINyLøsning(IdentStønadstype(ident, Stønadstype.LÆREMIDLER))).isFalse
+            assertThat(skalBehandlesINyLøsning(IdentStønadstype(ident, Stønadstype.BOUTGIFTER))).isFalse
 
             verify {
                 unleashService.getVariant(SØKNAD_ROUTING_BOUTGIFTER)
-                søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER)
+                søknadRoutingRepository.countByType(Stønadstype.BOUTGIFTER)
             }
             verify(exactly = 0) { søknadRoutingRepository.insert(any()) }
         }
 
         @Test
         fun `skal ikke sjekke toggle for tilsyn barn`() {
-            assertThat(skalBehandlesINyLøsning()).isFalse
+            assertThat(skalBehandlesINyLøsning(IdentStønadstype(ident, Stønadstype.BARNETILSYN))).isTrue
 
             verify(exactly = 0) {
                 unleashService.getVariant(any())
@@ -242,7 +249,10 @@ class SøknadRoutingServiceTest {
     inner class SkalRuteAlleUtenÅSjekkeFeatureToggle {
         @Test
         fun `skal rute alle til ny løsning`() {
-            val resultat = skalBehandlesINyLøsning(sjekkSkalRuteAlleSøkere = true)
+            val stønadstype = Stønadstype.BARNETILSYN
+            val request = IdentStønadstype(ident, stønadstype)
+
+            val resultat = skalBehandlesINyLøsning(request, sjekkSkalRuteAlleSøkere = true)
             assertThat(resultat).isTrue()
 
             verify {
