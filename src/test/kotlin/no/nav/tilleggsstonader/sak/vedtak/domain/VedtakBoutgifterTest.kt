@@ -67,7 +67,7 @@ class VedtakBoutgifterTest {
         }
 
         @Test
-        fun `skal feile om opphørt vedtak ikke har årsak for opphør`() {
+        fun `skal feile om opphørt vedtak ikke har begrunnelse for opphør`() {
             assertThatThrownBy {
                 OpphørBoutgifter(
                     beregningsresultat = beregningsresultat(fom = førsteJan25),
