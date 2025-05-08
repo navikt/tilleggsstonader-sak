@@ -404,7 +404,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `kan ikke fjerne begrunnelse hvis x`() {
+        fun `kan ikke fjerne begrunnelse hvis den er obligatorisk pga eksisterende svar`() {
             val originalMålgruppe =
                 målgruppe(
                     fom = now().minusMonths(1),
