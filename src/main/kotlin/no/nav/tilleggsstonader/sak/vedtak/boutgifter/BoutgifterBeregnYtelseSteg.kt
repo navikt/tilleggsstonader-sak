@@ -25,7 +25,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
@@ -36,7 +35,7 @@ import java.time.LocalDate
 class BoutgifterBeregnYtelseSteg(
     private val beregningService: BoutgifterBeregningService,
     private val opphørValideringService: OpphørValideringService,
-    vedtakRepository: VedtakRepository,
+    override val vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
 ) : BeregnYtelseSteg<VedtakBoutgifterRequest>(
@@ -60,19 +59,18 @@ class BoutgifterBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtak: InnvilgelseBoutgifterRequest,
     ) {
+        val vedtaksperioder = vedtak.vedtaksperioder.tilDomene().sorted()
         val beregningsresultat =
             beregningService.beregn(
-                vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
+                vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
             )
-        vedtakRepository.insert(
-            lagInnvilgetVedtak(
-                behandling = saksbehandling,
-                beregningsresultat = beregningsresultat,
-                vedtaksperioder = vedtak.vedtaksperioder.tilDomene().sorted(),
-                begrunnelse = vedtak.begrunnelse,
-            ),
+        lagreInnvilgetVedtak(
+            behandling = saksbehandling,
+            beregningsresultat = beregningsresultat,
+            vedtaksperioder = vedtaksperioder,
+            begrunnelse = vedtak.begrunnelse,
         )
         lagreTilkjentYtelse(saksbehandling, beregningsresultat)
     }
@@ -100,20 +98,7 @@ class BoutgifterBeregnYtelseSteg(
 
         val beregningsresultat = beregningService.beregn(saksbehandling, avkortedeVedtaksperioder, TypeVedtak.OPPHØR)
 
-        vedtakRepository.insert(
-            GeneriskVedtak(
-                behandlingId = saksbehandling.id,
-                type = TypeVedtak.OPPHØR,
-                data =
-                    OpphørBoutgifter(
-                        vedtaksperioder = avkortedeVedtaksperioder,
-                        beregningsresultat = beregningsresultat,
-                        årsaker = vedtak.årsakerOpphør,
-                        begrunnelse = vedtak.begrunnelse,
-                    ),
-                gitVersjon = Applikasjonsversjon.versjon,
-            ),
-        )
+        lagreOpphørsvedtak(saksbehandling, avkortedeVedtaksperioder, beregningsresultat, vedtak)
         lagreTilkjentYtelse(saksbehandling, beregningsresultat)
     }
 
@@ -145,23 +130,48 @@ class BoutgifterBeregnYtelseSteg(
         )
     }
 
-    private fun lagInnvilgetVedtak(
+    private fun lagreInnvilgetVedtak(
         behandling: Saksbehandling,
         beregningsresultat: BeregningsresultatBoutgifter,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
-    ): Vedtak =
-        GeneriskVedtak(
-            behandlingId = behandling.id,
-            type = TypeVedtak.INNVILGELSE,
-            data =
-                InnvilgelseBoutgifter(
-                    vedtaksperioder = vedtaksperioder,
-                    begrunnelse = begrunnelse,
-                    beregningsresultat = BeregningsresultatBoutgifter(beregningsresultat.perioder),
-                ),
-            gitVersjon = Applikasjonsversjon.versjon,
+    ) {
+        vedtakRepository.insert(
+            GeneriskVedtak(
+                behandlingId = behandling.id,
+                type = TypeVedtak.INNVILGELSE,
+                data =
+                    InnvilgelseBoutgifter(
+                        vedtaksperioder = vedtaksperioder,
+                        begrunnelse = begrunnelse,
+                        beregningsresultat = BeregningsresultatBoutgifter(beregningsresultat.perioder),
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+            ),
         )
+    }
+
+    private fun lagreOpphørsvedtak(
+        saksbehandling: Saksbehandling,
+        avkortedeVedtaksperioder: List<Vedtaksperiode>,
+        beregningsresultat: BeregningsresultatBoutgifter,
+        vedtak: OpphørBoutgifterRequest,
+    ) {
+        vedtakRepository.insert(
+            GeneriskVedtak(
+                behandlingId = saksbehandling.id,
+                type = TypeVedtak.OPPHØR,
+                data =
+                    OpphørBoutgifter(
+                        vedtaksperioder = avkortedeVedtaksperioder,
+                        beregningsresultat = beregningsresultat,
+                        årsaker = vedtak.årsakerOpphør,
+                        begrunnelse = vedtak.begrunnelse,
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+            ),
+        )
+    }
 
     private fun lagreTilkjentYtelse(
         saksbehandling: Saksbehandling,
