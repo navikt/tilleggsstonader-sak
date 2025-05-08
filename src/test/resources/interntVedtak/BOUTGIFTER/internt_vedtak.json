@@ -193,6 +193,13 @@
       "tom" : "2024-01-31",
       "stønadsbeløp" : 3000,
       "utbetalingsdato" : "2024-01-01",
+      "utgifter" : {
+        "UTGIFTER_OVERNATTING" : [ {
+          "fom" : "2024-01-01",
+          "tom" : "2024-01-31",
+          "utgift" : 3000
+        } ]
+      },
       "sumUtgifter" : 3000,
       "målgruppe" : "NEDSATT_ARBEIDSEVNE",
       "aktivitet" : "TILTAK",
@@ -203,6 +210,13 @@
       "tom" : "2024-02-29",
       "stønadsbeløp" : 4000,
       "utbetalingsdato" : "2024-01-01",
+      "utgifter" : {
+        "UTGIFTER_OVERNATTING" : [ {
+          "fom" : "2024-02-26",
+          "tom" : "2024-02-29",
+          "utgift" : 4000
+        } ]
+      },
       "sumUtgifter" : 4000,
       "målgruppe" : "NEDSATT_ARBEIDSEVNE",
       "aktivitet" : "TILTAK",

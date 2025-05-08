@@ -2,8 +2,10 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 
@@ -16,6 +18,7 @@ data class BeregningsresultatForPeriodeDto(
     override val tom: LocalDate,
     val stønadsbeløp: Int,
     val utbetalingsdato: LocalDate,
+    val utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
     val sumUtgifter: Int,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
@@ -31,6 +34,19 @@ fun BeregningsresultatBoutgifter.tilDto(revurderFra: LocalDate?): Beregningsresu
                 .map { it.tilDto() },
     )
 
+private fun BeregningsresultatBoutgifter.filtrerFraOgMed(dato: LocalDate?): BeregningsresultatBoutgifter {
+    if (dato == null) {
+        return this
+    }
+    return BeregningsresultatBoutgifter(perioder.filter { it.tom >= dato })
+}
+
+private fun BeregningsresultatBoutgifter.skalBrukeDetaljertVisning(): Boolean =
+    perioder.any {
+        it.grunnlag.utgifter.keys
+            .contains(TypeBoutgift.UTGIFTER_OVERNATTING)
+    }
+
 fun BeregningsresultatForLøpendeMåned.tilDto(): BeregningsresultatForPeriodeDto =
     BeregningsresultatForPeriodeDto(
         fom = grunnlag.fom,
@@ -38,6 +54,7 @@ fun BeregningsresultatForLøpendeMåned.tilDto(): BeregningsresultatForPeriodeDt
         stønadsbeløp = stønadsbeløp,
         utbetalingsdato = grunnlag.utbetalingsdato,
         sumUtgifter = summerUtgifter(),
+        utgifter = grunnlag.utgifter,
         målgruppe = grunnlag.målgruppe,
         aktivitet = grunnlag.aktivitet,
         makssatsBekreftet = grunnlag.makssatsBekreftet,

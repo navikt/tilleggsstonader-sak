@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
@@ -14,14 +13,7 @@ import kotlin.math.min
 
 data class BeregningsresultatBoutgifter(
     val perioder: List<BeregningsresultatForLøpendeMåned>,
-) {
-    fun filtrerFraOgMed(dato: LocalDate?): BeregningsresultatBoutgifter {
-        if (dato == null) {
-            return this
-        }
-        return BeregningsresultatBoutgifter(perioder.avkortPerioderFør(dato))
-    }
-}
+)
 
 data class BeregningsresultatForLøpendeMåned(
     val grunnlag: Beregningsgrunnlag,

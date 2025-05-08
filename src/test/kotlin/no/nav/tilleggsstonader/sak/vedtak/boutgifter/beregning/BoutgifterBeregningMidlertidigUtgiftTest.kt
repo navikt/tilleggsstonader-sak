@@ -233,7 +233,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 ),
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 3, 10),
-                    tom = LocalDate.of(2025, 3, 12),
+                    tom = LocalDate.of(2025, 4, 9),
                     utgifter = utgiftEtterRevurderFra,
                     delAvTidligere = false,
                 ),
