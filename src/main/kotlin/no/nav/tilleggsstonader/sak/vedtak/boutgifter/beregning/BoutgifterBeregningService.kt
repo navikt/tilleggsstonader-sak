@@ -74,7 +74,6 @@ class BoutgifterBeregningService(
             beregnAktuellePerioder(
                 vedtaksperioder = vedtaksperioderBeregning,
                 utgifter = utgifterPerVilkårtype,
-                skalAvkorteLøpendeMåned = unleashService.isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT).not(),
             )
 
         return if (forrigeVedtak != null) {
@@ -91,18 +90,20 @@ class BoutgifterBeregningService(
     private fun beregnAktuellePerioder(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
-        skalAvkorteLøpendeMåned: Boolean,
     ): List<BeregningsresultatForLøpendeMåned> =
         vedtaksperioder
             .sorted()
             .splittTilLøpendeMåneder()
-            .map { UtbetalingPeriode(it, skalAvkorteLøpendeMåned) }
+            .map { UtbetalingPeriode(it, skalAvkorteUtbetalingPeriode(utgifter)) }
             .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
             .map {
                 BeregningsresultatForLøpendeMåned(
                     grunnlag = lagBeregningsGrunnlag(periode = it, utgifter = utgifter),
                 )
             }
+
+    private fun skalAvkorteUtbetalingPeriode(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>): Boolean =
+        TypeBoutgift.UTGIFTER_OVERNATTING !in utgifter.keys || !unleashService.isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT)
 
     /**
      * Slår sammen perioder fra forrige og nytt vedtak.
