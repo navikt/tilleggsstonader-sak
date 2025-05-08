@@ -96,6 +96,7 @@ class BoutgifterBeregningService(
             .splittTilLøpendeMåneder()
             .map { UtbetalingPeriode(it, skalAvkorteUtbetalingPeriode(utgifter)) }
             .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
+            .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(utgifter)
             .map {
                 BeregningsresultatForLøpendeMåned(
                     grunnlag = lagBeregningsGrunnlag(periode = it, utgifter = utgifter),
@@ -278,6 +279,29 @@ private fun validerUtgifterTilMidlertidigOvernattingErInnenforVedtaksperiodene(
     brukerfeilHvisIkke(alleUtgifterErInnenforVedtaksperioder) {
         "Du har lagt inn utgifter til midlertidig overnatting som ikke er inneholdt i en vedtaksperiode. Foreløpig støtter vi ikke dette."
     }
+}
+
+private fun List<UtbetalingPeriode>.validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(
+    utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+): List<UtbetalingPeriode> {
+    val fasteUtgifter =
+        (utgifter[TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG] ?: emptyList()) +
+            (utgifter[TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER] ?: emptyList())
+
+    val detFinnesUtbetalingsperioderSomOverlapperFlereLøpendeUtgifter =
+        any { utbetalingsperiode ->
+            fasteUtgifter.filter { utbetalingsperiode.overlapper(it) }.size > 1
+        }
+
+    feilHvis(detFinnesUtbetalingsperioderSomOverlapperFlereLøpendeUtgifter) {
+        """
+        Vi støtter foreløpig ikke at utbetalingsperioder overlapper mer enn én løpende utgift. 
+        Utbetalingsperioder for denne behandlingen er: ${map { it.formatertPeriodeNorskFormat() }}, 
+        mens utgiftsperiodene er: ${fasteUtgifter.map { it.formatertPeriodeNorskFormat() }}
+        """.trimIndent()
+    }
+
+    return this
 }
 
 private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(

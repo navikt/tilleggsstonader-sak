@@ -52,6 +52,22 @@ Egenskap: Beregning av faste utgifter
       | 01.04.2025 | 30.04.2025 | 1              | 1000         | 4953      | 01.04.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
 
+  Scenario: Hvis det finnes en beregningsperiode som overlapper med flere utgiftsperioder, skal feil kastes fordi det ikke er støttet i løsningen enda
+    Gitt følgende vedtaksperioder for boutgifter
+      | Fom        | Tom        | Aktivitet | Målgruppe           |
+      | 15.01.2025 | 31.03.2025 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+
+    Gitt følgende utgifter for: LØPENDE_UTGIFTER_EN_BOLIG
+      | Fom        | Tom        | Utgift |
+      | 01.01.2025 | 31.01.2025 | 1000   |
+      | 01.02.2025 | 28.02.2025 | 1000   |
+      | 01.03.2025 | 31.03.2025 | 1000   |
+
+    Når beregner boutgifter
+
+    Så forvent følgende feil for boutgifter: Vi støtter foreløpig ikke at utbetalingsperioder overlapper mer enn én løpende utgift.
+
+
   Scenario: Vedtaksperiode krysser nyttår
     Gitt følgende vedtaksperioder for boutgifter
       | Fom        | Tom        | Aktivitet | Målgruppe           |
