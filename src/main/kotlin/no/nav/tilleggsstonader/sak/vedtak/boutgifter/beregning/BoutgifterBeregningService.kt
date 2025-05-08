@@ -2,12 +2,14 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -32,6 +34,7 @@ class BoutgifterBeregningService(
     private val boutgifterUtgiftService: BoutgifterUtgiftService,
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val vedtakRepository: VedtakRepository,
+    private val unleashService: UnleashService,
 ) {
     /**
      * Kjente begrensninger i beregningen (programmet kaster feil dersom antagelsene ikke stemmer):
@@ -71,6 +74,7 @@ class BoutgifterBeregningService(
             beregnAktuellePerioder(
                 vedtaksperioder = vedtaksperioderBeregning,
                 utgifter = utgifterPerVilkårtype,
+                skalAvkorteLøpendeMåned = unleashService.isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT).not(),
             )
 
         return if (forrigeVedtak != null) {
@@ -87,11 +91,12 @@ class BoutgifterBeregningService(
     private fun beregnAktuellePerioder(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+        skalAvkorteLøpendeMåned: Boolean,
     ): List<BeregningsresultatForLøpendeMåned> =
         vedtaksperioder
             .sorted()
             .splittTilLøpendeMåneder()
-            .map { UtbetalingPeriode(it) }
+            .map { UtbetalingPeriode(it, skalAvkorteLøpendeMåned) }
             .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
             .map {
                 BeregningsresultatForLøpendeMåned(

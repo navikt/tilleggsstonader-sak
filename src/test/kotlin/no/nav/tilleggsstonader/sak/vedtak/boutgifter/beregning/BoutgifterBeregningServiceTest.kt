@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -17,6 +19,7 @@ class BoutgifterBeregningServiceTest {
     val boutgifterUtgiftService = mockk<BoutgifterUtgiftService>()
     val vedtakRepository = mockk<VedtakRepository>()
     val vilkårperiodeService = mockk<VilkårperiodeService>()
+    val unleashService = mockk<UnleashService>()
 
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
@@ -29,6 +32,7 @@ class BoutgifterBeregningServiceTest {
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepository,
+            unleashService = unleashService,
         )
 
     val behandling = saksbehandling()
@@ -64,6 +68,7 @@ class BoutgifterBeregningServiceTest {
             )
 
         every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgift
+        every { unleashService.isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT) } returns true
 
         assertThatThrownBy {
             boutgifterBeregningService.beregn(

@@ -38,9 +38,10 @@ data class UtbetalingPeriode(
 
     constructor(
         løpendeMåned: LøpendeMåned,
+        skalAvkorte: Boolean,
     ) : this(
         fom = løpendeMåned.fom,
-        tom = løpendeMåned.tom,
+        tom = if (skalAvkorte) løpendeMåned.vedtaksperioder.maxOf { it.tom } else løpendeMåned.tom,
         // TODO: Prioriter hvilken målgruppe+aktivitet som skal være gjeldende til økonomi hvis ulike målgrupper havner innenfor samme løpende måned
         målgruppe =
             løpendeMåned.vedtaksperioder

@@ -2,10 +2,12 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -29,6 +31,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
     val boutgifterUtgiftService = mockk<BoutgifterUtgiftService>()
     val vedtakRepository = mockk<VedtakRepository>()
     val vilkårperiodeService = mockk<VilkårperiodeService>()
+    val unleashService = mockk<UnleashService>()
 
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
@@ -41,6 +44,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepository,
+            unleashService = unleashService,
         )
 
     val løpendeUtgifterEnBolig: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
@@ -107,6 +111,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
     @BeforeEach
     fun setup() {
         every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
+        every { unleashService.isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT) } returns true
     }
 
     @Test

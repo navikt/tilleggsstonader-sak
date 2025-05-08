@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
@@ -19,6 +20,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -48,12 +50,14 @@ class StepDefinitions {
     val vedtakRepositroy = mockk<VedtakRepository>(relaxed = true)
     val vilkårperiodeService = mockk<VilkårperiodeService>(relaxed = true)
     val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>(relaxed = true)
+    val unleashService = mockk<UnleashService>()
 
     val beregningsService =
         BoutgifterBeregningService(
             boutgifterUtgiftService = utgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepositroy,
+            unleashService = unleashService,
         )
 
     var vilkårperioder: Vilkårperioder? = null
@@ -74,6 +78,7 @@ class StepDefinitions {
                     ),
                 gitVersjon = "versjon-test",
             )
+        every { unleashService.isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT) } returns true
     }
 
     @Gitt("følgende vedtaksperioder for boutgifter")
