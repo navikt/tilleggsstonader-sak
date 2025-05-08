@@ -68,7 +68,7 @@ Egenskap: Beregning av faste utgifter
       | 15.11.2024 | 14.12.2024 | 1              | 4809         | 4809      | 15.11.2024      | NEDSATT_ARBEIDSEVNE | TILTAK    |
       | 15.12.2024 | 14.01.2025 | 1              | 4809         | 4809      | 15.12.2024      | NEDSATT_ARBEIDSEVNE | TILTAK    |
       | 15.01.2025 | 14.02.2025 | 1              | 4953         | 4953      | 15.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
-      | 15.02.2025 | 14.03.2025 | 1              | 4953         | 4953      | 15.02.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 15.02.2025 | 18.02.2025 | 1              | 4953         | 4953      | 15.02.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
   Scenario: To påfølgende vedtaksperioder som dekker utgiften
     Gitt følgende vedtaksperioder for boutgifter
@@ -107,7 +107,7 @@ Egenskap: Beregning av faste utgifter
         | 15.03.2025 | 14.04.2025 | 1              | 4000         | 4953      | 15.03.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
         | 15.04.2025 | 14.05.2025 | 1              | 4000         | 4953      | 15.04.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
         | 15.05.2025 | 14.06.2025 | 1              | 4000         | 4953      | 15.05.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
-        | 15.06.2025 | 14.07.2025 | 1              | 4000         | 4953      | 15.06.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
+        | 15.06.2025 | 20.06.2025 | 1              | 4000         | 4953      | 15.06.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
 
     Eksempel: Bruker leier ekstrabolig mye lengre enn hva som er nødvendig for utdanningen
       Gitt følgende vedtaksperioder for boutgifter
@@ -123,4 +123,4 @@ Egenskap: Beregning av faste utgifter
       Så skal beregnet stønad for boutgifter være
         | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
         | 15.01.2025 | 14.02.2025 | 1              | 4000         | 4953      | 15.01.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
-        | 15.02.2025 | 14.03.2025 | 1              | 4000         | 4953      | 15.02.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
+        | 15.02.2025 | 20.02.2025 | 1              | 4000         | 4953      | 15.02.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
