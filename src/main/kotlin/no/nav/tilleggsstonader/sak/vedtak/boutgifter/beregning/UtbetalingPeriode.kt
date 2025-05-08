@@ -22,7 +22,8 @@ import java.time.LocalDate
  * dvs 5 jan i tidligere eksemplet
  *
  */
-data class UtbetalingPeriode(
+@ConsistentCopyVisibility
+data class UtbetalingPeriode private constructor(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppe: FaktiskMålgruppe,
