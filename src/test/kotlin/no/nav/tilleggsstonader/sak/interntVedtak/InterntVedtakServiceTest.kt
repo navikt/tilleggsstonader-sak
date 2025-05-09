@@ -407,14 +407,28 @@ class InterntVedtakServiceTest {
 
         @Test
         fun `Vedtak avslag skal mappes riktig`() {
-            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Boutgifter.avslåttVedtak
+            val dummyAvslåttVedtak = Testdata.Boutgifter.avslåttVedtak
+            every { vedtakService.hentVedtak(behandlingId) } returns dummyAvslåttVedtak
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
-            val dummyAvslåttVedtak = Testdata.Boutgifter.avslåttVedtak.data
 
             assertThat(interntVedtak.vedtak!!).isEqualTo(
                 VedtakAvslagInternt(
-                    årsakerAvslag = dummyAvslåttVedtak.årsaker,
-                    avslagBegrunnelse = dummyAvslåttVedtak.begrunnelse,
+                    årsakerAvslag = dummyAvslåttVedtak.data.årsaker,
+                    avslagBegrunnelse = dummyAvslåttVedtak.data.begrunnelse,
+                ),
+            )
+        }
+
+        @Test
+        fun `Opphør skal mappes riktig`() {
+            val dummyOpphørtVedtak = Testdata.Boutgifter.opphørtVedtak
+            every { vedtakService.hentVedtak(behandlingId) } returns dummyOpphørtVedtak
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+
+            assertThat(interntVedtak.vedtak!!).isEqualTo(
+                VedtakOpphørInternt(
+                    årsakerOpphør = dummyOpphørtVedtak.data.årsaker,
+                    opphørBegrunnelse = dummyOpphørtVedtak.data.begrunnelse,
                 ),
             )
         }

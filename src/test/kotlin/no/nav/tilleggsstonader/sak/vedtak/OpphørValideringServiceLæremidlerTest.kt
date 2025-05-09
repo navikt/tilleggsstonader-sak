@@ -32,7 +32,7 @@ class OpphørValideringServiceLæremidlerTest {
         @Test
         fun `Kaster ikke feil når vedtaksperioden er avkortet`() {
             assertThatCode {
-                opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
+                opphørValideringService.validerVedtaksperioderAvkortetVedOpphørLæremidler(
                     forrigeBehandlingsVedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
                     revurderFraDato = sisteFebruar,
                 )
@@ -42,12 +42,12 @@ class OpphørValideringServiceLæremidlerTest {
         @Test
         fun `Kaster feil når vedtaksperioden ikke er avkortet`() {
             assertThatThrownBy {
-                opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
+                opphørValideringService.validerVedtaksperioderAvkortetVedOpphørLæremidler(
                     forrigeBehandlingsVedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
                     revurderFraDato = førsteMars,
                 )
             }.hasMessage(
-                "Opphør er et ugyldig vedtaksresultat fordi ønsket opphørsdato ikke fører til at noen ekisterende vedtaksperioder blir opphørt.",
+                "Opphør er et ugyldig valg fordi ønsket opphørsdato ikke korter ned vedtaket.",
             )
         }
     }

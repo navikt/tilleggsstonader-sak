@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.DEKNINGSGRAD_TILSYN_BARN
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
@@ -29,7 +28,7 @@ data class MakssatsDvhUtil(
                         andelFom = andelTilkjentYtelse.fom,
                     )
 
-                is InnvilgelseBoutgifter ->
+                is InnvilgelseEllerOpphørBoutgifter ->
                     finnMakssatsBoutgifter(
                         vedtaksdata = vedtaksdata,
                         andelFom = andelTilkjentYtelse.fom,

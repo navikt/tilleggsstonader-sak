@@ -36,10 +36,12 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
@@ -47,6 +49,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -259,6 +262,20 @@ fun vilkår(
         erFremtidigUtgift = erFremtidigUtgift,
         gitVersjon = Applikasjonsversjon.versjon,
     )
+
+fun vedtaksperiode(
+    id: UUID = UUID.randomUUID(),
+    fom: LocalDate = YearMonth.now().atDay(1),
+    tom: LocalDate = YearMonth.now().atEndOfMonth(),
+    aktivitet: AktivitetType = AktivitetType.TILTAK,
+    målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+) = Vedtaksperiode(
+    id = id,
+    fom = fom,
+    tom = tom,
+    aktivitet = aktivitet,
+    målgruppe = målgruppe,
+)
 
 fun fagsakpersoner(vararg identer: String): Set<PersonIdent> =
     identer
