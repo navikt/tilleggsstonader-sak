@@ -182,14 +182,22 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         )
     }
 
-    fun medNyTom(tom: LocalDate): GeneriskVilkårperiode<T> {
+    fun medNyTomOgBegrunnelse(
+        tom: LocalDate,
+        begrunnelse: String?,
+    ): GeneriskVilkårperiode<T> {
         val nyStatus =
             if (status == Vilkårstatus.NY) {
                 Vilkårstatus.NY
             } else {
                 Vilkårstatus.ENDRET
             }
-        return this.copy(tom = tom, status = nyStatus, gitVersjon = Applikasjonsversjon.versjon)
+        return this.copy(
+            tom = tom,
+            status = nyStatus,
+            gitVersjon = Applikasjonsversjon.versjon,
+            begrunnelse = begrunnelse,
+        )
     }
 
     /**

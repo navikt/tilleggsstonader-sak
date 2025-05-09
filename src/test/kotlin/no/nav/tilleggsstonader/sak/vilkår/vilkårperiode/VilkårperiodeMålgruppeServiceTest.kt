@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.tilOppdatering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -399,7 +400,31 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
 
             val nyTom = now().plusMonths(2)
 
-            validerHarEndretTom(målgruppeFørOppdatering, nyTom)
+            validerHarEndretTom(målgruppeFørOppdatering, nyTom, nyBegrunnelse = "Test")
+        }
+
+        @Test
+        fun `kan ikke fjerne begrunnelse hvis den er obligatorisk pga eksisterende svar`() {
+            val originalMålgruppe =
+                målgruppe(
+                    fom = now().minusMonths(1),
+                    tom = now().plusMonths(1),
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(SvarJaNei.JA)),
+                    begrunnelse = "Begrunnelse",
+                )
+            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe)
+            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
+
+            val nyTom = now().plusMonths(2)
+
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(
+                    målgruppeFørOppdatering.id,
+                    målgruppeFørOppdatering
+                        .tilOppdatering()
+                        .copy(tom = nyTom, begrunnelse = null),
+                )
+            }.hasMessageContaining("Mangler begrunnelse")
         }
 
         @Test
@@ -528,22 +553,24 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
     private fun validerHarEndretTom(
         målgruppeFørOppdatering: Vilkårperiode,
         nyTom: LocalDate,
+        nyBegrunnelse: String? = målgruppeFørOppdatering.begrunnelse,
     ) {
         val oppdatertPeriode =
             vilkårperiodeService.oppdaterVilkårperiode(
                 målgruppeFørOppdatering.id,
                 målgruppeFørOppdatering
                     .tilOppdatering()
-                    .copy(tom = nyTom),
+                    .copy(tom = nyTom, begrunnelse = nyBegrunnelse),
             )
 
         assertThat(oppdatertPeriode)
             .usingRecursiveComparison()
-            .ignoringFields("sporbar", "tom", "status")
+            .ignoringFields("sporbar", "tom", "status", "begrunnelse")
             .isEqualTo(målgruppeFørOppdatering)
 
         assertThat(oppdatertPeriode.tom).isEqualTo(nyTom)
         assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
+        assertThat(oppdatertPeriode.begrunnelse).isEqualTo(nyBegrunnelse)
     }
 
     private fun lagRevurderingMedKopiertMålgruppe(

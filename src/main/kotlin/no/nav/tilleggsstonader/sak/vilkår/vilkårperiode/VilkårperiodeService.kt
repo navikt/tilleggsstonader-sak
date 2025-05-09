@@ -204,7 +204,9 @@ class VilkårperiodeService(
         validerAtKunTomErEndret(eksisterendeVilkårperiode, vilkårperiode, revurderFra)
         validerAtAldersvilkårErGyldig(eksisterendeVilkårperiode, vilkårperiode, fødselFaktaGrunnlag)
 
-        return vilkårperiodeRepository.update(eksisterendeVilkårperiode.medNyTom(tom = vilkårperiode.tom))
+        return vilkårperiodeRepository.update(
+            eksisterendeVilkårperiode.medNyTomOgBegrunnelse(tom = vilkårperiode.tom, begrunnelse = vilkårperiode.begrunnelse),
+        )
     }
 
     @Transactional
