@@ -41,10 +41,11 @@ object BoutgifterTestUtil {
         )
 
     fun innvilgelseBoutgifter(
+        behandlingId: BehandlingId = BehandlingId.random(),
         vedtaksperioder: List<Vedtaksperiode>,
         beregningsresultat: BeregningsresultatBoutgifter,
     ) = GeneriskVedtak(
-        behandlingId = BehandlingId.random(),
+        behandlingId = behandlingId,
         data =
             InnvilgelseBoutgifter(
                 beregningsresultat = beregningsresultat,

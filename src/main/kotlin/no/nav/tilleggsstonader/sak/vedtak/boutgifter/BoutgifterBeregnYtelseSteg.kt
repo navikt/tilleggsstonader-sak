@@ -35,7 +35,7 @@ import java.time.LocalDate
 class BoutgifterBeregnYtelseSteg(
     private val beregningService: BoutgifterBeregningService,
     private val opphørValideringService: OpphørValideringService,
-    override val vedtakRepository: VedtakRepository,
+    vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
 ) : BeregnYtelseSteg<VedtakBoutgifterRequest>(
