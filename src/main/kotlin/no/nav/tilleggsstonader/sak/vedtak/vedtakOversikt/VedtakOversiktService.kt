@@ -29,11 +29,11 @@ class VedtakOversiktService(
         )
     }
 
-    private fun oppsummerVedtaksperioderTilsynBarn(fagsakId: FagsakId): List<VedtaksperiodeOversiktTilsynBarn> {
+    private fun oppsummerVedtaksperioderTilsynBarn(fagsakId: FagsakId): List<DetaljertVedtaksperiodeTilsynBarn> {
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørTilsynBarn>(fagsakId) ?: return emptyList()
 
-        val vedtaksperioderFraBeregningsresultat: List<VedtaksperiodeOversiktTilsynBarn> =
+        val vedtaksperioderFraBeregningsresultat: List<DetaljertVedtaksperiodeTilsynBarn> =
             finnVedtaksperioderFraBeregningsresultatTilsynBarn(vedtakForSisteIverksatteBehandling.beregningsresultat)
 
         return vedtaksperioderFraBeregningsresultat
@@ -41,13 +41,13 @@ class VedtakOversiktService(
             .mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
     }
 
-    private fun oppsummerVedtaksperioderLæremidler(fagsakId: FagsakId): List<VedtaksperiodeOversiktLæremidler> {
+    private fun oppsummerVedtaksperioderLæremidler(fagsakId: FagsakId): List<DetaljertVedtaksperiodeLæremidler> {
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørLæremidler>(fagsakId) ?: return emptyList()
 
-        val vedtaksperioderFraBeregningsresultat: List<VedtaksperiodeOversiktLæremidler> =
+        val vedtaksperioderFraBeregningsresultat: List<DetaljertVedtaksperiodeLæremidler> =
             vedtakForSisteIverksatteBehandling.beregningsresultat.perioder.map { periode ->
-                VedtaksperiodeOversiktLæremidler(
+                DetaljertVedtaksperiodeLæremidler(
                     fom = periode.fom,
                     tom = periode.tom,
                     antallMåneder = 1,
@@ -69,7 +69,7 @@ class VedtakOversiktService(
         beregningsresultatTilsynBarn.perioder.flatMap { resultatMåned ->
             resultatMåned.grunnlag.vedtaksperiodeGrunnlag
                 .map { vedtaksperiodeGrunnlag ->
-                    VedtaksperiodeOversiktTilsynBarn(
+                    DetaljertVedtaksperiodeTilsynBarn(
                         fom = vedtaksperiodeGrunnlag.vedtaksperiode.fom,
                         tom = vedtaksperiodeGrunnlag.vedtaksperiode.tom,
                         aktivitet = vedtaksperiodeGrunnlag.vedtaksperiode.aktivitet,
