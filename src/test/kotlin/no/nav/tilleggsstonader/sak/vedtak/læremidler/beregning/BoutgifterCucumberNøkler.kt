@@ -1,0 +1,14 @@
+package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
+
+import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
+
+enum class BoutgifterCucumberNøkler(
+    override val nøkkel: String,
+) : Domenenøkkel {
+    UTBETALINGSDATO("Utbetalingsdato"),
+    UTGIFT("Utgift"),
+    MAKS_SATS("Maks sats"),
+    STØNADSBELØP("Stønadsbeløp"),
+    AKTIVITET("Aktivitet"),
+    MÅLGRUPPE("Målgruppe"),
+}
