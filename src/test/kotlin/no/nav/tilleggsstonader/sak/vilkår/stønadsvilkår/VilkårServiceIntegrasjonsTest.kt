@@ -216,8 +216,8 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         @Test
         fun `kan ikke opprette vilkårtype som ikke finnes på stønadstype`() {
             assertThatThrownBy {
-                vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår.copy(vilkårType = VilkårType.EKSEMPEL))
-            }.hasMessageContaining("Vilkårtype=EKSEMPEL eksisterer ikke for stønadstype=BARNETILSYN")
+                vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår.copy(vilkårType = VilkårType.UTGIFTER_OVERNATTING))
+            }.hasMessageContaining("Vilkårtype=UTGIFTER_OVERNATTING eksisterer ikke for stønadstype=BARNETILSYN")
         }
     }
 

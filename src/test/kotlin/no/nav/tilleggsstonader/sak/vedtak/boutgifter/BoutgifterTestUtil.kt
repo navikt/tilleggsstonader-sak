@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -71,7 +71,7 @@ object BoutgifterTestUtil {
     fun lagBeregningsresultatMåned(
         fom: LocalDate,
         tom: LocalDate = fom.withDayOfMonth(fom.lengthOfMonth()),
-        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+        utgifter: Map<TypeBoutgift, List<UtgiftBeregningDato>>,
         delAvTidligere: Boolean,
     ) = BeregningsresultatForLøpendeMåned(
         grunnlag =

@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagBeregningsresultatMåned
@@ -47,11 +48,11 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
             unleashService = unleashService,
         )
 
-    val løpendeUtgifterEnBolig: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+    val løpendeUtgifterEnBolig: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
         mapOf(
             TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                 listOf(
-                    UtgiftBeregningBoutgifter(
+                    UtgiftBeregningDato(
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 3, 31),
                         utgift = 3000,
@@ -131,16 +132,16 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
 
     @Test
     fun `Beholder perioder fra før revuderFra, og beregner nye perioder ved revurdering`() {
-        val utgifterRevurdering: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgifterRevurdering: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
             mapOf(
                 TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 1, 1),
                             tom = LocalDate.of(2025, 3, 31),
                             utgift = 3000,
                         ),
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 4, 1),
                             tom = LocalDate.of(2025, 4, 30),
                             utgift = 6000,
@@ -169,11 +170,11 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                 vedtaksperioder = vedtaksperioderFørstegangsbehandling,
             )
 
-        val utgifterEtterRevuderFra: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgifterEtterRevuderFra: Map<TypeBoutgift, List<UtgiftBeregningDato>> =
             mapOf(
                 TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        UtgiftBeregningDato(
                             fom = LocalDate.of(2025, 4, 1),
                             tom = LocalDate.of(2025, 4, 30),
                             utgift = 6000,

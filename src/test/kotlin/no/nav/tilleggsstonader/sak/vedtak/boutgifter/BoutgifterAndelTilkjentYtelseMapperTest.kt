@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -219,7 +219,7 @@ private fun lagBeregningsgrunnlagMedEnkeltutgift(
         mapOf(
             TypeBoutgift.UTGIFTER_OVERNATTING to
                 listOf(
-                    UtgiftBeregningBoutgifter(
+                    UtgiftBeregningDato(
                         fom = fom,
                         tom = tom,
                         utgift = 1000,

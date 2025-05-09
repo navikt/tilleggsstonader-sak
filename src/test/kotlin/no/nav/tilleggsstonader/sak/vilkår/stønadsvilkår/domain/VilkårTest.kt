@@ -19,7 +19,7 @@ internal class VilkårTest {
             vilkår(
                 behandlingId = behandlingIdFørstegangsbehandling,
                 delvilkår = emptyList(),
-                type = VilkårType.EKSEMPEL,
+                type = VilkårType.PASS_BARN,
                 status = VilkårStatus.NY,
                 opphavsvilkår = null,
             )
@@ -43,7 +43,7 @@ internal class VilkårTest {
             vilkår(
                 behandlingId = behandlingIdRevurdering,
                 delvilkår = emptyList(),
-                type = VilkårType.EKSEMPEL,
+                type = VilkårType.PASS_BARN,
                 opphavsvilkår = opphavsvilkår,
                 status = VilkårStatus.UENDRET,
             )
@@ -58,7 +58,7 @@ internal class VilkårTest {
             vilkår(
                 behandlingId = behandlingIdRevurdering,
                 delvilkår = emptyList(),
-                type = VilkårType.EKSEMPEL,
+                type = VilkårType.PASS_BARN,
                 opphavsvilkår = opphavsvilkår,
                 status = VilkårStatus.ENDRET,
             )

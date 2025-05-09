@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningMåned
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningValideringUtil.validerPerioderForInnvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
@@ -33,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.til
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
+import no.nav.tilleggsstonader.sak.vedtak.validering.validerUtgiftHeleVedtaksperioden
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
@@ -171,7 +173,7 @@ class TilsynBarnBeregningService(
     private fun lagBeregningsgrunnlagPerMåned(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
         aktiviteter: List<Aktivitet>,
-        utgifterPerBarn: Map<BarnId, List<UtgiftBeregning>>,
+        utgifterPerBarn: Map<BarnId, List<UtgiftBeregningMåned>>,
     ): List<Beregningsgrunnlag> {
         val vedtaksperioderPerMåned = vedtaksperioder.tilÅrMåned()
         val utgifterPerMåned = utgifterPerBarn.tilÅrMåned()

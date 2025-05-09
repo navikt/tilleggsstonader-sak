@@ -5,8 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.validerUtgiftHeleVedtaksperioden
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUtils.validerEnkeltperiode
@@ -55,11 +54,11 @@ class VedtaksperiodeValideringUtilsTest {
             ),
         )
 
-    val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+    val utgifter: Map<BarnId, List<UtgiftBeregningMåned>> =
         mapOf(
             BarnId.random() to
                 listOf(
-                    UtgiftBeregning(
+                    UtgiftBeregningMåned(
                         fom = YearMonth.of(2025, 1),
                         tom = YearMonth.of(2025, 2),
                         utgift = 1000,
@@ -330,11 +329,11 @@ class VedtaksperiodeValideringUtilsTest {
         inner class ValiderUtgifterHeleVedtaksperioden {
             val vedtaksperiode = lagVedtaksperiode()
 
-            val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+            val utgifter: Map<BarnId, List<UtgiftBeregningMåned>> =
                 mapOf(
                     BarnId.random() to
                         listOf(
-                            UtgiftBeregning(
+                            UtgiftBeregningMåned(
                                 fom = YearMonth.of(2025, 1),
                                 tom = YearMonth.of(2025, 1),
                                 utgift = 1000,
@@ -361,21 +360,21 @@ class VedtaksperiodeValideringUtilsTest {
                             utgifter = utgifter,
                         )
                     }
-                assertThat(feil.feil).contains("Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden")
+                assertThat(feil.feil).contains("Vedtaksperioden 01.01.2025–28.02.2025 mangler oppfylt utgift hele eller deler av perioden.")
             }
 
             @Test
             fun `kaster ikke feil når det utgifter hele vedtaksperioden fordelt i flere perioder`() {
-                val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+                val utgifter: Map<BarnId, List<UtgiftBeregningMåned>> =
                     mapOf(
                         BarnId.random() to
                             listOf(
-                                UtgiftBeregning(
+                                UtgiftBeregningMåned(
                                     fom = YearMonth.of(2025, 1),
                                     tom = YearMonth.of(2025, 1),
                                     utgift = 1000,
                                 ),
-                                UtgiftBeregning(
+                                UtgiftBeregningMåned(
                                     fom = YearMonth.of(2025, 2),
                                     tom = YearMonth.of(2025, 2),
                                     utgift = 1000,
@@ -393,11 +392,11 @@ class VedtaksperiodeValideringUtilsTest {
 
             @Test
             fun `kaster ikke feil når det utgifter hele vedtaksperioden fordelt på flere barn`() {
-                val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+                val utgifter: Map<BarnId, List<UtgiftBeregningMåned>> =
                     mapOf(
                         BarnId.random() to
                             listOf(
-                                UtgiftBeregning(
+                                UtgiftBeregningMåned(
                                     fom = YearMonth.of(2025, 1),
                                     tom = YearMonth.of(2025, 1),
                                     utgift = 1000,
@@ -405,7 +404,7 @@ class VedtaksperiodeValideringUtilsTest {
                             ),
                         BarnId.random() to
                             listOf(
-                                UtgiftBeregning(
+                                UtgiftBeregningMåned(
                                     fom = YearMonth.of(2025, 2),
                                     tom = YearMonth.of(2025, 2),
                                     utgift = 1000,
@@ -423,16 +422,16 @@ class VedtaksperiodeValideringUtilsTest {
 
             @Test
             fun `kaster feil når det ikke finnes utgifter hele vedtaksperioden pga pause mellom utgiftene`() {
-                val utgifter: Map<BarnId, List<UtgiftBeregning>> =
+                val utgifter: Map<BarnId, List<UtgiftBeregningMåned>> =
                     mapOf(
                         BarnId.random() to
                             listOf(
-                                UtgiftBeregning(
+                                UtgiftBeregningMåned(
                                     fom = YearMonth.of(2025, 1),
                                     tom = YearMonth.of(2025, 1),
                                     utgift = 1000,
                                 ),
-                                UtgiftBeregning(
+                                UtgiftBeregningMåned(
                                     fom = YearMonth.of(2025, 3),
                                     tom = YearMonth.of(2025, 3),
                                     utgift = 1000,
@@ -446,7 +445,7 @@ class VedtaksperiodeValideringUtilsTest {
                             utgifter = utgifter,
                         )
                     }
-                assertThat(feil.feil).contains("Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden")
+                assertThat(feil.feil).contains("Vedtaksperioden 01.01.2025–31.03.2025 mangler oppfylt utgift hele eller deler av perioden.")
             }
         }
     }

@@ -12,9 +12,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.UtgiftBeregningDato
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.splittTilLøpendeMåneder
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterUtgifterValideringUtil.validerUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -27,6 +28,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.spl
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
+import no.nav.tilleggsstonader.sak.vedtak.validering.validerUtgiftHeleVedtaksperioden
 import org.springframework.stereotype.Service
 
 @Service
@@ -89,7 +91,7 @@ class BoutgifterBeregningService(
 
     private fun beregnAktuellePerioder(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
-        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+        utgifter: Map<TypeBoutgift, List<UtgiftBeregningDato>>,
     ): List<BeregningsresultatForLøpendeMåned> =
         vedtaksperioder
             .sorted()
@@ -232,7 +234,7 @@ class BoutgifterBeregningService(
 
     private fun lagBeregningsGrunnlag(
         periode: UtbetalingPeriode,
-        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+        utgifter: Map<TypeBoutgift, List<UtgiftBeregningDato>>,
     ): Beregningsgrunnlag {
         val sats = finnMakssats(periode.fom)
 
@@ -251,7 +253,7 @@ class BoutgifterBeregningService(
     }
 
     private fun finnUtgiftForUtbetalingsperiode(
-        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+        utgifter: Map<TypeBoutgift, List<UtgiftBeregningDato>>,
         periode: UtbetalingPeriode,
     ) = utgifter.mapValues { (_, utgifter) ->
         utgifter.filter {
@@ -261,7 +263,7 @@ class BoutgifterBeregningService(
 }
 
 private fun validerUtgifterTilMidlertidigOvernattingErInnenforVedtaksperiodene(
-    utgifterPerType: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    utgifterPerType: Map<TypeBoutgift, List<UtgiftBeregningDato>>,
     vedtaksperioder: List<VedtaksperiodeBeregning>,
 ) {
     val utgifterMidlertidigOvernatting = utgifterPerType[TypeBoutgift.UTGIFTER_OVERNATTING].orEmpty()
@@ -305,7 +307,7 @@ private fun List<UtbetalingPeriode>.validerIngenUtbetalingsperioderOverlapperFle
 }
 
 private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(
-    utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    utgifter: Map<TypeBoutgift, List<UtgiftBeregningDato>>,
 ): List<UtbetalingPeriode> {
     val utgifterTilOvernatting = utgifter[TypeBoutgift.UTGIFTER_OVERNATTING] ?: emptyList()
     val utbetalingsperioder = this
