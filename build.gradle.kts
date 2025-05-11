@@ -3,15 +3,15 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20250409144459_df36248"
+val familieProsesseringVersion = "2.20250505123518_aa76fed"
 val tilleggsstønaderLibsVersion = "2025.05.02-09.44.a9ae251aaf3c"
 val tilleggsstønaderKontrakterVersion = "2025.05.07-11.24.e7b674f11bbb"
 val avroVersion = "1.12.0"
-val confluentVersion = "7.9.0"
+val confluentVersion = "7.9.1"
 val joarkHendelseVersion = "08271806"
 val tokenSupportVersion = "5.0.25"
 val wiremockVersion = "3.13.0"
-val mockkVersion = "1.14.0"
+val mockkVersion = "1.14.2"
 val testcontainerVersion = "1.21.0"
 
 group = "no.nav.tilleggsstonader.sak"
@@ -31,7 +31,7 @@ plugins {
 
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
 
-    id("org.cyclonedx.bom") version "2.2.0"
+    id("org.cyclonedx.bom") version "2.3.0"
 }
 
 repositories {
