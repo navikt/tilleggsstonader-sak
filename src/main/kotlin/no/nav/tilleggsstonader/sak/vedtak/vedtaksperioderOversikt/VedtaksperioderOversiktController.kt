@@ -21,7 +21,7 @@ class VedtaksperioderOversiktController(
         @PathVariable fagsakPersonId: FagsakPersonId,
     ): VedtaksperiodeOversiktDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
-        return tilDto(vedtakOversiktService.hentVedtakOversikt(fagsakPersonId))
+        return tilDto(vedtakOversiktService.hentVedtaksperioderOversikt(fagsakPersonId))
     }
 }
 

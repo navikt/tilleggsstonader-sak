@@ -25,7 +25,7 @@ class VedtaksperioderOversiktService(
      * detaljert informasjon spesifikk for stønadstypen.
      * De er derfor ikke nødvendigvis en til en med vedtaksperiodene som saksbehandler registrerer.
      */
-    fun hentVedtakOversikt(fagsakPersonId: FagsakPersonId): VedtaksperioderOversikt {
+    fun hentVedtaksperioderOversikt(fagsakPersonId: FagsakPersonId): VedtaksperioderOversikt {
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
 
         return VedtaksperioderOversikt(
