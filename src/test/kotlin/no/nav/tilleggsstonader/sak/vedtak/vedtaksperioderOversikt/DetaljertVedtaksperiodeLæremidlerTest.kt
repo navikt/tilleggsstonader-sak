@@ -40,7 +40,7 @@ class DetaljertVedtaksperiodeLæremidlerTest {
                 vedtaksperiodeJan,
                 vedtaksperiodeFeb,
             )
-        val resultat = vedtaksperioder.mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
         assertThat(resultat).isEqualTo(
             listOf(
                 vedtaksperiodeJan.copy(tom = vedtaksperiodeFeb.tom, antallMåneder = 2),
@@ -59,7 +59,7 @@ class DetaljertVedtaksperiodeLæremidlerTest {
                     tom = LocalDate.of(2024, 3, 31),
                 ),
             )
-        val resultat = vedtaksperioder.mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
         assertThat(resultat).isEqualTo(
             listOf(
                 vedtaksperiodeJan.copy(tom = LocalDate.of(2024, 3, 31), antallMåneder = 3),
@@ -77,7 +77,7 @@ class DetaljertVedtaksperiodeLæremidlerTest {
                     målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 ),
             )
-        val resultat = vedtaksperioder.mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
         assertThat(resultat).isEqualTo(vedtaksperioder)
     }
 
@@ -92,7 +92,7 @@ class DetaljertVedtaksperiodeLæremidlerTest {
                     tom = LocalDate.of(2024, 3, 31),
                 ),
             )
-        val resultat = vedtaksperioder.mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
         assertThat(resultat[0].antallMåneder).isEqualTo(3)
     }
 
@@ -106,7 +106,7 @@ class DetaljertVedtaksperiodeLæremidlerTest {
                     månedsbeløp = 451,
                 ),
             )
-        val resultat = vedtaksperioder.mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
         assertThat(resultat).isEqualTo(vedtaksperioder)
     }
 
@@ -120,7 +120,7 @@ class DetaljertVedtaksperiodeLæremidlerTest {
                     månedsbeløp = 451,
                 ),
             )
-        val resultat = vedtaksperioder.mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
         assertThat(resultat).isEqualTo(vedtaksperioder)
     }
 
@@ -133,7 +133,7 @@ class DetaljertVedtaksperiodeLæremidlerTest {
                     fom = LocalDate.of(2024, 2, 2),
                 ),
             )
-        val resultat = vedtaksperioder.mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
         assertThat(resultat).isEqualTo(vedtaksperioder)
     }
 }

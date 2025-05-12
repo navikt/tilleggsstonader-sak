@@ -35,7 +35,7 @@ class DetaljertVedtaksperiodeTilsynBarnTest {
                 vedtaksperiodeJan,
                 vedtaksperiodeFeb,
             )
-        val resultat = vedtaksperioder.mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
         assertThat(resultat).isEqualTo(
             listOf(
                 vedtaksperiodeJan.copy(tom = vedtaksperiodeFeb.tom),
@@ -58,7 +58,7 @@ class DetaljertVedtaksperiodeTilsynBarnTest {
                     tom = LocalDate.of(2024, 4, 30),
                 ),
             )
-        val resultat = vedtaksperioder.mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
         assertThat(resultat).isEqualTo(
             listOf(
                 vedtaksperiodeJan.copy(tom = LocalDate.of(2024, 4, 30)),
@@ -76,7 +76,7 @@ class DetaljertVedtaksperiodeTilsynBarnTest {
                     målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
                 ),
             )
-        val resultat = vedtaksperioder.mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
         assertThat(resultat).isEqualTo(vedtaksperioder)
     }
 
@@ -89,7 +89,7 @@ class DetaljertVedtaksperiodeTilsynBarnTest {
                     totalMånedsUtgift = 2000,
                 ),
             )
-        val resultat = vedtaksperioder.mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
         assertThat(resultat).isEqualTo(vedtaksperioder)
     }
 
@@ -102,7 +102,7 @@ class DetaljertVedtaksperiodeTilsynBarnTest {
                     antallBarn = 2,
                 ),
             )
-        val resultat = vedtaksperioder.mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
         assertThat(resultat).isEqualTo(vedtaksperioder)
     }
 
@@ -115,7 +115,7 @@ class DetaljertVedtaksperiodeTilsynBarnTest {
                     fom = LocalDate.of(2024, 2, 2),
                 ),
             )
-        val resultat = vedtaksperioder.mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
         assertThat(resultat).isEqualTo(vedtaksperioder)
     }
 }

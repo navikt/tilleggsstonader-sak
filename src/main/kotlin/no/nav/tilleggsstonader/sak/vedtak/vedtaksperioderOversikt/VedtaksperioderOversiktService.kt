@@ -36,19 +36,19 @@ class VedtaksperioderOversiktService(
 
     private fun oppsummerVedtaksperioderTilsynBarn(fagsakId: FagsakId): List<DetaljertVedtaksperiodeTilsynBarn> {
         val vedtakForSisteIverksatteBehandling =
-            hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørTilsynBarn>(fagsakId) ?: return emptyList()
+            hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørTilsynBarn>(fagsakId)
+                ?: return emptyList()
 
         val vedtaksperioderFraBeregningsresultat: List<DetaljertVedtaksperiodeTilsynBarn> =
             finnVedtaksperioderFraBeregningsresultatTilsynBarn(vedtakForSisteIverksatteBehandling.beregningsresultat)
 
-        return vedtaksperioderFraBeregningsresultat
-            .sorted()
-            .mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        return vedtaksperioderFraBeregningsresultat.sorterOgMergeSammenhengende()
     }
 
     private fun oppsummerVedtaksperioderLæremidler(fagsakId: FagsakId): List<DetaljertVedtaksperiodeLæremidler> {
         val vedtakForSisteIverksatteBehandling =
-            hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørLæremidler>(fagsakId) ?: return emptyList()
+            hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørLæremidler>(fagsakId)
+                ?: return emptyList()
 
         val vedtaksperioderFraBeregningsresultat: List<DetaljertVedtaksperiodeLæremidler> =
             vedtakForSisteIverksatteBehandling.beregningsresultat.perioder.map { periode ->
@@ -64,9 +64,7 @@ class VedtaksperioderOversiktService(
                 )
             }
 
-        return vedtaksperioderFraBeregningsresultat
-            .sorted()
-            .mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+        return vedtaksperioderFraBeregningsresultat.sorterOgMergeSammenhengende()
     }
 
     private fun finnVedtaksperioderFraBeregningsresultatTilsynBarn(beregningsresultatTilsynBarn: BeregningsresultatTilsynBarn) =
