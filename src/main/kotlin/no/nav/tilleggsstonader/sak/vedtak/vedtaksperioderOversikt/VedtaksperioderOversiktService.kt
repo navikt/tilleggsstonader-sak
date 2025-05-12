@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.vedtakOversikt
+package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -15,15 +15,15 @@ import kotlin.collections.List
 import kotlin.collections.sorted
 
 @Service
-class VedtakOversiktService(
+class VedtaksperioderOversiktService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
     private val vedtakService: VedtakService,
 ) {
-    fun hentVedtakOversikt(fagsakPersonId: FagsakPersonId): VedtaksperiodeOversikt {
+    fun hentVedtakOversikt(fagsakPersonId: FagsakPersonId): VedtaksperioderOversikt {
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
 
-        return VedtaksperiodeOversikt(
+        return VedtaksperioderOversikt(
             tilsynBarn = fagsaker.barnetilsyn?.let { oppsummerVedtaksperioderTilsynBarn(it.id) } ?: emptyList(),
             læremidler = fagsaker.læremidler?.let { oppsummerVedtaksperioderLæremidler(it.id) } ?: emptyList(),
         )
