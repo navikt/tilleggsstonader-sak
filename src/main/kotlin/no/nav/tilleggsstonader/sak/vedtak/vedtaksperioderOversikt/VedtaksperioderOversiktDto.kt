@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
@@ -8,6 +9,7 @@ import java.time.LocalDate
 data class VedtaksperiodeOversiktDto(
     val tilsynBarn: List<DetaljertVedtaksperiodeTilsynBarnDto>,
     val læremidler: List<DetaljertVedtaksperiodeLæremidlerDto>,
+    val boutgifter: List<DetaljertVedtaksperiodeBoutgifterDto>,
 )
 
 data class DetaljertVedtaksperiodeTilsynBarnDto(
@@ -30,10 +32,22 @@ data class DetaljertVedtaksperiodeLæremidlerDto(
     val månedsbeløp: Int,
 )
 
+data class DetaljertVedtaksperiodeBoutgifterDto(
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val aktivitet: AktivitetType,
+    val målgruppe: FaktiskMålgruppe,
+    val antallMåneder: Int,
+    val type: TypeBoutgift,
+    val utgift: Int,
+    val stønad: Int,
+)
+
 fun VedtaksperioderOversikt.tilDto(): VedtaksperiodeOversiktDto =
     VedtaksperiodeOversiktDto(
         tilsynBarn = tilsynBarn.map { it -> it.tilDto() },
         læremidler = læremidler.map { it -> it.tilDto() },
+        boutgifter = boutgifter.map { it -> it.tilDto() },
     )
 
 private fun DetaljertVedtaksperiodeTilsynBarn.tilDto() =
@@ -56,4 +70,16 @@ private fun DetaljertVedtaksperiodeLæremidler.tilDto() =
         studienivå = this.studienivå,
         studieprosent = this.studieprosent,
         månedsbeløp = this.månedsbeløp,
+    )
+
+private fun DetaljertVedtaksperiodeBoutgifter.tilDto() =
+    DetaljertVedtaksperiodeBoutgifterDto(
+        fom = this.fom,
+        tom = this.tom,
+        aktivitet = this.aktivitet,
+        målgruppe = this.målgruppe,
+        antallMåneder = this.antallMåneder,
+        type = this.type,
+        utgift = this.utgift,
+        stønad = this.stønad,
     )
