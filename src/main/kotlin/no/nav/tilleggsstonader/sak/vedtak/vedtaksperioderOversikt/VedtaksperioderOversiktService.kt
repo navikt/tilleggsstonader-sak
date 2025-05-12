@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
@@ -28,6 +29,7 @@ class VedtaksperioderOversiktService(
         return VedtaksperioderOversikt(
             tilsynBarn = fagsaker.barnetilsyn?.let { oppsummerVedtaksperioderTilsynBarn(it.id) } ?: emptyList(),
             læremidler = fagsaker.læremidler?.let { oppsummerVedtaksperioderLæremidler(it.id) } ?: emptyList(),
+            boutgifter = fagsaker.boutgifter?.let { oppsummerVedtaksperioderBoutgifter(it.id) } ?: emptyList(),
         )
     }
 
@@ -59,6 +61,32 @@ class VedtaksperioderOversiktService(
                     studieprosent = periode.grunnlag.studieprosent,
                     månedsbeløp = periode.beløp,
                 )
+            }
+
+        return vedtaksperioderFraBeregningsresultat.sorterOgMergeSammenhengende()
+    }
+
+    private fun oppsummerVedtaksperioderBoutgifter(fagsakId: FagsakId): List<DetaljertVedtaksperiodeBoutgifter> {
+        val vedtakForSisteIverksatteBehandling =
+            hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørBoutgifter>(fagsakId)
+                ?: return emptyList()
+
+        val vedtaksperioderFraBeregningsresultat: List<DetaljertVedtaksperiodeBoutgifter> =
+            vedtakForSisteIverksatteBehandling.beregningsresultat.perioder.flatMap { periode ->
+                periode.grunnlag.utgifter.flatMap { utgift ->
+                    utgift.value.map { it ->
+                        DetaljertVedtaksperiodeBoutgifter(
+                            fom = periode.fom,
+                            tom = periode.tom,
+                            antallMåneder = 1,
+                            type = utgift.key,
+                            aktivitet = periode.grunnlag.aktivitet,
+                            målgruppe = periode.grunnlag.målgruppe,
+                            utgift = it.utgift,
+                            stønad = periode.stønadsbeløp,
+                        )
+                    }
+                }
             }
 
         return vedtaksperioderFraBeregningsresultat.sorterOgMergeSammenhengende()
