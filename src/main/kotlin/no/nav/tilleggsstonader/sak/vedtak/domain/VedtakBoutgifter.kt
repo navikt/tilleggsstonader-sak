@@ -9,7 +9,7 @@ enum class TypeVedtakBoutgifter(
 ) : TypeVedtaksdata {
     INNVILGELSE_BOUTGIFTER(TypeVedtak.INNVILGELSE),
     AVSLAG_BOUTGIFTER(TypeVedtak.AVSLAG),
-//    OPPHØR_BOUTGIFTER(TypeVedtak.OPPHØR),
+    OPPHØR_BOUTGIFTER(TypeVedtak.OPPHØR),
 }
 
 enum class TypeBoutgift {
@@ -33,7 +33,7 @@ sealed interface VedtakBoutgifter : Vedtaksdata
 
 sealed interface InnvilgelseEllerOpphørBoutgifter : VedtakBoutgifter {
     val beregningsresultat: BeregningsresultatBoutgifter
-    val vedtaksperioder: List<Vedtaksperiode>?
+    val vedtaksperioder: List<Vedtaksperiode>
 }
 
 data class InnvilgelseBoutgifter(
@@ -57,16 +57,16 @@ data class AvslagBoutgifter(
     }
 }
 
-// data class OpphørBoutgifter(
-//    override val vedtaksperioder: List<Vedtaksperiode>,
-//    override val beregningsresultat: BeregningsresultatBoutgifter,
-//    override val årsaker: List<ÅrsakOpphør>,
-//    override val begrunnelse: String,
-// ) : InnvilgelseEllerOpphørBoutgifter,
-//    Opphør {
-//    override val type: TypeVedtaksdata = TypeVedtakBoutgifter.OPPHØR_BOUTGIFTER
-//
-//    init {
-//        this.validerÅrsakerOgBegrunnelse()
-//    }
-// }
+data class OpphørBoutgifter(
+    override val vedtaksperioder: List<Vedtaksperiode>,
+    override val beregningsresultat: BeregningsresultatBoutgifter,
+    override val årsaker: List<ÅrsakOpphør>,
+    override val begrunnelse: String,
+) : InnvilgelseEllerOpphørBoutgifter,
+    Opphør {
+    override val type: TypeVedtaksdata = TypeVedtakBoutgifter.OPPHØR_BOUTGIFTER
+
+    init {
+        this.validerÅrsakerOgBegrunnelse()
+    }
+}

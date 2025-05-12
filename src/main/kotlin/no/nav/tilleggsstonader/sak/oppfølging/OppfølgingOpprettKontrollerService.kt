@@ -148,7 +148,7 @@ class OppfølgingOpprettKontrollerService(
                 hentVedtak<InnvilgelseEllerOpphørLæremidler>(behandling).vedtaksperioder.tilFellesFormat()
 
             Stønadstype.BOUTGIFTER ->
-                hentVedtak<InnvilgelseEllerOpphørBoutgifter>(behandling).vedtaksperioder ?: emptyList()
+                hentVedtak<InnvilgelseEllerOpphørBoutgifter>(behandling).vedtaksperioder
         }
 
     private inline fun <reified T : Vedtaksdata> hentVedtak(behandling: Behandling) =

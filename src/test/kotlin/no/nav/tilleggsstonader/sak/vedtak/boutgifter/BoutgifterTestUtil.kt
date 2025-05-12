@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
+import java.time.Month.JANUARY
 import java.util.UUID
 
 object BoutgifterTestUtil {
@@ -66,6 +67,31 @@ object BoutgifterTestUtil {
         tom = tom,
         målgruppe = målgruppe,
         aktivitet = aktivitet,
+    )
+
+    fun beregningsresultat(
+        fom: LocalDate = LocalDate.of(2025, JANUARY, 1),
+        tom: LocalDate = fom,
+    ) = BeregningsresultatBoutgifter(
+        perioder =
+            listOf(
+                lagBeregningsresultatMåned(
+                    fom = fom,
+                    tom = tom,
+                    utgifter =
+                        mapOf(
+                            TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
+                                listOf(
+                                    UtgiftBeregningBoutgifter(
+                                        fom = fom,
+                                        tom = tom,
+                                        utgift = 3000,
+                                    ),
+                                ),
+                        ),
+                    delAvTidligere = false,
+                ),
+            ),
     )
 
     fun lagBeregningsresultatMåned(

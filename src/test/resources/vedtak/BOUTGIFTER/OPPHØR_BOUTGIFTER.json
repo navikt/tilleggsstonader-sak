@@ -1,0 +1,42 @@
+{
+  "type": "OPPHØR_BOUTGIFTER",
+  "vedtaksperioder": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "fom": "2025-01-01",
+      "tom": "2025-01-31",
+      "målgruppe": "NEDSATT_ARBEIDSEVNE",
+      "aktivitet": "TILTAK"
+    }
+  ],
+  "årsaker": [
+    "ENDRING_AKTIVITET"
+  ],
+  "begrunnelse": "En begrunnelse for opphøret",
+  "beregningsresultat": {
+    "perioder": [
+      {
+        "grunnlag": {
+          "fom": "2025-01-01",
+          "tom": "2025-01-31",
+          "utbetalingsdato": "2025-01-01",
+          "utgifter": {
+            "LØPENDE_UTGIFTER_EN_BOLIG": [
+              {
+                "fom": "2025-01-01",
+                "tom": "2025-01-31",
+                "utgift": 2500
+              }
+            ]
+          },
+          "makssats": 4953,
+          "makssatsBekreftet": true,
+          "målgruppe": "NEDSATT_ARBEIDSEVNE",
+          "aktivitet": "TILTAK"
+        },
+        "delAvTidligereUtbetaling" : false,
+        "stønadsbeløp" : 2500
+      }
+    ]
+  }
+}
