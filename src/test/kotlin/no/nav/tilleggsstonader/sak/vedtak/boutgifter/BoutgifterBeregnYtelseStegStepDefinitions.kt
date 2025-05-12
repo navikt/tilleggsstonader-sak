@@ -5,7 +5,6 @@ import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
 import io.mockk.every
-import io.mockk.justRun
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
@@ -13,18 +12,15 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelAndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.behandlingIdFraUUID
 import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.behandlingIdTilUUID
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
-import no.nav.tilleggsstonader.sak.cucumber.parseEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
-import no.nav.tilleggsstonader.sak.cucumber.parseValgfriDato
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYtelseRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
@@ -32,33 +28,33 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.Vilkårperi
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterUtgiftService
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.mapAktiviteter
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.ForenkletAndel
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.mapAndeler
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.mapBeregningsresultat
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.mapMålgrupper
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BoutgifterDomenenøkkel
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBoligDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
@@ -73,160 +69,197 @@ import java.util.UUID
 class BoutgifterBeregnYtelseStegStepDefinitions {
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    val vilkårperiodeRepository = VilkårperiodeRepositoryFake()
-    val vedtakRepository = VedtakRepositoryFake()
-    val tilkjentYtelseRepository = TilkjentYtelseRepositoryFake()
-    val behandlingService = mockk<BehandlingService>()
-    val vilkårperiodeService =
+    val vilkårperiodeRepositoryFake = VilkårperiodeRepositoryFake()
+    val vilkårRepositoryFake = VilkårRepositoryFake()
+    val vedtakRepositoryFake = VedtakRepositoryFake()
+    val tilkjentYtelseRepositoryFake = TilkjentYtelseRepositoryFake()
+    val behandlingServiceMock = mockk<BehandlingService>()
+    val vilkårperiodeServiceMock =
         mockk<VilkårperiodeService>().apply {
             every { hentVilkårperioder(any()) } answers {
-                val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(BehandlingId(firstArg<UUID>())).sorted()
-
+                val vilkårsperioder =
+                    vilkårperiodeRepositoryFake.findByBehandlingId(BehandlingId(firstArg<UUID>())).sorted()
                 Vilkårperioder(
                     målgrupper = vilkårsperioder.ofType<MålgruppeFaktaOgVurdering>(),
                     aktiviteter = vilkårsperioder.ofType<AktivitetFaktaOgVurdering>(),
                 )
             }
         }
-
     val vilkårService =
         VilkårService(
-            behandlingService = behandlingService,
-            vilkårRepository = VilkårRepositoryFake(),
+            behandlingService = behandlingServiceMock,
+            vilkårRepository = vilkårRepositoryFake,
             barnService = mockk(relaxed = true),
         )
-
-    val boutgifterUtgiftService =
-        BoutgifterUtgiftService(
-            vilkårService = vilkårService,
-        )
-
+    val boutgifterUtgiftService = BoutgifterUtgiftService(vilkårService = vilkårService)
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
-            vedtakRepository = vedtakRepository,
-            vilkårperiodeService = vilkårperiodeService,
+            vedtakRepository = vedtakRepositoryFake,
+            vilkårperiodeService = vilkårperiodeServiceMock,
         )
-    val simuleringService =
-        mockk<SimuleringService>().apply {
-            justRun { slettSimuleringForBehandling(any()) }
-        }
-
+    val simuleringServiceMock = mockk<SimuleringService>(relaxed = true)
+    val beregningService =
+        BoutgifterBeregningService(
+            boutgifterUtgiftService = boutgifterUtgiftService,
+            vedtaksperiodeValideringService = vedtaksperiodeValideringService,
+            vedtakRepository = vedtakRepositoryFake,
+            unleashService = mockk<UnleashService>(relaxed = true),
+        )
     val steg =
         BoutgifterBeregnYtelseSteg(
             beregningService =
-                BoutgifterBeregningService(
-                    boutgifterUtgiftService = TODO(),
-                    vedtaksperiodeValideringService = vedtaksperiodeValideringService,
-                    vedtakRepository = vedtakRepository,
-                    unleashService = mockk<UnleashService>(relaxed = true),
-                ),
+            beregningService,
             opphørValideringService = mockk<OpphørValideringService>(relaxed = true), // TODO: Vurder om denne skal være streng
-            vedtakRepository = vedtakRepository,
-            tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepository),
-            simuleringService = simuleringService,
+            vedtakRepository = vedtakRepositoryFake,
+            tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepositoryFake),
+            simuleringService = simuleringServiceMock,
         )
-    val vedtaksperiodeId: UUID = UUID.randomUUID()
 
-    @Gitt("følgende aktiviteter for læremidler behandling={}")
-    fun `følgende aktiviteter`(
+    @Gitt("følgende boutgifter av type {} for behandling={}")
+    fun `følgende boutgifter`(
+        typeBoutgift: VilkårType,
         behandlingIdTall: Int,
         dataTable: DataTable,
     ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-        vilkårperiodeRepository.insertAll(mapAktiviteter(behandlingId, dataTable))
+        every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
+            dummyBehandling(
+                behandlingId = behandlingId,
+                steg = StegType.VILKÅR,
+            )
+        val delvilkår = oppfylteDelvilkårLøpendeUtgifterEnBoligDto()
+
+        val opprettVilkårDto =
+            dataTable.mapRad { rad ->
+                OpprettVilkårDto(
+                    vilkårType = typeBoutgift,
+                    behandlingId = behandlingId,
+                    delvilkårsett = delvilkår,
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    utgift = parseInt(BoutgifterDomenenøkkel.UTGIFT, rad),
+                    erFremtidigUtgift = false,
+                )
+            }
+
+        opprettVilkårDto.forEach { vilkårService.opprettNyttVilkår(it) }
     }
 
-    @Gitt("følgende målgrupper for læremidler behandling={}")
-    fun `følgende målgrupper`(
-        behandlingIdTall: Int,
-        dataTable: DataTable,
-    ) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-        vilkårperiodeRepository.insertAll(mapMålgrupper(behandlingId, dataTable))
-    }
-
-    @Når("innvilger vedtaksperioder for behandling={}")
+    @Når("vi innvilger boutgifter for behandling={} med følgende vedtaksperioder")
     fun `følgende vedtaksperioder`(
         behandlingIdTall: Int,
         dataTable: DataTable,
     ) {
-        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-        val vedtaksperioder = mapVedtaksperioderDto(dataTable)
+
+        val aktiviteterFraVedtaksperioder =
+            dataTable.mapRad { rad ->
+                aktivitet(
+                    behandlingId = behandlingId,
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    faktaOgVurdering =
+                        faktaOgVurderingAktivitetBoutgifter(
+                            type = parseValgfriEnum<AktivitetType>(BoutgifterDomenenøkkel.AKTIVITET, rad)!!,
+                        ),
+                )
+            }
+
+        val målgrupperFraVedtaksperioder =
+            dataTable.mapRad { rad ->
+                målgruppe(
+                    behandlingId = behandlingId,
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    begrunnelse = "begrunnelse",
+                    faktaOgVurdering =
+                        faktaOgVurderingMålgruppe(
+                            type = parseValgfriEnum<MålgruppeType>(BoutgifterDomenenøkkel.MÅLGRUPPE, rad)!!,
+                        ),
+                )
+            }
+
+        vilkårperiodeRepositoryFake.insertAll(aktiviteterFraVedtaksperioder)
+        vilkårperiodeRepositoryFake.insertAll(målgrupperFraVedtaksperioder)
+
+        every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
+            dummyBehandling(
+                behandlingId = behandlingId,
+                steg = StegType.BEREGNE_YTELSE,
+            )
+        val vedtaksperioder = mapVedtaksperioder(dataTable).map { it.tilDto() }
         steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseBoutgifterRequest(vedtaksperioder))
     }
 
-    @Når("innvilger revurdering med vedtaksperioder for behandling={} med revurderFra={}")
-    fun `innvilger vedtaksperioder for behandling={} med revurderFra={}`(
-        behandlingIdTall: Int,
-        revurderFraStr: String,
-        dataTable: DataTable,
-    ) {
-        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-        val revurderFra = parseDato(revurderFraStr)
+//    @Når("innvilger revurdering med vedtaksperioder for behandling={} med revurderFra={}")
+//    fun `innvilger vedtaksperioder for behandling={} med revurderFra={}`(
+//        behandlingIdTall: Int,
+//        revurderFraStr: String,
+//        dataTable: DataTable,
+//    ) {
+//        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
+//        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+//        val revurderFra = parseDato(revurderFraStr)
+//
+//        val vedtaksperioder = mapVedtaksperioderDto(dataTable)
+//        steg.utførSteg(dummyBehandling(behandlingId, revurderFra), InnvilgelseBoutgifterRequest(vedtaksperioder))
+//    }
 
-        val vedtaksperioder = mapVedtaksperioderDto(dataTable)
-        steg.utførSteg(dummyBehandling(behandlingId, revurderFra), InnvilgelseBoutgifterRequest(vedtaksperioder))
-    }
-
-    @Når("kopierer perioder fra forrige behandling for behandling={}")
+    @Når("kopierer perioder fra forrige boutgiftbehandling for behandling={}")
     fun `kopierer perioder`(behandlingIdTall: Int) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         val forrigeIverksatteBehandlingId =
             forrigeIverksatteBehandlingId(behandlingId) ?: error("Forventer å finne forrigeIverksatteBehandlingId")
 
-        val tidligereVilkårsperioder = vilkårperiodeRepository.findByBehandlingId(forrigeIverksatteBehandlingId)
-        vilkårperiodeRepository.insertAll(tidligereVilkårsperioder.map { it.kopierTilBehandling(behandlingId) })
+        val tidligereVilkårsperioder = vilkårperiodeRepositoryFake.findByBehandlingId(forrigeIverksatteBehandlingId)
+        val tidligereVilkår = vilkårRepositoryFake.findByBehandlingId(forrigeIverksatteBehandlingId)
+
+        vilkårperiodeRepositoryFake.insertAll(tidligereVilkårsperioder.map { it.kopierTilBehandling(behandlingId) })
+        vilkårRepositoryFake.insertAll(tidligereVilkår.map { it.kopierTilBehandling(behandlingId) })
     }
 
-    @Gitt("følgende utgifter for behandling={}")
-    fun `følgende utgifter`() {
-        TODO()
-    }
+//    @Gitt("lagrer beregningsresultatet behandling={}")
+//    fun `lagrer beregningsresultat`(
+//        behandlingIdTall: Int,
+//        dataTable: DataTable,
+//    ) {
+//        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+//        val utgifter = boutgifterUtgiftService.hentUtgifterTilBeregning(behandlingId)
+//        val perioderBeregningsresultat = mapBeregningsresultat(dataTable, utgifter)
+//        val vedtaksperiode = mapVedtaksperioder(dataTable)
+//        val vedtak =
+//            innvilgelseBoutgifter(
+//                behandlingId = behandlingId,
+//                vedtaksperioder = vedtaksperiode,
+//                beregningsresultat = BeregningsresultatBoutgifter(perioderBeregningsresultat),
+//            )
+//        vedtakRepository.insert(vedtak)
+//    }
+//
+//    @Gitt("lagrer andeler behandling={}")
+//    fun `lagrer andeler`(
+//        behandlingIdTall: Int,
+//        dataTable: DataTable,
+//    ) {
+//        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+//
+//        val andeler =
+//            mapAndeler(dataTable)
+//                .map {
+//                    AndelTilkjentYtelse(
+//                        beløp = it.beløp,
+//                        fom = it.fom,
+//                        tom = it.tom,
+//                        satstype = it.satstype,
+//                        type = it.type,
+//                        kildeBehandlingId = behandlingId,
+//                        utbetalingsdato = it.utbetalingsdato,
+//                    )
+//                }.toSet()
+//        tilkjentYtelseRepository.insert(TilkjentYtelse(behandlingId = behandlingId, andelerTilkjentYtelse = andeler))
+//    }
 
-    @Gitt("lagrer beregningsresultatet behandling={}")
-    fun `lagrer beregningsresultat`(
-        behandlingIdTall: Int,
-        dataTable: DataTable,
-    ) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-        val utgifter = boutgifterUtgiftService.hentUtgifterTilBeregning(behandlingId)
-        val perioderBeregningsresultat = mapBeregningsresultat(dataTable, utgifter)
-        val vedtaksperiode = mapVedtaksperioder(dataTable)
-        val vedtak =
-            innvilgelseBoutgifter(
-                behandlingId = behandlingId,
-                vedtaksperioder = vedtaksperiode,
-                beregningsresultat = BeregningsresultatBoutgifter(perioderBeregningsresultat),
-            )
-        vedtakRepository.insert(vedtak)
-    }
-
-    @Gitt("lagrer andeler behandling={}")
-    fun `lagrer andeler`(
-        behandlingIdTall: Int,
-        dataTable: DataTable,
-    ) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-
-        val andeler =
-            mapAndeler(dataTable)
-                .map {
-                    AndelTilkjentYtelse(
-                        beløp = it.beløp,
-                        fom = it.fom,
-                        tom = it.tom,
-                        satstype = it.satstype,
-                        type = it.type,
-                        kildeBehandlingId = behandlingId,
-                        utbetalingsdato = it.utbetalingsdato,
-                    )
-                }.toSet()
-        tilkjentYtelseRepository.insert(TilkjentYtelse(behandlingId = behandlingId, andelerTilkjentYtelse = andeler))
-    }
-
-    @Når("opphør behandling={} med revurderFra={}")
+    @Når("vi opphører boutgifter behandling={} med revurderFra={}")
     fun `opphør med revurderFra`(
         behandlingIdTall: Int,
         revurderFraStr: String,
@@ -242,7 +275,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         )
     }
 
-    @Så("forvent beregningsresultatet for behandling={}")
+    @Så("kan vi forvente følgende beregningsresultat for behandling={}")
     fun `forvent beregningsresultatet`(
         behandlingIdTall: Int,
         dataTable: DataTable,
@@ -269,7 +302,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         assertThat(beregningsresultat.perioder).hasSize(forventedeBeregningsperioder.size)
     }
 
-    @Så("forvent andeler for behandling={}")
+    @Så("kan vi forvente følgende andeler for behandling={}")
     fun `forvent andeler`(
         behandlingIdTall: Int,
         dataTable: DataTable,
@@ -279,7 +312,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val forventedeAndeler = mapAndeler(dataTable)
 
         val andeler =
-            tilkjentYtelseRepository
+            tilkjentYtelseRepositoryFake
                 .findByBehandlingId(behandlingId)!!
                 .andelerTilkjentYtelse
                 .sortedBy { it.fom }
@@ -296,7 +329,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         assertThat(andeler).hasSize(forventedeAndeler.size)
     }
 
-    @Så("forvent vedtaksperioder for behandling={}")
+    @Så("kan vi forvente følgende vedtaksperioder for behandling={}")
     fun `forvent vedtaksperioder`(
         behandlingIdTall: Int,
         dataTable: DataTable,
@@ -319,82 +352,21 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         assertThat(vedtaksperioder).hasSize(forventedeVedtaksperioder.size)
     }
 
-    private fun mapVedtaksperioder(dataTable: DataTable): List<Vedtaksperiode> =
-        dataTable.mapRad { rad ->
-            vedtaksperiode(
-                id = vedtaksperiodeId,
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                målgruppe =
-                    parseValgfriEnum<FaktiskMålgruppe>(DomenenøkkelFelles.MÅLGRUPPE, rad)
-                        ?: FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                aktivitet = parseValgfriEnum<AktivitetType>(DomenenøkkelFelles.AKTIVITET, rad) ?: AktivitetType.TILTAK,
-            )
-        }
-
-    private fun mapVedtaksperioderDto(dataTable: DataTable): List<VedtaksperiodeDto> =
-        dataTable.mapRad { rad ->
-            VedtaksperiodeDto(
-                id = vedtaksperiodeId,
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                målgruppeType =
-                    parseValgfriEnum<FaktiskMålgruppe>(DomenenøkkelFelles.MÅLGRUPPE, rad)
-                        ?: FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                aktivitetType = parseValgfriEnum<AktivitetType>(DomenenøkkelFelles.AKTIVITET, rad) ?: AktivitetType.TILTAK,
-            )
-        }
-
     private fun hentVedtak(behandlingId: BehandlingId): InnvilgelseEllerOpphørBoutgifter =
-        vedtakRepository
+        vedtakRepositoryFake
             .findByIdOrThrow(behandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørBoutgifter>()
             .data
 
-    private data class ForenkletAndel(
-        val fom: LocalDate,
-        val tom: LocalDate,
-        val beløp: Int,
-        val satstype: Satstype,
-        val type: TypeAndel,
-        val utbetalingsdato: LocalDate,
-        val statusIverksetting: StatusIverksetting,
-    ) {
-        constructor(andel: AndelTilkjentYtelse) : this(
-            fom = andel.fom,
-            tom = andel.tom,
-            beløp = andel.beløp,
-            satstype = andel.satstype,
-            type = andel.type,
-            utbetalingsdato = andel.utbetalingsdato,
-            statusIverksetting = andel.statusIverksetting,
-        )
-    }
-
-    private fun mapAndeler(dataTable: DataTable) =
-        dataTable.mapRad { rad ->
-            ForenkletAndel(
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad) ?: parseDato(DomenenøkkelFelles.FOM, rad),
-                beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
-                satstype = parseValgfriEnum<Satstype>(DomenenøkkelAndelTilkjentYtelse.SATS, rad) ?: Satstype.DAG,
-                type = parseEnum(DomenenøkkelAndelTilkjentYtelse.TYPE, rad),
-                utbetalingsdato = parseDato(DomenenøkkelAndelTilkjentYtelse.UTBETALINGSDATO, rad),
-                statusIverksetting =
-                    parseValgfriEnum<StatusIverksetting>(
-                        domenebegrep = DomenenøkkelAndelTilkjentYtelse.STATUS_IVERKSETTING,
-                        rad = rad,
-                    ) ?: StatusIverksetting.UBEHANDLET,
-            )
-        }
-
     private fun dummyBehandling(
         behandlingId: BehandlingId,
+        steg: StegType = StegType.BEREGNE_YTELSE,
         revurderFra: LocalDate? = null,
     ): Saksbehandling {
         val forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId(behandlingId)
         return saksbehandling(
             id = behandlingId,
+            steg = steg,
             fagsak = fagsak(stønadstype = Stønadstype.BOUTGIFTER),
             forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
             revurderFra = revurderFra,

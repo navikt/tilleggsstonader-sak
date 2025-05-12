@@ -25,7 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BoutgifterCucumberNøkler
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BoutgifterDomenenøkkel
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
@@ -120,7 +120,7 @@ class StepDefinitions {
     fun `skal beregnet stønad for boutgifter være`(dataTable: DataTable) {
         assertThat(exception).isNull()
         val forventetBeregningsresultat = mapBeregningsresultat(dataTable, utgifter)
-        val forventedeStønadsbeløp = dataTable.mapRad { rad -> parseInt(BoutgifterCucumberNøkler.STØNADSBELØP, rad) }
+        val forventedeStønadsbeløp = dataTable.mapRad { rad -> parseInt(BoutgifterDomenenøkkel.STØNADSBELØP, rad) }
 
         assertThat(beregningsresultat!!.perioder).hasSize(forventetBeregningsresultat.size)
 
