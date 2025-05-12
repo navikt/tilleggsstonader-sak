@@ -50,8 +50,8 @@ Egenskap: Beregning - med revurderFra
     Når beregner boutgifter med revurderFra=2025-01-22
 
     Så skal beregnet stønad for boutgifter være
-      | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
-      | 07.01.2025 | 06.02.2025 | 1              | 2000         | 4953      | 07.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet | Del av tidligere utbetaling |
+      | 07.01.2025 | 06.02.2025 | 1              | 2000         | 4953      | 07.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    | Ja                          |
 
   Scenario: Skal ta med perioder fra den utbetalingsperioden man revurder dersom de overlapper - beløpet når maks sats
     Gitt følgende vedtaksperioder for boutgifter
@@ -67,5 +67,5 @@ Egenskap: Beregning - med revurderFra
     Når beregner boutgifter med revurderFra=2025-01-22
 
     Så skal beregnet stønad for boutgifter være
-      | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
-      | 07.01.2025 | 06.02.2025 | 1              | 4953         | 4953      | 07.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | Fom        | Tom        | Antall måneder | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet | Del av tidligere utbetaling |
+      | 07.01.2025 | 06.02.2025 | 1              | 4953         | 4953      | 07.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    | Ja                          |

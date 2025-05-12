@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
@@ -28,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class BoutgifterBeregningService(
@@ -126,14 +128,18 @@ class BoutgifterBeregningService(
         val perioderFraForrigeVedtakSomSkalBeholdes =
             forrigeBeregningsresultat
                 .perioder
-                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < revurderFra }
+                .filter { it.grunnlag.tom < revurderFra }
                 .map { it.markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling = true) }
-        val nyePerioder =
+
+        val perioderSomSkalReberegnes =
             beregningsresultat
-                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() >= revurderFra }
+                .filter { revurderFra.erInneholdILøpendeMåned(it) }
+                .map { it.markerSomDelAvTidligereUtbetaling(true) }
+
+        val nyePerioder = beregningsresultat.filter { it.grunnlag.fom >= revurderFra }
 
         return BeregningsresultatBoutgifter(
-            perioder = perioderFraForrigeVedtakSomSkalBeholdes + nyePerioder,
+            perioder = perioderFraForrigeVedtakSomSkalBeholdes + perioderSomSkalReberegnes + nyePerioder,
         )
     }
 
@@ -173,6 +179,9 @@ class BoutgifterBeregningService(
             periode.overlapper(it)
         }
     }
+
+    private fun LocalDate.erInneholdILøpendeMåned(løpendeMåned: Periode<LocalDate>) =
+        løpendeMåned.fom < this && løpendeMåned.fom.sisteDagenILøpendeMåned() > this
 }
 
 private fun validerUtgifterTilMidlertidigOvernattingErInnenforVedtaksperiodene(
