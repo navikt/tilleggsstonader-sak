@@ -20,6 +20,11 @@ class VedtaksperioderOversiktService(
     private val behandlingService: BehandlingService,
     private val vedtakService: VedtakService,
 ) {
+    /**
+     * Oversikten baserer seg på vedtaksperiodene fra beregningsresultatet, som inneholder mer
+     * detaljert informasjon spesifikk for stønadstypen.
+     * De er derfor ikke nødvendigvis en til en med vedtaksperiodene som saksbehandler registrerer.
+     */
     fun hentVedtakOversikt(fagsakPersonId: FagsakPersonId): VedtaksperioderOversikt {
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
 
@@ -65,7 +70,6 @@ class VedtaksperioderOversiktService(
     }
 
     private fun finnVedtaksperioderFraBeregningsresultatTilsynBarn(beregningsresultatTilsynBarn: BeregningsresultatTilsynBarn) =
-        // TODO - Kommenter hva som skjer her (Gå igjennom og lære hva som skjer)
         beregningsresultatTilsynBarn.perioder.flatMap { resultatMåned ->
             resultatMåned.grunnlag.vedtaksperiodeGrunnlag
                 .map { vedtaksperiodeGrunnlag ->
