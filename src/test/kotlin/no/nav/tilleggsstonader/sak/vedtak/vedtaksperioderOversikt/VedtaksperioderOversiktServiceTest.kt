@@ -27,7 +27,7 @@ class VedtaksperioderOversiktServiceTest : IntegrationTest() {
         opprettBehandlingOgVedtakTilsynBarn(fagsakPerson)
         opprettBehandlingOgVedtakLæremidler(fagsakPerson)
 
-        val res = vedtaksperioderOversiktService.hentVedtakOversikt(fagsakPersonId = fagsakPerson.id)
+        val res = vedtaksperioderOversiktService.hentVedtaksperioderOversikt(fagsakPersonId = fagsakPerson.id)
 
         assertThat(res.tilsynBarn).isNotEmpty()
         assertThat(res.læremidler).isNotEmpty()
