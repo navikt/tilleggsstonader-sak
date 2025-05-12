@@ -27,10 +27,19 @@ class ArenaStatusService(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun finnStatus(request: ArenaFinnesPersonRequest): ArenaFinnesPersonResponse =
-        ArenaFinnesPersonResponse(request.ident, finnesPerson(request))
+    /**
+     * @param sjekkSkalRuteAlleSøkere er kun for å kunne teste uten å sjekke om alle skal routes
+     */
+    fun finnStatus(
+        request: ArenaFinnesPersonRequest,
+        sjekkSkalRuteAlleSøkere: Boolean = true,
+    ): ArenaFinnesPersonResponse =
+        ArenaFinnesPersonResponse(request.ident, finnesPerson(request, sjekkSkalRuteAlleSøkere))
 
-    private fun finnesPerson(request: ArenaFinnesPersonRequest): Boolean {
+    private fun finnesPerson(
+        request: ArenaFinnesPersonRequest,
+        sjekkSkalRuteAlleSøkere: Boolean = true,
+        ): Boolean {
         val identer = personService.hentFolkeregisterIdenter(request.ident).identer().toSet()
 
         val fagsak = fagsakService.finnFagsak(identer, request.stønadstype)
@@ -50,7 +59,7 @@ class ArenaStatusService(
             logger.info("$logPrefix finnes=true harRouting harBehandling")
             return true
         }
-        if (skalBehandlesITsSak(request.stønadstype)) {
+        if (sjekkSkalRuteAlleSøkere && skalBehandlesITsSak(request.stønadstype)) {
             logger.info("$logPrefix finnes=true skalAlltidBehandlesITsSak")
             return true
         }
@@ -70,11 +79,12 @@ class ArenaStatusService(
      * Denne håndterer at gitt stønadstype alltid svarer med at personen finnes i ny løsning.
      * Eks for Barnetilsyn er det ønskelig at personen skal håndteres i ny løsning og at det ikke fattes nye vedtak i Arena
      */
+    @Suppress("SameReturnValue") // Kan fjernes når vi har alle stønadstyper på plass
     private fun skalBehandlesITsSak(stønadstype: Stønadstype): Boolean =
         when (stønadstype) {
             Stønadstype.BARNETILSYN -> true
             Stønadstype.LÆREMIDLER -> true
-            Stønadstype.BOUTGIFTER -> false
+            Stønadstype.BOUTGIFTER -> true
         }
 
     private fun harBehandling(fagsak: Fagsak?): Boolean =

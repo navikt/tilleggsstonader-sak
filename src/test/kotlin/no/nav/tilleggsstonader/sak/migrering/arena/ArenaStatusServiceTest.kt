@@ -48,7 +48,7 @@ class ArenaStatusServiceTest {
     fun `skal returnere false når det ikke finnes noen fagsak`() {
         mockFinnFagsak(null)
 
-        assertThat(arenaStatusService.finnStatus(request).finnes).isFalse()
+        assertThat(arenaStatusService.finnStatus(request, sjekkSkalRuteAlleSøkere = false).finnes).isFalse()
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
         verify(exactly = 0) { behandlingService.finnesBehandlingForFagsak(any()) }
@@ -59,7 +59,7 @@ class ArenaStatusServiceTest {
     fun `skal returnere false når det ikke finnes noen behandlinger`() {
         mockFinnesBehandlingForFagsak(false)
 
-        assertThat(arenaStatusService.finnStatus(request).finnes).isFalse()
+        assertThat(arenaStatusService.finnStatus(request, sjekkSkalRuteAlleSøkere = false).finnes).isFalse()
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
         verify(exactly = 1) { behandlingService.finnesBehandlingForFagsak(any()) }
@@ -70,7 +70,7 @@ class ArenaStatusServiceTest {
     fun `skal returnere true hvis det finnes behandlinger`() {
         mockFinnesBehandlingForFagsak(true)
 
-        assertThat(arenaStatusService.finnStatus(request).finnes).isTrue()
+        assertThat(arenaStatusService.finnStatus(request, sjekkSkalRuteAlleSøkere = false).finnes).isTrue()
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
         verify(exactly = 1) { behandlingService.finnesBehandlingForFagsak(any()) }
@@ -83,7 +83,7 @@ class ArenaStatusServiceTest {
         mockFinnesBehandlingForFagsak(false)
         mockSøknadRouting(true)
 
-        assertThat(arenaStatusService.finnStatus(request).finnes).isTrue()
+        assertThat(arenaStatusService.finnStatus(request, sjekkSkalRuteAlleSøkere = false).finnes).isTrue()
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
         verify(exactly = 1) { behandlingService.finnesBehandlingForFagsak(any()) }
