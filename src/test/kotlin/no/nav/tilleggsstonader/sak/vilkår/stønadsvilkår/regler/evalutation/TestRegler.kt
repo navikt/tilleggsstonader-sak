@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
 
 class VilkårsregelEnHovedregel :
     Vilkårsregel(
-        VilkårType.EKSEMPEL,
+        VilkårType.PASS_BARN,
         setOf(
             RegelSteg(
                 regelId = RegelId.HAR_ET_NAVN,
@@ -35,7 +35,7 @@ class VilkårsregelEnHovedregel :
 
 class VilkårsregelToHovedregler :
     Vilkårsregel(
-        VilkårType.EKSEMPEL,
+        VilkårType.PASS_BARN,
         setOf(
             RegelSteg(
                 regelId = RegelId.HAR_ET_NAVN,
