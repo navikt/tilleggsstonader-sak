@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat

@@ -21,34 +21,6 @@ class VedtaksperioderOversiktController(
         @PathVariable fagsakPersonId: FagsakPersonId,
     ): VedtaksperiodeOversiktDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
-        return tilDto(vedtakOversiktService.hentVedtaksperioderOversikt(fagsakPersonId))
+        return vedtakOversiktService.hentVedtaksperioderOversikt(fagsakPersonId).tilDto()
     }
 }
-
-private fun tilDto(vedtaksperioder: VedtaksperioderOversikt): VedtaksperiodeOversiktDto =
-    VedtaksperiodeOversiktDto(
-        tilsynBarn =
-            vedtaksperioder.tilsynBarn.map { it ->
-                VedtaksperiodeOversiktTilsynBarnDto(
-                    fom = it.fom,
-                    tom = it.tom,
-                    aktivitet = it.aktivitet,
-                    målgruppe = it.målgruppe,
-                    antallBarn = it.antallBarn,
-                    totalMånedsUtgift = it.totalMånedsUtgift,
-                )
-            },
-        læremidler =
-            vedtaksperioder.læremidler.map { it ->
-                VedtaksperiodeOversiktLæremidlerDto(
-                    fom = it.fom,
-                    tom = it.tom,
-                    aktivitet = it.aktivitet,
-                    målgruppe = it.målgruppe,
-                    antallMåneder = it.antallMåneder,
-                    studienivå = it.studienivå,
-                    studieprosent = it.studieprosent,
-                    månedsbeløp = it.månedsbeløp,
-                )
-            },
-    )

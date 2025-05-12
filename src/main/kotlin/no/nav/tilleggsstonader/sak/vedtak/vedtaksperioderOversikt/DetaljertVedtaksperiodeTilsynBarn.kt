@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
@@ -23,17 +24,15 @@ data class DetaljertVedtaksperiodeTilsynBarn(
     /**
      * Ettersom vedtaksperiode ikke overlapper er det tilstrekkelig å kun merge TOM
      */
-    override fun merge(other: DetaljertVedtaksperiodeTilsynBarn): DetaljertVedtaksperiodeTilsynBarn =
-        this.copy(tom = other.tom)
+    override fun merge(other: DetaljertVedtaksperiodeTilsynBarn): DetaljertVedtaksperiodeTilsynBarn = this.copy(tom = other.tom)
 
     fun erLikOgPåfølgesAv(other: DetaljertVedtaksperiodeTilsynBarn): Boolean {
         val erLik =
             this.aktivitet == other.aktivitet &&
-                    this.målgruppe == other.målgruppe &&
-                    this.antallBarn == other.antallBarn &&
-                    this.totalMånedsUtgift == other.totalMånedsUtgift
-        val påfølgesAv = this.tom.plusDays(1) == other.fom
-        return erLik && påfølgesAv
+                this.målgruppe == other.målgruppe &&
+                this.antallBarn == other.antallBarn &&
+                this.totalMånedsUtgift == other.totalMånedsUtgift
+        return erLik && this.påfølgesAv(other)
     }
 }
 
@@ -41,4 +40,3 @@ fun List<DetaljertVedtaksperiodeTilsynBarn>.sorterOgMergeSammenhengende() =
     this
         .sorted()
         .mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
-
