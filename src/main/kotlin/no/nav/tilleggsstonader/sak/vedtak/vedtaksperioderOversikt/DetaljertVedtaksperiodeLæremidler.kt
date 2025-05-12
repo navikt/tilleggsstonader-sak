@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -36,11 +37,16 @@ data class DetaljertVedtaksperiodeLæremidler(
     fun erLikOgPåfølgesAv(other: DetaljertVedtaksperiodeLæremidler): Boolean {
         val erLik =
             this.aktivitet == other.aktivitet &&
-                this.målgruppe == other.målgruppe &&
-                this.studienivå == other.studienivå &&
-                this.studieprosent == other.studieprosent &&
-                this.månedsbeløp == other.månedsbeløp
+                    this.målgruppe == other.målgruppe &&
+                    this.studienivå == other.studienivå &&
+                    this.studieprosent == other.studieprosent &&
+                    this.månedsbeløp == other.månedsbeløp
         val påfølgesAv = this.tom.plusDays(1) == other.fom
         return erLik && påfølgesAv
     }
 }
+
+fun List<DetaljertVedtaksperiodeLæremidler>.sorterOgMergeSammenhengende() =
+    this
+        .sorted()
+        .mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
