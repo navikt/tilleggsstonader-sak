@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.vedtakOversikt
+package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/vedtak")
 @ProtectedWithClaims(issuer = "azuread")
-class VedtakOversiktController(
-    private val vedtakOversiktService: VedtakOversiktService,
+class VedtaksperioderOversiktController(
+    private val vedtakOversiktService: VedtaksperioderOversiktService,
     private val tilgangService: TilgangService,
 ) {
     @GetMapping("/fullstendig-oversikt/{fagsakPersonId}")
@@ -25,7 +25,7 @@ class VedtakOversiktController(
     }
 }
 
-private fun tilDto(vedtaksperioder: VedtaksperiodeOversikt): VedtaksperiodeOversiktDto =
+private fun tilDto(vedtaksperioder: VedtaksperioderOversikt): VedtaksperiodeOversiktDto =
     VedtaksperiodeOversiktDto(
         tilsynBarn =
             vedtaksperioder.tilsynBarn.map { it ->

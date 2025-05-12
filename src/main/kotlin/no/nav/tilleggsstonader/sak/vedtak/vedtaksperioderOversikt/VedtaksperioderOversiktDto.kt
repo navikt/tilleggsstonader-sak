@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.vedtakOversikt
+package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå

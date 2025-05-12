@@ -1,6 +1,6 @@
-package no.nav.tilleggsstonader.sak.vedtak.vedtakOversikt
+package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
-data class VedtaksperiodeOversikt(
+data class VedtaksperioderOversikt(
     val tilsynBarn: List<DetaljertVedtaksperiodeTilsynBarn>,
     val læremidler: List<DetaljertVedtaksperiodeLæremidler>,
 )

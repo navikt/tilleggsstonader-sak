@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.vedtakOversikt
+package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
