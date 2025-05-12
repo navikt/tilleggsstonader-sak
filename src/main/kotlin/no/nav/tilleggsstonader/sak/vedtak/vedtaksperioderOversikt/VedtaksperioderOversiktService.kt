@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -11,8 +10,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremid
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import org.springframework.stereotype.Service
-import kotlin.collections.List
-import kotlin.collections.sorted
 
 @Service
 class VedtaksperioderOversiktService(
