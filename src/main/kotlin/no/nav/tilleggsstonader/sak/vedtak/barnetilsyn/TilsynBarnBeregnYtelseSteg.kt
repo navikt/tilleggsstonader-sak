@@ -171,7 +171,7 @@ class TilsynBarnBeregnYtelseSteg(
     private fun lagInnvilgetVedtak(
         behandling: Saksbehandling,
         beregningsresultat: BeregningsresultatTilsynBarn,
-        vedtaksperioder: List<Vedtaksperiode>?,
+        vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
     ): Vedtak =
         GeneriskVedtak(

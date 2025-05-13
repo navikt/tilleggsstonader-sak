@@ -27,7 +27,7 @@ class VedtakRepositoryTest : IntegrationTest() {
         vedtakRepository.insert(
             innvilgetVedtak(
                 behandlingId = behandling.id,
-                vedtak = InnvilgelseTilsynBarn(beregningsresultat = beregningsresultat),
+                vedtak = InnvilgelseTilsynBarn(beregningsresultat = beregningsresultat, vedtaksperioder = emptyList()),
             ),
         )
 

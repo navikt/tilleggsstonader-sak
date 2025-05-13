@@ -54,7 +54,7 @@ object VedtakDtoMapper {
             is InnvilgelseTilsynBarn ->
                 InnvilgelseTilsynBarnResponse(
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
-                    vedtaksperioder = data.vedtaksperioder?.tilVedtaksperiodeDto(),
+                    vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(),
                     begrunnelse = data.begrunnelse,
                 )
 
@@ -63,7 +63,7 @@ object VedtakDtoMapper {
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
-                    vedtaksperioder = data.vedtaksperioder?.tilVedtaksperiodeDto(),
+                    vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(),
                 )
 
             is AvslagTilsynBarn ->

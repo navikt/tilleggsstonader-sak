@@ -168,15 +168,15 @@ class InterntVedtakService(
             }
         }
 
-    private fun mapVedtaksperioderTilsynBarnOgBoutgifter(vedtaksperioder: List<Vedtaksperiode>?): List<VedtaksperiodeInterntVedtak> =
-        vedtaksperioder?.map {
+    private fun mapVedtaksperioderTilsynBarnOgBoutgifter(vedtaksperioder: List<Vedtaksperiode>): List<VedtaksperiodeInterntVedtak> =
+        vedtaksperioder.map {
             VedtaksperiodeInterntVedtak(
                 målgruppe = it.målgruppe,
                 aktivitet = it.aktivitet,
                 fom = it.fom,
                 tom = it.tom,
             )
-        } ?: emptyList()
+        }
 
     private fun mapVedtaksperioderLæremidler(vedtaksperioder: List<VedtaksperiodeLæremidler>?): List<VedtaksperiodeInterntVedtak> =
         vedtaksperioder?.map {

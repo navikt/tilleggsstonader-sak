@@ -1,6 +1,6 @@
 {
   "type": "OPPHØR_TILSYN_BARN",
-  "vedtaksperioder" : null,
+  "vedtaksperioder" : [],
   "årsaker": [
     "ENDRING_AKTIVITET"
   ],
