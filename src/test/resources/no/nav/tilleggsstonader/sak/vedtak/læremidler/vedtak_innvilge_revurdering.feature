@@ -427,3 +427,92 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Beløp | Type           | Utbetalingsdato |
       | 20.01.2025 | 451   | LÆREMIDLER_AAP | 20.01.2025      |
       | 10.02.2025 | 902   | LÆREMIDLER_AAP | 10.02.2025      |
+
+  Scenario: Sara - forlenger periode
+
+    Gitt følgende aktiviteter for læremidler behandling=1
+      | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
+      | 01.01.2025 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
+
+    Gitt følgende målgrupper for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe |
+      | 01.01.2025 | 31.03.2025 | AAP       |
+
+    Når innvilger vedtaksperioder for behandling=1
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 17.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+
+    Når kopierer perioder fra forrige behandling for behandling=2
+
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 28.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+
+    Så forvent beregningsresultatet for behandling=2
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |
+      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      | Ja                          |
+      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      | Ja                          |
+
+    Så forvent andeler for behandling=2
+      | Fom        | Beløp | Type           | Utbetalingsdato |
+      | 01.01.2025 | 902   | LÆREMIDLER_AAP | 01.01.2025      |
+
+  Scenario: Sara - ny vedtaksperiode etter tidligere vedtaksperiode
+
+    Gitt følgende aktiviteter for læremidler behandling=1
+      | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
+      | 01.01.2025 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
+
+    Gitt følgende målgrupper for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe |
+      | 01.01.2025 | 31.03.2025 | AAP       |
+
+    Når innvilger vedtaksperioder for behandling=1
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 17.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+
+    Når kopierer perioder fra forrige behandling for behandling=2
+
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 17.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 18.02.2025 | 28.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+
+    Så forvent beregningsresultatet for behandling=2
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |
+      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      | Ja                          |
+      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      | Ja                          |
+
+    Så forvent andeler for behandling=2
+      | Fom        | Beløp | Type           | Utbetalingsdato |
+      | 01.01.2025 | 902   | LÆREMIDLER_AAP | 01.01.2025      |
+
+  Scenario: Sara - ny vedtaksperiode etter revurder-fra
+
+    Gitt følgende aktiviteter for læremidler behandling=1
+      | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
+      | 01.01.2025 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
+
+    Gitt følgende målgrupper for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe |
+      | 01.01.2025 | 31.03.2025 | AAP       |
+
+    Når innvilger vedtaksperioder for behandling=1
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 17.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+
+    Når kopierer perioder fra forrige behandling for behandling=2
+
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
+      | Fom        | Tom        | Målgruppe           | Aktivitet |
+      | 01.01.2025 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 01.02.2025 | 28.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+
+    Så forvent beregningsresultatet for behandling=2
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |
+      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      | Ja                          |
+      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      | Ja                          |
+
+    Så forvent andeler for behandling=2
+      | Fom        | Beløp | Type           | Utbetalingsdato |
+      | 01.01.2025 | 902   | LÆREMIDLER_AAP | 01.01.2025      |
