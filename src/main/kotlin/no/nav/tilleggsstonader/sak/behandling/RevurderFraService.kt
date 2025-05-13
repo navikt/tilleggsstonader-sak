@@ -4,11 +4,11 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.skalNullstilleBehan
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 
 @Service
 class RevurderFraService(
@@ -18,7 +18,7 @@ class RevurderFraService(
     @Transactional
     fun oppdaterRevurderFra(
         behandlingId: BehandlingId,
-        revurderFra: LocalDate?,
+        revurderFra: RevurderFra?,
     ): Saksbehandling {
         val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
 

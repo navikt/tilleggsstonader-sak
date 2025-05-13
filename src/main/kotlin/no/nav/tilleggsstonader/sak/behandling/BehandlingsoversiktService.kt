@@ -11,9 +11,9 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class BehandlingsoversiktService(
@@ -92,7 +92,7 @@ class BehandlingsoversiktService(
      */
     private fun slåSammenVedtaksperioderForBehandling(
         behandlingId: BehandlingId,
-        revurdererFra: LocalDate?,
+        revurdererFra: RevurderFra?,
     ): Vedtaksperiode {
         val vedtaksperioder = vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, revurdererFra)
         val minFom = vedtaksperioder.minOfOrNull { it.fom }

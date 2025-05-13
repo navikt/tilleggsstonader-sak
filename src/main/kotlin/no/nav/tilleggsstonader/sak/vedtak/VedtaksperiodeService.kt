@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
@@ -16,7 +17,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class VedtaksperiodeService(
@@ -55,7 +55,7 @@ class VedtaksperiodeService(
         }
 
         // .minusDays(1) fordi dagen før revurder fra blir siste dag i vedtaksperioden
-        return forrigeVedtaksperioder.avkortFraOgMed(behandling.revurderFra.minusDays(1))
+        return forrigeVedtaksperioder.avkortFraOgMed(behandling.revurderFra.dato.minusDays(1))
     }
 
     fun detFinnesVedtaksperioderPåForrigeBehandling(saksbehandling: Saksbehandling): Boolean =
@@ -85,7 +85,7 @@ class VedtaksperiodeService(
      */
     fun finnVedtaksperioderForBehandling(
         behandlingId: BehandlingId,
-        revurdererFra: LocalDate?,
+        revurdererFra: RevurderFra?,
     ): List<Vedtaksperiode> {
         val vedtak = vedtakRepository.findByIdOrNull(behandlingId) ?: return emptyList()
 
@@ -97,6 +97,6 @@ class VedtaksperiodeService(
                 is Avslag -> emptyList()
             }
 
-        return vedtaksperioder.avkortPerioderFør(revurdererFra)
+        return vedtaksperioder.avkortPerioderFør(revurdererFra?.dato)
     }
 }

@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
 import java.time.LocalDate
@@ -37,7 +38,7 @@ data class Saksbehandling(
     val eksternFagsakId: Long,
     @Column("stonadstype")
     val stønadstype: Stønadstype,
-    val revurderFra: LocalDate?,
+    val revurderFra: RevurderFra?,
     val opprettetAv: String,
     val opprettetTid: LocalDateTime,
     val endretAv: String,

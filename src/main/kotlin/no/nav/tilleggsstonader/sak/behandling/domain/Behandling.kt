@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak.MANUELT_OP
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
@@ -38,7 +39,7 @@ data class Behandling(
     val henlagtÅrsak: HenlagtÅrsak? = null,
     val henlagtBegrunnelse: String? = null,
     val vedtakstidspunkt: LocalDateTime? = null,
-    val revurderFra: LocalDate? = null,
+    val revurderFra: RevurderFra? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
 ) {

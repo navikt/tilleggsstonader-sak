@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra.Companion.compareTo
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
@@ -133,7 +134,7 @@ class BoutgifterBeregningService(
 
         val perioderSomSkalReberegnes =
             beregningsresultat
-                .filter { revurderFra.erInneholdILøpendeMåned(it) }
+                .filter { revurderFra.dato.erInneholdILøpendeMåned(it) }
                 .map { it.markerSomDelAvTidligereUtbetaling(true) }
 
         val nyePerioder = beregningsresultat.filter { it.grunnlag.fom >= revurderFra }

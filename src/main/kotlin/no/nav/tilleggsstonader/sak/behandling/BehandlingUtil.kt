@@ -6,8 +6,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.FØRSTEGANGSBEHANDLING
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.REVURDERING
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra.Companion.compareTo
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import java.time.LocalDate
 
 object BehandlingUtil {
     fun utledBehandlingType(tidligereBehandlinger: List<Behandling>): BehandlingType =
@@ -19,7 +20,7 @@ object BehandlingUtil {
 
     fun skalNullstilleBehandling(
         behandling: Behandling,
-        nyRevurderFra: LocalDate?,
+        nyRevurderFra: RevurderFra?,
     ): Boolean {
         val forrigeRevurdererFra = behandling.revurderFra
         return when {

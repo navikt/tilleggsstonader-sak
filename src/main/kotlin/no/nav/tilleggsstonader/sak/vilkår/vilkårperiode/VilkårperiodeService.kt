@@ -6,6 +6,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra.Companion.compareTo
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -42,7 +44,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.Vilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 import java.util.UUID
 
 @Service
@@ -188,7 +189,7 @@ class VilkårperiodeService(
     private fun oppdaterVilkårperiodeFørRevurderFra(
         vilkårperiode: LagreVilkårperiode,
         eksisterendeVilkårperiode: Vilkårperiode,
-        revurderFra: LocalDate,
+        revurderFra: RevurderFra,
         fødselFaktaGrunnlag: FødselFaktaGrunnlag?,
     ): Vilkårperiode {
         val vurderingerMedGammelManglerData =

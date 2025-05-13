@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra.Companion.compareTo
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
@@ -50,7 +52,7 @@ object VilkårperiodeRevurderFraValidering {
     fun validerAtKunTomErEndret(
         eksisterendePeriode: Vilkårperiode,
         oppdatertPeriode: LagreVilkårperiode,
-        revurderFra: LocalDate,
+        revurderFra: RevurderFra,
     ) {
         feilHvis(eksisterendePeriode.fom != oppdatertPeriode.fom) {
             "Kan ikke endre fom til ${oppdatertPeriode.fom.norskFormat()} fordi " +
@@ -96,7 +98,7 @@ object VilkårperiodeRevurderFraValidering {
 
     fun validerAtVilkårperiodeKanOppdateresIRevurdering(
         eksisterendePeriode: Vilkårperiode,
-        revurderFra: LocalDate,
+        revurderFra: RevurderFra,
     ) {
         feilHvis(eksisterendePeriode.tom < revurderFra.minusDays(1)) {
             "Kan ikke endre vilkårperiode som er ferdig før revurderingsdato. Kontakt utviklingsteamet."
@@ -113,7 +115,7 @@ object VilkårperiodeRevurderFraValidering {
     }
 
     @OptIn(ExperimentalContracts::class)
-    fun validerRevurderFraErSatt(revurderFra: LocalDate?) {
+    fun validerRevurderFraErSatt(revurderFra: RevurderFra?) {
         contract {
             returns() implies (revurderFra != null)
         }

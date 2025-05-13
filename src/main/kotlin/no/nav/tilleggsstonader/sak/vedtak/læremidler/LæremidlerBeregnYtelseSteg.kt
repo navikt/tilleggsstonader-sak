@@ -126,7 +126,7 @@ class LæremidlerBeregnYtelseSteg(
 
         opphørValideringService.validerVedtaksperioderAvkortetVedOpphørLæremidler(
             forrigeBehandlingsVedtaksperioder = forrigeVedtak.data.vedtaksperioder,
-            revurderFraDato = saksbehandling.revurderFra,
+            revurderFra = saksbehandling.revurderFra,
         )
 
         val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)

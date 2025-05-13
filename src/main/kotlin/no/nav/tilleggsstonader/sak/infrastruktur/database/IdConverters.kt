@@ -5,10 +5,12 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktaGrunnlagId
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.convert.WritingConverter
+import java.time.LocalDate
 import java.util.UUID
 
 /**
@@ -63,6 +65,10 @@ object IdConverters {
 
     class FaktaGrunnlagIdReaderConverter : ValueClassUUIDReader<FaktaGrunnlagId>({ FaktaGrunnlagId(it) })
 
+    class RevurderFraWritingConverter : ValueClassWriter<RevurderFra, LocalDate>({ it.dato })
+
+    class RevurderFraReaderConverter : ValueClassReader<RevurderFra, LocalDate>({ RevurderFra(it) })
+
     val alleValueClassConverters =
         listOf(
             FagsakPersonIdWritingConverter(),
@@ -77,5 +83,7 @@ object IdConverters {
             VilkårIdReaderConverter(),
             FaktaGrunnlagIdWritingConverter(),
             FaktaGrunnlagIdReaderConverter(),
+            RevurderFraWritingConverter(),
+            RevurderFraReaderConverter(),
         )
 }

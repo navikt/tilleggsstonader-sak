@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra.Companion.compareTo
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
@@ -40,7 +42,7 @@ class BehandlingOppsummeringService(
     /**
      * Slår sammen vilkårperioder med likt resultat og samme type, dersom de overlapper.
      */
-    private fun List<Vilkårperiode>.oppsummer(revurderFra: LocalDate?): List<OppsummertVilkårperiode> =
+    private fun List<Vilkårperiode>.oppsummer(revurderFra: RevurderFra?): List<OppsummertVilkårperiode> =
         this
             .map { it.tilOppsummertVilkårperiode() }
             .sortedBy { it.fom }
@@ -58,7 +60,7 @@ class BehandlingOppsummeringService(
 
     private fun oppsummerStønadsvilkår(
         behandlingId: BehandlingId,
-        revurderFra: LocalDate?,
+        revurderFra: RevurderFra?,
     ): List<Stønadsvilkår> {
         val vilkår = vilkårService.hentVilkår(behandlingId)
 
@@ -87,7 +89,7 @@ class BehandlingOppsummeringService(
 
     private fun oppsummerVedtak(
         behandlingId: BehandlingId,
-        revurderFra: LocalDate?,
+        revurderFra: RevurderFra?,
     ): OppsummertVedtak? {
         val vedtak = vedtakService.hentVedtak(behandlingId)
 
@@ -115,7 +117,7 @@ class BehandlingOppsummeringService(
     }
 
     private fun tomLikEllerEtterRevurderFra(
-        revurderFra: LocalDate?,
+        revurderFra: RevurderFra?,
         tom: LocalDate?,
     ): Boolean {
         if (revurderFra == null || tom == null) {

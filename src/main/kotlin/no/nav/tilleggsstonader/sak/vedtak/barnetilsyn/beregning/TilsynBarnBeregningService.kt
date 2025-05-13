@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
@@ -39,7 +40,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeR
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.time.LocalDate
 
 /**
  * Stønaden dekker 64% av utgifterne til barnetilsyn
@@ -110,7 +110,7 @@ class TilsynBarnBeregningService(
                     .withTypeOrThrow<InnvilgelseEllerOpphørTilsynBarn>()
                     .data
                     .beregningsresultat
-            val revurderFraMåned = behandling.revurderFra?.toYearMonth() ?: YEAR_MONTH_MIN
+            val revurderFraMåned = behandling.revurderFra?.dato?.toYearMonth() ?: YEAR_MONTH_MIN
 
             beregningsresultat.perioder.filter { it.grunnlag.måned < revurderFraMåned }
         } ?: emptyList()
@@ -249,8 +249,8 @@ class TilsynBarnBeregningService(
      * For at beregningen då skal bli riktig må man ha med grunnlaget til hele måneden og beregne det på nytt, sånn at man får en ny periode som er
      * 1-14 aug, 500kr, 15-30 aug 700kr.
      */
-    private fun List<Beregningsgrunnlag>.brukPerioderFraOgMedRevurderFra(revurderFra: LocalDate?): List<Beregningsgrunnlag> {
-        val revurderFraMåned = revurderFra?.toYearMonth() ?: return this
+    private fun List<Beregningsgrunnlag>.brukPerioderFraOgMedRevurderFra(revurderFra: RevurderFra?): List<Beregningsgrunnlag> {
+        val revurderFraMåned = revurderFra?.dato?.toYearMonth() ?: return this
 
         return this.filter { it.måned >= revurderFraMåned }
     }

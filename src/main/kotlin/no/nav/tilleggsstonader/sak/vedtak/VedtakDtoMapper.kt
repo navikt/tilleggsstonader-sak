@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
@@ -31,12 +32,11 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
-import java.time.LocalDate
 
 object VedtakDtoMapper {
     fun toDto(
         vedtak: Vedtak,
-        revurderFra: LocalDate?,
+        revurderFra: RevurderFra?,
     ): VedtakResponse {
         val data = vedtak.data
         return when (data) {
@@ -48,7 +48,7 @@ object VedtakDtoMapper {
 
     private fun mapVedtakTilsynBarn(
         data: VedtakTilsynBarn,
-        revurderFra: LocalDate?,
+        revurderFra: RevurderFra?,
     ): VedtakTilsynBarnResponse =
         when (data) {
             is InnvilgelseTilsynBarn ->
@@ -75,15 +75,15 @@ object VedtakDtoMapper {
 
     private fun mapVedtakLæremidler(
         data: VedtakLæremidler,
-        revurderFra: LocalDate?,
+        revurderFra: RevurderFra?,
     ): VedtakLæremidlerResponse =
         when (data) {
             is InnvilgelseLæremidler ->
                 InnvilgelseLæremidlerResponse(
                     vedtaksperioder = data.vedtaksperioder.tilDto(),
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
-                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).minOf { it.fom },
-                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).maxOf { it.tom },
+                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra?.dato).minOf { it.fom },
+                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra?.dato).maxOf { it.tom },
                     begrunnelse = data.begrunnelse,
                 )
 
@@ -103,15 +103,15 @@ object VedtakDtoMapper {
 
     private fun mapVedtakBoutgifter(
         data: VedtakBoutgifter,
-        revurderFra: LocalDate?,
+        revurderFra: RevurderFra?,
     ): VedtakBoutgifterResponse =
         when (data) {
             is InnvilgelseBoutgifter ->
                 InnvilgelseBoutgifterResponse(
                     vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(),
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
-                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).minOf { it.fom },
-                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).maxOf { it.tom },
+                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra?.dato).minOf { it.fom },
+                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra?.dato).maxOf { it.tom },
                     begrunnelse = data.begrunnelse,
                 )
 

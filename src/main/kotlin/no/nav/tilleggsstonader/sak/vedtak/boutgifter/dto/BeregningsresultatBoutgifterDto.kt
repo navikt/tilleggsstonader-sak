@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -26,10 +27,10 @@ data class BeregningsresultatForPeriodeDto(
     val delAvTidligereUtbetaling: Boolean,
 ) : Periode<LocalDate>
 
-fun BeregningsresultatBoutgifter.tilDto(revurderFra: LocalDate?): BeregningsresultatBoutgifterDto =
+fun BeregningsresultatBoutgifter.tilDto(revurderFra: RevurderFra?): BeregningsresultatBoutgifterDto =
     BeregningsresultatBoutgifterDto(
         perioder =
-            filtrerFraOgMed(revurderFra)
+            filtrerFraOgMed(revurderFra?.dato)
                 .perioder
                 .map { it.tilDto() },
     )

@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatForMånedDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
@@ -50,7 +51,7 @@ data class Behandlinginfo(
     val vedtakstidspunkt: LocalDateTime,
     val saksbehandler: String,
     val beslutter: String?,
-    val revurderFra: LocalDate?,
+    val revurderFra: RevurderFra?,
 )
 
 data class Søknadsinformasjon(

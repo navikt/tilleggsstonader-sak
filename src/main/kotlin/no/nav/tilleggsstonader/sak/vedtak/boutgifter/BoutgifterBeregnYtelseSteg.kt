@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
@@ -29,7 +30,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class BoutgifterBeregnYtelseSteg(
@@ -91,7 +91,7 @@ class BoutgifterBeregnYtelseSteg(
 
         opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
             forrigeBehandlingsVedtaksperioder = forrigeVedtak.data.vedtaksperioder,
-            revurderFraDato = saksbehandling.revurderFra,
+            revurderFra = saksbehandling.revurderFra,
         )
 
         val avkortedeVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
@@ -104,8 +104,8 @@ class BoutgifterBeregnYtelseSteg(
 
     private fun avkortVedtaksperiodeVedOpphør(
         forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørBoutgifter>,
-        revurderFra: LocalDate,
-    ): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(revurderFra.minusDays(1))
+        revurderFra: RevurderFra,
+    ): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(revurderFra.dato.minusDays(1))
 
     private fun hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørBoutgifter> =
         vedtakRepository

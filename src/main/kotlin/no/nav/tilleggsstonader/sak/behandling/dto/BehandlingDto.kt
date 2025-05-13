@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
-import java.time.LocalDate
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import java.time.LocalDateTime
 
 data class BehandlingDto(
@@ -37,7 +37,7 @@ data class BehandlingDto(
     val vedtaksdato: LocalDateTime?,
     val henlagtÅrsak: HenlagtÅrsak?,
     val henlagtBegrunnelse: String?,
-    val revurderFra: LocalDate?,
+    val revurderFra: RevurderFra?,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata?,
 )
 

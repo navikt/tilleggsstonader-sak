@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -47,7 +48,7 @@ data class BehandlingDetaljer(
     val vedtaksdato: LocalDateTime?,
     val henlagtÅrsak: HenlagtÅrsak?,
     val henlagtBegrunnelse: String?,
-    val revurderFra: LocalDate?,
+    val revurderFra: RevurderFra?,
     val vedtaksperiode: Vedtaksperiode?,
 )
 

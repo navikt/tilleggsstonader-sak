@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra.Companion.compareTo
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -82,18 +84,18 @@ object VedtaksperiodeBeregningUtil {
         tom: LocalDate,
     ): Int = ChronoUnit.DAYS.between(fom, tom).toInt() + 1
 
-    fun <P> List<P>.brukPerioderFraOgMedRevurderFra(revurderFra: LocalDate?): List<P> where P : Periode<LocalDate>, P : KopierPeriode<P> =
+    fun <P> List<P>.brukPerioderFraOgMedRevurderFra(revurderFra: RevurderFra?): List<P> where P : Periode<LocalDate>, P : KopierPeriode<P> =
         revurderFra?.let {
             this.splitFraRevurderFra(revurderFra).filter { it.fom >= revurderFra }
         } ?: this
 
-    fun <P> List<P>.splitFraRevurderFra(revurderFra: LocalDate?): List<P> where P : Periode<LocalDate>, P : KopierPeriode<P> {
+    fun <P> List<P>.splitFraRevurderFra(revurderFra: RevurderFra?): List<P> where P : Periode<LocalDate>, P : KopierPeriode<P> {
         if (revurderFra == null) return this
         return this.flatMap {
             if (it.fom < revurderFra && revurderFra <= it.tom) {
                 listOf(
-                    it.medPeriode(fom = it.fom, tom = revurderFra.minusDays(1)),
-                    it.medPeriode(fom = revurderFra, tom = it.tom),
+                    it.medPeriode(fom = it.fom, tom = revurderFra.dato.minusDays(1)),
+                    it.medPeriode(fom = revurderFra.dato, tom = it.tom),
                 )
             } else {
                 listOf(it)

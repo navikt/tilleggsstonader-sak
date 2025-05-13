@@ -1,15 +1,16 @@
 package no.nav.tilleggsstonader.sak.vedtak.validering
 
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra.Companion.compareTo
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.PeriodeMedId
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatus
-import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode as VedtaksperiodeLæremidler
 
 fun validerIngenEndringerFørRevurderFra(
     innsendteVedtaksperioder: List<PeriodeMedId>,
     vedtaksperioderForrigeBehandling: List<PeriodeMedId>?,
-    revurderFra: LocalDate?,
+    revurderFra: RevurderFra?,
 ) {
     if (revurderFra == null) return
 

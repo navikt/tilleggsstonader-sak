@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
@@ -45,10 +46,10 @@ data class BeregningsresultatForPeriodeDto(
             this.påfølgesAv(nestePeriode)
 }
 
-fun BeregningsresultatLæremidler.tilDto(revurderFra: LocalDate?): BeregningsresultatLæremidlerDto {
+fun BeregningsresultatLæremidler.tilDto(revurderFra: RevurderFra?): BeregningsresultatLæremidlerDto {
     val perioderDto =
         this
-            .filtrerFraOgMed(revurderFra)
+            .filtrerFraOgMed(revurderFra?.dato)
             .perioder
             .map { it.tilDto() }
     return BeregningsresultatLæremidlerDto(

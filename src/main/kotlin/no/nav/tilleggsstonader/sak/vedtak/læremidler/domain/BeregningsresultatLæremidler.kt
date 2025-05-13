@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.periode.AvkortResult
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.RevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -61,12 +62,12 @@ data class Beregningsgrunnlag(
 
 fun avkortBeregningsresultatVedOpphør(
     forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørLæremidler>,
-    revurderFra: LocalDate,
+    revurderFra: RevurderFra,
 ): AvkortResult<BeregningsresultatForMåned> =
     forrigeVedtak
         .data
         .beregningsresultat
         .perioder
-        .avkortFraOgMed(revurderFra.minusDays(1)) { periode, nyttTom ->
+        .avkortFraOgMed(revurderFra.dato.minusDays(1)) { periode, nyttTom ->
             periode.copy(grunnlag = periode.grunnlag.copy(tom = nyttTom))
         }
