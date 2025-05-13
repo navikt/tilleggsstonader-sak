@@ -16,42 +16,52 @@ import java.util.UUID
  */
 object IdConverters {
     @WritingConverter
-    abstract class ValueClassWriter<T>(
-        val convert: (T) -> UUID,
-    ) : Converter<T, UUID> {
-        override fun convert(valueClass: T & Any): UUID = this.convert.invoke(valueClass)
+    abstract class ValueClassWriter<T, R>(
+        val convert: (T) -> R,
+    ) : Converter<T, R> {
+        override fun convert(valueClass: T & Any): R = this.convert.invoke(valueClass)
     }
 
     @ReadingConverter
-    abstract class ValueClassReader<T : Any>(
-        val convert: (UUID) -> T,
-    ) : Converter<UUID, T> {
-        override fun convert(id: UUID): T = this.convert.invoke(id)
+    abstract class ValueClassReader<T : Any, R : Any>(
+        val convert: (R) -> T,
+    ) : Converter<R, T> {
+        override fun convert(id: R): T = this.convert.invoke(id)
     }
 
-    class FagsakPersonIdWritingConverter : ValueClassWriter<FagsakPersonId>({ it.id })
+    @WritingConverter
+    abstract class ValueClassUUIDWriter<T>(
+        convert: (T) -> UUID,
+    ) : ValueClassWriter<T, UUID>(convert)
 
-    class FagsakPersonIdReaderConverter : ValueClassReader<FagsakPersonId>({ FagsakPersonId(it) })
+    @ReadingConverter
+    abstract class ValueClassUUIDReader<T : Any>(
+        convert: (UUID) -> T,
+    ) : ValueClassReader<T, UUID>(convert)
 
-    class FagsakIdWritingConverter : ValueClassWriter<FagsakId>({ it.id })
+    class FagsakPersonIdWritingConverter : ValueClassUUIDWriter<FagsakPersonId>({ it.id })
 
-    class FagsakIdReaderConverter : ValueClassReader<FagsakId>({ FagsakId(it) })
+    class FagsakPersonIdReaderConverter : ValueClassUUIDReader<FagsakPersonId>({ FagsakPersonId(it) })
 
-    class BehandlingIdWritingConverter : ValueClassWriter<BehandlingId>({ it.id })
+    class FagsakIdWritingConverter : ValueClassUUIDWriter<FagsakId>({ it.id })
 
-    class BehandlingIdReaderConverter : ValueClassReader<BehandlingId>({ BehandlingId(it) })
+    class FagsakIdReaderConverter : ValueClassUUIDReader<FagsakId>({ FagsakId(it) })
 
-    class BarnIdWritingConverter : ValueClassWriter<BarnId>({ it.id })
+    class BehandlingIdWritingConverter : ValueClassUUIDWriter<BehandlingId>({ it.id })
 
-    class BarnIdReaderConverter : ValueClassReader<BarnId>({ BarnId(it) })
+    class BehandlingIdReaderConverter : ValueClassUUIDReader<BehandlingId>({ BehandlingId(it) })
 
-    class VilkårIdWritingConverter : ValueClassWriter<VilkårId>({ it.id })
+    class BarnIdWritingConverter : ValueClassUUIDWriter<BarnId>({ it.id })
 
-    class VilkårIdReaderConverter : ValueClassReader<VilkårId>({ VilkårId(it) })
+    class BarnIdReaderConverter : ValueClassUUIDReader<BarnId>({ BarnId(it) })
 
-    class FaktaGrunnlagIdWritingConverter : ValueClassWriter<FaktaGrunnlagId>({ it.id })
+    class VilkårIdWritingConverter : ValueClassUUIDWriter<VilkårId>({ it.id })
 
-    class FaktaGrunnlagIdReaderConverter : ValueClassReader<FaktaGrunnlagId>({ FaktaGrunnlagId(it) })
+    class VilkårIdReaderConverter : ValueClassUUIDReader<VilkårId>({ VilkårId(it) })
+
+    class FaktaGrunnlagIdWritingConverter : ValueClassUUIDWriter<FaktaGrunnlagId>({ it.id })
+
+    class FaktaGrunnlagIdReaderConverter : ValueClassUUIDReader<FaktaGrunnlagId>({ FaktaGrunnlagId(it) })
 
     val alleValueClassConverters =
         listOf(
