@@ -70,8 +70,6 @@ class VedtaksperioderOversiktServiceTest : IntegrationTest() {
                 identer = fagsakPerson.identer,
             )
 
-        val vedtaksperiode = BoutgifterTestUtil.vedtaksperiode(behandling.id.id, LocalDate.now(), LocalDate.now())
-
         val beregningsresultat =
             BoutgifterTestUtil.lagBeregningsresultatMåned(
                 fom = LocalDate.now(),
@@ -93,7 +91,7 @@ class VedtaksperioderOversiktServiceTest : IntegrationTest() {
         val vedtak =
             BoutgifterTestUtil.innvilgelseBoutgifter(
                 behandlingId = behandling.id,
-                vedtaksperioder = listOf(vedtaksperiode),
+                vedtaksperioder = emptyList(),
                 beregningsresultat = BeregningsresultatBoutgifter(listOf(beregningsresultat)),
             )
 
