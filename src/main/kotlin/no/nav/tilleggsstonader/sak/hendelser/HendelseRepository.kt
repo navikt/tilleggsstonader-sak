@@ -47,4 +47,5 @@ data class Hendelse(
 
 enum class TypeHendelse {
     JOURNALPOST,
+    PERSONHENDELSE,
 }

@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Profile("!local & !integrasjonstest & !prod")
@@ -19,23 +20,21 @@ class PersonhendelseKafkaListener(
         topics = ["\${topics.leesah}"],
         containerFactory = "personhendelserListenerContainerFactory",
     )
+    @Transactional
     fun listen(
         consumerRecords: List<ConsumerRecord<String, Personhendelse>>,
         acknowledgment: Acknowledgment,
     ) {
-        val dødsfallhendelser =
-            consumerRecords
-                .map { it.value() }
-                .filter { it.erDødsfall() }
-                .map { it.tilDødsfallDomene() }
+        consumerRecords
+            .map { it.value() }
+            .filter { it.erDødsfall() }
+            .map { it.tilDødsfallDomene() }
+            .forEach { dødsfallHåndterer.håndterDødsfall(it) }
 
-        if (dødsfallhendelser.isNotEmpty()) {
-            dødsfallHåndterer.håndterDødsfall(dødsfallhendelser)
-        }
         acknowledgment.acknowledge()
     }
 }
 
 private fun Personhendelse.erDødsfall() = doedsfall != null
 
-private fun Personhendelse.tilDødsfallDomene() = DødsfallHendelse(this.doedsfall.doedsdato, this.personidenter.toSet())
+private fun Personhendelse.tilDødsfallDomene() = DødsfallHendelse(this.hendelseId, this.doedsfall.doedsdato, this.personidenter.toSet())

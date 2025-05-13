@@ -27,6 +27,7 @@ class PersonhendelseKafkaListenerTest {
 
         val dødsfallHendelse =
             Personhendelse().apply {
+                hendelseId = UUID.randomUUID().toString()
                 personidenter = listOf("12345678901")
                 doedsfall =
                     Doedsfall().apply {
@@ -37,6 +38,7 @@ class PersonhendelseKafkaListenerTest {
         // Vi har ikke definert andre hendelser i vår avro, så objektet vil være ganske tomt
         val annenHendelse =
             Personhendelse().apply {
+                hendelseId = UUID.randomUUID().toString()
                 personidenter = listOf("10987654321")
             }
 
@@ -48,8 +50,9 @@ class PersonhendelseKafkaListenerTest {
             ack,
         )
 
-        val forventetDødsfallHendelse = DødsfallHendelse(dødsfallHendelse.doedsfall.doedsdato, dødsfallHendelse.personidenter.toSet())
-        verify(exactly = 1) { dødsfallHåndterer.håndterDødsfall(listOf(forventetDødsfallHendelse)) }
+        val forventetDødsfallHendelse =
+            DødsfallHendelse(dødsfallHendelse.hendelseId, dødsfallHendelse.doedsfall.doedsdato, dødsfallHendelse.personidenter.toSet())
+        verify(exactly = 1) { dødsfallHåndterer.håndterDødsfall(forventetDødsfallHendelse) }
         verify(exactly = 1) { ack.acknowledge() }
     }
 }
