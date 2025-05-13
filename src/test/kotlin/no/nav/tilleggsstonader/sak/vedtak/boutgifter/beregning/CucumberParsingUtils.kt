@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
-import no.nav.tilleggsstonader.sak.cucumber.parseValgfriBoolean
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriDato
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -76,7 +75,6 @@ fun mapBeregningsresultat(
                     parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
                         ?: AktivitetType.TILTAK,
             ),
-        delAvTidligereUtbetaling = parseValgfriBoolean(BoutgifterDomenenøkkel.DEL_AV_TIDLIGERE_UTBETALING, rad) ?: false,
     )
 }
 

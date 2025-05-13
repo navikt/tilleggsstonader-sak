@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
@@ -9,6 +8,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
@@ -80,9 +80,9 @@ class BoutgifterBeregningService(
 
         return if (forrigeVedtak != null) {
             settSammenGamleOgNyePerioder(
-                saksbehandling = behandling,
-                beregningsresultat = beregningsresultat,
-                forrigeVedtak = forrigeVedtak,
+                revurderFra = behandling.revurderFra ?: feil("Behandlingen mangler revurder fra-dato"),
+                nyttBeregningsresultat = beregningsresultat,
+                forrigeBeregningsresultat = forrigeVedtak.beregningsresultat,
             )
         } else {
             BeregningsresultatBoutgifter(perioder = beregningsresultat)
@@ -110,37 +110,24 @@ class BoutgifterBeregningService(
 
     /**
      * Slår sammen perioder fra forrige og nytt vedtak.
-     * Beholder perioder fra forrige vedtak frem til og med revurder-fra
-     * Bruker reberegnede perioder fra og med revurder-fra dato
-     * Dette gjøres for at vi ikke skal reberegne perioder før revurder-fra datoet
-     * Men vi trenger å reberegne perioder som løper i revurder-fra datoet da en periode kan ha endret utgift
+     * Beholder perioder fra forrige vedtak frem til revurder fra-datoen.
+     * Bruker reberegnede perioder fra og med revurder fra-datoen
+     * Dette gjøres for at vi ikke skal reberegne perioder som ikke er med i revurderingen, i tilfelle beregningskoden har endret seg siden sist.
+     * Vi trenger derimot å reberegne alle perioder som ligger etter revurder fra-datoen, da utgiftene, antall samlinger osv kan ha endret seg.
      */
     private fun settSammenGamleOgNyePerioder(
-        saksbehandling: Saksbehandling,
-        beregningsresultat: List<BeregningsresultatForLøpendeMåned>,
-        forrigeVedtak: InnvilgelseEllerOpphørBoutgifter,
+        revurderFra: LocalDate,
+        nyttBeregningsresultat: List<BeregningsresultatForLøpendeMåned>,
+        forrigeBeregningsresultat: BeregningsresultatBoutgifter,
     ): BeregningsresultatBoutgifter {
-        val revurderFra = saksbehandling.revurderFra
-        feilHvis(revurderFra == null) { "Behandling=$saksbehandling mangler revurderFra" }
-
-        val forrigeBeregningsresultat = forrigeVedtak.beregningsresultat
-
         val perioderFraForrigeVedtakSomSkalBeholdes =
-            forrigeBeregningsresultat
-                .perioder
-                .filter { it.grunnlag.tom < revurderFra }
-                .map { it.markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling = true) }
+            forrigeBeregningsresultat.perioder.filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < revurderFra }
 
-        val perioderSomSkalReberegnes =
-            beregningsresultat
-                .filter { revurderFra.erInneholdILøpendeMåned(it) }
-                .map { it.markerSomDelAvTidligereUtbetaling(true) }
-
-        val nyePerioder = beregningsresultat.filter { it.grunnlag.fom >= revurderFra }
-
-        return BeregningsresultatBoutgifter(
-            perioder = perioderFraForrigeVedtakSomSkalBeholdes + perioderSomSkalReberegnes + nyePerioder,
-        )
+        val reberegnedePerioder =
+            nyttBeregningsresultat.filter {
+                it.inneholder(revurderFra) || it.fom.sisteDagenILøpendeMåned() > revurderFra
+            }
+        return BeregningsresultatBoutgifter(perioderFraForrigeVedtakSomSkalBeholdes + reberegnedePerioder)
     }
 
     private fun hentForrigeVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørBoutgifter? =
@@ -179,9 +166,6 @@ class BoutgifterBeregningService(
             periode.overlapper(it)
         }
     }
-
-    private fun LocalDate.erInneholdILøpendeMåned(løpendeMåned: Periode<LocalDate>) =
-        løpendeMåned.fom < this && løpendeMåned.fom.sisteDagenILøpendeMåned() > this
 }
 
 private fun validerUtgifterTilMidlertidigOvernattingErInnenforVedtaksperiodene(
@@ -214,7 +198,7 @@ private fun List<UtbetalingPeriode>.validerIngenUtbetalingsperioderOverlapperFle
 
     val detFinnesUtbetalingsperioderSomOverlapperFlereLøpendeUtgifter =
         any { utbetalingsperiode ->
-            fasteUtgifter.filter { utbetalingsperiode.overlapper(it) }.size > 1
+            fasteUtgifter.count { utbetalingsperiode.overlapper(it) } > 1
         }
 
     feilHvis(detFinnesUtbetalingsperioderSomOverlapperFlereLøpendeUtgifter) {

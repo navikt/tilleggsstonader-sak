@@ -76,7 +76,6 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
                         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
                     ),
-                delAvTidligereUtbetaling = false,
             ),
             BeregningsresultatForLøpendeMåned(
                 grunnlag =
@@ -90,7 +89,6 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
                         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
                     ),
-                delAvTidligereUtbetaling = false,
             ),
             BeregningsresultatForLøpendeMåned(
                 grunnlag =
@@ -104,7 +102,6 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
                         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
                     ),
-                delAvTidligereUtbetaling = false,
             ),
         )
 
@@ -184,22 +181,18 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 1, 1),
                     utgifter = løpendeUtgifterToBoliger,
-                    delAvTidligere = true,
                 ),
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 2, 1),
                     utgifter = løpendeUtgifterToBoliger,
-                    delAvTidligere = true,
                 ),
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 3, 1),
                     utgifter = løpendeUtgifterToBoliger,
-                    delAvTidligere = true,
                 ),
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 4, 1),
                     utgifter = utgifterEtterRevuderFra,
-                    delAvTidligere = false,
                 ),
             )
 

@@ -203,8 +203,7 @@
       "sumUtgifter" : 3000,
       "målgruppe" : "NEDSATT_ARBEIDSEVNE",
       "aktivitet" : "TILTAK",
-      "makssatsBekreftet" : true,
-      "delAvTidligereUtbetaling" : false
+      "makssatsBekreftet" : true
     }, {
       "fom" : "2024-02-01",
       "tom" : "2024-02-29",
@@ -220,8 +219,7 @@
       "sumUtgifter" : 4000,
       "målgruppe" : "NEDSATT_ARBEIDSEVNE",
       "aktivitet" : "TILTAK",
-      "makssatsBekreftet" : true,
-      "delAvTidligereUtbetaling" : false
+      "makssatsBekreftet" : true
     } ]
   }
 }

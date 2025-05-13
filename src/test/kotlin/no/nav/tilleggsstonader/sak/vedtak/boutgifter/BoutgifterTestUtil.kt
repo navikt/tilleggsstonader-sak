@@ -20,7 +20,7 @@ import java.time.Month.JANUARY
 import java.util.UUID
 
 object BoutgifterTestUtil {
-    val vedtaksperiodeIdFørstegangsbehandling = UUID.randomUUID()
+    val vedtaksperiodeIdFørstegangsbehandling: UUID = UUID.randomUUID()
 
     val vilkårperioder =
         Vilkårperioder(
@@ -90,7 +90,6 @@ object BoutgifterTestUtil {
                                     ),
                                 ),
                         ),
-                    delAvTidligere = false,
                 ),
             ),
     )
@@ -99,7 +98,6 @@ object BoutgifterTestUtil {
         fom: LocalDate,
         tom: LocalDate = fom.withDayOfMonth(fom.lengthOfMonth()),
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
-        delAvTidligere: Boolean,
     ) = BeregningsresultatForLøpendeMåned(
         grunnlag =
             Beregningsgrunnlag(
@@ -112,6 +110,5 @@ object BoutgifterTestUtil {
                 målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 aktivitet = AktivitetType.TILTAK,
             ),
-        delAvTidligereUtbetaling = delAvTidligere,
     )
 }
