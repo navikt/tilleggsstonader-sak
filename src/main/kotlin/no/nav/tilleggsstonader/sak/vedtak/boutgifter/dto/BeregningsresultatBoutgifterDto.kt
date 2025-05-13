@@ -61,7 +61,7 @@ fun BeregningsresultatForLøpendeMåned.tilDto(revurderFra: LocalDate?): Beregni
         makssatsBekreftet = grunnlag.makssatsBekreftet,
     )
 
-private fun BeregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(
+fun BeregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(
     revurderFra: LocalDate?,
 ): List<UtgiftBoutgifterMedAndelTilUtbetaling> {
     var totalSum = 0
