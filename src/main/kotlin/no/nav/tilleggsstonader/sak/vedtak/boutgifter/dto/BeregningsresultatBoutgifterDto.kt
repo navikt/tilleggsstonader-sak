@@ -41,12 +41,6 @@ private fun BeregningsresultatBoutgifter.filtrerFraOgMed(dato: LocalDate?): Bere
     return BeregningsresultatBoutgifter(perioder.filter { it.tom >= dato })
 }
 
-private fun BeregningsresultatBoutgifter.skalBrukeDetaljertVisning(): Boolean =
-    perioder.any {
-        it.grunnlag.utgifter.keys
-            .contains(TypeBoutgift.UTGIFTER_OVERNATTING)
-    }
-
 fun BeregningsresultatForLøpendeMåned.tilDto(): BeregningsresultatForPeriodeDto =
     BeregningsresultatForPeriodeDto(
         fom = grunnlag.fom,
