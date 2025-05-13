@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBehandling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
@@ -40,10 +41,11 @@ object BoutgifterTestUtil {
         )
 
     fun innvilgelseBoutgifter(
+        behandlingId: BehandlingId = defaultBehandling.id,
         vedtaksperioder: List<Vedtaksperiode>,
         beregningsresultat: BeregningsresultatBoutgifter,
     ) = GeneriskVedtak(
-        behandlingId = BehandlingId.random(),
+        behandlingId = behandlingId,
         data =
             InnvilgelseBoutgifter(
                 beregningsresultat = beregningsresultat,
