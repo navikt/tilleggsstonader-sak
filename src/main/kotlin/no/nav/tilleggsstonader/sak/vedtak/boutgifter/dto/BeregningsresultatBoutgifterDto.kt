@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBoutgifterMedAndelTilUtbetaling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
@@ -11,6 +11,7 @@ import java.time.LocalDate
 
 data class BeregningsresultatBoutgifterDto(
     val perioder: List<BeregningsresultatForPeriodeDto>,
+    val skalBrukeDetaljertVisning: Boolean,
 )
 
 data class BeregningsresultatForPeriodeDto(
@@ -18,7 +19,7 @@ data class BeregningsresultatForPeriodeDto(
     override val tom: LocalDate,
     val stønadsbeløp: Int,
     val utbetalingsdato: LocalDate,
-    val utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    val utgifter: List<UtgiftBoutgifterMedAndelTilUtbetaling>,
     val sumUtgifter: Int,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
@@ -30,7 +31,8 @@ fun BeregningsresultatBoutgifter.tilDto(revurderFra: LocalDate?): Beregningsresu
         perioder =
             filtrerFraOgMed(revurderFra)
                 .perioder
-                .map { it.tilDto() },
+                .map { it.tilDto(revurderFra) },
+        skalBrukeDetaljertVisning = skalBrukeDetaljertVisning(),
     )
 
 private fun BeregningsresultatBoutgifter.filtrerFraOgMed(dato: LocalDate?): BeregningsresultatBoutgifter {
@@ -40,15 +42,46 @@ private fun BeregningsresultatBoutgifter.filtrerFraOgMed(dato: LocalDate?): Bere
     return BeregningsresultatBoutgifter(perioder.filter { it.tom >= dato })
 }
 
-fun BeregningsresultatForLøpendeMåned.tilDto(): BeregningsresultatForPeriodeDto =
+private fun BeregningsresultatBoutgifter.skalBrukeDetaljertVisning(): Boolean =
+    perioder.any {
+        it.grunnlag.utgifter.keys
+            .contains(TypeBoutgift.UTGIFTER_OVERNATTING)
+    }
+
+fun BeregningsresultatForLøpendeMåned.tilDto(revurderFra: LocalDate?): BeregningsresultatForPeriodeDto =
     BeregningsresultatForPeriodeDto(
         fom = grunnlag.fom,
         tom = grunnlag.tom,
         stønadsbeløp = stønadsbeløp,
         utbetalingsdato = grunnlag.utbetalingsdato,
         sumUtgifter = summerUtgifter(),
-        utgifter = grunnlag.utgifter,
+        utgifter = finnUtgifterMedAndelTilUtbetaling(revurderFra),
         målgruppe = grunnlag.målgruppe,
         aktivitet = grunnlag.aktivitet,
         makssatsBekreftet = grunnlag.makssatsBekreftet,
     )
+
+private fun BeregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(
+    revurderFra: LocalDate?,
+): List<UtgiftBoutgifterMedAndelTilUtbetaling> {
+    var totalSum = 0
+    return grunnlag.utgifter.values
+        .flatten()
+        .sorted()
+        .map { utgift ->
+            val skalUtbetales =
+                when {
+                    totalSum >= grunnlag.makssats -> 0
+                    totalSum + utgift.utgift <= grunnlag.makssats -> utgift.utgift
+                    else -> grunnlag.makssats - totalSum
+                }
+            totalSum += skalUtbetales
+            UtgiftBoutgifterMedAndelTilUtbetaling(
+                fom = utgift.fom,
+                tom = utgift.tom,
+                utgift = utgift.utgift,
+                tilUtbetaling = skalUtbetales,
+                erFørRevurderFra = revurderFra != null && utgift.tom < revurderFra,
+            )
+        }
+}
