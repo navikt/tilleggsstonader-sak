@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import org.springframework.stereotype.Service
 
@@ -76,8 +77,8 @@ class VedtaksperioderOversiktService(
                 periode.grunnlag.utgifter.flatMap { utgift ->
                     utgift.value.map { it ->
                         DetaljertVedtaksperiodeBoutgifter(
-                            fom = periode.fom,
-                            tom = periode.tom,
+                            fom = if (utgift.key == TypeBoutgift.UTGIFTER_OVERNATTING) it.fom else periode.fom,
+                            tom = if (utgift.key == TypeBoutgift.UTGIFTER_OVERNATTING) it.tom else periode.tom,
                             antallMåneder = 1,
                             type = utgift.key,
                             aktivitet = periode.grunnlag.aktivitet,
