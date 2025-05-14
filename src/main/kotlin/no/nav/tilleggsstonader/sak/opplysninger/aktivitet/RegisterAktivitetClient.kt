@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.opplysninger.aktivitet
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.felles.IdentRequest
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.IntegrasjonException
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.IntegrasjonsTjeneste
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -31,6 +33,14 @@ class RegisterAktivitetClient(
         tom: LocalDate,
     ): List<AktivitetArenaDto> {
         val uriVariables = mutableMapOf<String, Any>("fom" to fom, "tom" to tom)
-        return postForEntity(uriAktiviteter, IdentRequest(ident), uriVariables = uriVariables)
+        try {
+            return postForEntity(uriAktiviteter, IdentRequest(ident), uriVariables = uriVariables)
+        } catch (e: Exception) {
+            throw IntegrasjonException(
+                hendelse = "henting av aktiviteter",
+                tjeneste = IntegrasjonsTjeneste.AKTIVITETER,
+                e,
+            )
+        }
     }
 }
