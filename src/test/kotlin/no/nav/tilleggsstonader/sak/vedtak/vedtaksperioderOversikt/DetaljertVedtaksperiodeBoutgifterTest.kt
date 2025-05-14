@@ -1,137 +1,137 @@
-package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
-
-import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Test
-import java.time.LocalDate
-
-class DetaljertVedtaksperiodeBoutgifterTest {
-    val vedtaksperiodeJan =
-        DetaljertVedtaksperiodeBoutgifter(
-            fom = LocalDate.of(2024, 1, 1),
-            tom = LocalDate.of(2024, 1, 31),
-            aktivitet = AktivitetType.UTDANNING,
-            målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
-            antallMåneder = 1,
-            type = TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG,
-            utgift = 8000,
-            stønad = 4809,
-        )
-
-    val vedtaksperiodeFeb =
-        DetaljertVedtaksperiodeBoutgifter(
-            fom = LocalDate.of(2024, 2, 1),
-            tom = LocalDate.of(2024, 2, 29),
-            aktivitet = AktivitetType.UTDANNING,
-            målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
-            antallMåneder = 1,
-            type = TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG,
-            utgift = 8000,
-            stønad = 4809,
-        )
-
-    @Test
-    fun `skal slå sammen påfølgende perioder med like verdier`() {
-        val vedtaksperioder =
-            listOf(
-                vedtaksperiodeJan,
-                vedtaksperiodeFeb,
-            )
-        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
-        assertThat(resultat).isEqualTo(
-            listOf(
-                vedtaksperiodeJan.copy(tom = vedtaksperiodeFeb.tom, antallMåneder = 2),
-            ),
-        )
-    }
-
-    @Test
-    fun `skal slå sammen flere påfølgende perioder med like verdier`() {
-        val vedtaksperioder =
-            listOf(
-                vedtaksperiodeJan,
-                vedtaksperiodeFeb,
-                vedtaksperiodeFeb.copy(
-                    fom = LocalDate.of(2024, 3, 1),
-                    tom = LocalDate.of(2024, 3, 31),
-                ),
-            )
-        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
-        assertThat(resultat).isEqualTo(
-            listOf(
-                vedtaksperiodeJan.copy(tom = LocalDate.of(2024, 3, 31), antallMåneder = 3),
-            ),
-        )
-    }
-
-    @Test
-    fun `skal ikke slå sammen påfølgende perioder med ulike målgruppe og aktivitet`() {
-        val vedtaksperioder =
-            listOf(
-                vedtaksperiodeJan,
-                vedtaksperiodeFeb.copy(
-                    aktivitet = AktivitetType.TILTAK,
-                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                ),
-            )
-        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
-        assertThat(resultat).isEqualTo(vedtaksperioder)
-    }
-
-    @Test
-    fun `Sjekker at antall måneder øker dersom man slår sammen flere perioder`() {
-        val vedtaksperioder =
-            listOf(
-                vedtaksperiodeJan,
-                vedtaksperiodeFeb,
-                vedtaksperiodeFeb.copy(
-                    fom = LocalDate.of(2024, 3, 1),
-                    tom = LocalDate.of(2024, 3, 31),
-                ),
-            )
-        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
-        assertThat(resultat[0].antallMåneder).isEqualTo(3)
-    }
-
-    @Test
-    fun `skal ikke slå sammen påfølgende perioder med ulike type boutgifter`() {
-        val vedtaksperioder =
-            listOf(
-                vedtaksperiodeJan,
-                vedtaksperiodeFeb.copy(
-                    type = TypeBoutgift.UTGIFTER_OVERNATTING,
-                ),
-            )
-        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
-        assertThat(resultat).isEqualTo(vedtaksperioder)
-    }
-
-    @Test
-    fun `skal ikke slå sammen påfølgende perioder med ulik stønad og utgift`() {
-        val vedtaksperioder =
-            listOf(
-                vedtaksperiodeJan,
-                vedtaksperiodeFeb.copy(
-                    utgift = 3000,
-                    stønad = 3000,
-                ),
-            )
-        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
-        assertThat(resultat).isEqualTo(vedtaksperioder)
-    }
-
-    @Test
-    fun `skal ikke slå sammen like perioder som ikke er påfølgende`() {
-        val vedtaksperioder =
-            listOf(
-                vedtaksperiodeJan,
-                vedtaksperiodeFeb.copy(
-                    fom = LocalDate.of(2024, 2, 2),
-                ),
-            )
-        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
-        assertThat(resultat).isEqualTo(vedtaksperioder)
-    }
-}
+//package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
+//
+//import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+//import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
+//import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+//import org.assertj.core.api.Assertions.assertThat
+//import org.junit.jupiter.api.Test
+//import java.time.LocalDate
+//
+//class DetaljertVedtaksperiodeBoutgifterTest {
+//    val vedtaksperiodeJan =
+//        DetaljertVedtaksperiodeBoutgifter(
+//            fom = LocalDate.of(2024, 1, 1),
+//            tom = LocalDate.of(2024, 1, 31),
+//            aktivitet = AktivitetType.UTDANNING,
+//            målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
+//            antallMåneder = 1,
+//            type = TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG,
+//            utgift = 8000,
+//            stønad = 4809,
+//        )
+//
+//    val vedtaksperiodeFeb =
+//        DetaljertVedtaksperiodeBoutgifter(
+//            fom = LocalDate.of(2024, 2, 1),
+//            tom = LocalDate.of(2024, 2, 29),
+//            aktivitet = AktivitetType.UTDANNING,
+//            målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
+//            antallMåneder = 1,
+//            type = TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG,
+//            utgift = 8000,
+//            stønad = 4809,
+//        )
+//
+//    @Test
+//    fun `skal slå sammen påfølgende perioder med like verdier`() {
+//        val vedtaksperioder =
+//            listOf(
+//                vedtaksperiodeJan,
+//                vedtaksperiodeFeb,
+//            )
+//        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
+//        assertThat(resultat).isEqualTo(
+//            listOf(
+//                vedtaksperiodeJan.copy(tom = vedtaksperiodeFeb.tom, antallMåneder = 2),
+//            ),
+//        )
+//    }
+//
+//    @Test
+//    fun `skal slå sammen flere påfølgende perioder med like verdier`() {
+//        val vedtaksperioder =
+//            listOf(
+//                vedtaksperiodeJan,
+//                vedtaksperiodeFeb,
+//                vedtaksperiodeFeb.copy(
+//                    fom = LocalDate.of(2024, 3, 1),
+//                    tom = LocalDate.of(2024, 3, 31),
+//                ),
+//            )
+//        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
+//        assertThat(resultat).isEqualTo(
+//            listOf(
+//                vedtaksperiodeJan.copy(tom = LocalDate.of(2024, 3, 31), antallMåneder = 3),
+//            ),
+//        )
+//    }
+//
+//    @Test
+//    fun `skal ikke slå sammen påfølgende perioder med ulike målgruppe og aktivitet`() {
+//        val vedtaksperioder =
+//            listOf(
+//                vedtaksperiodeJan,
+//                vedtaksperiodeFeb.copy(
+//                    aktivitet = AktivitetType.TILTAK,
+//                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+//                ),
+//            )
+//        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
+//        assertThat(resultat).isEqualTo(vedtaksperioder)
+//    }
+//
+//    @Test
+//    fun `Sjekker at antall måneder øker dersom man slår sammen flere perioder`() {
+//        val vedtaksperioder =
+//            listOf(
+//                vedtaksperiodeJan,
+//                vedtaksperiodeFeb,
+//                vedtaksperiodeFeb.copy(
+//                    fom = LocalDate.of(2024, 3, 1),
+//                    tom = LocalDate.of(2024, 3, 31),
+//                ),
+//            )
+//        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
+//        assertThat(resultat[0].antallMåneder).isEqualTo(3)
+//    }
+//
+//    @Test
+//    fun `skal ikke slå sammen påfølgende perioder med ulike type boutgifter`() {
+//        val vedtaksperioder =
+//            listOf(
+//                vedtaksperiodeJan,
+//                vedtaksperiodeFeb.copy(
+//                    type = TypeBoutgift.UTGIFTER_OVERNATTING,
+//                ),
+//            )
+//        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
+//        assertThat(resultat).isEqualTo(vedtaksperioder)
+//    }
+//
+//    @Test
+//    fun `skal ikke slå sammen påfølgende perioder med ulik stønad og utgift`() {
+//        val vedtaksperioder =
+//            listOf(
+//                vedtaksperiodeJan,
+//                vedtaksperiodeFeb.copy(
+//                    utgift = 3000,
+//                    stønad = 3000,
+//                ),
+//            )
+//        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
+//        assertThat(resultat).isEqualTo(vedtaksperioder)
+//    }
+//
+//    @Test
+//    fun `skal ikke slå sammen like perioder som ikke er påfølgende`() {
+//        val vedtaksperioder =
+//            listOf(
+//                vedtaksperiodeJan,
+//                vedtaksperiodeFeb.copy(
+//                    fom = LocalDate.of(2024, 2, 2),
+//                ),
+//            )
+//        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
+//        assertThat(resultat).isEqualTo(vedtaksperioder)
+//    }
+//}

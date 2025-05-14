@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.boutgifter.DetaljertVedtaksperiodeBoutgifterV2
+import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.boutgifter.UtgifterBo
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 
@@ -41,6 +43,7 @@ data class DetaljertVedtaksperiodeBoutgifterDto(
     val type: TypeBoutgift,
     val utgift: Int,
     val stønad: Int,
+    val utgifter: List<UtgifterBo>? // TODO: Fiks
 )
 
 fun VedtaksperioderOversikt.tilDto(): VedtaksperiodeOversiktDto =
@@ -72,7 +75,7 @@ private fun DetaljertVedtaksperiodeLæremidler.tilDto() =
         månedsbeløp = this.månedsbeløp,
     )
 
-private fun DetaljertVedtaksperiodeBoutgifter.tilDto() =
+private fun DetaljertVedtaksperiodeBoutgifterV2.tilDto() =
     DetaljertVedtaksperiodeBoutgifterDto(
         fom = this.fom,
         tom = this.tom,
@@ -80,6 +83,7 @@ private fun DetaljertVedtaksperiodeBoutgifter.tilDto() =
         målgruppe = this.målgruppe,
         antallMåneder = this.antallMåneder,
         type = this.type,
-        utgift = this.utgift,
-        stønad = this.stønad,
+        utgift = this.totalUtgiftMåned,
+        stønad = this.stønadsbeløpMnd,
+        utgifter =  utgifter,
     )

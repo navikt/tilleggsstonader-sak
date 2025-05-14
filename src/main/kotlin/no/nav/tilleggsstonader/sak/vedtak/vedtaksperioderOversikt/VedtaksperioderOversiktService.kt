@@ -6,11 +6,19 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
+import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.boutgifter.BoLøpendeUtgift
+import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.boutgifter.BoOvernatting
+import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.boutgifter.BoutgifterVedtaksperioderUtils.finnVedtaksperioderMedLøpendeUtgifter
+import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.boutgifter.DetaljertVedtaksperiodeBoutgifterV2
+import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.boutgifter.UtgifterBo
+import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.boutgifter.sorterOgMergeSammenhengende
+import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.boutgifter.tilDetaljertVedtaksperiodeV2
 import org.springframework.stereotype.Service
 
 @Service
@@ -67,30 +75,83 @@ class VedtaksperioderOversiktService(
         return vedtaksperioderFraBeregningsresultat.sorterOgMergeSammenhengende()
     }
 
-    private fun oppsummerVedtaksperioderBoutgifter(fagsakId: FagsakId): List<DetaljertVedtaksperiodeBoutgifter> {
+    private fun oppsummerVedtaksperioderBoutgifter(fagsakId: FagsakId): List<DetaljertVedtaksperiodeBoutgifterV2> {
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørBoutgifter>(fagsakId)
                 ?: return emptyList()
 
-        val vedtaksperioderFraBeregningsresultat: List<DetaljertVedtaksperiodeBoutgifter> =
-            vedtakForSisteIverksatteBehandling.beregningsresultat.perioder.flatMap { periode ->
-                periode.grunnlag.utgifter.flatMap { utgift ->
-                    utgift.value.map { it ->
-                        DetaljertVedtaksperiodeBoutgifter(
-                            fom = if (utgift.key == TypeBoutgift.UTGIFTER_OVERNATTING) it.fom else periode.fom,
-                            tom = if (utgift.key == TypeBoutgift.UTGIFTER_OVERNATTING) it.tom else periode.tom,
-                            antallMåneder = 1,
-                            type = utgift.key,
-                            aktivitet = periode.grunnlag.aktivitet,
-                            målgruppe = periode.grunnlag.målgruppe,
-                            utgift = it.utgift,
-                            stønad = periode.stønadsbeløp,
-                        )
-                    }
-                }
-            }
+        val overnatting =
+            finnOvernatting(vedtakForSisteIverksatteBehandling).map { it.tilDetaljertVedtaksperiodeV2() }
 
-        return vedtaksperioderFraBeregningsresultat.sorterOgMergeSammenhengende()
+        val løpende = finnVedtaksperioderMedLøpendeUtgifter(vedtakForSisteIverksatteBehandling).sorterOgMergeSammenhengende()
+            .map { it.tilDetaljertVedtaksperiodeV2() }
+
+        return (overnatting + løpende).sorted()
+    }
+
+    private fun finnOvernatting(
+        vedtak: InnvilgelseEllerOpphørBoutgifter,
+    ): List<BoOvernatting> {
+        return vedtak.beregningsresultat.perioder
+            .filter { it.grunnlag.utgifter.containsKey(TypeBoutgift.UTGIFTER_OVERNATTING) }
+            .map { resultatForMåned ->
+                BoOvernatting(
+                    fom = resultatForMåned.fom,
+                    tom = resultatForMåned.tom,
+                    aktivitet = resultatForMåned.grunnlag.aktivitet,
+                    målgruppe = resultatForMåned.grunnlag.målgruppe,
+                    utgifter = overnattingRegnUtDekningAvUtgift(
+                        resultatForMåned.grunnlag.utgifter,
+                        resultatForMåned.grunnlag.makssats
+                    ),
+                )
+            }
+    }
+
+    private fun overnattingRegnUtDekningAvUtgift(
+        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+        makssats: Int
+    ): List<UtgifterBo> {
+        val utgifterOvernatting = utgifter[TypeBoutgift.UTGIFTER_OVERNATTING] ?: error("Burde ikke være mulig")
+
+        var sumForMåned = 0
+
+        return utgifterOvernatting.map { utgift ->
+            val beløpSomDekkes = minOf(utgift.utgift, makssats - sumForMåned)
+            sumForMåned += beløpSomDekkes
+
+            UtgifterBo(
+                fom = utgift.fom,
+                tom = utgift.tom,
+                utgift = utgift.utgift,
+                beløpSomDekkes = beløpSomDekkes,
+            )
+        }
+    }
+
+    private fun finnLøpende(
+        vedtak: InnvilgelseEllerOpphørBoutgifter,
+    ): List<BoLøpendeUtgift> {
+        return vedtak.beregningsresultat.perioder
+            .filter { it.grunnlag.utgifter.containsKey(TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG) }
+            .map { resultatForMåned ->
+                BoLøpendeUtgift(
+                    fom = resultatForMåned.fom,
+                    tom = resultatForMåned.tom,
+                    aktivitet = resultatForMåned.grunnlag.aktivitet,
+                    målgruppe = resultatForMåned.grunnlag.målgruppe,
+                    utgift = summerLøpendeUtgifterBo(
+                        resultatForMåned.grunnlag.utgifter,
+                    ),
+                    stønad = resultatForMåned.stønadsbeløp,
+                )
+            }
+    }
+
+    private fun summerLøpendeUtgifterBo(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>): Int {
+        return utgifter.flatMap { (type, liste) ->
+            liste.filter { type == TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG || type == TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER }
+        }.sumOf { it.utgift }
     }
 
     private fun finnVedtaksperioderFraBeregningsresultatTilsynBarn(beregningsresultatTilsynBarn: BeregningsresultatTilsynBarn) =
