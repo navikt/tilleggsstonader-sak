@@ -184,10 +184,10 @@ class VilkårperiodeGrunnlagService(
                         )
                     }.slåSammenOverlappendeEllerPåfølgende(),
             kildeResultat =
-                ytelserFraRegister.hentetInformasjon.map {
+                ytelserFraRegister.kildeResultat.map {
                     GrunnlagYtelse.KildeResultatYtelse(
                         type = it.type,
-                        resultat = it.status,
+                        resultat = it.resultat,
                     )
                 },
         )

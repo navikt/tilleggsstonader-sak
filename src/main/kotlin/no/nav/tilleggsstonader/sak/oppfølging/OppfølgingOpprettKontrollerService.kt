@@ -4,9 +4,9 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.kontrakter.ytelse.HentetInformasjon
-import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -190,7 +190,7 @@ class OppfølgingOpprettKontrollerService(
         val tom = typerSomSkalHentes.maxOf { it.second.tom }
         return ytelseService
             .hentYtelser(fagsak.ident, fom = fom, tom = tom, typer)
-            .also { validerResultat(it.hentetInformasjon) }
+            .also { validerResultat(it.kildeResultat) }
             .perioder
             .filter { it.aapErFerdigAvklart != true }
             .filter { it.tom != null }
@@ -199,8 +199,8 @@ class OppfølgingOpprettKontrollerService(
             .mapValues { it.value.mergeSammenhengende() }
     }
 
-    private fun validerResultat(hentetInformasjon: List<HentetInformasjon>) {
-        val test = hentetInformasjon.filter { it.status != StatusHentetInformasjon.OK }
+    private fun validerResultat(hentetInformasjon: List<YtelsePerioderDto.KildeResultatYtelse>) {
+        val test = hentetInformasjon.filter { it.resultat != ResultatKilde.OK }
 
         feilHvis(test.isNotEmpty()) {
             "Feil ved henting av ytelser fra andre systemer: ${test.joinToString(", ") { it.type.name }}. Prøv å laste inn siden på nytt."

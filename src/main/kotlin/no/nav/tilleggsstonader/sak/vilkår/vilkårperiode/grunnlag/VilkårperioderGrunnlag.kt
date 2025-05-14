@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.Kilde
 import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
-import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -56,7 +56,7 @@ data class GrunnlagYtelse(
 ) {
     data class KildeResultatYtelse(
         val type: TypeYtelsePeriode,
-        val resultat: StatusHentetInformasjon,
+        val resultat: ResultatKilde,
     )
 }
 

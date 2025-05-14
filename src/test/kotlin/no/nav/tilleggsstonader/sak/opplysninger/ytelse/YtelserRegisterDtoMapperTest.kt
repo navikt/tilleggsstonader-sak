@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
-import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.hentetInformasjonAAP
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.hentetInformasjonEnsligForsørger
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.kildeResultatAAP
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.kildeResultatEnsligForsørger
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeEnsligForsørger
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
@@ -45,38 +45,38 @@ class YtelserRegisterDtoMapperTest {
     inner class HentetInformasjon {
         @Test
         fun `skal mappe status fra aap`() {
-            val hentetInformasjon = listOf(hentetInformasjonAAP(status = StatusHentetInformasjon.FEILET))
-            val dto = ytelsePerioderDto(hentetInformasjon = hentetInformasjon).tilDto().hentetInformasjon
+            val kildeResultat = listOf(kildeResultatAAP(resultat = ResultatKilde.FEILET))
+            val dto = ytelsePerioderDto(kildeResultat = kildeResultat).tilDto().kildeResultat
 
             assertThat(dto).containsExactly(
-                HentetInformasjonDto(type = TypeYtelsePeriode.AAP, status = StatusHentetInformasjon.FEILET),
+                KildeResultatYtelseDto(type = TypeYtelsePeriode.AAP, resultat = ResultatKilde.FEILET),
             )
         }
 
         @Test
         fun `skal mappe status fra enslig forsørger`() {
-            val hentetInformasjon = listOf(hentetInformasjonEnsligForsørger(status = StatusHentetInformasjon.OK))
-            val dto = ytelsePerioderDto(hentetInformasjon = hentetInformasjon).tilDto().hentetInformasjon
+            val kildeResultat = listOf(kildeResultatEnsligForsørger(resultat = ResultatKilde.OK))
+            val dto = ytelsePerioderDto(kildeResultat = kildeResultat).tilDto().kildeResultat
 
             assertThat(dto).containsExactly(
-                HentetInformasjonDto(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, status = StatusHentetInformasjon.OK),
+                KildeResultatYtelseDto(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, resultat = ResultatKilde.OK),
             )
         }
 
         @Test
         fun `skal håndtere flere systemer`() {
-            val hentetInformasjon =
+            val kildeResultat =
                 ytelsePerioderDto(
-                    hentetInformasjon =
+                    kildeResultat =
                         listOf(
-                            hentetInformasjonEnsligForsørger(status = StatusHentetInformasjon.FEILET),
-                            hentetInformasjonAAP(status = StatusHentetInformasjon.OK),
+                            kildeResultatEnsligForsørger(resultat = ResultatKilde.FEILET),
+                            kildeResultatAAP(resultat = ResultatKilde.OK),
                         ),
-                ).tilDto().hentetInformasjon
+                ).tilDto().kildeResultat
 
-            assertThat(hentetInformasjon).containsExactlyInAnyOrder(
-                HentetInformasjonDto(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, status = StatusHentetInformasjon.FEILET),
-                HentetInformasjonDto(type = TypeYtelsePeriode.AAP, status = StatusHentetInformasjon.OK),
+            assertThat(kildeResultat).containsExactlyInAnyOrder(
+                KildeResultatYtelseDto(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, resultat = ResultatKilde.FEILET),
+                KildeResultatYtelseDto(type = TypeYtelsePeriode.AAP, resultat = ResultatKilde.OK),
             )
         }
     }

@@ -4,6 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+/**
+ * Mapper fra [YtelsePerioderDto] fra integrasjoner til [YtelserRegisterDto].
+ */
 object YtelserRegisterDtoMapper {
     private val sorteringTomDesc =
         compareByDescending<YtelsePeriodeRegisterDto, LocalDate?>(nullsLast()) { it.tom }
@@ -22,7 +25,7 @@ object YtelserRegisterDtoMapper {
                             ensligForsørgerStønadstype = it.ensligForsørgerStønadstype,
                         )
                     }.sortedWith(sorteringTomDesc),
-            hentetInformasjon = hentetInformasjon.map { HentetInformasjonDto(type = it.type, status = it.status) },
+            kildeResultat = kildeResultat.map { KildeResultatYtelseDto(type = it.type, resultat = it.resultat) },
             tidspunktHentet = LocalDateTime.now(),
         )
 }

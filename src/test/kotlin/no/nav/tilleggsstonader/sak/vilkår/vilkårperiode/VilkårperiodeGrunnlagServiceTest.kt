@@ -165,7 +165,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                             ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
                         ),
                     ),
-                hentetInformasjon = emptyList(),
+                kildeResultat = emptyList(),
             )
 
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
@@ -221,7 +221,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                             EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
                         ),
                     ),
-                hentetInformasjon = emptyList(),
+                kildeResultat = emptyList(),
             )
 
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())

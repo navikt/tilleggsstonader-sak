@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
-import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse.KildeResultatYtelse
 import java.time.LocalDate
@@ -23,7 +23,7 @@ data class GrunnlagYtelseDto(
 ) {
     data class KildeResultatYtelseDto(
         val type: TypeYtelsePeriode,
-        val resultat: StatusHentetInformasjon,
+        val resultat: ResultatKilde,
     )
 }
 

@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserUtil.finnRelevanteYtelsesTyper
 
 fun grunnlagYtelseOk(
@@ -11,6 +11,6 @@ fun grunnlagYtelseOk(
     perioder = perioder,
     kildeResultat =
         finnRelevanteYtelsesTyper(stønad).map {
-            GrunnlagYtelse.KildeResultatYtelse(it, StatusHentetInformasjon.OK)
+            GrunnlagYtelse.KildeResultatYtelse(it, ResultatKilde.OK)
         },
 )

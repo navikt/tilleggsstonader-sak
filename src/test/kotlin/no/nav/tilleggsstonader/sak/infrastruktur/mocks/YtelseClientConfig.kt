@@ -3,11 +3,11 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
-import no.nav.tilleggsstonader.kontrakter.ytelse.HentetInformasjon
-import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto.KildeResultatYtelse
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderRequest
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import org.springframework.context.annotation.Bean
@@ -52,11 +52,11 @@ class YtelseClientConfig {
                         aapErFerdigAvklart = true,
                     )
             }
-            val hentetInformasjon =
+            val kildeResultat =
                 request.typer.map {
-                    HentetInformasjon(type = it, status = StatusHentetInformasjon.OK)
+                    KildeResultatYtelse(type = it, resultat = ResultatKilde.OK)
                 }
-            YtelsePerioderDto(perioder = perioder, hentetInformasjon = hentetInformasjon)
+            YtelsePerioderDto(perioder = perioder, kildeResultat = kildeResultat)
         }
 
         return client
