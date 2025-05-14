@@ -210,23 +210,26 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         vilkårRepositoryFake.insertAll(tidligereVilkår.map { it.kopierTilBehandling(behandlingId) })
     }
 
-//    @Gitt("lagrer beregningsresultatet behandling={}")
-//    fun `lagrer beregningsresultat`(
-//        behandlingIdTall: Int,
-//        dataTable: DataTable,
-//    ) {
-//        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-//        val utgifter = boutgifterUtgiftService.hentUtgifterTilBeregning(behandlingId)
-//        val perioderBeregningsresultat = mapBeregningsresultat(dataTable, utgifter)
-//        val vedtaksperiode = mapVedtaksperioder(dataTable)
-//        val vedtak =
-//            innvilgelseBoutgifter(
-//                behandlingId = behandlingId,
-//                vedtaksperioder = vedtaksperiode,
-//                beregningsresultat = BeregningsresultatBoutgifter(perioderBeregningsresultat),
-//            )
-//        vedtakRepository.insert(vedtak)
-//    }
+    /**
+     * Her forutsetter vi at vi har lagret utgifter på behandlingen først
+     */
+    @Gitt("vi har lagret følgende beregningsresultat for behandling={}")
+    fun `lagrer beregningsresultat`(
+        behandlingIdTall: Int,
+        dataTable: DataTable,
+    ) {
+        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val utgifter = boutgifterUtgiftService.hentUtgifterTilBeregning(behandlingId)
+        val perioderBeregningsresultat = mapBeregningsresultat(dataTable, utgifter)
+        val vedtaksperiode = mapVedtaksperioder(dataTable)
+        val vedtak =
+            innvilgelseBoutgifter(
+                behandlingId = behandlingId,
+                vedtaksperioder = vedtaksperiode,
+                beregningsresultat = BeregningsresultatBoutgifter(perioderBeregningsresultat),
+            )
+        vedtakRepositoryFake.insert(vedtak)
+    }
 //
 //    @Gitt("lagrer andeler behandling={}")
 //    fun `lagrer andeler`(
