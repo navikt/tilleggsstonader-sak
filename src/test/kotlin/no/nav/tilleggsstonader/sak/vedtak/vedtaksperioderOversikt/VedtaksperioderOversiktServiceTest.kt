@@ -85,7 +85,6 @@ class VedtaksperioderOversiktServiceTest : IntegrationTest() {
                                 ),
                             ),
                     ),
-                delAvTidligere = false,
             )
 
         val vedtak =
