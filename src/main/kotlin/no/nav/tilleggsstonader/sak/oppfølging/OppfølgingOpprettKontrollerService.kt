@@ -199,8 +199,8 @@ class OppfølgingOpprettKontrollerService(
             .mapValues { it.value.mergeSammenhengende() }
     }
 
-    private fun validerResultat(hentetInformasjon: List<YtelsePerioderDto.KildeResultatYtelse>) {
-        val test = hentetInformasjon.filter { it.resultat != ResultatKilde.OK }
+    private fun validerResultat(kildeResultat: List<YtelsePerioderDto.KildeResultatYtelse>) {
+        val test = kildeResultat.filter { it.resultat != ResultatKilde.OK }
 
         feilHvis(test.isNotEmpty()) {
             "Feil ved henting av ytelser fra andre systemer: ${test.joinToString(", ") { it.type.name }}. Prøv å laste inn siden på nytt."
