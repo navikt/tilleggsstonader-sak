@@ -38,9 +38,9 @@ Egenskap: Beregning ved opphør av boutgifter
       Når vi opphører boutgifter behandling=2 med revurderFra=15.02.2025
 
       Så kan vi forvente følgende beregningsresultat for behandling=2
-        | Fom        | Tom        | Beløp | Maks sats | Utbetalingsdato |
-        | 01.01.2025 | 31.01.2025 | 1000  | 4953      | 01.01.2025      |
-        | 01.02.2025 | 14.02.2025 | 1000  | 4953      | 01.02.2025      |
+        | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato |
+        | 01.01.2025 | 31.01.2025 | 1000         | 4953      | 01.01.2025      |
+        | 01.02.2025 | 14.02.2025 | 1000         | 4953      | 01.02.2025      |
 
       Så kan vi forvente følgende andeler for behandling=2
         | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -64,19 +64,19 @@ Egenskap: Beregning ved opphør av boutgifter
       Gitt følgende boutgifter av type LØPENDE_UTGIFTER_EN_BOLIG for behandling=1
         | Fom        | Tom        | Utgift |
         | 01.01.2025 | 31.01.2025 | 99999  |
-            # En latterlig stor utgift, bare for å gjøre det ekstra tydelig at den ikke blir reberegnet og klippet til makssats
 
       Og vi har lagret følgende beregningsresultat for behandling=1
-        | Fom        | Tom        | Beløp | Maks sats | Utbetalingsdato |
-        | 01.01.2025 | 31.01.2025 | 99999 | 4953      | 01.01.2025      |
+        | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato |
+        | 01.01.2025 | 31.01.2025 | 99999        | 4953      | 01.01.2025      |
+            # En latterlig stort stønadsbeløp, bare for å gjøre det ekstra tydelig at den ikke blir reberegnet og klippet til makssats
 
       Når vi kopierer perioder fra forrige behandling for behandling=2
 
       Når vi opphører boutgifter behandling=2 med revurderFra=01.02.2025
 
       Så kan vi forvente følgende beregningsresultat for behandling=2
-        | Fom        | Tom        | Beløp | Maks sats | Utbetalingsdato |
-        | 01.01.2025 | 31.01.2025 | 99999 | 4953      | 01.01.2025      |
+        | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato |
+        | 01.01.2025 | 31.01.2025 | 99999        | 4953      | 01.01.2025      |
 
       Så kan vi forvente følgende andeler for behandling=2
         | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -84,4 +84,4 @@ Egenskap: Beregning ved opphør av boutgifter
 
       Så kan vi forvente følgende vedtaksperioder for behandling=2
         | Fom        | Tom        | Målgruppe           | Aktivitet |
-        | 01.01.2025 | 28.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+        | 01.01.2025 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |

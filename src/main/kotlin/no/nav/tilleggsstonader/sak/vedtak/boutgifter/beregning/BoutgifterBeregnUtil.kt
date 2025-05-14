@@ -4,8 +4,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.sisteDagIÅret
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.splitPerLøpendeMåneder
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import kotlin.collections.plus
+import kotlin.math.min
 
 object BoutgifterBeregnUtil {
     /**
@@ -16,7 +19,7 @@ object BoutgifterBeregnUtil {
     fun List<VedtaksperiodeBeregning>.splittTilLøpendeMåneder(): List<LøpendeMåned> =
         this
             .sorted()
-            .fold(listOf<LøpendeMåned>()) { acc, vedtaksperiode ->
+            .fold(listOf()) { acc, vedtaksperiode ->
                 if (acc.isEmpty()) {
                     val nyeUtbetalingsperioder = vedtaksperiode.delTilUtbetalingPerioder()
                     acc + nyeUtbetalingsperioder
@@ -25,6 +28,38 @@ object BoutgifterBeregnUtil {
                     acc + håndterNyUtbetalingsperiode
                 }
             }
+
+    fun Beregningsgrunnlag.beregnStønadsbeløp() = min(summerUtgifter(), makssats)
+
+    fun Beregningsgrunnlag.summerUtgifter() =
+        utgifter.values
+            .flatten()
+            .sumOf { it.utgift }
+
+    fun lagBeregningsgrunnlag(
+        periode: UtbetalingPeriode,
+        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    ): Beregningsgrunnlag {
+        val sats = finnMakssats(periode.fom)
+
+        val utgifterIPerioden =
+            utgifter.mapValues { (_, utgifter) ->
+                utgifter.filter {
+                    periode.overlapper(it)
+                }
+            }
+
+        return Beregningsgrunnlag(
+            fom = periode.fom,
+            tom = periode.tom,
+            utgifter = utgifterIPerioden,
+            makssats = sats.beløp,
+            makssatsBekreftet = sats.bekreftet,
+            utbetalingsdato = periode.utbetalingsdato,
+            målgruppe = periode.målgruppe,
+            aktivitet = periode.aktivitet,
+        )
+    }
 
     /**
      * Legger til periode som overlapper med forrige utbetalingsperiode

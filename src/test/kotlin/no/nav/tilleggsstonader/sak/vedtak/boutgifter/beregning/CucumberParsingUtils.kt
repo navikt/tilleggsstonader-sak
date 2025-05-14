@@ -99,22 +99,25 @@ fun mapBeregningsresultat(
 ) = dataTable.mapRad { rad ->
     val fom = parseDato(DomenenøkkelFelles.FOM, rad)
     val tom = parseDato(DomenenøkkelFelles.TOM, rad)
+    val grunnlag =
+        Beregningsgrunnlag(
+            fom = fom,
+            tom = tom,
+            utbetalingsdato = parseDato(BoutgifterDomenenøkkel.UTBETALINGSDATO, rad),
+            utgifter = finnRelevanteUtgifter(utgifter = utgifter, fom = fom, tom = tom),
+            makssats = parseInt(BoutgifterDomenenøkkel.MAKS_SATS, rad),
+            makssatsBekreftet = true,
+            målgruppe =
+                parseValgfriEnum<FaktiskMålgruppe>(BeregningNøkler.MÅLGRUPPE, rad)
+                    ?: FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+            aktivitet =
+                parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
+                    ?: AktivitetType.TILTAK,
+        )
+
     BeregningsresultatForLøpendeMåned(
-        grunnlag =
-            Beregningsgrunnlag(
-                fom = fom,
-                tom = tom,
-                utbetalingsdato = parseDato(BoutgifterDomenenøkkel.UTBETALINGSDATO, rad),
-                utgifter = finnRelevanteUtgifter(utgifter = utgifter, fom = fom, tom = tom),
-                makssats = parseInt(BoutgifterDomenenøkkel.MAKS_SATS, rad),
-                makssatsBekreftet = true,
-                målgruppe =
-                    parseValgfriEnum<FaktiskMålgruppe>(BeregningNøkler.MÅLGRUPPE, rad)
-                        ?: FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                aktivitet =
-                    parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
-                        ?: AktivitetType.TILTAK,
-            ),
+        grunnlag = grunnlag,
+        stønadsbeløp = parseInt(BoutgifterDomenenøkkel.STØNADSBELØP, rad),
     )
 }
 

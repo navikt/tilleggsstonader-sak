@@ -81,6 +81,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
                     ),
+                stønadsbeløp = 3000,
             ),
         )
 

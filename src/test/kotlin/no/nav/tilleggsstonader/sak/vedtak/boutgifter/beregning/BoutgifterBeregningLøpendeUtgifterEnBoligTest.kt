@@ -76,6 +76,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
                     ),
+                stønadsbeløp = 3000,
             ),
             BeregningsresultatForLøpendeMåned(
                 grunnlag =
@@ -89,6 +90,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
                     ),
+                stønadsbeløp = 3000,
             ),
             BeregningsresultatForLøpendeMåned(
                 grunnlag =
@@ -102,6 +104,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
                     ),
+                stønadsbeløp = 3000,
             ),
         )
 

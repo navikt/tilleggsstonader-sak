@@ -14,9 +14,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.lagBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.splittTilLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
@@ -99,9 +100,11 @@ class BoutgifterBeregningService(
             .map { UtbetalingPeriode(it, skalAvkorteUtbetalingPeriode(utgifter)) }
             .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
             .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(utgifter)
+            .map { lagBeregningsgrunnlag(periode = it, utgifter = utgifter) }
             .map {
                 BeregningsresultatForLøpendeMåned(
-                    grunnlag = lagBeregningsGrunnlag(periode = it, utgifter = utgifter),
+                    grunnlag = it,
+                    stønadsbeløp = it.beregnStønadsbeløp(),
                 )
             }
 
@@ -137,35 +140,6 @@ class BoutgifterBeregningService(
         vedtakRepository
             .findByIdOrThrow(behandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørBoutgifter>()
-
-    private fun lagBeregningsGrunnlag(
-        periode: UtbetalingPeriode,
-        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
-    ): Beregningsgrunnlag {
-        val sats = finnMakssats(periode.fom)
-
-        val utgifterIPerioden = finnUtgiftForUtbetalingsperiode(utgifter, periode)
-
-        return Beregningsgrunnlag(
-            fom = periode.fom,
-            tom = periode.tom,
-            utgifter = utgifterIPerioden,
-            makssats = sats.beløp,
-            makssatsBekreftet = sats.bekreftet,
-            utbetalingsdato = periode.utbetalingsdato,
-            målgruppe = periode.målgruppe,
-            aktivitet = periode.aktivitet,
-        )
-    }
-
-    private fun finnUtgiftForUtbetalingsperiode(
-        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
-        periode: UtbetalingPeriode,
-    ) = utgifter.mapValues { (_, utgifter) ->
-        utgifter.filter {
-            periode.overlapper(it)
-        }
-    }
 }
 
 private fun validerUtgifterTilMidlertidigOvernattingErInnenforVedtaksperiodene(

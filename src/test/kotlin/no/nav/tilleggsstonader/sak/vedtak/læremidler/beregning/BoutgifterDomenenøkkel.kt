@@ -6,7 +6,6 @@ enum class BoutgifterDomenenøkkel(
     override val nøkkel: String,
 ) : Domenenøkkel {
     UTBETALINGSDATO("Utbetalingsdato"),
-    DEL_AV_TIDLIGERE_UTBETALING("Del av tidligere utbetaling"),
     UTGIFT("Utgift"),
     MAKS_SATS("Maks sats"),
     STØNADSBELØP("Stønadsbeløp"),

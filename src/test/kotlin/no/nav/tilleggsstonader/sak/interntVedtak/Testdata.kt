@@ -470,6 +470,7 @@ object Testdata {
                                                 ),
                                         ),
                                 ),
+                            stønadsbeløp = 3000,
                         ),
                         BeregningsresultatForLøpendeMåned(
                             grunnlag =
@@ -501,6 +502,7 @@ object Testdata {
                                                 ),
                                         ),
                                 ),
+                            stønadsbeløp = 4953,
                         ),
                     ),
             )
