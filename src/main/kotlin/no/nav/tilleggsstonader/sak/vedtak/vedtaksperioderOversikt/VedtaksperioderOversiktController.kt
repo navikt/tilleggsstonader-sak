@@ -19,8 +19,8 @@ class VedtaksperioderOversiktController(
     @GetMapping("/fullstendig-oversikt/{fagsakPersonId}")
     fun hentFullstendigVedtaksoversikt(
         @PathVariable fagsakPersonId: FagsakPersonId,
-    ): VedtaksperiodeOversiktDto {
+    ): VedtaksperioderOversikt {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
-        return vedtakOversiktService.hentVedtaksperioderOversikt(fagsakPersonId).tilDto()
+        return vedtakOversiktService.hentVedtaksperioderOversikt(fagsakPersonId)
     }
 }

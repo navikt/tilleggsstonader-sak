@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
+package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder
 
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
