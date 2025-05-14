@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
+import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse.KildeResultatYtelse
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -17,7 +19,13 @@ data class GrunnlagAktivitetDto(
 
 data class GrunnlagYtelseDto(
     val perioder: List<PeriodeGrunnlagYtelseDto>,
-)
+    val kildeResultat: List<KildeResultatYtelseDto>,
+) {
+    data class KildeResultatYtelseDto(
+        val type: TypeYtelsePeriode,
+        val resultat: StatusHentetInformasjon,
+    )
+}
 
 data class PeriodeGrunnlagYtelseDto(
     val type: TypeYtelsePeriode,
@@ -64,6 +72,13 @@ private fun RegisterAktivitet.tilDto() =
 fun GrunnlagYtelse.tilDto() =
     GrunnlagYtelseDto(
         perioder = this.perioder.map { it.tilDto() },
+        kildeResultat = this.kildeResultat.map { it.tilDto() },
+    )
+
+private fun KildeResultatYtelse.tilDto() =
+    GrunnlagYtelseDto.KildeResultatYtelseDto(
+        type = this.type,
+        resultat = this.resultat,
     )
 
 fun PeriodeGrunnlagYtelse.tilDto() =
