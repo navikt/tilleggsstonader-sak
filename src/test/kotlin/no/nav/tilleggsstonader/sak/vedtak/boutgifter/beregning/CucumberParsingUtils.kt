@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriDato
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
@@ -22,7 +23,14 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BeregningNøkler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BoutgifterDomenenøkkel
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import java.time.LocalDate
 import java.util.UUID
 
@@ -35,6 +43,38 @@ fun mapUtgifter(dataTable: DataTable): List<UtgiftBeregningBoutgifter> =
             fom = parseDato(DomenenøkkelFelles.FOM, rad),
             tom = parseDato(DomenenøkkelFelles.TOM, rad),
             utgift = parseInt(BoutgifterDomenenøkkel.UTGIFT, rad),
+        )
+    }
+
+fun mapMålgrupper(
+    målgruppeData: DataTable,
+    behandlingId: BehandlingId,
+): List<GeneriskVilkårperiode<MålgruppeFaktaOgVurdering>> =
+    målgruppeData.mapRad { rad ->
+        VilkårperiodeTestUtil.målgruppe(
+            behandlingId = behandlingId,
+            fom = parseDato(DomenenøkkelFelles.FOM, rad),
+            tom = parseDato(DomenenøkkelFelles.TOM, rad),
+            faktaOgVurdering =
+                VilkårperiodeTestUtil.faktaOgVurderingMålgruppe(
+                    type = parseValgfriEnum<MålgruppeType>(BoutgifterDomenenøkkel.MÅLGRUPPE, rad)!!,
+                ),
+        )
+    }
+
+fun mapAktiviteter(
+    behandlingId: BehandlingId,
+    aktivitetData: DataTable,
+): List<GeneriskVilkårperiode<AktivitetFaktaOgVurdering>> =
+    aktivitetData.mapRad { rad ->
+        aktivitet(
+            behandlingId = behandlingId,
+            fom = parseDato(DomenenøkkelFelles.FOM, rad),
+            tom = parseDato(DomenenøkkelFelles.TOM, rad),
+            faktaOgVurdering =
+                faktaOgVurderingAktivitetBoutgifter(
+                    type = parseValgfriEnum<AktivitetType>(BoutgifterDomenenøkkel.AKTIVITET, rad)!!,
+                ),
         )
     }
 

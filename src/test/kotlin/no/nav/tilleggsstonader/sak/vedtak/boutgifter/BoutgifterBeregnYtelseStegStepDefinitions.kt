@@ -19,7 +19,6 @@ import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.behandlingIdTilUUID
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
-import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYtelseRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
@@ -31,12 +30,16 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterUtgiftService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.ForenkletAndel
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.mapAktiviteter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.mapAndeler
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.mapBeregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.mapMålgrupper
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.mapVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
@@ -49,12 +52,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBoligDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetBoutgifter
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
@@ -115,11 +112,33 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             simuleringService = simuleringServiceMock,
         )
 
+    @Gitt("følgende oppfylte aktiviteter for behandling={}")
+    fun `lagre aktiviteter`(
+        behandlingIdTall: Int,
+        aktivitetData: DataTable,
+    ) {
+        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        vilkårperiodeRepositoryFake.insertAll(
+            mapAktiviteter(behandlingId, aktivitetData),
+        )
+    }
+
+    @Gitt("følgende oppfylte målgrupper for behandling={}")
+    fun `lagre målgrupper`(
+        behandlingIdTall: Int,
+        målgruppeData: DataTable,
+    ) {
+        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        vilkårperiodeRepositoryFake.insertAll(
+            mapMålgrupper(målgruppeData, behandlingId),
+        )
+    }
+
     @Gitt("følgende boutgifter av type {} for behandling={}")
-    fun `følgende boutgifter`(
+    fun `lagre utgifter`(
         typeBoutgift: VilkårType,
         behandlingIdTall: Int,
-        dataTable: DataTable,
+        utgifterData: DataTable,
     ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
@@ -130,7 +149,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val delvilkår = oppfylteDelvilkårLøpendeUtgifterEnBoligDto()
 
         val opprettVilkårDto =
-            dataTable.mapRad { rad ->
+            utgifterData.mapRad { rad ->
                 OpprettVilkårDto(
                     vilkårType = typeBoutgift,
                     behandlingId = behandlingId,
@@ -151,36 +170,6 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         dataTable: DataTable,
     ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-
-        val aktiviteterFraVedtaksperioder =
-            dataTable.mapRad { rad ->
-                aktivitet(
-                    behandlingId = behandlingId,
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    faktaOgVurdering =
-                        faktaOgVurderingAktivitetBoutgifter(
-                            type = parseValgfriEnum<AktivitetType>(BoutgifterDomenenøkkel.AKTIVITET, rad)!!,
-                        ),
-                )
-            }
-
-        val målgrupperFraVedtaksperioder =
-            dataTable.mapRad { rad ->
-                målgruppe(
-                    behandlingId = behandlingId,
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    begrunnelse = "begrunnelse",
-                    faktaOgVurdering =
-                        faktaOgVurderingMålgruppe(
-                            type = parseValgfriEnum<MålgruppeType>(BoutgifterDomenenøkkel.MÅLGRUPPE, rad)!!,
-                        ),
-                )
-            }
-
-        vilkårperiodeRepositoryFake.insertAll(aktiviteterFraVedtaksperioder)
-        vilkårperiodeRepositoryFake.insertAll(målgrupperFraVedtaksperioder)
 
         every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
             dummyBehandling(
@@ -205,7 +194,10 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
 //        steg.utførSteg(dummyBehandling(behandlingId, revurderFra), InnvilgelseBoutgifterRequest(vedtaksperioder))
 //    }
 
-    @Når("kopierer perioder fra forrige boutgiftbehandling for behandling={}")
+    /**
+     * Her forutsetter vi at vi har lagret både utgifter og på behandlingen først
+     */
+    @Gitt("vi kopierer perioder fra forrige behandling for behandling={}")
     fun `kopierer perioder`(behandlingIdTall: Int) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         val forrigeIverksatteBehandlingId =
