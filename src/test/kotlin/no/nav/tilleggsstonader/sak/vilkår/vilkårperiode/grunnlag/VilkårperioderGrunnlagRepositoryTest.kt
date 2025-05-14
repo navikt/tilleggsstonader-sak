@@ -48,7 +48,7 @@ internal class VilkårperioderGrunnlagRepositoryTest : IntegrationTest() {
             VilkårperioderGrunnlag(
                 aktivitet = grunnlagAktivitet(),
                 ytelse =
-                    GrunnlagYtelse(
+                    grunnlagYtelseOk(
                         perioder =
                             listOf(
                                 PeriodeGrunnlagYtelse(
@@ -78,7 +78,7 @@ internal class VilkårperioderGrunnlagRepositoryTest : IntegrationTest() {
     }
 
     private fun grunnlagYtelse() =
-        GrunnlagYtelse(
+        grunnlagYtelseOk(
             perioder =
                 listOf(
                     PeriodeGrunnlagYtelse(

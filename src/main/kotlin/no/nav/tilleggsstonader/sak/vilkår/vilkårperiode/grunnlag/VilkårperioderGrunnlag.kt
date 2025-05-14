@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.Kilde
 import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
+import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -31,13 +32,33 @@ data class VilkårperioderGrunnlagDomain(
     val sporbar: Sporbar = Sporbar(),
 )
 
+/**
+ * Liste med aktiviteter hentet fra Arena
+ *
+ * Hvis kallet for å hente aktiviteter feiler er det ønskelig å stoppe saksbehandler fra å fortsette saksbehandle.
+ * Dvs man skal ikke kunne legge inn aktiviteter manuellt, då vi ønsker mest mulig kobling til en registerperiode på id
+ */
 data class GrunnlagAktivitet(
     val aktiviteter: List<RegisterAktivitet>,
 )
 
+/**
+ * Liste med ytelser hentet fra ulike kilder nevnt i [kildeResultat]
+ *
+ * Dersom henting av eks AAP-perioder feilet ønsker man ikke å stoppe saksbehandler fra å saksbehandle,
+ *  men at man viser at kallene til AAP feilet og at man kan hente de på nytt
+ *
+ * @param kildeResultat inneholder informasjon om hvilke kilder vi hentet informasjon fra
+ */
 data class GrunnlagYtelse(
     val perioder: List<PeriodeGrunnlagYtelse>,
-)
+    val kildeResultat: List<KildeResultatYtelse>,
+) {
+    data class KildeResultatYtelse(
+        val type: TypeYtelsePeriode,
+        val resultat: StatusHentetInformasjon,
+    )
+}
 
 /**
  * Kopi av [no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto]
@@ -101,6 +122,9 @@ data class PeriodeGrunnlagYtelse(
     }
 }
 
+/**
+ * Informasjon som ble brukt når aktivitet og ytelser ble hentet
+ */
 data class HentetInformasjon(
     val fom: LocalDate,
     val tom: LocalDate,
@@ -119,7 +143,7 @@ fun YtelsePeriodeKontrakter.tilYtelseSubtype(): PeriodeGrunnlagYtelse.YtelseSubt
 
         TypeYtelsePeriode.AAP -> {
             when (this.aapErFerdigAvklart) {
-                true -> PeriodeGrunnlagYtelse.YtelseSubtype.AAP_FERDIG_AVKLART
+                true -> AAP_FERDIG_AVKLART
                 else -> null
             }
         }

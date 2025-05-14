@@ -183,6 +183,13 @@ class VilkårperiodeGrunnlagService(
                             subtype = it.tilYtelseSubtype(),
                         )
                     }.slåSammenOverlappendeEllerPåfølgende(),
+            kildeResultat =
+                ytelserFraRegister.hentetInformasjon.map {
+                    GrunnlagYtelse.KildeResultatYtelse(
+                        type = it.type,
+                        resultat = it.status,
+                    )
+                },
         )
     }
 }
