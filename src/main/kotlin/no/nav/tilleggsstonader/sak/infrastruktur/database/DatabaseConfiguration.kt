@@ -29,7 +29,6 @@ import org.springframework.core.env.Environment
 import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.convert.WritingConverter
 import org.springframework.data.domain.AuditorAware
-import org.springframework.data.jdbc.core.convert.JdbcCustomConversions
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories
@@ -74,45 +73,42 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
         }
     }
 
-    @Bean
-    override fun jdbcCustomConversions(): JdbcCustomConversions =
-        JdbcCustomConversions(
-            listOf(
-                StringTilPropertiesWrapperConverter(),
-                PropertiesWrapperTilStringConverter(),
-                PGobjectTilJsonWrapperConverter(),
-                JsonWrapperTilPGobjectConverter(),
-                PGobjectTilDelvilkårConverter(),
-                DelvilkårTilPGobjectConverter(),
-                SimuleringResponseWriter(),
-                SimuleringResponseReader(),
-                ÅrsakerReader(),
-                ÅrsakerWriter(),
-                SkjemaBarnetilsynReader(),
-                SkjemaBarnetilsynWriter(),
-                SkjemaLæremidlerReader(),
-                SkjemaLæremidlerWriter(),
-                SkjemaBoutgifterReader(),
-                SkjemaBoutgifterWriter(),
-                BarnMedBarnepassReader(),
-                BarnMedBarnepassWriter(),
-                FilTilBytearrayConverter(),
-                BytearrayTilFilConverter(),
-                VedtaksdataReader(),
-                VedtaksdataWriter(),
-                TilVilkårperiodeTypeConverter(),
-                VilkårperiodeTypeTilStringConverter(),
-                VilkårperioderGrunnlagReader(),
-                VilkårperioderGrunnlagWriter(),
-                FaktaOgVurderingReader(),
-                FaktaOgVurderingWriter(),
-                OppfølgingDataReader(),
-                OppfølgingDataWriter(),
-                FaktaGrunnlagDataReader(),
-                FaktaGrunnlagDataWriter(),
-            ) + alleVedtaksstatistikkJsonConverters +
-                alleValueClassConverters,
-        )
+    override fun userConverters(): List<*> =
+        listOf(
+            StringTilPropertiesWrapperConverter(),
+            PropertiesWrapperTilStringConverter(),
+            PGobjectTilJsonWrapperConverter(),
+            JsonWrapperTilPGobjectConverter(),
+            PGobjectTilDelvilkårConverter(),
+            DelvilkårTilPGobjectConverter(),
+            SimuleringResponseWriter(),
+            SimuleringResponseReader(),
+            ÅrsakerReader(),
+            ÅrsakerWriter(),
+            SkjemaBarnetilsynReader(),
+            SkjemaBarnetilsynWriter(),
+            SkjemaLæremidlerReader(),
+            SkjemaLæremidlerWriter(),
+            SkjemaBoutgifterReader(),
+            SkjemaBoutgifterWriter(),
+            BarnMedBarnepassReader(),
+            BarnMedBarnepassWriter(),
+            FilTilBytearrayConverter(),
+            BytearrayTilFilConverter(),
+            VedtaksdataReader(),
+            VedtaksdataWriter(),
+            TilVilkårperiodeTypeConverter(),
+            VilkårperiodeTypeTilStringConverter(),
+            VilkårperioderGrunnlagReader(),
+            VilkårperioderGrunnlagWriter(),
+            FaktaOgVurderingReader(),
+            FaktaOgVurderingWriter(),
+            OppfølgingDataReader(),
+            OppfølgingDataWriter(),
+            FaktaGrunnlagDataReader(),
+            FaktaGrunnlagDataWriter(),
+        ) + alleVedtaksstatistikkJsonConverters +
+            alleValueClassConverters
 
     @WritingConverter
     abstract class JsonWriter<T> : Converter<T, PGobject> {
