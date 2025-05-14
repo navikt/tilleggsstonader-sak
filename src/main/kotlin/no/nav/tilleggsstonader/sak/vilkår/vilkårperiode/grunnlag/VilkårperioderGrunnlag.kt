@@ -56,7 +56,23 @@ data class RegisterAktivitet(
     val erUtdanning: Boolean?,
     val arrangør: String?,
     val kilde: Kilde,
-)
+) {
+    constructor(aktivitet: no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto) : this(
+        id = aktivitet.id,
+        fom = aktivitet.fom,
+        tom = aktivitet.tom,
+        type = aktivitet.type,
+        typeNavn = aktivitet.typeNavn,
+        status = aktivitet.status,
+        statusArena = aktivitet.statusArena,
+        antallDagerPerUke = aktivitet.antallDagerPerUke,
+        prosentDeltakelse = aktivitet.prosentDeltakelse,
+        erStønadsberettiget = aktivitet.erStønadsberettiget,
+        erUtdanning = aktivitet.erUtdanning,
+        arrangør = aktivitet.arrangør,
+        kilde = aktivitet.kilde,
+    )
+}
 
 data class PeriodeGrunnlagYtelse(
     val type: TypeYtelsePeriode,

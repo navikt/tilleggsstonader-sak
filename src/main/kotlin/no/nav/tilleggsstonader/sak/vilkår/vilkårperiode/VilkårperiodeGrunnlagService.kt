@@ -162,23 +162,7 @@ class VilkårperiodeGrunnlagService(
                     ident = behandlingService.hentSaksbehandling(behandlingId).ident,
                     fom = fom,
                     tom = tom,
-                ).map {
-                    RegisterAktivitet(
-                        id = it.id,
-                        fom = it.fom,
-                        tom = it.tom,
-                        type = it.type,
-                        typeNavn = it.typeNavn,
-                        status = it.status,
-                        statusArena = it.statusArena,
-                        antallDagerPerUke = it.antallDagerPerUke,
-                        prosentDeltakelse = it.prosentDeltakelse,
-                        erStønadsberettiget = it.erStønadsberettiget,
-                        erUtdanning = it.erUtdanning,
-                        arrangør = it.arrangør,
-                        kilde = it.kilde,
-                    )
-                },
+                ).map { RegisterAktivitet(it) },
     )
 
     private fun hentGrunnlagYtelse(
