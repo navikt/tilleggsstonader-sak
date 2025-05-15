@@ -40,8 +40,10 @@ private fun Personhendelse.erDødsfall() = doedsfall != null
 
 private fun Personhendelse.tilDødsfallDomene() =
     DødsfallHendelse(
-        this.hendelseId,
+        if (this.erAnnullering()) this.tidligereHendelseId else this.hendelseId,
         this.doedsfall.doedsdato,
         this.personidenter.toSet(),
-        this.endringstype == Endringstype.ANNULLERT,
+        erAnnullering(),
     )
+
+private fun Personhendelse.erAnnullering() = this.endringstype == Endringstype.ANNULLERT
