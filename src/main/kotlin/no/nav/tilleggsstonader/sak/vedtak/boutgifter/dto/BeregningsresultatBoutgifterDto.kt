@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.summerUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -42,11 +43,11 @@ private fun BeregningsresultatBoutgifter.filtrerFraOgMed(dato: LocalDate?): Bere
 
 fun BeregningsresultatForLøpendeMåned.tilDto(): BeregningsresultatForPeriodeDto =
     BeregningsresultatForPeriodeDto(
-        fom = grunnlag.fom,
-        tom = grunnlag.tom,
+        fom = fom,
+        tom = tom,
         stønadsbeløp = stønadsbeløp,
         utbetalingsdato = grunnlag.utbetalingsdato,
-        sumUtgifter = summerUtgifter(),
+        sumUtgifter = grunnlag.summerUtgifter(),
         utgifter = grunnlag.utgifter,
         målgruppe = grunnlag.målgruppe,
         aktivitet = grunnlag.aktivitet,

@@ -1,23 +1,23 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
-import no.nav.tilleggsstonader.kontrakter.ytelse.HentetInformasjon
-import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto.KildeResultatYtelse
 import java.time.LocalDate
 
 object YtelsePerioderUtil {
     fun ytelsePerioderDto(
         perioder: List<YtelsePeriode> = listOf(periodeAAP(), periodeEnsligForsørger()),
-        hentetInformasjon: List<HentetInformasjon> = listOf(hentetInformasjonAAP(), hentetInformasjonEnsligForsørger()),
-    ): YtelsePerioderDto = YtelsePerioderDto(perioder = perioder, hentetInformasjon = hentetInformasjon)
+        kildeResultat: List<KildeResultatYtelse> = listOf(kildeResultatAAP(), kildeResultatEnsligForsørger()),
+    ): YtelsePerioderDto = YtelsePerioderDto(perioder = perioder, kildeResultat = kildeResultat)
 
-    fun hentetInformasjonAAP(status: StatusHentetInformasjon = StatusHentetInformasjon.OK) =
-        HentetInformasjon(type = TypeYtelsePeriode.AAP, status = status)
+    fun kildeResultatAAP(resultat: ResultatKilde = ResultatKilde.OK) =
+        KildeResultatYtelse(type = TypeYtelsePeriode.AAP, resultat = resultat)
 
-    fun hentetInformasjonEnsligForsørger(status: StatusHentetInformasjon = StatusHentetInformasjon.OK) =
-        HentetInformasjon(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, status = status)
+    fun kildeResultatEnsligForsørger(resultat: ResultatKilde = ResultatKilde.OK) =
+        KildeResultatYtelse(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, resultat = resultat)
 
     fun periodeAAP(
         fom: LocalDate = LocalDate.now(),

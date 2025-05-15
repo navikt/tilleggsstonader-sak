@@ -35,12 +35,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivit
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagTestUtil.periodeGrunnlagAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.grunnlagYtelseOk
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
@@ -106,7 +106,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             val grunnlag =
                 VilkårperioderGrunnlag(
                     aktivitet = GrunnlagAktivitet(aktiviteter = listOf(periodeGrunnlagAktivitet("123"))),
-                    ytelse = GrunnlagYtelse(emptyList()),
+                    ytelse = grunnlagYtelseOk(perioder = emptyList()),
                     hentetInformasjon = hentetInformasjon,
                 )
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))
@@ -129,7 +129,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             val grunnlag =
                 VilkårperioderGrunnlag(
                     aktivitet = GrunnlagAktivitet(emptyList()),
-                    ytelse = GrunnlagYtelse(emptyList()),
+                    ytelse = grunnlagYtelseOk(emptyList()),
                     hentetInformasjon = hentetInformasjon,
                 )
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))

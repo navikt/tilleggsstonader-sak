@@ -1,14 +1,14 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
-import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class YtelserRegisterDto(
     val perioder: List<YtelsePeriodeRegisterDto>,
-    val hentetInformasjon: List<HentetInformasjonDto>,
+    val kildeResultat: List<KildeResultatYtelseDto>,
     val tidspunktHentet: LocalDateTime,
 )
 
@@ -20,7 +20,7 @@ data class YtelsePeriodeRegisterDto(
     val ensligForsørgerStønadstype: EnsligForsørgerStønadstype? = null,
 )
 
-data class HentetInformasjonDto(
+data class KildeResultatYtelseDto(
     val type: TypeYtelsePeriode,
-    val status: StatusHentetInformasjon,
+    val resultat: ResultatKilde,
 )

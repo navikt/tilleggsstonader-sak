@@ -99,8 +99,8 @@ object BoutgifterTestUtil {
         fom: LocalDate,
         tom: LocalDate = fom.withDayOfMonth(fom.lengthOfMonth()),
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
-    ) = BeregningsresultatForLøpendeMåned(
-        grunnlag =
+    ): BeregningsresultatForLøpendeMåned {
+        val grunnlag =
             Beregningsgrunnlag(
                 fom = fom,
                 tom = tom,
@@ -110,6 +110,11 @@ object BoutgifterTestUtil {
                 makssatsBekreftet = true,
                 målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 aktivitet = AktivitetType.TILTAK,
-            ),
-    )
+            )
+        return BeregningsresultatForLøpendeMåned(
+            grunnlag =
+            grunnlag,
+            stønadsbeløp = grunnlag.beregnStønadsbeløp(),
+        )
+    }
 }
