@@ -150,9 +150,10 @@ data class ForenkletAndel(
 
 fun mapAndeler(dataTable: DataTable) =
     dataTable.mapRad { rad ->
+        val fom = parseDato(DomenenøkkelFelles.FOM, rad)
         ForenkletAndel(
-            fom = parseDato(DomenenøkkelFelles.FOM, rad),
-            tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad) ?: parseDato(DomenenøkkelFelles.FOM, rad),
+            fom = fom,
+            tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad) ?: fom,
             beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
             satstype = parseValgfriEnum<Satstype>(DomenenøkkelAndelTilkjentYtelse.SATS, rad) ?: Satstype.DAG,
             type = parseEnum(DomenenøkkelAndelTilkjentYtelse.TYPE, rad),
