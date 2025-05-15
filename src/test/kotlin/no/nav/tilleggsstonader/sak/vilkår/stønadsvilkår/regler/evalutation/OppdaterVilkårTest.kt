@@ -122,7 +122,7 @@ internal class OppdaterVilkårTest {
                     )
 
                 @Test
-                fun `skal validere at man har med fom og tom for vilkår for utgfiter overnatting`() {
+                fun `skal validere at man har med fom og tom for vilkår for utgifter overnatting`() {
                     assertThatThrownBy {
                         validerVilkårOgBeregnResultat(
                             utgifterOvernattingVilkår,
@@ -139,7 +139,7 @@ internal class OppdaterVilkårTest {
                 }
 
                 @Test
-                fun `skal kaste feil hvis innvilget utgfiter overnatting ikke inneholder beløp`() {
+                fun `skal kaste feil hvis innvilget utgifter overnatting ikke inneholder beløp`() {
                     assertThatThrownBy {
                         validerVilkårOgBeregnResultat(
                             utgifterOvernattingVilkår,
@@ -149,7 +149,7 @@ internal class OppdaterVilkårTest {
                 }
 
                 @Test
-                fun `skal ikke kaste feil hvis ikke oppfylt utgfiter overnatting ikke inneholder beløp`() {
+                fun `skal ikke kaste feil hvis ikke oppfylt utgifter overnatting ikke inneholder beløp`() {
                     val dto =
                         opprettUtgifterOvernattingVilkårDto.copy(
                             utgift = null,
@@ -159,7 +159,7 @@ internal class OppdaterVilkårTest {
                 }
 
                 @Test
-                fun `oppfylt utgfiter overnatting kan mangle utgift når det er fremtidig utgift`() {
+                fun `oppfylt utgifter overnatting kan mangle utgift når det er fremtidig utgift`() {
                     validerVilkårOgBeregnResultat(
                         utgifterFremtidigUtgiftVilkår,
                         opprettUtgifterFremtidigUtgiftDto.copy(utgift = null, erFremtidigUtgift = true),
@@ -280,7 +280,7 @@ internal class OppdaterVilkårTest {
                 }
 
                 @Test
-                fun `utgift kan mangle når utgfiter overnatting ikke er oppfylt`() {
+                fun `utgift kan mangle når utgifter overnatting ikke er oppfylt`() {
                     val dto =
                         opprettVilkårDto.copy(
                             utgift = null,

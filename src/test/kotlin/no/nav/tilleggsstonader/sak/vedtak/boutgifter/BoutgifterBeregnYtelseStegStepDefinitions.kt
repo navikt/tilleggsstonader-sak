@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepos
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -99,18 +100,27 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             vilkårperiodeService = vilkårperiodeServiceMock,
         )
     val simuleringServiceMock = mockk<SimuleringService>(relaxed = true)
+    val unleashService =
+        mockk<UnleashService>().apply {
+            every { isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT) } returns true
+        }
     val beregningService =
         BoutgifterBeregningService(
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepositoryFake,
-            unleashService = mockk<UnleashService>(relaxed = true),
+            unleashService = unleashService,
+        )
+    val opphørValideringService =
+        OpphørValideringService(
+            vilkårsperiodeService = vilkårperiodeServiceMock,
+            vilkårService = vilkårService,
         )
     val steg =
         BoutgifterBeregnYtelseSteg(
             beregningService =
             beregningService,
-            opphørValideringService = mockk<OpphørValideringService>(relaxed = true), // TODO: Vurder om denne skal være streng
+            opphørValideringService = opphørValideringService,
             vedtakRepository = vedtakRepositoryFake,
             tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepositoryFake),
             simuleringService = simuleringServiceMock,
