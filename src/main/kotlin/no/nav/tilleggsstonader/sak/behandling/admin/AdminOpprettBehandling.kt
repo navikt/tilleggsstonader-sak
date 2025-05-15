@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.admin
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import java.time.LocalDate
 
 data class PersoninfoDto(
     val navn: String,
@@ -22,4 +23,5 @@ data class AdminOpprettFørstegangsbehandlingDto(
     val ident: String,
     val valgteBarn: Set<String>,
     val medBrev: Boolean = true,
+    val kravMottatt: LocalDate,
 )

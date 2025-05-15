@@ -231,6 +231,7 @@ class JournalføringService(
             behandlingService.opprettBehandling(
                 fagsakId = fagsak.id,
                 behandlingsårsak = behandlingÅrsak,
+                kravMottatt = journalpost.datoMottatt?.toLocalDate(),
             )
 
         behandlingService.leggTilBehandlingsjournalpost(journalpost.journalpostId, Journalposttype.I, behandling.id)

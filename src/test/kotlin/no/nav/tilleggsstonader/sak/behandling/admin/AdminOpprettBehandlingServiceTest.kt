@@ -25,6 +25,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class AdminOpprettBehandlingServiceTest {
     val personService = mockk<PersonService>()
@@ -53,7 +54,8 @@ class AdminOpprettBehandlingServiceTest {
 
     @BeforeEach
     fun setUp() {
-        every { personService.hentFolkeregisterIdenter(ident) } returns PdlIdenter(listOf(PdlIdent(ident, false, "FOLKEREGISTERIDENT")))
+        every { personService.hentFolkeregisterIdenter(ident) } returns
+            PdlIdenter(listOf(PdlIdent(ident, false, "FOLKEREGISTERIDENT")))
         every { personService.hentPersonMedBarn(ident) } returns
             SøkerMedBarn(ident, mockk(), barn = mapOf(identBarn to mockk()))
 
@@ -72,7 +74,13 @@ class AdminOpprettBehandlingServiceTest {
 
     @Test
     fun `skal opprette behandling med barn`() {
-        service.opprettFørstegangsbehandling(stønadstype = Stønadstype.BARNETILSYN, ident, setOf(identBarn), true)
+        service.opprettFørstegangsbehandling(
+            stønadstype = Stønadstype.BARNETILSYN,
+            ident = ident,
+            valgteBarn = setOf(identBarn),
+            medBrev = true,
+            kravMottatt = LocalDate.now(),
+        )
 
         with(opprettedeBarnSlot.captured.single()) {
             assertThat(this.ident).isEqualTo(identBarn)
@@ -82,13 +90,20 @@ class AdminOpprettBehandlingServiceTest {
             behandlingService.opprettBehandling(
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET,
+                kravMottatt = LocalDate.now(),
             )
         }
     }
 
     @Test
     fun `skal opprette behandling uten brev`() {
-        service.opprettFørstegangsbehandling(Stønadstype.BARNETILSYN, ident, setOf(identBarn), false)
+        service.opprettFørstegangsbehandling(
+            stønadstype = Stønadstype.BARNETILSYN,
+            ident = ident,
+            valgteBarn = setOf(identBarn),
+            medBrev = false,
+            kravMottatt = LocalDate.now(),
+        )
 
         with(opprettedeBarnSlot.captured.single()) {
             assertThat(this.ident).isEqualTo(identBarn)
@@ -98,19 +113,27 @@ class AdminOpprettBehandlingServiceTest {
             behandlingService.opprettBehandling(
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
+                kravMottatt = LocalDate.now(),
             )
         }
     }
 
     @Test
     fun `skal opprette behandling for læremidler`() {
-        service.opprettFørstegangsbehandling(Stønadstype.LÆREMIDLER, ident, setOf(), false)
+        service.opprettFørstegangsbehandling(
+            stønadstype = Stønadstype.LÆREMIDLER,
+            ident = ident,
+            valgteBarn = setOf(),
+            medBrev = false,
+            kravMottatt = LocalDate.now(),
+        )
 
         assertThat(opprettedeBarnSlot.isCaptured).isFalse()
         verify(exactly = 1) {
             behandlingService.opprettBehandling(
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
+                kravMottatt = LocalDate.now(),
             )
         }
     }
@@ -120,21 +143,39 @@ class AdminOpprettBehandlingServiceTest {
         every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(behandling())
 
         assertThatThrownBy {
-            service.opprettFørstegangsbehandling(stønadstype = Stønadstype.BARNETILSYN, ident, setOf(identBarn), true)
+            service.opprettFørstegangsbehandling(
+                stønadstype = Stønadstype.BARNETILSYN,
+                ident = ident,
+                valgteBarn = setOf(identBarn),
+                medBrev = true,
+                kravMottatt = LocalDate.now(),
+            )
         }.hasMessageContaining("Det finnes allerede en behandling på personen")
     }
 
     @Test
     fun `skal feile hvis barnen ikke finnes på personen`() {
         assertThatThrownBy {
-            service.opprettFørstegangsbehandling(Stønadstype.BARNETILSYN, ident, setOf(identBarn, "annenIdent"), true)
+            service.opprettFørstegangsbehandling(
+                stønadstype = Stønadstype.BARNETILSYN,
+                ident = ident,
+                valgteBarn = setOf(identBarn, "annenIdent"),
+                medBrev = true,
+                kravMottatt = LocalDate.now(),
+            )
         }.hasMessageContaining("Barn finnes ikke på person")
     }
 
     @Test
     fun `skal feile hvis stønadstype ikke forventer barn`() {
         assertThatThrownBy {
-            service.opprettFørstegangsbehandling(Stønadstype.LÆREMIDLER, ident, setOf(identBarn, "annenIdent"), true)
+            service.opprettFørstegangsbehandling(
+                stønadstype = Stønadstype.LÆREMIDLER,
+                ident = ident,
+                valgteBarn = setOf(identBarn, "annenIdent"),
+                medBrev = true,
+                kravMottatt = LocalDate.now(),
+            )
         }.hasMessageContaining("skal ikke ha barn")
     }
 }
