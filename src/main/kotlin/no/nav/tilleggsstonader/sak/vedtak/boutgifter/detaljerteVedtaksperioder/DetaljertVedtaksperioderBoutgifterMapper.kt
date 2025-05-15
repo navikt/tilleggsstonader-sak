@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBo
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
+import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.DetaljertVedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.sorterOgMergeSammenhengende
 
 object DetaljertVedtaksperioderBoutgifterMapper {
     fun InnvilgelseEllerOpphørBoutgifter.finnDetaljerteVedtaksperioder(): List<DetaljertVedtaksperiodeBoutgifter> {
@@ -40,30 +42,36 @@ object DetaljertVedtaksperioderBoutgifterMapper {
                 this.grunnlag.makssats,
             )
 
-        return DetaljertVedtaksperiodeBoutgifter(
+        return DetaljertVedtaksperiode(
             fom = this.fom,
             tom = this.tom,
-            aktivitet = this.grunnlag.aktivitet,
-            målgruppe = this.grunnlag.målgruppe,
-            utgifterTilOvernatting = utgifterTilOvernatting,
-            totalUtgiftMåned = utgifterTilOvernatting.sumOf { it.utgift },
-            stønadsbeløpMnd = utgifterTilOvernatting.sumOf { it.beløpSomDekkes },
-            erLøpendeUtgift = false,
+            detaljer =
+                DetaljerBoutgifter(
+                    aktivitet = this.grunnlag.aktivitet,
+                    målgruppe = this.grunnlag.målgruppe,
+                    utgifterTilOvernatting = utgifterTilOvernatting,
+                    totalUtgiftMåned = utgifterTilOvernatting.sumOf { it.utgift },
+                    stønadsbeløpMnd = utgifterTilOvernatting.sumOf { it.beløpSomDekkes },
+                    erLøpendeUtgift = false,
+                ),
         )
     }
 
     private fun BeregningsresultatForLøpendeMåned.mapBeregningsresultatMndLøpendeUtgift(): DetaljertVedtaksperiodeBoutgifter =
-        DetaljertVedtaksperiodeBoutgifter(
+        DetaljertVedtaksperiode(
             fom = this.fom,
             tom = this.tom,
-            aktivitet = this.grunnlag.aktivitet,
-            målgruppe = this.grunnlag.målgruppe,
-            totalUtgiftMåned =
-                summerLøpendeUtgifterBo(
-                    this.grunnlag.utgifter,
+            detaljer =
+                DetaljerBoutgifter(
+                    aktivitet = this.grunnlag.aktivitet,
+                    målgruppe = this.grunnlag.målgruppe,
+                    totalUtgiftMåned =
+                        summerLøpendeUtgifterBo(
+                            this.grunnlag.utgifter,
+                        ),
+                    stønadsbeløpMnd = this.stønadsbeløp,
+                    erLøpendeUtgift = true,
                 ),
-            stønadsbeløpMnd = this.stønadsbeløp,
-            erLøpendeUtgift = true,
         )
 
     private fun beregnAndelAvUtgifterSomDekkes(
