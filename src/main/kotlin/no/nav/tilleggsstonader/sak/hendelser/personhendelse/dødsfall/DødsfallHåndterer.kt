@@ -30,7 +30,7 @@ class DødsfallHåndterer(
     private val oppgaveService: OppgaveService,
 ) {
     companion object {
-        private const val annullertDødsfallBeskrivelse = "\n\nDenne oppgaven har blitt annullert"
+        private const val ANNULLERT_DØDSFALL_BESKRIVELSE = "\n\nDenne oppgaven har blitt annullert"
     }
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -117,7 +117,7 @@ class DødsfallHåndterer(
                 logger.info(
                     "Oppgave er allerede opprettet og åpen for dødshendelse ${hendelse.id}, oppdaterer oppgave",
                 )
-                oppgaveService.oppdaterOppgave(oppgave.copy(beskrivelse = oppgave.beskrivelse + annullertDødsfallBeskrivelse))
+                oppgaveService.oppdaterOppgave(oppgave.copy(beskrivelse = oppgave.beskrivelse + ANNULLERT_DØDSFALL_BESKRIVELSE))
             } else {
                 logger.info("Tidligere oppgave for dødsfall er ferdigstilt, oppretter ny oppgave for annullering av dødsfall")
                 val tidligereTaskData = objectMapper.readValue<OpprettDødsfallOppgaveTask.DødsfallOppgaveTaskData>(opprinneligTask.payload)
