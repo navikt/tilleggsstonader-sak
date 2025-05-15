@@ -47,7 +47,7 @@ object DetaljertVedtaksperioderBoutgifterMapper {
             målgruppe = this.grunnlag.målgruppe,
             utgifterTilOvernatting = utgifterTilOvernatting,
             totalUtgiftMåned = utgifterTilOvernatting.sumOf { it.utgift },
-            stønadsbeløpMnd = utgifterTilOvernatting.sumOf { it.beløpSomDekkes },
+            stønadsbeløpMnd = utgifterTilOvernatting.sumOf { it.beløpSomDekkes }, // bruk stønadsbeløp direkte
             erLøpendeUtgift = false,
         )
     }
