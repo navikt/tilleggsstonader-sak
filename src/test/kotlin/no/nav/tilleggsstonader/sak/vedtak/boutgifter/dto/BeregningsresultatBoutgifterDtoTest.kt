@@ -41,6 +41,7 @@ class BeregningsresultatBoutgifterDtoTest {
                         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
                     ),
+                stønadsbeløp = 3000,
             )
 
         val forventetResultat =
@@ -96,6 +97,7 @@ class BeregningsresultatBoutgifterDtoTest {
                         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
                     ),
+                stønadsbeløp = 4953,
             )
 
         val forventetResultat =
@@ -151,6 +153,7 @@ class BeregningsresultatBoutgifterDtoTest {
                         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
                     ),
+                stønadsbeløp = 3000,
             )
 
         val forventetResultat =
