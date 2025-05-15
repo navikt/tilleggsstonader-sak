@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -9,7 +8,6 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBo
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
-import kotlin.math.min
 
 data class BeregningsresultatBoutgifter(
     val perioder: List<BeregningsresultatForLøpendeMåned>,
@@ -17,7 +15,7 @@ data class BeregningsresultatBoutgifter(
 
 data class BeregningsresultatForLøpendeMåned(
     val grunnlag: Beregningsgrunnlag,
-    val delAvTidligereUtbetaling: Boolean = false,
+    val stønadsbeløp: Int,
 ) : Periode<LocalDate>,
     KopierPeriode<BeregningsresultatForLøpendeMåned> {
     @get:JsonIgnore
@@ -26,23 +24,10 @@ data class BeregningsresultatForLøpendeMåned(
     @get:JsonIgnore
     override val tom: LocalDate get() = grunnlag.tom
 
-    @JsonProperty("stønadsbeløp")
-    val stønadsbeløp = summerUtgifter().begrensTilMakssats()
-
     override fun medPeriode(
         fom: LocalDate,
         tom: LocalDate,
     ): BeregningsresultatForLøpendeMåned = this.copy(grunnlag = this.grunnlag.copy(fom = fom, tom = tom))
-
-    fun markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling: Boolean) =
-        this.copy(delAvTidligereUtbetaling = delAvTidligereUtbetaling)
-
-    fun summerUtgifter(): Int =
-        grunnlag.utgifter.values
-            .flatten()
-            .sumOf { it.utgift }
-
-    private fun Int.begrensTilMakssats() = min(this, grunnlag.makssats)
 }
 
 data class Beregningsgrunnlag(
@@ -55,15 +40,3 @@ data class Beregningsgrunnlag(
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
 ) : Periode<LocalDate>
-
-// fun avkortBeregningsresultatVedOpphør(
-//    forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørBoutgifter>,
-//    revurderFra: LocalDate,
-// ): AvkortResult<BeregningsresultatForMåned> =
-//    forrigeVedtak
-//        .data
-//        .beregningsresultat
-//        .perioder
-//        .avkortFraOgMed(revurderFra.minusDays(1)) { periode, nyttTom ->
-//            periode.copy(grunnlag = periode.grunnlag.copy(tom = nyttTom))
-//        }

@@ -31,7 +31,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.IntegrasjonException
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
@@ -49,7 +49,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import java.util.UUID
 
@@ -140,16 +139,6 @@ internal class OppgaveServiceTest {
         assertThat(slot.captured.aktivFra).isEqualTo(osloDateNow())
         assertThat(slot.captured.tema).isEqualTo(Tema.TSO)
         assertThat(opprettOppgaveDomainSlot.captured.behandlingId).isEqualTo(BEHANDLING_ID)
-    }
-
-    @Test
-    fun `Opprett oppgave som feiler på en ukjent måte skal bare kaste feil videre`() {
-        val slot = slot<OpprettOppgaveRequest>()
-        mockOpprettOppgave(slot)
-        every { oppgaveClient.opprettOppgave(any()) } throws IntegrasjonException("En merkelig feil vi ikke kjenner til")
-        assertThrows<IntegrasjonException> {
-            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
-        }
     }
 
     @Nested
@@ -390,7 +379,7 @@ internal class OppgaveServiceTest {
         every { oppgaveClient.opprettOppgave(capture(slot)) } answers {
             val oppgaveRequest: OpprettOppgaveRequest = firstArg()
             if (oppgaveRequest.enhetsnummer == null) {
-                throw IntegrasjonException("Fant ingen gyldig arbeidsfordeling for oppgaven")
+                throw Feil("Fant ingen gyldig arbeidsfordeling for oppgaven")
             } else {
                 GSAK_OPPGAVE_ID
             }

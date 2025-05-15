@@ -89,7 +89,7 @@ class VedtaksperiodeService(
     ): List<Vedtaksperiode> {
         val vedtak = vedtakRepository.findByIdOrNull(behandlingId) ?: return emptyList()
 
-        val vedtaksperioder: List<Vedtaksperiode>? =
+        val vedtaksperioder: List<Vedtaksperiode> =
             when (vedtak.data) {
                 is InnvilgelseEllerOpphørTilsynBarn -> vedtak.data.vedtaksperioder
                 is InnvilgelseEllerOpphørLæremidler -> vedtak.data.vedtaksperioder.map { it.tilFellesDomeneVedtaksperiode() }
@@ -97,6 +97,6 @@ class VedtaksperiodeService(
                 is Avslag -> emptyList()
             }
 
-        return vedtaksperioder?.avkortPerioderFør(revurdererFra) ?: emptyList()
+        return vedtaksperioder.avkortPerioderFør(revurdererFra)
     }
 }

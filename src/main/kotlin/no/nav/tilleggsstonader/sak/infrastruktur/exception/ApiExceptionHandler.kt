@@ -90,9 +90,10 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(IntegrasjonException::class)
     fun handleThrowable(feil: IntegrasjonException): ProblemDetail {
-        secureLogger.error("Feil mot integrasjonsclienten har oppstått: uri={} data={}", feil.uri, feil.data, feil)
-        logger.error("Feil mot integrasjonsclienten har oppstått exception=${rootCause(feil)}")
-        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, feil.message ?: "Mangler melding")
+        secureLogger.error("${feil.message}${feil.uri?.let { " uri=$it" }}", feil)
+        logger.error("${feil.message} exception=${rootCause(feil)}")
+        val detail = "Feilet ${feil.hendelse}. Prøv på nytt, og hvis problemet vedvarer kontakt utviklingsteamet."
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, detail)
     }
 
     private fun lagTimeoutfeilRessurs(): ProblemDetail =

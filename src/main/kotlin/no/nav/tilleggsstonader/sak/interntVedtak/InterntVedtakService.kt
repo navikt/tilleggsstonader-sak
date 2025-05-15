@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
@@ -167,15 +168,15 @@ class InterntVedtakService(
             }
         }
 
-    private fun mapVedtaksperioderTilsynBarnOgBoutgifter(vedtaksperioder: List<Vedtaksperiode>?): List<VedtaksperiodeInterntVedtak> =
-        vedtaksperioder?.map {
+    private fun mapVedtaksperioderTilsynBarnOgBoutgifter(vedtaksperioder: List<Vedtaksperiode>): List<VedtaksperiodeInterntVedtak> =
+        vedtaksperioder.map {
             VedtaksperiodeInterntVedtak(
                 målgruppe = it.målgruppe,
                 aktivitet = it.aktivitet,
                 fom = it.fom,
                 tom = it.tom,
             )
-        } ?: emptyList()
+        }
 
     private fun mapVedtaksperioderLæremidler(vedtaksperioder: List<VedtaksperiodeLæremidler>?): List<VedtaksperiodeInterntVedtak> =
         vedtaksperioder?.map {
@@ -272,12 +273,12 @@ class InterntVedtakService(
                     årsakerAvslag = vedtak.årsaker,
                     avslagBegrunnelse = vedtak.begrunnelse,
                 )
-//
-//            is OpphørBoutgifter ->
-//                VedtakOpphørInternt(
-//                    årsakerOpphør = vedtak.årsaker,
-//                    opphørBegrunnelse = vedtak.begrunnelse,
-//                )
+
+            is OpphørBoutgifter ->
+                VedtakOpphørInternt(
+                    årsakerOpphør = vedtak.årsaker,
+                    opphørBegrunnelse = vedtak.begrunnelse,
+                )
         }
 
     private fun Map<BarnId, GrunnlagBarn>.finnFødselsdato(barnId: BarnId): LocalDate {

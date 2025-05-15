@@ -43,12 +43,12 @@ class LæremidlerBeregnYtelseSteg(
     private val beregningService: LæremidlerBeregningService,
     private val opphørValideringService: OpphørValideringService,
     vedtakRepository: VedtakRepository,
-    tilkjentytelseService: TilkjentYtelseService,
+    tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
 ) : BeregnYtelseSteg<VedtakLæremidlerRequest>(
         stønadstype = Stønadstype.LÆREMIDLER,
         vedtakRepository = vedtakRepository,
-        tilkjentYtelseService = tilkjentytelseService,
+        tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
     ) {
     override fun lagreVedtak(
@@ -124,7 +124,7 @@ class LæremidlerBeregnYtelseSteg(
 
         opphørValideringService.validerVilkårperioder(saksbehandling)
 
-        opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
+        opphørValideringService.validerVedtaksperioderAvkortetVedOpphørLæremidler(
             forrigeBehandlingsVedtaksperioder = forrigeVedtak.data.vedtaksperioder,
             revurderFraDato = saksbehandling.revurderFra,
         )

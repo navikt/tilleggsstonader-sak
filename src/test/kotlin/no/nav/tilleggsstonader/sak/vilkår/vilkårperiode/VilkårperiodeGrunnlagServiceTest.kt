@@ -21,13 +21,13 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagYtelse.YtelseSubtype
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.grunnlagYtelseOk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
@@ -165,7 +165,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                             ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
                         ),
                     ),
-                hentetInformasjon = emptyList(),
+                kildeResultat = emptyList(),
             )
 
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
@@ -221,7 +221,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                             EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
                         ),
                     ),
-                hentetInformasjon = emptyList(),
+                kildeResultat = emptyList(),
             )
 
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
@@ -283,7 +283,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                 val hentetInformasjon =
                     HentetInformasjon(fom = fomFørsteGangHentet, tom = LocalDate.now(), LocalDateTime.now())
                 val aktivitet = GrunnlagAktivitet(emptyList())
-                val grunnlag = VilkårperioderGrunnlag(aktivitet, GrunnlagYtelse(emptyList()), hentetInformasjon)
+                val grunnlag = VilkårperioderGrunnlag(aktivitet, grunnlagYtelseOk(emptyList()), hentetInformasjon)
                 vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(it.id, grunnlag))
             }
             BrukerContextUtil.testWithBrukerContext("beh1", listOf(rolleConfig.saksbehandlerRolle)) {

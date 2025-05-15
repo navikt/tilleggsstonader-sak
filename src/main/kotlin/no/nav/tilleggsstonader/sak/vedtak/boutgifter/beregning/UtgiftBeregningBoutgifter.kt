@@ -13,6 +13,18 @@ data class UtgiftBeregningBoutgifter(
     }
 }
 
+data class UtgiftBoutgifterMedAndelTilUtbetaling(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val utgift: Int,
+    val tilUtbetaling: Int,
+    val erFørRevurderFra: Boolean,
+) : Periode<LocalDate> {
+    init {
+        validatePeriode()
+    }
+}
+
 // /**
 // * Dersom man har en lang utgiftsperiode for 1.1 - 31.1 så skal den splittes opp fra revurderFra sånn at man får 2 perioder
 // * Eks for revurderFra=15.1 så får man 1.1 - 14.1 og 15.1 - 31.1

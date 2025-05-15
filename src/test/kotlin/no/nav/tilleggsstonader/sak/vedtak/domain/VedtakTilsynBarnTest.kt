@@ -50,6 +50,7 @@ class VedtakTilsynBarnTest {
                     beregningsresultat = vedtakBeregningsresultat,
                     årsaker = emptyList(),
                     begrunnelse = "begrunnelse",
+                    vedtaksperioder = emptyList(),
                 )
             }.hasMessage("Må velge minst en årsak for opphør")
         }
@@ -61,6 +62,7 @@ class VedtakTilsynBarnTest {
                     beregningsresultat = vedtakBeregningsresultat,
                     årsaker = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
                     begrunnelse = "",
+                    vedtaksperioder = emptyList(),
                 )
             }.hasMessage("Opphør må begrunnes")
         }
@@ -71,9 +73,9 @@ class VedtakTilsynBarnTest {
         @Test
         fun `2 like opphør skal være like`() {
             val avslagTilsynBarn =
-                OpphørTilsynBarn(vedtakBeregningsresultat, listOf(ÅrsakOpphør.ENDRING_UTGIFTER), "asd")
+                OpphørTilsynBarn(vedtakBeregningsresultat, listOf(ÅrsakOpphør.ENDRING_UTGIFTER), "asd", emptyList())
             val avslagTilsynBarn2 =
-                OpphørTilsynBarn(vedtakBeregningsresultat, listOf(ÅrsakOpphør.ENDRING_UTGIFTER), "asd")
+                OpphørTilsynBarn(vedtakBeregningsresultat, listOf(ÅrsakOpphør.ENDRING_UTGIFTER), "asd", emptyList())
 
             assertThat(avslagTilsynBarn).isEqualTo(avslagTilsynBarn2)
         }

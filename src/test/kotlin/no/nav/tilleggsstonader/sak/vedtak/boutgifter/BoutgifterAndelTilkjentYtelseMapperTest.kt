@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
@@ -201,7 +202,7 @@ private fun finnAndelTilkjentYtelse(vararg beregningsgrunnlag: Beregningsgrunnla
         BeregningsresultatBoutgifter(
             perioder =
                 beregningsgrunnlag.map {
-                    BeregningsresultatForLøpendeMåned(grunnlag = it)
+                    BeregningsresultatForLøpendeMåned(grunnlag = it, stønadsbeløp = it.beregnStønadsbeløp())
                 },
         )
     return BoutgifterAndelTilkjentYtelseMapper.finnAndelTilkjentYtelse(saksbehandling, beregningsresultat)
@@ -228,6 +229,6 @@ private fun lagBeregningsgrunnlagMedEnkeltutgift(
         ),
     makssats = 4953,
     makssatsBekreftet = true,
-    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+    målgruppe = NEDSATT_ARBEIDSEVNE,
     aktivitet = AktivitetType.TILTAK,
 )

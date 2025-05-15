@@ -263,6 +263,20 @@ fun vilkår(
         gitVersjon = Applikasjonsversjon.versjon,
     )
 
+fun vedtaksperiode(
+    id: UUID = UUID.randomUUID(),
+    fom: LocalDate = YearMonth.now().atDay(1),
+    tom: LocalDate = YearMonth.now().atEndOfMonth(),
+    aktivitet: AktivitetType = AktivitetType.TILTAK,
+    målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+) = Vedtaksperiode(
+    id = id,
+    fom = fom,
+    tom = tom,
+    aktivitet = aktivitet,
+    målgruppe = målgruppe,
+)
+
 fun fagsakpersoner(vararg identer: String): Set<PersonIdent> =
     identer
         .map {

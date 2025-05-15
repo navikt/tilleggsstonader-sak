@@ -111,7 +111,7 @@ data class Vilkår(
 
     fun kopierTilBehandling(
         nyBehandlingId: BehandlingId,
-        barnIdINyBehandling: BarnId?,
+        barnIdINyBehandling: BarnId? = null,
     ): Vilkår =
         copy(
             id = VilkårId.random(),

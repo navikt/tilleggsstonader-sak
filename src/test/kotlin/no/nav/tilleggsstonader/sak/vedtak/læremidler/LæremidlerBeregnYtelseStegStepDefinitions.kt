@@ -106,7 +106,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                 ),
             opphørValideringService = mockk<OpphørValideringService>(relaxed = true),
             vedtakRepository = vedtakRepository,
-            tilkjentytelseService = TilkjentYtelseService(tilkjentYtelseRepository),
+            tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepository),
             simuleringService = simuleringService,
         )
     val vedtaksperiodeId: UUID = UUID.randomUUID()

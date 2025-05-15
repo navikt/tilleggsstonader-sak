@@ -4,13 +4,16 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakMetadata
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårAktivitet.Companion.fraVilkårperioder
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårMålgruppe.Companion.fraVilkårperioder
@@ -142,13 +145,13 @@ class OppfølgingOpprettKontrollerService(
     ): List<Vedtaksperiode> =
         when (fagsak.stønadstype) {
             Stønadstype.BARNETILSYN ->
-                hentVedtak<InnvilgelseEllerOpphørTilsynBarn>(behandling).vedtaksperioder ?: emptyList()
+                hentVedtak<InnvilgelseEllerOpphørTilsynBarn>(behandling).vedtaksperioder
 
             Stønadstype.LÆREMIDLER ->
                 hentVedtak<InnvilgelseEllerOpphørLæremidler>(behandling).vedtaksperioder.tilFellesFormat()
 
             Stønadstype.BOUTGIFTER ->
-                hentVedtak<InnvilgelseEllerOpphørBoutgifter>(behandling).vedtaksperioder ?: emptyList()
+                hentVedtak<InnvilgelseEllerOpphørBoutgifter>(behandling).vedtaksperioder
         }
 
     private inline fun <reified T : Vedtaksdata> hentVedtak(behandling: Behandling) =
@@ -187,12 +190,21 @@ class OppfølgingOpprettKontrollerService(
         val tom = typerSomSkalHentes.maxOf { it.second.tom }
         return ytelseService
             .hentYtelser(fagsak.ident, fom = fom, tom = tom, typer)
+            .also { validerResultat(it.kildeResultat) }
             .perioder
             .filter { it.aapErFerdigAvklart != true }
             .filter { it.tom != null }
             .map { it.type.tilMålgruppe() to Datoperiode(fom = it.fom, tom = it.tom!!) }
             .groupBy({ it.first }, { it.second })
             .mapValues { it.value.mergeSammenhengende() }
+    }
+
+    private fun validerResultat(kildeResultat: List<YtelsePerioderDto.KildeResultatYtelse>) {
+        val test = kildeResultat.filter { it.resultat != ResultatKilde.OK }
+
+        feilHvis(test.isNotEmpty()) {
+            "Feil ved henting av ytelser fra andre systemer: ${test.joinToString(", ") { it.type.name }}. Prøv å laste inn siden på nytt."
+        }
     }
 
     private fun TypeYtelsePeriode.tilMålgruppe() =

@@ -81,7 +81,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
                     ),
-                delAvTidligereUtbetaling = false,
+                stønadsbeløp = 3000,
             ),
         )
 
@@ -234,13 +234,11 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 1, 1),
                     utgifter = utgiftMidlertidigOvernatting,
-                    delAvTidligere = true,
                 ),
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 3, 10),
                     tom = LocalDate.of(2025, 4, 9),
                     utgifter = utgiftEtterRevurderFra,
-                    delAvTidligere = false,
                 ),
             )
 

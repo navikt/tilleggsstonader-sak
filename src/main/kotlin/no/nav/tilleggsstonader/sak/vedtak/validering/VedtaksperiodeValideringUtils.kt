@@ -81,35 +81,4 @@ object VedtaksperiodeValideringUtils {
                 "Finnes ingen periode med oppfylte vilkår for ${vedtaksperiode.aktivitet} i perioden ${vedtaksperiode.formatertPeriodeNorskFormat()}",
             )
     }
-
-    /**
-     * Kopi av [validerEnkeltperiode] over for å validere mot faktiske målgrupper
-     */
-    fun validerEnkeltperiode(
-        vedtaksperiode: no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode,
-        målgruppePerioderPerType: Map<FaktiskMålgruppe, List<Datoperiode>>,
-        aktivitetPerioderPerType: Map<AktivitetType, List<Datoperiode>>,
-    ) {
-        val målgruppe = vedtaksperiode.målgruppe ?: error("Vedtaksperiode mangler målgruppe")
-        val aktivitet = vedtaksperiode.aktivitet ?: error("Vedtaksperiode mangler aktivitet")
-        brukerfeilHvisIkke(målgruppe.gyldigeAktiviter.contains(aktivitet)) {
-            "Kombinasjonen av $målgruppe og $aktivitet er ikke gyldig"
-        }
-
-        val målgrupper =
-            målgruppePerioderPerType[målgruppe]?.takeIf { it.isNotEmpty() }
-                ?: brukerfeil("Finner ingen perioder hvor vilkår for $målgruppe er oppfylt")
-        val aktiviteter =
-            aktivitetPerioderPerType[aktivitet]?.takeIf { it.isNotEmpty() }
-                ?: brukerfeil("Finner ingen perioder hvor vilkår for $aktivitet er oppfylt")
-
-        målgrupper.firstOrNull { it.inneholder(vedtaksperiode) }
-            ?: brukerfeil(
-                "Finnes ingen periode med oppfylte vilkår for $målgruppe i perioden ${vedtaksperiode.formatertPeriodeNorskFormat()}",
-            )
-        aktiviteter.firstOrNull { it.inneholder(vedtaksperiode) }
-            ?: brukerfeil(
-                "Finnes ingen periode med oppfylte vilkår for $aktivitet i perioden ${vedtaksperiode.formatertPeriodeNorskFormat()}",
-            )
-    }
 }
