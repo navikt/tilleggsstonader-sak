@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import java.time.LocalDate
+import java.util.UUID
 
 data class BehandlingOppsummeringDto private constructor(
     val aktiviteter: List<OppsummertVilkårperiode>,
@@ -54,6 +55,7 @@ data class BehandlingOppsummeringDto private constructor(
 }
 
 data class OppsummertVilkårperiode(
+    val id: UUID,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val type: VilkårperiodeType,
@@ -68,6 +70,7 @@ data class OppsummertVilkårperiode(
 
 fun Vilkårperiode.tilOppsummertVilkårperiode(): OppsummertVilkårperiode =
     OppsummertVilkårperiode(
+        id = this.id,
         fom = this.fom,
         tom = this.tom,
         type = this.type,
