@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRespon
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterResponse
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
@@ -16,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
@@ -52,7 +54,7 @@ object VedtakDtoMapper {
             is InnvilgelseTilsynBarn ->
                 InnvilgelseTilsynBarnResponse(
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
-                    vedtaksperioder = data.vedtaksperioder?.tilVedtaksperiodeDto(),
+                    vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(),
                     begrunnelse = data.begrunnelse,
                 )
 
@@ -61,7 +63,7 @@ object VedtakDtoMapper {
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
-                    vedtaksperioder = data.vedtaksperioder?.tilVedtaksperiodeDto(),
+                    vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(),
                 )
 
             is AvslagTilsynBarn ->
@@ -118,12 +120,12 @@ object VedtakDtoMapper {
                     årsakerAvslag = data.årsaker,
                     begrunnelse = data.begrunnelse,
                 )
-//
-//            is OpphørLæremidler ->
-//                OpphørLæremidlerResponse(
-//                    årsakerOpphør = data.årsaker,
-//                    begrunnelse = data.begrunnelse,
-//                    vedtaksperioder = data.vedtaksperioder.tilDto(),
-//                )
+
+            is OpphørBoutgifter ->
+                OpphørBoutgifterResponse(
+                    årsakerOpphør = data.årsaker,
+                    begrunnelse = data.begrunnelse,
+                    vedtaksperioder = data.vedtaksperioder.tilDto(),
+                )
         }
 }

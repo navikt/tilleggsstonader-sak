@@ -105,16 +105,16 @@ class StegService(
         data: T,
     ): Behandling =
         håndterSteg(
-            behandlingService.hentSaksbehandling(behandlingId),
-            behandlingSteg,
-            data,
+            saksbehandling = behandlingService.hentSaksbehandling(behandlingId),
+            behandlingSteg = behandlingSteg,
+            data = data,
         )
 
     @Transactional
     fun håndterSteg(
         saksbehandling: Saksbehandling,
         behandlingSteg: BehandlingSteg<Void?>,
-    ): Behandling = håndterSteg(saksbehandling, behandlingSteg, null)
+    ): Behandling = håndterSteg(saksbehandling = saksbehandling, behandlingSteg = behandlingSteg, data = null)
 
     @Transactional
     fun <T> håndterSteg(

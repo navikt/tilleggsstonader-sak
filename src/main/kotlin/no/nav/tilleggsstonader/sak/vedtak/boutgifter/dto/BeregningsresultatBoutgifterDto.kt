@@ -23,7 +23,6 @@ data class BeregningsresultatForPeriodeDto(
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
     val makssatsBekreftet: Boolean,
-    val delAvTidligereUtbetaling: Boolean,
 ) : Periode<LocalDate>
 
 fun BeregningsresultatBoutgifter.tilDto(revurderFra: LocalDate?): BeregningsresultatBoutgifterDto =
@@ -41,12 +40,6 @@ private fun BeregningsresultatBoutgifter.filtrerFraOgMed(dato: LocalDate?): Bere
     return BeregningsresultatBoutgifter(perioder.filter { it.tom >= dato })
 }
 
-private fun BeregningsresultatBoutgifter.skalBrukeDetaljertVisning(): Boolean =
-    perioder.any {
-        it.grunnlag.utgifter.keys
-            .contains(TypeBoutgift.UTGIFTER_OVERNATTING)
-    }
-
 fun BeregningsresultatForLøpendeMåned.tilDto(): BeregningsresultatForPeriodeDto =
     BeregningsresultatForPeriodeDto(
         fom = grunnlag.fom,
@@ -58,5 +51,4 @@ fun BeregningsresultatForLøpendeMåned.tilDto(): BeregningsresultatForPeriodeDt
         målgruppe = grunnlag.målgruppe,
         aktivitet = grunnlag.aktivitet,
         makssatsBekreftet = grunnlag.makssatsBekreftet,
-        delAvTidligereUtbetaling = delAvTidligereUtbetaling,
     )

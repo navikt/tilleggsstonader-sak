@@ -80,6 +80,7 @@ object TilsynBarnTestUtil {
                             beregningsresultatForMåned(vedtaksperioder = listOf(vedtaksperiodeGrunnlag())),
                         ),
                 ),
+            vedtaksperioder = emptyList(),
         )
 
     val vedtakBeregningsresultat =
@@ -168,7 +169,7 @@ object TilsynBarnTestUtil {
     fun innvilgetVedtak(
         behandlingId: BehandlingId = defaultBehandling.id,
         beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
-        vedtaksperioder: List<Vedtaksperiode>? = null,
+        vedtaksperioder: List<Vedtaksperiode> = emptyList(),
     ) = GeneriskVedtak(
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,
@@ -218,6 +219,7 @@ object TilsynBarnTestUtil {
                 årsaker = årsaker,
                 begrunnelse = begrunnelse,
                 beregningsresultat = beregningsresultat,
+                vedtaksperioder = emptyList(),
             ),
         gitVersjon = Applikasjonsversjon.versjon,
     )

@@ -91,7 +91,7 @@ class BehandlingOppsummeringService(
     ): OppsummertVedtak? {
         val vedtak = vedtakService.hentVedtak(behandlingId)
 
-        return vedtak?.data.let { data ->
+        return vedtak?.data?.let { data ->
             when (data) {
                 is Avslag -> OppsummertVedtakAvslag(årsaker = data.årsaker)
 
@@ -108,8 +108,6 @@ class BehandlingOppsummeringService(
                     OppsummertVedtakOpphør(
                         årsaker = data.årsaker,
                     )
-
-                else -> null
             }
         }
     }

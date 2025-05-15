@@ -1,28 +1,31 @@
 {
-  "begrunnelse": "En begrunnelse",
-  "type": "INNVILGELSE_BOUTGIFTER",
+  "type": "OPPHØR_BOUTGIFTER",
   "vedtaksperioder": [
     {
       "id": "550e8400-e29b-41d4-a716-446655440000",
-      "fom": "2024-01-01",
-      "tom": "2024-01-31",
+      "fom": "2025-01-01",
+      "tom": "2025-01-31",
       "målgruppe": "NEDSATT_ARBEIDSEVNE",
       "aktivitet": "TILTAK"
     }
   ],
+  "årsaker": [
+    "ENDRING_AKTIVITET"
+  ],
+  "begrunnelse": "En begrunnelse for opphøret",
   "beregningsresultat": {
     "perioder": [
       {
         "grunnlag": {
-          "fom": "2024-01-01",
-          "tom": "2024-01-31",
-          "utbetalingsdato": "2024-01-01",
+          "fom": "2025-01-01",
+          "tom": "2025-01-31",
+          "utbetalingsdato": "2025-01-01",
           "utgifter": {
-            "UTGIFTER_OVERNATTING": [
+            "LØPENDE_UTGIFTER_EN_BOLIG": [
               {
-                "fom": "2024-01-01",
-                "tom": "2024-01-20",
-                "utgift": 2000
+                "fom": "2025-01-01",
+                "tom": "2025-01-31",
+                "utgift": 2500
               }
             ]
           },
@@ -31,7 +34,7 @@
           "målgruppe": "NEDSATT_ARBEIDSEVNE",
           "aktivitet": "TILTAK"
         },
-        "stønadsbeløp": 2000
+        "stønadsbeløp" : 2500
       }
     ]
   }

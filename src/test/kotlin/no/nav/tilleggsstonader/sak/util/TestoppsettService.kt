@@ -117,7 +117,7 @@ class TestoppsettService(
     fun lagVedtak(
         behandling: Behandling,
         beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
-        vedtaksperioder: List<Vedtaksperiode>? = null,
+        vedtaksperioder: List<Vedtaksperiode> = emptyList(),
     ): GeneriskVedtak<InnvilgelseTilsynBarn> {
         val vedtak =
             innvilgetVedtak(

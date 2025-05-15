@@ -17,10 +17,11 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
+import java.time.Month.JANUARY
 import java.util.UUID
 
 object BoutgifterTestUtil {
-    val vedtaksperiodeIdFørstegangsbehandling = UUID.randomUUID()
+    val vedtaksperiodeIdFørstegangsbehandling: UUID = UUID.randomUUID()
 
     val vilkårperioder =
         Vilkårperioder(
@@ -70,11 +71,34 @@ object BoutgifterTestUtil {
         aktivitet = aktivitet,
     )
 
+    fun beregningsresultat(
+        fom: LocalDate = LocalDate.of(2025, JANUARY, 1),
+        tom: LocalDate = fom,
+    ) = BeregningsresultatBoutgifter(
+        perioder =
+            listOf(
+                lagBeregningsresultatMåned(
+                    fom = fom,
+                    tom = tom,
+                    utgifter =
+                        mapOf(
+                            TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
+                                listOf(
+                                    UtgiftBeregningBoutgifter(
+                                        fom = fom,
+                                        tom = tom,
+                                        utgift = 3000,
+                                    ),
+                                ),
+                        ),
+                ),
+            ),
+    )
+
     fun lagBeregningsresultatMåned(
         fom: LocalDate,
         tom: LocalDate = fom.withDayOfMonth(fom.lengthOfMonth()),
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
-        delAvTidligere: Boolean,
     ) = BeregningsresultatForLøpendeMåned(
         grunnlag =
             Beregningsgrunnlag(
@@ -87,6 +111,5 @@ object BoutgifterTestUtil {
                 målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 aktivitet = AktivitetType.TILTAK,
             ),
-        delAvTidligereUtbetaling = delAvTidligere,
     )
 }

@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
@@ -28,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class BoutgifterBeregningService(
@@ -78,9 +80,9 @@ class BoutgifterBeregningService(
 
         return if (forrigeVedtak != null) {
             settSammenGamleOgNyePerioder(
-                saksbehandling = behandling,
-                beregningsresultat = beregningsresultat,
-                forrigeVedtak = forrigeVedtak,
+                revurderFra = behandling.revurderFra ?: feil("Behandlingen mangler revurder fra-dato"),
+                nyttBeregningsresultat = beregningsresultat,
+                forrigeBeregningsresultat = forrigeVedtak.beregningsresultat,
             )
         } else {
             BeregningsresultatBoutgifter(perioder = beregningsresultat)
@@ -108,33 +110,24 @@ class BoutgifterBeregningService(
 
     /**
      * Slår sammen perioder fra forrige og nytt vedtak.
-     * Beholder perioder fra forrige vedtak frem til og med revurder-fra
-     * Bruker reberegnede perioder fra og med revurder-fra dato
-     * Dette gjøres for at vi ikke skal reberegne perioder før revurder-fra datoet
-     * Men vi trenger å reberegne perioder som løper i revurder-fra datoet da en periode kan ha endret utgift
+     * Beholder perioder fra forrige vedtak frem til revurder fra-datoen.
+     * Bruker reberegnede perioder fra og med revurder fra-datoen
+     * Dette gjøres for at vi ikke skal reberegne perioder som ikke er med i revurderingen, i tilfelle beregningskoden har endret seg siden sist.
+     * Vi trenger derimot å reberegne alle perioder som ligger etter revurder fra-datoen, da utgiftene, antall samlinger osv kan ha endret seg.
      */
     private fun settSammenGamleOgNyePerioder(
-        saksbehandling: Saksbehandling,
-        beregningsresultat: List<BeregningsresultatForLøpendeMåned>,
-        forrigeVedtak: InnvilgelseEllerOpphørBoutgifter,
+        revurderFra: LocalDate,
+        nyttBeregningsresultat: List<BeregningsresultatForLøpendeMåned>,
+        forrigeBeregningsresultat: BeregningsresultatBoutgifter,
     ): BeregningsresultatBoutgifter {
-        val revurderFra = saksbehandling.revurderFra
-        feilHvis(revurderFra == null) { "Behandling=$saksbehandling mangler revurderFra" }
-
-        val forrigeBeregningsresultat = forrigeVedtak.beregningsresultat
-
         val perioderFraForrigeVedtakSomSkalBeholdes =
-            forrigeBeregningsresultat
-                .perioder
-                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < revurderFra }
-                .map { it.markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling = true) }
-        val nyePerioder =
-            beregningsresultat
-                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() >= revurderFra }
+            forrigeBeregningsresultat.perioder.filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < revurderFra }
 
-        return BeregningsresultatBoutgifter(
-            perioder = perioderFraForrigeVedtakSomSkalBeholdes + nyePerioder,
-        )
+        val reberegnedePerioder =
+            nyttBeregningsresultat.filter {
+                it.inneholder(revurderFra) || it.fom.sisteDagenILøpendeMåned() > revurderFra
+            }
+        return BeregningsresultatBoutgifter(perioderFraForrigeVedtakSomSkalBeholdes + reberegnedePerioder)
     }
 
     private fun hentForrigeVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørBoutgifter? =
@@ -144,91 +137,6 @@ class BoutgifterBeregningService(
         vedtakRepository
             .findByIdOrThrow(behandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørBoutgifter>()
-
-//    fun beregnForOpphør(
-//        behandling: Saksbehandling,
-//        avkortetVedtaksperioder: List<Vedtaksperiode>,
-//    ): BeregningsresultatBoutgifter {
-//        feilHvis(behandling.forrigeIverksatteBehandlingId == null) {
-//            "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
-//        }
-//        feilHvis(behandling.revurderFra == null) {
-//            "revurderFra-dato er påkrevd for opphør"
-//        }
-//        val forrigeVedtak = hentVedtak(behandling.forrigeIverksatteBehandlingId)
-//        val avkortetBeregningsresultat = avkortBeregningsresultatVedOpphør(forrigeVedtak, behandling.revurderFra)
-//
-//        return beregningsresultatForOpphør(
-//            behandling = behandling,
-//            avkortetBeregningsresultat = avkortetBeregningsresultat,
-//            avkortetVedtaksperioder = avkortetVedtaksperioder,
-//        )
-//    }
-
-//    /**
-//     * Hvis man har avkortet siste måneden må man reberegne den i tilfelle % på aktiviteter har endret seg
-//     * Eks at man hadde 2 aktiviteter, 50 og 100% som då gir 100%.
-//     * Etter opphør så har man kun 50% og då trenger å omberegne perioden
-//     */
-//    private fun beregningsresultatForOpphør(
-//        behandling: Saksbehandling,
-//        avkortetBeregningsresultat: AvkortResult<BeregningsresultatForMåned>,
-//        avkortetVedtaksperioder: List<Vedtaksperiode>,
-//    ): BeregningsresultatBoutgifter {
-//        if (!avkortetBeregningsresultat.harAvkortetPeriode) {
-//            return BeregningsresultatBoutgifter(avkortetBeregningsresultat.perioder)
-//        }
-//
-//        return beregningsresultatOpphørMedReberegnetPeriode(
-//            behandling = behandling,
-//            avkortetBeregningsresultat = avkortetBeregningsresultat,
-//            avkortetVedtaksperioder = avkortetVedtaksperioder,
-//        )
-//    }
-
-//    private fun beregningsresultatOpphørMedReberegnetPeriode(
-//        behandling: Saksbehandling,
-//        avkortetBeregningsresultat: AvkortResult<BeregningsresultatForMåned>,
-//        avkortetVedtaksperioder: List<Vedtaksperiode>,
-//    ): BeregningsresultatBoutgifter {
-//        val perioderSomBeholdes = avkortetBeregningsresultat.perioder.dropLast(1)
-//        val periodeTilReberegning = avkortetBeregningsresultat.perioder.last()
-//
-//        val reberegnedePerioderKorrigertUtbetalingsdato =
-//            reberegnPerioderForOpphør(
-//                behandling = behandling,
-//                avkortetVedtaksperioder = avkortetVedtaksperioder,
-//                beregningsresultatTilReberegning = periodeTilReberegning,
-//            )
-//
-//        val nyePerioder =
-//            (perioderSomBeholdes + reberegnedePerioderKorrigertUtbetalingsdato)
-//                .map { it.markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling = false) }
-//        return BeregningsresultatBoutgifter(nyePerioder)
-//    }
-
-//    /**
-//     * Reberegner siste perioden då den er avkortet og ev skal få annet beløp utbetalt
-//     * Korrigerer utbetalingsdatoet då vedtaksperioden sånn at andelen som sen genereres for det utbetales på likt dato
-//     */
-//    private fun reberegnPerioderForOpphør(
-//        behandling: Saksbehandling,
-//        avkortetVedtaksperioder: List<Vedtaksperiode>,
-//        beregningsresultatTilReberegning: BeregningsresultatForMåned,
-//    ): List<BeregningsresultatForMåned> {
-//        val stønadsperioder = hentStønadsperioder(behandling.id)
-//        val vedtaksperioderSomOmregnes =
-//            vedtaksperioderInnenforLøpendeMåned(avkortetVedtaksperioder, beregningsresultatTilReberegning)
-//
-//        val reberegnedePerioder = beregn(behandling, vedtaksperioderSomOmregnes, stønadsperioder)
-//        feilHvisIkke(reberegnedePerioder.size <= 1) {
-//            "Når vi reberegner vedtaksperioder innenfor en måned burde vi få maks 1 reberegnet periode, faktiskAntall=${reberegnedePerioder.size}"
-//        }
-//
-//        return reberegnedePerioder.map {
-//            it.medKorrigertUtbetalingsdato(beregningsresultatTilReberegning.grunnlag.utbetalingsdato)
-//        }
-//    }
 
     private fun lagBeregningsGrunnlag(
         periode: UtbetalingPeriode,
@@ -290,7 +198,7 @@ private fun List<UtbetalingPeriode>.validerIngenUtbetalingsperioderOverlapperFle
 
     val detFinnesUtbetalingsperioderSomOverlapperFlereLøpendeUtgifter =
         any { utbetalingsperiode ->
-            fasteUtgifter.filter { utbetalingsperiode.overlapper(it) }.size > 1
+            fasteUtgifter.count { utbetalingsperiode.overlapper(it) } > 1
         }
 
     feilHvis(detFinnesUtbetalingsperioderSomOverlapperFlereLøpendeUtgifter) {
