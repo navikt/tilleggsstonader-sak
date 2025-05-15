@@ -24,8 +24,9 @@ object DetaljertVedtaksperioderBoutgifterMapper {
     }
 
     private fun finnVedtaksperioderMedLøpendeUtgifter(vedtak: InnvilgelseEllerOpphørBoutgifter): List<DetaljertVedtaksperiodeBoutgifter> {
-        val relevantePerioder = vedtak.beregningsresultat.perioder
-            .filter { it.grunnlag.utgifter.containsKey(TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG) }
+        val relevantePerioder =
+            vedtak.beregningsresultat.perioder
+                .filter { it.grunnlag.utgifter.containsKey(TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG) }
 
         return relevantePerioder
             .map { it.mapBeregningsresultatMndLøpendeUtgift() }
@@ -65,7 +66,6 @@ object DetaljertVedtaksperioderBoutgifterMapper {
             erLøpendeUtgift = true,
         )
 
-
     private fun beregnAndelAvUtgifterSomDekkes(
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
         makssats: Int,
@@ -74,17 +74,19 @@ object DetaljertVedtaksperioderBoutgifterMapper {
 
         var sumForMåned = 0
 
-        return utgifterOvernatting.map { utgift ->
-            val beløpSomDekkes = minOf(utgift.utgift, makssats - sumForMåned)
-            sumForMåned += beløpSomDekkes
+        return utgifterOvernatting
+            .sorted()
+            .map { utgift ->
+                val beløpSomDekkes = minOf(utgift.utgift, makssats - sumForMåned)
+                sumForMåned += beløpSomDekkes
 
-            UtgiftTilOvernatting(
-                fom = utgift.fom,
-                tom = utgift.tom,
-                utgift = utgift.utgift,
-                beløpSomDekkes = beløpSomDekkes,
-            )
-        }
+                UtgiftTilOvernatting(
+                    fom = utgift.fom,
+                    tom = utgift.tom,
+                    utgift = utgift.utgift,
+                    beløpSomDekkes = beløpSomDekkes,
+                )
+            }
     }
 
     private fun summerLøpendeUtgifterBo(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>): Int =
