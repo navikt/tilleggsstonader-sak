@@ -356,17 +356,3 @@ fun nyeOpplysningerMetadata(
     endringer = endringer,
     beskrivelse = beskrivelse,
 )
-
-fun vedtaksperiode(
-    id: UUID = UUID.randomUUID(),
-    fom: LocalDate = LocalDate.now(),
-    tom: LocalDate = LocalDate.now().plusDays(1),
-    aktivitet: AktivitetType = AktivitetType.TILTAK,
-    målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-) = Vedtaksperiode(
-    id = id,
-    fom = fom,
-    tom = tom,
-    aktivitet = aktivitet,
-    målgruppe = målgruppe,
-)
