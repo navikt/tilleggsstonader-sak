@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.sorterOgMergeSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperiodeLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.sorterOgMergeSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat

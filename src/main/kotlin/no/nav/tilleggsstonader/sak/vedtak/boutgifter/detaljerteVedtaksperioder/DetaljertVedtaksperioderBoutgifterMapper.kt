@@ -20,10 +20,19 @@ object DetaljertVedtaksperioderBoutgifterMapper {
             vedtak.beregningsresultat.perioder
                 .filter { it.grunnlag.utgifter.containsKey(TypeBoutgift.UTGIFTER_OVERNATTING) }
 
-        return relevantePerioder.map { it.mapBeregningsresultatMndTilDetaljertVedtaksperiode() }
+        return relevantePerioder.map { it.mapBeregningsresultatMndOvernatting() }
     }
 
-    private fun BeregningsresultatForLøpendeMåned.mapBeregningsresultatMndTilDetaljertVedtaksperiode(): DetaljertVedtaksperiodeBoutgifter {
+    private fun finnVedtaksperioderMedLøpendeUtgifter(vedtak: InnvilgelseEllerOpphørBoutgifter): List<DetaljertVedtaksperiodeBoutgifter> {
+        val relevantePerioder = vedtak.beregningsresultat.perioder
+            .filter { it.grunnlag.utgifter.containsKey(TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG) }
+
+        return relevantePerioder
+            .map { it.mapBeregningsresultatMndLøpendeUtgift() }
+            .sorterOgMergeSammenhengende()
+    }
+
+    private fun BeregningsresultatForLøpendeMåned.mapBeregningsresultatMndOvernatting(): DetaljertVedtaksperiodeBoutgifter {
         val utgifterTilOvernatting =
             beregnAndelAvUtgifterSomDekkes(
                 this.grunnlag.utgifter,
@@ -36,29 +45,26 @@ object DetaljertVedtaksperioderBoutgifterMapper {
             aktivitet = this.grunnlag.aktivitet,
             målgruppe = this.grunnlag.målgruppe,
             utgifterTilOvernatting = utgifterTilOvernatting,
-            totalUtgiftMåned = utgifterTilOvernatting.sumOf { it.utgift }, // kan droppes om vi ikke bruker den
-            stønadsbeløpMnd = utgifterTilOvernatting.sumOf { it.beløpSomDekkes }, // kan droppes om vi ikke bruker den
+            totalUtgiftMåned = utgifterTilOvernatting.sumOf { it.utgift },
+            stønadsbeløpMnd = utgifterTilOvernatting.sumOf { it.beløpSomDekkes },
             erLøpendeUtgift = false,
         )
     }
 
-    private fun finnVedtaksperioderMedLøpendeUtgifter(vedtak: InnvilgelseEllerOpphørBoutgifter): List<DetaljertVedtaksperiodeBoutgifter> =
-        vedtak.beregningsresultat.perioder
-            .filter { it.grunnlag.utgifter.containsKey(TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG) }
-            .map { resultatForMåned ->
-                DetaljertVedtaksperiodeBoutgifter(
-                    fom = resultatForMåned.fom,
-                    tom = resultatForMåned.tom,
-                    aktivitet = resultatForMåned.grunnlag.aktivitet,
-                    målgruppe = resultatForMåned.grunnlag.målgruppe,
-                    totalUtgiftMåned =
-                        summerLøpendeUtgifterBo(
-                            resultatForMåned.grunnlag.utgifter,
-                        ),
-                    stønadsbeløpMnd = resultatForMåned.stønadsbeløp,
-                    erLøpendeUtgift = true,
-                )
-            }.sorterOgMergeSammenhengende()
+    private fun BeregningsresultatForLøpendeMåned.mapBeregningsresultatMndLøpendeUtgift(): DetaljertVedtaksperiodeBoutgifter =
+        DetaljertVedtaksperiodeBoutgifter(
+            fom = this.fom,
+            tom = this.tom,
+            aktivitet = this.grunnlag.aktivitet,
+            målgruppe = this.grunnlag.målgruppe,
+            totalUtgiftMåned =
+                summerLøpendeUtgifterBo(
+                    this.grunnlag.utgifter,
+                ),
+            stønadsbeløpMnd = this.stønadsbeløp,
+            erLøpendeUtgift = true,
+        )
+
 
     private fun beregnAndelAvUtgifterSomDekkes(
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,

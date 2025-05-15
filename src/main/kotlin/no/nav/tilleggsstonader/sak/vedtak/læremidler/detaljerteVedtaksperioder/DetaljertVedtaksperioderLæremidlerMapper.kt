@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremid
 
 object DetaljertVedtaksperioderLæremidlerMapper {
     fun InnvilgelseEllerOpphørLæremidler.finnDetaljerteVedtaksperioder(): List<DetaljertVedtaksperiodeLæremidler> {
-        val vedtaksperioderFraBeregningsresultat: List<DetaljertVedtaksperiodeLæremidler> =
+        val vedtaksperioderFraBeregningsresultat =
             this.beregningsresultat.perioder.map { periode ->
                 DetaljertVedtaksperiodeLæremidler(
                     fom = periode.fom,

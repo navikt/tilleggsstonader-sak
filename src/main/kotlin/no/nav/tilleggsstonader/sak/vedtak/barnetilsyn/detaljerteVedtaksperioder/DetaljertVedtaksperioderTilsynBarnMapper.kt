@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBa
 
 object DetaljertVedtaksperioderTilsynBarnMapper {
     fun InnvilgelseEllerOpphørTilsynBarn.finnDetaljerteVedtaksperioder(): List<DetaljertVedtaksperiodeTilsynBarn> {
-        val vedtaksperioderFraBeregningsresultat: List<DetaljertVedtaksperiodeTilsynBarn> =
+        val vedtaksperioderFraBeregningsresultat =
             finnVedtaksperioderFraBeregningsresultatTilsynBarn(this.beregningsresultat)
 
         return vedtaksperioderFraBeregningsresultat.sorterOgMergeSammenhengende()
