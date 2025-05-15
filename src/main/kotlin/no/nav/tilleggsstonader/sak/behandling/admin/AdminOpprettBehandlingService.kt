@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class AdminOpprettBehandlingService(
@@ -40,6 +41,7 @@ class AdminOpprettBehandlingService(
         ident: String,
         valgteBarn: Set<String>,
         medBrev: Boolean,
+        kravMottatt: LocalDate,
     ): BehandlingId {
         validerOpprettelseAvBehandling(stønadstype, ident, valgteBarn)
 
@@ -50,6 +52,7 @@ class AdminOpprettBehandlingService(
             behandlingService.opprettBehandling(
                 fagsakId = fagsak.id,
                 behandlingsårsak = behandlingsårsak,
+                kravMottatt = kravMottatt,
             )
 
         if (valgteBarn.isNotEmpty()) {
