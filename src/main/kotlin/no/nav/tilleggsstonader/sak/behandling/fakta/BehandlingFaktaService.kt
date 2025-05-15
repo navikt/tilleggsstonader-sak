@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GrunnlagB
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.BoligEllerOvernattingAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.DelerUtgifterFlereStederType
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.DokumentasjonBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.FasteUtgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.Personopplysninger
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.TypeFasteUtgifter
@@ -96,6 +97,7 @@ class BehandlingFaktaService(
             søknadMottattTidspunkt = søknad?.mottattTidspunkt,
             hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
             aktiviteter = mapAktivitet(søknad?.data?.aktivitet),
+            dokumentasjon = søknad?.let { mapDokumentasjon(it.data.dokumentasjon, it.journalpostId) },
             arena = arenaFakta(grunnlagsdata),
             boligEllerOvernatting =
                 FaktaBoligEllerOvernatting(
@@ -333,6 +335,17 @@ class BehandlingFaktaService(
                     dokumenter = dokumentasjon.dokumenter.map { Dokument(it.dokumentInfoId) },
                     identBarn = dokumentasjon.identBarn,
                 )
+            }
+        return FaktaDokumentasjon(journalpostId, dokumentasjon)
+    }
+
+    private fun mapDokumentasjon(
+        dokumentasjonListe: List<DokumentasjonBoutgifter>,
+        journalpostId: String,
+    ): FaktaDokumentasjon {
+        val dokumentasjon =
+            dokumentasjonListe.map {
+                Dokumentasjon(type = it.tittel, dokumenter = listOf(Dokument(it.dokumentInfoId)))
             }
         return FaktaDokumentasjon(journalpostId, dokumentasjon)
     }

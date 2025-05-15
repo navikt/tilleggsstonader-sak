@@ -5,6 +5,7 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
@@ -346,7 +347,20 @@ class OpprettTestBehandlingController(
                 språk = Språkkode.NB,
                 skjema = skjemaBoutgifter,
             )
-        val journalpost = Journalpost("TESTJPID", Journalposttype.I, Journalstatus.FERDIGSTILT)
+        val journalpost =
+            Journalpost(
+                "TESTJPID",
+                Journalposttype.I,
+                Journalstatus.FERDIGSTILT,
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            tittel = "Søknad om boutgifter",
+                            dokumentInfoId = "dokumentInfoId",
+                            brevkode = "BOUTGIFTER",
+                        ),
+                    ),
+            )
         søknadService.lagreSøknad(behandling.id, journalpost, skjema)
     }
 
