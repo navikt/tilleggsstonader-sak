@@ -65,8 +65,8 @@ Egenskap: Beregning av faste utgifter
     Og følgende andeler for behandling=1
       | Fom        | Beløp | Type           | Utbetalingsdato |
       | 01.01.2025 | 1000  | BOUTGIFTER_AAP | 01.01.2025      |
-      | 03.02.2025 | 1000  | BOUTGIFTER_AAP | 01.02.2025      |
-      | 03.03.2025 | 1000  | BOUTGIFTER_AAP | 01.03.2025      |
+      | 03.02.2025 | 1000  | BOUTGIFTER_AAP | 03.02.2025      |
+      | 03.03.2025 | 1000  | BOUTGIFTER_AAP | 03.03.2025      |
       | 01.04.2025 | 1000  | BOUTGIFTER_AAP | 01.04.2025      |
 
 
@@ -83,7 +83,7 @@ Egenskap: Beregning av faste utgifter
 
     Så forvent følgende feilmelding: Vi støtter foreløpig ikke at utbetalingsperioder overlapper mer enn én løpende utgift.
 
-  Scenario: Vedtaksperiode krysser nyttår skal få satsBekreftet=false
+  Scenario: Vedtaksperiode krysser nyttår
 
     Gitt følgende boutgifter av type LØPENDE_UTGIFTER_TO_BOLIGER for behandling=1
       | Fom        | Tom        | Utgift |
@@ -104,9 +104,9 @@ Egenskap: Beregning av faste utgifter
     Og følgende andeler for behandling=1
       | Fom        | Beløp | Type           | Utbetalingsdato |
       | 01.11.2024 | 4809  | BOUTGIFTER_AAP | 15.11.2024      |
-      | 02.12.2024 | 4809  | BOUTGIFTER_AAP | 15.12.2024      |
+      | 02.12.2024 | 4809  | BOUTGIFTER_AAP | 16.12.2024      |
       | 01.01.2025 | 4953  | BOUTGIFTER_AAP | 15.01.2025      |
-      | 03.02.2025 | 4953  | BOUTGIFTER_AAP | 15.02.2025      |
+      | 03.02.2025 | 4953  | BOUTGIFTER_AAP | 17.02.2025      |
 
   Scenario: To påfølgende vedtaksperioder som dekker utgiften
     Gitt følgende boutgifter av type LØPENDE_UTGIFTER_TO_BOLIGER for behandling=1

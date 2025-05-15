@@ -29,11 +29,11 @@ Egenskap: Beregning ved opphør av boutgifter
       Så kan vi forvente følgende andeler for behandling=1
         | Fom        | Beløp | Type           | Utbetalingsdato |
         | 01.01.2025 | 1000  | BOUTGIFTER_AAP | 01.01.2025      |
-        | 03.02.2025 | 1000  | BOUTGIFTER_AAP | 01.02.2025      |
-        | 03.03.2025 | 1000  | BOUTGIFTER_AAP | 01.03.2025      |
+        | 03.02.2025 | 1000  | BOUTGIFTER_AAP | 03.02.2025      |
+        | 03.03.2025 | 1000  | BOUTGIFTER_AAP | 03.03.2025      |
     # Merk: 03.02.25 og 03.03.25 tilsvarer første ukedag i hhv februar og mars 2025
 
-      Og vi kopierer perioder fra forrige behandling for behandling=2
+      Når vi kopierer perioder fra forrige behandling for behandling=2
 
       Og vi opphører boutgifter behandling=2 med revurderFra=15.02.2025
 
@@ -42,10 +42,10 @@ Egenskap: Beregning ved opphør av boutgifter
         | 01.01.2025 | 31.01.2025 | 1000         | 4953      | 01.01.2025      |
         | 01.02.2025 | 14.02.2025 | 1000         | 4953      | 01.02.2025      |
 
-      Så kan vi forvente følgende andeler for behandling=2
+      Og følgende andeler for behandling=2
         | Fom        | Beløp | Type           | Utbetalingsdato |
         | 01.01.2025 | 1000  | BOUTGIFTER_AAP | 01.01.2025      |
-        | 03.02.2025 | 1000  | BOUTGIFTER_AAP | 01.02.2025      |
+        | 03.02.2025 | 1000  | BOUTGIFTER_AAP | 03.02.2025      |
 
       Og følgende vedtaksperioder for behandling=2
         | Fom        | Tom        | Målgruppe           | Aktivitet |
@@ -63,11 +63,12 @@ Egenskap: Beregning ved opphør av boutgifter
 
       Og følgende boutgifter av type LØPENDE_UTGIFTER_EN_BOLIG for behandling=1
         | Fom        | Tom        | Utgift |
-        | 01.01.2025 | 31.01.2025 | 99999  |
+        | 01.01.2025 | 28.02.2025 | 99999  |
 
       Og vi har lagret følgende beregningsresultat for behandling=1
         | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato |
         | 01.01.2025 | 31.01.2025 | 99999        | 4953      | 01.01.2025      |
+        | 01.02.2025 | 28.02.2025 | 99999        | 4953      | 03.02.2025      |
             # En latterlig stort stønadsbeløp, bare for å gjøre det ekstra tydelig at den ikke blir reberegnet og klippet til makssats
 
       Og vi kopierer perioder fra forrige behandling for behandling=2
