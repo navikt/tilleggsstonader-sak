@@ -6,4 +6,5 @@ data class DødsfallHendelse(
     val hendelseId: String,
     val dødsdato: LocalDate,
     val personidenter: Set<String>,
+    val erAnnullering: Boolean,
 )

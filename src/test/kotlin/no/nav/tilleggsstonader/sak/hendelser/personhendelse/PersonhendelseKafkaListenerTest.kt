@@ -22,7 +22,7 @@ class PersonhendelseKafkaListenerTest {
 
     @Test
     fun `motta hendelser om dødsfall og annet, verifiser dødsfall blir håndtert`() {
-        every { dødsfallHåndterer.håndterDødsfall(any()) } just runs
+        every { dødsfallHåndterer.håndter(any()) } just runs
         every { ack.acknowledge() } just runs
 
         val dødsfallHendelse =
@@ -51,8 +51,13 @@ class PersonhendelseKafkaListenerTest {
         )
 
         val forventetDødsfallHendelse =
-            DødsfallHendelse(dødsfallHendelse.hendelseId, dødsfallHendelse.doedsfall.doedsdato, dødsfallHendelse.personidenter.toSet())
-        verify(exactly = 1) { dødsfallHåndterer.håndterDødsfall(forventetDødsfallHendelse) }
+            DødsfallHendelse(
+                dødsfallHendelse.hendelseId,
+                dødsfallHendelse.doedsfall.doedsdato,
+                dødsfallHendelse.personidenter.toSet(),
+                false,
+            )
+        verify(exactly = 1) { dødsfallHåndterer.håndter(forventetDødsfallHendelse) }
         verify(exactly = 1) { ack.acknowledge() }
     }
 }

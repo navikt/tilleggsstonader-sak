@@ -24,6 +24,11 @@ interface HendelseRepository :
         type: TypeHendelse,
         id: String,
     ): Boolean
+
+    fun findByTypeAndId(
+        type: TypeHendelse,
+        id: String,
+    ): Hendelse?
 }
 
 /**
