@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
+import io.cucumber.java.no.Og
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
@@ -43,14 +44,16 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBo
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BoutgifterDomenenøkkel
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBoligDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoligerDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernattingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
@@ -64,6 +67,7 @@ import java.util.UUID
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class BoutgifterBeregnYtelseStegStepDefinitions {
+    var feil: Exception? = null
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     val vilkårperiodeRepositoryFake = VilkårperiodeRepositoryFake()
@@ -136,7 +140,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
 
     @Gitt("følgende boutgifter av type {} for behandling={}")
     fun `lagre utgifter`(
-        typeBoutgift: VilkårType,
+        typeBoutgift: TypeBoutgift,
         behandlingIdTall: Int,
         utgifterData: DataTable,
     ) {
@@ -146,12 +150,17 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 behandlingId = behandlingId,
                 steg = StegType.VILKÅR,
             )
-        val delvilkår = oppfylteDelvilkårLøpendeUtgifterEnBoligDto()
+        val delvilkår =
+            when (typeBoutgift) {
+                TypeBoutgift.UTGIFTER_OVERNATTING -> oppfylteDelvilkårUtgifterOvernattingDto()
+                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG -> oppfylteDelvilkårLøpendeUtgifterEnBoligDto()
+                TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER -> oppfylteDelvilkårLøpendeUtgifterToBoligerDto()
+            }
 
         val opprettVilkårDto =
             utgifterData.mapRad { rad ->
                 OpprettVilkårDto(
-                    vilkårType = typeBoutgift,
+                    vilkårType = typeBoutgift.tilVilkårType(),
                     behandlingId = behandlingId,
                     delvilkårsett = delvilkår,
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
@@ -177,7 +186,12 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 steg = StegType.BEREGNE_YTELSE,
             )
         val vedtaksperioder = mapVedtaksperioder(dataTable).map { it.tilDto() }
-        steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseBoutgifterRequest(vedtaksperioder))
+        try {
+            steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseBoutgifterRequest(vedtaksperioder))
+        } catch (e: Exception) {
+            logger.info(e.message)
+            feil = e
+        }
     }
 
 //    @Når("innvilger revurdering med vedtaksperioder for behandling={} med revurderFra={}")
@@ -271,6 +285,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     }
 
     @Så("kan vi forvente følgende beregningsresultat for behandling={}")
+    @Og("følgende beregningsresultat for behandling={}")
     fun `forvent beregningsresultatet`(
         behandlingIdTall: Int,
         dataTable: DataTable,
@@ -298,6 +313,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     }
 
     @Så("kan vi forvente følgende andeler for behandling={}")
+    @Og("følgende andeler for behandling={}")
     fun `forvent andeler`(
         behandlingIdTall: Int,
         dataTable: DataTable,
@@ -325,6 +341,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     }
 
     @Så("kan vi forvente følgende vedtaksperioder for behandling={}")
+    @Og("følgende vedtaksperioder for behandling={}")
     fun `forvent vedtaksperioder`(
         behandlingIdTall: Int,
         dataTable: DataTable,
@@ -345,6 +362,12 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             }
         }
         assertThat(vedtaksperioder).hasSize(forventedeVedtaksperioder.size)
+    }
+
+    @Så("forvent følgende feilmelding: {}")
+    fun `forvent følgende feil`(forventetFeilmelding: String) {
+        assertThat(feil).isNotNull
+        assertThat(feil?.message).contains(forventetFeilmelding)
     }
 
     private fun hentVedtak(behandlingId: BehandlingId): InnvilgelseEllerOpphørBoutgifter =
