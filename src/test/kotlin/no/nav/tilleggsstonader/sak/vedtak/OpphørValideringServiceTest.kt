@@ -98,6 +98,23 @@ class OpphørValideringServiceTest {
                 )
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato")
         }
+
+        @Test
+        fun `Skal ikke kaste feil hvis det finnes en utbetaling med 0 i beløp etter opphørsdato`() {
+            val beregningsresultatForMåned =
+                beregningsresultatForMåned(
+                    måned = måned,
+                    beløpsperioder = listOf(Beløpsperiode(dato = fom, 0, FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)),
+                )
+            val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = måned.atDay(1))
+
+            assertThatCode {
+                opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
+                    beregningsresultatTilsynBarn = BeregningsresultatTilsynBarn(listOf(beregningsresultatForMåned)),
+                    revurderFra = saksbehandlingRevurdertFraTilbakeITid.revurderFra,
+                )
+            }.doesNotThrowAnyException()
+        }
     }
 
     @Nested

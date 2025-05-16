@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
+import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -47,6 +48,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -74,6 +76,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Autowired
     val vedtakService: VedtakService,
 ) : IntegrationTest() {
+    @Autowired
+    private lateinit var registerAktivitetClient: RegisterAktivitetClient
     val fagsak = fagsak()
     val behandling = behandling(fagsak = fagsak)
     val saksbehandling = saksbehandling(behandling = behandling)
@@ -291,8 +295,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     tom = LocalDate.of(2023, 1, 31),
                     status = Vilkårstatus.ENDRET,
                 )
-            val målgruppeForOpphør =
-                målgruppe.copy(behandlingId = behandlingForOpphør.id, status = Vilkårstatus.UENDRET)
+            val målgruppeForOpphør = målgruppe.kopierTilBehandling(behandlingForOpphør.id)
 
             vilkårperiodeRepository.insert(aktivitetForOpphør)
             vilkårperiodeRepository.insert(målgruppeForOpphør)
@@ -319,6 +322,55 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             assertThat(tilkjentYtelse).hasSize(1)
             assertThat(vedtak.data.vedtaksperioder).isEqualTo(listOf(forventetVedtaksperioderForOpphør))
             assertThat(vedtak.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
+        }
+
+        /**
+         * I tilfeller der AAP opphører 2 februar 2025 som er en søndag, så revurderer man fra og med 3 februar 2025.
+         * I dette tilfelle kommer det finnes en beløpsperiode for 1 og 2 februar, med beløp 0kr.
+         * Problemet her er at dato i [Beløpsperiode] er 3 januar, då den settes til første ukesdagen i perioden.
+         * Så hadde vi tidligere validering at det ikke finnes noen beløpsperioder fra og med revurder-fra.
+         * Nå validerer vi kun at det ikke finnes noen beløpsperioder med et beløp større enn 0kr
+         */
+        @Test
+        fun `skal kunne opphøre første mandag i måneden der det finnes helgdager før mandagen`() {
+            val januar = januar.withYear(2025)
+            val februar = februar.withYear(2025)
+            val aktivitet = vilkårperiodeRepository.insert(aktivitet.copy(tom = februar.atEndOfMonth()))
+            val målgruppe = vilkårperiodeRepository.insert(målgruppe.copy(tom = februar.atEndOfMonth()))
+            lagVilkårForPeriode(saksbehandling, januar, februar, 100)
+
+            val element =
+                VedtaksperiodeDto(
+                    id = UUID.randomUUID(),
+                    fom = januar.atDay(1),
+                    tom = februar.atEndOfMonth(),
+                    målgruppeType = NEDSATT_ARBEIDSEVNE,
+                    aktivitetType = AktivitetType.TILTAK,
+                )
+            val innvilgelse = innvilgelseDto(listOf(element))
+            steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelse)
+
+            testoppsettService.ferdigstillBehandling(behandling = behandling)
+
+            val behandlingForOpphør =
+                testoppsettService
+                    .opprettRevurdering(
+                        revurderFra = LocalDate.of(2025, 2, 3),
+                        forrigeBehandling = behandling,
+                        fagsak = fagsak,
+                    ).let { saksbehandling(behandling = it) }
+
+            val aktivitetForOpphør = aktivitet.kopierTilBehandling(behandlingForOpphør.id)
+            val målgruppeForOpphør = målgruppe.kopierTilBehandling(behandlingForOpphør.id)
+
+            vilkårperiodeRepository.insert(aktivitetForOpphør)
+            vilkårperiodeRepository.insert(målgruppeForOpphør)
+            lagVilkårForPeriode(behandlingForOpphør, januar, februar, 100, status = VilkårStatus.UENDRET)
+
+            val vedtakDto = opphørDto()
+            assertThatCode {
+                steg.utførOgReturnerNesteSteg(behandlingForOpphør, vedtakDto)
+            }.doesNotThrowAnyException()
         }
     }
 
