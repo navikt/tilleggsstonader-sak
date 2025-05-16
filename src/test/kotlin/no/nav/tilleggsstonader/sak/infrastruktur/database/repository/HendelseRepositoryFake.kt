@@ -11,4 +11,9 @@ class HendelseRepositoryFake :
         type: TypeHendelse,
         id: String,
     ): Boolean = findAll().any { it.type == type && it.id == id }
+
+    override fun findByTypeAndId(
+        type: TypeHendelse,
+        id: String,
+    ): Hendelse? = findAll().firstOrNull { it.type == type && it.id == id }
 }

@@ -29,7 +29,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.1.20"
 
-    id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
+    id("io.github.androa.gradle.plugin.avro") version "0.0.12"
 
     id("org.cyclonedx.bom") version "2.2.0"
 }

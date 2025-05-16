@@ -369,6 +369,28 @@ internal class OppgaveServiceTest {
         verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == false }) }
     }
 
+    @Test
+    fun `lagBeskrivelseMelding uten eksisterende beskrivelse returnerer kun ny tekst`() {
+        val endring = "Endring gjort i oppgaven"
+        val nåværendeBeskrivelse = null
+
+        val formattertBeskrivelse = oppgaveService.lagBeskrivelseMelding(endring, nåværendeBeskrivelse)
+        assertThat(formattertBeskrivelse)
+            .startsWith("---")
+            .endsWith(endring)
+    }
+
+    @Test
+    fun `lagBeskrivelseMelding med eksisterende beskrivelse konkatinerer beskrivelsene`() {
+        val endring = "Endring gjort i oppgaven"
+        val nåværendeBeskrivelse = "Tidligere beskrivelse"
+
+        val formattertBeskrivelse = oppgaveService.lagBeskrivelseMelding(endring, nåværendeBeskrivelse)
+        assertThat(formattertBeskrivelse)
+            .startsWith("---")
+            .endsWith("$endring\n\n$nåværendeBeskrivelse")
+    }
+
     private fun mockOpprettOppgave(slot: CapturingSlot<OpprettOppgaveRequest>) {
         every { fagsakService.hentFagsakForBehandling(BEHANDLING_ID) } returns lagTestFagsak()
 

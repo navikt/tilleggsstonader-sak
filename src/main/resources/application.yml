@@ -230,3 +230,4 @@ clients:
 
 topics:
   journalhendelser: teamdokumenthandtering.aapen-dok-journalfoering
+  pdl-personhendelser: pdl.leesah-v1
