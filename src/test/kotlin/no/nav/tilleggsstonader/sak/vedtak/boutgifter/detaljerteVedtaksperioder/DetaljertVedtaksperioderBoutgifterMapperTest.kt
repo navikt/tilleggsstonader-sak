@@ -224,6 +224,41 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
             assertThat(resFeb.totalUtgiftMåned).isEqualTo(4000)
             assertThat(resFeb.stønadsbeløpMnd).isEqualTo(4000)
         }
+
+        @Test
+        fun `skal sortere utgifter til overnatting kronologisk`() {
+            val beregningsresultatJan =
+                BoutgifterTestUtil.lagBeregningsresultatMåned(
+                    fom = førsteJan,
+                    tom = sisteJan,
+                    utgifter =
+                        listOf(
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 1, 7),
+                                tom = LocalDate.of(2024, 1, 8),
+                                utgift = 8000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 1, 3),
+                                tom = LocalDate.of(2024, 1, 4),
+                                utgift = 1000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            )
+                        ).tilUtgiftMap(),
+                )
+
+            val vedtak = innvilgelseBoutgifter(listOf(beregningsresultatJan))
+
+            val res = vedtak.finnDetaljerteVedtaksperioder()
+
+            assertThat(res).hasSize(1)
+
+            val utgifter = res.first().utgifterTilOvernatting!!
+
+            assertThat(utgifter[0].fom).isEqualTo(LocalDate.of(2024, 1, 3))
+            assertThat(utgifter[1].fom).isEqualTo(LocalDate.of(2024, 1, 7))
+        }
     }
 
     @Nested
