@@ -6,13 +6,13 @@ import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
+import no.nav.tilleggsstonader.sak.cucumber.verifiserAtListerErLike
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
@@ -146,16 +146,10 @@ class StepDefinitions {
 
         assertThat(beregningException).isNull()
 
-        forventedeBeregningsperioder.forEachIndexed { index, periode ->
-            try {
-                assertThat(resultat!!.perioder[index]).isEqualTo(periode)
-            } catch (e: Throwable) {
-                val actual = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(periode)
-                logger.error("Feilet validering av rad ${index + 1} $actual")
-                throw e
-            }
-        }
-        assertThat(resultat?.perioder).hasSize(forventedeBeregningsperioder.size)
+        verifiserAtListerErLike(
+            faktisk = resultat!!.perioder,
+            forventet = forventedeBeregningsperioder,
+        )
     }
 
     @Så("forvent følgende feil fra læremidlerberegning: {}")

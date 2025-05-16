@@ -7,7 +7,6 @@ import io.cucumber.java.no.Og
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -20,6 +19,7 @@ import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.behandlingIdTilUUID
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.cucumber.verifiserAtListerErLike
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYtelseRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
@@ -51,6 +51,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BoutgifterDomenenøkkel
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
@@ -69,7 +70,6 @@ import java.util.UUID
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class BoutgifterBeregnYtelseStegStepDefinitions {
-    var feil: Exception? = null
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     val vilkårperiodeRepositoryFake = VilkårperiodeRepositoryFake()
@@ -127,6 +127,8 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             simuleringService = simuleringServiceMock,
         )
 
+    var feil: Exception? = null
+
     @Gitt("følgende oppfylte aktiviteter for behandling={}")
     fun `lagre aktiviteter`(
         behandlingIdTall: Int,
@@ -164,26 +166,39 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             )
         val delvilkår =
             when (typeBoutgift) {
-                TypeBoutgift.UTGIFTER_OVERNATTING -> oppfylteDelvilkårUtgifterOvernatting().map { it.tilDto() }
-                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG -> oppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() }
-                TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER -> oppfylteDelvilkårLøpendeUtgifterToBoliger().map { it.tilDto() }
-            }
+                TypeBoutgift.UTGIFTER_OVERNATTING -> oppfylteDelvilkårUtgifterOvernatting()
+                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG -> oppfylteDelvilkårLøpendeUtgifterEnBolig()
+                TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER -> oppfylteDelvilkårLøpendeUtgifterToBoliger()
+            }.map { it.tilDto() }
 
         val opprettVilkårDto =
-            utgifterData.mapRad { rad ->
-                OpprettVilkårDto(
-                    vilkårType = typeBoutgift.tilVilkårType(),
-                    behandlingId = behandlingId,
-                    delvilkårsett = delvilkår,
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    utgift = parseInt(BoutgifterDomenenøkkel.UTGIFT, rad),
-                    erFremtidigUtgift = false,
-                )
-            }
+            mapOpprettVIlkårDto(
+                typeBoutgift = typeBoutgift,
+                behandlingId = behandlingId,
+                utgifterData = utgifterData,
+                delvilkår = delvilkår,
+            )
 
         opprettVilkårDto.forEach { vilkårService.opprettNyttVilkår(it) }
     }
+
+    private fun mapOpprettVIlkårDto(
+        typeBoutgift: TypeBoutgift,
+        behandlingId: BehandlingId,
+        utgifterData: DataTable,
+        delvilkår: List<DelvilkårDto>,
+    ): List<OpprettVilkårDto> =
+        utgifterData.mapRad { rad ->
+            OpprettVilkårDto(
+                vilkårType = typeBoutgift.tilVilkårType(),
+                behandlingId = behandlingId,
+                delvilkårsett = delvilkår,
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                utgift = parseInt(BoutgifterDomenenøkkel.UTGIFT, rad),
+                erFremtidigUtgift = false,
+            )
+        }
 
     @Gitt("vi fjerner utgiftene på behandling={}")
     fun `sletter og legger inn nye utgifter`(behandlingIdTall: Int) {
@@ -204,11 +219,9 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 steg = StegType.BEREGNE_YTELSE,
             )
         val vedtaksperioder = mapVedtaksperioder(dataTable).map { it.tilDto() }
-        try {
+
+        kjørMedFeilkontekst {
             steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseBoutgifterRequest(vedtaksperioder))
-        } catch (e: Exception) {
-            logger.error(e.message)
-            feil = e
         }
     }
 
@@ -253,7 +266,8 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
-        try {
+
+        kjørMedFeilkontekst {
             steg.utførSteg(
                 dummyBehandling(behandlingId, revurderFra = revurderFra),
                 OpphørBoutgifterRequest(
@@ -261,9 +275,6 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                     begrunnelse = "begrunnelse",
                 ),
             )
-        } catch (e: Exception) {
-            logger.error(e.message)
-            feil = e
         }
     }
 
@@ -276,14 +287,12 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
         val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto() }
-        try {
+
+        kjørMedFeilkontekst {
             steg.utførSteg(
                 dummyBehandling(behandlingId, revurderFra = revurderFra),
                 InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder),
             )
-        } catch (e: Exception) {
-            logger.error(e.message)
-            feil = e
         }
     }
 
@@ -300,19 +309,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
 
         val beregningsresultat = hentVedtak(behandlingId).beregningsresultat
 
-        forventedeBeregningsperioder.forEachIndexed { index, periode ->
-            try {
-                assertThat(beregningsresultat.perioder[index]).isEqualTo(periode)
-            } catch (e: Throwable) {
-                val actual =
-                    objectMapper
-                        .writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(beregningsresultat.perioder[index])
-                logger.error("Feilet validering av rad ${index + 1} $actual")
-                throw e
-            }
-        }
-        assertThat(beregningsresultat.perioder).hasSize(forventedeBeregningsperioder.size)
+        verifiserAtListerErLike(faktisk = beregningsresultat.perioder, forventet = forventedeBeregningsperioder)
     }
 
     @Så("kan vi forvente følgende andeler for behandling={}")
@@ -331,16 +328,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 .andelerTilkjentYtelse
                 .sortedBy { it.fom }
 
-        andeler.map { ForenkletAndel(it) }.forEachIndexed { index, andel ->
-            try {
-                assertThat(andel).isEqualTo(forventedeAndeler[index])
-            } catch (e: Throwable) {
-                val actual = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(andel)
-                logger.error("Feilet validering av rad ${index + 1} $actual")
-                throw e
-            }
-        }
-        assertThat(andeler).hasSize(forventedeAndeler.size)
+        verifiserAtListerErLike(faktisk = andeler.map { ForenkletAndel(it) }, forventet = forventedeAndeler)
     }
 
     @Så("kan vi forvente følgende vedtaksperioder for behandling={}")
@@ -355,16 +343,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
 
         val forventedeVedtaksperioder = mapVedtaksperioder(dataTable)
 
-        forventedeVedtaksperioder.forEachIndexed { index, periode ->
-            try {
-                assertThat(vedtaksperioder[index]).isEqualTo(periode)
-            } catch (e: Throwable) {
-                val actual = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(periode)
-                logger.error("Feilet validering av rad ${index + 1} $actual")
-                throw e
-            }
-        }
-        assertThat(vedtaksperioder).hasSize(forventedeVedtaksperioder.size)
+        verifiserAtListerErLike(vedtaksperioder, forventedeVedtaksperioder)
     }
 
     @Så("forvent følgende feilmelding: {}")
@@ -401,6 +380,15 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             behandlingIdTilUUID.getValue(behandlingIdInt - 1)
         } else {
             null
+        }
+    }
+
+    private fun kjørMedFeilkontekst(block: () -> Unit) {
+        try {
+            block()
+        } catch (e: Exception) {
+            logger.error(e.message, e)
+            feil = e
         }
     }
 }

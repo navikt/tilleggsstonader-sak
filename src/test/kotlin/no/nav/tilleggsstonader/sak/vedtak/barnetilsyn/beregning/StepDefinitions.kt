@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
+import no.nav.tilleggsstonader.sak.cucumber.verifiserAtListerErLike
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -170,6 +171,7 @@ class StepDefinitions {
             }
 
         val perioder = beregningsresultat!!.perioder
+
         perioder.forEachIndexed { index, resultat ->
             val forventetResultat = forventetBeregningsresultat[index]
             try {
@@ -319,18 +321,7 @@ class StepDefinitions {
                 ?.beløpsperioder
                 ?: error("Finner ikke beregningsresultat for $måned")
 
-        beløpsperioder.forEachIndexed { index, resultat ->
-            val forventetResultat = forventedeBeløpsperioder[index]
-            try {
-                assertThat(resultat.dato).isEqualTo(forventetResultat.dato)
-                assertThat(resultat.beløp).isEqualTo(forventetResultat.beløp)
-                assertThat(resultat.målgruppe).isEqualTo(forventetResultat.målgruppe)
-            } catch (e: Throwable) {
-                logger.error("Feilet validering av rad ${index + 1}")
-                throw e
-            }
-        }
-        assertThat(beløpsperioder).hasSize(forventedeBeløpsperioder.size)
+        verifiserAtListerErLike(beløpsperioder, forventedeBeløpsperioder)
     }
 
     private fun parseForventedeVedtaksperioder(dataTable: DataTable): List<ForventedeVedtaksperioder> =
