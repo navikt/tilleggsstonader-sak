@@ -52,9 +52,10 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BoutgifterDomene
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBoligDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoligerDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernattingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoliger
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
@@ -163,9 +164,9 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             )
         val delvilkår =
             when (typeBoutgift) {
-                TypeBoutgift.UTGIFTER_OVERNATTING -> oppfylteDelvilkårUtgifterOvernattingDto()
-                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG -> oppfylteDelvilkårLøpendeUtgifterEnBoligDto()
-                TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER -> oppfylteDelvilkårLøpendeUtgifterToBoligerDto()
+                TypeBoutgift.UTGIFTER_OVERNATTING -> oppfylteDelvilkårUtgifterOvernatting().map { it.tilDto() }
+                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG -> oppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() }
+                TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER -> oppfylteDelvilkårLøpendeUtgifterToBoliger().map { it.tilDto() }
             }
 
         val opprettVilkårDto =

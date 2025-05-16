@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 
@@ -74,25 +73,6 @@ object BoutgifterRegelTestUtil {
             delvilkår(Vurdering(RegelId.DOKUMENTERT_UTGIFTER_BOLIG, SvarId.JA)),
             delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
         )
-
-    fun oppfylteDelvilkårUtgifterOvernattingDto() = oppfylteDelvilkårUtgifterOvernatting().map { it.tilDto() }
-
-    fun delvilkårFremtidigeUtgifterDto() = delvilkårFremtidigeUtgifter().map { it.tilDto() }
-
-    fun oppfylteDelvilkårLøpendeUtgifterEnBoligDto() = oppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() }
-
-    fun oppfylteDelvilkårLøpendeUtgifterToBoligerDto() = oppfylteDelvilkårLøpendeUtgifterToBoliger().map { it.tilDto() }
-
-    fun oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsakerDto() =
-        oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsaker().map {
-            it.tilDto()
-        }
-
-    fun ikkeOppfylteDelvilkårUtgifterOvernattingDto() = ikkeOppfylteDelvilkårUtgifterOvernatting().map { it.tilDto() }
-
-    fun ikkeOppfylteDelvilkårLøpendeUtgifterEnBoligDto() = ikkeOppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() }
-
-    fun ikkeOppfylteDelvilkårLøpendeUtgifterToBoligerDto() = ikkeOppfylteDelvilkårLøpendeUtgifterToBoliger().map { it.tilDto() }
 
     private fun delvilkår(vararg vurderinger: Vurdering) =
         Delvilkår(

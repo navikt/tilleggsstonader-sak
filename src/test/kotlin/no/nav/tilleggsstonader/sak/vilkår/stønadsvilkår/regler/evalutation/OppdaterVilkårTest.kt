@@ -10,20 +10,17 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.oppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.validerVilkårOgBeregnResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.delvilkårFremtidigeUtgifter
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.delvilkårFremtidigeUtgifterDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårLøpendeUtgifterEnBoligDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårLøpendeUtgifterToBoligerDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårUtgifterOvernattingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårLøpendeUtgifterEnBolig
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårLøpendeUtgifterToBoliger
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårUtgifterOvernatting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBoligDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoliger
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoligerDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsakerDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsaker
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernattingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
@@ -92,7 +89,7 @@ internal class OppdaterVilkårTest {
                     OpprettVilkårDto(
                         vilkårType = VilkårType.UTGIFTER_OVERNATTING,
                         behandlingId = behandlingId,
-                        delvilkårsett = oppfylteDelvilkårUtgifterOvernattingDto(),
+                        delvilkårsett = oppfylteDelvilkårUtgifterOvernatting().map { it.tilDto() },
                         fom = LocalDate.now(),
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
@@ -108,7 +105,7 @@ internal class OppdaterVilkårTest {
                     OpprettVilkårDto(
                         vilkårType = VilkårType.UTGIFTER_OVERNATTING,
                         behandlingId = behandlingId,
-                        delvilkårsett = delvilkårFremtidigeUtgifterDto(),
+                        delvilkårsett = delvilkårFremtidigeUtgifter().map { it.tilDto() },
                         fom = LocalDate.now(),
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
@@ -153,7 +150,7 @@ internal class OppdaterVilkårTest {
                     val dto =
                         opprettUtgifterOvernattingVilkårDto.copy(
                             utgift = null,
-                            delvilkårsett = ikkeOppfylteDelvilkårUtgifterOvernattingDto(),
+                            delvilkårsett = ikkeOppfylteDelvilkårUtgifterOvernatting().map { it.tilDto() },
                         )
                     validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, dto)
                 }
@@ -171,7 +168,7 @@ internal class OppdaterVilkårTest {
                     val dto =
                         opprettUtgifterOvernattingVilkårDto.copy(
                             utgift = 1000,
-                            delvilkårsett = delvilkårFremtidigeUtgifterDto(),
+                            delvilkårsett = delvilkårFremtidigeUtgifter().map { it.tilDto() },
                             erFremtidigUtgift = true,
                         )
                     assertDoesNotThrow { validerVilkårOgBeregnResultat(utgifterOvernattingVilkår, dto) }
@@ -182,7 +179,7 @@ internal class OppdaterVilkårTest {
                     val dto =
                         opprettUtgifterOvernattingVilkårDto.copy(
                             utgift = 1000,
-                            delvilkårsett = oppfylteDelvilkårUtgifterOvernattingDto(),
+                            delvilkårsett = oppfylteDelvilkårUtgifterOvernatting().map { it.tilDto() },
                             erFremtidigUtgift = true,
                         )
                     assertThatThrownBy {
@@ -200,7 +197,7 @@ internal class OppdaterVilkårTest {
                     OpprettVilkårDto(
                         vilkårType = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
                         behandlingId = behandlingId,
-                        delvilkårsett = oppfylteDelvilkårLøpendeUtgifterEnBoligDto(),
+                        delvilkårsett = oppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() },
                         fom = LocalDate.now(),
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
@@ -236,7 +233,7 @@ internal class OppdaterVilkårTest {
                     val dto =
                         opprettVilkårDto.copy(
                             utgift = null,
-                            delvilkårsett = ikkeOppfylteDelvilkårLøpendeUtgifterEnBoligDto(),
+                            delvilkårsett = ikkeOppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() },
                         )
                     validerVilkårOgBeregnResultat(vilkår, dto)
                 }
@@ -248,7 +245,7 @@ internal class OppdaterVilkårTest {
                     OpprettVilkårDto(
                         vilkårType = VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
                         behandlingId = behandlingId,
-                        delvilkårsett = oppfylteDelvilkårLøpendeUtgifterToBoligerDto(),
+                        delvilkårsett = oppfylteDelvilkårLøpendeUtgifterToBoliger().map { it.tilDto() },
                         fom = LocalDate.now(),
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
@@ -284,7 +281,7 @@ internal class OppdaterVilkårTest {
                     val dto =
                         opprettVilkårDto.copy(
                             utgift = null,
-                            delvilkårsett = ikkeOppfylteDelvilkårLøpendeUtgifterToBoligerDto(),
+                            delvilkårsett = ikkeOppfylteDelvilkårLøpendeUtgifterToBoliger().map { it.tilDto() },
                         )
                     validerVilkårOgBeregnResultat(vilkår, dto)
                 }
@@ -294,7 +291,10 @@ internal class OppdaterVilkårTest {
                     val dto =
                         opprettVilkårDto.copy(
                             utgift = 500,
-                            delvilkårsett = oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsakerDto(),
+                            delvilkårsett =
+                                oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsaker().map {
+                                    it.tilDto()
+                                },
                         )
 
                     assertThatThrownBy {
