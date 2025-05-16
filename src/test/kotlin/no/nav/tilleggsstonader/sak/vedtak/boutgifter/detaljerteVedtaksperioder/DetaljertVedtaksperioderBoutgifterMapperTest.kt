@@ -18,22 +18,6 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
     val sisteJan = LocalDate.of(2024, 1, 31)
     val førsteFeb = LocalDate.of(2024, 2, 1)
     val sisteFeb = LocalDate.of(2024, 2, 29)
-    /*
-     * Overnatting:
-     * [X] To utgifter i hver sin 30 dagers periode skal ikke slås sammen (en over makssats og en under)
-     *
-     * [X] 3 utgifter i samme 30 dagersperiode -> en ender med beløp dekket = 0
-     * Sjekke utregning av "beløp som dekkes"
-     *
-     * Løpende utgifter:
-     * [X] Test 1: to mnd med løpende utgifter som skal slås sammen
-     *
-     * Felles:
-     * [x] Sjekke at de kommer som to ulike perioder og ikke slås sammen hvis det finnes to utgifter i samme beregningsmånedresultat
-     * assertThat(res.overnatting.utgifter).isEqual(overnattingsutgifter) OBS: skal ikke summere inn løpende utgifter
-     * */
-
-    // TODO: teste sortering av utgifter
 
     @Nested
     inner class DetaljertVedtaksperioderOvernatting {
