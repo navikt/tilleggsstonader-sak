@@ -32,7 +32,7 @@ class OpprettDødsfallOppgaveTask(
 
         val person = personService.hentPersonUtenBarn(dødsfallHendelse.personidenter.first())
 
-        if (personErFortsattDød(person.søker)) {
+        if (dødsfallHendelse.erAnnullering || personErFortsattDød(person.søker)) {
             val folkeregisterIdent =
                 person.søker.folkeregisteridentifikator
                     .first { it.status == FolkeregisteridentifikatorStatus.I_BRUK }
