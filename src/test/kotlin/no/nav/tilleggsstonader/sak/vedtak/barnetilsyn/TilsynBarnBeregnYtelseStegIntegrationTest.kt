@@ -295,7 +295,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     tom = LocalDate.of(2023, 1, 31),
                     status = Vilkårstatus.ENDRET,
                 )
-            val målgruppeForOpphør = målgruppe.kopierTilBehandling(behandlingForOpphør.id)
+            val målgruppeForOpphør =
+                målgruppe.copy(behandlingId = behandlingForOpphør.id, status = Vilkårstatus.UENDRET)
 
             vilkårperiodeRepository.insert(aktivitetForOpphør)
             vilkårperiodeRepository.insert(målgruppeForOpphør)
