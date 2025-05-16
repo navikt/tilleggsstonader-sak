@@ -18,6 +18,13 @@ enum class TypeBoutgift {
     LØPENDE_UTGIFTER_TO_BOLIGER,
     ;
 
+    fun tilVilkårType() =
+        when (this) {
+            UTGIFTER_OVERNATTING -> VilkårType.UTGIFTER_OVERNATTING
+            LØPENDE_UTGIFTER_EN_BOLIG -> VilkårType.LØPENDE_UTGIFTER_EN_BOLIG
+            LØPENDE_UTGIFTER_TO_BOLIGER -> VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER
+        }
+
     companion object {
         fun fraVilkårType(vilkårType: VilkårType) =
             when (vilkårType) {

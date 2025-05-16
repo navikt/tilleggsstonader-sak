@@ -19,6 +19,7 @@ object BoutgifterRegelTestUtil {
             ),
             delvilkår(Vurdering(regelId = RegelId.DOKUMENTERT_UTGIFTER_OVERNATTING, svar = SvarId.JA)),
             delvilkår(Vurdering(regelId = RegelId.DOKUMENTERT_DELTAKELSE, svar = SvarId.JA)),
+            delvilkår(Vurdering(regelId = RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, svar = SvarId.NEI)),
         )
 
     fun delvilkårFremtidigeUtgifter() =
@@ -26,6 +27,7 @@ object BoutgifterRegelTestUtil {
             delvilkår(Vurdering(regelId = RegelId.NØDVENDIGE_MERUTGIFTER, svar = null)),
             delvilkår(Vurdering(regelId = RegelId.DOKUMENTERT_UTGIFTER_OVERNATTING, svar = null)),
             delvilkår(Vurdering(regelId = RegelId.DOKUMENTERT_DELTAKELSE, svar = null)),
+            delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, null)),
         )
 
     fun oppfylteDelvilkårLøpendeUtgifterEnBolig() =
@@ -55,6 +57,7 @@ object BoutgifterRegelTestUtil {
             delvilkår(Vurdering(RegelId.NØDVENDIGE_MERUTGIFTER, SvarId.NEI, "begrunnelse")),
             delvilkår(Vurdering(RegelId.DOKUMENTERT_DELTAKELSE, SvarId.JA)),
             delvilkår(Vurdering(RegelId.DOKUMENTERT_UTGIFTER_OVERNATTING, SvarId.JA)),
+            delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
         )
 
     fun ikkeOppfylteDelvilkårLøpendeUtgifterEnBolig() =

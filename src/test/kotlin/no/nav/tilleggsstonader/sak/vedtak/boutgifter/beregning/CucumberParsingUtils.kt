@@ -34,17 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import java.time.LocalDate
 import java.util.UUID
 
-// Trenger denne fordi det ellers vil bli unik UUID per vedtaksperiode, som gjør at sammenlikningen blir misfornøyd
 val vedtaksperiodeId: UUID = UUID.randomUUID()
-
-fun mapUtgifter(dataTable: DataTable): List<UtgiftBeregningBoutgifter> =
-    dataTable.mapRad { rad ->
-        UtgiftBeregningBoutgifter(
-            fom = parseDato(DomenenøkkelFelles.FOM, rad),
-            tom = parseDato(DomenenøkkelFelles.TOM, rad),
-            utgift = parseInt(BoutgifterDomenenøkkel.UTGIFT, rad),
-        )
-    }
 
 fun mapMålgrupper(
     målgruppeData: DataTable,
@@ -150,9 +140,10 @@ data class ForenkletAndel(
 
 fun mapAndeler(dataTable: DataTable) =
     dataTable.mapRad { rad ->
+        val fom = parseDato(DomenenøkkelFelles.FOM, rad)
         ForenkletAndel(
-            fom = parseDato(DomenenøkkelFelles.FOM, rad),
-            tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad) ?: parseDato(DomenenøkkelFelles.FOM, rad),
+            fom = fom,
+            tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad) ?: fom,
             beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
             satstype = parseValgfriEnum<Satstype>(DomenenøkkelAndelTilkjentYtelse.SATS, rad) ?: Satstype.DAG,
             type = parseEnum(DomenenøkkelAndelTilkjentYtelse.TYPE, rad),

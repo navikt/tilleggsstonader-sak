@@ -33,7 +33,12 @@ object BoutgifterAndelTilkjentYtelseMapper {
                         "Alle perioder for et utbetalingsdato må være bekreftet eller ikke bekreftet"
                     }
 
-                    mapTilAndeler(perioder, saksbehandling, utbetalingsdato, satsBekreftet)
+                    mapTilAndeler(
+                        perioder = perioder,
+                        saksbehandling = saksbehandling,
+                        utbetalingsdato = utbetalingsdato.datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                        satsBekreftet = satsBekreftet,
+                    )
                 }
         return andeler
     }

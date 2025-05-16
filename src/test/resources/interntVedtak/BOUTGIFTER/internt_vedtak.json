@@ -146,6 +146,13 @@
         "svar" : "Ja",
         "begrunnelse" : null
       } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har søker høyere utgifter grunnet helsemessige årsaker?",
+        "svar" : "Nei",
+        "begrunnelse" : null
+      } ]
     } ],
     "fødselsdatoBarn" : null,
     "fom" : "2024-02-01",
@@ -173,6 +180,13 @@
       "vurderinger" : [ {
         "regel" : "Har søker dokumentert at de har samling/eksamen/opptaksprøve/kurs på datoene for overnatting?",
         "svar" : "Ja",
+        "begrunnelse" : null
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har søker høyere utgifter grunnet helsemessige årsaker?",
+        "svar" : "Nei",
         "begrunnelse" : null
       } ]
     } ],

@@ -1,11 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
-import no.nav.tilleggsstonader.sak.util.lørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.util.inneholderUkedag
+import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import java.time.LocalDate
 
 object LæremidlerVedtaksperiodeUtil {
@@ -31,7 +30,7 @@ object LæremidlerVedtaksperiodeUtil {
             val nyTom = minOf(gjeldendeFom.sisteDagenILøpendeMåned(), tom)
 
             val nyPeriode = medNyPeriode(gjeldendeFom, nyTom)
-            if (nyPeriode.harDatoerIUkedager()) {
+            if (nyPeriode.inneholderUkedag()) {
                 perioder.add(nyPeriode)
             }
 
@@ -39,13 +38,6 @@ object LæremidlerVedtaksperiodeUtil {
         }
         return perioder
     }
-
-    fun LocalDate.sisteDagenILøpendeMåned(): LocalDate = this.plusMonths(1).minusDays(1)
-
-    private fun <P : Periode<LocalDate>> P.harDatoerIUkedager(): Boolean =
-        this
-            .alleDatoer()
-            .any { dato -> !dato.lørdagEllerSøndag() }
 }
 
 data class VedtaksperiodeInnenforÅr(

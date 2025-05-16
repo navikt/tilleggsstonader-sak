@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
+import io.cucumber.java.no.Og
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
@@ -25,6 +26,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepos
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -43,14 +45,16 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBo
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BoutgifterDomenenøkkel
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBoligDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoligerDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernattingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
@@ -64,6 +68,7 @@ import java.util.UUID
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class BoutgifterBeregnYtelseStegStepDefinitions {
+    var feil: Exception? = null
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     val vilkårperiodeRepositoryFake = VilkårperiodeRepositoryFake()
@@ -95,18 +100,27 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             vilkårperiodeService = vilkårperiodeServiceMock,
         )
     val simuleringServiceMock = mockk<SimuleringService>(relaxed = true)
+    val unleashService =
+        mockk<UnleashService>().apply {
+            every { isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT) } returns true
+        }
     val beregningService =
         BoutgifterBeregningService(
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepositoryFake,
-            unleashService = mockk<UnleashService>(relaxed = true),
+            unleashService = unleashService,
+        )
+    val opphørValideringService =
+        OpphørValideringService(
+            vilkårsperiodeService = vilkårperiodeServiceMock,
+            vilkårService = vilkårService,
         )
     val steg =
         BoutgifterBeregnYtelseSteg(
             beregningService =
             beregningService,
-            opphørValideringService = mockk<OpphørValideringService>(relaxed = true), // TODO: Vurder om denne skal være streng
+            opphørValideringService = opphørValideringService,
             vedtakRepository = vedtakRepositoryFake,
             tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepositoryFake),
             simuleringService = simuleringServiceMock,
@@ -135,8 +149,9 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     }
 
     @Gitt("følgende boutgifter av type {} for behandling={}")
+    @Og("vi legger inn følgende nye utgifter av type {} for behandling={}")
     fun `lagre utgifter`(
-        typeBoutgift: VilkårType,
+        typeBoutgift: TypeBoutgift,
         behandlingIdTall: Int,
         utgifterData: DataTable,
     ) {
@@ -146,12 +161,17 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 behandlingId = behandlingId,
                 steg = StegType.VILKÅR,
             )
-        val delvilkår = oppfylteDelvilkårLøpendeUtgifterEnBoligDto()
+        val delvilkår =
+            when (typeBoutgift) {
+                TypeBoutgift.UTGIFTER_OVERNATTING -> oppfylteDelvilkårUtgifterOvernattingDto()
+                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG -> oppfylteDelvilkårLøpendeUtgifterEnBoligDto()
+                TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER -> oppfylteDelvilkårLøpendeUtgifterToBoligerDto()
+            }
 
         val opprettVilkårDto =
             utgifterData.mapRad { rad ->
                 OpprettVilkårDto(
-                    vilkårType = typeBoutgift,
+                    vilkårType = typeBoutgift.tilVilkårType(),
                     behandlingId = behandlingId,
                     delvilkårsett = delvilkår,
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
@@ -162,6 +182,12 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             }
 
         opprettVilkårDto.forEach { vilkårService.opprettNyttVilkår(it) }
+    }
+
+    @Gitt("vi fjerner utgiftene på behandling={}")
+    fun `sletter og legger inn nye utgifter`(behandlingIdTall: Int) {
+        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        vilkårRepositoryFake.deleteByBehandlingId(behandlingId)
     }
 
     @Når("vi innvilger boutgifter for behandling={} med følgende vedtaksperioder")
@@ -177,26 +203,14 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 steg = StegType.BEREGNE_YTELSE,
             )
         val vedtaksperioder = mapVedtaksperioder(dataTable).map { it.tilDto() }
-        steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseBoutgifterRequest(vedtaksperioder))
+        try {
+            steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseBoutgifterRequest(vedtaksperioder))
+        } catch (e: Exception) {
+            logger.error(e.message)
+            feil = e
+        }
     }
 
-//    @Når("innvilger revurdering med vedtaksperioder for behandling={} med revurderFra={}")
-//    fun `innvilger vedtaksperioder for behandling={} med revurderFra={}`(
-//        behandlingIdTall: Int,
-//        revurderFraStr: String,
-//        dataTable: DataTable,
-//    ) {
-//        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
-//        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-//        val revurderFra = parseDato(revurderFraStr)
-//
-//        val vedtaksperioder = mapVedtaksperioderDto(dataTable)
-//        steg.utførSteg(dummyBehandling(behandlingId, revurderFra), InnvilgelseBoutgifterRequest(vedtaksperioder))
-//    }
-
-    /**
-     * Her forutsetter vi at vi har lagret både utgifter og på behandlingen først
-     */
     @Gitt("vi kopierer perioder fra forrige behandling for behandling={}")
     fun `kopierer perioder`(behandlingIdTall: Int) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
@@ -230,29 +244,6 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             )
         vedtakRepositoryFake.insert(vedtak)
     }
-//
-//    @Gitt("lagrer andeler behandling={}")
-//    fun `lagrer andeler`(
-//        behandlingIdTall: Int,
-//        dataTable: DataTable,
-//    ) {
-//        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-//
-//        val andeler =
-//            mapAndeler(dataTable)
-//                .map {
-//                    AndelTilkjentYtelse(
-//                        beløp = it.beløp,
-//                        fom = it.fom,
-//                        tom = it.tom,
-//                        satstype = it.satstype,
-//                        type = it.type,
-//                        kildeBehandlingId = behandlingId,
-//                        utbetalingsdato = it.utbetalingsdato,
-//                    )
-//                }.toSet()
-//        tilkjentYtelseRepository.insert(TilkjentYtelse(behandlingId = behandlingId, andelerTilkjentYtelse = andeler))
-//    }
 
     @Når("vi opphører boutgifter behandling={} med revurderFra={}")
     fun `opphør med revurderFra`(
@@ -261,16 +252,42 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
-        steg.utførSteg(
-            dummyBehandling(behandlingId, revurderFra = revurderFra),
-            OpphørBoutgifterRequest(
-                årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
-                begrunnelse = "begrunnelse",
-            ),
-        )
+        try {
+            steg.utførSteg(
+                dummyBehandling(behandlingId, revurderFra = revurderFra),
+                OpphørBoutgifterRequest(
+                    årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
+                    begrunnelse = "begrunnelse",
+                ),
+            )
+        } catch (e: Exception) {
+            logger.error(e.message)
+            feil = e
+        }
+    }
+
+    @Når("vi innvilger boutgifter behandling={} med revurderFra={} med følgende vedtaksperioder")
+    fun `innvilgelse med revurderFra`(
+        behandlingIdTall: Int,
+        revurderFraStr: String,
+        vedtaksperiodeData: DataTable,
+    ) {
+        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val revurderFra = parseDato(revurderFraStr)
+        val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto() }
+        try {
+            steg.utførSteg(
+                dummyBehandling(behandlingId, revurderFra = revurderFra),
+                InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder),
+            )
+        } catch (e: Exception) {
+            logger.error(e.message)
+            feil = e
+        }
     }
 
     @Så("kan vi forvente følgende beregningsresultat for behandling={}")
+    @Og("følgende beregningsresultat for behandling={}")
     fun `forvent beregningsresultatet`(
         behandlingIdTall: Int,
         dataTable: DataTable,
@@ -298,6 +315,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     }
 
     @Så("kan vi forvente følgende andeler for behandling={}")
+    @Og("følgende andeler for behandling={}")
     fun `forvent andeler`(
         behandlingIdTall: Int,
         dataTable: DataTable,
@@ -325,6 +343,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     }
 
     @Så("kan vi forvente følgende vedtaksperioder for behandling={}")
+    @Og("følgende vedtaksperioder for behandling={}")
     fun `forvent vedtaksperioder`(
         behandlingIdTall: Int,
         dataTable: DataTable,
@@ -345,6 +364,12 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             }
         }
         assertThat(vedtaksperioder).hasSize(forventedeVedtaksperioder.size)
+    }
+
+    @Så("forvent følgende feilmelding: {}")
+    fun `forvent følgende feil`(forventetFeilmelding: String) {
+        assertThat(feil).isNotNull
+        assertThat(feil?.message).contains(forventetFeilmelding)
     }
 
     private fun hentVedtak(behandlingId: BehandlingId): InnvilgelseEllerOpphørBoutgifter =
