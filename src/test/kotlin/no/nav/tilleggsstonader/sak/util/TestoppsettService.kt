@@ -60,7 +60,7 @@ class TestoppsettService(
         opprettGrunnlagsdata: Boolean = true,
         identer: Set<PersonIdent> = defaultIdenter,
     ): Behandling {
-        val person = opprettPerson(fagsak(identer = identer))
+        val person = hentEllerOpprettPerson(fagsak(identer = identer))
         lagreFagsak(
             fagsak(
                 id = behandling.fagsakId,
