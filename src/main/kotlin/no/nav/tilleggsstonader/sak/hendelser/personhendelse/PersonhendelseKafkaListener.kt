@@ -5,6 +5,7 @@ import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.tilleggsstonader.sak.hendelser.personhendelse.dødsfall.DødsfallHendelse
 import no.nav.tilleggsstonader.sak.hendelser.personhendelse.dødsfall.DødsfallHåndterer
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.slf4j.MDC
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
@@ -15,6 +16,10 @@ import org.springframework.stereotype.Service
 class PersonhendelseKafkaListener(
     private val dødsfallHåndterer: DødsfallHåndterer,
 ) {
+    companion object {
+        private const val MDC_HENDELSE_ID_KEY = "hendelseId"
+    }
+
     @KafkaListener(
         id = "tilleggsstonader-sak",
         topics = ["\${topics.pdl-personhendelser}"],
@@ -29,7 +34,12 @@ class PersonhendelseKafkaListener(
             .filter { it.erDødsfall() }
             .map { it.tilDødsfallDomene() }
             .forEach {
-                dødsfallHåndterer.håndter(it)
+                try {
+                    MDC.put(MDC_HENDELSE_ID_KEY, it.hendelseId)
+                    dødsfallHåndterer.håndter(it)
+                } finally {
+                    MDC.remove(MDC_HENDELSE_ID_KEY)
+                }
             }
 
         acknowledgment.acknowledge()
