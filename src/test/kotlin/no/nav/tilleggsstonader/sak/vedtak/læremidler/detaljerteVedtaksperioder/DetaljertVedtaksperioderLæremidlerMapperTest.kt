@@ -28,12 +28,14 @@ class DetaljertVedtaksperioderLæremidlerMapperTest {
 
     @Test
     fun `skal slå sammen sammenhengende vedtaksperioder med like verdier`() {
-        val vedtak = innvilgetVedtak(
-            beregningsresulat = listOf(
-                beregningsresultatForMåned(førsteJan, sisteJan),
-                beregningsresultatForMåned(førsteFeb, sisteFeb)
+        val vedtak =
+            innvilgetVedtak(
+                beregningsresulat =
+                    listOf(
+                        beregningsresultatForMåned(førsteJan, sisteJan),
+                        beregningsresultatForMåned(førsteFeb, sisteFeb),
+                    ),
             )
-        )
 
         val res = vedtak.finnDetaljerteVedtaksperioder()
         val forventetRes = listOf(detaljertVedtaksperiodeLæremidler(fom = førsteJan, tom = sisteFeb, antallMåneder = 2))
@@ -44,19 +46,22 @@ class DetaljertVedtaksperioderLæremidlerMapperTest {
     fun `skal ikke slå sammen vedtaksperioder som ikke overlapper`() {
         val beregningsresultatForApril = beregningsresultatForMåned(førsteJan, sisteFeb)
 
-        val vedtak = innvilgetVedtak(
-            beregningsresulat = listOf(
-                beregningsresultatForMåned(førsteApril, sisteApril),
-                beregningsresultatForMåned(førsteFeb, sisteFeb)
+        val vedtak =
+            innvilgetVedtak(
+                beregningsresulat =
+                    listOf(
+                        beregningsresultatForMåned(førsteApril, sisteApril),
+                        beregningsresultatForMåned(førsteFeb, sisteFeb),
+                    ),
             )
-        )
 
         val res = vedtak.finnDetaljerteVedtaksperioder()
 
-        val forventetRes = listOf(
-            detaljertVedtaksperiodeLæremidler(fom = førsteFeb, tom = sisteFeb),
-            detaljertVedtaksperiodeLæremidler(fom = førsteApril, tom = sisteApril)
-        )
+        val forventetRes =
+            listOf(
+                detaljertVedtaksperiodeLæremidler(fom = førsteFeb, tom = sisteFeb),
+                detaljertVedtaksperiodeLæremidler(fom = førsteApril, tom = sisteApril),
+            )
 
         assertThat(res).isEqualTo(forventetRes)
     }
@@ -89,7 +94,7 @@ class DetaljertVedtaksperioderLæremidlerMapperTest {
         tom: LocalDate,
         antallMåneder: Int = 1,
         aktivitet: AktivitetType = defaultAktivitet,
-        målgruppe: FaktiskMålgruppe = defaultMålgruppe
+        målgruppe: FaktiskMålgruppe = defaultMålgruppe,
     ) = DetaljertVedtaksperiodeLæremidler(
         fom = fom,
         tom = tom,
