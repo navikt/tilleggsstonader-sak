@@ -32,35 +32,37 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
      * assertThat(res.overnatting.utgifter).isEqual(overnattingsutgifter) OBS: skal ikke summere inn løpende utgifter
      * */
 
+    // TODO: teste sortering av utgifter
+
     @Nested
     inner class DetaljertVedtaksperioderOvernatting {
         @Test
-        fun `skal ikke slå sammen 3 utgifter i samme 30 dagersperiode - sjekker utregning av beløpet som dekkes`() {
+        fun `skal ikke slå sammen utgifter i samme 30 dagersperiode og beløp som dekkes skal minkes for hver utgift`() {
             val beregningsresultat =
                 BoutgifterTestUtil.lagBeregningsresultatMåned(
                     fom = førsteJan,
                     tom = sisteJan,
                     utgifter =
-                        mapOf(
-                            TypeBoutgift.UTGIFTER_OVERNATTING to
-                                listOf(
-                                    UtgiftBeregningBoutgifter(
-                                        fom = LocalDate.of(2024, 1, 3),
-                                        tom = LocalDate.of(2024, 1, 4),
-                                        utgift = 4000,
-                                    ),
-                                    UtgiftBeregningBoutgifter(
-                                        fom = LocalDate.of(2024, 1, 7),
-                                        tom = LocalDate.of(2024, 1, 8),
-                                        utgift = 1000,
-                                    ),
-                                    UtgiftBeregningBoutgifter(
-                                        fom = LocalDate.of(2024, 1, 10),
-                                        tom = LocalDate.of(2024, 1, 11),
-                                        utgift = 1000,
-                                    ),
-                                ),
-                        ),
+                        listOf(
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 1, 3),
+                                tom = LocalDate.of(2024, 1, 4),
+                                utgift = 4000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 1, 7),
+                                tom = LocalDate.of(2024, 1, 8),
+                                utgift = 1000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 1, 10),
+                                tom = LocalDate.of(2024, 1, 11),
+                                utgift = 1000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                        ).tilUtgiftMap(),
                 )
 
             val vedtak =
@@ -113,21 +115,20 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                     fom = førsteJan,
                     tom = sisteJan,
                     utgifter =
-                        mapOf(
-                            TypeBoutgift.UTGIFTER_OVERNATTING to
-                                listOf(
-                                    UtgiftBeregningBoutgifter(
-                                        fom = LocalDate.of(2024, 1, 3),
-                                        tom = LocalDate.of(2024, 1, 4),
-                                        utgift = 8000,
-                                    ),
-                                    UtgiftBeregningBoutgifter(
-                                        fom = LocalDate.of(2024, 1, 7),
-                                        tom = LocalDate.of(2024, 1, 8),
-                                        utgift = 1000,
-                                    ),
-                                ),
-                        ),
+                        listOf(
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 1, 3),
+                                tom = LocalDate.of(2024, 1, 4),
+                                utgift = 8000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 1, 7),
+                                tom = LocalDate.of(2024, 1, 8),
+                                utgift = 1000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                        ).tilUtgiftMap(),
                 )
 
             val vedtak =
@@ -174,16 +175,14 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                     fom = førsteJan,
                     tom = sisteJan,
                     utgifter =
-                        mapOf(
-                            TypeBoutgift.UTGIFTER_OVERNATTING to
-                                listOf(
-                                    UtgiftBeregningBoutgifter(
-                                        fom = LocalDate.of(2024, 1, 3),
-                                        tom = LocalDate.of(2024, 1, 4),
-                                        utgift = 8000,
-                                    ),
-                                ),
-                        ),
+                        listOf(
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 1, 3),
+                                tom = LocalDate.of(2024, 1, 4),
+                                utgift = 8000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                        ).tilUtgiftMap(),
                 )
 
             val beregningsresultatFeb =
@@ -191,22 +190,27 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                     fom = førsteFeb,
                     tom = sisteFeb,
                     utgifter =
-                        mapOf(
-                            TypeBoutgift.UTGIFTER_OVERNATTING to
-                                listOf(
-                                    UtgiftBeregningBoutgifter(
-                                        fom = LocalDate.of(2024, 2, 10),
-                                        tom = LocalDate.of(2024, 2, 15),
-                                        utgift = 4000,
-                                    ),
-                                ),
-                        ),
+                        listOf(
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 2, 10),
+                                tom = LocalDate.of(2024, 2, 15),
+                                utgift = 4000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                        ).tilUtgiftMap(),
                 )
 
             val vedtak =
                 InnvilgelseBoutgifter(
                     vedtaksperioder = emptyList(),
-                    beregningsresultat = BeregningsresultatBoutgifter(perioder = listOf(beregningsresultatJan, beregningsresultatFeb)),
+                    beregningsresultat =
+                        BeregningsresultatBoutgifter(
+                            perioder =
+                                listOf(
+                                    beregningsresultatJan,
+                                    beregningsresultatFeb,
+                                ),
+                        ),
                 )
 
             val res = vedtak.finnDetaljerteVedtaksperioder()
@@ -240,31 +244,27 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                         fom = førsteJan,
                         tom = sisteJan,
                         utgifter =
-                            mapOf(
-                                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
-                                    listOf(
-                                        UtgiftBeregningBoutgifter(
-                                            fom = førsteJan,
-                                            tom = sisteJan,
-                                            utgift = 4000,
-                                        ),
-                                    ),
-                            ),
+                            listOf(
+                                UtgifterMedType(
+                                    fom = førsteJan,
+                                    tom = sisteJan,
+                                    utgift = 4000,
+                                    type = TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG,
+                                ),
+                            ).tilUtgiftMap(),
                     ),
                     BoutgifterTestUtil.lagBeregningsresultatMåned(
                         fom = førsteFeb,
                         tom = sisteFeb,
                         utgifter =
-                            mapOf(
-                                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
-                                    listOf(
-                                        UtgiftBeregningBoutgifter(
-                                            fom = førsteFeb,
-                                            tom = sisteFeb,
-                                            utgift = 4000,
-                                        ),
-                                    ),
-                            ),
+                            listOf(
+                                UtgifterMedType(
+                                    fom = førsteFeb,
+                                    tom = sisteFeb,
+                                    utgift = 4000,
+                                    TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG,
+                                ),
+                            ).tilUtgiftMap(),
                     ),
                 )
 
@@ -299,29 +299,26 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                     fom = førsteJan,
                     tom = sisteJan,
                     utgifter =
-                        mapOf(
-                            TypeBoutgift.UTGIFTER_OVERNATTING to
-                                listOf(
-                                    UtgiftBeregningBoutgifter(
-                                        fom = LocalDate.of(2024, 1, 3),
-                                        tom = LocalDate.of(2024, 1, 4),
-                                        utgift = 8000,
-                                    ),
-                                    UtgiftBeregningBoutgifter(
-                                        fom = LocalDate.of(2024, 1, 7),
-                                        tom = LocalDate.of(2024, 1, 8),
-                                        utgift = 1000,
-                                    ),
-                                ),
-                            TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
-                                listOf(
-                                    UtgiftBeregningBoutgifter(
-                                        fom = førsteJan,
-                                        tom = sisteJan,
-                                        utgift = 4000,
-                                    ),
-                                ),
-                        ),
+                        listOf(
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 1, 3),
+                                tom = LocalDate.of(2024, 1, 4),
+                                utgift = 8000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 1, 7),
+                                tom = LocalDate.of(2024, 1, 8),
+                                utgift = 1000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                            UtgifterMedType(
+                                fom = førsteJan,
+                                tom = sisteJan,
+                                utgift = 4000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                        ).tilUtgiftMap(),
                 )
 
             val vedtak =
@@ -358,29 +355,26 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                     fom = førsteJan,
                     tom = sisteJan,
                     utgifter =
-                        mapOf(
-                            TypeBoutgift.UTGIFTER_OVERNATTING to
-                                listOf(
-                                    UtgiftBeregningBoutgifter(
-                                        fom = LocalDate.of(2024, 1, 3),
-                                        tom = LocalDate.of(2024, 1, 4),
-                                        utgift = 8000,
-                                    ),
-                                    UtgiftBeregningBoutgifter(
-                                        fom = LocalDate.of(2024, 1, 7),
-                                        tom = LocalDate.of(2024, 1, 8),
-                                        utgift = 1000,
-                                    ),
-                                ),
-                            TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
-                                listOf(
-                                    UtgiftBeregningBoutgifter(
-                                        fom = førsteJan,
-                                        tom = sisteJan,
-                                        utgift = 4000,
-                                    ),
-                                ),
-                        ),
+                        listOf(
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 1, 3),
+                                tom = LocalDate.of(2024, 1, 4),
+                                utgift = 8000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 1, 7),
+                                tom = LocalDate.of(2024, 1, 8),
+                                utgift = 1000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                            UtgifterMedType(
+                                fom = førsteJan,
+                                tom = sisteJan,
+                                utgift = 4000,
+                                type = TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG,
+                            ),
+                        ).tilUtgiftMap(),
                 )
 
             val beregningsresultatForFebruar =
@@ -388,22 +382,27 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                     fom = førsteFeb,
                     tom = sisteFeb,
                     utgifter =
-                        mapOf(
-                            TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
-                                listOf(
-                                    UtgiftBeregningBoutgifter(
-                                        fom = førsteFeb,
-                                        tom = sisteFeb,
-                                        utgift = 4000,
-                                    ),
-                                ),
-                        ),
+                        listOf(
+                            UtgifterMedType(
+                                fom = førsteFeb,
+                                tom = sisteFeb,
+                                utgift = 4000,
+                                type = TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG,
+                            ),
+                        ).tilUtgiftMap(),
                 )
 
             val vedtak =
                 InnvilgelseBoutgifter(
                     vedtaksperioder = emptyList(),
-                    beregningsresultat = BeregningsresultatBoutgifter(perioder = listOf(beregningsresultat, beregningsresultatForFebruar)),
+                    beregningsresultat =
+                        BeregningsresultatBoutgifter(
+                            perioder =
+                                listOf(
+                                    beregningsresultat,
+                                    beregningsresultatForFebruar,
+                                ),
+                        ),
                 )
 
             val res = vedtak.finnDetaljerteVedtaksperioder()
@@ -428,4 +427,24 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
             assertThat(løpende.totalUtgiftMåned).isEqualTo(4000)
         }
     }
+
+    data class UtgifterMedType(
+        val fom: LocalDate,
+        val tom: LocalDate,
+        val utgift: Int,
+        val type: TypeBoutgift,
+    )
+
+    private fun List<UtgifterMedType>.tilUtgiftMap(): Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        this
+            .groupBy { it.type }
+            .mapValues { entry ->
+                entry.value.map {
+                    UtgiftBeregningBoutgifter(
+                        fom = it.fom,
+                        tom = it.tom,
+                        utgift = it.utgift,
+                    )
+                }
+            }
 }
