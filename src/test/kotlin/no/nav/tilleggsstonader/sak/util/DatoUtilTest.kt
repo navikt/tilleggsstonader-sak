@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -112,6 +113,45 @@ class DatoUtilTest {
         fun `lørdag og søndag skal gi true`() {
             assertThat(LocalDate.of(2025, 1, 4).lørdagEllerSøndag()).isTrue() // lørdag
             assertThat(LocalDate.of(2025, 1, 5).lørdagEllerSøndag()).isTrue() // søndag
+        }
+    }
+
+    @Nested
+    inner class InneholderUkedag {
+        @Test
+        fun `periode som kun inneholder helg skal gi false`() {
+            val datoperiode1 = Datoperiode(LocalDate.of(2025, 1, 4), LocalDate.of(2025, 1, 5))
+            val datoperiode2 = Datoperiode(LocalDate.of(2025, 1, 4), LocalDate.of(2025, 1, 5))
+
+            assertThat(datoperiode1.inneholderUkedag()).isFalse
+            assertThat(datoperiode2.inneholderUkedag()).isFalse
+        }
+
+        @Test
+        fun `periode som kun inneholder en ukesdag skal gi true`() {
+            val kunUkedag = Datoperiode(LocalDate.of(2025, 1, 3), LocalDate.of(2025, 1, 3))
+            assertThat(kunUkedag.inneholderUkedag()).isTrue
+        }
+
+        @Test
+        fun `periode som kun en ukesdag og en helgdag skal gi true`() {
+            val ukedagOgHelg = Datoperiode(LocalDate.of(2025, 1, 3), LocalDate.of(2025, 1, 4))
+
+            assertThat(ukedagOgHelg.inneholderUkedag()).isTrue
+        }
+
+        @Test
+        fun `periode som kun inneholder en ukesdag som er rød dag skal gi true`() {
+            val rødDag = Datoperiode(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1))
+
+            assertThat(rødDag.inneholderUkedag()).isTrue
+        }
+
+        @Test
+        fun `periode som går fra søndag til søndag en annen uke skal gi true`() {
+            val rødDag = Datoperiode(LocalDate.of(2025, 1, 5), LocalDate.of(2025, 1, 12))
+
+            assertThat(rødDag.inneholderUkedag()).isTrue
         }
     }
 }

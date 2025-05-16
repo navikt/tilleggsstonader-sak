@@ -1,9 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.util.lørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.util.inneholderUkedag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
@@ -22,7 +21,7 @@ object BoutgifterVedtaksperiodeUtil {
             val nyTom = minOf(gjeldendeFom.sisteDagenILøpendeMåned(), tom)
 
             val nyPeriode = medNyPeriode(gjeldendeFom, nyTom)
-            if (nyPeriode.harDatoerIUkedager()) {
+            if (nyPeriode.inneholderUkedag()) {
                 perioder.add(nyPeriode)
             }
 
@@ -32,11 +31,6 @@ object BoutgifterVedtaksperiodeUtil {
     }
 
     fun LocalDate.sisteDagenILøpendeMåned(): LocalDate = this.plusMonths(1).minusDays(1)
-
-    private fun <P : Periode<LocalDate>> P.harDatoerIUkedager(): Boolean =
-        this
-            .alleDatoer()
-            .any { dato -> !dato.lørdagEllerSøndag() }
 }
 
 /**
