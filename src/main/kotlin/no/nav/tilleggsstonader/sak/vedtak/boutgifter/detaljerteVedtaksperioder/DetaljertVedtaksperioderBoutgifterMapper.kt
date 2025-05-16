@@ -47,11 +47,19 @@ object DetaljertVedtaksperioderBoutgifterMapper {
             målgruppe = this.grunnlag.målgruppe,
             utgifterTilOvernatting = utgifterTilOvernatting,
             totalUtgiftMåned = utgifterTilOvernatting.sumOf { it.utgift },
-            stønadsbeløpMnd = utgifterTilOvernatting.sumOf { it.beløpSomDekkes }, // bruk stønadsbeløp direkte
+            stønadsbeløpMnd = utgifterTilOvernatting.sumOf { it.beløpSomDekkes },
             erLøpendeUtgift = false,
         )
     }
 
+    /**
+     * Bruker min(sumLøpendeUtgifter, makssats) for å håndtere fremtidig case hvor bruker kan ha både
+     * løpende utgifter og overnatting i samme måned. Da vil disse vises i to ulike perioder og stønadsbeløpet
+     * som ligger i grunnlaget for måneden vil være summen av både løpende utgifter og overnatting.
+     *
+     * Gjort for å unngå følgende: løpende utgift 4000, overnatting 1000 -> stønadsbeløp = makssats,
+     * men det vil være høyere enn det som står som utgift på denne raden
+     */
     private fun BeregningsresultatForLøpendeMåned.mapBeregningsresultatMndLøpendeUtgift(): DetaljertVedtaksperiodeBoutgifter {
         val sumLøpendeUtgifter =
             summerLøpendeUtgifterBo(
@@ -69,6 +77,13 @@ object DetaljertVedtaksperioderBoutgifterMapper {
         )
     }
 
+    /**
+     * Utgifter til overnatting og løpende utgifter vises hver for seg.
+     * For hver overnatting ønsker man å se beløpet som dekkes, som baserer seg på hvor mye man har fått før
+     * og kan begrenses av makssats.
+     *
+     * Utgifter fra samlinger trekkes fra makssats først, slik at det som dekkes på samlinger beregnes på det gjenstående den måneden.
+     */
     private fun beregnAndelAvUtgifterSomDekkes(
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
         makssats: Int,
