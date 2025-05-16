@@ -40,11 +40,13 @@ class OpphørValideringService(
         brukerfeilHvis(revurderFra == null) { "Revurder fra dato er påkrevd for opphør" }
 
         beregningsresultatTilsynBarn.perioder.forEach { periode ->
-            periode.beløpsperioder.forEach {
-                brukerfeilHvis(
-                    it.dato >= revurderFra,
-                ) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato" }
-            }
+            periode.beløpsperioder
+                .filter { it.beløp > 0 }
+                .forEach {
+                    brukerfeilHvis(
+                        it.dato >= revurderFra,
+                    ) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato" }
+                }
         }
     }
 
