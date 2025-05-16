@@ -59,7 +59,7 @@ class DødsfallHåndterer(
                 Hendelse(
                     type = TypeHendelse.PERSONHENDELSE,
                     id = dødsfallHendelse.hendelseId,
-                    metadata = mapOf("taskId" to lagretTask.id.toString()),
+                    metadata = mapOf("taskId" to listOf(lagretTask.id.toString())),
                 ),
             )
         }
