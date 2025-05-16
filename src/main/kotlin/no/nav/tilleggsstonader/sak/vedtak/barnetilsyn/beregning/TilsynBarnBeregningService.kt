@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.util.inneholderUkedag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -116,17 +117,19 @@ class TilsynBarnBeregningService(
         } ?: emptyList()
 
     private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<BeregningsresultatForMåned> =
-        beregningsgrunnlag.map {
-            val dagsats = beregnDagsats(it)
-            val beløpsperioder = lagBeløpsperioder(dagsats, it)
+        beregningsgrunnlag
+            .filter { it.vedtaksperiodeGrunnlag.any { it.vedtaksperiode.inneholderUkedag() } }
+            .map {
+                val dagsats = beregnDagsats(it)
+                val beløpsperioder = lagBeløpsperioder(dagsats, it)
 
-            BeregningsresultatForMåned(
-                dagsats = dagsats,
-                månedsbeløp = beløpsperioder.sumOf { it.beløp },
-                grunnlag = it,
-                beløpsperioder = beløpsperioder,
-            )
-        }
+                BeregningsresultatForMåned(
+                    dagsats = dagsats,
+                    månedsbeløp = beløpsperioder.sumOf { it.beløp },
+                    grunnlag = it,
+                    beløpsperioder = beløpsperioder,
+                )
+            }
 
     private fun lagBeløpsperioder(
         dagsats: BigDecimal,

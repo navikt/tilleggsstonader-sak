@@ -317,7 +317,7 @@ class StepDefinitions {
                 .perioder
                 .find { it.grunnlag.måned == måned }
                 ?.beløpsperioder
-                ?: error("Finner ikke beregningsresultat for $måned")
+                ?: emptyList()
 
         beløpsperioder.forEachIndexed { index, resultat ->
             val forventetResultat = forventedeBeløpsperioder[index]

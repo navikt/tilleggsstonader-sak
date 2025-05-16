@@ -66,3 +66,33 @@ Egenskap: Beregning - Håndtering av helgdager
       | Dato       | Beløp | Målgruppe           |
       # 01.04.2023 er en lørdag, lager en beløpsperiode som er
       | 03.04.2023 | 591   | NEDSATT_ARBEIDSEVNE |
+
+  Scenario: Lager ikke beløpsperiode når periode i måned kun gjelder helg
+    Gitt følgende aktiviteter
+      | Fom        | Tom        | Aktivitet | Aktivitetsdager |
+      | 01.01.2025 | 31.03.2025 | TILTAK    | 5               |
+
+    Gitt følgende målgrupper
+      | Fom        | Tom        | Målgruppe |
+      | 01.01.2025 | 31.03.2025 | AAP       |
+
+    Gitt følgende utgifter for barn med id: 1
+      | Fom     | Tom     | Utgift |
+      | 01.2025 | 02.2025 | 1000   |
+
+    Gitt følgende vedtaksperioder
+      | Fom        | Tom        | Aktivitet | Målgruppe           |
+      | 01.01.2025 | 02.02.2025 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+
+    Når beregner
+
+    Så forvent følgende beregningsresultat
+      | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
+      | 01.2025 | 29.53   | 23           | 1000   | 679         |
+
+    Så forvent følgende beløpsperioder for: 01.2025
+      | Dato       | Beløp | Målgruppe           |
+      | 01.01.2025 | 679   | NEDSATT_ARBEIDSEVNE |
+
+    Så forvent følgende beløpsperioder for: 02.2025
+      | Dato       | Beløp | Målgruppe           |
