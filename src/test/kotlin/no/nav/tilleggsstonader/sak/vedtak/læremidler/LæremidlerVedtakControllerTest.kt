@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -40,9 +40,9 @@ class LæremidlerVedtakControllerTest : IntegrationTest() {
 
         avslåVedtak(behandling, vedtak)
 
-        val lagretDto = hentVedtak(behandling.id).body!!
+        val lagretDto = hentVedtak<AvslagLæremidlerDto>(behandling.id).body!!
 
-        assertThat((lagretDto as AvslagLæremidlerDto).årsakerAvslag).isEqualTo(vedtak.årsakerAvslag)
+        assertThat(lagretDto.årsakerAvslag).isEqualTo(vedtak.årsakerAvslag)
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
         assertThat(lagretDto.type).isEqualTo(TypeVedtak.AVSLAG)
     }
@@ -58,8 +58,8 @@ class LæremidlerVedtakControllerTest : IntegrationTest() {
         )
     }
 
-    private fun hentVedtak(behandlingId: BehandlingId) =
-        restTemplate.exchange<VedtakLæremidlerDto>(
+    private inline fun <reified T : VedtakLæremidlerResponse> hentVedtak(behandlingId: BehandlingId) =
+        restTemplate.exchange<T>(
             localhost("api/vedtak/laremidler/$behandlingId"),
             HttpMethod.GET,
             HttpEntity(null, headers),

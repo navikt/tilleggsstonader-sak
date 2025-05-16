@@ -15,8 +15,10 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterDto
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterResponse
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -74,14 +76,14 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
     @Test
     fun `skal validere token`() {
         headers.clear()
-        val exception = catchProblemDetailException { hentVedtak(BehandlingId.random()) }
+        val exception = catchProblemDetailException { hentVedtak<InnvilgelseBoutgifterResponse>(BehandlingId.random()) }
 
         assertThat(exception.httpStatus).isEqualTo(HttpStatus.UNAUTHORIZED)
     }
 
     @Test
     fun `hent vedtak skal returnere tom body når det ikke finnes noen lagrede vedtak`() {
-        val response = hentVedtak(dummyBehandling.id)
+        val response = hentVedtak<InnvilgelseBoutgifterResponse>(dummyBehandling.id)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(response.body).isNull()
@@ -99,9 +101,9 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
 
             avslåVedtak(dummyBehandling, avslag)
 
-            val lagretDto = hentVedtak(dummyBehandling.id).body!!
+            val lagretDto = hentVedtak<AvslagBoutgifterDto>(dummyBehandling.id).body!!
 
-            assertThat((lagretDto as AvslagBoutgifterDto).årsakerAvslag).isEqualTo(avslag.årsakerAvslag)
+            assertThat(lagretDto.årsakerAvslag).isEqualTo(avslag.årsakerAvslag)
             assertThat(lagretDto.begrunnelse).isEqualTo(avslag.begrunnelse)
             assertThat(lagretDto.type).isEqualTo(TypeVedtak.AVSLAG)
         }
@@ -169,9 +171,9 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
 
             opphørVedtak(revurdering, opphørVedtak)
 
-            val lagretDto = hentVedtak(revurdering.id).body!!
+            val lagretDto = hentVedtak<OpphørBoutgifterResponse>(revurdering.id).body!!
 
-            assertThat((lagretDto as OpphørBoutgifterRequest).årsakerOpphør).isEqualTo(opphørVedtak.årsakerOpphør)
+            assertThat((lagretDto).årsakerOpphør).isEqualTo(opphørVedtak.årsakerOpphør)
             assertThat(lagretDto.begrunnelse).isEqualTo(opphørVedtak.begrunnelse)
             assertThat(lagretDto.type).isEqualTo(TypeVedtak.OPPHØR)
         }
@@ -199,8 +201,8 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
         )
     }
 
-    private fun hentVedtak(behandlingId: BehandlingId) =
-        restTemplate.exchange<VedtakBoutgifterDto>(
+    private inline fun <reified T : VedtakBoutgifterResponse> hentVedtak(behandlingId: BehandlingId) =
+        restTemplate.exchange<T>(
             localhost("api/vedtak/boutgifter/$behandlingId"),
             HttpMethod.GET,
             HttpEntity(null, headers),
