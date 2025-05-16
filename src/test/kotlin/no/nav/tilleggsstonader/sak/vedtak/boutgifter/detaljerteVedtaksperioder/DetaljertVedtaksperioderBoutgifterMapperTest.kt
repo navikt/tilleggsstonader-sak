@@ -420,8 +420,9 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
 
             val løpende = res.last()
             assertThat(løpende.fom).isEqualTo(førsteJan)
-            assertThat(løpende.tom).isEqualTo(sisteJan)
+            assertThat(løpende.tom).isEqualTo(sisteFeb)
             assertThat(løpende.erLøpendeUtgift).isTrue()
+            assertThat(løpende.antallMåneder).isEqualTo(2)
             assertThat(løpende.utgifterTilOvernatting).isNullOrEmpty()
             assertThat(løpende.stønadsbeløpMnd).isEqualTo(4000)
             assertThat(løpende.totalUtgiftMåned).isEqualTo(4000)
