@@ -149,6 +149,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     }
 
     @Gitt("følgende boutgifter av type {} for behandling={}")
+    @Og("vi legger inn følgende nye utgifter av type {} for behandling={}")
     fun `lagre utgifter`(
         typeBoutgift: TypeBoutgift,
         behandlingIdTall: Int,
@@ -183,6 +184,12 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         opprettVilkårDto.forEach { vilkårService.opprettNyttVilkår(it) }
     }
 
+    @Gitt("vi fjerner utgiftene på behandling={}")
+    fun `sletter og legger inn nye utgifter`(behandlingIdTall: Int) {
+        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        vilkårRepositoryFake.deleteByBehandlingId(behandlingId)
+    }
+
     @Når("vi innvilger boutgifter for behandling={} med følgende vedtaksperioder")
     fun `følgende vedtaksperioder`(
         behandlingIdTall: Int,
@@ -199,28 +206,11 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         try {
             steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseBoutgifterRequest(vedtaksperioder))
         } catch (e: Exception) {
-            logger.info(e.message)
+            logger.error(e.message)
             feil = e
         }
     }
 
-//    @Når("innvilger revurdering med vedtaksperioder for behandling={} med revurderFra={}")
-//    fun `innvilger vedtaksperioder for behandling={} med revurderFra={}`(
-//        behandlingIdTall: Int,
-//        revurderFraStr: String,
-//        dataTable: DataTable,
-//    ) {
-//        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
-//        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-//        val revurderFra = parseDato(revurderFraStr)
-//
-//        val vedtaksperioder = mapVedtaksperioderDto(dataTable)
-//        steg.utførSteg(dummyBehandling(behandlingId, revurderFra), InnvilgelseBoutgifterRequest(vedtaksperioder))
-//    }
-
-    /**
-     * Her forutsetter vi at vi har lagret både utgifter og på behandlingen først
-     */
     @Gitt("vi kopierer perioder fra forrige behandling for behandling={}")
     fun `kopierer perioder`(behandlingIdTall: Int) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
@@ -254,29 +244,6 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             )
         vedtakRepositoryFake.insert(vedtak)
     }
-//
-//    @Gitt("lagrer andeler behandling={}")
-//    fun `lagrer andeler`(
-//        behandlingIdTall: Int,
-//        dataTable: DataTable,
-//    ) {
-//        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-//
-//        val andeler =
-//            mapAndeler(dataTable)
-//                .map {
-//                    AndelTilkjentYtelse(
-//                        beløp = it.beløp,
-//                        fom = it.fom,
-//                        tom = it.tom,
-//                        satstype = it.satstype,
-//                        type = it.type,
-//                        kildeBehandlingId = behandlingId,
-//                        utbetalingsdato = it.utbetalingsdato,
-//                    )
-//                }.toSet()
-//        tilkjentYtelseRepository.insert(TilkjentYtelse(behandlingId = behandlingId, andelerTilkjentYtelse = andeler))
-//    }
 
     @Når("vi opphører boutgifter behandling={} med revurderFra={}")
     fun `opphør med revurderFra`(
@@ -285,13 +252,38 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
-        steg.utførSteg(
-            dummyBehandling(behandlingId, revurderFra = revurderFra),
-            OpphørBoutgifterRequest(
-                årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
-                begrunnelse = "begrunnelse",
-            ),
-        )
+        try {
+            steg.utførSteg(
+                dummyBehandling(behandlingId, revurderFra = revurderFra),
+                OpphørBoutgifterRequest(
+                    årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
+                    begrunnelse = "begrunnelse",
+                ),
+            )
+        } catch (e: Exception) {
+            logger.error(e.message)
+            feil = e
+        }
+    }
+
+    @Når("vi innvilger boutgifter behandling={} med revurderFra={} med følgende vedtaksperioder")
+    fun `innvilgelse med revurderFra`(
+        behandlingIdTall: Int,
+        revurderFraStr: String,
+        vedtaksperiodeData: DataTable,
+    ) {
+        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val revurderFra = parseDato(revurderFraStr)
+        val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto() }
+        try {
+            steg.utførSteg(
+                dummyBehandling(behandlingId, revurderFra = revurderFra),
+                InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder),
+            )
+        } catch (e: Exception) {
+            logger.error(e.message)
+            feil = e
+        }
     }
 
     @Så("kan vi forvente følgende beregningsresultat for behandling={}")
