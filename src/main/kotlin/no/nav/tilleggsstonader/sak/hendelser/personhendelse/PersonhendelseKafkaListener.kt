@@ -21,7 +21,7 @@ class PersonhendelseKafkaListener(
     }
 
     @KafkaListener(
-        id = "tilleggsstonader-sak",
+        groupId = "tilleggsstonader-sak",
         topics = ["\${topics.pdl-personhendelser}"],
         containerFactory = "personhendelserListenerContainerFactory",
     )
