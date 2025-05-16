@@ -105,6 +105,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
             assertThat(resJan.utgifterTilOvernatting).isEqualTo(forventetUtgiftRes)
         }
 
+        // TODO: Slette? Tror testen over dekker denne
         @Test
         fun `skal ikke slå sammen 2 utgifter i samme 30 dagersperiode`() {
             val beregningsresultat =
@@ -315,7 +316,6 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
 
     @Nested
     inner class DetaljertVedtaksperioderBegge {
-        // Tror dette blir feil - stønadsbeløpet blir brukt opp og beløpet som dekkes på overnattingene burde være 0
         @Test
         fun `skal ikke slå sammen løpende og overnatting i samme periode eller utgifter for overnatting`() {
             val beregningsresultat =
@@ -340,7 +340,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                                 fom = førsteJan,
                                 tom = sisteJan,
                                 utgift = 4000,
-                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                                type = TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG,
                             ),
                         ).tilUtgiftMap(),
                 )
