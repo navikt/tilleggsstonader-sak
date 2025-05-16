@@ -14,11 +14,13 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.lagFristForOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.util.Properties
 
 @Service
@@ -72,6 +74,8 @@ class OpprettOppgaveForOpprettetBehandlingTask(
                             tilordnetNavIdent = tilordnetNavIdent,
                             beskrivelse = data.beskrivelse,
                             prioritet = data.prioritet,
+                            fristFerdigstillelse =
+                                behandling.kravMottatt?.let { lagFristForOppgave(it.atTime(LocalTime.now())) },
                         ),
                 )
             task.metadata.setProperty("oppgaveId", oppgaveId.toString())

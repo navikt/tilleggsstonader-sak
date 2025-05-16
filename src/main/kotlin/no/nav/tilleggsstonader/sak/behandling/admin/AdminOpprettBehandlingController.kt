@@ -46,6 +46,7 @@ class AdminOpprettBehandlingController(
             ident = request.ident,
             valgteBarn = request.valgteBarn,
             medBrev = request.medBrev,
+            kravMottatt = request.kravMottatt,
         )
     }
 }

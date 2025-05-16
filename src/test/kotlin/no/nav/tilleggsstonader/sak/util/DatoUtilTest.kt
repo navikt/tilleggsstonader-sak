@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -112,6 +113,93 @@ class DatoUtilTest {
         fun `lørdag og søndag skal gi true`() {
             assertThat(LocalDate.of(2025, 1, 4).lørdagEllerSøndag()).isTrue() // lørdag
             assertThat(LocalDate.of(2025, 1, 5).lørdagEllerSøndag()).isTrue() // søndag
+        }
+    }
+
+    @Nested
+    inner class InneholderUkedag {
+        @Test
+        fun `periode som kun inneholder helg skal gi false`() {
+            val datoperiode1 = Datoperiode(LocalDate.of(2025, 1, 4), LocalDate.of(2025, 1, 5))
+            val datoperiode2 = Datoperiode(LocalDate.of(2025, 1, 4), LocalDate.of(2025, 1, 5))
+
+            assertThat(datoperiode1.inneholderUkedag()).isFalse
+            assertThat(datoperiode2.inneholderUkedag()).isFalse
+        }
+
+        @Test
+        fun `periode som kun inneholder en ukesdag skal gi true`() {
+            val kunUkedag = Datoperiode(LocalDate.of(2025, 1, 3), LocalDate.of(2025, 1, 3))
+            assertThat(kunUkedag.inneholderUkedag()).isTrue
+        }
+
+        @Test
+        fun `periode som kun en ukesdag og en helgdag skal gi true`() {
+            val ukedagOgHelg = Datoperiode(LocalDate.of(2025, 1, 3), LocalDate.of(2025, 1, 4))
+
+            assertThat(ukedagOgHelg.inneholderUkedag()).isTrue
+        }
+
+        @Test
+        fun `periode som kun inneholder en ukesdag som er rød dag skal gi true`() {
+            val rødDag = Datoperiode(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1))
+
+            assertThat(rødDag.inneholderUkedag()).isTrue
+        }
+
+        @Test
+        fun `periode som går fra søndag til søndag en annen uke skal gi true`() {
+            val rødDag = Datoperiode(LocalDate.of(2025, 1, 5), LocalDate.of(2025, 1, 12))
+
+            assertThat(rødDag.inneholderUkedag()).isTrue
+        }
+    }
+
+    @Nested
+    inner class SisteDagenILøpendeMåned {
+        @Test
+        fun `skal finne dato i neste måned`() {
+            assertThat(LocalDate.of(2025, 1, 1).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2025, 1, 31))
+            assertThat(LocalDate.of(2025, 2, 1).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2025, 2, 28))
+            assertThat(LocalDate.of(2025, 3, 1).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2025, 3, 31))
+            assertThat(LocalDate.of(2025, 4, 1).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2025, 4, 30))
+        }
+
+        @Test
+        fun `hvis neste måned har færre antall dager`() {
+            assertThat(LocalDate.of(2025, 2, 28).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2025, 3, 27))
+            assertThat(LocalDate.of(2025, 4, 30).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2025, 5, 29))
+        }
+
+        @Test
+        fun `hvis dagens måned har flere dager enn neste skal man bruke siste dagen i måneden`() {
+            assertThat(LocalDate.of(2025, 1, 29).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2025, 2, 27))
+            assertThat(LocalDate.of(2025, 1, 30).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2025, 2, 27))
+            assertThat(LocalDate.of(2025, 1, 31).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2025, 2, 27))
+
+            assertThat(LocalDate.of(2025, 3, 31).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2025, 4, 29))
+        }
+
+        @Nested
+        inner class Skuddår {
+            @Test
+            fun `skal finne dato i neste måned`() {
+                assertThat(LocalDate.of(2024, 1, 1).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2024, 1, 31))
+                assertThat(LocalDate.of(2024, 2, 1).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2024, 2, 29))
+            }
+
+            @Test
+            fun `hvis neste måned har færre antall dager`() {
+                assertThat(LocalDate.of(2024, 2, 29).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2024, 3, 28))
+                assertThat(LocalDate.of(2024, 4, 30).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2024, 5, 29))
+            }
+
+            @Test
+            fun `hvis dagens måned har flere dager enn neste skal man bruke siste dagen i måneden`() {
+                assertThat(LocalDate.of(2024, 1, 29).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2024, 2, 28))
+                assertThat(LocalDate.of(2024, 1, 30).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2024, 2, 28))
+                assertThat(LocalDate.of(2024, 1, 31).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2024, 2, 28))
+            }
         }
     }
 }
