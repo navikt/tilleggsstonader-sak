@@ -65,11 +65,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                         ).tilUtgiftMap(),
                 )
 
-            val vedtak =
-                InnvilgelseBoutgifter(
-                    vedtaksperioder = emptyList(),
-                    beregningsresultat = BeregningsresultatBoutgifter(perioder = listOf(beregningsresultat)),
-                )
+            val vedtak = innvilgelseBoutgifter(listOf(beregningsresultat))
 
             val res = vedtak.finnDetaljerteVedtaksperioder()
 
@@ -131,11 +127,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                         ).tilUtgiftMap(),
                 )
 
-            val vedtak =
-                InnvilgelseBoutgifter(
-                    vedtaksperioder = emptyList(),
-                    beregningsresultat = BeregningsresultatBoutgifter(perioder = listOf(beregningsresultat)),
-                )
+            val vedtak = innvilgelseBoutgifter(listOf(beregningsresultat))
 
             val res = vedtak.finnDetaljerteVedtaksperioder()
 
@@ -268,11 +260,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                     ),
                 )
 
-            val vedtak =
-                InnvilgelseBoutgifter(
-                    vedtaksperioder = emptyList(),
-                    beregningsresultat = BeregningsresultatBoutgifter(perioder = beregningsresultat),
-                )
+            val vedtak = innvilgelseBoutgifter(beregningsresultat)
 
             val res = vedtak.finnDetaljerteVedtaksperioder()
 
@@ -321,11 +309,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                         ).tilUtgiftMap(),
                 )
 
-            val vedtak =
-                InnvilgelseBoutgifter(
-                    vedtaksperioder = emptyList(),
-                    beregningsresultat = BeregningsresultatBoutgifter(perioder = listOf(beregningsresultat)),
-                )
+            val vedtak = innvilgelseBoutgifter(listOf(beregningsresultat))
 
             val res = vedtak.finnDetaljerteVedtaksperioder()
 
@@ -392,18 +376,12 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                         ).tilUtgiftMap(),
                 )
 
-            val vedtak =
-                InnvilgelseBoutgifter(
-                    vedtaksperioder = emptyList(),
-                    beregningsresultat =
-                        BeregningsresultatBoutgifter(
-                            perioder =
-                                listOf(
-                                    beregningsresultat,
-                                    beregningsresultatForFebruar,
-                                ),
-                        ),
+            val vedtak = innvilgelseBoutgifter(
+                listOf(
+                    beregningsresultat,
+                    beregningsresultatForFebruar
                 )
+            )
 
             val res = vedtak.finnDetaljerteVedtaksperioder()
 
@@ -447,4 +425,10 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                     )
                 }
             }
+
+    private fun innvilgelseBoutgifter(beregningsperioder: List<BeregningsresultatForLøpendeMåned>) =
+        InnvilgelseBoutgifter(
+            vedtaksperioder = emptyList(),
+            beregningsresultat = BeregningsresultatBoutgifter(perioder = beregningsperioder),
+        )
 }
