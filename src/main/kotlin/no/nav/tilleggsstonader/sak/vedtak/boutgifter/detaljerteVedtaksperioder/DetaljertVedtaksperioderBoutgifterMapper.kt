@@ -52,19 +52,22 @@ object DetaljertVedtaksperioderBoutgifterMapper {
         )
     }
 
-    private fun BeregningsresultatForLøpendeMåned.mapBeregningsresultatMndLøpendeUtgift(): DetaljertVedtaksperiodeBoutgifter =
-        DetaljertVedtaksperiodeBoutgifter(
+    private fun BeregningsresultatForLøpendeMåned.mapBeregningsresultatMndLøpendeUtgift(): DetaljertVedtaksperiodeBoutgifter {
+        val sumLøpendeUtgifter =
+            summerLøpendeUtgifterBo(
+                this.grunnlag.utgifter,
+            )
+
+        return DetaljertVedtaksperiodeBoutgifter(
             fom = this.fom,
             tom = this.tom,
             aktivitet = this.grunnlag.aktivitet,
             målgruppe = this.grunnlag.målgruppe,
-            totalUtgiftMåned =
-                summerLøpendeUtgifterBo(
-                    this.grunnlag.utgifter,
-                ),
-            stønadsbeløpMnd = this.stønadsbeløp,
+            totalUtgiftMåned = sumLøpendeUtgifter,
+            stønadsbeløpMnd = minOf(this.grunnlag.makssats, sumLøpendeUtgifter),
             erLøpendeUtgift = true,
         )
+    }
 
     private fun beregnAndelAvUtgifterSomDekkes(
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
@@ -72,13 +75,22 @@ object DetaljertVedtaksperioderBoutgifterMapper {
     ): List<UtgiftTilOvernatting> {
         val utgifterOvernatting = utgifter[TypeBoutgift.UTGIFTER_OVERNATTING] ?: error("Burde ikke være mulig")
 
-        var sumForMåned = 0
+        val sumLøpendeUtgifter =
+            utgifter
+                .filterKeys {
+                    it == TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG || it == TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER
+                }.values
+                .flatten()
+                .sumOf { it.utgift }
+
+        // Todo - kommentere hvorfor vi må ta hensyn til løpende utgifter
+        var alleredeSummerteUtgifter = sumLøpendeUtgifter
 
         return utgifterOvernatting
             .sorted()
             .map { utgift ->
-                val beløpSomDekkes = minOf(utgift.utgift, makssats - sumForMåned)
-                sumForMåned += beløpSomDekkes
+                val beløpSomDekkes = minOf(utgift.utgift, makssats - alleredeSummerteUtgifter)
+                alleredeSummerteUtgifter += beløpSomDekkes
 
                 UtgiftTilOvernatting(
                     fom = utgift.fom,
