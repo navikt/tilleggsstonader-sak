@@ -123,3 +123,15 @@ fun LocalDate.lørdagEllerSøndag() = this.dayOfWeek == DayOfWeek.SATURDAY || th
 fun Periode<LocalDate>.formatertPeriodeNorskFormat() = "${this.fom.norskFormat()}–${this.tom.norskFormat()}"
 
 fun Periode<LocalDate>.inneholderUkedag() = this.alleDatoer().any { !it.lørdagEllerSøndag() }
+
+/**
+ * https://ts-docs.ansatt.dev.nav.no/Saksbehandling/Beregning%20av%20st%C3%B8nadsbel%C3%B8p/l%C3%B8pende-m%C3%A5neder
+ * En løpende måned defineres som perioden fra en gitt startdato og én måned frem i tid.
+ * Hvis startdatoen er 15. januar, varer perioden til og med 14. februar.
+ * Hvis startmåneden har flere dager enn måneden som følger, brukes den nest siste dagen i den påfølgende måneden.
+ * Dette gjør at neste periode kan starte siste dagen i den påfølgende måneden.
+ *
+ * For eksempel vil en løpende måned som starter 31. januar avsluttes 27. februar,
+ * siden februar ikke har en 31. dag. Neste påfølgende måned vil gå fra 28. februar til 27. mars.
+ */
+fun LocalDate.sisteDagenILøpendeMåned(): LocalDate = this.plusMonths(1).minusDays(1)

@@ -3,8 +3,8 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
 import no.nav.tilleggsstonader.sak.util.inneholderUkedag
+import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import java.time.LocalDate
 
 object LæremidlerVedtaksperiodeUtil {
@@ -38,8 +38,6 @@ object LæremidlerVedtaksperiodeUtil {
         }
         return perioder
     }
-
-    fun LocalDate.sisteDagenILøpendeMåned(): LocalDate = this.plusMonths(1).minusDays(1)
 }
 
 data class VedtaksperiodeInnenforÅr(

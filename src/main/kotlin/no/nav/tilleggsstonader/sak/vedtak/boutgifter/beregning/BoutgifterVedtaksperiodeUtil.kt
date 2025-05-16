@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.inneholderUkedag
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.sisteDagenILøpendeMåned
+import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 
@@ -29,8 +29,6 @@ object BoutgifterVedtaksperiodeUtil {
         }
         return perioder
     }
-
-    fun LocalDate.sisteDagenILøpendeMåned(): LocalDate = this.plusMonths(1).minusDays(1)
 }
 
 /**
