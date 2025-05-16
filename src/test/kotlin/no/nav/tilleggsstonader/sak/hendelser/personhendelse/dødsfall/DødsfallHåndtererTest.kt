@@ -75,6 +75,7 @@ class DødsfallHåndtererTest {
         every { vedtaksperiodeService.finnVedtaksperioderForBehandling(behandling.id, null) } returns listOf(vedtaksperiode)
         every { personService.hentFolkeregisterIdenter(any()).gjeldende().ident } returns "12345678901"
         every { hendelseRepository.insert(any()) } returnsArgument 0
+        every { oppgaveService.lagBeskrivelseMelding(any(), any()) } returnsArgument 0
 
         dødsfallHåndterer.håndter(dødsfallHendelse)
 
@@ -249,6 +250,7 @@ class DødsfallHåndtererTest {
         every { taskService.findById(9999L) } returns opprettetTask
         every { oppgaveService.hentOppgave(12345L) } returns oppgave
         every { oppgaveService.oppdaterOppgave(any()) } returns mockk()
+        every { oppgaveService.lagBeskrivelseMelding(any(), any()) } returnsArgument 0
 
         dødsfallHåndterer.håndter(
             DødsfallHendelse(

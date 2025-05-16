@@ -117,7 +117,11 @@ class DødsfallHåndterer(
                 logger.info(
                     "Oppgave er allerede opprettet og åpen for dødshendelse ${hendelse.id}, oppdaterer oppgave",
                 )
-                oppgaveService.oppdaterOppgave(oppgave.copy(beskrivelse = oppgave.beskrivelse + ANNULLERT_DØDSFALL_BESKRIVELSE))
+                oppgaveService.oppdaterOppgave(
+                    oppgave.copy(
+                        beskrivelse = oppgaveService.lagBeskrivelseMelding(ANNULLERT_DØDSFALL_BESKRIVELSE, oppgave.beskrivelse),
+                    ),
+                )
             } else {
                 logger.info("Tidligere oppgave for dødsfall er ferdigstilt, oppretter ny oppgave for annullering av dødsfall")
                 val tidligereTaskData = objectMapper.readValue<OpprettDødsfallOppgaveTask.DødsfallOppgaveTaskData>(opprinneligTask.payload)
