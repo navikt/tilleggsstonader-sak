@@ -90,7 +90,7 @@ class DødsfallHåndterer(
         if (behandling != null) {
             return vedtaksperiodeService
                 .finnVedtaksperioderForBehandling(behandling.id, null)
-                .any { it.inneholder(dødsdato) }
+                .any { dødsdato <= it.tom }
         }
         return false
     }

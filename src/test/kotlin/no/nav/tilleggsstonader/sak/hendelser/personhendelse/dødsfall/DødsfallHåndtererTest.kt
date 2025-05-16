@@ -65,8 +65,8 @@ class DødsfallHåndtererTest {
         val behandling = behandling()
         val vedtaksperiode =
             vedtaksperiode(
-                fom = LocalDate.now().minusWeeks(1),
-                tom = LocalDate.now().plusWeeks(1),
+                fom = LocalDate.now().plusWeeks(1),
+                tom = LocalDate.now().plusWeeks(2),
             )
 
         every { hendelseRepository.existsByTypeAndId(any(), any()) } returns false
