@@ -55,7 +55,11 @@ object TilsynBarnTestUtil {
     val beløpsperioderDefault =
         listOf(
             Beløpsperiode(dato = LocalDate.now(), beløp = 1000, målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE),
-            Beløpsperiode(dato = LocalDate.now().plusDays(7), beløp = 2000, målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER),
+            Beløpsperiode(
+                dato = LocalDate.now().plusDays(7),
+                beløp = 2000,
+                målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
+            ),
         )
 
     val defaultVedtaksperiode =
@@ -120,7 +124,7 @@ object TilsynBarnTestUtil {
 
     fun beregningsgrunnlag(
         måned: YearMonth = YearMonth.of(2024, 1),
-        vedtaksperioder: List<VedtaksperiodeGrunnlag> = emptyList(),
+        vedtaksperioder: List<VedtaksperiodeGrunnlag> = vedtaksperiodeGrunnlag(måned),
         utgifterTotal: Int = 5000,
         utgifter: List<UtgiftBarn> = listOf(UtgiftBarn(defaultBarn1.id, 1000)),
     ) = Beregningsgrunnlag(
@@ -131,6 +135,21 @@ object TilsynBarnTestUtil {
         utgifterTotal = utgifterTotal,
         antallBarn = 1,
     )
+
+    fun vedtaksperiodeGrunnlag(måned: YearMonth): List<VedtaksperiodeGrunnlag> =
+        listOf(
+            VedtaksperiodeGrunnlag(
+                vedtaksperiode =
+                    VedtaksperiodeBeregning(
+                        fom = måned.atDay(1),
+                        tom = måned.atEndOfMonth(),
+                        målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                        aktivitet = AktivitetType.TILTAK,
+                    ),
+                antallDager = 0,
+                aktiviteter = emptyList(),
+            ),
+        )
 
     fun innvilgelse(data: InnvilgelseTilsynBarn = defaultInnvilgelseTilsynBarn) =
         GeneriskVedtak(
