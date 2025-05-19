@@ -33,7 +33,7 @@ class JournalhendelseKafkaListener(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @KafkaListener(
-        id = "tilleggsstonader-sak",
+        groupId = "tilleggsstonader-sak",
         topics = ["\${topics.journalhendelser}"],
         containerFactory = "journalhendelserListenerContainerFactory",
     )

@@ -24,6 +24,11 @@ interface HendelseRepository :
         type: TypeHendelse,
         id: String,
     ): Boolean
+
+    fun findByTypeAndId(
+        type: TypeHendelse,
+        id: String,
+    ): Hendelse?
 }
 
 /**
@@ -47,4 +52,5 @@ data class Hendelse(
 
 enum class TypeHendelse {
     JOURNALPOST,
+    PERSONHENDELSE,
 }

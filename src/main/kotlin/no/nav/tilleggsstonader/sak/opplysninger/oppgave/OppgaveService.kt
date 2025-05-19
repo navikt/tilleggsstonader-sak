@@ -18,10 +18,12 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.spring.cache.getCachedOrLoad
 import no.nav.tilleggsstonader.libs.spring.cache.getValue
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalPlasseresIKlarMappe
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.FinnOppgaveresultatMedMetadata
@@ -32,6 +34,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
+import no.nav.tilleggsstonader.sak.util.DatoFormat
 import no.nav.tilleggsstonader.sak.util.FnrUtil
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
@@ -352,4 +355,17 @@ class OppgaveService(
             ?.navn
             ?.gjeldende()
             ?.visningsnavn() ?: "Mangler navn"
+
+    fun lagBeskrivelseMelding(
+        endring: String,
+        nåværendeBeskrivelse: String?,
+    ): String {
+        val innloggetSaksbehandlerIdent = SikkerhetContext.hentSaksbehandlerEllerSystembruker()
+        val saksbehandlerNavn = SikkerhetContext.hentSaksbehandlerNavn(strict = false)
+        val formatertDato = osloNow().format(DatoFormat.GOSYS_DATE_TIME)
+
+        val prefix = "--- $formatertDato $saksbehandlerNavn ($innloggetSaksbehandlerIdent) ---\n"
+
+        return prefix + endring + nåværendeBeskrivelse?.let { "\n\n$it" }.orEmpty()
+    }
 }
