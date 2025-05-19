@@ -15,7 +15,7 @@ object BoutgifterAndelTilkjentYtelseMapper {
         beregningsresultat: BeregningsresultatBoutgifter,
     ): List<AndelTilkjentYtelse> =
         beregningsresultat.perioder
-            .sortedBy { it.fom }
+            .sorted()
             .map {
                 val førsteUkedagIMåneden = it.fom.tilFørsteDagIMåneden().datoEllerNesteMandagHvisLørdagEllerSøndag()
                 AndelTilkjentYtelse(
