@@ -16,6 +16,7 @@ data class BeregningsresultatBoutgifter(
 data class BeregningsresultatForLøpendeMåned(
     val grunnlag: Beregningsgrunnlag,
     val stønadsbeløp: Int,
+    val delAvTidligereUtbetaling: Boolean = false,
 ) : Periode<LocalDate>,
     KopierPeriode<BeregningsresultatForLøpendeMåned> {
     @get:JsonIgnore
@@ -28,6 +29,13 @@ data class BeregningsresultatForLøpendeMåned(
         fom: LocalDate,
         tom: LocalDate,
     ): BeregningsresultatForLøpendeMåned = this.copy(grunnlag = this.grunnlag.copy(fom = fom, tom = tom))
+
+    fun markerSomDelAvTidligereUtbetaling() = this.copy(delAvTidligereUtbetaling = true)
+
+    fun harUtgiftFørDagensDato(): Boolean =
+        this.grunnlag.utgifter.values
+            .flatten()
+            .any { utgift -> utgift.fom < LocalDate.now() }
 }
 
 data class Beregningsgrunnlag(
