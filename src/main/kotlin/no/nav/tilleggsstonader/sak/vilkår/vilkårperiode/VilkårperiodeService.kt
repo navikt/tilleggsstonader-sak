@@ -209,8 +209,7 @@ class VilkårperiodeService(
         )
     }
 
-    @Transactional
-    fun oppdaterVilkårperiodeHvorAltKanEndres(
+    private fun oppdaterVilkårperiodeHvorAltKanEndres(
         eksisterendeVilkårperiode: Vilkårperiode,
         vilkårperiode: LagreVilkårperiode,
         behandling: Saksbehandling,
@@ -229,9 +228,7 @@ class VilkårperiodeService(
                     ),
             )
 
-        return vilkårperiodeRepository.update(
-            oppdatert,
-        )
+        return vilkårperiodeRepository.update(oppdatert)
     }
 
     fun slettVilkårperiode(
