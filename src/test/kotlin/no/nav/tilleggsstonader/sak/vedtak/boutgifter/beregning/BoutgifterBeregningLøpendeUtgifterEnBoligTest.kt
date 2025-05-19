@@ -69,7 +69,6 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                     Beregningsgrunnlag(
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 31),
-                        utbetalingsdato = LocalDate.of(2025, 1, 1),
                         utgifter = løpendeUtgifterEnBolig,
                         makssats = 4953,
                         makssatsBekreftet = true,
@@ -83,7 +82,6 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                     Beregningsgrunnlag(
                         fom = LocalDate.of(2025, 2, 1),
                         tom = LocalDate.of(2025, 2, 28),
-                        utbetalingsdato = LocalDate.of(2025, 2, 1),
                         utgifter = løpendeUtgifterEnBolig,
                         makssats = 4953,
                         makssatsBekreftet = true,
@@ -97,7 +95,6 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                     Beregningsgrunnlag(
                         fom = LocalDate.of(2025, 3, 1),
                         tom = LocalDate.of(2025, 3, 31),
-                        utbetalingsdato = LocalDate.of(2025, 3, 1),
                         utgifter = løpendeUtgifterEnBolig,
                         makssats = 4953,
                         makssatsBekreftet = true,

@@ -15,10 +15,6 @@ import java.time.LocalDate
  * @param tom er maks dato for vedtaksperiode inne i en løpende måned.
  * I de tilfeller man kun har en vedtaksperiode som gjelder 5 jan - 7 jan så vil tom= 7 jan.
  *
- * @param utbetalingsdato utbetalingsdato for når en utbetalingsperiode skal utbetales.
- * Eks hvis man innvilger jan-juni så skal man utbetale hele beløpet for fom i første utbetalingsperioden,
- * dvs 5 jan i tidligere eksemplet
- *
  */
 @ConsistentCopyVisibility
 data class UtbetalingPeriode private constructor(
@@ -26,7 +22,6 @@ data class UtbetalingPeriode private constructor(
     override val tom: LocalDate,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
-    val utbetalingsdato: LocalDate,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -58,14 +53,12 @@ data class UtbetalingPeriode private constructor(
                 ?: brukerfeil(
                     "Det finnes flere ulike målgrupper i utbetalingsperioden ${løpendeMåned.formatertPeriodeNorskFormat()}. Dette er foreløpig ikke noe vi har støtte for.",
                 ),
-        utbetalingsdato = løpendeMåned.fom,
     )
 }
 
 data class LøpendeMåned(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val utbetalingsdato: LocalDate,
 ) : Periode<LocalDate> {
     /**
      * backing property for vedtaksperioder.

@@ -386,7 +386,6 @@ class InterntVedtakServiceTest {
             with(interntVedtak.beregningsresultat.boutgifter.first()) {
                 assertThat(fom).isEqualTo(forventet.fom)
                 assertThat(tom).isEqualTo(forventet.tom)
-                assertThat(utbetalingsdato).isEqualTo(forventet.grunnlag.utbetalingsdato)
                 assertThat(målgruppe).isEqualTo(forventet.grunnlag.målgruppe)
                 assertThat(aktivitet).isEqualTo(forventet.grunnlag.aktivitet)
             }

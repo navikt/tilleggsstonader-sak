@@ -56,7 +56,6 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
             lagBeregningsgrunnlagMedEnkeltutgift(
                 fom = lørdag8Mars,
                 tom = søndag9Mars,
-                utbetalingsdato = mandag10Mars,
             )
 
         val andeler = finnAndelTilkjentYtelse(beregningsgrunnlag)
@@ -96,40 +95,6 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
             assertThat(fom).isEqualTo(torsdag1Mai)
             assertThat(tom).isEqualTo(torsdag1Mai)
             assertThat(utbetalingsdato).isEqualTo(torsdag1Mai)
-        }
-    }
-
-    @Test
-    fun `Utbetalingsperioder med NEDSATT_ARBEIDSEVNE summeres opp til én andel så lenge de har samme utbetalingsdato`() {
-        val mandag10Februar = LocalDate.of(2025, FEBRUARY, 10)
-        val torsdag27Feb = LocalDate.of(2025, FEBRUARY, 27)
-        val fredag7Mars = LocalDate.of(2025, MARCH, 7)
-
-        val aap =
-            lagBeregningsgrunnlagMedEnkeltutgift(
-                fom = mandag10Februar,
-                utbetalingsdato = mandag10Februar,
-            ).copy(målgruppe = NEDSATT_ARBEIDSEVNE)
-
-        val uføretrygd =
-            lagBeregningsgrunnlagMedEnkeltutgift(
-                fom = torsdag27Feb,
-                utbetalingsdato = mandag10Februar,
-            ).copy(målgruppe = NEDSATT_ARBEIDSEVNE)
-
-        val nedsattArbeidsevne =
-            lagBeregningsgrunnlagMedEnkeltutgift(
-                fom = fredag7Mars,
-                utbetalingsdato = mandag10Februar,
-            ).copy(målgruppe = NEDSATT_ARBEIDSEVNE)
-
-        val andel = finnAndelTilkjentYtelse(aap, uføretrygd, nedsattArbeidsevne)
-
-        with(andel.single()) {
-            assertThat { fom == mandag10Februar }
-            assertThat { tom == mandag10Februar }
-            assertThat { type == TypeAndel.BOUTGIFTER_AAP }
-            assertThat { beløp == 1000 * 3 }
         }
     }
 
@@ -211,11 +176,9 @@ private fun finnAndelTilkjentYtelse(vararg beregningsgrunnlag: Beregningsgrunnla
 private fun lagBeregningsgrunnlagMedEnkeltutgift(
     fom: LocalDate,
     tom: LocalDate = fom,
-    utbetalingsdato: LocalDate = fom,
 ) = Beregningsgrunnlag(
     fom = fom,
     tom = tom,
-    utbetalingsdato = utbetalingsdato,
     utgifter =
         mapOf(
             TypeBoutgift.UTGIFTER_OVERNATTING to

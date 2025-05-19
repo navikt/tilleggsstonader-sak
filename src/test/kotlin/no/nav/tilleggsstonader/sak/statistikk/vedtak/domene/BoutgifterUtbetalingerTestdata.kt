@@ -49,7 +49,6 @@ fun lagBoutgifterInnvilgelseMedBeløp(
         Beregningsgrunnlag(
             fom = fom,
             tom = tom,
-            utbetalingsdato = fom,
             utgifter = mapOf(alleUtgifter),
             makssats = makssats,
             makssatsBekreftet = true,

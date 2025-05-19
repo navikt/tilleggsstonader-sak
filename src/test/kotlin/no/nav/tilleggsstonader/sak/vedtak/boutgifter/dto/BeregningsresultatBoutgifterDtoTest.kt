@@ -34,7 +34,6 @@ class BeregningsresultatBoutgifterDtoTest {
                     Beregningsgrunnlag(
                         fom = LocalDate.of(2023, 1, 1),
                         tom = LocalDate.of(2023, 1, 31),
-                        utbetalingsdato = LocalDate.of(2023, 2, 1),
                         utgifter = mapOf(TypeBoutgift.UTGIFTER_OVERNATTING to utgift),
                         makssats = 4953,
                         makssatsBekreftet = true,
@@ -90,7 +89,6 @@ class BeregningsresultatBoutgifterDtoTest {
                     Beregningsgrunnlag(
                         fom = LocalDate.of(2023, 1, 1),
                         tom = LocalDate.of(2023, 1, 31),
-                        utbetalingsdato = LocalDate.of(2023, 2, 1),
                         utgifter = mapOf(TypeBoutgift.UTGIFTER_OVERNATTING to utgift),
                         makssats = 4953,
                         makssatsBekreftet = true,
@@ -146,7 +144,6 @@ class BeregningsresultatBoutgifterDtoTest {
                     Beregningsgrunnlag(
                         fom = LocalDate.of(2023, 1, 1),
                         tom = LocalDate.of(2023, 1, 31),
-                        utbetalingsdato = LocalDate.of(2023, 2, 1),
                         utgifter = mapOf(TypeBoutgift.UTGIFTER_OVERNATTING to utgift),
                         makssats = 4953,
                         makssatsBekreftet = true,
