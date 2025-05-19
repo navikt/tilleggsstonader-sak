@@ -43,6 +43,21 @@ class DetaljertVedtaksperiodeTilsynBarnTest {
     }
 
     @Test
+    fun `skal sortere perioder før sammenslåing`() {
+        val vedtaksperioder =
+            listOf(
+                vedtaksperiodeFeb,
+                vedtaksperiodeJan,
+            )
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
+        assertThat(resultat).isEqualTo(
+            listOf(
+                vedtaksperiodeJan.copy(tom = vedtaksperiodeFeb.tom),
+            ),
+        )
+    }
+
+    @Test
     fun `skal slå sammen flere påfølgende perioder med like verdier`() {
         val vedtaksperioder =
             listOf(

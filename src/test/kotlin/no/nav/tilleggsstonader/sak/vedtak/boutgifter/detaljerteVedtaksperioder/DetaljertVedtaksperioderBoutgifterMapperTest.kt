@@ -89,63 +89,6 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
             assertThat(resJan.utgifterTilOvernatting).isEqualTo(forventetUtgiftRes)
         }
 
-        // TODO: Slette? Tror testen over dekker denne
-        @Test
-        fun `skal ikke slå sammen 2 utgifter i samme 30 dagersperiode`() {
-            val beregningsresultat =
-                BoutgifterTestUtil.lagBeregningsresultatMåned(
-                    fom = førsteJan,
-                    tom = sisteJan,
-                    utgifter =
-                        listOf(
-                            UtgifterMedType(
-                                fom = LocalDate.of(2024, 1, 3),
-                                tom = LocalDate.of(2024, 1, 4),
-                                utgift = 8000,
-                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
-                            ),
-                            UtgifterMedType(
-                                fom = LocalDate.of(2024, 1, 7),
-                                tom = LocalDate.of(2024, 1, 8),
-                                utgift = 1000,
-                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
-                            ),
-                        ).tilUtgiftMap(),
-                )
-
-            val vedtak = innvilgelseBoutgifter(listOf(beregningsresultat))
-
-            val res = vedtak.finnDetaljerteVedtaksperioder()
-
-            assertThat(res).hasSize(1)
-
-            val resJan = res.first()
-
-            assertThat(resJan.fom).isEqualTo(førsteJan)
-            assertThat(resJan.tom).isEqualTo(sisteJan)
-            assertThat(resJan.erLøpendeUtgift).isFalse
-            assertThat(resJan.utgifterTilOvernatting).hasSize(2)
-            assertThat(resJan.stønadsbeløpMnd).isEqualTo(finnMakssats(førsteJan).beløp)
-
-            val forventetUtgiftRes =
-                listOf(
-                    UtgiftTilOvernatting(
-                        fom = LocalDate.of(2024, 1, 3),
-                        tom = LocalDate.of(2024, 1, 4),
-                        utgift = 8000,
-                        beløpSomDekkes = 4809,
-                    ),
-                    UtgiftTilOvernatting(
-                        fom = LocalDate.of(2024, 1, 7),
-                        tom = LocalDate.of(2024, 1, 8),
-                        utgift = 1000,
-                        beløpSomDekkes = 0,
-                    ),
-                )
-
-            assertThat(resJan.utgifterTilOvernatting).isEqualTo(forventetUtgiftRes)
-        }
-
         @Test
         fun `skal ikke slå sammen 2 utgifter i ulike 30 dagersperioder`() {
             val beregningsresultatJan =
@@ -230,7 +173,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                                 tom = LocalDate.of(2024, 1, 4),
                                 utgift = 1000,
                                 type = TypeBoutgift.UTGIFTER_OVERNATTING,
-                            )
+                            ),
                         ).tilUtgiftMap(),
                 )
 
@@ -396,12 +339,13 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                         ).tilUtgiftMap(),
                 )
 
-            val vedtak = innvilgelseBoutgifter(
-                listOf(
-                    beregningsresultat,
-                    beregningsresultatForFebruar
+            val vedtak =
+                innvilgelseBoutgifter(
+                    listOf(
+                        beregningsresultat,
+                        beregningsresultatForFebruar,
+                    ),
                 )
-            )
 
             val res = vedtak.finnDetaljerteVedtaksperioder()
 

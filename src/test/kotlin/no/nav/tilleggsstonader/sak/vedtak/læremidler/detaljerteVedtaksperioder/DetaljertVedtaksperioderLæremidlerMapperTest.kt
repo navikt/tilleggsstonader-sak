@@ -44,8 +44,6 @@ class DetaljertVedtaksperioderLæremidlerMapperTest {
 
     @Test
     fun `skal ikke slå sammen vedtaksperioder som ikke overlapper`() {
-        val beregningsresultatForApril = beregningsresultatForMåned(førsteJan, sisteFeb)
-
         val vedtak =
             innvilgetVedtak(
                 beregningsresulat =
