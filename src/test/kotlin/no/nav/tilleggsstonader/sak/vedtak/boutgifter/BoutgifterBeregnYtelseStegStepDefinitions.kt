@@ -14,8 +14,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
-import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.behandlingIdFraUUID
-import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.behandlingIdTilUUID
+import no.nav.tilleggsstonader.sak.cucumber.TestIdTilBehandlingIdHolder.behandlingIdTilTestId
+import no.nav.tilleggsstonader.sak.cucumber.TestIdTilBehandlingIdHolder.testIdTilBehandlingId
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
@@ -134,7 +134,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         behandlingIdTall: Int,
         aktivitetData: DataTable,
     ) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         vilkårperiodeRepositoryFake.insertAll(
             mapAktiviteter(behandlingId, aktivitetData),
         )
@@ -145,7 +145,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         behandlingIdTall: Int,
         målgruppeData: DataTable,
     ) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         vilkårperiodeRepositoryFake.insertAll(
             mapMålgrupper(målgruppeData, behandlingId),
         )
@@ -158,7 +158,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         behandlingIdTall: Int,
         utgifterData: DataTable,
     ) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
             dummyBehandling(
                 behandlingId = behandlingId,
@@ -202,7 +202,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
 
     @Gitt("vi fjerner utgiftene på behandling={}")
     fun `sletter og legger inn nye utgifter`(behandlingIdTall: Int) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         vilkårRepositoryFake.deleteByBehandlingId(behandlingId)
     }
 
@@ -211,7 +211,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         behandlingIdTall: Int,
         dataTable: DataTable,
     ) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
 
         every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
             dummyBehandling(
@@ -227,7 +227,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
 
     @Gitt("vi kopierer perioder fra forrige behandling for behandling={}")
     fun `kopierer perioder`(behandlingIdTall: Int) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val forrigeIverksatteBehandlingId =
             forrigeIverksatteBehandlingId(behandlingId) ?: error("Forventer å finne forrigeIverksatteBehandlingId")
 
@@ -246,7 +246,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         behandlingIdTall: Int,
         dataTable: DataTable,
     ) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val utgifter = boutgifterUtgiftService.hentUtgifterTilBeregning(behandlingId)
         val perioderBeregningsresultat = mapBeregningsresultat(dataTable, utgifter)
         val vedtaksperiode = mapVedtaksperioder(dataTable)
@@ -264,7 +264,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         behandlingIdTall: Int,
         revurderFraStr: String,
     ) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
 
         kjørMedFeilkontekst {
@@ -284,7 +284,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         revurderFraStr: String,
         vedtaksperiodeData: DataTable,
     ) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
         val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto() }
 
@@ -302,7 +302,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         behandlingIdTall: Int,
         dataTable: DataTable,
     ) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val utgifter = boutgifterUtgiftService.hentUtgifterTilBeregning(behandlingId)
 
         val forventedeBeregningsperioder = mapBeregningsresultat(dataTable, utgifter)
@@ -318,7 +318,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         behandlingIdTall: Int,
         dataTable: DataTable,
     ) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
 
         val forventedeAndeler = mapAndeler(dataTable)
 
@@ -337,7 +337,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         behandlingIdTall: Int,
         dataTable: DataTable,
     ) {
-        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
 
         val vedtaksperioder = hentVedtak(behandlingId).vedtaksperioder
 
@@ -375,9 +375,9 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     }
 
     private fun forrigeIverksatteBehandlingId(behandlingId: BehandlingId): BehandlingId? {
-        val behandlingIdInt = behandlingIdFraUUID(behandlingId)
+        val behandlingIdInt = behandlingIdTilTestId(behandlingId)
         return if (behandlingIdInt > 1) {
-            behandlingIdTilUUID.getValue(behandlingIdInt - 1)
+            testIdTilBehandlingId.getValue(behandlingIdInt - 1)
         } else {
             null
         }
