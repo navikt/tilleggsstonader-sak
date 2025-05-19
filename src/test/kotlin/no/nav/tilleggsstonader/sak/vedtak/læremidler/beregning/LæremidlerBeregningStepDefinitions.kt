@@ -49,7 +49,7 @@ enum class BeregningNøkler(
 }
 
 @Suppress("unused", "ktlint:standard:function-naming")
-class StepDefinitions {
+class LæremidlerBeregningStepDefinitions {
     val logger = LoggerFactory.getLogger(javaClass)
 
     val vilkårperiodeRepository = VilkårperiodeRepositoryFake()

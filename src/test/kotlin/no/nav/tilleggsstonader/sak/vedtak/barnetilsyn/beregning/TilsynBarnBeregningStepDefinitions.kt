@@ -45,7 +45,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 @Suppress("unused", "ktlint:standard:function-naming")
-class StepDefinitions {
+class TilsynBarnBeregningStepDefinitions {
     private val logger = LoggerFactory.getLogger(javaClass)
     val vilkårperiodeRepository = VilkårperiodeRepositoryFake()
     val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>()
