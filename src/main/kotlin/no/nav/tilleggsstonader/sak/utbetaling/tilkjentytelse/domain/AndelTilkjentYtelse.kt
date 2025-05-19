@@ -24,7 +24,7 @@ import java.util.UUID
  * Når man fått kvittering fra økonomi oppdateres [statusIverksetting] på nytt
  *
  * @param iverksetting når vi iverksetter en andel så oppdateres dette feltet med id og tidspunkt
- * @param utbetalingsmåned måneden perioden skal iverksettes
+ * @param utbetalingsdato måneden perioden skal iverksettes
  */
 data class AndelTilkjentYtelse(
     @Id
@@ -183,4 +183,17 @@ enum class StatusIverksetting {
     ;
 
     fun erOk() = this == OK || this == OK_UTEN_UTBETALING
+
+    companion object {
+        /**
+         * Hvis utbetalingsmåneden er fremover i tid og det er nytt år så skal det ventes på satsendring før iverksetting.
+         */
+        fun fraSatsBekreftet(satsBekreftet: Boolean): StatusIverksetting {
+            if (!satsBekreftet) {
+                return VENTER_PÅ_SATS_ENDRING
+            }
+
+            return UBEHANDLET
+        }
+    }
 }

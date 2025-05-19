@@ -25,19 +25,8 @@ object BoutgifterAndelTilkjentYtelseMapper {
                     satstype = Satstype.DAG,
                     type = it.grunnlag.målgruppe.tilTypeAndel(Stønadstype.BOUTGIFTER),
                     kildeBehandlingId = saksbehandling.id,
-                    statusIverksetting = statusIverksettingForSatsBekreftet(it.grunnlag.makssatsBekreftet),
+                    statusIverksetting = StatusIverksetting.fraSatsBekreftet(it.grunnlag.makssatsBekreftet),
                     utbetalingsdato = it.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 )
             }
-
-    /**
-     * Hvis utbetalingsmåneden er fremover i tid og det er nytt år så skal det ventes på satsendring før iverksetting.
-     */
-    private fun statusIverksettingForSatsBekreftet(satsBekreftet: Boolean): StatusIverksetting {
-        if (!satsBekreftet) {
-            return StatusIverksetting.VENTER_PÅ_SATS_ENDRING
-        }
-
-        return StatusIverksetting.UBEHANDLET
-    }
 }
