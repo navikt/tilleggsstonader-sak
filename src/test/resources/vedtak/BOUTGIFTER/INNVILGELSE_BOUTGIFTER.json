@@ -30,7 +30,8 @@
           "målgruppe": "NEDSATT_ARBEIDSEVNE",
           "aktivitet": "TILTAK"
         },
-        "stønadsbeløp": 2000
+        "stønadsbeløp": 2000,
+        "delAvTidligereUtbetaling" : false
       }
     ]
   }

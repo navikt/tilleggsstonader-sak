@@ -181,14 +181,17 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 1, 1),
                     utgifter = løpendeUtgifterToBoliger,
+                    delAvTidligereUtbetaling = true,
                 ),
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 2, 1),
                     utgifter = løpendeUtgifterToBoliger,
+                    delAvTidligereUtbetaling = true,
                 ),
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 3, 1),
                     utgifter = løpendeUtgifterToBoliger,
+                    delAvTidligereUtbetaling = true,
                 ),
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 4, 1),

@@ -101,6 +101,7 @@ object BoutgifterTestUtil {
         fom: LocalDate,
         tom: LocalDate = fom.withDayOfMonth(fom.lengthOfMonth()),
         utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+        delAvTidligereUtbetaling: Boolean = false,
     ): BeregningsresultatForLøpendeMåned {
         val grunnlag =
             Beregningsgrunnlag(
@@ -116,6 +117,7 @@ object BoutgifterTestUtil {
             grunnlag =
             grunnlag,
             stønadsbeløp = grunnlag.beregnStønadsbeløp(),
+            delAvTidligereUtbetaling = delAvTidligereUtbetaling,
         )
     }
 }
