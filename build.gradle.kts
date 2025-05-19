@@ -3,15 +3,15 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20250409144459_df36248"
+val familieProsesseringVersion = "2.20250519094842_e8bd711"
 val tilleggsstønaderLibsVersion = "2025.05.19-15.53.0e647539090b"
 val tilleggsstønaderKontrakterVersion = "2025.05.14-19.56.a0c24fafc810"
 val avroVersion = "1.12.0"
-val confluentVersion = "7.9.0"
+val confluentVersion = "7.9.1"
 val joarkHendelseVersion = "08271806"
-val tokenSupportVersion = "5.0.25"
+val tokenSupportVersion = "5.0.27"
 val wiremockVersion = "3.13.0"
-val mockkVersion = "1.14.0"
+val mockkVersion = "1.14.2"
 val testcontainerVersion = "1.21.0"
 
 group = "no.nav.tilleggsstonader.sak"
@@ -20,18 +20,18 @@ version = "1.0.0"
 plugins {
     application
 
-    kotlin("jvm") version "2.1.20"
+    kotlin("jvm") version "2.1.21"
     id("com.diffplug.spotless") version "7.0.3"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.spring") version "2.1.20"
+    kotlin("plugin.spring") version "2.1.21"
 
     id("io.github.androa.gradle.plugin.avro") version "0.0.12"
 
-    id("org.cyclonedx.bom") version "2.2.0"
+    id("org.cyclonedx.bom") version "2.3.0"
 }
 
 repositories {
@@ -109,7 +109,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.22.1"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.22.2"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 }
