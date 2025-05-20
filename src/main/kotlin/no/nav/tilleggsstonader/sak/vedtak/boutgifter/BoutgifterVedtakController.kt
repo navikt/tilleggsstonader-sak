@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperiodeBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.BeregningsresultatBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
@@ -20,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
+import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.VedtaksperioderOversiktService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -34,6 +36,7 @@ class BoutgifterVedtakController(
     private val beregningService: BoutgifterBeregningService,
     private val tilgangService: TilgangService,
     private val vedtakService: VedtakService,
+    private val vedtakOversiktService: VedtaksperioderOversiktService,
     private val behandlingService: BehandlingService,
     private val stegService: StegService,
     private val steg: BoutgifterBeregnYtelseSteg,
@@ -98,14 +101,14 @@ class BoutgifterVedtakController(
         return VedtakDtoMapper.toDto(vedtak, revurderFra)
     }
 
-//    @GetMapping("/fullstendig-oversikt/{behandlingId}")
-//    fun hentFullstendigVedtaksoversikt(
-//        @PathVariable behandlingId: BehandlingId,
-//    ): VedtakResponse? {
-//        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-//        val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
-//        return VedtakDtoMapper.toDto(vedtak, null)
-//    }
+    @GetMapping("/fullstendig-oversikt/{behandlingId}")
+    fun hentFullstendigVedtaksoversikt(
+        @PathVariable behandlingId: BehandlingId,
+    ): List<DetaljertVedtaksperiodeBoutgifter>? {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        return vedtakOversiktService.hentDetaljerteVedtaksperioderForBehandlingBoutgifter(behandlingId)
+    }
 
     @GetMapping("{behandlingId}/foresla")
     fun foreslåVedtaksperioder(
