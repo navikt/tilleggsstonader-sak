@@ -24,7 +24,7 @@ import java.util.UUID
  * Når man fått kvittering fra økonomi oppdateres [statusIverksetting] på nytt
  *
  * @param iverksetting når vi iverksetter en andel så oppdateres dette feltet med id og tidspunkt
- * @param utbetalingsdato måneden perioden skal iverksettes
+ * @param utbetalingsdato datoen perioden skal iverksettes
  */
 data class AndelTilkjentYtelse(
     @Id
