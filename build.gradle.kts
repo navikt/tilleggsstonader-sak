@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20250519094842_e8bd711"
 val tilleggsstønaderLibsVersion = "2025.05.19-16.10.856a8b28ebfb"
-val tilleggsstønaderKontrakterVersion = "2025.05.19-16.09.454035001955"
+val tilleggsstønaderKontrakterVersion = "2025.05.20-14.04.d4aa7565b6a3"
 val avroVersion = "1.12.0"
 val confluentVersion = "7.9.1"
 val joarkHendelseVersion = "08271806"
@@ -28,8 +28,6 @@ plugins {
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.1.21"
-
-    id("io.github.androa.gradle.plugin.avro") version "0.0.12"
 
     id("org.cyclonedx.bom") version "2.3.0"
 }
@@ -92,6 +90,7 @@ dependencies {
     implementation("no.nav.tilleggsstonader-libs:spring:$tilleggsstønaderLibsVersion")
 
     implementation("no.nav.tilleggsstonader.kontrakter:tilleggsstonader-kontrakter:$tilleggsstønaderKontrakterVersion")
+    implementation("no.nav.tilleggsstonader.kontrakter:pdl-personhendelser-avro:$tilleggsstønaderKontrakterVersion")
 
     // For auditlogger. August, 2014, men det er den som blir brukt på NAV
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
