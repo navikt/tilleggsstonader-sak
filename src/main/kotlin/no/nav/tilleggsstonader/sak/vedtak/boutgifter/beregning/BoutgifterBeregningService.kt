@@ -127,9 +127,8 @@ class BoutgifterBeregningService(
             forrigeBeregningsresultat.perioder.filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < revurderFra }
 
         val reberegnedePerioder =
-            nyttBeregningsresultat.filter {
-                it.inneholder(revurderFra) || it.fom.sisteDagenILøpendeMåned() > revurderFra
-            }
+            nyttBeregningsresultat
+                .filter { it.fom.sisteDagenILøpendeMåned() >= revurderFra }
         return BeregningsresultatBoutgifter(perioderFraForrigeVedtakSomSkalBeholdes + reberegnedePerioder)
     }
 
