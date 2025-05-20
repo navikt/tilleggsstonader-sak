@@ -165,7 +165,7 @@ class TilsynBarnBeregnYtelseSteg(
                 }
             }
 
-        tilkjentYtelseService.lagreTilkjentYtelse(saksbehandling, andelerTilkjentYtelse)
+        tilkjentYtelseService.lagreTilkjentYtelse(saksbehandling.id, andelerTilkjentYtelse)
     }
 
     private fun lagInnvilgetVedtak(

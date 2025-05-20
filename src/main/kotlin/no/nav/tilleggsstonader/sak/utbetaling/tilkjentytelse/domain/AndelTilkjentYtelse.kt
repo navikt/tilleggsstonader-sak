@@ -55,6 +55,10 @@ data class AndelTilkjentYtelse(
         if (satstype == Satstype.MÅNED) {
             validerFørsteOgSisteIMåneden()
         }
+        if (satstype == Satstype.DAG) {
+            validerLikFomOgTom()
+            validerFomIkkeLørdagEllerSøndag()
+        }
 
         validerDataForType()
         feilHvisIkke(utbetalingsdato.toYearMonth() == fom.toYearMonth()) {
@@ -67,38 +71,18 @@ data class AndelTilkjentYtelse(
             TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER,
             TypeAndel.TILSYN_BARN_AAP,
             TypeAndel.TILSYN_BARN_ETTERLATTE,
-            -> validerTilsynBarn()
 
             TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER,
             TypeAndel.LÆREMIDLER_AAP,
             TypeAndel.LÆREMIDLER_ETTERLATTE,
-            -> validerLæremidler()
 
             TypeAndel.BOUTGIFTER_AAP,
             TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER,
             TypeAndel.BOUTGIFTER_ETTERLATTE,
-            -> validerBoutgifter()
+            -> validerErDagsats()
 
             TypeAndel.UGYLDIG -> {}
         }
-    }
-
-    private fun validerTilsynBarn() {
-        validerSatstype(Satstype.DAG)
-        validerLikFomOgTom()
-        validerFomIkkeLørdagEllerSøndag()
-    }
-
-    private fun validerLæremidler() {
-        validerSatstype(Satstype.DAG)
-        validerLikFomOgTom()
-        validerFomIkkeLørdagEllerSøndag()
-    }
-
-    private fun validerBoutgifter() {
-        validerSatstype(Satstype.DAG)
-        validerLikFomOgTom()
-        validerFomIkkeLørdagEllerSøndag()
     }
 
     private fun validerFomIkkeLørdagEllerSøndag() {
@@ -107,9 +91,9 @@ data class AndelTilkjentYtelse(
         }
     }
 
-    private fun validerSatstype(forventetSatstype: Satstype) {
-        feilHvis(satstype != forventetSatstype) {
-            "Ugyldig satstype=$satstype forventetSatsType=$forventetSatstype for type=$type"
+    private fun validerErDagsats() {
+        feilHvis(satstype != Satstype.DAG) {
+            "Ugyldig satstype=$satstype forventetSatsType=${Satstype.DAG} for type=$type"
         }
     }
 

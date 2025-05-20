@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverks
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
@@ -161,7 +160,6 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
 private fun finnAndelTilkjentYtelse(vararg beregningsgrunnlag: Beregningsgrunnlag): List<AndelTilkjentYtelse> {
     val fagsak = fagsak(stønadstype = Stønadstype.BOUTGIFTER)
     val behandling = behandling(fagsak = fagsak, steg = StegType.BEREGNE_YTELSE)
-    val saksbehandling = saksbehandling(fagsak = fagsak, behandling = behandling)
 
     val beregningsresultat =
         BeregningsresultatBoutgifter(
@@ -170,7 +168,7 @@ private fun finnAndelTilkjentYtelse(vararg beregningsgrunnlag: Beregningsgrunnla
                     BeregningsresultatForLøpendeMåned(grunnlag = it, stønadsbeløp = it.beregnStønadsbeløp())
                 },
         )
-    return BoutgifterAndelTilkjentYtelseMapper.finnAndelTilkjentYtelse(saksbehandling, beregningsresultat)
+    return beregningsresultat.mapTilAndelTilkjentYtelse(behandling.id)
 }
 
 private fun lagBeregningsgrunnlagMedEnkeltutgift(

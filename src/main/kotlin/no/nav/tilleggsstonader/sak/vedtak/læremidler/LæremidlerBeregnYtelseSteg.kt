@@ -188,7 +188,7 @@ class LæremidlerBeregnYtelseSteg(
 
                     mapTilAndeler(perioder, saksbehandling, utbetalingsdato, satsBekreftet)
                 }
-        tilkjentYtelseService.lagreTilkjentYtelse(saksbehandling, andeler)
+        tilkjentYtelseService.lagreTilkjentYtelse(saksbehandling.id, andeler)
     }
 
     /**
