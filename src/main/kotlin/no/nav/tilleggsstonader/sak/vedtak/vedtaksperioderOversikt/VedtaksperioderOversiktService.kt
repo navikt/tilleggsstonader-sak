@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -36,6 +37,11 @@ class VedtaksperioderOversiktService(
             læremidler = fagsaker.læremidler?.let { oppsummerVedtaksperioderLæremidler(it.id) } ?: emptyList(),
             boutgifter = fagsaker.boutgifter?.let { oppsummerVedtaksperioderBoutgifter(it.id) } ?: emptyList(),
         )
+    }
+
+    fun hentDetaljerteVedtaksperioderForBehandlingBoutgifter(behandlingId: BehandlingId): List<DetaljertVedtaksperiodeBoutgifter>? {
+        val vedtak = vedtakService.hentVedtak<InnvilgelseEllerOpphørBoutgifter>(behandlingId) ?: return null
+        return vedtak.data.finnDetaljerteVedtaksperioder()
     }
 
     private fun oppsummerVedtaksperioderTilsynBarn(fagsakId: FagsakId): List<DetaljertVedtaksperiodeTilsynBarn> {
