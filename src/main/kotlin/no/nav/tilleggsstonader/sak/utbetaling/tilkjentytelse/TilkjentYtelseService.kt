@@ -29,12 +29,12 @@ class TilkjentYtelseService(
             ?: error("Fant ikke tilkjent ytelse med behandlingsid $behandlingId")
 
     fun lagreTilkjentYtelse(
-        saksbehandling: Saksbehandling,
+        behandlingId: BehandlingId,
         andeler: List<AndelTilkjentYtelse>,
     ): TilkjentYtelse =
         tilkjentYtelseRepository.insert(
             TilkjentYtelse(
-                behandlingId = saksbehandling.id,
+                behandlingId = behandlingId,
                 andelerTilkjentYtelse = andeler.toSet(),
             ),
         )

@@ -106,7 +106,6 @@ object BoutgifterTestUtil {
             Beregningsgrunnlag(
                 fom = fom,
                 tom = tom,
-                utbetalingsdato = fom,
                 utgifter = utgifter,
                 makssats = finnMakssats(fom).beløp,
                 makssatsBekreftet = true,

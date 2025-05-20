@@ -206,7 +206,6 @@
       "fom" : "2024-01-01",
       "tom" : "2024-01-31",
       "stønadsbeløp" : 3000,
-      "utbetalingsdato" : "2024-01-01",
       "utgifter" : {
         "UTGIFTER_OVERNATTING" : [ {
           "fom" : "2024-01-01",
@@ -229,7 +228,6 @@
       "fom" : "2024-02-01",
       "tom" : "2024-02-29",
       "stønadsbeløp" : 4953,
-      "utbetalingsdato" : "2024-01-01",
       "utgifter" : {
         "UTGIFTER_OVERNATTING" : [ {
           "fom" : "2024-02-26",

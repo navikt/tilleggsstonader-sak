@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.sisteDagIÅret
-import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.splitPerLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
@@ -55,7 +54,6 @@ object BoutgifterBeregnUtil {
             utgifter = utgifterIPerioden,
             makssats = sats.beløp,
             makssatsBekreftet = sats.bekreftet,
-            utbetalingsdato = periode.utbetalingsdato,
             målgruppe = periode.målgruppe,
             aktivitet = periode.aktivitet,
         )
@@ -114,7 +112,6 @@ object BoutgifterBeregnUtil {
             LøpendeMåned(
                 fom = fom,
                 tom = minOf(fom.sisteDagenILøpendeMåned(), this.tom.sisteDagIÅret()),
-                utbetalingsdato = this.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
             ).medVedtaksperiode(
                 VedtaksperiodeInnenforLøpendeMåned(
                     fom = fom,

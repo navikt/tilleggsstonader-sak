@@ -93,7 +93,6 @@ fun mapBeregningsresultat(
         Beregningsgrunnlag(
             fom = fom,
             tom = tom,
-            utbetalingsdato = parseDato(BoutgifterDomenenøkkel.UTBETALINGSDATO, rad),
             utgifter = finnRelevanteUtgifter(utgifter = utgifter, fom = fom, tom = tom),
             makssats = parseInt(BoutgifterDomenenøkkel.MAKS_SATS, rad),
             makssatsBekreftet = true,

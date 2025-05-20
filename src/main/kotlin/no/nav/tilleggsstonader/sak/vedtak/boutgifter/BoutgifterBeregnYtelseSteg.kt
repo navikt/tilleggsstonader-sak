@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterAndelTilkjentYtelseMapper.finnAndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
@@ -72,7 +71,7 @@ class BoutgifterBeregnYtelseSteg(
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
         )
-        lagreTilkjentYtelse(saksbehandling, beregningsresultat)
+        lagreTilkjentYtelse(saksbehandling.id, beregningsresultat)
     }
 
     private fun beregnOgLagreOpphør(
@@ -99,7 +98,7 @@ class BoutgifterBeregnYtelseSteg(
         val beregningsresultat = beregningService.beregn(saksbehandling, avkortedeVedtaksperioder, TypeVedtak.OPPHØR)
 
         lagreOpphørsvedtak(saksbehandling, avkortedeVedtaksperioder, beregningsresultat, vedtak)
-        lagreTilkjentYtelse(saksbehandling, beregningsresultat)
+        lagreTilkjentYtelse(saksbehandling.id, beregningsresultat)
     }
 
     private fun avkortVedtaksperiodeVedOpphør(
@@ -174,16 +173,12 @@ class BoutgifterBeregnYtelseSteg(
     }
 
     private fun lagreTilkjentYtelse(
-        saksbehandling: Saksbehandling,
+        behandlingId: BehandlingId,
         beregningsresultat: BeregningsresultatBoutgifter,
     ) {
         tilkjentYtelseService.lagreTilkjentYtelse(
-            saksbehandling = saksbehandling,
-            andeler =
-                finnAndelTilkjentYtelse(
-                    saksbehandling,
-                    beregningsresultat,
-                ),
+            behandlingId = behandlingId,
+            andeler = beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId),
         )
     }
 }

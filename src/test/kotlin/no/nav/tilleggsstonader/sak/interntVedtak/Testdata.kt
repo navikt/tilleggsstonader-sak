@@ -453,7 +453,6 @@ object Testdata {
                                 no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
                                     tom = LocalDate.of(2024, 1, 31),
-                                    utbetalingsdato = LocalDate.of(2024, 1, 1),
                                     makssats = 4953,
                                     makssatsBekreftet = true,
                                     målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
@@ -477,7 +476,6 @@ object Testdata {
                                 no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag(
                                     fom = LocalDate.of(2024, 2, 1),
                                     tom = LocalDate.of(2024, 2, 29),
-                                    utbetalingsdato = LocalDate.of(2024, 1, 1),
                                     makssats = 4953,
                                     makssatsBekreftet = true,
                                     målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,

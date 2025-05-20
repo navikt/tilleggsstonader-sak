@@ -74,7 +74,6 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                     Beregningsgrunnlag(
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 31),
-                        utbetalingsdato = LocalDate.of(2025, 1, 1),
                         utgifter = utgiftMidlertidigOvernatting,
                         makssats = 4953,
                         makssatsBekreftet = true,

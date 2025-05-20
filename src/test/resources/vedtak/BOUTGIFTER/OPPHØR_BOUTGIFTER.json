@@ -19,7 +19,6 @@
         "grunnlag": {
           "fom": "2025-01-01",
           "tom": "2025-01-31",
-          "utbetalingsdato": "2025-01-01",
           "utgifter": {
             "LØPENDE_UTGIFTER_EN_BOLIG": [
               {
