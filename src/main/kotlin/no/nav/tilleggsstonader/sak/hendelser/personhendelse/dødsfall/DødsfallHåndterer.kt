@@ -37,9 +37,7 @@ class DødsfallHåndterer(
 
     @Transactional
     fun håndter(dødsfallHendelse: DødsfallHendelse) {
-        if (dødsfallHendelse.erAnnullering) {
-            håndterAnnullertDødsfall(dødsfallHendelse.hendelseId)
-        } else if (hendelseRepository.existsByTypeAndId(TypeHendelse.PERSONHENDELSE, dødsfallHendelse.hendelseId)) {
+        if (hendelseRepository.existsByTypeAndId(TypeHendelse.PERSONHENDELSE, dødsfallHendelse.hendelseId)) {
             logger.info("Dødsfallhendelse med id ${dødsfallHendelse.hendelseId} er allerede behandlet")
         } else {
             håndterDødsfall(dødsfallHendelse)
@@ -95,12 +93,12 @@ class DødsfallHåndterer(
         return false
     }
 
-    private fun håndterAnnullertDødsfall(hendelseId: String) {
-        val eksisterendeHendelse = hendelseRepository.findByTypeAndId(TypeHendelse.PERSONHENDELSE, hendelseId)
+    fun håndterAnnullertDødsfall(annullertHendelseId: String) {
+        val eksisterendeHendelse = hendelseRepository.findByTypeAndId(TypeHendelse.PERSONHENDELSE, annullertHendelseId)
         if (eksisterendeHendelse != null) {
             håndterAnnullertDødsfallhendelse(eksisterendeHendelse)
         } else {
-            logger.debug("Annullert dødsfallhendelse $hendelseId")
+            logger.debug("Annullert dødsfallhendelse $annullertHendelseId")
         }
     }
 
@@ -129,6 +127,7 @@ class DødsfallHåndterer(
                     OpprettDødsfallOppgaveTask.opprettTask(
                         tidligereTaskData
                             .copy(
+                                erAnnullering = true,
                                 beskrivelse =
                                     "Tidligere oppgave for håndtering av dødsfall-hendelse har blitt ferdigstilt. " +
                                         "Denne hendelsen er nå blitt annullert.",

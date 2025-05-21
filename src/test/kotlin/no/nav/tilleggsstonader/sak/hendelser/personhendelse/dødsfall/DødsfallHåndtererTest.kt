@@ -59,7 +59,6 @@ class DødsfallHåndtererTest {
                 hendelseId = UUID.randomUUID().toString(),
                 dødsdato = LocalDate.now(),
                 personidenter = setOf("12345678901"),
-                erAnnullering = false,
             )
         val fagsak = fagsak()
         val behandling = behandling()
@@ -92,7 +91,6 @@ class DødsfallHåndtererTest {
                 hendelseId = UUID.randomUUID().toString(),
                 dødsdato = LocalDate.now(),
                 personidenter = setOf("12345678901"),
-                erAnnullering = false,
             )
         val fagsak = fagsak()
         val behandling = behandling()
@@ -114,7 +112,6 @@ class DødsfallHåndtererTest {
                 hendelseId = UUID.randomUUID().toString(),
                 dødsdato = LocalDate.now(),
                 personidenter = setOf("12345678901"),
-                erAnnullering = false,
             )
         val fagsak = fagsak()
         val behandling = behandling()
@@ -148,7 +145,6 @@ class DødsfallHåndtererTest {
                             hendelseId = annullertHendelseId,
                             dødsdato = LocalDate.now(),
                             personidenter = setOf("12345678901"),
-                            erAnnullering = false,
                         ),
                 ).copy(
                     id = 9999L,
@@ -178,14 +174,7 @@ class DødsfallHåndtererTest {
         every { taskService.findById(opprettetTask.id) } returns opprettetTask
         every { oppgaveService.hentOppgave(opprettetOppgaveId) } returns oppgave
 
-        dødsfallHåndterer.håndter(
-            DødsfallHendelse(
-                hendelseId = annullertHendelseId,
-                dødsdato = LocalDate.now(),
-                personidenter = setOf("1234567801"),
-                erAnnullering = true,
-            ),
-        )
+        dødsfallHåndterer.håndterAnnullertDødsfall(annullertHendelseId)
 
         verify(exactly = 1) { taskService.save(any()) }
     }
@@ -196,14 +185,7 @@ class DødsfallHåndtererTest {
 
         every { hendelseRepository.findByTypeAndId(TypeHendelse.PERSONHENDELSE, annullertHendelseId) } returns null
 
-        dødsfallHåndterer.håndter(
-            DødsfallHendelse(
-                hendelseId = annullertHendelseId,
-                dødsdato = LocalDate.now(),
-                personidenter = setOf("1234567801"),
-                erAnnullering = true,
-            ),
-        )
+        dødsfallHåndterer.håndterAnnullertDødsfall(annullertHendelseId)
 
         verify(exactly = 0) { taskService.save(any()) }
         verify(exactly = 0) { oppgaveService.hentOppgave(any()) }
@@ -252,14 +234,7 @@ class DødsfallHåndtererTest {
         every { oppgaveService.oppdaterOppgave(any()) } returns mockk()
         every { oppgaveService.lagBeskrivelseMelding(any(), any()) } returnsArgument 0
 
-        dødsfallHåndterer.håndter(
-            DødsfallHendelse(
-                hendelseId = annullertHendelseId,
-                dødsdato = LocalDate.now(),
-                personidenter = setOf("1234567801"),
-                erAnnullering = true,
-            ),
-        )
+        dødsfallHåndterer.håndterAnnullertDødsfall(annullertHendelseId)
 
         verify { oppgaveService.oppdaterOppgave(any()) }
         verify(exactly = 0) { taskService.save(any()) }
@@ -290,14 +265,7 @@ class DødsfallHåndtererTest {
         every { hendelseRepository.findByTypeAndId(TypeHendelse.PERSONHENDELSE, annullertHendelseId) } returns eksisterendeHendelse
         every { taskService.findById(9999L) } returns opprettetTask
 
-        dødsfallHåndterer.håndter(
-            DødsfallHendelse(
-                hendelseId = annullertHendelseId,
-                dødsdato = LocalDate.now(),
-                personidenter = setOf("1234567801"),
-                erAnnullering = true,
-            ),
-        )
+        dødsfallHåndterer.håndterAnnullertDødsfall(annullertHendelseId)
 
         verify(exactly = 0) { taskService.save(opprettetTask.copy(status = Status.AVVIKSHÅNDTERT)) }
         verify(exactly = 0) { oppgaveService.hentOppgave(any()) }

@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.hendelser.personhendelse
 
 import no.nav.person.pdl.leesah.Endringstype
 import no.nav.person.pdl.leesah.Personhendelse
+import no.nav.tilleggsstonader.sak.hendelser.personhendelse.PersonhendelseKafkaListener.Companion.OPPLYSNINGSTYPE_DØDSFALL
 import no.nav.tilleggsstonader.sak.hendelser.personhendelse.dødsfall.DødsfallHendelse
 import no.nav.tilleggsstonader.sak.hendelser.personhendelse.dødsfall.DødsfallHåndterer
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -18,6 +19,7 @@ class PersonhendelseKafkaListener(
 ) {
     companion object {
         private const val MDC_HENDELSE_ID_KEY = "hendelseId"
+        const val OPPLYSNINGSTYPE_DØDSFALL = "DOEDSFALL_V1"
     }
 
     @KafkaListener(
@@ -32,11 +34,14 @@ class PersonhendelseKafkaListener(
         consumerRecords
             .map { it.value() }
             .filter { it.erDødsfall() }
-            .map { it.tilDødsfallDomene() }
             .forEach {
                 try {
                     MDC.put(MDC_HENDELSE_ID_KEY, it.hendelseId)
-                    dødsfallHåndterer.håndter(it)
+                    if (it.erAnnullering()) {
+                        dødsfallHåndterer.håndterAnnullertDødsfall(it.tidligereHendelseId)
+                    } else {
+                        dødsfallHåndterer.håndter(it.tilDødsfallDomene())
+                    }
                 } finally {
                     MDC.remove(MDC_HENDELSE_ID_KEY)
                 }
@@ -46,14 +51,13 @@ class PersonhendelseKafkaListener(
     }
 }
 
-private fun Personhendelse.erDødsfall() = doedsfall != null
+private fun Personhendelse.erDødsfall() = opplysningstype == OPPLYSNINGSTYPE_DØDSFALL
 
 private fun Personhendelse.tilDødsfallDomene() =
     DødsfallHendelse(
-        if (this.erAnnullering()) this.tidligereHendelseId else this.hendelseId,
+        this.hendelseId,
         this.doedsfall.doedsdato,
         this.personidenter.toSet(),
-        erAnnullering(),
     )
 
 private fun Personhendelse.erAnnullering() = this.endringstype == Endringstype.ANNULLERT

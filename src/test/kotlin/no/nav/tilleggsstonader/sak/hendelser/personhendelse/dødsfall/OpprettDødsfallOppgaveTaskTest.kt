@@ -20,7 +20,7 @@ class OpprettDødsfallOppgaveTaskTest {
     @Test
     fun `oppretter oppgave når personen fortsatt er død`() {
         val personident = "12345678901"
-        val dødsfallHendelse = DødsfallHendelse(UUID.randomUUID().toString(), LocalDate.now(), setOf(personident), false)
+        val dødsfallHendelse = DødsfallHendelse(UUID.randomUUID().toString(), LocalDate.now(), setOf(personident))
         val task = OpprettDødsfallOppgaveTask.opprettTask(Stønadstype.LÆREMIDLER, dødsfallHendelse)
         val person =
             mockk<PdlSøker> {
@@ -45,7 +45,7 @@ class OpprettDødsfallOppgaveTaskTest {
     @Test
     fun `oppretter ikke oppgave når person ikke er død`() {
         val personident = "12345678901"
-        val dødsfallHendelse = DødsfallHendelse(UUID.randomUUID().toString(), LocalDate.now(), setOf(personident), false)
+        val dødsfallHendelse = DødsfallHendelse(UUID.randomUUID().toString(), LocalDate.now(), setOf(personident))
         val task = OpprettDødsfallOppgaveTask.opprettTask(Stønadstype.LÆREMIDLER, dødsfallHendelse)
         val person =
             mockk<PdlSøker> {

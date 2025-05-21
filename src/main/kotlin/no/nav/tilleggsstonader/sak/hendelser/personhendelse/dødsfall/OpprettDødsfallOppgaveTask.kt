@@ -32,7 +32,7 @@ class OpprettDødsfallOppgaveTask(
 
         val person = personService.hentPersonUtenBarn(dødsfallHendelse.personidenter.first())
 
-        if (dødsfallHendelse.erAnnullering || personErFortsattDød(person.søker)) {
+        if (data.erAnnullering || personErFortsattDød(person.søker)) {
             val folkeregisterIdent =
                 person.søker.folkeregisteridentifikator
                     .first { it.status == FolkeregisteridentifikatorStatus.I_BRUK }
@@ -63,6 +63,7 @@ class OpprettDødsfallOppgaveTask(
     data class DødsfallOppgaveTaskData(
         val dødsfallHendelse: DødsfallHendelse,
         val stønadstype: Stønadstype,
+        val erAnnullering: Boolean,
         val beskrivelse: String? = null,
     )
 
@@ -86,6 +87,7 @@ class OpprettDødsfallOppgaveTask(
                         DødsfallOppgaveTaskData(
                             dødsfallHendelse = dødsfallHendelse,
                             stønadstype = stønadstype,
+                            erAnnullering = false,
                         ),
                     ),
             )

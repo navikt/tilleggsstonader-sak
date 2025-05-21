@@ -5,9 +5,11 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
+import no.nav.person.pdl.leesah.Endringstype
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.doedsfall.Doedsfall
 import no.nav.tilleggsstonader.sak.hendelser.ConsumerRecordUtil.lagConsumerRecord
+import no.nav.tilleggsstonader.sak.hendelser.personhendelse.PersonhendelseKafkaListener.Companion.OPPLYSNINGSTYPE_DØDSFALL
 import no.nav.tilleggsstonader.sak.hendelser.personhendelse.dødsfall.DødsfallHendelse
 import no.nav.tilleggsstonader.sak.hendelser.personhendelse.dødsfall.DødsfallHåndterer
 import org.junit.jupiter.api.Test
@@ -29,6 +31,7 @@ class PersonhendelseKafkaListenerTest {
             Personhendelse().apply {
                 hendelseId = UUID.randomUUID().toString()
                 personidenter = listOf("12345678901")
+                opplysningstype = OPPLYSNINGSTYPE_DØDSFALL
                 doedsfall =
                     Doedsfall().apply {
                         doedsdato = LocalDate.now()
@@ -55,9 +58,35 @@ class PersonhendelseKafkaListenerTest {
                 dødsfallHendelse.hendelseId,
                 dødsfallHendelse.doedsfall.doedsdato,
                 dødsfallHendelse.personidenter.toSet(),
-                false,
             )
         verify(exactly = 1) { dødsfallHåndterer.håndter(forventetDødsfallHendelse) }
+        verify(exactly = 1) { ack.acknowledge() }
+    }
+
+    @Test
+    fun `lytter på annullerte dødshendelser og kaller service videre`() {
+        every { dødsfallHåndterer.håndterAnnullertDødsfall(any()) } just runs
+        every { ack.acknowledge() } just runs
+
+        val annullertDødsfallHendelse =
+            Personhendelse().apply {
+                hendelseId = UUID.randomUUID().toString()
+                personidenter = listOf("12345678901")
+                opplysningstype = OPPLYSNINGSTYPE_DØDSFALL
+                endringstype = Endringstype.ANNULLERT
+                doedsfall =
+                    Doedsfall().apply {
+                        doedsdato = LocalDate.now()
+                    }
+                tidligereHendelseId = UUID.randomUUID().toString()
+            }
+
+        personhendelseKafkaListener.listen(
+            listOf(lagConsumerRecord(UUID.randomUUID().toString(), annullertDødsfallHendelse)),
+            ack,
+        )
+
+        verify(exactly = 1) { dødsfallHåndterer.håndterAnnullertDødsfall(annullertDødsfallHendelse.tidligereHendelseId) }
         verify(exactly = 1) { ack.acknowledge() }
     }
 }
