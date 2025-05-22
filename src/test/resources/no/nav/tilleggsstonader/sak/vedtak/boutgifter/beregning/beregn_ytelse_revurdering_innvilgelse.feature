@@ -38,9 +38,9 @@ Egenskap: Innvilgelse av boutgifter - revurdering
       | 15.02.2025 | 18.02.2025 |
 
     Så kan vi forvente følgende beregningsresultat for behandling=2
-      | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato |
-      | 07.01.2025 | 06.02.2025 | 1000         | 4953      | 07.01.2025      |
-      | 15.02.2025 | 14.03.2025 | 3000         | 4953      | 15.02.2025      |
+      | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Del av tidligere utbetaling |
+      | 07.01.2025 | 06.02.2025 | 1000         | 4953      | 07.01.2025      | Ja                          |
+      | 15.02.2025 | 14.03.2025 | 3000         | 4953      | 15.02.2025      | Nei                         |
 
     Og følgende vedtaksperioder for behandling=2
       | Fom        | Tom        |
@@ -74,8 +74,8 @@ Egenskap: Innvilgelse av boutgifter - revurdering
       | 04.03.2025 | 06.03.2025 |
 
     Så kan vi forvente følgende beregningsresultat for behandling=2
-      | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato |
-      | 25.02.2025 | 24.03.2025 | 4953         | 4953      | 25.02.2025      |
+      | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Del av tidligere utbetaling |
+      | 25.02.2025 | 24.03.2025 | 4953         | 4953      | 25.02.2025      | Ja                          |
 
     Og følgende vedtaksperioder for behandling=2
       | Fom        | Tom        |
@@ -120,10 +120,10 @@ Egenskap: Innvilgelse av boutgifter - revurdering
       | 17.08.2024 | 20.10.2024 |
 
     Så kan vi forvente følgende beregningsresultat for behandling=2
-      | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato |
-      | 17.08.2024 | 16.09.2024 | 4500         | 4809      | 17.08.2024      |
-      | 17.09.2024 | 16.10.2024 | 4500         | 4809      | 17.09.2024      |
-      | 17.10.2024 | 20.10.2024 | 4500         | 4809      | 17.10.2024      |
+      | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Del av tidligere utbetaling |
+      | 17.08.2024 | 16.09.2024 | 4500         | 4809      | 17.08.2024      | Ja                          |
+      | 17.09.2024 | 16.10.2024 | 4500         | 4809      | 17.09.2024      | Ja                          |
+      | 17.10.2024 | 20.10.2024 | 4500         | 4809      | 17.10.2024      | Ja                          |
 
     Og følgende andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -132,7 +132,7 @@ Egenskap: Innvilgelse av boutgifter - revurdering
       | 01.10.2024 | 4500  | BOUTGIFTER_AAP | 17.10.2024      |
 
   Scenario: Aktiviteten blir forskjøvet en uke framover i tid, inn i neste måned
-    Resultat: Forventer nye nye beregningsperioder, mens andelen får ny dato
+  Resultat: Forventer nye nye beregningsperioder, mens andelen får ny dato
     Gitt følgende boutgifter av type LØPENDE_UTGIFTER_EN_BOLIG for behandling=1
       | Fom        | Tom        | Utgift |
       | 01.01.2025 | 30.02.2025 | 1000   |
@@ -156,7 +156,7 @@ Egenskap: Innvilgelse av boutgifter - revurdering
       | 03.02.2025 | 1000  | BOUTGIFTER_AAP | 03.02.2025      |
 
   Scenario: Har faste utgifter fra før, legger inn en midlertidig overnatting
-    Resultat: Forventer feilmelding, ettersom det ikke er støttet i løsningen enda
+  Resultat: Forventer feilmelding, ettersom det ikke er støttet i løsningen enda
     Gitt følgende boutgifter av type LØPENDE_UTGIFTER_EN_BOLIG for behandling=1
       | Fom        | Tom        | Utgift |
       | 01.01.2025 | 31.11.2025 | 1000   |

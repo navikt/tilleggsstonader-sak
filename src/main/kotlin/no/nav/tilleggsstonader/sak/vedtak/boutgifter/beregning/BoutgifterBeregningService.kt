@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.lagBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.splittTilLøpendeMåneder
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.MarkerSomDelAvTidligereUtbetlingUtils.markerSomDelAvTidligereUtbetaling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -124,11 +125,15 @@ class BoutgifterBeregningService(
         forrigeBeregningsresultat: BeregningsresultatBoutgifter,
     ): BeregningsresultatBoutgifter {
         val perioderFraForrigeVedtakSomSkalBeholdes =
-            forrigeBeregningsresultat.perioder.filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < revurderFra }
+            forrigeBeregningsresultat.perioder
+                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < revurderFra }
+                .markerSomDelAvTidligereUtbetaling()
 
         val reberegnedePerioder =
             nyttBeregningsresultat
-                .filter { it.fom.sisteDagenILøpendeMåned() >= revurderFra }
+                .filter {
+                    it.fom.sisteDagenILøpendeMåned() >= revurderFra
+                }.markerSomDelAvTidligereUtbetaling(forrigeBeregningsresultat.perioder)
         return BeregningsresultatBoutgifter(perioderFraForrigeVedtakSomSkalBeholdes + reberegnedePerioder)
     }
 

@@ -233,6 +233,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 1, 1),
                     utgifter = utgiftMidlertidigOvernatting,
+                    delAvTidligereUtbetaling = true,
                 ),
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 3, 10),

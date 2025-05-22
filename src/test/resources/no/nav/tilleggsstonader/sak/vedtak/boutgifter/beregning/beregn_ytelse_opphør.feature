@@ -38,9 +38,9 @@ Egenskap: Beregning ved opphør av boutgifter
       Og vi opphører boutgifter behandling=2 med revurderFra=15.02.2025
 
       Så kan vi forvente følgende beregningsresultat for behandling=2
-        | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato |
-        | 01.01.2025 | 31.01.2025 | 1000         | 4953      | 01.01.2025      |
-        | 01.02.2025 | 14.02.2025 | 1000         | 4953      | 01.02.2025      |
+        | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Del av tidligere utbetaling |
+        | 01.01.2025 | 31.01.2025 | 1000         | 4953      | 01.01.2025      | Ja                          |
+        | 01.02.2025 | 14.02.2025 | 1000         | 4953      | 01.02.2025      | Ja                          |
 
       Og følgende andeler for behandling=2
         | Fom        | Beløp | Type           | Utbetalingsdato |
@@ -67,8 +67,8 @@ Egenskap: Beregning ved opphør av boutgifter
       Når vi opphører boutgifter behandling=2 med revurderFra=01.02.2025
 
       Så kan vi forvente følgende beregningsresultat for behandling=2
-        | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato |
-        | 01.01.2025 | 31.01.2025 | 99999        | 4953      | 01.01.2025      |
+        | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Del av tidligere utbetaling |
+        | 01.01.2025 | 31.01.2025 | 99999        | 4953      | 01.01.2025      | Ja                          |
 
       Og følgende andeler for behandling=2
         | Fom        | Beløp | Type           | Utbetalingsdato |
