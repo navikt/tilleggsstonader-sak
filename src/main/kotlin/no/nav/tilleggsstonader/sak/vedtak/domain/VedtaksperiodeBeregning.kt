@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -29,4 +31,12 @@ data class VedtaksperiodeBeregning(
         fom: LocalDate,
         tom: LocalDate,
     ): VedtaksperiodeBeregning = this.copy(fom = fom, tom = tom)
+
+    companion object {
+        fun List<VedtaksperiodeBeregning>.mergeSammenhengende() =
+            mergeSammenhengende(
+                { v1, v2 -> v1.overlapperEllerPåfølgesAv(v2) },
+                { v1, v2 -> v1.medPeriode(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
+            )
+    }
 }

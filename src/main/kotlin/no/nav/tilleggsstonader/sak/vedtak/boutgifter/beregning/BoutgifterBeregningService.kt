@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -27,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning.Companion.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.splitFraRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
@@ -69,7 +68,7 @@ class BoutgifterBeregningService(
         val vedtaksperioderBeregning =
             vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(behandling.revurderFra)
 
-        validerUtgifterTilMidlertidigOvernattingErInnenforVedtaksperiodene(
+        validerIngenDelvisOverlappMellomMidlertidigeUtgifterOgVedtaksperioder(
             utgifterPerVilkårtype,
             vedtaksperioderBeregning,
         )
@@ -146,23 +145,24 @@ class BoutgifterBeregningService(
             .withTypeOrThrow<InnvilgelseEllerOpphørBoutgifter>()
 }
 
-private fun validerUtgifterTilMidlertidigOvernattingErInnenforVedtaksperiodene(
+private fun validerIngenDelvisOverlappMellomMidlertidigeUtgifterOgVedtaksperioder(
     utgifterPerType: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
     vedtaksperioder: List<VedtaksperiodeBeregning>,
 ) {
-    val utgifterMidlertidigOvernatting = utgifterPerType[TypeBoutgift.UTGIFTER_OVERNATTING].orEmpty()
-    val sammenslåtteVedtaksperioder =
-        vedtaksperioder.mergeSammenhengende(
-            { v1, v2 -> v1.overlapperEllerPåfølgesAv(v2) },
-            { v1, v2 -> v1.medPeriode(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
-        )
+    val midlertidigOvernattinger = utgifterPerType[TypeBoutgift.UTGIFTER_OVERNATTING].orEmpty()
 
-    val alleUtgifterErInnenforVedtaksperioder =
-        utgifterMidlertidigOvernatting.all { utgiftsperiode ->
-            sammenslåtteVedtaksperioder.any { it.inneholder(utgiftsperiode) }
-        }
+    fun UtgiftBeregningBoutgifter.harDelvisOverlappMed(vedtaksperiode: VedtaksperiodeBeregning): Boolean =
+        vedtaksperiode.overlapper(this) && !vedtaksperiode.inneholder(this)
 
-    brukerfeilHvisIkke(alleUtgifterErInnenforVedtaksperioder) {
+    val alleOverlappErOmsluttende =
+        midlertidigOvernattinger
+            .all { midlertidigOvernatting ->
+                vedtaksperioder
+                    .mergeSammenhengende()
+                    .none { midlertidigOvernatting.harDelvisOverlappMed(it) }
+            }
+
+    brukerfeilHvisIkke(alleOverlappErOmsluttende) {
         "Du har lagt inn utgifter til midlertidig overnatting som ikke er inneholdt i en vedtaksperiode. Foreløpig støtter vi ikke dette."
     }
 }
