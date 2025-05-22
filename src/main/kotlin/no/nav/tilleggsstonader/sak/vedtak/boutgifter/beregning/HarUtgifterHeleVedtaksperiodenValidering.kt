@@ -5,12 +5,13 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 
 fun validerUtgiftHeleVedtaksperioden(
     vedtaksperioder: List<Vedtaksperiode>,
-    utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    utgifter: BoutgifterPerUtgiftstype,
 ) {
     val vedtaksperioderUtenOppfylteUtgifter =
         vedtaksperioder.filter { vedtaksperiode ->

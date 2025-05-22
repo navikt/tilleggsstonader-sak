@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.finnMakssats
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperioderBoutgifterMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import org.assertj.core.api.Assertions.assertThat
@@ -377,7 +378,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
         val type: TypeBoutgift,
     )
 
-    private fun List<UtgifterMedType>.tilUtgiftMap(): Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+    private fun List<UtgifterMedType>.tilUtgiftMap(): BoutgifterPerUtgiftstype =
         this
             .groupBy { it.type }
             .mapValues { entry ->

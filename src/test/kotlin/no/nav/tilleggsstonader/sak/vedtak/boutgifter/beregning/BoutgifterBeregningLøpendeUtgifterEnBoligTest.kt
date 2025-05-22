@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vilkårp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -47,7 +48,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
             unleashService = unleashService,
         )
 
-    val løpendeUtgifterEnBolig: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+    val løpendeUtgifterEnBolig: BoutgifterPerUtgiftstype =
         mapOf(
             TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                 listOf(
@@ -128,7 +129,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
 
     @Test
     fun `Beholder perioder fra før revuderFra, og beregner nye perioder ved revurdering`() {
-        val utgifterRevurdering: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgifterRevurdering: BoutgifterPerUtgiftstype =
             mapOf(
                 TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                     listOf(
@@ -166,7 +167,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                 vedtaksperioder = vedtaksperioderFørstegangsbehandling,
             )
 
-        val utgifterEtterRevuderFra: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgifterEtterRevuderFra: BoutgifterPerUtgiftstype =
             mapOf(
                 TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                     listOf(

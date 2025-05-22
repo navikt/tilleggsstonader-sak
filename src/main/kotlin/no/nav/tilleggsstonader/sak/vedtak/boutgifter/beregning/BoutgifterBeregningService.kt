@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.MarkerSomDelAvTid
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
@@ -94,7 +95,7 @@ class BoutgifterBeregningService(
 
     private fun beregnAktuellePerioder(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
-        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+        utgifter: BoutgifterPerUtgiftstype,
     ): List<BeregningsresultatForLøpendeMåned> =
         vedtaksperioder
             .sorted()
@@ -110,7 +111,7 @@ class BoutgifterBeregningService(
                 )
             }
 
-    private fun skalAvkorteUtbetalingPeriode(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>): Boolean =
+    private fun skalAvkorteUtbetalingPeriode(utgifter: BoutgifterPerUtgiftstype): Boolean =
         TypeBoutgift.UTGIFTER_OVERNATTING !in utgifter.keys || !unleashService.isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT)
 
     /**
@@ -147,15 +148,15 @@ class BoutgifterBeregningService(
             .withTypeOrThrow<InnvilgelseEllerOpphørBoutgifter>()
 }
 
-private fun Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>.filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder(
+private fun BoutgifterPerUtgiftstype.filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder(
     vedtaksperioder: List<VedtaksperiodeBeregning>,
-): Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+): BoutgifterPerUtgiftstype =
     mapValues { (_, utgifter) ->
         utgifter.filter { utgift -> vedtaksperioder.any { vedtaksperiode -> vedtaksperiode.overlapper(utgift) } }
     }
 
 private fun validerMidlertidigeUtgifterStrekkerSegUtenforVedtaksperiodene(
-    utgifterPerType: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    utgifterPerType: BoutgifterPerUtgiftstype,
     vedtaksperioder: List<VedtaksperiodeBeregning>,
 ) {
     val midlertidigOvernattinger = utgifterPerType[TypeBoutgift.UTGIFTER_OVERNATTING].orEmpty()
@@ -171,7 +172,7 @@ private fun validerMidlertidigeUtgifterStrekkerSegUtenforVedtaksperiodene(
 }
 
 private fun List<UtbetalingPeriode>.validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(
-    utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    utgifter: BoutgifterPerUtgiftstype,
 ): List<UtbetalingPeriode> {
     val fasteUtgifter =
         (utgifter[TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG] ?: emptyList()) +
@@ -194,7 +195,7 @@ private fun List<UtbetalingPeriode>.validerIngenUtbetalingsperioderOverlapperFle
 }
 
 private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(
-    utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    utgifter: BoutgifterPerUtgiftstype,
 ): List<UtbetalingPeriode> {
     val utgifterTilOvernatting = utgifter[TypeBoutgift.UTGIFTER_OVERNATTING] ?: emptyList()
     val utbetalingsperioder = this

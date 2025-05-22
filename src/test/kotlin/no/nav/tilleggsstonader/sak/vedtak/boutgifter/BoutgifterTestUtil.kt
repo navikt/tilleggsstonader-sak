@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.finnMakssats
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
@@ -100,7 +101,7 @@ object BoutgifterTestUtil {
     fun lagBeregningsresultatMåned(
         fom: LocalDate,
         tom: LocalDate = fom.withDayOfMonth(fom.lengthOfMonth()),
-        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+        utgifter: BoutgifterPerUtgiftstype,
         delAvTidligereUtbetaling: Boolean = false,
     ): BeregningsresultatForLøpendeMåned {
         val grunnlag =

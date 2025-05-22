@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder
 
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 
@@ -85,7 +85,7 @@ object DetaljertVedtaksperioderBoutgifterMapper {
      * Utgifter fra samlinger trekkes fra makssats først, slik at det som dekkes på samlinger beregnes på det gjenstående den måneden.
      */
     private fun beregnAndelAvUtgifterSomDekkes(
-        utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+        utgifter: BoutgifterPerUtgiftstype,
         makssats: Int,
     ): List<UtgiftTilOvernatting> {
         val utgifterOvernatting = utgifter[TypeBoutgift.UTGIFTER_OVERNATTING] ?: error("Burde ikke være mulig")
@@ -116,7 +116,7 @@ object DetaljertVedtaksperioderBoutgifterMapper {
             }
     }
 
-    private fun summerLøpendeUtgifterBo(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>): Int =
+    private fun summerLøpendeUtgifterBo(utgifter: BoutgifterPerUtgiftstype): Int =
         utgifter
             .flatMap { (type, liste) ->
                 liste.filter { type == TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG || type == TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER }

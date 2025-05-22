@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vilkårp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -48,7 +49,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
             unleashService = unleashService,
         )
 
-    val utgiftMidlertidigOvernatting: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+    val utgiftMidlertidigOvernatting: BoutgifterPerUtgiftstype =
         mapOf(
             TypeBoutgift.UTGIFTER_OVERNATTING to
                 listOf(
@@ -120,7 +121,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
 
     @Test
     fun `Kaster feil hvis utgift delvis i vedtaksperiode`() {
-        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgift: BoutgifterPerUtgiftstype =
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
@@ -157,7 +158,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 ),
             )
 
-        val utgift: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgift: BoutgifterPerUtgiftstype =
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
@@ -187,7 +188,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
 
     @Test
     fun `Beholder perioder fra før revuderFra, og beregner nye perioder ved revurdering`() {
-        val utgifterRevurdering: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgifterRevurdering: BoutgifterPerUtgiftstype =
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
@@ -216,7 +217,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 ),
             )
 
-        val utgiftEtterRevurderFra: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+        val utgiftEtterRevurderFra: BoutgifterPerUtgiftstype =
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(

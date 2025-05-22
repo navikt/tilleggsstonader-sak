@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 
 object UtgifterValideringUtil {
@@ -12,7 +13,7 @@ object UtgifterValideringUtil {
      * gir rett på stønad (hhv. 3/6 mnd for utgifter overnatting/løpende utgifter).
      *
      */
-    fun validerUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>) {
+    fun validerUtgifter(utgifter: BoutgifterPerUtgiftstype) {
         brukerfeilHvis(utgifter.values.flatten().isEmpty()) {
             "Det er ikke lagt inn noen oppfylte utgiftsperioder"
         }
@@ -31,7 +32,7 @@ object UtgifterValideringUtil {
         }
     }
 
-    private fun detFinnesBådeLøpendeOgMidlertidigeUtgifter(utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>): Boolean {
+    private fun detFinnesBådeLøpendeOgMidlertidigeUtgifter(utgifter: BoutgifterPerUtgiftstype): Boolean {
         val finnesLøpendeUtgifter =
             utgifter.keys.any {
                 it == TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG || it == TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER

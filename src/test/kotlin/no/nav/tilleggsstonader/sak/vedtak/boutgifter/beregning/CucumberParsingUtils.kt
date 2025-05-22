@@ -20,7 +20,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
-import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BeregningNøkler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BoutgifterDomenenøkkel
@@ -86,7 +86,7 @@ fun mapVedtaksperioder(dataTable: DataTable): List<Vedtaksperiode> =
 
 fun mapBeregningsresultat(
     dataTable: DataTable,
-    utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    utgifter: BoutgifterPerUtgiftstype,
 ) = dataTable.mapRad { rad ->
     val fom = parseDato(DomenenøkkelFelles.FOM, rad)
     val tom = parseDato(DomenenøkkelFelles.TOM, rad)
@@ -115,11 +115,10 @@ fun mapBeregningsresultat(
 }
 
 private fun finnRelevanteUtgifter(
-    utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    utgifter: BoutgifterPerUtgiftstype,
     fom: LocalDate,
     tom: LocalDate,
-): Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
-    utgifter.mapValues { (_, utgifterListe) -> utgifterListe.filter { it.overlapper(Datoperiode(fom, tom)) } }
+): BoutgifterPerUtgiftstype = utgifter.mapValues { (_, utgifterListe) -> utgifterListe.filter { it.overlapper(Datoperiode(fom, tom)) } }
 
 data class ForenkletAndel(
     val fom: LocalDate,

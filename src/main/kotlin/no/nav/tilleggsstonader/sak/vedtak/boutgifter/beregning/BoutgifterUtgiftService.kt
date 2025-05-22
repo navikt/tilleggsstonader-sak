@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service
 class BoutgifterUtgiftService(
     private val vilkårService: VilkårService,
 ) {
-    fun hentUtgifterTilBeregning(behandlingId: BehandlingId): Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>> =
+    fun hentUtgifterTilBeregning(behandlingId: BehandlingId): BoutgifterPerUtgiftstype =
         vilkårService
             .hentOppfylteBoutgiftVilkår(behandlingId)
             .groupBy { TypeBoutgift.fraVilkårType(it.type) }

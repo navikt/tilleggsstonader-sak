@@ -36,9 +36,11 @@ data class BeregningsresultatForLøpendeMåned(
 data class Beregningsgrunnlag(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val utgifter: Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>,
+    val utgifter: BoutgifterPerUtgiftstype,
     val makssats: Int,
     val makssatsBekreftet: Boolean,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
 ) : Periode<LocalDate>
+
+typealias BoutgifterPerUtgiftstype = Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>
