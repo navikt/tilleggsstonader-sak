@@ -2,10 +2,10 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.sisteDagIÅret
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterVedtaksperiodeUtil.splitPerLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.splitPerLøpendeMåneder
 import kotlin.collections.plus
 import kotlin.math.min
 
