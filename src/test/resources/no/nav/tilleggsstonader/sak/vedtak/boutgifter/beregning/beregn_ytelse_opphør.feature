@@ -80,7 +80,7 @@ Egenskap: Beregning ved opphør av boutgifter
 
     Scenario: Har innvilget to samlinger, og den siste skal opphøres
     Revurderer etter den første perioden, uten å fjerne utgiftene til samlingen i januar.
-    Resultat: Forventer feilmelding, ettersom det ikke er støttet å ha utgifter til samling utenfor vedtaksperiodene
+    Resultat: Forventer at det skal gå fint, ettersom samlingen i januar ligger helt utenfor vedtaksperiodene
       Gitt følgende boutgifter av type UTGIFTER_OVERNATTING for behandling=1
         | Fom        | Tom        | Utgift |
         | 07.01.2025 | 09.01.2025 | 1000   |
@@ -93,6 +93,8 @@ Egenskap: Beregning ved opphør av boutgifter
 
       Når vi kopierer perioder fra forrige behandling for behandling=2
 
-      Og vi opphører boutgifter behandling=2 med revurderFra=2025-01-09
+      Og vi opphører boutgifter behandling=2 med revurderFra=2025-01-10
 
-      Så forvent følgende feilmelding: Du har lagt inn utgifter til midlertidig overnatting som ikke er inneholdt i en vedtaksperiode. Foreløpig støtter vi ikke dette.
+      Så kan vi forvente følgende beregningsresultat for behandling=2
+        | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Del av tidligere utbetaling |
+        | 07.01.2025 | 06.02.2025 | 1000         | 4953      | 01.01.2025      | Ja                          |
