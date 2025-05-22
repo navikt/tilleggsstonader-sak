@@ -159,11 +159,11 @@ Egenskap: Innvilgelse av boutgifter - revurdering
   Resultat: Forventer feilmelding, ettersom det ikke er støttet i løsningen enda
     Gitt følgende boutgifter av type LØPENDE_UTGIFTER_EN_BOLIG for behandling=1
       | Fom        | Tom        | Utgift |
-      | 01.01.2025 | 31.11.2025 | 1000   |
+      | 01.01.2025 | 31.01.2025 | 1000   |
 
     Og vi innvilger boutgifter for behandling=1 med følgende vedtaksperioder
       | Fom        | Tom        |
-      | 01.01.2025 | 31.11.2025 |
+      | 01.01.2025 | 31.01.2025 |
 
     Og vi kopierer perioder fra forrige behandling for behandling=2
 
@@ -173,6 +173,7 @@ Egenskap: Innvilgelse av boutgifter - revurdering
 
     Når vi innvilger boutgifter behandling=2 med revurderFra=15.02.2025 med følgende vedtaksperioder
       | Fom        | Tom        |
+      | 01.01.2025 | 31.01.2025 |
       | 15.02.2025 | 16.02.2025 |
 
     Så forvent følgende feilmelding: Foreløpig støtter vi ikke løpende og midlertidige utgifter i samme behandling
