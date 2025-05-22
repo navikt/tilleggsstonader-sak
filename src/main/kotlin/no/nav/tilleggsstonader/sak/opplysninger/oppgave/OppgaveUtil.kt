@@ -43,6 +43,8 @@ object OppgaveUtil {
             Oppgavetype.GodkjenneVedtak,
             -> "tilleggsstonader-sak"
 
+            Oppgavetype.VurderLivshendelse -> null
+
             else -> error("Håndterer ikke behandlesAvApplikasjon for $oppgavetype")
         }
 
