@@ -54,6 +54,8 @@ object OppgaveUtil {
             Oppgavetype.GodkjenneVedtak,
             -> true
 
+            Oppgavetype.VurderLivshendelse -> false
+
             else -> error("Håndterer ikke klar-mappe-håndtering for $oppgavetype")
         }
 
