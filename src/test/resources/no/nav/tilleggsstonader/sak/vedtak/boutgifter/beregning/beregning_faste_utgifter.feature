@@ -153,3 +153,18 @@ Egenskap: Beregning av faste utgifter
         | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
         | 15.01.2025 | 14.02.2025 | 4000         | 4953      | 15.01.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
         | 15.02.2025 | 20.02.2025 | 4000         | 4953      | 15.02.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
+
+    Scenario: Kan ikke ha midlertidige utgifter og faste utgifter i samme behandling
+      Gitt følgende boutgifter av type LØPENDE_UTGIFTER_EN_BOLIG for behandling=1
+        | Fom        | Tom        | Utgift |
+        | 01.01.2025 | 31.03.2025 | 3000   |
+
+      Og følgende boutgifter av type UTGIFTER_OVERNATTING for behandling=1
+        | Fom        | Tom        | Utgift |
+        | 01.01.2025 | 03.01.2025 | 3000   |
+
+      Når vi innvilger boutgifter for behandling=1 med følgende vedtaksperioder
+        | Fom        | Tom        | Aktivitet | Målgruppe           |
+        | 01.01.2025 | 31.01.2025 | UTDANNING | NEDSATT_ARBEIDSEVNE |
+
+      Så forvent følgende feilmelding: Foreløpig støtter vi ikke løpende og midlertidige utgifter i samme behandling
