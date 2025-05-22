@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.summerUtgifter
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBoutgifterMedAndelTilUtbetaling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
@@ -23,13 +22,25 @@ data class BeregningsresultatForPeriodeDto(
     @Deprecated("Skal gå over til å bruke utgifterTilUtbetaling")
     val utgifter: BoutgifterPerUtgiftstype,
     // Kan renames til utgifter når frontend er klar
-    val utgifterTilUtbetaling: List<UtgiftBoutgifterMedAndelTilUtbetaling>,
+    val utgifterTilUtbetaling: List<UtgiftBoutgifterMedAndelTilUtbetalingDto>,
     val sumUtgifter: Int,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
     val makssatsBekreftet: Boolean,
     val delAvTidligereUtbetaling: Boolean,
 ) : Periode<LocalDate>
+
+data class UtgiftBoutgifterMedAndelTilUtbetalingDto(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val utgift: Int,
+    val tilUtbetaling: Int,
+    val erFørRevurderFra: Boolean,
+) : Periode<LocalDate> {
+    init {
+        validatePeriode()
+    }
+}
 
 fun BeregningsresultatBoutgifter.tilDto(revurderFra: LocalDate?): BeregningsresultatBoutgifterDto =
     BeregningsresultatBoutgifterDto(
@@ -69,7 +80,7 @@ fun BeregningsresultatForLøpendeMåned.tilDto(revurderFra: LocalDate?): Beregni
 
 fun BeregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(
     revurderFra: LocalDate?,
-): List<UtgiftBoutgifterMedAndelTilUtbetaling> {
+): List<UtgiftBoutgifterMedAndelTilUtbetalingDto> {
     var totalSum = 0
     return grunnlag.utgifter.values
         .flatten()
@@ -77,7 +88,7 @@ fun BeregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(
         .map { utgift ->
             val skalUtbetales = minOf(utgift.utgift, grunnlag.makssats - totalSum)
             totalSum += skalUtbetales
-            UtgiftBoutgifterMedAndelTilUtbetaling(
+            UtgiftBoutgifterMedAndelTilUtbetalingDto(
                 fom = utgift.fom,
                 tom = utgift.tom,
                 utgift = utgift.utgift,

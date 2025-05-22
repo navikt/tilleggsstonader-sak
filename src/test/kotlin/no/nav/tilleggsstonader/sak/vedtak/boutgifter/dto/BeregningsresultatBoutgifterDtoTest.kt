@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBoutgifterMedAndelTilUtbetaling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
@@ -45,14 +44,14 @@ class BeregningsresultatBoutgifterDtoTest {
 
         val forventetResultat =
             listOf(
-                UtgiftBoutgifterMedAndelTilUtbetaling(
+                UtgiftBoutgifterMedAndelTilUtbetalingDto(
                     fom = LocalDate.of(2023, 1, 1),
                     tom = LocalDate.of(2023, 1, 5),
                     utgift = 1000,
                     tilUtbetaling = 1000,
                     erFørRevurderFra = false,
                 ),
-                UtgiftBoutgifterMedAndelTilUtbetaling(
+                UtgiftBoutgifterMedAndelTilUtbetalingDto(
                     fom = LocalDate.of(2023, 1, 11),
                     tom = LocalDate.of(2023, 1, 16),
                     utgift = 2000,
@@ -100,14 +99,14 @@ class BeregningsresultatBoutgifterDtoTest {
 
         val forventetResultat =
             listOf(
-                UtgiftBoutgifterMedAndelTilUtbetaling(
+                UtgiftBoutgifterMedAndelTilUtbetalingDto(
                     fom = LocalDate.of(2023, 1, 1),
                     tom = LocalDate.of(2023, 1, 5),
                     utgift = 4000,
                     tilUtbetaling = 4000,
                     erFørRevurderFra = false,
                 ),
-                UtgiftBoutgifterMedAndelTilUtbetaling(
+                UtgiftBoutgifterMedAndelTilUtbetalingDto(
                     fom = LocalDate.of(2023, 1, 11),
                     tom = LocalDate.of(2023, 1, 16),
                     utgift = 2000,
@@ -155,14 +154,14 @@ class BeregningsresultatBoutgifterDtoTest {
 
         val forventetResultat =
             listOf(
-                UtgiftBoutgifterMedAndelTilUtbetaling(
+                UtgiftBoutgifterMedAndelTilUtbetalingDto(
                     fom = LocalDate.of(2023, 1, 1),
                     tom = LocalDate.of(2023, 1, 5),
                     utgift = 1000,
                     tilUtbetaling = 1000,
                     erFørRevurderFra = true,
                 ),
-                UtgiftBoutgifterMedAndelTilUtbetaling(
+                UtgiftBoutgifterMedAndelTilUtbetalingDto(
                     fom = LocalDate.of(2023, 1, 11),
                     tom = LocalDate.of(2023, 1, 16),
                     utgift = 2000,
