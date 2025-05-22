@@ -135,7 +135,7 @@ Egenskap: Beregning av midlertidig overnatting
       | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
       | 01.01.2025 | 31.01.2025 | 1000         | 4953      | 01.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
-  Scenario: Utgift som strekker seg utenfor en vedtaksperiode skal skal gi feilmelding
+  Scenario: Utgift som strekker seg utenfor en vedtaksperiode, er ikke støttet enda og skal skal gi feilmelding
 
     Gitt følgende boutgifter av type UTGIFTER_OVERNATTING for behandling=1
       | Fom        | Tom        | Utgift |
@@ -145,7 +145,7 @@ Egenskap: Beregning av midlertidig overnatting
       | Fom        | Tom        | Aktivitet | Målgruppe           |
       | 01.01.2025 | 15.01.2025 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
-    Så forvent følgende feilmelding: Du har lagt inn utgifter til midlertidig overnatting som ikke er inneholdt i en vedtaksperiode. Foreløpig støtter vi ikke dette.
+    Så forvent følgende feilmelding: Vi har foreløpig ikke støtte for å beregne når utgifter til midlertidig overnatting strekker seg utenfor vedtaksperiodene.
 
   Scenario: Utgifter som er helt utenfor vedtaksperiodene er OK, selv om de krysser beregningsperioder
 
