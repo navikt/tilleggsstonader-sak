@@ -31,11 +31,6 @@ data class BeregningsresultatForLøpendeMåned(
     ): BeregningsresultatForLøpendeMåned = this.copy(grunnlag = this.grunnlag.copy(fom = fom, tom = tom))
 
     fun markerSomDelAvTidligereUtbetaling() = this.copy(delAvTidligereUtbetaling = true)
-
-    fun harUtgiftFørDagensDato(): Boolean =
-        this.grunnlag.utgifter.values
-            .flatten()
-            .any { utgift -> utgift.fom < LocalDate.now() }
 }
 
 data class Beregningsgrunnlag(

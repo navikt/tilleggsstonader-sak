@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
-import io.mockk.every
-import io.mockk.spyk
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagBeregningsresultatMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.MarkerSomDelAvTidligereUtbetlingUtils.markerSomDelAvTidligereUtbetaling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -35,21 +33,17 @@ class MarkerSomDelAvTidligereUtbetlingUtilsTest {
         )
 
     private val periode1 =
-        spyk(
-            lagBeregningsresultatMåned(
-                fom = LocalDate.of(2025, 1, 1),
-                tom = LocalDate.of(2025, 1, 31),
-                utgifter = utgift1,
-            ),
+        lagBeregningsresultatMåned(
+            fom = LocalDate.of(2025, 1, 1),
+            tom = LocalDate.of(2025, 1, 31),
+            utgifter = utgift1,
         )
 
     private val periode2 =
-        spyk(
-            lagBeregningsresultatMåned(
-                fom = LocalDate.of(2025, 2, 7),
-                tom = LocalDate.of(2025, 3, 6),
-                utgifter = utgift2,
-            ),
+        lagBeregningsresultatMåned(
+            fom = LocalDate.of(2025, 2, 7),
+            tom = LocalDate.of(2025, 3, 6),
+            utgifter = utgift2,
         )
 
     @Test
@@ -62,12 +56,13 @@ class MarkerSomDelAvTidligereUtbetlingUtilsTest {
 
     @Test
     fun `Ikke marker perioder fra forrgie behandling hvis utgiften er etter dagens dato`() {
-        // Mocker dagens dato til å ligge mellom periode1 og periode2
-        every { periode1.harUtgiftFørDagensDato() } returns true
-        every { periode2.harUtgiftFørDagensDato() } returns false
-
+        val dagensDato = LocalDate.of(2025, 2, 5)
         val perioder = listOf(periode1, periode2)
-        val result = perioder.markerSomDelAvTidligereUtbetaling()
+        val result =
+            perioder.markerSomDelAvTidligereUtbetaling(
+                perioderFraForrigeVedtak = null,
+                dagensDato = dagensDato,
+            )
 
         assertThat(result[0].delAvTidligereUtbetaling).isTrue
         assertThat(result[1].delAvTidligereUtbetaling).isFalse
@@ -88,12 +83,14 @@ class MarkerSomDelAvTidligereUtbetlingUtilsTest {
     // det ikke finnes en utgift i den beregningsperiode som er før dagens dato
     @Test
     fun `Ikke marker nye perioder hvis datokrav ikke oppfylt`() {
-        // Mocker dagens dato til å ligge før periode1 og periode2
-        every { periode1.harUtgiftFørDagensDato() } returns false
-        every { periode2.harUtgiftFørDagensDato() } returns false
+        val dagensDato = LocalDate.of(2024, 12, 5)
 
         val perioder = listOf(periode1, periode2)
-        val result = perioder.markerSomDelAvTidligereUtbetaling()
+        val result =
+            perioder.markerSomDelAvTidligereUtbetaling(
+                perioderFraForrigeVedtak = listOf(periode1),
+                dagensDato = dagensDato,
+            )
 
         assertThat(result[0].delAvTidligereUtbetaling).isFalse
         assertThat(result[1].delAvTidligereUtbetaling).isFalse
