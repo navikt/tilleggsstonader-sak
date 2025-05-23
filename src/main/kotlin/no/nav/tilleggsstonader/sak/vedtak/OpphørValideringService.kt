@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
@@ -15,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.YearMonth
 
 @Service
 class OpphørValideringService(
@@ -27,6 +29,7 @@ class OpphørValideringService(
 
         validerIngenNyeOppfylteVilkårEllerVilkårperioder(vilkår, vilkårperioder)
         validerIngenEndredePerioderMedTomEtterRevurderFraDato(
+            saksbehandling.stønadstype,
             vilkårperioder,
             vilkår,
             saksbehandling.revurderFra ?: error("Revurder fra er påkrevd for opphør"),
@@ -88,6 +91,7 @@ class OpphørValideringService(
     }
 
     private fun validerIngenEndredePerioderMedTomEtterRevurderFraDato(
+        stønadstype: Stønadstype,
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
         revurderFraDato: LocalDate,
@@ -97,11 +101,21 @@ class OpphørValideringService(
                 "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret målgruppe er etter revurder fra dato"
             }
         }
-        vilkårperioder.aktiviteter.forEach { vilkårperiode ->
-            brukerfeilHvis(vilkårperiode.erOppfyltOgEndret() && vilkårperiode.tom > revurderFraDato) {
-                "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret aktivitet er etter revurder fra dato"
+
+        if (stønadstype == Stønadstype.BARNETILSYN) {
+            vilkårperioder.aktiviteter.forEach { vilkårperiode ->
+                brukerfeilHvis(vilkårperiode.erOppfyltOgEndret() && YearMonth.from(vilkårperiode.tom) > YearMonth.from(revurderFraDato)) {
+                    "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret aktivitet er etter revurder fra dato"
+                }
+            }
+        } else {
+            vilkårperioder.aktiviteter.forEach { vilkårperiode ->
+                brukerfeilHvis(vilkårperiode.erOppfyltOgEndret() && vilkårperiode.tom > revurderFraDato) {
+                    "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret aktivitet er etter revurder fra dato"
+                }
             }
         }
+
         vilkår.forEach { enkeltVilkår ->
             if (enkeltVilkår.erOppfyltOgEndret()) {
                 val tom = enkeltVilkår.tom ?: error("Til og med dato er påkrevd for endret vilkår")
