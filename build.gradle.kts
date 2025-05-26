@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20250519094842_e8bd711"
 val tilleggsstønaderLibsVersion = "2025.05.23-10.14.932a51a654b1"
-val tilleggsstønaderKontrakterVersion = "2025.05.20-14.04.d4aa7565b6a3"
+val tilleggsstønaderKontrakterVersion = "2025.05.26-09.25.f07899b2b19c"
 val avroVersion = "1.12.0"
 val confluentVersion = "7.9.1"
 val joarkHendelseVersion = "08271806"
@@ -89,7 +89,7 @@ dependencies {
     implementation("no.nav.tilleggsstonader-libs:kafka:$tilleggsstønaderLibsVersion")
     implementation("no.nav.tilleggsstonader-libs:spring:$tilleggsstønaderLibsVersion")
 
-    implementation("no.nav.tilleggsstonader.kontrakter:tilleggsstonader-kontrakter:$tilleggsstønaderKontrakterVersion")
+    implementation("no.nav.tilleggsstonader.kontrakter:kontrakter-felles:$tilleggsstønaderKontrakterVersion")
     implementation("no.nav.tilleggsstonader.kontrakter:pdl-personhendelser-avro:$tilleggsstønaderKontrakterVersion")
 
     // For auditlogger. August, 2014, men det er den som blir brukt på NAV
