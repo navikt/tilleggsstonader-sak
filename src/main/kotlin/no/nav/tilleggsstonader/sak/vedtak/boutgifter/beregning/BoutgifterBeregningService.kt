@@ -152,7 +152,9 @@ private fun BoutgifterPerUtgiftstype.filtrerBortUtgifterSomIkkeOverlapperVedtaks
     vedtaksperioder: List<VedtaksperiodeBeregning>,
 ): BoutgifterPerUtgiftstype =
     mapValues { (_, utgifter) ->
-        utgifter.filter { utgift -> vedtaksperioder.any { vedtaksperiode -> vedtaksperiode.overlapper(utgift) } }
+        utgifter.filter { utgift ->
+            vedtaksperioder.any { it.overlapper(utgift) }
+        }
     }
 
 private fun validerMidlertidigeUtgifterStrekkerSegUtenforVedtaksperiodene(
