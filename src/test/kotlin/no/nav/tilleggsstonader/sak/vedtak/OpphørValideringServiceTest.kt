@@ -204,13 +204,28 @@ class OpphørValideringServiceTest {
                 listOf(
                     vilkår.copy(
                         status = VilkårStatus.ENDRET,
-                        tom = måned.plusMonths(1).atEndOfMonth(),
+                        tom = måned.plusMonths(2).atEndOfMonth(),
                     ),
                 )
 
             assertThatThrownBy {
                 opphørValideringService.validerVilkårperioder(saksbehandling)
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato")
+        }
+
+        @Test
+        fun `Kaster ikke feil ved vilkår flyttet til etter opphørt dato men er i samme måned`() {
+            every { vilkårService.hentVilkår(saksbehandling.id) } returns
+                listOf(
+                    vilkår.copy(
+                        status = VilkårStatus.ENDRET,
+                        tom = måned.plusMonths(1).atEndOfMonth(),
+                    ),
+                )
+
+            assertThatCode {
+                opphørValideringService.validerVilkårperioder(saksbehandling)
+            }.doesNotThrowAnyException()
         }
     }
 }
