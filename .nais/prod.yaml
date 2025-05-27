@@ -108,6 +108,8 @@ spec:
           namespace: helved
         - application: kodeverk-api
           namespace: team-rocket
+        - application: logging
+          namespace: nais-system
       external:
         - host: pdl-api.prod-fss-pub.nais.io
         - host: tilleggsstonader-arena.prod-fss-pub.nais.io
