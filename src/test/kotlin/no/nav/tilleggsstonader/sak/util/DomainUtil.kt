@@ -356,3 +356,28 @@ fun nyeOpplysningerMetadata(
     endringer = endringer,
     beskrivelse = beskrivelse,
 )
+
+fun fagsakBoutgifter(
+    identer: Set<PersonIdent> = defaultIdenter,
+    stønadstype: Stønadstype = Stønadstype.BOUTGIFTER,
+    id: FagsakId = FagsakId.random(),
+    eksternId: EksternFagsakId = EksternFagsakId(fagsakId = id),
+    sporbar: Sporbar = Sporbar(),
+    fagsakPersonId: FagsakPersonId = FagsakPersonId.random(),
+): Fagsak = fagsakBoutgifter(stønadstype, id, FagsakPerson(id = fagsakPersonId, identer = identer), eksternId, sporbar)
+
+fun fagsakBoutgifter(
+    stønadstype: Stønadstype = Stønadstype.BOUTGIFTER,
+    id: FagsakId = FagsakId.random(),
+    person: FagsakPerson,
+    eksternId: EksternFagsakId = EksternFagsakId(fagsakId = id),
+    sporbar: Sporbar = Sporbar(),
+): Fagsak =
+    Fagsak(
+        id = id,
+        fagsakPersonId = person.id,
+        personIdenter = person.identer,
+        stønadstype = stønadstype,
+        eksternId = eksternId,
+        sporbar = sporbar,
+    )

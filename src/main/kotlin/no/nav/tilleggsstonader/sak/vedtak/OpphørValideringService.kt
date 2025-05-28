@@ -107,24 +107,18 @@ class OpphørValideringService(
                 "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret aktivitet er etter revurder fra dato"
             }
         }
-
-        if (stønadstype == Stønadstype.BARNETILSYN) {
-            vilkår.forEach { enkeltVilkår ->
-                if (enkeltVilkår.erOppfyltOgEndret()) {
-                    val tom = enkeltVilkår.tom ?: error("Til og med dato er påkrevd for endret vilkår")
-                    brukerfeilHvis(YearMonth.from(tom) > YearMonth.from(revurderFraDato)) {
-                        "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato"
+        vilkår.forEach { enkeltVilkår ->
+            if (enkeltVilkår.erOppfyltOgEndret()) {
+                val tom = enkeltVilkår.tom ?: error("Til og med dato er påkrevd for endret vilkår")
+                val erUgildig =
+                    if (stønadstype == Stønadstype.BARNETILSYN) {
+                        YearMonth.from(tom) > YearMonth.from(revurderFraDato)
+                    } else {
+                        tom > revurderFraDato
                     }
-                }
-            }
-        } else {
-            vilkår.forEach { enkeltVilkår ->
-                if (enkeltVilkår.erOppfyltOgEndret()) {
-                    val tom = enkeltVilkår.tom ?: error("Til og med dato er påkrevd for endret vilkår")
-                    brukerfeilHvis(tom > revurderFraDato) {
-                        "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato"
-                    }
-                }
+                brukerfeilHvis(
+                    erUgildig,
+                ) { "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato" }
             }
         }
     }
