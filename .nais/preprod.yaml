@@ -105,6 +105,8 @@ spec:
           namespace: teamfamilie
         - application: utsjekk
           namespace: helved
+        - application: logging
+          namespace: nais-system
       external:
         - host: pdl-api.dev-fss-pub.nais.io
         - host: tilleggsstonader-arena.dev-fss-pub.nais.io
