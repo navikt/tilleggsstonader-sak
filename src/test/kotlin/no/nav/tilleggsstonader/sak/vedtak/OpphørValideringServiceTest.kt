@@ -5,6 +5,7 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.util.fagsakBoutgifter
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
@@ -36,6 +37,13 @@ class OpphørValideringServiceTest {
     val fom = måned.atDay(1)
     val tom = måned.atEndOfMonth()
 
+    val saksbehandlingBoutgifter =
+        saksbehandling(
+            revurderFra = LocalDate.of(2025, 2, 1),
+            type = BehandlingType.REVURDERING,
+            fagsak = fagsakBoutgifter(),
+        )
+
     val saksbehandling =
         saksbehandling(
             revurderFra = LocalDate.of(2025, 2, 1),
@@ -62,6 +70,16 @@ class OpphørValideringServiceTest {
                     beløpsperioder = listOf(Beløpsperiode(dato = fom, 10, FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)),
                 ),
             ),
+        )
+
+    val vilkårBoutgifter =
+        vilkår(
+            behandlingId = saksbehandlingBoutgifter.id,
+            type = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+            resultat = Vilkårsresultat.OPPFYLT,
+            status = VilkårStatus.ENDRET,
+            fom = fom,
+            tom = tom,
         )
 
     @BeforeEach
@@ -204,7 +222,7 @@ class OpphørValideringServiceTest {
                 listOf(
                     vilkår.copy(
                         status = VilkårStatus.ENDRET,
-                        tom = måned.plusMonths(1).atEndOfMonth(),
+                        tom = YearMonth.from(saksbehandling.revurderFra).plusMonths(1).atEndOfMonth(),
                     ),
                 )
 
@@ -212,5 +230,35 @@ class OpphørValideringServiceTest {
                 opphørValideringService.validerVilkårperioder(saksbehandling)
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato")
         }
+
+        @Test
+        fun `Kaster ikke feil ved vilkår flyttet til etter opphørt dato men er i samme måned`() {
+            every { vilkårService.hentVilkår(saksbehandling.id) } returns
+                listOf(
+                    vilkår.copy(
+                        status = VilkårStatus.ENDRET,
+                        tom = YearMonth.from(saksbehandling.revurderFra).atEndOfMonth(),
+                    ),
+                )
+
+            assertThatCode {
+                opphørValideringService.validerVilkårperioder(saksbehandling)
+            }.doesNotThrowAnyException()
+        }
+    }
+
+    @Test
+    fun `Kaster feil ved vilkår flyttet til etter opphørt dato for boutgifter`() {
+        every { vilkårService.hentVilkår(saksbehandlingBoutgifter.id) } returns
+            listOf(
+                vilkårBoutgifter.copy(
+                    status = VilkårStatus.ENDRET,
+                    tom = YearMonth.from(saksbehandlingBoutgifter.revurderFra).atEndOfMonth(),
+                ),
+            )
+
+        assertThatThrownBy {
+            opphørValideringService.validerVilkårperioder(saksbehandlingBoutgifter)
+        }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato")
     }
 }

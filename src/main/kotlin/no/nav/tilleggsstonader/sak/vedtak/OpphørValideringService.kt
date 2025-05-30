@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -15,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.YearMonth
 
 @Service
 class OpphørValideringService(
@@ -97,6 +99,7 @@ class OpphørValideringService(
                 "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret målgruppe er etter revurder fra dato"
             }
         }
+
         vilkårperioder.aktiviteter.forEach { vilkårperiode ->
             brukerfeilHvis(vilkårperiode.erOppfyltOgEndret() && vilkårperiode.tom > revurderFraDato) {
                 "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret aktivitet er etter revurder fra dato"
@@ -105,9 +108,15 @@ class OpphørValideringService(
         vilkår.forEach { enkeltVilkår ->
             if (enkeltVilkår.erOppfyltOgEndret()) {
                 val tom = enkeltVilkår.tom ?: error("Til og med dato er påkrevd for endret vilkår")
-                brukerfeilHvis(tom > revurderFraDato) {
-                    "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato"
-                }
+                val erUgyldig =
+                    if (enkeltVilkår.type == VilkårType.PASS_BARN) {
+                        YearMonth.from(tom) > YearMonth.from(revurderFraDato)
+                    } else {
+                        tom > revurderFraDato
+                    }
+                brukerfeilHvis(
+                    erUgyldig,
+                ) { "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato" }
             }
         }
     }
