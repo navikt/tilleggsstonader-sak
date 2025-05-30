@@ -22,21 +22,14 @@ class FaktaGrunnlagArenaVedtakTest {
         @Test
         fun `skal mappe vedtakTom hvis det er innen 3 plus 2 mnd for tilsyn barn`() {
             val dato3mndsiden = LocalDate.now().minusMonths(5)
-
-            assertThat(
-                FaktaGrunnlagArenaVedtak
-                    .map(
-                        ArenaStatusDtoUtil.arenaStatusDto(
-                            ArenaStatusDtoUtil.vedtakStatus(
-                                vedtakTom =
-                                    dato3mndsiden.minusDays(
-                                        1,
-                                    ),
-                            ),
-                        ),
-                        Stønadstype.BARNETILSYN,
-                    ).vedtakTom,
-            ).isNull()
+            val arenaStatus =
+                ArenaStatusDtoUtil.arenaStatusDto(
+                    ArenaStatusDtoUtil.vedtakStatus(
+                        vedtakTom = dato3mndsiden.minusDays(1),
+                    ),
+                )
+            assertThat(FaktaGrunnlagArenaVedtak.map(arenaStatus, Stønadstype.BARNETILSYN).vedtakTom)
+                .isNull()
 
             listOf(dato3mndsiden, dato3mndsiden.plusDays(1)).forEach {
                 val statusDto = ArenaStatusDtoUtil.arenaStatusDto(ArenaStatusDtoUtil.vedtakStatus(vedtakTom = it))

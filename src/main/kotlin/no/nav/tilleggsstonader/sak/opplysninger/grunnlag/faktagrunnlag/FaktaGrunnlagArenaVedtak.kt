@@ -20,8 +20,7 @@ data class FaktaGrunnlagArenaVedtak(
                     val datoFraOgMed =
                         LocalDate
                             .now()
-                            .minusMonths(stønadstype.grunnlagAntallMånederBakITiden.toLong())
-                            .minusMonths(2)
+                            .minusMonths(stønadstype.grunnlagAntallMånederBakITiden.toLong() + 2)
                     it.isEqualOrAfter(datoFraOgMed)
                 }
             FaktaGrunnlagArenaVedtak(vedtakTom = vedtakTom)
