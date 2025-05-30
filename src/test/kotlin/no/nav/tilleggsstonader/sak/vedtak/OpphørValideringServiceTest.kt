@@ -222,7 +222,7 @@ class OpphørValideringServiceTest {
                 listOf(
                     vilkår.copy(
                         status = VilkårStatus.ENDRET,
-                        tom = måned.plusMonths(2).atEndOfMonth(),
+                        tom = YearMonth.from(saksbehandling.revurderFra).plusMonths(1).atEndOfMonth(),
                     ),
                 )
 
@@ -237,7 +237,7 @@ class OpphørValideringServiceTest {
                 listOf(
                     vilkår.copy(
                         status = VilkårStatus.ENDRET,
-                        tom = måned.plusMonths(1).atEndOfMonth(),
+                        tom = YearMonth.from(saksbehandling.revurderFra).atEndOfMonth(),
                     ),
                 )
 
