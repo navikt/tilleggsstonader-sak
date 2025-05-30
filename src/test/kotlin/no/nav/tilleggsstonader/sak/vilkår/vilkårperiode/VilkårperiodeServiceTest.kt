@@ -4,16 +4,22 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
+import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.RegisterAktivitetClientConfig.Companion.resetMock
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.tilOppdatering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
@@ -38,6 +44,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var registerAktivitetClient: RegisterAktivitetClient
+
+    @Autowired
+    lateinit var behandlingshistorikkService: BehandlingshistorikkService
 
     @AfterEach
     override fun tearDown() {
@@ -248,5 +257,43 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(res).hasSize(2)
             res.map { assertThat(it.resultat).isNotEqualTo(ResultatVilkårperiode.SLETTET) }
         }
+    }
+
+    @Test
+    fun `skal oppdatere historikk med utredning påbegynt ved ny vilkårperiode`() {
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.OPPRETTET))
+        val målgruppeSomSkalOpprettes =
+            dummyVilkårperiodeMålgruppe(
+                medlemskap = SvarJaNei.NEI,
+                begrunnelse = "begrunnelse målgruppe",
+                behandlingId = behandling.id,
+            )
+
+        vilkårperiodeService.opprettVilkårperiode(målgruppeSomSkalOpprettes)
+
+        val test = behandlingshistorikkService.finnSisteBehandlingshistorikk(behandling.id)
+
+        assertThat(test.steg).isEqualTo(StegType.INNGANGSVILKÅR)
+        assertThat(test.utfall).isEqualTo(StegUtfall.UTREDNING_PÅBEGYNT)
+    }
+
+    @Test
+    fun `skal oppdatere historikk ved oppdatering av eksisterende vilkårperiode`() {
+        val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+
+        val eksisterendeVilkårperiode =
+            vilkårperiodeRepository.insert(målgruppe(behandlingId = revurdering.id))
+
+        val oppdatering =
+            eksisterendeVilkårperiode.tilOppdatering().copy(
+                begrunnelse = "Oppdatert begrunnelse",
+            )
+
+        vilkårperiodeService.oppdaterVilkårperiode(eksisterendeVilkårperiode.id, oppdatering)
+
+        val test = behandlingshistorikkService.finnSisteBehandlingshistorikk(revurdering.id)
+
+        assertThat(test.steg).isEqualTo(StegType.INNGANGSVILKÅR)
+        assertThat(test.utfall).isEqualTo(StegUtfall.UTREDNING_PÅBEGYNT)
     }
 }

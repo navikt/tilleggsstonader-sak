@@ -2,8 +2,11 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
+import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -52,6 +55,7 @@ class VilkårperiodeService(
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
     private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
     private val faktaGrunnlagService: FaktaGrunnlagService,
+    private val behandlingshistorikkService: BehandlingshistorikkService,
 ) {
     fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
         val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
@@ -76,7 +80,11 @@ class VilkårperiodeService(
     @Transactional
     fun opprettVilkårperiode(vilkårperiode: LagreVilkårperiode): Vilkårperiode {
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
+
         validerBehandling(behandling)
+
+        oppdaterStatusOgHistorikkMedBehandlingUtredes(behandling)
+
         validerNyPeriodeRevurdering(behandling, vilkårperiode.fom)
 
         if (vilkårperiode.type is MålgruppeType) {
@@ -127,6 +135,8 @@ class VilkårperiodeService(
         validerBehandlingIdErLik(vilkårperiode.behandlingId, eksisterendeVilkårperiode.behandlingId)
         validerBehandling(behandling)
         validerKildeIdOgType(vilkårperiode, eksisterendeVilkårperiode)
+
+        oppdaterStatusOgHistorikkMedBehandlingUtredes(behandling)
 
         val fødselFaktaGrunnlag =
             faktaGrunnlagService
@@ -304,6 +314,18 @@ class VilkårperiodeService(
 
         feilHvis(eksisterendeVilkårperiode.type != vilkårperiode.type) {
             "Kan ikke endre type på en eksisterende periode. Kontakt utviklingsteamet"
+        }
+    }
+
+    private fun oppdaterStatusOgHistorikkMedBehandlingUtredes(behandling: Saksbehandling) {
+        if (behandling.status != BehandlingStatus.UTREDES) {
+            behandlingService.oppdaterStatusPåBehandling(behandling.id, BehandlingStatus.UTREDES)
+            behandlingshistorikkService.opprettHistorikkInnslag(
+                behandlingId = behandling.id,
+                stegtype = StegType.INNGANGSVILKÅR,
+                utfall = StegUtfall.UTREDNING_PÅBEGYNT,
+                metadata = null,
+            )
         }
     }
 }
