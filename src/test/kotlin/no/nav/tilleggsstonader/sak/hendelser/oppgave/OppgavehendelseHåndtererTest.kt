@@ -66,7 +66,7 @@ class OppgavehendelseHåndtererTest : IntegrationTest() {
         tilordnetSaksbehandler: String?,
         gsakOppgaveId: Long,
         hendelsestype: Hendelsestype = Hendelsestype.OPPGAVE_ENDRET,
-    ) = OppgaveRecord(
+    ) = OppgavehendelseRecord(
         hendelse =
             Hendelse(
                 hendelsestype = hendelsestype,

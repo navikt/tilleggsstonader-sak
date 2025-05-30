@@ -15,7 +15,7 @@ class OppgavehendelseHåndterer(
     }
 
     // For å kunne teste mottak av ConsumerRecord uten å måtte initialisere Kafka
-    fun behandleOppgavehendelser(consumerRecords: List<ConsumerRecord<String, OppgaveRecord>>) {
+    fun behandleOppgavehendelser(consumerRecords: List<ConsumerRecord<String, OppgavehendelseRecord>>) {
         consumerRecords
             .filter { it.value().erEndret() }
             .filter { it.value().erAktueltBehandlingstema() }
@@ -26,5 +26,6 @@ class OppgavehendelseHåndterer(
             }
     }
 
-    private fun OppgaveRecord.erAktueltBehandlingstema(): Boolean = oppgave.kategorisering.behandlingstema in aktuelleBehandlingstema
+    private fun OppgavehendelseRecord.erAktueltBehandlingstema(): Boolean =
+        oppgave.kategorisering.behandlingstema in aktuelleBehandlingstema
 }
