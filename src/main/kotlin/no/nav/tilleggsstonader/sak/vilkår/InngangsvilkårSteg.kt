@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
+import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service
 @Service
 class InngangsvilkårSteg(
     private val behandlingService: BehandlingService,
+    private val behandlingshistorikkService: BehandlingshistorikkService,
 ) : BehandlingSteg<Void?> {
     override fun validerSteg(saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.type == BehandlingType.REVURDERING && saksbehandling.revurderFra == null) {
@@ -25,6 +28,12 @@ class InngangsvilkårSteg(
     ) {
         if (saksbehandling.status != BehandlingStatus.UTREDES) {
             behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.UTREDES)
+            behandlingshistorikkService.opprettHistorikkInnslag(
+                behandlingId = saksbehandling.id,
+                stegtype = StegType.INNGANGSVILKÅR,
+                utfall = StegUtfall.UTREDNING_PÅBEGYNT,
+                metadata = null,
+            )
         }
     }
 

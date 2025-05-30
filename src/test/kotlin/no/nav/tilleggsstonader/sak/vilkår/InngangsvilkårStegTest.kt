@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -15,15 +16,18 @@ import org.junit.jupiter.api.Test
 
 class InngangsvilkårStegTest {
     val behandlingService = mockk<BehandlingService>()
+    val behandlingshistorikkService = mockk<BehandlingshistorikkService>()
 
     val steg =
         InngangsvilkårSteg(
             behandlingService = behandlingService,
+            behandlingshistorikkService = behandlingshistorikkService,
         )
 
     @BeforeEach
     fun setUp() {
         every { behandlingService.oppdaterStatusPåBehandling(any(), any()) } returns behandling()
+        every { behandlingshistorikkService.opprettHistorikkInnslag(any(), any(), any(), any()) } returns Unit
     }
 
     @Nested
