@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.hendelser.oppgave
 
-import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.tilleggsstonader.libs.kafka.KafkaErrorHandler
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -24,7 +23,7 @@ class OppgaveListenerContainerFactoryConfig {
         properties: KafkaProperties,
         kafkaErrorHandler: KafkaErrorHandler,
         sslBundles: ObjectProvider<SslBundles>,
-    ): ConcurrentKafkaListenerContainerFactory<Long, JournalfoeringHendelseRecord> {
+    ): ConcurrentKafkaListenerContainerFactory<Long, OppgavehendelseRecord> {
         val consumerProperties =
             properties.buildConsumerProperties(sslBundles.getIfAvailable()).apply {
                 this[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = 500
@@ -35,7 +34,7 @@ class OppgaveListenerContainerFactoryConfig {
                 this[JsonDeserializer.TRUSTED_PACKAGES] = "no.nav.tilleggsstonader.sak.hendelser.oppgave"
             }
 
-        return ConcurrentKafkaListenerContainerFactory<Long, JournalfoeringHendelseRecord>().apply {
+        return ConcurrentKafkaListenerContainerFactory<Long, OppgavehendelseRecord>().apply {
             containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
             containerProperties.setAuthExceptionRetryInterval(Duration.ofSeconds(2))
             setCommonErrorHandler(kafkaErrorHandler)
