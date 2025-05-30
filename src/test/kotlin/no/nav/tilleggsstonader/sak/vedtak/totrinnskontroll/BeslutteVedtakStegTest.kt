@@ -85,6 +85,7 @@ class BeslutteVedtakStegTest {
             gsakOppgaveId = 123L,
             type = Oppgavetype.BehandleSak,
             erFerdigstilt = false,
+            tilordnetSaksbehandler = null,
         )
     private lateinit var taskSlot: MutableList<Task>
 
