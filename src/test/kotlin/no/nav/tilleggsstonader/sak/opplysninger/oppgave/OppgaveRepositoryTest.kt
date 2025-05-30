@@ -121,6 +121,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
                 behandlingId = behandling.id,
                 type = Oppgavetype.InnhentDokumentasjon,
                 gsakOppgaveId = 1,
+                tilordnetSaksbehandler = null,
             ),
         )
         oppgaveRepository.insert(
@@ -128,6 +129,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
                 behandlingId = behandling.id,
                 type = Oppgavetype.BehandleSak,
                 gsakOppgaveId = 1,
+                tilordnetSaksbehandler = null,
             ),
         )
 
@@ -169,6 +171,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
                     behandlingId = null,
                     type = Oppgavetype.Journalføring,
                     gsakOppgaveId = 1,
+                    tilordnetSaksbehandler = null,
                 ),
             )
 
@@ -228,6 +231,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
                     behandlingId = behandling1.id,
                     type = Oppgavetype.BehandleSak,
                     gsakOppgaveId = 1,
+                    tilordnetSaksbehandler = null,
                 ),
             )
             oppgaveRepository.insert(
@@ -235,6 +239,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
                     behandlingId = behandling2.id,
                     type = Oppgavetype.BehandleSak,
                     gsakOppgaveId = 2,
+                    tilordnetSaksbehandler = null,
                 ),
             )
         }

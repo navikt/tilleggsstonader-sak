@@ -421,6 +421,7 @@ internal class OppgaveServiceTest {
             behandlingId = BEHANDLING_ID,
             type = Oppgavetype.BehandleSak,
             gsakOppgaveId = GSAK_OPPGAVE_ID,
+            tilordnetSaksbehandler = null,
         )
 
     private fun lagEksternTestOppgave(): Oppgave = Oppgave(id = GSAK_OPPGAVE_ID, versjon = 0)

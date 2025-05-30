@@ -12,3 +12,8 @@ data class OppgaveMetadata(
     val navn: String?,
     val behandlingMetadata: OppgaveBehandlingMetadata?,
 )
+
+data class OppdatertOppgaveHendelse(
+    val gsakOppgaveId: Long,
+    val tilordnetSaksbehandler: String?,
+)

@@ -60,19 +60,22 @@ fun oppgave(
     erFerdigstilt: Boolean = false,
     gsakOppgaveId: Long = 123,
     type: Oppgavetype = Oppgavetype.Journalføring,
-): OppgaveDomain = oppgave(behandling.id, erFerdigstilt, gsakOppgaveId, type)
+    tilordnetSaksbehandler: String? = null,
+): OppgaveDomain = oppgave(behandling.id, erFerdigstilt, gsakOppgaveId, type, tilordnetSaksbehandler)
 
 fun oppgave(
     behandlingId: BehandlingId?,
     erFerdigstilt: Boolean = false,
     gsakOppgaveId: Long = 123,
     type: Oppgavetype = Oppgavetype.Journalføring,
+    tilordnetSaksbehandler: String? = null,
 ): OppgaveDomain =
     OppgaveDomain(
         behandlingId = behandlingId,
         gsakOppgaveId = gsakOppgaveId,
         type = type,
         erFerdigstilt = erFerdigstilt,
+        tilordnetSaksbehandler = tilordnetSaksbehandler,
     )
 
 fun behandling(
