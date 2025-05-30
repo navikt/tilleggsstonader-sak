@@ -19,8 +19,9 @@ import org.junit.jupiter.api.Test
 class FerdigstillBehandlingStegTest {
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
     private val taskService = mockk<TaskService>()
+    private val brevmottakerVedtaksbrevRepository = mockk<no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository>()
 
-    private val steg = FerdigstillBehandlingSteg(behandlingService, taskService)
+    private val steg = FerdigstillBehandlingSteg(behandlingService, taskService, brevmottakerVedtaksbrevRepository)
 
     private val taskSlot = mutableListOf<Task>()
     private val fagsak = fagsak()
@@ -29,6 +30,7 @@ class FerdigstillBehandlingStegTest {
     @BeforeEach
     internal fun setUp() {
         taskSlot.clear()
+        every { brevmottakerVedtaksbrevRepository.findByBehandlingId(any()) } returns emptyList()
         every { taskService.save(capture(taskSlot)) } answers { firstArg() }
     }
 

@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokdist.Distribusjonstype
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
@@ -32,6 +33,7 @@ import java.util.Properties
     beskrivelse = "Distribuerer vedtaksbrev etter journalføring",
 )
 class DistribuerVedtaksbrevTask(
+    private val behandlingService: BehandlingService,
     private val brevmottakerVedtaksbrevRepository: BrevmottakerVedtaksbrevRepository,
     private val journalpostClient: JournalpostClient,
     private val stegService: StegService,
@@ -51,7 +53,10 @@ class DistribuerVedtaksbrevTask(
             .map { distribuerBrevet(mottaker = it) }
             .håndterRekjøringSenereHvisMottakerErDød(task)
 
-        stegService.håndterSteg(behandlingId, brevSteg)
+        // TODO slett if+håndterSteg når alle behandlinger som er på steg JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV er klare
+        if (behandlingService.hentBehandling(behandlingId).steg == brevSteg.stegType()) {
+            stegService.håndterSteg(behandlingId, brevSteg)
+        }
     }
 
     private sealed interface ResultatBrevutsendelse {

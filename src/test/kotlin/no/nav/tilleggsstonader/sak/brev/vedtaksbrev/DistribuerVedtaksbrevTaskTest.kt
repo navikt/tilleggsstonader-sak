@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.osloNow
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
@@ -37,10 +38,12 @@ class DistribuerVedtaksbrevTaskTest {
     val stegService = mockk<StegService>()
     val brevSteg = mockk<BrevSteg>()
     val taskService = mockk<TaskService>(relaxed = true)
+    val behandlingSerice = mockk<BehandlingService>()
 
     val saksbehandling = saksbehandling()
     val distribuerVedtaksbrevTask =
         DistribuerVedtaksbrevTask(
+            behandlingSerice,
             brevmottakerVedtaksbrevRepository,
             journalpostClient,
             stegService,
