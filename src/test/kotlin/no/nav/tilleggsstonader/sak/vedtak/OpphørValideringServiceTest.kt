@@ -75,9 +75,9 @@ class OpphørValideringServiceTest {
     val vilkårBoutgifter =
         vilkår(
             behandlingId = saksbehandlingBoutgifter.id,
-            type = VilkårType.UTGIFTER_OVERNATTING,
+            type = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
             resultat = Vilkårsresultat.OPPFYLT,
-            status = VilkårStatus.UENDRET,
+            status = VilkårStatus.ENDRET,
             fom = fom,
             tom = tom,
         )

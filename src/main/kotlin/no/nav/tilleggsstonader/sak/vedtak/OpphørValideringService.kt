@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
@@ -8,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -29,7 +29,6 @@ class OpphørValideringService(
 
         validerIngenNyeOppfylteVilkårEllerVilkårperioder(vilkår, vilkårperioder)
         validerIngenEndredePerioderMedTomEtterRevurderFraDato(
-            saksbehandling.stønadstype,
             vilkårperioder,
             vilkår,
             saksbehandling.revurderFra ?: error("Revurder fra er påkrevd for opphør"),
@@ -91,7 +90,6 @@ class OpphørValideringService(
     }
 
     private fun validerIngenEndredePerioderMedTomEtterRevurderFraDato(
-        stønadstype: Stønadstype,
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
         revurderFraDato: LocalDate,
@@ -110,14 +108,14 @@ class OpphørValideringService(
         vilkår.forEach { enkeltVilkår ->
             if (enkeltVilkår.erOppfyltOgEndret()) {
                 val tom = enkeltVilkår.tom ?: error("Til og med dato er påkrevd for endret vilkår")
-                val erUgildig =
-                    if (stønadstype == Stønadstype.BARNETILSYN) {
+                val erUgyldig =
+                    if (enkeltVilkår.type == VilkårType.PASS_BARN) {
                         YearMonth.from(tom) > YearMonth.from(revurderFraDato)
                     } else {
                         tom > revurderFraDato
                     }
                 brukerfeilHvis(
-                    erUgildig,
+                    erUgyldig,
                 ) { "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato" }
             }
         }
