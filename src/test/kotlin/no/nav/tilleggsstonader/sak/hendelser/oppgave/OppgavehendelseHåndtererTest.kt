@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.tilBehandlingstema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
-import no.nav.tilleggsstonader.sak.hendelser.ConsumerRecordUtil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 import kotlin.random.Random
 
 class OppgavehendelseHåndtererTest : IntegrationTest() {
@@ -44,9 +42,7 @@ class OppgavehendelseHåndtererTest : IntegrationTest() {
     fun `skal oppdatere intern oppgave om tilhørende oppgave blir oppdatert`() {
         val tilordnetSaksbehandler = "Z999999"
         val oppgaveHendelse = lagOppgavehendelse(tilordnetSaksbehandler, oppgave.gsakOppgaveId)
-        oppgavehendelseHåndterer.behandleOppgavehendelser(
-            listOf(ConsumerRecordUtil.lagConsumerRecord(UUID.randomUUID().toString(), oppgaveHendelse)),
-        )
+        oppgavehendelseHåndterer.behandleOppgavehendelser(listOf(oppgaveHendelse))
 
         assertThat(oppgaveRepository.findByIdOrThrow(oppgave.id).tilordnetSaksbehandler).isEqualTo(tilordnetSaksbehandler)
     }
@@ -55,9 +51,7 @@ class OppgavehendelseHåndtererTest : IntegrationTest() {
     fun `oppdaterer ikke oppgave om hendelsestype er OPPGAVE_FERDIGSTILT`() {
         val tilordnetSaksbehandler = "Z999999"
         val oppgaveHendelse = lagOppgavehendelse(tilordnetSaksbehandler, oppgave.gsakOppgaveId, Hendelsestype.OPPGAVE_FERDIGSTILT)
-        oppgavehendelseHåndterer.behandleOppgavehendelser(
-            listOf(ConsumerRecordUtil.lagConsumerRecord(UUID.randomUUID().toString(), oppgaveHendelse)),
-        )
+        oppgavehendelseHåndterer.behandleOppgavehendelser(listOf(oppgaveHendelse))
 
         assertThat(oppgaveRepository.findByIdOrThrow(oppgave.id).tilordnetSaksbehandler).isEqualTo(oppgave.tilordnetSaksbehandler)
     }

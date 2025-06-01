@@ -22,7 +22,7 @@ class OppgavehendelseKafkaListener(
         consumerRecords: List<ConsumerRecord<String, OppgavehendelseRecord>>,
         acknowledgment: Acknowledgment,
     ) {
-        oppgavehendelseHåndterer.behandleOppgavehendelser(consumerRecords)
+        oppgavehendelseHåndterer.behandleOppgavehendelser(consumerRecords.map { it.value() })
         acknowledgment.acknowledge()
     }
 }
