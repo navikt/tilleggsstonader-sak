@@ -32,6 +32,7 @@ class OppgaveListenerContainerFactoryConfig {
                 this[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
                 this[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java
                 this[JsonDeserializer.TRUSTED_PACKAGES] = "no.nav.tilleggsstonader.sak.hendelser.oppgave"
+                this[JsonDeserializer.VALUE_DEFAULT_TYPE] = OppgavehendelseRecord::class.java.name
             }
 
         return ConcurrentKafkaListenerContainerFactory<Long, OppgavehendelseRecord>().apply {
