@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
@@ -61,9 +62,8 @@ data class AndelTilkjentYtelse(
         }
 
         validerDataForType()
-        feilHvisIkke(utbetalingsdato.toYearMonth() == fom.toYearMonth()) {
-            "Må sette utbetalingsdato($utbetalingsdato) i den måned(${fom.toYearMonth()}) andelen gjelder for"
-        }
+
+        validerUtbetalingMaksFørsteArbeidsdagNesteMåned()
     }
 
     private fun validerDataForType() {
@@ -109,6 +109,16 @@ data class AndelTilkjentYtelse(
         }
         feilHvisIkke(tom.erSisteDagIMåneden()) {
             "Forventer at tom($tom) er siste dagen i måneden for type=$type"
+        }
+    }
+
+    private fun validerUtbetalingMaksFørsteArbeidsdagNesteMåned() {
+        val fomMåned = fom.toYearMonth()
+        val førsteArbeidsdagNesteMåned =
+            fomMåned.plusMonths(1).atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag()
+
+        feilHvis(utbetalingsdato != førsteArbeidsdagNesteMåned && utbetalingsdato.toYearMonth() != fomMåned) {
+            "Utbetalingsdato($utbetalingsdato) må være i samme måned ($fomMåned) som andelen gjelder for, eller første arbeidsdag i måneden etter."
         }
     }
 }

@@ -6,6 +6,8 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import java.time.LocalDate
 import java.time.YearMonth
 
 class AndelTilkjentYtelseTest {
@@ -126,6 +128,36 @@ class AndelTilkjentYtelseTest {
                     tom = måned.atEndOfMonth(),
                 )
             }.hasMessageContaining("Ugyldig satstype=MÅNED forventetSatsType=DAG for type=LÆREMIDLER_AAP")
+        }
+    }
+
+    @Nested
+    inner class UtbetalingAnnenMåned {
+        @Test
+        fun `skal ikke kaste feil hvis utbetaling er i annen måned om`() {
+            assertDoesNotThrow {
+                andelTilkjentYtelse(
+                    type = TypeAndel.BOUTGIFTER_AAP,
+                    satstype = Satstype.DAG,
+                    fom = LocalDate.of(2025, 5, 1),
+                    tom = LocalDate.of(2025, 5, 1),
+                    utbetalingsdato = LocalDate.of(2025, 6, 2),
+                )
+            }
+        }
+
+        @Test
+        fun `skal kaste feil dersom`() {
+            val utbetalingsdato = LocalDate.of(2025, 7, 1)
+            assertThatThrownBy {
+                andelTilkjentYtelse(
+                    type = TypeAndel.BOUTGIFTER_AAP,
+                    satstype = Satstype.DAG,
+                    fom = LocalDate.of(2025, 5, 1),
+                    tom = LocalDate.of(2025, 5, 1),
+                    utbetalingsdato = utbetalingsdato,
+                )
+            }.hasMessageContaining("Utbetalingsdato($utbetalingsdato) må være i samme måned")
         }
     }
 }
