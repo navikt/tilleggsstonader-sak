@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
@@ -39,6 +40,7 @@ class JournalførVedtaksbrevTaskTest {
     val arbeidsfordelingService = mockk<ArbeidsfordelingService>()
     val journalpostService = mockk<JournalpostService>()
     val brevmottakerVedtaksbrevRepository = mockk<BrevmottakerVedtaksbrevRepository>()
+    val stegService = mockk<StegService>(relaxed = true)
 
     private val journalførVedtaksbrevTask =
         JournalførVedtaksbrevTask(
@@ -48,6 +50,7 @@ class JournalførVedtaksbrevTaskTest {
             arbeidsfordelingService,
             journalpostService,
             brevmottakerVedtaksbrevRepository,
+            stegService,
             TransactionHandler(),
         )
 
