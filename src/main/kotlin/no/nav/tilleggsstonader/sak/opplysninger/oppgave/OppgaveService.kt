@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalPlasseresIKlarMappe
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.FinnOppgaveresultatMedMetadata
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppdatertOppgaveHendelse
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMedMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
@@ -172,6 +173,7 @@ class OppgaveService(
                 gsakOppgaveId = opprettetOppgaveId,
                 behandlingId = behandlingId,
                 type = oppgave.oppgavetype,
+                tilordnetSaksbehandler = oppgave.tilordnetNavIdent,
             )
         oppgaveRepository.insert(oppgave)
         return opprettetOppgaveId
@@ -367,5 +369,14 @@ class OppgaveService(
         val prefix = "--- $formatertDato $saksbehandlerNavn ($innloggetSaksbehandlerIdent) ---\n"
 
         return prefix + endring + nåværendeBeskrivelse?.let { "\n\n$it" }.orEmpty()
+    }
+
+    fun håndterOppdatertOppgaveHendelse(oppdatertOppgaveHendelse: OppdatertOppgaveHendelse) {
+        oppgaveRepository.findByGsakOppgaveId(oppdatertOppgaveHendelse.gsakOppgaveId)?.let { oppgave ->
+            if (oppgave.tilordnetSaksbehandler != oppdatertOppgaveHendelse.tilordnetSaksbehandler) {
+                oppgaveRepository.update(oppgave.copy(tilordnetSaksbehandler = oppdatertOppgaveHendelse.tilordnetSaksbehandler))
+                logger.info("Oppdatert oppgave med gsakOppgaveId ${oppdatertOppgaveHendelse.gsakOppgaveId} med tilordnet saksbehandler")
+            }
+        }
     }
 }
