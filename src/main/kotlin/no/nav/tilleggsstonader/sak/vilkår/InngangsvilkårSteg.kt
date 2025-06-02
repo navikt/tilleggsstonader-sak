@@ -1,11 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
-import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -25,7 +22,11 @@ class InngangsvilkårSteg(
         saksbehandling: Saksbehandling,
         data: Void?,
     ) {
-        behandlingService.markerBehandlingSomPåbegynt(behandlingId = saksbehandling.id, saksbehandling.status)
+        behandlingService.markerBehandlingSomPåbegynt(
+            behandlingId = saksbehandling.id,
+            saksbehandling.status,
+            saksbehandling.steg,
+        )
     }
 
     /**

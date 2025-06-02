@@ -70,8 +70,7 @@ class BehandlingService(
 
     fun finnSisteIverksatteBehandling(fagsakId: FagsakId) = behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
 
-    fun finnesIkkeFerdigstiltBehandling(fagsakId: FagsakId) =
-        behandlingRepository.existsByFagsakIdAndStatusIsNot(fagsakId, FERDIGSTILT)
+    fun finnesIkkeFerdigstiltBehandling(fagsakId: FagsakId) = behandlingRepository.existsByFagsakIdAndStatusIsNot(fagsakId, FERDIGSTILT)
 
     fun finnesBehandlingSomIkkeErFerdigstiltEllerSattPåVent(fagsakId: FagsakId) =
         behandlingRepository.existsByFagsakIdAndStatusIsNotIn(fagsakId, listOf(FERDIGSTILT, SATT_PÅ_VENT))
@@ -144,14 +143,11 @@ class BehandlingService(
 
     fun hentBehandling(behandlingId: BehandlingId): Behandling = behandlingRepository.findByIdOrThrow(behandlingId)
 
-    fun hentSaksbehandling(behandlingId: BehandlingId): Saksbehandling =
-        behandlingRepository.finnSaksbehandling(behandlingId)
+    fun hentSaksbehandling(behandlingId: BehandlingId): Saksbehandling = behandlingRepository.finnSaksbehandling(behandlingId)
 
-    fun hentSaksbehandling(eksternBehandlingId: Long): Saksbehandling =
-        behandlingRepository.finnSaksbehandling(eksternBehandlingId)
+    fun hentSaksbehandling(eksternBehandlingId: Long): Saksbehandling = behandlingRepository.finnSaksbehandling(eksternBehandlingId)
 
-    fun hentEksternBehandlingId(behandlingId: BehandlingId) =
-        eksternBehandlingIdRepository.findByBehandlingId(behandlingId)
+    fun hentEksternBehandlingId(behandlingId: BehandlingId) = eksternBehandlingIdRepository.findByBehandlingId(behandlingId)
 
     fun hentBehandlingPåEksternId(eksternBehandlingId: Long): Behandling =
         behandlingRepository.finnMedEksternId(
@@ -168,7 +164,7 @@ class BehandlingService(
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer status på behandling $behandlingId " +
-                    "fra ${behandling.status} til $status",
+                "fra ${behandling.status} til $status",
         )
 
         if (BehandlingStatus.UTREDES == status) {
@@ -186,7 +182,7 @@ class BehandlingService(
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer kategori på behandling $behandlingId " +
-                    "fra ${behandling.kategori} til $kategori",
+                "fra ${behandling.kategori} til $kategori",
         )
         return behandlingRepository.update(behandling.copy(kategori = kategori))
     }
@@ -199,7 +195,7 @@ class BehandlingService(
         behandling.status.validerKanBehandlingRedigeres()
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer forrigeIverksatteBehandlingId på behandling $behandlingId " +
-                    "fra ${behandling.forrigeIverksatteBehandlingId} til $forrigeIverksatteBehandlingId",
+                "fra ${behandling.forrigeIverksatteBehandlingId} til $forrigeIverksatteBehandlingId",
         )
         return behandlingRepository.update(behandling.copy(forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId))
     }
@@ -211,7 +207,7 @@ class BehandlingService(
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer steg på behandling $behandlingId " +
-                    "fra ${behandling.steg} til $steg",
+                "fra ${behandling.steg} til $steg",
         )
         return behandlingRepository.update(behandling.copy(steg = steg))
     }
@@ -320,8 +316,12 @@ class BehandlingService(
         behandlingshistorikkService.slettFritekstMetadataVedFerdigstillelse(behandlingId)
     }
 
-    fun markerBehandlingSomPåbegynt(behandlingId: BehandlingId, behandlingStatus: BehandlingStatus) {
-        if (behandlingStatus !== UTREDES) {
+    fun markerBehandlingSomPåbegynt(
+        behandlingId: BehandlingId,
+        behandlingStatus: BehandlingStatus,
+        behandlingSteg: StegType,
+    ) {
+        if (behandlingStatus !== UTREDES && behandlingSteg == StegType.INNGANGSVILKÅR) {
             oppdaterStatusPåBehandling(behandlingId, UTREDES)
             behandlingshistorikkService.opprettHistorikkInnslag(
                 behandlingId = behandlingId,

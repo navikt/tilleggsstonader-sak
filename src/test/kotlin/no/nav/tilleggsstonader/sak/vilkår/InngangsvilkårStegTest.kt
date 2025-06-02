@@ -6,7 +6,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -27,7 +26,7 @@ class InngangsvilkårStegTest {
     @BeforeEach
     fun setUp() {
         every { behandlingService.oppdaterStatusPåBehandling(any(), any()) } returns behandling()
-        justRun { behandlingService.markerBehandlingSomPåbegynt(any(), any()) }
+        justRun { behandlingService.markerBehandlingSomPåbegynt(any(), any(), any()) }
     }
 
     @Nested
@@ -39,7 +38,7 @@ class InngangsvilkårStegTest {
 
             assertThat(nesteSteg).isEqualTo(StegType.VILKÅR)
             verify(exactly = 1) {
-                behandlingService.markerBehandlingSomPåbegynt(any(), any())
+                behandlingService.markerBehandlingSomPåbegynt(any(), any(), any())
             }
         }
 
@@ -52,7 +51,7 @@ class InngangsvilkårStegTest {
 
                 assertThat(nesteSteg).isEqualTo(StegType.BEREGNE_YTELSE)
                 verify(exactly = 1) {
-                    behandlingService.markerBehandlingSomPåbegynt(any(), any())
+                    behandlingService.markerBehandlingSomPåbegynt(any(), any(), any())
                 }
             }
         }
