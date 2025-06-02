@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistor
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegValidering.validerGyldigTilstand
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegValidering.validerHarTilgang
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegValidering.validerRollerForResetSteg
+import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.BrevSteg
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
@@ -78,6 +79,7 @@ class StegService(
             StegType.INNGANGSVILKÅR -> håndterInngangsvilkår(behandlingId)
             StegType.VILKÅR -> håndterVilkår(behandlingId)
             StegType.SIMULERING -> håndterSimulering(behandlingId)
+            StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV -> håndterBrev(behandlingId)
             else -> error("Steg $steg kan ikke ferdigstilles her")
         }
     }
@@ -96,6 +98,11 @@ class StegService(
     private fun håndterSimulering(behandlingId: BehandlingId): Behandling {
         val simuleringSteg: SimuleringSteg = behandlingSteg.filterIsInstance<SimuleringSteg>().single()
         return håndterSteg(behandlingId, simuleringSteg)
+    }
+
+    private fun håndterBrev(behandlingId: BehandlingId): Behandling {
+        val steg: BrevSteg = behandlingSteg.filterIsInstance<BrevSteg>().single()
+        return håndterSteg(behandlingId, steg)
     }
 
     @Transactional

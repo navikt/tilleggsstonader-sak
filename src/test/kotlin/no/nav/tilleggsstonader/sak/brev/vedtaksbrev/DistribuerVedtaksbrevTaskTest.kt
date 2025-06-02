@@ -13,7 +13,9 @@ import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.osloNow
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
@@ -35,12 +37,14 @@ class DistribuerVedtaksbrevTaskTest {
     val brevmottakerVedtaksbrevRepository = mockk<BrevmottakerVedtaksbrevRepository>()
     val journalpostClient = mockk<JournalpostClient>()
     val stegService = mockk<StegService>()
-    val brevSteg = mockk<BrevSteg>()
     val taskService = mockk<TaskService>(relaxed = true)
+    val brevSteg = BrevSteg(taskService)
+    val behandlingSerice = mockk<BehandlingService>()
 
-    val saksbehandling = saksbehandling()
+    val saksbehandling = saksbehandling(steg = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
     val distribuerVedtaksbrevTask =
         DistribuerVedtaksbrevTask(
+            behandlingSerice,
             brevmottakerVedtaksbrevRepository,
             journalpostClient,
             stegService,
@@ -55,6 +59,7 @@ class DistribuerVedtaksbrevTaskTest {
 
     @BeforeEach
     fun setUp() {
+        every { behandlingSerice.hentSaksbehandling(saksbehandling.id) } returns saksbehandling
         every { stegService.håndterSteg(any<BehandlingId>(), brevSteg) } returns mockk()
     }
 

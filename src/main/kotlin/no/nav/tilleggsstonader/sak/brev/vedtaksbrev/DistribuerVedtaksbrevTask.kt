@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokdist.Distribusjonstype
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
@@ -23,6 +24,12 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpClientErrorException
 import java.util.Properties
 
+/**
+ * Distribuering av vedtaksbrev skjer asynkront etter at journalposten er opprettet.
+ * Det er ikke en del av behandlingsflyten sånn at en distribuering ikke skal stoppe behandlingen.
+ *
+ * I tilfelle en person er død, vil distribueringen feile med 410 Gone. Og denne tasken vil da kjøre på nytt.
+ */
 @Service
 @TaskStepBeskrivelse(
     taskStepType = DistribuerVedtaksbrevTask.TYPE,
@@ -32,6 +39,7 @@ import java.util.Properties
     beskrivelse = "Distribuerer vedtaksbrev etter journalføring",
 )
 class DistribuerVedtaksbrevTask(
+    private val behandlingService: BehandlingService,
     private val brevmottakerVedtaksbrevRepository: BrevmottakerVedtaksbrevRepository,
     private val journalpostClient: JournalpostClient,
     private val stegService: StegService,
@@ -51,7 +59,10 @@ class DistribuerVedtaksbrevTask(
             .map { distribuerBrevet(mottaker = it) }
             .håndterRekjøringSenereHvisMottakerErDød(task)
 
-        stegService.håndterSteg(behandlingId, brevSteg)
+        // TODO kan fjernes når alle behandlinger som distribuerer er i brevsteg (dvs har task av denne typen som er i steg distribuer)
+        if (behandlingService.hentSaksbehandling(behandlingId).steg == brevSteg.stegType()) {
+            stegService.håndterSteg(behandlingId, brevSteg)
+        }
     }
 
     private sealed interface ResultatBrevutsendelse {

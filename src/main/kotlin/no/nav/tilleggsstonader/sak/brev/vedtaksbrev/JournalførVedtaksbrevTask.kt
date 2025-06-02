@@ -12,6 +12,8 @@ import no.nav.tilleggsstonader.kontrakter.dokarkiv.dokumenttyper
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerUtil.tilAvsenderMottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
@@ -39,6 +41,7 @@ class JournalførVedtaksbrevTask(
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val journalpostService: JournalpostService,
     private val brevmottakerVedtaksbrevRepository: BrevmottakerVedtaksbrevRepository,
+    private val stegService: StegService,
     private val transactionHandler: TransactionHandler,
 ) : AsyncTaskStep {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -56,6 +59,7 @@ class JournalførVedtaksbrevTask(
                 journalførVedtaksbrevForEnMottaker(vedtaksbrev, saksbehandling, brevmottaker)
             }
         }
+        stegService.håndterSteg(behandlingId, StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
     }
 
     private fun journalførVedtaksbrevForEnMottaker(
