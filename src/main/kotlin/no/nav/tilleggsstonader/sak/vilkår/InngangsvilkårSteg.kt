@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service
 @Service
 class InngangsvilkårSteg(
     private val behandlingService: BehandlingService,
-    private val behandlingshistorikkService: BehandlingshistorikkService,
 ) : BehandlingSteg<Void?> {
     override fun validerSteg(saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.type == BehandlingType.REVURDERING && saksbehandling.revurderFra == null) {
@@ -26,19 +25,11 @@ class InngangsvilkårSteg(
         saksbehandling: Saksbehandling,
         data: Void?,
     ) {
-        if (saksbehandling.status != BehandlingStatus.UTREDES) {
-            behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.UTREDES)
-            behandlingshistorikkService.opprettHistorikkInnslag(
-                behandlingId = saksbehandling.id,
-                stegtype = StegType.INNGANGSVILKÅR,
-                utfall = StegUtfall.UTREDNING_PÅBEGYNT,
-                metadata = null,
-            )
-        }
+        behandlingService.markerBehandlingSomPåbegynt(behandlingId = saksbehandling.id, saksbehandling.status)
     }
 
     /**
-     * håndteres av [BehandlingService.oppdaterStatusPåBehandling]
+     * håndteres av [BehandlingService.markerBehandlingSomPåbegynt]
      */
     override fun settInnHistorikk() = false
 

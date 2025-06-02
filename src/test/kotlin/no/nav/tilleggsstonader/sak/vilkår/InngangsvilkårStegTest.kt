@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
@@ -16,18 +18,16 @@ import org.junit.jupiter.api.Test
 
 class InngangsvilkårStegTest {
     val behandlingService = mockk<BehandlingService>()
-    val behandlingshistorikkService = mockk<BehandlingshistorikkService>()
 
     val steg =
         InngangsvilkårSteg(
             behandlingService = behandlingService,
-            behandlingshistorikkService = behandlingshistorikkService,
         )
 
     @BeforeEach
     fun setUp() {
         every { behandlingService.oppdaterStatusPåBehandling(any(), any()) } returns behandling()
-        every { behandlingshistorikkService.opprettHistorikkInnslag(any(), any(), any(), any()) } returns Unit
+        justRun { behandlingService.markerBehandlingSomPåbegynt(any(), any()) }
     }
 
     @Nested
@@ -38,17 +38,23 @@ class InngangsvilkårStegTest {
             val nesteSteg = steg.utførOgReturnerNesteSteg(behandling, null)
 
             assertThat(nesteSteg).isEqualTo(StegType.VILKÅR)
+            verify(exactly = 1) {
+                behandlingService.markerBehandlingSomPåbegynt(any(), any())
+            }
         }
-    }
 
-    @Nested
-    inner class Læremidler {
-        @Test
-        fun `Neste steg - har ikke noen vilkår og kan hoppe direkte til beregne ytelse`() {
-            val behandling = saksbehandling(fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER))
-            val nesteSteg = steg.utførOgReturnerNesteSteg(behandling, null)
+        @Nested
+        inner class Læremidler {
+            @Test
+            fun `Neste steg - har ikke noen vilkår og kan hoppe direkte til beregne ytelse`() {
+                val behandling = saksbehandling(fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER))
+                val nesteSteg = steg.utførOgReturnerNesteSteg(behandling, null)
 
-            assertThat(nesteSteg).isEqualTo(StegType.BEREGNE_YTELSE)
+                assertThat(nesteSteg).isEqualTo(StegType.BEREGNE_YTELSE)
+                verify(exactly = 1) {
+                    behandlingService.markerBehandlingSomPåbegynt(any(), any())
+                }
+            }
         }
     }
 }

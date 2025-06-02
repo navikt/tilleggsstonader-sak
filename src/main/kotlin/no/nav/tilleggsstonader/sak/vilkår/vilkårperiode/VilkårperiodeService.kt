@@ -82,9 +82,6 @@ class VilkårperiodeService(
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
 
         validerBehandling(behandling)
-
-        oppdaterStatusOgHistorikkMedBehandlingUtredes(behandling)
-
         validerNyPeriodeRevurdering(behandling, vilkårperiode.fom)
 
         if (vilkårperiode.type is MålgruppeType) {
@@ -96,6 +93,8 @@ class VilkårperiodeService(
             type = vilkårperiode.type,
             kildeId = vilkårperiode.kildeId,
         )
+
+        behandlingService.markerBehandlingSomPåbegynt(behandling.id, behandling.status)
 
         val fødselFaktaGrunnlag =
             faktaGrunnlagService
@@ -136,7 +135,7 @@ class VilkårperiodeService(
         validerBehandling(behandling)
         validerKildeIdOgType(vilkårperiode, eksisterendeVilkårperiode)
 
-        oppdaterStatusOgHistorikkMedBehandlingUtredes(behandling)
+        behandlingService.markerBehandlingSomPåbegynt(behandling.id, behandling.status)
 
         val fødselFaktaGrunnlag =
             faktaGrunnlagService
@@ -314,18 +313,6 @@ class VilkårperiodeService(
 
         feilHvis(eksisterendeVilkårperiode.type != vilkårperiode.type) {
             "Kan ikke endre type på en eksisterende periode. Kontakt utviklingsteamet"
-        }
-    }
-
-    private fun oppdaterStatusOgHistorikkMedBehandlingUtredes(behandling: Saksbehandling) {
-        if (behandling.status != BehandlingStatus.UTREDES) {
-            behandlingService.oppdaterStatusPåBehandling(behandling.id, BehandlingStatus.UTREDES)
-            behandlingshistorikkService.opprettHistorikkInnslag(
-                behandlingId = behandling.id,
-                stegtype = StegType.INNGANGSVILKÅR,
-                utfall = StegUtfall.UTREDNING_PÅBEGYNT,
-                metadata = null,
-            )
         }
     }
 }
