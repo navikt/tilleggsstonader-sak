@@ -53,8 +53,10 @@ class SettPåVentService(
         val behandling = behandlingService.hentBehandling(behandlingId)
         behandling.status.validerKanBehandlingRedigeres()
 
+        behandlingService.markerBehandlingSomPåbegynt(behandlingId, behandling.status)
+
         opprettHistorikkInnslag(behandling, StegUtfall.SATT_PÅ_VENT, årsaker = dto.årsaker, kommentar = dto.kommentar)
-        behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT)
+        behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT, behandling.steg)
 
         val oppgave = hentOppgave(behandlingId)
 
