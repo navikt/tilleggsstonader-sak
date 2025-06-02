@@ -8,8 +8,6 @@ import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokdist.Distribusjonstype
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -39,11 +37,8 @@ import java.util.Properties
     beskrivelse = "Distribuerer vedtaksbrev etter journalføring",
 )
 class DistribuerVedtaksbrevTask(
-    private val behandlingService: BehandlingService,
     private val brevmottakerVedtaksbrevRepository: BrevmottakerVedtaksbrevRepository,
     private val journalpostClient: JournalpostClient,
-    private val stegService: StegService,
-    private val brevSteg: BrevSteg,
     private val transactionHandler: TransactionHandler,
     private val taskService: TaskService,
 ) : AsyncTaskStep {
@@ -58,11 +53,6 @@ class DistribuerVedtaksbrevTask(
             .filter { it.harIkkeFåttBrevet() }
             .map { distribuerBrevet(mottaker = it) }
             .håndterRekjøringSenereHvisMottakerErDød(task)
-
-        // TODO kan fjernes når alle behandlinger som distribuerer er i brevsteg (dvs har task av denne typen som er i steg distribuer)
-        if (behandlingService.hentSaksbehandling(behandlingId).steg == brevSteg.stegType()) {
-            stegService.håndterSteg(behandlingId, brevSteg)
-        }
     }
 
     private sealed interface ResultatBrevutsendelse {

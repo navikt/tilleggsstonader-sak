@@ -44,11 +44,8 @@ class DistribuerVedtaksbrevTaskTest {
     val saksbehandling = saksbehandling(steg = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
     val distribuerVedtaksbrevTask =
         DistribuerVedtaksbrevTask(
-            behandlingSerice,
             brevmottakerVedtaksbrevRepository,
             journalpostClient,
-            stegService,
-            brevSteg,
             TransactionHandler(),
             taskService,
         )
