@@ -5,7 +5,10 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -22,7 +25,14 @@ class BeregnFraUtlederServiceTest {
     private val behandlingService = mockk<BehandlingService>()
     private val vilkårService = mockk<VilkårService>()
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
-    private val utledBeregnFraDatoService = UtledBeregnFraDatoService(behandlingService, vilkårService, vilkårperiodeService)
+    private val vedtaksperiodeService = mockk<VedtaksperiodeService>()
+    private val utledBeregnFraDatoService =
+        UtledBeregnFraDatoService(
+            behandlingService,
+            vilkårService,
+            vilkårperiodeService,
+            vedtaksperiodeService,
+        )
 
     var behandling: Behandling = behandling()
     var sisteIverksatteBehandling: Behandling = behandling()
@@ -31,6 +41,8 @@ class BeregnFraUtlederServiceTest {
     lateinit var vilkårSisteIverksatteBehandling: List<Vilkår>
     lateinit var vilkårperioder: Vilkårperioder
     lateinit var vilkårperioderSisteIverksattBehandling: Vilkårperioder
+    lateinit var vedtaksperioder: List<Vedtaksperiode>
+    lateinit var vedtaksperioderSisteIverksatteBehandling: List<Vedtaksperiode>
 
     @BeforeEach
     fun setUp() {
@@ -39,20 +51,22 @@ class BeregnFraUtlederServiceTest {
 
         every { vilkårService.hentVilkår(behandling.id) } answers { vilkår }
         every { vilkårperiodeService.hentVilkårperioder(behandling.id) } answers { vilkårperioder }
+        every { vedtaksperiodeService.finnVedtaksperioderForBehandling(behandling.id, null) } answers { vedtaksperioder }
 
         every { vilkårService.hentVilkår(sisteIverksatteBehandling.id) } answers { vilkårSisteIverksatteBehandling }
         every { vilkårperiodeService.hentVilkårperioder(sisteIverksatteBehandling.id) } answers { vilkårperioderSisteIverksattBehandling }
-    }
+        every { vedtaksperiodeService.finnVedtaksperioderForBehandling(sisteIverksatteBehandling.id, null) } answers
+            { vedtaksperioderSisteIverksatteBehandling }
 
-    @Test
-    fun `utled beregnFraDato, lagt på nye perioder, beregnFraDato blir fom-dato på ny periode`() {
+        val fom = LocalDate.now().minusMonths(1)
+        val tom = LocalDate.now()
         vilkårSisteIverksatteBehandling =
             listOf(
                 vilkår(
-                    sisteIverksatteBehandling.id,
-                    VilkårType.UTGIFTER_OVERNATTING,
-                    fom = LocalDate.now().minusMonths(1),
-                    tom = LocalDate.now(),
+                    behandlingId = sisteIverksatteBehandling.id,
+                    type = VilkårType.UTGIFTER_OVERNATTING,
+                    fom = fom,
+                    tom = tom,
                 ),
             )
         vilkårperioderSisteIverksattBehandling =
@@ -66,7 +80,17 @@ class BeregnFraUtlederServiceTest {
                         VilkårperiodeTestUtil.aktivitet(fom = LocalDate.now().minusMonths(1), tom = LocalDate.now()),
                     ),
             )
+        vedtaksperioderSisteIverksatteBehandling =
+            listOf(
+                vedtaksperiode(
+                    fom = LocalDate.now().minusMonths(1),
+                    tom = LocalDate.now(),
+                ),
+            )
+    }
 
+    @Test
+    fun `utled beregnFraDato, lagt på nye perioder, beregnFraDato blir fom-dato på ny periode`() {
         val nyttVilkår =
             vilkår(
                 sisteIverksatteBehandling.id,
@@ -85,6 +109,7 @@ class BeregnFraUtlederServiceTest {
                     vilkårperioderSisteIverksattBehandling.aktiviteter +
                         VilkårperiodeTestUtil.aktivitet(fom = LocalDate.now().plusDays(1), tom = LocalDate.now().plusMonths(1)),
             )
+        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
 
         val result = utledBeregnFraDatoService.utledBeregnFraDato(behandling.id)
 
@@ -93,27 +118,6 @@ class BeregnFraUtlederServiceTest {
 
     @Test
     fun `utled beregnFraDato, målgruppe endret, beregnFraDato blir startdato på endret målgruppe`() {
-        vilkårSisteIverksatteBehandling =
-            listOf(
-                vilkår(
-                    sisteIverksatteBehandling.id,
-                    VilkårType.UTGIFTER_OVERNATTING,
-                    fom = LocalDate.now().minusMonths(1),
-                    tom = LocalDate.now(),
-                ),
-            )
-        vilkårperioderSisteIverksattBehandling =
-            Vilkårperioder(
-                målgrupper =
-                    listOf(
-                        VilkårperiodeTestUtil.målgruppe(fom = LocalDate.now().minusMonths(1), tom = LocalDate.now()),
-                    ),
-                aktiviteter =
-                    listOf(
-                        VilkårperiodeTestUtil.aktivitet(fom = LocalDate.now().minusMonths(1), tom = LocalDate.now()),
-                    ),
-            )
-
         vilkår = vilkårSisteIverksatteBehandling
         vilkårperioder =
             Vilkårperioder(
@@ -125,6 +129,7 @@ class BeregnFraUtlederServiceTest {
                     ),
                 aktiviteter = vilkårperioderSisteIverksattBehandling.aktiviteter,
             )
+        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
 
         val result = utledBeregnFraDatoService.utledBeregnFraDato(behandling.id)
 
@@ -133,27 +138,6 @@ class BeregnFraUtlederServiceTest {
 
     @Test
     fun `utled beregnFraDato, aktivitet endret, beregnFraDato blir startdato på endret målgruppe`() {
-        vilkårSisteIverksatteBehandling =
-            listOf(
-                vilkår(
-                    sisteIverksatteBehandling.id,
-                    VilkårType.UTGIFTER_OVERNATTING,
-                    fom = LocalDate.now().minusMonths(1),
-                    tom = LocalDate.now(),
-                ),
-            )
-        vilkårperioderSisteIverksattBehandling =
-            Vilkårperioder(
-                målgrupper =
-                    listOf(
-                        VilkårperiodeTestUtil.målgruppe(fom = LocalDate.now().minusMonths(1), tom = LocalDate.now()),
-                    ),
-                aktiviteter =
-                    listOf(
-                        VilkårperiodeTestUtil.aktivitet(fom = LocalDate.now().minusMonths(1), tom = LocalDate.now()),
-                    ),
-            )
-
         vilkår = vilkårSisteIverksatteBehandling
         vilkårperioder =
             Vilkårperioder(
@@ -165,6 +149,7 @@ class BeregnFraUtlederServiceTest {
                             .copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
                     ),
             )
+        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
 
         val result = utledBeregnFraDatoService.utledBeregnFraDato(behandling.id)
 
@@ -173,32 +158,27 @@ class BeregnFraUtlederServiceTest {
 
     @Test
     fun `utled beregnFraDato, vilkår-fom endret, beregnFraDato blir startdato på originalt vilkår`() {
-        vilkårSisteIverksatteBehandling =
-            listOf(
-                vilkår(
-                    sisteIverksatteBehandling.id,
-                    VilkårType.UTGIFTER_OVERNATTING,
-                    fom = LocalDate.now().minusMonths(1),
-                    tom = LocalDate.now(),
-                ),
-            )
-        vilkårperioderSisteIverksattBehandling =
-            Vilkårperioder(
-                målgrupper =
-                    listOf(
-                        VilkårperiodeTestUtil.målgruppe(fom = LocalDate.now().minusMonths(1), tom = LocalDate.now()),
-                    ),
-                aktiviteter =
-                    listOf(
-                        VilkårperiodeTestUtil.aktivitet(fom = LocalDate.now().minusMonths(1), tom = LocalDate.now()),
-                    ),
-            )
-
         vilkår = listOf(vilkårSisteIverksatteBehandling.single().copy(fom = LocalDate.now().minusWeeks(1)))
         vilkårperioder = vilkårperioderSisteIverksattBehandling
+        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
 
         val result = utledBeregnFraDatoService.utledBeregnFraDato(behandling.id)
 
         assertThat(result).isEqualTo(vilkårSisteIverksatteBehandling.single().fom)
+    }
+
+    @Test
+    fun `utled beregnFraDato, vedtaksperiode splittet i to`() {
+        vilkår = vilkårSisteIverksatteBehandling
+        vilkårperioder = vilkårperioderSisteIverksattBehandling
+        vedtaksperioder =
+            listOf(
+                vedtaksperiode(fom = LocalDate.now().minusMonths(1), tom = LocalDate.now().minusWeeks(1)),
+                vedtaksperiode(fom = LocalDate.now().minusWeeks(1).plusDays(1), tom = LocalDate.now()),
+            )
+
+        val result = utledBeregnFraDatoService.utledBeregnFraDato(behandling.id)
+
+        assertThat(result).isEqualTo(vedtaksperioder.last().fom)
     }
 }
