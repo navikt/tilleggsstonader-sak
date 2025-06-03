@@ -25,6 +25,6 @@ class SøknadRoutingController(
         feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.SOKNAD_API), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
-        return søknadRoutingService.sjekkRoutingForPerson(request)
+        return søknadRoutingService.sjekkRoutingForPerson(request.tilRoutingContext())
     }
 }

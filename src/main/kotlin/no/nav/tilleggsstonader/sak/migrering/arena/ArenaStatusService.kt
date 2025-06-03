@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.migrering.arena
 
-import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -85,7 +84,7 @@ class ArenaStatusService(
         identer: Set<String>,
         stønadstype: Stønadstype,
     ): Boolean =
-        identer.any {
-            søknadRoutingService.harLagretRouting(IdentStønadstype(it, stønadstype))
+        identer.any { ident ->
+            søknadRoutingService.harLagretRouting(ident, stønadstype)
         }
 }

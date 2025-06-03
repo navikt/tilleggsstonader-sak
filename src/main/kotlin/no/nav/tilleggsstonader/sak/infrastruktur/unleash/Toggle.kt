@@ -12,6 +12,5 @@ enum class Toggle(
 
     HENT_BEHANDLINGER_FOR_OPPFØLGING("sak.hent-behandlinger-for-oppfoelging"),
 
-    SØKNAD_ROUTING_BOUTGIFTER("sak.soknad-routing.boutgifter"),
     SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT("sak.detaljert_beregningsresultat"),
 }
