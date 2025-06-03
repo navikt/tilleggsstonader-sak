@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.beregnfra
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -37,6 +38,8 @@ class UtledBeregnFraDatoService(
             vilkårTidligereBehandling = vilkårTidligereBehandling,
             vilkårsperioder = vilkårsperioder,
             vilkårsperioderTidligereBehandling = vilkårsperioderTidligereBehandling,
+            vedtaksperioder = emptyList(),
+            vedtaksperioderTidligereBehandling = emptyList(),
         ).utledTidligsteEndring()
     }
 }
@@ -46,8 +49,8 @@ data class BeregnFraUtleder(
     val vilkårTidligereBehandling: List<Vilkår>,
     val vilkårsperioder: Vilkårperioder,
     val vilkårsperioderTidligereBehandling: Vilkårperioder,
-//    val vedtaksperioder: List<Vedtaksperiode>,
-//    val vedtaksperioderTidligereBehandling: List<Vedtaksperiode>,
+    val vedtaksperioder: List<Vedtaksperiode>,
+    val vedtaksperioderTidligereBehandling: List<Vedtaksperiode>,
 ) {
     fun utledTidligsteEndring(): LocalDate? =
         listOfNotNull(utledTidligsteEndringForVilkår())
