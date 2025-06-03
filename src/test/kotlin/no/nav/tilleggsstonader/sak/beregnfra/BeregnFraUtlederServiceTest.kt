@@ -73,18 +73,18 @@ class BeregnFraUtlederServiceTest {
             Vilkårperioder(
                 målgrupper =
                     listOf(
-                        VilkårperiodeTestUtil.målgruppe(fom = LocalDate.now().minusMonths(1), tom = LocalDate.now()),
+                        VilkårperiodeTestUtil.målgruppe(fom = fom, tom = tom),
                     ),
                 aktiviteter =
                     listOf(
-                        VilkårperiodeTestUtil.aktivitet(fom = LocalDate.now().minusMonths(1), tom = LocalDate.now()),
+                        VilkårperiodeTestUtil.aktivitet(fom = fom, tom = tom),
                     ),
             )
         vedtaksperioderSisteIverksatteBehandling =
             listOf(
                 vedtaksperiode(
-                    fom = LocalDate.now().minusMonths(1),
-                    tom = LocalDate.now(),
+                    fom = fom,
+                    tom = tom,
                 ),
             )
     }
