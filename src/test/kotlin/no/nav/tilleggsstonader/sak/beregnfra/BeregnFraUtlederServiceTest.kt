@@ -168,7 +168,7 @@ class BeregnFraUtlederServiceTest {
     }
 
     @Test
-    fun `utled beregnFraDato, vedtaksperiode splittet i to`() {
+    fun `utled beregnFraDato, vedtaksperiode splittet i to, beregnFraDato blir første dato etter korteste vedtaksperiode`() {
         vilkår = vilkårSisteIverksatteBehandling
         vilkårperioder = vilkårperioderSisteIverksattBehandling
         vedtaksperioder =
