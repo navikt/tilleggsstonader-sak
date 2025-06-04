@@ -103,8 +103,7 @@ data class BeregnFraUtleder(
         vilkårNå: Vilkår,
         vilkårTidligereBehandling: Vilkår,
     ): Boolean =
-        vilkårNå.status != vilkårTidligereBehandling.status ||
-            vilkårNå.utgift != vilkårTidligereBehandling.utgift ||
+        vilkårNå.utgift != vilkårTidligereBehandling.utgift ||
             vilkårNå.barnId != vilkårTidligereBehandling.barnId ||
             delvilkårErEndret(vilkårNå, vilkårTidligereBehandling)
 
