@@ -2,8 +2,8 @@ package no.nav.tilleggsstonader.sak.beregnfra
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -27,10 +27,8 @@ class UtledBeregnFraDatoService(
     fun utledBeregnFraDato(behandlingId: BehandlingId): LocalDate? {
         val behandling = behandlingService.hentBehandling(behandlingId)
         val sisteIverksatteBehandling =
-            behandlingService
-                .hentBehandlinger(behandling.fagsakId)
-                .sortertEtterVedtakstidspunkt()
-                .last { it.id != behandling.id }
+            behandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentBehandling(it) }
+                ?: feil("Fant ingen tidligere iverksatt behandling for behandlingId=$behandlingId")
 
         val vilkår = vilkårService.hentVilkår(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)

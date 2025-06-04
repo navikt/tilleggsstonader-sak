@@ -81,8 +81,8 @@ class BeregnFraUtlederServiceTest {
             vedtaksperiodeService,
         )
 
-    var behandling: Behandling = behandling()
     var sisteIverksatteBehandling: Behandling = behandling()
+    var behandling: Behandling = behandling(forrigeIverksatteBehandlingId = sisteIverksatteBehandling.id)
 
     lateinit var vilkår: List<Vilkår>
     lateinit var vilkårSisteIverksatteBehandling: List<Vilkår>
@@ -97,7 +97,7 @@ class BeregnFraUtlederServiceTest {
     @BeforeEach
     fun setUp() {
         every { behandlingService.hentBehandling(behandling.id) } answers { behandling }
-        every { behandlingService.hentBehandlinger(behandling.fagsakId) } answers { listOf(sisteIverksatteBehandling, behandling) }
+        every { behandlingService.hentBehandling(behandling.forrigeIverksatteBehandlingId!!) } answers { sisteIverksatteBehandling }
 
         every { vilkårService.hentVilkår(behandling.id) } answers { vilkår }
         every { vilkårperiodeService.hentVilkårperioder(behandling.id) } answers { vilkårperioder }
