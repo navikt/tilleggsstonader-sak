@@ -16,7 +16,7 @@ class RegisterAktivitetController(
     private val tilgangService: TilgangService,
     private val registerAktivitetService: RegisterAktivitetService,
 ) {
-    @GetMapping("{fagsakPersonId}", "temp/{fagsakPersonId}")
+    @GetMapping("{fagsakPersonId}")
     fun hentAktiviteter(
         @PathVariable fagsakPersonId: FagsakPersonId,
     ): RegisterAktiviteterDto {
