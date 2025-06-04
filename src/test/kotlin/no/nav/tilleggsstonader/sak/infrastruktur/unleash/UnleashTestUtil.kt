@@ -5,6 +5,7 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
+import no.nav.tilleggsstonader.libs.unleash.ToggleId
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 
 fun mockUnleashService(isEnabled: Boolean = true): UnleashService {
@@ -38,7 +39,7 @@ fun UnleashService.mockIsEnabled(
 }
 
 fun UnleashService.mockGetVariant(
-    toggle: Toggle,
+    toggle: ToggleId,
     variant: Variant,
 ): UnleashService {
     val service = this

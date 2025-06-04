@@ -52,7 +52,7 @@ class ArenaStatusServiceTest {
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
         verify(exactly = 0) { behandlingService.finnesBehandlingForFagsak(any()) }
-        verify(exactly = 1) { søknadRoutingService.harLagretRouting(any()) }
+        verify(exactly = 1) { søknadRoutingService.harLagretRouting(any(), any()) }
     }
 
     @Test
@@ -63,7 +63,7 @@ class ArenaStatusServiceTest {
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
         verify(exactly = 1) { behandlingService.finnesBehandlingForFagsak(any()) }
-        verify(exactly = 1) { søknadRoutingService.harLagretRouting(any()) }
+        verify(exactly = 1) { søknadRoutingService.harLagretRouting(any(), any()) }
     }
 
     @Test
@@ -74,7 +74,7 @@ class ArenaStatusServiceTest {
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
         verify(exactly = 1) { behandlingService.finnesBehandlingForFagsak(any()) }
-        verify(exactly = 0) { søknadRoutingService.harLagretRouting(any()) }
+        verify(exactly = 0) { søknadRoutingService.harLagretRouting(any(), any()) }
     }
 
     @Test
@@ -87,7 +87,7 @@ class ArenaStatusServiceTest {
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
         verify(exactly = 1) { behandlingService.finnesBehandlingForFagsak(any()) }
-        verify(exactly = 1) { søknadRoutingService.harLagretRouting(any()) }
+        verify(exactly = 1) { søknadRoutingService.harLagretRouting(any(), any()) }
     }
 
     private fun mockFinnFagsak(fagsak: Fagsak?) {
@@ -99,6 +99,6 @@ class ArenaStatusServiceTest {
     }
 
     private fun mockSøknadRouting(svar: Boolean) {
-        every { søknadRoutingService.harLagretRouting(any()) } returns svar
+        every { søknadRoutingService.harLagretRouting(any(), any()) } returns svar
     }
 }
