@@ -13,8 +13,8 @@ import java.time.LocalDate
 data class InnvilgelseBoutgifterResponse(
     val vedtaksperioder: List<VedtaksperiodeDto>?,
     val beregningsresultat: BeregningsresultatBoutgifterDto,
-    val gjelderFraOgMed: LocalDate,
-    val gjelderTilOgMed: LocalDate,
+    val gjelderFraOgMed: LocalDate?,
+    val gjelderTilOgMed: LocalDate?,
     val begrunnelse: String? = null,
 ) : VedtakBoutgifterDto(TypeVedtak.INNVILGELSE),
     VedtakBoutgifterResponse

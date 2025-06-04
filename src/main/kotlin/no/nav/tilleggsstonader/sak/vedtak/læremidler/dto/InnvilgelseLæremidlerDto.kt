@@ -12,8 +12,8 @@ import java.time.LocalDate
 data class InnvilgelseLæremidlerResponse(
     val vedtaksperioder: List<VedtaksperiodeLæremidlerDto>,
     val beregningsresultat: BeregningsresultatLæremidlerDto,
-    val gjelderFraOgMed: LocalDate,
-    val gjelderTilOgMed: LocalDate,
+    val gjelderFraOgMed: LocalDate?,
+    val gjelderTilOgMed: LocalDate?,
     val begrunnelse: String? = null,
 ) : VedtakLæremidlerDto(TypeVedtak.INNVILGELSE),
     VedtakLæremidlerResponse

@@ -82,8 +82,8 @@ object VedtakDtoMapper {
                 InnvilgelseLæremidlerResponse(
                     vedtaksperioder = data.vedtaksperioder.tilDto(),
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
-                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).minOf { it.fom },
-                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).maxOf { it.tom },
+                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).minOfOrNull { it.fom },
+                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
                 )
 
@@ -110,8 +110,8 @@ object VedtakDtoMapper {
                 InnvilgelseBoutgifterResponse(
                     vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(),
                     beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
-                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).minOf { it.fom },
-                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).maxOf { it.tom },
+                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).minOfOrNull { it.fom },
+                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
                 )
 
