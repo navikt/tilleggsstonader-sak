@@ -47,7 +47,7 @@ class UtgifterOvernattingRegel :
                 erHovedregel = true,
                 svarMapping =
                     mapOf(
-                        SvarId.JA to IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
+                        SvarId.JA to OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                         SvarId.NEI to IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     ),
             )
