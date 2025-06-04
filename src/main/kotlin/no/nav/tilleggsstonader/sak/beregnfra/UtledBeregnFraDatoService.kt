@@ -73,31 +73,31 @@ data class BeregnFraUtleder(
             perioderNå = vilkår.map { it.wrapSomPeriode() }.sorted(),
             perioderTidligere = vilkårTidligereBehandling.map { it.wrapSomPeriode() }.sorted(),
         ) { vilkårNå, vilkårTidligereBehandling ->
-            erEndret(vilkårNå.periodeType, vilkårTidligereBehandling.periodeType)
+            erVilkårEndret(vilkårNå.periodeType, vilkårTidligereBehandling.periodeType)
         }
 
     private fun utledTidligsteEndringForAktiviteter(): LocalDate? =
         utledEndringIPeriode(
             perioderNå = vilkårsperioder.aktiviteter.sorted(),
             perioderTidligere = vilkårsperioderTidligereBehandling.aktiviteter.sorted(),
-            erEndretFunksjon = ::erEndret,
+            erEndretFunksjon = ::erMålgruppeEllerAktivitetEndret,
         )
 
     private fun utledTidligsteEndringForMålgrupper(): LocalDate? =
         utledEndringIPeriode(
             perioderNå = vilkårsperioder.målgrupper.sorted(),
             perioderTidligere = vilkårsperioderTidligereBehandling.målgrupper.sorted(),
-            erEndretFunksjon = ::erEndret,
+            erEndretFunksjon = ::erMålgruppeEllerAktivitetEndret,
         )
 
     private fun utledTidligsteEndringForVedtaksperioder(): LocalDate? =
         utledEndringIPeriode(
             perioderNå = vedtaksperioder.sorted(),
             perioderTidligere = vedtaksperioderTidligereBehandling.sorted(),
-            erEndretFunksjon = ::erEndret,
+            erEndretFunksjon = ::erVedtaksperiodeEndret,
         )
 
-    private fun erEndret(
+    private fun erVilkårEndret(
         vilkårNå: Vilkår,
         vilkårTidligereBehandling: Vilkår,
     ): Boolean =
@@ -110,14 +110,14 @@ data class BeregnFraUtleder(
         vilkårTidligereBehandling: Vilkår,
     ): Boolean = vilkårNå.delvilkårsett.utenVurderinger() != vilkårTidligereBehandling.delvilkårsett.utenVurderinger()
 
-    private fun erEndret(
+    private fun erMålgruppeEllerAktivitetEndret(
         vilkårperiode: GeneriskVilkårperiode<*>,
         tidligereVilkårperiode: GeneriskVilkårperiode<*>,
     ): Boolean =
         vilkårperiode.resultat != tidligereVilkårperiode.resultat ||
             vilkårperiode.faktaOgVurdering != tidligereVilkårperiode.faktaOgVurdering
 
-    private fun erEndret(
+    private fun erVedtaksperiodeEndret(
         vedtaksperiode: Vedtaksperiode,
         tidligereVedtaksperiode: Vedtaksperiode,
     ): Boolean =
