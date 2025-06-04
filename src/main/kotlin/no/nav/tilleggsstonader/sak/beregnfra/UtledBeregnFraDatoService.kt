@@ -70,10 +70,8 @@ data class BeregnFraUtleder(
 
     private fun utledTidligsteEndringForVilkår(): LocalDate? =
         utledEndringIPeriode(
-            perioderNå =
-                vilkår.map { PeriodeWrapper(periodeType = it, fom = it.fom!!, tom = it.tom!!) }.sorted(),
-            perioderTidligere =
-                vilkårTidligereBehandling.map { PeriodeWrapper(periodeType = it, fom = it.fom!!, tom = it.tom!!) }.sorted(),
+            perioderNå = vilkår.map { it.wrapSomPeriode() }.sorted(),
+            perioderTidligere = vilkårTidligereBehandling.map { it.wrapSomPeriode() }.sorted(),
         ) { vilkårNå, vilkårTidligereBehandling ->
             erEndret(vilkårNå.periodeType, vilkårTidligereBehandling.periodeType)
         }
@@ -162,6 +160,8 @@ data class BeregnFraUtleder(
 }
 
 private fun List<Delvilkår>.utenVurderinger() = this.map { it.copy(vurderinger = emptyList()) }
+
+private fun Vilkår.wrapSomPeriode() = PeriodeWrapper(periodeType = this, fom = fom!!, tom = tom!!)
 
 data class PeriodeWrapper<T>(
     val periodeType: T,
