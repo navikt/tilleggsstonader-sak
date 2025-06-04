@@ -115,7 +115,9 @@ data class BeregnFraUtleder(
     private fun erEndret(
         vilkårperiode: GeneriskVilkårperiode<*>,
         tidligereVilkårperiode: GeneriskVilkårperiode<*>,
-    ): Boolean = vilkårperiode.resultat != tidligereVilkårperiode.resultat
+    ): Boolean =
+        vilkårperiode.resultat != tidligereVilkårperiode.resultat ||
+            vilkårperiode.faktaOgVurdering != tidligereVilkårperiode.faktaOgVurdering
 
     private fun erEndret(
         vedtaksperiode: Vedtaksperiode,
