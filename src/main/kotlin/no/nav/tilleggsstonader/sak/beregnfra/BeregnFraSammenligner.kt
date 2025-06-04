@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Component
-class BeregnFraAnalyserer(
+class BeregnFraSammenligner(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
     private val utledBeregnFraDatoService: UtledBeregnFraDatoService,
@@ -23,6 +23,7 @@ class BeregnFraAnalyserer(
     fun sammenlignRevurderFraMedBeregnFra() {
         try {
             MDC.put(mdcBeregnFraProsessKjøringKey, UUID.randomUUID().toString())
+            logger.info("Starter sammenligning av revurderFra med utledet beregnFra for alle fagsaker og behandlinger")
             fagsakService
                 .hentAlleFagsakIder()
                 .forEach { sammenlignRevurderFraMedBeregnFraForFagsak(it) }
