@@ -128,7 +128,7 @@
     "delvilkår" : [ {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Har søker nødvendige merutgifter til bolig eller overnatting?",
+        "regel" : "Har søker nødvendige merutgifter til overnatting?",
         "svar" : "Ja",
         "begrunnelse" : "En begrunnelse på delvilkåret"
       } ]
@@ -164,7 +164,7 @@
     "delvilkår" : [ {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Har søker nødvendige merutgifter til bolig eller overnatting?",
+        "regel" : "Har søker nødvendige merutgifter til overnatting?",
         "svar" : "Ja",
         "begrunnelse" : "En begrunnelse på delvilkåret"
       } ]
