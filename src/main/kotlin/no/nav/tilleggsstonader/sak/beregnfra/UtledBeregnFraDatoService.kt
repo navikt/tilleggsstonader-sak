@@ -71,31 +71,31 @@ data class BeregnFraUtleder(
     private fun utledTidligsteEndringForVilkår(): LocalDate? =
         utledEndringIPeriode(
             perioderNå =
-                vilkår.map { PeriodeWrapper(periodeType = it, fom = it.fom!!, tom = it.tom!!) },
+                vilkår.map { PeriodeWrapper(periodeType = it, fom = it.fom!!, tom = it.tom!!) }.sorted(),
             perioderTidligere =
-                vilkårTidligereBehandling.map { PeriodeWrapper(periodeType = it, fom = it.fom!!, tom = it.tom!!) },
+                vilkårTidligereBehandling.map { PeriodeWrapper(periodeType = it, fom = it.fom!!, tom = it.tom!!) }.sorted(),
         ) { vilkårNå, vilkårTidligereBehandling ->
             erEndret(vilkårNå.periodeType, vilkårTidligereBehandling.periodeType)
         }
 
     private fun utledTidligsteEndringForAktiviteter(): LocalDate? =
         utledEndringIPeriode(
-            perioderNå = vilkårsperioder.aktiviteter,
-            perioderTidligere = vilkårsperioderTidligereBehandling.aktiviteter,
+            perioderNå = vilkårsperioder.aktiviteter.sorted(),
+            perioderTidligere = vilkårsperioderTidligereBehandling.aktiviteter.sorted(),
             erEndretFunksjon = ::erEndret,
         )
 
     private fun utledTidligsteEndringForMålgrupper(): LocalDate? =
         utledEndringIPeriode(
-            perioderNå = vilkårsperioder.målgrupper,
-            perioderTidligere = vilkårsperioderTidligereBehandling.målgrupper,
+            perioderNå = vilkårsperioder.målgrupper.sorted(),
+            perioderTidligere = vilkårsperioderTidligereBehandling.målgrupper.sorted(),
             erEndretFunksjon = ::erEndret,
         )
 
     private fun utledTidligsteEndringForVedtaksperioder(): LocalDate? =
         utledEndringIPeriode(
-            perioderNå = vedtaksperioder,
-            perioderTidligere = vedtaksperioderTidligereBehandling,
+            perioderNå = vedtaksperioder.sorted(),
+            perioderTidligere = vedtaksperioderTidligereBehandling.sorted(),
             erEndretFunksjon = ::erEndret,
         )
 
