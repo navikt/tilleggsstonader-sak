@@ -9,9 +9,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryI
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
 
-/**
- * TODO: Alle metoder burde gåes igjennom senere
- */
 @Repository
 interface BehandlingRepository :
     RepositoryInterface<Behandling, BehandlingId>,
