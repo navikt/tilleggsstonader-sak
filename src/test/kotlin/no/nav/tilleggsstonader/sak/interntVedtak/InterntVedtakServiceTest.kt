@@ -241,8 +241,8 @@ class InterntVedtakServiceTest {
                 assertThat(fom).isEqualTo(forventet.fom)
                 assertThat(tom).isEqualTo(forventet.tom)
                 assertThat(antallMåneder).isEqualTo(forventet.antallMåneder)
-                assertThat(beløp).isEqualTo(forventet.beløp)
-                assertThat(stønadsbeløp).isEqualTo(forventet.stønadsbeløp)
+                assertThat(stønadsbeløpPerMåned).isEqualTo(forventet.stønadsbeløpPerMåned)
+                assertThat(stønadsbeløpForPeriode).isEqualTo(forventet.stønadsbeløpForPeriode)
                 assertThat(utbetalingsdato).isEqualTo(forventet.utbetalingsdato)
             }
         }

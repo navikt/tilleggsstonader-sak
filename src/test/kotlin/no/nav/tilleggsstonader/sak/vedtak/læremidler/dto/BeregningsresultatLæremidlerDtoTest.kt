@@ -35,7 +35,7 @@ class BeregningsresultatLæremidlerDtoTest {
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 29),
                 antallMåneder = 2,
-                stønadsbeløp = 1750,
+                stønadsbeløpForPeriode = 1750,
             ),
             beregningsresultatForPeriodeDto(
                 fom = LocalDate.of(2024, 5, 1),
