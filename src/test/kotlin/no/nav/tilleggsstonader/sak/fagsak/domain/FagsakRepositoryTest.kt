@@ -225,9 +225,9 @@ class FagsakRepositoryTest : IntegrationTest() {
         val læremidler = testoppsettService.lagreFagsak(fagsak(person = person, stønadstype = Stønadstype.LÆREMIDLER))
         testoppsettService.lagreFagsak(fagsak())
 
-        assertThat(fagsakRepository.findByFagsakPersonIdAndStønadstype(person.id, Stønadstype.LÆREMIDLER)!!.id)
-            .isEqualTo(barnetilsyn.id)
         assertThat(fagsakRepository.findByFagsakPersonIdAndStønadstype(person.id, Stønadstype.BARNETILSYN)!!.id)
+            .isEqualTo(barnetilsyn.id)
+        assertThat(fagsakRepository.findByFagsakPersonIdAndStønadstype(person.id, Stønadstype.LÆREMIDLER)!!.id)
             .isEqualTo(læremidler.id)
         assertThat(fagsakRepository.findByFagsakPersonIdAndStønadstype(person.id, Stønadstype.BOUTGIFTER)).isNull()
     }
