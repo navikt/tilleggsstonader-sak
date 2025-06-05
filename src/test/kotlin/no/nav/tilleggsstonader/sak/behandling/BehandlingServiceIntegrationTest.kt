@@ -98,48 +98,6 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
         assertThat(sisteBehandling?.id).isEqualTo(førstegang.id)
     }
 
-    /* TODO fix senere har ikke flere stønadstyper
-    @Test
-    internal fun `hentBehandlingForGjenbrukAvVilkår - skal returnere en sortert liste av aktuelle behandlinger for vilkårsgjenbruk`() {
-        val fagsakPersonId = UUID.randomUUID()
-        val fagsakOs = testoppsettService.lagreFagsak(
-            fagsak(
-                stønadstype = StønadType.OVERGANGSSTØNAD,
-                fagsakPersonId = fagsakPersonId,
-            ),
-        )
-        val fagsakBt = testoppsettService.lagreFagsak(
-            fagsak(
-                stønadstype = StønadType.BARNETILSYN,
-                fagsakPersonId = fagsakPersonId,
-            ),
-        )
-        val fagsakSp = testoppsettService.lagreFagsak(
-            fagsak(
-                stønadstype = StønadType.SKOLEPENGER,
-                fagsakPersonId = fagsakPersonId,
-            ),
-        )
-
-        testoppsettService.lagre(
-            behandling(fagsakOs, resultat = BehandlingResultat.HENLAGT, status = BehandlingStatus.FERDIGSTILT),
-        )
-        val førstegangBt = testoppsettService.lagre(
-            behandling(fagsakBt, resultat = BehandlingResultat.INNVILGET, status = BehandlingStatus.FERDIGSTILT),
-        )
-        val førstegangSp = testoppsettService.lagre(
-            behandling(fagsakSp, resultat = BehandlingResultat.INNVILGET, status = BehandlingStatus.FERDIGSTILT),
-        )
-        val revurderingUnderArbeidSP = testoppsettService.lagre(
-            behandling(fagsakSp, resultat = BehandlingResultat.IKKE_SATT, status = BehandlingStatus.UTREDES),
-        )
-
-        val behandlingerForVilkårsgjenbrukHentet = behandlingService.hentBehandlingerForGjenbrukAvVilkår(fagsakPersonId)
-        val behandlingerForVilkårsgjenbrukkLagret = listOf(revurderingUnderArbeidSP, førstegangSp, førstegangBt)
-        assertThat(behandlingerForVilkårsgjenbrukHentet).isEqualTo(behandlingerForVilkårsgjenbrukkLagret)
-    }
-     */
-
     @Nested
     inner class BehandlingPåVent {
         @Test
