@@ -73,8 +73,8 @@ data class BeregnFraUtleder(
 
     private fun utledTidligsteEndringForVilkår(): LocalDate? =
         utledEndringIPeriode(
-            perioderNå = vilkår.map { it.wrapSomPeriode() }.sorted(),
-            perioderTidligere = vilkårTidligereBehandling.map { it.wrapSomPeriode() }.sorted(),
+            perioderNå = vilkår.mapNotNull { it.wrapSomPeriode() }.sorted(),
+            perioderTidligere = vilkårTidligereBehandling.mapNotNull { it.wrapSomPeriode() }.sorted(),
         ) { vilkårNå, vilkårTidligereBehandling ->
             erVilkårEndret(vilkårNå.periodeType, vilkårTidligereBehandling.periodeType)
         }
@@ -105,6 +105,7 @@ data class BeregnFraUtleder(
         vilkårTidligereBehandling: Vilkår,
     ): Boolean =
         vilkårNå.utgift != vilkårTidligereBehandling.utgift ||
+            // FIXME barnId er forskjellig for hver behandling
             vilkårNå.barnId != vilkårTidligereBehandling.barnId ||
             vilkårNå.erFremtidigUtgift != vilkårTidligereBehandling.erFremtidigUtgift ||
             vilkårNå.type != vilkårTidligereBehandling.type ||
@@ -168,7 +169,13 @@ data class BeregnFraUtleder(
 
 private fun List<Delvilkår>.utenVurderinger() = this.map { it.copy(vurderinger = emptyList()) }
 
-private fun Vilkår.wrapSomPeriode() = PeriodeWrapper(periodeType = this, fom = fom!!, tom = tom!!)
+// Gamle vilkår har ikke fom/tom, så de må pakkes inn i en PeriodeWrapper for å kunne brukes som Periode<LocalDate>
+private fun Vilkår.wrapSomPeriode() =
+    if (fom != null && tom != null) {
+        PeriodeWrapper(periodeType = this, fom = fom, tom = tom)
+    } else {
+        null
+    }
 
 data class PeriodeWrapper<T>(
     val periodeType: T,
