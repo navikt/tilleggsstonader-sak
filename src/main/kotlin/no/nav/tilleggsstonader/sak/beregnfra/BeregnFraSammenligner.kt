@@ -46,19 +46,19 @@ class BeregnFraSammenligner(
 
             if (revurderFraDato == beregnFraDato) {
                 logger.info(
-                    "For fagsak=${behandling.fagsakId}, behandling=${behandling.id}, revurderFra=$revurderFraDato, beregnFra=$beregnFraDato - BeregnFraDato er lik RevurderFraDato",
+                    "BeregnFraDato er lik RevurderFraDato - fagsak=${behandling.fagsakId}, behandling=${behandling.id}, revurderFra=$revurderFraDato, beregnFra=$beregnFraDato",
                 )
             } else if (beregnFraDato == null) {
                 logger.info(
-                    "For fagsak=${behandling.fagsakId}, behandling=${behandling.id}, revurderFra=$revurderFraDato, beregnFra=$beregnFraDato - Kunne ikke utlede beregnFraDato",
+                    "Kunne ikke utlede beregnFraDato - fagsak=${behandling.fagsakId}, behandling=${behandling.id}, revurderFra=$revurderFraDato, beregnFra=$beregnFraDato",
                 )
             } else if (beregnFraDato < revurderFraDato) {
-                logger.warn(
-                    "For fagsak=${behandling.fagsakId}, behandling=${behandling.id}, revurderFra=$revurderFraDato, beregnFra=$beregnFraDato - BeregnFraDato er før RevurderFraDato",
+                logger.info(
+                    "BeregnFraDato er før RevurderFraDato - fagsak=${behandling.fagsakId}, behandling=${behandling.id}, revurderFra=$revurderFraDato, beregnFra=$beregnFraDato",
                 )
             } else {
-                logger.warn(
-                    "For fagsak=${behandling.fagsakId}, behandling=${behandling.id}, revurderFra=$revurderFraDato, beregnFra=$beregnFraDato - BeregnFraDato er etter RevurderFraDato",
+                logger.info(
+                    "BeregnFraDato er etter RevurderFraDato - for fagsak=${behandling.fagsakId}, behandling=${behandling.id}, revurderFra=$revurderFraDato, beregnFra=$beregnFraDato",
                 )
             }
         } catch (e: Exception) {
