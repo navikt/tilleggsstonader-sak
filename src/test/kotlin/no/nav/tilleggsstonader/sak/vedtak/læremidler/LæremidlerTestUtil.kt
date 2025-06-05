@@ -131,7 +131,7 @@ object LæremidlerTestUtil {
         fom: LocalDate,
         tom: LocalDate,
         antallMåneder: Int = 1,
-        stønadsbeløp: Int = 875,
+        stønadsbeløpForPeriode: Int = 875,
         utbetalingsdato: LocalDate = fom,
     ): BeregningsresultatForPeriodeDto =
         BeregningsresultatForPeriodeDto(
@@ -140,10 +140,8 @@ object LæremidlerTestUtil {
             antallMåneder = antallMåneder,
             studienivå = Studienivå.HØYERE_UTDANNING,
             studieprosent = 100,
-            beløp = 875,
             stønadsbeløpPerMåned = 875,
-            stønadsbeløp = stønadsbeløp,
-            stønadsbeløpForPeriode = stønadsbeløp,
+            stønadsbeløpForPeriode = stønadsbeløpForPeriode,
             utbetalingsdato = utbetalingsdato,
             målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
             aktivitet = AktivitetType.TILTAK,

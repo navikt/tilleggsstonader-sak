@@ -20,9 +20,7 @@ data class BeregningsresultatForPeriodeDto(
     val antallMåneder: Int,
     val studienivå: Studienivå,
     val studieprosent: Int,
-    val beløp: Int,
     val stønadsbeløpPerMåned: Int,
-    val stønadsbeløp: Int,
     val stønadsbeløpForPeriode: Int,
     val utbetalingsdato: LocalDate,
     val målgruppe: FaktiskMålgruppe,
@@ -32,7 +30,6 @@ data class BeregningsresultatForPeriodeDto(
     fun slåSammen(nestePeriode: BeregningsresultatForPeriodeDto): BeregningsresultatForPeriodeDto =
         this.copy(
             tom = nestePeriode.tom,
-            stønadsbeløp = this.stønadsbeløp + nestePeriode.stønadsbeløp,
             stønadsbeløpForPeriode = this.stønadsbeløpForPeriode + nestePeriode.stønadsbeløpForPeriode,
             antallMåneder = this.antallMåneder + 1,
         )
@@ -42,7 +39,6 @@ data class BeregningsresultatForPeriodeDto(
             this.aktivitet == nestePeriode.aktivitet &&
             this.studienivå == nestePeriode.studienivå &&
             this.studieprosent == nestePeriode.studieprosent &&
-            this.beløp == nestePeriode.beløp &&
             this.stønadsbeløpPerMåned == nestePeriode.stønadsbeløpPerMåned &&
             this.utbetalingsdato == nestePeriode.utbetalingsdato &&
             this.delAvTidligereUtbetaling == nestePeriode.delAvTidligereUtbetaling &&
@@ -72,9 +68,7 @@ fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto =
         antallMåneder = 1,
         studienivå = grunnlag.studienivå,
         studieprosent = grunnlag.studieprosent,
-        beløp = beløp,
         stønadsbeløpPerMåned = beløp,
-        stønadsbeløp = beløp,
         stønadsbeløpForPeriode = beløp,
         utbetalingsdato = grunnlag.utbetalingsdato,
         målgruppe = grunnlag.målgruppe,
