@@ -173,7 +173,11 @@ class BehandlingService(
         return behandlingRepository.update(behandling.copy(status = status))
     }
 
-    // TODO skal vi sette kategori på behandling?
+    /**
+     * TODO skal vi sette kategori på behandling?
+     * Dette er noe som sendes til DVH og som brukes i statistikk.
+     * Den settes for å vite om en sak gjelder EØS eller nasjonal behandling.
+     */
     fun oppdaterKategoriPåBehandling(
         behandlingId: BehandlingId,
         kategori: BehandlingKategori,
