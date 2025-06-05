@@ -91,9 +91,7 @@ enum class BehandlingType(
 
 /**
  * Sjekkes sammen med vedtakstidspunkt i behandling_resultat_vedtakstidspunkt_check
- * // TODO: Legg i kontrakter.
  */
-
 enum class BehandlingResultat(
     val displayName: String,
     val skalIverksettes: Boolean = false,
