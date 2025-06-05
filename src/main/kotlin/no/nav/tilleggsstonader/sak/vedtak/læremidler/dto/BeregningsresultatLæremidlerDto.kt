@@ -21,7 +21,9 @@ data class BeregningsresultatForPeriodeDto(
     val studienivå: Studienivå,
     val studieprosent: Int,
     val beløp: Int,
+    val beløpPerMåned: Int,
     val stønadsbeløp: Int,
+    val beløpForPeriode: Int,
     val utbetalingsdato: LocalDate,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
@@ -31,6 +33,7 @@ data class BeregningsresultatForPeriodeDto(
         this.copy(
             tom = nestePeriode.tom,
             stønadsbeløp = this.stønadsbeløp + nestePeriode.stønadsbeløp,
+            beløpForPeriode = this.beløpForPeriode + nestePeriode.beløpForPeriode,
             antallMåneder = this.antallMåneder + 1,
         )
 
@@ -40,6 +43,7 @@ data class BeregningsresultatForPeriodeDto(
             this.studienivå == nestePeriode.studienivå &&
             this.studieprosent == nestePeriode.studieprosent &&
             this.beløp == nestePeriode.beløp &&
+            this.beløpPerMåned == nestePeriode.beløpPerMåned &&
             this.utbetalingsdato == nestePeriode.utbetalingsdato &&
             this.delAvTidligereUtbetaling == nestePeriode.delAvTidligereUtbetaling &&
             this.påfølgesAv(nestePeriode)
@@ -69,7 +73,9 @@ fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto =
         studienivå = grunnlag.studienivå,
         studieprosent = grunnlag.studieprosent,
         beløp = beløp,
+        beløpPerMåned = beløp,
         stønadsbeløp = beløp,
+        beløpForPeriode = beløp,
         utbetalingsdato = grunnlag.utbetalingsdato,
         målgruppe = grunnlag.målgruppe,
         aktivitet = grunnlag.aktivitet,
