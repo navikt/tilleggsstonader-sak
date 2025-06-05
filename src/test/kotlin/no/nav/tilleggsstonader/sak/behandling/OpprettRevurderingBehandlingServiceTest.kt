@@ -254,8 +254,6 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             }
         }
 
-        // TODO gjenbruke barn fra henlagt/avslått behandling?
-
         @Test
         fun `skal gjenbruke informasjon fra forrige behandling`() {
             val revurderingId =
