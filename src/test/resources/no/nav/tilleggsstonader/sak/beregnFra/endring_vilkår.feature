@@ -96,3 +96,32 @@ Egenskap: Utled beregn fra endring av vilkår
     Når utleder beregnFraDato
 
     Så forvent følgende dato for tidligste endring: 01.03.2024
+
+  Scenario: Vilkår blir slettet og nytt senere vilkår lagt til
+    Gitt følgende vilkår i forrige behandling - beregnFra
+      | Fom        | Tom        | Type      | Resultat | Status |
+      | 01.03.2024 | 31.03.2024 | PASS_BARN | OPPFYLT  | NY     |
+
+    Gitt følgende vilkår i revurdering - beregnFra
+      | Fom        | Tom        | Type      | Resultat     | Status |
+      | 01.03.2024 | 31.03.2024 | PASS_BARN | OPPFYLT | SLETTET |
+      | 01.05.2024 | 31.05.2024 | PASS_BARN | OPPFYLT | NY |
+
+    Når utleder beregnFraDato
+
+    Så forvent følgende dato for tidligste endring: 01.03.2024
+
+  Scenario: Vilkår slettet i tidligere behandling, tilsvarende vilkår lagt til i revurdering
+    Gitt følgende vilkår i forrige behandling - beregnFra
+      | Fom        | Tom        | Type      | Resultat | Status |
+      | 01.03.2024 | 31.03.2024 | PASS_BARN | OPPFYLT  | SLETTET     |
+      | 01.04.2024 | 30.04.2024 | PASS_BARN | OPPFYLT  | NY     |
+
+    Gitt følgende vilkår i revurdering - beregnFra
+      | Fom        | Tom        | Type      | Resultat     | Status |
+      | 01.03.2024 | 31.03.2024 | PASS_BARN | OPPFYLT  | NY    |
+      | 01.04.2024 | 30.04.2024 | PASS_BARN | OPPFYLT  | NY    |
+
+    Når utleder beregnFraDato
+
+    Så forvent følgende dato for tidligste endring: 01.03.2024
