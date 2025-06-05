@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.BeslutteVedtakSteg
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -34,7 +35,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeR
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchIllegalStateException
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -59,6 +59,8 @@ class StegServiceTest(
     val vilkårperiodeRepository: VilkårperiodeRepository,
     @Autowired
     val vilkårRepository: VilkårRepository,
+    @Autowired
+    val beslutteVedtakSteg: BeslutteVedtakSteg,
     @Autowired
     val ferdigstillBehandlingSteg: FerdigstillBehandlingSteg,
 ) : IntegrationTest() {
@@ -182,7 +184,6 @@ class StegServiceTest(
             assertThat(exception).hasMessage("Du må sette revurder fra-dato før du kan gå videre")
         }
 
-        @Disabled
         @Test
         internal fun `skal feile hvis behandling iverksettes og man prøver godkjenne saksbehandling`() {
             val behandling = behandlingSomIverksettes()
@@ -191,8 +192,7 @@ class StegServiceTest(
             val beslutteVedtakDto = BeslutteVedtakDto(true, "")
             val feil =
                 catchThrowableOfType<ApiFeil> {
-                    // TODO
-                    // stegService.håndterBeslutteVedtak(saksbehandling(behandling =  behandling), beslutteVedtakDto)
+                    stegService.håndterSteg(saksbehandling(behandling = behandling), beslutteVedtakSteg, beslutteVedtakDto)
                 }
             assertThat(feil.message).isEqualTo("Behandlingen er allerede besluttet. Status på behandling er 'Iverksetter vedtak'")
         }
