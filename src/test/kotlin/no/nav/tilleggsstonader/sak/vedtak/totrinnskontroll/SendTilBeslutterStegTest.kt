@@ -37,7 +37,6 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil.totrinnskontroll
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -50,7 +49,6 @@ class SendTilBeslutterStegTest {
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
     private val vedtaksbrevRepository = mockk<VedtaksbrevRepository>()
     private val vedtaksresultatService = mockk<VedtaksresultatService>()
-    private val vilkårService = mockk<VilkårService>()
     private val oppgaveService = mockk<OppgaveService>()
     private val totrinnskontrollService = mockk<TotrinnskontrollService>(relaxed = true)
 
@@ -133,7 +131,6 @@ class SendTilBeslutterStegTest {
     @Test
     internal fun `Skal avslutte oppgave BehandleSak hvis den finnes`() {
         utførOgVerifiserKall(Oppgavetype.BehandleSak)
-        verifiserVedtattBehandlingsstatistikkTask()
     }
 
     @Test
@@ -141,7 +138,6 @@ class SendTilBeslutterStegTest {
         every { totrinnskontrollService.hentTotrinnskontroll(any()) } returns totrinnskontroll(status = TotrinnInternStatus.UNDERKJENT)
 
         utførOgVerifiserKall(Oppgavetype.BehandleUnderkjentVedtak)
-        verifiserVedtattBehandlingsstatistikkTask()
     }
 
     @Test
@@ -196,13 +192,6 @@ class SendTilBeslutterStegTest {
         verify(exactly = 0) {
             vedtaksbrevRepository.findByIdOrNull(any())
         }
-    }
-
-    // TODO DVH
-    private fun verifiserVedtattBehandlingsstatistikkTask() {
-        // assertThat(taskSlot[2].type).isEqualTo(BehandlingsstatistikkTask.TYPE)
-        // assertThat(objectMapper.readValue<BehandlingsstatistikkTaskPayload>(taskSlot[2].payload).hendelse)
-        //    .isEqualTo(Hendelse.VEDTATT)
     }
 
     private fun utførOgVerifiserKall(ferdigstillOppgaveType: Oppgavetype) {
