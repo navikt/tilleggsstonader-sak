@@ -1,14 +1,12 @@
 package no.nav.tilleggsstonader.sak.migrering.routing
 
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
-import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.UnleashUtil.getVariantWithNameOrDefault
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import org.slf4j.LoggerFactory
@@ -24,90 +22,68 @@ class SøknadRoutingService(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun sjekkRoutingForPerson(
-        request: IdentStønadstype,
-        sjekkSkalRuteAlleSøkere: Boolean = true,
-    ): SøknadRoutingResponse {
-        val skalBehandlesINyLøsning = skalBehandlesINyLøsning(request, sjekkSkalRuteAlleSøkere)
-        logger.info("routing - stønadstype=${request.stønadstype} skalBehandlesINyLøsning=$skalBehandlesINyLøsning")
+    fun sjekkRoutingForPerson(context: RoutingContext): SøknadRoutingResponse {
+        val skalBehandlesINyLøsning = skalBehandlesINyLøsning(context)
+        logger.info(
+            "routing - " +
+                "stønadstype=${context.stønadstype} " +
+                "skalBehandlesINyLøsning=$skalBehandlesINyLøsning",
+        )
         return SøknadRoutingResponse(skalBehandlesINyLøsning = skalBehandlesINyLøsning)
     }
 
-    fun harLagretRouting(request: IdentStønadstype): Boolean {
-        val søknadRouting = søknadRoutingRepository.findByIdentAndType(request.ident, request.stønadstype)
+    fun harLagretRouting(
+        ident: String,
+        stønadstype: Stønadstype,
+    ): Boolean {
+        val søknadRouting = søknadRoutingRepository.findByIdentAndType(ident, stønadstype)
         return søknadRouting != null
     }
 
-    private fun skalBehandlesINyLøsning(
-        request: IdentStønadstype,
-        sjekkSkalRuteAlleSøkere: Boolean,
-    ): Boolean {
-        if (harLagretRouting(request)) {
-            logger.info("routing - stønadstype=${request.stønadstype} harLagretRouting=true")
+    private fun skalBehandlesINyLøsning(context: RoutingContext): Boolean {
+        if (harLagretRouting(context.ident, context.stønadstype)) {
+            logger.info("routing - stønadstype=${context.stønadstype} harLagretRouting=true")
             return true
         }
 
-        if (sjekkSkalRuteAlleSøkere && skalRuteAlleSøkereTilNyLøsning(request.stønadstype)) {
-            lagreRouting(request, mapOf("ruterAlleSøkere" to true))
+        when (context) {
+            is SkalRouteAlleSøkereTilNyLøsning -> {
+                logger.info("routing - stønadstype=${context.stønadstype} skalRuteAlleSøkere=true")
+                lagreRouting(context, mapOf("ruterAlleSøkere" to true))
+                return true
+            }
+            is FeatureTogglet -> {
+                return kontrollerFeatureToggle(context)
+            }
+        }
+    }
+
+    private fun kontrollerFeatureToggle(context: FeatureTogglet): Boolean {
+        if (harBehandling(context)) {
+            lagreRouting(context, mapOf("harBehandling" to true))
             return true
         }
 
-        if (harBehandling(request)) {
-            lagreRouting(request, mapOf("harBehandling" to true))
-            return true
-        }
-
-        if (skalStoppesPgaFeatureToggle(request.stønadstype)) {
+        if (maksAntallErNådd(context)) {
             return false
         }
-
-        val arenaStatus = arenaService.hentStatus(request.ident, request.stønadstype)
-        if (harGyldigStateIArena(request.stønadstype, arenaStatus)) {
-            lagreRouting(request, arenaStatus)
+        val arenaStatus = arenaService.hentStatus(context.ident, context.stønadstype)
+        if (harGyldigStateIArena(context, arenaStatus)) {
+            lagreRouting(context, arenaStatus)
             return true
         }
         return false
     }
 
-    /**
-     * Ønsker å sette at alle skal rutes til ny løsning, uten å sjekke status i Arena då det tar unødvendig lang tid
-     */
-    private fun skalRuteAlleSøkereTilNyLøsning(stønadstype: Stønadstype): Boolean {
-        val skalRutes =
-            when (stønadstype) {
-                Stønadstype.BARNETILSYN -> true
-                Stønadstype.LÆREMIDLER -> true
-                Stønadstype.BOUTGIFTER -> false
-            }
-        logger.info("routing - stønadstype=$stønadstype skalRuteAlleSøkere=true")
-        return skalRutes
-    }
-
-    private fun skalStoppesPgaFeatureToggle(stønadstype: Stønadstype): Boolean =
-        when (stønadstype) {
-            Stønadstype.BARNETILSYN -> false // tilsyn barn skal ikke stoppes med feature toggle
-            Stønadstype.LÆREMIDLER -> false // læremidler skal ikke stoppes med feature toggle
-            Stønadstype.BOUTGIFTER -> maksAntallErNådd(stønadstype)
-        }
-
-    private fun maksAntallErNådd(stønadstype: Stønadstype): Boolean {
-        val maksAntall = maksAntall(stønadstype)
-        val antall = søknadRoutingRepository.countByType(stønadstype)
-        logger.info("routing - stønadstype=$stønadstype antallIDatabase=$antall toggleMaksAntall=$maksAntall")
+    private fun maksAntallErNådd(context: FeatureTogglet): Boolean {
+        val maksAntall = unleashService.getVariantWithNameOrDefault(context.toggleId, "antall", 0)
+        val antall = søknadRoutingRepository.countByType(context.stønadstype)
+        logger.info("routing - stønadstype=${context.stønadstype} antallIDatabase=$antall toggleMaksAntall=$maksAntall")
         return antall >= maksAntall
     }
 
-    private fun maksAntall(stønadstype: Stønadstype) =
-        unleashService.getVariantWithNameOrDefault(stønadstype.maksAntallToggle(), "antall", 0)
-
-    private fun Stønadstype.maksAntallToggle() =
-        when (this) {
-            Stønadstype.BOUTGIFTER -> Toggle.SØKNAD_ROUTING_BOUTGIFTER
-            else -> error("Har ikke maksAntalLToggle for stønadstype=$this")
-        }
-
     private fun harGyldigStateIArena(
-        stønadstype: Stønadstype,
+        context: FeatureTogglet,
         arenaStatus: ArenaStatusDto,
     ): Boolean {
         val harAktivtVedtak = arenaStatus.vedtak.harAktivtVedtak
@@ -115,12 +91,8 @@ class SøknadRoutingService(
         val harVedtak = arenaStatus.vedtak.harVedtak
         val harAktivSakUtenVedtak = arenaStatus.sak.harAktivSakUtenVedtak
 
-        val harGyldigStatus =
-            when (stønadstype) {
-                Stønadstype.BARNETILSYN -> true
-                Stønadstype.LÆREMIDLER -> true
-                Stønadstype.BOUTGIFTER -> !harAktivtVedtak
-            }
+        val stønadstype = context.stønadstype
+        val harGyldigStatus = context.harGyldigStateIArena(arenaStatus)
 
         logger.info(
             "routing - stønadstype=$stønadstype harGyldigStatusArena=$harGyldigStatus - " +
@@ -134,26 +106,26 @@ class SøknadRoutingService(
     }
 
     private fun lagreRouting(
-        request: IdentStønadstype,
+        context: RoutingContext,
         detaljer: Any,
     ) {
         søknadRoutingRepository.insert(
             SøknadRouting(
-                ident = request.ident,
-                type = request.stønadstype,
+                ident = context.ident,
+                type = context.stønadstype,
                 detaljer = JsonWrapper(objectMapper.writeValueAsString(detaljer)),
             ),
         )
     }
 
-    private fun harBehandling(request: IdentStønadstype): Boolean {
+    private fun harBehandling(context: RoutingContext): Boolean {
         val harBehandling = (
             fagsakService
-                .finnFagsak(setOf(request.ident), request.stønadstype)
+                .finnFagsak(setOf(context.ident), context.stønadstype)
                 ?.let { behandlingService.hentBehandlinger(it.id).isNotEmpty() }
                 ?: false
         )
-        logger.info("routing - stønadstype=${request.stønadstype} harBehandling=$harBehandling")
+        logger.info("routing - stønadstype=${context.stønadstype} harBehandling=$harBehandling")
         return harBehandling
     }
 }

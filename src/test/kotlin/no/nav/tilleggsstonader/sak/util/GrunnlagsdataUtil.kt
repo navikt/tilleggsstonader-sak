@@ -44,10 +44,11 @@ object GrunnlagsdataUtil {
         navn: Navn = lagNavn(),
         fødselsdato: LocalDate? = LocalDate.of(2024, 6, 4),
         dødsdato: LocalDate? = null,
+        alder: Int? = antallÅrSiden(fødselsdato),
     ) = GrunnlagBarn(
         ident = ident,
         navn = navn,
-        alder = antallÅrSiden(fødselsdato),
+        alder = alder,
         fødselsdato = fødselsdato,
         dødsdato = dødsdato,
     )

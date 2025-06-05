@@ -57,8 +57,12 @@ internal class BehandlingFaktaServiceTest {
     @Test
     fun `skal mappe søknad og grunnlag`() {
         val saksinformasjonAndreForeldre = GeneriskFaktaGrunnlagTestUtil.faktaGrunnlagBarnAnnenForelder(identBarn = "1")
+        val personopplysninger = lagFaktaGrunnlagPersonopplysninger(barn = listOf(lagGrunnlagsdataBarn(alder = 0)))
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns
-            lagGrunnlagsdata(saksinformasjonAndreForeldre = listOf(saksinformasjonAndreForeldre))
+            lagGrunnlagsdata(
+                personopplysninger = personopplysninger,
+                saksinformasjonAndreForeldre = listOf(saksinformasjonAndreForeldre),
+            )
         every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn()
         val behandlingBarn =
             behandlingBarn(personIdent = "1", id = BarnId.fromString("60921c76-f8ef-4000-9824-f127a50a575e"))

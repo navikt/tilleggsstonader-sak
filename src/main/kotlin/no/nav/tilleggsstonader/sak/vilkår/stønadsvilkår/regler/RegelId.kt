@@ -17,7 +17,7 @@ enum class RegelId(
     UNNTAK_ALDER("Har barnet behov for pass utover 4. skoleår, og er behovet tilfredsstillende dokumentert?"),
 
     // BOUTGIFTER
-    NØDVENDIGE_MERUTGIFTER("Har søker nødvendige merutgifter til bolig eller overnatting?"),
+    NØDVENDIGE_MERUTGIFTER("Har søker nødvendige merutgifter til overnatting?"),
     DOKUMENTERT_UTGIFTER_OVERNATTING("Har søker dokumentert utgifter til overnatting tilfredsstillende?"),
     HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE(
         "Har søker dokumentert høyere boutgifter på aktivitetssted sammenlignet med tidligere bolig?",

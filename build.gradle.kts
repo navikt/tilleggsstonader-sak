@@ -92,9 +92,6 @@ dependencies {
     implementation("no.nav.tilleggsstonader.kontrakter:kontrakter-felles:$tilleggsstønaderKontrakterVersion")
     implementation("no.nav.tilleggsstonader.kontrakter:pdl-personhendelser-avro:$tilleggsstønaderKontrakterVersion")
 
-    // For auditlogger. August, 2014, men det er den som blir brukt på NAV
-    implementation("com.papertrailapp:logback-syslog4j:1.0.0")
-
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "mockito-core")

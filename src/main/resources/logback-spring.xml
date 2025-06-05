@@ -28,17 +28,12 @@
         <appender-ref ref="team-logs"/>
     </logger>
 
-    <appender name="auditLogger" class="com.papertrailapp.logback.Syslog4jAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%m%n%xEx</pattern>
-        </layout>
-
-        <syslogConfig class="org.productivity.java.syslog4j.impl.net.tcp.TCPNetSyslogConfig">
-            <host>audit.nais</host>
-            <port>6514</port>
-            <ident>TILLEGGSTONADER-SAK</ident>
-            <maxMessageLength>128000</maxMessageLength>
-        </syslogConfig>
+    <appender name="auditLogger" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>audit.nais:6514</destination>
+        <writeBufferSize>128000</writeBufferSize>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${HOSTNAME} TILLEGGSTONADER-SAK: %msg%n</pattern>
+        </encoder>
     </appender>
 
     <logger level="INFO" name="auditLogger" additivity="false">
