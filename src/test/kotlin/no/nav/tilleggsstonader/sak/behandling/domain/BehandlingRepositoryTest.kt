@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.OPPRETTET
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.SATT_PÅ_VENT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
-import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -45,13 +44,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
     @Autowired
     private lateinit var eksternBehandlingIdRepository: EksternBehandlingIdRepository
 
-    @Autowired
-    private lateinit var fagsakPersonRepository: FagsakPersonRepository
-
-    /*@Autowired
-    private lateinit var oppgaveRepository: OppgaveRepository
-     */
-
     private val ident = "123"
 
     @Test
@@ -70,54 +62,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
         assertThat(behandlingRepository.findByFagsakId(FagsakId.random())).isEmpty()
         assertThat(behandlingRepository.findByFagsakId(fagsak.id)).containsOnly(behandling)
     }
-
-    /*
-    TODO Har ikke oppgave ennå
-    @Test
-    fun `hentUferdigeBehandlingerFørDato skal bare hente behandlinger før en gitt dato`() {
-        val enMånedSiden = osloNow().minusMonths(1)
-
-        val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = BARNETILSYN))
-        val behandling = behandling(fagsak, opprettetTid = osloNow().minusMonths(2))
-        testoppsettService.lagre(behandling)
-        val annenFagsak =
-            testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1")), stønadstype = BARNETILSYN))
-        testoppsettService.lagre(behandling(annenFagsak, opprettetTid = osloNow().minusWeeks(1)))
-        val sporbar = Sporbar("saksbh", enMånedSiden.minusDays(1))
-        val oppgave = Oppgave(sporbar = sporbar, behandlingId = behandling.id, gsakOppgaveId = 1, type = Oppgavetype.BehandleSak, erFerdigstilt = false)
-        oppgaveRepository.insert(oppgave)
-        assertThat(
-            behandlingRepository.hentUferdigeBehandlingerOpprettetFørDato(
-                BARNETILSYN,
-                enMånedSiden,
-            ),
-        ).size()
-            .isEqualTo(1)
-    }
-
-    TODO Har ikke oppgave ennå
-    @Test
-    fun `hentUferdigeBehandlingerFørDato skal ikke hente behandling dersom oppgave er endret etter frist`() {
-        val enMånedSiden = osloNow().minusMonths(1)
-
-        val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = BARNETILSYN))
-        val behandling = behandling(fagsak, opprettetTid = osloNow().minusMonths(2))
-        testoppsettService.lagre(behandling)
-        val annenFagsak =
-            testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1")), stønadstype = BARNETILSYN))
-        testoppsettService.lagre(behandling(annenFagsak, opprettetTid = osloNow().minusWeeks(1)))
-        val sporbar = Sporbar("saksbh", enMånedSiden.plusDays(1))
-        val oppgave = Oppgave(sporbar = sporbar, behandlingId = behandling.id, gsakOppgaveId = 1, type = Oppgavetype.BehandleSak, erFerdigstilt = false)
-        oppgaveRepository.insert(oppgave)
-        assertThat(
-            behandlingRepository.hentUferdigeBehandlingerOpprettetFørDato(
-                BARNETILSYN,
-                enMånedSiden,
-            ),
-        ).size()
-            .isEqualTo(0)
-    }
-     */
 
     @Test
     fun findByFagsakAndStatus() {
@@ -426,53 +370,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
             assertThat(ikkeUtredesFinnesIkke).isFalse()
         }
     }
-
-    /* har ikke andre fagsaker
-    @Test
-    internal fun `skal finne aktuell behandling for gjenbruk av inngangsvilkår`() {
-        val fagsakPersonId = UUID.randomUUID()
-
-        val fagsakOS = lagreFagsak(UUID.randomUUID(), BARNETILSYN, fagsakPersonId)
-        val førstegangsbehandlingOS = lagreBehandling(UUID.randomUUID(), FERDIGSTILT, INNVILGET, fagsakOS)
-        lagreBehandling(UUID.randomUUID(), OPPRETTET, IKKE_SATT, fagsakOS)
-
-        val fagsakBT = lagreFagsak(UUID.randomUUID(), BARNETILSYN, fagsakPersonId)
-        val førstegangsbehandlingBT = lagreBehandling(UUID.randomUUID(), UTREDES, IKKE_SATT, fagsakBT)
-
-        val behandlingerForGjenbruk: List<Behandling> =
-            behandlingRepository.finnBehandlingerForGjenbrukAvVilkår(fagsakBT.fagsakPersonId)
-
-        assertThat(behandlingerForGjenbruk).containsExactly(førstegangsbehandlingOS, førstegangsbehandlingBT)
-    }
-
-    @Test
-    internal fun `skal finne alle aktuelle behandlinger for gjenbruk av inngangsvilkår`() {
-        val fagsakPersonId = UUID.randomUUID()
-
-        val fagsakOS = lagreFagsak(UUID.randomUUID(), BARNETILSYN, fagsakPersonId)
-        val førstegangsbehandlingOS = lagreBehandling(UUID.randomUUID(), FERDIGSTILT, INNVILGET, fagsakOS)
-        val annengangsbehandlingOS = lagreBehandling(UUID.randomUUID(), FERDIGSTILT, INNVILGET, fagsakOS)
-        lagreBehandling(UUID.randomUUID(), FERDIGSTILT, HENLAGT, fagsakOS)
-
-        val fagsakBT = lagreFagsak(UUID.randomUUID(), BARNETILSYN, fagsakPersonId)
-        val førstegangsbehandlingBT = lagreBehandling(UUID.randomUUID(), FERDIGSTILT, INNVILGET, fagsakBT)
-        val revurderingUnderArbeidBT = lagreBehandling(UUID.randomUUID(), UTREDES, IKKE_SATT, fagsakBT)
-
-        val fagsakSP = lagreFagsak(UUID.randomUUID(), SKOLEPENGER, fagsakPersonId)
-        val revurderingUnderArbeidSP = lagreBehandling(UUID.randomUUID(), UTREDES, IKKE_SATT, fagsakSP)
-
-        val behandlingerForGjenbruk: List<Behandling> =
-            behandlingRepository.finnBehandlingerForGjenbrukAvVilkår(fagsakSP.fagsakPersonId)
-
-        assertThat(behandlingerForGjenbruk).containsExactly(
-            førstegangsbehandlingOS,
-            annengangsbehandlingOS,
-            førstegangsbehandlingBT,
-            revurderingUnderArbeidBT,
-            revurderingUnderArbeidSP,
-        )
-    }
-     */
 
     @Nested
     inner class Vedtakstidspunkt {

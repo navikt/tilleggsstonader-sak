@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.behandling.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import org.springframework.data.jdbc.repository.query.Query
@@ -140,20 +139,6 @@ interface BehandlingRepository :
     """,
     )
     fun finnSisteIverksatteBehandling(fagsakId: FagsakId): Behandling?
-
-    @Query(
-        """
-        SELECT b.*, be.id AS eksternid_id
-        FROM behandling b
-        JOIN behandling_ekstern be ON b.id = be.behandling_id
-        JOIN fagsak f on b.fagsak_id = f.id 
-        WHERE f.fagsak_person_id = :fagsakPersonId
-         AND b.resultat IN ('OPPHØRT', 'INNVILGET', 'AVSLÅTT', 'IKKE_SATT')
-         AND b.status NOT IN ('OPPRETTET')
-         AND b.arsak != 'MIGRERING'
-    """,
-    )
-    fun finnBehandlingerForGjenbrukAvVilkår(fagsakPersonId: FagsakPersonId): List<Behandling>
 
     fun existsByFagsakIdAndStatusIsNot(
         fagsakId: FagsakId,
