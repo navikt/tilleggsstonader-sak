@@ -178,19 +178,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
             assertThat(res).hasSize(2)
 
-            // TODO "nullstiller" felter fordi usingRecursiveComparison ikke virker som forventet
-            val nullstilteRes =
-                res.map { oppdatert ->
-                    val forrige = eksisterendeVilkårperioder.single { it.id == oppdatert.forrigeVilkårperiodeId!! }
-                    oppdatert.copy(
-                        id = forrige.id,
-                        sporbar = forrige.sporbar,
-                        behandlingId = forrige.behandlingId,
-                        forrigeVilkårperiodeId = forrige.forrigeVilkårperiodeId,
-                        status = forrige.status,
-                    )
-                }
-            assertThat(nullstilteRes)
+            assertThat(res)
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields(
                     "id",
                     "sporbar",
