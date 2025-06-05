@@ -84,10 +84,6 @@ class TilsynBarnVedtakController(
             ).tilDto(behandling.revurderFra)
     }
 
-    /**
-     * TODO Post og Get burde kanskje håndtere 2 ulike objekt?
-     * På en måte hadde det vært fint hvis GET returnerer beløpsperioder
-     */
     @GetMapping("{behandlingId}")
     fun hentVedtak(
         @PathVariable behandlingId: BehandlingId,
