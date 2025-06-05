@@ -35,7 +35,7 @@ class BeregnFraSammenligner(
     private fun sammenlignRevurderFraMedBeregnFraForFagsak(fagsakId: FagsakId) {
         behandlingService
             .hentBehandlinger(fagsakId)
-            .filter { it.forrigeIverksatteBehandlingId != null && it.revurderFra != null }
+            .filter { it.forrigeIverksatteBehandlingId != null && it.revurderFra != null && it.erAvsluttet() }
             .forEach { sammenlignRevurderFraMedBeregnFraForBehandling(it) }
     }
 
