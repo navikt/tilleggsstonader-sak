@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
@@ -73,8 +74,16 @@ data class BeregnFraUtleder(
 
     private fun utledTidligsteEndringForVilkår(): LocalDate? =
         utledEndringIPeriode(
-            perioderNå = vilkår.mapNotNull { it.wrapSomPeriode() }.sorted(),
-            perioderTidligere = vilkårTidligereBehandling.mapNotNull { it.wrapSomPeriode() }.sorted(),
+            perioderNå =
+                vilkår
+                    .filter { it.status != VilkårStatus.SLETTET }
+                    .mapNotNull { it.wrapSomPeriode() }
+                    .sorted(),
+            perioderTidligere =
+                vilkårTidligereBehandling
+                    .filter { it.status != VilkårStatus.SLETTET }
+                    .mapNotNull { it.wrapSomPeriode() }
+                    .sorted(),
         ) { vilkårNå, vilkårTidligereBehandling ->
             erVilkårEndret(vilkårNå.periodeType, vilkårTidligereBehandling.periodeType)
         }
