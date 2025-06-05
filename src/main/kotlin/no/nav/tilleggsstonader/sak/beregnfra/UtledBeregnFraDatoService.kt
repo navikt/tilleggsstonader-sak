@@ -58,6 +58,11 @@ data class BeregnFraUtleder(
     val vedtaksperioder: List<Vedtaksperiode>,
     val vedtaksperioderTidligereBehandling: List<Vedtaksperiode>,
 ) {
+    /**
+     * Utleder tidligste endring i vilkår, aktiviteter, målgrupper og vedtaksperioder.
+     * Gjør dette ved å sortere listene med perioder og sammenligne med periode i tidligere behandling
+     * Returnerer null hvis det ikke er noen endringer.
+     */
     fun utledTidligsteEndring(): LocalDate? =
         listOfNotNull(
             utledTidligsteEndringForVilkår(),
@@ -101,6 +106,8 @@ data class BeregnFraUtleder(
     ): Boolean =
         vilkårNå.utgift != vilkårTidligereBehandling.utgift ||
             vilkårNå.barnId != vilkårTidligereBehandling.barnId ||
+            vilkårNå.erFremtidigUtgift != vilkårTidligereBehandling.erFremtidigUtgift ||
+            vilkårNå.type != vilkårTidligereBehandling.type ||
             delvilkårErEndret(vilkårNå, vilkårTidligereBehandling)
 
     private fun delvilkårErEndret(
@@ -113,6 +120,7 @@ data class BeregnFraUtleder(
         tidligereVilkårperiode: GeneriskVilkårperiode<*>,
     ): Boolean =
         vilkårperiode.resultat != tidligereVilkårperiode.resultat ||
+            vilkårperiode.type != tidligereVilkårperiode.type ||
             vilkårperiode.faktaOgVurdering != tidligereVilkårperiode.faktaOgVurdering
 
     private fun erVedtaksperiodeEndret(
