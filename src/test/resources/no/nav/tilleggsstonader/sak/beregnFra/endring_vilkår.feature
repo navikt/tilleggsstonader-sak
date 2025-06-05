@@ -4,7 +4,7 @@
 Egenskap: Utled beregn fra endring av vilkår
 
   Scenario: Vilkår er forlenget
-    Gitt følgende vilkår i forrige behandling for beregnFra
+    Gitt følgende vilkår i forrige behandling - beregnFra
       | Fom        | Tom        | Type      | Resultat | Status |
       | 01.01.2024 | 31.01.2024 | PASS_BARN | OPPFYLT  | NY     |
 

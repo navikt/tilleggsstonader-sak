@@ -108,6 +108,7 @@ data class BeregnFraUtleder(
             vilkårNå.barnId != vilkårTidligereBehandling.barnId ||
             vilkårNå.erFremtidigUtgift != vilkårTidligereBehandling.erFremtidigUtgift ||
             vilkårNå.type != vilkårTidligereBehandling.type ||
+            vilkårNå.resultat != vilkårTidligereBehandling.resultat ||
             delvilkårErEndret(vilkårNå, vilkårTidligereBehandling)
 
     private fun delvilkårErEndret(
