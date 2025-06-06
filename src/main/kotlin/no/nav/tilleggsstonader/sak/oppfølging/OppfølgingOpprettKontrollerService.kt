@@ -212,6 +212,8 @@ class OppfølgingOpprettKontrollerService(
             TypeYtelsePeriode.AAP -> MålgruppeType.AAP
             TypeYtelsePeriode.ENSLIG_FORSØRGER -> MålgruppeType.OVERGANGSSTØNAD
             TypeYtelsePeriode.OMSTILLINGSSTØNAD -> MålgruppeType.OMSTILLINGSSTØNAD
+            TypeYtelsePeriode.TILTAKSPENGER -> MålgruppeType.TILTAKSPENGER
+            TypeYtelsePeriode.DAGPENGER -> TODO()
         }
 
     private fun MålgruppeType.tilTypeYtelsePeriode() =
@@ -220,6 +222,7 @@ class OppfølgingOpprettKontrollerService(
             MålgruppeType.DAGPENGER -> TODO("Har ikke mapping for dagpenger ennå")
             MålgruppeType.OMSTILLINGSSTØNAD -> TypeYtelsePeriode.OMSTILLINGSSTØNAD
             MålgruppeType.OVERGANGSSTØNAD -> TypeYtelsePeriode.ENSLIG_FORSØRGER
+            MålgruppeType.TILTAKSPENGER -> TypeYtelsePeriode.TILTAKSPENGER
 
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
             MålgruppeType.UFØRETRYGD,
