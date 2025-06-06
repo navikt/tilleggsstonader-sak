@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
@@ -25,10 +26,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import org.assertj.core.api.Assertions.assertThat
 import java.time.LocalDate
 
@@ -57,6 +60,14 @@ enum class VilkårNøkler(
     ER_FREMTIDIG_UTGIFT("Er fremtidig utgift"),
 }
 
+enum class VedtaksperiodeNøkler(
+    override val nøkkel: String,
+) : Domenenøkkel {
+    AKTIVITET("Aktivitet"),
+    MÅLGRUPPE("Målgruppe"),
+}
+
+
 @Suppress("unused", "ktlint:standard:function-naming")
 class UtledBeregnFraStepDefinitions {
     var behandlingId = BehandlingId.random()
@@ -68,10 +79,11 @@ class UtledBeregnFraStepDefinitions {
     var aktiviteter = emptyList<GeneriskVilkårperiode<AktivitetFaktaOgVurdering>>()
     var aktiviteterForrigeBehandling = emptyList<GeneriskVilkårperiode<AktivitetFaktaOgVurdering>>()
 
-    var vilkårsperioder: Vilkårperioder? = null
-    var vilkårsperioderTidligereBehandling: Vilkårperioder? = null
+    var målgrupper = emptyList<GeneriskVilkårperiode<MålgruppeFaktaOgVurdering>>()
+    var målgrupperForrigeBehandling = emptyList<GeneriskVilkårperiode<MålgruppeFaktaOgVurdering>>()
+
     var vedtaksperioder = emptyList<Vedtaksperiode>()
-    var vedtaksperioderTidligereBehandling = emptyList<Vedtaksperiode>()
+    var vedtaksperioderForrigeBehandling = emptyList<Vedtaksperiode>()
 
     var exception: Exception? = null
     var tidligsteEndring: LocalDate? = null
@@ -96,19 +108,39 @@ class UtledBeregnFraStepDefinitions {
         aktiviteter = mapAktiviteter(dataTable)
     }
 
+    @Gitt("følgende målgrupper i forrige behandling - beregnFra")
+    fun `følgende målgrupper i forrige behandling`(dataTable: DataTable) {
+        målgrupperForrigeBehandling = mapMålgrupper(dataTable)
+    }
+
+    @Gitt("følgende målgrupper i revurdering - beregnFra")
+    fun `følgende målgrupper i revurdering`(dataTable: DataTable) {
+        målgrupper = mapMålgrupper(dataTable)
+    }
+
+    @Gitt("følgende vedtaksperioder i forrige behandling - beregnFra")
+    fun `følgende vedtaksperioder i forrige behandling`(dataTable: DataTable) {
+        vedtaksperioderForrigeBehandling = mapVedtaksperioder(dataTable)
+    }
+
+    @Gitt("følgende vedtaksperioder i revurdering - beregnFra")
+    fun `følgende vedtaksperioder i revurdering`(dataTable: DataTable) {
+        vedtaksperioder = mapVedtaksperioder(dataTable)
+    }
+
     @Når("utleder beregnFraDato")
     fun `utleder beregnFraDato`() {
         tidligsteEndring =
             BeregnFraUtleder(
                 vilkår = vilkår,
                 vilkårTidligereBehandling = vilkårForrigeBehandling,
-                vilkårsperioder = Vilkårperioder(aktiviteter = aktiviteter, målgrupper = emptyList()),
+                vilkårsperioder = Vilkårperioder(aktiviteter = aktiviteter, målgrupper = målgrupper),
                 vilkårsperioderTidligereBehandling = Vilkårperioder(
                     aktiviteter = aktiviteterForrigeBehandling,
-                    målgrupper = emptyList()
+                    målgrupper = målgrupperForrigeBehandling
                 ),
                 vedtaksperioder = vedtaksperioder,
-                vedtaksperioderTidligereBehandling = vedtaksperioderTidligereBehandling,
+                vedtaksperioderTidligereBehandling = vedtaksperioderForrigeBehandling,
             ).utledTidligsteEndring()
     }
 
@@ -144,6 +176,28 @@ class UtledBeregnFraStepDefinitions {
                 faktaOgVurdering = mapFaktaOgVurderingAktivitet(rad),
                 resultat = parseEnum(BeregnFraFellesNøkler.RESULTAT, rad),
                 status = parseEnum(BeregnFraFellesNøkler.STATUS, rad),
+            )
+        }
+
+    private fun mapMålgrupper(dataTable: DataTable) =
+        dataTable.mapRad { rad ->
+            målgruppe(
+                behandlingId = behandlingId,
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                faktaOgVurdering = faktaOgVurderingMålgruppe(type = parseEnum(VilkårperiodeNøkler.TYPE, rad)),
+                resultat = parseEnum(BeregnFraFellesNøkler.RESULTAT, rad),
+                status = parseEnum(BeregnFraFellesNøkler.STATUS, rad),
+            )
+        }
+
+    private fun mapVedtaksperioder(dataTable: DataTable) =
+        dataTable.mapRad { rad ->
+            vedtaksperiode(
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                aktivitet = parseEnum(VedtaksperiodeNøkler.AKTIVITET, rad),
+                målgruppe = parseEnum(VedtaksperiodeNøkler.MÅLGRUPPE, rad),
             )
         }
 
