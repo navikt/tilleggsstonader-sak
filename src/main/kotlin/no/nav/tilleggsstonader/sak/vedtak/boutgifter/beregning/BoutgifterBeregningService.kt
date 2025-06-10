@@ -207,11 +207,37 @@ private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtb
 
     brukerfeilHvis(detFinnesUtgiftSomKrysserUtbetalingsperioder) {
         """
-        Vi støtter foreløpig ikke at utgifter krysser ulike utbetalingsperioder. 
-        Utbetalingsperioder for denne behandlingen er: ${utbetalingsperioder.map { it.formatertPeriodeNorskFormat() }}, 
-        mens utgiftsperiodene er: ${utgifterTilOvernatting.map { it.formatertPeriodeNorskFormat() }}
-        """.trimIndent()
+        Utgiftsperioder krysser beregningsperioder
+        
+        ${lagPunktlisteMedOverlappendeUtgifterOgBeregningsperioder(utgifterTilOvernatting, utbetalingsperioder)}
+        
+        Utgiftsperioden(e) må splittes.
+        """.trim().fjernInnrykk()
     }
 
     return this
 }
+
+private fun String.fjernInnrykk(): String = this.replace(Regex(" {2,}"), "")
+
+private fun UtgiftBeregningBoutgifter.finnOverlappendeUtbetalingsperioder(
+    utbetalingsperioder: List<UtbetalingPeriode>,
+): List<UtbetalingPeriode> = utbetalingsperioder.filter { it.overlapper(this) }
+
+private fun UtgiftBeregningBoutgifter.overlapperFlereUtbetalingsperioder(utbetalingsperioder: List<UtbetalingPeriode>): Boolean =
+    finnOverlappendeUtbetalingsperioder(utbetalingsperioder).size > 1
+
+private fun lagPunktlisteMedOverlappendeUtgifterOgBeregningsperioder(
+    utgifter: List<UtgiftBeregningBoutgifter>,
+    utbetalingsperioder: List<UtbetalingPeriode>,
+): String =
+    utgifter
+        .sorted()
+        .filter { utgift -> utgift.overlapperFlereUtbetalingsperioder(utbetalingsperioder) }
+        .joinToString(separator = "\n\n") { utgift ->
+            "Utgiftsperiode ${utgift.formatertPeriodeNorskFormat()} krysser beregningsperiodene: \n ${
+                utgift.finnOverlappendeUtbetalingsperioder(
+                    utbetalingsperioder,
+                ).joinToString("\n ") { utbetalingsperiode -> "- ${utbetalingsperiode.formatertPeriodeNorskFormat()}" }
+            }"
+        }
