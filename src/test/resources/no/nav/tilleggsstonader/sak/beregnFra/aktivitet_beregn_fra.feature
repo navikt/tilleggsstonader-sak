@@ -244,7 +244,7 @@ Egenskap: Utled beregn fra endring av aktivitet
 
       Gitt følgende aktiviteter i revurdering - beregnFra
         | Fom        | Tom        | Stønadstype | Type   | Resultat | Status  |
-        | 12.03.2024 | 14.05.2024 | BOUTGIFTER  | TILTAK | OPPFYLT  | UENDRET |
+        | 12.03.2024 | 14.05.2024 | BOUTGIFTER  | TILTAK | OPPFYLT  | SLETTET |
 
 
       Når utleder beregnFraDato

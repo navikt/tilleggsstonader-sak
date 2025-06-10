@@ -200,7 +200,7 @@ Egenskap: Utled beregn fra endring av målgruppe
 
       Gitt følgende målgrupper i revurdering - beregnFra
         | Fom        | Tom        | Type | Resultat | Status  |
-        | 12.03.2024 | 14.05.2024 | AAP  | OPPFYLT  | UENDRET |
+        | 12.03.2024 | 14.05.2024 | AAP  | OPPFYLT  | SLETTET |
 
 
       Når utleder beregnFraDato
