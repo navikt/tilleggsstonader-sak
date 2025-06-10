@@ -107,7 +107,6 @@ class HåndterSøknadService(
                 oppgave =
                     OpprettOppgave(
                         oppgavetype = Oppgavetype.Journalføring,
-                        enhetsnummer = journalpost.journalforendeEnhet?.takeIf { it != MASKINELL_JOURNALFOERENDE_ENHET },
                         beskrivelse = lagOppgavebeskrivelseForJournalføringsoppgave(journalpost),
                         journalpostId = journalpost.journalpostId,
                     ),

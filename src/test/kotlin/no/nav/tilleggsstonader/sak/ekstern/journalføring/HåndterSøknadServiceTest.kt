@@ -218,6 +218,5 @@ internal class HåndterSøknadServiceTest {
         val payload = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(taskSlot.captured.payload)
         assertThat(payload.oppgave.journalpostId).isEqualTo(journalpostId)
         assertThat(payload.oppgave.oppgavetype).isEqualTo(Oppgavetype.Journalføring)
-        assertThat(payload.oppgave.enhetsnummer).isEqualTo("123")
     }
 }

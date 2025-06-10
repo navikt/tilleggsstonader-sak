@@ -195,8 +195,7 @@ class OppgaveService(
         oppgave: OpprettOppgave,
     ): Long {
         val enhetsnummer =
-            oppgave.enhetsnummer
-                ?: arbeidsfordelingService.hentNavEnhetId(personIdent, stønadstype, oppgave.oppgavetype)
+            arbeidsfordelingService.hentNavEnhetId(personIdent, stønadstype, oppgave.oppgavetype)
 
         val mappeId = utledMappeId(personIdent, oppgave, enhetsnummer)
         val opprettOppgave =
@@ -328,7 +327,7 @@ class OppgaveService(
 
     fun finnMapper(enheter: List<String>): List<MappeDto> = enheter.flatMap { finnMapper(it) }
 
-    fun finnMapper(enhet: String): List<MappeDto> =
+    private fun finnMapper(enhet: String): List<MappeDto> =
         cacheManager.getValue("oppgave-mappe", enhet) {
             logger.info("Henter mapper på nytt")
             val mappeRespons =
