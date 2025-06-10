@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import kotlin.math.min
@@ -74,33 +75,29 @@ data class BeregnFraUtleder(
 
     private fun utledTidligsteEndringForVilkår(): LocalDate? =
         utledEndringIPeriode(
-            perioderNå =
-                vilkår
-                    .filter { it.status != VilkårStatus.SLETTET }
-                    .mapNotNull { it.wrapSomPeriode() }
-                    .sorted(),
-            perioderTidligere =
-                vilkårTidligereBehandling
-                    .filter { it.status != VilkårStatus.SLETTET }
-                    .mapNotNull { it.wrapSomPeriode() }
-                    .sorted(),
+            perioderNå = vilkår.fjernSlettede().mapNotNull { it.wrapSomPeriode() }.sorted(),
+            perioderTidligere = vilkårTidligereBehandling.fjernSlettede().mapNotNull { it.wrapSomPeriode() }.sorted(),
         ) { vilkårNå, vilkårTidligereBehandling ->
             erVilkårEndret(vilkårNå.periodeType, vilkårTidligereBehandling.periodeType)
         }
 
+    private fun Iterable<Vilkår>.fjernSlettede() = this.filterNot { it.status == VilkårStatus.SLETTET }
+
     private fun utledTidligsteEndringForAktiviteter(): LocalDate? =
         utledEndringIPeriode(
-            perioderNå = vilkårsperioder.aktiviteter.sorted(),
-            perioderTidligere = vilkårsperioderTidligereBehandling.aktiviteter.sorted(),
+            perioderNå = vilkårsperioder.aktiviteter.fjernSlettede().sorted(),
+            perioderTidligere = vilkårsperioderTidligereBehandling.aktiviteter.fjernSlettede().sorted(),
             erEndretFunksjon = ::erMålgruppeEllerAktivitetEndret,
         )
 
     private fun utledTidligsteEndringForMålgrupper(): LocalDate? =
         utledEndringIPeriode(
-            perioderNå = vilkårsperioder.målgrupper.sorted(),
-            perioderTidligere = vilkårsperioderTidligereBehandling.målgrupper.sorted(),
+            perioderNå = vilkårsperioder.målgrupper.fjernSlettede().sorted(),
+            perioderTidligere = vilkårsperioderTidligereBehandling.målgrupper.fjernSlettede().sorted(),
             erEndretFunksjon = ::erMålgruppeEllerAktivitetEndret,
         )
+
+    private fun List<GeneriskVilkårperiode<*>>.fjernSlettede() = this.filterNot { it.status == Vilkårstatus.SLETTET }
 
     private fun utledTidligsteEndringForVedtaksperioder(): LocalDate? =
         utledEndringIPeriode(
