@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.beregnfra
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
@@ -73,12 +74,14 @@ class BeregnFraUtlederServiceTest {
     private val vilkårService = mockk<VilkårService>()
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
     private val vedtaksperiodeService = mockk<VedtaksperiodeService>()
+    private val barnService = mockk<BarnService>()
     private val utledBeregnFraDatoService =
         UtledBeregnFraDatoService(
             behandlingService,
             vilkårService,
             vilkårperiodeService,
             vedtaksperiodeService,
+            barnService,
         )
 
     var sisteIverksatteBehandling: Behandling = behandling()
@@ -107,6 +110,8 @@ class BeregnFraUtlederServiceTest {
         every { vilkårperiodeService.hentVilkårperioder(sisteIverksatteBehandling.id) } answers { vilkårperioderSisteIverksattBehandling }
         every { vedtaksperiodeService.finnVedtaksperioderForBehandling(sisteIverksatteBehandling.id, null) } answers
             { vedtaksperioderSisteIverksatteBehandling }
+
+        every { barnService.finnBarnPåBehandling(any()) } returns emptyList()
 
         vilkårSisteIverksatteBehandling =
             listOf(

@@ -15,11 +15,11 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriBoolean
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriString
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.BarnIdTilTestIdHolder.barnIder
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -70,7 +70,6 @@ enum class VedtaksperiodeNøkler(
     MÅLGRUPPE("Målgruppe"),
 }
 
-
 @Suppress("unused", "ktlint:standard:function-naming")
 class UtledBeregnFraStepDefinitions {
     var behandlingId = BehandlingId.random()
@@ -88,17 +87,21 @@ class UtledBeregnFraStepDefinitions {
     var vedtaksperioder = emptyList<Vedtaksperiode>()
     var vedtaksperioderForrigeBehandling = emptyList<Vedtaksperiode>()
 
+    // barnid til ident
+    var barnIder = mutableMapOf<String, BarnId>()
+    var barnIderForrigeBehandling = mutableMapOf<String, BarnId>()
+
     var exception: Exception? = null
     var tidligsteEndring: LocalDate? = null
 
     @Gitt("følgende vilkår i forrige behandling - beregnFra")
     fun `følgende vilkår i forrige behandling`(dataTable: DataTable) {
-        vilkårForrigeBehandling = mapVilkår(dataTable)
+        vilkårForrigeBehandling = mapVilkår(dataTable, barnIderForrigeBehandling)
     }
 
     @Gitt("følgende vilkår i revurdering - beregnFra")
     fun `følgende vilkår i revurdering`(dataTable: DataTable) {
-        vilkår = mapVilkår(dataTable)
+        vilkår = mapVilkår(dataTable, barnIder)
     }
 
     @Gitt("følgende aktiviteter i forrige behandling - beregnFra")
@@ -138,12 +141,16 @@ class UtledBeregnFraStepDefinitions {
                 vilkår = vilkår,
                 vilkårTidligereBehandling = vilkårForrigeBehandling,
                 vilkårsperioder = Vilkårperioder(aktiviteter = aktiviteter, målgrupper = målgrupper),
-                vilkårsperioderTidligereBehandling = Vilkårperioder(
-                    aktiviteter = aktiviteterForrigeBehandling,
-                    målgrupper = målgrupperForrigeBehandling
-                ),
+                vilkårsperioderTidligereBehandling =
+                    Vilkårperioder(
+                        aktiviteter = aktiviteterForrigeBehandling,
+                        målgrupper = målgrupperForrigeBehandling,
+                    ),
                 vedtaksperioder = vedtaksperioder,
                 vedtaksperioderTidligereBehandling = vedtaksperioderForrigeBehandling,
+                barnIdTilIdentMap =
+                    barnIder.entries.associate { it.value to it.key } +
+                        barnIderForrigeBehandling.entries.associate { it.value to it.key },
             ).utledTidligsteEndring()
     }
 
@@ -153,24 +160,30 @@ class UtledBeregnFraStepDefinitions {
         assertThat(tidligsteEndring).isEqualTo(forventetDato)
     }
 
-    private fun mapVilkår(dataTable: DataTable) =
-        dataTable.mapRad { rad ->
-            val valgtBarnId = parseValgfriInt(VilkårNøkler.BARN_ID, rad)
-            vilkår(
-                behandlingId = BehandlingId.random(),
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                resultat = parseEnum(BeregnFraFellesNøkler.RESULTAT, rad),
-                type = parseValgfriEnum<VilkårType>(BeregnFraFellesNøkler.TYPE, rad) ?: VilkårType.PASS_BARN,
-                barnId = barnIder[valgtBarnId],
-                status = parseValgfriEnum<VilkårStatus>(
+    private fun mapVilkår(
+        dataTable: DataTable,
+        barnIderForBehandlingMap: MutableMap<String, BarnId>,
+    ) = dataTable.mapRad { rad ->
+        val valgtBarnId = parseValgfriString(VilkårNøkler.BARN_ID, rad)
+        vilkår(
+            behandlingId = BehandlingId.random(),
+            fom = parseDato(DomenenøkkelFelles.FOM, rad),
+            tom = parseDato(DomenenøkkelFelles.TOM, rad),
+            resultat = parseEnum(BeregnFraFellesNøkler.RESULTAT, rad),
+            type = parseValgfriEnum<VilkårType>(BeregnFraFellesNøkler.TYPE, rad) ?: VilkårType.PASS_BARN,
+            barnId =
+                valgtBarnId?.let {
+                    barnIderForBehandlingMap.getOrPut(it) { BarnId.random() }
+                },
+            status =
+                parseValgfriEnum<VilkårStatus>(
                     BeregnFraFellesNøkler.STATUS,
                     rad,
                 ) ?: VilkårStatus.NY,
-                utgift = parseValgfriInt(VilkårNøkler.UTGIFT, rad) ?: 1000,
-                erFremtidigUtgift = parseValgfriBoolean(VilkårNøkler.ER_FREMTIDIG_UTGIFT, rad) ?: false
-            )
-        }
+            utgift = parseValgfriInt(VilkårNøkler.UTGIFT, rad) ?: 1000,
+            erFremtidigUtgift = parseValgfriBoolean(VilkårNøkler.ER_FREMTIDIG_UTGIFT, rad) ?: false,
+        )
+    }
 
     private fun mapAktiviteter(dataTable: DataTable) =
         dataTable.mapRad { rad ->
@@ -206,29 +219,31 @@ class UtledBeregnFraStepDefinitions {
             )
         }
 
-    private fun mapFaktaOgVurderingAktivitet(
-        rad: Map<String, String>,
-    ): AktivitetFaktaOgVurdering {
+    private fun mapFaktaOgVurderingAktivitet(rad: Map<String, String>): AktivitetFaktaOgVurdering {
         val stønadstype: Stønadstype = parseEnum(VilkårperiodeNøkler.STØNADSTYPE, rad)
 
         return when (stønadstype) {
-            Stønadstype.BARNETILSYN -> faktaOgVurderingAktivitetTilsynBarn(
-                type = parseEnum(VilkårperiodeNøkler.TYPE, rad),
-                aktivitetsdager = parseInt(
-                    VilkårperiodeNøkler.AKTIVITETSDAGER, rad
-                ),
-            )
+            Stønadstype.BARNETILSYN ->
+                faktaOgVurderingAktivitetTilsynBarn(
+                    type = parseEnum(VilkårperiodeNøkler.TYPE, rad),
+                    aktivitetsdager =
+                        parseInt(
+                            VilkårperiodeNøkler.AKTIVITETSDAGER,
+                            rad,
+                        ),
+                )
 
-            Stønadstype.LÆREMIDLER -> faktaOgVurderingAktivitetLæremidler(
-                type = parseEnum(VilkårperiodeNøkler.TYPE, rad),
-                studienivå = parseEnum(VilkårperiodeNøkler.STUDIENIVÅ, rad),
-                prosent = parseInt(VilkårperiodeNøkler.STUDIEPROSENT, rad)
-            )
+            Stønadstype.LÆREMIDLER ->
+                faktaOgVurderingAktivitetLæremidler(
+                    type = parseEnum(VilkårperiodeNøkler.TYPE, rad),
+                    studienivå = parseEnum(VilkårperiodeNøkler.STUDIENIVÅ, rad),
+                    prosent = parseInt(VilkårperiodeNøkler.STUDIEPROSENT, rad),
+                )
 
-            Stønadstype.BOUTGIFTER -> faktaOgVurderingAktivitetBoutgifter(
-                type = parseEnum(VilkårperiodeNøkler.TYPE, rad)
-
-            )
+            Stønadstype.BOUTGIFTER ->
+                faktaOgVurderingAktivitetBoutgifter(
+                    type = parseEnum(VilkårperiodeNøkler.TYPE, rad),
+                )
 
             else -> error("Ukjent stønadstype: $stønadstype")
         }

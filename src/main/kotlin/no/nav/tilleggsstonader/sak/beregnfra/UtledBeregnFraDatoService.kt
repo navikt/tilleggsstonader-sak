@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.beregnfra
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
@@ -25,6 +27,7 @@ class UtledBeregnFraDatoService(
     private val vilkårService: VilkårService,
     private val vilkårperiodeService: VilkårperiodeService,
     private val vedtaksperiodeService: VedtaksperiodeService,
+    private val barnService: BarnService,
 ) {
     fun utledBeregnFraDato(behandlingId: BehandlingId): LocalDate? {
         val behandling = behandlingService.hentBehandling(behandlingId)
@@ -41,6 +44,9 @@ class UtledBeregnFraDatoService(
         val vedtaksperioder = vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, null)
         val vedtaksperioderTidligereBehandling = vedtaksperiodeService.finnVedtaksperioderForBehandling(sisteIverksatteBehandling.id, null)
 
+        val barnIder = barnService.finnBarnPåBehandling(behandlingId)
+        val barnIderTidligereBehandling = barnService.finnBarnPåBehandling(sisteIverksatteBehandling.id)
+
         return BeregnFraUtleder(
             vilkår = vilkår,
             vilkårTidligereBehandling = vilkårTidligereBehandling,
@@ -48,6 +54,7 @@ class UtledBeregnFraDatoService(
             vilkårsperioderTidligereBehandling = vilkårsperioderTidligereBehandling,
             vedtaksperioder = vedtaksperioder,
             vedtaksperioderTidligereBehandling = vedtaksperioderTidligereBehandling,
+            barnIdTilIdentMap = (barnIder + barnIderTidligereBehandling).associate { it.id to it.ident },
         ).utledTidligsteEndring()
     }
 }
@@ -59,6 +66,7 @@ data class BeregnFraUtleder(
     val vilkårsperioderTidligereBehandling: Vilkårperioder,
     val vedtaksperioder: List<Vedtaksperiode>,
     val vedtaksperioderTidligereBehandling: List<Vedtaksperiode>,
+    val barnIdTilIdentMap: Map<BarnId, String>,
 ) {
     /**
      * Utleder tidligste endring i vilkår, aktiviteter, målgrupper og vedtaksperioder.
@@ -111,8 +119,8 @@ data class BeregnFraUtleder(
         vilkårTidligereBehandling: Vilkår,
     ): Boolean =
         vilkårNå.utgift != vilkårTidligereBehandling.utgift ||
-            // FIXME barnId er forskjellig for hver behandling
-            vilkårNå.barnId != vilkårTidligereBehandling.barnId ||
+            // barnId er forskjellig for hver behandling, sjekker på ident
+            barnIdTilIdentMap[vilkårNå.barnId] != barnIdTilIdentMap[vilkårTidligereBehandling.barnId] ||
             vilkårNå.erFremtidigUtgift != vilkårTidligereBehandling.erFremtidigUtgift ||
             vilkårNå.type != vilkårTidligereBehandling.type ||
             vilkårNå.resultat != vilkårTidligereBehandling.resultat ||
