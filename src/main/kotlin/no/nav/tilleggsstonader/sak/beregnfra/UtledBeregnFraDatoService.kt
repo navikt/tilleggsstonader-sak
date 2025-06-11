@@ -19,7 +19,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import kotlin.math.min
-import no.nav.tilleggsstonader.sak.util.min as nullableMin
 
 @Service
 class UtledBeregnFraDatoService(
@@ -165,11 +164,11 @@ data class BeregnFraUtleder(
             val periodeTidligere = perioderTidligere[i]
 
             if (periodeNå.fom != periodeTidligere.fom || erEndretFunksjon(periodeNå, periodeTidligere)) {
-                return nullableMin(periodeNå.fom, periodeTidligere.fom)
+                return minOf(periodeNå.fom, periodeTidligere.fom)
             }
             if (periodeNå.tom != periodeTidligere.tom) {
                 // Legger på en dag, da det først er fra dagen etter tom-datoen at det er en endring
-                return nullableMin(periodeNå.tom, periodeTidligere.tom)?.plusDays(1)
+                return minOf(periodeNå.tom, periodeTidligere.tom).plusDays(1)
             }
 
             i++
