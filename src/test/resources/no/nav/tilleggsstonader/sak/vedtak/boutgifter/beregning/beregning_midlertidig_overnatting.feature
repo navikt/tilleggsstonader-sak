@@ -119,7 +119,7 @@ Egenskap: Beregning av midlertidig overnatting
       | 11.01.2025 | 12.01.2025 | TILTAK    | NEDSATT_ARBEIDSEVNE |
       | 09.02.2025 | 14.02.2025 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
-    Så forvent følgende feilmelding: Vi støtter foreløpig ikke at utgifter krysser ulike utbetalingsperioder.
+    Så forvent følgende feilmelding: Utgiftsperioder krysser beregningsperioder
 
   Scenario: To påfølgende vedtaksperioder som dekker utgiften
     Gitt følgende boutgifter av type UTGIFTER_OVERNATTING for behandling=1
