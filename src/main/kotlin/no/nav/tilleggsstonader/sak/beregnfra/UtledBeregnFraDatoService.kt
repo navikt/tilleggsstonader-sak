@@ -143,6 +143,7 @@ data class BeregnFraUtleder(
             vilkårNå.resultat != vilkårTidligereBehandling.resultat ||
             delvilkårErEndret(vilkårNå, vilkårTidligereBehandling)
 
+    // Ikke interessert i vurderingen som er gjort i et delvilkår, kun resultatet
     private fun delvilkårErEndret(
         vilkårNå: Vilkår,
         vilkårTidligereBehandling: Vilkår,
