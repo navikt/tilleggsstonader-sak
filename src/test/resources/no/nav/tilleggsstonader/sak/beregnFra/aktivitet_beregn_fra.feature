@@ -251,4 +251,22 @@ Egenskap: Utled beregn fra endring av aktivitet
 
       Så forvent følgende dato for tidligste endring: 12.03.2024
 
+  Regel: Skal håndtere endring i aktiviteter med samme fom og tom
+    Scenario: En aktivitet blir utvidet
+      Gitt følgende aktiviteter i forrige behandling - beregnFra
+        | Fom        | Tom        | Stønadstype | Type   | Resultat | Status |
+        | 04.02.2024 | 31.03.2024 | BOUTGIFTER  | UTDANNING | OPPFYLT  | NY     |
+        | 04.02.2024 | 31.03.2024 | BOUTGIFTER  | TILTAK | OPPFYLT  | NY     |
+
+      Gitt følgende aktiviteter i revurdering - beregnFra
+        | Fom        | Tom        | Stønadstype | Type   | Resultat | Status  |
+        | 04.02.2024 | 31.04.2024 | BOUTGIFTER  | UTDANNING | OPPFYLT  | ENDRET |
+        | 04.02.2024 | 31.03.2024 | BOUTGIFTER  | TILTAK | OPPFYLT  | UENDRET |
+
+
+      Når utleder beregnFraDato
+
+      Så forvent følgende dato for tidligste endring: 01.04.2024
+
+
 #    Burde man ha noe om at kildeId er endret? Feks. samme periode men ny aktivitet?

@@ -74,6 +74,17 @@ data class BeregnFraUtleder(
                 (barnIdTilIdentMap[o1.periodeType.barnId] ?: "").compareTo(barnIdTilIdentMap[o2.periodeType.barnId] ?: "")
             }.thenComparing { o1, o2 -> o1.tom.compareTo(o2.tom) }
 
+    private val vilkårsperioderComparator =
+        Comparator
+            .comparing<GeneriskVilkårperiode<*>, LocalDate> { it.fom }
+            .thenComparing { o1, o2 -> o1.tom.compareTo(o2.tom) }
+            .thenComparing { o1, o2 ->
+                o1.faktaOgVurdering.type.vilkårperiodeType.toString().compareTo(
+                    o2.faktaOgVurdering.type.vilkårperiodeType
+                        .toString(),
+                )
+            }
+
     /**
      * Utleder tidligste endring i vilkår, aktiviteter, målgrupper og vedtaksperioder.
      * Gjør dette ved å sortere listene med perioder og sammenligne med periode i tidligere behandling
@@ -99,15 +110,15 @@ data class BeregnFraUtleder(
 
     private fun utledTidligsteEndringForAktiviteter(): LocalDate? =
         utledEndringIPeriode(
-            perioderNå = vilkårsperioder.aktiviteter.fjernSlettede().sorted(),
-            perioderTidligere = vilkårsperioderTidligereBehandling.aktiviteter.fjernSlettede().sorted(),
+            perioderNå = vilkårsperioder.aktiviteter.fjernSlettede().sortedWith(vilkårsperioderComparator),
+            perioderTidligere = vilkårsperioderTidligereBehandling.aktiviteter.fjernSlettede().sortedWith(vilkårsperioderComparator),
             erEndretFunksjon = ::erMålgruppeEllerAktivitetEndret,
         )
 
     private fun utledTidligsteEndringForMålgrupper(): LocalDate? =
         utledEndringIPeriode(
-            perioderNå = vilkårsperioder.målgrupper.fjernSlettede().sorted(),
-            perioderTidligere = vilkårsperioderTidligereBehandling.målgrupper.fjernSlettede().sorted(),
+            perioderNå = vilkårsperioder.målgrupper.fjernSlettede().sortedWith(vilkårsperioderComparator),
+            perioderTidligere = vilkårsperioderTidligereBehandling.målgrupper.fjernSlettede().sortedWith(vilkårsperioderComparator),
             erEndretFunksjon = ::erMålgruppeEllerAktivitetEndret,
         )
 
