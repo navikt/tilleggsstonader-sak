@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.beregnfra
+package no.nav.tilleggsstonader.sak.tidligsteendring
 
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
@@ -37,7 +37,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import org.assertj.core.api.Assertions.assertThat
 import java.time.LocalDate
 
-enum class BeregnFraFellesNøkler(
+enum class TidligsteEndringFellesNøkler(
     override val nøkkel: String,
 ) : Domenenøkkel {
     STATUS("Status"),
@@ -71,7 +71,7 @@ enum class VedtaksperiodeNøkler(
 }
 
 @Suppress("unused", "ktlint:standard:function-naming")
-class UtledBeregnFraStepDefinitions {
+class UtledTidligsteEndringStepDefinitions {
     var behandlingId = BehandlingId.random()
     var behandling = behandling(id = behandlingId)
 
@@ -94,50 +94,50 @@ class UtledBeregnFraStepDefinitions {
     var exception: Exception? = null
     var tidligsteEndring: LocalDate? = null
 
-    @Gitt("følgende vilkår i forrige behandling - beregnFra")
+    @Gitt("følgende vilkår i forrige behandling - utledTidligsteEndring")
     fun `følgende vilkår i forrige behandling`(dataTable: DataTable) {
         vilkårForrigeBehandling = mapVilkår(dataTable, barnIderForrigeBehandling)
     }
 
-    @Gitt("følgende vilkår i revurdering - beregnFra")
+    @Gitt("følgende vilkår i revurdering - utledTidligsteEndring")
     fun `følgende vilkår i revurdering`(dataTable: DataTable) {
         vilkår = mapVilkår(dataTable, barnIder)
     }
 
-    @Gitt("følgende aktiviteter i forrige behandling - beregnFra")
+    @Gitt("følgende aktiviteter i forrige behandling - utledTidligsteEndring")
     fun `følgende aktiviteter i forrige behandling`(dataTable: DataTable) {
         aktiviteterForrigeBehandling = mapAktiviteter(dataTable)
     }
 
-    @Gitt("følgende aktiviteter i revurdering - beregnFra")
+    @Gitt("følgende aktiviteter i revurdering - utledTidligsteEndring")
     fun `følgende aktiviteter i revurdering`(dataTable: DataTable) {
         aktiviteter = mapAktiviteter(dataTable)
     }
 
-    @Gitt("følgende målgrupper i forrige behandling - beregnFra")
+    @Gitt("følgende målgrupper i forrige behandling - utledTidligsteEndring")
     fun `følgende målgrupper i forrige behandling`(dataTable: DataTable) {
         målgrupperForrigeBehandling = mapMålgrupper(dataTable)
     }
 
-    @Gitt("følgende målgrupper i revurdering - beregnFra")
+    @Gitt("følgende målgrupper i revurdering - utledTidligsteEndring")
     fun `følgende målgrupper i revurdering`(dataTable: DataTable) {
         målgrupper = mapMålgrupper(dataTable)
     }
 
-    @Gitt("følgende vedtaksperioder i forrige behandling - beregnFra")
+    @Gitt("følgende vedtaksperioder i forrige behandling - utledTidligsteEndring")
     fun `følgende vedtaksperioder i forrige behandling`(dataTable: DataTable) {
         vedtaksperioderForrigeBehandling = mapVedtaksperioder(dataTable)
     }
 
-    @Gitt("følgende vedtaksperioder i revurdering - beregnFra")
+    @Gitt("følgende vedtaksperioder i revurdering - utledTidligsteEndring")
     fun `følgende vedtaksperioder i revurdering`(dataTable: DataTable) {
         vedtaksperioder = mapVedtaksperioder(dataTable)
     }
 
-    @Når("utleder beregnFraDato")
-    fun `utleder beregnFraDato`() {
+    @Når("utleder tidligste endring")
+    fun `utleder tidligste endring`() {
         tidligsteEndring =
-            BeregnFraUtleder(
+            TidligsteEndringIBehandlingUtleder(
                 vilkår = vilkår,
                 vilkårTidligereBehandling = vilkårForrigeBehandling,
                 vilkårsperioder = Vilkårperioder(aktiviteter = aktiviteter, målgrupper = målgrupper),
@@ -169,15 +169,15 @@ class UtledBeregnFraStepDefinitions {
             behandlingId = BehandlingId.random(),
             fom = parseDato(DomenenøkkelFelles.FOM, rad),
             tom = parseDato(DomenenøkkelFelles.TOM, rad),
-            resultat = parseEnum(BeregnFraFellesNøkler.RESULTAT, rad),
-            type = parseValgfriEnum<VilkårType>(BeregnFraFellesNøkler.TYPE, rad) ?: VilkårType.PASS_BARN,
+            resultat = parseEnum(TidligsteEndringFellesNøkler.RESULTAT, rad),
+            type = parseValgfriEnum<VilkårType>(TidligsteEndringFellesNøkler.TYPE, rad) ?: VilkårType.PASS_BARN,
             barnId =
                 valgtBarnId?.let {
                     barnIderForBehandlingMap.getOrPut(it) { BarnId.random() }
                 },
             status =
                 parseValgfriEnum<VilkårStatus>(
-                    BeregnFraFellesNøkler.STATUS,
+                    TidligsteEndringFellesNøkler.STATUS,
                     rad,
                 ) ?: VilkårStatus.NY,
             utgift = parseValgfriInt(VilkårNøkler.UTGIFT, rad) ?: 1000,
@@ -192,8 +192,8 @@ class UtledBeregnFraStepDefinitions {
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 faktaOgVurdering = mapFaktaOgVurderingAktivitet(rad),
-                resultat = parseEnum(BeregnFraFellesNøkler.RESULTAT, rad),
-                status = parseEnum(BeregnFraFellesNøkler.STATUS, rad),
+                resultat = parseEnum(TidligsteEndringFellesNøkler.RESULTAT, rad),
+                status = parseEnum(TidligsteEndringFellesNøkler.STATUS, rad),
             )
         }
 
@@ -204,8 +204,8 @@ class UtledBeregnFraStepDefinitions {
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 faktaOgVurdering = faktaOgVurderingMålgruppe(type = parseEnum(VilkårperiodeNøkler.TYPE, rad)),
-                resultat = parseEnum(BeregnFraFellesNøkler.RESULTAT, rad),
-                status = parseEnum(BeregnFraFellesNøkler.STATUS, rad),
+                resultat = parseEnum(TidligsteEndringFellesNøkler.RESULTAT, rad),
+                status = parseEnum(TidligsteEndringFellesNøkler.STATUS, rad),
             )
         }
 

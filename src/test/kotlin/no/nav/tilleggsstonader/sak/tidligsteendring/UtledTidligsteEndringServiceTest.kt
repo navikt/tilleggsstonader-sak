@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.beregnfra
+package no.nav.tilleggsstonader.sak.tidligsteendring
 
 import io.mockk.every
 import io.mockk.mockk
@@ -26,14 +26,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class BeregnFraUtlederServiceTest {
+class UtledTidligsteEndringServiceTest {
     private val behandlingService = mockk<BehandlingService>()
     private val vilkårService = mockk<VilkårService>()
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
     private val vedtaksperiodeService = mockk<VedtaksperiodeService>()
     private val barnService = mockk<BarnService>()
-    private val utledBeregnFraDatoService =
-        UtledBeregnFraDatoService(
+    private val utledTidligsteEndringService =
+        UtledTidligsteEndringService(
             behandlingService,
             vilkårService,
             vilkårperiodeService,
@@ -91,7 +91,7 @@ class BeregnFraUtlederServiceTest {
     }
 
     @Test
-    fun `utled beregnFraDato, lagt på nye perioder, data hentes ut fra servicer og beregnFraDato blir fom-dato på ny periode`() {
+    fun `utled tidligste endring, lagt på nye perioder, data hentes ut fra servicer og tidligste endring blir fom-dato på ny periode`() {
         val nyttFom = originalTom.plusDays(1)
         val nyttTom = originalTom.plusMonths(1)
         val nyttVilkår =
@@ -112,7 +112,7 @@ class BeregnFraUtlederServiceTest {
             }
         vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
 
-        val result = utledBeregnFraDatoService.utledBeregnFraDato(behandling.id)
+        val result = utledTidligsteEndringService.utledTidligsteEndring(behandling.id)
 
         assertThat(result).isEqualTo(nyttVilkår.fom)
     }

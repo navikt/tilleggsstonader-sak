@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.beregnfra
+package no.nav.tilleggsstonader.sak.tidligsteendring
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -21,14 +21,14 @@ import java.time.LocalDate
 import kotlin.math.min
 
 @Service
-class UtledBeregnFraDatoService(
+class UtledTidligsteEndringService(
     private val behandlingService: BehandlingService,
     private val vilkårService: VilkårService,
     private val vilkårperiodeService: VilkårperiodeService,
     private val vedtaksperiodeService: VedtaksperiodeService,
     private val barnService: BarnService,
 ) {
-    fun utledBeregnFraDato(behandlingId: BehandlingId): LocalDate? {
+    fun utledTidligsteEndring(behandlingId: BehandlingId): LocalDate? {
         val behandling = behandlingService.hentBehandling(behandlingId)
         val sisteIverksatteBehandling =
             behandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentBehandling(it) }
@@ -45,7 +45,7 @@ class UtledBeregnFraDatoService(
         val barnIder = barnService.finnBarnPåBehandling(behandlingId)
         val barnIderTidligereBehandling = barnService.finnBarnPåBehandling(sisteIverksatteBehandling.id)
 
-        return BeregnFraUtleder(
+        return TidligsteEndringIBehandlingUtleder(
             vilkår = vilkår,
             vilkårTidligereBehandling = vilkårTidligereBehandling,
             vilkårsperioder = vilkårsperioder,
@@ -57,7 +57,7 @@ class UtledBeregnFraDatoService(
     }
 }
 
-data class BeregnFraUtleder(
+data class TidligsteEndringIBehandlingUtleder(
     val vilkår: List<Vilkår>,
     val vilkårTidligereBehandling: List<Vilkår>,
     val vilkårsperioder: Vilkårperioder,

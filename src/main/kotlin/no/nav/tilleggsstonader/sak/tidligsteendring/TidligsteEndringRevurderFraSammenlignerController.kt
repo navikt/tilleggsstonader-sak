@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.beregnfra
+package no.nav.tilleggsstonader.sak.tidligsteendring
 
 import no.nav.security.token.support.core.api.Unprotected
 import org.slf4j.LoggerFactory
@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.concurrent.Executors
 
 @RestController
-@RequestMapping(path = ["/api/beregnfra"])
+@RequestMapping(path = ["/api/tidligste-endring"])
 @Unprotected
-class BeregnFraSammenlignerController(
-    private val beregnFraSammenligner: BeregnFraSammenligner,
+class TidligsteEndringRevurderFraSammenlignerController(
+    private val tidligsteEndringRevurderFraSammenligner: TidligsteEndringRevurderFraSammenligner,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -19,9 +19,9 @@ class BeregnFraSammenlignerController(
     fun startSammenligning() {
         Executors.newVirtualThreadPerTaskExecutor().submit {
             try {
-                beregnFraSammenligner.sammenlignRevurderFraMedBeregnFra()
+                tidligsteEndringRevurderFraSammenligner.sammenlignRevurderFraMedTidligsteEndring()
             } catch (e: Exception) {
-                logger.warn("Feil under sammenligning av revurderinger med beregn fra", e)
+                logger.warn("Feil under sammenligning av revurderinger med tidligste endring", e)
             }
         }
     }
