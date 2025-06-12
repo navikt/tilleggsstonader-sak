@@ -62,7 +62,7 @@ class TidligsteEndringRevurderFraSammenligner(
                 )
             }
         } catch (e: Exception) {
-            logger.info("Kunne ikke utlede tidligste endring for behandling=${behandling.id}, fagsak=${behandling.fagsakId}", e)
+            logger.info("Feil ved utledning av tidligste endring for behandling=${behandling.id}, fagsak=${behandling.fagsakId}", e)
         }
     }
 }

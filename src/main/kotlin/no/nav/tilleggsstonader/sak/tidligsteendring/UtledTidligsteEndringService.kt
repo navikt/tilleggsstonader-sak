@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -139,14 +138,7 @@ data class TidligsteEndringIBehandlingUtleder(
             barnIdTilIdentMap[vilkårNå.barnId] != barnIdTilIdentMap[vilkårTidligereBehandling.barnId] ||
             vilkårNå.erFremtidigUtgift != vilkårTidligereBehandling.erFremtidigUtgift ||
             vilkårNå.type != vilkårTidligereBehandling.type ||
-            vilkårNå.resultat != vilkårTidligereBehandling.resultat ||
-            delvilkårErEndret(vilkårNå, vilkårTidligereBehandling)
-
-    // Ikke interessert i vurderingen som er gjort i et delvilkår, kun resultatet
-    private fun delvilkårErEndret(
-        vilkårNå: Vilkår,
-        vilkårTidligereBehandling: Vilkår,
-    ): Boolean = vilkårNå.delvilkårsett.utenVurderinger() != vilkårTidligereBehandling.delvilkårsett.utenVurderinger()
+            vilkårNå.resultat != vilkårTidligereBehandling.resultat
 
     private fun erMålgruppeEllerAktivitetEndret(
         vilkårperiode: GeneriskVilkårperiode<*>,
@@ -192,8 +184,6 @@ data class TidligsteEndringIBehandlingUtleder(
         }
     }
 }
-
-private fun List<Delvilkår>.utenVurderinger() = this.map { it.copy(vurderinger = emptyList()) }
 
 // Gamle vilkår har ikke fom/tom, så de må pakkes inn i en PeriodeWrapper for å kunne brukes som Periode<LocalDate>
 private fun Vilkår.wrapSomPeriode() =
