@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -52,6 +53,7 @@ class VilkårperiodeService(
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
     private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
     private val faktaGrunnlagService: FaktaGrunnlagService,
+    private val behandlingshistorikkService: BehandlingshistorikkService,
 ) {
     fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
         val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
@@ -76,6 +78,7 @@ class VilkårperiodeService(
     @Transactional
     fun opprettVilkårperiode(vilkårperiode: LagreVilkårperiode): Vilkårperiode {
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
+
         validerBehandling(behandling)
         validerNyPeriodeRevurdering(behandling, vilkårperiode.fom)
 
@@ -88,6 +91,8 @@ class VilkårperiodeService(
             type = vilkårperiode.type,
             kildeId = vilkårperiode.kildeId,
         )
+
+        behandlingService.markerBehandlingSomPåbegynt(behandling.id, behandling.status, behandling.steg)
 
         val fødselFaktaGrunnlag =
             faktaGrunnlagService
@@ -127,6 +132,8 @@ class VilkårperiodeService(
         validerBehandlingIdErLik(vilkårperiode.behandlingId, eksisterendeVilkårperiode.behandlingId)
         validerBehandling(behandling)
         validerKildeIdOgType(vilkårperiode, eksisterendeVilkårperiode)
+
+        behandlingService.markerBehandlingSomPåbegynt(behandling.id, behandling.status, behandling.steg)
 
         val fødselFaktaGrunnlag =
             faktaGrunnlagService
@@ -205,7 +212,10 @@ class VilkårperiodeService(
         validerAtAldersvilkårErGyldig(eksisterendeVilkårperiode, vilkårperiode, fødselFaktaGrunnlag)
 
         return vilkårperiodeRepository.update(
-            eksisterendeVilkårperiode.medNyTomOgBegrunnelse(tom = vilkårperiode.tom, begrunnelse = vilkårperiode.begrunnelse),
+            eksisterendeVilkårperiode.medNyTomOgBegrunnelse(
+                tom = vilkårperiode.tom,
+                begrunnelse = vilkårperiode.begrunnelse,
+            ),
         )
     }
 

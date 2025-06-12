@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
+import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
@@ -37,6 +38,9 @@ class SettPåVentServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var behandlingshistorikkService: BehandlingshistorikkService
+
+    @Autowired
+    lateinit var behandlingshistorikkRepository: BehandlingshistorikkRepository
 
     val behandling = behandling()
     var oppgaveId: Long? = null
@@ -91,7 +95,16 @@ class SettPåVentServiceTest : IntegrationTest() {
                     assertThat(mappeId?.getOrNull()).isEqualTo(MAPPE_ID_PÅ_VENT)
                 }
 
-                with(behandlingshistorikkService.finnSisteBehandlingshistorikk(behandling.id)) {
+                val behandlingshistorikk = behandlingshistorikkRepository.findByBehandlingIdOrderByEndretTidAsc(behandling.id)
+
+                assertThat(behandlingshistorikk).hasSize(2)
+
+                with(behandlingshistorikk[0]) {
+                    assertThat(utfall).isEqualTo(StegUtfall.UTREDNING_PÅBEGYNT)
+                    assertThat(metadata).isNull()
+                }
+
+                with(behandlingshistorikk[1]) {
                     assertThat(utfall).isEqualTo(StegUtfall.SATT_PÅ_VENT)
                     assertThat(metadata).isNotNull()
                 }

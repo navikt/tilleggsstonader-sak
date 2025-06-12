@@ -12,7 +12,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.FERDIGSTILT
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.OPPRETTET
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.SATT_PÅ_VENT
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingsjournalpostRepository
@@ -309,5 +311,21 @@ class BehandlingService(
 
     fun fjernFritekstFraBehandlingshistorikk(behandlingId: BehandlingId) {
         behandlingshistorikkService.slettFritekstMetadataVedFerdigstillelse(behandlingId)
+    }
+
+    fun markerBehandlingSomPåbegynt(
+        behandlingId: BehandlingId,
+        behandlingStatus: BehandlingStatus,
+        behandlingSteg: StegType,
+    ) {
+        if (behandlingStatus == OPPRETTET) {
+            oppdaterStatusPåBehandling(behandlingId, UTREDES)
+            behandlingshistorikkService.opprettHistorikkInnslag(
+                behandlingId = behandlingId,
+                stegtype = behandlingSteg,
+                utfall = StegUtfall.UTREDNING_PÅBEGYNT,
+                metadata = null,
+            )
+        }
     }
 }
