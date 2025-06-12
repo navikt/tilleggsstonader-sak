@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -43,9 +42,6 @@ class FagsakRepositoryTest : IntegrationTest() {
     @Autowired
     private lateinit var fagsakRepository: FagsakRepository
 
-    @Autowired
-    private lateinit var behandlingRepository: BehandlingRepository
-
     @Test
     fun `harLøpendeUtbetaling returnerer true for fagsak med ferdigstilt behandling med aktiv utbetaling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("321"))))
@@ -70,25 +66,40 @@ class FagsakRepositoryTest : IntegrationTest() {
         assertThat(harLøpendeUtbetaling).isTrue()
     }
 
-    /* TODO har ikke flere ytelser ennå
     @Test
     fun `harLøpendeUtbetaling returnerer true for fagsak med flere aktive ytelser`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("321"))))
-        val behandling = testoppsettService.lagre(
-            behandling(
-                fagsak,
-                resultat = BehandlingResultat.INNVILGET,
-                status = BehandlingStatus.FERDIGSTILT,
+        val behandling =
+            testoppsettService.lagre(
+                behandling(
+                    fagsak,
+                    resultat = BehandlingResultat.INNVILGET,
+                    status = BehandlingStatus.FERDIGSTILT,
+                ),
+            )
+        tilkjentYtelseRepository.insert(
+            tilkjentYtelse(
+                behandling.id,
+                andelTilkjentYtelse(
+                    kildeBehandlingId = behandling.id,
+                    fom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                ),
             ),
         )
-        tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, "321", osloDateNow().year))
-        tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, "321", osloDateNow().year))
+        tilkjentYtelseRepository.insert(
+            tilkjentYtelse(
+                behandling.id,
+                andelTilkjentYtelse(
+                    kildeBehandlingId = behandling.id,
+                    fom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                ),
+            ),
+        )
 
         val harLøpendeUtbetaling = fagsakRepository.harLøpendeUtbetaling(fagsak.id)
 
         assertThat(harLøpendeUtbetaling).isTrue()
     }
-     */
 
     @Test
     fun `harLøpendeUtbetaling returnerer false for fagsak med ferdigstilt behandling med inaktiv utbetaling`() {
@@ -166,23 +177,24 @@ class FagsakRepositoryTest : IntegrationTest() {
         assertThat(person.identer.map { it.ident }).contains("98765432109")
     }
 
-    /* TODO har ikke flere stønadstyper
     @Test
     internal fun `skal returnere en liste med fagsaker hvis stønadstypen ikke satt`() {
         val ident = "12345678901"
         val person = testoppsettService.opprettPerson(ident)
-        val fagsak1 = testoppsettService.lagreFagsak(
-            fagsak(
-                person = person,
-                stønadstype = Stønadstype.OVERGANGSSTØNAD,
-            ),
-        )
-        val fagsak2 = testoppsettService.lagreFagsak(
-            fagsak(
-                person = person,
-                stønadstype = Stønadstype.SKOLEPENGER,
-            ),
-        )
+        val fagsak1 =
+            testoppsettService.lagreFagsak(
+                fagsak(
+                    person = person,
+                    stønadstype = Stønadstype.BARNETILSYN,
+                ),
+            )
+        val fagsak2 =
+            testoppsettService.lagreFagsak(
+                fagsak(
+                    person = person,
+                    stønadstype = Stønadstype.LÆREMIDLER,
+                ),
+            )
         val fagsaker = fagsakRepository.findBySøkerIdent(setOf(ident))
 
         assertThat(
@@ -193,11 +205,8 @@ class FagsakRepositoryTest : IntegrationTest() {
             },
         )
 
-        assertThat(fagsaker.map { it.stønadstype }).contains(Stønadstype.SKOLEPENGER)
-        assertThat(fagsaker.map { it.stønadstype }).contains(Stønadstype.OVERGANGSSTØNAD)
         assertThat(fagsaker).containsExactlyInAnyOrder(fagsak1.tilFagsakDomain(), fagsak2.tilFagsakDomain())
     }
-     */
 
     @Test
     internal fun finnMedEksternId() {
@@ -209,21 +218,19 @@ class FagsakRepositoryTest : IntegrationTest() {
         assertThat(findByEksternId).isEqualTo(fagsak.tilFagsakDomain())
     }
 
-    /* TODO har ikke flere stønadstyper
     @Test
     internal fun `findByFagsakPersonIdAndStønadstype - skal finne fagsak`() {
         val person = testoppsettService.opprettPerson("1")
-        val overgangsstønad = testoppsettService.lagreFagsak(fagsak(person = person))
-        val barnetilsyn = testoppsettService.lagreFagsak(fagsak(person = person, stønadstype = Stønadstype.BARNETILSYN))
+        val barnetilsyn = testoppsettService.lagreFagsak(fagsak(person = person))
+        val læremidler = testoppsettService.lagreFagsak(fagsak(person = person, stønadstype = Stønadstype.LÆREMIDLER))
         testoppsettService.lagreFagsak(fagsak())
 
-        assertThat(fagsakRepository.findByFagsakPersonIdAndStønadstype(person.id, Stønadstype.OVERGANGSSTØNAD)!!.id)
-            .isEqualTo(overgangsstønad.id)
         assertThat(fagsakRepository.findByFagsakPersonIdAndStønadstype(person.id, Stønadstype.BARNETILSYN)!!.id)
             .isEqualTo(barnetilsyn.id)
-        assertThat(fagsakRepository.findByFagsakPersonIdAndStønadstype(person.id, Stønadstype.SKOLEPENGER)).isNull()
+        assertThat(fagsakRepository.findByFagsakPersonIdAndStønadstype(person.id, Stønadstype.LÆREMIDLER)!!.id)
+            .isEqualTo(læremidler.id)
+        assertThat(fagsakRepository.findByFagsakPersonIdAndStønadstype(person.id, Stønadstype.BOUTGIFTER)).isNull()
     }
-     */
 
     @Test
     internal fun `finnMedEksternId skal gi null når det ikke finnes fagsak for gitt id`() {

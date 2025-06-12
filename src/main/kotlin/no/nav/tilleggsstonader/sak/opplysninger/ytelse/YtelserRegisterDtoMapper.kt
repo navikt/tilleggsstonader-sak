@@ -14,18 +14,22 @@ object YtelserRegisterDtoMapper {
 
     fun YtelsePerioderDto.tilDto(): YtelserRegisterDto =
         YtelserRegisterDto(
-            perioder =
-                this.perioder
-                    .map {
-                        YtelsePeriodeRegisterDto(
-                            type = it.type,
-                            fom = it.fom,
-                            tom = it.tom,
-                            aapErFerdigAvklart = it.aapErFerdigAvklart,
-                            ensligForsørgerStønadstype = it.ensligForsørgerStønadstype,
-                        )
-                    }.sortedWith(sorteringTomDesc),
+            perioder = mapPerioder(),
+            perioderHentetFom = perioderHentetFom,
+            perioderHentetTom = perioderHentetTom,
             kildeResultat = kildeResultat.map { KildeResultatYtelseDto(type = it.type, resultat = it.resultat) },
             tidspunktHentet = LocalDateTime.now(),
         )
+
+    private fun YtelsePerioderDto.mapPerioder(): List<YtelsePeriodeRegisterDto> =
+        this.perioder
+            .map {
+                YtelsePeriodeRegisterDto(
+                    type = it.type,
+                    fom = it.fom,
+                    tom = it.tom,
+                    aapErFerdigAvklart = it.aapErFerdigAvklart,
+                    ensligForsørgerStønadstype = it.ensligForsørgerStønadstype,
+                )
+            }.sortedWith(sorteringTomDesc)
 }

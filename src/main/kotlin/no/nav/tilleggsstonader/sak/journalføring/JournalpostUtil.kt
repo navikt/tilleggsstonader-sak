@@ -20,7 +20,9 @@ fun Journalpost.dokumentBrevkode(): DokumentBrevkode? =
 
 fun Journalpost.brevkoder(): List<String> = dokumenter?.mapNotNull { it.brevkode } ?: emptyList()
 
-fun Journalpost.gjelderKanalSkanningEllerNavNo(): Boolean = this.kanal?.substring(0, 5) == "SKAN_" || this.kanal == "NAV_NO"
+fun Journalpost.gjelderKanalSkanningEllerNavNo(): Boolean = this.kanal?.substring(0, 5) == "SKAN_" || gjelderKanalNavNo()
+
+fun Journalpost.gjelderKanalNavNo(): Boolean = this.kanal == "NAV_NO"
 
 fun Journalpost.harStrukturertSøknad(): Boolean =
     this.dokumenter?.any {

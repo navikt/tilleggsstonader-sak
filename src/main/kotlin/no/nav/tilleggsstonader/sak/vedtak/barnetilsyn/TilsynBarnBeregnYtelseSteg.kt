@@ -3,14 +3,9 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
-import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
-import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -30,7 +25,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import org.springframework.stereotype.Service
-import java.time.DayOfWeek
 
 @Service
 class TilsynBarnBeregnYtelseSteg(
@@ -140,31 +134,7 @@ class TilsynBarnBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         beregningsresultat: BeregningsresultatTilsynBarn,
     ) {
-        val andelerTilkjentYtelse =
-            beregningsresultat.perioder.flatMap {
-                it.beløpsperioder.map { beløpsperiode ->
-                    val satstype = Satstype.DAG
-                    val ukedag = beløpsperiode.dato.dayOfWeek
-                    feilHvis(ukedag == DayOfWeek.SATURDAY || ukedag == DayOfWeek.SUNDAY) {
-                        "Skal ikke opprette perioder som begynner på en helgdag for satstype=$satstype"
-                    }
-                    val førsteDagIMåneden =
-                        beløpsperiode.dato
-                            .toYearMonth()
-                            .atDay(1)
-                            .datoEllerNesteMandagHvisLørdagEllerSøndag()
-                    AndelTilkjentYtelse(
-                        beløp = beløpsperiode.beløp,
-                        fom = beløpsperiode.dato,
-                        tom = beløpsperiode.dato,
-                        satstype = satstype,
-                        type = beløpsperiode.målgruppe.tilTypeAndel(Stønadstype.BARNETILSYN),
-                        kildeBehandlingId = saksbehandling.id,
-                        utbetalingsdato = førsteDagIMåneden,
-                    )
-                }
-            }
-
+        val andelerTilkjentYtelse = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
         tilkjentYtelseService.lagreTilkjentYtelse(saksbehandling.id, andelerTilkjentYtelse)
     }
 

@@ -14,12 +14,12 @@ val alleVedtaksstatistikkJsonConverters =
         ÅrsakerAvslagDvhReader(),
         ÅrsakerAvslagDvhWriter(),
         ÅrsakerOpphørDvhWriter(),
-        VedtaksperioderDvhV2Writer(),
-        UtbetalingerDvhV2Writer(),
+        VedtaksperioderDvhWriter(),
+        UtbetalingerDvhWriter(),
     )
 
 @WritingConverter
-private class VedtaksperioderDvhV2Writer : Converter<VedtaksperioderDvh.JsonWrapper, PGobject> {
+private class VedtaksperioderDvhWriter : Converter<VedtaksperioderDvh.JsonWrapper, PGobject> {
     override fun convert(data: VedtaksperioderDvh.JsonWrapper) =
         PGobject().apply {
             type = "json"
@@ -28,7 +28,7 @@ private class VedtaksperioderDvhV2Writer : Converter<VedtaksperioderDvh.JsonWrap
 }
 
 @WritingConverter
-private class UtbetalingerDvhV2Writer : Converter<UtbetalingerDvh.JsonWrapper, PGobject> {
+private class UtbetalingerDvhWriter : Converter<UtbetalingerDvh.JsonWrapper, PGobject> {
     override fun convert(data: UtbetalingerDvh.JsonWrapper) =
         PGobject().apply {
             type = "json"

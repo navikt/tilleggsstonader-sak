@@ -146,7 +146,6 @@ class JournalpostClient(
         dokumentInfoId: String,
         dokumentVariantformat: Dokumentvariantformat,
     ): ByteArray {
-        // TODO: kastApiFeilDersomUtviklerMedVeilederrolle() for å ikke gi tilgang til dokumenter med feil tema i prod
         val uri =
             UriComponentsBuilder
                 .fromUri(journalpostUri)

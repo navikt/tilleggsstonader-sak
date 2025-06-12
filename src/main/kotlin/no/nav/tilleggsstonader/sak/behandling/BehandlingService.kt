@@ -4,7 +4,6 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
-import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunktEllerEndretTid
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingUtil.validerKanOppretteNyBehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -30,7 +29,6 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findAllByIdOrThrow
@@ -82,12 +80,6 @@ class BehandlingService(
 
     fun hentBehandlingsjournalposter(behandlingId: BehandlingId): List<Behandlingsjournalpost> =
         behandlingsjournalpostRepository.findAllByBehandlingId(behandlingId)
-
-    fun hentBehandlingerForGjenbrukAvVilkår(fagsakPersonId: FagsakPersonId): List<Behandling> =
-        behandlingRepository
-            .finnBehandlingerForGjenbrukAvVilkår(fagsakPersonId)
-            .sortertEtterVedtakstidspunktEllerEndretTid()
-            .reversed()
 
     @Transactional
     fun opprettBehandling(
