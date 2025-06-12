@@ -170,10 +170,9 @@ data class BeregnFraUtleder(
         erEndretFunksjon: (T, T) -> Boolean,
     ): LocalDate? {
         val antallPerioder = min(perioderNå.size, perioderTidligere.size)
-        var i = 0
-        while (i < antallPerioder) {
-            val periodeNå = perioderNå[i]
-            val periodeTidligere = perioderTidligere[i]
+
+        perioderNå.take(antallPerioder).forEachIndexed { index, periodeNå ->
+            val periodeTidligere = perioderTidligere[index]
 
             if (periodeNå.fom != periodeTidligere.fom || erEndretFunksjon(periodeNå, periodeTidligere)) {
                 return minOf(periodeNå.fom, periodeTidligere.fom)
@@ -182,19 +181,15 @@ data class BeregnFraUtleder(
                 // Legger på en dag, da det først er fra dagen etter tom-datoen at det er en endring
                 return minOf(periodeNå.tom, periodeTidligere.tom).plusDays(1)
             }
-
-            i++
         }
 
-        return if (i < perioderNå.size) {
+        return when {
             // Ny periode i ny behandling
-            perioderNå[i].fom
-        } else if (i < perioderTidligere.size) {
+            perioderNå.size > antallPerioder -> perioderNå[antallPerioder].fom
             // Periode har blitt slettet i ny behandling
-            perioderTidligere[i].fom
-        } else {
+            perioderTidligere.size > antallPerioder -> perioderTidligere[antallPerioder].fom
             // Ingen endringer i perioder
-            null
+            else -> null
         }
     }
 }
