@@ -167,4 +167,6 @@ class FagsakService(
         val eksternId = eksternFagsakIdRepository.findByFagsakId(this.id)
         return this.tilFagsakMedPerson(personIdenter, eksternId)
     }
+
+    fun hentAlleFagsakIder() = fagsakRepository.findAllIds()
 }
