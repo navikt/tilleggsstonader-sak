@@ -126,8 +126,29 @@ internal class OpprettBehandlingUtilTest {
                 )
 
             assertThatThrownBy {
-                validerKanOppretteNyBehandling(BehandlingType.FØRSTEGANGSBEHANDLING, listOf(behandling))
+                validerKanOppretteNyBehandling(
+                    behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    tidligereBehandlinger = listOf(behandling),
+                    kanHaFlereBehandlingPåSammeFagsak = false,
+                )
             }.hasMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
+        }
+
+        @Test
+        fun `det skal være mulig å opprette en revurdering når det finnes en førstegangsbehandling på vent`() {
+            val behandling =
+                behandling(
+                    fagsak = fagsak,
+                    resultat = BehandlingResultat.IKKE_SATT,
+                    status = BehandlingStatus.SATT_PÅ_VENT,
+                )
+
+            // Sjekker at denne ikke kaster feil
+            validerKanOppretteNyBehandling(
+                behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
+                tidligereBehandlinger = listOf(behandling),
+                kanHaFlereBehandlingPåSammeFagsak = true,
+            )
         }
     }
 

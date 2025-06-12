@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.FØRSTEGANGSBEHANDLING
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.REVURDERING
@@ -11,7 +12,7 @@ import java.time.LocalDate
 
 object BehandlingUtil {
     fun utledBehandlingType(tidligereBehandlinger: List<Behandling>): BehandlingType =
-        if (tidligereBehandlinger.any { it.resultat != BehandlingResultat.HENLAGT }) {
+        if (tidligereBehandlinger.any { it.resultat != BehandlingResultat.HENLAGT && it.status != BehandlingStatus.SATT_PÅ_VENT }) {
             REVURDERING
         } else {
             FØRSTEGANGSBEHANDLING
