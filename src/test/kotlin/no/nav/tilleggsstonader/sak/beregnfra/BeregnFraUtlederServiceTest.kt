@@ -26,49 +26,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-private fun vilkårperioder(block: VilkårperioderBuilder.() -> Unit): Vilkårperioder = VilkårperioderBuilder().apply(block).build()
-
-private class VilkårperioderBuilder {
-    val målgrupper = mutableListOf<VilkårperiodeMålgruppe>()
-    val aktiviteter = mutableListOf<VilkårperiodeAktivitet>()
-
-    fun målgruppe(
-        fom: LocalDate,
-        tom: LocalDate,
-        resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
-    ) {
-        målgrupper += VilkårperiodeTestUtil.målgruppe(fom = fom, tom = tom, resultat = resultat)
-    }
-
-    fun aktivitet(
-        fom: LocalDate,
-        tom: LocalDate,
-        resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
-        faktaOgVurdering: AktivitetFaktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(),
-    ) {
-        aktiviteter +=
-            VilkårperiodeTestUtil.aktivitet(
-                fom = fom,
-                tom = tom,
-                resultat = resultat,
-                faktaOgVurdering = faktaOgVurdering,
-            )
-    }
-
-    fun build() = Vilkårperioder(målgrupper = målgrupper, aktiviteter = aktiviteter)
-}
-
-private fun vedtaksperiode(
-    fom: LocalDate,
-    tom: LocalDate,
-    block: (Vedtaksperiode.() -> Unit)? = null,
-): Vedtaksperiode {
-    val v =
-        vedtaksperiode(fom = fom, tom = tom)
-    block?.invoke(v)
-    return v
-}
-
 class BeregnFraUtlederServiceTest {
     private val behandlingService = mockk<BehandlingService>()
     private val vilkårService = mockk<VilkårService>()
@@ -134,7 +91,7 @@ class BeregnFraUtlederServiceTest {
     }
 
     @Test
-    fun `utled beregnFraDato, lagt på nye perioder, beregnFraDato blir fom-dato på ny periode`() {
+    fun `utled beregnFraDato, lagt på nye perioder, data hentes ut fra servicer og beregnFraDato blir fom-dato på ny periode`() {
         val nyttFom = originalTom.plusDays(1)
         val nyttTom = originalTom.plusMonths(1)
         val nyttVilkår =
@@ -159,124 +116,47 @@ class BeregnFraUtlederServiceTest {
 
         assertThat(result).isEqualTo(nyttVilkår.fom)
     }
+}
 
-    @Test
-    fun `utled beregnFraDato, målgruppe endret, beregnFraDato blir startdato på endret målgruppe`() {
-        vilkår = vilkårSisteIverksatteBehandling
-        vilkårperioder =
-            vilkårperioder {
-                målgruppe(originalFom, originalTom, resultat = ResultatVilkårperiode.IKKE_OPPFYLT)
-                aktivitet(originalFom, originalTom)
-            }
-        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
+private fun vilkårperioder(block: VilkårperioderBuilder.() -> Unit): Vilkårperioder = VilkårperioderBuilder().apply(block).build()
 
-        val result = utledBeregnFraDatoService.utledBeregnFraDato(behandling.id)
+private class VilkårperioderBuilder {
+    val målgrupper = mutableListOf<VilkårperiodeMålgruppe>()
+    val aktiviteter = mutableListOf<VilkårperiodeAktivitet>()
 
-        assertThat(result).isEqualTo(vilkårperioder.målgrupper.single().fom)
+    fun målgruppe(
+        fom: LocalDate,
+        tom: LocalDate,
+        resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
+    ) {
+        målgrupper += VilkårperiodeTestUtil.målgruppe(fom = fom, tom = tom, resultat = resultat)
     }
 
-    @Test
-    fun `utled beregnFraDato, aktivitet endret, beregnFraDato blir startdato på endret målgruppe`() {
-        vilkår = vilkårSisteIverksatteBehandling
-        vilkårperioder =
-            vilkårperioder {
-                målgruppe(originalFom, originalTom)
-                aktivitet(originalFom, originalTom, resultat = ResultatVilkårperiode.IKKE_OPPFYLT)
-            }
-        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
-
-        val result = utledBeregnFraDatoService.utledBeregnFraDato(behandling.id)
-
-        assertThat(result).isEqualTo(vilkårperioder.aktiviteter.single().fom)
-    }
-
-    @Test
-    fun `utled beregnFraDato, vilkår-fom endret, beregnFraDato blir startdato på originalt vilkår`() {
-        vilkår =
-            listOf(
-                vilkår(
-                    behandlingId = sisteIverksatteBehandling.id,
-                    type = VilkårType.UTGIFTER_OVERNATTING,
-                    fom = originalFom.plusWeeks(1),
-                    tom = originalTom,
-                ),
+    fun aktivitet(
+        fom: LocalDate,
+        tom: LocalDate,
+        resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
+        faktaOgVurdering: AktivitetFaktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(),
+    ) {
+        aktiviteter +=
+            VilkårperiodeTestUtil.aktivitet(
+                fom = fom,
+                tom = tom,
+                resultat = resultat,
+                faktaOgVurdering = faktaOgVurdering,
             )
-        vilkårperioder =
-            vilkårperioder {
-                målgruppe(originalFom, originalTom)
-                aktivitet(originalFom, originalTom)
-            }
-        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
-
-        val result = utledBeregnFraDatoService.utledBeregnFraDato(behandling.id)
-
-        assertThat(result).isEqualTo(vilkårSisteIverksatteBehandling.single().fom)
     }
 
-    @Test
-    fun `utled beregnFraDato, vedtaksperiode splittet i to, beregnFraDato blir første dato etter korteste vedtaksperiode`() {
-        val endringsdato = originalFom.plusWeeks(1)
-        vilkår = vilkårSisteIverksatteBehandling
-        vilkårperioder = vilkårperioderSisteIverksattBehandling
-        vedtaksperioder =
-            listOf(
-                vedtaksperiode(endringsdato, originalTom),
-                vedtaksperiode(originalFom, endringsdato.minusDays(1)),
-            )
+    fun build() = Vilkårperioder(målgrupper = målgrupper, aktiviteter = aktiviteter)
+}
 
-        val result = utledBeregnFraDatoService.utledBeregnFraDato(behandling.id)
-
-        assertThat(result).isEqualTo(endringsdato)
-    }
-
-    @Test
-    fun `utled beregnFraDato, tiltak og vedtaksperiode blir forelenget, beregnFraDato blir første dato etter gammel tom`() {
-        val nyttTom = LocalDate.now().plusMonths(1)
-
-        vilkår =
-            listOf(
-                vilkår(
-                    behandlingId = sisteIverksatteBehandling.id,
-                    type = VilkårType.UTGIFTER_OVERNATTING,
-                    fom = originalFom,
-                    tom = nyttTom,
-                ),
-            )
-        vilkårperioder =
-            vilkårperioder {
-                målgruppe(originalFom, nyttTom)
-                aktivitet(originalFom, nyttTom)
-            }
-        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
-
-        val result = utledBeregnFraDatoService.utledBeregnFraDato(behandling.id)
-
-        assertThat(result).isEqualTo(originalTom.plusDays(1))
-    }
-
-    @Test
-    fun `utled beregnFraDato, gammelt tiltak endret og lagt til nytt tiltak, beregnFraDato blir startdato på gammelt tiltakt`() {
-        val nyttTom = LocalDate.now().plusMonths(1)
-
-        vilkår =
-            listOf(
-                vilkår(
-                    behandlingId = sisteIverksatteBehandling.id,
-                    type = VilkårType.UTGIFTER_OVERNATTING,
-                    fom = originalFom,
-                    tom = nyttTom,
-                ),
-            )
-        vilkårperioder =
-            vilkårperioder {
-                målgruppe(originalFom, nyttTom)
-                aktivitet(originalFom, originalTom, faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(aktivitetsdager = 2))
-                aktivitet(originalTom.plusDays(1), nyttTom)
-            }
-        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling.map { it.copy(tom = nyttTom) }
-
-        val result = utledBeregnFraDatoService.utledBeregnFraDato(behandling.id)
-
-        assertThat(result).isEqualTo(originalFom)
-    }
+private fun vedtaksperiode(
+    fom: LocalDate,
+    tom: LocalDate,
+    block: (Vedtaksperiode.() -> Unit)? = null,
+): Vedtaksperiode {
+    val v =
+        vedtaksperiode(fom = fom, tom = tom)
+    block?.invoke(v)
+    return v
 }
