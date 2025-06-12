@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.FERDIGSTILT
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.OPPRETTET
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.SATT_PÅ_VENT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -321,11 +322,11 @@ class BehandlingService(
         behandlingStatus: BehandlingStatus,
         behandlingSteg: StegType,
     ) {
-        if (behandlingStatus !== UTREDES && behandlingSteg == StegType.INNGANGSVILKÅR) {
+        if (behandlingStatus == OPPRETTET) {
             oppdaterStatusPåBehandling(behandlingId, UTREDES)
             behandlingshistorikkService.opprettHistorikkInnslag(
                 behandlingId = behandlingId,
-                stegtype = StegType.INNGANGSVILKÅR,
+                stegtype = behandlingSteg,
                 utfall = StegUtfall.UTREDNING_PÅBEGYNT,
                 metadata = null,
             )
