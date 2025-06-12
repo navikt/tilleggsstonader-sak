@@ -29,10 +29,5 @@ class InngangsvilkårSteg(
         )
     }
 
-    /**
-     * håndteres av [BehandlingService.markerBehandlingSomPåbegynt]
-     */
-    override fun settInnHistorikk() = false
-
     override fun stegType(): StegType = StegType.INNGANGSVILKÅR
 }
