@@ -36,11 +36,10 @@ class UtledBeregnFraDatoService(
 
         val vilkår = vilkårService.hentVilkår(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
+        val vedtaksperioder = vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, null)
 
         val vilkårTidligereBehandling = vilkårService.hentVilkår(sisteIverksatteBehandling.id)
         val vilkårsperioderTidligereBehandling = vilkårperiodeService.hentVilkårperioder(sisteIverksatteBehandling.id)
-
-        val vedtaksperioder = vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, null)
         val vedtaksperioderTidligereBehandling = vedtaksperiodeService.finnVedtaksperioderForBehandling(sisteIverksatteBehandling.id, null)
 
         val barnIder = barnService.finnBarnPåBehandling(behandlingId)
@@ -112,14 +111,14 @@ data class BeregnFraUtleder(
         utledEndringIPeriode(
             perioderNå = vilkårsperioder.aktiviteter.fjernSlettede().sortedWith(vilkårsperioderComparator),
             perioderTidligere = vilkårsperioderTidligereBehandling.aktiviteter.fjernSlettede().sortedWith(vilkårsperioderComparator),
-            erEndretFunksjon = ::erMålgruppeEllerAktivitetEndret,
+            erEndret = ::erMålgruppeEllerAktivitetEndret,
         )
 
     private fun utledTidligsteEndringForMålgrupper(): LocalDate? =
         utledEndringIPeriode(
             perioderNå = vilkårsperioder.målgrupper.fjernSlettede().sortedWith(vilkårsperioderComparator),
             perioderTidligere = vilkårsperioderTidligereBehandling.målgrupper.fjernSlettede().sortedWith(vilkårsperioderComparator),
-            erEndretFunksjon = ::erMålgruppeEllerAktivitetEndret,
+            erEndret = ::erMålgruppeEllerAktivitetEndret,
         )
 
     private fun List<GeneriskVilkårperiode<*>>.fjernSlettede() = this.filterNot { it.status == Vilkårstatus.SLETTET }
@@ -128,7 +127,7 @@ data class BeregnFraUtleder(
         utledEndringIPeriode(
             perioderNå = vedtaksperioder.sorted(),
             perioderTidligere = vedtaksperioderTidligereBehandling.sorted(),
-            erEndretFunksjon = ::erVedtaksperiodeEndret,
+            erEndret = ::erVedtaksperiodeEndret,
         )
 
     private fun erVilkårEndret(
@@ -167,14 +166,14 @@ data class BeregnFraUtleder(
     private fun <T : Periode<LocalDate>> utledEndringIPeriode(
         perioderNå: List<T>,
         perioderTidligere: List<T>,
-        erEndretFunksjon: (T, T) -> Boolean,
+        erEndret: (T, T) -> Boolean,
     ): LocalDate? {
         val antallPerioder = min(perioderNå.size, perioderTidligere.size)
 
         perioderNå.take(antallPerioder).forEachIndexed { index, periodeNå ->
             val periodeTidligere = perioderTidligere[index]
 
-            if (periodeNå.fom != periodeTidligere.fom || erEndretFunksjon(periodeNå, periodeTidligere)) {
+            if (periodeNå.fom != periodeTidligere.fom || erEndret(periodeNå, periodeTidligere)) {
                 return minOf(periodeNå.fom, periodeTidligere.fom)
             }
             if (periodeNå.tom != periodeTidligere.tom) {
