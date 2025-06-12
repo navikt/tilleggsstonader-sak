@@ -19,13 +19,18 @@ object OpprettBehandlingUtil {
     fun validerKanOppretteNyBehandling(
         behandlingType: BehandlingType,
         tidligereBehandlinger: List<Behandling>,
+        kanHaFlereBehandlingPåSammeFagsak: Boolean = false,
     ) {
         val sisteBehandling =
             tidligereBehandlinger
                 .filter { it.resultat != BehandlingResultat.HENLAGT }
                 .sisteFerdigstilteBehandling()
 
-        validerTidligereBehandlingerErFerdigstilte(tidligereBehandlinger)
+        if (kanHaFlereBehandlingPåSammeFagsak) {
+            validerTidligereBehandlingerErFerdigstilteEllerPåVent(tidligereBehandlinger)
+        } else {
+            validerTidligereBehandlingerErFerdigstilte(tidligereBehandlinger)
+        }
 
         when (behandlingType) {
             FØRSTEGANGSBEHANDLING -> validerKanOppretteFørstegangsbehandling(sisteBehandling)
@@ -41,6 +46,19 @@ object OpprettBehandlingUtil {
             "Kan ikke opprette ny behandling når det finnes en førstegangsbehandling på vent"
         }
     }
+
+    private fun validerTidligereBehandlingerErFerdigstilteEllerPåVent(tidligereBehandlinger: List<Behandling>) {
+        brukerfeilHvis(tidligereBehandlinger.any { erUnderBehandling(it) }) {
+            "Det finnes en behandling på fagsaken som hverken er ferdigstilt eller satt på vent"
+        }
+
+        feilHvis(tidligereBehandlinger.any { it.type == FØRSTEGANGSBEHANDLING && it.status == BehandlingStatus.SATT_PÅ_VENT }) {
+            "Kan ikke opprette ny behandling når det finnes en førstegangsbehandling på vent"
+        }
+    }
+
+    private fun erUnderBehandling(behandling: Behandling): Boolean =
+        behandling.status != BehandlingStatus.FERDIGSTILT && behandling.status != BehandlingStatus.SATT_PÅ_VENT
 
     private fun validerKanOppretteFørstegangsbehandling(sisteBehandling: Behandling?) {
         if (sisteBehandling == null) return

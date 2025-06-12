@@ -101,7 +101,11 @@ class BehandlingService(
         val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
         val behandlingType = utledBehandlingType(tidligereBehandlinger)
 
-        validerKanOppretteNyBehandling(behandlingType, tidligereBehandlinger)
+        validerKanOppretteNyBehandling(
+            behandlingType = behandlingType,
+            tidligereBehandlinger = tidligereBehandlinger,
+            kanHaFlereBehandlingPåSammeFagsak = unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK),
+        )
 
         val behandling =
             behandlingRepository.insert(
