@@ -213,7 +213,7 @@ class OppfølgingOpprettKontrollerService(
             TypeYtelsePeriode.DAGPENGER -> MålgruppeType.DAGPENGER
             TypeYtelsePeriode.ENSLIG_FORSØRGER -> MålgruppeType.OVERGANGSSTØNAD
             TypeYtelsePeriode.OMSTILLINGSSTØNAD -> MålgruppeType.OMSTILLINGSSTØNAD
-            TypeYtelsePeriode.TILTAKSPENGER -> TODO()
+            TypeYtelsePeriode.TILTAKSPENGER -> MålgruppeType.TILTAKSPENGER
         }
 
     private fun MålgruppeType.tilTypeYtelsePeriode() =
@@ -223,6 +223,7 @@ class OppfølgingOpprettKontrollerService(
             MålgruppeType.OMSTILLINGSSTØNAD -> TypeYtelsePeriode.OMSTILLINGSSTØNAD
             MålgruppeType.OVERGANGSSTØNAD -> TypeYtelsePeriode.ENSLIG_FORSØRGER
 
+            MålgruppeType.TILTAKSPENGER,
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
             MålgruppeType.UFØRETRYGD,
             MålgruppeType.SYKEPENGER_100_PROSENT,

@@ -297,6 +297,7 @@ private fun mapMålgruppeBarnetilsyn(
         }
 
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
+        MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
     }
 
 private fun mapMålgruppeLæremidler(
@@ -355,6 +356,7 @@ private fun mapMålgruppeLæremidler(
         }
 
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
+        MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
     }
 
 private fun mapMålgruppeBoutgfiter(
@@ -417,4 +419,5 @@ private fun mapMålgruppeBoutgfiter(
 
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for boutgifter")
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
+        MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
     }
