@@ -183,7 +183,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
             )
-        }.hasMessageContaining("Vi støtter foreløpig ikke at utgifter krysser ulike utbetalingsperioder")
+        }.hasMessageContaining("Utgiftsperioder krysser beregningsperioder")
     }
 
     @Test
