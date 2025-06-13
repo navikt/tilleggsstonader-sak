@@ -206,19 +206,22 @@ private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtb
         }
 
     brukerfeilHvis(detFinnesUtgiftSomKrysserUtbetalingsperioder) {
-        """
-        Utgiftsperioder krysser beregningsperioder
-        
-        ${lagPunktlisteMedOverlappendeUtgifterOgBeregningsperioder(utgifterTilOvernatting, utbetalingsperioder)}
-        
-        Utgiftsperioden(e) må splittes.
-        """.trim().fjernInnrykk()
+        buildString {
+            appendLine("Utgiftsperioder krysser beregningsperioder")
+            appendLine()
+            appendLine(
+                lagPunktlisteMedOverlappendeUtgifterOgBeregningsperioder(
+                    utgifter = utgifterTilOvernatting,
+                    utbetalingsperioder = utbetalingsperioder,
+                ),
+            )
+            appendLine()
+            appendLine("Utgiftsperioden(e) må splittes.")
+        }
     }
 
     return this
 }
-
-private fun String.fjernInnrykk(): String = this.replace(Regex(" {2,}"), "")
 
 private fun UtgiftBeregningBoutgifter.finnOverlappendeUtbetalingsperioder(
     utbetalingsperioder: List<UtbetalingPeriode>,
