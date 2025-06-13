@@ -13,7 +13,7 @@ import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelse as innvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse as innvilgelseLæremidler
 
-class VedtaksperioderDvhV2Test {
+class VedtaksperioderDvhTest {
     val fom: LocalDate = LocalDate.of(2025, 1, 1)
     val tom: LocalDate = LocalDate.of(2025, 1, 31)
 

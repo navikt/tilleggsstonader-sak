@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -30,7 +31,7 @@ object AldersvilkårVurdering {
         vilkårperiode: LagreVilkårperiode,
     ): Boolean {
         val attenårsdagenTilBruker = fødselsdato.plusYears(18)
-        feilHvis((vilkårperiode.fom <= attenårsdagenTilBruker) && (attenårsdagenTilBruker <= vilkårperiode.tom)) {
+        brukerfeilHvis((vilkårperiode.fom <= attenårsdagenTilBruker) && (attenårsdagenTilBruker <= vilkårperiode.tom)) {
             "Brukeren fyller 18 år i løpet av vilkårsperioden"
         }
         return attenårsdagenTilBruker < vilkårperiode.fom
@@ -41,7 +42,7 @@ object AldersvilkårVurdering {
         vilkårperiode: LagreVilkårperiode,
     ): Boolean {
         val sekstisyvÅrsDagenTilBruker = fødselsdato.plusYears(67)
-        feilHvis((vilkårperiode.fom <= sekstisyvÅrsDagenTilBruker) && (sekstisyvÅrsDagenTilBruker <= vilkårperiode.tom)) {
+        brukerfeilHvis((vilkårperiode.fom <= sekstisyvÅrsDagenTilBruker) && (sekstisyvÅrsDagenTilBruker <= vilkårperiode.tom)) {
             "Brukeren fyller 67 år i løpet av vilkårsperioden"
         }
         return vilkårperiode.tom < sekstisyvÅrsDagenTilBruker

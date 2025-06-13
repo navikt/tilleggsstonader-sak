@@ -24,7 +24,6 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
@@ -77,6 +76,7 @@ internal class HåndterSøknadServiceTest {
             dokumenter = listOf(DokumentInfo("", brevkode = "1")),
             bruker = Bruker(personIdent, BrukerIdType.FNR),
             journalforendeEnhet = "123",
+            kanal = "NAV_NO",
         )
 
     val taskSlot = slot<Task>()
@@ -105,7 +105,6 @@ internal class HåndterSøknadServiceTest {
         every { barnService.opprettBarn(any()) } returns mockk()
         every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent(aktørId, false, "AKTOERID")))
         every { taskService.save(capture(taskSlot)) } returns mockk()
-        every { behandlingService.utledNesteBehandlingstype(fagsak.id) } returns BehandlingType.FØRSTEGANGSBEHANDLING
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
     }
 
@@ -113,7 +112,7 @@ internal class HåndterSøknadServiceTest {
     internal fun `kan ikke opprette behandling hvis det eksisterer en åpen behandling i ny løsning`() {
         every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(behandling(status = BehandlingStatus.UTREDES))
         val kanOppretteBehandling =
-            håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
+            håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN, journalpost)
         assertThat(kanOppretteBehandling).isFalse
     }
 
@@ -121,7 +120,7 @@ internal class HåndterSøknadServiceTest {
     internal fun `kan opprette behandling hvis det ikke finnes innslag i ny løsning`() {
         every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf()
         val kanOppretteBehandling =
-            håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
+            håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN, journalpost)
         assertThat(kanOppretteBehandling).isTrue
     }
 
@@ -135,7 +134,7 @@ internal class HåndterSøknadServiceTest {
                 ),
             )
         val kanOppretteBehandling =
-            håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
+            håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN, journalpost)
         assertThat(kanOppretteBehandling).isTrue
     }
 
@@ -150,15 +149,36 @@ internal class HåndterSøknadServiceTest {
                 behandling(resultat = BehandlingResultat.AVSLÅTT, status = BehandlingStatus.FERDIGSTILT),
             )
         val kanOppretteBehandling =
-            håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
+            håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN, journalpost)
         assertThat(kanOppretteBehandling).isTrue
+    }
+
+    @Test
+    fun `kan ikke automatisk journalføre hvis kanal er skanning`() {
+        val journalpostSkanning = journalpost.copy(kanal = "SKAN_IM")
+        val kanOppretteBehandling =
+            håndterSøknadService.kanAutomatiskJournalføre(
+                personIdent,
+                Stønadstype.BARNETILSYN,
+                journalpostSkanning,
+            )
+        assertThat(kanOppretteBehandling).isFalse
     }
 
     @Test
     internal fun `skal kunne automatisk journalføre`() {
         every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
 
-        justRun { journalføringService.journalførTilNyBehandling(journalpost, personIdent, Stønadstype.BARNETILSYN, any(), any(), any()) }
+        justRun {
+            journalføringService.journalførTilNyBehandling(
+                journalpost,
+                personIdent,
+                Stønadstype.BARNETILSYN,
+                any(),
+                any(),
+                any(),
+            )
+        }
 
         håndterSøknadService.håndterSøknad(
             HåndterSøknadRequest(
@@ -196,6 +216,5 @@ internal class HåndterSøknadServiceTest {
         val payload = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(taskSlot.captured.payload)
         assertThat(payload.oppgave.journalpostId).isEqualTo(journalpostId)
         assertThat(payload.oppgave.oppgavetype).isEqualTo(Oppgavetype.Journalføring)
-        assertThat(payload.oppgave.enhetsnummer).isEqualTo("123")
     }
 }

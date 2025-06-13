@@ -26,6 +26,7 @@ class YtelseService(
         val typer =
             listOf(
                 TypeYtelsePeriode.AAP,
+                TypeYtelsePeriode.DAGPENGER,
                 TypeYtelsePeriode.ENSLIG_FORSØRGER,
                 TypeYtelsePeriode.OMSTILLINGSSTØNAD,
                 TypeYtelsePeriode.TILTAKSPENGER,

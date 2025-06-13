@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
@@ -23,15 +22,12 @@ class InngangsvilkårSteg(
         saksbehandling: Saksbehandling,
         data: Void?,
     ) {
-        if (saksbehandling.status != BehandlingStatus.UTREDES) {
-            behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.UTREDES)
-        }
+        behandlingService.markerBehandlingSomPåbegynt(
+            behandlingId = saksbehandling.id,
+            saksbehandling.status,
+            saksbehandling.steg,
+        )
     }
-
-    /**
-     * håndteres av [BehandlingService.oppdaterStatusPåBehandling]
-     */
-    override fun settInnHistorikk() = false
 
     override fun stegType(): StegType = StegType.INNGANGSVILKÅR
 }

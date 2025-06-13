@@ -5,13 +5,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
@@ -26,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.VedtaksperiodeStatusMapper.settStatusPåVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.avkortVedtaksperiodeVedOpphør
@@ -36,7 +30,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequ
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class LæremidlerBeregnYtelseSteg(
@@ -73,7 +66,8 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
     ) {
-        val forrigeVedtaksperioder = saksbehandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it).data.vedtaksperioder }
+        val forrigeVedtaksperioder =
+            saksbehandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it).data.vedtaksperioder }
         val vedtaksperioderMedStatus =
             settStatusPåVedtaksperioder(
                 vedtaksperioder = vedtaksperioder,
@@ -173,49 +167,9 @@ class LæremidlerBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         beregningsresultat: BeregningsresultatLæremidler,
     ) {
-        val andeler =
-            beregningsresultat.perioder
-                .groupBy { it.grunnlag.utbetalingsdato }
-                .entries
-                .sortedBy { (utbetalingsdato, _) -> utbetalingsdato }
-                .flatMap { (utbetalingsdato, perioder) ->
-                    val førstePerioden = perioder.first()
-                    val satsBekreftet = førstePerioden.grunnlag.satsBekreftet
-
-                    feilHvisIkke(perioder.all { it.grunnlag.satsBekreftet == satsBekreftet }) {
-                        "Alle perioder for et utbetalingsdato må være bekreftet eller ikke bekreftet"
-                    }
-
-                    mapTilAndeler(perioder, saksbehandling, utbetalingsdato, satsBekreftet)
-                }
+        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling.id)
         tilkjentYtelseService.lagreTilkjentYtelse(saksbehandling.id, andeler)
     }
-
-    /**
-     * Andeler grupperes per [TypeAndel], sånn at hvis man har 2 ulike målgrupper men som er av samme [TypeAndel]
-     * så summeres beløpet sammen for disse 2 andelene
-     * Hvis man har 2 [BeregningsresultatForMåned] med med 2 ulike [TypeAndel]
-     * så blir det mappet til ulike andeler for at regnskapet i økonomi skal få riktig type for gitt utbetalingsmåned
-     */
-    private fun mapTilAndeler(
-        perioder: List<BeregningsresultatForMåned>,
-        saksbehandling: Saksbehandling,
-        utbetalingsdato: LocalDate,
-        satsBekreftet: Boolean,
-    ) = perioder
-        .groupBy { it.grunnlag.målgruppe.tilTypeAndel(Stønadstype.LÆREMIDLER) }
-        .map { (typeAndel, perioder) ->
-            AndelTilkjentYtelse(
-                beløp = perioder.sumOf { it.beløp },
-                fom = utbetalingsdato,
-                tom = utbetalingsdato,
-                satstype = Satstype.DAG,
-                type = typeAndel,
-                kildeBehandlingId = saksbehandling.id,
-                statusIverksetting = StatusIverksetting.fraSatsBekreftet(satsBekreftet),
-                utbetalingsdato = utbetalingsdato,
-            )
-        }
 
     private fun lagInnvilgetVedtak(
         behandlingId: BehandlingId,

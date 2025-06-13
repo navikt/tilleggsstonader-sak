@@ -9,6 +9,8 @@ import java.time.LocalDateTime
 data class YtelserRegisterDto(
     val perioder: List<YtelsePeriodeRegisterDto>,
     val kildeResultat: List<KildeResultatYtelseDto>,
+    val perioderHentetFom: LocalDate,
+    val perioderHentetTom: LocalDate,
     val tidspunktHentet: LocalDateTime,
 )
 

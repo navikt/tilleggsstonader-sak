@@ -210,16 +210,16 @@ class OppfølgingOpprettKontrollerService(
     private fun TypeYtelsePeriode.tilMålgruppe() =
         when (this) {
             TypeYtelsePeriode.AAP -> MålgruppeType.AAP
+            TypeYtelsePeriode.DAGPENGER -> MålgruppeType.DAGPENGER
             TypeYtelsePeriode.ENSLIG_FORSØRGER -> MålgruppeType.OVERGANGSSTØNAD
             TypeYtelsePeriode.OMSTILLINGSSTØNAD -> MålgruppeType.OMSTILLINGSSTØNAD
             TypeYtelsePeriode.TILTAKSPENGER -> MålgruppeType.TILTAKSPENGER
-            TypeYtelsePeriode.DAGPENGER -> TODO()
         }
 
     private fun MålgruppeType.tilTypeYtelsePeriode() =
         when (this) {
             MålgruppeType.AAP -> TypeYtelsePeriode.AAP
-            MålgruppeType.DAGPENGER -> TODO("Har ikke mapping for dagpenger ennå")
+            MålgruppeType.DAGPENGER -> TypeYtelsePeriode.DAGPENGER
             MålgruppeType.OMSTILLINGSSTØNAD -> TypeYtelsePeriode.OMSTILLINGSSTØNAD
             MålgruppeType.OVERGANGSSTØNAD -> TypeYtelsePeriode.ENSLIG_FORSØRGER
             MålgruppeType.TILTAKSPENGER -> TypeYtelsePeriode.TILTAKSPENGER

@@ -19,20 +19,26 @@ object OpprettBehandlingUtil {
     fun validerKanOppretteNyBehandling(
         behandlingType: BehandlingType,
         tidligereBehandlinger: List<Behandling>,
+        kanHaFlereBehandlingPåSammeFagsak: Boolean = false,
     ) {
-        val sisteBehandling =
+        val sisteFerdigstilteBehandling =
             tidligereBehandlinger
                 .filter { it.resultat != BehandlingResultat.HENLAGT }
                 .sisteFerdigstilteBehandling()
 
-        validerTidligereBehandlingerErFerdigstilte(tidligereBehandlinger)
+        if (kanHaFlereBehandlingPåSammeFagsak) {
+            validerTidligereBehandlingerErFerdigstilteEllerPåVent(tidligereBehandlinger)
+        } else {
+            validerTidligereBehandlingerErFerdigstilte(tidligereBehandlinger)
+        }
 
         when (behandlingType) {
-            FØRSTEGANGSBEHANDLING -> validerKanOppretteFørstegangsbehandling(sisteBehandling)
-            REVURDERING -> validerKanOppretteRevurdering(sisteBehandling)
+            FØRSTEGANGSBEHANDLING -> validerKanOppretteFørstegangsbehandling(sisteFerdigstilteBehandling)
+            REVURDERING -> validerKanOppretteRevurdering(sisteFerdigstilteBehandling)
         }
     }
 
+    // TODO: Slett når snike i køen er implementert
     private fun validerTidligereBehandlingerErFerdigstilte(tidligereBehandlinger: List<Behandling>) {
         if (tidligereBehandlinger.any { it.status != BehandlingStatus.FERDIGSTILT }) {
             throw ApiFeil("Det finnes en behandling på fagsaken som ikke er ferdigstilt", HttpStatus.BAD_REQUEST)
@@ -42,18 +48,27 @@ object OpprettBehandlingUtil {
         }
     }
 
-    private fun validerKanOppretteFørstegangsbehandling(sisteBehandling: Behandling?) {
-        if (sisteBehandling == null) return
-        brukerfeilHvis(sisteBehandling.type != FØRSTEGANGSBEHANDLING) {
+    private fun validerTidligereBehandlingerErFerdigstilteEllerPåVent(tidligereBehandlinger: List<Behandling>) {
+        brukerfeilHvis(tidligereBehandlinger.any { erAktivBehandling(it) }) {
+            "Det finnes en behandling på fagsaken som hverken er ferdigstilt eller satt på vent"
+        }
+    }
+
+    private fun erAktivBehandling(behandling: Behandling): Boolean =
+        behandling.status != BehandlingStatus.FERDIGSTILT && behandling.status != BehandlingStatus.SATT_PÅ_VENT
+
+    private fun validerKanOppretteFørstegangsbehandling(sisteFerdigstilteBehandling: Behandling?) {
+        if (sisteFerdigstilteBehandling == null) return
+        brukerfeilHvis(sisteFerdigstilteBehandling.type != FØRSTEGANGSBEHANDLING) {
             "Kan ikke opprette en førstegangsbehandling når forrige behandling ikke er en førstegangsbehandling"
         }
-        brukerfeilHvis(sisteBehandling.resultat != BehandlingResultat.HENLAGT) {
+        brukerfeilHvis(sisteFerdigstilteBehandling.resultat != BehandlingResultat.HENLAGT) {
             "Kan ikke opprette en førstegangsbehandling når siste behandling ikke er henlagt"
         }
     }
 
-    private fun validerKanOppretteRevurdering(sisteBehandling: Behandling?) {
-        if (sisteBehandling == null) {
+    private fun validerKanOppretteRevurdering(sisteFerdigstilteBehandling: Behandling?) {
+        if (sisteFerdigstilteBehandling == null) {
             throw ApiFeil("Det finnes ikke en tidligere behandling på fagsaken", HttpStatus.BAD_REQUEST)
         }
     }

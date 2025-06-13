@@ -63,7 +63,7 @@ class VedtaksstatistikkRepositoryV2Test : IntegrationTest() {
             behandlingType = BehandlingTypeDvh.FØRSTEGANGSBEHANDLING,
             behandlingÅrsak = BehandlingÅrsakDvh.MANUELT_OPPRETTET,
             vedtakResultat = VedtakResultatDvh.INNVILGET,
-            vedtaksperioder = vedtaksperioderDvhV2JsonWrapper(),
+            vedtaksperioder = vedtaksperioderDvhJsonWrapper(),
             utbetalinger = utbetalinger(),
             stønadstype = StønadstypeDvh.BARNETILSYN,
             årsakerAvslag = ÅrsakAvslagDvh.JsonWrapper(listOf(ÅrsakAvslagDvh.INGEN_AKTIVITET)),
@@ -72,7 +72,7 @@ class VedtaksstatistikkRepositoryV2Test : IntegrationTest() {
             endretTid = LocalDateTime.of(2024, Month.FEBRUARY, 7, 20, 30),
         )
 
-    private fun vedtaksperioderDvhV2JsonWrapper(): VedtaksperioderDvh.JsonWrapper =
+    private fun vedtaksperioderDvhJsonWrapper(): VedtaksperioderDvh.JsonWrapper =
         VedtaksperioderDvh.JsonWrapper(
             vedtaksperioder =
                 listOf(

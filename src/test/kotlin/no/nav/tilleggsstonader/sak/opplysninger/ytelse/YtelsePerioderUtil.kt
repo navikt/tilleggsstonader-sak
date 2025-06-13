@@ -11,7 +11,13 @@ object YtelsePerioderUtil {
     fun ytelsePerioderDto(
         perioder: List<YtelsePeriode> = listOf(periodeAAP(), periodeEnsligForsørger()),
         kildeResultat: List<KildeResultatYtelse> = listOf(kildeResultatAAP(), kildeResultatEnsligForsørger()),
-    ): YtelsePerioderDto = YtelsePerioderDto(perioder = perioder, kildeResultat = kildeResultat)
+    ): YtelsePerioderDto =
+        YtelsePerioderDto(
+            perioder = perioder,
+            kildeResultat = kildeResultat,
+            perioderHentetFom = LocalDate.now(),
+            perioderHentetTom = LocalDate.now(),
+        )
 
     fun kildeResultatAAP(resultat: ResultatKilde = ResultatKilde.OK) =
         KildeResultatYtelse(type = TypeYtelsePeriode.AAP, resultat = resultat)

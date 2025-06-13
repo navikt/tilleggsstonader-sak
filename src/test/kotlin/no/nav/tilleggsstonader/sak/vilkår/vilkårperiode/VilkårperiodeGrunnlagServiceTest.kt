@@ -4,7 +4,6 @@ import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
-import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -17,6 +16,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.RegisterAktivitetClientCo
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
@@ -152,7 +152,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         every {
             ytelseClient.hentYtelser(any())
         } returns
-            YtelsePerioderDto(
+            ytelsePerioderDto(
                 perioder =
                     listOf(
                         YtelsePeriode(TypeYtelsePeriode.AAP, LocalDate.now(), LocalDate.now(), aapErFerdigAvklart = false),
@@ -195,7 +195,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         every {
             ytelseClient.hentYtelser(any())
         } returns
-            YtelsePerioderDto(
+            ytelsePerioderDto(
                 perioder =
                     listOf(
                         YtelsePeriode(TypeYtelsePeriode.AAP, LocalDate.now(), LocalDate.now(), aapErFerdigAvklart = false),

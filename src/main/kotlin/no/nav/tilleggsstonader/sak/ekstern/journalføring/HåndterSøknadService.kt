@@ -12,10 +12,12 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
+import no.nav.tilleggsstonader.sak.journalføring.gjelderKanalNavNo
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -28,6 +30,8 @@ class HåndterSøknadService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     @Transactional
     fun håndterSøknad(request: HåndterSøknadRequest) {
         val personIdent = request.personIdent
@@ -51,7 +55,7 @@ class HåndterSøknadService(
         stønadstype: Stønadstype,
         journalpost: Journalpost,
     ) {
-        if (kanAutomatiskJournalføre(personIdent, stønadstype)) {
+        if (kanAutomatiskJournalføre(personIdent, stønadstype, journalpost)) {
             journalføringService.journalførTilNyBehandling(
                 journalpost = journalpost,
                 personIdent = personIdent,
@@ -72,7 +76,12 @@ class HåndterSøknadService(
     fun kanAutomatiskJournalføre(
         personIdent: String,
         stønadstype: Stønadstype,
+        journalpost: Journalpost,
     ): Boolean {
+        if (!journalpost.gjelderKanalNavNo()) {
+            logger.info("Journalpost=${journalpost.journalpostId} kan ikke automatisk journalføres pga kanal=${journalpost.kanal}")
+            return false
+        }
         val allePersonIdenter = personService.hentFolkeregisterIdenter(personIdent).identer()
         val fagsak = fagsakService.finnFagsak(allePersonIdenter, stønadstype)
 
@@ -98,7 +107,6 @@ class HåndterSøknadService(
                 oppgave =
                     OpprettOppgave(
                         oppgavetype = Oppgavetype.Journalføring,
-                        enhetsnummer = journalpost.journalforendeEnhet?.takeIf { it != MASKINELL_JOURNALFOERENDE_ENHET },
                         beskrivelse = lagOppgavebeskrivelseForJournalføringsoppgave(journalpost),
                         journalpostId = journalpost.journalpostId,
                     ),
