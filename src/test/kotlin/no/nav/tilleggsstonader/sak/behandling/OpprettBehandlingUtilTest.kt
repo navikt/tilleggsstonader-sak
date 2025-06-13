@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
+import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingTypeV2
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingUtil.validerKanOppretteNyBehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -31,6 +32,7 @@ internal class OpprettBehandlingUtilTest {
             assertThat(utledBehandlingType(behandlinger)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
 
+        // TODO: Slett når snike i køen er implementert
         @Test
         fun `hvis man har en behandling som ikke er henlagt så blir neste behandling revurdering`() {
             assertThat(utledBehandlingType(listOf(behandling(resultat = BehandlingResultat.IKKE_SATT))))
@@ -42,6 +44,40 @@ internal class OpprettBehandlingUtilTest {
         }
 
         @Test
+        fun `hvis man har en ferdigstilt behandling som ikke er henlagt så blir neste behandling revurdering`() {
+            assertThat(
+                utledBehandlingTypeV2(
+                    listOf(
+                        behandling(
+                            resultat = BehandlingResultat.AVSLÅTT,
+                            status = BehandlingStatus.FERDIGSTILT,
+                        ),
+                    ),
+                ),
+            ).isEqualTo(BehandlingType.REVURDERING)
+            assertThat(
+                utledBehandlingTypeV2(
+                    listOf(
+                        behandling(
+                            resultat = BehandlingResultat.INNVILGET,
+                            status = BehandlingStatus.FERDIGSTILT,
+                        ),
+                    ),
+                ),
+            ).isEqualTo(BehandlingType.REVURDERING)
+            assertThat(
+                utledBehandlingTypeV2(
+                    listOf(
+                        behandling(
+                            resultat = BehandlingResultat.OPPHØRT,
+                            status = BehandlingStatus.FERDIGSTILT,
+                        ),
+                    ),
+                ),
+            ).isEqualTo(BehandlingType.REVURDERING)
+        }
+
+        @Test
         fun `hvis man har en innvilget og sen en henlagt er det fortsatt revurdering`() {
             assertThat(
                 utledBehandlingType(
@@ -49,6 +85,7 @@ internal class OpprettBehandlingUtilTest {
                         behandling(
                             resultat = BehandlingResultat.INNVILGET,
                             vedtakstidspunkt = LocalDateTime.now().minusDays(1),
+                            status = BehandlingStatus.FERDIGSTILT,
                         ),
                         behandling(resultat = BehandlingResultat.HENLAGT),
                     ),
@@ -126,8 +163,29 @@ internal class OpprettBehandlingUtilTest {
                 )
 
             assertThatThrownBy {
-                validerKanOppretteNyBehandling(BehandlingType.FØRSTEGANGSBEHANDLING, listOf(behandling))
+                validerKanOppretteNyBehandling(
+                    behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    tidligereBehandlinger = listOf(behandling),
+                    kanHaFlereBehandlingPåSammeFagsak = false,
+                )
             }.hasMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
+        }
+
+        @Test
+        fun `det skal være mulig å opprette en revurdering når det finnes en førstegangsbehandling på vent`() {
+            val behandling =
+                behandling(
+                    fagsak = fagsak,
+                    resultat = BehandlingResultat.IKKE_SATT,
+                    status = BehandlingStatus.SATT_PÅ_VENT,
+                )
+
+            // Sjekker at denne ikke kaster feil
+            validerKanOppretteNyBehandling(
+                behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
+                tidligereBehandlinger = listOf(behandling),
+                kanHaFlereBehandlingPåSammeFagsak = true,
+            )
         }
     }
 

@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
+import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingTypeV2
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingUtil.validerKanOppretteNyBehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
@@ -15,7 +16,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.FERDIGSTIL
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.OPPRETTET
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.SATT_PÅ_VENT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingsjournalpostRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -99,11 +99,22 @@ class BehandlingService(
             "Feature toggle for å opprette behandling er slått av"
         }
 
+        val kanHaFlereBehandlingerPåSammeFagsak =
+            unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK)
+
         val tidligereBehandlinger = behandlingRepository.findByFagsakId(fagsakId)
         val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
-        val behandlingType = utledBehandlingType(tidligereBehandlinger)
+        val behandlingType =
+            when (kanHaFlereBehandlingerPåSammeFagsak) {
+                true -> utledBehandlingTypeV2(tidligereBehandlinger)
+                false -> utledBehandlingType(tidligereBehandlinger)
+            }
 
-        validerKanOppretteNyBehandling(behandlingType, tidligereBehandlinger)
+        validerKanOppretteNyBehandling(
+            behandlingType = behandlingType,
+            tidligereBehandlinger = tidligereBehandlinger,
+            kanHaFlereBehandlingPåSammeFagsak = kanHaFlereBehandlingerPåSammeFagsak,
+        )
 
         val behandling =
             behandlingRepository.insert(
@@ -296,11 +307,6 @@ class BehandlingService(
                 vedtakstidspunkt = SporbarUtils.now(),
             ),
         )
-    }
-
-    fun utledNesteBehandlingstype(fagsakId: FagsakId): BehandlingType {
-        val behandlinger = hentBehandlinger(fagsakId)
-        return utledBehandlingType(behandlinger)
     }
 
     /**
