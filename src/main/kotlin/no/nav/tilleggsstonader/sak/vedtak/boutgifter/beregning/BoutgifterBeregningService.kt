@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.lagBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.splittTilLøpendeMåneder
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningServiceFeilmeldingUtil.lagDetFinnesUtgifterSomKrysserUtbetlingsperioderFeilmelding
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.MarkerSomDelAvTidligereUtbetlingUtils.markerSomDelAvTidligereUtbetaling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
@@ -206,41 +207,11 @@ private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtb
         }
 
     brukerfeilHvis(detFinnesUtgiftSomKrysserUtbetalingsperioder) {
-        buildString {
-            appendLine("Utgiftsperioder krysser beregningsperioder")
-            appendLine()
-            appendLine(
-                lagPunktlisteMedOverlappendeUtgifterOgBeregningsperioder(
-                    utgifter = utgifterTilOvernatting,
-                    utbetalingsperioder = utbetalingsperioder,
-                ),
-            )
-            appendLine()
-            appendLine("Utgiftsperioden(e) må splittes.")
-        }
+        lagDetFinnesUtgifterSomKrysserUtbetlingsperioderFeilmelding(
+            utgifter = utgifterTilOvernatting,
+            utbetalingsperioder = utbetalingsperioder,
+        )
     }
 
     return this
 }
-
-private fun UtgiftBeregningBoutgifter.finnOverlappendeUtbetalingsperioder(
-    utbetalingsperioder: List<UtbetalingPeriode>,
-): List<UtbetalingPeriode> = utbetalingsperioder.filter { it.overlapper(this) }
-
-private fun UtgiftBeregningBoutgifter.overlapperFlereUtbetalingsperioder(utbetalingsperioder: List<UtbetalingPeriode>): Boolean =
-    finnOverlappendeUtbetalingsperioder(utbetalingsperioder).size > 1
-
-private fun lagPunktlisteMedOverlappendeUtgifterOgBeregningsperioder(
-    utgifter: List<UtgiftBeregningBoutgifter>,
-    utbetalingsperioder: List<UtbetalingPeriode>,
-): String =
-    utgifter
-        .sorted()
-        .filter { utgift -> utgift.overlapperFlereUtbetalingsperioder(utbetalingsperioder) }
-        .joinToString(separator = "\n\n") { utgift ->
-            "Utgiftsperiode ${utgift.formatertPeriodeNorskFormat()} krysser beregningsperiodene: \n ${
-                utgift.finnOverlappendeUtbetalingsperioder(
-                    utbetalingsperioder,
-                ).joinToString("\n ") { utbetalingsperiode -> "- ${utbetalingsperiode.formatertPeriodeNorskFormat()}" }
-            }"
-        }
