@@ -26,7 +26,7 @@ class LøpendeUtgifterToBoligerRegel :
                 erHovedregel = true,
                 svarMapping =
                     mapOf(
-                        SvarId.JA to OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                        SvarId.JA to OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                         SvarId.NEI to IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     ),
             )

@@ -18,7 +18,7 @@ Egenskap: Beregning ved opphør av boutgifter
   - beregningsperioder som i sin helhet ligger etter revurder fra-datoen fjernes
 
     Scenario: Revurdering fra midt i en beregningsperiode
-      Og følgende boutgifter av type LØPENDE_UTGIFTER_EN_BOLIG for behandling=1
+      Gitt følgende boutgifter av type LØPENDE_UTGIFTER_EN_BOLIG for behandling=1
         | Fom        | Tom        | Utgift |
         | 01.01.2025 | 31.03.2025 | 1000   |
 
@@ -52,7 +52,7 @@ Egenskap: Beregning ved opphør av boutgifter
         | 01.01.2025 | 14.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Scenario: Tidligere beregnet ytelse fra før revurder fra-datoen skal ikke reberegnes
-      Og følgende boutgifter av type LØPENDE_UTGIFTER_EN_BOLIG for behandling=1
+      Gitt følgende boutgifter av type LØPENDE_UTGIFTER_EN_BOLIG for behandling=1
         | Fom        | Tom        | Utgift |
         | 01.01.2025 | 28.02.2025 | 99999  |
 
