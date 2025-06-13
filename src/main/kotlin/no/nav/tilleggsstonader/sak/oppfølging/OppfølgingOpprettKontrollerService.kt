@@ -222,8 +222,8 @@ class OppfølgingOpprettKontrollerService(
             MålgruppeType.DAGPENGER -> TypeYtelsePeriode.DAGPENGER
             MålgruppeType.OMSTILLINGSSTØNAD -> TypeYtelsePeriode.OMSTILLINGSSTØNAD
             MålgruppeType.OVERGANGSSTØNAD -> TypeYtelsePeriode.ENSLIG_FORSØRGER
-            MålgruppeType.TILTAKSPENGER -> TypeYtelsePeriode.TILTAKSPENGER
 
+            MålgruppeType.TILTAKSPENGER,
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
             MålgruppeType.UFØRETRYGD,
             MålgruppeType.SYKEPENGER_100_PROSENT,
