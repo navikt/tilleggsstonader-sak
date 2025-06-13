@@ -9,6 +9,8 @@ import io.mockk.unmockkObject
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.libs.utils.osloNow
+import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
+import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingTypeV2
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -234,6 +236,7 @@ internal class BehandlingServiceTest {
 
     @Nested
     inner class UtledNesteBehandlingstype {
+        // TODO: Slett når snike i køen er implementert
         @Test
         internal fun `skal returnere revurdering hvis det finnes en førstegangsbehandling`() {
             val fagsak = fagsak()
@@ -249,6 +252,24 @@ internal class BehandlingServiceTest {
                 )
 
             assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
+        }
+
+        @Test
+        internal fun `skal returnere revurdering hvis det finnes en ferdigstillt førstegangsbehandling som ikke er henlagt`() {
+            val fagsak = fagsak()
+            every {
+                behandlingRepository.findByFagsakId(fagsak.id)
+            } returns
+                listOf(
+                    behandling(
+                        fagsak,
+                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                        resultat = BehandlingResultat.INNVILGET,
+                        status = BehandlingStatus.FERDIGSTILT,
+                    ),
+                )
+
+            assertThat(behandlingService.utledNesteBehandlingstypeV2(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
         }
 
         @Test
@@ -278,6 +299,7 @@ internal class BehandlingServiceTest {
             assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
 
+        // TODO: Slett når snike i køen er implementert
         @Test
         internal fun `skal returnere revurdering hvis det finnes en førstegangsbehandling som ikke er ferdigstilt`() {
             val fagsak = fagsak()
@@ -295,5 +317,34 @@ internal class BehandlingServiceTest {
 
             assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
         }
+
+        @Test
+        internal fun `skal returnere førstegangsbehandling hvis det finnes en førstegangsbehandling på vent`() {
+            val fagsak = fagsak()
+            every {
+                behandlingRepository.findByFagsakId(fagsak.id)
+            } returns
+                listOf(
+                    behandling(
+                        fagsak,
+                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                        status = BehandlingStatus.SATT_PÅ_VENT,
+                        resultat = BehandlingResultat.IKKE_SATT,
+                    ),
+                )
+
+            assertThat(behandlingService.utledNesteBehandlingstypeV2(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+        }
     }
+}
+
+fun BehandlingService.utledNesteBehandlingstypeV2(fagsakId: FagsakId): BehandlingType {
+    val behandlinger = hentBehandlinger(fagsakId)
+    return utledBehandlingTypeV2(behandlinger)
+}
+
+// TODO: Slett når snike i køen er implementert
+fun BehandlingService.utledNesteBehandlingstype(fagsakId: FagsakId): BehandlingType {
+    val behandlinger = hentBehandlinger(fagsakId)
+    return utledBehandlingType(behandlinger)
 }

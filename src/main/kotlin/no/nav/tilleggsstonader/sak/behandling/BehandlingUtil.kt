@@ -4,18 +4,30 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.FØRSTEGANGSBEHANDLING
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.REVURDERING
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import java.time.LocalDate
 
 object BehandlingUtil {
+    fun utledBehandlingTypeV2(tidligereBehandlinger: List<Behandling>): BehandlingType {
+        val skalVæreRevurdering =
+            tidligereBehandlinger.any {
+                val erFerdigstilt = it.status == BehandlingStatus.FERDIGSTILT
+                val ikkeHenlagt = it.resultat != BehandlingResultat.HENLAGT
+                erFerdigstilt && ikkeHenlagt
+            }
+        return if (skalVæreRevurdering) {
+            BehandlingType.REVURDERING
+        } else {
+            BehandlingType.FØRSTEGANGSBEHANDLING
+        }
+    }
+
     fun utledBehandlingType(tidligereBehandlinger: List<Behandling>): BehandlingType =
         if (tidligereBehandlinger.any { it.resultat != BehandlingResultat.HENLAGT && it.status != BehandlingStatus.SATT_PÅ_VENT }) {
-            REVURDERING
+            BehandlingType.REVURDERING
         } else {
-            FØRSTEGANGSBEHANDLING
+            BehandlingType.FØRSTEGANGSBEHANDLING
         }
 
     fun skalNullstilleBehandling(

@@ -24,7 +24,6 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
@@ -106,7 +105,6 @@ internal class HåndterSøknadServiceTest {
         every { barnService.opprettBarn(any()) } returns mockk()
         every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent(aktørId, false, "AKTOERID")))
         every { taskService.save(capture(taskSlot)) } returns mockk()
-        every { behandlingService.utledNesteBehandlingstype(fagsak.id) } returns BehandlingType.FØRSTEGANGSBEHANDLING
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
     }
 

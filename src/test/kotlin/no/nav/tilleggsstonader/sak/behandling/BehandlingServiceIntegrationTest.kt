@@ -141,6 +141,7 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
             every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns true
             val fagsak = testoppsettService.lagreFagsak(fagsak())
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT))
+
             // Sjekker at denne ikke kaster feil
             behandlingService.opprettBehandling(
                 fagsak.id,
