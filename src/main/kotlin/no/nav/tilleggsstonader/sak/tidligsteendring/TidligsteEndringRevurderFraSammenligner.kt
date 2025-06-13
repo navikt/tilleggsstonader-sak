@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
@@ -15,6 +17,7 @@ class TidligsteEndringRevurderFraSammenligner(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val vedtakService: VedtakService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val mdcTidligsteEndringProsessKjøringKey = "tidligsteEndringProsessKjoering"
@@ -35,9 +38,12 @@ class TidligsteEndringRevurderFraSammenligner(
     private fun sammenlignRevurderFraMedTidligsteEndringForFagsak(fagsakId: FagsakId) {
         behandlingService
             .hentBehandlinger(fagsakId)
-            .filter { it.forrigeIverksatteBehandlingId != null && it.revurderFra != null && it.erAvsluttet() }
+            .filter { it.forrigeIverksatteBehandlingId != null && it.revurderFra != null && it.erAvsluttet() && !it.erHenlagt() }
+            .filtrerVekkAvslag()
             .forEach { sammenlignRevurderFraMedTidligsteEndringForBehandling(it) }
     }
+
+    private fun List<Behandling>.filtrerVekkAvslag() = filter { vedtakService.hentVedtak(it.id)!!.type != TypeVedtak.AVSLAG }
 
     private fun sammenlignRevurderFraMedTidligsteEndringForBehandling(behandling: Behandling) {
         try {
