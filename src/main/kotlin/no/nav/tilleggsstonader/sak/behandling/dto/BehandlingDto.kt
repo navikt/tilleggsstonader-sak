@@ -70,9 +70,7 @@ fun Behandling.tilDto(
         tilordnetSaksbehandler = null,
     )
 
-fun Saksbehandling.tilDto(
-    tilordnetSaksbehandler: String?,
-): BehandlingDto =
+fun Saksbehandling.tilDto(tilordnetSaksbehandler: String?): BehandlingDto =
     BehandlingDto(
         id = this.id,
         forrigeIverksatteBehandlingId = this.forrigeIverksatteBehandlingId,
