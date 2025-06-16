@@ -39,6 +39,7 @@ data class BehandlingDto(
     val henlagtBegrunnelse: String?,
     val revurderFra: LocalDate?,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata?,
+    val tilordnetSaksbehandler: String?,
 )
 
 fun Behandling.tilDto(
@@ -66,9 +67,12 @@ fun Behandling.tilDto(
         vedtaksdato = this.vedtakstidspunkt,
         revurderFra = this.revurderFra,
         nyeOpplysningerMetadata = this.nyeOpplysningerMetadata,
+        tilordnetSaksbehandler = null,
     )
 
-fun Saksbehandling.tilDto(): BehandlingDto =
+fun Saksbehandling.tilDto(
+    tilordnetSaksbehandler: String?,
+): BehandlingDto =
     BehandlingDto(
         id = this.id,
         forrigeIverksatteBehandlingId = this.forrigeIverksatteBehandlingId,
@@ -90,4 +94,5 @@ fun Saksbehandling.tilDto(): BehandlingDto =
         vedtaksdato = this.vedtakstidspunkt,
         revurderFra = this.revurderFra,
         nyeOpplysningerMetadata = this.nyeOpplysningerMetadata,
+        tilordnetSaksbehandler = tilordnetSaksbehandler,
     )

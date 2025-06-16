@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -40,6 +41,7 @@ class BehandlingController(
     private val fagsakService: FagsakService,
     private val henleggService: HenleggService,
     private val tilgangService: TilgangService,
+    private val oppgaveService: OppgaveService,
 ) {
     @GetMapping("{behandlingId}")
     fun hentBehandling(
@@ -48,13 +50,15 @@ class BehandlingController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+        val tilordnetSaksbehandler = oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(saksbehandling.id)?.tilordnetSaksbehandler
+
         if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
             brukerfeilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
                 "Behandlingen er ikke påbegynt. En saksbehandler må påbegynne behandlingen før du kan gå inn."
             }
             faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId)
         }
-        return saksbehandling.tilDto()
+        return saksbehandling.tilDto(tilordnetSaksbehandler)
     }
 
     @GetMapping("fagsak-person/{fagsakPersonId}")
@@ -116,7 +120,7 @@ class BehandlingController(
     ): BehandlingDto {
         val saksbehandling = behandlingService.hentSaksbehandling(eksternBehandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.ACCESS)
-        return saksbehandling.tilDto()
+        return saksbehandling.tilDto(tilordnetSaksbehandler = null)
     }
 
     @PostMapping("{behandlingId}/revurder-fra/{revurderFra}")
@@ -126,6 +130,6 @@ class BehandlingController(
     ): BehandlingDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        return revurderFraService.oppdaterRevurderFra(behandlingId, revurderFra).tilDto()
+        return revurderFraService.oppdaterRevurderFra(behandlingId, revurderFra).tilDto(tilordnetSaksbehandler = null)
     }
 }
