@@ -299,4 +299,33 @@ Egenskap: Utled tidligste endring av aktivitet
 
       Så forvent følgende dato for tidligste endring: 20.03.2024
 
-#    Burde man ha noe om at kildeId er endret? Feks. samme periode men ny aktivitet?
+  Regel: Aktiviteter som får endret kildeId skal håndteres som endringer
+    Scenario: Aktivitet blir slettet og ny legges til med samme data men annen kildeId
+      Gitt følgende aktiviteter i forrige behandling - utledTidligsteEndring
+        | Fom        | Tom        | Stønadstype | Type   | Resultat | Status | Kilde Id |
+        | 01.02.2024 | 31.03.2024 | BOUTGIFTER  | TILTAK | OPPFYLT  | NY     | 12345    |
+
+      Gitt følgende aktiviteter i revurdering - utledTidligsteEndring
+        | Fom        | Tom        | Stønadstype | Type   | Resultat | Status  | Kilde Id |
+        | 01.02.2024 | 31.03.2024 | BOUTGIFTER  | TILTAK | OPPFYLT  | SLETTET | 12345    |
+        | 01.02.2024 | 31.03.2024 | BOUTGIFTER  | TILTAK | OPPFYLT  | NY      | 54321    |
+
+
+      Når utleder tidligste endring
+
+      Så forvent følgende dato for tidligste endring: 01.02.2024
+
+    Scenario: Aktivitet blir slettet og ny legges til med samme data og samme kildeId
+      Gitt følgende aktiviteter i forrige behandling - utledTidligsteEndring
+        | Fom        | Tom        | Stønadstype | Type   | Resultat | Status | Kilde Id |
+        | 01.02.2024 | 31.03.2024 | BOUTGIFTER  | TILTAK | OPPFYLT  | NY     | 12345    |
+
+      Gitt følgende aktiviteter i revurdering - utledTidligsteEndring
+        | Fom        | Tom        | Stønadstype | Type   | Resultat | Status  | Kilde Id |
+        | 01.02.2024 | 31.03.2024 | BOUTGIFTER  | TILTAK | OPPFYLT  | SLETTET | 12345    |
+        | 01.02.2024 | 31.03.2024 | BOUTGIFTER  | TILTAK | OPPFYLT  | NY      | 12345    |
+
+
+      Når utleder tidligste endring
+
+      Så forvent ingen endring
