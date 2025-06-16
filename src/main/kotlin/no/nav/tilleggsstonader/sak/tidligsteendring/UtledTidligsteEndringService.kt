@@ -146,7 +146,7 @@ data class TidligsteEndringIBehandlingUtleder(
     ): Boolean =
         vilkårperiode.resultat != tidligereVilkårperiode.resultat ||
             vilkårperiode.type != tidligereVilkårperiode.type ||
-            vilkårperiode.faktaOgVurdering != tidligereVilkårperiode.faktaOgVurdering
+            vilkårperiode.faktaOgVurdering.fakta != tidligereVilkårperiode.faktaOgVurdering.fakta
 
     private fun erVedtaksperiodeEndret(
         vedtaksperiode: Vedtaksperiode,
@@ -162,26 +162,33 @@ data class TidligsteEndringIBehandlingUtleder(
     ): LocalDate? {
         val antallPerioder = min(perioderNå.size, perioderTidligere.size)
 
-        perioderNå.take(antallPerioder).forEachIndexed { index, periodeNå ->
-            val periodeTidligere = perioderTidligere[index]
+        val minsteEndringVedSammenligningAvPerioder =
+            perioderNå
+                .take(antallPerioder)
+                .mapIndexedNotNull { index, periodeNå ->
+                    val periodeTidligere = perioderTidligere[index]
 
-            if (periodeNå.fom != periodeTidligere.fom || erEndret(periodeNå, periodeTidligere)) {
-                return minOf(periodeNå.fom, periodeTidligere.fom)
-            }
-            if (periodeNå.tom != periodeTidligere.tom) {
-                // Legger på en dag, da det først er fra dagen etter tom-datoen at det er en endring
-                return minOf(periodeNå.tom, periodeTidligere.tom).plusDays(1)
-            }
-        }
+                    if (periodeNå.fom != periodeTidligere.fom || erEndret(periodeNå, periodeTidligere)) {
+                        minOf(periodeNå.fom, periodeTidligere.fom)
+                    } else if (periodeNå.tom != periodeTidligere.tom) {
+                        // Legger på en dag, da det først er fra dagen etter tom-datoen at det er en endring
+                        minOf(periodeNå.tom, periodeTidligere.tom).plusDays(1)
+                    } else {
+                        null
+                    }
+                }.minOrNull()
 
-        return when {
-            // Ny periode i ny behandling
-            perioderNå.size > antallPerioder -> perioderNå[antallPerioder].fom
-            // Periode har blitt slettet i ny behandling
-            perioderTidligere.size > antallPerioder -> perioderTidligere[antallPerioder].fom
-            // Ingen endringer i perioder
-            else -> null
-        }
+        val minsteEndringIResterendePerioder =
+            when {
+                // Ny periode i ny behandling
+                perioderNå.size > antallPerioder -> perioderNå[antallPerioder].fom
+                // Periode har blitt slettet i ny behandling
+                perioderTidligere.size > antallPerioder -> perioderTidligere[antallPerioder].fom
+                // Ingen endringer i perioder
+                else -> null
+            }
+
+        return listOfNotNull(minsteEndringVedSammenligningAvPerioder, minsteEndringIResterendePerioder).minOrNull()
     }
 }
 

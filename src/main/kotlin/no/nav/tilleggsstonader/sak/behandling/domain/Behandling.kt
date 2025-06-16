@@ -48,8 +48,10 @@ data class Behandling(
 
     fun vedtakstidspunktEllerFeil(): LocalDateTime = this.vedtakstidspunkt ?: error("Mangler vedtakstidspunkt for behandling=$id")
 
+    fun erHenlagt(): Boolean = resultat == BehandlingResultat.HENLAGT
+
     init {
-        if (resultat == BehandlingResultat.HENLAGT) {
+        if (erHenlagt()) {
             feilHvis(henlagtÅrsak == null) { "Kan ikke henlegge behandling uten en årsak" }
         }
         feilHvis(revurderFra != null && type != BehandlingType.REVURDERING) {
