@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprett
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -110,7 +111,7 @@ class OpprettRevurderingBehandlingService(
         feilHvis(!valgbareIdenter.containsAll(request.valgteBarn)) {
             "Kan ikke velge barn som ikke er valgbare."
         }
-        feilHvis(behandlingIdForGjenbruk == null && request.valgteBarn.isEmpty()) {
+        brukerfeilHvis(behandlingIdForGjenbruk == null && request.valgteBarn.isEmpty()) {
             "Behandling må opprettes med minimum 1 barn. Dersom alle tidligere behandlinger er henlagt, må ny behandling opprettes som søknad eller papirsøknad."
         }
     }
