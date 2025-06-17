@@ -50,7 +50,7 @@ class BehandlingController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        val tilordnetSaksbehandler = oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(saksbehandling.id)?.tilordnetSaksbehandler
+        val tilordnetSaksbehandler = oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(behandlingId)?.tilordnetSaksbehandler
 
         if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
             brukerfeilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
@@ -93,7 +93,11 @@ class BehandlingController(
     fun hentBehandlingerForPersonOgStønadstype(
         @RequestBody identStønadstype: IdentStønadstype,
     ): List<BehandlingDto> {
-        tilgangService.validerTilgangTilStønadstype(identStønadstype.ident, identStønadstype.stønadstype, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilStønadstype(
+            identStønadstype.ident,
+            identStønadstype.stønadstype,
+            AuditLoggerEvent.ACCESS,
+        )
 
         return fagsakService.hentBehandlingerForPersonOgStønadstype(
             identStønadstype.ident,
