@@ -148,7 +148,6 @@ object VilkårperiodeTestUtil {
                 )
 
             MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
-            MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
         }
 
     fun faktaOgVurderingMålgruppeLæremidler(
@@ -196,7 +195,6 @@ object VilkårperiodeTestUtil {
                 )
 
             MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
-            MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
         }
 
     fun faktaOgVurderingerMålgruppeDto() =
