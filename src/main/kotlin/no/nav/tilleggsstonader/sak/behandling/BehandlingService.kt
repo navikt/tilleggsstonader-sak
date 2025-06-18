@@ -69,6 +69,10 @@ class BehandlingService(
 
     fun finnSisteIverksatteBehandling(fagsakId: FagsakId) = behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
 
+    fun finnSisteIverksatteBehandlingElseThrow(fagsakId: FagsakId) =
+        finnSisteIverksatteBehandling(fagsakId)?.id
+            ?: error("Finner ikke siste iverksatte behandling for fagsak=$fagsakId")
+
     fun finnesIkkeFerdigstiltBehandling(fagsakId: FagsakId) = behandlingRepository.existsByFagsakIdAndStatusIsNot(fagsakId, FERDIGSTILT)
 
     fun finnesBehandlingSomIkkeErFerdigstiltEllerSattPåVent(fagsakId: FagsakId) =
@@ -195,7 +199,7 @@ class BehandlingService(
         return behandlingRepository.update(behandling.copy(kategori = kategori))
     }
 
-    fun oppdaterforrigeIverksatteBehandlingId(
+    fun oppdaterForrigeIverksatteBehandlingId(
         behandlingId: BehandlingId,
         forrigeIverksatteBehandlingId: BehandlingId,
     ): Behandling {

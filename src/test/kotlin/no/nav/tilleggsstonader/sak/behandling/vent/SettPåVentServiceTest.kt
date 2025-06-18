@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.vent
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
@@ -16,7 +17,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -42,7 +46,11 @@ class SettPåVentServiceTest : IntegrationTest() {
     @Autowired
     lateinit var behandlingshistorikkRepository: BehandlingshistorikkRepository
 
-    val behandling = behandling()
+    @Autowired
+    lateinit var vilkårperiodeService: VilkårperiodeService
+
+    val fagsak = fagsak()
+    val behandling = behandling(fagsak = fagsak)
     var oppgaveId: Long? = null
 
     val settPåVentDto =
@@ -64,7 +72,8 @@ class SettPåVentServiceTest : IntegrationTest() {
 
     @BeforeEach
     fun setUp() {
-        testoppsettService.opprettBehandlingMedFagsak(behandling)
+        testoppsettService.lagreFagsak(fagsak)
+        testoppsettService.lagre(behandling)
         oppgaveId =
             oppgaveService.opprettOppgave(
                 behandling.id,
@@ -95,7 +104,8 @@ class SettPåVentServiceTest : IntegrationTest() {
                     assertThat(mappeId?.getOrNull()).isEqualTo(MAPPE_ID_PÅ_VENT)
                 }
 
-                val behandlingshistorikk = behandlingshistorikkRepository.findByBehandlingIdOrderByEndretTidAsc(behandling.id)
+                val behandlingshistorikk =
+                    behandlingshistorikkRepository.findByBehandlingIdOrderByEndretTidAsc(behandling.id)
 
                 assertThat(behandlingshistorikk).hasSize(2)
 
@@ -208,7 +218,7 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal ta av vent og fortsette behandling - uten dto`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.taAvVent(behandling.id, null)
+                settPåVentService.taAvVent(behandling.id)
             }
 
             validerTattAvVent(behandling.id)
@@ -275,6 +285,52 @@ class SettPåVentServiceTest : IntegrationTest() {
                         TaAvVentDto(skalTilordnesRessurs = false, kommentar = "årsak av vent"),
                     )
                 }.hasMessageContaining("Kan ikke ta behandling av vent når man ikke er eier av oppgaven.")
+            }
+        }
+
+        @Test
+        fun `skal feile hvis behandlingen tas av vent to ganger etter hverandre`() {
+            testWithBrukerContext(dummySaksbehandler) {
+                settPåVentService.taAvVent(behandling.id)
+                assertThatThrownBy {
+                    settPåVentService.taAvVent(behandling.id)
+                }.hasMessageContaining("Behandlingen er allerede på vent")
+            }
+        }
+
+        @Test
+        fun `skal feile hvis det finnes en annen aktiv behandling på fagsaken`() {
+            testWithBrukerContext(dummySaksbehandler) {
+                testoppsettService.lagre(behandling(fagsak = fagsak))
+                assertThatThrownBy {
+                    settPåVentService.taAvVent(behandling.id)
+                }.hasMessageContaining("Det finnes en annen aktiv behandling på fagsaken som må ferdigstilles eller settes på vent")
+            }
+        }
+
+        @Test
+        fun `skal nullstille behandling hvis en annen behandling på fagsaken har blitt iverksatt i mellomtiden`() {
+            testWithBrukerContext(dummySaksbehandler) {
+                // Lagre informasjon på behandlingen som skal nullstilles
+                settPåVentService.taAvVent(behandling.id)
+                vilkårperiodeService.opprettVilkårperiode(dummyVilkårperiodeMålgruppe(behandlingId = behandling.id))
+                settPåVentService.settPåVent(behandling.id, settPåVentDto.copy(beholdOppgave = true))
+
+                // Lag ny behandling som "sniker i køen" og blir iverksatt
+                val behandlingSomSniker =
+                    behandling(
+                        fagsak = fagsak,
+                        status = BehandlingStatus.FERDIGSTILT,
+                        resultat = BehandlingResultat.INNVILGET,
+                    )
+                testoppsettService.lagre(behandlingSomSniker)
+
+                // Ta den første behandlingen av vent og sjekk at den blir nullstilt
+                settPåVentService.taAvVent(behandling.id)
+                val nullstilteVilkår = vilkårperiodeService.hentVilkårperioder(behandling.id)
+                val nullstiltBehandling = testoppsettService.hentBehandling(behandling.id)
+                assertThat(nullstiltBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandlingSomSniker.id)
+                assertThat(nullstilteVilkår.målgrupper).isEmpty()
             }
         }
 
@@ -345,10 +401,10 @@ class SettPåVentServiceTest : IntegrationTest() {
             )
         }
 
-        /*
-         * skal skjule kommentarer fra vent-hendelser fra dto når en behandling er ferdigstilt for å ikke vise intern
-         * kommunikasjon for saksbehandler
-         */
+            /*
+             * skal skjule kommentarer fra vent-hendelser fra dto når en behandling er ferdigstilt for å ikke vise intern
+             * kommunikasjon for saksbehandler
+             */
         @Test
         fun `skal skjule kommentarer fra vent-hendelser fra dto når en behandling er ferdigstilt`() {
             val saksbehandling = saksbehandling(behandling = behandling)

@@ -49,13 +49,10 @@ object OpprettBehandlingUtil {
     }
 
     private fun validerTidligereBehandlingerErFerdigstilteEllerPåVent(tidligereBehandlinger: List<Behandling>) {
-        brukerfeilHvis(tidligereBehandlinger.any { erAktivBehandling(it) }) {
+        brukerfeilHvis(tidligereBehandlinger.any { it.erAktiv() }) {
             "Det finnes en behandling på fagsaken som hverken er ferdigstilt eller satt på vent"
         }
     }
-
-    private fun erAktivBehandling(behandling: Behandling): Boolean =
-        behandling.status != BehandlingStatus.FERDIGSTILT && behandling.status != BehandlingStatus.SATT_PÅ_VENT
 
     private fun validerKanOppretteFørstegangsbehandling(sisteFerdigstilteBehandling: Behandling?) {
         if (sisteFerdigstilteBehandling == null) return

@@ -304,9 +304,9 @@ class BehandlingRepositoryTest : IntegrationTest() {
     }
 
     @Nested
-    inner class Maks1UtredesPerFagsak {
+    inner class KunEnAktivBehandlingPerFagsak {
         @Test
-        fun `skal ikke kunne ha flere behandlinger på samma fagsak med annen status enn ferdigstilt`() {
+        fun `skal ikke kunne ha flere behandlinger på samma fagsak med annen status enn ferdigstilt eller på vent`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak())
             testoppsettService.lagre(behandling(fagsak, status = FERDIGSTILT))
             testoppsettService.lagre(behandling(fagsak, status = UTREDES))
@@ -333,7 +333,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         }
 
         @Test
-        fun `kan ikke endre en behandling fra satt på vent til utredes når det allerede finnes en behandling som ikke er ferdigstilt`() {
+        fun `kan ikke endre en behandling fra SATT_PÅ_VENT til UTREDES når det allerede finnes en aktiv behandling`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak())
             testoppsettService.lagre(behandling(fagsak, status = FERDIGSTILT))
             val påVent = testoppsettService.lagre(behandling(fagsak, status = SATT_PÅ_VENT))

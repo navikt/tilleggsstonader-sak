@@ -46,6 +46,8 @@ data class Behandling(
 
     fun erAvsluttet(): Boolean = status == BehandlingStatus.FERDIGSTILT
 
+    fun erAktiv(): Boolean = !(erAvsluttet() || status == BehandlingStatus.SATT_PÅ_VENT)
+
     fun vedtakstidspunktEllerFeil(): LocalDateTime = this.vedtakstidspunkt ?: error("Mangler vedtakstidspunkt for behandling=$id")
 
     fun erHenlagt(): Boolean = resultat == BehandlingResultat.HENLAGT
