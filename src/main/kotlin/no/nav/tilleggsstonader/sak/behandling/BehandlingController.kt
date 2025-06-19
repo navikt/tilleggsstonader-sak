@@ -50,7 +50,7 @@ class BehandlingController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        val tilordnetSaksbehandler = oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(behandlingId)?.tilordnetSaksbehandler
+        val tilordnetSaksbehandler = oppgaveService.hentBehandleSak(behandlingId)
 
         if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
             brukerfeilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
@@ -58,7 +58,7 @@ class BehandlingController(
             }
             faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId)
         }
-        return saksbehandling.tilDto(tilordnetSaksbehandler)
+        return saksbehandling.tilDto(tilordnetSaksbehandler?.tilordnetSaksbehandler)
     }
 
     @GetMapping("fagsak-person/{fagsakPersonId}")
