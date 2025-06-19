@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -41,9 +42,9 @@ import kotlin.jvm.optionals.getOrNull
 class OppgaveClientConfig {
     @Bean
     @Primary
-    fun oppgaveClient(): OppgaveClient {
+    fun oppgaveClient(oppgaveRepository: OppgaveRepository): OppgaveClient {
         val oppgaveClient = mockk<OppgaveClient>()
-        resetMock(oppgaveClient)
+        resetMock(oppgaveClient, oppgaveRepository)
         return oppgaveClient
     }
 
@@ -51,7 +52,10 @@ class OppgaveClientConfig {
         const val MAPPE_ID_PÅ_VENT = 10L
         const val MAPPE_ID_KLAR = 20L
 
-        fun resetMock(oppgaveClient: OppgaveClient) {
+        fun resetMock(
+            oppgaveClient: OppgaveClient,
+            oppgaveRepository: OppgaveRepository,
+        ) {
             clearMocks(oppgaveClient)
 
             opprettOppgave(journalføringsoppgaveRequest)
@@ -130,6 +134,13 @@ class OppgaveClientConfig {
                             fristFerdigstillelse = it.fristFerdigstillelse ?: eksisterendeOppgave.fristFerdigstillelse,
                         )
                     }
+                oppgaveRepository.update(
+                    oppgaveRepository
+                        .findByGsakOppgaveId(
+                            oppdaterOppgave.id,
+                        )!!
+                        .copy(tilordnetSaksbehandler = oppdaterOppgave.tilordnetRessurs),
+                )
                 oppgavelager[oppdaterOppgave.id] = oppdaterOppgave // Forenklet, dette er ikke det som skje ri integrasjoner
                 OppdatertOppgaveResponse(oppdaterOppgave.id, oppdaterOppgave.versjonEllerFeil())
             }

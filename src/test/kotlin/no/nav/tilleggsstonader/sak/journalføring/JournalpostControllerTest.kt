@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.OppgaveRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.JournalpostClientConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
@@ -63,7 +64,7 @@ class JournalpostControllerTest : IntegrationTest() {
         super.tearDown()
 
         JournalpostClientConfig.resetMock(journalpostClient)
-        OppgaveClientConfig.resetMock(oppgaveClient)
+        OppgaveClientConfig.resetMock(oppgaveClient, OppgaveRepositoryFake())
     }
 
     @Test
