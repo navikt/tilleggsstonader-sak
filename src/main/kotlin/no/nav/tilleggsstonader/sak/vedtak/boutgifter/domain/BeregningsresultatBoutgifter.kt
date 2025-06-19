@@ -41,6 +41,7 @@ data class Beregningsgrunnlag(
     val makssatsBekreftet: Boolean,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
+    val skalFåDekketFaktiskeUtgifter: Boolean = false,
 ) : Periode<LocalDate>
 
 typealias BoutgifterPerUtgiftstype = Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>

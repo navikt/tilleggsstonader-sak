@@ -7,6 +7,7 @@ data class UtgiftBeregningBoutgifter(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val utgift: Int,
+    val skalFåDekketFaktiskeUtgifter: Boolean = false,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()

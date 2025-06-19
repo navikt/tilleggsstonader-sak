@@ -50,7 +50,7 @@ object OppdaterVilkår {
 
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
         validerPeriodeOgBeløp(oppdatering, vilkårsresultat)
-        validerIngenHøyereUtgifterGrunnetHelsemessigeÅrsaker(oppdatering)
+        // validerIngenHøyereUtgifterGrunnetHelsemessigeÅrsaker(oppdatering)
 
         return vilkårsresultat
     }
