@@ -29,6 +29,7 @@ class YtelseService(
                 TypeYtelsePeriode.DAGPENGER,
                 TypeYtelsePeriode.ENSLIG_FORSØRGER,
                 TypeYtelsePeriode.OMSTILLINGSSTØNAD,
+                TypeYtelsePeriode.TILTAKSPENGER,
             )
 
         return ytelseClient
