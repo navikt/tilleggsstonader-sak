@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import java.time.LocalDate
 
 object VilkårUtil {
@@ -49,10 +50,21 @@ object VilkårUtil {
             )
 
         fun kanSlåsSammen(other: VilkårHolder): Boolean =
-            vilkår.type == other.vilkår.type &&
+            vilkår.type.erLøpendeOgSkalSlåsSammen() &&
+                vilkår.type == other.vilkår.type &&
                 vilkår.resultat == other.vilkår.resultat &&
                 vilkår.utgift == other.vilkår.utgift &&
                 vilkår.barnId == other.vilkår.barnId &&
                 overlapperEllerPåfølgesAv(other)
+
+        private fun VilkårType.erLøpendeOgSkalSlåsSammen() =
+            when (this) {
+                VilkårType.PASS_BARN -> true
+                VilkårType.UTGIFTER_OVERNATTING -> false
+                VilkårType.LØPENDE_UTGIFTER_EN_BOLIG -> true
+                VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER -> true
+                VilkårType.EKSEMPEL2 -> false
+                VilkårType.EKSEMPEL -> false
+            }
     }
 }
