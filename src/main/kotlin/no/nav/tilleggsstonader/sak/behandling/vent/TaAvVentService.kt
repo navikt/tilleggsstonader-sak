@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
+import no.nav.tilleggsstonader.sak.behandling.vent.KanTaAvVent.Ja.PåkrevdHandling
+import no.nav.tilleggsstonader.sak.behandling.vent.KanTaAvVent.Nei.Årsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
@@ -50,10 +52,9 @@ class TaAvVentService(
 
             is KanTaAvVent.Nei -> {
                 when (kanTaAvVent.årsak) {
+                    Årsak.ErAlleredePåVent -> feil("Behandlingen er allerede på vent")
                     Årsak.AnnenAktivBehandlingPåFagsaken ->
                         brukerfeil("Det finnes en annen aktiv behandling på fagsaken som må ferdigstilles eller settes på vent")
-
-                    Årsak.ErAlleredePåVent -> feil("Behandlingen er allerede på vent")
                 }
             }
         }
@@ -77,13 +78,12 @@ class TaAvVentService(
         if (behandling.status != BehandlingStatus.SATT_PÅ_VENT) {
             return KanTaAvVent.Nei(årsak = Årsak.ErAlleredePåVent)
         }
-        val andreBehandlingerPåFagsaken =
-            behandlingService.hentBehandlinger(behandling.fagsakId).filter { it.id != behandling.id }
-        if (andreBehandlingerPåFagsaken.any { it.erAktiv() }) {
+
+        if (detFinnesAndreAktiveBehandlingerPåFagsaken(behandling)) {
             return KanTaAvVent.Nei(årsak = Årsak.AnnenAktivBehandlingPåFagsaken)
         }
-        val sisteIverksatte = behandlingService.finnSisteIverksatteBehandling(behandling.fagsakId)
-        return if (sisteIverksatte == null || sisteIverksatte.id == behandling.forrigeIverksatteBehandlingId) {
+
+        return if (enAnnenBehandlingHarBlittIverksattIMellomtiden(behandling)) {
             KanTaAvVent.Ja(påkrevdHandling = PåkrevdHandling.Ingen)
         } else {
             KanTaAvVent.Ja(påkrevdHandling = PåkrevdHandling.BehandlingMåNullstilles)
@@ -115,6 +115,17 @@ class TaAvVentService(
         oppgaveService.taAvVent(taAvVent)
     }
 
+    private fun detFinnesAndreAktiveBehandlingerPåFagsaken(behandling: Behandling): Boolean =
+        behandlingService
+            .hentBehandlinger(behandling.fagsakId)
+            .filter { it.id != behandling.id }
+            .any { it.erAktiv() }
+
+    private fun enAnnenBehandlingHarBlittIverksattIMellomtiden(behandling: Behandling): Boolean {
+        val sisteIverksatte = behandlingService.finnSisteIverksatteBehandling(behandling.fagsakId)
+        return sisteIverksatte == null || sisteIverksatte.id == behandling.forrigeIverksatteBehandlingId
+    }
+
     private fun finnAktivSattPåVent(behandlingId: BehandlingId) =
         settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
             ?: error("Finner ikke settPåVent for behandling=$behandlingId")
@@ -123,21 +134,21 @@ class TaAvVentService(
 sealed class KanTaAvVent {
     data class Ja(
         val påkrevdHandling: PåkrevdHandling,
-    ) : KanTaAvVent()
+    ) : KanTaAvVent() {
+        sealed class PåkrevdHandling {
+            data object Ingen : PåkrevdHandling()
+
+            data object BehandlingMåNullstilles : PåkrevdHandling()
+        }
+    }
 
     data class Nei(
         val årsak: Årsak,
-    ) : KanTaAvVent()
-}
+    ) : KanTaAvVent() {
+        sealed class Årsak {
+            data object ErAlleredePåVent : Årsak()
 
-sealed class PåkrevdHandling {
-    data object Ingen : PåkrevdHandling()
-
-    data object BehandlingMåNullstilles : PåkrevdHandling()
-}
-
-sealed class Årsak {
-    data object ErAlleredePåVent : Årsak()
-
-    data object AnnenAktivBehandlingPåFagsaken : Årsak()
+            data object AnnenAktivBehandlingPåFagsaken : Årsak()
+        }
+    }
 }

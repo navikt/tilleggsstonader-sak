@@ -1,5 +1,8 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
+import no.nav.tilleggsstonader.sak.behandling.vent.KanTaAvVent.Ja.PåkrevdHandling
+import no.nav.tilleggsstonader.sak.behandling.vent.KanTaAvVent.Nei.Årsak
+
 data class KanTaAvVentDto(
     val resultat: KanTaAvVentStatus,
 ) {
