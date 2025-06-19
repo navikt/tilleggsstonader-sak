@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -188,7 +189,6 @@ class SettPåVentService(
         val behandling = behandlingService.hentBehandling(behandlingId)
 
         when (val kanTaAvVent = utledTaAvVentStatus(behandling)) {
-            is KanTaAvVent.Nei -> brukerfeil(kanTaAvVent.feilmelding)
             is KanTaAvVent.Ja -> {
                 behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.UTREDES)
                 opprettHistorikkInnslagTaAvVent(behandling, taAvVentDto?.kommentar)
@@ -201,6 +201,15 @@ class SettPåVentService(
                         nullstillBehandlingService.nullstillBehandling(behandlingId)
                         behandlingService.oppdaterForrigeIverksatteBehandlingId(behandlingId, nyForrigeBehandlingId)
                     }
+                }
+            }
+
+            is KanTaAvVent.Nei -> {
+                when (kanTaAvVent.årsak) {
+                    Årsak.AnnenAktivBehandlingPåFagsaken ->
+                        brukerfeil("Det finnes en annen aktiv behandling på fagsaken som må ferdigstilles eller settes på vent")
+
+                    Årsak.ErAlleredePåVent -> feil("Behandlingen er allerede på vent")
                 }
             }
         }
@@ -217,12 +226,12 @@ class SettPåVentService(
 
     private fun utledTaAvVentStatus(behandling: Behandling): KanTaAvVent {
         if (behandling.status != BehandlingStatus.SATT_PÅ_VENT) {
-            return KanTaAvVent.Nei("Behandlingen er allerede på vent")
+            return KanTaAvVent.Nei(årsak = Årsak.ErAlleredePåVent)
         }
         val andreBehandlingerPåFagsaken =
             behandlingService.hentBehandlinger(behandling.fagsakId).filter { it.id != behandling.id }
         if (andreBehandlingerPåFagsaken.any { it.erAktiv() }) {
-            return KanTaAvVent.Nei("Det finnes en annen aktiv behandling på fagsaken som må ferdigstilles eller settes på vent")
+            return KanTaAvVent.Nei(årsak = Årsak.AnnenAktivBehandlingPåFagsaken)
         }
         val sisteIverksatte = behandlingService.finnSisteIverksatteBehandling(behandling.fagsakId)
         return if (sisteIverksatte == null || sisteIverksatte.id == behandling.forrigeIverksatteBehandlingId) {
@@ -280,6 +289,11 @@ class SettPåVentService(
             metadata = kommentar?.takeIf { it.isNotEmpty() }?.let { mapOf("kommentar" to it) },
         )
     }
+
+    fun kanTaAvVent(behandlingId: BehandlingId): KanTaAvVentDto {
+        val behandling = behandlingService.hentBehandling(behandlingId)
+        return KanTaAvVentDto.fraDomene(kanTaAvVent = utledTaAvVentStatus(behandling = behandling))
+    }
 }
 
 sealed class KanTaAvVent {
@@ -288,7 +302,7 @@ sealed class KanTaAvVent {
     ) : KanTaAvVent()
 
     data class Nei(
-        val feilmelding: String,
+        val årsak: Årsak,
     ) : KanTaAvVent()
 }
 
@@ -296,4 +310,10 @@ sealed class PåkrevdHandling {
     data object Ingen : PåkrevdHandling()
 
     data object BehandlingMåNullstilles : PåkrevdHandling()
+}
+
+sealed class Årsak {
+    data object ErAlleredePåVent : Årsak()
+
+    data object AnnenAktivBehandlingPåFagsaken : Årsak()
 }

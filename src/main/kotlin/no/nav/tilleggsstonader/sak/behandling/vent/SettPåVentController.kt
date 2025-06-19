@@ -61,4 +61,14 @@ class SettPåVentController(
         tilgangService.validerHarSaksbehandlerrolle()
         settPåVentService.taAvVent(behandlingId, taAvVentDto)
     }
+
+    @GetMapping("{behandlingId}/kan-ta-av-vent")
+    fun kanTaAvVent(
+        @PathVariable behandlingId: BehandlingId,
+    ): KanTaAvVentDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerHarSaksbehandlerrolle()
+        return settPåVentService.kanTaAvVent(behandlingId)
+    }
 }
