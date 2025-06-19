@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 class SettPåVentController(
     private val tilgangService: TilgangService,
     private val settPåVentService: SettPåVentService,
+    private val taAvVentService: TaAvVentService,
 ) {
     @GetMapping("{behandlingId}")
     fun hentStatusSettPåVent(
@@ -59,7 +60,7 @@ class SettPåVentController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
-        settPåVentService.taAvVent(behandlingId, taAvVentDto)
+        taAvVentService.taAvVent(behandlingId, taAvVentDto)
     }
 
     @GetMapping("{behandlingId}/kan-ta-av-vent")
@@ -69,6 +70,6 @@ class SettPåVentController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
-        return settPåVentService.kanTaAvVent(behandlingId)
+        return taAvVentService.kanTaAvVent(behandlingId)
     }
 }

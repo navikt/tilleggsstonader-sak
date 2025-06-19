@@ -3,15 +3,12 @@ package no.nav.tilleggsstonader.sak.behandling.vent
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_KLAR
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_PÅ_VENT
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
@@ -20,14 +17,12 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 
 class SettPåVentServiceTest : IntegrationTest() {
@@ -35,7 +30,7 @@ class SettPåVentServiceTest : IntegrationTest() {
     lateinit var settPåVentService: SettPåVentService
 
     @Autowired
-    lateinit var settPåVentRepository: SettPåVentRepository
+    lateinit var taAvVentService: TaAvVentService
 
     @Autowired
     lateinit var oppgaveService: OppgaveService
@@ -207,174 +202,6 @@ class SettPåVentServiceTest : IntegrationTest() {
     }
 
     @Nested
-    inner class TaAvVent {
-        @BeforeEach
-        fun setUp() {
-            testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto.copy(beholdOppgave = true))
-            }
-        }
-
-        @Test
-        fun `skal ta av vent og fortsette behandling - uten dto`() {
-            testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.taAvVent(behandling.id)
-            }
-
-            validerTattAvVent(behandling.id)
-            validerOppdatertOppgave(oppgaveId!!, tilordnetRessurs = dummySaksbehandler)
-            validerHistorikkInnslag(behandling.id, skalHaMetadata = false)
-        }
-
-        @Test
-        fun `skal ta av vent og fortsette behandling - uten kommentar`() {
-            testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.taAvVent(behandling.id, TaAvVentDto(skalTilordnesRessurs = true, kommentar = null))
-            }
-
-            validerTattAvVent(behandling.id)
-            validerOppdatertOppgave(oppgaveId!!, tilordnetRessurs = dummySaksbehandler)
-            validerHistorikkInnslag(behandling.id, skalHaMetadata = false)
-        }
-
-        @Test
-        fun `skal ta av vent og fortsette behandling - med kommentar`() {
-            testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.taAvVent(
-                    behandling.id,
-                    TaAvVentDto(skalTilordnesRessurs = true, kommentar = "årsak av vent"),
-                )
-            }
-
-            validerTattAvVent(behandling.id, kommentar = "årsak av vent")
-            validerOppdatertOppgave(oppgaveId!!, tilordnetRessurs = dummySaksbehandler)
-            validerHistorikkInnslag(behandling.id, skalHaMetadata = true)
-        }
-
-        @Test
-        fun `skal ta av vent og markere oppgave som ufordelt - uten kommentar`() {
-            testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.taAvVent(behandling.id, TaAvVentDto(skalTilordnesRessurs = false, kommentar = null))
-            }
-
-            validerTattAvVent(behandling.id)
-            validerOppdatertOppgave(oppgaveId!!, tilordnetRessurs = dummySaksbehandler)
-            validerHistorikkInnslag(behandling.id, skalHaMetadata = false)
-        }
-
-        @Test
-        fun `skal ta av vent og markere oppgave som ufordelt - med kommentar`() {
-            testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.taAvVent(
-                    behandling.id,
-                    TaAvVentDto(skalTilordnesRessurs = false, kommentar = "årsak av vent"),
-                )
-            }
-
-            validerTattAvVent(behandling.id, kommentar = "årsak av vent")
-            validerOppdatertOppgave(oppgaveId!!, tilordnetRessurs = dummySaksbehandler)
-            validerHistorikkInnslag(behandling.id, skalHaMetadata = true)
-        }
-
-        @Test
-        fun `skal feile hvis man ikke er eier av oppgaven`() {
-            testWithBrukerContext {
-                assertThatThrownBy {
-                    settPåVentService.taAvVent(
-                        behandling.id,
-                        TaAvVentDto(skalTilordnesRessurs = false, kommentar = "årsak av vent"),
-                    )
-                }.hasMessageContaining("Kan ikke ta behandling av vent når man ikke er eier av oppgaven.")
-            }
-        }
-
-        @Test
-        fun `skal feile hvis behandlingen tas av vent to ganger etter hverandre`() {
-            testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.taAvVent(behandling.id)
-                assertThatThrownBy {
-                    settPåVentService.taAvVent(behandling.id)
-                }.hasMessageContaining("Behandlingen er allerede på vent")
-            }
-        }
-
-        @Test
-        fun `skal feile hvis det finnes en annen aktiv behandling på fagsaken`() {
-            testWithBrukerContext(dummySaksbehandler) {
-                testoppsettService.lagre(behandling(fagsak = fagsak))
-                assertThatThrownBy {
-                    settPåVentService.taAvVent(behandling.id)
-                }.hasMessageContaining("Det finnes en annen aktiv behandling på fagsaken som må ferdigstilles eller settes på vent")
-            }
-        }
-
-        @Test
-        fun `skal nullstille behandling hvis en annen behandling på fagsaken har blitt iverksatt i mellomtiden`() {
-            testWithBrukerContext(dummySaksbehandler) {
-                // Lagre informasjon på behandlingen som skal nullstilles
-                settPåVentService.taAvVent(behandling.id)
-                vilkårperiodeService.opprettVilkårperiode(dummyVilkårperiodeMålgruppe(behandlingId = behandling.id))
-                settPåVentService.settPåVent(behandling.id, settPåVentDto.copy(beholdOppgave = true))
-
-                // Lag ny behandling som "sniker i køen" og blir iverksatt
-                val behandlingSomSniker =
-                    behandling(
-                        fagsak = fagsak,
-                        status = BehandlingStatus.FERDIGSTILT,
-                        resultat = BehandlingResultat.INNVILGET,
-                    )
-                testoppsettService.lagre(behandlingSomSniker)
-
-                // Ta den første behandlingen av vent og sjekk at den blir nullstilt
-                settPåVentService.taAvVent(behandling.id)
-                val nullstilteVilkår = vilkårperiodeService.hentVilkårperioder(behandling.id)
-                val nullstiltBehandling = testoppsettService.hentBehandling(behandling.id)
-                assertThat(nullstiltBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandlingSomSniker.id)
-                assertThat(nullstilteVilkår.målgrupper).isEmpty()
-            }
-        }
-
-        private fun validerTattAvVent(
-            behandlingId: BehandlingId,
-            kommentar: String? = null,
-        ) {
-            with(settPåVentRepository.findAll().single()) {
-                assertThat(aktiv).isFalse()
-                assertThat(taAvVentKommentar).isEqualTo(kommentar)
-            }
-
-            assertThat(testoppsettService.hentBehandling(behandlingId).status)
-                .isEqualTo(BehandlingStatus.UTREDES)
-        }
-
-        private fun validerOppdatertOppgave(
-            oppgaveId: Long,
-            tilordnetRessurs: String?,
-        ) {
-            with(oppgaveService.hentOppgave(oppgaveId)) {
-                assertThat(tilordnetRessurs).isEqualTo(tilordnetRessurs)
-                assertThat(beskrivelse).contains("Tatt av vent")
-                assertThat(fristFerdigstillelse).isEqualTo(osloDateNow())
-                assertThat(mappeId).isEqualTo(Optional.of(MAPPE_ID_KLAR))
-            }
-        }
-
-        private fun validerHistorikkInnslag(
-            behandlingId: BehandlingId,
-            skalHaMetadata: Boolean,
-        ) {
-            with(behandlingshistorikkService.finnSisteBehandlingshistorikk(behandlingId)) {
-                assertThat(utfall).isEqualTo(StegUtfall.TATT_AV_VENT)
-                if (skalHaMetadata) {
-                    assertThat(metadata).isNotNull()
-                } else {
-                    assertThat(metadata).isNull()
-                }
-            }
-        }
-    }
-
-    @Nested
     inner class Historikk {
         @Test
         fun `skal returnere kommentar fra historikk når behandlingen ikke ennå er sendt til iverksetting eller ferdigstilt`() {
@@ -384,7 +211,7 @@ class SettPåVentServiceTest : IntegrationTest() {
             testWithBrukerContext(dummySaksbehandler) {
                 settPåVentService.settPåVent(behandling.id, settPåVentDto)
                 plukkOppgaven()
-                settPåVentService.taAvVent(behandling.id, taAvVentDto)
+                taAvVentService.taAvVent(behandling.id, taAvVentDto)
             }
 
             val historikk = behandlingshistorikkService.finnHendelseshistorikk(saksbehandling)
@@ -412,7 +239,7 @@ class SettPåVentServiceTest : IntegrationTest() {
 
             testWithBrukerContext(dummySaksbehandler) {
                 settPåVentService.settPåVent(behandling.id, settPåVentDto.copy(beholdOppgave = true))
-                settPåVentService.taAvVent(behandling.id, taAvVentDto)
+                taAvVentService.taAvVent(behandling.id, taAvVentDto)
             }
 
             val ferdigstiltBehandling = saksbehandling.copy(status = BehandlingStatus.FERDIGSTILT)
