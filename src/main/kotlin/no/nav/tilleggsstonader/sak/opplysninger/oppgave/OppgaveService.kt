@@ -254,6 +254,9 @@ class OppgaveService(
             setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak),
         )
 
+    fun hentBehandleSak(behandlingId: BehandlingId): OppgaveDomain? =
+        oppgaveRepository.findByBehandlingIdAndType(behandlingId, Oppgavetype.BehandleSak)?.lastOrNull()
+
     fun hentOppgave(gsakOppgaveId: Long): Oppgave = oppgaveClient.finnOppgaveMedId(gsakOppgaveId)
 
     fun ferdigstillBehandleOppgave(
