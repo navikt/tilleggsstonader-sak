@@ -41,7 +41,8 @@ data class Beregningsgrunnlag(
     val makssatsBekreftet: Boolean,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
-    val skalFåDekketFaktiskeUtgifter: Boolean = false,
-) : Periode<LocalDate>
+) : Periode<LocalDate> {
+    fun skalFåDekketFaktiskeUtgifter(): Boolean = utgifter.values.flatten().any { it.skalFåDekketFaktiskeUtgifter }
+}
 
 typealias BoutgifterPerUtgiftstype = Map<TypeBoutgift, List<UtgiftBeregningBoutgifter>>

@@ -30,7 +30,7 @@ object BoutgifterBeregnUtil {
 
     fun Beregningsgrunnlag.beregnStønadsbeløp(): Int {
         val sumUtgifter = summerUtgifter()
-        if (this.skalFåDekketFaktiskeUtgifter) {
+        if (this.skalFåDekketFaktiskeUtgifter()) {
             return sumUtgifter
         }
         return min(sumUtgifter, makssats)
@@ -45,7 +45,6 @@ object BoutgifterBeregnUtil {
         periode: UtbetalingPeriode,
         utgifter: BoutgifterPerUtgiftstype,
     ): Beregningsgrunnlag {
-        val skalFåDekketFaktiskeUtgifter = utgifter.values.flatten().any { it.skalFåDekketFaktiskeUtgifter }
         val makssats = finnMakssats(periode.fom)
 
         val utgifterIPerioden =
@@ -63,7 +62,6 @@ object BoutgifterBeregnUtil {
             makssatsBekreftet = makssats.bekreftet,
             målgruppe = periode.målgruppe,
             aktivitet = periode.aktivitet,
-            skalFåDekketFaktiskeUtgifter = skalFåDekketFaktiskeUtgifter,
         )
     }
 

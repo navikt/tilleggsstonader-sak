@@ -201,7 +201,6 @@ class BeregningsresultatBoutgifterDtoTest {
                         makssatsBekreftet = true,
                         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
-                        skalFåDekketFaktiskeUtgifter = true,
                     ),
                 stønadsbeløp = 20_000,
             )

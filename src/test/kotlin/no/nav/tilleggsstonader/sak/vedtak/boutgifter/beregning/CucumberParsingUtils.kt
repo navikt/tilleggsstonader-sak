@@ -103,8 +103,6 @@ fun mapBeregningsresultat(
             aktivitet =
                 parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
                     ?: AktivitetType.TILTAK,
-            skalFåDekketFaktiskeUtgifter =
-                parseValgfriBoolean(BoutgifterDomenenøkkel.HØYERE_UTGIFTER, rad) ?: false,
         )
 
     BeregningsresultatForLøpendeMåned(

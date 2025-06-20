@@ -3,6 +3,9 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import java.time.LocalDate
 
+/**
+ * @param skalFåDekketFaktiskeUtgifter er default false då feltet er lagt til i ettertid og mangler i tidligere data i basen
+ */
 data class UtgiftBeregningBoutgifter(
     override val fom: LocalDate,
     override val tom: LocalDate,

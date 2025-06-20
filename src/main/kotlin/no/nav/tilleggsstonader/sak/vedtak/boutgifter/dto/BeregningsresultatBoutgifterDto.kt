@@ -87,7 +87,7 @@ fun BeregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(
         .sorted()
         .map { utgift ->
             val skalUtbetales =
-                if (grunnlag.skalFåDekketFaktiskeUtgifter) {
+                if (grunnlag.skalFåDekketFaktiskeUtgifter()) {
                     utgift.utgift
                 } else {
                     minOf(utgift.utgift, grunnlag.makssats - totalSum)
