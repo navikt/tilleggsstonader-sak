@@ -59,7 +59,7 @@ class RevurderFraServiceTest {
             service.oppdaterRevurderFra(behandling.id, revurderFra)
 
             assertThat(oppdaterBehandlingSlot.captured.revurderFra).isEqualTo(revurderFra)
-            verify(exactly = 1) { nullstillBehandlingService.nullstillBehandling(behandling.id) }
+            verify(exactly = 1) { nullstillBehandlingService.nullstillBehandling(behandling) }
         }
 
         @Test

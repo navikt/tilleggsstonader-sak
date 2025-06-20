@@ -35,7 +35,7 @@ class RevurderFraService(
 
         behandlingRepository.update(behandling.copy(revurderFra = revurderFra))
         if (skalNullstilleBehandling(behandling, revurderFra)) {
-            nullstillBehandlingService.nullstillBehandling(behandlingId)
+            nullstillBehandlingService.nullstillBehandling(behandling)
         }
         nullstillBehandlingService.slettVilkårperiodegrunnlag(behandlingId)
 

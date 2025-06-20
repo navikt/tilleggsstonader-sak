@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.FERDIGSTIL
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.OPPRETTET
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.SATT_PÅ_VENT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingsjournalpostRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -68,10 +69,6 @@ class BehandlingService(
             ?.let { behandlingRepository.finnEksterneIder(it) } ?: emptySet()
 
     fun finnSisteIverksatteBehandling(fagsakId: FagsakId) = behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
-
-    fun finnSisteIverksatteBehandlingElseThrow(fagsakId: FagsakId) =
-        finnSisteIverksatteBehandling(fagsakId)?.id
-            ?: error("Finner ikke siste iverksatte behandling for fagsak=$fagsakId")
 
     fun finnesIkkeFerdigstiltBehandling(fagsakId: FagsakId) = behandlingRepository.existsByFagsakIdAndStatusIsNot(fagsakId, FERDIGSTILT)
 
@@ -212,6 +209,14 @@ class BehandlingService(
         return behandlingRepository.update(behandling.copy(forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId))
     }
 
+    fun finnSisteBehandlingSomHarVedtakPåFagsaken(fagsakId: FagsakId): Behandling? =
+        behandlingRepository
+            .findByFagsakId(fagsakId)
+            .filter { it.erAvsluttet() }
+            .filterNot { it.erHenlagt() }
+            .sortertEtterVedtakstidspunkt()
+            .lastOrNull()
+
     fun oppdaterStegPåBehandling(
         behandlingId: BehandlingId,
         steg: StegType,
@@ -337,5 +342,23 @@ class BehandlingService(
                 metadata = null,
             )
         }
+    }
+
+    fun gjørOmTilRevurdering(
+        behandling: Behandling,
+        forrigeIverksatteBehandlingId: BehandlingId?,
+    ): Behandling {
+        feilHvis(
+            behandling.status.behandlingErLåstForVidereRedigering(),
+        ) {
+            "Kan ikke gjøre om behandling til revurdering når den har status ${behandling.status.visningsnavn()}."
+        }
+        return behandlingRepository.update(
+            behandling.copy(
+                type = BehandlingType.REVURDERING,
+                steg = StegType.INNGANGSVILKÅR,
+                forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
+            ),
+        )
     }
 }

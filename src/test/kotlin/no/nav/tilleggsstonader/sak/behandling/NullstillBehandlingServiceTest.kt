@@ -89,7 +89,7 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
     fun `skal fjerne alt dersom forrigeBehandling ikke har noe`() {
         opprettVilkårperiode(revurdering.id)
 
-        nullstillBehandlingService.nullstillBehandling(revurdering.id)
+        nullstillBehandlingService.nullstillBehandling(revurdering)
 
         assertThat(vilkårperiodeRepository.findByBehandlingId(revurdering.id)).isEmpty()
         assertThat(vilkårRepository.findByBehandlingId(revurdering.id)).isEmpty()
@@ -106,7 +106,7 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
 
         assertIngenDataPåRevurdering()
 
-        nullstillBehandlingService.nullstillBehandling(revurdering.id)
+        nullstillBehandlingService.nullstillBehandling(revurdering)
 
         assertVilkårPeriodeErGjenbrukt(vilkårperiode)
         assertVilkårErGjenbrukt(vilkår)
@@ -119,7 +119,7 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
         val barnBehandling = barnService.finnBarnPåBehandling(behandling.id)
         val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
 
-        nullstillBehandlingService.nullstillBehandling(revurdering.id)
+        nullstillBehandlingService.nullstillBehandling(revurdering)
 
         assertThat(barnService.finnBarnPåBehandling(behandling.id))
             .hasSize(1)
@@ -135,7 +135,7 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, andelTilkjentYtelse(behandling.id)))
         tilkjentYtelseRepository.insert(tilkjentYtelse(revurdering.id, andelTilkjentYtelse(revurdering.id)))
 
-        nullstillBehandlingService.nullstillBehandling(revurdering.id)
+        nullstillBehandlingService.nullstillBehandling(revurdering)
 
         assertThat(tilkjentYtelseRepository.findByBehandlingId(behandling.id)).isNotNull
         assertThat(tilkjentYtelseRepository.findByBehandlingId(revurdering.id)).isNull()
@@ -146,7 +146,7 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
         vedtakRepository.insert(innvilgetVedtak(behandlingId = behandling.id))
         vedtakRepository.insert(innvilgetVedtak(behandlingId = revurdering.id))
 
-        nullstillBehandlingService.nullstillBehandling(revurdering.id)
+        nullstillBehandlingService.nullstillBehandling(revurdering)
 
         assertThat(vedtakRepository.findByIdOrNull(behandling.id)).isNotNull
         assertThat(vedtakRepository.findByIdOrNull(revurdering.id)).isNull()
@@ -157,7 +157,7 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
         vedtaksbrevRepository.insert(vedtaksbrev(behandling.id))
         vedtaksbrevRepository.insert(vedtaksbrev(revurdering.id))
 
-        nullstillBehandlingService.nullstillBehandling(revurdering.id)
+        nullstillBehandlingService.nullstillBehandling(revurdering)
 
         assertThat(vedtaksbrevRepository.findByIdOrNull(behandling.id)).isNotNull
         assertThat(vedtaksbrevRepository.findByIdOrNull(revurdering.id)).isNull()
@@ -168,7 +168,7 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
         simuleringsresultatRepository.insert(simuleringsresultat(behandling.id))
         simuleringsresultatRepository.insert(simuleringsresultat(revurdering.id))
 
-        nullstillBehandlingService.nullstillBehandling(revurdering.id)
+        nullstillBehandlingService.nullstillBehandling(revurdering)
 
         assertThat(simuleringsresultatRepository.findByIdOrNull(behandling.id)).isNotNull
         assertThat(simuleringsresultatRepository.findByIdOrNull(revurdering.id)).isNull()
@@ -177,7 +177,7 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
     @Test
     fun `kan ikke nullstille er behandling som er ferdigstilt`() {
         assertThatThrownBy {
-            nullstillBehandlingService.nullstillBehandling(behandling.id)
+            nullstillBehandlingService.nullstillBehandling(behandling)
         }.hasMessageContaining("Behandlingen kan ikke nullstilles fordi den har status Ferdigstilt.")
     }
 
