@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.lagBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.splittTilLøpendeMåneder
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningServiceFeilmeldingUtil.lagDetFinnesUtgifterSomKrysserUtbetlingsperioderFeilmelding
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.MarkerSomDelAvTidligereUtbetlingUtils.markerSomDelAvTidligereUtbetaling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
@@ -210,11 +211,10 @@ private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtb
         }
 
     brukerfeilHvis(detFinnesUtgiftSomKrysserUtbetalingsperioder) {
-        """
-        Vi støtter foreløpig ikke at utgifter krysser ulike utbetalingsperioder. 
-        Utbetalingsperioder for denne behandlingen er: ${utbetalingsperioder.map { it.formatertPeriodeNorskFormat() }}, 
-        mens utgiftsperiodene er: ${utgifterTilOvernatting.map { it.formatertPeriodeNorskFormat() }}
-        """.trimIndent()
+        lagDetFinnesUtgifterSomKrysserUtbetlingsperioderFeilmelding(
+            utgifter = utgifterTilOvernatting,
+            utbetalingsperioder = utbetalingsperioder,
+        )
     }
 
     return this

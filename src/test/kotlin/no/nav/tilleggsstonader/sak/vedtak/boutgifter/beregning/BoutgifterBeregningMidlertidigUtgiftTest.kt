@@ -183,7 +183,18 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
             )
-        }.hasMessageContaining("Vi støtter foreløpig ikke at utgifter krysser ulike utbetalingsperioder")
+        }.hasMessage(
+            """
+            Utgiftsperioder krysser beregningsperioder
+            
+            Utgiftsperiode 25.01.2025–05.02.2025 krysser beregningsperiodene:
+            - 01.01.2025–31.01.2025
+            - 01.02.2025–28.02.2025
+            
+            Utgiftsperioden(e) må splittes.
+            
+            """.trimIndent(),
+        )
     }
 
     @Test

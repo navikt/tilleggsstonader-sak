@@ -363,6 +363,12 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         assertThat(feil?.message).contains(forventetFeilmelding)
     }
 
+    @Så("forvent følgende feilmelding:")
+    fun `forvent følgende feilmelding`(forventetFeilmelding: String) {
+        assertThat(feil).isNotNull
+        assertThat(feil?.message).contains(forventetFeilmelding)
+    }
+
     private fun hentVedtak(behandlingId: BehandlingId): InnvilgelseEllerOpphørBoutgifter =
         vedtakRepositoryFake
             .findByIdOrThrow(behandlingId)
