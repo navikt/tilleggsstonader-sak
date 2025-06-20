@@ -178,7 +178,8 @@ class TaAvVentServiceTest : IntegrationTest() {
                     fagsak = fagsak,
                     status = BehandlingStatus.UTREDES,
                     resultat = BehandlingResultat.INNVILGET,
-                    vedtakstidspunkt = LocalDateTime.now(), // Må være senere enn tidspunktet behandlingen ble satt på vent
+                    // vedtakstidspunkt må være senere enn tidspunktet saken tas av vent for å "snike i køen"
+                    vedtakstidspunkt = LocalDateTime.now().plusMinutes(10),
                 )
             testoppsettService.lagre(behandlingSomSniker)
             vilkårperiodeService.opprettVilkårperiode(dummyVilkårperiodeAktivitet(behandlingId = behandlingSomSniker.id))
