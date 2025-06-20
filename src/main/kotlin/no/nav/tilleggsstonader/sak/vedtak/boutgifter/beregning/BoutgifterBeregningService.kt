@@ -229,10 +229,9 @@ private fun List<Beregningsgrunnlag>.validerIkkeUlikeKombinasjonerAvSvarPåHøye
                 .distinct()
                 .count()
         brukerfeilHvis(antallUlikeSvarHøyereUtgifter > 1) {
-            """
-            Vi støtter ikke at man velger at en person både skal få dekket faktiske utgifter og ikke faktiske utgifter 
-            i samme utbetalingsperiode (${beregningsgrunnlag.formatertPeriodeNorskFormat()})
-            """.trimIndent()
+            "Vi støtter ikke at man velger at en person både skal få dekket faktiske utgifter og " +
+                "ikke faktiske utgifter i samme utbetalingsperiode " +
+                "(${beregningsgrunnlag.formatertPeriodeNorskFormat()})"
         }
     }
 
