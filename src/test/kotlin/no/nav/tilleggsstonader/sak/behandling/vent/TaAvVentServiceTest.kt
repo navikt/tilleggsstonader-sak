@@ -15,12 +15,14 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDateTime
 import java.util.Optional
 
 class TaAvVentServiceTest : IntegrationTest() {
@@ -158,7 +160,7 @@ class TaAvVentServiceTest : IntegrationTest() {
             testoppsettService.lagre(behandling(fagsak = fagsak))
             assertThatThrownBy {
                 taAvVentService.taAvVent(behandling.id)
-            }.hasMessageContaining("Det finnes en annen aktiv behandling på fagsaken som må ferdigstilles eller settes på vent")
+            }.hasMessageContaining("Det finnes allerede en aktiv behandling på denne fagsaken")
         }
     }
 
@@ -174,17 +176,22 @@ class TaAvVentServiceTest : IntegrationTest() {
             val behandlingSomSniker =
                 behandling(
                     fagsak = fagsak,
-                    status = BehandlingStatus.FERDIGSTILT,
+                    status = BehandlingStatus.UTREDES,
                     resultat = BehandlingResultat.INNVILGET,
+                    vedtakstidspunkt = LocalDateTime.now(), // Må være senere enn tidspunktet behandlingen ble satt på vent
                 )
             testoppsettService.lagre(behandlingSomSniker)
+            vilkårperiodeService.opprettVilkårperiode(dummyVilkårperiodeAktivitet(behandlingId = behandlingSomSniker.id))
+            testoppsettService.ferdigstillBehandling(behandlingSomSniker)
 
-            // Ta den første behandlingen av vent og sjekk at den blir nullstilt
+            // Ta den første behandlingen av vent og sjekk at den blir nullstilt og får ny forrigeIverksatteBehandlingId
             taAvVentService.taAvVent(behandling.id)
+
             val nullstilteVilkår = vilkårperiodeService.hentVilkårperioder(behandling.id)
             val nullstiltBehandling = testoppsettService.hentBehandling(behandling.id)
             assertThat(nullstiltBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandlingSomSniker.id)
             assertThat(nullstilteVilkår.målgrupper).isEmpty()
+            assertThat(nullstilteVilkår.aktiviteter).isNotEmpty()
         }
     }
 
