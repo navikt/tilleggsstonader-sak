@@ -106,7 +106,7 @@ class BoutgifterBeregningService(
             .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
             .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(utgifter)
             .map { lagBeregningsgrunnlag(periode = it, utgifter = utgifter) }
-            .validerIkkeUlikeKombinasjonerAvSvarPåHøyereUtgifter()
+            .validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter()
             .map {
                 BeregningsresultatForLøpendeMåned(
                     grunnlag = it,
@@ -220,7 +220,7 @@ private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtb
     return this
 }
 
-private fun List<Beregningsgrunnlag>.validerIkkeUlikeKombinasjonerAvSvarPåHøyereUtgifter(): List<Beregningsgrunnlag> {
+private fun List<Beregningsgrunnlag>.validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter(): List<Beregningsgrunnlag> {
     this.forEach { beregningsgrunnlag ->
         val antallUlikeSvarHøyereUtgifter =
             beregningsgrunnlag.utgifter.values
@@ -229,7 +229,7 @@ private fun List<Beregningsgrunnlag>.validerIkkeUlikeKombinasjonerAvSvarPåHøye
                 .distinct()
                 .count()
         brukerfeilHvis(antallUlikeSvarHøyereUtgifter > 1) {
-            "Vi støtter ikke at man velger at en person både skal få dekket faktiske utgifter og " +
+            "Vi støtter ikke at en person både skal få dekket faktiske utgifter og " +
                 "ikke faktiske utgifter i samme utbetalingsperiode " +
                 "(${beregningsgrunnlag.formatertPeriodeNorskFormat()})"
         }

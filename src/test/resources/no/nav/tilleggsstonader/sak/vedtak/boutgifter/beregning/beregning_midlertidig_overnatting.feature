@@ -197,4 +197,4 @@ Egenskap: Beregning av midlertidig overnatting
       | Fom        | Tom        | Aktivitet | Målgruppe           |
       | 01.01.2025 | 11.01.2025 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
-    Så forvent følgende feilmelding: Vi støtter ikke at man velger at en person både skal få dekket faktiske utgifter og ikke faktiske utgifter
+    Så forvent følgende feilmelding: Vi støtter ikke at en person både skal få dekket faktiske utgifter og ikke faktiske utgifter i samme utbetalingsperiode
