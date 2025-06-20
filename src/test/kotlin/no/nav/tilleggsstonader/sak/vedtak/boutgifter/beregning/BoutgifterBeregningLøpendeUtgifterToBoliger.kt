@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -45,7 +44,6 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepository,
-            unleashService = unleashService,
         )
 
     val løpendeUtgifterToBoliger: BoutgifterPerUtgiftstype =
@@ -109,7 +107,6 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
     @BeforeEach
     fun setup() {
         every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
-        every { unleashService.isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT) } returns true
     }
 
     @Test
