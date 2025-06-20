@@ -176,3 +176,15 @@ Egenskap: Beregning av midlertidig overnatting
       | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet | Høyere utgifter |
       | 01.01.2025 | 31.01.2025 | 20000        | 4953      | 01.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    | Ja              |
 
+  Scenario: Kombinasjon av høyere utgifter og ikke høyere utgifter i samme utbetalingsperiode er ikke støttet
+
+    Gitt følgende boutgifter av type UTGIFTER_OVERNATTING for behandling=1
+      | Fom        | Tom        | Utgift | Høyere utgifter |
+      | 01.01.2025 | 10.01.2025 | 20000  | Ja              |
+      | 11.01.2025 | 11.01.2025 | 20000  | Nei             |
+
+    Når vi innvilger boutgifter for behandling=1 med følgende vedtaksperioder
+      | Fom        | Tom        | Aktivitet | Målgruppe           |
+      | 01.01.2025 | 11.01.2025 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+
+    Så forvent følgende feilmelding: Vi støtter ikke at man velger at en person både skal få dekket faktiske utgifter og ikke faktiske utgifter
