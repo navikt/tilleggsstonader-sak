@@ -8,8 +8,8 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgifts
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.springframework.stereotype.Service
 
 @Service
@@ -32,15 +32,20 @@ class BoutgifterUtgiftService(
         feilHvis(type.erLøpendeUtgifterBo() && !tom.erSisteDagIMåneden()) {
             "Noe er feil. Tom skal være satt til siste dagen i måneden"
         }
-        val skalFåDekketFaktiskeUtgifter =
-            this.delvilkårsett
-                .single { it.hovedregel == RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER }
-                .let { it.resultat == Vilkårsresultat.OPPFYLT }
         return UtgiftBeregningBoutgifter(
             fom = fom,
             tom = tom,
             utgift = utgift,
-            skalFåDekketFaktiskeUtgifter = skalFåDekketFaktiskeUtgifter,
+            skalFåDekketFaktiskeUtgifter = skalFåDekketFaktiskeUtgifter(),
         )
     }
+
+    private fun Vilkår.skalFåDekketFaktiskeUtgifter(): Boolean =
+        this.delvilkårsett
+            .firstOrNull { it.hovedregel == RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER }
+            ?.let { delvilkår ->
+                delvilkår.vurderinger
+                    .single { it.regelId == RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER }
+                    .svar == SvarId.JA
+            } ?: false
 }
