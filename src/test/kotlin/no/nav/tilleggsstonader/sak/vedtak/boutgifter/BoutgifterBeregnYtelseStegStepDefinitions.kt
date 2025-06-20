@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.cucumber.TestIdTilBehandlingIdHolder.testIdTi
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.cucumber.parseValgfriBoolean
 import no.nav.tilleggsstonader.sak.cucumber.verifiserAtListerErLike
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYtelseRepositoryFake
@@ -54,6 +55,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoliger
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
@@ -164,31 +166,24 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 behandlingId = behandlingId,
                 steg = StegType.VILKÅR,
             )
-        val delvilkår =
-            when (typeBoutgift) {
-                TypeBoutgift.UTGIFTER_OVERNATTING -> oppfylteDelvilkårUtgifterOvernatting()
-                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG -> oppfylteDelvilkårLøpendeUtgifterEnBolig()
-                TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER -> oppfylteDelvilkårLøpendeUtgifterToBoliger()
-            }.map { it.tilDto() }
 
         val opprettVilkårDto =
-            mapOpprettVIlkårDto(
+            mapOpprettVilkårDto(
                 typeBoutgift = typeBoutgift,
                 behandlingId = behandlingId,
                 utgifterData = utgifterData,
-                delvilkår = delvilkår,
             )
 
         opprettVilkårDto.forEach { vilkårService.opprettNyttVilkår(it) }
     }
 
-    private fun mapOpprettVIlkårDto(
+    private fun mapOpprettVilkårDto(
         typeBoutgift: TypeBoutgift,
         behandlingId: BehandlingId,
         utgifterData: DataTable,
-        delvilkår: List<DelvilkårDto>,
     ): List<OpprettVilkårDto> =
         utgifterData.mapRad { rad ->
+            val delvilkår = mapDelvilkår(rad, typeBoutgift)
             OpprettVilkårDto(
                 vilkårType = typeBoutgift.tilVilkårType(),
                 behandlingId = behandlingId,
@@ -199,6 +194,22 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 erFremtidigUtgift = false,
             )
         }
+
+    private fun mapDelvilkår(
+        rad: Map<String, String>,
+        typeBoutgift: TypeBoutgift,
+    ): List<DelvilkårDto> {
+        val harHøyereUtgifter =
+            parseValgfriBoolean(BoutgifterDomenenøkkel.HØYERE_UTGIFTER, rad)
+                ?.takeIf { it }
+                ?.let { SvarId.JA }
+                ?: SvarId.NEI
+        return when (typeBoutgift) {
+            TypeBoutgift.UTGIFTER_OVERNATTING -> oppfylteDelvilkårUtgifterOvernatting(harHøyereUtgifter)
+            TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG -> oppfylteDelvilkårLøpendeUtgifterEnBolig(harHøyereUtgifter)
+            TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER -> oppfylteDelvilkårLøpendeUtgifterToBoliger(harHøyereUtgifter)
+        }.map { it.tilDto() }
+    }
 
     @Gitt("vi fjerner utgiftene på behandling={}")
     fun `sletter og legger inn nye utgifter`(behandlingIdTall: Int) {

@@ -162,3 +162,17 @@ Egenskap: Beregning av midlertidig overnatting
       | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
       | 01.02.2025 | 28.02.2025 | 1000         | 4953      | 01.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
+  Scenario: Skal få dekket for faktiske utgifter
+
+    Gitt følgende boutgifter av type UTGIFTER_OVERNATTING for behandling=1
+      | Fom        | Tom        | Utgift | Høyere utgifter |
+      | 01.01.2025 | 10.01.2025 | 20000  | Ja              |
+
+    Når vi innvilger boutgifter for behandling=1 med følgende vedtaksperioder
+      | Fom        | Tom        | Aktivitet | Målgruppe           |
+      | 01.01.2025 | 10.01.2025 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+
+    Så kan vi forvente følgende beregningsresultat for behandling=1
+      | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet | Høyere utgifter |
+      | 01.01.2025 | 31.01.2025 | 20000        | 4953      | 01.01.2025      | NEDSATT_ARBEIDSEVNE | TILTAK    | Ja              |
+
