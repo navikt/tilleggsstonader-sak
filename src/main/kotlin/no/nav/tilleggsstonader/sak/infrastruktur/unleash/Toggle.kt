@@ -12,7 +12,5 @@ enum class Toggle(
 
     HENT_BEHANDLINGER_FOR_OPPFØLGING("sak.hent-behandlinger-for-oppfoelging"),
 
-    SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT("sak.detaljert_beregningsresultat"),
-
     KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK("sak.kan-ha-flere-behandlinger-på-samme-fagsak"),
 }
