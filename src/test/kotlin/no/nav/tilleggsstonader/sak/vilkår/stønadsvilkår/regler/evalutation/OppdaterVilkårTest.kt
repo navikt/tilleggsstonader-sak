@@ -287,21 +287,21 @@ internal class OppdaterVilkårTest {
                 }
 
                 @Test
-                internal fun `Skal ikke kunne oppdatere vilkår som har Høyere utgifter grunnet helsemessig årsaker`() {
-                    val dto =
-                        opprettVilkårDto.copy(
-                            utgift = 500,
-                            delvilkårsett =
-                                oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsaker().map {
-                                    it.tilDto()
-                                },
-                        )
+                internal fun `løpende utgifter uten høyere utgifter skal gi oppfylt vilkårsresultat`() {
+                    val delvilkår = oppfylteDelvilkårLøpendeUtgifterToBoliger()
+                    val dto = opprettVilkårDto.copy(utgift = 500, delvilkårsett = delvilkår.map { it.tilDto() })
 
-                    assertThatThrownBy {
-                        validerVilkårOgBeregnResultat(vilkår, dto)
-                    }.hasMessageContaining(
-                        "Vi støtter ikke beregning med \"Høyere utgifter grunnet helsemessig årsaker\". Ta kontakt med Tilleggsstønader teamet.",
-                    )
+                    assertThat(validerVilkårOgBeregnResultat(vilkår, dto).vilkår)
+                        .isEqualTo(Vilkårsresultat.OPPFYLT)
+                }
+
+                @Test
+                internal fun `løpende utgifter med høyere utgifter skal gi oppfylt vilkårsresultat`() {
+                    val delvilkår = oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsaker()
+                    val dto = opprettVilkårDto.copy(utgift = 500, delvilkårsett = delvilkår.map { it.tilDto() })
+
+                    assertThat(validerVilkårOgBeregnResultat(vilkår, dto).vilkår)
+                        .isEqualTo(Vilkårsresultat.OPPFYLT)
                 }
             }
         }
