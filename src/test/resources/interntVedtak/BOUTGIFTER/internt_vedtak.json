@@ -210,7 +210,8 @@
         "UTGIFTER_OVERNATTING" : [ {
           "fom" : "2024-01-01",
           "tom" : "2024-01-31",
-          "utgift" : 3000
+          "utgift" : 3000,
+          "skalFåDekketFaktiskeUtgifter" : false
         } ]
       },
       "utgifterTilUtbetaling" : [ {
@@ -233,7 +234,8 @@
         "UTGIFTER_OVERNATTING" : [ {
           "fom" : "2024-02-26",
           "tom" : "2024-02-29",
-          "utgift" : 4000
+          "utgift" : 4000,
+          "skalFåDekketFaktiskeUtgifter" : false
         } ]
       },
       "utgifterTilUtbetaling" : [ {

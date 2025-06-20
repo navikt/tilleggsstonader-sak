@@ -45,8 +45,8 @@ class VedtakRepositoryJsonTest : IntegrationTest() {
         val jsonFraFil = objectMapper.readValue<Map<String, Any>>(json).toSortedMap()
 
         assertThat(vedtak.data).isInstanceOf(forventetType(fil.typeVedtaksdata()))
-        assertThat(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonFraFil))
-            .isEqualTo(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonFraObj))
+        assertThat(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonFraObj))
+            .isEqualTo(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonFraFil))
     }
 
     @Disabled

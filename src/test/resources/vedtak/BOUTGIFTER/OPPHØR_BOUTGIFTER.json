@@ -24,7 +24,8 @@
               {
                 "fom": "2025-01-01",
                 "tom": "2025-01-31",
-                "utgift": 2500
+                "utgift": 2500,
+                "skalFåDekketFaktiskeUtgifter": false
               }
             ]
           },
