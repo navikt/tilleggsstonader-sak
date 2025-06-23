@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
@@ -286,6 +287,24 @@ internal class OppdaterVilkårTest {
                     validerVilkårOgBeregnResultat(vilkår, dto)
                 }
 
+                // TODO denne kan slettes når man fjerner FT skalTillateIngenHøyereUtgifter
+                @Test
+                internal fun `Skal ikke kunne oppdatere vilkår som har Høyere utgifter grunnet helsemessig årsaker`() {
+                    val dto =
+                        opprettVilkårDto.copy(
+                            utgift = 500,
+                            delvilkårsett =
+                                oppfylteDelvilkårLøpendeUtgifterToBoliger(høyereUtgifter = SvarId.JA)
+                                    .map { it.tilDto() },
+                        )
+
+                    assertThatThrownBy {
+                        validerVilkårOgBeregnResultat(vilkår, dto, skalTillateIngenHøyereUtgifter = false)
+                    }.hasMessageContaining(
+                        "Vi støtter ikke beregning med \"Høyere utgifter grunnet helsemessig årsaker\". Ta kontakt med Tilleggsstønader teamet.",
+                    )
+                }
+
                 @Test
                 internal fun `løpende utgifter uten høyere utgifter skal gi oppfylt vilkårsresultat`() {
                     val delvilkår = oppfylteDelvilkårLøpendeUtgifterToBoliger()
@@ -372,4 +391,15 @@ internal class OppdaterVilkårTest {
                 erFremtidigUtgift = false,
             )
     }
+
+    private fun validerVilkårOgBeregnResultat(
+        vilkår: Vilkår,
+        oppdatering: LagreVilkårDto,
+        skalTillateIngenHøyereUtgifter: Boolean = true,
+    ): RegelResultat =
+        OppdaterVilkår.validerVilkårOgBeregnResultat(
+            vilkår = vilkår,
+            oppdatering = oppdatering,
+            skalTillateIngenHøyereUtgifter = skalTillateIngenHøyereUtgifter,
+        )
 }

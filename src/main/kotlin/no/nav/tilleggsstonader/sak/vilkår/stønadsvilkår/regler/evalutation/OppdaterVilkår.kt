@@ -20,6 +20,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.svarTilDomene
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering.utledResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelValidering.validerVilkår
@@ -34,6 +36,7 @@ object OppdaterVilkår {
     fun validerVilkårOgBeregnResultat(
         vilkår: Vilkår,
         oppdatering: LagreVilkårDto,
+        skalTillateIngenHøyereUtgifter: Boolean,
     ): RegelResultat {
         val vilkårsregel = hentVilkårsregel(vilkår.type)
 
@@ -48,6 +51,9 @@ object OppdaterVilkår {
 
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
         validerPeriodeOgBeløp(oppdatering, vilkårsresultat)
+        if (!skalTillateIngenHøyereUtgifter) {
+            validerIngenHøyereUtgifterGrunnetHelsemessigeÅrsaker(oppdatering)
+        }
 
         return vilkårsresultat
     }
@@ -86,6 +92,20 @@ object OppdaterVilkår {
         }
         feilHvis(vilkårType !in vilkårMedUtgift && oppdatering.utgift != null) {
             "Kan ikke ha utgift på vilkårType=$vilkårType"
+        }
+    }
+
+    private fun validerIngenHøyereUtgifterGrunnetHelsemessigeÅrsaker(lagreVilkårDto: LagreVilkårDto) {
+        feilHvis(
+            lagreVilkårDto.delvilkårsett.any { delvilkår ->
+                delvilkår.vurderinger.any {
+                    it.regelId ==
+                        RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER &&
+                        it.svar == SvarId.JA
+                }
+            },
+        ) {
+            "Vi støtter ikke beregning med \"Høyere utgifter grunnet helsemessig årsaker\". Ta kontakt med Tilleggsstønader teamet."
         }
     }
 
