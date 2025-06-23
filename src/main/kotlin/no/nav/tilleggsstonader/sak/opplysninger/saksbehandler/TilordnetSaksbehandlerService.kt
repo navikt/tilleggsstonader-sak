@@ -40,6 +40,11 @@ class TilordnetSaksbehandlerService(
      * stegene returnerer vi OPPGAVE_FINNES_IKKE til frontend.
      */
 
+    fun finnSaksbehandler(behandlingId: BehandlingId): SaksbehandlerDto? {
+        val oppgave = hentIkkeFerdigstiltOppgaveForBehandlingGittStegtype(behandlingId)
+        return utledAnsvarligSaksbehandlerForOppgave(behandlingId, oppgave)
+    }
+
     fun tilordnetRessursErInnloggetSaksbehandler(
         behandlingId: BehandlingId,
         oppgavetyper: Set<Oppgavetype> = setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak),

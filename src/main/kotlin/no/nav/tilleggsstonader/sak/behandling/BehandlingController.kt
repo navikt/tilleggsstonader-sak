@@ -18,7 +18,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.opplysninger.saksbehandler.TilordnetSaksbehandlerService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -41,7 +41,7 @@ class BehandlingController(
     private val fagsakService: FagsakService,
     private val henleggService: HenleggService,
     private val tilgangService: TilgangService,
-    private val oppgaveService: OppgaveService,
+    private val tilordnetSaksbehandlerService: TilordnetSaksbehandlerService,
 ) {
     @GetMapping("{behandlingId}")
     fun hentBehandling(
@@ -50,7 +50,7 @@ class BehandlingController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        val tilordnetSaksbehandler = oppgaveService.finnSaksbehandler(behandlingId)
+        val tilordnetSaksbehandler = tilordnetSaksbehandlerService.finnSaksbehandler(behandlingId)
 
         if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
             brukerfeilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
