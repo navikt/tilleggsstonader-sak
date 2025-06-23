@@ -66,7 +66,6 @@ class UtledTidligsteEndringServiceTest {
 
         every { vilkårService.hentVilkår(behandling.id) } answers { vilkår }
         every { vilkårperiodeService.hentVilkårperioder(behandling.id) } answers { vilkårperioder }
-        every { vedtaksperiodeService.finnVedtaksperioderForBehandling(behandling.id, null) } answers { vedtaksperioder }
 
         every { vilkårService.hentVilkår(sisteIverksatteBehandling.id) } answers { vilkårSisteIverksatteBehandling }
         every { vilkårperiodeService.hentVilkårperioder(sisteIverksatteBehandling.id) } answers { vilkårperioderSisteIverksattBehandling }
@@ -119,16 +118,17 @@ class UtledTidligsteEndringServiceTest {
             }
         vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
 
-        val result = utledTidligsteEndringService.utledTidligsteEndring(behandling.id)
+        val result = utledTidligsteEndringService.utledTidligsteEndring(behandling.id, vedtaksperioder)
 
         assertThat(result).isEqualTo(nyttVilkår.fom)
     }
 
     @Test
     fun `utled tidligste endring, feature-toggle er av, returnerer revurderFra`() {
+        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling // Må initialiseres
         every { unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) } returns false
         behandling = behandling.copy(type = BehandlingType.REVURDERING, revurderFra = LocalDate.of(2023, 1, 1))
-        assertThat(utledTidligsteEndringService.utledTidligsteEndring(behandling.id))
+        assertThat(utledTidligsteEndringService.utledTidligsteEndring(behandling.id, vedtaksperioder))
             .isEqualTo(behandling.revurderFra)
     }
 }

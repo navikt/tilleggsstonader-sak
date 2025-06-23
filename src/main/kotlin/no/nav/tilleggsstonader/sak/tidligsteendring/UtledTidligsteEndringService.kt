@@ -31,7 +31,7 @@ class UtledTidligsteEndringService(
 ) {
     fun utledTidligsteEndring(
         behandlingId: BehandlingId,
-        vedtaksperioderUtkast: List<Vedtaksperiode>? = null,
+        vedtaksperioder: List<Vedtaksperiode>,
     ): LocalDate? {
         val behandling = behandlingService.hentBehandling(behandlingId)
 
@@ -47,7 +47,6 @@ class UtledTidligsteEndringService(
 
         val vilkår = vilkårService.hentVilkår(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
-        val vedtaksperioder = vedtaksperioderUtkast ?: vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, null)
 
         val vilkårTidligereBehandling = vilkårService.hentVilkår(sisteIverksatteBehandling.id)
         val vilkårsperioderTidligereBehandling = vilkårperiodeService.hentVilkårperioder(sisteIverksatteBehandling.id)

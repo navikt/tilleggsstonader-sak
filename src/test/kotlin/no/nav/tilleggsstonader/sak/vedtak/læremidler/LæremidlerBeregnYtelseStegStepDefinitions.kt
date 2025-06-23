@@ -78,7 +78,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     val behandlingService = mockk<BehandlingService>()
     val utledTidligsteEndringService =
         mockk<UtledTidligsteEndringService> {
-            every { utledTidligsteEndring(any()) } returns null
+            every { utledTidligsteEndring(any(), any()) } returns null
         }
     val vilkårperiodeService =
         mockk<VilkårperiodeService>().apply {
@@ -158,7 +158,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
 
-        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId) } returns revurderFra
+        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId, any()) } returns revurderFra
 
         val vedtaksperioder = mapVedtaksperioderDto(dataTable)
         steg.utførSteg(dummyBehandling(behandlingId, revurderFra), InnvilgelseLæremidlerRequest(vedtaksperioder))

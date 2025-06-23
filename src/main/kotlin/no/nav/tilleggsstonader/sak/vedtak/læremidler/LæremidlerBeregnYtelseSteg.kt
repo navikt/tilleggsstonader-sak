@@ -93,7 +93,13 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
     ) {
-        val beregnFraDato = utledTidligsteEndringService.utledTidligsteEndring(saksbehandling.id)
+        val beregnFraDato =
+            utledTidligsteEndringService.utledTidligsteEndring(
+                saksbehandling.id,
+                vedtaksperioder.map {
+                    it.tilFellesDomeneVedtaksperiode()
+                },
+            )
 
         val beregningsresultat =
             beregningService.beregn(
