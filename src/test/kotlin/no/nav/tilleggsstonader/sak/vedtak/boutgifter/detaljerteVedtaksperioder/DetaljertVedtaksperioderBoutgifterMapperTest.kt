@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder
 
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.finnMakssats
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperioderBoutgifterMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
@@ -383,7 +383,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
             .groupBy { it.type }
             .mapValues { entry ->
                 entry.value.map {
-                    UtgiftBeregningBoutgifter(
+                    lagUtgiftBeregningBoutgifter(
                         fom = it.fom,
                         tom = it.tom,
                         utgift = it.utgift,

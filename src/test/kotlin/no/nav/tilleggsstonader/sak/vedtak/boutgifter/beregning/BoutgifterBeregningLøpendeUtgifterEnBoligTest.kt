@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagBeregningsresultatMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vilkårperioder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
@@ -50,7 +51,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
         mapOf(
             TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                 listOf(
-                    UtgiftBeregningBoutgifter(
+                    lagUtgiftBeregningBoutgifter(
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 3, 31),
                         utgift = 3000,
@@ -130,12 +131,12 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
             mapOf(
                 TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        lagUtgiftBeregningBoutgifter(
                             fom = LocalDate.of(2025, 1, 1),
                             tom = LocalDate.of(2025, 3, 31),
                             utgift = 3000,
                         ),
-                        UtgiftBeregningBoutgifter(
+                        lagUtgiftBeregningBoutgifter(
                             fom = LocalDate.of(2025, 4, 1),
                             tom = LocalDate.of(2025, 4, 30),
                             utgift = 6000,
@@ -168,7 +169,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
             mapOf(
                 TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        lagUtgiftBeregningBoutgifter(
                             fom = LocalDate.of(2025, 4, 1),
                             tom = LocalDate.of(2025, 4, 30),
                             utgift = 6000,
