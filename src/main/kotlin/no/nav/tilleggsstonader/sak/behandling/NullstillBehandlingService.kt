@@ -32,16 +32,15 @@ class NullstillBehandlingService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun nullstillBehandling(behandlingId: BehandlingId) {
-        val behandling = behandlingService.hentBehandling(behandlingId)
+    fun nullstillBehandling(behandling: Behandling) {
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Behandlingen kan ikke nullstilles fordi den har status ${behandling.status.visningsnavn()}."
         }
-        logger.info("Nullstiller behandling=$behandlingId")
+        logger.info("Nullstiller behandling=${behandling.id}")
 
-        behandlingService.oppdaterStegPåBehandling(behandlingId, StegType.INNGANGSVILKÅR)
+        behandlingService.oppdaterStegPåBehandling(behandling.id, StegType.INNGANGSVILKÅR)
 
-        slettDataIBehandling(behandlingId)
+        slettDataIBehandling(behandling.id)
 
         gjenbrukData(behandling)
     }

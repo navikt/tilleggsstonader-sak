@@ -7,12 +7,12 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagBeregningsresultatMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vilkårperioder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
@@ -45,14 +45,13 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepository,
-            unleashService = unleashService,
         )
 
     val løpendeUtgifterEnBolig: BoutgifterPerUtgiftstype =
         mapOf(
             TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                 listOf(
-                    UtgiftBeregningBoutgifter(
+                    lagUtgiftBeregningBoutgifter(
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 3, 31),
                         utgift = 3000,
@@ -109,7 +108,6 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
     @BeforeEach
     fun setup() {
         every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
-        every { unleashService.isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT) } returns true
     }
 
     @Test
@@ -133,12 +131,12 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
             mapOf(
                 TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        lagUtgiftBeregningBoutgifter(
                             fom = LocalDate.of(2025, 1, 1),
                             tom = LocalDate.of(2025, 3, 31),
                             utgift = 3000,
                         ),
-                        UtgiftBeregningBoutgifter(
+                        lagUtgiftBeregningBoutgifter(
                             fom = LocalDate.of(2025, 4, 1),
                             tom = LocalDate.of(2025, 4, 30),
                             utgift = 6000,
@@ -171,7 +169,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
             mapOf(
                 TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        lagUtgiftBeregningBoutgifter(
                             fom = LocalDate.of(2025, 4, 1),
                             tom = LocalDate.of(2025, 4, 30),
                             utgift = 6000,
