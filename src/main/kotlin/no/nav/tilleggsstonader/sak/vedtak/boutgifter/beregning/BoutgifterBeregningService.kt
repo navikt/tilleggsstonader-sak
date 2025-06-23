@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnU
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningServiceFeilmeldingUtil.lagDetFinnesUtgifterSomKrysserUtbetlingsperioderFeilmelding
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.MarkerSomDelAvTidligereUtbetlingUtils.markerSomDelAvTidligereUtbetaling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
@@ -102,6 +103,7 @@ class BoutgifterBeregningService(
             .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
             .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(utgifter)
             .map { lagBeregningsgrunnlag(periode = it, utgifter = utgifter) }
+            .validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter()
             .map {
                 BeregningsresultatForLøpendeMåned(
                     grunnlag = it,
@@ -210,6 +212,24 @@ private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtb
             utgifter = utgifterTilOvernatting,
             utbetalingsperioder = utbetalingsperioder,
         )
+    }
+
+    return this
+}
+
+private fun List<Beregningsgrunnlag>.validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter(): List<Beregningsgrunnlag> {
+    this.forEach { beregningsgrunnlag ->
+        val antallUlikeSvarHøyereUtgifter =
+            beregningsgrunnlag.utgifter.values
+                .flatten()
+                .map { it.skalFåDekketFaktiskeUtgifter }
+                .distinct()
+                .count()
+        brukerfeilHvis(antallUlikeSvarHøyereUtgifter > 1) {
+            "Vi støtter ikke at en person både skal få dekket faktiske utgifter og " +
+                "ikke faktiske utgifter i samme utbetalingsperiode " +
+                "(${beregningsgrunnlag.formatertPeriodeNorskFormat()})"
+        }
     }
 
     return this

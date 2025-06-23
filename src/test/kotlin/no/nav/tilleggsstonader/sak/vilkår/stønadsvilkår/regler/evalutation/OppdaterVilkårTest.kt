@@ -8,9 +8,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.oppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.validerVilkårOgBeregnResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.delvilkårFremtidigeUtgifter
@@ -19,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.Boutgi
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.ikkeOppfylteDelvilkårUtgifterOvernatting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoliger
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsaker
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
@@ -286,22 +287,40 @@ internal class OppdaterVilkårTest {
                     validerVilkårOgBeregnResultat(vilkår, dto)
                 }
 
+                // TODO denne kan slettes når man fjerner FT skalTillateIngenHøyereUtgifter
                 @Test
                 internal fun `Skal ikke kunne oppdatere vilkår som har Høyere utgifter grunnet helsemessig årsaker`() {
                     val dto =
                         opprettVilkårDto.copy(
                             utgift = 500,
                             delvilkårsett =
-                                oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsaker().map {
-                                    it.tilDto()
-                                },
+                                oppfylteDelvilkårLøpendeUtgifterToBoliger(høyereUtgifter = SvarId.JA)
+                                    .map { it.tilDto() },
                         )
 
                     assertThatThrownBy {
-                        validerVilkårOgBeregnResultat(vilkår, dto)
+                        validerVilkårOgBeregnResultat(vilkår, dto, skalTillateIngenHøyereUtgifter = false)
                     }.hasMessageContaining(
                         "Vi støtter ikke beregning med \"Høyere utgifter grunnet helsemessig årsaker\". Ta kontakt med Tilleggsstønader teamet.",
                     )
+                }
+
+                @Test
+                internal fun `løpende utgifter uten høyere utgifter skal gi oppfylt vilkårsresultat`() {
+                    val delvilkår = oppfylteDelvilkårLøpendeUtgifterToBoliger()
+                    val dto = opprettVilkårDto.copy(utgift = 500, delvilkårsett = delvilkår.map { it.tilDto() })
+
+                    assertThat(validerVilkårOgBeregnResultat(vilkår, dto).vilkår)
+                        .isEqualTo(Vilkårsresultat.OPPFYLT)
+                }
+
+                @Test
+                internal fun `løpende utgifter med høyere utgifter skal gi oppfylt vilkårsresultat`() {
+                    val delvilkår = oppfylteDelvilkårLøpendeUtgifterToBoliger(høyereUtgifter = SvarId.JA)
+                    val dto = opprettVilkårDto.copy(utgift = 500, delvilkårsett = delvilkår.map { it.tilDto() })
+
+                    assertThat(validerVilkårOgBeregnResultat(vilkår, dto).vilkår)
+                        .isEqualTo(Vilkårsresultat.OPPFYLT)
                 }
             }
         }
@@ -372,4 +391,15 @@ internal class OppdaterVilkårTest {
                 erFremtidigUtgift = false,
             )
     }
+
+    private fun validerVilkårOgBeregnResultat(
+        vilkår: Vilkår,
+        oppdatering: LagreVilkårDto,
+        skalTillateIngenHøyereUtgifter: Boolean = true,
+    ): RegelResultat =
+        OppdaterVilkår.validerVilkårOgBeregnResultat(
+            vilkår = vilkår,
+            oppdatering = oppdatering,
+            skalTillateIngenHøyereUtgifter = skalTillateIngenHøyereUtgifter,
+        )
 }

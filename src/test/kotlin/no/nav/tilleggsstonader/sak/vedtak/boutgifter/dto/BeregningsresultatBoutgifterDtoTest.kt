@@ -177,4 +177,50 @@ class BeregningsresultatBoutgifterDtoTest {
 
         assertEquals(forventetResultat, result)
     }
+
+    @Test
+    fun `skal vise riktig beløp hvis man har fått høyere utgifter`() {
+        val utgift =
+            listOf(
+                lagUtgiftBeregningBoutgifter(
+                    fom = LocalDate.of(2023, 1, 1),
+                    tom = LocalDate.of(2023, 1, 5),
+                    utgift = 20_000,
+                    skalFåDekketFaktiskeUtgifter = true,
+                ),
+            )
+
+        val beregningsresultatForLøpendeMåned =
+            BeregningsresultatForLøpendeMåned(
+                grunnlag =
+                    Beregningsgrunnlag(
+                        fom = LocalDate.of(2023, 1, 1),
+                        tom = LocalDate.of(2023, 1, 31),
+                        utgifter = mapOf(TypeBoutgift.UTGIFTER_OVERNATTING to utgift),
+                        makssats = 4953,
+                        makssatsBekreftet = true,
+                        målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                        aktivitet = AktivitetType.TILTAK,
+                    ),
+                stønadsbeløp = 20_000,
+            )
+
+        val forventetResultat =
+            listOf(
+                UtgiftBoutgifterMedAndelTilUtbetalingDto(
+                    fom = LocalDate.of(2023, 1, 1),
+                    tom = LocalDate.of(2023, 1, 5),
+                    utgift = 20_000,
+                    tilUtbetaling = 20_000,
+                    erFørRevurderFra = true,
+                ),
+            )
+
+        val revurderFra = LocalDate.of(2023, 1, 10)
+
+        val result =
+            beregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(revurderFra)
+
+        assertEquals(forventetResultat, result)
+    }
 }
