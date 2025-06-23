@@ -34,7 +34,7 @@ class TaAvVentService(
         when (val kanTaAvVent = utledTaAvVentStatus(behandling)) {
             is KanTaAvVent.Nei -> {
                 when (kanTaAvVent.årsak) {
-                    Årsak.ErAlleredePåVent -> feil("Behandlingen er allerede på vent")
+                    Årsak.ErIkkePåVent -> feil("Behandlingen er ikke på vent")
                     Årsak.AnnenAktivBehandlingPåFagsaken -> brukerfeil("Det finnes allerede en aktiv behandling på denne fagsaken")
                 }
             }
@@ -67,7 +67,7 @@ class TaAvVentService(
 
     private fun utledTaAvVentStatus(behandling: Behandling): KanTaAvVent {
         if (behandling.status != BehandlingStatus.SATT_PÅ_VENT) {
-            return KanTaAvVent.Nei(årsak = Årsak.ErAlleredePåVent)
+            return KanTaAvVent.Nei(årsak = Årsak.ErIkkePåVent)
         }
 
         if (detFinnesAndreAktiveBehandlingerPåFagsaken(behandling)) {
@@ -151,7 +151,7 @@ sealed class KanTaAvVent {
         val årsak: Årsak,
     ) : KanTaAvVent() {
         sealed class Årsak {
-            data object ErAlleredePåVent : Årsak()
+            data object ErIkkePåVent : Årsak()
 
             data object AnnenAktivBehandlingPåFagsaken : Årsak()
         }

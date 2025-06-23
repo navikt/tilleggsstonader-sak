@@ -150,7 +150,7 @@ class TaAvVentServiceTest : IntegrationTest() {
             taAvVentService.taAvVent(behandling.id)
             assertThatThrownBy {
                 taAvVentService.taAvVent(behandling.id)
-            }.hasMessageContaining("Behandlingen er allerede på vent")
+            }.hasMessageContaining("Behandlingen er ikke på vent")
         }
     }
 
