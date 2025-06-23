@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
@@ -78,7 +78,7 @@ class VedtaksperioderOversiktServiceTest : IntegrationTest() {
                     mapOf(
                         TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                             listOf(
-                                UtgiftBeregningBoutgifter(
+                                lagUtgiftBeregningBoutgifter(
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now(),
                                     utgift = 1000,

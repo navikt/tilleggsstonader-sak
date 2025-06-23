@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagBeregningsresultatMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.MarkerSomDelAvTidligereUtbetlingUtils.markerSomDelAvTidligereUtbetaling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
@@ -13,7 +14,7 @@ class MarkerSomDelAvTidligereUtbetlingUtilsTest {
         mapOf(
             TypeBoutgift.UTGIFTER_OVERNATTING to
                 listOf(
-                    UtgiftBeregningBoutgifter(
+                    lagUtgiftBeregningBoutgifter(
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 4),
                         utgift = 3000,
@@ -24,7 +25,7 @@ class MarkerSomDelAvTidligereUtbetlingUtilsTest {
         mapOf(
             TypeBoutgift.UTGIFTER_OVERNATTING to
                 listOf(
-                    UtgiftBeregningBoutgifter(
+                    lagUtgiftBeregningBoutgifter(
                         fom = LocalDate.of(2025, 2, 7),
                         tom = LocalDate.of(2025, 2, 13),
                         utgift = 3000,

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift.UTGIFTER_OVERNATTING
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -154,7 +155,7 @@ private fun lagDummyVedtaksperiode(
 private fun lagDummyUtgift(
     fom: LocalDate,
     tom: LocalDate = fom,
-) = UtgiftBeregningBoutgifter(
+) = lagUtgiftBeregningBoutgifter(
     fom = fom,
     tom = tom,
     utgift = 1000,

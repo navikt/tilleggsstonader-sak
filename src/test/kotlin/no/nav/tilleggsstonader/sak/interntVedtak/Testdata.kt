@@ -22,7 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
@@ -464,7 +464,7 @@ object Testdata {
                                         mapOf(
                                             TypeBoutgift.UTGIFTER_OVERNATTING to
                                                 listOf(
-                                                    UtgiftBeregningBoutgifter(
+                                                    lagUtgiftBeregningBoutgifter(
                                                         fom = LocalDate.of(2024, 1, 1),
                                                         tom = LocalDate.of(2024, 1, 31),
                                                         utgift = 3000,
@@ -487,7 +487,7 @@ object Testdata {
                                         mapOf(
                                             TypeBoutgift.UTGIFTER_OVERNATTING to
                                                 listOf(
-                                                    UtgiftBeregningBoutgifter(
+                                                    lagUtgiftBeregningBoutgifter(
                                                         fom = LocalDate.of(2024, FEBRUARY, 1),
                                                         tom = LocalDate.of(2024, FEBRUARY, 2),
                                                         utgift = 3000,
@@ -495,7 +495,7 @@ object Testdata {
                                                 ),
                                             TypeBoutgift.UTGIFTER_OVERNATTING to
                                                 listOf(
-                                                    UtgiftBeregningBoutgifter(
+                                                    lagUtgiftBeregningBoutgifter(
                                                         fom = LocalDate.of(2024, FEBRUARY, 26),
                                                         tom = LocalDate.of(2024, FEBRUARY, 29),
                                                         utgift = 4000,

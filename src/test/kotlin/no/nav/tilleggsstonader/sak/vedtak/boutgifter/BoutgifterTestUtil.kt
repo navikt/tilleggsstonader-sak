@@ -88,7 +88,7 @@ object BoutgifterTestUtil {
                         mapOf(
                             TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                                 listOf(
-                                    UtgiftBeregningBoutgifter(
+                                    lagUtgiftBeregningBoutgifter(
                                         fom = fom,
                                         tom = tom,
                                         utgift = 3000,
@@ -98,6 +98,19 @@ object BoutgifterTestUtil {
                 ),
             ),
     )
+
+    fun lagUtgiftBeregningBoutgifter(
+        fom: LocalDate,
+        tom: LocalDate,
+        utgift: Int = 3000,
+        skalFåDekketFaktiskeUtgifter: Boolean = false,
+    ): UtgiftBeregningBoutgifter =
+        UtgiftBeregningBoutgifter(
+            fom = fom,
+            tom = tom,
+            utgift = utgift,
+            skalFåDekketFaktiskeUtgifter = skalFåDekketFaktiskeUtgifter,
+        )
 
     fun lagBeregningsresultatMåned(
         fom: LocalDate,

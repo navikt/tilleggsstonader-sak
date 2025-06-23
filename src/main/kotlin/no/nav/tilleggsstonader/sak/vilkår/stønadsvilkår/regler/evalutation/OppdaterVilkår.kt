@@ -36,6 +36,7 @@ object OppdaterVilkår {
     fun validerVilkårOgBeregnResultat(
         vilkår: Vilkår,
         oppdatering: LagreVilkårDto,
+        skalTillateIngenHøyereUtgifter: Boolean,
     ): RegelResultat {
         val vilkårsregel = hentVilkårsregel(vilkår.type)
 
@@ -50,7 +51,9 @@ object OppdaterVilkår {
 
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
         validerPeriodeOgBeløp(oppdatering, vilkårsresultat)
-        validerIngenHøyereUtgifterGrunnetHelsemessigeÅrsaker(oppdatering)
+        if (!skalTillateIngenHøyereUtgifter) {
+            validerIngenHøyereUtgifterGrunnetHelsemessigeÅrsaker(oppdatering)
+        }
 
         return vilkårsresultat
     }
