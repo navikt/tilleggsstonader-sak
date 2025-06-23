@@ -8,7 +8,6 @@ import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -26,7 +25,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepos
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -101,16 +99,11 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             vilkårperiodeService = vilkårperiodeServiceMock,
         )
     val simuleringServiceMock = mockk<SimuleringService>(relaxed = true)
-    val unleashService =
-        mockk<UnleashService>().apply {
-            every { isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT) } returns true
-        }
     val beregningService =
         BoutgifterBeregningService(
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepositoryFake,
-            unleashService = unleashService,
         )
     val opphørValideringService =
         OpphørValideringService(
