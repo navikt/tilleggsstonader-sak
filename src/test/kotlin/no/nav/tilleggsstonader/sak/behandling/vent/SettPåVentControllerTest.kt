@@ -73,7 +73,7 @@ class SettPåVentControllerTest : IntegrationTest() {
                     fagsak = fagsak,
                     resultat = BehandlingResultat.INNVILGET,
                     status = BehandlingStatus.FERDIGSTILT,
-                    vedtakstidspunkt = LocalDateTime.now().plusMinutes(10),
+                    vedtakstidspunkt = LocalDateTime.now().plusDays(2),
                 )
             testoppsettService.lagre(behandlingSomSniker)
 

@@ -127,8 +127,8 @@ class TaAvVentService(
         val sisteVedtakstidspunktPåFagsaken =
             behandlingService.finnSisteBehandlingSomHarVedtakPåFagsaken(behandling.fagsakId)?.vedtakstidspunkt
                 ?: return false
-        val tidspunktOppgavenSistBleSattPåVent = finnAktivSattPåVent(behandling.id).sporbar.opprettetTid
-        return sisteVedtakstidspunktPåFagsaken.isAfter(tidspunktOppgavenSistBleSattPåVent)
+        val tidspunktBehandlingenSistBleSattPåVent = finnAktivSattPåVent(behandling.id).sporbar.opprettetTid
+        return sisteVedtakstidspunktPåFagsaken.isAfter(tidspunktBehandlingenSistBleSattPåVent)
     }
 
     private fun finnAktivSattPåVent(behandlingId: BehandlingId) =
