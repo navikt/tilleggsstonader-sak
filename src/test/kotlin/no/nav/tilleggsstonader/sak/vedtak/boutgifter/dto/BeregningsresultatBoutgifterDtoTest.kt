@@ -182,7 +182,7 @@ class BeregningsresultatBoutgifterDtoTest {
     fun `skal vise riktig beløp hvis man har fått høyere utgifter`() {
         val utgift =
             listOf(
-                UtgiftBeregningBoutgifter(
+                lagUtgiftBeregningBoutgifter(
                     fom = LocalDate.of(2023, 1, 1),
                     tom = LocalDate.of(2023, 1, 5),
                     utgift = 20_000,

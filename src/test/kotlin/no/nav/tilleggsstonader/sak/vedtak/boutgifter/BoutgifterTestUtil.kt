@@ -102,11 +102,13 @@ object BoutgifterTestUtil {
         fom: LocalDate,
         tom: LocalDate,
         utgift: Int = 3000,
+        skalFåDekketFaktiskeUtgifter: Boolean = false,
     ): UtgiftBeregningBoutgifter =
         UtgiftBeregningBoutgifter(
             fom = fom,
             tom = tom,
             utgift = utgift,
+            skalFåDekketFaktiskeUtgifter = skalFåDekketFaktiskeUtgifter,
         )
 
     fun lagBeregningsresultatMåned(
