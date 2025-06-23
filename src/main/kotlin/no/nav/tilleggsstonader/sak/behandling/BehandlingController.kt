@@ -50,7 +50,7 @@ class BehandlingController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        val tilordnetSaksbehandler = oppgaveService.hentBehandleSak(behandlingId)
+        val tilordnetSaksbehandler = oppgaveService.finnSaksbehandler(behandlingId)
 
         if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
             brukerfeilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
@@ -58,7 +58,7 @@ class BehandlingController(
             }
             faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId)
         }
-        return saksbehandling.tilDto(tilordnetSaksbehandler?.tilordnetSaksbehandler)
+        return saksbehandling.tilDto(tilordnetSaksbehandler)
     }
 
     @GetMapping("fagsak-person/{fagsakPersonId}")
@@ -115,7 +115,7 @@ class BehandlingController(
         tilgangService.validerHarSaksbehandlerrolle()
         val henlagtBehandling = henleggService.henleggBehandling(behandlingId, henlagt)
         val fagsak: Fagsak = fagsakService.hentFagsak(henlagtBehandling.fagsakId)
-        return henlagtBehandling.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId)
+        return henlagtBehandling.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId, null)
     }
 
     @GetMapping("/ekstern/{eksternBehandlingId}")

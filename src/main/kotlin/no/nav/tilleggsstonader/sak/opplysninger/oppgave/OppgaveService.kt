@@ -31,10 +31,12 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppdatertOppgaveH
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMedMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.SaksbehandlerDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
+import no.nav.tilleggsstonader.sak.opplysninger.saksbehandler.TilordnetSaksbehandlerService
 import no.nav.tilleggsstonader.sak.util.DatoFormat
 import no.nav.tilleggsstonader.sak.util.FnrUtil
 import org.slf4j.LoggerFactory
@@ -50,6 +52,7 @@ class OppgaveService(
     private val cacheManager: CacheManager,
     private val personService: PersonService,
     private val klageService: KlageService,
+    private val tilordnetSaksbehandlerService: TilordnetSaksbehandlerService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -254,8 +257,12 @@ class OppgaveService(
             setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak),
         )
 
-    fun hentBehandleSak(behandlingId: BehandlingId): OppgaveDomain? =
-        oppgaveRepository.findByBehandlingIdAndType(behandlingId, Oppgavetype.BehandleSak)?.lastOrNull()
+    fun finnSaksbehandler(behandlingId: BehandlingId): SaksbehandlerDto? {
+        val oppgave = tilordnetSaksbehandlerService.hentIkkeFerdigstiltOppgaveForBehandlingGittStegtype(behandlingId)
+        val saksbehandler =
+            tilordnetSaksbehandlerService.utledAnsvarligSaksbehandlerForOppgave(behandlingId, oppgave)
+        return saksbehandler
+    }
 
     fun hentOppgave(gsakOppgaveId: Long): Oppgave = oppgaveClient.finnOppgaveMedId(gsakOppgaveId)
 
