@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringSer
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class LæremidlerBeregningService(
@@ -40,11 +41,13 @@ class LæremidlerBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
+        beregnFraDato: LocalDate?,
     ): BeregningsresultatLæremidler {
         vedtaksperiodeValideringService.validerVedtaksperioderLæremidler(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             typeVedtak = TypeVedtak.INNVILGELSE,
+            beregnFraDato = beregnFraDato,
         )
 
         val vedtaksperioderBeregningsgrunnlag = vedtaksperioder.tilBeregningsgrunnlag()
@@ -53,7 +56,7 @@ class LæremidlerBeregningService(
         val beregningsresultatForMåned = beregn(behandling, vedtaksperioderBeregningsgrunnlag)
 
         return if (forrigeVedtak != null) {
-            settSammenGamleOgNyePerioder(behandling, beregningsresultatForMåned, forrigeVedtak)
+            settSammenGamleOgNyePerioder(behandling, beregningsresultatForMåned, forrigeVedtak, behandling.revurderFra ?: beregnFraDato)
         } else {
             BeregningsresultatLæremidler(beregningsresultatForMåned)
         }
@@ -74,6 +77,7 @@ class LæremidlerBeregningService(
         feilHvis(behandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
+        // TODO - opphørsdato (ny)
         feilHvis(behandling.revurderFra == null) {
             "revurderFra-dato er påkrevd for opphør"
         }
@@ -163,20 +167,20 @@ class LæremidlerBeregningService(
         saksbehandling: Saksbehandling,
         beregningsresultat: List<BeregningsresultatForMåned>,
         forrigeVedtak: InnvilgelseEllerOpphørLæremidler,
+        beregnFraDato: LocalDate?,
     ): BeregningsresultatLæremidler {
-        val revurderFra = saksbehandling.revurderFra
-        feilHvis(revurderFra == null) { "Behandling=$saksbehandling mangler revurderFra" }
+        feilHvis(beregnFraDato == null) { "Behandling=$saksbehandling mangler revurderFra eller dato for tidligste endring" }
 
         val forrigeBeregningsresultat = forrigeVedtak.beregningsresultat
 
         val perioderFraForrigeVedtakSomSkalBeholdes =
             forrigeBeregningsresultat
                 .perioder
-                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < revurderFra }
+                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < beregnFraDato }
                 .map { it.markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling = true) }
         val nyePerioder =
             beregningsresultat
-                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() >= revurderFra }
+                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() >= beregnFraDato }
 
         val nyePerioderMedKorrigertUtbetalingsdato = korrigerUtbetalingsdato(nyePerioder, forrigeBeregningsresultat)
 

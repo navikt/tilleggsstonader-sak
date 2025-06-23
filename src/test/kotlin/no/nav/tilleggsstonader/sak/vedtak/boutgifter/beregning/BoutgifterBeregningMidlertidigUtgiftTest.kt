@@ -101,6 +101,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                     behandling = saksbehandling(),
                     vedtaksperioder = vedtaksperioder,
                     typeVedtak = TypeVedtak.INNVILGELSE,
+                    beregnFraDato = null,
                 ).perioder
 
         assertThat(res).isEqualTo(beregningsresultatFørstegangsbehandlingMidlertidigOvernatting)
@@ -115,6 +116,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 behandling = saksbehandling(),
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
+                beregnFraDato = null,
             )
         }.hasMessage("Det er ikke lagt inn noen oppfylte utgiftsperioder")
     }
@@ -140,6 +142,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 behandling = saksbehandling(),
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
+                beregnFraDato = null,
             )
         }.hasMessage("Vedtaksperioden 01.01.2025–31.01.2025 mangler oppfylt utgift hele eller deler av perioden.")
     }
@@ -182,6 +185,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 behandling = saksbehandling(),
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
+                beregnFraDato = null,
             )
         }.hasMessage(
             """
@@ -264,17 +268,20 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 vedtaksperioder = vedtaksperioder,
             )
 
+        val saksbehandling =
+            saksbehandling(
+                revurderFra = LocalDate.of(2025, 3, 10),
+                forrigeIverksatteBehandlingId = BehandlingId.random(),
+                type = BehandlingType.REVURDERING,
+            )
+
         val res =
             boutgifterBeregningService
                 .beregn(
-                    behandling =
-                        saksbehandling(
-                            revurderFra = LocalDate.of(2025, 3, 10),
-                            forrigeIverksatteBehandlingId = BehandlingId.random(),
-                            type = BehandlingType.REVURDERING,
-                        ),
+                    behandling = saksbehandling,
                     vedtaksperioder = vedtaksperioderRevurdering,
                     typeVedtak = TypeVedtak.INNVILGELSE,
+                    beregnFraDato = saksbehandling.revurderFra,
                 ).perioder
 
         assertThat(res.size).isEqualTo(2)

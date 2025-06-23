@@ -1,8 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -25,12 +28,15 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class TilsynBarnBeregnYtelseSteg(
     private val beregningService: TilsynBarnBeregningService,
     private val opphørValideringService: OpphørValideringService,
     private val vedtaksperiodeService: VedtaksperiodeService,
+    private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val unleashService: UnleashService,
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -55,11 +61,14 @@ class TilsynBarnBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtak: InnvilgelseTilsynBarnRequest,
     ) {
+        val beregnFraDato = utledTidligsteEndringService.utledTidligsteEndring(saksbehandling.id)
+
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
+                beregnFraDato = beregnFraDato,
             )
         vedtakRepository.insert(
             lagInnvilgetVedtak(
@@ -67,6 +76,7 @@ class TilsynBarnBeregnYtelseSteg(
                 beregningsresultat = beregningsresultat,
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene().sorted(),
                 begrunnelse = vedtak.begrunnelse,
+                beregnetFra = beregnFraDato,
             ),
         )
         lagreAndeler(saksbehandling, beregningsresultat)
@@ -82,6 +92,7 @@ class TilsynBarnBeregnYtelseSteg(
 
         opphørValideringService.validerVilkårperioder(saksbehandling)
 
+        // TODO - send med opphørsdato (ny)
         val vedtaksperioder = vedtaksperiodeService.finnNyeVedtaksperioderForOpphør(saksbehandling)
 
         val beregningsresultat =
@@ -89,6 +100,8 @@ class TilsynBarnBeregnYtelseSteg(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.OPPHØR,
+                // TODO: Sette beregnFraDato til opphørsdato (ny)
+                beregnFraDato = saksbehandling.revurderFra,
             )
         opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
             beregningsresultat,
@@ -106,6 +119,7 @@ class TilsynBarnBeregnYtelseSteg(
                         vedtaksperioder = vedtaksperioder,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
+                beregnetFra = null, // TODO: Sette beregnFraDato til opphørsdato (ny)
             ),
         )
 
@@ -126,6 +140,7 @@ class TilsynBarnBeregnYtelseSteg(
                         begrunnelse = vedtak.begrunnelse,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
+                beregnetFra = null,
             ),
         )
     }
@@ -143,6 +158,7 @@ class TilsynBarnBeregnYtelseSteg(
         beregningsresultat: BeregningsresultatTilsynBarn,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
+        beregnetFra: LocalDate?,
     ): Vedtak =
         GeneriskVedtak(
             behandlingId = behandling.id,
@@ -154,5 +170,6 @@ class TilsynBarnBeregnYtelseSteg(
                     beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
+            beregnetFra = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) beregnetFra else null,
         )
 }

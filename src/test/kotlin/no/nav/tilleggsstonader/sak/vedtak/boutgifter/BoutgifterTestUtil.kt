@@ -58,6 +58,7 @@ object BoutgifterTestUtil {
             ),
         type = TypeVedtak.INNVILGELSE,
         gitVersjon = "versjon-test",
+        beregnetFra = defaultBehandling.revurderFra,
     )
 
     fun vedtaksperiode(

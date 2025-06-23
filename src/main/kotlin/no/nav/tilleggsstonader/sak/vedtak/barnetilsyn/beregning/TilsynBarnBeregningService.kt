@@ -58,6 +58,7 @@ class TilsynBarnBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
+        beregnFraDato: LocalDate?,
     ): BeregningsresultatTilsynBarn {
         feilHvis(typeVedtak == TypeVedtak.AVSLAG) {
             "Skal ikke beregne for avslag"
@@ -70,10 +71,11 @@ class TilsynBarnBeregningService(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             typeVedtak = typeVedtak,
+            beregnFraDato = beregnFraDato,
         )
 
         val vedtaksperioderBeregning =
-            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(behandling.revurderFra)
+            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(beregnFraDato)
 
         val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioderBeregning)
         val relevantePerioderFraForrigeVedtak =

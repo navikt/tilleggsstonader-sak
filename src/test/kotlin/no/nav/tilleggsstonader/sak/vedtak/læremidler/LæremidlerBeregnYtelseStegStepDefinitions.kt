@@ -28,6 +28,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYte
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -74,6 +76,10 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     val vedtakRepository = VedtakRepositoryFake()
     val tilkjentYtelseRepository = TilkjentYtelseRepositoryFake()
     val behandlingService = mockk<BehandlingService>()
+    val utledTidligsteEndringService =
+        mockk<UtledTidligsteEndringService> {
+            every { utledTidligsteEndring(any()) } returns null
+        }
     val vilkårperiodeService =
         mockk<VilkårperiodeService>().apply {
             val mock = this
@@ -108,6 +114,8 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             vedtakRepository = vedtakRepository,
             tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepository),
             simuleringService = simuleringService,
+            utledTidligsteEndringService = utledTidligsteEndringService,
+            unleashService = mockUnleashService(),
         )
     val vedtaksperiodeId: UUID = UUID.randomUUID()
 
@@ -149,6 +157,8 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
+
+        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId) } returns revurderFra
 
         val vedtaksperioder = mapVedtaksperioderDto(dataTable)
         steg.utførSteg(dummyBehandling(behandlingId, revurderFra), InnvilgelseLæremidlerRequest(vedtaksperioder))

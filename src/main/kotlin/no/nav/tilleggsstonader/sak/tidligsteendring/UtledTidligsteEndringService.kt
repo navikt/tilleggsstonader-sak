@@ -1,11 +1,12 @@
 package no.nav.tilleggsstonader.sak.tidligsteendring
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -26,16 +27,27 @@ class UtledTidligsteEndringService(
     private val vilkårperiodeService: VilkårperiodeService,
     private val vedtaksperiodeService: VedtaksperiodeService,
     private val barnService: BarnService,
+    private val unleashService: UnleashService,
 ) {
-    fun utledTidligsteEndring(behandlingId: BehandlingId): LocalDate? {
+    fun utledTidligsteEndring(
+        behandlingId: BehandlingId,
+        vedtaksperioderUtkast: List<Vedtaksperiode>? = null,
+    ): LocalDate? {
         val behandling = behandlingService.hentBehandling(behandlingId)
-        val sisteIverksatteBehandling =
-            behandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentBehandling(it) }
-                ?: feil("Fant ingen tidligere iverksatt behandling for behandlingId=$behandlingId")
+
+        if (!unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
+            return behandling.revurderFra
+        }
+
+        val sisteIverksatteBehandling = behandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentBehandling(it) }
+
+        if (sisteIverksatteBehandling == null) {
+            return null
+        }
 
         val vilkår = vilkårService.hentVilkår(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
-        val vedtaksperioder = vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, null)
+        val vedtaksperioder = vedtaksperioderUtkast ?: vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, null)
 
         val vilkårTidligereBehandling = vilkårService.hentVilkår(sisteIverksatteBehandling.id)
         val vilkårsperioderTidligereBehandling = vilkårperiodeService.hentVilkårperioder(sisteIverksatteBehandling.id)

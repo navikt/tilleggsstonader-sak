@@ -4,6 +4,7 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
@@ -36,6 +37,7 @@ class LæremidlerVedtakController(
     private val stegService: StegService,
     private val steg: LæremidlerBeregnYtelseSteg,
     private val vedtaksperiodeService: VedtaksperiodeLæremidlerService,
+    private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -77,11 +79,17 @@ class LæremidlerVedtakController(
     ): BeregningsresultatLæremidlerDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        val beregnFraDato =
+            utledTidligsteEndringService.utledTidligsteEndring(
+                behandling.id,
+                vedtaksperioder.tilDomene().map { it.tilFellesDomeneVedtaksperiode() },
+            )
         return beregningService
             .beregn(
                 behandling,
                 vedtaksperioder.tilDomene(),
-            ).tilDto(revurderFra = behandling.revurderFra)
+                beregnFraDato,
+            ).tilDto(beregnetFra = beregnFraDato)
     }
 
     @GetMapping("{behandlingId}")

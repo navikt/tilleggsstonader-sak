@@ -13,6 +13,7 @@ import java.time.LocalDate
 data class BeregningsresultatBoutgifterDto(
     val perioder: List<BeregningsresultatForPeriodeDto>,
     val inneholderUtgifterOvernatting: Boolean,
+    val beregnetFra: LocalDate? = null,
 )
 
 data class BeregningsresultatForPeriodeDto(
@@ -42,13 +43,14 @@ data class UtgiftBoutgifterMedAndelTilUtbetalingDto(
     }
 }
 
-fun BeregningsresultatBoutgifter.tilDto(revurderFra: LocalDate?): BeregningsresultatBoutgifterDto =
+fun BeregningsresultatBoutgifter.tilDto(beregnetFra: LocalDate?): BeregningsresultatBoutgifterDto =
     BeregningsresultatBoutgifterDto(
         perioder =
-            filtrerFraOgMed(revurderFra)
+            filtrerFraOgMed(beregnetFra)
                 .perioder
-                .map { it.tilDto(revurderFra) },
+                .map { it.tilDto(beregnetFra) },
         inneholderUtgifterOvernatting = inneholderUtgifterOvernatting(),
+        beregnetFra = beregnetFra,
     )
 
 private fun BeregningsresultatBoutgifter.filtrerFraOgMed(dato: LocalDate?): BeregningsresultatBoutgifter {

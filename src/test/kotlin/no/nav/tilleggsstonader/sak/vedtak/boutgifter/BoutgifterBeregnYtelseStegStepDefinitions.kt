@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepo
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -77,6 +78,10 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     val vedtakRepositoryFake = VedtakRepositoryFake()
     val tilkjentYtelseRepositoryFake = TilkjentYtelseRepositoryFake()
     val behandlingServiceMock = mockk<BehandlingService>()
+    val utledTidligsteEndringService =
+        mockk<UtledTidligsteEndringService> {
+            every { utledTidligsteEndring(any(), any()) } returns null
+        }
     val vilkårperiodeServiceMock =
         mockk<VilkårperiodeService>().apply {
             every { hentVilkårperioder(any()) } answers {
@@ -102,8 +107,9 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         )
     val simuleringServiceMock = mockk<SimuleringService>(relaxed = true)
     val unleashService =
-        mockk<UnleashService>().apply {
+        mockk<UnleashService> {
             every { isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT) } returns true
+            every { isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) } returns true
         }
     val beregningService =
         BoutgifterBeregningService(
@@ -122,9 +128,11 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             beregningService =
             beregningService,
             opphørValideringService = opphørValideringService,
+            utledTidligsteEndringService = utledTidligsteEndringService,
             vedtakRepository = vedtakRepositoryFake,
             tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepositoryFake),
             simuleringService = simuleringServiceMock,
+            unleashService = unleashService,
         )
 
     var feil: Exception? = null
@@ -267,6 +275,8 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
 
+        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId, any()) } returns revurderFra
+
         kjørMedFeilkontekst {
             steg.utførSteg(
                 dummyBehandling(behandlingId, revurderFra = revurderFra),
@@ -287,6 +297,8 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
         val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto() }
+
+        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId, any()) } returns revurderFra
 
         kjørMedFeilkontekst {
             steg.utførSteg(

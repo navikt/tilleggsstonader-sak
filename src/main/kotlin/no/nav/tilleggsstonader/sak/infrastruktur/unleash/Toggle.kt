@@ -15,4 +15,5 @@ enum class Toggle(
     SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT("sak.detaljert_beregningsresultat"),
 
     KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK("sak.kan-ha-flere-behandlinger-på-samme-fagsak"),
+    SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK("sak.utled-endringsdato-revurdering"),
 }

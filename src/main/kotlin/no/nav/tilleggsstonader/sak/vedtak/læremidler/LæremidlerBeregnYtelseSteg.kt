@@ -1,10 +1,13 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -30,11 +33,14 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequ
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class LæremidlerBeregnYtelseSteg(
     private val beregningService: LæremidlerBeregningService,
     private val opphørValideringService: OpphørValideringService,
+    private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val unleashService: UnleashService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -87,10 +93,13 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
     ) {
+        val beregnFraDato = utledTidligsteEndringService.utledTidligsteEndring(saksbehandling.id)
+
         val beregningsresultat =
             beregningService.beregn(
-                saksbehandling,
-                vedtaksperioder,
+                behandling = saksbehandling,
+                vedtaksperioder = vedtaksperioder,
+                beregnFraDato = beregnFraDato,
             )
 
         vedtakRepository.insert(
@@ -99,6 +108,7 @@ class LæremidlerBeregnYtelseSteg(
                 vedtaksperioder = vedtaksperioder,
                 beregningsresultat = beregningsresultat,
                 begrunnelse = begrunnelse,
+                beregnetFra = beregnFraDato,
             ),
         )
         lagreAndeler(saksbehandling, beregningsresultat)
@@ -139,6 +149,7 @@ class LæremidlerBeregnYtelseSteg(
                         begrunnelse = vedtak.begrunnelse,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
+                beregnetFra = null,
             ),
         )
 
@@ -159,6 +170,7 @@ class LæremidlerBeregnYtelseSteg(
                         begrunnelse = vedtak.begrunnelse,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
+                beregnetFra = null,
             ),
         )
     }
@@ -176,6 +188,7 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         beregningsresultat: BeregningsresultatLæremidler,
         begrunnelse: String?,
+        beregnetFra: LocalDate?,
     ): Vedtak =
         GeneriskVedtak(
             behandlingId = behandlingId,
@@ -187,5 +200,6 @@ class LæremidlerBeregnYtelseSteg(
                     begrunnelse = begrunnelse,
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
+            beregnetFra = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) beregnetFra else null,
         )
 }

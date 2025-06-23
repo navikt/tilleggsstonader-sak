@@ -122,6 +122,7 @@ class LæremidlerBeregningStepDefinitions {
                 læremidlerBeregningService.beregn(
                     behandling,
                     vedtaksPerioder,
+                    beregnFraDato = behandling.revurderFra,
                 )
         } catch (e: Exception) {
             beregningException = e
