@@ -129,6 +129,8 @@ class OpprettTestBehandlingController(
             Stønadstype.BARNETILSYN -> opprettSøknadBarnetilsyn(fagsak, behandling)
             Stønadstype.LÆREMIDLER -> opprettSøknadLæremidler(fagsak, behandling)
             Stønadstype.BOUTGIFTER -> opprettSøknadBoutgifter(fagsak, behandling)
+            Stønadstype.DAGLIG_REISE_TSO -> TODO()
+            Stønadstype.DAGLIG_REISE_TSR -> TODO()
         }
     }
 

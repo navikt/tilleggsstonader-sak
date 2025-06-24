@@ -34,6 +34,8 @@ fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
                 LøpendeUtgifterEnBoligRegel(),
                 LøpendeUtgifterToBoligerRegel(),
             )
+        Stønadstype.DAGLIG_REISE_TSO -> emptyList()
+        Stønadstype.DAGLIG_REISE_TSR -> emptyList()
     }
 
 private val vilkårstyperPerStønad: Map<Stønadstype, Set<VilkårType>> =

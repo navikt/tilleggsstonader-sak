@@ -60,6 +60,8 @@ class BehandlingFaktaService(
             Stønadstype.BARNETILSYN -> hentFaktaDTOForBarneTilsyn(behandlingId)
             Stønadstype.LÆREMIDLER -> hentFaktaDTOForLæremidler(behandlingId)
             Stønadstype.BOUTGIFTER -> hentFaktaDTOForBoutgifter(behandlingId)
+            Stønadstype.DAGLIG_REISE_TSO -> TODO()
+            Stønadstype.DAGLIG_REISE_TSR -> TODO()
         }
     }
 
