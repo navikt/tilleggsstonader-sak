@@ -19,7 +19,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.SaksbehandlerRolle
 import org.springframework.stereotype.Service
 
 @Service
-class TilordnetSaksbehandlerService(
+class SaksbehandlerService(
     private val oppgaveClient: OppgaveClient,
     private val oppgaveRepository: OppgaveRepository,
     private val behandlingRepository: BehandlingRepository,
