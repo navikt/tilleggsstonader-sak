@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.fagsak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -27,6 +26,7 @@ import org.junit.jupiter.api.Test
 import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 class FagsakRepositoryTest : IntegrationTest() {
@@ -56,8 +56,8 @@ class FagsakRepositoryTest : IntegrationTest() {
         val andel =
             andelTilkjentYtelse(
                 behandling.id,
-                fom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
-                tom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                fom = LocalDate.now().datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                tom = LocalDate.now().datoEllerNesteMandagHvisLørdagEllerSøndag(),
             )
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, andeler = arrayOf(andel)))
 
@@ -82,7 +82,7 @@ class FagsakRepositoryTest : IntegrationTest() {
                 behandling.id,
                 andelTilkjentYtelse(
                     kildeBehandlingId = behandling.id,
-                    fom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                    fom = LocalDate.now().datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 ),
             ),
         )
@@ -91,7 +91,7 @@ class FagsakRepositoryTest : IntegrationTest() {
                 behandling.id,
                 andelTilkjentYtelse(
                     kildeBehandlingId = behandling.id,
-                    fom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                    fom = LocalDate.now().datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 ),
             ),
         )

@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -219,7 +218,7 @@ class OppgaveClientConfig {
             OpprettOppgaveRequest(
                 tema = Tema.TSO,
                 oppgavetype = Oppgavetype.Journalføring,
-                fristFerdigstillelse = osloDateNow().plusDays(14),
+                fristFerdigstillelse = LocalDate.now().plusDays(14),
                 beskrivelse = "Dummy søknad",
                 behandlingstema = "ab0300",
                 enhetsnummer = "",
@@ -232,7 +231,7 @@ class OppgaveClientConfig {
             OpprettOppgaveRequest(
                 tema = Tema.TSO,
                 oppgavetype = Oppgavetype.BehandleSak,
-                fristFerdigstillelse = osloDateNow().plusDays(14),
+                fristFerdigstillelse = LocalDate.now().plusDays(14),
                 beskrivelse = "Dummy klage",
                 behandlingstema = "ab0300",
                 behandlingstype = "ae0058",

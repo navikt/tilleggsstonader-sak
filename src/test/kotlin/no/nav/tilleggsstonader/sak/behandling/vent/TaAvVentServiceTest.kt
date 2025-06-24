@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -22,6 +21,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Optional
 
@@ -67,7 +67,7 @@ class TaAvVentServiceTest : IntegrationTest() {
     val settPåVentDto =
         SettPåVentDto(
             årsaker = listOf(ÅrsakSettPåVent.ANNET),
-            frist = osloDateNow().plusDays(3),
+            frist = LocalDate.now().plusDays(3),
             kommentar = "ny beskrivelse",
         )
 
@@ -212,7 +212,7 @@ class TaAvVentServiceTest : IntegrationTest() {
         with(oppgaveService.hentOppgave(oppgaveId)) {
             assertThat(tilordnetRessurs).isEqualTo(tilordnetRessurs)
             assertThat(beskrivelse).contains("Tatt av vent")
-            assertThat(fristFerdigstillelse).isEqualTo(osloDateNow())
+            assertThat(fristFerdigstillelse).isEqualTo(LocalDate.now())
             assertThat(mappeId).isEqualTo(Optional.of(MAPPE_ID_KLAR))
         }
     }

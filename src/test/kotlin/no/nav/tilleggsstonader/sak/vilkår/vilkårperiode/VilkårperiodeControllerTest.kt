@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.libs.test.httpclient.ProblemDetailUtil.catchProblemDetailException
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
@@ -21,6 +20,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.web.client.exchange
+import java.time.LocalDate
 import java.util.UUID
 
 class VilkårperiodeControllerTest : IntegrationTest() {
@@ -36,8 +36,8 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         kallOpprettVilkårperiode(
             LagreVilkårperiode(
                 type = MålgruppeType.AAP,
-                fom = osloDateNow(),
-                tom = osloDateNow(),
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
                 faktaOgSvar = faktaOgVurderingerMålgruppeDto(),
                 behandlingId = behandling.id,
             ),
@@ -59,15 +59,15 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         val originalLagreRequest =
             LagreVilkårperiode(
                 type = MålgruppeType.AAP,
-                fom = osloDateNow(),
-                tom = osloDateNow(),
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
                 faktaOgSvar = faktaOgVurderingerMålgruppeDto(),
                 behandlingId = behandling.id,
             )
 
         val response = kallOpprettVilkårperiode(originalLagreRequest)
 
-        val nyTom = osloDateNow()
+        val nyTom = LocalDate.now()
 
         kallOppdaterVikårperiode(
             lagreVilkårperiode = originalLagreRequest.copy(behandlingId = behandling.id, tom = nyTom),
@@ -91,8 +91,8 @@ class VilkårperiodeControllerTest : IntegrationTest() {
             kallOpprettVilkårperiode(
                 LagreVilkårperiode(
                     type = MålgruppeType.AAP,
-                    fom = osloDateNow(),
-                    tom = osloDateNow(),
+                    fom = LocalDate.now(),
+                    tom = LocalDate.now(),
                     faktaOgSvar = faktaOgVurderingerMålgruppeDto(),
                     behandlingId = behandling.id,
                 ),

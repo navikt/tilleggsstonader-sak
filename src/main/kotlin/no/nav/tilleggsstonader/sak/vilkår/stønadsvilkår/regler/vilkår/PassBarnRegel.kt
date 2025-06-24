@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår
 
 import no.nav.tilleggsstonader.libs.utils.fnr.Fødselsnummer
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.norskFormat
@@ -97,7 +96,7 @@ class PassBarnRegel :
     }
 
     private fun automatiskVurderAlderLavereEnnGrenseverdi(): Delvilkår {
-        val iDag = osloDateNow().norskFormat()
+        val iDag = LocalDate.now().norskFormat()
         val begrunnelse =
             "Automatisk vurdert: Ut ifra barnets alder er det $iDag automatisk vurdert at barnet ikke har fullført 4. skoleår."
 
@@ -116,7 +115,7 @@ class PassBarnRegel :
     private fun harFullførtFjerdetrinn(
         barnId: BarnId?,
         metadata: HovedregelMetadata,
-        datoForBeregning: LocalDate = osloDateNow(),
+        datoForBeregning: LocalDate = LocalDate.now(),
     ): Boolean {
         val ident = metadata.barn.firstOrNull { it.id == barnId }?.ident
         feilHvis(ident == null, sensitivFeilmelding = { "Fant ikke barn med id=$barnId i metadata" }) {

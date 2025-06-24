@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.brev.vedtaksbrev
 
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -21,6 +20,7 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class BrevService(
@@ -169,7 +169,7 @@ class BrevService(
 
         return html
             .replace(BESLUTTER_SIGNATUR_PLACEHOLDER, beslutterSignatur)
-            .replace(BREVDATO_PLACEHOLDER, osloDateNow().norskFormat())
+            .replace(BREVDATO_PLACEHOLDER, LocalDate.now().norskFormat())
     }
 
     private fun validerRedigerbarBehandling(saksbehandling: Saksbehandling) = saksbehandling.status.validerKanBehandlingRedigeres()

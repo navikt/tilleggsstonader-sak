@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.brev
 
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.norskFormat
+import java.time.LocalDate
 
 object BrevUtil {
     const val SAKSBEHANDLER_SIGNATUR_PLACEHOLDER = "SAKSBEHANDLER_SIGNATUR"
@@ -22,6 +22,6 @@ object BrevUtil {
 
         return html
             .replace(SAKSBEHANDLER_SIGNATUR_PLACEHOLDER, saksbehandlerSignatur)
-            .replace(BREVDATO_PLACEHOLDER, osloDateNow().norskFormat())
+            .replace(BREVDATO_PLACEHOLDER, LocalDate.now().norskFormat())
     }
 }

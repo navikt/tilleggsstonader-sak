@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
@@ -14,6 +13,7 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class TilkjentYtelseServiceTest {
     private val tilkjentYtelseRepository = mockk<TilkjentYtelseRepository>()
@@ -33,8 +33,8 @@ class TilkjentYtelseServiceTest {
                 andelTilkjentYtelse(
                     kildeBehandlingId = BehandlingId.random(),
                     beløp = 1,
-                    fom = osloDateNow().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
-                    tom = osloDateNow().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                    fom = LocalDate.now().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                    tom = LocalDate.now().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 )
             val tilkjentYtelse =
                 tilkjentYtelse(behandling.id)
@@ -49,8 +49,8 @@ class TilkjentYtelseServiceTest {
                 andelTilkjentYtelse(
                     kildeBehandlingId = BehandlingId.random(),
                     beløp = 1,
-                    fom = osloDateNow().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),
-                    tom = osloDateNow().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                    fom = LocalDate.now().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                    tom = LocalDate.now().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 )
             val tilkjentYtelse =
                 tilkjentYtelse(behandling.id)

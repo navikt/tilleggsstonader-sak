@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.aktivitet.GruppeAktivitet
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import org.slf4j.LoggerFactory
@@ -20,8 +19,8 @@ class RegisterAktivitetService(
 
     fun hentAktiviteterMedPerioder(
         fagsakPersonId: FagsakPersonId,
-        fom: LocalDate = osloDateNow().minusYears(3),
-        tom: LocalDate = osloDateNow().plusYears(1),
+        fom: LocalDate = LocalDate.now().minusYears(3),
+        tom: LocalDate = LocalDate.now().plusYears(1),
     ): RegisterAktiviteterDto =
         RegisterAktiviteterDto(
             periodeHentetFra = fom,
@@ -31,8 +30,8 @@ class RegisterAktivitetService(
 
     fun hentAktiviteter(
         fagsakPersonId: FagsakPersonId,
-        fom: LocalDate = osloDateNow().minusYears(3),
-        tom: LocalDate = osloDateNow().plusYears(1),
+        fom: LocalDate = LocalDate.now().minusYears(3),
+        tom: LocalDate = LocalDate.now().plusYears(1),
     ): List<AktivitetArenaDto> {
         val ident = fagsakPersonService.hentAktivIdent(fagsakPersonId)
         return hentStønadsberettigedeTiltak(ident, fom, tom)

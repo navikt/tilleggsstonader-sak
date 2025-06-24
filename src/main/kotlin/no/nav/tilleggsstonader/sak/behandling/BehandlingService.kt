@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingTypeV2
@@ -93,7 +92,7 @@ class BehandlingService(
         kravMottatt: LocalDate? = null,
         nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
     ): Behandling {
-        brukerfeilHvis(kravMottatt != null && kravMottatt.isAfter(osloDateNow())) {
+        brukerfeilHvis(kravMottatt != null && kravMottatt.isAfter(LocalDate.now())) {
             "Kan ikke sette krav mottattdato frem i tid"
         }
         feilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_BEHANDLING)) {

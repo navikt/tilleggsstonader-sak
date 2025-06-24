@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.util.DatoFormat.DATE_FORMAT_NORSK
 import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDato
@@ -25,9 +24,9 @@ object DatoFormat {
 object DatoUtil {
     fun dagensDatoMedTid(): LocalDateTime = osloNow()
 
-    fun dagensDato(): LocalDate = osloDateNow()
+    fun dagensDato(): LocalDate = LocalDate.now()
 
-    fun inneværendeÅr() = osloDateNow().year
+    fun inneværendeÅr() = LocalDate.now().year
 
     fun årMånedNå() = YearMonth.now()
 }
@@ -39,7 +38,7 @@ fun antallÅrSiden(dato: LocalDate?) = dato?.let { Period.between(it, dagensDato
 
 fun LocalDate.norskFormat() = this.format(DATE_FORMAT_NORSK)
 
-fun datoEllerIdag(localDate: LocalDate?): LocalDate = localDate ?: osloDateNow()
+fun datoEllerIdag(localDate: LocalDate?): LocalDate = localDate ?: LocalDate.now()
 
 fun min(
     first: LocalDateTime?,
@@ -79,17 +78,17 @@ fun LocalDate.harPåfølgendeMåned(påfølgende: LocalDate): Boolean = YearMont
 
 fun YearMonth.erPåfølgende(påfølgende: YearMonth): Boolean = this.plusMonths(1) == påfølgende
 
-fun LocalDate.er6MndEllerMer(): Boolean = this.plusDays(183) <= osloDateNow()
+fun LocalDate.er6MndEllerMer(): Boolean = this.plusDays(183) <= LocalDate.now()
 
-fun LocalDate.erEttÅrEllerMer(): Boolean = this.plusYears(1) <= osloDateNow()
+fun LocalDate.erEttÅrEllerMer(): Boolean = this.plusYears(1) <= LocalDate.now()
 
 fun LocalDate.er6MndEllerMerOgInnenforCutoff(numberOfDaysCutoff: Long): Boolean =
     this.er6MndEllerMer() &&
-        osloDateNow() < this.plusDays(182).plusDays(numberOfDaysCutoff)
+        LocalDate.now() < this.plusDays(182).plusDays(numberOfDaysCutoff)
 
 fun LocalDate.erEttÅrEllerMerOgInnenforCutoff(numberOfDaysCutoff: Long): Boolean =
     erEttÅrEllerMer() &&
-        osloDateNow() <= this.plusYears(1).plusDays(numberOfDaysCutoff)
+        LocalDate.now() <= this.plusYears(1).plusDays(numberOfDaysCutoff)
 
 fun LocalDateTime.harGåttAntallTimer(timer: Int) = this.plusHours(timer.toLong()) < osloNow()
 
