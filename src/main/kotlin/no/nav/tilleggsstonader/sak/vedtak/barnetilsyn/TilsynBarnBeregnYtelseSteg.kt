@@ -61,14 +61,14 @@ class TilsynBarnBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtak: InnvilgelseTilsynBarnRequest,
     ) {
-        val beregnFraDato = utledTidligsteEndringService.utledTidligsteEndring(saksbehandling.id, vedtak.vedtaksperioder.tilDomene())
+        val tidligsteEndring = utledTidligsteEndringService.utledTidligsteEndring(saksbehandling.id, vedtak.vedtaksperioder.tilDomene())
 
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                beregnFraDato = beregnFraDato,
+                tidligsteEndring = tidligsteEndring,
             )
         vedtakRepository.insert(
             lagInnvilgetVedtak(
@@ -76,7 +76,7 @@ class TilsynBarnBeregnYtelseSteg(
                 beregningsresultat = beregningsresultat,
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene().sorted(),
                 begrunnelse = vedtak.begrunnelse,
-                beregnetFra = beregnFraDato,
+                tidligsteEndring = tidligsteEndring,
             ),
         )
         lagreAndeler(saksbehandling, beregningsresultat)
@@ -100,8 +100,8 @@ class TilsynBarnBeregnYtelseSteg(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.OPPHØR,
-                // TODO: Sette beregnFraDato til opphørsdato (ny)
-                beregnFraDato = saksbehandling.revurderFra,
+                // TODO: Sette til opphørsdato (ny)
+                tidligsteEndring = saksbehandling.revurderFra,
             )
         opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
             beregningsresultat,
@@ -119,7 +119,7 @@ class TilsynBarnBeregnYtelseSteg(
                         vedtaksperioder = vedtaksperioder,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                beregnetFra = null, // TODO: Sette beregnFraDato til opphørsdato (ny)
+                tidligsteEndring = null, // TODO: Sette til opphørsdato (ny)
             ),
         )
 
@@ -140,7 +140,7 @@ class TilsynBarnBeregnYtelseSteg(
                         begrunnelse = vedtak.begrunnelse,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                beregnetFra = null,
+                tidligsteEndring = null,
             ),
         )
     }
@@ -158,7 +158,7 @@ class TilsynBarnBeregnYtelseSteg(
         beregningsresultat: BeregningsresultatTilsynBarn,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
-        beregnetFra: LocalDate?,
+        tidligsteEndring: LocalDate?,
     ): Vedtak =
         GeneriskVedtak(
             behandlingId = behandling.id,
@@ -170,6 +170,6 @@ class TilsynBarnBeregnYtelseSteg(
                     beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
-            beregnetFra = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) beregnetFra else null,
+            tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
         )
 }

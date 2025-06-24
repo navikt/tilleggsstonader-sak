@@ -32,16 +32,16 @@ class VedtaksperiodeValideringService(
         vedtaksperioder: List<no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
-        beregnFraDato: LocalDate?,
+        tidligsteEndring: LocalDate?,
     ) {
-        validerVedtaksperioder(vedtaksperioder.tilFellesVedtaksperiode(), behandling, typeVedtak, beregnFraDato)
+        validerVedtaksperioder(vedtaksperioder.tilFellesVedtaksperiode(), behandling, typeVedtak, tidligsteEndring)
     }
 
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
-        beregnFraDato: LocalDate?,
+        tidligsteEndring: LocalDate?,
     ) {
         if (typeVedtak != TypeVedtak.OPPHØR) {
             validerVedtaksperioderEksisterer(vedtaksperioder)
@@ -53,7 +53,7 @@ class VedtaksperiodeValideringService(
         validerIngenEndringerFørRevurderFra(
             innsendteVedtaksperioder = vedtaksperioder,
             vedtaksperioderForrigeBehandling = hentForrigeVedtaksperioder(behandling),
-            revurderFra = beregnFraDato,
+            revurderFra = tidligsteEndring,
         )
     }
 

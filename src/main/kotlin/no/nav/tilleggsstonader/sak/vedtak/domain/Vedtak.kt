@@ -19,7 +19,7 @@ data class GeneriskVedtak<T : Vedtaksdata>(
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     val gitVersjon: String?,
-    val beregnetFra: LocalDate?,
+    val tidligsteEndring: LocalDate?,
 ) {
     init {
         require(data.type.typeVedtak == type) { "$type på vedtak er ikke lik vedtak på data(${data.type.typeVedtak})" }

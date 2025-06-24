@@ -79,15 +79,15 @@ class TilsynBarnVedtakController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtaksperioder = vedtak.vedtaksperioder.tilDomene()
-        val beregnFraDato = utledTidligsteEndringService.utledTidligsteEndring(behandling.id, vedtaksperioder)
+        val tidligsteEndring = utledTidligsteEndringService.utledTidligsteEndring(behandling.id, vedtaksperioder)
 
         return beregningService
             .beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = behandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                beregnFraDato = beregnFraDato,
-            ).tilDto(beregnFraDato)
+                tidligsteEndring = tidligsteEndring,
+            ).tilDto(tidligsteEndring)
     }
 
     @GetMapping("{behandlingId}")

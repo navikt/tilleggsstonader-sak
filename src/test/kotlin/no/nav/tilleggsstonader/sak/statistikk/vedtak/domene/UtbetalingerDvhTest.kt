@@ -98,7 +98,7 @@ class UtbetalingerDvhTest {
                 type = TypeVedtak.INNVILGELSE,
                 data = vedtaksdata,
                 gitVersjon = Applikasjonsversjon.versjon,
-                beregnetFra = null,
+                tidligsteEndring = null,
             )
 
         val resultat = UtbetalingerDvh.fraDomene(listOf(andelTilkjentYtelse), innvilgelse)

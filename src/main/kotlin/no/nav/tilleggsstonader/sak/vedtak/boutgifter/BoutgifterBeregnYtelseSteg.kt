@@ -64,20 +64,20 @@ class BoutgifterBeregnYtelseSteg(
         vedtak: InnvilgelseBoutgifterRequest,
     ) {
         val vedtaksperioder = vedtak.vedtaksperioder.tilDomene().sorted()
-        val beregnFraDato = utledTidligsteEndringService.utledTidligsteEndring(saksbehandling.id, vedtaksperioder)
+        val tidligsteEndring = utledTidligsteEndringService.utledTidligsteEndring(saksbehandling.id, vedtaksperioder)
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                beregnFraDato = beregnFraDato,
+                tidligsteEndring = tidligsteEndring,
             )
         lagreInnvilgetVedtak(
             behandling = saksbehandling,
             beregningsresultat = beregningsresultat,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
-            beregnetFra = beregnFraDato,
+            tidligsteEndring = tidligsteEndring,
         )
         lagreTilkjentYtelse(saksbehandling.id, beregningsresultat)
     }
@@ -139,7 +139,7 @@ class BoutgifterBeregnYtelseSteg(
                         begrunnelse = vedtak.begrunnelse,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                beregnetFra = null,
+                tidligsteEndring = null,
             ),
         )
     }
@@ -149,7 +149,7 @@ class BoutgifterBeregnYtelseSteg(
         beregningsresultat: BeregningsresultatBoutgifter,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
-        beregnetFra: LocalDate?,
+        tidligsteEndring: LocalDate?,
     ) {
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -162,7 +162,7 @@ class BoutgifterBeregnYtelseSteg(
                         beregningsresultat = BeregningsresultatBoutgifter(beregningsresultat.perioder),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                beregnetFra = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) beregnetFra else null,
+                tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
             ),
         )
     }
@@ -185,7 +185,7 @@ class BoutgifterBeregnYtelseSteg(
                         begrunnelse = vedtak.begrunnelse,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                beregnetFra = null, // TODO: Sette beregnFraDato til opphørsdato (ny)
+                tidligsteEndring = null, // TODO: Sette til opphørsdato (ny)
             ),
         )
     }

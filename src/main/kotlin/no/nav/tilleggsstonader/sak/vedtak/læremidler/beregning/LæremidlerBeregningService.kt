@@ -41,13 +41,13 @@ class LæremidlerBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
-        beregnFraDato: LocalDate?,
+        tidligsteEndring: LocalDate?,
     ): BeregningsresultatLæremidler {
         vedtaksperiodeValideringService.validerVedtaksperioderLæremidler(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             typeVedtak = TypeVedtak.INNVILGELSE,
-            beregnFraDato = beregnFraDato,
+            tidligsteEndring = tidligsteEndring,
         )
 
         val vedtaksperioderBeregningsgrunnlag = vedtaksperioder.tilBeregningsgrunnlag()
@@ -56,7 +56,7 @@ class LæremidlerBeregningService(
         val beregningsresultatForMåned = beregn(behandling, vedtaksperioderBeregningsgrunnlag)
 
         return if (forrigeVedtak != null) {
-            settSammenGamleOgNyePerioder(behandling, beregningsresultatForMåned, forrigeVedtak, behandling.revurderFra ?: beregnFraDato)
+            settSammenGamleOgNyePerioder(behandling, beregningsresultatForMåned, forrigeVedtak, behandling.revurderFra ?: tidligsteEndring)
         } else {
             BeregningsresultatLæremidler(beregningsresultatForMåned)
         }
@@ -167,20 +167,20 @@ class LæremidlerBeregningService(
         saksbehandling: Saksbehandling,
         beregningsresultat: List<BeregningsresultatForMåned>,
         forrigeVedtak: InnvilgelseEllerOpphørLæremidler,
-        beregnFraDato: LocalDate?,
+        tidligsteEndring: LocalDate?,
     ): BeregningsresultatLæremidler {
-        feilHvis(beregnFraDato == null) { "Behandling=$saksbehandling mangler revurderFra eller dato for tidligste endring" }
+        feilHvis(tidligsteEndring == null) { "Behandling=$saksbehandling mangler revurderFra eller dato for tidligste endring" }
 
         val forrigeBeregningsresultat = forrigeVedtak.beregningsresultat
 
         val perioderFraForrigeVedtakSomSkalBeholdes =
             forrigeBeregningsresultat
                 .perioder
-                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < beregnFraDato }
+                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < tidligsteEndring }
                 .map { it.markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling = true) }
         val nyePerioder =
             beregningsresultat
-                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() >= beregnFraDato }
+                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() >= tidligsteEndring }
 
         val nyePerioderMedKorrigertUtbetalingsdato = korrigerUtbetalingsdato(nyePerioder, forrigeBeregningsresultat)
 

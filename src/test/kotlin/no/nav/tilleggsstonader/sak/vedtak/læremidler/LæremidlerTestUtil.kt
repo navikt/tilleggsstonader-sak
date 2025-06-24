@@ -53,7 +53,7 @@ object LæremidlerTestUtil {
             type = TypeVedtak.INNVILGELSE,
             data = data,
             gitVersjon = Applikasjonsversjon.versjon,
-            beregnetFra = null,
+            tidligsteEndring = null,
         )
 
     fun innvilgelse(
@@ -69,7 +69,7 @@ object LæremidlerTestUtil {
                 beregningsresultat = beregningsresultat,
             ),
         gitVersjon = Applikasjonsversjon.versjon,
-        beregnetFra = null,
+        tidligsteEndring = null,
     )
 
     fun avslag(
@@ -85,7 +85,7 @@ object LæremidlerTestUtil {
                 begrunnelse = begrunnelse,
             ),
         gitVersjon = Applikasjonsversjon.versjon,
-        beregnetFra = null,
+        tidligsteEndring = null,
     )
 
     fun opphør(
@@ -105,7 +105,7 @@ object LæremidlerTestUtil {
                 begrunnelse = begrunnelse,
             ),
         gitVersjon = Applikasjonsversjon.versjon,
-        beregnetFra = null,
+        tidligsteEndring = null,
     )
 
     fun beregningsresultatForMåned(

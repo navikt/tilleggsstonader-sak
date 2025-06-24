@@ -12,7 +12,7 @@ import java.time.LocalDate
 
 data class BeregningsresultatLæremidlerDto(
     val perioder: List<BeregningsresultatForPeriodeDto>,
-    val beregnetFra: LocalDate? = null,
+    val tidligsteEndring: LocalDate? = null,
 )
 
 data class BeregningsresultatForPeriodeDto(
@@ -46,10 +46,10 @@ data class BeregningsresultatForPeriodeDto(
             this.påfølgesAv(nestePeriode)
 }
 
-fun BeregningsresultatLæremidler.tilDto(beregnetFra: LocalDate?): BeregningsresultatLæremidlerDto {
+fun BeregningsresultatLæremidler.tilDto(tidligsteEndring: LocalDate?): BeregningsresultatLæremidlerDto {
     val perioderDto =
         this
-            .filtrerFraOgMed(beregnetFra)
+            .filtrerFraOgMed(tidligsteEndring)
             .perioder
             .map { it.tilDto() }
     return BeregningsresultatLæremidlerDto(
@@ -59,7 +59,7 @@ fun BeregningsresultatLæremidler.tilDto(beregnetFra: LocalDate?): Beregningsres
                     skalMerges = { v1, v2 -> v1.kanSlåsSammen(v2) },
                     merge = { v1, v2 -> v1.slåSammen(v2) },
                 ),
-        beregnetFra = beregnetFra,
+        tidligsteEndring = tidligsteEndring,
     )
 }
 

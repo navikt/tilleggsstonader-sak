@@ -84,14 +84,14 @@ class BoutgifterVedtakController(
     ): BeregningsresultatBoutgifterDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val beregnFraDato = utledTidligsteEndringService.utledTidligsteEndring(behandling.id, vedtak.vedtaksperioder.tilDomene())
+        val tidligsteEndring = utledTidligsteEndringService.utledTidligsteEndring(behandling.id, vedtak.vedtaksperioder.tilDomene())
         return beregningService
             .beregn(
                 behandling = behandling,
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                beregnFraDato = beregnFraDato,
-            ).tilDto(beregnetFra = beregnFraDato)
+                tidligsteEndring = tidligsteEndring,
+            ).tilDto(tidligsteEndring = tidligsteEndring)
     }
 
     @GetMapping("{behandlingId}")

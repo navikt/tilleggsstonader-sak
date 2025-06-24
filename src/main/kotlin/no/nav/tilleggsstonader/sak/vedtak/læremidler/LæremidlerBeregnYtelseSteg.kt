@@ -93,7 +93,7 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
     ) {
-        val beregnFraDato =
+        val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndring(
                 saksbehandling.id,
                 vedtaksperioder.map {
@@ -105,7 +105,7 @@ class LæremidlerBeregnYtelseSteg(
             beregningService.beregn(
                 behandling = saksbehandling,
                 vedtaksperioder = vedtaksperioder,
-                beregnFraDato = beregnFraDato,
+                tidligsteEndring = tidligsteEndring,
             )
 
         vedtakRepository.insert(
@@ -114,7 +114,7 @@ class LæremidlerBeregnYtelseSteg(
                 vedtaksperioder = vedtaksperioder,
                 beregningsresultat = beregningsresultat,
                 begrunnelse = begrunnelse,
-                beregnetFra = beregnFraDato,
+                tidligsteEndring = tidligsteEndring,
             ),
         )
         lagreAndeler(saksbehandling, beregningsresultat)
@@ -155,7 +155,7 @@ class LæremidlerBeregnYtelseSteg(
                         begrunnelse = vedtak.begrunnelse,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                beregnetFra = null,
+                tidligsteEndring = null,
             ),
         )
 
@@ -176,7 +176,7 @@ class LæremidlerBeregnYtelseSteg(
                         begrunnelse = vedtak.begrunnelse,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                beregnetFra = null,
+                tidligsteEndring = null,
             ),
         )
     }
@@ -194,7 +194,7 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         beregningsresultat: BeregningsresultatLæremidler,
         begrunnelse: String?,
-        beregnetFra: LocalDate?,
+        tidligsteEndring: LocalDate?,
     ): Vedtak =
         GeneriskVedtak(
             behandlingId = behandlingId,
@@ -206,6 +206,6 @@ class LæremidlerBeregnYtelseSteg(
                     begrunnelse = begrunnelse,
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
-            beregnetFra = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) beregnetFra else null,
+            tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
         )
 }

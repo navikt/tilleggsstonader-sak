@@ -229,7 +229,7 @@ class VedtaksperiodeValideringServiceTest {
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             typeVedtak = TypeVedtak.INNVILGELSE,
-            beregnFraDato = behandling.revurderFra,
+            tidligsteEndring = behandling.revurderFra,
         )
     }
 
@@ -238,7 +238,7 @@ class VedtaksperiodeValideringServiceTest {
             vedtaksperioder = vedtaksperioder,
             behandling = saksbehandling(),
             typeVedtak = TypeVedtak.OPPHØR,
-            beregnFraDato = behandling.revurderFra,
+            tidligsteEndring = behandling.revurderFra,
         )
     }
 

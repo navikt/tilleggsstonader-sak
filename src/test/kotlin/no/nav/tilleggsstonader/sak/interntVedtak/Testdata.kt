@@ -241,7 +241,7 @@ object Testdata {
                             ),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                beregnetFra = behandling.revurderFra,
+                tidligsteEndring = behandling.revurderFra,
             )
 
         private val aktiviteterTilsynBarn =
@@ -348,7 +348,7 @@ object Testdata {
                         begrunnelse = "Sånn her vil en begrunnelse se ut",
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                beregnetFra = behandling.revurderFra,
+                tidligsteEndring = behandling.revurderFra,
             )
 
         val avslåttVedtak =
@@ -361,7 +361,7 @@ object Testdata {
                         begrunnelse = "Begrunelse for avslag",
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                beregnetFra = null,
+                tidligsteEndring = null,
             )
 
         private val aktivitetererLæremidler =
@@ -539,7 +539,7 @@ object Testdata {
                         begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                beregnetFra = behandling.revurderFra,
+                tidligsteEndring = behandling.revurderFra,
             )
         val avslåttVedtak =
             GeneriskVedtak(
@@ -551,7 +551,7 @@ object Testdata {
                         begrunnelse = "Begrunelse for avslag",
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                beregnetFra = null,
+                tidligsteEndring = null,
             )
         val opphørtVedtak =
             GeneriskVedtak(
@@ -565,7 +565,7 @@ object Testdata {
                         beregningsresultat = beregningsresultat,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                beregnetFra = null, // TODO: Sette beregnFraDato til opphørsdato (ny)
+                tidligsteEndring = null, // TODO: Sette til opphørsdato (ny)
             )
 
         private val aktivitetererBoutgifter =

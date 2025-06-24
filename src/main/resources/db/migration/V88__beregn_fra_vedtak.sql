@@ -1,1 +1,1 @@
-alter table vedtak add column beregnet_fra DATE;
+alter table vedtak add column tidligste_endring DATE;

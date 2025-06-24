@@ -99,7 +99,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                     behandling = saksbehandling(),
                     vedtaksperioder = vedtaksperioder,
                     typeVedtak = TypeVedtak.INNVILGELSE,
-                    beregnFraDato = null,
+                    tidligsteEndring = null,
                 ).perioder
 
         assertThat(res).isEqualTo(beregningsresultatFørstegangsbehandlingMidlertidigOvernatting)
@@ -114,7 +114,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 behandling = saksbehandling(),
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                beregnFraDato = null,
+                tidligsteEndring = null,
             )
         }.hasMessage("Det er ikke lagt inn noen oppfylte utgiftsperioder")
     }
@@ -140,7 +140,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 behandling = saksbehandling(),
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                beregnFraDato = null,
+                tidligsteEndring = null,
             )
         }.hasMessage("Vedtaksperioden 01.01.2025–31.01.2025 mangler oppfylt utgift hele eller deler av perioden.")
     }
@@ -183,7 +183,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 behandling = saksbehandling(),
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                beregnFraDato = null,
+                tidligsteEndring = null,
             )
         }.hasMessage(
             """
@@ -279,7 +279,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                     behandling = saksbehandling,
                     vedtaksperioder = vedtaksperioderRevurdering,
                     typeVedtak = TypeVedtak.INNVILGELSE,
-                    beregnFraDato = saksbehandling.revurderFra,
+                    tidligsteEndring = saksbehandling.revurderFra,
                 ).perioder
 
         assertThat(res.size).isEqualTo(2)

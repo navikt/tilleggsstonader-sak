@@ -79,7 +79,7 @@ class LæremidlerVedtakController(
     ): BeregningsresultatLæremidlerDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val beregnFraDato =
+        val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndring(
                 behandling.id,
                 vedtaksperioder.tilDomene().map { it.tilFellesDomeneVedtaksperiode() },
@@ -88,8 +88,8 @@ class LæremidlerVedtakController(
             .beregn(
                 behandling,
                 vedtaksperioder.tilDomene(),
-                beregnFraDato,
-            ).tilDto(beregnetFra = beregnFraDato)
+                tidligsteEndring,
+            ).tilDto(tidligsteEndring = tidligsteEndring)
     }
 
     @GetMapping("{behandlingId}")
