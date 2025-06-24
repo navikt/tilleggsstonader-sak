@@ -12,4 +12,5 @@ enum class BoutgifterDomenenøkkel(
     AKTIVITET("Aktivitet"),
     MÅLGRUPPE("Målgruppe"),
     DEL_AV_TIDLIGERE_UTBETALING("Del av tidligere utbetaling"),
+    HØYERE_UTGIFTER("Høyere utgifter"),
 }

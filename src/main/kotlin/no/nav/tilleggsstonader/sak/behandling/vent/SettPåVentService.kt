@@ -4,7 +4,6 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
-import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -53,7 +52,9 @@ class SettPåVentService(
         val behandling = behandlingService.hentBehandling(behandlingId)
         behandling.status.validerKanBehandlingRedigeres()
 
-        opprettHistorikkInnslag(behandling, StegUtfall.SATT_PÅ_VENT, årsaker = dto.årsaker, kommentar = dto.kommentar)
+        behandlingService.markerBehandlingSomPåbegynt(behandlingId, behandling.status, behandling.steg)
+
+        opprettHistorikkInnslag(behandling, årsaker = dto.årsaker, kommentar = dto.kommentar)
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT)
 
         val oppgave = hentOppgave(behandlingId)
@@ -110,8 +111,7 @@ class SettPåVentService(
 
         if (harEndretÅrsaker(settPåVent, dto) || harEndretKommentar(settPåVent, dto)) {
             opprettHistorikkInnslag(
-                behandling,
-                StegUtfall.SATT_PÅ_VENT,
+                behandling = behandling,
                 årsaker = dto.årsaker,
                 kommentar = dto.kommentar,
             )
@@ -175,45 +175,12 @@ class SettPåVentService(
         oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(behandlingId)
             ?: error("Finner ikke behandleSakOppgave for behandling=$behandlingId")
 
-    @Transactional
-    fun taAvVent(
-        behandlingId: BehandlingId,
-        taAvVentDto: TaAvVentDto?,
-    ) {
-        val behandling = behandlingService.hentBehandling(behandlingId)
-        feilHvis(behandling.status != BehandlingStatus.SATT_PÅ_VENT) {
-            "Kan ikke ta behandling av vent når status=${behandling.status}"
-        }
-        behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.UTREDES)
-
-        val settPåVent = finnAktivSattPåVent(behandlingId).copy(aktiv = false, taAvVentKommentar = taAvVentDto?.kommentar)
-        settPåVentRepository.update(settPåVent)
-
-        opprettHistorikkInnslagTaAvVent(behandling, taAvVentDto?.kommentar)
-        taOppgaveAvVent(settPåVent.oppgaveId, settPåVent, skalTilordnesRessurs = taAvVentDto?.skalTilordnesRessurs ?: true)
-    }
-
     private fun finnAktivSattPåVent(behandlingId: BehandlingId) =
         settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
             ?: error("Finner ikke settPåVent for behandling=$behandlingId")
 
-    private fun taOppgaveAvVent(
-        oppgaveId: Long,
-        settPåVent: SettPåVent,
-        skalTilordnesRessurs: Boolean,
-    ) {
-        val taAvVent =
-            TaAvVentRequest(
-                oppgaveId = oppgaveId,
-                beholdOppgave = skalTilordnesRessurs,
-                kommentar = settPåVent.taAvVentKommentar,
-            )
-        oppgaveService.taAvVent(taAvVent)
-    }
-
     private fun opprettHistorikkInnslag(
         behandling: Behandling,
-        utfall: StegUtfall,
         kommentar: String?,
         årsaker: List<ÅrsakSettPåVent>,
     ) {
@@ -226,20 +193,8 @@ class SettPåVentService(
         behandlingshistorikkService.opprettHistorikkInnslag(
             behandlingId = behandling.id,
             stegtype = behandling.steg,
-            utfall = utfall,
+            utfall = StegUtfall.SATT_PÅ_VENT,
             metadata = metadata,
-        )
-    }
-
-    private fun opprettHistorikkInnslagTaAvVent(
-        behandling: Behandling,
-        kommentar: String?,
-    ) {
-        behandlingshistorikkService.opprettHistorikkInnslag(
-            behandlingId = behandling.id,
-            stegtype = behandling.steg,
-            utfall = StegUtfall.TATT_AV_VENT,
-            metadata = kommentar?.takeIf { it.isNotEmpty() }?.let { mapOf("kommentar" to it) },
         )
     }
 }

@@ -168,3 +168,17 @@ Egenskap: Beregning av faste utgifter
         | 01.01.2025 | 31.01.2025 | UTDANNING | NEDSATT_ARBEIDSEVNE |
 
       Så forvent følgende feilmelding: Foreløpig støtter vi ikke løpende og midlertidige utgifter i samme behandling
+
+    Scenario: Skal få dekket for faktiske utgifter
+
+      Gitt følgende boutgifter av type UTGIFTER_OVERNATTING for behandling=1
+        | Fom        | Tom        | Utgift | Høyere utgifter |
+        | 01.01.2025 | 31.01.2025 | 20000  | Ja              |
+
+      Når vi innvilger boutgifter for behandling=1 med følgende vedtaksperioder
+        | Fom        | Tom        | Aktivitet | Målgruppe           |
+        | 01.01.2025 | 31.01.2025 | UTDANNING    | NEDSATT_ARBEIDSEVNE |
+
+      Så kan vi forvente følgende beregningsresultat for behandling=1
+        | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet | Høyere utgifter |
+        | 01.01.2025 | 31.01.2025 | 20000        | 4953      | 01.01.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING    | Ja              |

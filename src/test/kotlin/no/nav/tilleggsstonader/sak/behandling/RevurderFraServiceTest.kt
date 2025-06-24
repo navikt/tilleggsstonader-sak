@@ -21,11 +21,13 @@ import java.time.LocalDate
 class RevurderFraServiceTest {
     private val behandlingRepository = mockk<BehandlingRepository>()
     private val nullstillBehandlingService = mockk<NullstillBehandlingService>(relaxed = true)
+    private val behandlingService = mockk<BehandlingService>(relaxed = true)
 
     private val service =
         RevurderFraService(
             behandlingRepository = behandlingRepository,
             nullstillBehandlingService = nullstillBehandlingService,
+            behandlingService = behandlingService,
         )
 
     private val oppdaterBehandlingSlot = slot<Behandling>()
@@ -57,7 +59,7 @@ class RevurderFraServiceTest {
             service.oppdaterRevurderFra(behandling.id, revurderFra)
 
             assertThat(oppdaterBehandlingSlot.captured.revurderFra).isEqualTo(revurderFra)
-            verify(exactly = 1) { nullstillBehandlingService.nullstillBehandling(behandling.id) }
+            verify(exactly = 1) { nullstillBehandlingService.nullstillBehandling(behandling) }
         }
 
         @Test

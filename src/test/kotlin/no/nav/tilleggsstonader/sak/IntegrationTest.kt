@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.hendelser.Hendelse
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRouting
 import no.nav.tilleggsstonader.sak.oppfølging.Oppfølging
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlag
@@ -123,6 +124,7 @@ abstract class IntegrationTest {
         clearClientMocks()
         resetDatabase()
         clearCaches()
+        resetMock(unleashService)
     }
 
     private fun resetDatabase() {

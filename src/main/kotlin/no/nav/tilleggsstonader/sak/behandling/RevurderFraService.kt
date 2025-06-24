@@ -14,6 +14,7 @@ import java.time.LocalDate
 class RevurderFraService(
     private val behandlingRepository: BehandlingRepository,
     private val nullstillBehandlingService: NullstillBehandlingService,
+    private val behandlingService: BehandlingService,
 ) {
     @Transactional
     fun oppdaterRevurderFra(
@@ -26,9 +27,15 @@ class RevurderFraService(
             "Kan ikke oppdatere revurder fra når behandlingen har status ${behandling.status.visningsnavn()}."
         }
 
+        behandlingService.markerBehandlingSomPåbegynt(
+            behandlingId = behandling.id,
+            behandlingStatus = behandling.status,
+            behandlingSteg = behandling.steg,
+        )
+
         behandlingRepository.update(behandling.copy(revurderFra = revurderFra))
         if (skalNullstilleBehandling(behandling, revurderFra)) {
-            nullstillBehandlingService.nullstillBehandling(behandlingId)
+            nullstillBehandlingService.nullstillBehandling(behandling)
         }
         nullstillBehandlingService.slettVilkårperiodegrunnlag(behandlingId)
 

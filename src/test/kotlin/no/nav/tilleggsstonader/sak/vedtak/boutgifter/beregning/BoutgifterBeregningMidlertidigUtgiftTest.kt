@@ -7,12 +7,12 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagBeregningsresultatMåned
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vilkårperioder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
@@ -46,14 +46,13 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepository,
-            unleashService = unleashService,
         )
 
     val utgiftMidlertidigOvernatting: BoutgifterPerUtgiftstype =
         mapOf(
             TypeBoutgift.UTGIFTER_OVERNATTING to
                 listOf(
-                    UtgiftBeregningBoutgifter(
+                    lagUtgiftBeregningBoutgifter(
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 31),
                         utgift = 3000,
@@ -88,7 +87,6 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
     @BeforeEach
     fun setup() {
         every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
-        every { unleashService.isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT) } returns true
     }
 
     @Test
@@ -125,7 +123,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        lagUtgiftBeregningBoutgifter(
                             fom = LocalDate.of(2025, 1, 15),
                             tom = LocalDate.of(2025, 2, 14),
                             utgift = 3000,
@@ -162,12 +160,12 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        lagUtgiftBeregningBoutgifter(
                             fom = LocalDate.of(2025, 1, 1),
                             tom = LocalDate.of(2025, 1, 10),
                             utgift = 3000,
                         ),
-                        UtgiftBeregningBoutgifter(
+                        lagUtgiftBeregningBoutgifter(
                             fom = LocalDate.of(2025, 1, 25),
                             tom = LocalDate.of(2025, 2, 5),
                             utgift = 3000,
@@ -183,7 +181,18 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
             )
-        }.hasMessageContaining("Vi støtter foreløpig ikke at utgifter krysser ulike utbetalingsperioder")
+        }.hasMessage(
+            """
+            Utgiftsperioder krysser beregningsperioder
+            
+            Utgiftsperiode 25.01.2025–05.02.2025 krysser beregningsperiodene:
+            - 01.01.2025–31.01.2025
+            - 01.02.2025–28.02.2025
+            
+            Utgiftsperioden(e) må splittes.
+            
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -192,12 +201,12 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        lagUtgiftBeregningBoutgifter(
                             fom = LocalDate.of(2025, 1, 1),
                             tom = LocalDate.of(2025, 1, 31),
                             utgift = 3000,
                         ),
-                        UtgiftBeregningBoutgifter(
+                        lagUtgiftBeregningBoutgifter(
                             fom = LocalDate.of(2025, 3, 10),
                             tom = LocalDate.of(2025, 3, 12),
                             utgift = 6000,
@@ -221,7 +230,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
-                        UtgiftBeregningBoutgifter(
+                        lagUtgiftBeregningBoutgifter(
                             fom = LocalDate.of(2025, 3, 10),
                             tom = LocalDate.of(2025, 3, 12),
                             utgift = 6000,

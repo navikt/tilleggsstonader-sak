@@ -46,7 +46,7 @@ class TestoppsettService(
     private val behandlingRepository: BehandlingRepository,
     private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
     private val faktaGrunnlagService: FaktaGrunnlagService,
-    private val repository: VedtakRepository,
+    private val vedtakRepository: VedtakRepository,
 ) {
     fun hentFagsak(fagsakId: FagsakId) = fagsakService.hentFagsak(fagsakId)
 
@@ -125,7 +125,7 @@ class TestoppsettService(
                 beregningsresultat = beregningsresultat,
                 vedtaksperioder = vedtaksperioder,
             )
-        repository.insert(vedtak)
+        vedtakRepository.insert(vedtak)
         return vedtak
     }
 

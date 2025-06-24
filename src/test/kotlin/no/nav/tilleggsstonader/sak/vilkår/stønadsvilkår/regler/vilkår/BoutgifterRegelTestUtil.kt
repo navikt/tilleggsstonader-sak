@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 
 object BoutgifterRegelTestUtil {
-    fun oppfylteDelvilkårUtgifterOvernatting() =
+    fun oppfylteDelvilkårUtgifterOvernatting(høyereUtgifter: SvarId = SvarId.NEI) =
         listOf(
             delvilkår(
                 Vurdering(
@@ -18,7 +18,13 @@ object BoutgifterRegelTestUtil {
             ),
             delvilkår(Vurdering(regelId = RegelId.DOKUMENTERT_UTGIFTER_OVERNATTING, svar = SvarId.JA)),
             delvilkår(Vurdering(regelId = RegelId.DOKUMENTERT_DELTAKELSE, svar = SvarId.JA)),
-            delvilkår(Vurdering(regelId = RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, svar = SvarId.NEI)),
+            delvilkår(
+                Vurdering(
+                    regelId = RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER,
+                    svar = høyereUtgifter,
+                    begrunnelse = begrunnelseHøyereUtgifter(høyereUtgifter),
+                ),
+            ),
         )
 
     fun delvilkårFremtidigeUtgifter() =
@@ -29,26 +35,31 @@ object BoutgifterRegelTestUtil {
             delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, null)),
         )
 
-    fun oppfylteDelvilkårLøpendeUtgifterEnBolig() =
+    fun oppfylteDelvilkårLøpendeUtgifterEnBolig(høyereUtgifter: SvarId = SvarId.NEI) =
         listOf(
             delvilkår(Vurdering(RegelId.HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE, SvarId.JA)),
-            delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.JA)),
+            delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.JA, begrunnelse = "påkrevd")),
             delvilkår(Vurdering(RegelId.RETT_TIL_BOSTØTTE, SvarId.NEI)),
-            delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
+            delvilkår(
+                Vurdering(
+                    regelId = RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER,
+                    svar = høyereUtgifter,
+                    begrunnelse = begrunnelseHøyereUtgifter(høyereUtgifter),
+                ),
+            ),
         )
 
-    fun oppfylteDelvilkårLøpendeUtgifterToBoliger() =
+    fun oppfylteDelvilkårLøpendeUtgifterToBoliger(høyereUtgifter: SvarId = SvarId.NEI) =
         listOf(
-            delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.JA)),
+            delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.JA, begrunnelse = "påkrevd")),
             delvilkår(Vurdering(RegelId.DOKUMENTERT_UTGIFTER_BOLIG, SvarId.JA)),
-            delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
-        )
-
-    fun oppfylteDelvilkårLøpendeUtgifterToBoligerHøyereUtgifterHelsemessigÅrsaker() =
-        listOf(
-            delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.JA)),
-            delvilkår(Vurdering(RegelId.DOKUMENTERT_UTGIFTER_BOLIG, SvarId.JA)),
-            delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.JA, "begrunnelse")),
+            delvilkår(
+                Vurdering(
+                    regelId = RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER,
+                    svar = høyereUtgifter,
+                    begrunnelse = begrunnelseHøyereUtgifter(høyereUtgifter),
+                ),
+            ),
         )
 
     fun ikkeOppfylteDelvilkårUtgifterOvernatting() =
@@ -62,7 +73,7 @@ object BoutgifterRegelTestUtil {
     fun ikkeOppfylteDelvilkårLøpendeUtgifterEnBolig() =
         listOf(
             delvilkår(Vurdering(RegelId.HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE, SvarId.NEI, "begrunnelse")),
-            delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.JA)),
+            delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.JA, begrunnelse = "påkrevd")),
             delvilkår(Vurdering(RegelId.RETT_TIL_BOSTØTTE, SvarId.NEI)),
             delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
         )
@@ -79,4 +90,6 @@ object BoutgifterRegelTestUtil {
             resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
             vurderinger = vurderinger.toList(),
         )
+
+    private fun begrunnelseHøyereUtgifter(høyereUtgifter: SvarId): String? = if (høyereUtgifter == SvarId.JA) "begrunnelse" else null
 }

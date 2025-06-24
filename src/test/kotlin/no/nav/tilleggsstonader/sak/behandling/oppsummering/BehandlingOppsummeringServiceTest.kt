@@ -152,6 +152,36 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
         }
 
         @Test
+        fun `skal ikke slå sammen utgifter for overnatting hvis de er sammenhengende`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
+
+            vilkårRepository.insertAll(
+                listOf(
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.UTGIFTER_OVERNATTING,
+                        fom = LocalDate.of(2025, 1, 1),
+                        tom = LocalDate.of(2025, 1, 5),
+                        utgift = 1000,
+                    ),
+                    vilkår(
+                        behandlingId = behandling.id,
+                        type = VilkårType.UTGIFTER_OVERNATTING,
+                        fom = LocalDate.of(2025, 1, 6),
+                        tom = LocalDate.of(2025, 1, 31),
+                        utgift = 1000,
+                    ),
+                ),
+            )
+
+            val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
+
+            assertThat(behandlingOppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(behandlingOppsummering.vilkår).hasSize(1)
+            assertThat(behandlingOppsummering.vilkår[0].vilkår).hasSize(2)
+        }
+
+        @Test
         fun `skal ikke slå sammen vilkår for to ulike barn`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
             val barn1 = BarnId.random()

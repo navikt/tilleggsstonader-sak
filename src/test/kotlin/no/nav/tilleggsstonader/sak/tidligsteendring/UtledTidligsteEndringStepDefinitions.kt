@@ -53,6 +53,7 @@ enum class VilkårperiodeNøkler(
     TYPE("Type"),
     STUDIENIVÅ("Studienivå"),
     STUDIEPROSENT("Studieprosent"),
+    KILDE_ID("Kilde Id"),
 }
 
 enum class VilkårNøkler(
@@ -160,6 +161,11 @@ class UtledTidligsteEndringStepDefinitions {
         assertThat(tidligsteEndring).isEqualTo(forventetDato)
     }
 
+    @Så("forvent ingen endring")
+    fun `forvent ingen endring`() {
+        assertThat(tidligsteEndring).isNull()
+    }
+
     private fun mapVilkår(
         dataTable: DataTable,
         barnIderForBehandlingMap: MutableMap<String, BarnId>,
@@ -194,6 +200,7 @@ class UtledTidligsteEndringStepDefinitions {
                 faktaOgVurdering = mapFaktaOgVurderingAktivitet(rad),
                 resultat = parseEnum(TidligsteEndringFellesNøkler.RESULTAT, rad),
                 status = parseEnum(TidligsteEndringFellesNøkler.STATUS, rad),
+                kildeId = parseValgfriString(VilkårperiodeNøkler.KILDE_ID, rad),
             )
         }
 

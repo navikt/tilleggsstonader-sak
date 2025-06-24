@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -8,7 +7,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -16,8 +14,10 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.lagBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.splittTilLøpendeMåneder
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningServiceFeilmeldingUtil.lagDetFinnesUtgifterSomKrysserUtbetlingsperioderFeilmelding
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.MarkerSomDelAvTidligereUtbetlingUtils.markerSomDelAvTidligereUtbetaling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
@@ -38,7 +38,6 @@ class BoutgifterBeregningService(
     private val boutgifterUtgiftService: BoutgifterUtgiftService,
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val vedtakRepository: VedtakRepository,
-    private val unleashService: UnleashService,
 ) {
     /**
      * Kjente begrensninger i beregningen (programmet kaster feil dersom antagelsene ikke stemmer):
@@ -104,6 +103,7 @@ class BoutgifterBeregningService(
             .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
             .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(utgifter)
             .map { lagBeregningsgrunnlag(periode = it, utgifter = utgifter) }
+            .validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter()
             .map {
                 BeregningsresultatForLøpendeMåned(
                     grunnlag = it,
@@ -112,7 +112,7 @@ class BoutgifterBeregningService(
             }
 
     private fun skalAvkorteUtbetalingPeriode(utgifter: BoutgifterPerUtgiftstype): Boolean =
-        TypeBoutgift.UTGIFTER_OVERNATTING !in utgifter.keys || !unleashService.isEnabled(Toggle.SKAL_VISE_DETALJERT_BEREGNINGSRESULTAT)
+        TypeBoutgift.UTGIFTER_OVERNATTING !in utgifter.keys
 
     /**
      * Slår sammen perioder fra forrige og nytt vedtak.
@@ -208,11 +208,28 @@ private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtb
         }
 
     brukerfeilHvis(detFinnesUtgiftSomKrysserUtbetalingsperioder) {
-        """
-        Vi støtter foreløpig ikke at utgifter krysser ulike utbetalingsperioder. 
-        Utbetalingsperioder for denne behandlingen er: ${utbetalingsperioder.map { it.formatertPeriodeNorskFormat() }}, 
-        mens utgiftsperiodene er: ${utgifterTilOvernatting.map { it.formatertPeriodeNorskFormat() }}
-        """.trimIndent()
+        lagDetFinnesUtgifterSomKrysserUtbetlingsperioderFeilmelding(
+            utgifter = utgifterTilOvernatting,
+            utbetalingsperioder = utbetalingsperioder,
+        )
+    }
+
+    return this
+}
+
+private fun List<Beregningsgrunnlag>.validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter(): List<Beregningsgrunnlag> {
+    this.forEach { beregningsgrunnlag ->
+        val antallUlikeSvarHøyereUtgifter =
+            beregningsgrunnlag.utgifter.values
+                .flatten()
+                .map { it.skalFåDekketFaktiskeUtgifter }
+                .distinct()
+                .count()
+        brukerfeilHvis(antallUlikeSvarHøyereUtgifter > 1) {
+            "Vi støtter ikke at en person både skal få dekket faktiske utgifter og " +
+                "ikke faktiske utgifter i samme utbetalingsperiode " +
+                "(${beregningsgrunnlag.formatertPeriodeNorskFormat()})"
+        }
     }
 
     return this

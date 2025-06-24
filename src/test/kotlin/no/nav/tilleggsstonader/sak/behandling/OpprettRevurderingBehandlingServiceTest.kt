@@ -65,7 +65,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
             assertThatThrownBy {
                 service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling.fagsakId))
-            }.hasMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
+            }.hasMessage("Det finnes en behandling på fagsaken som hverken er ferdigstilt eller satt på vent")
         }
 
         @Test
