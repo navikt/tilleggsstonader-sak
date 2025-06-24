@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.hendelser.journalføring
 
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.libs.log.IdUtils
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Service
 class JournalhendelseKafkaListener(
     private val hendelseRepository: HendelseRepository,
     private val transactionHandler: TransactionHandler,
-    private val journalhendelseKafkaHåndterer: JournalhendelseKafkaHåndterer,
+    private val taskService: TaskService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -62,7 +63,7 @@ class JournalhendelseKafkaListener(
         val hendelseId = hendelseRecord.hendelsesId.takeIf { it.isNotBlank() } ?: error("Mangler hendelseId")
         if (!hendelseRepository.existsByTypeAndId(TypeHendelse.JOURNALPOST, hendelseId)) {
             transactionHandler.runInNewTransaction {
-                journalhendelseKafkaHåndterer.behandleJournalpost(hendelseRecord)
+                taskService.save(JournalhendelseKafkaHåndtererTask.opprettTask(hendelseRecord))
                 val metadata = mapOf("journalpostId" to hendelseRecord.journalpostId)
                 val hendelse = Hendelse(TypeHendelse.JOURNALPOST, id = hendelseId, metadata = metadata)
                 hendelseRepository.insert(hendelse)

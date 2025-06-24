@@ -4,6 +4,7 @@ import io.mockk.clearMocks
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.sak.hendelser.ConsumerRecordUtil.lagConsumerRecord
@@ -18,13 +19,13 @@ import org.springframework.kafka.support.Acknowledgment
 
 class JournalhendelseKafkaListenerTest {
     val hendelseRepository = spyk(HendelseRepositoryFake())
-    val journalhendelseKafkaHåndterer: JournalhendelseKafkaHåndterer = mockk(relaxed = true)
+    val taskService = mockk<TaskService>(relaxed = true)
 
     val listener =
         JournalhendelseKafkaListener(
             hendelseRepository = hendelseRepository,
             transactionHandler = TransactionHandler(),
-            journalhendelseKafkaHåndterer = journalhendelseKafkaHåndterer,
+            taskService = taskService,
         )
 
     val ack = mockk<Acknowledgment>(relaxed = true)
@@ -43,7 +44,7 @@ class JournalhendelseKafkaListenerTest {
             assertThat(type).isEqualTo(TypeHendelse.JOURNALPOST)
         }
         verify(exactly = 1) { hendelseRepository.existsByTypeAndId(TypeHendelse.JOURNALPOST, "hendelseId") }
-        verify(exactly = 1) { journalhendelseKafkaHåndterer.behandleJournalpost(any()) }
+        verify(exactly = 1) { taskService.save(any()) }
         verify(exactly = 1) { hendelseRepository.insert(any()) }
         verify(exactly = 1) { ack.acknowledge() }
     }
@@ -56,7 +57,7 @@ class JournalhendelseKafkaListenerTest {
         listener.listen(lagConsumerRecord("key", record()), ack)
 
         verify(exactly = 1) { hendelseRepository.existsByTypeAndId(any(), any()) }
-        verify(exactly = 0) { journalhendelseKafkaHåndterer.behandleJournalpost(any()) }
+        verify(exactly = 0) { taskService.save(any()) }
         verify(exactly = 0) { hendelseRepository.insert(any()) }
         verify(exactly = 1) { ack.acknowledge() }
     }
@@ -66,7 +67,7 @@ class JournalhendelseKafkaListenerTest {
         listener.listen(lagConsumerRecord("key", record(tema = "ENF")), ack)
 
         verify(exactly = 0) { hendelseRepository.existsByTypeAndId(any(), any()) }
-        verify(exactly = 0) { journalhendelseKafkaHåndterer.behandleJournalpost(any()) }
+        verify(exactly = 0) { taskService.save(any()) }
         verify(exactly = 0) { hendelseRepository.insert(any()) }
         verify(exactly = 1) { ack.acknowledge() }
     }
