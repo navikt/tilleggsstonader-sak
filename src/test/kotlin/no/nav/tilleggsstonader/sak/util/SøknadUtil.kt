@@ -31,7 +31,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.HarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.UtdanningAvsnitt
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
@@ -39,7 +38,7 @@ import java.time.Year
 object SøknadUtil {
     fun søknadskjemaBarnetilsyn(
         ident: String = "søker",
-        mottattTidspunkt: LocalDateTime = osloNow(),
+        mottattTidspunkt: LocalDateTime = LocalDateTime.now(),
         barnMedBarnepass: List<BarnMedBarnepass> = listOf(barnMedBarnepass()),
         dokumentasjon: List<DokumentasjonFelt> = emptyList(),
     ): Søknadsskjema<Skjema> {
@@ -80,7 +79,7 @@ object SøknadUtil {
 
     fun søknadskjemaLæremidler(
         ident: String = "søker",
-        mottattTidspunkt: LocalDateTime = osloNow(),
+        mottattTidspunkt: LocalDateTime = LocalDateTime.now(),
         dokumentasjon: List<DokumentasjonFelt> = emptyList(),
     ): Søknadsskjema<Skjema> {
         val skjemaBarnetilsyn =

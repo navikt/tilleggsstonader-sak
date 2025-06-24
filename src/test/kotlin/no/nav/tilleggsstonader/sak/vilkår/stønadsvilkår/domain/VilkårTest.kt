@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.vilkår
@@ -8,6 +7,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 internal class VilkårTest {
     private val behandlingIdFørstegangsbehandling = BehandlingId.random()
@@ -38,7 +38,7 @@ internal class VilkårTest {
      */
     @Test
     internal fun `opprettOpphavsvilkår skal bruke opphavsvilkår hvis den finnes`() {
-        val opphavsvilkår = Opphavsvilkår(behandlingIdFørstegangsbehandling, osloNow())
+        val opphavsvilkår = Opphavsvilkår(behandlingIdFørstegangsbehandling, LocalDateTime.now())
         val vilkår =
             vilkår(
                 behandlingId = behandlingIdRevurdering,
@@ -53,7 +53,7 @@ internal class VilkårTest {
 
     @Test
     internal fun `opprettOpphavsvilkår - skal ikke bruke opphavsvilkår hvis den finnes og vilkåret er endret`() {
-        val opphavsvilkår = Opphavsvilkår(behandlingIdFørstegangsbehandling, osloNow())
+        val opphavsvilkår = Opphavsvilkår(behandlingIdFørstegangsbehandling, LocalDateTime.now())
         val vilkår =
             vilkår(
                 behandlingId = behandlingIdRevurdering,

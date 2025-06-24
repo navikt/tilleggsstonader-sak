@@ -6,7 +6,6 @@ import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import org.springframework.stereotype.Service
@@ -34,7 +33,7 @@ class VedtaksstatistikkTask(
         fun opprettVedtaksstatistikkTask(
             behandlingId: BehandlingId,
             fagsakId: FagsakId,
-            hendelseTidspunkt: LocalDateTime = osloNow(),
+            hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
             stønadstype: Stønadstype,
         ): Task =
             Task(

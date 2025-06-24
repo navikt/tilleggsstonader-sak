@@ -12,7 +12,6 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -32,6 +31,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.web.client.HttpClientErrorException
+import java.time.LocalDateTime
 
 class DistribuerVedtaksbrevTaskTest {
     val brevmottakerVedtaksbrevRepository = mockk<BrevmottakerVedtaksbrevRepository>()
@@ -171,7 +171,7 @@ class DistribuerVedtaksbrevTaskTest {
             val rekjørSenereException = catchThrowableOfType<RekjørSenereException> { distribuerVedtaksbrevTask.doTask(task) }
 
             assertThat(rekjørSenereException.triggerTid)
-                .isBetween(osloNow().plusDays(6), osloNow().plusDays(8))
+                .isBetween(LocalDateTime.now().plusDays(6), LocalDateTime.now().plusDays(8))
             assertThat(rekjørSenereException.årsak).startsWith("Mottaker er død")
 
             verify(exactly = 1) { journalpostClient.distribuerJournalpost(any(), any()) }

@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.opplysninger.pdl
 
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Bostedsadresse
@@ -46,6 +45,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Vegadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergeEllerFullmektig
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergemaalEllerFremtidsfullmakt
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 object PdlTestdata {
     private val metadataGjeldende = Metadata(false)
@@ -65,7 +65,7 @@ object PdlTestdata {
     private val matrikkeladresse = Matrikkeladresse(1L, "", "", "")
     private val utenlandskAdresse = UtenlandskAdresse("", "", "", "", "", "", "")
 
-    private val folkeregistermetadata = Folkeregistermetadata(osloNow(), osloNow())
+    private val folkeregistermetadata = Folkeregistermetadata(LocalDateTime.now(), LocalDateTime.now())
 
     private val navn = listOf(Navn("", "", "", metadataGjeldende))
 

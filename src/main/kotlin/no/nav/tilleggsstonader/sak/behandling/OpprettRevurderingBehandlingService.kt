@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.behandling
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -27,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class OpprettRevurderingBehandlingService(
@@ -77,7 +77,7 @@ class OpprettRevurderingBehandlingService(
                     behandlingId = behandling.id,
                     saksbehandler = SikkerhetContext.hentSaksbehandler(),
                     beskrivelse = "Skal behandles i TS-Sak",
-                    hendelseTidspunkt = behandling.kravMottatt?.atStartOfDay() ?: osloNow(),
+                    hendelseTidspunkt = behandling.kravMottatt?.atStartOfDay() ?: LocalDateTime.now(),
                 ),
             ),
         )

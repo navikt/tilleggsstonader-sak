@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -25,7 +24,7 @@ object IverksettDtoUtil {
     )
 
     fun vedtaksdetaljerDto(
-        vedtakstidspunkt: LocalDateTime = osloNow(),
+        vedtakstidspunkt: LocalDateTime = LocalDateTime.now(),
         saksbehandlerId: String = "saksbehandler",
         beslutterId: String = "beslutter",
         utbetalinger: List<UtbetalingDto> = listOf(utbetalingDto()),

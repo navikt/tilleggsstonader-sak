@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.statistikk.behandling
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.SakYtelseDvh
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
@@ -85,7 +84,7 @@ class BehandlingsstatistikkService(
             sisteOppgaveForBehandling = sisteOppgaveForBehandling,
             behandlingMetode = behandlingMetode,
             beslutterId = beslutterId,
-            tekniskTid = osloNow(),
+            tekniskTid = LocalDateTime.now(),
             relatertBehandlingId = relatertBehandlingId,
         )
     }

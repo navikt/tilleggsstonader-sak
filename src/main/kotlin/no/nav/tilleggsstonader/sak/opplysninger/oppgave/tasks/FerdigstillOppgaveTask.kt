@@ -6,7 +6,6 @@ import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -29,7 +28,7 @@ class FerdigstillOppgaveTask(
     data class FerdigstillOppgaveTaskData(
         val behandlingId: BehandlingId,
         val oppgavetype: Oppgavetype,
-        val unik: LocalDateTime? = osloNow(),
+        val unik: LocalDateTime? = LocalDateTime.now(),
     )
 
     override fun doTask(task: Task) {

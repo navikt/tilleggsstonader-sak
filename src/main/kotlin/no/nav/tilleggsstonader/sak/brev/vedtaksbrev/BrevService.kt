@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.brev.vedtaksbrev
 
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -21,6 +20,7 @@ import no.nav.tilleggsstonader.sak.util.norskFormat
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 class BrevService(
@@ -100,7 +100,7 @@ class BrevService(
                 besluttersignatur = beslutterSignatur,
                 beslutterIdent = beslutterIdent,
                 beslutterPdf = beslutterPdf,
-                besluttetTid = osloNow(),
+                besluttetTid = LocalDateTime.now(),
             )
         vedtaksbrevRepository.update(besluttervedtaksbrev)
         return Fil(bytes = beslutterPdf.bytes)

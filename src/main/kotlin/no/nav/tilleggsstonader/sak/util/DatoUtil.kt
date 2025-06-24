@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.util.DatoFormat.DATE_FORMAT_NORSK
 import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDato
 import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDatoMedTid
@@ -22,7 +21,7 @@ object DatoFormat {
 }
 
 object DatoUtil {
-    fun dagensDatoMedTid(): LocalDateTime = osloNow()
+    fun dagensDatoMedTid(): LocalDateTime = LocalDateTime.now()
 
     fun dagensDato(): LocalDate = LocalDate.now()
 
@@ -90,7 +89,7 @@ fun LocalDate.erEttÅrEllerMerOgInnenforCutoff(numberOfDaysCutoff: Long): Boolea
     erEttÅrEllerMer() &&
         LocalDate.now() <= this.plusYears(1).plusDays(numberOfDaysCutoff)
 
-fun LocalDateTime.harGåttAntallTimer(timer: Int) = this.plusHours(timer.toLong()) < osloNow()
+fun LocalDateTime.harGåttAntallTimer(timer: Int) = this.plusHours(timer.toLong()) < LocalDateTime.now()
 
 fun dagensDatoMedTidNorskFormat(): String = dagensDatoMedTid().medGosysTid()
 

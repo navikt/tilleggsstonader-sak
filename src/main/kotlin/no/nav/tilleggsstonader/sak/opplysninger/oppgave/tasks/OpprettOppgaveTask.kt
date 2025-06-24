@@ -8,7 +8,6 @@ import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -38,7 +37,7 @@ class OpprettOppgaveTask(
     data class OpprettOppgaveTaskData(
         val kobling: Oppgavekobling,
         val oppgave: OpprettOppgave,
-        val unik: LocalDateTime? = osloNow(),
+        val unik: LocalDateTime? = LocalDateTime.now(),
     )
 
     override fun doTask(task: Task) {

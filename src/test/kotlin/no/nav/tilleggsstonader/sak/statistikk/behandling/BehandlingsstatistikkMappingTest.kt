@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.statistikk.behandling
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.SakYtelseDvh
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -33,9 +32,9 @@ class BehandlingsstatistikkMappingTest {
         val aktørId = "9876543210127"
         val saksbehandlerId = "7873486250023"
 
-        val henvendelseTidspunkt = osloNow()
-        val hendelseTidspunkt = osloNow()
-        val tekniskTid = osloNow()
+        val henvendelseTidspunkt = LocalDateTime.now()
+        val hendelseTidspunkt = LocalDateTime.now()
+        val tekniskTid = LocalDateTime.now()
 
         val saksbehandling =
             saksbehandling(
@@ -105,9 +104,9 @@ class BehandlingsstatistikkMappingTest {
         val aktørId = "9876543210127"
         val saksbehandlerId = "7873486250023"
 
-        val henvendelseTidspunkt = osloNow()
-        val hendelseTidspunkt = osloNow()
-        val tekniskTid = osloNow()
+        val henvendelseTidspunkt = LocalDateTime.now()
+        val hendelseTidspunkt = LocalDateTime.now()
+        val tekniskTid = LocalDateTime.now()
 
         val saksbehandling =
             saksbehandling(behandlingId = behandlingId, ident = aktørId, eksternId = 1337L, eksternFagId = 8080L)
@@ -171,9 +170,9 @@ class BehandlingsstatistikkMappingTest {
         val aktørId = "9876543210127"
         val saksbehandlerId = "7873486250023"
 
-        val henvendelseTidspunkt = osloNow()
-        val hendelseTidspunkt = osloNow()
-        val tekniskTid = osloNow()
+        val henvendelseTidspunkt = LocalDateTime.now()
+        val hendelseTidspunkt = LocalDateTime.now()
+        val tekniskTid = LocalDateTime.now()
 
         val saksbehandling =
             saksbehandling(
@@ -242,9 +241,9 @@ class BehandlingsstatistikkMappingTest {
         val aktørId = "9876543210127"
         val saksbehandlerId = "7873486250023"
 
-        val henvendelseTidspunkt = osloNow()
-        val hendelseTidspunkt = osloNow()
-        val tekniskTid = osloNow()
+        val henvendelseTidspunkt = LocalDateTime.now()
+        val hendelseTidspunkt = LocalDateTime.now()
+        val tekniskTid = LocalDateTime.now()
 
         val saksbehandling =
             saksbehandling(
@@ -315,9 +314,9 @@ class BehandlingsstatistikkMappingTest {
         val aktørId = "9876543210127"
         val saksbehandlerId = "7873486250023"
 
-        val henvendelseTidspunkt = osloNow()
-        val hendelseTidspunkt = osloNow()
-        val tekniskTid = osloNow()
+        val henvendelseTidspunkt = LocalDateTime.now()
+        val hendelseTidspunkt = LocalDateTime.now()
+        val tekniskTid = LocalDateTime.now()
 
         val saksbehandling =
             saksbehandling(
@@ -387,9 +386,9 @@ class BehandlingsstatistikkMappingTest {
         val aktørId = "9876543210127"
         val saksbehandlerId = "7873486250023"
 
-        val henvendelseTidspunkt = osloNow()
-        val hendelseTidspunkt = osloNow()
-        val tekniskTid = osloNow()
+        val henvendelseTidspunkt = LocalDateTime.now()
+        val hendelseTidspunkt = LocalDateTime.now()
+        val tekniskTid = LocalDateTime.now()
 
         val saksbehandling =
             saksbehandling(
@@ -459,9 +458,9 @@ class BehandlingsstatistikkMappingTest {
         val aktørId = "9876543210127"
         val saksbehandlerId = "7873486250023"
 
-        val henvendelseTidspunkt = osloNow()
-        val hendelseTidspunkt = osloNow()
-        val tekniskTid = osloNow()
+        val henvendelseTidspunkt = LocalDateTime.now()
+        val hendelseTidspunkt = LocalDateTime.now()
+        val tekniskTid = LocalDateTime.now()
 
         val saksbehandling =
             saksbehandling(
