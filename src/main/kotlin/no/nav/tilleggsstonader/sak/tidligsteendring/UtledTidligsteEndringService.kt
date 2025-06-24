@@ -29,6 +29,11 @@ class UtledTidligsteEndringService(
     private val barnService: BarnService,
     private val unleashService: UnleashService,
 ) {
+    /**
+     * Vil plukke opp alle endringer i vilkår, aktiviteter, målgrupper og vedtaksperioder og betrakte det som en endring i revurderingen.
+     * Noe som kan vurderes om vi bør ta hensyn til:
+     * Vil også plukke oppe endringer som ikke har noe å si for beregning, eksempelvis om man legger til en ny målgruppe.
+     */
     fun utledTidligsteEndring(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
