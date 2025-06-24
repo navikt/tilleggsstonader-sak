@@ -137,7 +137,7 @@ class TilordnetSaksbehandlerService(
         if (oppgave == null) {
             val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
 
-            if (behandling.steg == StegType.REVURDERING_ÅRSAK ||
+            if (behandling.steg == StegType.INNGANGSVILKÅR ||
                 behandling.steg == StegType.VILKÅR ||
                 behandling.steg == StegType.BEREGNE_YTELSE
             ) {
