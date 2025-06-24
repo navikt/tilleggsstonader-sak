@@ -40,7 +40,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDt
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
-import no.nav.tilleggsstonader.sak.opplysninger.saksbehandler.TilordnetSaksbehandlerService
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.lagNavn
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlPersonKort
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -61,7 +60,6 @@ internal class OppgaveServiceTest {
     private val cacheManager = ConcurrentMapCacheManager()
     private val personService = mockk<PersonService>(relaxed = true)
     private val klageService = mockk<KlageService>(relaxed = true)
-    private val tilordnetSaksbehandlerService = mockk<TilordnetSaksbehandlerService>(relaxed = true)
 
     private val oppgaveService =
         OppgaveService(
@@ -72,7 +70,6 @@ internal class OppgaveServiceTest {
             cacheManager = cacheManager,
             personService = personService,
             klageService = klageService,
-            tilordnetSaksbehandlerService = tilordnetSaksbehandlerService,
         )
 
     val opprettOppgaveDomainSlot = slot<OppgaveDomain>()
