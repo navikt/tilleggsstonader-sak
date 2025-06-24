@@ -40,27 +40,27 @@ object VedtakDtoMapper {
     ): VedtakResponse {
         val data = vedtak.data
         return when (data) {
-            is VedtakTilsynBarn -> mapVedtakTilsynBarn(data, revurderFra)
-            is VedtakLæremidler -> mapVedtakLæremidler(data, revurderFra)
-            is VedtakBoutgifter -> mapVedtakBoutgifter(data, revurderFra)
+            is VedtakTilsynBarn -> mapVedtakTilsynBarn(data, vedtak.tidligsteEndring ?: revurderFra)
+            is VedtakLæremidler -> mapVedtakLæremidler(data, vedtak.tidligsteEndring ?: revurderFra)
+            is VedtakBoutgifter -> mapVedtakBoutgifter(data, vedtak.tidligsteEndring ?: revurderFra)
         }
     }
 
     private fun mapVedtakTilsynBarn(
         data: VedtakTilsynBarn,
-        revurderFra: LocalDate?,
+        tidligsteEndring: LocalDate?,
     ): VedtakTilsynBarnResponse =
         when (data) {
             is InnvilgelseTilsynBarn ->
                 InnvilgelseTilsynBarnResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
+                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
                     vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(),
                     begrunnelse = data.begrunnelse,
                 )
 
             is OpphørTilsynBarn ->
                 OpphørTilsynBarnResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
+                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(),
@@ -75,15 +75,15 @@ object VedtakDtoMapper {
 
     private fun mapVedtakLæremidler(
         data: VedtakLæremidler,
-        revurderFra: LocalDate?,
+        tidligsteEndring: LocalDate?,
     ): VedtakLæremidlerResponse =
         when (data) {
             is InnvilgelseLæremidler ->
                 InnvilgelseLæremidlerResponse(
                     vedtaksperioder = data.vedtaksperioder.tilDto(),
-                    beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
-                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).minOfOrNull { it.fom },
-                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).maxOfOrNull { it.tom },
+                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
+                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
+                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
                 )
 
@@ -103,15 +103,15 @@ object VedtakDtoMapper {
 
     private fun mapVedtakBoutgifter(
         data: VedtakBoutgifter,
-        revurderFra: LocalDate?,
+        tidligsteEndring: LocalDate?,
     ): VedtakBoutgifterResponse =
         when (data) {
             is InnvilgelseBoutgifter ->
                 InnvilgelseBoutgifterResponse(
                     vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(),
-                    beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
-                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).minOfOrNull { it.fom },
-                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(revurderFra).maxOfOrNull { it.tom },
+                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
+                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
+                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
                 )
 

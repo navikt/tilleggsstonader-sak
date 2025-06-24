@@ -25,6 +25,7 @@ fun resetMock(
     clearMocks(mockk)
     every { mockk.isEnabled(any()) } returns isEnabled
     every { mockk.isEnabled(any(), any<Boolean>()) } returns isEnabled
+    every { mockk.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) } returns false
     justRun { mockk.destroy() }
 }
 

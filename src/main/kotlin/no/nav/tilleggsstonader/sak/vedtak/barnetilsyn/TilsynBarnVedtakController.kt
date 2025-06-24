@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -35,6 +36,7 @@ class TilsynBarnVedtakController(
     private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
     private val vedtaksperiodeService: VedtaksperiodeService,
+    private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -76,12 +78,16 @@ class TilsynBarnVedtakController(
     ): BeregningsresultatTilsynBarnDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        val vedtaksperioder = vedtak.vedtaksperioder.tilDomene()
+        val tidligsteEndring = utledTidligsteEndringService.utledTidligsteEndring(behandling.id, vedtaksperioder)
+
         return beregningService
             .beregn(
-                vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
+                vedtaksperioder = vedtaksperioder,
                 behandling = behandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-            ).tilDto(behandling.revurderFra)
+                tidligsteEndring = tidligsteEndring,
+            ).tilDto(tidligsteEndring)
     }
 
     @GetMapping("{behandlingId}")

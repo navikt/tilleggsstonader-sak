@@ -226,17 +226,19 @@ class VedtaksperiodeValideringServiceTest {
         behandling: Saksbehandling = saksbehandling(),
     ) {
         vedtaksperiodeValidingerService.validerVedtaksperioder(
-            vedtaksperioder,
-            behandling,
-            TypeVedtak.INNVILGELSE,
+            vedtaksperioder = vedtaksperioder,
+            behandling = behandling,
+            typeVedtak = TypeVedtak.INNVILGELSE,
+            tidligsteEndring = behandling.revurderFra,
         )
     }
 
     private fun validerOpphør(vedtaksperioder: List<Vedtaksperiode>) {
         vedtaksperiodeValidingerService.validerVedtaksperioder(
-            vedtaksperioder,
-            saksbehandling(),
-            TypeVedtak.OPPHØR,
+            vedtaksperioder = vedtaksperioder,
+            behandling = saksbehandling(),
+            typeVedtak = TypeVedtak.OPPHØR,
+            tidligsteEndring = behandling.revurderFra,
         )
     }
 

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -10,6 +11,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagPersonopplysninger
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
@@ -54,6 +56,7 @@ class VilkårperiodeService(
     private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
     private val faktaGrunnlagService: FaktaGrunnlagService,
     private val behandlingshistorikkService: BehandlingshistorikkService,
+    private val unleashService: UnleashService,
 ) {
     fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
         val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
@@ -80,7 +83,10 @@ class VilkårperiodeService(
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
 
         validerBehandling(behandling)
-        validerNyPeriodeRevurdering(behandling, vilkårperiode.fom)
+
+        if (!unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
+            validerNyPeriodeRevurdering(behandling, vilkårperiode.fom)
+        }
 
         if (vilkårperiode.type is MålgruppeType) {
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
@@ -140,7 +146,7 @@ class VilkårperiodeService(
                 .hentEnkeltGrunnlag<FaktaGrunnlagPersonopplysninger>(behandling.id)
                 .data.fødsel
 
-        if (behandling.type != BehandlingType.REVURDERING) {
+        if (behandling.type != BehandlingType.REVURDERING || unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
             return oppdaterVilkårperiodeHvorAltKanEndres(
                 eksisterendeVilkårperiode,
                 vilkårperiode,
@@ -251,7 +257,10 @@ class VilkårperiodeService(
 
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
         validerBehandling(behandling)
-        validerSlettPeriodeRevurdering(behandling, vilkårperiode)
+
+        if (!unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
+            validerSlettPeriodeRevurdering(behandling, vilkårperiode)
+        }
 
         if (vilkårperiode.kanSlettesPermanent()) {
             vilkårperiodeRepository.deleteById(vilkårperiode.id)

@@ -10,6 +10,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -46,6 +48,11 @@ class TilsynBarnBeregnYtelseStegTest {
     private val tilsynBarnVedtaksperiodeValidingerService =
         mockk<VedtaksperiodeValideringService>(relaxed = true)
     private val vedtaksperiodeService = mockk<VedtaksperiodeService>(relaxed = true)
+    private val utledTidligsteEndringService =
+        mockk<UtledTidligsteEndringService> {
+            every { utledTidligsteEndring(any(), any()) } returns null
+        }
+    private val unleashService = mockUnleashService()
 
     val tilsynBarnBeregningService =
         TilsynBarnBeregningService(
@@ -63,6 +70,8 @@ class TilsynBarnBeregnYtelseStegTest {
             simuleringService = simuleringService,
             opphørValideringService = opphørValideringService,
             vedtaksperiodeService = vedtaksperiodeService,
+            utledTidligsteEndringService = utledTidligsteEndringService,
+            unleashService = unleashService,
         )
 
     val saksbehandling = saksbehandling()

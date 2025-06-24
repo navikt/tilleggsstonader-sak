@@ -120,6 +120,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                     behandling = saksbehandling(),
                     vedtaksperioder = vedtaksperioderFørstegangsbehandling,
                     typeVedtak = TypeVedtak.INNVILGELSE,
+                    tidligsteEndring = null,
                 ).perioder
 
         assertThat(beregningsresultat).isEqualTo(beregningsresultatFørstegangsbehandlingLøpendeUtgifterEnBolig)
@@ -203,17 +204,19 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
         every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifterRevurdering
         every { vedtakRepository.findByIdOrThrow(any()) } returns innvilgelseBoutgifter
 
+        val saksbehandling =
+            saksbehandling(
+                revurderFra = LocalDate.of(2025, 4, 1),
+                forrigeIverksatteBehandlingId = BehandlingId.random(),
+                type = BehandlingType.REVURDERING,
+            )
         val res =
             boutgifterBeregningService
                 .beregn(
-                    behandling =
-                        saksbehandling(
-                            revurderFra = LocalDate.of(2025, 4, 1),
-                            forrigeIverksatteBehandlingId = BehandlingId.random(),
-                            type = BehandlingType.REVURDERING,
-                        ),
+                    behandling = saksbehandling,
                     vedtaksperioder = vedtaksperioderRevurdering,
                     typeVedtak = TypeVedtak.INNVILGELSE,
+                    tidligsteEndring = saksbehandling.revurderFra,
                 ).perioder
 
         assertThat(res.size).isEqualTo(4)
