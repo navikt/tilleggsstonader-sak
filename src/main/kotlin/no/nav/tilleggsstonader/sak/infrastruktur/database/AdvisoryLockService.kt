@@ -7,8 +7,12 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Service for å låse eks en behandlingId før man sjekker om noe finnes i databasen for å sen opprette noe koblet til behandlingen.
- * Row lock, med eks @Lock(LockMode.PESSIMISTIC_WRITE) i Repository fungerer hvis tabellen allerede inneholder en rad
+ * Service for å utføre databaselås.
+ * Eks låse basert på en behandlingId, slik at kall som først sjekker om noe finnes i databasen før den
+ * oppretter noe koblet til behandlingen blir stoppet, dersom det den leter etter opprettes i en annen transaksjon
+ *
+ * Alternativet er å bruke Row lock, med eks @Lock(LockMode.PESSIMISTIC_WRITE) i Repository,
+ * som fungerer hvis tabellen allerede inneholder en rad
  */
 @Service
 class AdvisoryLockService(
