@@ -16,7 +16,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer
 import java.time.Duration
 
 @Configuration
-@Profile("!local & !integrasjonstest & !prod")
+@Profile("!local & !integrasjonstest")
 class OppgaveListenerContainerFactoryConfig {
     @Bean
     fun oppgavehendelserListenerContainerFactory(
