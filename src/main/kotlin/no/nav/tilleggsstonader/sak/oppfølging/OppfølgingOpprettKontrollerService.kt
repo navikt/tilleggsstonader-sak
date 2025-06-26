@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -193,11 +194,26 @@ class OppfølgingOpprettKontrollerService(
             .also { validerResultat(it.kildeResultat) }
             .perioder
             .filter { it.aapErFerdigAvklart != true }
+            .korrigerTom()
             .filter { it.tom != null }
             .map { it.type.tilMålgruppe() to Datoperiode(fom = it.fom, tom = it.tom!!) }
             .groupBy({ it.first }, { it.second })
             .mapValues { it.value.mergeSammenhengende() }
     }
+
+    /**
+     * Det er vanlig at omstillingsstønad mangler TOM,
+     * og de kan være lagt inn hos oss med tom 3 år frem i tiden fordi det er det som står på vedtaket
+     * Av den grunnen settes tom = MAX for omstillingsstønad når den er null.
+     */
+    private fun List<YtelsePeriode>.korrigerTom(): List<YtelsePeriode> =
+        this.map {
+            if (it.type == TypeYtelsePeriode.OMSTILLINGSSTØNAD && it.tom == null) {
+                it.copy(tom = LocalDate.MAX)
+            } else {
+                it
+            }
+        }
 
     private fun validerResultat(kildeResultat: List<YtelsePerioderDto.KildeResultatYtelse>) {
         val test = kildeResultat.filter { it.resultat != ResultatKilde.OK }

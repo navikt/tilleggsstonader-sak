@@ -11,12 +11,14 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakMetadata
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.OppfølgingRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.aktivitetArenaDto
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeEnsligForsørger
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeOmstillingsstønad
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -271,6 +273,32 @@ class OppfølgingOpprettKontrollerServiceTest {
     }
 
     @Nested
+    inner class OmstillingsstønadSkalHåndtereAtTomMangler {
+        @Test
+        fun `skal ikke finne treff hvis tom mangler verdi då den settes til LocalDate-MAX`() {
+            val tom = vedtaksperiode.fom.plusYears(2)
+            mockTilstandForOmstillingsstønad(tom)
+
+            assertThat(opprettOppfølging()).isNull()
+        }
+
+        private fun mockTilstandForOmstillingsstønad(tom: LocalDate) {
+            val målgruppe =
+                målgruppe(
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.OMSTILLINGSSTØNAD),
+                    fom = vedtaksperiode.fom,
+                    tom = tom,
+                )
+            every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
+                listOf(målgruppe, aktivitet.copy(tom = tom))
+
+            mockVedtakTilsynBarn(vedtaksperiode.copy(målgruppe = FaktiskMålgruppe.GJENLEVENDE, tom = tom))
+            mockHentYtelser(periodeOmstillingsstønad(fom = vedtaksperiode.fom, tom = null))
+            mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = tom))
+        }
+    }
+
+    @Nested
     inner class EndringIAktivitet {
         @BeforeEach
         fun setUp() {
@@ -327,7 +355,13 @@ class OppfølgingOpprettKontrollerServiceTest {
 
         @Test
         fun `skal finne treff hvis man har en aktivitet men er av feil type`() {
-            mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom, erUtdanning = true))
+            mockHentAktiviteter(
+                aktivitetArenaDto(
+                    fom = vedtaksperiode.fom,
+                    tom = vedtaksperiode.tom,
+                    erUtdanning = true,
+                ),
+            )
 
             with(opprettOppfølging()) {
                 assertThat(this).isNotNull
