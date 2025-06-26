@@ -259,15 +259,34 @@ internal class OppgaveServiceTest {
     fun `Fordel oppgave skal tildele oppgave til saksbehandler`() {
         val oppgaveSlot = slot<Long>()
         val saksbehandlerSlot = slot<String>()
+        val testOppgave = lagTestOppgave()
 
-        every { oppgaveClient.fordelOppgave(capture(oppgaveSlot), capture(saksbehandlerSlot), any()) } answers {
-            lagEksternTestOppgave().copy(tilordnetRessurs = secondArg(), versjon = thirdArg<Int>() + 1)
+        every { oppgaveRepository.findByGsakOppgaveId(GSAK_OPPGAVE_ID) } returns testOppgave
+
+        every {
+            oppgaveClient.fordelOppgave(capture(oppgaveSlot), capture(saksbehandlerSlot), any())
+        } answers {
+            lagEksternTestOppgave().copy(
+                tilordnetRessurs = secondArg(),
+                versjon = thirdArg<Int>() + 1,
+            )
         }
+        every {
+            oppgaveRepository.update(testOppgave)
+        } answers { firstArg() }
 
         oppgaveService.fordelOppgave(GSAK_OPPGAVE_ID, SAKSBEHANDLER_ID, 1)
 
-        assertThat(GSAK_OPPGAVE_ID).isEqualTo(oppgaveSlot.captured)
-        assertThat(SAKSBEHANDLER_ID).isEqualTo(saksbehandlerSlot.captured)
+        assertThat(oppgaveSlot.captured).isEqualTo(GSAK_OPPGAVE_ID)
+        assertThat(saksbehandlerSlot.captured).isEqualTo(SAKSBEHANDLER_ID)
+
+        verify(exactly = 1) {
+            oppgaveRepository.update(
+                match {
+                    it.tilordnetSaksbehandler == SAKSBEHANDLER_ID
+                },
+            )
+        }
     }
 
     @Test
@@ -285,7 +304,16 @@ internal class OppgaveServiceTest {
     fun `skal legge til navn på oppgave hvis oppgaven har folkeregisterident`() {
         val oppgaveIdMedNavn = 1L
 
-        every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent("1", false, "FOLKEREGISTERIDENT")))
+        every { personService.hentAktørIder(any()) } returns
+            PdlIdenter(
+                listOf(
+                    PdlIdent(
+                        "1",
+                        false,
+                        "FOLKEREGISTERIDENT",
+                    ),
+                ),
+            )
         every { personService.hentPersonKortBolk(any()) } answers {
             firstArg<List<String>>().associateWith { pdlPersonKort(navn = lagNavn(fornavn = "fornavn$it")) }
         }
@@ -297,7 +325,10 @@ internal class OppgaveServiceTest {
                         id = oppgaveIdMedNavn,
                         identer = listOf(OppgaveIdentV2("1", gruppe = IdentGruppe.FOLKEREGISTERIDENT)),
                     ),
-                    lagEksternTestOppgave().copy(id = 2, identer = listOf(OppgaveIdentV2("2", gruppe = IdentGruppe.ORGNR))),
+                    lagEksternTestOppgave().copy(
+                        id = 2,
+                        identer = listOf(OppgaveIdentV2("2", gruppe = IdentGruppe.ORGNR)),
+                    ),
                     lagEksternTestOppgave().copy(id = 3),
                 ),
             )
@@ -306,7 +337,11 @@ internal class OppgaveServiceTest {
 
         verify(exactly = 1) { personService.hentPersonKortBolk(eq(listOf("1"))) }
         assertThat(oppgaver.single { it.oppgave.id == oppgaveIdMedNavn }.navn).contains("fornavn1 ")
-        assertThat(oppgaver.filterNot { it.oppgave.id == oppgaveIdMedNavn }.map { it.navn }).containsOnly("Mangler navn")
+        assertThat(
+            oppgaver
+                .filterNot { it.oppgave.id == oppgaveIdMedNavn }
+                .map { it.navn },
+        ).containsOnly("Mangler navn")
     }
 
     @Test
@@ -342,7 +377,12 @@ internal class OppgaveServiceTest {
         every { oppgaveClient.hentOppgaver(any()) } returns
             FinnOppgaveResponseDto(
                 1,
-                listOf(lagEksternTestOppgave().copy(id = oppgaveIdMedBehandling, behandlingstype = Behandlingstype.Klage.value)),
+                listOf(
+                    lagEksternTestOppgave().copy(
+                        id = oppgaveIdMedBehandling,
+                        behandlingstype = Behandlingstype.Klage.value,
+                    ),
+                ),
             )
         every { klageService.hentBehandlingIderForOppgaveIder(any()) } returns mapOf(oppgaveIdMedBehandling to behandlingIdKlage)
 

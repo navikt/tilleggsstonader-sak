@@ -136,6 +136,11 @@ class OppgaveService(
                 saksbehandler = saksbehandler,
                 versjon = versjon,
             )
+        val finnOppgave = oppgaveRepository.findByGsakOppgaveId(gsakOppgaveId)
+
+        finnOppgave?.let { oppgave ->
+            oppgaveRepository.update(oppgave.copy(tilordnetSaksbehandler = saksbehandler))
+        }
         return medMetadata(oppdatertOppgave)
     }
 
