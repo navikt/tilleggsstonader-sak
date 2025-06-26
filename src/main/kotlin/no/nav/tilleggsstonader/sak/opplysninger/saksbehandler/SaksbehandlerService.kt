@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.SaksbehandlerDto
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class SaksbehandlerService(
-    private val oppgaveClient: OppgaveClient,
     private val oppgaveRepository: OppgaveRepository,
     private val behandlingRepository: BehandlingRepository,
     private val saksbehandlerClient: SaksbehandlerClient,
@@ -36,8 +34,6 @@ class SaksbehandlerService(
      * [no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.SaksbehandlerRolle.OPPGAVE_FINNES_IKKE]: Dersom null returneres og behandlingen ikke befinner seg i et av de nevnte
      * stegene returnerer vi OPPGAVE_FINNES_IKKE til frontend.
      */
-
-    // Todo - kan denne alltid returnere saksbehandlerDto?
 
     fun finnSaksbehandler(behandlingId: BehandlingId): SaksbehandlerDto? {
         val oppgave = hentIkkeFerdigstiltOppgaveForBehandlingGittStegtype(behandlingId)
