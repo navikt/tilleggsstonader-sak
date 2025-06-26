@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
+import no.nav.tilleggsstonader.sak.infrastruktur.database.AdvisoryLockService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagUtil.ofType
@@ -39,14 +40,22 @@ class FaktaGrunnlagService(
     private val personService: PersonService,
     private val vedtakRepository: VedtakRepository,
     private val arenaService: ArenaService,
+    private val advisoryLockService: AdvisoryLockService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun opprettGrunnlagHvisDetIkkeEksisterer(behandlingId: BehandlingId): FaktaGrunnlagOpprettResultat {
-        if (faktaGrunnlagRepository.existsByBehandlingId(behandlingId)) {
-            return FaktaGrunnlagOpprettResultat.IkkeOpprettet
+    fun opprettGrunnlagHvisDetIkkeEksisterer(behandlingId: BehandlingId): FaktaGrunnlagOpprettResultat =
+        advisoryLockService.lockForTransaction(behandlingId) {
+            if (faktaGrunnlagRepository.existsByBehandlingId(behandlingId)) {
+                FaktaGrunnlagOpprettResultat.IkkeOpprettet
+            } else {
+                opprettGrunnlag(behandlingId)
+                FaktaGrunnlagOpprettResultat.Opprettet
+            }
         }
+
+    private fun opprettGrunnlag(behandlingId: BehandlingId) {
         logger.info("Oppretter faktaGrunnlag for behandling=$behandlingId")
 
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
@@ -54,7 +63,6 @@ class FaktaGrunnlagService(
         opprettGrunnlagPersonopplysninger(behandling)
         opprettGrunnlagBarnAnnenForelder(behandling)
         opprettGrunnlagArenaVedtak(behandling)
-        return FaktaGrunnlagOpprettResultat.Opprettet
     }
 
     fun hentGrunnlagsdata(behandlingId: BehandlingId): Grunnlag {
