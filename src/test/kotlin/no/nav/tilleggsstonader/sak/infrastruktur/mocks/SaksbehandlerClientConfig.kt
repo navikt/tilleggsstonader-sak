@@ -30,8 +30,8 @@ class SaksbehandlerClientConfig {
                 Saksbehandler(
                     navIdent = "Z993543",
                     azureId = UUID.randomUUID(),
-                    fornavn = "Mysil",
-                    etternavn = "Bergsprekken",
+                    fornavn = "Test",
+                    etternavn = "Testesen",
                     enhet = "TSO",
                 )
         }
