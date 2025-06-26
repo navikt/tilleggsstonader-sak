@@ -54,5 +54,21 @@ enum class FaktiskMålgruppe(
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
                 }
             }
+            Stønadstype.DAGLIG_REISE_TSO -> {
+                when (this) {
+                    NEDSATT_ARBEIDSEVNE -> TypeAndel.DAGLIG_REISE_AAP
+                    ENSLIG_FORSØRGER -> TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER
+                    GJENLEVENDE -> TypeAndel.DAGLIG_REISE_ETTERLATTE
+                    else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
+                }
+            }
+            Stønadstype.DAGLIG_REISE_TSR -> {
+                when (this) {
+                    NEDSATT_ARBEIDSEVNE -> TypeAndel.DAGLIG_REISE_AAP
+                    ENSLIG_FORSØRGER -> TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER
+                    GJENLEVENDE -> TypeAndel.DAGLIG_REISE_ETTERLATTE
+                    else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
+                }
+            }
         }
 }

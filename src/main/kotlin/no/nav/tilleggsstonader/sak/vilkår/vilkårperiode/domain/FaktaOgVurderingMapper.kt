@@ -109,6 +109,18 @@ private fun mapAktiviteter(
             require(faktaOgSvar is FaktaOgSvarAktivitetBoutgifterDto)
             return mapAktiviteterBoutgifter(type, faktaOgSvar)
         }
+
+        Stønadstype.DAGLIG_REISE_TSO -> TODO("Ikke implementert ennå")
+        Stønadstype.DAGLIG_REISE_TSR -> TODO("Ikke implementert ennå")
+//        Stønadstype.DAGLIG_REISE_TSO -> {
+//            require(faktaOgSvar is FaktaOgSvarAktivitetBoutgifterDto)
+//            return mapAktiviteterBoutgifter(type, faktaOgSvar)
+//        }
+//
+//        Stønadstype.DAGLIG_REISE_TSR -> {
+//            require(faktaOgSvar is FaktaOgSvarAktivitetBoutgifterDto)
+//            return mapAktiviteterBoutgifter(type, faktaOgSvar)
+//        }
     }
 }
 
@@ -135,6 +147,15 @@ private fun mapMålgruppe(
         Stønadstype.BOUTGIFTER -> {
             mapMålgruppeBoutgfiter(type, faktaOgSvar, målgruppe, fødselFaktaGrunnlag)
         }
+        Stønadstype.DAGLIG_REISE_TSO -> TODO()
+        Stønadstype.DAGLIG_REISE_TSR -> TODO()
+
+//        Stønadstype.DAGLIG_REISE_TSO -> {
+//            mapMålgruppeBoutgfiter(type, faktaOgSvar, målgruppe, fødselFaktaGrunnlag)
+//        }
+//        Stønadstype.DAGLIG_REISE_TSR -> {
+//            mapMålgruppeBoutgfiter(type, faktaOgSvar, målgruppe, fødselFaktaGrunnlag)
+//        }
     }
 }
 

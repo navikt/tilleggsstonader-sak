@@ -29,13 +29,11 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.TypeUtgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterFlereSteder
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterIForbindelseMedSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterNyBolig
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.DokumentasjonDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.UtdanningAvsnitt
 import no.nav.tilleggsstonader.sak.util.antallÅrSiden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
@@ -112,15 +110,15 @@ class BehandlingFaktaService(
     }
 
     private fun hentFaktaDTOForDagligReise(behandlingId: BehandlingId): BehandlingFaktaDagligReiseDto {
-        val søknad = søknadService.hentSøknadDagligReise(behandlingId)
+        // val søknad = søknadService.hentSøknadDagligReise(behandlingId)
         val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
         return BehandlingFaktaDagligReiseDto(
-            søknadMottattTidspunkt = søknad?.mottattTidspunkt,
-            hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
-            aktiviteter = mapAktivitet(søknad?.data?.aktivitet),
-            dokumentasjon = søknad?.let { mapDokumentasjonDagligReise(it.data.dokumentasjon, it.journalpostId) },
+//            søknadMottattTidspunkt = søknad?.mottattTidspunkt,
+//            hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
+//            aktiviteter = mapAktivitet(søknad?.data?.aktivitet),
+//            dokumentasjon = søknad?.let { mapDokumentasjon(it.data.dokumentasjon, it.journalpostId) },
             arena = arenaFakta(grunnlagsdata),
-            personopplysninger = mapPersonopplysninger(søknad),
+//            personopplysninger = mapPersonopplysninger(søknad),
         )
     }
 
@@ -134,15 +132,15 @@ class BehandlingFaktaService(
                 },
         )
 
-    private fun mapPersonopplysninger(søknad: SøknadDagligReise?): FaktaPersonopplysninger =
-        FaktaPersonopplysninger(
-            søknadsgrunnlag =
-                søknad?.data?.personopplysninger?.adresse?.let {
-                    FaktaPersonopplysningerSøknadsgrunnlag(
-                        adresse = listOfNotNull(it.adresse, it.postnummer, it.poststed).joinToString(", "),
-                    )
-                },
-        )
+//    private fun mapPersonopplysninger(søknad: SøknadDagligReise?): FaktaPersonopplysninger =
+//        FaktaPersonopplysninger(
+//            søknadsgrunnlag =
+//                søknad?.data?.personopplysninger?.adresse?.let {
+//                    FaktaPersonopplysningerSøknadsgrunnlag(
+//                        adresse = listOfNotNull(it.adresse, it.postnummer, it.poststed).joinToString(", "),
+//                    )
+//                },
+//        )
 
     private fun arenaFakta(grunnlagsdata: Grunnlag): ArenaFakta? =
         grunnlagsdata.arenaVedtak?.let {
@@ -377,16 +375,16 @@ class BehandlingFaktaService(
         return FaktaDokumentasjon(journalpostId, dokumentasjon)
     }
 
-    private fun mapDokumentasjonDagligReise(
-        dokumentasjonListe: List<DokumentasjonDagligReise>,
-        journalpostId: String,
-    ): FaktaDokumentasjon {
-        val dokumentasjon =
-            dokumentasjonListe.map {
-                Dokumentasjon(type = it.tittel, dokumenter = listOf(Dokument(it.dokumentInfoId)))
-            }
-        return FaktaDokumentasjon(journalpostId, dokumentasjon)
-    }
+//    private fun mapDokumentasjon(
+//        dokumentasjonListe: List<DokumentasjonDagligReise>,
+//        journalpostId: String,
+//    ): FaktaDokumentasjon {
+//        val dokumentasjon =
+//            dokumentasjonListe.map {
+//                Dokumentasjon(type = it.tittel, dokumenter = listOf(Dokument(it.dokumentInfoId)))
+//            }
+//        return FaktaDokumentasjon(journalpostId, dokumentasjon)
+//    }
 
     private fun validerFinnesGrunnlagsdataForAlleBarnISøknad(
         grunnlagsdata: Grunnlag,

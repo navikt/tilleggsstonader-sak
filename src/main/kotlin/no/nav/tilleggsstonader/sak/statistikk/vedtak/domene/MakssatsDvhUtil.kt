@@ -34,6 +34,7 @@ data class MakssatsDvhUtil(
                         andelFom = andelTilkjentYtelse.fom,
                         andelsbeløp = andelTilkjentYtelse.beløp,
                     )
+//                is InnvilgelseEllerOpphørDagligReise -> TODO()
             }
 
         private val ikkeRelevant = MakssatsDvhUtil(makssats = null, beløpErBegrensetAvMakssats = null)

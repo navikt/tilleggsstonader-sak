@@ -79,6 +79,10 @@ data class AndelTilkjentYtelse(
             TypeAndel.BOUTGIFTER_AAP,
             TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER,
             TypeAndel.BOUTGIFTER_ETTERLATTE,
+
+            TypeAndel.DAGLIG_REISE_AAP,
+            TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER,
+            TypeAndel.DAGLIG_REISE_ETTERLATTE,
             -> validerErDagsats()
 
             TypeAndel.UGYLDIG -> {}
@@ -146,6 +150,10 @@ enum class TypeAndel {
     BOUTGIFTER_AAP,
     BOUTGIFTER_ENSLIG_FORSØRGER,
     BOUTGIFTER_ETTERLATTE,
+
+    DAGLIG_REISE_AAP,
+    DAGLIG_REISE_ENSLIG_FORSØRGER,
+    DAGLIG_REISE_ETTERLATTE,
 
     UGYLDIG,
 }

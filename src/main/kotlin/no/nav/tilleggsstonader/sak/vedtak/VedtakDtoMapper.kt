@@ -43,6 +43,7 @@ object VedtakDtoMapper {
             is VedtakTilsynBarn -> mapVedtakTilsynBarn(data, vedtak.tidligsteEndring ?: revurderFra)
             is VedtakLæremidler -> mapVedtakLæremidler(data, vedtak.tidligsteEndring ?: revurderFra)
             is VedtakBoutgifter -> mapVedtakBoutgifter(data, vedtak.tidligsteEndring ?: revurderFra)
+//            is VedtakDagligReise -> TODO()
         }
     }
 

@@ -94,6 +94,7 @@ class VedtaksperiodeService(
                 is InnvilgelseEllerOpphørTilsynBarn -> vedtak.data.vedtaksperioder
                 is InnvilgelseEllerOpphørLæremidler -> vedtak.data.vedtaksperioder.map { it.tilFellesDomeneVedtaksperiode() }
                 is InnvilgelseEllerOpphørBoutgifter -> vedtak.data.vedtaksperioder
+//                is InnvilgelseEllerOpphørDagligReise -> vedtak.data.vedtaksperioder
                 is Avslag -> emptyList()
             }
 

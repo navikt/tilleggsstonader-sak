@@ -59,12 +59,12 @@ data class BehandlingFaktaBoutgifterDto(
 ) : BehandlingFaktaDto
 
 data class BehandlingFaktaDagligReiseDto(
-    override val søknadMottattTidspunkt: LocalDateTime?,
+    override val søknadMottattTidspunkt: LocalDateTime? = null,
     override val hovedytelse: FaktaHovedytelse? = null,
     override val dokumentasjon: FaktaDokumentasjon? = null,
     override val arena: ArenaFakta?,
-    val aktiviteter: FaktaAktivtet,
-    val personopplysninger: FaktaPersonopplysninger,
+//    val aktiviteter: FaktaAktivtet,
+//    val personopplysninger: FaktaPersonopplysninger,
 ) : BehandlingFaktaDto
 
 data class FaktaHovedytelse(

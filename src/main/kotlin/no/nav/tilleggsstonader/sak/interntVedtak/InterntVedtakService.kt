@@ -227,6 +227,8 @@ class InterntVedtakService(
                 is VedtakLæremidler -> mapVedtakLæremidler(vedtak.data)
 
                 is VedtakBoutgifter -> mapVedtakBoutgifter(vedtak.data)
+
+//                is VedtakDagligReise -> TODO()
             }
         }
 
@@ -280,6 +282,23 @@ class InterntVedtakService(
                     opphørBegrunnelse = vedtak.begrunnelse,
                 )
         }
+
+//    private fun mapVedtakDagligReise(vedtak: VedtakDagligReise) =
+//        when (vedtak) {
+//            is InnvilgelseDagligReise -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
+//
+//            is AvslagDagligReise ->
+//                VedtakAvslagInternt(
+//                    årsakerAvslag = vedtak.årsaker,
+//                    avslagBegrunnelse = vedtak.begrunnelse,
+//                )
+//
+//            is OpphørDagligReise ->
+//                VedtakOpphørInternt(
+//                    årsakerOpphør = vedtak.årsaker,
+//                    opphørBegrunnelse = vedtak.begrunnelse,
+//                )
+//        }
 
     private fun Map<BarnId, GrunnlagBarn>.finnFødselsdato(barnId: BarnId): LocalDate {
         val barn = this[barnId] ?: error("Finner ikke barn=$barnId")

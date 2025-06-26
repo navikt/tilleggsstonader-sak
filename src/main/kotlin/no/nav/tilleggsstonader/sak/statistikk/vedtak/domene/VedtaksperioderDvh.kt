@@ -51,8 +51,12 @@ data class VedtaksperioderDvh(
                     )
 
                 is InnvilgelseEllerOpphørBoutgifter -> mapVedtaksperioderBoutgifter(vedtaksdata)
+//                is InnvilgelseEllerOpphørDagligReise -> TODO()
 
-                is AvslagBoutgifter, is AvslagLæremidler, is AvslagTilsynBarn -> JsonWrapper(vedtaksperioder = emptyList())
+                is AvslagBoutgifter, is AvslagLæremidler, is AvslagTilsynBarn ->
+                    JsonWrapper(
+                        vedtaksperioder = emptyList(),
+                    )
             }
 
         private fun mapVedtaksperioderLæremidler(beregningsresultat: BeregningsresultatLæremidler): JsonWrapper =
