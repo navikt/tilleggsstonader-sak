@@ -3,15 +3,14 @@ package no.nav.tilleggsstonader.sak.opplysninger.aktivitet
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.aktivitet.Kilde
 import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import java.math.BigDecimal
 import java.time.LocalDate
 
 object ArenaKontraktUtil {
     fun aktivitetArenaDto(
         id: String = "123",
-        fom: LocalDate = osloDateNow(),
-        tom: LocalDate? = osloDateNow().plusMonths(1),
+        fom: LocalDate = LocalDate.now(),
+        tom: LocalDate? = LocalDate.now().plusMonths(1),
         type: String = "TYPE",
         typeNavn: String = "Type navn",
         status: StatusAktivitet? = StatusAktivitet.AKTUELL,

@@ -19,6 +19,7 @@ data class BeregningsresultatTilsynBarnDto(
     val vedtaksperioder: List<VedtaksperiodeTilsynBarnDto>,
     val gjelderFraOgMed: LocalDate?,
     val gjelderTilOgMed: LocalDate?,
+    val tidligsteEndring: LocalDate?,
 )
 
 data class BeregningsresultatForMånedDto(
@@ -45,22 +46,23 @@ data class BeregningsgrunnlagDto(
  * Beregningsresultat inneholder perioder for nytt vedtak inklusive perioder som er kopiert fra forrige behandling
  * Men det er i de fleste tilfeller kun interessant å vise perioder fra og med revurderFra
  */
-fun BeregningsresultatTilsynBarn.tilDto(revurderFra: LocalDate?): BeregningsresultatTilsynBarnDto {
+fun BeregningsresultatTilsynBarn.tilDto(tidligsteEndring: LocalDate?): BeregningsresultatTilsynBarnDto {
     val filtrertPerioder =
         this.perioder
-            .filterNot { it.grunnlag.måned < (revurderFra?.toYearMonth() ?: YEAR_MONTH_MIN) }
+            .filterNot { it.grunnlag.måned < (tidligsteEndring?.toYearMonth() ?: YEAR_MONTH_MIN) }
 
     val vedtaksperioder =
         VedtaksperiodeTilsynBarnMapper
             .mapTilVedtaksperiode(this.perioder)
-            .filtrerVedtaksperioderFra(revurderFra)
+            .filtrerVedtaksperioderFra(tidligsteEndring)
             .map { it.tilDto() }
 
     return BeregningsresultatTilsynBarnDto(
-        perioder = filtrertPerioder.map { it.tilDto(revurderFra) },
+        perioder = filtrertPerioder.map { it.tilDto(tidligsteEndring) },
         vedtaksperioder = vedtaksperioder,
         gjelderFraOgMed = vedtaksperioder.minOfOrNull { it.fom },
         gjelderTilOgMed = vedtaksperioder.maxOfOrNull { it.tom },
+        tidligsteEndring = tidligsteEndring,
     )
 }
 

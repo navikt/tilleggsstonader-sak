@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderRequest
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -36,8 +35,8 @@ class YtelseService(
             .hentYtelser(
                 YtelsePerioderRequest(
                     ident = ident,
-                    fom = osloDateNow().minusYears(3),
-                    tom = osloDateNow().plusYears(1),
+                    fom = LocalDate.now().minusYears(3),
+                    tom = LocalDate.now().plusYears(1),
                     typer = typer,
                 ),
             ).tilDto()

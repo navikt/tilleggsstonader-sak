@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.util
 
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.IVERKSETTER_VEDTAK
@@ -9,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
+import java.time.LocalDateTime
 
 object BehandlingOppsettUtil {
     private val fagsak = fagsak(setOf(PersonIdent("1")))
@@ -20,7 +20,7 @@ object BehandlingOppsettUtil {
                 status = BehandlingStatus.FERDIGSTILT,
                 resultat = BehandlingResultat.HENLAGT,
                 vedtakstidspunkt = SporbarUtils.now(),
-                sporbar = Sporbar(opprettetTid = osloNow().minusDays(4)),
+                sporbar = Sporbar(opprettetTid = LocalDateTime.now().minusDays(4)),
             )
 
     val iverksattFørstegangsbehandling =
@@ -30,7 +30,7 @@ object BehandlingOppsettUtil {
                 status = BehandlingStatus.FERDIGSTILT,
                 resultat = BehandlingResultat.INNVILGET,
                 vedtakstidspunkt = SporbarUtils.now(),
-                sporbar = Sporbar(opprettetTid = osloNow().minusDays(3)),
+                sporbar = Sporbar(opprettetTid = LocalDateTime.now().minusDays(3)),
             )
 
     val henlagtRevurdering =
@@ -40,7 +40,7 @@ object BehandlingOppsettUtil {
                 status = BehandlingStatus.FERDIGSTILT,
                 resultat = BehandlingResultat.HENLAGT,
                 vedtakstidspunkt = SporbarUtils.now(),
-                sporbar = Sporbar(opprettetTid = osloNow().minusDays(1)),
+                sporbar = Sporbar(opprettetTid = LocalDateTime.now().minusDays(1)),
             )
 
     private val revurderingUnderArbeid =

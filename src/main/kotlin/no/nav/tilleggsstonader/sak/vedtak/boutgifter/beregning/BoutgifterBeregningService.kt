@@ -50,6 +50,7 @@ class BoutgifterBeregningService(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
         typeVedtak: TypeVedtak,
+        tidligsteEndring: LocalDate?,
     ): BeregningsresultatBoutgifter {
         val forrigeVedtak = hentForrigeVedtak(behandling)
 
@@ -57,10 +58,11 @@ class BoutgifterBeregningService(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             typeVedtak = typeVedtak,
+            tidligsteEndring = tidligsteEndring,
         )
 
         val vedtaksperioderBeregning =
-            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(behandling.revurderFra)
+            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(tidligsteEndring)
 
         val utgifterPerVilkårtype =
             boutgifterUtgiftService
@@ -83,7 +85,7 @@ class BoutgifterBeregningService(
 
         return if (forrigeVedtak != null) {
             settSammenGamleOgNyePerioder(
-                revurderFra = behandling.revurderFra ?: feil("Behandlingen mangler revurder fra-dato"),
+                revurderFra = tidligsteEndring ?: feil("Behandlingen mangler revurder fra-dato"),
                 nyttBeregningsresultat = beregningsresultat,
                 forrigeBeregningsresultat = forrigeVedtak.beregningsresultat,
             )

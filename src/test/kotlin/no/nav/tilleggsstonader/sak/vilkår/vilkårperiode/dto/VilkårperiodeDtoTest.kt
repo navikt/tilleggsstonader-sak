@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
@@ -26,14 +25,15 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class VilkårperiodeDtoTest {
     @Test
     fun `skal validere at periode er gyldig`() {
         assertThatThrownBy {
             målgruppe(
-                fom = osloDateNow(),
-                tom = osloDateNow().minusDays(1),
+                fom = LocalDate.now(),
+                tom = LocalDate.now().minusDays(1),
             ).tilDto()
         }.hasMessageContaining("Til-og-med før fra-og-med")
     }

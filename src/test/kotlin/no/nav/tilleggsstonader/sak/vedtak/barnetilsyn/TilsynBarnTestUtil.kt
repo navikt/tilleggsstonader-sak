@@ -157,6 +157,7 @@ object TilsynBarnTestUtil {
             type = TypeVedtak.INNVILGELSE,
             data = data,
             gitVersjon = Applikasjonsversjon.versjon,
+            tidligsteEndring = null,
         )
 
     fun vedtaksperiodeGrunnlag(vedtaksperiode: VedtaksperiodeBeregning = vedtaksperiodeBeregning()): VedtaksperiodeGrunnlag =
@@ -179,6 +180,7 @@ object TilsynBarnTestUtil {
                 vedtaksperioder = vedtaksperioder,
             ),
         gitVersjon = Applikasjonsversjon.versjon,
+        tidligsteEndring = defaultBehandling.revurderFra,
     )
 
     fun innvilgetVedtak(
@@ -189,6 +191,7 @@ object TilsynBarnTestUtil {
         type = TypeVedtak.INNVILGELSE,
         data = vedtak,
         gitVersjon = Applikasjonsversjon.versjon,
+        tidligsteEndring = defaultBehandling.revurderFra,
     )
 
     fun avslagVedtak(
@@ -204,6 +207,7 @@ object TilsynBarnTestUtil {
                 begrunnelse = begrunnelse,
             ),
         gitVersjon = Applikasjonsversjon.versjon,
+        tidligsteEndring = null,
     )
 
     fun opphørVedtak(
@@ -222,5 +226,6 @@ object TilsynBarnTestUtil {
                 vedtaksperioder = emptyList(),
             ),
         gitVersjon = Applikasjonsversjon.versjon,
+        tidligsteEndring = null, // TODO: Sette til opphørsdato (ny)
     )
 }

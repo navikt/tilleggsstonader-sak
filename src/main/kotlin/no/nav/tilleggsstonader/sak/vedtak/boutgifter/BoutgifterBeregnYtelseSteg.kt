@@ -2,10 +2,13 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -34,6 +37,8 @@ import java.time.LocalDate
 class BoutgifterBeregnYtelseSteg(
     private val beregningService: BoutgifterBeregningService,
     private val opphørValideringService: OpphørValideringService,
+    private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val unleashService: UnleashService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -59,17 +64,20 @@ class BoutgifterBeregnYtelseSteg(
         vedtak: InnvilgelseBoutgifterRequest,
     ) {
         val vedtaksperioder = vedtak.vedtaksperioder.tilDomene().sorted()
+        val tidligsteEndring = utledTidligsteEndringService.utledTidligsteEndring(saksbehandling.id, vedtaksperioder)
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
+                tidligsteEndring = tidligsteEndring,
             )
         lagreInnvilgetVedtak(
             behandling = saksbehandling,
             beregningsresultat = beregningsresultat,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
+            tidligsteEndring = tidligsteEndring,
         )
         lagreTilkjentYtelse(saksbehandling.id, beregningsresultat)
     }
@@ -95,7 +103,13 @@ class BoutgifterBeregnYtelseSteg(
 
         val avkortedeVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
 
-        val beregningsresultat = beregningService.beregn(saksbehandling, avkortedeVedtaksperioder, TypeVedtak.OPPHØR)
+        val beregningsresultat =
+            beregningService.beregn(
+                saksbehandling,
+                avkortedeVedtaksperioder,
+                TypeVedtak.OPPHØR,
+                saksbehandling.revurderFra,
+            )
 
         lagreOpphørsvedtak(saksbehandling, avkortedeVedtaksperioder, beregningsresultat, vedtak)
         lagreTilkjentYtelse(saksbehandling.id, beregningsresultat)
@@ -125,6 +139,7 @@ class BoutgifterBeregnYtelseSteg(
                         begrunnelse = vedtak.begrunnelse,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = null,
             ),
         )
     }
@@ -134,6 +149,7 @@ class BoutgifterBeregnYtelseSteg(
         beregningsresultat: BeregningsresultatBoutgifter,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
+        tidligsteEndring: LocalDate?,
     ) {
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -146,6 +162,7 @@ class BoutgifterBeregnYtelseSteg(
                         beregningsresultat = BeregningsresultatBoutgifter(beregningsresultat.perioder),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
             ),
         )
     }
@@ -168,6 +185,7 @@ class BoutgifterBeregnYtelseSteg(
                         begrunnelse = vedtak.begrunnelse,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = null, // TODO: Sette til opphørsdato (ny)
             ),
         )
     }

@@ -26,7 +26,9 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepos
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -78,6 +80,10 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     val vedtakRepositoryFake = VedtakRepositoryFake()
     val tilkjentYtelseRepositoryFake = TilkjentYtelseRepositoryFake()
     val behandlingServiceMock = mockk<BehandlingService>()
+    val utledTidligsteEndringService =
+        mockk<UtledTidligsteEndringService> {
+            every { utledTidligsteEndring(any(), any()) } returns null
+        }
     val vilkårperiodeServiceMock =
         mockk<VilkårperiodeService>().apply {
             every { hentVilkårperioder(any()) } answers {
@@ -89,12 +95,16 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 )
             }
         }
+    val unleashService =
+        mockUnleashService().apply {
+            every { isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) } returns true
+        }
     val vilkårService =
         VilkårService(
             behandlingService = behandlingServiceMock,
             vilkårRepository = vilkårRepositoryFake,
             barnService = mockk(relaxed = true),
-            mockUnleashService(),
+            unleashService = unleashService,
         )
     val boutgifterUtgiftService = BoutgifterUtgiftService(vilkårService = vilkårService)
     val vedtaksperiodeValideringService =
@@ -103,6 +113,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             vilkårperiodeService = vilkårperiodeServiceMock,
         )
     val simuleringServiceMock = mockk<SimuleringService>(relaxed = true)
+
     val beregningService =
         BoutgifterBeregningService(
             boutgifterUtgiftService = boutgifterUtgiftService,
@@ -119,9 +130,11 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             beregningService =
             beregningService,
             opphørValideringService = opphørValideringService,
+            utledTidligsteEndringService = utledTidligsteEndringService,
             vedtakRepository = vedtakRepositoryFake,
             tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepositoryFake),
             simuleringService = simuleringServiceMock,
+            unleashService = unleashService,
         )
 
     var feil: Exception? = null
@@ -273,6 +286,8 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
 
+        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId, any()) } returns revurderFra
+
         kjørMedFeilkontekst {
             steg.utførSteg(
                 dummyBehandling(behandlingId, revurderFra = revurderFra),
@@ -293,6 +308,8 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
         val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto() }
+
+        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId, any()) } returns revurderFra
 
         kjørMedFeilkontekst {
             steg.utførSteg(

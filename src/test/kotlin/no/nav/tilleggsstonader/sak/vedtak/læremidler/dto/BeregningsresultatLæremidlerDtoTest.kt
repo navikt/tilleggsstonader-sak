@@ -28,7 +28,7 @@ class BeregningsresultatLæremidlerDtoTest {
                             LocalDate.of(2024, 5, 31),
                         ),
                     ),
-            ).tilDto(revurderFra = null)
+            ).tilDto(tidligsteEndring = null)
 
         assertThat(dto.perioder).containsExactlyInAnyOrder(
             beregningsresultatForPeriodeDto(

@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mergeSammenheng
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mergeSammenhengendeOppfylteMålgrupper
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class VedtaksperiodeValideringService(
@@ -31,14 +32,16 @@ class VedtaksperiodeValideringService(
         vedtaksperioder: List<no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
+        tidligsteEndring: LocalDate?,
     ) {
-        validerVedtaksperioder(vedtaksperioder.tilFellesVedtaksperiode(), behandling, typeVedtak)
+        validerVedtaksperioder(vedtaksperioder.tilFellesVedtaksperiode(), behandling, typeVedtak, tidligsteEndring)
     }
 
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
+        tidligsteEndring: LocalDate?,
     ) {
         if (typeVedtak != TypeVedtak.OPPHØR) {
             validerVedtaksperioderEksisterer(vedtaksperioder)
@@ -50,7 +53,7 @@ class VedtaksperiodeValideringService(
         validerIngenEndringerFørRevurderFra(
             innsendteVedtaksperioder = vedtaksperioder,
             vedtaksperioderForrigeBehandling = hentForrigeVedtaksperioder(behandling),
-            revurderFra = behandling.revurderFra,
+            revurderFra = tidligsteEndring,
         )
     }
 

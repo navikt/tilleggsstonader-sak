@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.hendelser.journalføring
 
-import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
@@ -13,15 +12,19 @@ import no.nav.tilleggsstonader.sak.journalføring.gjelderKanalSkanningEllerNavNo
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
+/**
+ * Håndterer journalhendelser fra dokarkiv.
+ * Foreløpig håndterer vi kun innkommende journalposter med brevkode for boutgifter.
+ */
 @Service
-class JournalhendelseKafkaHåndterer(
+class JournalhendelseKafkaHåndtererService(
     private val journalpostService: JournalpostService,
     private val håndterSøknadService: HåndterSøknadService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun behandleJournalpost(hendelseRecord: JournalfoeringHendelseRecord) {
-        val journalpost = journalpostService.hentJournalpost(hendelseRecord.journalpostId.toString())
+    fun behandleJournalhendelse(journalpostId: String) {
+        val journalpost = journalpostService.hentJournalpost(journalpostId)
         val kanBehandles = journalpost.kanBehandles()
 
         val brevkode = journalpost.dokumentBrevkode()

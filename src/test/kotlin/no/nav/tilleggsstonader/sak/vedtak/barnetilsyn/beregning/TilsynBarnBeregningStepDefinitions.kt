@@ -137,7 +137,7 @@ class TilsynBarnBeregningStepDefinitions {
     private fun beregn(behandling: Saksbehandling) {
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
         try {
-            beregningsresultat = service.beregn(vedtaksperioder, behandling, TypeVedtak.INNVILGELSE)
+            beregningsresultat = service.beregn(vedtaksperioder, behandling, TypeVedtak.INNVILGELSE, behandling.revurderFra)
         } catch (e: Exception) {
             exception = e
         }

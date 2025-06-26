@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.behandling.historikk.domain
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
@@ -25,7 +24,7 @@ data class Behandlingshistorikk(
     val metadata: JsonWrapper? = null,
     val opprettetAvNavn: String = SikkerhetContext.hentSaksbehandlerNavn(),
     val opprettetAv: String = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
-    val endretTid: LocalDateTime = osloNow().truncatedTo(ChronoUnit.MILLIS),
+    val endretTid: LocalDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS),
     val gitVersjon: String?,
 )
 

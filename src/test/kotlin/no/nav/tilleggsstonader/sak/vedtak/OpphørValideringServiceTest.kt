@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.fagsakBoutgifter
@@ -90,7 +89,7 @@ class OpphørValideringServiceTest {
                 målgrupper = listOf(målgruppe),
                 aktiviteter = listOf(aktivitet),
             )
-        every { tilsynBarnBeregningService.beregn(any(), any(), any()) } returns beregningsresultat
+        every { tilsynBarnBeregningService.beregn(any(), any(), any(), any()) } returns beregningsresultat
     }
 
     @Nested
@@ -185,7 +184,7 @@ class OpphørValideringServiceTest {
                     målgrupper =
                         listOf(
                             målgruppe.copy(
-                                tom = osloDateNow().plusMonths(2),
+                                tom = LocalDate.now().plusMonths(2),
                                 status = Vilkårstatus.ENDRET,
                             ),
                         ),

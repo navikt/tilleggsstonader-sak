@@ -5,9 +5,9 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.familie.prosessering.error.TaskExceptionUtenStackTrace
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.LocalDateTime
 
 val logger: Logger = LoggerFactory.getLogger(TaskService::class.java)
 
@@ -39,7 +39,7 @@ fun TaskService.stoppTaskOgRekjørSenere(
         )
         throw RekjørSenereException(
             årsak = årsak,
-            triggerTid = osloNow().plusDays(antallDagerTilNesteRekjøring),
+            triggerTid = LocalDateTime.now().plusDays(antallDagerTilNesteRekjøring),
         )
     } else {
         throw TaskExceptionUtenStackTrace("Nådd max antall rekjøringer - $totaltAntallRekjøringerFørFeiling")

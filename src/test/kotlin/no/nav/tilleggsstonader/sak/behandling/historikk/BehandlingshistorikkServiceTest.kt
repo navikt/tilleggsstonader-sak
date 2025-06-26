@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.historikk
 
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -76,13 +75,13 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
         val behandling = testoppsettService.lagre(behandling(fagsak))
         val beslutteVedtak = behandling.copy(steg = StegType.BESLUTTE_VEDTAK)
 
-        insert(behandling.copy(steg = StegType.INNGANGSVILKÅR), osloNow().minusDays(8))
-        insert(behandling.copy(steg = StegType.INNGANGSVILKÅR), osloNow().minusDays(7))
-        insert(behandling.copy(steg = StegType.SEND_TIL_BESLUTTER), osloNow().minusDays(6))
-        insert(beslutteVedtak, osloNow().minusDays(5), StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT)
-        insert(behandling.copy(steg = StegType.INNGANGSVILKÅR), osloNow().minusDays(4))
-        insert(behandling.copy(steg = StegType.SEND_TIL_BESLUTTER), osloNow().minusDays(3))
-        insert(beslutteVedtak, osloNow().minusDays(2), StegUtfall.BESLUTTE_VEDTAK_GODKJENT)
+        insert(behandling.copy(steg = StegType.INNGANGSVILKÅR), LocalDateTime.now().minusDays(8))
+        insert(behandling.copy(steg = StegType.INNGANGSVILKÅR), LocalDateTime.now().minusDays(7))
+        insert(behandling.copy(steg = StegType.SEND_TIL_BESLUTTER), LocalDateTime.now().minusDays(6))
+        insert(beslutteVedtak, LocalDateTime.now().minusDays(5), StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT)
+        insert(behandling.copy(steg = StegType.INNGANGSVILKÅR), LocalDateTime.now().minusDays(4))
+        insert(behandling.copy(steg = StegType.SEND_TIL_BESLUTTER), LocalDateTime.now().minusDays(3))
+        insert(beslutteVedtak, LocalDateTime.now().minusDays(2), StegUtfall.BESLUTTE_VEDTAK_GODKJENT)
 
         val historikk = behandlingshistorikkService.finnHendelseshistorikk(saksbehandling(behandling = behandling))
         assertThat(historikk.map { it.hendelse }).containsExactly(
@@ -98,11 +97,11 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
     internal fun `flere sett og av vent skal ikke slåes sammen`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak, steg = StegType.INNGANGSVILKÅR))
-        insert(behandling, osloNow().minusDays(10))
-        insert(behandling, osloNow().minusDays(8), StegUtfall.SATT_PÅ_VENT)
-        insert(behandling, osloNow().minusDays(5), StegUtfall.TATT_AV_VENT)
-        insert(behandling, osloNow().minusDays(3), StegUtfall.SATT_PÅ_VENT)
-        insert(behandling, osloNow().minusDays(2), StegUtfall.TATT_AV_VENT)
+        insert(behandling, LocalDateTime.now().minusDays(10))
+        insert(behandling, LocalDateTime.now().minusDays(8), StegUtfall.SATT_PÅ_VENT)
+        insert(behandling, LocalDateTime.now().minusDays(5), StegUtfall.TATT_AV_VENT)
+        insert(behandling, LocalDateTime.now().minusDays(3), StegUtfall.SATT_PÅ_VENT)
+        insert(behandling, LocalDateTime.now().minusDays(2), StegUtfall.TATT_AV_VENT)
 
         val historikk = behandlingshistorikkService.finnHendelseshistorikk(saksbehandling(behandling = behandling))
         assertThat(historikk.map { it.hendelse }).containsExactly(
@@ -119,9 +118,9 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        insert(behandling, "A", osloNow().minusDays(1))
-        insert(behandling, "B", osloNow().plusDays(1))
-        insert(behandling, "C", osloNow())
+        insert(behandling, "A", LocalDateTime.now().minusDays(1))
+        insert(behandling, "B", LocalDateTime.now().plusDays(1))
+        insert(behandling, "C", LocalDateTime.now())
 
         val siste = behandlingshistorikkService.finnSisteBehandlingshistorikk(behandlingId = behandling.id)
         assertThat(siste.opprettetAvNavn).isEqualTo("B")
@@ -132,9 +131,9 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        insert(behandling, "A", osloNow().minusDays(1))
-        insert(behandling, "B", osloNow().plusDays(1))
-        insert(behandling, "C", osloNow())
+        insert(behandling, "A", LocalDateTime.now().minusDays(1))
+        insert(behandling, "B", LocalDateTime.now().plusDays(1))
+        insert(behandling, "C", LocalDateTime.now())
 
         var siste =
             behandlingshistorikkService.finnSisteBehandlingshistorikk(
@@ -155,14 +154,14 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
         insert(
             behandling = behandling,
             opprettetAv = "A",
-            endretTid = osloNow(),
+            endretTid = LocalDateTime.now(),
             steg = StegType.SEND_TIL_BESLUTTER,
         )
 
         insert(
             behandling = behandling,
             opprettetAv = "A",
-            endretTid = osloNow().plusDays(1),
+            endretTid = LocalDateTime.now().plusDays(1),
             steg = StegType.BESLUTTE_VEDTAK,
             utfall = StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT,
             metadata = mapOf("begrunnelse" to "begrunnelse", "årsakerUnderkjent" to listOf(ÅrsakUnderkjent.INNGANGSVILKÅR)),
@@ -171,7 +170,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
         insert(
             behandling = behandling,
             opprettetAv = "A",
-            endretTid = osloNow().plusDays(2),
+            endretTid = LocalDateTime.now().plusDays(2),
             steg = StegType.SEND_TIL_BESLUTTER,
             metadata = mapOf("kommentarTilBeslutter" to "kommentar"),
         )

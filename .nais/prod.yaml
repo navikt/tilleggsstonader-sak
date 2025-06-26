@@ -120,3 +120,5 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: prod
+    - name: TZ
+      value: Europe/Oslo

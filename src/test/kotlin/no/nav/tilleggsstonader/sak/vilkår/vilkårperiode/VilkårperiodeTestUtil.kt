@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
@@ -68,8 +67,8 @@ import java.util.UUID
 object VilkårperiodeTestUtil {
     fun målgruppe(
         behandlingId: BehandlingId = BehandlingId.random(),
-        fom: LocalDate = osloDateNow(),
-        tom: LocalDate = osloDateNow().plusDays(5),
+        fom: LocalDate = LocalDate.now(),
+        tom: LocalDate = LocalDate.now().plusDays(5),
         faktaOgVurdering: MålgruppeFaktaOgVurdering = faktaOgVurderingMålgruppe(),
         begrunnelse: String? = null,
         resultat: ResultatVilkårperiode = faktaOgVurdering.utledResultat(),
@@ -205,8 +204,8 @@ object VilkårperiodeTestUtil {
 
     fun aktivitet(
         behandlingId: BehandlingId = BehandlingId.random(),
-        fom: LocalDate = osloDateNow(),
-        tom: LocalDate = osloDateNow().plusDays(5),
+        fom: LocalDate = LocalDate.now(),
+        tom: LocalDate = LocalDate.now().plusDays(5),
         faktaOgVurdering: AktivitetFaktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(),
         begrunnelse: String? = null,
         resultat: ResultatVilkårperiode = faktaOgVurdering.utledResultat(),
@@ -328,8 +327,8 @@ object VilkårperiodeTestUtil {
 
     fun dummyVilkårperiodeMålgruppe(
         type: MålgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,
-        fom: LocalDate = osloDateNow(),
-        tom: LocalDate = osloDateNow(),
+        fom: LocalDate = LocalDate.now(),
+        tom: LocalDate = LocalDate.now(),
         medlemskap: SvarJaNei? = null,
         dekkesAvAnnetRegelverk: SvarJaNei? = null,
         mottarSykepengerForFulltidsstilling: SvarJaNei? = null,
@@ -357,8 +356,8 @@ object VilkårperiodeTestUtil {
 
     fun dummyVilkårperiodeAktivitet(
         type: AktivitetType = AktivitetType.TILTAK,
-        fom: LocalDate = osloDateNow(),
-        tom: LocalDate = osloDateNow(),
+        fom: LocalDate = LocalDate.now(),
+        tom: LocalDate = LocalDate.now(),
         begrunnelse: String? = null,
         behandlingId: BehandlingId = BehandlingId.random(),
         kildeId: String? = null,

@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.behandling.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.AVSLÅTT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.IKKE_SATT
@@ -83,7 +82,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
                             PersonIdent(ident = "1"),
                             PersonIdent(
                                 ident = "2",
-                                sporbar = Sporbar(endret = Endret(endretTid = osloNow().plusDays(2))),
+                                sporbar = Sporbar(endret = Endret(endretTid = LocalDateTime.now().plusDays(2))),
                             ),
                             PersonIdent(ident = "3"),
                         ),
@@ -172,7 +171,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
                         PersonIdent(ident = "1"),
                         PersonIdent(
                             ident = "2",
-                            sporbar = Sporbar(endret = Endret(endretTid = osloNow().plusDays(2))),
+                            sporbar = Sporbar(endret = Endret(endretTid = LocalDateTime.now().plusDays(2))),
                         ),
                         PersonIdent(ident = "3"),
                     ),
@@ -196,7 +195,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
             behandling(
                 fagsak,
                 status = UTREDES,
-                opprettetTid = osloNow().minusDays(2),
+                opprettetTid = LocalDateTime.now().minusDays(2),
             ),
         )
         assertThat(behandlingRepository.finnSisteIverksatteBehandling(fagsak.id)).isNull()

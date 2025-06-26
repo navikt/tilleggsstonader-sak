@@ -4,7 +4,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_SIGNATUR_PLACEHOLDER
@@ -33,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import java.time.LocalDate
 
 internal class BrevServiceTest {
     private val fagsak = fagsak(setOf(PersonIdent("12345678910")))
@@ -260,7 +260,7 @@ internal class BrevServiceTest {
 
         brevService.forhåndsvisBeslutterBrev(saksbehandling(fagsak, behandlingForBeslutter))
 
-        val vedtaksdato = osloDateNow().norskFormat()
+        val vedtaksdato = LocalDate.now().norskFormat()
 
         assertThat(pdfHtmlSlot.captured)
             .isEqualTo(

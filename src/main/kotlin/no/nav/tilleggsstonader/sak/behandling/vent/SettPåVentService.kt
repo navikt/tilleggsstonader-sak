@@ -68,7 +68,7 @@ class SettPåVentService(
             )
         settPåVentRepository.insert(settPåVent)
 
-        val oppdatertOppgave = settPåVent(oppgave, dto)
+        val oppdatertOppgave = settOppgavePåVent(oppgave, dto)
 
         taskService.save(BehandlingsstatistikkTask.opprettVenterTask(behandlingId))
         val endret = utledEndretInformasjon(settPåVent)
@@ -85,7 +85,7 @@ class SettPåVentService(
         )
     }
 
-    private fun settPåVent(
+    private fun settOppgavePåVent(
         oppgave: OppgaveDomain,
         dto: SettPåVentDto,
     ): SettPåVentResponse =

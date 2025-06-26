@@ -15,7 +15,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -25,6 +24,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.vedlegg.VedleggRequest
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class JournalpostService(
@@ -138,7 +138,7 @@ class JournalpostService(
                 dokumentInfoId = dokumentinfo.dokumentInfoId,
                 Dokumentvariantformat.ORIGINAL,
             )
-        val mottattTidspunkt = mestRelevanteDato(søknadJournalpost) ?: osloNow()
+        val mottattTidspunkt = mestRelevanteDato(søknadJournalpost) ?: LocalDateTime.now()
         return SøknadsskjemaUtil.parseSøknadsskjema(stønadstype, data, mottattTidspunkt = mottattTidspunkt)
     }
 

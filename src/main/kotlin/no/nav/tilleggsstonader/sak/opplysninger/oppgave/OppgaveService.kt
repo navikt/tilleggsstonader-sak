@@ -18,7 +18,6 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.spring.cache.getCachedOrLoad
 import no.nav.tilleggsstonader.libs.spring.cache.getValue
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -40,6 +39,7 @@ import no.nav.tilleggsstonader.sak.util.FnrUtil
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class OppgaveService(
@@ -368,7 +368,7 @@ class OppgaveService(
     ): String {
         val innloggetSaksbehandlerIdent = SikkerhetContext.hentSaksbehandlerEllerSystembruker()
         val saksbehandlerNavn = SikkerhetContext.hentSaksbehandlerNavn(strict = false)
-        val formatertDato = osloNow().format(DatoFormat.GOSYS_DATE_TIME)
+        val formatertDato = LocalDateTime.now().format(DatoFormat.GOSYS_DATE_TIME)
 
         val prefix = "--- $formatertDato $saksbehandlerNavn ($innloggetSaksbehandlerIdent) ---\n"
 

@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDate
 
 typealias Vedtak = GeneriskVedtak<out Vedtaksdata>
 
@@ -18,6 +19,7 @@ data class GeneriskVedtak<T : Vedtaksdata>(
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     val gitVersjon: String?,
+    val tidligsteEndring: LocalDate?,
 ) {
     init {
         require(data.type.typeVedtak == type) { "$type på vedtak er ikke lik vedtak på data(${data.type.typeVedtak})" }

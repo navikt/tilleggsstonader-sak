@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
@@ -11,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
+import java.time.LocalDate
 
 /**
  * Brukes for å utlede hvilke delvilkår som må besvares
@@ -55,7 +55,7 @@ abstract class Vilkårsregel(
                 Vurdering(
                     regelId = regelId,
                     svar = svarId,
-                    begrunnelse = "Automatisk vurdert (${osloDateNow().norskFormat()}): $begrunnelse",
+                    begrunnelse = "Automatisk vurdert (${LocalDate.now().norskFormat()}): $begrunnelse",
                 ),
             ),
         )

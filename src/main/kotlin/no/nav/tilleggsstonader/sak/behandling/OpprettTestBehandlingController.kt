@@ -57,7 +57,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNor
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.HarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.UtdanningAvsnitt
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -183,7 +182,7 @@ class OpprettTestBehandlingController(
         val skjema =
             Søknadsskjema(
                 ident = fagsak.hentAktivIdent(),
-                mottattTidspunkt = osloNow(),
+                mottattTidspunkt = LocalDateTime.now(),
                 språk = Språkkode.NB,
                 skjema = skjemaBarnetilsyn,
             )
@@ -343,7 +342,7 @@ class OpprettTestBehandlingController(
         val skjema =
             Søknadsskjema(
                 ident = fagsak.hentAktivIdent(),
-                mottattTidspunkt = osloNow(),
+                mottattTidspunkt = LocalDateTime.now(),
                 språk = Språkkode.NB,
                 skjema = skjemaBoutgifter,
             )
