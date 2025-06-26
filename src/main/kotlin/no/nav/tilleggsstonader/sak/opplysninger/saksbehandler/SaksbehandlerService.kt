@@ -76,8 +76,8 @@ class SaksbehandlerService(
             }
 
         return SaksbehandlerDto(
-            etternavn = tilordnetSaksbehandler?.etternavn ?: "",
-            fornavn = tilordnetSaksbehandler?.fornavn ?: "",
+            etternavn = tilordnetSaksbehandler?.etternavn,
+            fornavn = tilordnetSaksbehandler?.fornavn,
             rolle = rolle,
         )
     }

@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto
 
 data class SaksbehandlerDto(
-    val fornavn: String,
-    val etternavn: String,
+    val fornavn: String?,
+    val etternavn: String?,
     val rolle: SaksbehandlerRolle,
 )
 
