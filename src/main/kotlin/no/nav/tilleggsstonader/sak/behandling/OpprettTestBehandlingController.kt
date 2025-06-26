@@ -128,6 +128,8 @@ class OpprettTestBehandlingController(
             Stønadstype.BARNETILSYN -> opprettSøknadBarnetilsyn(fagsak, behandling)
             Stønadstype.LÆREMIDLER -> opprettSøknadLæremidler(fagsak, behandling)
             Stønadstype.BOUTGIFTER -> opprettSøknadBoutgifter(fagsak, behandling)
+            Stønadstype.DAGLIG_REISE_TSO -> { /* Oppretter foreløpig ikke søknad for Daglig Reise*/ }
+            Stønadstype.DAGLIG_REISE_TSR -> { /* Oppretter foreløpig ikke søknad for Daglig Reise*/ }
         }
     }
 

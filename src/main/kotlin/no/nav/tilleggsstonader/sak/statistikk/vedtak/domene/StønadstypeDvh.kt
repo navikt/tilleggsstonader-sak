@@ -6,6 +6,8 @@ enum class StønadstypeDvh {
     BARNETILSYN,
     LÆREMIDLER,
     BOUTGIFTER,
+    DAGLIG_REISE_TSO,
+    DAGLIG_REISE_TSR,
     ;
 
     companion object {
@@ -14,6 +16,8 @@ enum class StønadstypeDvh {
                 Stønadstype.BARNETILSYN -> BARNETILSYN
                 Stønadstype.LÆREMIDLER -> LÆREMIDLER
                 Stønadstype.BOUTGIFTER -> BOUTGIFTER
+                Stønadstype.DAGLIG_REISE_TSO -> DAGLIG_REISE_TSO
+                Stønadstype.DAGLIG_REISE_TSR -> DAGLIG_REISE_TSR
             }
     }
 }

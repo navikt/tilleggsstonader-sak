@@ -22,6 +22,8 @@ object SøknadsskjemaUtil {
             Stønadstype.BARNETILSYN -> objectMapper.readValue<Søknadsskjema<SøknadsskjemaBarnetilsyn>>(data)
             Stønadstype.LÆREMIDLER -> objectMapper.readValue<Søknadsskjema<SøknadsskjemaLæremidler>>(data)
             Stønadstype.BOUTGIFTER -> håndterBoutgifter(data, mottattTidspunkt)
+            Stønadstype.DAGLIG_REISE_TSO -> error("Har ikke støtte for parsing av skjema for $stønadstype ennå")
+            Stønadstype.DAGLIG_REISE_TSR -> error("Har ikke støtte for parsing av skjema for $stønadstype ennå")
         }
 
     private fun håndterBoutgifter(

@@ -103,6 +103,8 @@ class InterntVedtakGenereringTest {
             Stønadstype.BARNETILSYN -> mockTilsynBarn()
             Stønadstype.LÆREMIDLER -> mockLæremidler()
             Stønadstype.BOUTGIFTER -> mockBoutgifter()
+            Stønadstype.DAGLIG_REISE_TSO -> TODO()
+            Stønadstype.DAGLIG_REISE_TSR -> TODO()
         }
     }
 
@@ -183,6 +185,9 @@ class InterntVedtakGenereringTest {
                     Stønadstype.LÆREMIDLER,
                     Stønadstype.BOUTGIFTER,
                     -> it.håndteres()
+                    Stønadstype.DAGLIG_REISE_TSO,
+                    Stønadstype.DAGLIG_REISE_TSR,
+                    -> it.håndteresIkke()
                 }
             }
 
