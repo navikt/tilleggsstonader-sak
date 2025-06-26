@@ -1,10 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.saksbehandler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Saksbehandler
-import no.nav.tilleggsstonader.kontrakter.felles.Tema
-import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -40,50 +37,14 @@ class SaksbehandlerService(
      * stegene returnerer vi OPPGAVE_FINNES_IKKE til frontend.
      */
 
+    // Todo - kan denne alltid returnere saksbehandlerDto?
+
     fun finnSaksbehandler(behandlingId: BehandlingId): SaksbehandlerDto? {
         val oppgave = hentIkkeFerdigstiltOppgaveForBehandlingGittStegtype(behandlingId)
         return utledAnsvarligSaksbehandlerForOppgave(behandlingId, oppgave)
     }
 
-    fun tilordnetRessursErInnloggetSaksbehandler(
-        behandlingId: BehandlingId,
-        oppgavetyper: Set<Oppgavetype> = setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak),
-    ): Boolean {
-        val oppgave =
-            if (erUtviklerMedVeilderrolle()) {
-                null
-            } else {
-                hentIkkeFerdigstiltOppgaveForBehandling(
-                    behandlingId,
-                    oppgavetyper,
-                )
-            }
-
-        val rolle = utledSaksbehandlerRolle(behandlingId, oppgave)
-
-        return when (rolle) {
-            SaksbehandlerRolle.INNLOGGET_SAKSBEHANDLER, SaksbehandlerRolle.OPPGAVE_FINNES_IKKE,
-            @Suppress("ktlint:standard:max-line-length")
-            SaksbehandlerRolle.OPPGAVE_FINNES_IKKE_SANNSYNLIGVIS_INNLOGGET_SAKSBEHANDLER,
-            -> true
-
-            else -> false
-        }
-    }
-
-    fun hentIkkeFerdigstiltOppgaveForBehandling(
-        behandlingId: BehandlingId,
-        oppgavetyper: Set<Oppgavetype> =
-            setOf(
-                Oppgavetype.BehandleSak,
-                Oppgavetype.BehandleUnderkjentVedtak,
-                Oppgavetype.GodkjenneVedtak,
-            ),
-    ): Oppgave? =
-        hentOppgaveSomIkkeErFerdigstilt(behandlingId, oppgavetyper)
-            ?.let { oppgaveClient.finnOppgaveMedId(it.gsakOppgaveId) }
-
-    fun hentIkkeFerdigstiltOppgaveForBehandlingGittStegtype(behandlingId: BehandlingId): Oppgave? {
+    fun hentIkkeFerdigstiltOppgaveForBehandlingGittStegtype(behandlingId: BehandlingId): OppgaveDomain? {
         val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
         val oppgavetyper =
             when (behandling.steg.tillattFor) {
@@ -92,7 +53,6 @@ class SaksbehandlerService(
                 else -> emptySet()
             }
         return hentOppgaveSomIkkeErFerdigstilt(behandlingId, oppgavetyper)
-            ?.let { oppgaveClient.finnOppgaveMedId(it.gsakOppgaveId) }
     }
 
     fun hentOppgaveSomIkkeErFerdigstilt(
@@ -106,15 +66,17 @@ class SaksbehandlerService(
 
     fun utledAnsvarligSaksbehandlerForOppgave(
         behandlingId: BehandlingId,
-        behandleSakOppgave: Oppgave?,
+        behandleSakOppgave: OppgaveDomain?,
     ): SaksbehandlerDto {
         val rolle = utledSaksbehandlerRolle(behandlingId, behandleSakOppgave)
 
         val tilordnetSaksbehandler =
             if (rolle == SaksbehandlerRolle.OPPGAVE_FINNES_IKKE_SANNSYNLIGVIS_INNLOGGET_SAKSBEHANDLER) {
                 hentSaksbehandlerInfo(SikkerhetContext.hentSaksbehandler())
+            } else if (behandleSakOppgave?.tilordnetSaksbehandler == null) {
+                null
             } else {
-                behandleSakOppgave?.tilordnetRessurs?.let { hentSaksbehandlerInfo(it) }
+                hentSaksbehandlerInfo(behandleSakOppgave.tilordnetSaksbehandler)
             }
 
         return SaksbehandlerDto(
@@ -128,7 +90,7 @@ class SaksbehandlerService(
 
     private fun utledSaksbehandlerRolle(
         behandlingId: BehandlingId,
-        oppgave: Oppgave?,
+        oppgave: OppgaveDomain?,
     ): SaksbehandlerRolle {
         if (erUtviklerMedVeilderrolle()) {
             return SaksbehandlerRolle.UTVIKLER_MED_VEILDERROLLE
@@ -146,13 +108,8 @@ class SaksbehandlerService(
             return SaksbehandlerRolle.OPPGAVE_FINNES_IKKE
         }
 
-        // Skal vi sjekke for både tso og tsr?
-        if (oppgave.tema != Tema.TSO || oppgave.status == StatusEnum.FEILREGISTRERT) {
-            return SaksbehandlerRolle.OPPGAVE_TILHØRER_IKKE_TILLEGGSSTONADER
-        }
-
         val innloggetSaksbehandler = SikkerhetContext.hentSaksbehandler()
-        return when (oppgave.tilordnetRessurs) {
+        return when (oppgave.tilordnetSaksbehandler) {
             innloggetSaksbehandler -> SaksbehandlerRolle.INNLOGGET_SAKSBEHANDLER
             null -> SaksbehandlerRolle.IKKE_SATT
             else -> SaksbehandlerRolle.ANNEN_SAKSBEHANDLER
@@ -160,7 +117,6 @@ class SaksbehandlerService(
     }
 
     private fun erUtviklerMedVeilderrolle(): Boolean {
-        // Trenger vi dette?
         // val bryter = featureToggleService.isEnabled(Toggle.UTVIKLER_MED_VEILEDERRROLLE)
         return false
     }
