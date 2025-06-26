@@ -477,6 +477,7 @@ class OppfølgingOpprettKontrollerServiceTest {
         }
     }
 
+    // Sara er god i figma
     @Nested
     inner class SjekkAvRegisterAktivitetForInngangsvilkår {
         @BeforeEach
