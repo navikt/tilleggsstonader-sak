@@ -55,7 +55,7 @@ class VedtaksperiodeService(
         }
 
         // .minusDays(1) fordi dagen før revurder fra blir siste dag i vedtaksperioden
-        return forrigeVedtaksperioder.avkortFraOgMed(opphørsdato)
+        return forrigeVedtaksperioder.avkortFraOgMed(opphørsdato.minusDays(1))
     }
 
     fun detFinnesVedtaksperioderPåForrigeBehandling(saksbehandling: Saksbehandling): Boolean =
