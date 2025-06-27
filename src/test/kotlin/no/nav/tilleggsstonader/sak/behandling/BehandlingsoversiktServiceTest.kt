@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -36,7 +37,14 @@ class BehandlingsoversiktServiceTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
     val vilkårService = mockk<VilkårService>()
     val behandlingService = mockk<BehandlingService>()
-    val vedtaksperiodeService = VedtaksperiodeService(vilkårperiodeService, vilkårService, vedtakRepository, behandlingService)
+    val vedtaksperiodeService =
+        VedtaksperiodeService(
+            vilkårperiodeService,
+            vilkårService,
+            vedtakRepository,
+            behandlingService,
+            mockUnleashService(),
+        )
 
     val service =
         BehandlingsoversiktService(
