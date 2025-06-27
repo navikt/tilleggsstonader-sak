@@ -44,6 +44,7 @@ object TilsynBarnTestUtil {
         OpphørTilsynBarnRequest(
             årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
             begrunnelse = "Endring i utgifter",
+            opphørsdato = defaultBehandling.revurderFra,
         )
 
     val defaultBehandling = behandling()
@@ -158,6 +159,7 @@ object TilsynBarnTestUtil {
             data = data,
             gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = null,
+            opphørsdato = null,
         )
 
     fun vedtaksperiodeGrunnlag(vedtaksperiode: VedtaksperiodeBeregning = vedtaksperiodeBeregning()): VedtaksperiodeGrunnlag =
@@ -181,6 +183,7 @@ object TilsynBarnTestUtil {
             ),
         gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = defaultBehandling.revurderFra,
+        opphørsdato = null,
     )
 
     fun innvilgetVedtak(
@@ -192,6 +195,7 @@ object TilsynBarnTestUtil {
         data = vedtak,
         gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = defaultBehandling.revurderFra,
+        opphørsdato = null,
     )
 
     fun avslagVedtak(
@@ -208,6 +212,7 @@ object TilsynBarnTestUtil {
             ),
         gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
+        opphørsdato = null,
     )
 
     fun opphørVedtak(
@@ -226,6 +231,7 @@ object TilsynBarnTestUtil {
                 vedtaksperioder = emptyList(),
             ),
         gitVersjon = Applikasjonsversjon.versjon,
-        tidligsteEndring = null, // TODO: Sette til opphørsdato (ny)
+        tidligsteEndring = null,
+        opphørsdato = null,
     )
 }

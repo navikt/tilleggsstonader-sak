@@ -36,7 +36,7 @@ class TilsynBarnBeregnYtelseSteg(
     private val opphørValideringService: OpphørValideringService,
     private val vedtaksperiodeService: VedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
-    private val unleashService: UnleashService,
+    unleashService: UnleashService,
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -45,6 +45,7 @@ class TilsynBarnBeregnYtelseSteg(
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentytelseService,
         simuleringService = simuleringService,
+        unleashService = unleashService,
     ) {
     override fun lagreVedtak(
         saksbehandling: Saksbehandling,
@@ -92,7 +93,11 @@ class TilsynBarnBeregnYtelseSteg(
 
         opphørValideringService.validerVilkårperioder(saksbehandling)
 
-        // TODO - send med opphørsdato (ny)
+        val opphørsdato =
+            revurderFraEllerOpphørsdato(
+                revurderFra = saksbehandling.revurderFra,
+                opphørsdato = vedtak.opphørsdato,
+            )
         val vedtaksperioder = vedtaksperiodeService.finnNyeVedtaksperioderForOpphør(saksbehandling)
 
         val beregningsresultat =
@@ -100,12 +105,11 @@ class TilsynBarnBeregnYtelseSteg(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.OPPHØR,
-                // TODO: Sette til opphørsdato (ny)
-                tidligsteEndring = saksbehandling.revurderFra,
+                tidligsteEndring = opphørsdato,
             )
         opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
             beregningsresultat,
-            saksbehandling.revurderFra,
+            opphørsdato,
         )
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -119,7 +123,8 @@ class TilsynBarnBeregnYtelseSteg(
                         vedtaksperioder = vedtaksperioder,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = null, // TODO: Sette til opphørsdato (ny)
+                tidligsteEndring = null,
+                opphørsdato = vedtak.opphørsdato,
             ),
         )
 
@@ -141,6 +146,7 @@ class TilsynBarnBeregnYtelseSteg(
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
+                opphørsdato = null,
             ),
         )
     }
@@ -171,5 +177,6 @@ class TilsynBarnBeregnYtelseSteg(
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
+            opphørsdato = null,
         )
 }

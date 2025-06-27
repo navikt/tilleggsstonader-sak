@@ -227,6 +227,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             OpphørLæremidlerRequest(
                 årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
                 begrunnelse = "begrunnelse",
+                opphørsdato = revurderFra,
             ),
         )
     }

@@ -115,6 +115,7 @@ class LæremidlerBeregnYtelseStegTest(
                 OpphørLæremidlerRequest(
                     årsakerOpphør = listOf(ÅrsakOpphør.ANNET),
                     begrunnelse = "en begrunnelse",
+                    opphørsdato = behandlingForOpphør.revurderFra,
                 )
             steg.utførSteg(behandlingForOpphør, opphør)
 

@@ -44,11 +44,13 @@ class LæremidlerBeregnYtelseSteg(
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
+    unleashService: UnleashService,
 ) : BeregnYtelseSteg<VedtakLæremidlerRequest>(
         stønadstype = Stønadstype.LÆREMIDLER,
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
+        unleashService = unleashService,
     ) {
     override fun lagreVedtak(
         saksbehandling: Saksbehandling,
@@ -127,19 +129,22 @@ class LæremidlerBeregnYtelseSteg(
         feilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
-        feilHvis(saksbehandling.revurderFra == null) {
-            "revurderFra-dato er påkrevd for opphør"
-        }
+
+        val opphørsdato =
+            revurderFraEllerOpphørsdato(
+                revurderFra = saksbehandling.revurderFra,
+                opphørsdato = vedtak.opphørsdato,
+            )
         val forrigeVedtak = hentVedtak(saksbehandling.forrigeIverksatteBehandlingId)
 
         opphørValideringService.validerVilkårperioder(saksbehandling)
 
         opphørValideringService.validerVedtaksperioderAvkortetVedOpphørLæremidler(
             forrigeBehandlingsVedtaksperioder = forrigeVedtak.data.vedtaksperioder,
-            revurderFraDato = saksbehandling.revurderFra,
+            revurderFraDato = opphørsdato,
         )
 
-        val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
+        val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
 
         val beregningsresultat = beregningService.beregnForOpphør(saksbehandling, avkortetVedtaksperioder)
 
@@ -156,6 +161,7 @@ class LæremidlerBeregnYtelseSteg(
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
+                opphørsdato = vedtak.opphørsdato,
             ),
         )
 
@@ -177,6 +183,7 @@ class LæremidlerBeregnYtelseSteg(
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
+                opphørsdato = null,
             ),
         )
     }
@@ -207,5 +214,6 @@ class LæremidlerBeregnYtelseSteg(
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
+            opphørsdato = null,
         )
 }

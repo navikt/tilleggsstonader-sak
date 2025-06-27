@@ -20,6 +20,7 @@ data class GeneriskVedtak<T : Vedtaksdata>(
     val sporbar: Sporbar = Sporbar(),
     val gitVersjon: String?,
     val tidligsteEndring: LocalDate?,
+    val opphørsdato: LocalDate?,
 ) {
     init {
         require(data.type.typeVedtak == type) { "$type på vedtak er ikke lik vedtak på data(${data.type.typeVedtak})" }

@@ -38,7 +38,7 @@ class BoutgifterBeregnYtelseSteg(
     private val beregningService: BoutgifterBeregningService,
     private val opphørValideringService: OpphørValideringService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
-    private val unleashService: UnleashService,
+    unleashService: UnleashService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -47,6 +47,7 @@ class BoutgifterBeregnYtelseSteg(
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
+        unleashService = unleashService,
     ) {
     override fun lagreVedtak(
         saksbehandling: Saksbehandling,
@@ -89,26 +90,29 @@ class BoutgifterBeregnYtelseSteg(
         feilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
-        feilHvis(saksbehandling.revurderFra == null) {
-            "revurderFra-dato er påkrevd for opphør"
-        }
+
+        val opphørsdato =
+            revurderFraEllerOpphørsdato(
+                revurderFra = saksbehandling.revurderFra,
+                opphørsdato = vedtak.opphørsdato,
+            )
         val forrigeVedtak = hentVedtak(saksbehandling.forrigeIverksatteBehandlingId)
 
         opphørValideringService.validerVilkårperioder(saksbehandling)
 
         opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
             forrigeBehandlingsVedtaksperioder = forrigeVedtak.data.vedtaksperioder,
-            revurderFraDato = saksbehandling.revurderFra,
+            revurderFraDato = opphørsdato,
         )
 
-        val avkortedeVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
+        val avkortedeVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
 
         val beregningsresultat =
             beregningService.beregn(
                 saksbehandling,
                 avkortedeVedtaksperioder,
                 TypeVedtak.OPPHØR,
-                saksbehandling.revurderFra,
+                opphørsdato,
             )
 
         lagreOpphørsvedtak(saksbehandling, avkortedeVedtaksperioder, beregningsresultat, vedtak)
@@ -140,6 +144,7 @@ class BoutgifterBeregnYtelseSteg(
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
+                opphørsdato = null,
             ),
         )
     }
@@ -163,6 +168,7 @@ class BoutgifterBeregnYtelseSteg(
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
+                opphørsdato = null,
             ),
         )
     }
@@ -185,7 +191,8 @@ class BoutgifterBeregnYtelseSteg(
                         begrunnelse = vedtak.begrunnelse,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = null, // TODO: Sette til opphørsdato (ny)
+                tidligsteEndring = null,
+                opphørsdato = vedtak.opphørsdato,
             ),
         )
     }
