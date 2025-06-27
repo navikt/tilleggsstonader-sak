@@ -25,10 +25,37 @@ object GeneriskFaktaGrunnlagTestUtil {
     fun faktaGrunnlagAnnenForelder(
         ident: String = "forelder1",
         harBehandlingUnderArbeid: Boolean = true,
-        oppfyltePerioderForBarn: List<Datoperiode> = listOf(Datoperiode(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31))),
+        oppfyltePerioderForBarn: List<Datoperiode> =
+            listOf(
+                Datoperiode(
+                    LocalDate.of(2025, 1, 1),
+                    LocalDate.of(2025, 1, 31),
+                ),
+            ),
     ) = FaktaGrunnlagAnnenForelderSaksinformasjon(
         ident = ident,
         harBehandlingUnderArbeid = harBehandlingUnderArbeid,
         vedtaksperioderBarn = oppfyltePerioderForBarn,
     )
+
+    fun faktaGrunnlagPersonopplysninger(
+        behandlingId: BehandlingId = BehandlingId.random(),
+    ): GeneriskFaktaGrunnlag<FaktaGrunnlagPersonopplysninger> =
+        GeneriskFaktaGrunnlag(
+            behandlingId = behandlingId,
+            data =
+                FaktaGrunnlagPersonopplysninger(
+                    navn =
+                        Navn(
+                            fornavn = "Maximus",
+                            mellomnavn = "Decimus",
+                            etternavn = "Meridius",
+                        ),
+                    fødsel = null,
+                    barn = emptyList(),
+                ),
+            type = TypeFaktaGrunnlag.PERSONOPPLYSNINGER,
+            typeId = null,
+            sporbar = Sporbar(opprettetAv = "id123", opprettetTid = LocalDate.of(2025, 1, 2).atStartOfDay()),
+        )
 }
