@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.barn
 
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
@@ -29,6 +30,25 @@ class BarnService(
                 .associate { it.id to it.copy(id = BarnId.random(), behandlingId = nyBehandlingId, sporbar = Sporbar()) }
         barnRepository.insertAll(nyeBarnPåGammelId.values.toList())
         return nyeBarnPåGammelId.map { it.key to it.value.id }.toMap()
+    }
+
+    fun kopierManglendeBarnFraForrigeBehandling(
+        forrigeBehandlingId: BehandlingId,
+        nyBehandling: Behandling,
+    ) {
+        val barnPåForrigeBehandling = finnBarnPåBehandling(forrigeBehandlingId)
+        val barnPåBehandlingSomSkalTasAvVent = finnBarnPåBehandling(nyBehandling.id)
+
+        val identerPåVent = barnPåBehandlingSomSkalTasAvVent.map { it.ident }.toSet()
+        val barnSomMåLeggesTilBehandlingSomSkalTasAvVent =
+            barnPåForrigeBehandling.filter { it.ident !in identerPåVent }
+
+        val nyeBarn =
+            barnSomMåLeggesTilBehandlingSomSkalTasAvVent.map {
+                it.copy(behandlingId = nyBehandling.id, id = BarnId.random(), sporbar = Sporbar())
+            }
+
+        barnRepository.insertAll(nyeBarn)
     }
 }
 
