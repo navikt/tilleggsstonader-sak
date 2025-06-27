@@ -7,6 +7,7 @@ interface Domenenøkkel {
 enum class DomenenøkkelFelles(
     override val nøkkel: String,
 ) : Domenenøkkel {
+    ID("Id"),
     FOM("Fom"),
     TOM("Tom"),
     BELØP("Beløp"),
