@@ -590,4 +590,50 @@ object Testdata {
                 aktiviteter = aktivitetererBoutgifter,
             )
     }
+
+//    object DagligReise {
+//        val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+//
+//        val behandling =
+//            saksbehandling(
+//                behandling =
+//                    behandling(
+//                        id = behandlingId,
+//                        vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay(),
+//                        opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
+//                        fagsak = fagsak,
+//                        resultat = BehandlingResultat.INNVILGET,
+//                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+//                    ),
+//                fagsak = fagsak,
+//            )
+//
+//        val grunnlagsdata =
+//            lagGrunnlagsdata(personopplysninger = lagFaktaGrunnlagPersonopplysninger(barn = emptyList()))
+//
+//        val vedtaksperioder =
+//            listOf(
+//                Vedtaksperiode(
+//                    id = UUID.randomUUID(),
+//                    fom = LocalDate.of(2024, JANUARY, 1),
+//                    tom = LocalDate.of(2024, FEBRUARY, 29),
+//                    aktivitet = AktivitetType.TILTAK,
+//                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+//                ),
+//            )
+//
+//        val beregningsresultat = null
+//
+//        val vilkår = null
+//
+//        val innvilgetVedtak = null
+//        val avslåttVedtak = null
+//        val opphørtVedtak = null
+//
+//        val vilkårperioder =
+//            Vilkårperioder(
+//                målgrupper = målgrupper,
+//                aktiviteter = aktivitetererBoutgifter,
+//            )
+//    }
 }

@@ -134,6 +134,15 @@ class InterntVedtakGenereringTest {
         every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Boutgifter.innvilgetVedtak
     }
 
+//    private fun mockDagligReiseTSO() {
+//        every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.DagligReise.behandling
+//        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.DagligReise.vilkårperioder
+//        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.DagligReise.grunnlagsdata
+//        every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
+//        every { vilkårService.hentVilkår(behandlingId) } returns Testdata.DagligReise.vilkår
+//        every { vedtakService.hentVedtak(behandlingId) } returns Testdata.DagligReise.innvilgetVedtak
+//    }
+
     @Test
     fun `html skal være formatert for å enklere kunne sjekke diff`() {
         val rootFolder = "interntVedtak"

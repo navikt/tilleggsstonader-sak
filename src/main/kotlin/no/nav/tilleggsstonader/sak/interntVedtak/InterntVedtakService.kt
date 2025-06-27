@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.interntVedtak
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -52,6 +53,16 @@ class InterntVedtakService(
 ) {
     fun lagInterntVedtak(behandlingId: BehandlingId): InterntVedtak {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        val stønadstype = behandling.stønadstype
+        if (stønadstype !in
+            setOf(
+                Stønadstype.BARNETILSYN,
+                Stønadstype.LÆREMIDLER,
+                Stønadstype.BOUTGIFTER,
+            )
+        ) {
+            throw IllegalArgumentException("Internt vedtak håndterer ikke stønadstype=$stønadstype")
+        }
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandling.id)
         val vedtak = vedtakService.hentVedtak(behandling.id)
 
