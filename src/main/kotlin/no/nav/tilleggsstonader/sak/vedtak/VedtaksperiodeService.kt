@@ -2,11 +2,13 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
@@ -24,6 +26,7 @@ class VedtaksperiodeService(
     private val vilkårService: VilkårService,
     private val vedtakRepository: VedtakRepository,
     private val behandlingService: BehandlingService,
+    private val unleashService: UnleashService,
 ) {
     fun foreslåPerioder(behandlingId: BehandlingId): List<Vedtaksperiode> {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
@@ -34,10 +37,22 @@ class VedtaksperiodeService(
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
         val vilkår = vilkårService.hentVilkår(behandlingId)
 
-        return ForeslåVedtaksperiode.finnVedtaksperiode(
-            vilkårperioder = vilkårperioder,
-            vilkår = vilkår,
-        )
+        if (unleashService.isEnabled(Toggle.BRUK_NY_FORESLÅ_VEDTAKSPERIODE)) {
+            val tidligereVedtaksperioder =
+                saksbehandling.forrigeIverksatteBehandlingId
+                    ?.let { this.finnVedtaksperioderForBehandling(it, null) }
+                    ?: emptyList()
+            return ForeslåVedtaksperiode.finnVedtaksperiodeV2(
+                vilkårperioder = vilkårperioder,
+                vilkår = vilkår,
+                tidligereVedtaksperioder = tidligereVedtaksperioder,
+            )
+        } else {
+            return ForeslåVedtaksperiode.finnVedtaksperiode(
+                vilkårperioder = vilkårperioder,
+                vilkår = vilkår,
+            )
+        }
     }
 
     fun finnNyeVedtaksperioderForOpphør(
