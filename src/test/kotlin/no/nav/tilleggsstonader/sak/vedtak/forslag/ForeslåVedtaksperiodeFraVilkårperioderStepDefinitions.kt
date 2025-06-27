@@ -26,6 +26,7 @@ class ForeslåVedtaksperiodeFraVilkårperioderStepDefinitions {
     var aktiviteter: List<VilkårperiodeAktivitet> = emptyList()
     var målgrupper: List<VilkårperiodeMålgruppe> = emptyList()
     var resultat: List<ForslagVedtaksperiodeFraVilkårperioder> = emptyList()
+    var resultat2: List<ForslagVedtaksperiodeFraVilkårperioder> = emptyList()
     var resultatFaktiskMålgruppe: List<ForslagVedtaksperiodeFraVilkårperioder> = emptyList()
     var feil: ApiFeil? = null
 
@@ -70,6 +71,21 @@ class ForeslåVedtaksperiodeFraVilkårperioderStepDefinitions {
                         aktiviteter = aktiviteter,
                     ),
                 )
+            resultat2 =
+                ForeslåVedtaksperioderV2Util
+                    .foreslåPerioder(
+                        Vilkårperioder(
+                            målgrupper = målgrupper,
+                            aktiviteter = aktiviteter,
+                        ),
+                    ).map {
+                        ForslagVedtaksperiodeFraVilkårperioder(
+                            fom = it.fom,
+                            tom = it.tom,
+                            målgruppe = it.målgruppe,
+                            aktivitet = it.aktivitet,
+                        )
+                    }
         } catch (e: ApiFeil) {
             feil = e
         }
@@ -94,5 +110,6 @@ class ForeslåVedtaksperiodeFraVilkårperioderStepDefinitions {
             }
 
         assertThat(resultat).isEqualTo(forventedeVedtaksperioder)
+        assertThat(resultat2).isEqualTo(forventedeVedtaksperioder)
     }
 }
