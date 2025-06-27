@@ -54,7 +54,7 @@ class VedtaksperiodeService(
             "Kan ikke opphøre fordi data fra forrige vedtak mangler"
         }
 
-        // .minusDays(1) fordi dagen før revurder fra blir siste dag i vedtaksperioden
+        // .minusDays(1) fordi dagen før opphørsdato blir siste dag i vedtaksperioden
         return forrigeVedtaksperioder.avkortFraOgMed(opphørsdato.minusDays(1))
     }
 
