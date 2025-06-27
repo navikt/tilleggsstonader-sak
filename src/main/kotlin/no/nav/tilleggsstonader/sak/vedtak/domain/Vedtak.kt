@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
@@ -20,6 +21,7 @@ data class GeneriskVedtak<T : Vedtaksdata>(
     val sporbar: Sporbar = Sporbar(),
     val gitVersjon: String?,
     val tidligsteEndring: LocalDate?,
+    @Column("opphorsdato")
     val opphørsdato: LocalDate?,
 ) {
     init {

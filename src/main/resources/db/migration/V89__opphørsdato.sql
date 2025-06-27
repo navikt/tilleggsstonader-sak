@@ -1,1 +1,1 @@
-alter table vedtak add column opphørsdato DATE;
+alter table vedtak add column opphorsdato DATE;
