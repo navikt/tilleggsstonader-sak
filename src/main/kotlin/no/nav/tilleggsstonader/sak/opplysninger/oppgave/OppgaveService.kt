@@ -130,12 +130,20 @@ class OppgaveService(
         saksbehandler: String?,
         versjon: Int,
     ): OppgaveMedMetadata {
+        val finnOppgave =
+            oppgaveRepository.findByGsakOppgaveId(gsakOppgaveId)
+                ?: error("Fant ikke oppgave for gsakOppgaveId $gsakOppgaveId")
+
         val oppdatertOppgave =
             oppgaveClient.fordelOppgave(
                 oppgaveId = gsakOppgaveId,
                 saksbehandler = saksbehandler,
                 versjon = versjon,
             )
+
+        oppgaveRepository.update(
+            finnOppgave.copy(tilordnetSaksbehandler = saksbehandler),
+        )
         return medMetadata(oppdatertOppgave)
     }
 
