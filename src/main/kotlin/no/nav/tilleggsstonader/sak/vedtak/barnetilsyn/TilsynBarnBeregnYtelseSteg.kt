@@ -99,7 +99,7 @@ class TilsynBarnBeregnYtelseSteg(
 
         opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
 
-        val vedtaksperioder = vedtaksperiodeService.finnNyeVedtaksperioderForOpphør(saksbehandling)
+        val vedtaksperioder = vedtaksperiodeService.finnNyeVedtaksperioderForOpphør(saksbehandling, opphørsdato)
 
         val beregningsresultat =
             beregningService.beregn(
