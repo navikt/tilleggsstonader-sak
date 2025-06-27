@@ -40,13 +40,14 @@ object VedtakDtoMapper {
     ): VedtakResponse {
         val data = vedtak.data
         return when (data) {
-            is VedtakTilsynBarn -> mapVedtakTilsynBarn(data, vedtak.tidligsteEndring ?: revurderFra)
-            is VedtakLæremidler -> mapVedtakLæremidler(data, vedtak.tidligsteEndring ?: revurderFra)
-            is VedtakBoutgifter -> mapVedtakBoutgifter(data, vedtak.tidligsteEndring ?: revurderFra)
+            is VedtakTilsynBarn -> mapVedtakTilsynBarn(vedtak, data, vedtak.tidligsteEndring ?: revurderFra)
+            is VedtakLæremidler -> mapVedtakLæremidler(vedtak, data, vedtak.tidligsteEndring ?: revurderFra)
+            is VedtakBoutgifter -> mapVedtakBoutgifter(vedtak, data, vedtak.tidligsteEndring ?: revurderFra)
         }
     }
 
     private fun mapVedtakTilsynBarn(
+        vedtak: Vedtak,
         data: VedtakTilsynBarn,
         tidligsteEndring: LocalDate?,
     ): VedtakTilsynBarnResponse =
@@ -64,6 +65,7 @@ object VedtakDtoMapper {
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(),
+                    opphørsdato = vedtak.opphørsdato,
                 )
 
             is AvslagTilsynBarn ->
@@ -74,6 +76,7 @@ object VedtakDtoMapper {
         }
 
     private fun mapVedtakLæremidler(
+        vedtak: Vedtak,
         data: VedtakLæremidler,
         tidligsteEndring: LocalDate?,
     ): VedtakLæremidlerResponse =
@@ -98,10 +101,12 @@ object VedtakDtoMapper {
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder = data.vedtaksperioder.tilDto(),
+                    opphørsdato = vedtak.opphørsdato,
                 )
         }
 
     private fun mapVedtakBoutgifter(
+        vedtak: Vedtak,
         data: VedtakBoutgifter,
         tidligsteEndring: LocalDate?,
     ): VedtakBoutgifterResponse =
@@ -126,6 +131,7 @@ object VedtakDtoMapper {
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder = data.vedtaksperioder.tilDto(),
+                    opphørsdato = vedtak.opphørsdato,
                 )
         }
 }

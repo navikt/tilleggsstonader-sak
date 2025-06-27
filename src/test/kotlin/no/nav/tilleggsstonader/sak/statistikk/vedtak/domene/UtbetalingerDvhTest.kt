@@ -99,6 +99,7 @@ class UtbetalingerDvhTest {
                 data = vedtaksdata,
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
+                opphørsdato = null,
             )
 
         val resultat = UtbetalingerDvh.fraDomene(listOf(andelTilkjentYtelse), innvilgelse)

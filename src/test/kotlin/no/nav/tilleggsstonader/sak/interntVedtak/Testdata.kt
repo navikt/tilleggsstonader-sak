@@ -242,6 +242,7 @@ object Testdata {
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = behandling.revurderFra,
+                opphørsdato = null,
             )
 
         private val aktiviteterTilsynBarn =
@@ -349,6 +350,7 @@ object Testdata {
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = behandling.revurderFra,
+                opphørsdato = null,
             )
 
         val avslåttVedtak =
@@ -362,6 +364,7 @@ object Testdata {
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
+                opphørsdato = null,
             )
 
         private val aktivitetererLæremidler =
@@ -540,6 +543,7 @@ object Testdata {
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = behandling.revurderFra,
+                opphørsdato = null,
             )
         val avslåttVedtak =
             GeneriskVedtak(
@@ -552,6 +556,7 @@ object Testdata {
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
+                opphørsdato = null,
             )
         val opphørtVedtak =
             GeneriskVedtak(
@@ -565,7 +570,8 @@ object Testdata {
                         beregningsresultat = beregningsresultat,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = null, // TODO: Sette til opphørsdato (ny)
+                tidligsteEndring = null,
+                opphørsdato = behandling.revurderFra ?: LocalDate.now(),
             )
 
         private val aktivitetererBoutgifter =

@@ -40,12 +40,12 @@ class VedtaksperiodeService(
         )
     }
 
-    fun finnNyeVedtaksperioderForOpphør(behandling: Saksbehandling): List<Vedtaksperiode> {
+    fun finnNyeVedtaksperioderForOpphør(
+        behandling: Saksbehandling,
+        opphørsdato: LocalDate,
+    ): List<Vedtaksperiode> {
         feilHvis(behandling.forrigeIverksatteBehandlingId == null) {
             "Kan ikke finne nye vedtaksperioder for opphør fordi behandlingen er en førstegangsbehandling"
-        }
-        feilHvis(behandling.revurderFra == null) {
-            "Kan ikke finne nye vedtaksperioder for opphør fordi revurder fra dato mangler"
         }
 
         val forrigeVedtaksperioder = finnVedtaksperioder(behandling.forrigeIverksatteBehandlingId)
@@ -54,8 +54,8 @@ class VedtaksperiodeService(
             "Kan ikke opphøre fordi data fra forrige vedtak mangler"
         }
 
-        // .minusDays(1) fordi dagen før revurder fra blir siste dag i vedtaksperioden
-        return forrigeVedtaksperioder.avkortFraOgMed(behandling.revurderFra.minusDays(1))
+        // .minusDays(1) fordi dagen før opphørsdato blir siste dag i vedtaksperioden
+        return forrigeVedtaksperioder.avkortFraOgMed(opphørsdato.minusDays(1))
     }
 
     fun detFinnesVedtaksperioderPåForrigeBehandling(saksbehandling: Saksbehandling): Boolean =

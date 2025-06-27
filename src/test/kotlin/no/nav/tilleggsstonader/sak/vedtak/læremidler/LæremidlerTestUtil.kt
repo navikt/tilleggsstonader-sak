@@ -54,6 +54,7 @@ object LæremidlerTestUtil {
             data = data,
             gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = null,
+            opphørsdato = null,
         )
 
     fun innvilgelse(
@@ -70,6 +71,7 @@ object LæremidlerTestUtil {
             ),
         gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
+        opphørsdato = null,
     )
 
     fun avslag(
@@ -86,6 +88,7 @@ object LæremidlerTestUtil {
             ),
         gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
+        opphørsdato = null,
     )
 
     fun opphør(
@@ -106,6 +109,7 @@ object LæremidlerTestUtil {
             ),
         gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
+        opphørsdato = LocalDate.now(),
     )
 
     fun beregningsresultatForMåned(

@@ -294,6 +294,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 OpphørBoutgifterRequest(
                     årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
                     begrunnelse = "begrunnelse",
+                    opphørsdato = revurderFra,
                 ),
             )
         }

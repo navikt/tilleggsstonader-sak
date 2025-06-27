@@ -142,10 +142,11 @@ class TilsynBarnVedtakControllerTest(
                 ),
         )
         testoppsettService.ferdigstillBehandling(behandling)
+        val revurderFra = LocalDate.of(2023, 1, 15)
         val behandlingLagreOpphør =
             testoppsettService.opprettRevurdering(
                 forrigeBehandling = behandling,
-                revurderFra = LocalDate.of(2023, 1, 15),
+                revurderFra = revurderFra,
                 fagsak = fagsak,
             )
 
@@ -175,6 +176,7 @@ class TilsynBarnVedtakControllerTest(
             OpphørTilsynBarnRequest(
                 årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
                 begrunnelse = "endre utgifter opphør",
+                opphørsdato = revurderFra,
             )
 
         opphørVedtak(behandlingLagreOpphør, vedtak)
