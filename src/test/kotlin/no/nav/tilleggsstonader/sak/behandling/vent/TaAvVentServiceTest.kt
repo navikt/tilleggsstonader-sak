@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling.vent
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
@@ -43,6 +44,9 @@ class TaAvVentServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårperiodeService: VilkårperiodeService
+
+    @Autowired
+    lateinit var barnService: no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 
     val fagsak = fagsak()
     val behandling = behandling(fagsak = fagsak)
@@ -192,6 +196,55 @@ class TaAvVentServiceTest : IntegrationTest() {
             assertThat(nullstiltBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandlingSomSniker.id)
             assertThat(nullstilteVilkår.målgrupper).isEmpty()
             assertThat(nullstilteVilkår.aktiviteter).isNotEmpty()
+        }
+    }
+
+    /**
+     * Utility method for creating a dummy test barn (child)
+     */
+    private fun dummyBarn(
+        behandlingId: BehandlingId,
+        ident: String,
+    ) = BehandlingBarn(
+        behandlingId = behandlingId,
+        ident = ident,
+    )
+
+    @Test
+    fun `skal legge til barn fra forrige behandling som ikke finnes i behandling som tas av vent`() {
+        testWithBrukerContext(dummySaksbehandler) {
+            // Lagre informasjon på behandlingen som skal nullstilles
+            taAvVentService.taAvVent(behandling.id)
+            settPåVentService.settPåVent(behandling.id, settPåVentDto.copy(beholdOppgave = true))
+
+            // Lag ny behandling med ett barn som blir iverksatt, og legg til en kid på den
+            val behandlingSomBlirIverksatt =
+                behandling(
+                    fagsak = fagsak,
+                    status = BehandlingStatus.UTREDES,
+                    resultat = BehandlingResultat.INNVILGET,
+                    vedtakstidspunkt = LocalDateTime.now().plusDays(1),
+                )
+            testoppsettService.lagre(behandlingSomBlirIverksatt)
+
+            val barnPåIverksattBehandling = dummyBarn(behandlingSomBlirIverksatt.id, "barn1")
+            barnService.opprettBarn(listOf(barnPåIverksattBehandling))
+
+            // Legg til et annet barn på behandlingen som tas av vent
+            val barnPåBehandlingSomTasAvVent = dummyBarn(behandling.id, "barn2")
+            barnService.opprettBarn(listOf(barnPåBehandlingSomTasAvVent))
+
+            // Iverksett behandlingen med barn1
+            testoppsettService.ferdigstillBehandling(behandlingSomBlirIverksatt)
+
+            // Vi forventer at barn1 (fra forrige behandling) nå skal bli lagt til behandlingen som tas av vent
+            // siden barn1 ikke finnes i behandling som tas av vent fra før
+            taAvVentService.taAvVent(behandling.id)
+
+            // Verifiser at begge barna nå er på behandlingen som ble tatt av vent
+            val barnEtterTaAvVent = barnService.finnBarnPåBehandling(behandling.id)
+            assertThat(barnEtterTaAvVent).hasSize(2)
+            assertThat(barnEtterTaAvVent.map { it.ident }).containsExactlyInAnyOrder("barn1", "barn2")
         }
     }
 

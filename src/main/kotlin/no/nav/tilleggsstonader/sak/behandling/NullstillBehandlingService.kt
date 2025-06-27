@@ -78,7 +78,7 @@ class NullstillBehandlingService(
     private fun gjenbrukData(behandling: Behandling) {
         val behandlingIdForGjenbruk =
             gjennbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
-                ?: error("Kan ikke nullstille behandling som ikke har behandlingIdForGjenbruk")
+                ?: error("Fant ingen behandling å gjenbruke data fra")
         val barnMap = gjennbrukDataRevurderingService.finnNyttIdForBarn(behandling.id, behandlingIdForGjenbruk)
         gjennbrukDataRevurderingService.gjenbrukData(behandling, behandlingIdForGjenbruk, barnMap)
     }
