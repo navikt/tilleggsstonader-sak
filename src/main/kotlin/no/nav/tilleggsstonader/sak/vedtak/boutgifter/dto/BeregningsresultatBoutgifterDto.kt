@@ -19,10 +19,7 @@ data class BeregningsresultatForPeriodeDto(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val stønadsbeløp: Int,
-    @Deprecated("Skal gå over til å bruke utgifterTilUtbetaling")
     val utgifter: List<UtgiftBoutgifterMedAndelTilUtbetalingDto>,
-    // Kan renames til utgifter når frontend er klar
-    val utgifterTilUtbetaling: List<UtgiftBoutgifterMedAndelTilUtbetalingDto>,
     val sumUtgifter: Int,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
@@ -72,7 +69,6 @@ fun BeregningsresultatForLøpendeMåned.tilDto(revurderFra: LocalDate?): Beregni
         stønadsbeløp = stønadsbeløp,
         sumUtgifter = grunnlag.summerUtgifter(),
         utgifter = finnUtgifterMedAndelTilUtbetaling(revurderFra),
-        utgifterTilUtbetaling = finnUtgifterMedAndelTilUtbetaling(revurderFra),
         målgruppe = grunnlag.målgruppe,
         aktivitet = grunnlag.aktivitet,
         makssatsBekreftet = grunnlag.makssatsBekreftet,

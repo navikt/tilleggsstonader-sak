@@ -213,13 +213,6 @@
         "tilUtbetaling" : 3000,
         "erFørRevurderFra" : false
       } ],
-      "utgifterTilUtbetaling" : [ {
-        "fom" : "2024-01-01",
-        "tom" : "2024-01-31",
-        "utgift" : 3000,
-        "tilUtbetaling" : 3000,
-        "erFørRevurderFra" : false
-      } ],
       "sumUtgifter" : 3000,
       "målgruppe" : "NEDSATT_ARBEIDSEVNE",
       "aktivitet" : "TILTAK",
@@ -230,13 +223,6 @@
       "tom" : "2024-02-29",
       "stønadsbeløp" : 4953,
       "utgifter" : [ {
-        "fom" : "2024-02-26",
-        "tom" : "2024-02-29",
-        "utgift" : 4000,
-        "tilUtbetaling" : 4000,
-        "erFørRevurderFra" : false
-      } ],
-      "utgifterTilUtbetaling" : [ {
         "fom" : "2024-02-26",
         "tom" : "2024-02-29",
         "utgift" : 4000,
