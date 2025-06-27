@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeFraVilkårperioder.foreslåVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
@@ -13,11 +14,20 @@ import java.time.LocalDate
 import java.util.UUID
 
 object ForeslåVedtaksperiode {
+    fun finnVedtaksperiodeV2(
+        vilkårperioder: Vilkårperioder,
+        vilkår: List<Vilkår>,
+        tidligereVedtaksperioder: List<Vedtaksperiode>,
+    ): List<Vedtaksperiode> {
+        val forslag = ForeslåVedtaksperioderV2Util.foreslåPerioder(vilkårperioder, vilkår)
+        return ForeslåVedtaksperioderBeholdIdUtil.beholdTidligereIdnForVedtaksperioder(tidligereVedtaksperioder, forslag)
+    }
+
     fun finnVedtaksperiode(
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
     ): List<Vedtaksperiode> {
-        val forslagVedtaksperiode = ForeslåVedtaksperiodeFraVilkårperioder.foreslåVedtaksperioder(vilkårperioder).single()
+        val forslagVedtaksperiode = foreslåVedtaksperioder(vilkårperioder).single()
         val oppfylteVilkår = vilkår.finnOppfylte()
 
         brukerfeilHvis(oppfylteVilkår.isEmpty()) {
