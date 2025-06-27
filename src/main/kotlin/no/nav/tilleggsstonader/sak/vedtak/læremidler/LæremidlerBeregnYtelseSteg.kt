@@ -40,7 +40,6 @@ class LæremidlerBeregnYtelseSteg(
     private val beregningService: LæremidlerBeregningService,
     private val opphørValideringService: OpphørValideringService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
-    private val unleashService: UnleashService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -137,11 +136,11 @@ class LæremidlerBeregnYtelseSteg(
             )
         val forrigeVedtak = hentVedtak(saksbehandling.forrigeIverksatteBehandlingId)
 
-        opphørValideringService.validerVilkårperioder(saksbehandling)
+        opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
 
         opphørValideringService.validerVedtaksperioderAvkortetVedOpphørLæremidler(
             forrigeBehandlingsVedtaksperioder = forrigeVedtak.data.vedtaksperioder,
-            revurderFraDato = opphørsdato,
+            opphørsdato = opphørsdato,
         )
 
         val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)

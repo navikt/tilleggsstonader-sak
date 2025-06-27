@@ -96,13 +96,14 @@ class BoutgifterBeregnYtelseSteg(
                 revurderFra = saksbehandling.revurderFra,
                 opphørsdato = vedtak.opphørsdato,
             )
-        val forrigeVedtak = hentVedtak(saksbehandling.forrigeIverksatteBehandlingId)
 
-        opphørValideringService.validerVilkårperioder(saksbehandling)
+        opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
+
+        val forrigeVedtak = hentVedtak(saksbehandling.forrigeIverksatteBehandlingId)
 
         opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
             forrigeBehandlingsVedtaksperioder = forrigeVedtak.data.vedtaksperioder,
-            revurderFraDato = opphørsdato,
+            opphørsdato = opphørsdato,
         )
 
         val avkortedeVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)

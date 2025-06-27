@@ -36,16 +36,18 @@ class OpphørValideringServiceTest {
     val fom = måned.atDay(1)
     val tom = måned.atEndOfMonth()
 
+    val opphørsdato = LocalDate.of(2025, 2, 1)
+
     val saksbehandlingBoutgifter =
         saksbehandling(
-            revurderFra = LocalDate.of(2025, 2, 1),
+            revurderFra = opphørsdato,
             type = BehandlingType.REVURDERING,
             fagsak = fagsakBoutgifter(),
         )
 
     val saksbehandling =
         saksbehandling(
-            revurderFra = LocalDate.of(2025, 2, 1),
+            revurderFra = opphørsdato,
             type = BehandlingType.REVURDERING,
         )
     val opphørValideringService = OpphørValideringService(vilkårperiodeService, vilkårService)
@@ -97,23 +99,23 @@ class OpphørValideringServiceTest {
         @Test
         fun `Kaster ikke feil ved korrekt data`() {
             assertThatCode {
-                opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
+                opphørValideringService.validerIngenUtbetalingEtterOpphørsdato(
                     beregningsresultatTilsynBarn = beregningsresultat,
-                    revurderFra = saksbehandling.revurderFra,
+                    opphørsdato = opphørsdato,
                 )
             }.doesNotThrowAnyException()
         }
 
         @Test
         fun `Kaster feil ved utbetaling etter opphørdato`() {
-            val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = måned.atDay(1))
+            val opphørsdatoTilbakeITid = måned.atDay(1)
 
             assertThatThrownBy {
-                opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
+                opphørValideringService.validerIngenUtbetalingEtterOpphørsdato(
                     beregningsresultatTilsynBarn = beregningsresultat,
-                    revurderFra = saksbehandlingRevurdertFraTilbakeITid.revurderFra,
+                    opphørsdato = opphørsdatoTilbakeITid,
                 )
-            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato")
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter opphørsdato")
         }
 
         @Test
@@ -123,12 +125,12 @@ class OpphørValideringServiceTest {
                     måned = måned,
                     beløpsperioder = listOf(Beløpsperiode(dato = fom, 0, FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)),
                 )
-            val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = måned.atDay(1))
+            val opphørsdatoTilbakeITid = måned.atDay(1)
 
             assertThatCode {
-                opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
+                opphørValideringService.validerIngenUtbetalingEtterOpphørsdato(
                     beregningsresultatTilsynBarn = BeregningsresultatTilsynBarn(listOf(beregningsresultatForMåned)),
-                    revurderFra = saksbehandlingRevurdertFraTilbakeITid.revurderFra,
+                    opphørsdato = opphørsdatoTilbakeITid,
                 )
             }.doesNotThrowAnyException()
         }
@@ -138,7 +140,7 @@ class OpphørValideringServiceTest {
     inner class `Valider perioder` {
         @Test
         fun `validerPerioder kaster ikke feil ved korrekt data`() {
-            assertThatCode { opphørValideringService.validerVilkårperioder(saksbehandling = saksbehandling) }
+            assertThatCode { opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato) }
                 .doesNotThrowAnyException()
         }
 
@@ -147,7 +149,7 @@ class OpphørValideringServiceTest {
             every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår.copy(status = VilkårStatus.NY))
 
             assertThatThrownBy {
-                opphørValideringService.validerVilkårperioder(saksbehandling)
+                opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er lagt inn nye utgifter med oppfylte vilkår")
         }
 
@@ -160,7 +162,7 @@ class OpphørValideringServiceTest {
                 )
 
             assertThatThrownBy {
-                opphørValideringService.validerVilkårperioder(saksbehandling)
+                opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er lagt inn nye målgrupper med oppfylte vilkår")
         }
 
@@ -173,7 +175,7 @@ class OpphørValideringServiceTest {
                 )
 
             assertThatThrownBy {
-                opphørValideringService.validerVilkårperioder(saksbehandling)
+                opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er lagt inn nye aktiviteter med oppfylte vilkår")
         }
 
@@ -192,8 +194,8 @@ class OpphørValideringServiceTest {
                 )
 
             assertThatThrownBy {
-                opphørValideringService.validerVilkårperioder(saksbehandling)
-            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret målgruppe er etter revurder fra dato")
+                opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret målgruppe er etter opphørsdato")
         }
 
         @Test
@@ -211,8 +213,8 @@ class OpphørValideringServiceTest {
                 )
 
             assertThatThrownBy {
-                opphørValideringService.validerVilkårperioder(saksbehandling)
-            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret aktivitet er etter revurder fra dato")
+                opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret aktivitet er etter opphørsdato")
         }
 
         @Test
@@ -221,13 +223,13 @@ class OpphørValideringServiceTest {
                 listOf(
                     vilkår.copy(
                         status = VilkårStatus.ENDRET,
-                        tom = YearMonth.from(saksbehandling.revurderFra).plusMonths(1).atEndOfMonth(),
+                        tom = YearMonth.from(opphørsdato).plusMonths(1).atEndOfMonth(),
                     ),
                 )
 
             assertThatThrownBy {
-                opphørValideringService.validerVilkårperioder(saksbehandling)
-            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato")
+                opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter opphørsdato")
         }
 
         @Test
@@ -236,12 +238,12 @@ class OpphørValideringServiceTest {
                 listOf(
                     vilkår.copy(
                         status = VilkårStatus.ENDRET,
-                        tom = YearMonth.from(saksbehandling.revurderFra).atEndOfMonth(),
+                        tom = YearMonth.from(opphørsdato).atEndOfMonth(),
                     ),
                 )
 
             assertThatCode {
-                opphørValideringService.validerVilkårperioder(saksbehandling)
+                opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
             }.doesNotThrowAnyException()
         }
     }
@@ -257,7 +259,7 @@ class OpphørValideringServiceTest {
             )
 
         assertThatThrownBy {
-            opphørValideringService.validerVilkårperioder(saksbehandlingBoutgifter)
-        }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato")
+            opphørValideringService.validerVilkårperioder(saksbehandlingBoutgifter, opphørsdato)
+        }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter opphørsdato")
     }
 }

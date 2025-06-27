@@ -91,13 +91,14 @@ class TilsynBarnBeregnYtelseSteg(
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
 
-        opphørValideringService.validerVilkårperioder(saksbehandling)
-
         val opphørsdato =
             revurderFraEllerOpphørsdato(
                 revurderFra = saksbehandling.revurderFra,
                 opphørsdato = vedtak.opphørsdato,
             )
+
+        opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
+
         val vedtaksperioder = vedtaksperiodeService.finnNyeVedtaksperioderForOpphør(saksbehandling)
 
         val beregningsresultat =
@@ -107,7 +108,7 @@ class TilsynBarnBeregnYtelseSteg(
                 typeVedtak = TypeVedtak.OPPHØR,
                 tidligsteEndring = opphørsdato,
             )
-        opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
+        opphørValideringService.validerIngenUtbetalingEtterOpphørsdato(
             beregningsresultat,
             opphørsdato,
         )
