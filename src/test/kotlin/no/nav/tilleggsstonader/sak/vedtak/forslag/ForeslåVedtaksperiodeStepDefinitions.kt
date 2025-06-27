@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperioderV2Util
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -43,6 +44,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
     var målgrupper: List<VilkårperiodeMålgruppe> = emptyList()
     var vilkår: List<Vilkår> = emptyList()
     var resultat: List<Vedtaksperiode> = emptyList()
+    var resultat2: List<Vedtaksperiode> = emptyList()
     var feil: ApiFeil? = null
 
     @Gitt("følgende vilkårsperioder med aktiviteter for vedtaksforslag")
@@ -71,6 +73,14 @@ class ForeslåVedtaksperiodeStepDefinitions {
                     ),
                     vilkår,
                 )
+            resultat2 =
+                ForeslåVedtaksperioderV2Util.foreslåPerioder(
+                    Vilkårperioder(
+                        målgrupper = målgrupper,
+                        aktiviteter = aktiviteter,
+                    ),
+                    vilkår,
+                )
         } catch (e: ApiFeil) {
             feil = e
         }
@@ -84,10 +94,14 @@ class ForeslåVedtaksperiodeStepDefinitions {
 
     @Så("forvent følgende vedtaksperioder")
     fun `forvent følgende vedtaksperioder`(dataTable: DataTable) {
+        assertThat(this.feil).isNull()
+
         val uuid = UUID.randomUUID()
         val forventetVedtaksperioderMedSammeId = mapVedtaksperioder(dataTable).map { it.copy(id = uuid) }
         val resultatMedSammeId = resultat.map { it.copy(id = uuid) }
+        val resultatMedSammeId2 = resultat2.map { it.copy(id = uuid) }
         assertThat(resultatMedSammeId).isEqualTo(forventetVedtaksperioderMedSammeId)
+        assertThat(resultatMedSammeId2).isEqualTo(forventetVedtaksperioderMedSammeId)
     }
 
     private fun mapAktiviteter(dataTable: DataTable) =
