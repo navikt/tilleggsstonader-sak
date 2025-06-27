@@ -57,6 +57,10 @@ enum class AndelstypeDvh {
     BOUTGIFTER_ETTERLATTE,
     BOUTGIFTER_ENSLIG_FORSØRGER,
 
+    DAGLIG_REISE_AAP,
+    DAGLIG_REISE_ENSLIG_FORSØRGER,
+    DAGLIG_REISE_ETTERLATTE,
+
     ;
 
     companion object {
@@ -71,6 +75,9 @@ enum class AndelstypeDvh {
                 TypeAndel.BOUTGIFTER_AAP -> BOUTGIFTER_AAP
                 TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER -> BOUTGIFTER_ENSLIG_FORSØRGER
                 TypeAndel.BOUTGIFTER_ETTERLATTE -> BOUTGIFTER_ETTERLATTE
+                TypeAndel.DAGLIG_REISE_AAP -> DAGLIG_REISE_AAP
+                TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER -> DAGLIG_REISE_ENSLIG_FORSØRGER
+                TypeAndel.DAGLIG_REISE_ETTERLATTE -> DAGLIG_REISE_ETTERLATTE
                 TypeAndel.UGYLDIG -> throw Error("Trenger ikke statistikk på ugyldige betalinger")
             }
     }

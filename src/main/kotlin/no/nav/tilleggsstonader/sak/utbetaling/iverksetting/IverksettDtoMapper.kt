@@ -82,6 +82,10 @@ object IverksettDtoMapper {
             TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER -> StønadstypeIverksetting.BOUTGIFTER_ENSLIG_FORSØRGER
             TypeAndel.BOUTGIFTER_ETTERLATTE -> StønadstypeIverksetting.BOUTGIFTER_ETTERLATTE
 
+            TypeAndel.DAGLIG_REISE_AAP -> StønadstypeIverksetting.DAGLIG_REISE_AAP
+            TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER -> StønadstypeIverksetting.DAGLIG_REISE_ENSLIG_FORSØRGER
+            TypeAndel.DAGLIG_REISE_ETTERLATTE -> StønadstypeIverksetting.DAGLIG_REISE_ETTERLATTE
+
             TypeAndel.UGYLDIG -> error("Ugyldig type andel. Skal ikke iverksettes")
         }
 }
