@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeFraVilkårperioder.foreslåVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperioderBeholdIdUtil
+import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperioderV2Util
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForslagVedtaksperiodeFraVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -15,6 +17,15 @@ import java.time.LocalDate
 import java.util.UUID
 
 object ForeslåVedtaksperiode {
+    fun finnVedtaksperiodeV2(
+        vilkårperioder: Vilkårperioder,
+        vilkår: List<Vilkår>,
+        tidligereVedtaksperioder: List<Vedtaksperiode>,
+    ): List<Vedtaksperiode> {
+        val forslag = ForeslåVedtaksperioderV2Util.foreslåPerioder(vilkårperioder, vilkår)
+        return ForeslåVedtaksperioderBeholdIdUtil.beholdTidligereIdnForVedtaksperioder(tidligereVedtaksperioder, forslag)
+    }
+
     fun finnVedtaksperiode(
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
