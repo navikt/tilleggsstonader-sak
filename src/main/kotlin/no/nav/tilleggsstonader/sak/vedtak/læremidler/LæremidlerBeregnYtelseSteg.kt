@@ -145,7 +145,7 @@ class LæremidlerBeregnYtelseSteg(
 
         val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
 
-        val beregningsresultat = beregningService.beregnForOpphør(saksbehandling, avkortetVedtaksperioder)
+        val beregningsresultat = beregningService.beregnForOpphør(saksbehandling, avkortetVedtaksperioder, opphørsdato)
 
         vedtakRepository.insert(
             GeneriskVedtak(
