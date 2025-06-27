@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.SaksbehandlerDto
+import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.dto.AnsvarligSaksbehandlerDto
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -40,13 +40,13 @@ data class BehandlingDto(
     val henlagtBegrunnelse: String?,
     val revurderFra: LocalDate?,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata?,
-    val tilordnetSaksbehandler: SaksbehandlerDto?,
+    val tilordnetSaksbehandler: AnsvarligSaksbehandlerDto?,
 )
 
 fun Behandling.tilDto(
     stønadstype: Stønadstype,
     fagsakPersonId: FagsakPersonId,
-    tilordnetSaksbehandler: SaksbehandlerDto?,
+    tilordnetSaksbehandler: AnsvarligSaksbehandlerDto?,
 ): BehandlingDto =
     BehandlingDto(
         id = this.id,
@@ -72,7 +72,7 @@ fun Behandling.tilDto(
         tilordnetSaksbehandler = tilordnetSaksbehandler,
     )
 
-fun Saksbehandling.tilDto(tilordnetSaksbehandler: SaksbehandlerDto?): BehandlingDto =
+fun Saksbehandling.tilDto(tilordnetSaksbehandler: AnsvarligSaksbehandlerDto?): BehandlingDto =
     BehandlingDto(
         id = this.id,
         forrigeIverksatteBehandlingId = this.forrigeIverksatteBehandlingId,

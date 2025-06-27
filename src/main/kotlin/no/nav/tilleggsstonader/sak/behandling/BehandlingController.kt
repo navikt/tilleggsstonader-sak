@@ -17,8 +17,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
+import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.AnsvarligSaksbehandlerService
+import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.domain.tilDto
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
-import no.nav.tilleggsstonader.sak.opplysninger.saksbehandler.SaksbehandlerService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.http.HttpStatus
@@ -44,7 +45,7 @@ class BehandlingController(
     private val henleggService: HenleggService,
     private val tilgangService: TilgangService,
     private val nullstillBehandlingService: NullstillBehandlingService,
-    private val tilordnetSaksbehandlerService: SaksbehandlerService,
+    private val tilordnetSaksbehandlerService: AnsvarligSaksbehandlerService,
 ) {
     @GetMapping("{behandlingId}")
     fun hentBehandling(
@@ -53,7 +54,7 @@ class BehandlingController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        val tilordnetSaksbehandler = tilordnetSaksbehandlerService.finnSaksbehandler(behandlingId)
+        val tilordnetSaksbehandler = tilordnetSaksbehandlerService.finnAnsvarligSaksbehandler(behandlingId).tilDto()
 
         if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
             brukerfeilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {

@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.saksbehandler
+package no.nav.tilleggsstonader.sak.ansvarligSaksbehandler
 
 import io.mockk.every
 import io.mockk.mockk
@@ -9,12 +9,13 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.AnsvarligSaksbehandlerClient
+import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.AnsvarligSaksbehandlerService
+import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.domain.SaksbehandlerRolle
+import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.domain.tilDto
+import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.dto.AnsvarligSaksbehandlerDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.SaksbehandlerDto
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.SaksbehandlerRolle
-import no.nav.tilleggsstonader.sak.opplysninger.saksbehandler.SaksbehandlerClient
-import no.nav.tilleggsstonader.sak.opplysninger.saksbehandler.SaksbehandlerService
 import no.nav.tilleggsstonader.sak.util.BehandlingOppsettUtil.iverksattFørstegangsbehandling
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import org.assertj.core.api.Assertions.assertThat
@@ -22,18 +23,23 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-internal class SaksbehandlerServiceTest {
+internal class AnsvarligSaksbehandlerServiceTest {
     private val oppgaveRepository = mockk<OppgaveRepository>()
     private val behandlingRepository = mockk<BehandlingRepository>()
-    private val saksbehandlerClient = mockk<SaksbehandlerClient>()
-    private lateinit var service: SaksbehandlerService
+    private val saksbehandlerClient = mockk<AnsvarligSaksbehandlerClient>()
+    private lateinit var service: AnsvarligSaksbehandlerService
 
     private val behandlingId = BehandlingId(UUID.randomUUID())
     private val saksbehandlerInfo = Saksbehandler(UUID.randomUUID(), "Z123456", "Test", "Testesen", "TSO")
 
     @BeforeEach
     fun setUp() {
-        service = SaksbehandlerService(oppgaveRepository, behandlingRepository, saksbehandlerClient)
+        service =
+            AnsvarligSaksbehandlerService(
+                oppgaveRepository,
+                behandlingRepository,
+                saksbehandlerClient,
+            )
     }
 
     @Test
@@ -57,11 +63,11 @@ internal class SaksbehandlerServiceTest {
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
 
         testWithBrukerContext(saksbehandlerInfo.navIdent) {
-            val resultat = service.finnSaksbehandler(behandlingId)
+            val resultat = service.finnAnsvarligSaksbehandler(behandlingId)
 
-            assertThat(resultat?.rolle).isEqualTo(SaksbehandlerRolle.INNLOGGET_SAKSBEHANDLER)
-            assertThat(resultat?.fornavn).isEqualTo("Test")
-            assertThat(resultat?.etternavn).isEqualTo("Testesen")
+            assertThat(resultat.rolle).isEqualTo(SaksbehandlerRolle.INNLOGGET_SAKSBEHANDLER)
+            assertThat(resultat.fornavn).isEqualTo("Test")
+            assertThat(resultat.etternavn).isEqualTo("Testesen")
         }
     }
 
@@ -77,11 +83,11 @@ internal class SaksbehandlerServiceTest {
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
 
         testWithBrukerContext(saksbehandlerInfo.navIdent) {
-            val resultat = service.finnSaksbehandler(behandlingId)
+            val resultat = service.finnAnsvarligSaksbehandler(behandlingId)
 
-            assertThat(resultat?.rolle).isEqualTo(SaksbehandlerRolle.OPPGAVE_FINNES_IKKE_SANNSYNLIGVIS_INNLOGGET_SAKSBEHANDLER)
-            assertThat(resultat?.fornavn).isEqualTo("Test")
-            assertThat(resultat?.etternavn).isEqualTo("Testesen")
+            assertThat(resultat.rolle).isEqualTo(SaksbehandlerRolle.OPPGAVE_FINNES_IKKE_SANNSYNLIGVIS_INNLOGGET_SAKSBEHANDLER)
+            assertThat(resultat.fornavn).isEqualTo("Test")
+            assertThat(resultat.etternavn).isEqualTo("Testesen")
         }
     }
 
@@ -97,11 +103,11 @@ internal class SaksbehandlerServiceTest {
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
 
         testWithBrukerContext(saksbehandlerInfo.navIdent) {
-            val resultat = service.finnSaksbehandler(behandlingId)
+            val resultat = service.finnAnsvarligSaksbehandler(behandlingId)
 
-            assertThat(resultat?.rolle).isEqualTo(SaksbehandlerRolle.OPPGAVE_FINNES_IKKE)
-            assertThat(resultat?.fornavn).isEqualTo(null)
-            assertThat(resultat?.etternavn).isEqualTo(null)
+            assertThat(resultat.rolle).isEqualTo(SaksbehandlerRolle.OPPGAVE_FINNES_IKKE)
+            assertThat(resultat.fornavn).isEqualTo(null)
+            assertThat(resultat.etternavn).isEqualTo(null)
         }
     }
 
@@ -126,11 +132,11 @@ internal class SaksbehandlerServiceTest {
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
 
         testWithBrukerContext(saksbehandlerInfo.navIdent) {
-            val resultat = service.finnSaksbehandler(behandlingId)
+            val resultat = service.finnAnsvarligSaksbehandler(behandlingId)
 
-            assertThat(resultat?.rolle).isEqualTo(SaksbehandlerRolle.IKKE_SATT)
-            assertThat(resultat?.fornavn).isEqualTo(null)
-            assertThat(resultat?.etternavn).isEqualTo(null)
+            assertThat(resultat.rolle).isEqualTo(SaksbehandlerRolle.IKKE_SATT)
+            assertThat(resultat.fornavn).isEqualTo(null)
+            assertThat(resultat.etternavn).isEqualTo(null)
         }
     }
 
@@ -146,10 +152,10 @@ internal class SaksbehandlerServiceTest {
 
         every { oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(any(), emptySet()) } returns null
 
-        val resultat = service.finnSaksbehandler(behandlingId)
+        val resultat = service.finnAnsvarligSaksbehandler(behandlingId).tilDto()
 
         assertThat(resultat).isEqualTo(
-            SaksbehandlerDto(
+            AnsvarligSaksbehandlerDto(
                 fornavn = null,
                 etternavn = null,
                 rolle = SaksbehandlerRolle.OPPGAVE_FINNES_IKKE,
@@ -183,12 +189,12 @@ internal class SaksbehandlerServiceTest {
         every { oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(any(), any()) } returns oppgave
 
         testWithBrukerContext(innloggetSaksbehandlerSomIkkeEierBehandling.navIdent) {
-            val resultat = service.finnSaksbehandler(behandlingId)
+            val resultat = service.finnAnsvarligSaksbehandler(behandlingId)
 
             assertThat(oppgave.tilordnetSaksbehandler).isNotEqualTo(innloggetSaksbehandlerSomIkkeEierBehandling.navIdent)
-            assertThat(resultat?.rolle).isEqualTo(SaksbehandlerRolle.ANNEN_SAKSBEHANDLER)
-            assertThat(resultat?.fornavn).isEqualTo("Test")
-            assertThat(resultat?.etternavn).isEqualTo("Testesen")
+            assertThat(resultat.rolle).isEqualTo(SaksbehandlerRolle.ANNEN_SAKSBEHANDLER)
+            assertThat(resultat.fornavn).isEqualTo("Test")
+            assertThat(resultat.etternavn).isEqualTo("Testesen")
         }
     }
 }

@@ -4,7 +4,7 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Saksbehandler
-import no.nav.tilleggsstonader.sak.opplysninger.saksbehandler.SaksbehandlerClient
+import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.AnsvarligSaksbehandlerClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -16,14 +16,14 @@ import java.util.UUID
 class SaksbehandlerClientConfig {
     @Bean
     @Primary
-    fun saksbehandlerClient(): SaksbehandlerClient {
-        val saksbehandlerClient = mockk<SaksbehandlerClient>()
+    fun saksbehandlerClient(): AnsvarligSaksbehandlerClient {
+        val saksbehandlerClient = mockk<AnsvarligSaksbehandlerClient>()
         resetMock(saksbehandlerClient)
         return saksbehandlerClient
     }
 
     companion object {
-        fun resetMock(saksbehandlerClient: SaksbehandlerClient) {
+        fun resetMock(saksbehandlerClient: AnsvarligSaksbehandlerClient) {
             clearMocks(saksbehandlerClient)
 
             every { saksbehandlerClient.hentSaksbehandlerInfo(any()) } returns
