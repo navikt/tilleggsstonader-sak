@@ -3,16 +3,16 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20250526085951_e212049"
-val tilleggsstønaderLibsVersion = "2025.05.26-09.43.0bdd5b9aa775"
-val tilleggsstønaderKontrakterVersion = "2025.06.10-12.56.ea582af44a70"
+val familieProsesseringVersion = "2.20250624093734_e06ed70"
+val tilleggsstønaderLibsVersion = "2025.06.25-07.59.55db83b77624"
+val tilleggsstønaderKontrakterVersion = "2025.06.26-12.57.4625545dd271"
 val avroVersion = "1.12.0"
-val confluentVersion = "7.9.1"
+val confluentVersion = "8.0.0"
 val joarkHendelseVersion = "08271806"
-val tokenSupportVersion = "5.0.29"
+val tokenSupportVersion = "5.0.30"
 val wiremockVersion = "3.13.1"
-val mockkVersion = "1.14.2"
-val testcontainerVersion = "1.21.1"
+val mockkVersion = "1.14.4"
+val testcontainerVersion = "1.21.3"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -20,14 +20,14 @@ version = "1.0.0"
 plugins {
     application
 
-    kotlin("jvm") version "2.1.21"
+    kotlin("jvm") version "2.2.0"
     id("com.diffplug.spotless") version "7.0.4"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
-    id("org.springframework.boot") version "3.4.5"
+    id("org.springframework.boot") version "3.5.3"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.spring") version "2.1.21"
+    kotlin("plugin.spring") version "2.2.0"
 
     id("org.cyclonedx.bom") version "2.3.1"
 }
