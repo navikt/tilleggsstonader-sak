@@ -220,6 +220,7 @@ object TilsynBarnTestUtil {
         årsaker: List<ÅrsakOpphør>,
         beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
         begrunnelse: String,
+        opphørsdato: LocalDate = LocalDate.now(),
     ) = GeneriskVedtak(
         behandlingId = behandlingId,
         type = TypeVedtak.OPPHØR,
@@ -232,6 +233,6 @@ object TilsynBarnTestUtil {
             ),
         gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
-        opphørsdato = null,
+        opphørsdato = opphørsdato,
     )
 }

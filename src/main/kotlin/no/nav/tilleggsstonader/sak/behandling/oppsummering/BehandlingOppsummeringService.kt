@@ -107,6 +107,7 @@ class BehandlingOppsummeringService(
                 is Opphør ->
                     OppsummertVedtakOpphør(
                         årsaker = data.årsaker,
+                        opphørsdato = vedtak.opphørsdato ?: revurderFra,
                     )
             }
         }
