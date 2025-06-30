@@ -8,11 +8,11 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.lagFristForOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandlesAvApplikasjon
 import no.nav.tilleggsstonader.sak.util.medGosysTid
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class OpprettOppgave(
     val oppgavetype: Oppgavetype,
@@ -35,7 +35,7 @@ fun tilOpprettOppgaveRequest(
         tema = Tema.TSO,
         journalpostId = oppgave.journalpostId,
         oppgavetype = oppgave.oppgavetype,
-        fristFerdigstillelse = oppgave.fristFerdigstillelse ?: lagFristForOppgave(osloNow()),
+        fristFerdigstillelse = oppgave.fristFerdigstillelse ?: lagFristForOppgave(LocalDateTime.now()),
         beskrivelse = lagOppgaveTekst(oppgave.beskrivelse),
         enhetsnummer = enhetsnummer,
         behandlingstema = stønadstype.tilBehandlingstema().value,
@@ -46,7 +46,7 @@ fun tilOpprettOppgaveRequest(
     )
 
 private fun lagOppgaveTekst(beskrivelse: String? = null): String {
-    val tidspunkt = osloNow().medGosysTid()
+    val tidspunkt = LocalDateTime.now().medGosysTid()
     val prefix = "----- Opprettet av tilleggsstonader-sak $tidspunkt ---"
     val beskrivelseMedNewLine = beskrivelse?.let { "\n$it" } ?: ""
     return prefix + beskrivelseMedNewLine

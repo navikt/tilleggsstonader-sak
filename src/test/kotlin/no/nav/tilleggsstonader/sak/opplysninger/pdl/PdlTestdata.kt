@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.opplysninger.pdl
 
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Bostedsadresse
@@ -46,6 +44,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.UtflyttingFraNorge
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Vegadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergeEllerFullmektig
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergemaalEllerFremtidsfullmakt
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 object PdlTestdata {
     private val metadataGjeldende = Metadata(false)
@@ -65,7 +65,7 @@ object PdlTestdata {
     private val matrikkeladresse = Matrikkeladresse(1L, "", "", "")
     private val utenlandskAdresse = UtenlandskAdresse("", "", "", "", "", "", "")
 
-    private val folkeregistermetadata = Folkeregistermetadata(osloNow(), osloNow())
+    private val folkeregistermetadata = Folkeregistermetadata(LocalDateTime.now(), LocalDateTime.now())
 
     private val navn = listOf(Navn("", "", "", metadataGjeldende))
 
@@ -75,31 +75,31 @@ object PdlTestdata {
     private val bostedsadresse =
         listOf(
             Bostedsadresse(
-                osloDateNow().minusDays(10),
-                osloDateNow(),
-                osloDateNow(),
-                "",
-                utenlandskAdresse,
-                vegadresse,
-                UkjentBosted(""),
-                matrikkeladresse,
-                metadataGjeldende,
+                angittFlyttedato = LocalDate.now().minusDays(10),
+                gyldigFraOgMed = LocalDate.now(),
+                gyldigTilOgMed = LocalDate.now(),
+                coAdressenavn = "",
+                utenlandskAdresse = utenlandskAdresse,
+                vegadresse = vegadresse,
+                ukjentBosted = UkjentBosted(""),
+                matrikkeladresse = matrikkeladresse,
+                metadata = metadataGjeldende,
             ),
         )
 
-    private val dødsfall = listOf(Dødsfall(osloDateNow()))
+    private val dødsfall = listOf(Dødsfall(LocalDate.now()))
 
     private val familierelasjon =
         listOf(ForelderBarnRelasjon("", Familierelasjonsrolle.BARN, Familierelasjonsrolle.FAR))
 
-    private val fødselsdato = listOf(Fødselsdato(1, osloDateNow(), metadataGjeldende))
+    private val fødselsdato = listOf(Fødselsdato(1, LocalDate.now(), metadataGjeldende))
 
-    private val opphold = listOf(Opphold(Oppholdstillatelse.MIDLERTIDIG, osloDateNow(), osloDateNow()))
+    private val opphold = listOf(Opphold(Oppholdstillatelse.MIDLERTIDIG, LocalDate.now(), LocalDate.now()))
 
     private val oppholdsadresse =
         listOf(
             Oppholdsadresse(
-                osloDateNow(),
+                LocalDate.now(),
                 null,
                 "",
                 utenlandskAdresse,
@@ -109,64 +109,67 @@ object PdlTestdata {
             ),
         )
 
-    private val statsborgerskap = listOf(Statsborgerskap("", osloDateNow(), osloDateNow()))
+    private val statsborgerskap = listOf(Statsborgerskap("", LocalDate.now(), LocalDate.now()))
 
     private val innflyttingTilNorge = listOf(InnflyttingTilNorge("", "", folkeregistermetadata))
 
-    private val utflyttingFraNorge = listOf(UtflyttingFraNorge("", "", osloDateNow(), folkeregistermetadata))
+    private val utflyttingFraNorge = listOf(UtflyttingFraNorge("", "", LocalDate.now(), folkeregistermetadata))
 
     val søkerIdentifikator = "1"
 
     val folkeregisteridentifikatorSøker =
         listOf(
             Folkeregisteridentifikator(
-                søkerIdentifikator,
-                FolkeregisteridentifikatorStatus.I_BRUK,
-                metadataGjeldende,
+                ident = søkerIdentifikator,
+                status = FolkeregisteridentifikatorStatus.I_BRUK,
+                metadata = metadataGjeldende,
             ),
         )
 
     val pdlSøkerData =
         PdlSøkerData(
             PdlSøker(
-                adressebeskyttelse,
-                bostedsadresse,
-                dødsfall,
-                familierelasjon,
-                folkeregisteridentifikatorSøker,
-                fødselsdato,
-                listOf(Folkeregisterpersonstatus("", "", metadataGjeldende)),
-                listOf(
-                    Kontaktadresse(
-                        "",
-                        osloDateNow(),
-                        osloDateNow(),
-                        PostadresseIFrittFormat("", "", "", ""),
-                        Postboksadresse("", "", ""),
-                        KontaktadresseType.INNLAND,
-                        utenlandskAdresse,
-                        UtenlandskAdresseIFrittFormat("", "", "", "", "", ""),
-                        vegadresse,
-                    ),
-                ),
-                navn,
-                opphold,
-                oppholdsadresse,
-                statsborgerskap,
-                innflyttingTilNorge,
-                utflyttingFraNorge,
-                listOf(
-                    VergemaalEllerFremtidsfullmakt(
-                        "",
-                        folkeregistermetadata,
-                        "",
-                        VergeEllerFullmektig(
-                            IdentifiserendeInformasjon(Personnavn("", "", "")),
-                            "",
-                            "",
+                adressebeskyttelse = adressebeskyttelse,
+                bostedsadresse = bostedsadresse,
+                dødsfall = dødsfall,
+                forelderBarnRelasjon = familierelasjon,
+                folkeregisteridentifikator = folkeregisteridentifikatorSøker,
+                fødselsdato = fødselsdato,
+                folkeregisterpersonstatus = listOf(Folkeregisterpersonstatus("", "", metadataGjeldende)),
+                kontaktadresse =
+                    listOf(
+                        Kontaktadresse(
+                            coAdressenavn = "",
+                            gyldigFraOgMed = LocalDate.now(),
+                            gyldigTilOgMed = LocalDate.now(),
+                            postadresseIFrittFormat = PostadresseIFrittFormat("", "", "", ""),
+                            postboksadresse = Postboksadresse("", "", ""),
+                            type = KontaktadresseType.INNLAND,
+                            utenlandskAdresse = utenlandskAdresse,
+                            utenlandskAdresseIFrittFormat = UtenlandskAdresseIFrittFormat("", "", "", "", "", ""),
+                            vegadresse = vegadresse,
                         ),
                     ),
-                ),
+                navn = navn,
+                opphold = opphold,
+                oppholdsadresse = oppholdsadresse,
+                statsborgerskap = statsborgerskap,
+                innflyttingTilNorge = innflyttingTilNorge,
+                utflyttingFraNorge = utflyttingFraNorge,
+                vergemaalEllerFremtidsfullmakt =
+                    listOf(
+                        VergemaalEllerFremtidsfullmakt(
+                            embete = "",
+                            folkeregistermetadata = folkeregistermetadata,
+                            type = "",
+                            vergeEllerFullmektig =
+                                VergeEllerFullmektig(
+                                    IdentifiserendeInformasjon(Personnavn("", "", "")),
+                                    "",
+                                    "",
+                                ),
+                        ),
+                    ),
             ),
         )
 

@@ -136,7 +136,7 @@ data class LøpendeMåned(
             "Det finnes ingen aktiviteter av type ${vedtaksperioderBeregningsgrunnlag.aktivitet} som varer i hele perioden ${this.formatertPeriodeNorskFormat()}}"
         }
 
-        feilHvis(relevanteAktiviteter.overlapper()) {
+        brukerfeilHvis(relevanteAktiviteter.overlapper()) {
             "Det er foreløpig ikke støtte for flere aktiviteter med ulike studienivåer som overlapper" +
                 " (gjelder perioden ${this.formatertPeriodeNorskFormat()}). " +
                 "Ta kontakt med utviklerteamet for å forstå situasjonen og om det burde legges til støtte for det."

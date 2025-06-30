@@ -8,7 +8,6 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -40,7 +39,7 @@ class OpprettOppgaveForOpprettetBehandlingTask(
         val behandlingId: BehandlingId,
         val saksbehandler: String? = null,
         val beskrivelse: String? = null,
-        val hendelseTidspunkt: LocalDateTime = osloNow(),
+        val hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
         val prioritet: OppgavePrioritet = OppgavePrioritet.NORM,
     )
 

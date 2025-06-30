@@ -6,7 +6,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Dokument
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Filtype
-import no.nav.tilleggsstonader.kontrakter.dokarkiv.dokumentTypeInterntVedtak
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.dokumenttyper
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.journalføring.FamilieDokumentClient
@@ -53,7 +53,7 @@ class InterntVedtakTask(
                             filtype = Filtype.PDFA,
                             filnavn = null,
                             tittel = "Internt vedtak $stønadstype",
-                            dokumenttype = stønadstype.dokumentTypeInterntVedtak(),
+                            dokumenttype = stønadstype.dokumenttyper.interntVedtak,
                         ),
                     ),
                 fagsakId = behandlingInfo.eksternFagsakId.toString(),

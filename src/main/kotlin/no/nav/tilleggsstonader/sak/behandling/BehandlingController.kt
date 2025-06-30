@@ -20,11 +20,13 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 
@@ -40,6 +42,7 @@ class BehandlingController(
     private val fagsakService: FagsakService,
     private val henleggService: HenleggService,
     private val tilgangService: TilgangService,
+    private val nullstillBehandlingService: NullstillBehandlingService,
 ) {
     @GetMapping("{behandlingId}")
     fun hentBehandling(
@@ -127,5 +130,16 @@ class BehandlingController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         return revurderFraService.oppdaterRevurderFra(behandlingId, revurderFra).tilDto()
+    }
+
+    @PostMapping("{behandlingId}/nullstill")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun nullstillBehandling(
+        @PathVariable behandlingId: BehandlingId,
+    ) {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+        nullstillBehandlingService.nullstillBehandling(behandlingService.hentBehandling(behandlingId))
     }
 }

@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.behandling.vent
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -20,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.web.client.exchange
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 class SettPåVentControllerTest : IntegrationTest() {
@@ -32,7 +32,7 @@ class SettPåVentControllerTest : IntegrationTest() {
     val settPåVentDto =
         SettPåVentDto(
             årsaker = listOf(ÅrsakSettPåVent.ANNET),
-            frist = osloDateNow().plusDays(3),
+            frist = LocalDate.now().plusDays(3),
             kommentar = "kommentar",
         )
 

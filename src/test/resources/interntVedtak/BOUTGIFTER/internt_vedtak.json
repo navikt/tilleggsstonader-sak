@@ -206,14 +206,13 @@
       "fom" : "2024-01-01",
       "tom" : "2024-01-31",
       "stønadsbeløp" : 3000,
-      "utgifter" : {
-        "UTGIFTER_OVERNATTING" : [ {
-          "fom" : "2024-01-01",
-          "tom" : "2024-01-31",
-          "utgift" : 3000,
-          "skalFåDekketFaktiskeUtgifter" : false
-        } ]
-      },
+      "utgifter" : [ {
+        "fom" : "2024-01-01",
+        "tom" : "2024-01-31",
+        "utgift" : 3000,
+        "tilUtbetaling" : 3000,
+        "erFørRevurderFra" : false
+      } ],
       "utgifterTilUtbetaling" : [ {
         "fom" : "2024-01-01",
         "tom" : "2024-01-31",
@@ -230,14 +229,13 @@
       "fom" : "2024-02-01",
       "tom" : "2024-02-29",
       "stønadsbeløp" : 4953,
-      "utgifter" : {
-        "UTGIFTER_OVERNATTING" : [ {
-          "fom" : "2024-02-26",
-          "tom" : "2024-02-29",
-          "utgift" : 4000,
-          "skalFåDekketFaktiskeUtgifter" : false
-        } ]
-      },
+      "utgifter" : [ {
+        "fom" : "2024-02-26",
+        "tom" : "2024-02-29",
+        "utgift" : 4000,
+        "tilUtbetaling" : 4000,
+        "erFørRevurderFra" : false
+      } ],
       "utgifterTilUtbetaling" : [ {
         "fom" : "2024-02-26",
         "tom" : "2024-02-29",

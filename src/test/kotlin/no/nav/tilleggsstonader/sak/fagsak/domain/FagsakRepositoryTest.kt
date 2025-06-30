@@ -2,8 +2,6 @@ package no.nav.tilleggsstonader.sak.fagsak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -27,6 +25,7 @@ import org.junit.jupiter.api.Test
 import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 class FagsakRepositoryTest : IntegrationTest() {
@@ -56,8 +55,8 @@ class FagsakRepositoryTest : IntegrationTest() {
         val andel =
             andelTilkjentYtelse(
                 behandling.id,
-                fom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
-                tom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                fom = LocalDate.now().datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                tom = LocalDate.now().datoEllerNesteMandagHvisLørdagEllerSøndag(),
             )
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, andeler = arrayOf(andel)))
 
@@ -82,7 +81,7 @@ class FagsakRepositoryTest : IntegrationTest() {
                 behandling.id,
                 andelTilkjentYtelse(
                     kildeBehandlingId = behandling.id,
-                    fom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                    fom = LocalDate.now().datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 ),
             ),
         )
@@ -91,7 +90,7 @@ class FagsakRepositoryTest : IntegrationTest() {
                 behandling.id,
                 andelTilkjentYtelse(
                     kildeBehandlingId = behandling.id,
-                    fom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                    fom = LocalDate.now().datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 ),
             ),
         )
@@ -328,7 +327,7 @@ class FagsakRepositoryTest : IntegrationTest() {
         ident2: String = "2",
         ident3: String = "3",
     ): Fagsak {
-        val endret2DagerSiden = Sporbar(endret = Endret(endretTid = osloNow().plusDays(2)))
+        val endret2DagerSiden = Sporbar(endret = Endret(endretTid = LocalDateTime.now().plusDays(2)))
         return fagsak(
             setOf(
                 PersonIdent(ident = ident),

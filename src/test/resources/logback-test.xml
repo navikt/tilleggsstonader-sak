@@ -9,4 +9,7 @@
 
     <logger name="no" level="INFO"/>
     <logger name="no.nav.tilleggsstonader" level="DEBUG"/>
+    <!--
+    <logger name="org.springframework.jdbc.core" level="TRACE"/>
+    -->
 </configuration>

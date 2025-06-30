@@ -1,13 +1,13 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.AldersvilkårVurdering
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.time.LocalDate
 
 class VurderingAldersvilkårTest {
-    val fødselsdatoBruker = osloDateNow().minusYears(25)
+    val fødselsdatoBruker: LocalDate = LocalDate.now().minusYears(25)
 
     fun vurderingAldersvilkår(svar: SvarJaNei) =
         VurderingAldersVilkår(

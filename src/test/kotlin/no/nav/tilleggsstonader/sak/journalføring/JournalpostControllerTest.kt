@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.klage.OpprettKlagebehandlingRequest
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -28,6 +27,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
+import java.time.LocalDate
 
 class JournalpostControllerTest : IntegrationTest() {
     val ident = "12345678910"
@@ -144,7 +144,7 @@ class JournalpostControllerTest : IntegrationTest() {
                     stønadstype = Stønadstype.BARNETILSYN,
                     eksternFagsakId = fagsak.eksternId.id.toString(),
                     fagsystem = Fagsystem.TILLEGGSSTONADER,
-                    klageMottatt = osloDateNow().minusDays(7),
+                    klageMottatt = LocalDate.now().minusDays(7),
                     behandlendeEnhet = "4462",
                 ),
             )

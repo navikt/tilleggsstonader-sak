@@ -19,13 +19,13 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.journalpost.RelevantDato
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.web.client.RestClientException
+import java.time.LocalDateTime
 
 @Configuration
 @Profile("mock-journalpost")
@@ -79,8 +79,8 @@ class JournalpostClientConfig {
                 journalforendeEnhet = "tilleggsstonader-sak",
                 relevanteDatoer =
                     listOf(
-                        RelevantDato(osloNow().minusDays(7), "DATO_REGISTRERT"),
-                        RelevantDato(osloNow(), "DATO_JOURNALFOERT"),
+                        RelevantDato(LocalDateTime.now().minusDays(7), "DATO_REGISTRERT"),
+                        RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT"),
                     ),
                 dokumenter =
                     listOf(
@@ -163,8 +163,8 @@ class JournalpostClientConfig {
                             journalforendeEnhet = "tilleggsstonader-sak",
                             relevanteDatoer =
                                 listOf(
-                                    RelevantDato(osloNow().minusDays(7), "DATO_REGISTRERT"),
-                                    RelevantDato(osloNow(), "DATO_JOURNALFOERT"),
+                                    RelevantDato(LocalDateTime.now().minusDays(7), "DATO_REGISTRERT"),
+                                    RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT"),
                                 ),
                             dokumenter =
                                 listOf(
@@ -210,8 +210,8 @@ class JournalpostClientConfig {
                             journalforendeEnhet = "tilleggsstonader-sak",
                             relevanteDatoer =
                                 listOf(
-                                    RelevantDato(osloNow().minusDays(7), "DATO_REGISTRERT"),
-                                    RelevantDato(osloNow(), "DATO_JOURNALFOERT"),
+                                    RelevantDato(LocalDateTime.now().minusDays(7), "DATO_REGISTRERT"),
+                                    RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT"),
                                 ),
                             dokumenter =
                                 listOf(

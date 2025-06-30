@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Profile("!local & !integrasjonstest & !prod")
+@Profile("!local & !integrasjonstest")
 class OppgavehendelseKafkaListener(
     private val oppgavehendelseHåndterer: OppgavehendelseHåndterer,
 ) {

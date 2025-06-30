@@ -7,8 +7,6 @@ import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.unmockkObject
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingTypeV2
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -43,6 +41,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.springframework.http.HttpStatus
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -91,7 +90,7 @@ internal class BehandlingServiceTest {
                 fagsakId = FagsakId.random(),
                 stegType = StegType.VILKÅR,
                 behandlingsårsak = BehandlingÅrsak.PAPIRSØKNAD,
-                kravMottatt = osloDateNow().plusDays(1),
+                kravMottatt = LocalDate.now().plusDays(1),
             )
         }
     }
@@ -206,9 +205,9 @@ internal class BehandlingServiceTest {
     inner class HentBehandlinger {
         @Test
         internal fun `skal sortere behandlinger etter vedtakstidspunkt og til sist uten vedtakstidspunkt`() {
-            val tiDagerSiden = osloNow().minusDays(10)
-            val femFagerSiden = osloNow().minusDays(5)
-            val now = osloNow()
+            val tiDagerSiden = LocalDateTime.now().minusDays(10)
+            val femFagerSiden = LocalDateTime.now().minusDays(5)
+            val now = LocalDateTime.now()
             val behandling1 = opprettBehandling(femFagerSiden, tiDagerSiden, tiDagerSiden)
             val behandling2 = opprettBehandling(null, femFagerSiden, femFagerSiden)
             val behandling3 = opprettBehandling(tiDagerSiden, now, now)

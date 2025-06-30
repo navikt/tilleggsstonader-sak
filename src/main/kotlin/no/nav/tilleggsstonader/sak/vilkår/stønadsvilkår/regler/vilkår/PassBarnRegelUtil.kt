@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår
 
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import java.time.LocalDate
 import java.time.Month
 
@@ -18,7 +17,7 @@ object PassBarnRegelUtil {
      */
     fun harFullførtFjerdetrinn(
         fødselsdato: LocalDate,
-        datoForBeregning: LocalDate = osloDateNow(),
+        datoForBeregning: LocalDate = LocalDate.now(),
     ): Boolean =
         if (datoForBeregning.month >= Month.JUNE) {
             datoForBeregning.year - fødselsdato.year > 9

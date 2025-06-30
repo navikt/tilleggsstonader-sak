@@ -34,4 +34,9 @@ object YtelsePerioderUtil {
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate? = LocalDate.now(),
     ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, fom = fom, tom = tom)
+
+    fun periodeOmstillingsstønad(
+        fom: LocalDate = LocalDate.now(),
+        tom: LocalDate? = LocalDate.now(),
+    ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.OMSTILLINGSSTØNAD, fom = fom, tom = tom)
 }

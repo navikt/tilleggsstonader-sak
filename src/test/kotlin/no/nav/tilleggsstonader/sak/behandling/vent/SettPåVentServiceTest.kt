@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
@@ -23,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 import kotlin.jvm.optionals.getOrNull
 
 class SettPåVentServiceTest : IntegrationTest() {
@@ -51,14 +51,14 @@ class SettPåVentServiceTest : IntegrationTest() {
     val settPåVentDto =
         SettPåVentDto(
             årsaker = listOf(ÅrsakSettPåVent.ANNET),
-            frist = osloDateNow().plusDays(3),
+            frist = LocalDate.now().plusDays(3),
             kommentar = "ny beskrivelse",
         )
 
     val oppdaterSettPåVentDto =
         OppdaterSettPåVentDto(
             årsaker = listOf(ÅrsakSettPåVent.ANTALL_DAGER_PÅ_TILTAK),
-            frist = osloDateNow().plusDays(5),
+            frist = LocalDate.now().plusDays(5),
             kommentar = "oppdatert beskrivelse",
             oppgaveVersjon = 1,
         )

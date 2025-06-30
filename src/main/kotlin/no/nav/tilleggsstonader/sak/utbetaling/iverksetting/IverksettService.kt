@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -20,6 +19,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.UUID
 
@@ -82,7 +82,7 @@ class IverksettService(
             finnAndelerTilIverksetting(tilkjentYtelse, iverksettingId, utbetalingsdato = LocalDate.now())
 
         return andelerTilIverksetting.ifEmpty {
-            val iverksetting = Iverksetting(iverksettingId, osloNow())
+            val iverksetting = Iverksetting(iverksettingId, LocalDateTime.now())
             listOf(tilkjentYtelseService.leggTilNullAndel(tilkjentYtelse, iverksetting, måned))
         }
     }
@@ -169,7 +169,7 @@ class IverksettService(
         iverksettingId: UUID,
         utbetalingsdato: LocalDate,
     ): List<AndelTilkjentYtelse> {
-        val iverksetting = Iverksetting(iverksettingId, osloNow())
+        val iverksetting = Iverksetting(iverksettingId, LocalDateTime.now())
         val aktuelleAndeler =
             tilkjentYtelse.andelerTilkjentYtelse
                 .filter { it.utbetalingsdato <= utbetalingsdato }

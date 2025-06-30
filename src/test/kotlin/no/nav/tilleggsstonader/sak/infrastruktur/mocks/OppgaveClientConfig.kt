@@ -20,8 +20,6 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
-import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -32,6 +30,7 @@ import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
@@ -104,7 +103,7 @@ class OppgaveClientConfig {
                     oppgave.copy(
                         versjon = oppgave.versjon + 1,
                         status = StatusEnum.FERDIGSTILT,
-                        ferdigstiltTidspunkt = osloNow().format(DateTimeFormatter.ISO_DATE_TIME),
+                        ferdigstiltTidspunkt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
                     )
                 oppgavelager[oppgave.id] = oppdatertOppgave
             }
@@ -219,7 +218,7 @@ class OppgaveClientConfig {
             OpprettOppgaveRequest(
                 tema = Tema.TSO,
                 oppgavetype = Oppgavetype.Journalføring,
-                fristFerdigstillelse = osloDateNow().plusDays(14),
+                fristFerdigstillelse = LocalDate.now().plusDays(14),
                 beskrivelse = "Dummy søknad",
                 behandlingstema = "ab0300",
                 enhetsnummer = "",
@@ -232,7 +231,7 @@ class OppgaveClientConfig {
             OpprettOppgaveRequest(
                 tema = Tema.TSO,
                 oppgavetype = Oppgavetype.BehandleSak,
-                fristFerdigstillelse = osloDateNow().plusDays(14),
+                fristFerdigstillelse = LocalDate.now().plusDays(14),
                 beskrivelse = "Dummy klage",
                 behandlingstema = "ab0300",
                 behandlingstype = "ae0058",
@@ -263,7 +262,7 @@ class OppgaveClientConfig {
                     behandlingstype = oppgaveDto.behandlingstype,
                     behandlesAvApplikasjon = oppgaveDto.behandlesAvApplikasjon,
                     mappeId = oppgaveDto.mappeId?.let { Optional.of(it) },
-                    opprettetTidspunkt = osloNow().format(DateTimeFormatter.ISO_DATE_TIME),
+                    opprettetTidspunkt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
                 )
             oppgavelager[oppgave.id] = oppgave
             return oppgave

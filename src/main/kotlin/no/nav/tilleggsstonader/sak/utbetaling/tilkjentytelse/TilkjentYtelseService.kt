@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -12,6 +11,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.time.YearMonth
 
 @Service
@@ -42,7 +42,7 @@ class TilkjentYtelseService(
     fun harLøpendeUtbetaling(behandlingId: BehandlingId): Boolean =
         tilkjentYtelseRepository
             .findByBehandlingId(behandlingId)
-            ?.let { it.andelerTilkjentYtelse.any { andel -> andel.tom.isAfter(osloDateNow()) } } ?: false
+            ?.let { it.andelerTilkjentYtelse.any { andel -> andel.tom.isAfter(LocalDate.now()) } } ?: false
 
     fun slettTilkjentYtelseForBehandling(saksbehandling: Saksbehandling) {
         saksbehandling.status.validerKanBehandlingRedigeres()

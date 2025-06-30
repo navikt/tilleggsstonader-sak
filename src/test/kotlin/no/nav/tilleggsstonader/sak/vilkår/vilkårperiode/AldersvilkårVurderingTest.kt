@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFødselFaktaGrunnlag
@@ -11,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.time.LocalDate
 
 class AldersvilkårVurderingTest {
     @Test
@@ -83,14 +83,14 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe AAP hvor bruker fyller 18 år dagen før vilkårsperioden starter skal gi svar JA`() {
-        val fom = osloDateNow().minusDays(10)
+        val fom = LocalDate.now().minusDays(10)
         val fødselsdato = fom.minusDays(1).minusYears(18)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
                 fom = fom,
-                tom = osloDateNow().plusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
@@ -100,13 +100,13 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe AAP hvor bruker fyller 18 år dagen etter vilkårsperioden slutter skal gi svar NEI`() {
-        val tom = osloDateNow().plusDays(10)
+        val tom = LocalDate.now().plusDays(10)
         val fødselsdato = tom.plusDays(1).minusYears(18)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
-                fom = osloDateNow().minusDays(10),
+                fom = LocalDate.now().minusDays(10),
                 tom = tom,
             )
 
@@ -120,11 +120,11 @@ class AldersvilkårVurderingTest {
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
-                fom = osloDateNow().minusDays(10),
-                tom = osloDateNow().plusDays(10),
+                fom = LocalDate.now().minusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
-        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(osloDateNow().minusYears(18))
+        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(LocalDate.now().minusYears(18))
 
         val feil = assertThrows<ApiFeil> { vurderAldersvilkår(målgruppe, fødselFaktaGrunnlag) }
         assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
@@ -132,14 +132,14 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe AAP hvor bruker fyller 18 år første dag i vilkårsperiode skal kaste feil`() {
-        val fom = osloDateNow().minusDays(10)
+        val fom = LocalDate.now().minusDays(10)
         val fødselsdato = fom.minusYears(18)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
                 fom = fom,
-                tom = osloDateNow().plusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
@@ -150,13 +150,13 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe AAP hvor bruker fyller 18 år siste dag i vilkårsperiode skal kaste feil`() {
-        val tom = osloDateNow().plusDays(10)
+        val tom = LocalDate.now().plusDays(10)
         val fødselsdato = tom.minusYears(18)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
-                fom = osloDateNow().minusDays(10),
+                fom = LocalDate.now().minusDays(10),
                 tom = tom,
             )
 
@@ -168,14 +168,14 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe NEDSATT_ARBEIDSEVNE hvor bruker fyller 18 år dagen før vilkårsperioden starter skal gi svar JA`() {
-        val fom = osloDateNow().minusDays(10)
+        val fom = LocalDate.now().minusDays(10)
         val fødselsdato = fom.minusDays(1).minusYears(18)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
                 fom = fom,
-                tom = osloDateNow().plusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
@@ -185,13 +185,13 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe NEDSATT_ARBEIDSEVNE hvor bruker fyller 18 år dagen etter vilkårsperioden slutter skal gi svar NEI`() {
-        val tom = osloDateNow().plusDays(10)
+        val tom = LocalDate.now().plusDays(10)
         val fødselsdato = tom.plusDays(1).minusYears(18)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-                fom = osloDateNow().minusDays(10),
+                fom = LocalDate.now().minusDays(10),
                 tom = tom,
             )
 
@@ -205,11 +205,11 @@ class AldersvilkårVurderingTest {
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-                fom = osloDateNow().minusDays(10),
-                tom = osloDateNow().plusDays(10),
+                fom = LocalDate.now().minusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
-        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(osloDateNow().minusYears(18))
+        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(LocalDate.now().minusYears(18))
 
         val feil = assertThrows<ApiFeil> { vurderAldersvilkår(målgruppe, fødselFaktaGrunnlag) }
         assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
@@ -217,14 +217,14 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe NEDSATT_ARBEIDSEVNE hvor bruker fyller 18 år første dag i vilkårsperiode skal kaste feil`() {
-        val fom = osloDateNow().minusDays(10)
+        val fom = LocalDate.now().minusDays(10)
         val fødselsdato = fom.minusYears(18)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
                 fom = fom,
-                tom = osloDateNow().plusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
@@ -234,13 +234,13 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe NEDSATT_ARBEIDSEVNE hvor bruker fyller 18 år siste dag i vilkårsperiode skal kaste feil`() {
-        val tom = osloDateNow().plusDays(10)
+        val tom = LocalDate.now().plusDays(10)
         val fødselsdato = tom.minusYears(18)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-                fom = osloDateNow().minusDays(10),
+                fom = LocalDate.now().minusDays(10),
                 tom = tom,
             )
 
@@ -251,14 +251,14 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe UFØRETRYGD hvor bruker fyller 18 år dagen før vilkårsperioden starter skal gi svar JA`() {
-        val fom = osloDateNow().minusDays(10)
+        val fom = LocalDate.now().minusDays(10)
         val fødselsdato = fom.minusDays(1).minusYears(18)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.UFØRETRYGD,
                 fom = fom,
-                tom = osloDateNow().plusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
@@ -268,13 +268,13 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe UFØRETRYGD hvor bruker fyller 18 år dagen etter vilkårsperioden slutter skal gi svar NEI`() {
-        val tom = osloDateNow().plusDays(10)
+        val tom = LocalDate.now().plusDays(10)
         val fødselsdato = tom.plusDays(1).minusYears(18)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.UFØRETRYGD,
-                fom = osloDateNow().minusDays(10),
+                fom = LocalDate.now().minusDays(10),
                 tom = tom,
             )
 
@@ -288,11 +288,11 @@ class AldersvilkårVurderingTest {
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.UFØRETRYGD,
-                fom = osloDateNow().minusDays(10),
-                tom = osloDateNow().plusDays(10),
+                fom = LocalDate.now().minusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
-        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(osloDateNow().minusYears(18))
+        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(LocalDate.now().minusYears(18))
 
         val feil = assertThrows<ApiFeil> { vurderAldersvilkår(målgruppe, fødselFaktaGrunnlag) }
         assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
@@ -300,14 +300,14 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe UFØRETRYGD hvor bruker fyller 18 år første dag i vilkårsperiode skal kaste feil`() {
-        val fom = osloDateNow().minusDays(10)
+        val fom = LocalDate.now().minusDays(10)
         val fødselsdato = fom.minusYears(18)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.UFØRETRYGD,
                 fom = fom,
-                tom = osloDateNow().plusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
@@ -318,13 +318,13 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe UFØRETRYGD hvor bruker fyller 18 år siste dag i vilkårsperiode skal kaste feil`() {
-        val tom = osloDateNow().plusDays(10)
+        val tom = LocalDate.now().plusDays(10)
         val fødselsdato = tom.minusYears(18)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.UFØRETRYGD,
-                fom = osloDateNow().minusDays(10),
+                fom = LocalDate.now().minusDays(10),
                 tom = tom,
             )
 
@@ -336,14 +336,14 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe AAP hvor bruker fyller 67 år dagen før vilkårsperioden starter skal gi svar NEI`() {
-        val fom = osloDateNow().minusDays(10)
+        val fom = LocalDate.now().minusDays(10)
         val fødselsdato = fom.minusDays(1).minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
                 fom = fom,
-                tom = osloDateNow().plusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
@@ -353,13 +353,13 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe AAP hvor bruker fyller 67 år dagen etter vilkårsperioden slutter skal gi svar JA`() {
-        val tom = osloDateNow().plusDays(10)
+        val tom = LocalDate.now().plusDays(10)
         val fødselsdato = tom.plusDays(1).minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
-                fom = osloDateNow().minusDays(10),
+                fom = LocalDate.now().minusDays(10),
                 tom = tom,
             )
 
@@ -373,11 +373,11 @@ class AldersvilkårVurderingTest {
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
-                fom = osloDateNow().minusDays(10),
-                tom = osloDateNow().plusDays(10),
+                fom = LocalDate.now().minusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
-        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = osloDateNow().minusYears(67))
+        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = LocalDate.now().minusYears(67))
 
         val feil = assertThrows<ApiFeil> { vurderAldersvilkår(målgruppe, fødselFaktaGrunnlag) }
         assertThat(feil.message).isEqualTo("Brukeren fyller 67 år i løpet av vilkårsperioden")
@@ -385,14 +385,14 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe AAP hvor bruker fyller 67 år første dag i vilkårsperiode skal kaste feil`() {
-        val fom = osloDateNow().minusDays(10)
+        val fom = LocalDate.now().minusDays(10)
         val fødselsdato = fom.minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
                 fom = fom,
-                tom = osloDateNow().plusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
@@ -403,13 +403,13 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe AAP hvor bruker fyller 67 år siste dag i vilkårsperiode skal kaste feil`() {
-        val tom = osloDateNow().plusDays(10)
+        val tom = LocalDate.now().plusDays(10)
         val fødselsdato = tom.minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.AAP,
-                fom = osloDateNow().minusDays(10),
+                fom = LocalDate.now().minusDays(10),
                 tom = tom,
             )
 
@@ -421,14 +421,14 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe NEDSATT_ARBEIDSEVNE hvor bruker fyller 67 år dagen før vilkårsperioden starter skal gi svar NEI`() {
-        val fom = osloDateNow().minusDays(10)
+        val fom = LocalDate.now().minusDays(10)
         val fødselsdato = fom.minusDays(1).minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
                 fom = fom,
-                tom = osloDateNow().plusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
@@ -438,13 +438,13 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe NEDSATT_ARBEIDSEVNE hvor bruker fyller 67 år dagen etter vilkårsperioden slutter skal gi svar JA`() {
-        val tom = osloDateNow().plusDays(10)
+        val tom = LocalDate.now().plusDays(10)
         val fødselsdato = tom.plusDays(1).minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-                fom = osloDateNow().minusDays(10),
+                fom = LocalDate.now().minusDays(10),
                 tom = tom,
             )
 
@@ -458,11 +458,11 @@ class AldersvilkårVurderingTest {
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-                fom = osloDateNow().minusDays(10),
-                tom = osloDateNow().plusDays(10),
+                fom = LocalDate.now().minusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
-        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = osloDateNow().minusYears(67))
+        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = LocalDate.now().minusYears(67))
 
         val feil = assertThrows<ApiFeil> { vurderAldersvilkår(målgruppe, fødselFaktaGrunnlag) }
         assertThat(feil.message).isEqualTo("Brukeren fyller 67 år i løpet av vilkårsperioden")
@@ -470,14 +470,14 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe NEDSATT_ARBEIDSEVNE hvor bruker fyller 67 år første dag i vilkårsperiode skal kaste feil`() {
-        val fom = osloDateNow().minusDays(10)
+        val fom = LocalDate.now().minusDays(10)
         val fødselsdato = fom.minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
                 fom = fom,
-                tom = osloDateNow().plusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
@@ -488,13 +488,13 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe NEDSATT_ARBEIDSEVNE hvor bruker fyller 67 år siste dag i vilkårsperiode skal kaste feil`() {
-        val tom = osloDateNow().plusDays(10)
+        val tom = LocalDate.now().plusDays(10)
         val fødselsdato = tom.minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-                fom = osloDateNow().minusDays(10),
+                fom = LocalDate.now().minusDays(10),
                 tom = tom,
             )
 
@@ -505,14 +505,14 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe UFØRETRYGD hvor bruker fyller 67 år dagen før vilkårsperioden starter skal gi svar NEI`() {
-        val fom = osloDateNow().minusDays(10)
+        val fom = LocalDate.now().minusDays(10)
         val fødselsdato = fom.minusDays(1).minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.UFØRETRYGD,
                 fom = fom,
-                tom = osloDateNow().plusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
@@ -522,13 +522,13 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe UFØRETRYGD hvor bruker fyller 67 år dagen etter vilkårsperioden slutter skal gi svar JA`() {
-        val tom = osloDateNow().plusDays(10)
+        val tom = LocalDate.now().plusDays(10)
         val fødselsdato = tom.plusDays(1).minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.UFØRETRYGD,
-                fom = osloDateNow().minusDays(10),
+                fom = LocalDate.now().minusDays(10),
                 tom = tom,
             )
 
@@ -542,11 +542,11 @@ class AldersvilkårVurderingTest {
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.UFØRETRYGD,
-                fom = osloDateNow().minusDays(10),
-                tom = osloDateNow().plusDays(10),
+                fom = LocalDate.now().minusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
-        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = osloDateNow().minusYears(67))
+        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = LocalDate.now().minusYears(67))
 
         val feil = assertThrows<ApiFeil> { vurderAldersvilkår(målgruppe, fødselFaktaGrunnlag) }
         assertThat(feil.message).isEqualTo("Brukeren fyller 67 år i løpet av vilkårsperioden")
@@ -554,14 +554,14 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe UFØRETRYGD hvor bruker fyller 67 år første dag i vilkårsperiode skal kaste feil`() {
-        val fom = osloDateNow().minusDays(10)
+        val fom = LocalDate.now().minusDays(10)
         val fødselsdato = fom.minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.UFØRETRYGD,
                 fom = fom,
-                tom = osloDateNow().plusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
@@ -572,13 +572,13 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe UFØRETRYGD hvor bruker fyller 67 år siste dag i vilkårsperiode skal kaste feil`() {
-        val tom = osloDateNow().plusDays(10)
+        val tom = LocalDate.now().plusDays(10)
         val fødselsdato = tom.minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.UFØRETRYGD,
-                fom = osloDateNow().minusDays(10),
+                fom = LocalDate.now().minusDays(10),
                 tom = tom,
             )
 
@@ -590,14 +590,14 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe OMSTILLINGSSTØNAD hvor bruker fyller 67 år dagen før vilkårsperioden starter skal gi svar NEI`() {
-        val fom = osloDateNow().minusDays(10)
+        val fom = LocalDate.now().minusDays(10)
         val fødselsdato = fom.minusDays(1).minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.OMSTILLINGSSTØNAD,
                 fom = fom,
-                tom = osloDateNow().plusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
@@ -607,13 +607,13 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe OMSTILLINGSSTØNAD hvor bruker fyller 67 år dagen etter vilkårsperioden slutter skal gi svar JA`() {
-        val tom = osloDateNow().plusDays(10)
+        val tom = LocalDate.now().plusDays(10)
         val fødselsdato = tom.plusDays(1).minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.OMSTILLINGSSTØNAD,
-                fom = osloDateNow().minusDays(10),
+                fom = LocalDate.now().minusDays(10),
                 tom = tom,
             )
 
@@ -627,11 +627,11 @@ class AldersvilkårVurderingTest {
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.OMSTILLINGSSTØNAD,
-                fom = osloDateNow().minusDays(10),
-                tom = osloDateNow().plusDays(10),
+                fom = LocalDate.now().minusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
-        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = osloDateNow().minusYears(67))
+        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = LocalDate.now().minusYears(67))
 
         val feil = assertThrows<ApiFeil> { vurderAldersvilkår(målgruppe, fødselFaktaGrunnlag) }
         assertThat(feil.message).isEqualTo("Brukeren fyller 67 år i løpet av vilkårsperioden")
@@ -639,14 +639,14 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe OMSTILLINGSSTØNAD hvor bruker fyller 67 år første dag i vilkårsperiode skal kaste feil`() {
-        val fom = osloDateNow().minusDays(10)
+        val fom = LocalDate.now().minusDays(10)
         val fødselsdato = fom.minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.OMSTILLINGSSTØNAD,
                 fom = fom,
-                tom = osloDateNow().plusDays(10),
+                tom = LocalDate.now().plusDays(10),
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
@@ -657,13 +657,13 @@ class AldersvilkårVurderingTest {
 
     @Test
     fun `Målgruppe OMSTILLINGSSTØNAD hvor bruker fyller 67 år siste dag i vilkårsperiode skal kaste feil`() {
-        val tom = osloDateNow().plusDays(10)
+        val tom = LocalDate.now().plusDays(10)
         val fødselsdato = tom.minusYears(67)
 
         val målgruppe =
             dummyVilkårperiodeMålgruppe().copy(
                 type = MålgruppeType.OMSTILLINGSSTØNAD,
-                fom = osloDateNow().minusDays(10),
+                fom = LocalDate.now().minusDays(10),
                 tom = tom,
             )
 

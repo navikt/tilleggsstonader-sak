@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -39,6 +38,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class JournalføringService(
@@ -164,7 +164,7 @@ class JournalføringService(
 
         feilHvis(journalpost.harStrukturertSøknad()) { "Journalpost med id=${journalpost.journalpostId} gjelder ikke en Klagebehandling." }
 
-        klageService.opprettKlage(fagsakId = fagsak.id, OpprettKlageDto(journalpost.datoMottatt?.toLocalDate() ?: osloDateNow()))
+        klageService.opprettKlage(fagsakId = fagsak.id, OpprettKlageDto(journalpost.datoMottatt?.toLocalDate() ?: LocalDate.now()))
 
         ferdigstillJournalpost(
             journalpost = journalpost,
