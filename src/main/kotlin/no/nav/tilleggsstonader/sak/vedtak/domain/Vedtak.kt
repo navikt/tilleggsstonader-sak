@@ -22,7 +22,7 @@ data class GeneriskVedtak<T : Vedtaksdata>(
     val gitVersjon: String?,
     val tidligsteEndring: LocalDate?,
     @Column("opphorsdato")
-    val opphørsdato: LocalDate?,
+    val opphørsdato: LocalDate? = null,
 ) {
     init {
         require(data.type.typeVedtak == type) { "$type på vedtak er ikke lik vedtak på data(${data.type.typeVedtak})" }

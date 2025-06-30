@@ -147,7 +147,6 @@ class TilsynBarnBeregnYtelseSteg(
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
-                opphørsdato = null,
             ),
         )
     }
@@ -178,6 +177,5 @@ class TilsynBarnBeregnYtelseSteg(
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
-            opphørsdato = null,
         )
 }
