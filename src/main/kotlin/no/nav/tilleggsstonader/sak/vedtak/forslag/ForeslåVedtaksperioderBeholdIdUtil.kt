@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 /**
- * For å kunne foreslå vedtaksperioder i revurderinger trenger man å beholde id'n til vedtaksperioden for å kunne tracke endringer.
+ *  Når foreslå vedtaksperioder brukes i revurderinger trenger man å beholde id'n til vedtaksperioden for å kunne tracke endringer.
  *
  * Bruker en [ArrayDeque] for å håndtere tilfeller der et forslag overlapper flere tidligere vedtaksperioder.
  * Et tidligere id skal ikke gjenbrukes flere ganger
