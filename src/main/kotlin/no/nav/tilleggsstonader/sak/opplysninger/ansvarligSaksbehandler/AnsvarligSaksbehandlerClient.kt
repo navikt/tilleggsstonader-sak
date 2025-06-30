@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Saksbehandler
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
@@ -21,6 +22,7 @@ class AnsvarligSaksbehandlerClient(
             .build()
             .toUri()
 
+    @Cacheable("saksbehandlerInfo", cacheManager = "longCache")
     fun hentSaksbehandlerInfo(navIdent: String): Saksbehandler {
         val uri =
             UriComponentsBuilder
