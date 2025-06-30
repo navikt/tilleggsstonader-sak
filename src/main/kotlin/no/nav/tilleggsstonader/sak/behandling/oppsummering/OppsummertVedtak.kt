@@ -20,5 +20,5 @@ data class OppsummertVedtakAvslag(
 
 data class OppsummertVedtakOpphør(
     val årsaker: List<ÅrsakOpphør>,
-    val opphørsdato: LocalDate?,
+    val opphørsdato: LocalDate,
 ) : OppsummertVedtak(resultat = TypeVedtak.OPPHØR)
