@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Saksbehandler
+import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -10,12 +12,14 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.domain.AnsvarligSaksbehandler
 import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.domain.SaksbehandlerRolle
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import org.springframework.stereotype.Service
 
 @Service
 class AnsvarligSaksbehandlerService(
+    private val oppgaveClient: OppgaveClient,
     private val oppgaveRepository: OppgaveRepository,
     private val behandlingRepository: BehandlingRepository,
     private val saksbehandlerClient: AnsvarligSaksbehandlerClient,
@@ -100,13 +104,10 @@ class AnsvarligSaksbehandlerService(
             return SaksbehandlerRolle.OPPGAVE_FINNES_IKKE
         }
 
-        // todo - høre om dette er nødvendig
-
-//        val t = oppgaveClient.finnOppgaveMedId(oppgave.gsakOppgaveId)
-//
-//         if (t.tema != Tema.TSO || t.tema != Tema.TSR || t.status == StatusEnum.FEILREGISTRERT) {
-//            return SaksbehandlerRolle.OPPGAVE_TILHØRER_IKKE_TILLEGGSSTONADER
-//        }
+        val tildeltOppgave = oppgaveClient.finnOppgaveMedId(oppgave.gsakOppgaveId)
+        if ((tildeltOppgave.tema != Tema.TSO && tildeltOppgave.tema != Tema.TSR) || tildeltOppgave.status == StatusEnum.FEILREGISTRERT) {
+            return SaksbehandlerRolle.OPPGAVE_TILHØRER_IKKE_TILLEGGSSTONADER
+        }
 
         val innloggetSaksbehandler = SikkerhetContext.hentSaksbehandler()
         return when (oppgave.tilordnetSaksbehandler) {
