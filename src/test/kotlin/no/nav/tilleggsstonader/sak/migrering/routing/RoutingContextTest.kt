@@ -49,6 +49,8 @@ class RoutingContextTest {
             Stønadstype.BARNETILSYN to SkalRouteAlleSøkereTilNyLøsning::class,
             Stønadstype.LÆREMIDLER to SkalRouteAlleSøkereTilNyLøsning::class,
             Stønadstype.BOUTGIFTER to SkalRouteAlleSøkereTilNyLøsning::class,
+            Stønadstype.DAGLIG_REISE_TSO to SkalRouteAlleSøkereTilNyLøsning::class,
+            Stønadstype.DAGLIG_REISE_TSR to SkalRouteAlleSøkereTilNyLøsning::class,
         )
 
     private fun Stønadstype.tilRoutingContext() = IdentStønadstype(ident = ident, stønadstype = this).tilRoutingContext()

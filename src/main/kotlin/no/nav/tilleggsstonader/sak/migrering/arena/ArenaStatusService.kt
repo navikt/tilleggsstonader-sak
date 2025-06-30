@@ -74,6 +74,8 @@ class ArenaStatusService(
             Stønadstype.BARNETILSYN -> true
             Stønadstype.LÆREMIDLER -> true
             Stønadstype.BOUTGIFTER -> false
+            Stønadstype.DAGLIG_REISE_TSO -> false
+            Stønadstype.DAGLIG_REISE_TSR -> false
         }
 
     private fun harBehandling(fagsak: Fagsak?): Boolean =

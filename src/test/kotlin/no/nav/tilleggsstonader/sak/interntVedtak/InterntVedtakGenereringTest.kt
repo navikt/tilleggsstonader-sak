@@ -103,6 +103,7 @@ class InterntVedtakGenereringTest {
             Stønadstype.BARNETILSYN -> mockTilsynBarn()
             Stønadstype.LÆREMIDLER -> mockLæremidler()
             Stønadstype.BOUTGIFTER -> mockBoutgifter()
+            else -> error("Har ikke mapping for ${type.stønadstype}")
         }
     }
 
@@ -132,6 +133,15 @@ class InterntVedtakGenereringTest {
         every { vilkårService.hentVilkår(behandlingId) } returns Testdata.Boutgifter.vilkår
         every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Boutgifter.innvilgetVedtak
     }
+
+//    private fun mockDagligReiseTSO() {
+//        every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.DagligReise.behandling
+//        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.DagligReise.vilkårperioder
+//        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.DagligReise.grunnlagsdata
+//        every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
+//        every { vilkårService.hentVilkår(behandlingId) } returns Testdata.DagligReise.vilkår
+//        every { vedtakService.hentVedtak(behandlingId) } returns Testdata.DagligReise.innvilgetVedtak
+//    }
 
     @Test
     fun `html skal være formatert for å enklere kunne sjekke diff`() {
@@ -183,6 +193,9 @@ class InterntVedtakGenereringTest {
                     Stønadstype.LÆREMIDLER,
                     Stønadstype.BOUTGIFTER,
                     -> it.håndteres()
+                    Stønadstype.DAGLIG_REISE_TSO,
+                    Stønadstype.DAGLIG_REISE_TSR,
+                    -> it.håndteresIkke()
                 }
             }
 

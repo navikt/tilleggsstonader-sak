@@ -48,4 +48,6 @@ fun IdentStønadstype.tilRoutingContext() =
         Stønadstype.BARNETILSYN -> SkalRouteAlleSøkereTilNyLøsning.fraIdentStønadstype(this)
         Stønadstype.LÆREMIDLER -> SkalRouteAlleSøkereTilNyLøsning.fraIdentStønadstype(this)
         Stønadstype.BOUTGIFTER -> SkalRouteAlleSøkereTilNyLøsning.fraIdentStønadstype(this)
+        Stønadstype.DAGLIG_REISE_TSO -> SkalRouteAlleSøkereTilNyLøsning.fraIdentStønadstype(this)
+        Stønadstype.DAGLIG_REISE_TSR -> SkalRouteAlleSøkereTilNyLøsning.fraIdentStønadstype(this)
     }

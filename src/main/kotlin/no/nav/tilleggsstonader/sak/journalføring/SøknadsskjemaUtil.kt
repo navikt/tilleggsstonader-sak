@@ -22,6 +22,8 @@ object SøknadsskjemaUtil {
             Stønadstype.BARNETILSYN -> objectMapper.readValue<Søknadsskjema<SøknadsskjemaBarnetilsyn>>(data)
             Stønadstype.LÆREMIDLER -> objectMapper.readValue<Søknadsskjema<SøknadsskjemaLæremidler>>(data)
             Stønadstype.BOUTGIFTER -> håndterBoutgifter(data, mottattTidspunkt)
+            Stønadstype.DAGLIG_REISE_TSO -> TODO()
+            Stønadstype.DAGLIG_REISE_TSR -> TODO()
         }
 
     private fun håndterBoutgifter(

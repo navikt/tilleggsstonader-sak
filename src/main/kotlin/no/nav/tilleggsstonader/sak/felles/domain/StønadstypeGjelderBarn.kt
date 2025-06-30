@@ -7,4 +7,6 @@ fun Stønadstype.gjelderBarn() =
         Stønadstype.BARNETILSYN -> true
         Stønadstype.LÆREMIDLER -> false
         Stønadstype.BOUTGIFTER -> false
+        Stønadstype.DAGLIG_REISE_TSO -> false
+        Stønadstype.DAGLIG_REISE_TSR -> false
     }
