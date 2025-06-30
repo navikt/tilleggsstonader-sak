@@ -167,6 +167,7 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
                 OpphørBoutgifterRequest(
                     årsakerOpphør = listOf(ÅrsakOpphør.ANNET),
                     begrunnelse = "Statsbudsjettet er tomt",
+                    opphørsdato = revurderFraDato,
                 )
 
             opphørVedtak(revurdering, opphørVedtak)
