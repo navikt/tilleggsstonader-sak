@@ -14,41 +14,80 @@ import java.util.UUID
 object ForeslåVedtaksperioderBeholdIdUtil {
     fun beholdTidligereIdnForVedtaksperioder(
         tidligereVedtaksperioder: List<Vedtaksperiode>,
-        forslagFraVilkår: List<Vedtaksperiode>,
-    ): List<Vedtaksperiode> {
-        val perioder = mutableListOf<Vedtaksperiode>()
-        val gjenbrukteIdn = mutableSetOf<UUID>()
-        forslagFraVilkår.forEach { initielltForslag ->
+        forslag: List<Vedtaksperiode>,
+    ): List<Vedtaksperiode> =
+        ForeslåVedtaksperioderBeholdId(
+            tidligereVedtaksperioder = tidligereVedtaksperioder,
+            initielleForslag = forslag,
+        ).beholdTidligereIdnForVedtaksperioder()
+}
 
-            val stack = ArrayDeque<Vedtaksperiode>()
-            stack.add(initielltForslag)
+/**
+ * Plassert som en private class for at den ikke skal kalles på flere ganger.
+ * Bruk av klasse gjør det enklere å splitte ut metoder som er avhengig av state i klassen.
+ * [beholdTidligereIdnForVedtaksperioder] er avhengig av state i klassen
+ */
+private class ForeslåVedtaksperioderBeholdId(
+    private val tidligereVedtaksperioder: List<Vedtaksperiode>,
+    private val initielleForslag: List<Vedtaksperiode>,
+) {
+    private val nyttForslag = mutableListOf<Vedtaksperiode>()
 
-            while (!stack.isEmpty()) {
-                val forslag = stack.removeFirst()
-                val tidligereVedtaksperiodeMedSnitt = snitt(forslag, tidligereVedtaksperioder, gjenbrukteIdn)
+    /**
+     * Gjenbrukte ID'er for vedtaksperioder skal ikke gjenbrukes flere ganger
+     */
+    private val gjenbrukteIdn = mutableSetOf<UUID>()
 
-                if (tidligereVedtaksperiodeMedSnitt != null) {
-                    val snitt = tidligereVedtaksperiodeMedSnitt.snitt
-                    val tidligereVedtaksperiodeId = tidligereVedtaksperiodeMedSnitt.tidligereVedtaksperiode.id
+    /**
+     * Bruker nytt forslag delvis overlapper med tidligere vedtaksperiode.
+     */
+    private val stack = ArrayDeque<Vedtaksperiode>()
 
-                    gjenbrukteIdn.add(tidligereVedtaksperiodeId)
-                    perioder.add(snitt.copy(id = tidligereVedtaksperiodeId))
+    fun beholdTidligereIdnForVedtaksperioder(): List<Vedtaksperiode> {
+        initielleForslag.forEach { initielltForslag ->
+            håndterInitieltForslag(initielltForslag)
+        }
+        return nyttForslag.sorted()
+    }
 
-                    // Hvis forslaget starter før snittet, legger vi til forslaget med nytt tom
-                    if (forslag.fom < snitt.fom) {
-                        perioder.add(forslag.medNyId(tom = snitt.fom.minusDays(1)))
-                    }
+    private fun håndterInitieltForslag(initielltForslag: Vedtaksperiode) {
+        stack.add(initielltForslag)
 
-                    // Hvis snittet slutter før forslaget, legger vi til resten av forslaget i stacken for å kunne sjekke videre
-                    if (forslag.tom > snitt.tom) {
-                        stack.add(forslag.medNyId(fom = snitt.tom.plusDays(1)))
-                    }
-                } else {
-                    perioder.add(forslag)
-                }
+        while (!stack.isEmpty()) {
+            val forslag = stack.removeFirst()
+            val tidligereVedtaksperiodeMedSnitt = snitt(forslag, tidligereVedtaksperioder, gjenbrukteIdn)
+
+            if (tidligereVedtaksperiodeMedSnitt != null) {
+                val snitt = tidligereVedtaksperiodeMedSnitt.snitt
+                val tidligereVedtaksperiodeId = tidligereVedtaksperiodeMedSnitt.tidligereVedtaksperiode.id
+
+                gjenbrukteIdn.add(tidligereVedtaksperiodeId)
+                nyttForslag.add(snitt.copy(id = tidligereVedtaksperiodeId))
+
+                håndterForslagSomBegynnerFørSnitt(forslag, snitt)
+                håndterForslagSomSlutterEtterSnitt(forslag, snitt)
+            } else {
+                nyttForslag.add(forslag)
             }
         }
-        return perioder.sorted()
+    }
+
+    private fun håndterForslagSomSlutterEtterSnitt(
+        forslag: Vedtaksperiode,
+        snitt: Vedtaksperiode,
+    ) {
+        if (forslag.tom > snitt.tom) {
+            stack.add(forslag.medNyId(fom = snitt.tom.plusDays(1)))
+        }
+    }
+
+    private fun håndterForslagSomBegynnerFørSnitt(
+        forslag: Vedtaksperiode,
+        snitt: Vedtaksperiode,
+    ) {
+        if (forslag.fom < snitt.fom) {
+            nyttForslag.add(forslag.medNyId(tom = snitt.fom.minusDays(1)))
+        }
     }
 
     /**
