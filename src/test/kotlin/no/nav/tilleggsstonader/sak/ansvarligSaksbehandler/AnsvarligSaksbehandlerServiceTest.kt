@@ -3,8 +3,6 @@ package no.nav.tilleggsstonader.sak.ansvarligSaksbehandler
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Saksbehandler
-import no.nav.tilleggsstonader.kontrakter.felles.Tema
-import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -16,7 +14,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.Ansvarlig
 import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.domain.SaksbehandlerRolle
 import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.domain.tilDto
 import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.dto.AnsvarligSaksbehandlerDto
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.util.BehandlingOppsettUtil.iverksattFørstegangsbehandling
@@ -27,7 +24,6 @@ import org.junit.jupiter.api.Test
 import java.util.UUID
 
 internal class AnsvarligSaksbehandlerServiceTest {
-    private val oppgaveClient = mockk<OppgaveClient>()
     private val oppgaveRepository = mockk<OppgaveRepository>()
     private val behandlingRepository = mockk<BehandlingRepository>()
     private val saksbehandlerClient = mockk<AnsvarligSaksbehandlerClient>()
@@ -40,7 +36,6 @@ internal class AnsvarligSaksbehandlerServiceTest {
     fun setUp() {
         service =
             AnsvarligSaksbehandlerService(
-                oppgaveClient,
                 oppgaveRepository,
                 behandlingRepository,
                 saksbehandlerClient,
@@ -60,21 +55,12 @@ internal class AnsvarligSaksbehandlerServiceTest {
                 erFerdigstilt = false,
                 tilordnetSaksbehandler = saksbehandlerInfo.navIdent,
             )
-        val oppgaveMedTema =
-            Oppgave(
-                id = 1L,
-                versjon = 1,
-                tema = Tema.TSR,
-            )
 
         every { behandlingRepository.findByIdOrThrow(behandlingId) } returns behandling
         every {
             oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(any(), any())
         } returns oppgave
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
-        every {
-            oppgaveClient.finnOppgaveMedId(any())
-        } returns oppgaveMedTema
 
         testWithBrukerContext(saksbehandlerInfo.navIdent) {
             val resultat = service.finnAnsvarligSaksbehandler(behandlingId)
@@ -138,21 +124,12 @@ internal class AnsvarligSaksbehandlerServiceTest {
                 erFerdigstilt = false,
                 tilordnetSaksbehandler = null,
             )
-        val oppgaveMedTema =
-            Oppgave(
-                id = 1L,
-                versjon = 1,
-                tema = Tema.TSR,
-            )
 
         every { behandlingRepository.findByIdOrThrow(behandlingId) } returns behandling
         every {
             oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(any(), any())
         } returns oppgave
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
-        every {
-            oppgaveClient.finnOppgaveMedId(any())
-        } returns oppgaveMedTema
 
         testWithBrukerContext(saksbehandlerInfo.navIdent) {
             val resultat = service.finnAnsvarligSaksbehandler(behandlingId)
@@ -202,12 +179,6 @@ internal class AnsvarligSaksbehandlerServiceTest {
                 erFerdigstilt = false,
                 tilordnetSaksbehandler = saksbehandlerInfo.navIdent,
             )
-        val oppgaveMedTema =
-            Oppgave(
-                id = 1L,
-                versjon = 1,
-                tema = Tema.TSR,
-            )
 
         every { saksbehandlerClient.hentSaksbehandlerInfo(innloggetSaksbehandlerSomIkkeEierBehandling.navIdent) } returns
             innloggetSaksbehandlerSomIkkeEierBehandling
@@ -216,9 +187,6 @@ internal class AnsvarligSaksbehandlerServiceTest {
 
         every { behandlingRepository.findByIdOrThrow(behandlingId) } returns behandling
         every { oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(any(), any()) } returns oppgave
-        every {
-            oppgaveClient.finnOppgaveMedId(any())
-        } returns oppgaveMedTema
 
         testWithBrukerContext(innloggetSaksbehandlerSomIkkeEierBehandling.navIdent) {
             val resultat = service.finnAnsvarligSaksbehandler(behandlingId)
@@ -227,46 +195,6 @@ internal class AnsvarligSaksbehandlerServiceTest {
             assertThat(resultat.rolle).isEqualTo(SaksbehandlerRolle.ANNEN_SAKSBEHANDLER)
             assertThat(resultat.fornavn).isEqualTo("Test")
             assertThat(resultat.etternavn).isEqualTo("Testesen")
-        }
-    }
-
-    @Test
-    fun `skal returnere OPPGAVE_TILHØRER_IKKE_TILLEGGSSTONADER hvis oppgave har tema ulikt TSO eller TSR`() {
-        val innloggetSaksbehandlerSomIkkeEierBehandling =
-            Saksbehandler(UUID.randomUUID(), "Z223344", "Test", "Mockk", "TSO")
-
-        val behandling =
-            iverksattFørstegangsbehandling.copy(steg = StegType.INNGANGSVILKÅR, status = BehandlingStatus.UTREDES)
-        val oppgave =
-            OppgaveDomain(
-                id = UUID.randomUUID(),
-                behandlingId = behandlingId,
-                gsakOppgaveId = 1L,
-                type = Oppgavetype.BehandleSak,
-                erFerdigstilt = false,
-                tilordnetSaksbehandler = saksbehandlerInfo.navIdent,
-            )
-        val oppgaveMedTema =
-            Oppgave(
-                id = 1L,
-                versjon = 1,
-                tema = null,
-            )
-
-        every { saksbehandlerClient.hentSaksbehandlerInfo(innloggetSaksbehandlerSomIkkeEierBehandling.navIdent) } returns
-            innloggetSaksbehandlerSomIkkeEierBehandling
-
-        every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
-
-        every { behandlingRepository.findByIdOrThrow(behandlingId) } returns behandling
-        every { oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(any(), any()) } returns oppgave
-        every {
-            oppgaveClient.finnOppgaveMedId(any())
-        } returns oppgaveMedTema
-
-        testWithBrukerContext(innloggetSaksbehandlerSomIkkeEierBehandling.navIdent) {
-            val resultat = service.finnAnsvarligSaksbehandler(behandlingId)
-            assertThat(resultat.rolle).isEqualTo(SaksbehandlerRolle.OPPGAVE_TILHØRER_IKKE_TILLEGGSSTONADER)
         }
     }
 }

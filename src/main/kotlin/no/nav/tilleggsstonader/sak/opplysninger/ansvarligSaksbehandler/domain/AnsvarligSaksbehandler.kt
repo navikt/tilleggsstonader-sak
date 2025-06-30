@@ -14,7 +14,6 @@ enum class SaksbehandlerRolle {
     ANNEN_SAKSBEHANDLER,
     OPPGAVE_FINNES_IKKE,
     OPPGAVE_FINNES_IKKE_SANNSYNLIGVIS_INNLOGGET_SAKSBEHANDLER,
-    OPPGAVE_TILHØRER_IKKE_TILLEGGSSTONADER,
 }
 
 fun AnsvarligSaksbehandler.tilDto(): AnsvarligSaksbehandlerDto =
