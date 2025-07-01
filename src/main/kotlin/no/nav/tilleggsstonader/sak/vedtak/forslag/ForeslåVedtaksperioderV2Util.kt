@@ -56,7 +56,7 @@ object ForeslåVedtaksperioderV2Util {
             .values
             .flatten()
 
-    private fun foreslåPerioder(
+    fun foreslåPerioder(
         målgrupper: List<ForenkletVilkårperiode<FaktiskMålgruppe>>,
         aktiviteter: Map<AktivitetType, List<ForenkletVilkårperiode<AktivitetType>>>,
         vilkår: List<Datoperiode>,
@@ -79,7 +79,7 @@ object ForeslåVedtaksperioderV2Util {
         return forslag
     }
 
-    private fun forslagVedtaksperiodeForInngangsvilkår(
+    fun forslagVedtaksperiodeForInngangsvilkår(
         målgrupper: List<ForenkletVilkårperiode<FaktiskMålgruppe>>,
         aktiviteter: Map<AktivitetType, List<ForenkletVilkårperiode<AktivitetType>>>,
     ): List<Vedtaksperiode> =
@@ -122,7 +122,7 @@ object ForeslåVedtaksperioderV2Util {
             )
         }
 
-    private data class ForenkletVilkårperiode<TYPE>(
+    data class ForenkletVilkårperiode<TYPE>(
         override val fom: LocalDate,
         override val tom: LocalDate,
         val type: TYPE,
