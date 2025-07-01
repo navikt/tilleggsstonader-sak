@@ -55,7 +55,7 @@ private class ForeslåVedtaksperioderBeholdId(
 
         while (!stack.isEmpty()) {
             val forslag = stack.removeFirst()
-            val tidligereVedtaksperiodeMedSnitt = snitt(forslag, tidligereVedtaksperioder, gjenbrukteIdn)
+            val tidligereVedtaksperiodeMedSnitt = beregnSnittForForslag(forslag)
 
             if (tidligereVedtaksperiodeMedSnitt != null) {
                 val snitt = tidligereVedtaksperiodeMedSnitt.snitt
@@ -94,19 +94,31 @@ private class ForeslåVedtaksperioderBeholdId(
      * Finner første snitt mellom forslag og tidligere vedtaksperiode
      * Skal ikke gjenbruke et ID flere ganger, så filtrerer ut ID'er som allerede er gjenbrukt.
      */
-    private fun snitt(
-        delAvForslag: Vedtaksperiode,
-        tidligereVedtaksperioder: List<Vedtaksperiode>,
-        gjenbrukteIdn: Set<UUID>,
-    ): TidligereVedtaksperiodeMedSnitt? =
+    private fun beregnSnittForForslag(delAvForslag: Vedtaksperiode): TidligereVedtaksperiodeMedSnitt? =
         tidligereVedtaksperioder
             .asSequence()
             .filterNot { gjenbrukteIdn.contains(it.id) }
             .mapNotNull { tidligereVedtaksperiode ->
-                delAvForslag
-                    .beregnSnitt(tidligereVedtaksperiode)
+                beregnSnitt(delAvForslag, tidligereVedtaksperiode)
                     ?.let { snitt -> TidligereVedtaksperiodeMedSnitt(tidligereVedtaksperiode, snitt) }
             }.firstOrNull()
+
+    /**
+     * Beregner snitt mellom del av forslag og tidligere vedtaksperiode.
+     * Hvis tidligere vedtaksperiode er siste i listen og del av forslag overlapper,
+     * så skal man beholde ID fra tidligere vedtaksperiode, og forlenge denne til TOM på nye forslaget.
+     */
+    private fun beregnSnitt(
+        delAvForslag: Vedtaksperiode,
+        tidligereVedtaksperiode: Vedtaksperiode,
+    ): Vedtaksperiode? {
+        val erSisteTidligerePeriode = tidligereVedtaksperiode == tidligereVedtaksperioder.last()
+        return if (erSisteTidligerePeriode && delAvForslag.overlapper(tidligereVedtaksperiode)) {
+            delAvForslag.copy(fom = maxOf(tidligereVedtaksperiode.fom, delAvForslag.fom))
+        } else {
+            delAvForslag.beregnSnitt(tidligereVedtaksperiode)
+        }
+    }
 
     private fun Vedtaksperiode.medNyId(
         fom: LocalDate = this.fom,
