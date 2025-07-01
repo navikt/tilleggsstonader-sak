@@ -1,17 +1,22 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.NullstillBehandlingService
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandling.vent.KanTaAvVent.Ja.PåkrevdHandling
 import no.nav.tilleggsstonader.sak.behandling.vent.KanTaAvVent.Nei.Årsak
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,6 +28,10 @@ class TaAvVentService(
     private val behandlingshistorikkService: BehandlingshistorikkService,
     private val settPåVentRepository: SettPåVentRepository,
     private val oppgaveService: OppgaveService,
+    private val gjennbrukDataRevurderingService: GjennbrukDataRevurderingService,
+    private val barnService: BarnService,
+    private val fagsakService: FagsakService,
+    private val faktaGrunnlagService: FaktaGrunnlagService,
 ) {
     @Transactional
     fun taAvVent(
@@ -38,6 +47,7 @@ class TaAvVentService(
                     Årsak.AnnenAktivBehandlingPåFagsaken -> brukerfeil("Det finnes allerede en aktiv behandling på denne fagsaken")
                 }
             }
+
             is KanTaAvVent.Ja -> {
                 val behandlingTattAvVent = behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.UTREDES)
                 opprettHistorikkInnslagTaAvVent(behandling, taAvVentDto?.kommentar)
@@ -85,10 +95,24 @@ class TaAvVentService(
      * Dersom behandling A har ligger på vent, og en annen behandling på fagsaken har fått et vedtak i mellomtiden, så
      * må behandling A nullstilles før den kan settes av vent, ettersom både vilkår og annen historikk kan ha endret
      * seg.
+     *
+     * For tilsyn barn må vi også sørge for at barna fra forrige behandling blir med over i den nullstilte behandlingen, ellers blir det
+     * kluss når stønadsvilkårene gjenbrukes.
      */
     private fun håndterAtNyBehandlingHarBlittFerdigstiltPåFagsaken(behandlingSomTasAvVent: Behandling) {
-        nullstillBehandlingService.nullstillBehandling(behandlingSomTasAvVent)
         val sisteIverksatteBehandlingId = behandlingService.finnSisteIverksatteBehandling(behandlingSomTasAvVent.fagsakId)
+        val fagsak = fagsakService.hentFagsakForBehandling(behandlingSomTasAvVent.id)
+
+        if (fagsak.stønadstype == Stønadstype.BARNETILSYN) {
+            val idForGjenbruk =
+                gjennbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandlingSomTasAvVent)
+                    ?: error("Forventer å finne en ferdigstilt behandling på fagsaken")
+
+            barnService.kopierManglendeBarnFraForrigeBehandling(idForGjenbruk, behandlingSomTasAvVent)
+            faktaGrunnlagService.slettOgOpprettNyttGrunnlag(behandlingSomTasAvVent.id)
+        }
+
+        nullstillBehandlingService.nullstillBehandling(behandlingSomTasAvVent)
         behandlingService.gjørOmTilRevurdering(behandlingSomTasAvVent, sisteIverksatteBehandlingId?.id)
     }
 

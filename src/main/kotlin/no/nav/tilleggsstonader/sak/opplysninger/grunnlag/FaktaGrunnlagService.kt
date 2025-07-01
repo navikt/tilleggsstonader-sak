@@ -55,6 +55,15 @@ class FaktaGrunnlagService(
             }
         }
 
+    @Transactional
+    fun slettOgOpprettNyttGrunnlag(behandlingId: BehandlingId): FaktaGrunnlagOpprettResultat {
+        advisoryLockService.lockForTransaction(behandlingId) {
+            faktaGrunnlagRepository.deleteAllByBehandlingId(behandlingId)
+            opprettGrunnlag(behandlingId)
+        }
+        return FaktaGrunnlagOpprettResultat.Opprettet
+    }
+
     private fun opprettGrunnlag(behandlingId: BehandlingId) {
         logger.info("Oppretter faktaGrunnlag for behandling=$behandlingId")
 
