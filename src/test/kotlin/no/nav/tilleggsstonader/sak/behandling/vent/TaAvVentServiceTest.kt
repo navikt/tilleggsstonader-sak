@@ -12,12 +12,12 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_KLAR
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
@@ -230,11 +230,11 @@ class TaAvVentServiceTest : IntegrationTest() {
                 )
             testoppsettService.lagre(behandlingSomBlirIverksatt)
 
-            val barnPåIverksattBehandling = dummyBarn(behandlingSomBlirIverksatt.id, TilsynBarnTestUtil.BARN_FNR)
+            val barnPåIverksattBehandling = dummyBarn(behandlingSomBlirIverksatt.id, PdlClientConfig.BARN_FNR)
             barnService.opprettBarn(listOf(barnPåIverksattBehandling))
 
             // Legg til et annet barn på behandlingen som tas av vent
-            val barnPåBehandlingSomTasAvVent = dummyBarn(behandling.id, TilsynBarnTestUtil.BARN2_FNR)
+            val barnPåBehandlingSomTasAvVent = dummyBarn(behandling.id, PdlClientConfig.BARN2_FNR)
             barnService.opprettBarn(listOf(barnPåBehandlingSomTasAvVent))
 
             // Iverksett behandlingen med barn1
@@ -248,8 +248,8 @@ class TaAvVentServiceTest : IntegrationTest() {
             val barnEtterTaAvVent = barnService.finnBarnPåBehandling(behandling.id)
             assertThat(barnEtterTaAvVent).hasSize(2)
             assertThat(barnEtterTaAvVent.map { it.ident }).containsExactlyInAnyOrder(
-                TilsynBarnTestUtil.BARN_FNR,
-                TilsynBarnTestUtil.BARN2_FNR,
+                PdlClientConfig.BARN_FNR,
+                PdlClientConfig.BARN2_FNR,
             )
 
             // Sjekk at fakta har blitt kopiert rett for barn
