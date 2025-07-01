@@ -37,6 +37,26 @@ class UtledTidligsteEndringService(
     fun utledTidligsteEndring(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
+    ): LocalDate? =
+        utledTidligsteEndring(
+            behandlingId = behandlingId,
+            vedtaksperioder = vedtaksperioder,
+            hentVedtaksperioderTidligereBehandlingFunction = { behandlingId ->
+                vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, null)
+            },
+        )
+
+    fun utledTidligsteEndringIgnorerVedtaksperioder(behandlingId: BehandlingId): LocalDate? =
+        utledTidligsteEndring(
+            behandlingId = behandlingId,
+            vedtaksperioder = emptyList(),
+            hentVedtaksperioderTidligereBehandlingFunction = { _ -> emptyList() },
+        )
+
+    private fun utledTidligsteEndring(
+        behandlingId: BehandlingId,
+        vedtaksperioder: List<Vedtaksperiode>,
+        hentVedtaksperioderTidligereBehandlingFunction: (BehandlingId) -> List<Vedtaksperiode>,
     ): LocalDate? {
         val behandling = behandlingService.hentBehandling(behandlingId)
 
@@ -55,7 +75,8 @@ class UtledTidligsteEndringService(
 
         val vilkårTidligereBehandling = vilkårService.hentVilkår(sisteIverksatteBehandling.id)
         val vilkårsperioderTidligereBehandling = vilkårperiodeService.hentVilkårperioder(sisteIverksatteBehandling.id)
-        val vedtaksperioderTidligereBehandling = vedtaksperiodeService.finnVedtaksperioderForBehandling(sisteIverksatteBehandling.id, null)
+
+        val vedtaksperioderTidligereBehandling = hentVedtaksperioderTidligereBehandlingFunction(sisteIverksatteBehandling.id)
 
         val barnIder = barnService.finnBarnPåBehandling(behandlingId)
         val barnIderTidligereBehandling = barnService.finnBarnPåBehandling(sisteIverksatteBehandling.id)

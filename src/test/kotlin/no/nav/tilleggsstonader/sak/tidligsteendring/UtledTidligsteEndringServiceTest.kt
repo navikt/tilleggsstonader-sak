@@ -124,6 +124,19 @@ class UtledTidligsteEndringServiceTest {
     }
 
     @Test
+    fun `utled tidligste endring ignorer vedtaksperiode, ingen endring utenom vedtaksperioder, forvent ingen endring`() {
+        every { unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) } returns true
+
+        vilkår = vilkårSisteIverksatteBehandling
+        vilkårperioder = vilkårperioderSisteIverksattBehandling
+        // vedtaksperioderSisteIverksatteBehandling har verdi og ville slått ut som endring om det sammenlignes
+
+        val result = utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(behandling.id)
+
+        assertThat(result).isNull()
+    }
+
+    @Test
     fun `utled tidligste endring, feature-toggle er av, returnerer revurderFra`() {
         vedtaksperioder = vedtaksperioderSisteIverksatteBehandling // Må initialiseres
         every { unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) } returns false
