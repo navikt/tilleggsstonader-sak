@@ -88,8 +88,7 @@ object ForeslåVedtaksperioderV2Util {
                 .mapNotNull { aktiviteter[it] }
                 .flatten()
                 .mapNotNull { målgruppe.snitt(it) }
-                .mergeSammenhengende()
-        }
+        }.mergeSammenhengende()
 
     private fun List<Vilkår>.forenklet(): List<Datoperiode> =
         this
