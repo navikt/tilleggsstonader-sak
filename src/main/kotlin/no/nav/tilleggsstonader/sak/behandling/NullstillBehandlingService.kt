@@ -1,11 +1,13 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagerBrevRepository
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -28,6 +30,8 @@ class NullstillBehandlingService(
     private val tilkjentYtelseRepository: TilkjentYtelseRepository,
     private val mellomlagerBrevRepository: MellomlagerBrevRepository,
     private val vedtaksbrevRepository: VedtaksbrevRepository,
+    private val barnService: BarnService,
+    private val faktaGrunnlagService: FaktaGrunnlagService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -79,7 +83,16 @@ class NullstillBehandlingService(
         val behandlingIdForGjenbruk =
             gjennbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
                 ?: error("Fant ingen behandling å gjenbruke data fra")
+        kopierManglendeBarnFraForrgieBehandling(behandlingIdForGjenbruk, behandling)
         val barnMap = gjennbrukDataRevurderingService.finnNyttIdForBarn(behandling.id, behandlingIdForGjenbruk)
         gjennbrukDataRevurderingService.gjenbrukData(behandling, behandlingIdForGjenbruk, barnMap)
+    }
+
+    private fun kopierManglendeBarnFraForrgieBehandling(
+        behandlingIdForGjenbruk: BehandlingId,
+        nyBehandling: Behandling,
+    ) {
+        barnService.kopierManglendeBarnFraForrigeBehandling(behandlingIdForGjenbruk, nyBehandling)
+        faktaGrunnlagService.slettOgOpprettNyttGrunnlag(nyBehandling.id)
     }
 }
