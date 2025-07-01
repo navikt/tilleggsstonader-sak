@@ -28,14 +28,16 @@ class InsertUpdateRepositoryImplTest : IntegrationTest() {
                 @Suppress("DEPRECATION")
                 fagsakPersonRepository.save(fagsakPerson())
             },
-        ).isInstanceOf(DbActionExecutionException::class.java)
+        ).isInstanceOf(IllegalStateException::class.java)
+            .hasMessage("Not implemented - Use InsertUpdateRepository - insert/update")
 
         assertThat(
             catchThrowable {
                 @Suppress("DEPRECATION")
                 fagsakPersonRepository.saveAll(listOf(fagsakPerson(), fagsakPerson()))
             },
-        ).isInstanceOf(DbActionExecutionException::class.java)
+        ).isInstanceOf(IllegalStateException::class.java)
+            .hasMessage("Not implemented - Use InsertUpdateRepository - insertAll/updateAll")
     }
 
     @Test
