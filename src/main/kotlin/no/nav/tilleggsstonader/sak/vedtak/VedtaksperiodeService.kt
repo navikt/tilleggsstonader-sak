@@ -42,11 +42,17 @@ class VedtaksperiodeService(
                 saksbehandling.forrigeIverksatteBehandlingId
                     ?.let { this.finnVedtaksperioderForBehandling(it, null) }
                     ?: emptyList()
+            val revurderFra =
+                if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
+                    null
+                } else {
+                    saksbehandling.revurderFra
+                }
             return ForeslåVedtaksperiode.finnVedtaksperiodeV2(
                 vilkårperioder = vilkårperioder,
                 vilkår = vilkår,
                 tidligereVedtaksperioder = tidligereVedtaksperioder,
-                revurderFra = saksbehandling.revurderFra,
+                revurderFra = revurderFra,
             )
         } else {
             return ForeslåVedtaksperiode.finnVedtaksperiode(

@@ -40,10 +40,16 @@ class VedtaksperiodeLæremidlerService(
                 .let {
                     val tidligereVedtaksperioder =
                         finnVedtaksperioder(saksbehandling.forrigeIverksatteBehandlingId) ?: emptyList()
+                    val revurderFra =
+                        if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
+                            null
+                        } else {
+                            saksbehandling.revurderFra
+                        }
                     ForeslåVedtaksperioderBeholdIdUtil.beholdTidligereIdnForVedtaksperioderLæremidler(
                         tidligereVedtaksperioder = tidligereVedtaksperioder,
                         forslag = it,
-                        revurderFra = saksbehandling.revurderFra,
+                        revurderFra = revurderFra,
                     )
                 }
         }
