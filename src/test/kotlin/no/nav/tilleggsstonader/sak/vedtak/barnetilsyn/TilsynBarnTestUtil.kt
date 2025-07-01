@@ -32,6 +32,9 @@ import java.time.YearMonth
 import java.util.UUID
 
 object TilsynBarnTestUtil {
+    const val BARN_FNR = "01012067050"
+    const val BARN2_FNR = "14041385481"
+
     fun innvilgelseDto(
         vedtaksperioder: List<VedtaksperiodeDto>,
         begrunnelse: String? = null,

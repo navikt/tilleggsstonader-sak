@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -30,6 +31,7 @@ class TaAvVentService(
     private val gjennbrukDataRevurderingService: GjennbrukDataRevurderingService,
     private val barnService: BarnService,
     private val fagsakService: FagsakService,
+    private val faktaGrunnlagService: FaktaGrunnlagService,
 ) {
     @Transactional
     fun taAvVent(
@@ -107,6 +109,7 @@ class TaAvVentService(
                     ?: error("Forventer å finne en ferdigstilt behandling på fagsaken")
 
             barnService.kopierManglendeBarnFraForrigeBehandling(idForGjenbruk, behandlingSomTasAvVent)
+            faktaGrunnlagService.slettOgOpprettNyttGrunnlag(behandlingSomTasAvVent.id)
         }
 
         nullstillBehandlingService.nullstillBehandling(behandlingSomTasAvVent)

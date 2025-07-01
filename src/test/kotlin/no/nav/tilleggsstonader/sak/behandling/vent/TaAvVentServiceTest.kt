@@ -6,6 +6,8 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
+import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaTilsynBarnDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -15,6 +17,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
@@ -48,6 +51,9 @@ class TaAvVentServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var barnService: BarnService
+
+    @Autowired
+    lateinit var behandlingFaktaService: BehandlingFaktaService
 
     val fagsak = fagsak()
     val behandling = behandling(fagsak = fagsak)
@@ -224,11 +230,11 @@ class TaAvVentServiceTest : IntegrationTest() {
                 )
             testoppsettService.lagre(behandlingSomBlirIverksatt)
 
-            val barnPåIverksattBehandling = dummyBarn(behandlingSomBlirIverksatt.id, "barn1")
+            val barnPåIverksattBehandling = dummyBarn(behandlingSomBlirIverksatt.id, TilsynBarnTestUtil.BARN_FNR)
             barnService.opprettBarn(listOf(barnPåIverksattBehandling))
 
             // Legg til et annet barn på behandlingen som tas av vent
-            val barnPåBehandlingSomTasAvVent = dummyBarn(behandling.id, "barn2")
+            val barnPåBehandlingSomTasAvVent = dummyBarn(behandling.id, TilsynBarnTestUtil.BARN2_FNR)
             barnService.opprettBarn(listOf(barnPåBehandlingSomTasAvVent))
 
             // Iverksett behandlingen med barn1
@@ -241,7 +247,14 @@ class TaAvVentServiceTest : IntegrationTest() {
             // Verifiser at begge barna nå er på behandlingen som ble tatt av vent
             val barnEtterTaAvVent = barnService.finnBarnPåBehandling(behandling.id)
             assertThat(barnEtterTaAvVent).hasSize(2)
-            assertThat(barnEtterTaAvVent.map { it.ident }).containsExactlyInAnyOrder("barn1", "barn2")
+            assertThat(barnEtterTaAvVent.map { it.ident }).containsExactlyInAnyOrder(
+                TilsynBarnTestUtil.BARN_FNR,
+                TilsynBarnTestUtil.BARN2_FNR,
+            )
+
+            // Sjekk at fakta har blitt kopiert rett for barn
+            val fakta = behandlingFaktaService.hentFakta(behandling.id) as BehandlingFaktaTilsynBarnDto
+            assertThat(fakta.barn.size).isEqualTo(2)
         }
     }
 
