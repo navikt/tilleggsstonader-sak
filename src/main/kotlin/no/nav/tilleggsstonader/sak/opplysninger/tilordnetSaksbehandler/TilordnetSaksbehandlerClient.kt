@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler
+package no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Saksbehandler
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
@@ -11,7 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 
 @Component
-class AnsvarligSaksbehandlerClient(
+class TilordnetSaksbehandlerClient(
     @Value("\${clients.integrasjoner.uri}") private val integrasjonerBaseUrl: URI,
     @Qualifier("azure") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {

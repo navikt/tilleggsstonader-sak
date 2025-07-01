@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler
+package no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Saksbehandler
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -6,53 +6,47 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
-import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.domain.AnsvarligSaksbehandler
-import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.domain.SaksbehandlerRolle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
+import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.domain.TilordnetSaksbehandler
+import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.domain.TilordnetSaksbehandlerPåOppgave
 import org.springframework.stereotype.Service
 
 @Service
-class AnsvarligSaksbehandlerService(
+class TilordnetSaksbehandlerService(
     private val oppgaveRepository: OppgaveRepository,
     private val behandlingRepository: BehandlingRepository,
-    private val saksbehandlerClient: AnsvarligSaksbehandlerClient,
+    private val saksbehandlerClient: TilordnetSaksbehandlerClient,
 ) {
-    fun finnAnsvarligSaksbehandler(behandlingId: BehandlingId): AnsvarligSaksbehandler {
-        val oppgave = hentIkkeFerdigstiltOppgaveForBehandling(behandlingId)
-        return utledAnsvarligSaksbehandlerForOppgave(behandlingId, oppgave)
+    fun finnTilordnetSaksbehandler(behandlingId: BehandlingId): TilordnetSaksbehandler {
+        val oppgave = hentOppgaveMedTypeSomIkkeErFerdigstilt(behandlingId)
+        return utledTilordnetSaksbehandlerForOppgave(behandlingId, oppgave)
     }
 
-    private fun hentIkkeFerdigstiltOppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? {
-        val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
+    private fun hentOppgaveMedTypeSomIkkeErFerdigstilt(behandlingId: BehandlingId): OppgaveDomain? {
         val oppgavetyper =
-            when (behandling.steg.tillattFor) {
-                BehandlerRolle.SAKSBEHANDLER -> setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak)
-                BehandlerRolle.BESLUTTER -> setOf(Oppgavetype.GodkjenneVedtak)
-                else -> emptySet()
-            }
-        return hentOppgaveMedTypeSomIkkeErFerdigstilt(behandlingId, oppgavetyper)
-    }
-
-    private fun hentOppgaveMedTypeSomIkkeErFerdigstilt(
-        behandlingId: BehandlingId,
-        oppgavetyper: Set<Oppgavetype>,
-    ): OppgaveDomain? =
-        oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(
+            setOf(
+                Oppgavetype.BehandleSak,
+                Oppgavetype.BehandleUnderkjentVedtak,
+                Oppgavetype.GodkjenneVedtak,
+            )
+        return oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(
             behandlingId,
             oppgavetyper,
         )
+    }
 
-    private fun utledAnsvarligSaksbehandlerForOppgave(
+    private fun utledTilordnetSaksbehandlerForOppgave(
         behandlingId: BehandlingId,
         behandleSakOppgave: OppgaveDomain?,
-    ): AnsvarligSaksbehandler {
-        val rolle = utledSaksbehandlerRolle(behandlingId, behandleSakOppgave)
+    ): TilordnetSaksbehandler {
+        val tilordnetSaksbehandlerPåOppgave = utledSaksbehandlerRolle(behandlingId, behandleSakOppgave)
 
         val tilordnetSaksbehandler =
-            if (rolle == SaksbehandlerRolle.OPPGAVE_FINNES_IKKE_SANNSYNLIGVIS_INNLOGGET_SAKSBEHANDLER) {
+            if (tilordnetSaksbehandlerPåOppgave ==
+                TilordnetSaksbehandlerPåOppgave.OPPGAVE_FINNES_IKKE_SANNSYNLIGVIS_INNLOGGET_SAKSBEHANDLER
+            ) {
                 hentSaksbehandlerInfo(SikkerhetContext.hentSaksbehandler())
             } else if (behandleSakOppgave?.tilordnetSaksbehandler == null) {
                 // Dersom oppgaven er null og tilordnet saksbehandler er null får man status SaksbehandlerRolle.OPPGAVE_FINNES_IKKE
@@ -61,10 +55,11 @@ class AnsvarligSaksbehandlerService(
                 hentSaksbehandlerInfo(behandleSakOppgave.tilordnetSaksbehandler)
             }
 
-        return AnsvarligSaksbehandler(
+        return TilordnetSaksbehandler(
+            navIdent = tilordnetSaksbehandler?.navIdent,
             etternavn = tilordnetSaksbehandler?.etternavn,
             fornavn = tilordnetSaksbehandler?.fornavn,
-            rolle = rolle,
+            tilordnetSaksbehandlerPåOppgave = tilordnetSaksbehandlerPåOppgave,
         )
     }
 
@@ -88,23 +83,23 @@ class AnsvarligSaksbehandlerService(
     private fun utledSaksbehandlerRolle(
         behandlingId: BehandlingId,
         oppgave: OppgaveDomain?,
-    ): SaksbehandlerRolle {
+    ): TilordnetSaksbehandlerPåOppgave {
         if (oppgave == null) {
             val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
             if (behandling.steg == StegType.INNGANGSVILKÅR ||
                 behandling.steg == StegType.VILKÅR ||
                 behandling.steg == StegType.BEREGNE_YTELSE
             ) {
-                return SaksbehandlerRolle.OPPGAVE_FINNES_IKKE_SANNSYNLIGVIS_INNLOGGET_SAKSBEHANDLER
+                return TilordnetSaksbehandlerPåOppgave.OPPGAVE_FINNES_IKKE_SANNSYNLIGVIS_INNLOGGET_SAKSBEHANDLER
             }
-            return SaksbehandlerRolle.OPPGAVE_FINNES_IKKE
+            return TilordnetSaksbehandlerPåOppgave.OPPGAVE_FINNES_IKKE
         }
 
         val innloggetSaksbehandler = SikkerhetContext.hentSaksbehandler()
         return when (oppgave.tilordnetSaksbehandler) {
-            innloggetSaksbehandler -> SaksbehandlerRolle.INNLOGGET_SAKSBEHANDLER
-            null -> SaksbehandlerRolle.IKKE_SATT
-            else -> SaksbehandlerRolle.ANNEN_SAKSBEHANDLER
+            innloggetSaksbehandler -> TilordnetSaksbehandlerPåOppgave.INNLOGGET_SAKSBEHANDLER
+            null -> TilordnetSaksbehandlerPåOppgave.IKKE_SATT
+            else -> TilordnetSaksbehandlerPåOppgave.ANNEN_SAKSBEHANDLER
         }
     }
 }

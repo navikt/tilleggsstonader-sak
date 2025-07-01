@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.ansvarligSaksbehandler
+package no.nav.tilleggsstonader.sak.tilordnetSaksbehandler
 
 import io.mockk.every
 import io.mockk.mockk
@@ -9,13 +9,13 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.AnsvarligSaksbehandlerClient
-import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.AnsvarligSaksbehandlerService
-import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.domain.SaksbehandlerRolle
-import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.domain.tilDto
-import no.nav.tilleggsstonader.sak.opplysninger.ansvarligSaksbehandler.dto.AnsvarligSaksbehandlerDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
+import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.TilordnetSaksbehandlerClient
+import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.TilordnetSaksbehandlerService
+import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.domain.TilordnetSaksbehandlerPåOppgave
+import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.dto.TilordnetSaksbehandlerDto
+import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.dto.tilDto
 import no.nav.tilleggsstonader.sak.util.BehandlingOppsettUtil.iverksattFørstegangsbehandling
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import org.assertj.core.api.Assertions.assertThat
@@ -23,11 +23,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-internal class AnsvarligSaksbehandlerServiceTest {
+internal class TilordnetSaksbehandlerServiceTest {
     private val oppgaveRepository = mockk<OppgaveRepository>()
     private val behandlingRepository = mockk<BehandlingRepository>()
-    private val saksbehandlerClient = mockk<AnsvarligSaksbehandlerClient>()
-    private lateinit var service: AnsvarligSaksbehandlerService
+    private val saksbehandlerClient = mockk<TilordnetSaksbehandlerClient>()
+    private lateinit var service: TilordnetSaksbehandlerService
 
     private val behandlingId = BehandlingId(UUID.randomUUID())
     private val saksbehandlerInfo = Saksbehandler(UUID.randomUUID(), "Z123456", "Test", "Testesen", "TSO")
@@ -35,7 +35,7 @@ internal class AnsvarligSaksbehandlerServiceTest {
     @BeforeEach
     fun setUp() {
         service =
-            AnsvarligSaksbehandlerService(
+            TilordnetSaksbehandlerService(
                 oppgaveRepository,
                 behandlingRepository,
                 saksbehandlerClient,
@@ -63,9 +63,9 @@ internal class AnsvarligSaksbehandlerServiceTest {
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
 
         testWithBrukerContext(saksbehandlerInfo.navIdent) {
-            val resultat = service.finnAnsvarligSaksbehandler(behandlingId)
+            val resultat = service.finnTilordnetSaksbehandler(behandlingId)
 
-            assertThat(resultat.rolle).isEqualTo(SaksbehandlerRolle.INNLOGGET_SAKSBEHANDLER)
+            assertThat(resultat.tilordnetSaksbehandlerPåOppgave).isEqualTo(TilordnetSaksbehandlerPåOppgave.INNLOGGET_SAKSBEHANDLER)
             assertThat(resultat.fornavn).isEqualTo("Test")
             assertThat(resultat.etternavn).isEqualTo("Testesen")
         }
@@ -83,9 +83,11 @@ internal class AnsvarligSaksbehandlerServiceTest {
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
 
         testWithBrukerContext(saksbehandlerInfo.navIdent) {
-            val resultat = service.finnAnsvarligSaksbehandler(behandlingId)
+            val resultat = service.finnTilordnetSaksbehandler(behandlingId)
 
-            assertThat(resultat.rolle).isEqualTo(SaksbehandlerRolle.OPPGAVE_FINNES_IKKE_SANNSYNLIGVIS_INNLOGGET_SAKSBEHANDLER)
+            assertThat(
+                resultat.tilordnetSaksbehandlerPåOppgave,
+            ).isEqualTo(TilordnetSaksbehandlerPåOppgave.OPPGAVE_FINNES_IKKE_SANNSYNLIGVIS_INNLOGGET_SAKSBEHANDLER)
             assertThat(resultat.fornavn).isEqualTo("Test")
             assertThat(resultat.etternavn).isEqualTo("Testesen")
         }
@@ -103,9 +105,9 @@ internal class AnsvarligSaksbehandlerServiceTest {
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
 
         testWithBrukerContext(saksbehandlerInfo.navIdent) {
-            val resultat = service.finnAnsvarligSaksbehandler(behandlingId)
+            val resultat = service.finnTilordnetSaksbehandler(behandlingId)
 
-            assertThat(resultat.rolle).isEqualTo(SaksbehandlerRolle.OPPGAVE_FINNES_IKKE)
+            assertThat(resultat.tilordnetSaksbehandlerPåOppgave).isEqualTo(TilordnetSaksbehandlerPåOppgave.OPPGAVE_FINNES_IKKE)
             assertThat(resultat.fornavn).isEqualTo(null)
             assertThat(resultat.etternavn).isEqualTo(null)
         }
@@ -132,16 +134,16 @@ internal class AnsvarligSaksbehandlerServiceTest {
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
 
         testWithBrukerContext(saksbehandlerInfo.navIdent) {
-            val resultat = service.finnAnsvarligSaksbehandler(behandlingId)
+            val resultat = service.finnTilordnetSaksbehandler(behandlingId)
 
-            assertThat(resultat.rolle).isEqualTo(SaksbehandlerRolle.IKKE_SATT)
+            assertThat(resultat.tilordnetSaksbehandlerPåOppgave).isEqualTo(TilordnetSaksbehandlerPåOppgave.IKKE_SATT)
             assertThat(resultat.fornavn).isEqualTo(null)
             assertThat(resultat.etternavn).isEqualTo(null)
         }
     }
 
     @Test
-    fun `skal returnere null hvis behandlingen er ferdigstilt`() {
+    fun `skal returnere null og OPPGAVE_FINNES_IKKE hvis behandlingen er ferdigstilt`() {
         val ferdigstiltBehandling =
             iverksattFørstegangsbehandling.copy(
                 steg = StegType.FERDIGSTILLE_BEHANDLING,
@@ -150,15 +152,21 @@ internal class AnsvarligSaksbehandlerServiceTest {
 
         every { behandlingRepository.findByIdOrThrow(behandlingId) } returns ferdigstiltBehandling
 
-        every { oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(any(), emptySet()) } returns null
+        every {
+            oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(
+                any(),
+                any(),
+            )
+        } returns null
 
-        val resultat = service.finnAnsvarligSaksbehandler(behandlingId).tilDto()
+        val resultat = service.finnTilordnetSaksbehandler(behandlingId).tilDto()
 
         assertThat(resultat).isEqualTo(
-            AnsvarligSaksbehandlerDto(
+            TilordnetSaksbehandlerDto(
+                navIdent = null,
                 fornavn = null,
                 etternavn = null,
-                rolle = SaksbehandlerRolle.OPPGAVE_FINNES_IKKE,
+                tilordnetSaksbehandlerPåOppgave = TilordnetSaksbehandlerPåOppgave.OPPGAVE_FINNES_IKKE,
             ),
         )
     }
@@ -189,10 +197,10 @@ internal class AnsvarligSaksbehandlerServiceTest {
         every { oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(any(), any()) } returns oppgave
 
         testWithBrukerContext(innloggetSaksbehandlerSomIkkeEierBehandling.navIdent) {
-            val resultat = service.finnAnsvarligSaksbehandler(behandlingId)
+            val resultat = service.finnTilordnetSaksbehandler(behandlingId)
 
             assertThat(oppgave.tilordnetSaksbehandler).isNotEqualTo(innloggetSaksbehandlerSomIkkeEierBehandling.navIdent)
-            assertThat(resultat.rolle).isEqualTo(SaksbehandlerRolle.ANNEN_SAKSBEHANDLER)
+            assertThat(resultat.tilordnetSaksbehandlerPåOppgave).isEqualTo(TilordnetSaksbehandlerPåOppgave.ANNEN_SAKSBEHANDLER)
             assertThat(resultat.fornavn).isEqualTo("Test")
             assertThat(resultat.etternavn).isEqualTo("Testesen")
         }
