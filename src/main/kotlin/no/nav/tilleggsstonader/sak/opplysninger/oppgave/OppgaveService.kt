@@ -39,6 +39,7 @@ import no.nav.tilleggsstonader.sak.util.FnrUtil
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
@@ -125,17 +126,27 @@ class OppgaveService(
     private val Oppgave.ident: String?
         get() = this.identer?.firstOrNull { it.gruppe == IdentGruppe.FOLKEREGISTERIDENT }?.ident
 
+    @Transactional
     fun fordelOppgave(
         gsakOppgaveId: Long,
         saksbehandler: String?,
         versjon: Int,
     ): OppgaveMedMetadata {
+        val finnOppgave =
+            oppgaveRepository.findByGsakOppgaveId(gsakOppgaveId)
+                ?: error("Fant ikke oppgave for gsakOppgaveId $gsakOppgaveId")
+
+        oppgaveRepository.update(
+            finnOppgave.copy(tilordnetSaksbehandler = saksbehandler),
+        )
+
         val oppdatertOppgave =
             oppgaveClient.fordelOppgave(
                 oppgaveId = gsakOppgaveId,
                 saksbehandler = saksbehandler,
                 versjon = versjon,
             )
+
         return medMetadata(oppdatertOppgave)
     }
 
