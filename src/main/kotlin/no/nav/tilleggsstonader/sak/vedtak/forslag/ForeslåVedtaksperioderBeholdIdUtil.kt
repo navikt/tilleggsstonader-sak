@@ -20,6 +20,24 @@ object ForeslåVedtaksperioderBeholdIdUtil {
             tidligereVedtaksperioder = tidligereVedtaksperioder,
             initielleForslag = forslag,
         ).beholdTidligereIdnForVedtaksperioder()
+
+    fun beholdTidligereIdnForVedtaksperioderLæremidler(
+        tidligereVedtaksperioder: List<no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode>,
+        forslag: List<Vedtaksperiode>,
+    ): List<no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode> =
+        ForeslåVedtaksperioderBeholdId(
+            tidligereVedtaksperioder = tidligereVedtaksperioder.map { it.tilFellesDomeneVedtaksperiode() },
+            initielleForslag = forslag,
+        ).beholdTidligereIdnForVedtaksperioder()
+            .map {
+                no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode(
+                    id = it.id,
+                    fom = it.fom,
+                    tom = it.tom,
+                    målgruppe = it.målgruppe,
+                    aktivitet = it.aktivitet,
+                )
+            }
 }
 
 /**
