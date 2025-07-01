@@ -12,7 +12,7 @@ enum class Toggle(
 
     HENT_BEHANDLINGER_FOR_OPPFØLGING("sak.hent-behandlinger-for-oppfoelging"),
 
-    KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK("sak.kan-ha-flere-behandlinger-på-samme-fagsak"),
+    KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK("sak.kan-ha-flere-behandlinger-pa-samme-fagsak"),
 
     BOUTGIFTER_TILLAT_HOYERE_UTGIFTER("sak.boutgifter-tillat-hoyere-utgifter"),
 
