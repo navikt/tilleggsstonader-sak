@@ -18,9 +18,10 @@ object ForeslåVedtaksperiode {
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
         tidligereVedtaksperioder: List<Vedtaksperiode>,
+        revurderFra: LocalDate?,
     ): List<Vedtaksperiode> {
         val forslag = ForeslåVedtaksperioderV2Util.foreslåPerioder(vilkårperioder, vilkår)
-        return ForeslåVedtaksperioderBeholdIdUtil.beholdTidligereIdnForVedtaksperioder(tidligereVedtaksperioder, forslag)
+        return ForeslåVedtaksperioderBeholdIdUtil.beholdTidligereIdnForVedtaksperioder(tidligereVedtaksperioder, forslag, revurderFra)
     }
 
     fun finnVedtaksperiode(
