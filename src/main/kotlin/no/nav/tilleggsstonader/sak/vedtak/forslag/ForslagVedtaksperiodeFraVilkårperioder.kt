@@ -10,13 +10,9 @@ import java.time.LocalDate
  * Forslag av vedtaksperioder i forhold til vilkårperioder.
  * Forholder seg ikke til ev. stønadsvilkår eks [VilkårType.PASS_BARN]
  */
-data class ForslagVedtaksperiodeFraVilkårperioderGenerisk<MÅLGRUPPE>(
+data class ForslagVedtaksperiodeFraVilkårperioder(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val målgruppe: MÅLGRUPPE,
+    val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
 ) : Periode<LocalDate>
-
-typealias ForslagVedtaksperiodeFraVilkårperioder = ForslagVedtaksperiodeFraVilkårperioderGenerisk<FaktiskMålgruppe>
-
-typealias ForslagVedtaksperiodeFraVilkårperioderFaktiskMålgruppe = ForslagVedtaksperiodeFraVilkårperioderGenerisk<FaktiskMålgruppe>

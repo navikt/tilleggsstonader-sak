@@ -27,7 +27,7 @@ class VedtaksperiodeLæremidlerService(
 
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
 
-        return ForeslåVedtaksperiodeFraVilkårperioder.foreslåVedtaksperioderFaktiskMålgruppe(vilkårperioder).single().let {
+        return ForeslåVedtaksperiodeFraVilkårperioder.foreslåVedtaksperioder(vilkårperioder).single().let {
             listOf(
                 Vedtaksperiode(
                     fom = it.fom,
