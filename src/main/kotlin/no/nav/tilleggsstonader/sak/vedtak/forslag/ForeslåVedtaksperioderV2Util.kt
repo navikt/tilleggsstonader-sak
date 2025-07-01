@@ -28,11 +28,7 @@ object ForeslåVedtaksperioderV2Util {
     ): List<Vedtaksperiode> {
         val forslag =
             foreslåPerioder(
-                målgrupper =
-                    vilkårperioder.målgrupper
-                        .forenklet { (it.type as MålgruppeType).faktiskMålgruppe() }
-                        .values
-                        .flatten(),
+                målgrupper = forenkledeMålgrupper(vilkårperioder),
                 aktiviteter = vilkårperioder.aktiviteter.forenklet { it.type as AktivitetType },
                 vilkår = vilkår.forenklet(),
             )
@@ -45,11 +41,7 @@ object ForeslåVedtaksperioderV2Util {
     fun foreslåPerioder(vilkårperioder: Vilkårperioder): List<Vedtaksperiode> {
         val forslag =
             forslagVedtaksperiodeForInngangsvilkår(
-                målgrupper =
-                    vilkårperioder.målgrupper
-                        .forenklet { (it.type as MålgruppeType).faktiskMålgruppe() }
-                        .values
-                        .flatten(),
+                målgrupper = forenkledeMålgrupper(vilkårperioder),
                 aktiviteter = vilkårperioder.aktiviteter.forenklet { it.type as AktivitetType },
             )
         brukerfeilHvis(forslag.isEmpty()) {
@@ -57,6 +49,12 @@ object ForeslåVedtaksperioderV2Util {
         }
         return forslag
     }
+
+    private fun forenkledeMålgrupper(vilkårperioder: Vilkårperioder): List<ForenkletVilkårperiode<FaktiskMålgruppe>> =
+        vilkårperioder.målgrupper
+            .forenklet { (it.type as MålgruppeType).faktiskMålgruppe() }
+            .values
+            .flatten()
 
     private fun foreslåPerioder(
         målgrupper: List<ForenkletVilkårperiode<FaktiskMålgruppe>>,
