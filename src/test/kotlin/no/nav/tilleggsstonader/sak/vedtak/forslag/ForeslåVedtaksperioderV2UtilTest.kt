@@ -1,10 +1,12 @@
 package no.nav.tilleggsstonader.sak.vedtak.forslag
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
+import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.FileUtil
@@ -16,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodet
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.time.LocalDate
+import java.time.Month
 import java.time.temporal.ChronoUnit
 
 /*
@@ -26,6 +29,17 @@ with q as (select 'behandling' type, b.id behandling_id, b.id, current_date, cur
              AND b.resultat = 'INNVILGET')
 select *
 from q
+union all
+select 'arena_vedtak_tom',
+       fg.behandling_id,
+       fg.behandling_id,
+       (fg.data ->> 'vedtakTom')::date,
+       current_date,
+       'type1',
+       'type2'
+from fakta_grunnlag fg
+         join q q1 on q1.behandling_id = fg.behandling_id
+WHERE fg.type = 'ARENA_VEDTAK_TOM'
 union all
 select 'vilkarperiode' type, vp.behandling_id, vp.id, vp.fom, vp.tom, vp.type, 'type2'
 from vilkar_periode vp
@@ -56,22 +70,11 @@ class ForeslåVedtaksperioderV2UtilTest {
         val avvik = mutableListOf<Avvik>()
         var antallRiktige = 0
         var antallMedOverlappende = 0
-        fil.entries.forEach { (id, it) ->
+        fil.entries.forEach { (id, info) ->
             try {
-                val forslagVedtaksperiode = when (it.stønadstype) {
-                    Stønadstype.LÆREMIDLER -> ForeslåVedtaksperioderV2Util.forslagVedtaksperiodeForInngangsvilkår(
-                        it.målgrupper,
-                        it.aktiviteter.groupBy { it.type })
+                val forslagVedtaksperiode = mapForslag(info)
 
-                    Stønadstype.BARNETILSYN,
-                    Stønadstype.BOUTGIFTER -> ForeslåVedtaksperioderV2Util.foreslåPerioder(
-                        it.målgrupper,
-                        it.aktiviteter.groupBy { it.type },
-                        it.vilkår
-                    )
-                }.sorted().map { ForenkletVedtaksperiode(it) }
-
-                val faktiskeVedtaksperioder = it.vedtaksperioder.mergeSammenhengende(
+                val faktiskeVedtaksperioder = info.vedtaksperioder.mergeSammenhengende(
                     skalMerges = { a, b ->
                         a.målgruppe == b.målgruppe && a.aktivitet == b.aktivitet && a.overlapperEllerPåfølgesAv(b)
                     },
@@ -79,13 +82,18 @@ class ForeslåVedtaksperioderV2UtilTest {
                 )
 
                 if (forslagVedtaksperiode != faktiskeVedtaksperioder) {
+                    // mulighet for å filtrere vekk de perioder som finnes i begge settene
                     val set = forslagVedtaksperiode.toSet()
                     val set2 = faktiskeVedtaksperioder.toSet()
                     avvik.add(
                         Avvik(
-                            faktiske = faktiskeVedtaksperioder.filterNot { it in set && it in set2 },
-                            foreslåtte = forslagVedtaksperiode.filterNot { it in set && it in set2 },
-                            info = it
+                            faktiske = faktiskeVedtaksperioder
+                                .filterNot { it in set && it in set2 }
+                            ,
+                            foreslåtte = forslagVedtaksperiode
+                                .filterNot { it in set && it in set2 }
+                            ,
+                            info = info
                         )
                     )
                 } else {
@@ -102,20 +110,59 @@ class ForeslåVedtaksperioderV2UtilTest {
         println("Antall riktige: $antallRiktige")
         println("Antall overlapp: $antallMedOverlappende")
         println("Antall avvik: ${avvik.size}")
+        println("Antall med vedtak i Arena=${fil.values.count { it.arenaTom != null }}")
 
-        val akko = avvik.map {
-            val fomForeslått = it.foreslåtte.minOfOrNull { it.fom }
-            val fomFaktisk = it.faktiske.minOfOrNull { it.fom }
-            val fomDager = if (fomForeslått == null || fomFaktisk == null) -1 else
-                ChronoUnit.DAYS.between(fomForeslått, fomFaktisk)
+        printTotalAntallDagerAvvik(avvik)
+        println("Kun FAKTISK_SLUTTER_ANNET_DATO")
+        printTotalAntallDagerAvvik(avvik.filter { finnÅrsak(it).contains("FAKTISK_SLUTTER_ANNET_DATO") })
 
-            val tomForeslått = it.foreslåtte.minOfOrNull { it.fom }
-            val tomFaktisk = it.faktiske.minOfOrNull { it.fom }
-            val tomDager = if (tomForeslått == null || tomFaktisk == null) -1 else
-                ChronoUnit.DAYS.between(tomForeslått, tomFaktisk)
-            Pair(fomDager, tomDager)
+        printTilFil(avvik)
+    }
+
+    private fun mapForslag(info: Info): List<ForenkletVedtaksperiode> = when (info.stønadstype) {
+        Stønadstype.LÆREMIDLER -> ForeslåVedtaksperioderV2Util.forslagVedtaksperiodeForInngangsvilkår(
+            info.målgrupper,
+            info.aktiviteter.groupBy { it.type })
+
+        Stønadstype.BARNETILSYN,
+        Stønadstype.BOUTGIFTER -> ForeslåVedtaksperioderV2Util.foreslåPerioder(
+            info.målgrupper,
+            info.aktiviteter.groupBy { it.type },
+            info.vilkår
+        )
+    }.sorted().map { ForenkletVedtaksperiode(it) }
+        .let {
+            if (info.arenaTom != null) {
+                it.avkortPerioderFør(info.arenaTom)
+            } else {
+                it
+            }
         }
-        val fomDager = akko.map { it.first }.groupBy {
+
+    private fun printTilFil(avvik: MutableList<Avvik>) {
+        File("src/test/resources/avvik.txt").apply {
+            avvik.forEach {
+                val dagerAvvik = antallDagerAvvik(it)
+                val årsaker = finnÅrsak(it)
+
+                appendText("Stønadstype: ${it.info.stønadstype}, behandlingId: ${it.info.behandlingId}\n")
+                appendText("FORESLÅTT:\n")
+                it.foreslåtte.forEach { appendText("$it\n") }
+                appendText("FAKTISKE:\n")
+                it.faktiske.forEach { appendText("$it\n") }
+                appendText("Avvik: ${årsaker.joinToString(", ")}\n")
+                appendText("Dager avvik: fom=${dagerAvvik.first}, tom=${dagerAvvik.second}\n")
+                it.info.arenaTom?.let { appendText("ArenaTom=$it\n") }
+                appendText("\n")
+            }
+        }
+    }
+
+    private fun printTotalAntallDagerAvvik(avvik: List<Avvik>) {
+        val totaltAvvik = avvik.map {
+            antallDagerAvvik(it)
+        }
+        val fomDager = totaltAvvik.map { it.first }.groupBy {
             when {
                 it <= 1 -> it
                 it <= 5 -> 5
@@ -127,7 +174,7 @@ class ForeslåVedtaksperioderV2UtilTest {
                 else -> 101
             }
         }.mapValues { it.value.size }.entries.sortedBy { it.key }
-        val tomDager = akko.map { it.second }.groupBy {
+        val tomDager = totaltAvvik.map { it.second }.groupBy {
             when {
                 it <= 1 -> it
                 it <= 5 -> 5
@@ -142,7 +189,7 @@ class ForeslåVedtaksperioderV2UtilTest {
 
         println("FOM")
         fomDager.forEach {
-            if(it.key == 101L) {
+            if (it.key == 101L) {
                 println("over 100: ${it.value}")
                 return@forEach
             } else {
@@ -152,32 +199,26 @@ class ForeslåVedtaksperioderV2UtilTest {
 
         println("TOM")
         tomDager.forEach {
-            if(it.key == 101L) {
+            if (it.key == 101L) {
                 println("over 100: ${it.value}")
                 return@forEach
             } else {
                 println("<= ${it.key}: ${it.value}")
             }
         }
+    }
 
-        File("src/test/resources/avvik.txt").apply {
-            avvik.forEach {
-                val årsaker = finnÅrsak(it)
-                /*
-                if(årsaker.contains("KUNNE_BEGYNT_FØR") || årsaker.contains("KUNNE_SLUTTET_SENERE")) {
-                    return@forEach
-                }
-                 */
-                appendText("Stønadstype: ${it.info.stønadstype}, behandlingId: ${it.info.behandlingId}\n")
-                appendText("FORESLÅTT:\n")
-                it.foreslåtte.forEach { appendText("$it\n") }
-                appendText("FAKTISKE:\n")
-                it.faktiske.forEach { appendText("$it\n") }
-                appendText("Avvik: ${årsaker.joinToString(", ")}\n")
-                appendText("\n")
-            }
-        }
+    private fun antallDagerAvvik(avvik1: Avvik): Pair<Long, Long> {
+        val fomForeslått = avvik1.foreslåtte.minOfOrNull { it.fom }
+        val fomFaktisk = avvik1.faktiske.minOfOrNull { it.fom }
+        val fomDager = if (fomForeslått == null || fomFaktisk == null) -1 else
+            ChronoUnit.DAYS.between(fomForeslått, fomFaktisk)
 
+        val tomForeslått = avvik1.foreslåtte.maxOfOrNull { it.tom }
+        val tomFaktisk = avvik1.faktiske.maxOfOrNull { it.tom }
+        val tomDager = if (tomForeslått == null || tomFaktisk == null) -1 else
+            ChronoUnit.DAYS.between(tomFaktisk, tomForeslått)
+        return Pair(fomDager, tomDager)
     }
 
     private fun finnÅrsak(avvik1: Avvik): MutableList<String> {
@@ -188,17 +229,25 @@ class ForeslåVedtaksperioderV2UtilTest {
             if (foreslått.overlapper(faktisk)) {
                 if (foreslått.fom < faktisk.fom) {
                     årsak.add("KUNNE_BEGYNT_FØR")
-                }
-                if (foreslått.fom > faktisk.fom) {
-                    årsak.add("FOM_ETTER_CHECK")
+                    if (faktisk.fom == avvik1.info.arenaTom?.plusDays(1)) {
+                        årsak.add("FAKTISK_BEGYNNER_DAGEN_ETTER_ARENA_TOM")
+                    }
                 }
                 if (foreslått.tom > faktisk.tom) {
                     årsak.add("KUNNE_SLUTTET_SENERE")
+                    if (faktisk.tom.month == Month.JUNE && faktisk.tom.dayOfMonth == 30) {
+                        årsak.add("FAKTISK_SLUTTER_30_JUNI")
+                    } else {
+                        årsak.add("FAKTISK_SLUTTER_ANNET_DATO")
+                    }
                 }
-                if (foreslått.tom < faktisk.tom) {
-                    årsak.add("TOM_FØR_CHECK")
+
+                // skal ikke skje
+                if (foreslått.fom > faktisk.fom || foreslått.tom < faktisk.tom) {
+                    årsak.add("CHECK")
                 }
             } else {
+                // skal ikke skje
                 årsak.add("CHECK")
             }
         } else {
@@ -218,9 +267,10 @@ class ForeslåVedtaksperioderV2UtilTest {
         it
             .drop(1)
             .filter { it.isNotBlank() }
-            .forEach { line ->
+            .forEachIndexed { index, line ->
                 val parts = line.split(",")
                 try {
+                    //println("$index $line")
                     map(parts, map)
                 } catch (e: Throwable) {
                     println("Feil ved parsing av linje: $line")
@@ -237,7 +287,7 @@ class ForeslåVedtaksperioderV2UtilTest {
         val type = parts[0]
         val type2 = parts[5]
         val type3 = parts[6]
-        val fom = LocalDate.parse(parts[3])
+        val fomEllerArenaTom = parts[3].takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) }
         val tom = LocalDate.parse(parts[4])
         val behandlingId = BehandlingId.fromString(parts[1])
 
@@ -247,13 +297,17 @@ class ForeslåVedtaksperioderV2UtilTest {
                 map.put(behandlingId, Info(behandlingId, stønadstype))
             }
 
+            "arena_vedtak_tom" -> {
+                map.getValue(behandlingId).arenaTom = fomEllerArenaTom
+            }
+
             "vilkarperiode" -> {
                 val value = map.getValue(behandlingId)
                 val typeVilkårperiode = vilkårperiodetyper[type2]!!
                 when (typeVilkårperiode) {
                     is MålgruppeType -> value.målgrupper.add(
                         ForenkletVilkårperiode(
-                            fom = fom,
+                            fom = fomEllerArenaTom!!,
                             tom = tom,
                             type = typeVilkårperiode.faktiskMålgruppe()
                         )
@@ -261,7 +315,7 @@ class ForeslåVedtaksperioderV2UtilTest {
 
                     is AktivitetType -> value.aktiviteter.add(
                         ForenkletVilkårperiode(
-                            fom = fom,
+                            fom = fomEllerArenaTom!!,
                             tom = tom,
                             type = typeVilkårperiode
                         )
@@ -271,14 +325,14 @@ class ForeslåVedtaksperioderV2UtilTest {
 
             "vilkar" -> {
                 val value = map.getValue(behandlingId)
-                value.vilkår.add(Datoperiode(fom = fom, tom = tom))
+                value.vilkår.add(Datoperiode(fom = fomEllerArenaTom!!, tom = tom))
             }
 
             "vedtaksperiode" -> {
                 val value = map.getValue(behandlingId)
                 value.vedtaksperioder.add(
                     ForenkletVedtaksperiode(
-                        fom = fom,
+                        fom = fomEllerArenaTom!!,
                         tom = tom,
                         målgruppe = FaktiskMålgruppe.valueOf(type2),
                         aktivitet = AktivitetType.valueOf(type3)
@@ -291,6 +345,7 @@ class ForeslåVedtaksperioderV2UtilTest {
     data class Info(
         val behandlingId: BehandlingId,
         val stønadstype: Stønadstype,
+        var arenaTom: LocalDate? = null,
         val målgrupper: MutableList<ForenkletVilkårperiode<FaktiskMålgruppe>> = mutableListOf(),
         val aktiviteter: MutableList<ForenkletVilkårperiode<AktivitetType>> = mutableListOf(),
         val vilkår: MutableList<Datoperiode> = mutableListOf(),
@@ -302,12 +357,19 @@ class ForeslåVedtaksperioderV2UtilTest {
         override val tom: LocalDate,
         val målgruppe: FaktiskMålgruppe,
         val aktivitet: AktivitetType,
-    ) : Periode<LocalDate> {
+    ) : Periode<LocalDate>, KopierPeriode<ForenkletVedtaksperiode> {
         constructor(vedtaksperiode: Vedtaksperiode) : this(
             fom = vedtaksperiode.fom,
             tom = vedtaksperiode.tom,
             målgruppe = vedtaksperiode.målgruppe,
             aktivitet = vedtaksperiode.aktivitet
         )
+
+        override fun medPeriode(
+            fom: LocalDate,
+            tom: LocalDate
+        ): ForenkletVedtaksperiode {
+            return this.copy(fom = fom, tom = tom)
+        }
     }
 }
