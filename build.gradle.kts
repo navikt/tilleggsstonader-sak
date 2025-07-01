@@ -108,6 +108,10 @@ dependencies {
     testImplementation(platform("io.cucumber:cucumber-bom:7.23.0"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
+
+    // Transitiv avhengighet fra mock-oauth2-server -> bcpix. Disse under er definert som dynamisk versjon, noe bygget vårt ikke vil ha noe av
+    testImplementation("org.bouncycastle:bcutil-jdk18on:1.81")
+    testImplementation("org.bouncycastle:bcprov-jdk18on:1.81")
 }
 
 kotlin {
