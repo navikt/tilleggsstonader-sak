@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeA
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
+import org.slf4j.LoggerFactory
 import java.util.UUID
 
 enum class DomenenøkkelForeslåVedtaksperioder(
@@ -42,6 +43,8 @@ enum class DomenenøkkelForeslåVedtaksperioder(
 
 @Suppress("ktlint:standard:function-naming", "unused")
 class ForeslåVedtaksperiodeStepDefinitions {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     var aktiviteter: List<VilkårperiodeAktivitet> = emptyList()
     var målgrupper: List<VilkårperiodeMålgruppe> = emptyList()
     var vilkår: List<Vilkår> = emptyList()
@@ -146,18 +149,24 @@ class ForeslåVedtaksperiodeStepDefinitions {
                 )
             }
             val actual = resultat[index]
-            if (!idSomSkalIgnoreres.contains(it.id)) {
-                assertThat(actual.id).isEqualTo(it.id)
+            try {
+                if (!idSomSkalIgnoreres.contains(it.id)) {
+                    assertThat(actual.id).isEqualTo(it.id)
+                }
+                if (idSomSkalIgnoreres.contains(it.id) && tidligereVedtaksperioder.any { it.id == actual.id }) {
+                    throw Error(
+                        "Feilet rad ${index + 1}. Hvis actual inneholder en id som eksisterer i tidligere vedtaksperioder må den assertes riktig",
+                    )
+                }
+                assertThat(actual.fom).isEqualTo(it.fom)
+                assertThat(actual.tom).isEqualTo(it.tom)
+                assertThat(actual.aktivitet).isEqualTo(it.aktivitet)
+                assertThat(actual.målgruppe).isEqualTo(it.målgruppe)
+            } catch (e: Throwable) {
+                logger.error("Feilet validering av rad ${index + 1} $actual")
+                logger.error("Antall faktiske rader=${resultat.size}, forventet=${expected.size}")
+                throw e
             }
-            if (idSomSkalIgnoreres.contains(it.id) && tidligereVedtaksperioder.any { it.id == actual.id }) {
-                throw Error(
-                    "Feilet rad ${index + 1}. Hvis actual inneholder en id som eksisterer i tidligere vedtaksperioder må den assertes riktig",
-                )
-            }
-            assertThat(actual.fom).isEqualTo(it.fom)
-            assertThat(actual.tom).isEqualTo(it.tom)
-            assertThat(actual.aktivitet).isEqualTo(it.aktivitet)
-            assertThat(actual.målgruppe).isEqualTo(it.målgruppe)
         }
 
         assertThat(resultat).hasSize(expected.size)
