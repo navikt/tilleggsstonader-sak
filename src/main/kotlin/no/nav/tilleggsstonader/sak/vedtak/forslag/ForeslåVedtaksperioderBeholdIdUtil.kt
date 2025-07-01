@@ -26,7 +26,10 @@ object ForeslåVedtaksperioderBeholdIdUtil {
                 tidligereVedtaksperioder = aktuelleVedtaksperioder.tidligereVedtaksperioder,
                 initielleForslag = aktuelleVedtaksperioder.forslagEtterRevurderFra,
             ).beholdTidligereIdnForVedtaksperioder()
-        return (aktuelleVedtaksperioder.tidligereVedtaksperioderSkalIkkeEndres + nyttForslag).mergeHvisLikeOgSammeId()
+        return mergeHvisLikeOgSammeId(
+            tidligereVedtaksperioderSkalIkkeEndres = aktuelleVedtaksperioder.tidligereVedtaksperioderSkalIkkeEndres,
+            nyttForslag = nyttForslag,
+        )
     }
 
     fun beholdTidligereIdnForVedtaksperioderLæremidler(
@@ -99,16 +102,36 @@ object ForeslåVedtaksperioderBeholdIdUtil {
             )
         }
 
-    private fun List<Vedtaksperiode>.mergeHvisLikeOgSammeId() =
-        this.mergeSammenhengende(
-            skalMerges = { v1, v2 ->
-                v1.id == v2.id &&
-                    v1.målgruppe == v2.målgruppe &&
-                    v1.aktivitet == v2.aktivitet &&
-                    v1.overlapperEllerPåfølgesAv(v2)
-            },
-            merge = { v1, v2 -> v1.copy(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
-        )
+    /**
+     * Slår sammen tidligere vedtaksperioder og nye forslag
+     * Hvis man har en periode
+     * 01.01.01 - 31.01.01 og man revurderer fra 1 feb, men man får ny målgruppe/aktivitet så skal man ikke forlenge den første perioden
+     * Den første perioden finnes i [tidligereVedtaksperioderSkalIkkeEndres] samtidig har den blitt sendt inn til forslag, så ID på perioden finnes også i forslag
+     * Det håndteres gjennom å sjekke at ID'n ikke finnes flere ganger. Hvis de finnes flere ganger, så genereres en ny ID for den perioden.
+     */
+    private fun mergeHvisLikeOgSammeId(
+        tidligereVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
+        nyttForslag: List<Vedtaksperiode>,
+    ): List<Vedtaksperiode> {
+        val idn = mutableSetOf<UUID>()
+        return (tidligereVedtaksperioderSkalIkkeEndres + nyttForslag)
+            .mergeSammenhengende(
+                skalMerges = { v1, v2 ->
+                    v1.id == v2.id &&
+                        v1.målgruppe == v2.målgruppe &&
+                        v1.aktivitet == v2.aktivitet &&
+                        v1.overlapperEllerPåfølgesAv(v2)
+                },
+                merge = { v1, v2 -> v1.copy(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
+            ).map {
+                val idFinnesIkkeFraFør = idn.add(it.id)
+                if (idFinnesIkkeFraFør) {
+                    it
+                } else {
+                    it.copy(id = UUID.randomUUID())
+                }
+            }
+    }
 }
 
 /**
