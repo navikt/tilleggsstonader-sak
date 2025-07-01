@@ -46,6 +46,7 @@ class VedtaksperiodeService(
                 vilkårperioder = vilkårperioder,
                 vilkår = vilkår,
                 tidligereVedtaksperioder = tidligereVedtaksperioder,
+                revurderFra = saksbehandling.revurderFra,
             )
         } else {
             return ForeslåVedtaksperiode.finnVedtaksperiode(

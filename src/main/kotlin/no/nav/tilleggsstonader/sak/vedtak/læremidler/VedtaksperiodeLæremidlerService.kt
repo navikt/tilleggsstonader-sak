@@ -43,6 +43,7 @@ class VedtaksperiodeLæremidlerService(
                     ForeslåVedtaksperioderBeholdIdUtil.beholdTidligereIdnForVedtaksperioderLæremidler(
                         tidligereVedtaksperioder = tidligereVedtaksperioder,
                         forslag = it,
+                        revurderFra = saksbehandling.revurderFra,
                     )
                 }
         }
