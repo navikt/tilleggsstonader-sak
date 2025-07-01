@@ -1,46 +1,122 @@
 package no.nav.tilleggsstonader.sak.vedtak.forslag
 
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
+import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
+import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import java.time.LocalDate
 import java.util.UUID
 
-/**
- *  Når foreslå vedtaksperioder brukes i revurderinger trenger man å beholde id'n til vedtaksperioden for å kunne tracke endringer.
- *
- * Bruker en [ArrayDeque] for å håndtere tilfeller der et forslag overlapper flere tidligere vedtaksperioder.
- * Et tidligere id skal ikke gjenbrukes flere ganger
- */
 object ForeslåVedtaksperioderBeholdIdUtil {
     fun beholdTidligereIdnForVedtaksperioder(
         tidligereVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
-    ): List<Vedtaksperiode> =
-        ForeslåVedtaksperioderBeholdId(
-            tidligereVedtaksperioder = tidligereVedtaksperioder,
-            initielleForslag = forslag,
-        ).beholdTidligereIdnForVedtaksperioder()
+        revurderFra: LocalDate?,
+    ): List<Vedtaksperiode> {
+        val aktuelleVedtaksperioder =
+            finnAktuelleVedtaksperioder(
+                tidligereVedtaksperioder = tidligereVedtaksperioder,
+                forslag = forslag,
+                revurderFra = revurderFra,
+            )
+        val nyttForslag =
+            ForeslåVedtaksperioderBeholdId(
+                tidligereVedtaksperioder = aktuelleVedtaksperioder.tidligereVedtaksperioder,
+                initielleForslag = aktuelleVedtaksperioder.forslagEtterRevurderFra,
+            ).beholdTidligereIdnForVedtaksperioder()
+        return (aktuelleVedtaksperioder.tidligereVedtaksperioderSkalIkkeEndres + nyttForslag).mergeHvisLikeOgSammeId()
+    }
 
     fun beholdTidligereIdnForVedtaksperioderLæremidler(
         tidligereVedtaksperioder: List<no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
+        revurderFra: LocalDate?,
     ): List<no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode> =
-        ForeslåVedtaksperioderBeholdId(
+        beholdTidligereIdnForVedtaksperioder(
             tidligereVedtaksperioder = tidligereVedtaksperioder.map { it.tilFellesDomeneVedtaksperiode() },
-            initielleForslag = forslag,
-        ).beholdTidligereIdnForVedtaksperioder()
-            .map {
-                no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode(
-                    id = it.id,
-                    fom = it.fom,
-                    tom = it.tom,
-                    målgruppe = it.målgruppe,
-                    aktivitet = it.aktivitet,
-                )
+            forslag = forslag,
+            revurderFra = revurderFra,
+        ).tilVedtaksperiodeLæremidler()
+
+    /**
+     * Vi skal ikke foreslå perioder før revurder fra, der må vi beholde alle perioder som tidligere
+     * Kan fjernes når man fjernet revurder fra
+     */
+    private fun finnAktuelleVedtaksperioder(
+        tidligereVedtaksperioder: List<Vedtaksperiode>,
+        forslag: List<Vedtaksperiode>,
+        revurderFra: LocalDate?,
+    ): Vedtaksperioder {
+        val tidligereVedtaksperioderSkalIkkeEndres =
+            if (revurderFra != null) {
+                tidligereVedtaksperioder.avkortFraOgMed(revurderFra.minusDays(1))
+            } else {
+                emptyList()
             }
+
+        /**
+         * Korrigerer tom-dato for den siste vedtaksperioden i listen
+         * sånn at man forlenger den siste perioden med tom fra nytt forslag
+         * Gjelder kun når man må forholde seg til revurder-fra
+         */
+        val tidligereVedtaksperioderMedKorrigertTomDato: List<Vedtaksperiode> =
+            tidligereVedtaksperioder.dropLast(1) +
+                listOfNotNull(
+                    tidligereVedtaksperioder
+                        .lastOrNull()
+                        ?.let { it.copy(tom = it.tom.plusDays(1)) },
+                )
+
+        val forslagEtterRevurderFra =
+            if (revurderFra != null) {
+                forslag.avkortPerioderFør(revurderFra)
+            } else {
+                forslag
+            }
+        return Vedtaksperioder(
+            tidligereVedtaksperioderSkalIkkeEndres = tidligereVedtaksperioderSkalIkkeEndres,
+            tidligereVedtaksperioder = tidligereVedtaksperioderMedKorrigertTomDato,
+            forslagEtterRevurderFra = forslagEtterRevurderFra,
+        )
+    }
+
+    private data class Vedtaksperioder(
+        val tidligereVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
+        val tidligereVedtaksperioder: List<Vedtaksperiode>,
+        val forslagEtterRevurderFra: List<Vedtaksperiode>,
+    )
+
+    private fun List<Vedtaksperiode>.tilVedtaksperiodeLæremidler() =
+        this.map {
+            no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode(
+                id = it.id,
+                fom = it.fom,
+                tom = it.tom,
+                målgruppe = it.målgruppe,
+                aktivitet = it.aktivitet,
+            )
+        }
+
+    private fun List<Vedtaksperiode>.mergeHvisLikeOgSammeId() =
+        this.mergeSammenhengende(
+            skalMerges = { v1, v2 ->
+                v1.id == v2.id &&
+                    v1.målgruppe == v2.målgruppe &&
+                    v1.aktivitet == v2.aktivitet &&
+                    v1.overlapperEllerPåfølgesAv(v2)
+            },
+            merge = { v1, v2 -> v1.copy(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
+        )
 }
 
 /**
+ * Når vedtaksperioder brukes i revurderinger trenger man å beholde id'n til vedtaksperioden for å kunne tracke endringer.
+ *
+ * Bruker en [ArrayDeque] for å håndtere tilfeller der et forslag overlapper flere tidligere vedtaksperioder.
+ * Et tidligere id skal ikke gjenbrukes flere ganger
+ *
  * Plassert som en private class for at den ikke skal kalles på flere ganger.
  * Bruk av klasse gjør det enklere å splitte ut metoder som er avhengig av state i klassen.
  * [beholdTidligereIdnForVedtaksperioder] er avhengig av state i klassen
