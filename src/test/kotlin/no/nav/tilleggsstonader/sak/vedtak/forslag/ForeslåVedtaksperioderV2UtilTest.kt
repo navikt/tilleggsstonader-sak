@@ -68,7 +68,6 @@ class ForeslåVedtaksperioderV2UtilTest {
     @Test
     fun abc() {
         printTotalAntallDagerAvvik(avvik)
-        println("Kun FAKTISK_SLUTTER_ANNET_DATO")
 
         fil.values.groupBy { it.stønadstype }
             .mapValues { it.value.count() }
@@ -76,7 +75,6 @@ class ForeslåVedtaksperioderV2UtilTest {
             .forEach { (stønadstype, antall) ->
                 println("Stønadstype: $stønadstype, Antall: $antall")
             }
-
 
         val ikkeKunSlutter30Juni = avvik.filterNot {
             val finnÅrsak = finnÅrsak(it)
@@ -92,24 +90,21 @@ class ForeslåVedtaksperioderV2UtilTest {
                 println("Stønadstype: ${it.key}, Antall avvik med FAKTISK_SLUTTER_30_JUNI: ${it.value}")
             }
 
-        avvik.groupBy { it.info.stønadstype }
+        ikkeKunSlutter30Juni.groupBy { it.info.stønadstype }
             .values.forEach { avvikPerStønad ->
                 println("")
                 println("Stønadstype: ${avvikPerStønad.first().info.stønadstype}")
                 printTotalAntallDagerAvvik(avvikPerStønad)
             }
 
-        printTilFil(avvik.filter { it.info.stønadstype == Stønadstype.BARNETILSYN })
+        //printTilFil(avvik.filter { it.info.stønadstype == Stønadstype.BARNETILSYN })
     }
 
     @Test
     fun `print info til noen`() {
-        avvik.filter { it.antallDagerAvvik.tom > 50 }
+        avvik.filter { it.antallDagerAvvik.fom < 5 }
             .filter { it.info.stønadstype != Stønadstype.LÆREMIDLER }
-            .forEach {
-                printInfo(it)
-                println()
-            }
+            .forEach { printInfo(it) }
     }
 
     @Test
@@ -148,7 +143,7 @@ class ForeslåVedtaksperioderV2UtilTest {
         avvik.foreslåtte.forEach {
             println("målgruppe: ${it.målgruppe}, aktivitet: ${it.aktivitet}, fom: ${it.fom}, tom: ${it.tom}")
         }
-
+        println()
     }
 
     private fun mapForslag(info: Info): List<ForenkletVedtaksperiode> = when (info.stønadstype) {
@@ -165,7 +160,7 @@ class ForeslåVedtaksperioderV2UtilTest {
     }.sorted().map { ForenkletVedtaksperiode(it) }
         .let {
             if (info.arenaTom != null) {
-                it.avkortPerioderFør(info.arenaTom)
+                it.avkortPerioderFør(info.arenaTom?.plusDays(1))
             } else {
                 it
             }
