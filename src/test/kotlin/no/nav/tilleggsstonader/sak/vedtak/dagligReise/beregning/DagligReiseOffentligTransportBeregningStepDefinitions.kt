@@ -4,6 +4,7 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
+import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
@@ -25,6 +26,7 @@ class DagligReiseOffentligTransportBeregningStepDefinitions {
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
                     prisEnkelBilett = parseInt(DomenenøkkelFelles.BELØP, rad),
+                    antallReisedagerPerUke = parseInt(DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE, rad),
                 )
             }
 
@@ -43,6 +45,12 @@ class DagligReiseOffentligTransportBeregningStepDefinitions {
                 parseInt(DomenenøkkelFelles.BELØP, rad)
             }
         val beregningsresultatHentetUt = beregningsresultatListe.single()
-        assertThat(beregningsresultatHentetUt).isEqualTo(beregningsResultat)
+        assertThat(beregningsResultat).isEqualTo(beregningsresultatHentetUt)
     }
+}
+
+enum class DomenenøkkelOffentligtransport(
+    override val nøkkel: String,
+) : Domenenøkkel {
+    ANTALL_REISEDAGER_PER_UKE("Antall reisedager per uke"),
 }
