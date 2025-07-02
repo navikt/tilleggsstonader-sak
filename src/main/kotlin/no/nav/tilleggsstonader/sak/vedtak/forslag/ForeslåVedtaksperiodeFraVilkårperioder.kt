@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -15,17 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
 
 object ForeslåVedtaksperiodeFraVilkårperioder {
-    fun foreslåVedtaksperioder(vilkårperioder: Vilkårperioder): List<ForslagVedtaksperiodeFraVilkårperioder> =
-        foreslåVedtaksperioderFaktiskMålgruppe(vilkårperioder)
-
-    fun foreslåVedtaksperioderFaktiskMålgruppe(
-        vilkårperioder: Vilkårperioder,
-    ): List<ForslagVedtaksperiodeFraVilkårperioderFaktiskMålgruppe> = foreslåVedtaksperioder(vilkårperioder) { it.faktiskMålgruppe() }
-
-    private inline fun <reified T : Enum<T>> foreslåVedtaksperioder(
-        vilkårperioder: Vilkårperioder,
-        mapMålgruppe: (MålgruppeType) -> T,
-    ): List<ForslagVedtaksperiodeFraVilkårperioderGenerisk<T>> {
+    fun foreslåVedtaksperioder(vilkårperioder: Vilkårperioder): List<ForslagVedtaksperiodeFraVilkårperioder> {
         val oppfylteVilkårsperioder = filtrerOppfylteVilkårsperioder(vilkårperioder)
 
         val filtrerteVilkårperioder = filterKombinasjonerAvMålgruppeOgAktivitet(oppfylteVilkårsperioder)
@@ -35,9 +26,9 @@ object ForeslåVedtaksperiodeFraVilkårperioder {
         }
 
         val sammenslåtteVilkårsperioder =
-            Sammenslåtte<T>(
-                aktiviteter = mergeSammenhengende(filtrerteVilkårperioder.aktiviteter.forenklet()),
-                målgrupper = mergeSammenhengende(filtrerteVilkårperioder.målgrupper.forenklet(mapMålgruppe)),
+            Sammenslåtte(
+                aktiviteter = mergeSammenhengende(filtrerteVilkårperioder.aktiviteter.forenkledeAktiviteter()),
+                målgrupper = mergeSammenhengende(filtrerteVilkårperioder.målgrupper.forenkledeMålgrupper()),
             )
 
         brukerfeilHvis(
@@ -53,7 +44,7 @@ object ForeslåVedtaksperiodeFraVilkårperioder {
             )
 
         return listOf(
-            ForslagVedtaksperiodeFraVilkårperioderGenerisk<T>(
+            ForslagVedtaksperiodeFraVilkårperioder(
                 fom = overlapp.fom,
                 tom = overlapp.tom,
                 målgruppe = sammenslåtteVilkårsperioder.målgrupper.first().type,
@@ -109,21 +100,21 @@ object ForeslåVedtaksperiodeFraVilkårperioder {
                 merge = { v1, v2 -> v1.copy(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
             )
 
-    private fun List<VilkårperiodeAktivitet>.forenklet() =
-        this.map { ForenkletVilkårperiode<AktivitetType>(fom = it.fom, tom = it.tom, type = it.type as AktivitetType) }
+    private fun List<VilkårperiodeAktivitet>.forenkledeAktiviteter() =
+        this.map { ForenkletVilkårperiode(fom = it.fom, tom = it.tom, type = it.type as AktivitetType) }
 
-    private inline fun <reified T : Enum<T>> List<VilkårperiodeMålgruppe>.forenklet(mapMålgruppe: (MålgruppeType) -> T) =
+    private fun List<VilkårperiodeMålgruppe>.forenkledeMålgrupper() =
         this.map {
-            ForenkletVilkårperiode<T>(
+            ForenkletVilkårperiode(
                 fom = it.fom,
                 tom = it.tom,
-                type = mapMålgruppe(it.type as MålgruppeType),
+                type = (it.type as MålgruppeType).faktiskMålgruppe(),
             )
         }
 
-    private data class Sammenslåtte<MÅLGRUPPE_TYPE>(
+    private data class Sammenslåtte(
         val aktiviteter: List<ForenkletVilkårperiode<AktivitetType>>,
-        val målgrupper: List<ForenkletVilkårperiode<MÅLGRUPPE_TYPE>>,
+        val målgrupper: List<ForenkletVilkårperiode<FaktiskMålgruppe>>,
     )
 
     private data class ForenkletVilkårperiode<TYPE>(

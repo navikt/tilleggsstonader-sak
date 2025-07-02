@@ -26,7 +26,7 @@ class ForeslåVedtaksperiodeFraVilkårperioderStepDefinitions {
     var aktiviteter: List<VilkårperiodeAktivitet> = emptyList()
     var målgrupper: List<VilkårperiodeMålgruppe> = emptyList()
     var resultat: List<ForslagVedtaksperiodeFraVilkårperioder> = emptyList()
-    var resultatFaktiskMålgruppe: List<ForslagVedtaksperiodeFraVilkårperioderFaktiskMålgruppe> = emptyList()
+    var resultatFaktiskMålgruppe: List<ForslagVedtaksperiodeFraVilkårperioder> = emptyList()
     var feil: ApiFeil? = null
 
     @Gitt("følgende vilkårsperioder med aktiviteter")

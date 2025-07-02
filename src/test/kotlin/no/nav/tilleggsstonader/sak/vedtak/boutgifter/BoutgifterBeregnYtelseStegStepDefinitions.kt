@@ -104,7 +104,6 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             behandlingService = behandlingServiceMock,
             vilkårRepository = vilkårRepositoryFake,
             barnService = mockk(relaxed = true),
-            unleashService = unleashService,
         )
     val boutgifterUtgiftService = BoutgifterUtgiftService(vilkårService = vilkårService)
     val vedtaksperiodeValideringService =
@@ -294,6 +293,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 OpphørBoutgifterRequest(
                     årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
                     begrunnelse = "begrunnelse",
+                    opphørsdato = revurderFra,
                 ),
             )
         }

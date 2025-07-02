@@ -73,16 +73,13 @@ class LæremidlerBeregningService(
     fun beregnForOpphør(
         behandling: Saksbehandling,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
+        opphørsdato: LocalDate,
     ): BeregningsresultatLæremidler {
         feilHvis(behandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
-        // TODO - opphørsdato (ny)
-        feilHvis(behandling.revurderFra == null) {
-            "revurderFra-dato er påkrevd for opphør"
-        }
         val forrigeVedtak = hentVedtak(behandling.forrigeIverksatteBehandlingId)
-        val avkortetBeregningsresultat = avkortBeregningsresultatVedOpphør(forrigeVedtak, behandling.revurderFra)
+        val avkortetBeregningsresultat = avkortBeregningsresultatVedOpphør(forrigeVedtak, opphørsdato)
 
         return beregningsresultatForOpphør(
             behandling = behandling,

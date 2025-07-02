@@ -264,18 +264,27 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `skal inneholde årsaker dersom det er et opphør`() {
+        fun `skal inneholde årsaker og opphørsdato dersom det er et opphør`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_AKTIVITET)
+            val opphørsdato = LocalDate.now()
 
             vedtakRepository.insert(
-                opphørVedtak(behandlingId = behandling.id, årsaker = årsakerOpphør, begrunnelse = "begrunnelse"),
+                opphørVedtak(
+                    behandlingId = behandling.id,
+                    årsaker = årsakerOpphør,
+                    begrunnelse = "begrunnelse",
+                    opphørsdato = LocalDate.now(),
+                ),
             )
 
             val behandlingsoppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
 
             assertThat(behandlingsoppsummering.vedtak).isInstanceOf(OppsummertVedtakOpphør::class.java)
-            assertThat((behandlingsoppsummering.vedtak as OppsummertVedtakOpphør).årsaker).isEqualTo(årsakerOpphør)
+
+            val opphørVedtak = behandlingsoppsummering.vedtak as OppsummertVedtakOpphør
+            assertThat(opphørVedtak.årsaker).isEqualTo(årsakerOpphør)
+            assertThat(opphørVedtak.opphørsdato).isEqualTo(opphørsdato)
         }
     }
 
