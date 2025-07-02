@@ -157,6 +157,9 @@ class ForeslåVedtaksperioderV2UtilTest {
             info.aktiviteter.groupBy { it.type },
             info.vilkår
         )
+
+        Stønadstype.DAGLIG_REISE_TSO -> TODO()
+        Stønadstype.DAGLIG_REISE_TSR -> TODO()
     }.sorted().map { ForenkletVedtaksperiode(it) }
         .let {
             if (info.arenaTom != null) {
