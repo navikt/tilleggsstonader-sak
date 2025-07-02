@@ -16,8 +16,8 @@ enum class StønadstypeDvh {
                 Stønadstype.BARNETILSYN -> BARNETILSYN
                 Stønadstype.LÆREMIDLER -> LÆREMIDLER
                 Stønadstype.BOUTGIFTER -> BOUTGIFTER
-                Stønadstype.DAGLIG_REISE_TSO -> DAGLIG_REISE_TSO
-                Stønadstype.DAGLIG_REISE_TSR -> DAGLIG_REISE_TSR
+                Stønadstype.DAGLIG_REISE_TSO -> TODO("Daglig reise er ikke implementert enda")
+                Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise er ikke implementert enda")
             }
     }
 }

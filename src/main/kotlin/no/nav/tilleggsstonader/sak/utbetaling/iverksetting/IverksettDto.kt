@@ -65,10 +65,6 @@ enum class StønadstypeIverksetting {
     BOUTGIFTER_ENSLIG_FORSØRGER,
     BOUTGIFTER_AAP,
     BOUTGIFTER_ETTERLATTE,
-
-    DAGLIG_REISE_AAP,
-    DAGLIG_REISE_ENSLIG_FORSØRGER,
-    DAGLIG_REISE_ETTERLATTE,
 }
 
 @Suppress("unused")

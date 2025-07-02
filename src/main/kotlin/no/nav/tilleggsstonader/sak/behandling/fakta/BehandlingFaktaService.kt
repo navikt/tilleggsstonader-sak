@@ -60,8 +60,8 @@ class BehandlingFaktaService(
             Stønadstype.BARNETILSYN -> hentFaktaDTOForBarneTilsyn(behandlingId)
             Stønadstype.LÆREMIDLER -> hentFaktaDTOForLæremidler(behandlingId)
             Stønadstype.BOUTGIFTER -> hentFaktaDTOForBoutgifter(behandlingId)
-            Stønadstype.DAGLIG_REISE_TSO -> hentFaktaDTOForDagligReise(behandlingId)
-            Stønadstype.DAGLIG_REISE_TSR -> hentFaktaDTOForDagligReise(behandlingId)
+            Stønadstype.DAGLIG_REISE_TSO -> TODO("Daglig reise er ikke implementert enda")
+            Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise er ikke implementert enda")
         }
     }
 
@@ -106,19 +106,6 @@ class BehandlingFaktaService(
                     søknadsgrunnlag = søknad?.data?.boutgifter?.tilFakta(),
                 ),
             personopplysninger = mapPersonopplysninger(søknad),
-        )
-    }
-
-    private fun hentFaktaDTOForDagligReise(behandlingId: BehandlingId): BehandlingFaktaDagligReiseDto {
-        val søknad = søknadService.hentSøknadBoutgifter(behandlingId)
-        val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
-        return BehandlingFaktaDagligReiseDto(
-//            søknadMottattTidspunkt = søknad?.mottattTidspunkt,
-//            hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
-//            aktiviteter = mapAktivitet(søknad?.data?.aktivitet),
-//            dokumentasjon = søknad?.let { mapDokumentasjon(it.data.dokumentasjon, it.journalpostId) },
-            arena = arenaFakta(grunnlagsdata),
-            // personopplysninger = mapPersonopplysninger(søknad),
         )
     }
 
