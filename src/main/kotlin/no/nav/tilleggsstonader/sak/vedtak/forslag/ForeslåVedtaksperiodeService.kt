@@ -15,6 +15,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode as VedtaksperiodeLæremidler
 
+/**
+ * TODO 1 - Burde man forholde seg til arenaTom når man foreslår vedtaksperioder?
+ * TODO 2 - Hvordan skal man sette min/maks datoer på forslag av vedtaksperioder? Eks skal man ikke innvilge alt for langt frem i tid?
+ */
 @Service
 class ForeslåVedtaksperiodeService(
     private val behandlingService: BehandlingService,
