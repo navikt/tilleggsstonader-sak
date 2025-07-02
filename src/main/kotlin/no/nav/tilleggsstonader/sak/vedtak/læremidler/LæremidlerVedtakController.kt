@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
+import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatLæremidlerDto
@@ -36,7 +37,7 @@ class LæremidlerVedtakController(
     private val behandlingService: BehandlingService,
     private val stegService: StegService,
     private val steg: LæremidlerBeregnYtelseSteg,
-    private val vedtaksperiodeService: VedtaksperiodeLæremidlerService,
+    private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
@@ -121,6 +122,6 @@ class LæremidlerVedtakController(
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return vedtaksperiodeService.foreslåPerioder(behandlingId).tilDto()
+        return foreslåVedtaksperiodeService.foreslåVedtaksperioderLæremidler(behandlingId).tilDto()
     }
 }

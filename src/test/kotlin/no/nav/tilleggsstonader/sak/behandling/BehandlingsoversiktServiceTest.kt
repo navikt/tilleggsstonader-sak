@@ -17,8 +17,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -33,10 +31,7 @@ class BehandlingsoversiktServiceTest {
     val fagsakService = mockk<FagsakService>()
     val behandlingRepository = mockk<BehandlingRepository>()
     val vedtakRepository = mockk<VedtakRepository>()
-    val vilkårperiodeService = mockk<VilkårperiodeService>()
-    val vilkårService = mockk<VilkårService>()
-    val behandlingService = mockk<BehandlingService>()
-    val vedtaksperiodeService = VedtaksperiodeService(vilkårperiodeService, vilkårService, vedtakRepository, behandlingService)
+    val vedtaksperiodeService = VedtaksperiodeService(vedtakRepository)
 
     val service =
         BehandlingsoversiktService(

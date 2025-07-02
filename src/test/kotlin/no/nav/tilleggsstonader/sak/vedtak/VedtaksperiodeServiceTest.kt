@@ -2,13 +2,10 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -20,17 +17,9 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode as V
 
 class VedtaksperiodeServiceTest {
     val vedtakRepository = mockk<VedtakRepository>()
-    val vilkårService = mockk<VilkårService>()
-    val vilkårperiodeService = mockk<VilkårperiodeService>()
-    val behandlingService = mockk<BehandlingService>()
 
     val vedtaksperiodeService =
-        VedtaksperiodeService(
-            vilkårperiodeService = vilkårperiodeService,
-            vedtakRepository = vedtakRepository,
-            behandlingService = behandlingService,
-            vilkårService = vilkårService,
-        )
+        VedtaksperiodeService(vedtakRepository = vedtakRepository)
 
     val vedtaksperiode1 =
         Vedtaksperiode(

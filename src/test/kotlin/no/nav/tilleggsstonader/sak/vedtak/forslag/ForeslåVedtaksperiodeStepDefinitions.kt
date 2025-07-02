@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak
+package no.nav.tilleggsstonader.sak.vedtak.forslag
 
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt

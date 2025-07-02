@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak
+package no.nav.tilleggsstonader.sak.vedtak.forslag
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
@@ -6,8 +6,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeFraVilkårperioder.foreslåVedtaksperioder
-import no.nav.tilleggsstonader.sak.vedtak.forslag.ForslagVedtaksperiodeFraVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
@@ -19,7 +17,7 @@ object ForeslåVedtaksperiode {
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
     ): List<Vedtaksperiode> {
-        val forslagVedtaksperiode = foreslåVedtaksperioder(vilkårperioder).single()
+        val forslagVedtaksperiode = ForeslåVedtaksperiodeFraVilkårperioder.foreslåVedtaksperioder(vilkårperioder).single()
         val oppfylteVilkår = vilkår.finnOppfylte()
 
         brukerfeilHvis(oppfylteVilkår.isEmpty()) {

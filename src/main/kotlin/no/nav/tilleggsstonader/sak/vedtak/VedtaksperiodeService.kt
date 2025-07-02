@@ -2,44 +2,22 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
 class VedtaksperiodeService(
-    private val vilkårperiodeService: VilkårperiodeService,
-    private val vilkårService: VilkårService,
     private val vedtakRepository: VedtakRepository,
-    private val behandlingService: BehandlingService,
 ) {
-    fun foreslåPerioder(behandlingId: BehandlingId): List<Vedtaksperiode> {
-        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        brukerfeilHvis(detFinnesVedtaksperioderPåForrigeBehandling(saksbehandling)) {
-            "Kan ikke foreslå vedtaksperioder fordi det finnes lagrede vedtaksperioder fra en tidligere behandling"
-        }
-
-        val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
-        val vilkår = vilkårService.hentVilkår(behandlingId)
-
-        return ForeslåVedtaksperiode.finnVedtaksperiode(
-            vilkårperioder = vilkårperioder,
-            vilkår = vilkår,
-        )
-    }
-
     fun finnNyeVedtaksperioderForOpphør(
         behandling: Saksbehandling,
         opphørsdato: LocalDate,
@@ -68,6 +46,7 @@ class VedtaksperiodeService(
             null -> null
             is InnvilgelseEllerOpphørTilsynBarn -> vedtak.vedtaksperioder
             is InnvilgelseEllerOpphørBoutgifter -> vedtak.vedtaksperioder
+            is InnvilgelseEllerOpphørLæremidler -> vedtak.vedtaksperioder.map { it.tilFellesDomeneVedtaksperiode() }
             else ->
                 error(
                     "Kan ikke hente vedtaksperioder når vedtak var ${vedtak.type}",
