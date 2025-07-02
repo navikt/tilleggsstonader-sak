@@ -74,8 +74,8 @@ class ArenaStatusService(
             Stønadstype.BARNETILSYN -> true
             Stønadstype.LÆREMIDLER -> true
             Stønadstype.BOUTGIFTER -> false
-            Stønadstype.DAGLIG_REISE_TSO -> TODO()
-            Stønadstype.DAGLIG_REISE_TSR -> TODO()
+            Stønadstype.DAGLIG_REISE_TSO -> TODO("Daglig reise er ikke implementert enda")
+            Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise er ikke implementert enda")
         }
 
     private fun harBehandling(fagsak: Fagsak?): Boolean =
