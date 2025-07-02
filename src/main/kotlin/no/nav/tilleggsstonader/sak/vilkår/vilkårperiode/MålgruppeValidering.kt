@@ -11,8 +11,7 @@ object MålgruppeValidering {
     ) {
         val gyldig =
             when (stønadstype) {
-                Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER, Stønadstype.BOUTGIFTER,
-                ->
+                Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER, Stønadstype.BOUTGIFTER ->
                     when (målgruppeType) {
                         MålgruppeType.AAP -> true
                         MålgruppeType.DAGPENGER -> false
