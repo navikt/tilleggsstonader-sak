@@ -17,7 +17,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperioderV2Util
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -118,7 +117,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
                     ),
                     vilkår = vilkår,
                     tidligereVedtaksperioder = tidligereVedtaksperioder,
-                    revurderFra = revurderFra?.let { parseDato(it) },
+                    tidligstEndring = revurderFra?.let { parseDato(it) },
                 )
         } catch (e: ApiFeil) {
             feil = e

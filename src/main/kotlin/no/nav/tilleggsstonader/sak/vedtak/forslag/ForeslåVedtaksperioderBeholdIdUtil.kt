@@ -13,13 +13,13 @@ object ForeslåVedtaksperioderBeholdIdUtil {
     fun beholdTidligereIdnForVedtaksperioder(
         tidligereVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
-        revurderFra: LocalDate?,
+        tidligstEndring: LocalDate?,
     ): List<Vedtaksperiode> {
         val aktuelleVedtaksperioder =
             finnAktuelleVedtaksperioder(
                 tidligereVedtaksperioder = tidligereVedtaksperioder,
                 forslag = forslag,
-                revurderFra = revurderFra,
+                tidligstEndring = tidligstEndring,
             )
         val nyttForslag =
             ForeslåVedtaksperioderBeholdId(
@@ -32,17 +32,6 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         )
     }
 
-    fun beholdTidligereIdnForVedtaksperioderLæremidler(
-        tidligereVedtaksperioder: List<no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode>,
-        forslag: List<Vedtaksperiode>,
-        revurderFra: LocalDate?,
-    ): List<no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode> =
-        beholdTidligereIdnForVedtaksperioder(
-            tidligereVedtaksperioder = tidligereVedtaksperioder.map { it.tilFellesDomeneVedtaksperiode() },
-            forslag = forslag,
-            revurderFra = revurderFra,
-        ).tilVedtaksperiodeLæremidler()
-
     /**
      * Vi skal ikke foreslå perioder før revurder fra, der må vi beholde alle perioder som tidligere
      * Kan fjernes når man fjernet revurder fra
@@ -50,11 +39,11 @@ object ForeslåVedtaksperioderBeholdIdUtil {
     private fun finnAktuelleVedtaksperioder(
         tidligereVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
-        revurderFra: LocalDate?,
+        tidligstEndring: LocalDate?,
     ): Vedtaksperioder {
         val tidligereVedtaksperioderSkalIkkeEndres =
-            if (revurderFra != null) {
-                tidligereVedtaksperioder.avkortFraOgMed(revurderFra.minusDays(1))
+            if (tidligstEndring != null) {
+                tidligereVedtaksperioder.avkortFraOgMed(tidligstEndring.minusDays(1))
             } else {
                 emptyList()
             }
@@ -73,8 +62,8 @@ object ForeslåVedtaksperioderBeholdIdUtil {
                 )
 
         val forslagEtterRevurderFra =
-            if (revurderFra != null) {
-                forslag.avkortPerioderFør(revurderFra)
+            if (tidligstEndring != null) {
+                forslag.avkortPerioderFør(tidligstEndring)
             } else {
                 forslag
             }

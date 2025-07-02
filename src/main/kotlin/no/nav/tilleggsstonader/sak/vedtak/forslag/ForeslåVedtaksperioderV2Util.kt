@@ -38,7 +38,7 @@ object ForeslåVedtaksperioderV2Util {
         return forslag
     }
 
-    fun foreslåPerioder(vilkårperioder: Vilkårperioder): List<Vedtaksperiode> {
+    fun foreslåPerioderUtenVilkår(vilkårperioder: Vilkårperioder): List<Vedtaksperiode> {
         val forslag =
             forslagVedtaksperiodeForInngangsvilkår(
                 målgrupper = forenkledeMålgrupper(vilkårperioder),
