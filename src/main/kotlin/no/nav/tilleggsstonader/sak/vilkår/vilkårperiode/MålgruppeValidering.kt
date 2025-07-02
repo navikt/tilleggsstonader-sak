@@ -11,8 +11,7 @@ object MålgruppeValidering {
     ) {
         val gyldig =
             when (stønadstype) {
-                Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER, Stønadstype.BOUTGIFTER, Stønadstype.DAGLIG_REISE_TSO,
-                Stønadstype.DAGLIG_REISE_TSR,
+                Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER, Stønadstype.BOUTGIFTER,
                 ->
                     when (målgruppeType) {
                         MålgruppeType.AAP -> true
@@ -24,6 +23,8 @@ object MålgruppeValidering {
                         MålgruppeType.SYKEPENGER_100_PROSENT -> true
                         MålgruppeType.INGEN_MÅLGRUPPE -> true
                     }
+                Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise er ikke implementert enda")
+                Stønadstype.DAGLIG_REISE_TSO -> TODO("Daglig reise er ikke implementert enda")
             }
         feilHvisIkke(gyldig) {
             "målgruppe=$målgruppeType er ikke gyldig for $stønadstype"
