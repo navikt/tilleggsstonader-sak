@@ -103,6 +103,7 @@ class InterntVedtakGenereringTest {
             Stønadstype.BARNETILSYN -> mockTilsynBarn()
             Stønadstype.LÆREMIDLER -> mockLæremidler()
             Stønadstype.BOUTGIFTER -> mockBoutgifter()
+            else -> error("Har ikke mapping for ${type.stønadstype}")
         }
     }
 
@@ -183,6 +184,9 @@ class InterntVedtakGenereringTest {
                     Stønadstype.LÆREMIDLER,
                     Stønadstype.BOUTGIFTER,
                     -> it.håndteres()
+                    Stønadstype.DAGLIG_REISE_TSO,
+                    Stønadstype.DAGLIG_REISE_TSR,
+                    -> it.håndteresIkke()
                 }
             }
 

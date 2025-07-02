@@ -128,6 +128,8 @@ class OpprettTestBehandlingController(
             Stønadstype.BARNETILSYN -> opprettSøknadBarnetilsyn(fagsak, behandling)
             Stønadstype.LÆREMIDLER -> opprettSøknadLæremidler(fagsak, behandling)
             Stønadstype.BOUTGIFTER -> opprettSøknadBoutgifter(fagsak, behandling)
+            Stønadstype.DAGLIG_REISE_TSO -> TODO("Oppretter foreløpig ikke søknad for daglig reise")
+            Stønadstype.DAGLIG_REISE_TSR -> TODO("Oppretter foreløpig ikke søknad for daglig reise")
         }
     }
 

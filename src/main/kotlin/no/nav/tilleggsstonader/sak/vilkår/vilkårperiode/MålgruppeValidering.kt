@@ -22,6 +22,8 @@ object MålgruppeValidering {
                         MålgruppeType.SYKEPENGER_100_PROSENT -> true
                         MålgruppeType.INGEN_MÅLGRUPPE -> true
                     }
+                Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise er ikke implementert enda")
+                Stønadstype.DAGLIG_REISE_TSO -> TODO("Daglig reise er ikke implementert enda")
             }
         feilHvisIkke(gyldig) {
             "målgruppe=$målgruppeType er ikke gyldig for $stønadstype"

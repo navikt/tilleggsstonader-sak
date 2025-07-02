@@ -17,7 +17,11 @@ class RoutingContextTest {
     val ident = "testIdent"
 
     @ParameterizedTest
-    @EnumSource(Stønadstype::class)
+    @EnumSource(
+        value = Stønadstype::class,
+        names = ["DAGLIG_REISE_TSO", "DAGLIG_REISE_TSR"],
+        mode = EnumSource.Mode.EXCLUDE,
+    )
     fun `skal mappe stønadstype til riktig context`(stønadstype: Stønadstype) {
         val routingContext = stønadstype.tilRoutingContext()
 

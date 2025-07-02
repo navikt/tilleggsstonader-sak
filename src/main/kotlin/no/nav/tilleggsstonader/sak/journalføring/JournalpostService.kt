@@ -205,4 +205,6 @@ private fun Stønadstype.tilDokumentBrevkode(): DokumentBrevkode =
         Stønadstype.BARNETILSYN -> DokumentBrevkode.BARNETILSYN
         Stønadstype.LÆREMIDLER -> DokumentBrevkode.LÆREMIDLER
         Stønadstype.BOUTGIFTER -> DokumentBrevkode.BOUTGIFTER
+        Stønadstype.DAGLIG_REISE_TSO -> TODO("Daglig reise er ikke implementert enda")
+        Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise er ikke implementert enda")
     }

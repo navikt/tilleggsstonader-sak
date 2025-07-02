@@ -54,5 +54,7 @@ enum class FaktiskMålgruppe(
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
                 }
             }
+            Stønadstype.DAGLIG_REISE_TSO -> TODO("Daglig reise er ikke implementert enda")
+            Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise er ikke implementert enda")
         }
 }

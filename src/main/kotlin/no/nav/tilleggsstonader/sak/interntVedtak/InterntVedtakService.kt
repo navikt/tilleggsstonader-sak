@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.interntVedtak
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -52,6 +53,7 @@ class InterntVedtakService(
 ) {
     fun lagInterntVedtak(behandlingId: BehandlingId): InterntVedtak {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        validerStønadstype(behandling.stønadstype)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandling.id)
         val vedtak = vedtakService.hentVedtak(behandling.id)
 
@@ -284,5 +286,14 @@ class InterntVedtakService(
     private fun Map<BarnId, GrunnlagBarn>.finnFødselsdato(barnId: BarnId): LocalDate {
         val barn = this[barnId] ?: error("Finner ikke barn=$barnId")
         return barn.fødselsdato ?: error("Mangler fødselsdato for barn=$barnId")
+    }
+
+    private fun validerStønadstype(stønadstype: Stønadstype) {
+        when (stønadstype) {
+            Stønadstype.BARNETILSYN -> {}
+            Stønadstype.LÆREMIDLER -> {}
+            Stønadstype.BOUTGIFTER -> {}
+            else -> error("Internt vedtak håndterer ikke stønadstype=$stønadstype ennå")
+        }
     }
 }
