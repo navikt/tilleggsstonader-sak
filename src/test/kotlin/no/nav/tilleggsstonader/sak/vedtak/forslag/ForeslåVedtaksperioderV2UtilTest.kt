@@ -67,56 +67,88 @@ class ForeslåVedtaksperioderV2UtilTest {
 
     @Test
     fun abc() {
-        val avvik = mutableListOf<Avvik>()
-        var antallRiktige = 0
-        var antallMedOverlappende = 0
-        fil.entries.forEach { (id, info) ->
-            try {
-                val forslagVedtaksperiode = mapForslag(info)
-
-                val faktiskeVedtaksperioder = info.vedtaksperioder.mergeSammenhengende(
-                    skalMerges = { a, b ->
-                        a.målgruppe == b.målgruppe && a.aktivitet == b.aktivitet && a.overlapperEllerPåfølgesAv(b)
-                    },
-                    merge = { a, b -> a.copy(fom = minOf(a.fom, b.fom), tom = maxOf(a.tom, b.tom)) }
-                )
-
-                if (forslagVedtaksperiode != faktiskeVedtaksperioder) {
-                    // mulighet for å filtrere vekk de perioder som finnes i begge settene
-                    val set = forslagVedtaksperiode.toSet()
-                    val set2 = faktiskeVedtaksperioder.toSet()
-                    avvik.add(
-                        Avvik(
-                            faktiske = faktiskeVedtaksperioder
-                                .filterNot { it in set && it in set2 }
-                            ,
-                            foreslåtte = forslagVedtaksperiode
-                                .filterNot { it in set && it in set2 }
-                            ,
-                            info = info
-                        )
-                    )
-                } else {
-                    antallRiktige++
-                }
-            } catch (e: Exception) {
-                if (e.message!!.contains("Foreløpig klarer vi bare å foreslå perioder når målgruppe og aktivitet har ett sammenhengende overlapp")) {
-                    antallMedOverlappende++
-                } else {
-                    throw e
-                }
-            }
-        }
-        println("Antall riktige: $antallRiktige")
-        println("Antall overlapp: $antallMedOverlappende")
-        println("Antall avvik: ${avvik.size}")
-        println("Antall med vedtak i Arena=${fil.values.count { it.arenaTom != null }}")
-
         printTotalAntallDagerAvvik(avvik)
         println("Kun FAKTISK_SLUTTER_ANNET_DATO")
-        printTotalAntallDagerAvvik(avvik.filter { finnÅrsak(it).contains("FAKTISK_SLUTTER_ANNET_DATO") })
 
-        printTilFil(avvik)
+        fil.values.groupBy { it.stønadstype }
+            .mapValues { it.value.count() }
+            .entries.sortedBy { it.key }
+            .forEach { (stønadstype, antall) ->
+                println("Stønadstype: $stønadstype, Antall: $antall")
+            }
+
+
+        val ikkeKunSlutter30Juni = avvik.filterNot {
+            val finnÅrsak = finnÅrsak(it)
+            finnÅrsak.size == 2 && finnÅrsak.contains("FAKTISK_SLUTTER_30_JUNI")
+        }
+
+        avvik.filterNot {
+            val finnÅrsak = finnÅrsak(it)
+            finnÅrsak.contains("FAKTISK_SLUTTER_30_JUNI")
+        }.groupBy { it.info.stønadstype }
+            .mapValues { it.value.count() }
+            .forEach {
+                println("Stønadstype: ${it.key}, Antall avvik med FAKTISK_SLUTTER_30_JUNI: ${it.value}")
+            }
+
+        avvik.groupBy { it.info.stønadstype }
+            .values.forEach { avvikPerStønad ->
+                println("")
+                println("Stønadstype: ${avvikPerStønad.first().info.stønadstype}")
+                printTotalAntallDagerAvvik(avvikPerStønad)
+            }
+
+        printTilFil(avvik.filter { it.info.stønadstype == Stønadstype.BARNETILSYN })
+    }
+
+    @Test
+    fun `print info til noen`() {
+        avvik.filter { it.antallDagerAvvik.tom > 50 }
+            .filter { it.info.stønadstype != Stønadstype.LÆREMIDLER }
+            .forEach {
+                printInfo(it)
+                println()
+            }
+    }
+
+    @Test
+    fun `printInfo til behandling`() {
+        val behandlingId = BehandlingId.fromString("f5c6bbb7-b035-48ae-9358-2a6228b302c2")
+        printInfo(avvik.single { it.info.behandlingId == behandlingId })
+    }
+
+    private fun printInfo(avvik: Avvik) {
+        val info = avvik.info
+        println("##############")
+        println("##############")
+        println("BehandlingId: ${info.behandlingId} stønadstype=${info.stønadstype}")
+        println("fomAvvik= ${avvik.antallDagerAvvik.fom}, tomAvvik=${avvik.antallDagerAvvik.tom}")
+        println("Årsaker: ${finnÅrsak(avvik).joinToString(", ")}")
+        println("ArenaTom: ${info.arenaTom}")
+        println()
+        println("Målgrupper:")
+        info.målgrupper.forEach {
+            println("${it.type}, fom: ${it.fom}, tom: ${it.tom}")
+        }
+        println("Aktiviteter:")
+        info.aktiviteter.forEach {
+            println("${it.type}, fom: ${it.fom}, tom: ${it.tom}")
+        }
+        println("Vilkår:")
+        info.vilkår.forEach {
+            println("fom: ${it.fom}, tom: ${it.tom}")
+        }
+        println("Vedtaksperioder:")
+        info.vedtaksperioder.forEach {
+            println("målgruppe: ${it.målgruppe}, aktivitet: ${it.aktivitet}, fom: ${it.fom}, tom: ${it.tom}")
+        }
+
+        println("\nForslag:")
+        avvik.foreslåtte.forEach {
+            println("målgruppe: ${it.målgruppe}, aktivitet: ${it.aktivitet}, fom: ${it.fom}, tom: ${it.tom}")
+        }
+
     }
 
     private fun mapForslag(info: Info): List<ForenkletVedtaksperiode> = when (info.stønadstype) {
@@ -139,10 +171,10 @@ class ForeslåVedtaksperioderV2UtilTest {
             }
         }
 
-    private fun printTilFil(avvik: MutableList<Avvik>) {
+    private fun printTilFil(avvik: List<Avvik>) {
         File("src/test/resources/avvik.txt").apply {
             avvik.forEach {
-                val dagerAvvik = antallDagerAvvik(it)
+                val dagerAvvik = it.antallDagerAvvik
                 val årsaker = finnÅrsak(it)
 
                 appendText("Stønadstype: ${it.info.stønadstype}, behandlingId: ${it.info.behandlingId}\n")
@@ -151,7 +183,7 @@ class ForeslåVedtaksperioderV2UtilTest {
                 appendText("FAKTISKE:\n")
                 it.faktiske.forEach { appendText("$it\n") }
                 appendText("Avvik: ${årsaker.joinToString(", ")}\n")
-                appendText("Dager avvik: fom=${dagerAvvik.first}, tom=${dagerAvvik.second}\n")
+                appendText("Dager avvik: fom=${dagerAvvik.fom}, tom=${dagerAvvik.tom}\n")
                 it.info.arenaTom?.let { appendText("ArenaTom=$it\n") }
                 appendText("\n")
             }
@@ -159,11 +191,10 @@ class ForeslåVedtaksperioderV2UtilTest {
     }
 
     private fun printTotalAntallDagerAvvik(avvik: List<Avvik>) {
-        val totaltAvvik = avvik.map {
-            antallDagerAvvik(it)
-        }
-        val fomDager = totaltAvvik.map { it.first }.groupBy {
+        val totaltAvvik = avvik.map { it.antallDagerAvvik }
+        val fomDager = totaltAvvik.map { it.fom }.groupBy {
             when {
+                it < -1 -> -2
                 it <= 1 -> it
                 it <= 5 -> 5
                 it <= 10 -> 10
@@ -174,8 +205,9 @@ class ForeslåVedtaksperioderV2UtilTest {
                 else -> 101
             }
         }.mapValues { it.value.size }.entries.sortedBy { it.key }
-        val tomDager = totaltAvvik.map { it.second }.groupBy {
+        val tomDager = totaltAvvik.map { it.tom }.groupBy {
             when {
+                it < -1 -> -2
                 it <= 1 -> it
                 it <= 5 -> 5
                 it <= 10 -> 10
@@ -206,19 +238,6 @@ class ForeslåVedtaksperioderV2UtilTest {
                 println("<= ${it.key}: ${it.value}")
             }
         }
-    }
-
-    private fun antallDagerAvvik(avvik1: Avvik): Pair<Long, Long> {
-        val fomForeslått = avvik1.foreslåtte.minOfOrNull { it.fom }
-        val fomFaktisk = avvik1.faktiske.minOfOrNull { it.fom }
-        val fomDager = if (fomForeslått == null || fomFaktisk == null) -1 else
-            ChronoUnit.DAYS.between(fomForeslått, fomFaktisk)
-
-        val tomForeslått = avvik1.foreslåtte.maxOfOrNull { it.tom }
-        val tomFaktisk = avvik1.faktiske.maxOfOrNull { it.tom }
-        val tomDager = if (tomForeslått == null || tomFaktisk == null) -1 else
-            ChronoUnit.DAYS.between(tomFaktisk, tomForeslått)
-        return Pair(fomDager, tomDager)
     }
 
     private fun finnÅrsak(avvik1: Avvik): MutableList<String> {
@@ -256,13 +275,84 @@ class ForeslåVedtaksperioderV2UtilTest {
         return årsak
     }
 
+    val fil = readFile()
+
+    val avvik = finnAvvik()
+
+    fun finnAvvik(): List<Avvik> {
+        val avvik = mutableListOf<Avvik>()
+        var antallRiktige = 0
+        var antallMedOverlappende = 0
+        fil.entries.forEach { (id, info) ->
+            try {
+                val forslagVedtaksperiode = mapForslag(info)
+
+                val faktiskeVedtaksperioder = info.vedtaksperioder.mergeSammenhengende(
+                    skalMerges = { a, b ->
+                        a.målgruppe == b.målgruppe && a.aktivitet == b.aktivitet && a.overlapperEllerPåfølgesAv(b)
+                    },
+                    merge = { a, b -> a.copy(fom = minOf(a.fom, b.fom), tom = maxOf(a.tom, b.tom)) }
+                )
+
+                if (forslagVedtaksperiode != faktiskeVedtaksperioder) {
+                    // mulighet for å filtrere vekk de perioder som finnes i begge settene
+                    val set = forslagVedtaksperiode.toSet()
+                    val set2 = faktiskeVedtaksperioder.toSet()
+                    avvik.add(
+                        Avvik(
+                            faktiske = faktiskeVedtaksperioder
+                            //.filterNot { it in set && it in set2 }
+                            ,
+                            foreslåtte = forslagVedtaksperiode
+                            //.filterNot { it in set && it in set2 }
+                            ,
+                            info = info
+                        )
+                    )
+                } else {
+                    antallRiktige++
+                }
+            } catch (e: Exception) {
+                if (e.message!!.contains("Foreløpig klarer vi bare å foreslå perioder når målgruppe og aktivitet har ett sammenhengende overlapp")) {
+                    antallMedOverlappende++
+                } else {
+                    throw e
+                }
+            }
+        }
+        println("Antall riktige: $antallRiktige")
+        println("Antall overlapp: $antallMedOverlappende")
+        println("Antall avvik: ${avvik.size}")
+        println("Antall med vedtak i Arena=${fil.values.count { it.arenaTom != null }}")
+        return avvik
+    }
+
+    data class AntallDagerAvvik(
+        val fom: Long,
+        val tom: Long,
+    )
+
     data class Avvik(
         val faktiske: List<ForenkletVedtaksperiode>,
         val foreslåtte: List<ForenkletVedtaksperiode>,
         val info: Info,
-    )
+    ) {
 
-    val fil = FileUtil.readFile("Result_25.csv").split("\n").let {
+        val antallDagerAvvik = run {
+            val fomForeslått = foreslåtte.minOfOrNull { it.fom }
+            val fomFaktisk = faktiske.minOfOrNull { it.fom }
+            val fomDager = if (fomForeslått == null || fomFaktisk == null) -1 else
+                ChronoUnit.DAYS.between(fomForeslått, fomFaktisk)
+
+            val tomForeslått = foreslåtte.maxOfOrNull { it.tom }
+            val tomFaktisk = faktiske.maxOfOrNull { it.tom }
+            val tomDager = if (tomForeslått == null || tomFaktisk == null) -1 else
+                ChronoUnit.DAYS.between(tomFaktisk, tomForeslått)
+            AntallDagerAvvik(fomDager, tomDager)
+        }
+    }
+
+    private fun readFile(): MutableMap<BehandlingId, Info> = FileUtil.readFile("Result_25.csv").split("\n").let {
         val map = mutableMapOf<BehandlingId, Info>()
         it
             .drop(1)
