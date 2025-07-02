@@ -79,7 +79,6 @@ data class AndelTilkjentYtelse(
             TypeAndel.BOUTGIFTER_AAP,
             TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER,
             TypeAndel.BOUTGIFTER_ETTERLATTE,
-
             -> validerErDagsats()
 
             TypeAndel.UGYLDIG -> {}
