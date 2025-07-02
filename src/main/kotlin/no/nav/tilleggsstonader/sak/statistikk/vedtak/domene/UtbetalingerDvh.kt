@@ -56,11 +56,6 @@ enum class AndelstypeDvh {
     BOUTGIFTER_AAP,
     BOUTGIFTER_ETTERLATTE,
     BOUTGIFTER_ENSLIG_FORSØRGER,
-
-//    DAGLIG_REISE_AAP,
-//    DAGLIG_REISE_ENSLIG_FORSØRGER,
-//    DAGLIG_REISE_ETTERLATTE,
-
     ;
 
     companion object {
