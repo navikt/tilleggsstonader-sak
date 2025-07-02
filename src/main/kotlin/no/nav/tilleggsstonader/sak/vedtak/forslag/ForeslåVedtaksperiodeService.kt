@@ -43,10 +43,11 @@ class ForeslåVedtaksperiodeService(
 
     private fun foreslåV2(saksbehandling: Saksbehandling): List<Vedtaksperiode> {
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(saksbehandling.id)
-        val forrigeVedtaksperioder = saksbehandling.forrigeIverksatteBehandlingId?.let {
-            // skal hente alle vedtaksperioder fra forrige behandling, så setter revurderFra til null
-            vedtaksperiodeService.finnVedtaksperioderForBehandling(it, revurdererFra = null)
-        } ?: emptyList()
+        val forrigeVedtaksperioder =
+            saksbehandling.forrigeIverksatteBehandlingId?.let {
+                // skal hente alle vedtaksperioder fra forrige behandling, så setter revurderFra til null
+                vedtaksperiodeService.finnVedtaksperioderForBehandling(it, revurdererFra = null)
+            } ?: emptyList()
         val tidligstEndring =
             utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(saksbehandling.id)
 
@@ -55,13 +56,13 @@ class ForeslåVedtaksperiodeService(
                 vilkårperioder = vilkårperioder,
                 vilkår = vilkårService.hentVilkår(saksbehandling.id),
                 tidligereVedtaksperioder = forrigeVedtaksperioder,
-                tidligstEndring = tidligstEndring
+                tidligstEndring = tidligstEndring,
             )
         } else {
             ForeslåVedtaksperiode.finnVedtaksperiodeUtenVilkårV2(
                 vilkårperioder = vilkårperioder,
                 tidligereVedtaksperioder = forrigeVedtaksperioder,
-                tidligstEndring = tidligstEndring
+                tidligstEndring = tidligstEndring,
             )
         }
     }

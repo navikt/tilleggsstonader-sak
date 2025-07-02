@@ -83,12 +83,13 @@ object ForeslåVedtaksperioderV2Util {
         målgrupper: List<ForenkletVilkårperiode<FaktiskMålgruppe>>,
         aktiviteter: Map<AktivitetType, List<ForenkletVilkårperiode<AktivitetType>>>,
     ): List<Vedtaksperiode> =
-        målgrupper.flatMap { målgruppe ->
-            målgruppe.type.gyldigeAktiviter
-                .mapNotNull { aktiviteter[it] }
-                .flatten()
-                .mapNotNull { målgruppe.snitt(it) }
-        }.mergeSammenhengende()
+        målgrupper
+            .flatMap { målgruppe ->
+                målgruppe.type.gyldigeAktiviter
+                    .mapNotNull { aktiviteter[it] }
+                    .flatten()
+                    .mapNotNull { målgruppe.snitt(it) }
+            }.mergeSammenhengende()
 
     private fun List<Vilkår>.forenklet(): List<Datoperiode> =
         this
