@@ -12,6 +12,7 @@ import java.util.UUID
  * Forslag av vedtaksperioder i forhold til vilkårperioder.
  * Forholder seg ikke til ev. stønadsvilkår eks [VilkårType.PASS_BARN]
  */
+@Deprecated("Skal erstattes av finnVedtaksperiodeV2")
 data class ForslagVedtaksperiodeFraVilkårperioder(
     override val fom: LocalDate,
     override val tom: LocalDate,

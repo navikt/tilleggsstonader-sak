@@ -73,7 +73,7 @@ class ForeslåVedtaksperiodeFraVilkårperioderStepDefinitions {
                 )
             resultat2 =
                 ForeslåVedtaksperioderV2Util
-                    .foreslåPerioder(
+                    .foreslåPerioderUtenVilkår(
                         Vilkårperioder(
                             målgrupper = målgrupper,
                             aktiviteter = aktiviteter,
