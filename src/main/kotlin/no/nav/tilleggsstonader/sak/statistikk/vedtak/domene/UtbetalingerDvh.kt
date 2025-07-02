@@ -56,6 +56,7 @@ enum class AndelstypeDvh {
     BOUTGIFTER_AAP,
     BOUTGIFTER_ETTERLATTE,
     BOUTGIFTER_ENSLIG_FORSØRGER,
+
     ;
 
     companion object {
