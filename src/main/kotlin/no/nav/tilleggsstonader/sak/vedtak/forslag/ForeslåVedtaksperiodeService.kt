@@ -1,10 +1,13 @@
 package no.nav.tilleggsstonader.sak.vedtak.forslag
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -18,18 +21,52 @@ class ForeslåVedtaksperiodeService(
     private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
     private val vedtaksperiodeService: VedtaksperiodeService,
+    private val unleashService: UnleashService,
+    private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
     fun foreslåVedtaksperioderLæremidler(behandlingId: BehandlingId): List<VedtaksperiodeLæremidler> =
         foreslåPerioder(behandlingId).map { it.tilVedtaksperiodeLæremidler() }
 
     fun foreslåPerioder(behandlingId: BehandlingId): List<Vedtaksperiode> {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        validerFinnesIkkeVedtaksperioderPåTidligereBehandling(saksbehandling)
 
-        val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
+        return if (unleashService.isEnabled(Toggle.BRUK_NY_FORESLÅ_VEDTAKSPERIODE)) {
+            foreslåV2(saksbehandling)
+        } else {
+            foreslåV1(saksbehandling)
+        }
+    }
+
+    private fun foreslåV2(saksbehandling: Saksbehandling): List<Vedtaksperiode> {
+        val vilkårperioder = vilkårperiodeService.hentVilkårperioder(saksbehandling.id)
+        val forrigeVedtaksperioder = saksbehandling.forrigeIverksatteBehandlingId?.let {
+            // skal hente alle vedtaksperioder fra forrige behandling, så setter revurderFra til null
+            vedtaksperiodeService.finnVedtaksperioderForBehandling(it, revurdererFra = null)
+        } ?: emptyList()
+        val tidligstEndring =
+            utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(saksbehandling.id)
 
         return if (saksbehandling.stønadstype.skalHenteStønadsvilkår()) {
-            ForeslåVedtaksperiode.finnVedtaksperiode(vilkårperioder, vilkårService.hentVilkår(behandlingId))
+            ForeslåVedtaksperiode.finnVedtaksperiodeV2(
+                vilkårperioder = vilkårperioder,
+                vilkår = vilkårService.hentVilkår(saksbehandling.id),
+                tidligereVedtaksperioder = forrigeVedtaksperioder,
+                tidligstEndring = tidligstEndring
+            )
+        } else {
+            ForeslåVedtaksperiode.finnVedtaksperiodeUtenVilkårV2(
+                vilkårperioder = vilkårperioder,
+                tidligereVedtaksperioder = forrigeVedtaksperioder,
+                revurderFra = tidligstEndring
+            )
+        }
+    }
+
+    private fun foreslåV1(saksbehandling: Saksbehandling): List<Vedtaksperiode> {
+        val vilkårperioder = vilkårperiodeService.hentVilkårperioder(saksbehandling.id)
+        validerFinnesIkkeVedtaksperioderPåTidligereBehandling(saksbehandling)
+        return if (saksbehandling.stønadstype.skalHenteStønadsvilkår()) {
+            ForeslåVedtaksperiode.finnVedtaksperiode(vilkårperioder, vilkårService.hentVilkår(saksbehandling.id))
         } else {
             ForeslåVedtaksperiodeFraVilkårperioder.foreslåVedtaksperioder(vilkårperioder).map { it.tilVedtaksperiode() }
         }
