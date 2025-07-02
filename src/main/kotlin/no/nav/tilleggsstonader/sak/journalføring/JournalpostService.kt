@@ -205,6 +205,6 @@ private fun Stønadstype.tilDokumentBrevkode(): DokumentBrevkode =
         Stønadstype.BARNETILSYN -> DokumentBrevkode.BARNETILSYN
         Stønadstype.LÆREMIDLER -> DokumentBrevkode.LÆREMIDLER
         Stønadstype.BOUTGIFTER -> DokumentBrevkode.BOUTGIFTER
-        Stønadstype.DAGLIG_REISE_TSO -> DokumentBrevkode.DAGLIG_REISE_TSO
-        Stønadstype.DAGLIG_REISE_TSR -> DokumentBrevkode.DAGLIG_REISE_TSR
+        Stønadstype.DAGLIG_REISE_TSO -> TODO()
+        Stønadstype.DAGLIG_REISE_TSR -> TODO()
     }
