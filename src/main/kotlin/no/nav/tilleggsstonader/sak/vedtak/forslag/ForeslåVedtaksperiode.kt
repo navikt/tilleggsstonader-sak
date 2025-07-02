@@ -29,10 +29,10 @@ object ForeslåVedtaksperiode {
     fun finnVedtaksperiodeUtenVilkårV2(
         vilkårperioder: Vilkårperioder,
         tidligereVedtaksperioder: List<Vedtaksperiode>,
-        revurderFra: LocalDate?,
+        tidligstEndring: LocalDate?,
     ): List<Vedtaksperiode> {
         val forslag = ForeslåVedtaksperioderV2Util.foreslåPerioderUtenVilkår(vilkårperioder)
-        return beholdTidligereIdnForVedtaksperioder(tidligereVedtaksperioder, forslag, revurderFra)
+        return beholdTidligereIdnForVedtaksperioder(tidligereVedtaksperioder, forslag, tidligstEndring)
     }
 
     @Deprecated("Skal erstattes av finnVedtaksperiodeV2")

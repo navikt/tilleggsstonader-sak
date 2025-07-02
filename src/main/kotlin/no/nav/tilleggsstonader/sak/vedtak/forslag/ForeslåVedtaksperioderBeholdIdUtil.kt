@@ -24,7 +24,7 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         val nyttForslag =
             ForeslåVedtaksperioderBeholdId(
                 tidligereVedtaksperioder = aktuelleVedtaksperioder.tidligereVedtaksperioder,
-                initielleForslag = aktuelleVedtaksperioder.forslagEtterRevurderFra,
+                initielleForslag = aktuelleVedtaksperioder.forslagEtterTidligtEndring,
             ).beholdTidligereIdnForVedtaksperioder()
         return mergeHvisLikeOgSammeId(
             tidligereVedtaksperioderSkalIkkeEndres = aktuelleVedtaksperioder.tidligereVedtaksperioderSkalIkkeEndres,
@@ -61,7 +61,7 @@ object ForeslåVedtaksperioderBeholdIdUtil {
                         ?.let { it.copy(tom = it.tom.plusDays(1)) },
                 )
 
-        val forslagEtterRevurderFra =
+        val forslagEtterTidligtEndring =
             if (tidligstEndring != null) {
                 forslag.avkortPerioderFør(tidligstEndring)
             } else {
@@ -70,14 +70,14 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         return Vedtaksperioder(
             tidligereVedtaksperioderSkalIkkeEndres = tidligereVedtaksperioderSkalIkkeEndres,
             tidligereVedtaksperioder = tidligereVedtaksperioderMedKorrigertTomDato,
-            forslagEtterRevurderFra = forslagEtterRevurderFra,
+            forslagEtterTidligtEndring = forslagEtterTidligtEndring,
         )
     }
 
     private data class Vedtaksperioder(
         val tidligereVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
         val tidligereVedtaksperioder: List<Vedtaksperiode>,
-        val forslagEtterRevurderFra: List<Vedtaksperiode>,
+        val forslagEtterTidligtEndring: List<Vedtaksperiode>,
     )
 
     private fun List<Vedtaksperiode>.tilVedtaksperiodeLæremidler() =

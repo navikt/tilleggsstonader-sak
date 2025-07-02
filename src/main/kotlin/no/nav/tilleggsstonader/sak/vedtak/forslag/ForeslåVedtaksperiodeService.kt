@@ -57,7 +57,7 @@ class ForeslåVedtaksperiodeService(
             ForeslåVedtaksperiode.finnVedtaksperiodeUtenVilkårV2(
                 vilkårperioder = vilkårperioder,
                 tidligereVedtaksperioder = forrigeVedtaksperioder,
-                revurderFra = tidligstEndring
+                tidligstEndring = tidligstEndring
             )
         }
     }
