@@ -25,8 +25,10 @@ class DagligReiseOffentligTransportBeregningStepDefinitions {
                 BeregningsInputOffentligTransport(
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    prisEnkelBilett = parseInt(DomenenøkkelFelles.BELØP, rad),
                     antallReisedagerPerUke = parseInt(DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE, rad),
+                    prisEnkelbillett = parseInt(DomenenøkkelOffentligtransport.PRIS_ENKELTBILLETT, rad),
+                    pris7dagersbillett = parseInt(DomenenøkkelOffentligtransport.PRIS_SYV_DAGERS_BILLETT, rad),
+                    pris30dagersbillett = parseInt(DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT, rad),
                 )
             }
 
@@ -53,4 +55,7 @@ enum class DomenenøkkelOffentligtransport(
     override val nøkkel: String,
 ) : Domenenøkkel {
     ANTALL_REISEDAGER_PER_UKE("Antall reisedager per uke"),
+    PRIS_ENKELTBILLETT("Pris enkeltbillett"),
+    PRIS_SYV_DAGERS_BILLETT("Pris syv-dagersbillett"),
+    PRIS_TRETTI_DAGERS_BILLETT("Pris tretti-dagersbillett"),
 }

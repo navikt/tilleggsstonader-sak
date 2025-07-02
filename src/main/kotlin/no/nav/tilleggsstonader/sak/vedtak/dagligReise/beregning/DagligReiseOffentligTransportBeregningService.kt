@@ -9,14 +9,22 @@ import java.time.LocalDate
 
 @Service
 class DagligReiseOffentligTransportBeregningService {
-    fun beregn(beregningsInputOffentligTransport: BeregningsInputOffentligTransport): Int =
-        Datoperiode(beregningsInputOffentligTransport.fom, beregningsInputOffentligTransport.tom)
-            .splitPerUke { fom, tom ->
+    fun beregn(beregningsInputOffentligTransport: BeregningsInputOffentligTransport): Int {
+        val prisBilligstAlternativForUke =
+            Datoperiode(
+                beregningsInputOffentligTransport.fom,
+                beregningsInputOffentligTransport.tom,
+            ).splitPerUke { fom, tom ->
                 finnReisedagerForUke(fom, tom, beregningsInputOffentligTransport)
             }.values
-            .sumOf { it ->
-                prisKunEnkelbilett(it.antallDager, beregningsInputOffentligTransport.prisEnkelBilett)
-            }
+                .sumOf { it ->
+                    finnBilligsteAlternativForUke(it.antallDager, beregningsInputOffentligTransport)
+                }
+
+        val pris30dagersbillett = beregningsInputOffentligTransport.pris30dagersbillett
+
+        return min(prisBilligstAlternativForUke, pris30dagersbillett)
+    }
 
     fun finnReisedagerForUke(
         fom: LocalDate,
@@ -29,17 +37,21 @@ class DagligReiseOffentligTransportBeregningService {
             antallDagerIPeriodeInklusiv(beregningsInputOffentligTransport.fom, beregningsInputOffentligTransport.tom),
         )
 
-    fun prisKunEnkelbilett(
+    fun finnBilligsteAlternativForUke(
         antallDager: Int,
-        prisEnkelBilett: Int,
-    ): Int = antallDager * prisEnkelBilett
+        beregningsInputOffentligTransport: BeregningsInputOffentligTransport,
+    ): Int {
+        val prisEnkeltbilletter = antallDager * beregningsInputOffentligTransport.prisEnkelbillett * 2
+        val pris7dagersbillett = beregningsInputOffentligTransport.pris7dagersbillett
+        return min(prisEnkeltbilletter, pris7dagersbillett)
+    }
 }
 
 data class BeregningsInputOffentligTransport(
     val fom: LocalDate,
     val tom: LocalDate,
     val antallReisedagerPerUke: Int,
-    val prisEnkelBilett: Int,
-//    val pris30dagersBilett: Int,
-//    val pris7dagersBilett: Int,
+    val prisEnkelbillett: Int,
+    val pris30dagersbillett: Int,
+    val pris7dagersbillett: Int,
 )
