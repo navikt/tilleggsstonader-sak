@@ -15,7 +15,6 @@ import java.time.LocalDate
 import java.util.UUID
 
 object ForeslåVedtaksperiode {
-
     fun finnVedtaksperiodeV2(
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
