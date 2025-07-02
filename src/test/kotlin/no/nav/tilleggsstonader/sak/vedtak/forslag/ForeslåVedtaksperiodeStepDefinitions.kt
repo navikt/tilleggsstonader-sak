@@ -103,11 +103,11 @@ class ForeslåVedtaksperiodeStepDefinitions {
 
     @Når("forslag til vedtaksperioder behold id lages")
     fun `forslag til vedtaksperioder behold id lages`() {
-        `forslag til vedtaksperioder behold id lages revurderFra`(null)
+        `forslag til vedtaksperioder behold id lages tidligstEndring`(null)
     }
 
-    @Når("forslag til vedtaksperioder behold id lages revurderFra={}")
-    fun `forslag til vedtaksperioder behold id lages revurderFra`(revurderFra: String?) {
+    @Når("forslag til vedtaksperioder behold id lages tidligstEndring={}")
+    fun `forslag til vedtaksperioder behold id lages tidligstEndring`(tidligstEndring: String?) {
         try {
             resultat =
                 ForeslåVedtaksperiode.finnVedtaksperiodeV2(
@@ -117,7 +117,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
                     ),
                     vilkår = vilkår,
                     tidligereVedtaksperioder = tidligereVedtaksperioder,
-                    tidligstEndring = revurderFra?.let { parseDato(it) },
+                    tidligstEndring = tidligstEndring?.let { parseDato(it) },
                 )
         } catch (e: ApiFeil) {
             feil = e
