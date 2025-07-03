@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import BeregningsresultatOffentligTransport
-import BeregningsresultatPerMåned
+import BeregningsresultatPerLøpendeMåned
 import BergningsGrunnlag
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
@@ -17,44 +17,47 @@ class DagligReiseOffentligTransportBeregningService {
         // TODO håndtere liste med input
         val utgiftOffentligTransport = utgifterOffentligTransport.single()
 
+        val løpendeMåneder =
+            utgiftOffentligTransport
+                .delTilLøpendeMåneder()
+                .map { måned -> måned.finnBilligsteAlternativForMåned() }
+
+        return BeregningsresultatOffentligTransport(
+            perioder = løpendeMåneder,
+        )
+    }
+
+    fun UtgiftOffentligTransport.finnBilligsteAlternativForMåned(): BeregningsresultatPerLøpendeMåned {
         val prisBilligstAlternativForUke =
             Datoperiode(
-                utgiftOffentligTransport.fom,
-                utgiftOffentligTransport.tom,
+                this.fom,
+                this.tom,
             ).splitPerUke { fom, tom ->
-                finnReisedagerForUke(fom, tom, utgiftOffentligTransport)
+                finnReisedagerForUke(fom, tom, this)
             }.values
                 .sumOf { it ->
-                    finnBilligsteAlternativForUke(it.antallDager, utgiftOffentligTransport)
+                    finnBilligsteAlternativForUke(it.antallDager, this)
                 }
 
-        val pris30dagersbillett = utgiftOffentligTransport.pris30dagersbillett
+        val pris30dagersbillett = this.pris30dagersbillett
 
         val lavestePris = min(prisBilligstAlternativForUke, pris30dagersbillett)
 
-        // TODO håndtere flere måneder
-        // Hvis bruker søker for jan til mai må vi finne ut hvor mye søker skal ha per måned
-        // altså per jan, feb, mars osv
-        val beregingsresultatPerMåned =
-            BeregningsresultatPerMåned(
-                fom = utgiftOffentligTransport.fom,
-                tom = utgiftOffentligTransport.tom,
-                beløp = lavestePris,
-                grunnlag =
-                    listOf(
-                        BergningsGrunnlag(
-                            fom = utgiftOffentligTransport.fom,
-                            tom = utgiftOffentligTransport.tom,
-                            antallReisedagerPerUke = utgiftOffentligTransport.antallReisedagerPerUke,
-                            prisEnkelbillett = utgiftOffentligTransport.prisEnkelbillett,
-                            pris30dagersbillett = utgiftOffentligTransport.pris30dagersbillett,
-                            pris7dagersbillett = utgiftOffentligTransport.pris7dagersbillett,
-                        ),
+        return BeregningsresultatPerLøpendeMåned(
+            fom = this.fom,
+            tom = this.tom,
+            beløp = lavestePris,
+            grunnlag =
+                listOf(
+                    BergningsGrunnlag(
+                        fom = this.fom,
+                        tom = this.tom,
+                        antallReisedagerPerUke = this.antallReisedagerPerUke,
+                        prisEnkelbillett = this.prisEnkelbillett,
+                        pris30dagersbillett = this.pris30dagersbillett,
+                        pris7dagersbillett = this.pris7dagersbillett,
                     ),
-            )
-
-        return BeregningsresultatOffentligTransport(
-            peroder = listOf(beregingsresultatPerMåned),
+                ),
         )
     }
 

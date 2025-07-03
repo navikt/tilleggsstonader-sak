@@ -2,10 +2,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import java.time.LocalDate
 
 data class BeregningsresultatOffentligTransport(
-    val peroder: List<BeregningsresultatPerMåned>,
+    val perioder: List<BeregningsresultatPerLøpendeMåned>,
 )
 
-data class BeregningsresultatPerMåned(
+data class BeregningsresultatPerLøpendeMåned(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val beløp: Int,

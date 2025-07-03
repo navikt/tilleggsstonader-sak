@@ -12,8 +12,22 @@ Egenskap: Beregning av offentlig transport daglig reise
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
-      | Beløp |
-      | 778   |
+      | Fom        | Tom        | Beløp |
+      | 01.01.2025 | 31.01.2025 | 778   |
+
+  Scenario: Forventer at tre tretti-dagersbillett lønner seg
+
+    Gitt følgende beregnings input for offentlig transport
+      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 01.01.2025 | 15.03.2025 | 44                 | 366                    | 778                       | 3                         |
+
+    Når beregner for daglig reise offentlig transport
+
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+      | Fom        | Tom        | Beløp |
+      | 01.01.2025 | 31.01.2025 | 778   |
+      | 01.02.2025 | 28.02.2025 | 778   |
+      | 01.03.2025 | 15.03.2025 | 528   |
 
   Scenario: Forventer at syv-dagersbillett lønner seg
 
@@ -24,8 +38,8 @@ Egenskap: Beregning av offentlig transport daglig reise
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
-      | Beløp |
-      | 366   |
+      | Fom        | Tom        | Beløp |
+      | 06.01.2025 | 12.01.2025 | 366   |
 
   Scenario: Forventer at enkeltbillett lønner seg
 
@@ -36,8 +50,8 @@ Egenskap: Beregning av offentlig transport daglig reise
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
-      | Beløp |
-      | 440   |
+      | Fom        | Tom        | Beløp |
+      | 01.01.2025 | 31.01.2025 | 440   |
 
 #  Scenario: TODO Forventer at ukeskort lønner seg på tvers av uker
 #

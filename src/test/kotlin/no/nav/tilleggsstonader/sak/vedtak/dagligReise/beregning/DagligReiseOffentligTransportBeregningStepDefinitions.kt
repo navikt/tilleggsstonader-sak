@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import BeregningsresultatOffentligTransport
+import BeregningsresultatPerLøpendeMåned
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
@@ -17,12 +18,13 @@ import org.assertj.core.api.Assertions.assertThat
 class DagligReiseOffentligTransportBeregningStepDefinitions {
     val dagligReiseOffentligTransportBeregningService = DagligReiseOffentligTransportBeregningService()
 
-    var beregningsInputOffentligTransport: List<UtgiftOffentligTransport>? = null
+    var utgiftOffentligTransport: List<UtgiftOffentligTransport>? = null
     var beregningsResultat: BeregningsresultatOffentligTransport? = null
+    var forventetBeregningsresultat: BeregningsresultatOffentligTransport? = null
 
     @Gitt("følgende beregnings input for offentlig transport")
     fun `følgende beregnins input offentlig transport`(dataTable: DataTable) {
-        beregningsInputOffentligTransport =
+        utgiftOffentligTransport =
             dataTable.mapRad { rad ->
                 UtgiftOffentligTransport(
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
@@ -37,17 +39,28 @@ class DagligReiseOffentligTransportBeregningStepDefinitions {
 
     @Når("beregner for daglig reise offentlig transport")
     fun `beregner for daglig reise offentlig transport`() {
-        beregningsResultat = dagligReiseOffentligTransportBeregningService.beregn(beregningsInputOffentligTransport!!)
+        beregningsResultat = dagligReiseOffentligTransportBeregningService.beregn(utgiftOffentligTransport!!)
     }
 
     @Så("forventer vi følgende beregningsrsultat for daglig resie offentlig transport")
     fun `forventer vi følgende beregningsrsultat for daglig resie offentlig transport`(dataTable: DataTable) {
-        val beregningsresultatListe =
-            dataTable.mapRad { rad ->
-                parseInt(DomenenøkkelFelles.BELØP, rad)
-            }
-        beregningsResultat!!.peroder.forEachIndexed { index, it ->
-            assertThat(it.beløp).isEqualTo(beregningsresultatListe[index])
+        val forventetBeregninsresultatOffentligTransport =
+            BeregningsresultatOffentligTransport(
+                perioder =
+                    dataTable.mapRad { rad ->
+                        BeregningsresultatPerLøpendeMåned(
+                            fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                            tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                            beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
+                            grunnlag = emptyList(),
+                        )
+                    },
+            )
+
+        beregningsResultat!!.perioder.forEachIndexed { index, it ->
+            assertThat(it.fom).isEqualTo(forventetBeregninsresultatOffentligTransport.perioder[index].fom)
+            assertThat(it.tom).isEqualTo(forventetBeregninsresultatOffentligTransport.perioder[index].tom)
+            assertThat(it.beløp).isEqualTo(forventetBeregninsresultatOffentligTransport.perioder[index].beløp)
         }
     }
 }
