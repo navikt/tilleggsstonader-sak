@@ -196,6 +196,8 @@ enum class Vilkårsresultat(
     SKAL_IKKE_VURDERES("Saksbehandleren kan sette att ett delvilkår ikke skal vurderes"),
     ;
 
+    fun erOppfylt() = this == OPPFYLT || this == AUTOMATISK_OPPFYLT
+
     fun oppfyltEllerIkkeOppfylt() = this == OPPFYLT || this == IKKE_OPPFYLT
 
     fun erIkkeDelvilkårsresultat() = this != AUTOMATISK_OPPFYLT
