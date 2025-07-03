@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
+import BeregningsresultatOffentligTransport
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
@@ -9,20 +10,21 @@ import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import org.assertj.core.api.Assertions.assertThat
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class DagligReiseOffentligTransportBeregningStepDefinitions {
     val dagligReiseOffentligTransportBeregningService = DagligReiseOffentligTransportBeregningService()
 
-    var beregningsInputOffentligTransport: BeregningsInputOffentligTransport? = null
-    var beregningsResultat: Int? = null
+    var beregningsInputOffentligTransport: List<UtgiftOffentligTransport>? = null
+    var beregningsResultat: BeregningsresultatOffentligTransport? = null
 
     @Gitt("følgende beregnings input for offentlig transport")
     fun `følgende beregnins input offentlig transport`(dataTable: DataTable) {
-        val beregningsInputOffentligTransportHentet =
+        beregningsInputOffentligTransport =
             dataTable.mapRad { rad ->
-                BeregningsInputOffentligTransport(
+                UtgiftOffentligTransport(
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
                     antallReisedagerPerUke = parseInt(DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE, rad),
@@ -31,8 +33,6 @@ class DagligReiseOffentligTransportBeregningStepDefinitions {
                     pris30dagersbillett = parseInt(DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT, rad),
                 )
             }
-
-        beregningsInputOffentligTransport = beregningsInputOffentligTransportHentet.single()
     }
 
     @Når("beregner for daglig reise offentlig transport")
@@ -46,8 +46,9 @@ class DagligReiseOffentligTransportBeregningStepDefinitions {
             dataTable.mapRad { rad ->
                 parseInt(DomenenøkkelFelles.BELØP, rad)
             }
-        val beregningsresultatHentetUt = beregningsresultatListe.single()
-        assertThat(beregningsResultat).isEqualTo(beregningsresultatHentetUt)
+        beregningsResultat!!.peroder.forEachIndexed { index, it ->
+            assertThat(it.beløp).isEqualTo(beregningsresultatListe[index])
+        }
     }
 }
 
