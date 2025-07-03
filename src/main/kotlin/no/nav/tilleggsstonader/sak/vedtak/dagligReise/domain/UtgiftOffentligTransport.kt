@@ -7,23 +7,25 @@ import java.time.LocalDate
 data class UtgiftOffentligTransport(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val antallReisedagerPerUke: Int,
-    val prisEnkelbillett: Int,
-    val pris30dagersbillett: Int,
-    val pris7dagersbillett: Int,
+    val reiseInformasjon: List<ReiseInformasjon>,
 ) : Periode<LocalDate> {
-    fun delTil30DagersPerioder(): List<UtgiftOffentligTransport> =
+    fun delTil30Dagersperioder(): List<UtgiftOffentligTransport> =
         this.splitPer30DagersPerioder { fom, tom ->
             UtgiftOffentligTransport(
                 fom = fom,
                 tom = tom,
-                antallReisedagerPerUke = this.antallReisedagerPerUke,
-                prisEnkelbillett = this.prisEnkelbillett,
-                pris7dagersbillett = this.pris7dagersbillett,
-                pris30dagersbillett = this.pris30dagersbillett,
+                reiseInformasjon = this.reiseInformasjon,
             )
         }
 }
+
+data class ReiseInformasjon(
+    val antallReisedagerPerUke: Int,
+    val prisEnkelbillett: Int,
+    val pris30dagersbillett: Int,
+    val pris7dagersbillett: Int,
+    val kilde: String,
+)
 
 // TODO: Skriv tester for denne
 fun <P : Periode<LocalDate>, VAL : Periode<LocalDate>> P.splitPer30DagersPerioder(

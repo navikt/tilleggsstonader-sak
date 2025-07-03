@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import BeregningsresultatOffentligTransport
-import BeregningsresultatPerLøpendeMåned
+import BeregningsresultatPer30Dagersperiode
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
@@ -11,30 +11,55 @@ import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.ReiseInformasjon
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import org.assertj.core.api.Assertions.assertThat
+import java.time.LocalDate
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class DagligReiseOffentligTransportBeregningStepDefinitions {
     val dagligReiseOffentligTransportBeregningService = DagligReiseOffentligTransportBeregningService()
 
-    var utgiftOffentligTransport: List<UtgiftOffentligTransport>? = null
+    var utgiftOffentligTransport: UtgiftOffentligTransport? = null
     var beregningsResultat: BeregningsresultatOffentligTransport? = null
     var forventetBeregningsresultat: BeregningsresultatOffentligTransport? = null
 
     @Gitt("følgende beregnings input for offentlig transport")
     fun `følgende beregnins input offentlig transport`(dataTable: DataTable) {
-        utgiftOffentligTransport =
+        var fom: LocalDate? = null
+        var tom: LocalDate? = null
+
+        val reiseInformasjon =
             dataTable.mapRad { rad ->
-                UtgiftOffentligTransport(
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    antallReisedagerPerUke = parseInt(DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE, rad),
+                fom = parseDato(DomenenøkkelFelles.FOM, rad)
+                tom = parseDato(DomenenøkkelFelles.TOM, rad)
+                ReiseInformasjon(
+                    antallReisedagerPerUke =
+                        parseInt(
+                            DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE,
+                            rad,
+                        ),
                     prisEnkelbillett = parseInt(DomenenøkkelOffentligtransport.PRIS_ENKELTBILLETT, rad),
-                    pris7dagersbillett = parseInt(DomenenøkkelOffentligtransport.PRIS_SYV_DAGERS_BILLETT, rad),
-                    pris30dagersbillett = parseInt(DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT, rad),
+                    pris7dagersbillett =
+                        parseInt(
+                            DomenenøkkelOffentligtransport.PRIS_SYV_DAGERS_BILLETT,
+                            rad,
+                        ),
+                    pris30dagersbillett =
+                        parseInt(
+                            DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT,
+                            rad,
+                        ),
+                    kilde = "Entur",
                 )
             }
+
+        utgiftOffentligTransport =
+            UtgiftOffentligTransport(
+                fom = fom!!,
+                tom = tom!!,
+                reiseInformasjon = reiseInformasjon,
+            )
     }
 
     @Når("beregner for daglig reise offentlig transport")
@@ -48,10 +73,12 @@ class DagligReiseOffentligTransportBeregningStepDefinitions {
             BeregningsresultatOffentligTransport(
                 perioder =
                     dataTable.mapRad { rad ->
-                        BeregningsresultatPerLøpendeMåned(
+                        BeregningsresultatPer30Dagersperiode(
                             fom = parseDato(DomenenøkkelFelles.FOM, rad),
                             tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                            beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
+                            // TODO må fikse domenenøkkel
+                            beregningsresultatTransportmiddel = emptyList(),
+                            summertBeløp = parseInt(DomenenøkkelFelles.BELØP, rad),
                             grunnlag = emptyList(),
                         )
                     },
@@ -60,7 +87,7 @@ class DagligReiseOffentligTransportBeregningStepDefinitions {
         beregningsResultat!!.perioder.forEachIndexed { index, it ->
             assertThat(it.fom).isEqualTo(forventetBeregninsresultatOffentligTransport.perioder[index].fom)
             assertThat(it.tom).isEqualTo(forventetBeregninsresultatOffentligTransport.perioder[index].tom)
-            assertThat(it.beløp).isEqualTo(forventetBeregninsresultatOffentligTransport.perioder[index].beløp)
+            assertThat(it.summertBeløp).isEqualTo(forventetBeregninsresultatOffentligTransport.perioder[index].summertBeløp)
         }
     }
 }
