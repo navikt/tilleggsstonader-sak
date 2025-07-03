@@ -19,7 +19,7 @@ class DagligReiseOffentligTransportBeregningService {
 
         val løpendeMåneder =
             utgiftOffentligTransport
-                .delTilLøpendeMåneder()
+                .delTil30DagersPerioder()
                 .map { måned -> måned.finnBilligsteAlternativForMåned() }
 
         return BeregningsresultatOffentligTransport(
