@@ -84,7 +84,12 @@ class BoutgifterVedtakController(
     ): BeregningsresultatBoutgifterDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val tidligsteEndring = utledTidligsteEndringService.utledTidligsteEndring(behandling.id, vedtak.vedtaksperioder.tilDomene())
+        val tidligsteEndring =
+            utledTidligsteEndringService
+                .utledTidligsteEndring(
+                    behandling.id,
+                    vedtak.vedtaksperioder.tilDomene(),
+                )?.tidligsteEndringSomPåvirkerUtbetalinger
         return beregningService
             .beregn(
                 behandling = behandling,

@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.Vilkårperi
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
+import no.nav.tilleggsstonader.sak.tidligsteendring.TidligsteEndringResultat
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -285,7 +286,8 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
 
-        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId, any()) } returns revurderFra
+        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId, any()) } returns
+            TidligsteEndringResultat(revurderFra, revurderFra)
 
         kjørMedFeilkontekst {
             steg.utførSteg(
@@ -309,7 +311,8 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val revurderFra = parseDato(revurderFraStr)
         val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto() }
 
-        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId, any()) } returns revurderFra
+        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId, any()) } returns
+            TidligsteEndringResultat(revurderFra, revurderFra)
 
         kjørMedFeilkontekst {
             steg.utførSteg(

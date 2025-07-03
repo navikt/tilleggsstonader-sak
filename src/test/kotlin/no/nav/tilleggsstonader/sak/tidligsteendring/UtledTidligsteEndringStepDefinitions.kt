@@ -152,7 +152,7 @@ class UtledTidligsteEndringStepDefinitions {
                 barnIdTilIdentMap =
                     barnIder.entries.associate { it.value to it.key } +
                         barnIderForrigeBehandling.entries.associate { it.value to it.key },
-            ).utledTidligsteEndring()
+            ).utledTidligsteEndring()?.tidligsteEndring
     }
 
     @Så("forvent følgende dato for tidligste endring: {}")

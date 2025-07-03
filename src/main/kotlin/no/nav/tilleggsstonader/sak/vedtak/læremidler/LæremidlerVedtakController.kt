@@ -81,10 +81,11 @@ class LæremidlerVedtakController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val tidligsteEndring =
-            utledTidligsteEndringService.utledTidligsteEndring(
-                behandling.id,
-                vedtaksperioder.tilDomene().map { it.tilFellesDomeneVedtaksperiode() },
-            )
+            utledTidligsteEndringService
+                .utledTidligsteEndring(
+                    behandling.id,
+                    vedtaksperioder.tilDomene().map { it.tilFellesDomeneVedtaksperiode() },
+                )?.tidligsteEndringSomPåvirkerUtbetalinger
         return beregningService
             .beregn(
                 behandling,

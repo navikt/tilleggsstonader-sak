@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepos
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
+import no.nav.tilleggsstonader.sak.tidligsteendring.TidligsteEndringResultat
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -158,7 +159,8 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
 
-        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId, any()) } returns revurderFra
+        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId, any()) } returns
+            TidligsteEndringResultat(revurderFra, revurderFra)
 
         val vedtaksperioder = mapVedtaksperioderDto(dataTable)
         steg.utførSteg(dummyBehandling(behandlingId, revurderFra), InnvilgelseLæremidlerRequest(vedtaksperioder))

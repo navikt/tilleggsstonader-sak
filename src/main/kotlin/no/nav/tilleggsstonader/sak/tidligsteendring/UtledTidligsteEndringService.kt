@@ -37,7 +37,7 @@ class UtledTidligsteEndringService(
     fun utledTidligsteEndring(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): LocalDate? =
+    ): TidligsteEndringResultat? =
         utledTidligsteEndring(
             behandlingId = behandlingId,
             vedtaksperioder = vedtaksperioder,
@@ -46,7 +46,7 @@ class UtledTidligsteEndringService(
             },
         )
 
-    fun utledTidligsteEndringIgnorerVedtaksperioder(behandlingId: BehandlingId): LocalDate? =
+    fun utledTidligsteEndringIgnorerVedtaksperioder(behandlingId: BehandlingId): TidligsteEndringResultat? =
         utledTidligsteEndring(
             behandlingId = behandlingId,
             vedtaksperioder = emptyList(),
@@ -57,17 +57,20 @@ class UtledTidligsteEndringService(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
         hentVedtaksperioderTidligereBehandlingFunction: (BehandlingId) -> List<Vedtaksperiode>,
-    ): LocalDate? {
+    ): TidligsteEndringResultat? {
         val behandling = behandlingService.hentBehandling(behandlingId)
 
         if (!unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
-            return behandling.revurderFra
+            return TidligsteEndringResultat(
+                tidligsteEndring = behandling.revurderFra,
+                tidligsteEndringSomPåvirkerUtbetalinger = behandling.revurderFra,
+            )
         }
 
         val sisteIverksatteBehandling = behandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentBehandling(it) }
 
         if (sisteIverksatteBehandling == null) {
-            return null
+            return TidligsteEndringResultat.tom()
         }
 
         val vilkår = vilkårService.hentVilkår(behandlingId)
@@ -90,6 +93,19 @@ class UtledTidligsteEndringService(
             vedtaksperioderTidligereBehandling = vedtaksperioderTidligereBehandling,
             barnIdTilIdentMap = (barnIder + barnIderTidligereBehandling).associate { it.id to it.ident },
         ).utledTidligsteEndring()
+    }
+}
+
+data class TidligsteEndringResultat(
+    val tidligsteEndring: LocalDate?,
+    val tidligsteEndringSomPåvirkerUtbetalinger: LocalDate?,
+) {
+    companion object {
+        fun tom() =
+            TidligsteEndringResultat(
+                tidligsteEndring = null,
+                tidligsteEndringSomPåvirkerUtbetalinger = null,
+            )
     }
 }
 
@@ -125,13 +141,26 @@ data class TidligsteEndringIBehandlingUtleder(
      * Gjør dette ved å sortere listene med perioder og sammenligne med periode i tidligere behandling
      * Returnerer null hvis det ikke er noen endringer.
      */
-    fun utledTidligsteEndring(): LocalDate? =
-        listOfNotNull(
-            utledTidligsteEndringForVilkår(),
-            utledTidligsteEndringForAktiviteter(),
-            utledTidligsteEndringForMålgrupper(),
-            utledTidligsteEndringForVedtaksperioder(),
-        ).minOrNull()
+    fun utledTidligsteEndring(): TidligsteEndringResultat? {
+        val tidligsteEndring =
+            listOfNotNull(
+                utledTidligsteEndringForVilkår(),
+                utledTidligsteEndringForAktiviteter(),
+                utledTidligsteEndringForMålgrupper(),
+                utledTidligsteEndringForVedtaksperioder(),
+            ).minOrNull()
+
+        return TidligsteEndringResultat(
+            tidligsteEndring = tidligsteEndring,
+            tidligsteEndringSomPåvirkerUtbetalinger =
+                tidligsteEndring?.let {
+                    finnTidligsteOverlappEllerNestePeriode(
+                        vedtaksperioder = vedtaksperioder + vedtaksperioderTidligereBehandling,
+                        dato = it,
+                    )
+                },
+        )
+    }
 
     private fun utledTidligsteEndringForVilkår(): LocalDate? =
         utledEndringIPeriode(
@@ -243,3 +272,16 @@ data class PeriodeWrapper<T>(
     override val fom: LocalDate,
     override val tom: LocalDate,
 ) : Periode<LocalDate>
+
+fun finnTidligsteOverlappEllerNestePeriode(
+    vedtaksperioder: List<Vedtaksperiode>,
+    dato: LocalDate,
+): LocalDate? {
+    val overlapp = vedtaksperioder.firstOrNull { it.fom <= dato && it.tom >= dato }
+
+    return if (overlapp != null) {
+        dato
+    } else {
+        vedtaksperioder.filter { it.fom >= dato }.minByOrNull { it.fom }?.fom
+    }
+}
