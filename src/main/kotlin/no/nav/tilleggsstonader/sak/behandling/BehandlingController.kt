@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
@@ -110,35 +109,35 @@ class BehandlingController(
     }
 
     @PostMapping("{behandlingId}/henlegg")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun henleggBehandling(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody henlagt: HenlagtDto,
-    ): BehandlingDto {
+    ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
-        val henlagtBehandling = henleggService.henleggBehandling(behandlingId, henlagt)
-        val fagsak: Fagsak = fagsakService.hentFagsak(henlagtBehandling.fagsakId)
-        return henlagtBehandling.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId, null)
+        henleggService.henleggBehandling(behandlingId, henlagt)
     }
 
     @GetMapping("/ekstern/{eksternBehandlingId}")
     fun hentBehandling(
         @PathVariable eksternBehandlingId: Long,
-    ): BehandlingDto {
+    ): BehandlingId {
         val saksbehandling = behandlingService.hentSaksbehandling(eksternBehandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.ACCESS)
-        return saksbehandling.tilDto(null)
+        return saksbehandling.id
     }
 
     @PostMapping("{behandlingId}/revurder-fra/{revurderFra}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun oppdaterRevurderFra(
         @PathVariable behandlingId: BehandlingId,
         @PathVariable revurderFra: LocalDate,
-    ): BehandlingDto {
+    ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        return revurderFraService.oppdaterRevurderFra(behandlingId, revurderFra).tilDto(null)
+        revurderFraService.oppdaterRevurderFra(behandlingId, revurderFra)
     }
 
     @PostMapping("{behandlingId}/nullstill")
