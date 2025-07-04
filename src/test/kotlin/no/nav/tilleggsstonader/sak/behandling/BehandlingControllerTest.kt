@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.test.httpclient.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -15,12 +16,14 @@ import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
@@ -29,6 +32,9 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.exchange
 
 internal class BehandlingControllerTest : IntegrationTest() {
+    @Autowired
+    lateinit var behandlingRepository: BehandlingRepository
+
     @BeforeEach
     fun setUp() {
         headers.setBearerAuth(onBehalfOfToken())
@@ -51,10 +57,12 @@ internal class BehandlingControllerTest : IntegrationTest() {
         val respons =
             henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
 
-        assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(respons.body!!.resultat).isEqualTo(BehandlingResultat.HENLAGT)
-        assertThat(respons.body!!.henlagtÅrsak).isEqualTo(HenlagtÅrsak.FEILREGISTRERT)
-        assertThat(respons.body!!.henlagtBegrunnelse).isEqualTo(henlagtBegrunnelse)
+        assertThat(respons.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+
+        val oppdatert = behandlingRepository.findByIdOrThrow(behandling.id)
+        assertThat(oppdatert.resultat).isEqualTo(BehandlingResultat.HENLAGT)
+        assertThat(oppdatert.henlagtÅrsak).isEqualTo(HenlagtÅrsak.FEILREGISTRERT)
+        assertThat(oppdatert.henlagtBegrunnelse).isEqualTo(henlagtBegrunnelse)
     }
 
     @Test
@@ -65,10 +73,13 @@ internal class BehandlingControllerTest : IntegrationTest() {
         val respons =
             henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
 
-        assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(respons.body!!.resultat).isEqualTo(BehandlingResultat.HENLAGT)
-        assertThat(respons.body!!.henlagtÅrsak).isEqualTo(HenlagtÅrsak.FEILREGISTRERT)
-        assertThat(respons.body!!.henlagtBegrunnelse).isEqualTo(henlagtBegrunnelse)
+        assertThat(respons.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+
+        val oppdatert = behandlingRepository.findByIdOrThrow(behandling.id)
+
+        assertThat(oppdatert.resultat).isEqualTo(BehandlingResultat.HENLAGT)
+        assertThat(oppdatert.henlagtÅrsak).isEqualTo(HenlagtÅrsak.FEILREGISTRERT)
+        assertThat(oppdatert.henlagtBegrunnelse).isEqualTo(henlagtBegrunnelse)
     }
 
     @Test
