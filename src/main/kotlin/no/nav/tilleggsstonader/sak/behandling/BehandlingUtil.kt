@@ -55,6 +55,6 @@ object BehandlingUtil {
 
     fun List<Behandling>.sisteFerdigstilteBehandling() =
         this
-            .filter { it.erAvsluttet() }
+            .filter { it.erFerdigstilt() }
             .maxByOrNull { it.vedtakstidspunktEllerFeil() }
 }

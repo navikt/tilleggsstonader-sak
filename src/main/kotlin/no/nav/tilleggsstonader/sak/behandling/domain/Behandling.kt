@@ -44,9 +44,9 @@ data class Behandling(
 ) {
     fun kanHenlegges(): Boolean = !status.behandlingErLåstForVidereRedigering()
 
-    fun erAvsluttet(): Boolean = status == BehandlingStatus.FERDIGSTILT
+    fun erFerdigstilt(): Boolean = status == BehandlingStatus.FERDIGSTILT
 
-    fun erAktiv(): Boolean = !(erAvsluttet() || status == BehandlingStatus.SATT_PÅ_VENT)
+    fun erAktiv(): Boolean = !(erFerdigstilt() || status == BehandlingStatus.SATT_PÅ_VENT)
 
     fun vedtakstidspunktEllerFeil(): LocalDateTime = this.vedtakstidspunkt ?: error("Mangler vedtakstidspunkt for behandling=$id")
 

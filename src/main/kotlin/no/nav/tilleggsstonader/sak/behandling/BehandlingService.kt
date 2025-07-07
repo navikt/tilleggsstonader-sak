@@ -211,7 +211,7 @@ class BehandlingService(
     fun finnSisteBehandlingSomHarVedtakPåFagsaken(fagsakId: FagsakId): Behandling? =
         behandlingRepository
             .findByFagsakId(fagsakId)
-            .filter { it.erAvsluttet() }
+            .filter { it.erFerdigstilt() }
             .filterNot { it.erHenlagt() }
             .sortertEtterVedtakstidspunkt()
             .lastOrNull()
