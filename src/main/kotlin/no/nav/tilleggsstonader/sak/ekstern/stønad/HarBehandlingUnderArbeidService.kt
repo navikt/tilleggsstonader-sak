@@ -16,7 +16,7 @@ class HarBehandlingUnderArbeidService(
                 identStønadstype.ident,
                 identStønadstype.stønadstype,
             )
-        return behandlinger.any { erSøknadUnderBehandling(it.behandlingsårsak, it.status) }
+        return behandlinger.any { erSøknadUnderBehandling(it.behandlingsÅrsak, it.status) }
     }
 
     companion object {
