@@ -104,5 +104,6 @@ fun Behandling.tilBehandlingJournalDto(): BehandlingTilJournalføringDto =
         type = this.type,
         status = this.status,
         resultat = this.resultat,
+        behandlingsÅrsak = this.årsak,
         sistEndret = this.sporbar.endret.endretTid,
     )
