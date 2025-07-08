@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import BehandlingTilJournalføringDto
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -103,6 +104,22 @@ class BehandlingController(
         )
 
         return fagsakService.hentBehandlingerForPersonOgStønadstype(
+            identStønadstype.ident,
+            identStønadstype.stønadstype,
+        )
+    }
+
+    @PostMapping("person/V2")
+    fun hentBehandlingerForPersonOgStønadstypeV2(
+        @RequestBody identStønadstype: IdentStønadstype,
+    ): List<BehandlingTilJournalføringDto> {
+        tilgangService.validerTilgangTilStønadstype(
+            identStønadstype.ident,
+            identStønadstype.stønadstype,
+            AuditLoggerEvent.ACCESS,
+        )
+
+        return fagsakService.hentBehandlingerForPersonOgStønadstypeV2(
             identStønadstype.ident,
             identStønadstype.stønadstype,
         )

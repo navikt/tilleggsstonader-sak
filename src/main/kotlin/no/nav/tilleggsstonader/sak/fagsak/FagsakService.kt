@@ -1,8 +1,10 @@
 package no.nav.tilleggsstonader.sak.fagsak
 
+import BehandlingTilJournalføringDto
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
+import no.nav.tilleggsstonader.sak.behandling.dto.tilBehandlingJournalDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakIdRepository
@@ -57,6 +59,16 @@ class FagsakService(
         finnFagsak(personService.hentFolkeregisterIdenter(personIdent).identer(), stønadstype)?.let { fagsak ->
             behandlingService.hentBehandlinger(fagsak.id).map {
                 it.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId, null)
+            }
+        } ?: emptyList()
+
+    fun hentBehandlingerForPersonOgStønadstypeV2(
+        personIdent: String,
+        stønadstype: Stønadstype,
+    ): List<BehandlingTilJournalføringDto> =
+        finnFagsak(personService.hentFolkeregisterIdenter(personIdent).identer(), stønadstype)?.let { fagsak ->
+            behandlingService.hentBehandlinger(fagsak.id).map {
+                it.tilBehandlingJournalDto()
             }
         } ?: emptyList()
 
