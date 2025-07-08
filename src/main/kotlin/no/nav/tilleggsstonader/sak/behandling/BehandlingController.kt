@@ -96,22 +96,6 @@ class BehandlingController(
     @PostMapping("person")
     fun hentBehandlingerForPersonOgStønadstype(
         @RequestBody identStønadstype: IdentStønadstype,
-    ): List<BehandlingDto> {
-        tilgangService.validerTilgangTilStønadstype(
-            identStønadstype.ident,
-            identStønadstype.stønadstype,
-            AuditLoggerEvent.ACCESS,
-        )
-
-        return fagsakService.hentBehandlingerForPersonOgStønadstype(
-            identStønadstype.ident,
-            identStønadstype.stønadstype,
-        )
-    }
-
-    @PostMapping("person/V2")
-    fun hentBehandlingerForPersonOgStønadstypeV2(
-        @RequestBody identStønadstype: IdentStønadstype,
     ): List<BehandlingTilJournalføringDto> {
         tilgangService.validerTilgangTilStønadstype(
             identStønadstype.ident,
@@ -119,7 +103,7 @@ class BehandlingController(
             AuditLoggerEvent.ACCESS,
         )
 
-        return fagsakService.hentBehandlingerForPersonOgStønadstypeV2(
+        return fagsakService.hentBehandlingerForPersonOgStønadstype(
             identStønadstype.ident,
             identStønadstype.stønadstype,
         )
