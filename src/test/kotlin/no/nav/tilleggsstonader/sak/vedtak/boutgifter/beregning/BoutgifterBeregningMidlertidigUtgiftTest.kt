@@ -187,14 +187,10 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
             )
         }.hasMessage(
             """
-            Utgiftsperioder krysser beregningsperioder
-            
-            Utgiftsperiode 25.01.2025–05.02.2025 krysser beregningsperiodene:
-            - 01.01.2025–31.01.2025
-            - 01.02.2025–28.02.2025
-            
-            Utgiftsperioden(e) må splittes.
-            
+            Systemet klarer ikke å beregne utgifter til overnatting som krysser beregningsperioder
+            Følgende perioder med overnatting må splittes i to perioder for å kunne beregne
+
+            25.01.2025–05.02.2025 må splittes til 01.01.2025–31.01.2025 og 01.02.2025–28.02.2025
             """.trimIndent(),
         )
     }
