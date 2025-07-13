@@ -3,9 +3,9 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20250624093734_e06ed70"
+val familieProsesseringVersion = "2.20250710084329_76f7728"
 val tilleggsstønaderLibsVersion = "2025.06.25-07.59.55db83b77624"
-val tilleggsstønaderKontrakterVersion = "2025.07.02-11.12.1001cd94eded"
+val tilleggsstønaderKontrakterVersion = "2025.07.10-14.03.c6bf32f4d884"
 val avroVersion = "1.12.0"
 val confluentVersion = "8.0.0"
 val joarkHendelseVersion = "08271806"
@@ -21,7 +21,7 @@ plugins {
     application
 
     kotlin("jvm") version "2.2.0"
-    id("com.diffplug.spotless") version "7.0.4"
+    id("com.diffplug.spotless") version "7.1.0"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
@@ -105,7 +105,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.23.0"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.25.0"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 
