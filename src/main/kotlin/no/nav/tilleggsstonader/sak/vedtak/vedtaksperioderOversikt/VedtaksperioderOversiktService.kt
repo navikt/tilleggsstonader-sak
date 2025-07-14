@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
-import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder.DetaljertVedtaksperiodeTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder.DetaljertVedtaksperioderTilsynBarnMapper.finnDetaljerteVedtaksperioder
@@ -19,9 +18,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBa
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperiodeLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperioderLæremidlerMapper.finnDetaljerteVedtaksperioder
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class VedtaksperioderOversiktService(
@@ -79,25 +76,9 @@ class VedtaksperioderOversiktService(
         return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder()
     }
 
-    private fun oppsummerVedtaksperioderDagligReiseTSO(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReiseTSO> =
-        listOf(
-            DetaljertVedtaksperiodeDagligReiseTSO(
-                fom = LocalDate.now(),
-                tom = LocalDate.now().plusDays(1),
-                aktivitet = AktivitetType.TILTAK,
-                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-            ),
-        )
+    private fun oppsummerVedtaksperioderDagligReiseTSO(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReiseTSO> = emptyList()
 
-    private fun oppsummerVedtaksperioderDagligReiseTSR(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReiseTSR> =
-        listOf(
-            DetaljertVedtaksperiodeDagligReiseTSR(
-                fom = LocalDate.now(),
-                tom = LocalDate.now().plusDays(1),
-                aktivitet = AktivitetType.UTDANNING,
-                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-            ),
-        )
+    private fun oppsummerVedtaksperioderDagligReiseTSR(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReiseTSR> = emptyList()
 
     private inline fun <reified T : Vedtaksdata> hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): T? {
         val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId) ?: return null
