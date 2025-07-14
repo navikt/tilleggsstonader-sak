@@ -5,18 +5,23 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder.DetaljertVedtaksperiodeTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder.DetaljertVedtaksperioderTilsynBarnMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperiodeBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperioderBoutgifterMapper.finnDetaljerteVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReiseTSO
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReiseTSR
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperiodeLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperioderLæremidlerMapper.finnDetaljerteVedtaksperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class VedtaksperioderOversiktService(
@@ -36,6 +41,12 @@ class VedtaksperioderOversiktService(
             tilsynBarn = fagsaker.barnetilsyn?.let { oppsummerVedtaksperioderTilsynBarn(it.id) } ?: emptyList(),
             læremidler = fagsaker.læremidler?.let { oppsummerVedtaksperioderLæremidler(it.id) } ?: emptyList(),
             boutgifter = fagsaker.boutgifter?.let { oppsummerVedtaksperioderBoutgifter(it.id) } ?: emptyList(),
+            dagligreiseTSO =
+                fagsaker.dagligReiseTSO?.let { oppsummerVedtaksperioderDagligReiseTSO(it.id) }
+                    ?: emptyList(),
+            dagligreiseTSR =
+                fagsaker.dagligReiseTSR?.let { oppsummerVedtaksperioderDagligReiseTSR(it.id) }
+                    ?: emptyList(),
         )
     }
 
@@ -54,7 +65,8 @@ class VedtaksperioderOversiktService(
 
     private fun oppsummerVedtaksperioderLæremidler(fagsakId: FagsakId): List<DetaljertVedtaksperiodeLæremidler> {
         val vedtakForSisteIverksatteBehandling =
-            hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørLæremidler>(fagsakId) ?: return emptyList()
+            hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørLæremidler>(fagsakId)
+                ?: return emptyList()
 
         return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder()
     }
@@ -66,6 +78,26 @@ class VedtaksperioderOversiktService(
 
         return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder()
     }
+
+    private fun oppsummerVedtaksperioderDagligReiseTSO(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReiseTSO> =
+        listOf(
+            DetaljertVedtaksperiodeDagligReiseTSO(
+                fom = LocalDate.now(),
+                tom = LocalDate.now().plusDays(1),
+                aktivitet = AktivitetType.TILTAK,
+                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+            ),
+        )
+
+    private fun oppsummerVedtaksperioderDagligReiseTSR(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReiseTSR> =
+        listOf(
+            DetaljertVedtaksperiodeDagligReiseTSR(
+                fom = LocalDate.now(),
+                tom = LocalDate.now().plusDays(1),
+                aktivitet = AktivitetType.UTDANNING,
+                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+            ),
+        )
 
     private inline fun <reified T : Vedtaksdata> hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): T? {
         val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId) ?: return null

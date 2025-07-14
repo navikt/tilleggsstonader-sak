@@ -89,6 +89,8 @@ class FagsakService(
             barnetilsyn = fagsaker[Stønadstype.BARNETILSYN],
             læremidler = fagsaker[Stønadstype.LÆREMIDLER],
             boutgifter = fagsaker[Stønadstype.BOUTGIFTER],
+            dagligReiseTSO = fagsaker[Stønadstype.DAGLIG_REISE_TSO],
+            dagligReiseTSR = fagsaker[Stønadstype.DAGLIG_REISE_TSR],
         )
     }
 
