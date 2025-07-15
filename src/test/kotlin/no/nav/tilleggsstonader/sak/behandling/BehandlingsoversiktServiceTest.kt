@@ -50,6 +50,8 @@ class BehandlingsoversiktServiceTest {
                 barnetilsyn = fagsak,
                 læremidler = null,
                 boutgifter = null,
+                dagligReiseTSO = null,
+                dagligReiseTSR = null,
             )
         every { behandlingRepository.findByFagsakId(fagsakId = fagsak.id) } returns listOf(behandling)
         every { fagsakService.erLøpende(fagsak.id) } returns true
@@ -128,6 +130,10 @@ class BehandlingsoversiktServiceTest {
         val beregningsresultat = BeregningsresultatTilsynBarn(perioder = listOf(beregningsresultatForMåned))
 
         every { vedtakRepository.findByIdOrNull(any()) } returns
-            innvilgetVedtak(beregningsresultat = beregningsresultat, behandlingId = behandling.id, vedtaksperioder = listOf(vedtaksperiode))
+            innvilgetVedtak(
+                beregningsresultat = beregningsresultat,
+                behandlingId = behandling.id,
+                vedtaksperioder = listOf(vedtaksperiode),
+            )
     }
 }
