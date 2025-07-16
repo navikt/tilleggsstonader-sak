@@ -11,8 +11,10 @@ import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.ReiseInformasjon
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import org.assertj.core.api.Assertions.assertThat
 import java.time.LocalDate
 
@@ -23,6 +25,12 @@ class DagligReiseOffentligTransportBeregningStepDefinitions {
     var utgiftOffentligTransport: UtgiftOffentligTransport? = null
     var beregningsResultat: BeregningsresultatOffentligTransport? = null
     var forventetBeregningsresultat: BeregningsresultatOffentligTransport? = null
+    var vedtaksperioder: List<Vedtaksperiode> = emptyList()
+
+    @Gitt("følgende vedtaksperioder")
+    fun `følgende vedtaksperioder`(dataTable: DataTable) {
+        vedtaksperioder = mapVedtaksperioder(dataTable)
+    }
 
     @Gitt("følgende beregnings input for offentlig transport")
     fun `følgende beregnins input offentlig transport`(dataTable: DataTable) {
@@ -59,12 +67,17 @@ class DagligReiseOffentligTransportBeregningStepDefinitions {
                 fom = fom!!,
                 tom = tom!!,
                 reiseInformasjon = reiseInformasjon,
+                vedtaksperioder = vedtaksperioder,
             )
     }
 
     @Når("beregner for daglig reise offentlig transport")
     fun `beregner for daglig reise offentlig transport`() {
-        beregningsResultat = dagligReiseOffentligTransportBeregningService.beregn(utgiftOffentligTransport!!)
+        beregningsResultat =
+            dagligReiseOffentligTransportBeregningService.beregn(
+                utgifterOffentligTransport = utgiftOffentligTransport!!,
+                vedtaksperioder = vedtaksperioder,
+            )
     }
 
     @Så("forventer vi følgende beregningsrsultat for daglig resie offentlig transport")

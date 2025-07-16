@@ -7,20 +7,45 @@ import BergningsGrunnlag
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.ReiseInformasjon
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.antallDagerIPeriodeInklusiv
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.splitPerUke
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import org.apache.commons.lang3.math.NumberUtils.min
 import org.springframework.stereotype.Service
 
 @Service
 class DagligReiseOffentligTransportBeregningService {
-    fun beregn(utgifterOffentligTransport: UtgiftOffentligTransport): BeregningsresultatOffentligTransport =
-        BeregningsresultatOffentligTransport(
-            perioder =
-                utgifterOffentligTransport.delTil30Dagersperioder().map { it ->
-                    it.lagBeregningsresultatPer30dagersperiode()
-                },
-        )
+    fun beregn(
+        utgifterOffentligTransport: UtgiftOffentligTransport,
+        vedtaksperioder: List<Vedtaksperiode>,
+    ): BeregningsresultatOffentligTransport {
+        val vedtaksperioderBeregning =
+            vedtaksperioder.tilVedtaksperiodeBeregning()
+
+        val beregningsresultat =
+            utgifterOffentligTransport
+                .delTil30Dagersperioder()
+                .filter { periode ->
+                    vedtaksperioderBeregning.any { vedtaksperiode ->
+                        vedtaksperiode.overlapper(periode)
+                    }
+                }.map { periode ->
+                    val vedtaksperiodeForPeriode =
+                        vedtaksperioderBeregning.find { it.overlapper(periode) }
+                            ?: error("Fant ingen vedtaksperiode for periode ${periode.fom} - ${periode.tom}")
+
+                    val justertPeriode =
+                        periode.copy(
+                            fom = maxOf(periode.fom, vedtaksperiodeForPeriode.fom),
+                            tom = minOf(periode.tom, vedtaksperiodeForPeriode.tom),
+                        )
+
+                    justertPeriode.lagBeregningsresultatPer30dagersperiode()
+                }
+
+        return BeregningsresultatOffentligTransport(perioder = beregningsresultat)
+    }
 
     fun UtgiftOffentligTransport.lagBeregningsresultatPer30dagersperiode(): BeregningsresultatPer30Dagersperiode {
         val beregningresultatPerTransportmiddel =

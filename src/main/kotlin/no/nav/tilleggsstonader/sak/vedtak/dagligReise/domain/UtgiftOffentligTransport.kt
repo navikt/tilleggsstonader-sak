@@ -2,12 +2,14 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.util.inneholderUkedag
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import java.time.LocalDate
 
 data class UtgiftOffentligTransport(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val reiseInformasjon: List<ReiseInformasjon>,
+    val vedtaksperioder: List<Vedtaksperiode>,
 ) : Periode<LocalDate> {
     fun delTil30Dagersperioder(): List<UtgiftOffentligTransport> =
         this.splitPer30DagersPerioder { fom, tom ->
@@ -15,6 +17,7 @@ data class UtgiftOffentligTransport(
                 fom = fom,
                 tom = tom,
                 reiseInformasjon = this.reiseInformasjon,
+                vedtaksperioder = this.vedtaksperioder,
             )
         }
 }

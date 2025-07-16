@@ -5,6 +5,10 @@ Egenskap: Beregning av offentlig transport daglig reise
 
   Scenario: Forventer at tretti-dagersbillett lønner seg
 
+    Gitt følgende vedtaksperioder
+      | Fom        | Tom        | FaktiskMålgruppe | Aktivitet |
+      | 01.01.2025 | 01.02.2025 | AAP              | UTDANNING |
+
     Gitt følgende beregnings input for offentlig transport
       | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
       | 01.01.2025 | 31.01.2025 | 44                 | 366                    | 778                       | 3                         |
@@ -16,6 +20,9 @@ Egenskap: Beregning av offentlig transport daglig reise
       | 01.01.2025 | 31.01.2025 | 778   |
 
   Scenario: Forventer at tre tretti-dagersbillett lønner seg
+    Gitt følgende vedtaksperioder
+      | Fom        | Tom        | FaktiskMålgruppe | Aktivitet |
+      | 01.01.2025 | 31.03.2025 | AAP              | UTDANNING |
 
     Gitt følgende beregnings input for offentlig transport
       | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
@@ -30,6 +37,9 @@ Egenskap: Beregning av offentlig transport daglig reise
       | 04.03.2025 | 15.03.2025 | 528   |
 
   Scenario: Forventer at syv-dagersbillett lønner seg
+    Gitt følgende vedtaksperioder
+      | Fom        | Tom        | FaktiskMålgruppe | Aktivitet |
+      | 01.01.2025 | 01.02.2025 | AAP              | UTDANNING |
 
     Gitt følgende beregnings input for offentlig transport
       | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
@@ -42,6 +52,9 @@ Egenskap: Beregning av offentlig transport daglig reise
       | 06.01.2025 | 12.01.2025 | 366   |
 
   Scenario: Forventer at enkeltbillett lønner seg
+    Gitt følgende vedtaksperioder
+      | Fom        | Tom        | FaktiskMålgruppe | Aktivitet |
+      | 01.01.2025 | 31.01.2025 | AAP              | UTDANNING |
 
     Gitt følgende beregnings input for offentlig transport
       | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
@@ -54,6 +67,9 @@ Egenskap: Beregning av offentlig transport daglig reise
       | 01.01.2025 | 31.01.2025 | 440   |
 
   Scenario: Billigste alternativ over flere 30 dagers perioder
+    Gitt følgende vedtaksperioder
+      | Fom        | Tom        | FaktiskMålgruppe | Aktivitet |
+      | 01.01.2025 | 01.04.2025 | AAP              | UTDANNING |
 
     Gitt følgende beregnings input for offentlig transport
       | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
@@ -66,17 +82,36 @@ Egenskap: Beregning av offentlig transport daglig reise
       | 31.01.2025 | 02.03.2025 | 778   |
       | 03.03.2025 | 15.03.2025 | 528   |
 
-#  Scenario: TODO Forventer at ukeskort lønner seg på tvers av uker
+  Scenario: Forventer at ukeskort lønner seg på tvers av uker
+    Gitt følgende vedtaksperioder
+      | Fom        | Tom        | FaktiskMålgruppe | Aktivitet |
+      | 01.01.2025 | 31.01.2025 | AAP              | UTDANNING |
+
+    Gitt følgende beregnings input for offentlig transport
+      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 09.01.2025 | 15.01.2025 | 44                 | 366                    | 778                       | 5                         |
+
+    Når beregner for daglig reise offentlig transport
+
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+      | Fom        | Tom        | Beløp |
+      | 09.01.2025 | 15.01.2025 | 366   |
+
+#  Scenario: Kaster feil når utgifterperioder er lengre enn vedtaksperioder
+#    Gitt følgende vedtaksperioder
+#      | Fom        | Tom        | FaktiskMålgruppe | Aktivitet |
+#      | 01.01.2025 | 05.03.2025 | AAP              | UTDANNING |
 #
 #    Gitt følgende beregnings input for offentlig transport
 #      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
-#      | 09.01.2025 | 15.01.2025 | 44                | 366                  | 778                     | 5                         |
+#      | 31.01.2025 | 15.03.2025 | 44                 | 366                    | 778                       | 3                         |
 #
 #    Når beregner for daglig reise offentlig transport
 #
 #    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
-#      | Beløp |
-#      | 366   |
+#      | Fom        | Tom        | Beløp |
+#      | 31.01.2025 | 02.03.2025 | 778   |
+#      | 03.03.2025 | 15.03.2025 | 528   |
 
 #
 #  Scenario: TODO Forventer at månedskort og tre enkeltbilletter lønner seg på tvers av måneder
