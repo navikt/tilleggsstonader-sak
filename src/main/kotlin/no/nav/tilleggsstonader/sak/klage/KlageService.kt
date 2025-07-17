@@ -40,6 +40,8 @@ class KlageService(
             tilsynBarn = klagebehandlingerPåEksternId[fagsaker.barnetilsyn?.eksternId?.id] ?: emptyList(),
             læremidler = klagebehandlingerPåEksternId[fagsaker.læremidler?.eksternId?.id] ?: emptyList(),
             boutgifter = klagebehandlingerPåEksternId[fagsaker.boutgifter?.eksternId?.id] ?: emptyList(),
+            dagligReiseTSO = klagebehandlingerPåEksternId[fagsaker.dagligReiseTSO?.eksternId?.id] ?: emptyList(),
+            dagligReiseTSR = klagebehandlingerPåEksternId[fagsaker.dagligReiseTSR?.eksternId?.id] ?: emptyList(),
         )
     }
 
