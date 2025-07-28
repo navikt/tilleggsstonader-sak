@@ -1,9 +1,7 @@
 package no.nav.tilleggsstonader.sak.felles.domain
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import java.util.UUID
 
-@JsonDeserialize(keyUsing = BarnIdKeyDeserializer::class)
 @JvmInline
 value class BarnId(
     val id: UUID,
