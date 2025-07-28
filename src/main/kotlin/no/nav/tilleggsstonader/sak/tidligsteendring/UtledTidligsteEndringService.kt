@@ -61,16 +61,18 @@ class UtledTidligsteEndringService(
         val behandling = behandlingService.hentBehandling(behandlingId)
 
         if (!unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
-            return TidligsteEndringResultat(
-                tidligsteEndring = behandling.revurderFra,
-                tidligsteEndringSomPåvirkerUtbetalinger = behandling.revurderFra,
-            )
+            return behandling.revurderFra?.let {
+                TidligsteEndringResultat(
+                    tidligsteEndring = it,
+                    tidligsteEndringSomPåvirkerUtbetalinger = it,
+                )
+            }
         }
 
         val sisteIverksatteBehandling = behandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentBehandling(it) }
 
         if (sisteIverksatteBehandling == null) {
-            return TidligsteEndringResultat.tom()
+            return null
         }
 
         val vilkår = vilkårService.hentVilkår(behandlingId)
@@ -97,17 +99,9 @@ class UtledTidligsteEndringService(
 }
 
 data class TidligsteEndringResultat(
-    val tidligsteEndring: LocalDate?,
+    val tidligsteEndring: LocalDate,
     val tidligsteEndringSomPåvirkerUtbetalinger: LocalDate?,
-) {
-    companion object {
-        fun tom() =
-            TidligsteEndringResultat(
-                tidligsteEndring = null,
-                tidligsteEndringSomPåvirkerUtbetalinger = null,
-            )
-    }
-}
+)
 
 data class TidligsteEndringIBehandlingUtleder(
     val vilkår: List<Vilkår>,
@@ -150,16 +144,16 @@ data class TidligsteEndringIBehandlingUtleder(
                 utledTidligsteEndringForVedtaksperioder(),
             ).minOrNull()
 
-        return TidligsteEndringResultat(
-            tidligsteEndring = tidligsteEndring,
-            tidligsteEndringSomPåvirkerUtbetalinger =
-                tidligsteEndring?.let {
+        return tidligsteEndring?.let {
+            TidligsteEndringResultat(
+                tidligsteEndring = it,
+                tidligsteEndringSomPåvirkerUtbetalinger =
                     finnTidligsteOverlappEllerNestePeriode(
                         vedtaksperioder = vedtaksperioder + vedtaksperioderTidligereBehandling,
                         dato = it,
-                    )
-                },
-        )
+                    ),
+            )
+        }
     }
 
     private fun utledTidligsteEndringForVilkår(): LocalDate? =
