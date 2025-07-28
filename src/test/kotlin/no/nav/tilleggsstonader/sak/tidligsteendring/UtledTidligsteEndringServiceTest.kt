@@ -118,7 +118,7 @@ class UtledTidligsteEndringServiceTest {
             }
         vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
 
-        val result = utledTidligsteEndringService.utledTidligsteEndring(behandling.id, vedtaksperioder)?.tidligsteEndring
+        val result = utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandling.id, vedtaksperioder)
 
         assertThat(result).isEqualTo(nyttVilkår.fom)
     }
@@ -141,7 +141,7 @@ class UtledTidligsteEndringServiceTest {
         vedtaksperioder = vedtaksperioderSisteIverksatteBehandling // Må initialiseres
         every { unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) } returns false
         behandling = behandling.copy(type = BehandlingType.REVURDERING, revurderFra = LocalDate.of(2023, 1, 1))
-        assertThat(utledTidligsteEndringService.utledTidligsteEndring(behandling.id, vedtaksperioder)?.tidligsteEndring)
+        assertThat(utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandling.id, vedtaksperioder))
             .isEqualTo(behandling.revurderFra)
     }
 }

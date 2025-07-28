@@ -28,7 +28,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.Vilkårperi
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
-import no.nav.tilleggsstonader.sak.tidligsteendring.TidligsteEndringResultat
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -83,7 +82,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     val behandlingServiceMock = mockk<BehandlingService>()
     val utledTidligsteEndringService =
         mockk<UtledTidligsteEndringService> {
-            every { utledTidligsteEndring(any(), any()) } returns null
+            every { utledTidligsteEndringForBeregning(any(), any()) } returns null
         }
     val vilkårperiodeServiceMock =
         mockk<VilkårperiodeService>().apply {
@@ -286,8 +285,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
 
-        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId, any()) } returns
-            TidligsteEndringResultat(revurderFra, revurderFra)
+        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns revurderFra
 
         kjørMedFeilkontekst {
             steg.utførSteg(
@@ -311,8 +309,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val revurderFra = parseDato(revurderFraStr)
         val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto() }
 
-        every { utledTidligsteEndringService.utledTidligsteEndring(behandlingId, any()) } returns
-            TidligsteEndringResultat(revurderFra, revurderFra)
+        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns revurderFra
 
         kjørMedFeilkontekst {
             steg.utførSteg(

@@ -66,11 +66,10 @@ class BoutgifterBeregnYtelseSteg(
     ) {
         val vedtaksperioder = vedtak.vedtaksperioder.tilDomene().sorted()
         val tidligsteEndring =
-            utledTidligsteEndringService
-                .utledTidligsteEndring(
-                    saksbehandling.id,
-                    vedtaksperioder,
-                )?.tidligsteEndringSomPåvirkerUtbetalingerEllerTidligsteEndring()
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                saksbehandling.id,
+                vedtaksperioder,
+            )
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,

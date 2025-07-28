@@ -63,11 +63,10 @@ class TilsynBarnBeregnYtelseSteg(
         vedtak: InnvilgelseTilsynBarnRequest,
     ) {
         val tidligsteEndring =
-            utledTidligsteEndringService
-                .utledTidligsteEndring(
-                    saksbehandling.id,
-                    vedtak.vedtaksperioder.tilDomene(),
-                )?.tidligsteEndringSomPåvirkerUtbetalingerEllerTidligsteEndring()
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                saksbehandling.id,
+                vedtak.vedtaksperioder.tilDomene(),
+            )
 
         val beregningsresultat =
             beregningService.beregn(

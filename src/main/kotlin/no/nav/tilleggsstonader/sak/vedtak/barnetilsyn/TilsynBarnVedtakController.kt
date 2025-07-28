@@ -80,11 +80,10 @@ class TilsynBarnVedtakController(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtaksperioder = vedtak.vedtaksperioder.tilDomene()
         val tidligsteEndring =
-            utledTidligsteEndringService
-                .utledTidligsteEndring(
-                    behandling.id,
-                    vedtaksperioder,
-                )?.tidligsteEndringSomPåvirkerUtbetalingerEllerTidligsteEndring()
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                behandling.id,
+                vedtaksperioder,
+            )
 
         return beregningService
             .beregn(

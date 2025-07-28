@@ -31,28 +31,38 @@ class UtledTidligsteEndringService(
     private val unleashService: UnleashService,
 ) {
     /**
-     * Vil plukke opp alle endringer i vilkår, aktiviteter, målgrupper og vedtaksperioder og betrakte det som en endring i revurderingen.
-     * Noe som kan vurderes om vi bør ta hensyn til:
-     * Vil også plukke oppe endringer som ikke har noe å si for beregning, eksempelvis om man legger til en ny målgruppe.
+     * Sammenligner gitt behandling med tidligere iverksatte behandling, for å finne tidligste endring i vilkårsperioder,
+     * vilkår og vedtaksperioder. Sjekker deretter denne datoen mot alle vedtaksperioder for å finne første dato som
+     * vil påvirke beregningen.
+     *
+     * - Om det ikke finnes noen tidligere iverksatte behandlinger, returneres null.
+     * - Om det ikke utledes endringer, returnreres null.
+     * - Om utbetalinger ikke vil påvirkes av endringer, returneres tidligste endring hvis det finnes en.
      */
-    fun utledTidligsteEndring(
+    fun utledTidligsteEndringForBeregning(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): TidligsteEndringResultat? =
+    ): LocalDate? =
         utledTidligsteEndring(
             behandlingId = behandlingId,
             vedtaksperioder = vedtaksperioder,
             hentVedtaksperioderTidligereBehandlingFunction = { behandlingId ->
                 vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, null)
             },
-        )
+        )?.tidligsteEndringSomPåvirkerUtbetalingerEllerTidligsteEndring()
 
-    fun utledTidligsteEndringIgnorerVedtaksperioder(behandlingId: BehandlingId): TidligsteEndringResultat? =
+    /**
+     * Sammenligner gitt behandling med tidligere iverksatte behandling, for å finne tidligste endring i vilkårsperioder og vilkår.
+     *
+     * - Om det ikke finnes noen tidligere iverksatte behandlinger, returneres null.
+     * - Om det ikke utledes endringer, returnreres null.
+     */
+    fun utledTidligsteEndringIgnorerVedtaksperioder(behandlingId: BehandlingId): LocalDate? =
         utledTidligsteEndring(
             behandlingId = behandlingId,
             vedtaksperioder = emptyList(),
             hentVedtaksperioderTidligereBehandlingFunction = { _ -> emptyList() },
-        )
+        )?.tidligsteEndring
 
     private fun utledTidligsteEndring(
         behandlingId: BehandlingId,
