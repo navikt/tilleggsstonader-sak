@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.tidligsteendring
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.finnFørsteTreffFraOgMedDato
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -148,8 +149,8 @@ data class TidligsteEndringIBehandlingUtleder(
             TidligsteEndringResultat(
                 tidligsteEndring = it,
                 tidligsteEndringSomPåvirkerUtbetalinger =
-                    finnTidligsteOverlappEllerNestePeriode(
-                        vedtaksperioder = vedtaksperioder + vedtaksperioderTidligereBehandling,
+                    finnFørsteTreffFraOgMedDato(
+                        perioder = vedtaksperioder + vedtaksperioderTidligereBehandling,
                         dato = it,
                     ),
             )
@@ -266,16 +267,3 @@ data class PeriodeWrapper<T>(
     override val fom: LocalDate,
     override val tom: LocalDate,
 ) : Periode<LocalDate>
-
-fun finnTidligsteOverlappEllerNestePeriode(
-    vedtaksperioder: List<Vedtaksperiode>,
-    dato: LocalDate,
-): LocalDate? {
-    val overlapp = vedtaksperioder.firstOrNull { it.fom <= dato && it.tom >= dato }
-
-    return if (overlapp != null) {
-        dato
-    } else {
-        vedtaksperioder.filter { it.fom >= dato }.minByOrNull { it.fom }?.fom
-    }
-}

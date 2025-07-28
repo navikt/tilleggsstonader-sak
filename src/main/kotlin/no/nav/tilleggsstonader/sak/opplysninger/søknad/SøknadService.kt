@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad
 
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadskjemaDagligreise
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
@@ -91,6 +92,8 @@ class SøknadService(
                         journalpost,
                         søknadsskjema,
                     )
+
+                is SøknadskjemaDagligreise -> TODO()
             }
         val lagretSøknad =
             when (søknad) {
