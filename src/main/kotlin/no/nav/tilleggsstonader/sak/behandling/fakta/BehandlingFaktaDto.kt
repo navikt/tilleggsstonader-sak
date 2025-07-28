@@ -58,6 +58,13 @@ data class BehandlingFaktaBoutgifterDto(
     val boligEllerOvernatting: FaktaBoligEllerOvernatting?,
 ) : BehandlingFaktaDto
 
+data class BehandlingFaktaDagligreiseDto(
+    override val søknadMottattTidspunkt: LocalDateTime? = LocalDateTime.now(),
+    override val hovedytelse: FaktaHovedytelse? = null,
+    override val dokumentasjon: FaktaDokumentasjon? = null,
+    override val arena: ArenaFakta? = null,
+) : BehandlingFaktaDto
+
 data class FaktaHovedytelse(
     val søknadsgrunnlag: SøknadsgrunnlagHovedytelse?,
 )

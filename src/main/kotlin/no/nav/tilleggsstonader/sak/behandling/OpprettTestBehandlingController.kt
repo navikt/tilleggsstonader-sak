@@ -128,8 +128,8 @@ class OpprettTestBehandlingController(
             Stønadstype.BARNETILSYN -> opprettSøknadBarnetilsyn(fagsak, behandling)
             Stønadstype.LÆREMIDLER -> opprettSøknadLæremidler(fagsak, behandling)
             Stønadstype.BOUTGIFTER -> opprettSøknadBoutgifter(fagsak, behandling)
-            Stønadstype.DAGLIG_REISE_TSO -> TODO("Oppretter foreløpig ikke søknad for daglig reise")
-            Stønadstype.DAGLIG_REISE_TSR -> TODO("Oppretter foreløpig ikke søknad for daglig reise")
+            Stønadstype.DAGLIG_REISE_TSO -> opprettSøknadDagligeReiseTSO(fagsak, behandling)
+            Stønadstype.DAGLIG_REISE_TSR -> opprettSøknadDagligeReiseTSR(fagsak, behandling)
         }
     }
 
@@ -362,6 +362,126 @@ class OpprettTestBehandlingController(
                         ),
                     ),
             )
+        søknadService.lagreSøknad(behandling.id, journalpost, skjema)
+    }
+
+    private fun opprettSøknadDagligeReiseTSO(
+        fagsak: Fagsak,
+        behandling: Behandling,
+    ) {
+        val skjemaLæremidler =
+            SøknadsskjemaLæremidler(
+                hovedytelse =
+                    HovedytelseAvsnitt(
+                        hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
+                        arbeidOgOpphold = arbeidOgOpphold(),
+                    ),
+                utdanning =
+                    UtdanningAvsnitt(
+                        aktiviteter =
+                            EnumFlereValgFelt(
+                                "Hvilken utdanning eller opplæring søker du om støtte til læremidler for",
+                                listOf(
+                                    VerdiFelt("1", "Høyere utdanning: 25. februar 2024 - 25. juli 2024"),
+                                ),
+                                listOf("Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
+                            ),
+                        annenUtdanning =
+                            EnumFelt(
+                                "Annen utdanning tekst",
+                                AnnenUtdanningType.INGEN_UTDANNING,
+                                "Ja",
+                                emptyList(),
+                            ),
+                        harRettTilUtstyrsstipend =
+                            HarRettTilUtstyrsstipend(
+                                erLærlingEllerLiknende =
+                                    EnumFelt(
+                                        "Er lærling eller liknende?",
+                                        JaNei.JA,
+                                        "Ja",
+                                        emptyList(),
+                                    ),
+                                harTidligereFullførtVgs =
+                                    EnumFelt(
+                                        "Har du tidligere fullført videregående skole?",
+                                        JaNei.JA,
+                                        "Ja",
+                                        emptyList(),
+                                    ),
+                            ),
+                        harFunksjonsnedsettelse = EnumFelt("Har funksjonsnedsettelse?", JaNei.JA, "Ja", emptyList()),
+                    ),
+                dokumentasjon = emptyList(),
+            )
+        val skjema =
+            Søknadsskjema(
+                ident = fagsak.hentAktivIdent(),
+                mottattTidspunkt = LocalDateTime.of(2020, 1, 1, 0, 0),
+                språk = Språkkode.NB,
+                skjema = skjemaLæremidler,
+            )
+        val journalpost = Journalpost("TESTJPID", Journalposttype.I, Journalstatus.FERDIGSTILT)
+        søknadService.lagreSøknad(behandling.id, journalpost, skjema)
+    }
+
+    private fun opprettSøknadDagligeReiseTSR(
+        fagsak: Fagsak,
+        behandling: Behandling,
+    ) {
+        val skjemaLæremidler =
+            SøknadsskjemaLæremidler(
+                hovedytelse =
+                    HovedytelseAvsnitt(
+                        hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
+                        arbeidOgOpphold = arbeidOgOpphold(),
+                    ),
+                utdanning =
+                    UtdanningAvsnitt(
+                        aktiviteter =
+                            EnumFlereValgFelt(
+                                "Hvilken utdanning eller opplæring søker du om støtte til læremidler for",
+                                listOf(
+                                    VerdiFelt("1", "Høyere utdanning: 25. februar 2024 - 25. juli 2024"),
+                                ),
+                                listOf("Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
+                            ),
+                        annenUtdanning =
+                            EnumFelt(
+                                "Annen utdanning tekst",
+                                AnnenUtdanningType.INGEN_UTDANNING,
+                                "Ja",
+                                emptyList(),
+                            ),
+                        harRettTilUtstyrsstipend =
+                            HarRettTilUtstyrsstipend(
+                                erLærlingEllerLiknende =
+                                    EnumFelt(
+                                        "Er lærling eller liknende?",
+                                        JaNei.JA,
+                                        "Ja",
+                                        emptyList(),
+                                    ),
+                                harTidligereFullførtVgs =
+                                    EnumFelt(
+                                        "Har du tidligere fullført videregående skole?",
+                                        JaNei.JA,
+                                        "Ja",
+                                        emptyList(),
+                                    ),
+                            ),
+                        harFunksjonsnedsettelse = EnumFelt("Har funksjonsnedsettelse?", JaNei.JA, "Ja", emptyList()),
+                    ),
+                dokumentasjon = emptyList(),
+            )
+        val skjema =
+            Søknadsskjema(
+                ident = fagsak.hentAktivIdent(),
+                mottattTidspunkt = LocalDateTime.of(2020, 1, 1, 0, 0),
+                språk = Språkkode.NB,
+                skjema = skjemaLæremidler,
+            )
+        val journalpost = Journalpost("TESTJPID", Journalposttype.I, Journalstatus.FERDIGSTILT)
         søknadService.lagreSøknad(behandling.id, journalpost, skjema)
     }
 

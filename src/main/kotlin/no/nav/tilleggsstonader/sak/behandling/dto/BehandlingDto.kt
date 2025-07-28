@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.dto
 
+import BehandlingTilJournalføringDto
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
@@ -95,4 +96,14 @@ fun Saksbehandling.tilDto(tilordnetSaksbehandler: TilordnetSaksbehandlerDto?): B
         revurderFra = this.revurderFra,
         nyeOpplysningerMetadata = this.nyeOpplysningerMetadata,
         tilordnetSaksbehandler = tilordnetSaksbehandler,
+    )
+
+fun Behandling.tilBehandlingJournalDto(): BehandlingTilJournalføringDto =
+    BehandlingTilJournalføringDto(
+        id = this.id,
+        type = this.type,
+        status = this.status,
+        resultat = this.resultat,
+        behandlingsÅrsak = this.årsak,
+        sistEndret = this.sporbar.endret.endretTid,
     )

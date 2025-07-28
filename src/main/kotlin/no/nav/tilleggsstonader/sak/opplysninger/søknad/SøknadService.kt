@@ -50,6 +50,16 @@ class SøknadService(
             .findByIdOrNull(behandlingId)
             ?.let { søknadBoutgifterRepository.findByIdOrThrow(it.søknadId) }
 
+    fun hentSøknadDagligReiseTSO(behandlingId: BehandlingId): SøknadLæremidler? =
+        søknadBehandlingRepository
+            .findByIdOrNull(behandlingId)
+            ?.let { søknadLæremidlerRepository.findByIdOrThrow(it.søknadId) }
+
+    fun hentSøknadDagligReiseTSR(behandlingId: BehandlingId): SøknadLæremidler? =
+        søknadBehandlingRepository
+            .findByIdOrNull(behandlingId)
+            ?.let { søknadLæremidlerRepository.findByIdOrThrow(it.søknadId) }
+
     fun lagreSøknad(
         behandlingId: BehandlingId,
         journalpost: Journalpost,
@@ -65,6 +75,7 @@ class SøknadService(
                         journalpost,
                         søknadsskjema,
                     )
+
                 is SøknadsskjemaLæremidler ->
                     SøknadskjemaLæremidlerMapper.map(
                         skjema.mottattTidspunkt,
@@ -72,6 +83,7 @@ class SøknadService(
                         journalpost,
                         søknadsskjema,
                     )
+
                 is SøknadsskjemaBoutgifterFyllUtSendInn ->
                     søknadskjemaBoutgifterMapper.map(
                         skjema.mottattTidspunkt,

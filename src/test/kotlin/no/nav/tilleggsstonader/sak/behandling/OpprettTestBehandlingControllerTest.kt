@@ -64,4 +64,26 @@ class OpprettTestBehandlingControllerTest : IntegrationTest() {
         assertThat(søknad).isNotNull
         assertThat(søknad).isInstanceOf(SøknadLæremidler::class.java)
     }
+
+    @Test
+    fun `skal kunne opprette en behandling for daglig reise TSO`() {
+        val ident = FnrGenerator.generer(2000, 1, 1)
+        val behandlingId = controller.opprettBehandling(TestBehandlingRequest(ident, stønadstype = Stønadstype.DAGLIG_REISE_TSO))
+
+        assertThat(behandlingRepository.findByIdOrNull(behandlingId)).isNotNull
+        val søknad = søknadService.hentSøknadDagligReiseTSO(behandlingId)!!
+        assertThat(søknad).isNotNull
+        assertThat(søknad).isInstanceOf(SøknadLæremidler::class.java)
+    }
+
+    @Test
+    fun `skal kunne opprette en behandling for daglig reise TSR`() {
+        val ident = FnrGenerator.generer(2000, 1, 1)
+        val behandlingId = controller.opprettBehandling(TestBehandlingRequest(ident, stønadstype = Stønadstype.DAGLIG_REISE_TSR))
+
+        assertThat(behandlingRepository.findByIdOrNull(behandlingId)).isNotNull
+        val søknad = søknadService.hentSøknadDagligReiseTSR(behandlingId)!!
+        assertThat(søknad).isNotNull
+        assertThat(søknad).isInstanceOf(SøknadLæremidler::class.java)
+    }
 }

@@ -60,8 +60,8 @@ class BehandlingFaktaService(
             Stønadstype.BARNETILSYN -> hentFaktaDTOForBarneTilsyn(behandlingId)
             Stønadstype.LÆREMIDLER -> hentFaktaDTOForLæremidler(behandlingId)
             Stønadstype.BOUTGIFTER -> hentFaktaDTOForBoutgifter(behandlingId)
-            Stønadstype.DAGLIG_REISE_TSO -> TODO("Daglig reise er ikke implementert enda")
-            Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise er ikke implementert enda")
+            Stønadstype.DAGLIG_REISE_TSO -> hentFaktaDTOForDagligreise(behandlingId)
+            Stønadstype.DAGLIG_REISE_TSR -> hentFaktaDTOForDagligreise(behandlingId)
         }
     }
 
@@ -108,6 +108,8 @@ class BehandlingFaktaService(
             personopplysninger = mapPersonopplysninger(søknad),
         )
     }
+
+    private fun hentFaktaDTOForDagligreise(behandlingId: BehandlingId): BehandlingFaktaDagligreiseDto = BehandlingFaktaDagligreiseDto()
 
     private fun mapPersonopplysninger(søknad: SøknadBoutgifter?): FaktaPersonopplysninger =
         FaktaPersonopplysninger(

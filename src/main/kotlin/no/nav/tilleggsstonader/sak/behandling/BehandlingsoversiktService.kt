@@ -29,6 +29,8 @@ class BehandlingsoversiktService(
             tilsynBarn = hentFagsakMedBehandlinger(fagsak.barnetilsyn),
             læremidler = hentFagsakMedBehandlinger(fagsak.læremidler),
             boutgifter = hentFagsakMedBehandlinger(fagsak.boutgifter),
+            dagligReiseTSO = hentFagsakMedBehandlinger(fagsak.dagligReiseTSO),
+            dagligReiseTSR = hentFagsakMedBehandlinger(fagsak.dagligReiseTSR),
         )
     }
 
