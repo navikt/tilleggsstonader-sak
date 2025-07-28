@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.tidligsteendring
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.kontrakter.felles.finnFørsteTreffFraOgMedDato
+import no.nav.tilleggsstonader.kontrakter.felles.førstePeriodeEtter
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -42,14 +42,19 @@ class UtledTidligsteEndringService(
     fun utledTidligsteEndringForBeregning(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): LocalDate? =
-        utledTidligsteEndring(
-            behandlingId = behandlingId,
-            vedtaksperioder = vedtaksperioder,
-            hentVedtaksperioderTidligereBehandlingFunction = { behandlingId ->
-                vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, null)
-            },
-        )?.tidligsteEndringSomPåvirkerUtbetalingerEllerTidligsteEndring()
+    ): LocalDate? {
+        val tidligsteEndringResultat =
+            utledTidligsteEndring(
+                behandlingId = behandlingId,
+                vedtaksperioder = vedtaksperioder,
+                hentVedtaksperioderTidligereBehandlingFunction = { behandlingId ->
+                    vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, null)
+                },
+            )
+
+        return tidligsteEndringResultat?.tidligsteEndringSomPåvirkerUtbetalinger
+            ?: tidligsteEndringResultat?.tidligsteEndring
+    }
 
     /**
      * Sammenligner gitt behandling med tidligere iverksatte behandling, for å finne tidligste endring i vilkårsperioder og vilkår.
@@ -112,10 +117,7 @@ class UtledTidligsteEndringService(
 data class TidligsteEndringResultat(
     val tidligsteEndring: LocalDate,
     val tidligsteEndringSomPåvirkerUtbetalinger: LocalDate?,
-) {
-    fun tidligsteEndringSomPåvirkerUtbetalingerEllerTidligsteEndring(): LocalDate =
-        tidligsteEndringSomPåvirkerUtbetalinger ?: tidligsteEndring
-}
+)
 
 data class TidligsteEndringIBehandlingUtleder(
     val vilkår: List<Vilkår>,
@@ -161,13 +163,20 @@ data class TidligsteEndringIBehandlingUtleder(
         return tidligsteEndring?.let {
             TidligsteEndringResultat(
                 tidligsteEndring = it,
-                tidligsteEndringSomPåvirkerUtbetalinger =
-                    finnFørsteTreffFraOgMedDato(
-                        perioder = vedtaksperioder + vedtaksperioderTidligereBehandling,
-                        dato = it,
-                    ),
+                tidligsteEndringSomPåvirkerUtbetalinger = finnFørsteDatoSomPåvirkerUtbetalinger(it),
             )
         }
+    }
+
+    private fun finnFørsteDatoSomPåvirkerUtbetalinger(dato: LocalDate): LocalDate? {
+        val vedtaksperiodeNyOgGammelBehandling = vedtaksperioder + vedtaksperioderTidligereBehandling
+        val datoTrefferEnPeriode = vedtaksperiodeNyOgGammelBehandling.any { it.inneholder(dato) }
+
+        if (datoTrefferEnPeriode) {
+            return dato
+        }
+
+        return vedtaksperiodeNyOgGammelBehandling.førstePeriodeEtter(dato)?.fom
     }
 
     private fun utledTidligsteEndringForVilkår(): LocalDate? =
