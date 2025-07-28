@@ -85,7 +85,7 @@ class LæremidlerVedtakController(
                 .utledTidligsteEndring(
                     behandling.id,
                     vedtaksperioder.tilDomene().map { it.tilFellesDomeneVedtaksperiode() },
-                )?.tidligsteEndringSomPåvirkerUtbetalinger
+                )?.tidligsteEndringSomPåvirkerUtbetalingerEllerTidligsteEndring()
         return beregningService
             .beregn(
                 behandling,

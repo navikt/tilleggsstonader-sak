@@ -89,7 +89,7 @@ class BoutgifterVedtakController(
                 .utledTidligsteEndring(
                     behandling.id,
                     vedtak.vedtaksperioder.tilDomene(),
-                )?.tidligsteEndringSomPåvirkerUtbetalinger
+                )?.tidligsteEndringSomPåvirkerUtbetalingerEllerTidligsteEndring()
         return beregningService
             .beregn(
                 behandling = behandling,

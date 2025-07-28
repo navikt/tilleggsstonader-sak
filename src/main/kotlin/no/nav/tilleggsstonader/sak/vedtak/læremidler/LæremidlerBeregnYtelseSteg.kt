@@ -101,7 +101,7 @@ class LæremidlerBeregnYtelseSteg(
                     vedtaksperioder.map {
                         it.tilFellesDomeneVedtaksperiode()
                     },
-                )?.tidligsteEndringSomPåvirkerUtbetalinger
+                )?.tidligsteEndringSomPåvirkerUtbetalingerEllerTidligsteEndring()
 
         val beregningsresultat =
             beregningService.beregn(

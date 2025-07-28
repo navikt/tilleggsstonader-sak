@@ -70,7 +70,7 @@ class BoutgifterBeregnYtelseSteg(
                 .utledTidligsteEndring(
                     saksbehandling.id,
                     vedtaksperioder,
-                )?.tidligsteEndringSomPåvirkerUtbetalinger
+                )?.tidligsteEndringSomPåvirkerUtbetalingerEllerTidligsteEndring()
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,

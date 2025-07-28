@@ -84,7 +84,7 @@ class TilsynBarnVedtakController(
                 .utledTidligsteEndring(
                     behandling.id,
                     vedtaksperioder,
-                )?.tidligsteEndringSomPåvirkerUtbetalinger
+                )?.tidligsteEndringSomPåvirkerUtbetalingerEllerTidligsteEndring()
 
         return beregningService
             .beregn(

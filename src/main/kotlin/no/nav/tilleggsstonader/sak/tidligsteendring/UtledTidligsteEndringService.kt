@@ -102,7 +102,10 @@ class UtledTidligsteEndringService(
 data class TidligsteEndringResultat(
     val tidligsteEndring: LocalDate,
     val tidligsteEndringSomPåvirkerUtbetalinger: LocalDate?,
-)
+) {
+    fun tidligsteEndringSomPåvirkerUtbetalingerEllerTidligsteEndring(): LocalDate =
+        tidligsteEndringSomPåvirkerUtbetalinger ?: tidligsteEndring
+}
 
 data class TidligsteEndringIBehandlingUtleder(
     val vilkår: List<Vilkår>,

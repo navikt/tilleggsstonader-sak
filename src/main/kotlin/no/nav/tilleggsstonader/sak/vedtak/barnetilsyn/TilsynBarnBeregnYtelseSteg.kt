@@ -67,7 +67,7 @@ class TilsynBarnBeregnYtelseSteg(
                 .utledTidligsteEndring(
                     saksbehandling.id,
                     vedtak.vedtaksperioder.tilDomene(),
-                )?.tidligsteEndringSomPåvirkerUtbetalinger
+                )?.tidligsteEndringSomPåvirkerUtbetalingerEllerTidligsteEndring()
 
         val beregningsresultat =
             beregningService.beregn(
