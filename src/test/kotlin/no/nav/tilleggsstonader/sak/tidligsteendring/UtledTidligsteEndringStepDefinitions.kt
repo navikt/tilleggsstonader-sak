@@ -35,7 +35,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import org.assertj.core.api.Assertions.assertThat
-import java.time.LocalDate
 
 enum class TidligsteEndringFellesNøkler(
     override val nøkkel: String,
@@ -93,7 +92,7 @@ class UtledTidligsteEndringStepDefinitions {
     var barnIderForrigeBehandling = mutableMapOf<String, BarnId>()
 
     var exception: Exception? = null
-    var tidligsteEndring: LocalDate? = null
+    var tidligsteEndring: TidligsteEndringResultat? = null
 
     @Gitt("følgende vilkår i forrige behandling - utledTidligsteEndring")
     fun `følgende vilkår i forrige behandling`(dataTable: DataTable) {
@@ -152,18 +151,29 @@ class UtledTidligsteEndringStepDefinitions {
                 barnIdTilIdentMap =
                     barnIder.entries.associate { it.value to it.key } +
                         barnIderForrigeBehandling.entries.associate { it.value to it.key },
-            ).utledTidligsteEndring()?.tidligsteEndring
+            ).utledTidligsteEndring()
     }
 
     @Så("forvent følgende dato for tidligste endring: {}")
     fun `forvent følgende dato for tidligste endring`(forventetDatoStr: String) {
         val forventetDato = parseDato(forventetDatoStr)
-        assertThat(tidligsteEndring).isEqualTo(forventetDato)
+        assertThat(tidligsteEndring?.tidligsteEndring).isEqualTo(forventetDato)
+    }
+
+    @Så("forvent følgende dato for tidligste endring som påvirker utbetaling: {}")
+    fun `forvent følgende dato for tidligste endring som påvirker utbetaling`(forventetDatoStr: String) {
+        val forventetDato = parseDato(forventetDatoStr)
+        assertThat(tidligsteEndring?.tidligsteEndringSomPåvirkerUtbetalinger).isEqualTo(forventetDato)
     }
 
     @Så("forvent ingen endring")
     fun `forvent ingen endring`() {
-        assertThat(tidligsteEndring).isNull()
+        assertThat(tidligsteEndring?.tidligsteEndring).isNull()
+    }
+
+    @Så("forvent ingen endring som påvirker utbetaling")
+    fun `forvent ingen endring som påvirker utbetaling`() {
+        assertThat(tidligsteEndring?.tidligsteEndringSomPåvirkerUtbetalinger).isNull()
     }
 
     private fun mapVilkår(
