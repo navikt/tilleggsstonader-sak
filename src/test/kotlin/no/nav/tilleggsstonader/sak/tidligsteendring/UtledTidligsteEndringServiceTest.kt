@@ -133,7 +133,7 @@ class UtledTidligsteEndringServiceTest {
 
         val result = utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(behandling.id)
 
-        assertThat(result?.tidligsteEndring).isNull()
+        assertThat(result).isNull()
     }
 
     @Test
