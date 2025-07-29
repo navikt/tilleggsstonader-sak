@@ -18,7 +18,7 @@ import org.springframework.kafka.listener.ContainerProperties
 import java.time.Duration
 
 @Configuration
-@Profile("!local & !integrasjonstest & !prod")
+@Profile("!local & !integrasjonstest")
 class PersonhendelseListenerContainerFactoryConfig {
     @Bean
     fun personhendelserListenerContainerFactory(
