@@ -47,7 +47,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
         val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
 
-        assertThat(behandlingOppsummering.finnesDataÅOppsummere).isFalse()
+        assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isFalse()
         assertThat(behandlingOppsummering.aktiviteter).isEmpty()
         assertThat(behandlingOppsummering.målgrupper).isEmpty()
         assertThat(behandlingOppsummering.vilkår).isEmpty()
@@ -76,7 +76,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
 
-            assertThat(behandlingOppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(behandlingOppsummering.målgrupper).hasSize(1)
             assertThat(behandlingOppsummering.målgrupper[0].fom).isEqualTo(LocalDate.of(2025, 1, 1))
             assertThat(behandlingOppsummering.målgrupper[0].tom).isEqualTo(LocalDate.of(2025, 1, 31))
@@ -112,7 +112,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
 
-            assertThat(behandlingOppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(behandlingOppsummering.målgrupper).hasSize(3)
         }
     }
@@ -145,7 +145,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
 
-            assertThat(behandlingOppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(behandlingOppsummering.vilkår).hasSize(1)
             assertThat(behandlingOppsummering.vilkår[0].barnId).isEqualTo(barn1)
             assertThat(behandlingOppsummering.vilkår[0].vilkår).hasSize(1)
@@ -176,7 +176,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
 
-            assertThat(behandlingOppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(behandlingOppsummering.vilkår).hasSize(1)
             assertThat(behandlingOppsummering.vilkår[0].vilkår).hasSize(2)
         }
@@ -208,7 +208,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
 
-            assertThat(behandlingOppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(behandlingOppsummering.vilkår).hasSize(2)
         }
     }
@@ -302,7 +302,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
             )
 
             val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
-            assertThat(oppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(oppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(oppsummering.aktiviteter).hasSize(1)
             assertThat(oppsummering.aktiviteter[0].fom).isEqualTo(LocalDate.of(2024, 8, 1))
         }
@@ -331,7 +331,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
             )
 
             val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
-            assertThat(oppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(oppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(oppsummering.vilkår).hasSize(1)
             assertThat(oppsummering.vilkår[0].type).isEqualTo(VilkårType.LØPENDE_UTGIFTER_EN_BOLIG)
 
@@ -363,7 +363,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
             )
 
             val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
-            assertThat(oppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(oppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(oppsummering.vilkår[0].vilkår[0].fom).isEqualTo(LocalDate.of(2025, 1, 1))
         }
     }

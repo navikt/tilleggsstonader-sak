@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.oppsummering
 
+import com.fasterxml.jackson.annotation.JsonGetter
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
@@ -19,21 +20,8 @@ data class BehandlingOppsummeringDto(
     val vilkår: List<Stønadsvilkår>,
     val vedtak: OppsummertVedtak?,
 ) {
-    val finnesDataÅOppsummere: Boolean
-        get() =
-            finnesDataÅOppsummere(
-                aktiviteter = aktiviteter,
-                målgrupper = målgrupper,
-                vilkår = vilkår,
-                vedtak = vedtak,
-            )
-
-    private fun finnesDataÅOppsummere(
-        aktiviteter: List<OppsummertVilkårperiode>,
-        målgrupper: List<OppsummertVilkårperiode>,
-        vilkår: List<Stønadsvilkår>,
-        vedtak: OppsummertVedtak?,
-    ): Boolean =
+    @JsonGetter
+    fun finnesDataÅOppsummere(): Boolean =
         aktiviteter.isNotEmpty() ||
             målgrupper.isNotEmpty() ||
             vilkår.isNotEmpty() ||
