@@ -33,9 +33,9 @@ Egenskap: Utled tidligste endring med betydning for beregning
         | 01.01.2024 | 30.06.2024 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | NY     |
 
       Gitt følgende aktiviteter i revurdering - utledTidligsteEndring
-        | Fom        | Tom        | Stønadstype | Type   | Aktivitetsdager | Resultat | Status |
-        | 01.01.2024 | 30.06.2024 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | NY     |
-        | 01.08.2024 | 31.08.2024 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | NY     |
+        | Fom        | Tom        | Stønadstype | Type   | Aktivitetsdager | Resultat | Status  |
+        | 01.01.2024 | 30.06.2024 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | UENDRET |
+        | 01.08.2024 | 31.08.2024 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | NY      |
 
       Gitt følgende vedtaksperioder i forrige behandling - utledTidligsteEndring
         | Fom        | Tom        | Aktivitet | Målgruppe           |
@@ -57,8 +57,8 @@ Egenskap: Utled tidligste endring med betydning for beregning
         | 01.01.2024 | 30.06.2024 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | NY     |
 
       Gitt følgende aktiviteter i revurdering - utledTidligsteEndring
-        | Fom        | Tom        | Stønadstype | Type   | Aktivitetsdager | Resultat | Status |
-        | 01.01.2024 | 30.06.2024 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | NY     |
+        | Fom        | Tom        | Stønadstype | Type   | Aktivitetsdager | Resultat | Status  |
+        | 01.01.2024 | 30.06.2024 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | UENDRET |
 
       Gitt følgende vedtaksperioder i forrige behandling - utledTidligsteEndring
         | Fom        | Tom        | Aktivitet | Målgruppe           |
@@ -79,9 +79,9 @@ Egenskap: Utled tidligste endring med betydning for beregning
         | 01.01.2024 | 30.06.2024 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | NY     |
 
       Gitt følgende aktiviteter i revurdering - utledTidligsteEndring
-        | Fom        | Tom        | Stønadstype | Type   | Aktivitetsdager | Resultat | Status |
-        | 01.12.2023 | 31.12.2023 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | NY     |
-        | 01.01.2024 | 30.06.2024 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | NY     |
+        | Fom        | Tom        | Stønadstype | Type   | Aktivitetsdager | Resultat | Status  |
+        | 01.12.2023 | 31.12.2023 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | NY      |
+        | 01.01.2024 | 30.06.2024 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | UENDRET |
 
       Gitt følgende vedtaksperioder i forrige behandling - utledTidligsteEndring
         | Fom        | Tom        | Aktivitet | Målgruppe           |
