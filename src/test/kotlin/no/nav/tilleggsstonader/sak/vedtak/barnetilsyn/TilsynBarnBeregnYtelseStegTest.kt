@@ -50,7 +50,7 @@ class TilsynBarnBeregnYtelseStegTest {
     private val vedtaksperiodeService = mockk<VedtaksperiodeService>(relaxed = true)
     private val utledTidligsteEndringService =
         mockk<UtledTidligsteEndringService> {
-            every { utledTidligsteEndring(any(), any()) } returns null
+            every { utledTidligsteEndringForBeregning(any(), any()) } returns null
         }
     private val unleashService = mockUnleashService()
 

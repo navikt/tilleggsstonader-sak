@@ -81,7 +81,7 @@ class LæremidlerVedtakController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val tidligsteEndring =
-            utledTidligsteEndringService.utledTidligsteEndring(
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
                 behandling.id,
                 vedtaksperioder.tilDomene().map { it.tilFellesDomeneVedtaksperiode() },
             )
