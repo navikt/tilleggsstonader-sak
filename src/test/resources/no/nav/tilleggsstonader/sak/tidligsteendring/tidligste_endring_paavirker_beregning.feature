@@ -5,7 +5,7 @@ Egenskap: Utled tidligste endring med betydning for beregning
 
   Regel: Endring av sluttdato skal gi tidligste endring som tidligste av ny og gammel fom
 
-    Scenario: Endring i aktivitet, ingen endring i vedtaksperioder
+    Scenario: Endring i aktivitet, målgruppe og vilkår, ingen endring i vedtaksperioder
       Gitt følgende aktiviteter i forrige behandling - utledTidligsteEndring
         | Fom        | Tom        | Stønadstype | Type   | Aktivitetsdager | Resultat | Status |
         | 01.01.2024 | 31.01.2024 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | NY     |
@@ -13,6 +13,22 @@ Egenskap: Utled tidligste endring med betydning for beregning
       Gitt følgende aktiviteter i revurdering - utledTidligsteEndring
         | Fom        | Tom        | Stønadstype | Type   | Aktivitetsdager | Resultat | Status |
         | 01.01.2024 | 31.03.2024 | BARNETILSYN | TILTAK | 5               | OPPFYLT  | ENDRET |
+
+      Gitt følgende målgrupper i forrige behandling - utledTidligsteEndring
+        | Fom        | Tom        | Type | Resultat | Status |
+        | 01.01.2024 | 31.01.2024 | AAP  | OPPFYLT  | NY     |
+
+      Gitt følgende målgrupper i revurdering - utledTidligsteEndring
+        | Fom        | Tom        | Type | Resultat | Status |
+        | 01.01.2024 | 31.03.2024 | AAP  | OPPFYLT  | ENDRET |
+
+      Gitt følgende vilkår i forrige behandling - utledTidligsteEndring
+        | Fom        | Tom        | Type      | Resultat | Status |
+        | 01.01.2024 | 31.01.2024 | PASS_BARN | OPPFYLT  | NY     |
+
+      Gitt følgende vilkår i revurdering - utledTidligsteEndring
+        | Fom        | Tom        | Type      | Resultat | Status |
+        | 01.01.2024 | 31.03.2024 | PASS_BARN | OPPFYLT  | ENDRET |
 
       Gitt følgende vedtaksperioder i forrige behandling - utledTidligsteEndring
         | Fom        | Tom        | Aktivitet | Målgruppe           |
