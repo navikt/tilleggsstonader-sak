@@ -42,28 +42,37 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.util.UUID
 
-class StegServiceTest(
+class StegServiceTest : IntegrationTest() {
     @Autowired
-    val stegService: StegService,
+    lateinit var stegService: StegService
+
     @Autowired
-    val behandlingshistorikkRepository: BehandlingshistorikkRepository,
+    lateinit var behandlingshistorikkRepository: BehandlingshistorikkRepository
+
     @Autowired
-    val behandlingRepository: BehandlingRepository,
+    lateinit var behandlingRepository: BehandlingRepository
+
     @Autowired
-    val barnRepository: BarnRepository,
+    lateinit var barnRepository: BarnRepository
+
     @Autowired
-    val tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
+    lateinit var tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg
+
     @Autowired
-    val inngangsvilkårSteg: InngangsvilkårSteg,
+    lateinit var inngangsvilkårSteg: InngangsvilkårSteg
+
     @Autowired
-    val vilkårperiodeRepository: VilkårperiodeRepository,
+    lateinit var vilkårperiodeRepository: VilkårperiodeRepository
+
     @Autowired
-    val vilkårRepository: VilkårRepository,
+    lateinit var vilkårRepository: VilkårRepository
+
     @Autowired
-    val beslutteVedtakSteg: BeslutteVedtakSteg,
+    lateinit var beslutteVedtakSteg: BeslutteVedtakSteg
+
     @Autowired
-    val ferdigstillBehandlingSteg: FerdigstillBehandlingSteg,
-) : IntegrationTest() {
+    lateinit var ferdigstillBehandlingSteg: FerdigstillBehandlingSteg
+
     val stegForBeslutter =
         object : BehandlingSteg<String> {
             override fun utførSteg(

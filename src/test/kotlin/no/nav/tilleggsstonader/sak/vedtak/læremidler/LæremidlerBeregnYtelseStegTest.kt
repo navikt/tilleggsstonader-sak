@@ -39,16 +39,19 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.util.UUID
 
-class LæremidlerBeregnYtelseStegTest(
+class LæremidlerBeregnYtelseStegTest : IntegrationTest() {
     @Autowired
-    val steg: LæremidlerBeregnYtelseSteg,
+    lateinit var steg: LæremidlerBeregnYtelseSteg
+
     @Autowired
-    val repository: VedtakRepository,
+    lateinit var repository: VedtakRepository
+
     @Autowired
-    val tilkjentYtelseRepository: TilkjentYtelseRepository,
+    lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
+
     @Autowired
-    val vilkårperiodeRepository: VilkårperiodeRepository,
-) : IntegrationTest() {
+    lateinit var vilkårperiodeRepository: VilkårperiodeRepository
+
     val fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER)
     val behandling = behandling(fagsak = fagsak)
     val saksbehandling = saksbehandling(behandling = behandling, fagsak = fagsak)

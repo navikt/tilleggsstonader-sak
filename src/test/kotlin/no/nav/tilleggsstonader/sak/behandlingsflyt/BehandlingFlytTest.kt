@@ -61,22 +61,49 @@ import org.springframework.test.context.transaction.TestTransaction
 import java.time.LocalDate
 import java.util.UUID
 
-class BehandlingFlytTest(
-    @Autowired val barnService: BarnService,
-    @Autowired val oppgaveRepository: OppgaveRepository,
-    @Autowired val opprettTestBehandlingController: OpprettTestBehandlingController,
-    @Autowired val vilkårController: VilkårController,
-    @Autowired val tilsynBarnVedtakController: TilsynBarnVedtakController,
-    @Autowired val brevController: BrevController,
-    @Autowired val brevmottakereRepository: BrevmottakerVedtaksbrevRepository,
-    @Autowired val totrinnskontrollController: TotrinnskontrollController,
-    @Autowired val totrinnskontrollService: TotrinnskontrollService,
-    @Autowired val taskService: TaskService,
-    @Autowired val stegService: StegService,
-    @Autowired val taskWorker: TaskWorker,
-    @Autowired val vilkårperiodeService: VilkårperiodeService,
-    @Autowired val simuleringStegService: SimuleringStegService,
-) : IntegrationTest() {
+class BehandlingFlytTest : IntegrationTest() {
+    @Autowired
+    lateinit var barnService: BarnService
+
+    @Autowired
+    lateinit var oppgaveRepository: OppgaveRepository
+
+    @Autowired
+    lateinit var opprettTestBehandlingController: OpprettTestBehandlingController
+
+    @Autowired
+    lateinit var vilkårController: VilkårController
+
+    @Autowired
+    lateinit var tilsynBarnVedtakController: TilsynBarnVedtakController
+
+    @Autowired
+    lateinit var brevController: BrevController
+
+    @Autowired
+    lateinit var brevmottakereRepository: BrevmottakerVedtaksbrevRepository
+
+    @Autowired
+    lateinit var totrinnskontrollController: TotrinnskontrollController
+
+    @Autowired
+    lateinit var totrinnskontrollService: TotrinnskontrollService
+
+    @Autowired
+    lateinit var taskService: TaskService
+
+    @Autowired
+    lateinit var stegService: StegService
+
+    @Autowired
+    lateinit var taskWorker: TaskWorker
+
+    @Autowired
+    lateinit var vilkårperiodeService: VilkårperiodeService
+
+    @Autowired
+    lateinit var simuleringStegService: SimuleringStegService
+
     val personIdent = FnrGenerator.generer(år = 2000)
 
     @AfterEach

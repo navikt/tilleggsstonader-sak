@@ -44,14 +44,16 @@ import org.springframework.web.client.exchange
 import java.time.LocalDate
 import java.util.UUID
 
-class TilsynBarnVedtakControllerTest(
+class TilsynBarnVedtakControllerTest : IntegrationTest() {
     @Autowired
-    val barnRepository: BarnRepository,
+    lateinit var barnRepository: BarnRepository
+
     @Autowired
-    val vilkårperiodeRepository: VilkårperiodeRepository,
+    lateinit var vilkårperiodeRepository: VilkårperiodeRepository
+
     @Autowired
-    val vilkårRepository: VilkårRepository,
-) : IntegrationTest() {
+    lateinit var vilkårRepository: VilkårRepository
+
     val fagsak = fagsak()
     val behandling = behandling(fagsak = fagsak, steg = StegType.BEREGNE_YTELSE, status = BehandlingStatus.UTREDES)
     val barn = BehandlingBarn(behandlingId = behandling.id, ident = "123")

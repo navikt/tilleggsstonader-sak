@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
-import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -60,24 +59,28 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
 
-class TilsynBarnBeregnYtelseStegIntegrationTest(
+class TilsynBarnBeregnYtelseStegIntegrationTest : IntegrationTest() {
     @Autowired
-    val steg: TilsynBarnBeregnYtelseSteg,
+    lateinit var steg: TilsynBarnBeregnYtelseSteg
+
     @Autowired
-    val repository: VedtakRepository,
+    lateinit var repository: VedtakRepository
+
     @Autowired
-    val barnRepository: BarnRepository,
+    lateinit var barnRepository: BarnRepository
+
     @Autowired
-    val tilkjentYtelseRepository: TilkjentYtelseRepository,
+    lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
+
     @Autowired
-    val vilkårperiodeRepository: VilkårperiodeRepository,
+    lateinit var vilkårperiodeRepository: VilkårperiodeRepository
+
     @Autowired
-    val vilkårRepository: VilkårRepository,
+    lateinit var vilkårRepository: VilkårRepository
+
     @Autowired
-    val vedtakService: VedtakService,
-) : IntegrationTest() {
-    @Autowired
-    private lateinit var registerAktivitetClient: RegisterAktivitetClient
+    lateinit var vedtakService: VedtakService
+
     val fagsak = fagsak()
     val behandling = behandling(fagsak = fagsak)
     val saksbehandling = saksbehandling(behandling = behandling)
