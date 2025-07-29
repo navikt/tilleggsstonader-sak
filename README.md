@@ -13,7 +13,9 @@ secret kan hentes fra cluster:
 3. `kubectl --context dev-gcp -n tilleggsstonader get secret azuread-tilleggsstonader-sak-lokal -o json | jq '.data | map_values(@base64d)' | grep CLIENT`
 
 Variablene legges inn under SakAppLocal -> Edit Configurations -> Modify Options -> huk av for Environemntal Variables
-Legg inn `AZURE_APP_CLIENT_ID={secret},AZURE_APP_CLIENT_SECRET={secret}`
+Her kan du gjøre en av følgende:
+- Legg inn `AZURE_APP_CLIENT_ID={secret},AZURE_APP_CLIENT_SECRET={secret}`
+- Legg til en .env-fil i prosjektet med innholdet `AZURE_APP_CLIENT_ID={secret}` og `AZURE_APP_CLIENT_SECRET={secret}`
 
 ### Kjøring med temp-database
 
