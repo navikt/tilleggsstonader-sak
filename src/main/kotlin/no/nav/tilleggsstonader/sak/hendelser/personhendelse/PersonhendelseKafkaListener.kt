@@ -13,7 +13,7 @@ import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
 
 @Service
-@Profile("!local & !integrasjonstest & !prod")
+@Profile("!local & !integrasjonstest")
 class PersonhendelseKafkaListener(
     private val dødsfallHåndterer: DødsfallHåndterer,
 ) {
