@@ -17,6 +17,10 @@ val testcontainerVersion = "1.21.3"
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
 
+// Cucumber har nyere versjon av junit-jupiter som ikke er kompatibel med vår versjon fra spring-boot-starter-test
+// Kan fjernes når spring-boot 4 kommer
+ext["junit-jupiter.version"] = "5.13.4"
+
 plugins {
     application
 
@@ -105,7 +109,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.26.0"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.27.0"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 
