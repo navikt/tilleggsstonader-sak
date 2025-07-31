@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeM
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
 
+@Deprecated("Skal erstattes av finnVedtaksperiodeV2")
 object ForeslåVedtaksperiodeFraVilkårperioder {
     fun foreslåVedtaksperioder(vilkårperioder: Vilkårperioder): List<ForslagVedtaksperiodeFraVilkårperioder> {
         val oppfylteVilkårsperioder = filtrerOppfylteVilkårsperioder(vilkårperioder)
