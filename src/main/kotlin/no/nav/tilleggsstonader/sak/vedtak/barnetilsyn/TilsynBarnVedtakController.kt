@@ -37,6 +37,7 @@ class TilsynBarnVedtakController(
     private val behandlingService: BehandlingService,
     private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val tilsynBarnValiderGyldigÅrsakAvslag: TilsynBarnValiderGyldigÅrsakAvslag,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -51,6 +52,7 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: AvslagTilsynBarnDto,
     ) {
+        tilsynBarnValiderGyldigÅrsakAvslag.validerGyldigAvslag(behandlingId, vedtak)
         lagreVedtak(behandlingId, vedtak)
     }
 

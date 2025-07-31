@@ -43,6 +43,7 @@ class BoutgifterVedtakController(
     private val steg: BoutgifterBeregnYtelseSteg,
     private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val validerGyldigÅrsakAvslag: BoutgifterValiderGyldigÅrsakAvslag,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -57,6 +58,7 @@ class BoutgifterVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: AvslagBoutgifterDto,
     ) {
+        validerGyldigÅrsakAvslag.validerGyldigAvslag(behandlingId, vedtak)
         lagreVedtak(behandlingId, vedtak)
     }
 
