@@ -13,6 +13,8 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 
 class ValiderGyldigÅrsakAvslagTest {
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
@@ -22,16 +24,21 @@ class ValiderGyldigÅrsakAvslagTest {
 
     @Nested
     inner class ValiderAktivitet {
-        @Test
-        fun `INGEN AKTIVITET er gyldig avslagårsak dersom det finnes en ikke oppfylt aktivitet`() {
+        @ParameterizedTest
+        @EnumSource(
+            value = ÅrsakAvslag::class,
+            names = [ "INGEN_AKTIVITET", "HAR_IKKE_UTGIFTER", "RETT_TIL_UTSTYRSSTIPEND"],
+            mode = EnumSource.Mode.INCLUDE,
+        )
+        fun `gyldig å avslå på aktivitet dersom det finnes en ikke oppfylt aktivitet`(årsakAvslag: ÅrsakAvslag) {
             every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
-                    Vilkårperioder(
-                        aktiviteter =
-                            listOf(
-                                aktivitet(behandlingId = behandlingId, resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
-                            ),
-                        målgrupper = emptyList(),
-                    )
+                Vilkårperioder(
+                    aktiviteter =
+                        listOf(
+                            aktivitet(behandlingId = behandlingId, resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
+                        ),
+                    målgrupper = emptyList(),
+                )
 
             assertDoesNotThrow {
                 validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
@@ -41,43 +48,55 @@ class ValiderGyldigÅrsakAvslagTest {
             }
         }
 
-        @Test
-        fun `INGEN AKTIVITET er gyldig avslagårsak dersom det finnes minst en ikke oppfylt aktivitet`() {
+        @ParameterizedTest
+        @EnumSource(
+            value = ÅrsakAvslag::class,
+            names = [ "INGEN_AKTIVITET", "HAR_IKKE_UTGIFTER", "RETT_TIL_UTSTYRSSTIPEND"],
+            mode = EnumSource.Mode.INCLUDE,
+        )
+        fun `gyldig å avslå på aktivitet dersom det finnes minst en ikke oppfylt aktivitet`(årsakAvslag: ÅrsakAvslag) {
             every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
-                    Vilkårperioder(
-                        aktiviteter =
-                            listOf(
-                                aktivitet(behandlingId = behandlingId, resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
-                                aktivitet(behandlingId = behandlingId, resultat = ResultatVilkårperiode.OPPFYLT),
-                            ),
-                        målgrupper = emptyList(),
-                    )
+                Vilkårperioder(
+                    aktiviteter =
+                        listOf(
+                            aktivitet(behandlingId = behandlingId, resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
+                            aktivitet(behandlingId = behandlingId, resultat = ResultatVilkårperiode.OPPFYLT),
+                        ),
+                    målgrupper = emptyList(),
+                )
 
             assertDoesNotThrow {
                 validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
                     behandlingId,
-                    listOf(ÅrsakAvslag.INGEN_AKTIVITET),
+                    listOf(årsakAvslag),
                 )
             }
         }
 
-        @Test
-        fun `INGEN AKTIVITET er ikke gyldig avslagsgrunn dersom det ikke finnes en aktivitet med resultat ikke oppfylt`() {
+        @ParameterizedTest
+        @EnumSource(
+            value = ÅrsakAvslag::class,
+            names = [ "INGEN_AKTIVITET", "HAR_IKKE_UTGIFTER", "RETT_TIL_UTSTYRSSTIPEND"],
+            mode = EnumSource.Mode.INCLUDE,
+        )
+        fun `skal kaste feil om avslaggrunn er aktivitet dersom det ikke finnes en aktivitet med resultat ikke oppfylt`(
+            årsakAvslag: ÅrsakAvslag,
+        ) {
             every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
-                    Vilkårperioder(
-                        aktiviteter =
-                            listOf(
-                                aktivitet(behandlingId = behandlingId, resultat = ResultatVilkårperiode.OPPFYLT),
-                            ),
-                        målgrupper = emptyList(),
-                    )
+                Vilkårperioder(
+                    aktiviteter =
+                        listOf(
+                            aktivitet(behandlingId = behandlingId, resultat = ResultatVilkårperiode.OPPFYLT),
+                        ),
+                    målgrupper = emptyList(),
+                )
 
             assertThatThrownBy {
                 validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
                     behandlingId,
-                    listOf(ÅrsakAvslag.INGEN_AKTIVITET),
+                    listOf(årsakAvslag),
                 )
-            }.hasMessageContaining("Kan ikke avslå med årsak '${ÅrsakAvslag.INGEN_AKTIVITET.displayName}'")
+            }.hasMessageContaining("Kan ikke avslå med følgende årsak(er)")
         }
     }
 
@@ -86,13 +105,13 @@ class ValiderGyldigÅrsakAvslagTest {
         @Test
         fun `IKKE I MÅLGRUPPE er gyldig avslagårsak dersom det finnes en ikke oppfylt målgruppe`() {
             every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
-                    Vilkårperioder(
-                        aktiviteter = emptyList(),
-                        målgrupper =
-                            listOf(
-                                målgruppe(behandlingId = behandlingId, resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
-                            ),
-                    )
+                Vilkårperioder(
+                    aktiviteter = emptyList(),
+                    målgrupper =
+                        listOf(
+                            målgruppe(behandlingId = behandlingId, resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
+                        ),
+                )
 
             assertDoesNotThrow {
                 validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
@@ -105,14 +124,14 @@ class ValiderGyldigÅrsakAvslagTest {
         @Test
         fun `IKKE I MÅLGRUPPE er gyldig avslagårsak dersom det finnes minst en ikke oppfylt målgruppe`() {
             every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
-                    Vilkårperioder(
-                        aktiviteter = emptyList(),
-                        målgrupper =
-                            listOf(
-                                målgruppe(behandlingId = behandlingId, resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
-                                målgruppe(behandlingId = behandlingId, resultat = ResultatVilkårperiode.OPPFYLT),
-                            ),
-                    )
+                Vilkårperioder(
+                    aktiviteter = emptyList(),
+                    målgrupper =
+                        listOf(
+                            målgruppe(behandlingId = behandlingId, resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
+                            målgruppe(behandlingId = behandlingId, resultat = ResultatVilkårperiode.OPPFYLT),
+                        ),
+                )
 
             assertDoesNotThrow {
                 validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
@@ -125,13 +144,13 @@ class ValiderGyldigÅrsakAvslagTest {
         @Test
         fun `IKKE I MÅLGRUPPE er ikke gyldig hvis det ikke er lagt inn en målgruppe som ikke er oppfylt`() {
             every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
-                    Vilkårperioder(
-                        aktiviteter = emptyList(),
-                        målgrupper =
-                            listOf(
-                                målgruppe(behandlingId = behandlingId, resultat = ResultatVilkårperiode.OPPFYLT),
-                            ),
-                    )
+                Vilkårperioder(
+                    aktiviteter = emptyList(),
+                    målgrupper =
+                        listOf(
+                            målgruppe(behandlingId = behandlingId, resultat = ResultatVilkårperiode.OPPFYLT),
+                        ),
+                )
 
             assertThatThrownBy {
                 validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
@@ -142,12 +161,17 @@ class ValiderGyldigÅrsakAvslagTest {
         }
     }
 
-    @Test
-    fun `skal ikke kaste valideringsfeil dersom årsak ikke gjelder aktivitet elelr målgruppe`() {
+    @ParameterizedTest
+    @EnumSource(
+        value = ÅrsakAvslag::class,
+        names = ["IKKE_I_MÅLGRUPPE", "INGEN_AKTIVITET", "HAR_IKKE_UTGIFTER", "RETT_TIL_UTSTYRSSTIPEND"],
+        mode = EnumSource.Mode.EXCLUDE,
+    )
+    fun `skal ikke kaste valideringsfeil dersom årsak ikke gjelder aktivitet eller målgruppe`(årsakAvslag: ÅrsakAvslag) {
         assertDoesNotThrow {
             validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
                 behandlingId,
-                listOf(ÅrsakAvslag.HAR_IKKE_UTGIFTER),
+                listOf(årsakAvslag),
             )
         }
     }

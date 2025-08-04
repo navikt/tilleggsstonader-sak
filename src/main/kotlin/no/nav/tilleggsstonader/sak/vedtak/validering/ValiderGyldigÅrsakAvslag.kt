@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.validering
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.sak.vedtak.domain.formaterListe
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -23,12 +24,21 @@ class ValiderGyldigÅrsakAvslag(
         behandlingId: BehandlingId,
         årsakerAvslag: List<ÅrsakAvslag>,
     ) {
-        if (!årsakerAvslag.contains(ÅrsakAvslag.INGEN_AKTIVITET)) return
+        val årsakerKnyttetTilAktivitet =
+            listOf(
+                ÅrsakAvslag.INGEN_AKTIVITET,
+                ÅrsakAvslag.HAR_IKKE_UTGIFTER,
+                ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND,
+            )
+
+        val aktuelleÅrsaker = årsakerAvslag.intersect(årsakerKnyttetTilAktivitet)
+
+        if (aktuelleÅrsaker.isEmpty()) return
 
         val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
 
         brukerfeilHvisIkke(aktiviteter.any { it.resultat == ResultatVilkårperiode.IKKE_OPPFYLT }) {
-            "Kan ikke avslå med årsak '${ÅrsakAvslag.INGEN_AKTIVITET.displayName}' uten å legge inn minst én aktivitet som ikke er oppfylt."
+            "Kan ikke avslå med følgende årsak(er) uten å legge inn minst én aktivitet med resultat 'ikke oppfylt': ${årsakerAvslag.formaterListe()}"
         }
     }
 
