@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.formaterListe
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -35,11 +36,7 @@ class TilsynBarnValiderGyldigÅrsakAvslag(
         val stønadsvilkår = vilkårService.hentVilkår(behandlingId)
 
         brukerfeilHvisIkke(stønadsvilkår.any { it.resultat == Vilkårsresultat.IKKE_OPPFYLT }) {
-            "Kan ikke avslå med årsak '${
-                aktuelleÅrsaker.joinToString(
-                    "' og '",
-                ) { it.displayName }
-            }' uten å legge inn minst ett vilkår for pass barn som ikke er oppfylt."
+            "Kan ikke avslå med følgende årsak(er) uten å legge inn minst ett vilkår for pass barn som ikke er oppfylt: ${årsakerAvslag.formaterListe()}"
         }
     }
 }

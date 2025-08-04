@@ -13,3 +13,5 @@ enum class ÅrsakAvslag(
     RETT_TIL_BOSTØTTE("Rett til bostøtte"),
     ANNET("Annet"),
 }
+
+fun List<ÅrsakAvslag>.formaterListe(): String = joinToString(separator = ", ") { it.displayName }

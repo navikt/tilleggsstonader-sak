@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.formaterListe
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -30,7 +31,7 @@ class BoutgifterValiderGyldigÅrsakAvslag(
             listOf(
                 ÅrsakAvslag.MANGELFULL_DOKUMENTASJON,
                 ÅrsakAvslag.HAR_IKKE_MERUTGIFTER,
-                ÅrsakAvslag.RETT_TIL_BOSTØTTE
+                ÅrsakAvslag.RETT_TIL_BOSTØTTE,
             )
 
         val aktuelleÅrsaker = årsakerAvslag.intersect(årsakerBasertPåStønadsvilkår)
@@ -40,11 +41,7 @@ class BoutgifterValiderGyldigÅrsakAvslag(
         val stønadsvilkår = vilkårService.hentVilkår(behandlingId)
 
         brukerfeilHvisIkke(stønadsvilkår.any { it.resultat == Vilkårsresultat.IKKE_OPPFYLT }) {
-            "Kan ikke avslå med årsak '${
-                aktuelleÅrsaker.joinToString(
-                    "' og '",
-                ) { it.displayName }
-            }' uten å legge inn minst ett vilkår for bolig/overnatting som ikke er oppfylt."
+            "Kan ikke avslå med følgende årsak(er) uten å legge inn minst ett vilkår for bolig/overnatting som ikke er oppfylt: ${årsakerAvslag.formaterListe()}"
         }
     }
 }

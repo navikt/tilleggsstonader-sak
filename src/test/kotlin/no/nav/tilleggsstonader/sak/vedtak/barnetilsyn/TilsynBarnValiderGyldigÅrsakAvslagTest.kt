@@ -6,6 +6,7 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.formaterListe
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -62,13 +63,13 @@ class TilsynBarnValiderGyldigÅrsakAvslagTest {
 
         assertThatThrownBy {
             tilsynBarnValiderGyldigÅrsakAvslag.validerGyldigAvslag(behandlingId, vedtak)
-        }.hasMessageContaining("Kan ikke avslå med årsak '${årsakAvslag.displayName}'")
+        }.hasMessageEndingWith(listOf(årsakAvslag).formaterListe())
     }
 
     @ParameterizedTest
     @EnumSource(
         value = ÅrsakAvslag::class,
-        names = ["MANGELFULL_DOKUMENTASJON", "HAR_IKKE_MERUTGIFTER", "RETT_TIL_BOSTØTTE"],
+        names = ["MANGELFULL_DOKUMENTASJON", "HAR_IKKE_UTGIFTER"],
         mode = EnumSource.Mode.INCLUDE,
     )
     fun `skal kaste feil ved stønadsvilkårårsak men ingen registrerte vilkår`(årsakAvslag: ÅrsakAvslag) {
@@ -82,24 +83,28 @@ class TilsynBarnValiderGyldigÅrsakAvslagTest {
 
         assertThatThrownBy {
             tilsynBarnValiderGyldigÅrsakAvslag.validerGyldigAvslag(behandlingId, vedtak)
-        }.hasMessageContaining("Kan ikke avslå med årsak '${årsakAvslag.displayName}'")
+        }.hasMessageEndingWith(listOf(årsakAvslag).formaterListe())
     }
 
     @Test
     fun `skal kaste feil ved flere stønadsvilkårårsak men kun oppfylte vilkår`() {
         every { vilkårService.hentVilkår(behandlingId) } returns listOf(oppfyltVilkår)
 
+        val årsaker =
+            listOf(
+                ÅrsakAvslag.HAR_IKKE_UTGIFTER,
+                ÅrsakAvslag.MANGELFULL_DOKUMENTASJON,
+            )
+
         val vedtak =
             AvslagTilsynBarnDto(
-                årsakerAvslag = listOf(ÅrsakAvslag.HAR_IKKE_UTGIFTER, ÅrsakAvslag.MANGELFULL_DOKUMENTASJON),
+                årsakerAvslag = årsaker,
                 begrunnelse = "Begrunnelse",
             )
 
         assertThatThrownBy {
             tilsynBarnValiderGyldigÅrsakAvslag.validerGyldigAvslag(behandlingId, vedtak)
-        }.hasMessageContaining(
-            "Kan ikke avslå med årsak '${ÅrsakAvslag.HAR_IKKE_UTGIFTER.displayName}' og '${ÅrsakAvslag.MANGELFULL_DOKUMENTASJON.displayName}'",
-        )
+        }.hasMessageEndingWith(årsaker.formaterListe())
     }
 
     @ParameterizedTest

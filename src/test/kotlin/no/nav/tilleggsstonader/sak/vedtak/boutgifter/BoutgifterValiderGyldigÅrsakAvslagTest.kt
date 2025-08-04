@@ -6,6 +6,7 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.formaterListe
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -62,7 +63,7 @@ class BoutgifterValiderGyldigÅrsakAvslagTest {
 
         assertThatThrownBy {
             boutgifterValiderGyldigÅrsakAvslag.validerGyldigAvslag(behandlingId, vedtak)
-        }.hasMessageContaining("Kan ikke avslå med årsak '${årsakAvslag.displayName}'")
+        }.hasMessageEndingWith(listOf(årsakAvslag).formaterListe())
     }
 
     @ParameterizedTest
@@ -82,24 +83,23 @@ class BoutgifterValiderGyldigÅrsakAvslagTest {
 
         assertThatThrownBy {
             boutgifterValiderGyldigÅrsakAvslag.validerGyldigAvslag(behandlingId, vedtak)
-        }.hasMessageContaining("Kan ikke avslå med årsak '${årsakAvslag.displayName}'")
+        }.hasMessageEndingWith(listOf(årsakAvslag).formaterListe())
     }
 
     @Test
     fun `skal kaste feil ved flere stønadsvilkårårsak men kun oppfylte vilkår`() {
         every { vilkårService.hentVilkår(behandlingId) } returns listOf(oppfyltVilkår)
 
+        val årsakerAvslag = listOf(ÅrsakAvslag.HAR_IKKE_MERUTGIFTER, ÅrsakAvslag.MANGELFULL_DOKUMENTASJON)
         val vedtak =
             AvslagBoutgifterDto(
-                årsakerAvslag = listOf(ÅrsakAvslag.HAR_IKKE_MERUTGIFTER, ÅrsakAvslag.MANGELFULL_DOKUMENTASJON),
+                årsakerAvslag = årsakerAvslag,
                 begrunnelse = "Begrunnelse",
             )
 
         assertThatThrownBy {
             boutgifterValiderGyldigÅrsakAvslag.validerGyldigAvslag(behandlingId, vedtak)
-        }.hasMessageContaining(
-            "Kan ikke avslå med årsak '${ÅrsakAvslag.HAR_IKKE_MERUTGIFTER.displayName}' og '${ÅrsakAvslag.MANGELFULL_DOKUMENTASJON.displayName}'",
-        )
+        }.hasMessageEndingWith(årsakerAvslag.formaterListe())
     }
 
     @ParameterizedTest
