@@ -1,11 +1,13 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import io.mockk.every
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -19,6 +21,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.tilFørsteDagIMåneden
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
@@ -244,6 +248,44 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                 YtelseSubtype.OVERGANGSSTØNAD,
             ),
         )
+    }
+
+    @Nested
+    inner class DatoGrunnlagHentetFraOgMed {
+        @Test
+        fun `skal bruke opprettet tid hvis den er før vilkårperiode`() {
+            val dato3DagerSiden = LocalDate.now().minusDays(3)
+            val behandling = behandling(opprettetTid = dato3DagerSiden.atTime(3, 0))
+            val vilkårperioder = Vilkårperioder(emptyList(), listOf(aktivitet()))
+            testoppsettService.opprettBehandlingMedFagsak(behandling)
+
+            val grunnlagFom = hentGrunnlagFom(behandling, vilkårperioder)
+
+            val grunnlagAntallMånederBakITiden = Stønadstype.BARNETILSYN.grunnlagAntallMånederBakITiden.toLong()
+            assertThat(grunnlagFom)
+                .isEqualTo(dato3DagerSiden.minusMonths(grunnlagAntallMånederBakITiden).tilFørsteDagIMåneden())
+        }
+
+        @Test
+        fun `skal bruke fom i vilkårperiode hvis den er før opprettet tid`() {
+            val dato1ÅrSiden = LocalDate.now().minusYears(1)
+            val behandling = behandling()
+            testoppsettService.opprettBehandlingMedFagsak(behandling)
+            val aktivitet = aktivitet(fom = dato1ÅrSiden, tom = dato1ÅrSiden)
+            val vilkårperioder = Vilkårperioder(emptyList(), listOf(aktivitet))
+
+            val grunnlagFom = hentGrunnlagFom(behandling, vilkårperioder)
+
+            assertThat(grunnlagFom).isEqualTo(dato1ÅrSiden)
+        }
+
+        private fun hentGrunnlagFom(
+            behandling: Behandling,
+            vilkårperioder: Vilkårperioder,
+        ): LocalDate =
+            vilkårperiodeGrunnlagService
+                .hentEllerOpprettGrunnlag(behandling.id, vilkårperioder)!!
+                .hentetInformasjon.fom
     }
 
     @Nested
