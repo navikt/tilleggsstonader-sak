@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 object BoutgifterBeregningServiceFeilmeldingUtil {
     fun lagDetFinnesUtgifterSomKrysserUtbetlingsperioderFeilmelding(
@@ -40,10 +38,10 @@ object BoutgifterBeregningServiceFeilmeldingUtil {
     private fun UtgiftBeregningBoutgifter.tilOverlappendePerioderPunktliste(utbetalingsperioder: List<UtbetalingPeriode>): String =
         finnOverlappendeUtbetalingsperioder(utbetalingsperioder)
             .mapNotNull { utbetalingPeriode ->
-                val overlapStart = maxOf(this.fom, utbetalingPeriode.fom)
-                val overlapEnd = minOf(this.tom, utbetalingPeriode.tom)
-                if (overlapStart <= overlapEnd) {
-                    Periode(overlapStart, overlapEnd)
+                val overlapFom = maxOf(this.fom, utbetalingPeriode.fom)
+                val overlapTom = minOf(this.tom, utbetalingPeriode.tom)
+                if (overlapFom <= overlapTom) {
+                    UtgiftBeregningBoutgifter(overlapFom, overlapTom, utgift = this.utgift, this.skalFåDekketFaktiskeUtgifter)
                 } else {
                     null
                 }
@@ -55,14 +53,4 @@ object BoutgifterBeregningServiceFeilmeldingUtil {
 
     private fun UtgiftBeregningBoutgifter.harFlereOverlappendeUtbetalingsperioder(utbetalingsperioder: List<UtbetalingPeriode>): Boolean =
         finnOverlappendeUtbetalingsperioder(utbetalingsperioder).size > 1
-
-    data class Periode(
-        val fom: LocalDate,
-        val tom: LocalDate,
-    ) {
-        fun formatertPeriodeNorskFormat(): String {
-            val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-            return "${formatter.format(fom)}–${formatter.format(tom)}"
-        }
-    }
 }

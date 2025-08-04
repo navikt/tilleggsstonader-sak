@@ -124,7 +124,7 @@ Egenskap: Beregning av midlertidig overnatting
     Systemet klarer ikke å beregne utgifter til overnatting som krysser beregningsperioder
     Følgende perioder med overnatting må splittes i to perioder for å kunne beregne
 
-    09.02.2025–14.02.2025 må splittes til 11.01.2025–10.02.2025 og 11.02.2025–10.03.2025
+    09.02.2025–14.02.2025 må splittes til 09.02.2025–10.02.2025 og 11.02.2025–14.02.2025
     """
 
   Scenario: To påfølgende vedtaksperioder som dekker utgiften
