@@ -80,17 +80,6 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         val forslagEtterTidligtEndring: List<Vedtaksperiode>,
     )
 
-    private fun List<Vedtaksperiode>.tilVedtaksperiodeLæremidler() =
-        this.map {
-            no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode(
-                id = it.id,
-                fom = it.fom,
-                tom = it.tom,
-                målgruppe = it.målgruppe,
-                aktivitet = it.aktivitet,
-            )
-        }
-
     /**
      * Slår sammen tidligere vedtaksperioder og nye forslag
      * Hvis man har en periode
