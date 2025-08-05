@@ -11,23 +11,23 @@ import java.util.UUID
 
 object ForeslåVedtaksperioderBeholdIdUtil {
     fun beholdTidligereIdnForVedtaksperioder(
-        tidligereVedtaksperioder: List<Vedtaksperiode>,
+        forrigeVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
     ): List<Vedtaksperiode> {
         val aktuelleVedtaksperioder =
             finnAktuelleVedtaksperioder(
-                tidligereVedtaksperioder = tidligereVedtaksperioder,
+                forrigeVedtaksperioder = forrigeVedtaksperioder,
                 forslag = forslag,
                 tidligsteEndring = tidligsteEndring,
             )
         val nyttForslag =
             ForeslåVedtaksperioderBeholdId(
-                tidligereVedtaksperioder = aktuelleVedtaksperioder.tidligereVedtaksperioder,
+                forrigeVedtaksperioder = aktuelleVedtaksperioder.forrigeVedtaksperioder,
                 initielleForslag = aktuelleVedtaksperioder.forslagEtterTidligtEndring,
             ).beholdTidligereIdnForVedtaksperioder()
         return mergeHvisLikeOgSammeId(
-            tidligereVedtaksperioderSkalIkkeEndres = aktuelleVedtaksperioder.tidligereVedtaksperioderSkalIkkeEndres,
+            forrigeVedtaksperioderSkalIkkeEndres = aktuelleVedtaksperioder.forrigeVedtaksperioderSkalIkkeEndres,
             nyttForslag = nyttForslag,
         )
     }
@@ -37,13 +37,13 @@ object ForeslåVedtaksperioderBeholdIdUtil {
      * Kan fjernes når man fjernet revurder fra
      */
     private fun finnAktuelleVedtaksperioder(
-        tidligereVedtaksperioder: List<Vedtaksperiode>,
+        forrigeVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
     ): Vedtaksperioder {
-        val tidligereVedtaksperioderSkalIkkeEndres =
+        val forrigeVedtaksperioderSkalIkkeEndres =
             if (tidligsteEndring != null) {
-                tidligereVedtaksperioder.avkortFraOgMed(tidligsteEndring.minusDays(1))
+                forrigeVedtaksperioder.avkortFraOgMed(tidligsteEndring.minusDays(1))
             } else {
                 emptyList()
             }
@@ -53,10 +53,10 @@ object ForeslåVedtaksperioderBeholdIdUtil {
          * sånn at man forlenger den siste perioden med tom fra nytt forslag
          * Gjelder kun når man må forholde seg til revurder-fra
          */
-        val tidligereVedtaksperioderMedKorrigertTomDato: List<Vedtaksperiode> =
-            tidligereVedtaksperioder.dropLast(1) +
+        val forrigeVedtaksperioderMedKorrigertTomDato: List<Vedtaksperiode> =
+            forrigeVedtaksperioder.dropLast(1) +
                 listOfNotNull(
-                    tidligereVedtaksperioder
+                    forrigeVedtaksperioder
                         .lastOrNull()
                         ?.let { it.copy(tom = it.tom.plusDays(1)) },
                 )
@@ -68,31 +68,31 @@ object ForeslåVedtaksperioderBeholdIdUtil {
                 forslag
             }
         return Vedtaksperioder(
-            tidligereVedtaksperioderSkalIkkeEndres = tidligereVedtaksperioderSkalIkkeEndres,
-            tidligereVedtaksperioder = tidligereVedtaksperioderMedKorrigertTomDato,
+            forrigeVedtaksperioderSkalIkkeEndres = forrigeVedtaksperioderSkalIkkeEndres,
+            forrigeVedtaksperioder = forrigeVedtaksperioderMedKorrigertTomDato,
             forslagEtterTidligtEndring = forslagEtterTidligtEndring,
         )
     }
 
     private data class Vedtaksperioder(
-        val tidligereVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
-        val tidligereVedtaksperioder: List<Vedtaksperiode>,
+        val forrigeVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
+        val forrigeVedtaksperioder: List<Vedtaksperiode>,
         val forslagEtterTidligtEndring: List<Vedtaksperiode>,
     )
 
     /**
-     * Slår sammen tidligere vedtaksperioder og nye forslag
+     * Slår sammen forrige vedtaksperioder og nye forslag
      * Hvis man har en periode
      * 01.01.01 - 31.01.01 og man revurderer fra 1 feb, men man får ny målgruppe/aktivitet så skal man ikke forlenge den første perioden
-     * Den første perioden finnes i [tidligereVedtaksperioderSkalIkkeEndres] samtidig har den blitt sendt inn til forslag, så ID på perioden finnes også i forslag
+     * Den første perioden finnes i [forrigeVedtaksperioderSkalIkkeEndres] samtidig har den blitt sendt inn til forslag, så ID på perioden finnes også i forslag
      * Det håndteres gjennom å sjekke at ID'n ikke finnes flere ganger. Hvis de finnes flere ganger, så genereres en ny ID for den perioden.
      */
     private fun mergeHvisLikeOgSammeId(
-        tidligereVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
+        forrigeVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
         nyttForslag: List<Vedtaksperiode>,
     ): List<Vedtaksperiode> {
         val idn = mutableSetOf<UUID>()
-        return (tidligereVedtaksperioderSkalIkkeEndres + nyttForslag)
+        return (forrigeVedtaksperioderSkalIkkeEndres + nyttForslag)
             .mergeSammenhengende(
                 skalMerges = { v1, v2 ->
                     v1.id == v2.id &&
@@ -115,10 +115,10 @@ object ForeslåVedtaksperioderBeholdIdUtil {
 /**
  * Når vedtaksperioder brukes i revurderinger trenger man å beholde id'n til vedtaksperioden for å kunne tracke endringer.
  *
- * Bruker en [ArrayDeque] for å håndtere tilfeller der et forslag overlapper flere tidligere vedtaksperioder.
+ * Bruker en [ArrayDeque] for å håndtere tilfeller der et forslag overlapper flere forrige vedtaksperioder.
  * Et tidligere id skal ikke gjenbrukes flere ganger
  *
- * I tilfelle nytt forslag overlapper med tidligere vedtaksperiode:
+ * I tilfelle nytt forslag overlapper med forrige vedtaksperiode:
  * - Periode før snitt får nytt id
  * - Snitt beholder tidligere id
  * - Periode etter snitt får nytt id
@@ -128,7 +128,7 @@ object ForeslåVedtaksperioderBeholdIdUtil {
  * [beholdTidligereIdnForVedtaksperioder] er avhengig av state i klassen
  */
 private class ForeslåVedtaksperioderBeholdId(
-    private val tidligereVedtaksperioder: List<Vedtaksperiode>,
+    private val forrigeVedtaksperioder: List<Vedtaksperiode>,
     private val initielleForslag: List<Vedtaksperiode>,
 ) {
     private val nyttForslag = mutableListOf<Vedtaksperiode>()
@@ -139,7 +139,7 @@ private class ForeslåVedtaksperioderBeholdId(
     private val gjenbrukteIdn = mutableSetOf<UUID>()
 
     /**
-     * Bruker nytt forslag delvis overlapper med tidligere vedtaksperiode.
+     * Bruker nytt forslag delvis overlapper med forrige vedtaksperiode.
      */
     private val stack = ArrayDeque<Vedtaksperiode>()
 
@@ -155,14 +155,14 @@ private class ForeslåVedtaksperioderBeholdId(
 
         while (!stack.isEmpty()) {
             val forslag = stack.removeFirst()
-            val tidligereVedtaksperiodeMedSnitt = beregnSnittForForslag(forslag)
+            val forrigeVedtaksperiodeMedSnitt = beregnSnittForForslag(forslag)
 
-            if (tidligereVedtaksperiodeMedSnitt != null) {
-                val snitt = tidligereVedtaksperiodeMedSnitt.snitt
-                val tidligereVedtaksperiodeId = tidligereVedtaksperiodeMedSnitt.tidligereVedtaksperiode.id
+            if (forrigeVedtaksperiodeMedSnitt != null) {
+                val snitt = forrigeVedtaksperiodeMedSnitt.snitt
+                val forrigeVedtaksperiodeId = forrigeVedtaksperiodeMedSnitt.forrigeVedtaksperiode.id
 
-                gjenbrukteIdn.add(tidligereVedtaksperiodeId)
-                nyttForslag.add(snitt.copy(id = tidligereVedtaksperiodeId))
+                gjenbrukteIdn.add(forrigeVedtaksperiodeId)
+                nyttForslag.add(snitt.copy(id = forrigeVedtaksperiodeId))
 
                 leggTilForslagHvisBegynnerFørSnitt(forslag, snitt)
                 håndterForslagSomSlutterEtterSnitt(forslag, snitt)
@@ -194,32 +194,32 @@ private class ForeslåVedtaksperioderBeholdId(
     }
 
     /**
-     * Finner første snitt mellom forslag og tidligere vedtaksperiode
+     * Finner første snitt mellom forslag og forrige vedtaksperiode
      * Skal ikke gjenbruke et ID flere ganger, så filtrerer ut ID'er som allerede er gjenbrukt.
      */
-    private fun beregnSnittForForslag(delAvForslag: Vedtaksperiode): TidligereVedtaksperiodeMedSnitt? =
-        tidligereVedtaksperioder
+    private fun beregnSnittForForslag(delAvForslag: Vedtaksperiode): ForrigeVedtaksperiodeMedSnitt? =
+        forrigeVedtaksperioder
             .asSequence()
             .filterNot { gjenbrukteIdn.contains(it.id) }
-            .mapNotNull { tidligereVedtaksperiode ->
-                beregnSnitt(delAvForslag, tidligereVedtaksperiode)
-                    ?.let { snitt -> TidligereVedtaksperiodeMedSnitt(tidligereVedtaksperiode, snitt) }
+            .mapNotNull { forrigeVedtaksperiode ->
+                beregnSnitt(delAvForslag, forrigeVedtaksperiode)
+                    ?.let { snitt -> ForrigeVedtaksperiodeMedSnitt(forrigeVedtaksperiode, snitt) }
             }.firstOrNull()
 
     /**
-     * Beregner snitt mellom del av forslag og tidligere vedtaksperiode.
-     * Hvis tidligere vedtaksperiode er siste i listen og del av forslag overlapper,
-     * så skal man beholde ID fra tidligere vedtaksperiode, og forlenge denne til TOM på nye forslaget.
+     * Beregner snitt mellom del av forslag og forrige vedtaksperiode.
+     * Hvis forrige vedtaksperiode er siste i listen og del av forslag overlapper,
+     * så skal man beholde ID fra forrige vedtaksperiode, og forlenge denne til TOM på nye forslaget.
      */
     private fun beregnSnitt(
         delAvForslag: Vedtaksperiode,
-        tidligereVedtaksperiode: Vedtaksperiode,
+        forrigeVedtaksperiode: Vedtaksperiode,
     ): Vedtaksperiode? {
-        val erSisteTidligerePeriode = tidligereVedtaksperiode == tidligereVedtaksperioder.last()
-        return if (erSisteTidligerePeriode && delAvForslag.overlapper(tidligereVedtaksperiode)) {
-            delAvForslag.copy(fom = maxOf(tidligereVedtaksperiode.fom, delAvForslag.fom))
+        val erSisteForrigePeriode = forrigeVedtaksperiode == forrigeVedtaksperioder.last()
+        return if (erSisteForrigePeriode && delAvForslag.overlapper(forrigeVedtaksperiode)) {
+            delAvForslag.copy(fom = maxOf(forrigeVedtaksperiode.fom, delAvForslag.fom))
         } else {
-            delAvForslag.beregnSnitt(tidligereVedtaksperiode)
+            delAvForslag.beregnSnitt(forrigeVedtaksperiode)
         }
     }
 
@@ -228,8 +228,8 @@ private class ForeslåVedtaksperioderBeholdId(
         tom: LocalDate = this.tom,
     ): Vedtaksperiode = this.copy(id = UUID.randomUUID(), fom = fom, tom = tom)
 
-    private data class TidligereVedtaksperiodeMedSnitt(
-        val tidligereVedtaksperiode: Vedtaksperiode,
+    private data class ForrigeVedtaksperiodeMedSnitt(
+        val forrigeVedtaksperiode: Vedtaksperiode,
         val snitt: Vedtaksperiode,
     )
 }

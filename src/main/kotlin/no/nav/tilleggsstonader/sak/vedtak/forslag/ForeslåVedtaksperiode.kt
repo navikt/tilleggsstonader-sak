@@ -18,20 +18,20 @@ object ForeslåVedtaksperiode {
     fun finnVedtaksperiodeV2(
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
-        tidligereVedtaksperioder: List<Vedtaksperiode>,
+        forrigeVedtaksperioder: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
     ): List<Vedtaksperiode> {
         val forslag = ForeslåVedtaksperioderV2Util.foreslåPerioder(vilkårperioder, vilkår)
-        return beholdTidligereIdnForVedtaksperioder(tidligereVedtaksperioder, forslag, tidligsteEndring)
+        return beholdTidligereIdnForVedtaksperioder(forrigeVedtaksperioder, forslag, tidligsteEndring)
     }
 
     fun finnVedtaksperiodeUtenVilkårV2(
         vilkårperioder: Vilkårperioder,
-        tidligereVedtaksperioder: List<Vedtaksperiode>,
+        forrigeVedtaksperioder: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
     ): List<Vedtaksperiode> {
         val forslag = ForeslåVedtaksperioderV2Util.foreslåPerioderUtenVilkår(vilkårperioder)
-        return beholdTidligereIdnForVedtaksperioder(tidligereVedtaksperioder, forslag, tidligsteEndring)
+        return beholdTidligereIdnForVedtaksperioder(forrigeVedtaksperioder, forslag, tidligsteEndring)
     }
 
     @Deprecated("Skal erstattes av finnVedtaksperiodeV2")

@@ -116,7 +116,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
                         aktiviteter = aktiviteter,
                     ),
                     vilkår = vilkår,
-                    tidligereVedtaksperioder = tidligereVedtaksperioder,
+                    forrigeVedtaksperioder = tidligereVedtaksperioder,
                     tidligsteEndring = tidligsteEndring?.let { parseDato(it) },
                 )
         } catch (e: ApiFeil) {

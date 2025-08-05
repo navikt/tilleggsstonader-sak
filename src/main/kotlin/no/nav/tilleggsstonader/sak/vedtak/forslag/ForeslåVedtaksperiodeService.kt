@@ -54,13 +54,13 @@ class ForeslåVedtaksperiodeService(
             ForeslåVedtaksperiode.finnVedtaksperiodeV2(
                 vilkårperioder = vilkårperioder,
                 vilkår = vilkårService.hentVilkår(saksbehandling.id),
-                tidligereVedtaksperioder = forrigeVedtaksperioder,
+                forrigeVedtaksperioder = forrigeVedtaksperioder,
                 tidligsteEndring = tidligsteEndring,
             )
         } else {
             ForeslåVedtaksperiode.finnVedtaksperiodeUtenVilkårV2(
                 vilkårperioder = vilkårperioder,
-                tidligereVedtaksperioder = forrigeVedtaksperioder,
+                forrigeVedtaksperioder = forrigeVedtaksperioder,
                 tidligsteEndring = tidligsteEndring,
             )
         }
