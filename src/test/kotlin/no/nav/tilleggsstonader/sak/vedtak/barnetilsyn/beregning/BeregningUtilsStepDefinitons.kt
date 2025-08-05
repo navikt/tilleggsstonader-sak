@@ -32,7 +32,7 @@ class BeregningUtilsStepDefinitons {
 
     @Gitt("disse vedtaksperiodene")
     fun `denne vedtaksperioden`(dataTable: DataTable) {
-        vedtaksperiodeBeregning = VedtaksperiodeBeregning(mapVedtaksperioder(dataTable).tilVedtaksperiodeDto().first())
+        vedtaksperiodeBeregning = VedtaksperiodeBeregning(mapVedtaksperioder(dataTable).tilVedtaksperiodeDto(emptyList()).first())
     }
 
     @Gitt("disse aktivitetene")

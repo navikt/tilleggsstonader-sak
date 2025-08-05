@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 import java.util.UUID
@@ -38,17 +39,30 @@ data class Vedtaksperiode(
         tom: LocalDate,
     ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
 
-    fun tilDto() =
+    fun tilDto(forrigeVedtaksperiode: Vedtaksperiode?) =
         VedtaksperiodeDto(
             id = id,
             fom = fom,
             tom = tom,
             målgruppeType = målgruppe,
             aktivitetType = aktivitet,
+            status = utledStatus(forrigeVedtaksperiode),
         )
+
+    private fun Vedtaksperiode.utledStatus(forrigeVedtaksperiode: Vedtaksperiode?): VedtaksperiodeStatus =
+        when {
+            forrigeVedtaksperiode == null -> VedtaksperiodeStatus.NY
+            this.fom == forrigeVedtaksperiode.fom && this.tom == forrigeVedtaksperiode.tom ->
+                VedtaksperiodeStatus.UENDRET
+
+            else -> VedtaksperiodeStatus.ENDRET
+        }
 }
 
-fun List<Vedtaksperiode>.tilVedtaksperiodeDto() = map { it.tilDto() }
+fun List<Vedtaksperiode>.tilVedtaksperiodeDto(tidligereVedtaksperioder: List<Vedtaksperiode>?) =
+    map {
+        it.tilDto(tidligereVedtaksperioder?.find { v -> v.id == it.id })
+    }
 
 fun List<Vedtaksperiode>.tilVedtaksperiodeBeregning() =
     map {

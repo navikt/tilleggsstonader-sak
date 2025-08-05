@@ -15,6 +15,7 @@ data class VedtaksperiodeDto(
     override val tom: LocalDate,
     val målgruppeType: FaktiskMålgruppe,
     val aktivitetType: AktivitetType,
+    val status: VedtaksperiodeStatus,
 ) : Periode<LocalDate>,
     KopierPeriode<VedtaksperiodeDto> {
     override fun medPeriode(
@@ -30,6 +31,12 @@ data class VedtaksperiodeDto(
             målgruppe = målgruppeType,
             aktivitet = aktivitetType,
         )
+}
+
+enum class VedtaksperiodeStatus {
+    NY,
+    ENDRET,
+    UENDRET,
 }
 
 fun List<VedtaksperiodeDto>.tilDomene() = map { it.tilDomene() }
