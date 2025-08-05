@@ -13,13 +13,13 @@ object ForeslåVedtaksperioderBeholdIdUtil {
     fun beholdTidligereIdnForVedtaksperioder(
         tidligereVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
-        tidligstEndring: LocalDate?,
+        tidligsteEndring: LocalDate?,
     ): List<Vedtaksperiode> {
         val aktuelleVedtaksperioder =
             finnAktuelleVedtaksperioder(
                 tidligereVedtaksperioder = tidligereVedtaksperioder,
                 forslag = forslag,
-                tidligstEndring = tidligstEndring,
+                tidligsteEndring = tidligsteEndring,
             )
         val nyttForslag =
             ForeslåVedtaksperioderBeholdId(
@@ -39,11 +39,11 @@ object ForeslåVedtaksperioderBeholdIdUtil {
     private fun finnAktuelleVedtaksperioder(
         tidligereVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
-        tidligstEndring: LocalDate?,
+        tidligsteEndring: LocalDate?,
     ): Vedtaksperioder {
         val tidligereVedtaksperioderSkalIkkeEndres =
-            if (tidligstEndring != null) {
-                tidligereVedtaksperioder.avkortFraOgMed(tidligstEndring.minusDays(1))
+            if (tidligsteEndring != null) {
+                tidligereVedtaksperioder.avkortFraOgMed(tidligsteEndring.minusDays(1))
             } else {
                 emptyList()
             }
@@ -62,8 +62,8 @@ object ForeslåVedtaksperioderBeholdIdUtil {
                 )
 
         val forslagEtterTidligtEndring =
-            if (tidligstEndring != null) {
-                forslag.avkortPerioderFør(tidligstEndring)
+            if (tidligsteEndring != null) {
+                forslag.avkortPerioderFør(tidligsteEndring)
             } else {
                 forslag
             }

@@ -47,7 +47,7 @@ class ForeslåVedtaksperiodeService(
                 // skal hente alle vedtaksperioder fra forrige behandling, så setter revurderFra til null
                 vedtaksperiodeService.finnVedtaksperioderForBehandling(it, revurdererFra = null)
             } ?: emptyList()
-        val tidligstEndring =
+        val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(saksbehandling.id)
 
         return if (saksbehandling.stønadstype.skalHenteStønadsvilkår()) {
@@ -55,13 +55,13 @@ class ForeslåVedtaksperiodeService(
                 vilkårperioder = vilkårperioder,
                 vilkår = vilkårService.hentVilkår(saksbehandling.id),
                 tidligereVedtaksperioder = forrigeVedtaksperioder,
-                tidligstEndring = tidligstEndring,
+                tidligsteEndring = tidligsteEndring,
             )
         } else {
             ForeslåVedtaksperiode.finnVedtaksperiodeUtenVilkårV2(
                 vilkårperioder = vilkårperioder,
                 tidligereVedtaksperioder = forrigeVedtaksperioder,
-                tidligstEndring = tidligstEndring,
+                tidligsteEndring = tidligsteEndring,
             )
         }
     }

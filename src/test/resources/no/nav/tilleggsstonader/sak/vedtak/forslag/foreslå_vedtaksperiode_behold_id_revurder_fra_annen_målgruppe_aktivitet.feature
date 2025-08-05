@@ -1,7 +1,7 @@
 # language: no
 # encoding: UTF-8
 
-Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurdering med tidligstEndring - annen målgruppe
+Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurdering med tidligsteEndring - annen målgruppe
 
   Bakgrunn:
 
@@ -24,7 +24,7 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
 
   Scenario: Revurder fra før tidligere vedtaksperioder
 
-    Når forslag til vedtaksperioder behold id lages tidligstEndring=28.02.2023
+    Når forslag til vedtaksperioder behold id lages tidligsteEndring=28.02.2023
 
     Så forvent følgende vedtaksperioder med riktig id
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
@@ -34,7 +34,7 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
 
   Scenario: Revurder fra 1 dag etter TOM i tidligere vedtaksperiode - skal ikke forlenge siste perioden pga annen målgruppe
 
-    Når forslag til vedtaksperioder behold id lages tidligstEndring=16.03.2023
+    Når forslag til vedtaksperioder behold id lages tidligsteEndring=16.03.2023
 
     Så forvent følgende vedtaksperioder med riktig id
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
@@ -44,7 +44,7 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
 
   Scenario: Revurder fra 2 dager etter TOM i tidligere vedtaksperiode - skal legge til ny periode etter tidligere perioder
 
-    Når forslag til vedtaksperioder behold id lages tidligstEndring=17.03.2023
+    Når forslag til vedtaksperioder behold id lages tidligsteEndring=17.03.2023
 
     Så forvent følgende vedtaksperioder med riktig id
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
@@ -54,7 +54,7 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
 
   Scenario: Revurder fra 1 dag før TOM i tidligere vedtaksperiode - skal ikke forlenge siste perioden pga annen målgruppe
 
-    Når forslag til vedtaksperioder behold id lages tidligstEndring=14.03.2023
+    Når forslag til vedtaksperioder behold id lages tidligsteEndring=14.03.2023
 
     Så forvent følgende vedtaksperioder med riktig id
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
@@ -64,7 +64,7 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
 
   Scenario: Revurder fra TOM i tidligere vedtaksperiode - skal ikke forlenge siste perioden pga annen målgruppe
 
-    Når forslag til vedtaksperioder behold id lages tidligstEndring=15.03.2023
+    Når forslag til vedtaksperioder behold id lages tidligsteEndring=15.03.2023
 
     Så forvent følgende vedtaksperioder med riktig id
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
