@@ -9,7 +9,7 @@ object BoutgifterBeregningServiceFeilmeldingUtil {
     ): String =
         buildString {
             appendLine("Systemet klarer ikke å beregne utgifter til overnatting som krysser beregningsperioder")
-            appendLine("Følgende perioder med overnatting må splittes i to perioder for å kunne beregne")
+            appendLine("Følgende perioder med overnatting må splittes")
             appendLine()
             append(
                 lagOverlappendeUtgifterOgBeregningsperioderAvsnitt(
@@ -32,7 +32,8 @@ object BoutgifterBeregningServiceFeilmeldingUtil {
         utbetalingsperioder: List<UtbetalingPeriode>,
     ): String =
         buildString {
-            append("${formatertPeriodeNorskFormat()} må splittes til${tilOverlappendePerioderPunktliste(utbetalingsperioder)}")
+            appendLine("Utgiftsperiode ${formatertPeriodeNorskFormat()} må splittes opp i")
+            appendLine(tilOverlappendePerioderPunktliste(utbetalingsperioder))
         }
 
     private fun UtgiftBeregningBoutgifter.tilOverlappendePerioderPunktliste(utbetalingsperioder: List<UtbetalingPeriode>): String =
@@ -45,7 +46,7 @@ object BoutgifterBeregningServiceFeilmeldingUtil {
                 } else {
                     null
                 }
-            }.joinToString(" og") { " ${it.formatertPeriodeNorskFormat()}" }
+            }.joinToString("\n") { " - ${it.formatertPeriodeNorskFormat()}" }
 
     private fun UtgiftBeregningBoutgifter.finnOverlappendeUtbetalingsperioder(
         utbetalingsperioder: List<UtbetalingPeriode>,
