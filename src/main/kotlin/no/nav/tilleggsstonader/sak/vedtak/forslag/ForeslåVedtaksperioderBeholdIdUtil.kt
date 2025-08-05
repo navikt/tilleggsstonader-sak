@@ -129,6 +129,11 @@ object ForeslåVedtaksperioderBeholdIdUtil {
  * Bruker en [ArrayDeque] for å håndtere tilfeller der et forslag overlapper flere tidligere vedtaksperioder.
  * Et tidligere id skal ikke gjenbrukes flere ganger
  *
+ * I tilfelle nytt forslag overlapper med tidligere vedtaksperiode:
+ * - Periode før snitt får nytt id
+ * - Snitt beholder tidligere id
+ * - Periode etter snitt får nytt id
+ *
  * Plassert som en private class for at den ikke skal kalles på flere ganger.
  * Bruk av klasse gjør det enklere å splitte ut metoder som er avhengig av state i klassen.
  * [beholdTidligereIdnForVedtaksperioder] er avhengig av state i klassen
@@ -170,7 +175,7 @@ private class ForeslåVedtaksperioderBeholdId(
                 gjenbrukteIdn.add(tidligereVedtaksperiodeId)
                 nyttForslag.add(snitt.copy(id = tidligereVedtaksperiodeId))
 
-                håndterForslagSomBegynnerFørSnitt(forslag, snitt)
+                leggTilForslagHvisBegynnerFørSnitt(forslag, snitt)
                 håndterForslagSomSlutterEtterSnitt(forslag, snitt)
             } else {
                 nyttForslag.add(forslag)
@@ -178,21 +183,24 @@ private class ForeslåVedtaksperioderBeholdId(
         }
     }
 
+    private fun leggTilForslagHvisBegynnerFørSnitt(
+        forslag: Vedtaksperiode,
+        snitt: Vedtaksperiode,
+    ) {
+        if (forslag.fom < snitt.fom) {
+            nyttForslag.add(forslag.medNyId(tom = snitt.fom.minusDays(1)))
+        }
+    }
+
+    /**
+     * Et forslag som slutter etter snittet legges til i stacken for å sjekke om det overlapper med andre vedtaksperioder
+     */
     private fun håndterForslagSomSlutterEtterSnitt(
         forslag: Vedtaksperiode,
         snitt: Vedtaksperiode,
     ) {
         if (forslag.tom > snitt.tom) {
             stack.add(forslag.medNyId(fom = snitt.tom.plusDays(1)))
-        }
-    }
-
-    private fun håndterForslagSomBegynnerFørSnitt(
-        forslag: Vedtaksperiode,
-        snitt: Vedtaksperiode,
-    ) {
-        if (forslag.fom < snitt.fom) {
-            nyttForslag.add(forslag.medNyId(tom = snitt.fom.minusDays(1)))
         }
     }
 
