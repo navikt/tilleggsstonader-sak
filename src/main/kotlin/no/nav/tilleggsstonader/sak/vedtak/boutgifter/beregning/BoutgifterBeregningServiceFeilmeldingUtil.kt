@@ -46,7 +46,7 @@ object BoutgifterBeregningServiceFeilmeldingUtil {
                 } else {
                     null
                 }
-            }.joinToString("\n") { " - ${it.formatertPeriodeNorskFormat()}" }
+            }.joinToString("\n") { "- ${it.formatertPeriodeNorskFormat()}" }
 
     private fun UtgiftBeregningBoutgifter.finnOverlappendeUtbetalingsperioder(
         utbetalingsperioder: List<UtbetalingPeriode>,

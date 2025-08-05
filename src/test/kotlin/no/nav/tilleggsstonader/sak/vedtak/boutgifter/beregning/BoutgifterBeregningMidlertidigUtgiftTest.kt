@@ -188,9 +188,12 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
         }.hasMessage(
             """
             Systemet klarer ikke å beregne utgifter til overnatting som krysser beregningsperioder
-            Følgende perioder med overnatting må splittes i to perioder for å kunne beregne
-
-            25.01.2025–05.02.2025 må splittes til 25.01.2025–31.01.2025 og 01.02.2025–05.02.2025
+            Følgende perioder med overnatting må splittes
+            
+            Utgiftsperiode 25.01.2025–05.02.2025 må splittes opp i
+            - 25.01.2025–31.01.2025
+            - 01.02.2025–05.02.2025
+            
             """.trimIndent(),
         )
     }
