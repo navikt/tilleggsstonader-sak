@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -20,6 +21,7 @@ class BehandlingsoversiktService(
     private val fagsakService: FagsakService,
     private val behandlingRepository: BehandlingRepository,
     private val vedtaksperiodeService: VedtaksperiodeService,
+    private val vedtakService: VedtakService,
 ) {
     fun hentOversikt(fagsakPersonId: FagsakPersonId): BehandlingsoversiktDto {
         val fagsak = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
@@ -39,6 +41,7 @@ class BehandlingsoversiktService(
         val behandlinger = behandlingRepository.findByFagsakId(fagsakId = fagsak.id)
 
         val vedtaksperioder = hentVedtaksperioder(behandlinger)
+        val opphørsdato = hentOpphørsdato(behandlinger)
 
         return FagsakMedBehandlinger(
             fagsakId = fagsak.id,
@@ -66,6 +69,7 @@ class BehandlingsoversiktService(
                         henlagtBegrunnelse = it.henlagtBegrunnelse,
                         revurderFra = it.revurderFra,
                         vedtaksperiode = vedtaksperioder[it.id],
+                        opphørsdato = opphørsdato[it.id] ?: it.revurderFra,
                     )
                 },
         )
@@ -85,6 +89,12 @@ class BehandlingsoversiktService(
         return revurderFraPåBehandlingId.mapValues { (behandlingId, revurderFra) ->
             slåSammenVedtaksperioderForBehandling(behandlingId, revurderFra)
         }
+    }
+
+    private fun hentOpphørsdato(behandlinger: List<Behandling>): Map<BehandlingId?, LocalDate?> {
+        val opphørtBehandlinger = behandlinger.filter { it.resultat == BehandlingResultat.OPPHØRT }
+        val opphørtVedtaker = opphørtBehandlinger.map { it -> vedtakService.hentVedtak(it.id) }
+        return opphørtVedtaker.associate { it?.behandlingId to it?.opphørsdato }
     }
 
     /**
