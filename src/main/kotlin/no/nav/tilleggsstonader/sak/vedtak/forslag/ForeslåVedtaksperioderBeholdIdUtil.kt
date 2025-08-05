@@ -47,19 +47,6 @@ object ForeslåVedtaksperioderBeholdIdUtil {
                 emptyList()
             }
 
-        /**
-         * Korrigerer tom-dato for den siste vedtaksperioden i listen
-         * sånn at man forlenger den siste perioden med tom fra nytt forslag
-         * Gjelder kun når man må forholde seg til revurder-fra
-         */
-        val forrigeVedtaksperioderMedKorrigertTomDato: List<Vedtaksperiode> =
-            forrigeVedtaksperioder.dropLast(1) +
-                listOfNotNull(
-                    forrigeVedtaksperioder
-                        .lastOrNull()
-                        ?.let { it.copy(tom = it.tom.plusDays(1)) },
-                )
-
         val forslagEtterTidligsteEndring =
             if (tidligsteEndring != null) {
                 forslag.avkortPerioderFør(tidligsteEndring)
@@ -68,10 +55,28 @@ object ForeslåVedtaksperioderBeholdIdUtil {
             }
         return Vedtaksperioder(
             forrigeVedtaksperioderSkalIkkeEndres = forrigeVedtaksperioderSkalIkkeEndres,
-            forrigeVedtaksperioder = forrigeVedtaksperioderMedKorrigertTomDato,
+            forrigeVedtaksperioder = forrigeVedtaksperioder.leggTilEnDagPåSistePerioden(),
             forslagEtterTidligsteEndring = forslagEtterTidligsteEndring,
         )
     }
+
+    /**
+     * I tilfelle man lagt til en vedtaksperiode etter siste vedtaksperiode i forrige behandling
+     * så er målet å forlenge den siste perioden og beholde ID'n på den.
+     * For å gjøre det forlenger vi den siste perioden med en dag
+     *
+     * Den ekstra dagen gjør at man kan få ett snitt på nye vedtaksperioder,
+     * og den nye dagen som gjør at den siste forrige vedtaksperioden forlenges
+     *
+     * Dette gjøres på grunn av at forslaget er avkortet i forhold til tidligste endringen
+     */
+    private fun List<Vedtaksperiode>.leggTilEnDagPåSistePerioden() =
+        this.dropLast(1) +
+            listOfNotNull(
+                this
+                    .lastOrNull()
+                    ?.let { it.copy(tom = it.tom.plusDays(1)) },
+            )
 
     private data class Vedtaksperioder(
         val forrigeVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
