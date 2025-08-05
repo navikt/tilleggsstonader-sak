@@ -24,7 +24,7 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         val nyttForslag =
             ForeslåVedtaksperioderBeholdId(
                 forrigeVedtaksperioder = aktuelleVedtaksperioder.forrigeVedtaksperioder,
-                initielleForslag = aktuelleVedtaksperioder.forslagEtterTidligtEndring,
+                initielleForslag = aktuelleVedtaksperioder.forslagEtterTidligsteEndring,
             ).beholdTidligereIdnForVedtaksperioder()
         return mergeHvisLikeOgSammeId(
             forrigeVedtaksperioderSkalIkkeEndres = aktuelleVedtaksperioder.forrigeVedtaksperioderSkalIkkeEndres,
@@ -60,7 +60,7 @@ object ForeslåVedtaksperioderBeholdIdUtil {
                         ?.let { it.copy(tom = it.tom.plusDays(1)) },
                 )
 
-        val forslagEtterTidligtEndring =
+        val forslagEtterTidligsteEndring =
             if (tidligsteEndring != null) {
                 forslag.avkortPerioderFør(tidligsteEndring)
             } else {
@@ -69,14 +69,14 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         return Vedtaksperioder(
             forrigeVedtaksperioderSkalIkkeEndres = forrigeVedtaksperioderSkalIkkeEndres,
             forrigeVedtaksperioder = forrigeVedtaksperioderMedKorrigertTomDato,
-            forslagEtterTidligtEndring = forslagEtterTidligtEndring,
+            forslagEtterTidligsteEndring = forslagEtterTidligsteEndring,
         )
     }
 
     private data class Vedtaksperioder(
         val forrigeVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
         val forrigeVedtaksperioder: List<Vedtaksperiode>,
-        val forslagEtterTidligtEndring: List<Vedtaksperiode>,
+        val forslagEtterTidligsteEndring: List<Vedtaksperiode>,
     )
 
     /**
