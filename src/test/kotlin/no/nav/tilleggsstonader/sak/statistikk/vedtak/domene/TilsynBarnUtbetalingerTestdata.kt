@@ -49,7 +49,7 @@ fun lagTilsynBarnInnvilgelseMedBeløp(
         )
     val grunnlag =
         VedtaksperiodeGrunnlag(
-            vedtaksperiode = VedtaksperiodeBeregning(vedtaksperiode.tilDto()),
+            vedtaksperiode = VedtaksperiodeBeregning(vedtaksperiode.tilDto(null)),
             aktiviteter = listOf<Aktivitet>(aktivitet),
             antallDager = 25,
         )

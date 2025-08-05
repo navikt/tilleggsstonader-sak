@@ -245,7 +245,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             val oppsummertInnvilgelse = behandlingsoppsummering.vedtak as OppsummertVedtakInnvilgelse
 
-            assertThat(oppsummertInnvilgelse.vedtaksperioder).isEqualTo(vedtaksperioder.map { it.tilDto() })
+            assertThat(oppsummertInnvilgelse.vedtaksperioder).isEqualTo(vedtaksperioder.map { it.tilDto(null) })
         }
 
         @Test

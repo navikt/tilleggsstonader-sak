@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
@@ -36,6 +37,7 @@ class VedtaksperiodeTest {
                     tom = tom,
                     målgruppeType = målgruppe,
                     aktivitetType = aktivitet,
+                    status = VedtaksperiodeStatus.NY,
                 ),
             )
 

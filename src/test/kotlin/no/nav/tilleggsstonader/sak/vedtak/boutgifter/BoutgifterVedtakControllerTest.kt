@@ -127,7 +127,7 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
             val revurderFraDato = dummyFom.plusDays(4)
             innvilgeVedtak(
                 behandling = dummyBehandling,
-                vedtak = InnvilgelseBoutgifterRequest(listOf(vedtaksperiode.tilDto())),
+                vedtak = InnvilgelseBoutgifterRequest(listOf(vedtaksperiode.tilDto(null))),
             )
             testoppsettService.ferdigstillBehandling(dummyBehandling)
 

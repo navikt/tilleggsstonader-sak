@@ -34,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -92,6 +93,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : IntegrationTest() {
             tom = LocalDate.of(2023, 1, 31),
             målgruppeType = NEDSATT_ARBEIDSEVNE,
             aktivitetType = AktivitetType.TILTAK,
+            status = VedtaksperiodeStatus.NY,
         )
     val aktivitet = aktivitet(behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
     val målgruppe = målgruppe(behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 2, 28))
@@ -350,6 +352,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : IntegrationTest() {
                     tom = februar.atEndOfMonth(),
                     målgruppeType = NEDSATT_ARBEIDSEVNE,
                     aktivitetType = AktivitetType.TILTAK,
+                    status = VedtaksperiodeStatus.NY,
                 )
             val innvilgelse = innvilgelseDto(listOf(element))
             steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelse)
@@ -436,6 +439,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : IntegrationTest() {
                     tom = mars.atEndOfMonth(),
                     målgruppeType = NEDSATT_ARBEIDSEVNE,
                     aktivitetType = AktivitetType.TILTAK,
+                    status = VedtaksperiodeStatus.NY,
                 )
             vilkårperiodeRepository.insert(aktivitet(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
             vilkårperiodeRepository.insert(målgruppe(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
@@ -570,6 +574,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : IntegrationTest() {
                     tom = januar.atDay(2),
                     målgruppeType = FaktiskMålgruppe.ENSLIG_FORSØRGER,
                     aktivitetType = AktivitetType.UTDANNING,
+                    status = VedtaksperiodeStatus.NY,
                 )
 
             vilkårperiodeRepository.insert(
@@ -615,6 +620,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : IntegrationTest() {
                     tom = januar.atDay(2),
                     målgruppeType = FaktiskMålgruppe.GJENLEVENDE,
                     aktivitetType = AktivitetType.UTDANNING,
+                    status = VedtaksperiodeStatus.NY,
                 )
 
             vilkårperiodeRepository.insert(

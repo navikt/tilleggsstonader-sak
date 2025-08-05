@@ -236,7 +236,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 behandlingId = behandlingId,
                 steg = StegType.BEREGNE_YTELSE,
             )
-        val vedtaksperioder = mapVedtaksperioder(dataTable).map { it.tilDto() }
+        val vedtaksperioder = mapVedtaksperioder(dataTable).map { it.tilDto(null) }
 
         kjørMedFeilkontekst {
             steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseBoutgifterRequest(vedtaksperioder))
@@ -307,7 +307,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     ) {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
-        val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto() }
+        val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto(null) }
 
         every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns revurderFra
 
