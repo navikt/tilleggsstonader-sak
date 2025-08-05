@@ -4,8 +4,6 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.NyttBarnId
 import no.nav.tilleggsstonader.sak.behandling.barn.TidligereBarnId
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -53,11 +51,11 @@ class GjennbrukDataRevurderingService(
 
     fun finnBehandlingIdForGjenbruk(behandling: Behandling): BehandlingId? =
         behandling.forrigeIverksatteBehandlingId
-            ?: finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(behandling.fagsakId)
+            ?: behandlingService.finnSisteBehandlingSomHarVedtakPåFagsaken(behandling.fagsakId)?.id
 
     fun finnBehandlingIdForGjenbruk(fagsakId: FagsakId): BehandlingId? =
         behandlingService.finnSisteIverksatteBehandling(fagsakId)?.id
-            ?: finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(fagsakId)
+            ?: behandlingService.finnSisteBehandlingSomHarVedtakPåFagsaken(fagsakId)?.id
 
     /**
      * Returnerer en map som mapper tidligere barnId til nytt barnId
@@ -75,12 +73,4 @@ class GjennbrukDataRevurderingService(
             it.id to nyttBarnId.id
         }
     }
-
-    private fun finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(fagsakId: FagsakId): BehandlingId? =
-        behandlingService
-            .hentBehandlinger(fagsakId)
-            .lastOrNull {
-                it.status == BehandlingStatus.FERDIGSTILT &&
-                    it.resultat != BehandlingResultat.HENLAGT
-            }?.id
 }

@@ -2,32 +2,37 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
 import io.mockk.verify
-import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class GjennbrukDataRevurderingServiceTest {
-    val behandlingService = mockk<BehandlingService>()
-    val barnService = mockk<BarnService>()
-    val vilkårperiodeService = mockk<VilkårperiodeService>()
-    val vilkårService = mockk<VilkårService>()
+    val behandlingService =
+        spyk(
+            BehandlingService(
+                behandlingsjournalpostRepository = mockk(),
+                behandlingRepository = mockk(),
+                eksternBehandlingIdRepository = mockk(),
+                behandlingshistorikkService = mockk(),
+                taskService = mockk(),
+                unleashService = mockk(),
+            ),
+        )
 
     val service =
         GjennbrukDataRevurderingService(
             behandlingService = behandlingService,
-            barnService = barnService,
-            vilkårperiodeService = vilkårperiodeService,
-            vilkårService = vilkårService,
+            barnService = mockk(),
+            vilkårperiodeService = mockk(),
+            vilkårService = mockk(),
         )
 
     val fagsakId = FagsakId.random()

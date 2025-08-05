@@ -209,11 +209,9 @@ class BehandlingService(
     }
 
     fun finnSisteBehandlingSomHarVedtakPåFagsaken(fagsakId: FagsakId): Behandling? =
-        behandlingRepository
-            .findByFagsakId(fagsakId)
+        hentBehandlinger(fagsakId)
             .filter { it.erFerdigstilt() }
             .filterNot { it.erHenlagt() }
-            .sortertEtterVedtakstidspunkt()
             .lastOrNull()
 
     fun oppdaterStegPåBehandling(
