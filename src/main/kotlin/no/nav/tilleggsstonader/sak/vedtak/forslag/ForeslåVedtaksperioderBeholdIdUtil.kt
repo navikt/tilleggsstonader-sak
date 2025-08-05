@@ -34,7 +34,6 @@ object ForeslåVedtaksperioderBeholdIdUtil {
 
     /**
      * Vi skal ikke foreslå perioder før revurder fra, der må vi beholde alle perioder som tidligere
-     * Kan fjernes når man fjernet revurder fra
      */
     private fun finnAktuelleVedtaksperioder(
         forrigeVedtaksperioder: List<Vedtaksperiode>,
