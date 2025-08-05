@@ -25,8 +25,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerResponse

@@ -19,10 +19,10 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRe
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.VedtaksperioderOversiktService
 import org.springframework.web.bind.annotation.GetMapping

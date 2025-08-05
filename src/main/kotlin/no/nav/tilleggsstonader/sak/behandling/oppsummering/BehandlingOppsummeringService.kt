@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårUtil.slåSammenSammenhengende
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService

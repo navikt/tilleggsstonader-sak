@@ -38,31 +38,7 @@ data class Vedtaksperiode(
         fom: LocalDate,
         tom: LocalDate,
     ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
-
-    fun tilDto(forrigeVedtaksperiode: Vedtaksperiode?) =
-        VedtaksperiodeDto(
-            id = id,
-            fom = fom,
-            tom = tom,
-            målgruppeType = målgruppe,
-            aktivitetType = aktivitet,
-            status = utledStatus(forrigeVedtaksperiode),
-        )
-
-    private fun Vedtaksperiode.utledStatus(forrigeVedtaksperiode: Vedtaksperiode?): VedtaksperiodeStatus =
-        when {
-            forrigeVedtaksperiode == null -> VedtaksperiodeStatus.NY
-            this.fom == forrigeVedtaksperiode.fom && this.tom == forrigeVedtaksperiode.tom ->
-                VedtaksperiodeStatus.UENDRET
-
-            else -> VedtaksperiodeStatus.ENDRET
-        }
 }
-
-fun List<Vedtaksperiode>.tilVedtaksperiodeDto(tidligereVedtaksperioder: List<Vedtaksperiode>?) =
-    map {
-        it.tilDto(tidligereVedtaksperioder?.find { v -> v.id == it.id })
-    }
 
 fun List<Vedtaksperiode>.tilVedtaksperiodeBeregning() =
     map {
