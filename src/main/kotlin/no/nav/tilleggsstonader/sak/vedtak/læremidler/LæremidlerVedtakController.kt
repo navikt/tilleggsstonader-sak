@@ -9,7 +9,10 @@ import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
@@ -40,6 +43,7 @@ class LæremidlerVedtakController(
     private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     private val vedtakDtoMapper: VedtakDtoMapper,
+    private val vedtaksperiodeService: VedtaksperiodeService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -119,11 +123,25 @@ class LæremidlerVedtakController(
     @GetMapping("{behandlingId}/foresla")
     fun foreslåVedtaksperioder(
         @PathVariable behandlingId: BehandlingId,
-    ): List<VedtaksperiodeLæremidlerDto> {
+    ): List<VedtaksperiodeDto> {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return foreslåVedtaksperiodeService.foreslåVedtaksperioderLæremidler(behandlingId).tilDto()
+        val behandling = behandlingService.hentBehandling(behandlingId)
+        val forrigeVedtaksperioder =
+            behandling.forrigeIverksatteBehandlingId?.let {
+                vedtaksperiodeService.finnVedtaksperioderForBehandling(
+                    behandlingId = it,
+                    revurdererFra = null,
+                )
+            }
+
+        return foreslåVedtaksperiodeService
+            .foreslåVedtaksperioderLæremidler(behandlingId)
+            .map { it.tilFellesDomeneVedtaksperiode() }
+            .tilVedtaksperiodeDto(
+                tidligereVedtaksperioder = forrigeVedtaksperioder,
+            )
     }
 }

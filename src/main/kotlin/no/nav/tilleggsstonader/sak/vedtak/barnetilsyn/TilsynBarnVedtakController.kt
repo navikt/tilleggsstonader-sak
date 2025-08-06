@@ -128,12 +128,16 @@ class TilsynBarnVedtakController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         val behandling = behandlingService.hentBehandling(behandlingId)
-        return foreslåVedtaksperiodeService.foreslåPerioder(behandlingId).tilVedtaksperiodeDto(
-            tidligereVedtaksperioder =
+        val forrigeVedtaksperioder =
+            behandling.forrigeIverksatteBehandlingId?.let {
                 vedtaksperiodeService.finnVedtaksperioderForBehandling(
-                    behandlingId = behandling.id,
-                    revurdererFra = behandling.revurderFra,
-                ),
+                    behandlingId = it,
+                    revurdererFra = null,
+                )
+            }
+
+        return foreslåVedtaksperiodeService.foreslåPerioder(behandlingId).tilVedtaksperiodeDto(
+            tidligereVedtaksperioder = forrigeVedtaksperioder,
         )
     }
 }
