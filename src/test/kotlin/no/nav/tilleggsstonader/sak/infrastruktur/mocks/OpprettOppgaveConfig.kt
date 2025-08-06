@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -31,8 +30,9 @@ import java.time.LocalDate
 class OpprettOppgaveConfig(
     private val oppgaveRepository: OppgaveRepository,
     private val behandlingService: BehandlingService,
-    private val oppgaveClient: OppgaveClient,
     private val oppgaveService: OppgaveService,
+    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
+    private val oppgavelager: Oppgavelager,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -44,20 +44,19 @@ class OpprettOppgaveConfig(
         )
 
     init {
-        val oppgaver =
-            oppgaveRepository
-                .findAll()
+        val oppgaver = oppgaveRepository.findAll()
+        val oppgaverUnderArbeid =
+            oppgaver
                 .filterNot { it.erFerdigstilt }
                 .filter { oppgavetyper.contains(it.type) }
-        oppgaver.forEach { oppgave ->
+        oppgaverUnderArbeid.forEach { oppgave ->
             oppgave.behandlingId?.let { behandlingId ->
                 val behandling = behandlingService.hentSaksbehandling(behandlingId)
-                val nyttOppgaveId = opprettOppgave(behandling, oppgave)
-                // Oppdaterer oppgaveId på oppgaven då vi oppretter alle oppgaver på nytt, og får då et nytt oppgaveId
-                oppgaveRepository.update(oppgave.copy(gsakOppgaveId = nyttOppgaveId))
+                opprettOppgave(behandling, oppgave)
             }
         }
-        logger.info("Opprettet ${oppgaver.size} oppgaver")
+        oppgavelager.oppdaterMaxOppgaveId(oppgaver.maxOfOrNull { it.gsakOppgaveId })
+        logger.info("Opprettet ${oppgaverUnderArbeid.size} oppgaver")
     }
 
     private fun opprettOppgave(
@@ -65,21 +64,23 @@ class OpprettOppgaveConfig(
         oppgave: OppgaveDomain,
     ): Long {
         val oppgavetype = oppgave.type
-        return oppgaveClient.opprettOppgave(
-            OpprettOppgaveRequest(
-                ident = OppgaveIdentV2(ident = behandling.ident, gruppe = IdentGruppe.FOLKEREGISTERIDENT),
-                tema = behandling.stønadstype.tilTema(),
-                tilordnetRessurs = mapTilordnetRessurs(oppgavetype, behandling),
-                oppgavetype = oppgavetype,
-                behandlingstema = behandling.stønadstype.tilBehandlingstema().value,
-                behandlingstype = Behandlingstype.NASJONAL.value,
-                enhetsnummer = mapEnhet(),
-                fristFerdigstillelse = LocalDate.now().plusDays(14),
-                beskrivelse = mapBeskrivelse(oppgavetype),
-                behandlesAvApplikasjon = utledBehandlesAvApplikasjon(oppgavetype),
-                mappeId = oppgaveService.finnMappe(mapEnhet(), OppgaveMappe.KLAR).id,
-            ),
-        )
+        return oppgavelager
+            .leggTilOppgaveFraRepository(
+                OpprettOppgaveRequest(
+                    ident = OppgaveIdentV2(ident = behandling.ident, gruppe = IdentGruppe.FOLKEREGISTERIDENT),
+                    tema = behandling.stønadstype.tilTema(),
+                    tilordnetRessurs = mapTilordnetRessurs(oppgavetype, behandling),
+                    oppgavetype = oppgavetype,
+                    behandlingstema = behandling.stønadstype.tilBehandlingstema().value,
+                    behandlingstype = Behandlingstype.NASJONAL.value,
+                    enhetsnummer = mapEnhet(),
+                    fristFerdigstillelse = LocalDate.now().plusDays(14),
+                    beskrivelse = mapBeskrivelse(oppgavetype),
+                    behandlesAvApplikasjon = utledBehandlesAvApplikasjon(oppgavetype),
+                    mappeId = oppgaveService.finnMappe(mapEnhet(), OppgaveMappe.KLAR).id,
+                ),
+                oppgave.gsakOppgaveId,
+            ).id
     }
 
     private fun mapEnhet() = "4462" // Tilleggsstønad INN, som er Nasjonal kø for NAY tilleggsstønader
