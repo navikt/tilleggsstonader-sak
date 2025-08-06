@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.forslag
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -16,22 +17,24 @@ import java.util.UUID
 
 object ForeslåVedtaksperiode {
     fun finnVedtaksperiodeV2(
+        stønadstype: Stønadstype,
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
     ): List<Vedtaksperiode> {
         val forslag = ForeslåVedtaksperioderV2Util.foreslåPerioder(vilkårperioder, vilkår)
-        return beholdTidligereIdnForVedtaksperioder(forrigeVedtaksperioder, forslag, tidligsteEndring)
+        return beholdTidligereIdnForVedtaksperioder(stønadstype, forrigeVedtaksperioder, forslag, tidligsteEndring)
     }
 
     fun finnVedtaksperiodeUtenVilkårV2(
+        stønadstype: Stønadstype,
         vilkårperioder: Vilkårperioder,
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
     ): List<Vedtaksperiode> {
         val forslag = ForeslåVedtaksperioderV2Util.foreslåPerioderUtenVilkår(vilkårperioder)
-        return beholdTidligereIdnForVedtaksperioder(forrigeVedtaksperioder, forslag, tidligsteEndring)
+        return beholdTidligereIdnForVedtaksperioder(stønadstype, forrigeVedtaksperioder, forslag, tidligsteEndring)
     }
 
     @Deprecated("Skal erstattes av finnVedtaksperiodeV2")

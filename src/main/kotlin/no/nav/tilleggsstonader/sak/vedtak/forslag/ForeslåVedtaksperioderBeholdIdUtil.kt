@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.forslag
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
@@ -11,12 +12,14 @@ import java.util.UUID
 
 object ForeslåVedtaksperioderBeholdIdUtil {
     fun beholdTidligereIdnForVedtaksperioder(
+        stønadstype: Stønadstype,
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
     ): List<Vedtaksperiode> {
         val aktuelleVedtaksperioder =
             finnAktuelleVedtaksperioder(
+                stønadstype = stønadstype,
                 forrigeVedtaksperioder = forrigeVedtaksperioder,
                 forslag = forslag,
                 tidligsteEndring = tidligsteEndring,
@@ -36,6 +39,7 @@ object ForeslåVedtaksperioderBeholdIdUtil {
      * Vi skal ikke foreslå perioder før revurder fra, der må vi beholde alle perioder som tidligere
      */
     private fun finnAktuelleVedtaksperioder(
+        stønadstype: Stønadstype,
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
@@ -55,7 +59,7 @@ object ForeslåVedtaksperioderBeholdIdUtil {
             }
         return Vedtaksperioder(
             forrigeVedtaksperioderSkalIkkeEndres = forrigeVedtaksperioderSkalIkkeEndres,
-            forrigeVedtaksperioder = forrigeVedtaksperioder.leggTilEnDagPåSistePerioden(),
+            forrigeVedtaksperioder = forrigeVedtaksperioder.leggTilEnDagPåSistePerioden(stønadstype),
             forslagEtterTidligsteEndring = forslagEtterTidligsteEndring,
         )
     }
@@ -69,14 +73,21 @@ object ForeslåVedtaksperioderBeholdIdUtil {
      * og den nye dagen som gjør at den siste forrige vedtaksperioden forlenges
      *
      * Dette gjøres på grunn av at forslaget er avkortet i forhold til tidligste endringen
+     *
+     * Skal ikke avkorte for læremidler,
+     * då man har forskuddsutbetaling og ikke skal laga et nytt forslag som betales ut i forrige periode.
      */
-    private fun List<Vedtaksperiode>.leggTilEnDagPåSistePerioden() =
-        this.dropLast(1) +
-            listOfNotNull(
-                this
-                    .lastOrNull()
-                    ?.let { it.copy(tom = it.tom.plusDays(1)) },
-            )
+    private fun List<Vedtaksperiode>.leggTilEnDagPåSistePerioden(stønadstype: Stønadstype) =
+        if (stønadstype == Stønadstype.LÆREMIDLER) {
+            this
+        } else {
+            this.dropLast(1) +
+                listOfNotNull(
+                    this
+                        .lastOrNull()
+                        ?.let { it.copy(tom = it.tom.plusDays(1)) },
+                )
+        }
 
     private data class Vedtaksperioder(
         val forrigeVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,

@@ -41,6 +41,18 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
       | 1  | 01.01.2023 | 31.01.2023 | UTDANNING | ENSLIG_FORSØRGER    |
       | 2  | 01.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
+  Scenario: Revurder fra 1 dag etter TOM i tidligere vedtaksperiode for læremidler - skal IKKE forlenge siste perioden
+
+    Når følgende stønadstype=LÆREMIDLER
+
+    Når forslag til vedtaksperioder behold id lages tidligsteEndring=16.03.2023
+
+    Så forvent følgende vedtaksperioder med riktig id
+      | Id | Fom        | Tom        | aktivitet | målgruppe           |
+      | 1  | 01.01.2023 | 31.01.2023 | UTDANNING | ENSLIG_FORSØRGER    |
+      | 2  | 01.03.2023 | 15.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | -1 | 16.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+
   Scenario: Revurder fra 2 dager etter TOM i tidligere vedtaksperiode - skal legge til ny periode etter tidligere perioder
 
     Når forslag til vedtaksperioder behold id lages tidligsteEndring=17.03.2023
