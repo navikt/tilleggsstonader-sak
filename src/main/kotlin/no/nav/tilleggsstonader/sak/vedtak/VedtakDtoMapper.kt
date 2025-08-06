@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
@@ -49,7 +50,6 @@ class VedtakDtoMapper(
             is VedtakTilsynBarn -> mapVedtakTilsynBarn(vedtak, data, vedtak.tidligsteEndring ?: revurderFra, forrigeIverksatteBehandlingId)
             is VedtakLæremidler -> mapVedtakLæremidler(vedtak, data, vedtak.tidligsteEndring ?: revurderFra, forrigeIverksatteBehandlingId)
             is VedtakBoutgifter -> mapVedtakBoutgifter(vedtak, data, vedtak.tidligsteEndring ?: revurderFra, forrigeIverksatteBehandlingId)
-            else -> error("Ukjent vedtakstype: ${data.type}")
         }
     }
 
@@ -61,16 +61,9 @@ class VedtakDtoMapper(
     ): VedtakTilsynBarnResponse =
         when (data) {
             is InnvilgelseTilsynBarn -> {
-                val forrigeVedtaksperioder =
-                    forrigeIverksatteBehandlingId?.let {
-                        vedtaksperiodeService.finnVedtaksperioderForBehandling(
-                            it,
-                            null,
-                        )
-                    }
                 InnvilgelseTilsynBarnResponse(
                     beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
-                    vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(forrigeVedtaksperioder),
+                    vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
                     begrunnelse = data.begrunnelse,
                 )
             }
@@ -98,18 +91,11 @@ class VedtakDtoMapper(
     ): VedtakLæremidlerResponse =
         when (data) {
             is InnvilgelseLæremidler -> {
-                val tidligereVedtaksperioder =
-                    forrigeIverksatteBehandlingId?.let {
-                        vedtaksperiodeService.finnVedtaksperioderForBehandling(
-                            it,
-                            null,
-                        )
-                    }
                 InnvilgelseLæremidlerResponse(
                     vedtaksperioder =
                         data.vedtaksperioder
                             .map { it.tilFellesDomeneVedtaksperiode() }
-                            .tilVedtaksperiodeDto(tidligereVedtaksperioder),
+                            .tilVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
                     beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
@@ -127,7 +113,11 @@ class VedtakDtoMapper(
                 OpphørLæremidlerResponse(
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
-                    vedtaksperioder = data.vedtaksperioder.tilDto(),
+                    vedtaksperioder =
+                        data.vedtaksperioder
+                            .map {
+                                it.tilFellesDomeneVedtaksperiode()
+                            }.tilVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
                     opphørsdato = vedtak.opphørsdato,
                 )
         }
@@ -140,16 +130,8 @@ class VedtakDtoMapper(
     ): VedtakBoutgifterResponse =
         when (data) {
             is InnvilgelseBoutgifter -> {
-                val tidligereVedtaksperioder =
-                    forrigeIverksatteBehandlingId?.let {
-                        vedtaksperiodeService.finnVedtaksperioderForBehandling(
-                            it,
-                            null,
-                        )
-                    }
-
                 InnvilgelseBoutgifterResponse(
-                    vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(tidligereVedtaksperioder),
+                    vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
                     beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
@@ -167,8 +149,16 @@ class VedtakDtoMapper(
                 OpphørBoutgifterResponse(
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
-                    vedtaksperioder = data.vedtaksperioder.tilDto(),
+                    vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
                     opphørsdato = vedtak.opphørsdato,
                 )
+        }
+
+    private fun hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId: BehandlingId?): List<Vedtaksperiode>? =
+        forrigeIverksatteBehandlingId?.let {
+            vedtaksperiodeService.finnVedtaksperioderForBehandling(
+                it,
+                null,
+            )
         }
 }

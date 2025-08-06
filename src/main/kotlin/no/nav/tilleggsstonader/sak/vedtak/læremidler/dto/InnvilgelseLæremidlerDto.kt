@@ -20,7 +20,7 @@ data class InnvilgelseLæremidlerResponse(
     VedtakLæremidlerResponse
 
 data class InnvilgelseLæremidlerRequest(
-    val vedtaksperioder: List<VedtaksperiodeLæremidlerDto>,
+    val vedtaksperioder: List<VedtaksperiodeDto>,
     val begrunnelse: String? = null,
 ) : VedtakLæremidlerDto(TypeVedtak.INNVILGELSE),
     VedtakLæremidlerRequest

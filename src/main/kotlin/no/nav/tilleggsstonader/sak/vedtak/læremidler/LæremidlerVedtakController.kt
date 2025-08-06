@@ -12,7 +12,9 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperioderLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
@@ -20,8 +22,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatLær
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeLæremidlerDto
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -81,19 +81,19 @@ class LæremidlerVedtakController(
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtaksperioder: List<VedtaksperiodeLæremidlerDto>,
+        @RequestBody vedtaksperioder: List<VedtaksperiodeDto>,
     ): BeregningsresultatLæremidlerDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(
                 behandling.id,
-                vedtaksperioder.tilDomene().map { it.tilFellesDomeneVedtaksperiode() },
+                vedtaksperioder.tilDomene(),
             )
         return beregningService
             .beregn(
                 behandling,
-                vedtaksperioder.tilDomene(),
+                vedtaksperioder.tilVedtaksperioderLæremidler(),
                 tidligsteEndring,
             ).tilDto(tidligsteEndring = tidligsteEndring)
     }

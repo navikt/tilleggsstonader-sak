@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperioderLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.VedtaksperiodeStatusMapper.settStatusPåVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
@@ -31,7 +32,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -59,7 +59,7 @@ class LæremidlerBeregnYtelseSteg(
             is InnvilgelseLæremidlerRequest ->
                 beregnOgLagreInnvilgelse(
                     saksbehandling = saksbehandling,
-                    vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
+                    vedtaksperioder = vedtak.vedtaksperioder.tilVedtaksperioderLæremidler(),
                     begrunnelse = vedtak.begrunnelse,
                 )
 
