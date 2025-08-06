@@ -15,7 +15,7 @@ data class VedtaksperiodeDto(
     override val tom: LocalDate,
     val målgruppeType: FaktiskMålgruppe,
     val aktivitetType: AktivitetType,
-    val status: VedtaksperiodeStatus,
+    val status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
 ) : Periode<LocalDate>,
     KopierPeriode<VedtaksperiodeDto> {
     override fun medPeriode(
