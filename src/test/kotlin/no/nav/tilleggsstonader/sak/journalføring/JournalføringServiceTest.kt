@@ -21,7 +21,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
+import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -61,7 +61,7 @@ class JournalføringServiceTest {
     val barnService = mockk<BarnService>()
     val personService = mockk<PersonService>()
     val oppgaveService = mockk<OppgaveService>()
-    val gjennbrukDataRevurderingService = mockk<GjennbrukDataRevurderingService>(relaxed = true)
+    val gjenbrukDataRevurderingService = mockk<GjenbrukDataRevurderingService>(relaxed = true)
     val klageService = mockk<KlageService>()
 
     val journalføringService =
@@ -75,7 +75,7 @@ class JournalføringServiceTest {
             TransactionHandler(),
             personService,
             oppgaveService,
-            gjennbrukDataRevurderingService,
+            gjenbrukDataRevurderingService,
             klageService,
         )
 
@@ -132,7 +132,7 @@ class JournalføringServiceTest {
         }
         every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
 
-        every { gjennbrukDataRevurderingService.finnBehandlingIdForGjenbruk(any<Behandling>()) } returns null
+        every { gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(any<Behandling>()) } returns null
     }
 
     @AfterEach
@@ -332,7 +332,7 @@ class JournalføringServiceTest {
 
         @Test
         fun `skal gjennbruke data fra tidligere behandling`() {
-            every { gjennbrukDataRevurderingService.finnBehandlingIdForGjenbruk(any<Behandling>()) } returns
+            every { gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(any<Behandling>()) } returns
                 forrigeBehandling.id
 
             journalføringService.journalførTilNyBehandling(
@@ -345,7 +345,7 @@ class JournalføringServiceTest {
             )
 
             verify(exactly = 1) {
-                gjennbrukDataRevurderingService.gjenbrukData(
+                gjenbrukDataRevurderingService.gjenbrukData(
                     nyBehandling,
                     forrigeBehandling.id,
                 )

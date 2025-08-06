@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class GjennbrukDataRevurderingService(
+class GjenbrukDataRevurderingService(
     private val behandlingService: BehandlingService,
     private val barnService: BarnService,
     private val vilkårperiodeService: VilkårperiodeService,

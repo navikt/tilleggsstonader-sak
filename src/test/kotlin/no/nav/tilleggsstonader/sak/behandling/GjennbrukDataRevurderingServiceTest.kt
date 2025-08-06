@@ -28,7 +28,7 @@ class GjennbrukDataRevurderingServiceTest {
         )
 
     val service =
-        GjennbrukDataRevurderingService(
+        GjenbrukDataRevurderingService(
             behandlingService = behandlingService,
             barnService = mockk(),
             vilkårperiodeService = mockk(),
