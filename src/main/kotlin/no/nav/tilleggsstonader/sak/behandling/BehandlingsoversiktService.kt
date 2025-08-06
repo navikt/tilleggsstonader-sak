@@ -41,7 +41,6 @@ class BehandlingsoversiktService(
         val behandlinger = behandlingRepository.findByFagsakId(fagsakId = fagsak.id)
 
         val vedtaksperioder = hentVedtaksperioder(behandlinger)
-        val opphørsdato = hentOpphørsdato(behandlinger)
 
         return FagsakMedBehandlinger(
             fagsakId = fagsak.id,
@@ -69,7 +68,7 @@ class BehandlingsoversiktService(
                         henlagtBegrunnelse = it.henlagtBegrunnelse,
                         revurderFra = it.revurderFra,
                         vedtaksperiode = vedtaksperioder[it.id],
-                        opphørsdato = opphørsdato[it.id] ?: it.revurderFra,
+                        opphørsdato = if (it.erOpphørt()) hentOpphørsdato(it) else null,
                     )
                 },
         )
@@ -91,11 +90,7 @@ class BehandlingsoversiktService(
         }
     }
 
-    private fun hentOpphørsdato(behandlinger: List<Behandling>): Map<BehandlingId?, LocalDate?> {
-        val opphørtBehandlinger = behandlinger.filter { it.resultat == BehandlingResultat.OPPHØRT }
-        val opphørtVedtaker = opphørtBehandlinger.map { it -> vedtakService.hentVedtak(it.id) }
-        return opphørtVedtaker.associate { it?.behandlingId to it?.opphørsdato }
-    }
+    private fun hentOpphørsdato(behandling: Behandling): LocalDate? = vedtakService.hentVedtak(behandling.id)?.opphørsdato
 
     /**
      * Slår sammen alle vedtaksperioder som finnes i en behandling slik at oversikten kun viser en periode.
