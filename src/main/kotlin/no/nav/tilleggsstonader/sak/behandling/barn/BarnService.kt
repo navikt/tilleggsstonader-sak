@@ -32,20 +32,24 @@ class BarnService(
         return nyeBarnPåGammelId.map { it.key to it.value.id }.toMap()
     }
 
+    /**
+     * Når det skal gjenbrukes grunnlagsdata fra en annen behandling, så må eventuelle nye barn som har kommet til i nye søknader
+     * mellomtiden også bli med over.
+     *
+     * Eksempel: Når en behandling tas av vent, kan det ha blitt fattet nye vedtak på fagsaken i mellomtiden. Potensielt nye barn i disse
+     * vedtakene må kopieres over i behandlingen som tas av vent.
+     */
     fun kopierManglendeBarnFraForrigeBehandling(
-        forrigeBehandlingId: BehandlingId,
-        nyBehandling: Behandling,
+        forrigeBehandlingMedEventuelleNyeBarn: BehandlingId,
+        gjeldendeBehandling: Behandling,
     ) {
-        val barnPåForrigeBehandling = finnBarnPåBehandling(forrigeBehandlingId)
-        val barnPåBehandlingSomSkalTasAvVent = finnBarnPåBehandling(nyBehandling.id)
-
-        val identerPåVent = barnPåBehandlingSomSkalTasAvVent.map { it.ident }.toSet()
-        val barnSomMåLeggesTilBehandlingSomSkalTasAvVent =
-            barnPåForrigeBehandling.filter { it.ident !in identerPåVent }
+        val barneidenterPåGjeldendeBehandling = finnBarnPåBehandling(gjeldendeBehandling.id).map { it.ident }.toSet()
+        val barnSomMåLeggesTil =
+            finnBarnPåBehandling(forrigeBehandlingMedEventuelleNyeBarn).filter { it.ident !in barneidenterPåGjeldendeBehandling }
 
         val nyeBarn =
-            barnSomMåLeggesTilBehandlingSomSkalTasAvVent.map {
-                it.copy(behandlingId = nyBehandling.id, id = BarnId.random(), sporbar = Sporbar())
+            barnSomMåLeggesTil.map {
+                it.copy(behandlingId = gjeldendeBehandling.id, id = BarnId.random(), sporbar = Sporbar())
             }
 
         barnRepository.insertAll(nyeBarn)
