@@ -51,6 +51,7 @@ data class BehandlingDetaljer(
     val henlagtBegrunnelse: String?,
     val revurderFra: LocalDate?,
     val vedtaksperiode: Vedtaksperiode?,
+    val opphørsdato: LocalDate?,
 )
 
 data class Vedtaksperiode(

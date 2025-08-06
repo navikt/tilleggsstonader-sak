@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
@@ -29,6 +30,7 @@ import java.util.UUID
 
 class BehandlingsoversiktServiceTest {
     val fagsakService = mockk<FagsakService>()
+    val vedtakService = mockk<VedtakService>()
     val behandlingRepository = mockk<BehandlingRepository>()
     val vedtakRepository = mockk<VedtakRepository>()
     val vedtaksperiodeService = VedtaksperiodeService(vedtakRepository)
@@ -38,6 +40,7 @@ class BehandlingsoversiktServiceTest {
             fagsakService = fagsakService,
             behandlingRepository = behandlingRepository,
             vedtaksperiodeService = vedtaksperiodeService,
+            vedtakService = vedtakService,
         )
 
     val fagsak = fagsak()
