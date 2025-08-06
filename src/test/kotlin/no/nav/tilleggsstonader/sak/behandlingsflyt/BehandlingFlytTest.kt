@@ -33,7 +33,6 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto

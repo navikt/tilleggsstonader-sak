@@ -18,7 +18,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Uke
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.tilUke
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import org.assertj.core.api.Assertions.assertThat
 
 @Suppress("ktlint:standard:function-naming", "unused")
