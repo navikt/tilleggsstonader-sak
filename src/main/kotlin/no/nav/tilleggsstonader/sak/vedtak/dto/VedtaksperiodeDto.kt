@@ -9,20 +9,46 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 import java.util.UUID
 
-data class VedtaksperiodeDto(
-    val id: UUID,
+interface VedtaksperiodeDtoInterface : Periode<LocalDate> {
+    val id: UUID
+    override val fom: LocalDate
+    override val tom: LocalDate
+    val målgruppeType: FaktiskMålgruppe
+    val aktivitetType: AktivitetType
+}
+
+data class LagretVedtaksperiodeDto(
+    override val id: UUID,
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val målgruppeType: FaktiskMålgruppe,
-    val aktivitetType: AktivitetType,
+    override val målgruppeType: FaktiskMålgruppe,
+    override val aktivitetType: AktivitetType,
     val status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
-) : Periode<LocalDate>,
-    KopierPeriode<VedtaksperiodeDto> {
+    val forrigeVedtaksperiode: VedtaksperiodeDto?,
+) : VedtaksperiodeDtoInterface,
+    KopierPeriode<LagretVedtaksperiodeDto> {
     override fun medPeriode(
         fom: LocalDate,
         tom: LocalDate,
-    ): VedtaksperiodeDto = this.copy(fom = fom, tom = tom)
+    ): LagretVedtaksperiodeDto = this.copy(fom = fom, tom = tom)
 
+    fun tilVedtaksperiodeDto() =
+        VedtaksperiodeDto(
+            id = id,
+            fom = fom,
+            tom = tom,
+            målgruppeType = målgruppeType,
+            aktivitetType = aktivitetType,
+        )
+}
+
+data class VedtaksperiodeDto(
+    override val id: UUID = UUID.randomUUID(),
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    override val målgruppeType: FaktiskMålgruppe,
+    override val aktivitetType: AktivitetType,
+) : VedtaksperiodeDtoInterface {
     fun tilDomene() =
         Vedtaksperiode(
             id = id,
@@ -39,19 +65,29 @@ enum class VedtaksperiodeStatus {
     UENDRET,
 }
 
-fun List<Vedtaksperiode>.tilVedtaksperiodeDto(tidligereVedtaksperioder: List<Vedtaksperiode>?) =
+fun List<Vedtaksperiode>.tilLagretVedtaksperiodeDto(tidligereVedtaksperioder: List<Vedtaksperiode>?) =
     map {
-        it.tilDto(tidligereVedtaksperioder?.find { v -> v.id == it.id })
+        it.tilLagretVedtaksperiodeDto(tidligereVedtaksperioder?.find { v -> v.id == it.id })
     }
 
-fun Vedtaksperiode.tilDto(forrigeVedtaksperiode: Vedtaksperiode?) =
-    VedtaksperiodeDto(
+fun Vedtaksperiode.tilLagretVedtaksperiodeDto(forrigeVedtaksperiode: Vedtaksperiode?) =
+    LagretVedtaksperiodeDto(
         id = id,
         fom = fom,
         tom = tom,
         målgruppeType = målgruppe,
         aktivitetType = aktivitet,
         status = utledStatus(forrigeVedtaksperiode),
+        forrigeVedtaksperiode = forrigeVedtaksperiode?.tilDto(),
+    )
+
+fun Vedtaksperiode.tilDto() =
+    VedtaksperiodeDto(
+        id = id,
+        fom = fom,
+        tom = tom,
+        målgruppeType = målgruppe,
+        aktivitetType = aktivitet,
     )
 
 private fun Vedtaksperiode.utledStatus(forrigeVedtaksperiode: Vedtaksperiode?): VedtaksperiodeStatus =

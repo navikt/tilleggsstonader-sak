@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
@@ -50,7 +51,7 @@ fun lagTilsynBarnInnvilgelseMedBeløp(
         )
     val grunnlag =
         VedtaksperiodeGrunnlag(
-            vedtaksperiode = VedtaksperiodeBeregning(vedtaksperiode.tilDto(null)),
+            vedtaksperiode = VedtaksperiodeBeregning(vedtaksperiode.tilDto()),
             aktiviteter = listOf<Aktivitet>(aktivitet),
             antallDager = 25,
         )

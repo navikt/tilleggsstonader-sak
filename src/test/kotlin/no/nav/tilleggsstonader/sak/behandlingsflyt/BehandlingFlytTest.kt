@@ -436,7 +436,6 @@ class BehandlingFlytTest : IntegrationTest() {
                     tom = LocalDate.of(2024, 1, 31),
                     målgruppeType = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitetType = AktivitetType.TILTAK,
-                    status = VedtaksperiodeStatus.NY,
                 ),
             )
         tilsynBarnVedtakController.lagreVedtak(

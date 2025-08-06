@@ -87,7 +87,6 @@ class TilsynBarnBeregnYtelseStegTest {
             tom = tom,
             målgruppeType = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
             aktivitetType = AktivitetType.TILTAK,
-            status = VedtaksperiodeStatus.NY,
         )
 
     @BeforeEach

@@ -51,6 +51,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BoutgifterDomenenøkkel
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -237,7 +238,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 behandlingId = behandlingId,
                 steg = StegType.BEREGNE_YTELSE,
             )
-        val vedtaksperioder = mapVedtaksperioder(dataTable).map { it.tilDto(null) }
+        val vedtaksperioder = mapVedtaksperioder(dataTable).map { it.tilDto() }
 
         kjørMedFeilkontekst {
             steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseBoutgifterRequest(vedtaksperioder))
@@ -308,7 +309,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     ) {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
-        val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto(null) }
+        val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto() }
 
         every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns revurderFra
 

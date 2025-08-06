@@ -37,7 +37,6 @@ class VedtaksperiodeTest {
                     tom = tom,
                     målgruppeType = målgruppe,
                     aktivitetType = aktivitet,
-                    status = VedtaksperiodeStatus.NY,
                 ),
             )
 

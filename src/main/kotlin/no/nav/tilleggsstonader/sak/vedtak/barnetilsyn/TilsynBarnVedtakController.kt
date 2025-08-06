@@ -17,10 +17,11 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnR
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -122,7 +123,7 @@ class TilsynBarnVedtakController(
     @GetMapping("{behandlingId}/foresla")
     fun foreslåVedtaksperioder(
         @PathVariable behandlingId: BehandlingId,
-    ): List<VedtaksperiodeDto> {
+    ): List<LagretVedtaksperiodeDto> {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
@@ -136,7 +137,7 @@ class TilsynBarnVedtakController(
                 )
             }
 
-        return foreslåVedtaksperiodeService.foreslåPerioder(behandlingId).tilVedtaksperiodeDto(
+        return foreslåVedtaksperiodeService.foreslåPerioder(behandlingId).tilLagretVedtaksperiodeDto(
             tidligereVedtaksperioder = forrigeVedtaksperioder,
         )
     }

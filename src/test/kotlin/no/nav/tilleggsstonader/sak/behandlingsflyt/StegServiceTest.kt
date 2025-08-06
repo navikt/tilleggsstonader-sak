@@ -323,7 +323,6 @@ class StegServiceTest : IntegrationTest() {
                     tom = LocalDate.of(2023, 1, 31),
                     målgruppeType = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitetType = AktivitetType.TILTAK,
-                    status = VedtaksperiodeStatus.NY,
                 ),
             )
         return InnvilgelseTilsynBarnRequest(

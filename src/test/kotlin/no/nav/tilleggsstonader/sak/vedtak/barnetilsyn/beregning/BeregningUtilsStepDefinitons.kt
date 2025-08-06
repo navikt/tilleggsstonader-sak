@@ -17,7 +17,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.PeriodeMedDager
 import no.nav.tilleggsstonader.sak.vedtak.domain.Uke
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.tilUke
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import org.assertj.core.api.Assertions.assertThat
 
 @Suppress("ktlint:standard:function-naming", "unused")
@@ -32,7 +33,7 @@ class BeregningUtilsStepDefinitons {
 
     @Gitt("disse vedtaksperiodene")
     fun `denne vedtaksperioden`(dataTable: DataTable) {
-        vedtaksperiodeBeregning = VedtaksperiodeBeregning(mapVedtaksperioder(dataTable).tilVedtaksperiodeDto(emptyList()).first())
+        vedtaksperiodeBeregning = VedtaksperiodeBeregning(mapVedtaksperioder(dataTable).map { it.tilDto() }.first())
     }
 
     @Gitt("disse aktivitetene")

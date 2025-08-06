@@ -19,10 +19,10 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRe
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.VedtaksperioderOversiktService
 import org.springframework.web.bind.annotation.GetMapping
@@ -125,7 +125,7 @@ class BoutgifterVedtakController(
     @GetMapping("{behandlingId}/foresla")
     fun foreslåVedtaksperioder(
         @PathVariable behandlingId: BehandlingId,
-    ): List<VedtaksperiodeDto> {
+    ): List<LagretVedtaksperiodeDto> {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
@@ -139,7 +139,7 @@ class BoutgifterVedtakController(
                 )
             }
 
-        return foreslåVedtaksperiodeService.foreslåPerioder(behandlingId).tilVedtaksperiodeDto(
+        return foreslåVedtaksperiodeService.foreslåPerioder(behandlingId).tilLagretVedtaksperiodeDto(
             tidligereVedtaksperioder = forrigeVedtaksperioder,
         )
     }

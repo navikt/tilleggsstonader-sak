@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.behandlingId
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.avslagVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
@@ -11,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeStatus
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
 import org.assertj.core.api.Assertions.assertThat
@@ -56,10 +56,16 @@ class VedtakDtoMapperTest {
             assertThat(dto).isInstanceOf(InnvilgelseTilsynBarnResponse::class.java)
 
             val vedtakResponse = dto as InnvilgelseTilsynBarnResponse
-            assertThat(vedtakResponse.vedtaksperioder)
-                .singleElement()
-                .extracting { it.status }
-                .isEqualTo(VedtaksperiodeStatus.UENDRET)
+            assertThat(vedtakResponse.vedtaksperioder).hasSize(1)
+
+            val vedtaksperiodeIRespons = vedtakResponse.vedtaksperioder!!.single()
+            assertThat(
+                vedtaksperiodeIRespons.forrigeVedtaksperiode,
+            ).isEqualTo(
+                tidligereInnvilgetVedtak.data.vedtaksperioder
+                    .single()
+                    .tilDto(),
+            )
         }
 
         @Test

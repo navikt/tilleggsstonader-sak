@@ -10,10 +10,11 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
+import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperioderLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
@@ -123,7 +124,7 @@ class LæremidlerVedtakController(
     @GetMapping("{behandlingId}/foresla")
     fun foreslåVedtaksperioder(
         @PathVariable behandlingId: BehandlingId,
-    ): List<VedtaksperiodeDto> {
+    ): List<LagretVedtaksperiodeDto> {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
@@ -140,7 +141,7 @@ class LæremidlerVedtakController(
         return foreslåVedtaksperiodeService
             .foreslåVedtaksperioderLæremidler(behandlingId)
             .map { it.tilFellesDomeneVedtaksperiode() }
-            .tilVedtaksperiodeDto(
+            .tilLagretVedtaksperiodeDto(
                 tidligereVedtaksperioder = forrigeVedtaksperioder,
             )
     }
