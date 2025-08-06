@@ -1,13 +1,16 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
+import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.behandlingId
+import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.avslagVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
 import org.assertj.core.api.Assertions.assertThat
@@ -28,6 +31,35 @@ class VedtakDtoMapperTest {
             val dto = vedtakDtoMapper.toDto(vedtak, revurderFra = null, forrigeIverksatteBehandlingId = null)
 
             assertThat(dto).isInstanceOf(InnvilgelseTilsynBarnResponse::class.java)
+        }
+
+        @Test
+        fun `skal mappe innvilget vedtak til dto med riktig statuser`() {
+            val vedtaksperiode = vedtaksperiode()
+            val tidligereInnvilgetVedtak =
+                innvilgetVedtak(
+                    vedtaksperioder = listOf(vedtaksperiode),
+                ).copy(behandlingId = BehandlingId.random())
+
+            val vedtak = innvilgetVedtak(vedtaksperioder = listOf(vedtaksperiode))
+
+            every { vedtaksperiodeService.finnVedtaksperioderForBehandling(tidligereInnvilgetVedtak.behandlingId, any()) } returns
+                tidligereInnvilgetVedtak.data.vedtaksperioder
+
+            val dto =
+                vedtakDtoMapper.toDto(
+                    vedtak,
+                    revurderFra = null,
+                    forrigeIverksatteBehandlingId = tidligereInnvilgetVedtak.behandlingId,
+                )
+
+            assertThat(dto).isInstanceOf(InnvilgelseTilsynBarnResponse::class.java)
+
+            val vedtakResponse = dto as InnvilgelseTilsynBarnResponse
+            assertThat(vedtakResponse.vedtaksperioder)
+                .singleElement()
+                .extracting { it.status }
+                .isEqualTo(VedtaksperiodeStatus.UENDRET)
         }
 
         @Test
