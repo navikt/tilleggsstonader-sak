@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
+import no.nav.tilleggsstonader.sak.util.min
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import java.time.LocalDate
 import java.util.UUID
@@ -40,16 +41,18 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         forslag: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
     ): Vedtaksperioder {
+        val kanEndrePerioderFraOgMed = min(tidligsteEndring, forrigeVedtaksperioder.maxOfOrNull { it.tom }?.plusDays(1))
+
         val forrigeVedtaksperioderSkalIkkeEndres =
-            if (tidligsteEndring != null) {
-                forrigeVedtaksperioder.avkortFraOgMed(tidligsteEndring.minusDays(1))
+            if (kanEndrePerioderFraOgMed != null) {
+                forrigeVedtaksperioder.avkortFraOgMed(kanEndrePerioderFraOgMed.minusDays(1))
             } else {
-                emptyList()
+                forrigeVedtaksperioder
             }
 
         val forslagEtterTidligsteEndring =
-            if (tidligsteEndring != null) {
-                forslag.avkortPerioderFør(tidligsteEndring)
+            if (kanEndrePerioderFraOgMed != null) {
+                forslag.avkortPerioderFør(kanEndrePerioderFraOgMed)
             } else {
                 forslag
             }
@@ -188,7 +191,8 @@ private class ForeslåVedtaksperioderBeholdId(
             .asSequence()
             .filterNot { gjenbrukteIdn.contains(it.id) }
             .mapNotNull { forrigeVedtaksperiode ->
-                delAvForslag.beregnSnitt(forrigeVedtaksperiode)
+                delAvForslag
+                    .beregnSnitt(forrigeVedtaksperiode)
                     ?.let { snitt -> ForrigeVedtaksperiodeMedSnitt(forrigeVedtaksperiode, snitt) }
             }.firstOrNull()
 

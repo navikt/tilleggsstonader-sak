@@ -14,6 +14,15 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
 import java.util.UUID
 
+/**
+ * Foreslå vedtaksperioder gir et forslag på perioder ut fra målgrupper, aktiviteter og vilkår.
+ *
+ * I en revurdering fylles hull i med nye vedtaksperioder.
+ * Dvs både hull mellom 2 tidligere vedtaksperioder og hull etter tidligere vedtaksperioder.
+ *
+ * Hvis man har en [tidligsteEndring] endres ikke målgruppe/aktivitet før det datoet.
+ * Hvis man mangler eller har en [tidligsteEndring] frem i tiden, fylles hull etter den siste tidligere vedtaksperioden.
+ */
 object ForeslåVedtaksperiode {
     fun finnVedtaksperiodeV2(
         vilkårperioder: Vilkårperioder,

@@ -51,7 +51,7 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
       | 1  | 01.01.2023 | 31.01.2023 | UTDANNING | ENSLIG_FORSØRGER    |
       | 2  | 01.03.2023 | 15.03.2023 | UTDANNING | ENSLIG_FORSØRGER    |
-      | -1 | 17.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | -1 | 16.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
   Scenario: Revurder fra 1 dag før TOM i tidligere vedtaksperiode
 
