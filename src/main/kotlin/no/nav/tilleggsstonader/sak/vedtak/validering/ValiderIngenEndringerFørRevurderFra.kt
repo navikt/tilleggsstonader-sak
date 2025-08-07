@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.validering
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.PeriodeMedId
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatus
 import java.time.LocalDate
 
 fun validerIngenEndringerFørRevurderFra(
