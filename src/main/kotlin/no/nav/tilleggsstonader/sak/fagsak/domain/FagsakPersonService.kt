@@ -16,8 +16,6 @@ class FagsakPersonService(
 ) {
     fun hentPerson(personId: FagsakPersonId): FagsakPerson = fagsakPersonRepository.findByIdOrThrow(personId)
 
-    fun hentPersoner(personId: List<FagsakPersonId>): Iterable<FagsakPerson> = fagsakPersonRepository.findAllById(personId)
-
     fun finnPerson(personIdenter: Set<String>): FagsakPerson? = fagsakPersonRepository.findByIdent(personIdenter)
 
     fun hentIdenter(personId: FagsakPersonId): Set<PersonIdent> {

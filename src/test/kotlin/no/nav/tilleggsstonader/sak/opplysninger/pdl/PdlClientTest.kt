@@ -5,7 +5,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
 import org.assertj.core.api.Assertions
@@ -13,10 +12,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertDoesNotThrow
-import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.web.client.RestTemplate
 import java.net.URI
@@ -153,44 +149,5 @@ class PdlClientTest {
         assertThat(Assertions.catchThrowable { pdlClient.hentBarn(listOf("")) })
             .hasMessageStartingWith("Data er null fra PDL")
             .isInstanceOf(PdlRequestException::class.java)
-    }
-
-    @Nested
-    inner class HentIdenterBolk {
-        @Test
-        fun `håndterer response for uthenting av identer i bolk`() {
-            wiremockServerItem.stubFor(
-                post(urlEqualTo("/${PdlConfig.PATH_GRAPHQL}"))
-                    .willReturn(okJson(readFile("pdl/hent_identer_bolk.json"))),
-            )
-            val response = pdlClient.hentIdenterBolk(listOf("12345"))
-            assertThat(response["12345678910"]?.ident).isEqualTo("11223344556677")
-            assertThat(response["12345678911"]?.ident).isEqualTo("12345678911")
-            assertThat(response["test"]?.ident).isEqualTo("test")
-        }
-
-        @Test
-        fun `feiler hvis antall identer overstiger MAKS_ANTALL_IDENTER`() {
-            assertThrows<Feil> { pdlClient.hentIdenterBolk((1..PdlClient.MAKS_ANTALL_IDENTER + 1).map { "$it" }) }
-        }
-
-        @Test
-        fun `kjører feilfritt hvis antall identer er lik MAKS_ANTALL_IDENTER`() {
-            wiremockServerItem.stubFor(
-                post(urlEqualTo("/${PdlConfig.PATH_GRAPHQL}"))
-                    .willReturn(okJson(readFile("pdl/hent_identer_bolk.json"))),
-            )
-            assertDoesNotThrow { pdlClient.hentIdenterBolk((1..PdlClient.MAKS_ANTALL_IDENTER).map { "$it" }) }
-        }
-
-        @Test
-        fun `skal håndtere hentIdenter hvor det ikke finnes en person`() {
-            wiremockServerItem.stubFor(
-                post(urlEqualTo("/${PdlConfig.PATH_GRAPHQL}"))
-                    .willReturn(okJson(readFile("pdl/hent_identer_finnes_ikke.json"))),
-            )
-
-            assertThrows<PdlNotFoundException> { pdlClient.hentPersonidenter("12345678901") }
-        }
     }
 }

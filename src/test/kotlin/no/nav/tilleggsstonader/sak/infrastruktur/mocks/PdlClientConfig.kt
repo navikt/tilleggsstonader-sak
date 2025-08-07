@@ -98,31 +98,6 @@ class PdlClientConfig {
                     )
                 }
             }
-
-            every { pdlClient.hentIdenterBolk(listOf("123", "456")) }
-                .returns(
-                    mapOf(
-                        "123" to PdlIdent("ny123", false, "FOLKEREGISTERIDENT"),
-                        "456" to PdlIdent("ny456", false, "FOLKEREGISTERIDENT"),
-                    ),
-                )
-
-            every { pdlClient.hentIdenterBolk(listOf("456", "123")) }
-                .returns(
-                    mapOf(
-                        "123" to PdlIdent("ny123", false, "FOLKEREGISTERIDENT"),
-                        "456" to PdlIdent("ny456", false, "FOLKEREGISTERIDENT"),
-                    ),
-                )
-
-            every { pdlClient.hentIdenterBolk(listOf("111", "222")) }
-                .returns(
-                    mapOf(
-                        "111" to PdlIdent("111", false, "FOLKEREGISTERIDENT"),
-                        "222" to PdlIdent("222", false, "FOLKEREGISTERIDENT"),
-                    ),
-                )
-
             every { pdlClient.hentGeografiskTilknytning(any()) } returns
                 GeografiskTilknytningDto(
                     gtBydel = "030103",
