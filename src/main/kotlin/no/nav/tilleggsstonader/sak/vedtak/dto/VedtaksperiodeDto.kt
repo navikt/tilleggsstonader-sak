@@ -24,7 +24,7 @@ data class LagretVedtaksperiodeDto(
     override val målgruppeType: FaktiskMålgruppe,
     override val aktivitetType: AktivitetType,
     val status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
-    val forrigeVedtaksperiode: VedtaksperiodeDto?,
+    val vedtaksperiodeFraForrigeVedtak: VedtaksperiodeDto?,
 ) : VedtaksperiodeDtoInterface,
     KopierPeriode<LagretVedtaksperiodeDto> {
     override fun medPeriode(
@@ -78,7 +78,7 @@ fun Vedtaksperiode.tilLagretVedtaksperiodeDto(forrigeVedtaksperiode: Vedtaksperi
         målgruppeType = målgruppe,
         aktivitetType = aktivitet,
         status = utledStatus(forrigeVedtaksperiode),
-        forrigeVedtaksperiode = forrigeVedtaksperiode?.tilDto(),
+        vedtaksperiodeFraForrigeVedtak = forrigeVedtaksperiode?.tilDto(),
     )
 
 fun Vedtaksperiode.tilDto() =

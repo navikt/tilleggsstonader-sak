@@ -59,7 +59,7 @@ class VedtakDtoMapperTest {
 
             val vedtaksperiodeIRespons = vedtakResponse.vedtaksperioder!!.single()
             assertThat(
-                vedtaksperiodeIRespons.forrigeVedtaksperiode,
+                vedtaksperiodeIRespons.vedtaksperiodeFraForrigeVedtak,
             ).isEqualTo(
                 tidligereInnvilgetVedtak.data.vedtaksperioder
                     .single()
