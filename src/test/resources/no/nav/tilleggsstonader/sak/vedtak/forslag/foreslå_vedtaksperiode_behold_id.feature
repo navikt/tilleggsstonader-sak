@@ -128,7 +128,7 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
       | 1  | 01.01.2023 | 31.01.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
-  Scenario: Skal forlenge siste tidligere vedtaksperiode og ikke kun beregne snitt og legge til en ny periode
+  Scenario: Målgruppe/aktivitet er forlenget og nytt forslag legges til
     Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag
       | Fom        | Tom        | type   |
       | 01.01.2023 | 31.05.2023 | TILTAK |
@@ -149,9 +149,10 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
 
     Så forvent følgende vedtaksperioder med riktig id
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
-      | 1  | 01.01.2023 | 31.05.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | 1  | 01.01.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | -1 | 01.04.2023 | 31.05.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
-  Scenario: Skal ikke forlenge siste tidligere vedtaksperiode bakover
+  Scenario: Skal legge til ny periode før tidligere vedtaksperiode hvis det finnes et hull
     Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag
       | Fom        | Tom        | type   |
       | 01.01.2023 | 31.05.2023 | TILTAK |
@@ -175,7 +176,7 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
       | -1 | 01.01.2023 | 28.02.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
       | 1  | 01.03.2023 | 31.05.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
-  Scenario: Skal forlenge siste tidligere vedtaksperiode og ikke kun beregne snitt og legge til en ny periode
+  Scenario: Fyller i hull fra tidligere vedtaksperioder, og legger til etter siste forrige periode
     Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag
       | Fom        | Tom        | type   |
       | 01.01.2023 | 31.05.2023 | TILTAK |
@@ -199,4 +200,5 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
       | 1  | 01.01.2023 | 31.01.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
       | -1 | 01.02.2023 | 28.02.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
-      | 2  | 01.03.2023 | 31.05.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | 2  | 01.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | -1 | 01.04.2023 | 31.05.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |

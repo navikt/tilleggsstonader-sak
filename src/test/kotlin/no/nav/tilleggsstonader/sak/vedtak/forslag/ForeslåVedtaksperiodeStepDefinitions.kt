@@ -4,7 +4,6 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.TestIdTilUUIDHolder.testIdTilUUID
@@ -45,8 +44,6 @@ enum class DomenenøkkelForeslåVedtaksperioder(
 class ForeslåVedtaksperiodeStepDefinitions {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    var stønadstype = Stønadstype.BARNETILSYN
-
     var aktiviteter: List<VilkårperiodeAktivitet> = emptyList()
     var målgrupper: List<VilkårperiodeMålgruppe> = emptyList()
     var vilkår: List<Vilkår> = emptyList()
@@ -55,11 +52,6 @@ class ForeslåVedtaksperiodeStepDefinitions {
     var resultat2: List<Vedtaksperiode> = emptyList()
     var feil: ApiFeil? = null
     var idSomSkalIgnoreres = mutableSetOf<UUID>()
-
-    @Gitt("følgende stønadstype={}")
-    fun `følgende stønadstype`(stønadstype: String) {
-        this.stønadstype = Stønadstype.valueOf(stønadstype)
-    }
 
     @Gitt("følgende vilkårsperioder med aktiviteter for vedtaksforslag")
     fun `følgende vilkårsperioder med aktiviteter`(dataTable: DataTable) {
@@ -119,7 +111,6 @@ class ForeslåVedtaksperiodeStepDefinitions {
         try {
             resultat =
                 ForeslåVedtaksperiode.finnVedtaksperiodeV2(
-                    stønadstype = stønadstype,
                     Vilkårperioder(
                         målgrupper = målgrupper,
                         aktiviteter = aktiviteter,

@@ -52,7 +52,6 @@ class ForeslåVedtaksperiodeService(
 
         return if (saksbehandling.stønadstype.skalHenteStønadsvilkår()) {
             ForeslåVedtaksperiode.finnVedtaksperiodeV2(
-                stønadstype = saksbehandling.stønadstype,
                 vilkårperioder = vilkårperioder,
                 vilkår = vilkårService.hentVilkår(saksbehandling.id),
                 forrigeVedtaksperioder = forrigeVedtaksperioder,
@@ -60,7 +59,6 @@ class ForeslåVedtaksperiodeService(
             )
         } else {
             ForeslåVedtaksperiode.finnVedtaksperiodeUtenVilkårV2(
-                stønadstype = saksbehandling.stønadstype,
                 vilkårperioder = vilkårperioder,
                 forrigeVedtaksperioder = forrigeVedtaksperioder,
                 tidligsteEndring = tidligsteEndring,

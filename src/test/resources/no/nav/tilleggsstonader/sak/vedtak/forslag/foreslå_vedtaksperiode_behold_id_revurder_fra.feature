@@ -30,20 +30,10 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
       | 1  | 01.01.2023 | 31.01.2023 | UTDANNING | ENSLIG_FORSØRGER    |
       | -1 | 28.02.2023 | 28.02.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
-      | 2  | 01.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | 2  | 01.03.2023 | 15.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | -1 | 16.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
-  Scenario: Revurder fra 1 dag etter TOM i tidligere vedtaksperiode - skal forlenge siste perioden
-
-    Når forslag til vedtaksperioder behold id lages tidligsteEndring=16.03.2023
-
-    Så forvent følgende vedtaksperioder med riktig id
-      | Id | Fom        | Tom        | aktivitet | målgruppe           |
-      | 1  | 01.01.2023 | 31.01.2023 | UTDANNING | ENSLIG_FORSØRGER    |
-      | 2  | 01.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
-
-  Scenario: Revurder fra 1 dag etter TOM i tidligere vedtaksperiode for læremidler - skal IKKE forlenge siste perioden
-
-    Når følgende stønadstype=LÆREMIDLER
+  Scenario: Revurder fra 1 dag etter TOM i tidligere vedtaksperiode
 
     Når forslag til vedtaksperioder behold id lages tidligsteEndring=16.03.2023
 
@@ -70,7 +60,8 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
     Så forvent følgende vedtaksperioder med riktig id
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
       | 1  | 01.01.2023 | 31.01.2023 | UTDANNING | ENSLIG_FORSØRGER    |
-      | 2  | 01.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | 2  | 01.03.2023 | 15.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | -1 | 16.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
   Scenario: Revurder fra midt i tidligere vedtaksperiode
 
@@ -79,7 +70,8 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
     Så forvent følgende vedtaksperioder med riktig id
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
       | 1  | 01.01.2023 | 31.01.2023 | UTDANNING | ENSLIG_FORSØRGER    |
-      | 2  | 01.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | 2  | 01.03.2023 | 15.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | -1 | 16.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
   Scenario: Revurder fra dagen før TOM i tidligere vedtaksperiode
 
@@ -88,7 +80,8 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
     Så forvent følgende vedtaksperioder med riktig id
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
       | 1  | 01.01.2023 | 31.01.2023 | UTDANNING | ENSLIG_FORSØRGER    |
-      | 2  | 01.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | 2  | 01.03.2023 | 15.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | -1 | 16.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
   Scenario: Revurder fra TOM i tidligere vedtaksperiode
 
@@ -97,4 +90,5 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
     Så forvent følgende vedtaksperioder med riktig id
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
       | 1  | 01.01.2023 | 31.01.2023 | UTDANNING | ENSLIG_FORSØRGER    |
-      | 2  | 01.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | 2  | 01.03.2023 | 15.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | -1 | 16.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |

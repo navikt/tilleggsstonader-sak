@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.forslag
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
@@ -12,14 +11,12 @@ import java.util.UUID
 
 object ForeslåVedtaksperioderBeholdIdUtil {
     fun beholdTidligereIdnForVedtaksperioder(
-        stønadstype: Stønadstype,
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
     ): List<Vedtaksperiode> {
         val aktuelleVedtaksperioder =
             finnAktuelleVedtaksperioder(
-                stønadstype = stønadstype,
                 forrigeVedtaksperioder = forrigeVedtaksperioder,
                 forslag = forslag,
                 tidligsteEndring = tidligsteEndring,
@@ -39,7 +36,6 @@ object ForeslåVedtaksperioderBeholdIdUtil {
      * Vi skal ikke foreslå perioder før revurder fra, der må vi beholde alle perioder som tidligere
      */
     private fun finnAktuelleVedtaksperioder(
-        stønadstype: Stønadstype,
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
@@ -59,35 +55,10 @@ object ForeslåVedtaksperioderBeholdIdUtil {
             }
         return Vedtaksperioder(
             forrigeVedtaksperioderSkalIkkeEndres = forrigeVedtaksperioderSkalIkkeEndres,
-            forrigeVedtaksperioder = forrigeVedtaksperioder.leggTilEnDagPåSistePerioden(stønadstype),
+            forrigeVedtaksperioder = forrigeVedtaksperioder,
             forslagEtterTidligsteEndring = forslagEtterTidligsteEndring,
         )
     }
-
-    /**
-     * I tilfelle man lagt til en vedtaksperiode etter siste vedtaksperiode i forrige behandling
-     * så er målet å forlenge den siste perioden og beholde ID'n på den.
-     * For å gjøre det forlenger vi den siste perioden med en dag
-     *
-     * Den ekstra dagen gjør at man kan få ett snitt på nye vedtaksperioder,
-     * og den nye dagen som gjør at den siste forrige vedtaksperioden forlenges
-     *
-     * Dette gjøres på grunn av at forslaget er avkortet i forhold til tidligste endringen
-     *
-     * Skal ikke avkorte for læremidler,
-     * då man har forskuddsutbetaling og ikke skal laga et nytt forslag som betales ut i forrige periode.
-     */
-    private fun List<Vedtaksperiode>.leggTilEnDagPåSistePerioden(stønadstype: Stønadstype) =
-        if (stønadstype == Stønadstype.LÆREMIDLER) {
-            this
-        } else {
-            this.dropLast(1) +
-                listOfNotNull(
-                    this
-                        .lastOrNull()
-                        ?.let { it.copy(tom = it.tom.plusDays(1)) },
-                )
-        }
 
     private data class Vedtaksperioder(
         val forrigeVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
@@ -217,26 +188,9 @@ private class ForeslåVedtaksperioderBeholdId(
             .asSequence()
             .filterNot { gjenbrukteIdn.contains(it.id) }
             .mapNotNull { forrigeVedtaksperiode ->
-                beregnSnitt(delAvForslag, forrigeVedtaksperiode)
+                delAvForslag.beregnSnitt(forrigeVedtaksperiode)
                     ?.let { snitt -> ForrigeVedtaksperiodeMedSnitt(forrigeVedtaksperiode, snitt) }
             }.firstOrNull()
-
-    /**
-     * Beregner snitt mellom del av forslag og forrige vedtaksperiode.
-     * Hvis forrige vedtaksperiode er siste i listen og del av forslag overlapper,
-     * så skal man beholde ID fra forrige vedtaksperiode, og forlenge denne til TOM på nye forslaget.
-     */
-    private fun beregnSnitt(
-        delAvForslag: Vedtaksperiode,
-        forrigeVedtaksperiode: Vedtaksperiode,
-    ): Vedtaksperiode? {
-        val erSisteForrigePeriode = forrigeVedtaksperiode == forrigeVedtaksperioder.last()
-        return if (erSisteForrigePeriode && delAvForslag.overlapper(forrigeVedtaksperiode)) {
-            delAvForslag.copy(fom = maxOf(forrigeVedtaksperiode.fom, delAvForslag.fom))
-        } else {
-            delAvForslag.beregnSnitt(forrigeVedtaksperiode)
-        }
-    }
 
     private fun Vedtaksperiode.medNyId(
         fom: LocalDate = this.fom,
