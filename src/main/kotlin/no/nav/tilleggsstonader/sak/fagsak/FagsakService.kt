@@ -106,20 +106,6 @@ class FagsakService(
         return fagsak.tilFagsakMedPerson(oppdatertPerson.identer)
     }
 
-    fun fagsakerMedOppdatertePersonIdenter(fagsakId: List<FagsakId>): List<Fagsak> {
-        val fagsaker = fagsakRepository.findAllById(fagsakId)
-        val personer = fagsakPersonService.hentPersoner(fagsaker.map { it.fagsakPersonId }).associateBy { it.id }
-
-        val gjeldendeIdenter = personService.hentIdenterBolk(personer.values.map { it.hentAktivIdent() })
-
-        return fagsaker.map {
-            val person = personer[it.fagsakPersonId]!!
-            val gjeldendeIdent = gjeldendeIdenter[person.hentAktivIdent()]
-            val oppdatertPerson = gjeldendeIdent?.let { oppdatertPerson(person, gjeldendeIdent) } ?: person
-            it.tilFagsakMedPerson(oppdatertPerson.identer)
-        }
-    }
-
     private fun oppdatertPerson(
         person: FagsakPerson,
         gjeldendePersonIdent: PdlIdent,
