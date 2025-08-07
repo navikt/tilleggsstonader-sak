@@ -183,12 +183,6 @@ type GeografiskTilknytning {
     regel: String!
 }
 
-type HentIdenterBolkResult {
-    code: String!
-    ident: String!
-    identer: [IdentInformasjon!]
-}
-
 type HentPersonBolkResult {
     code: String!
     ident: String!
@@ -558,7 +552,6 @@ type Query {
     hentGeografiskTilknytning(ident: ID!): GeografiskTilknytning
     hentGeografiskTilknytningBolk(identer: [ID!]!): [hentGeografiskTilknytningBolkResult!]!
     hentIdenter(grupper: [IdentGruppe!], historikk: Boolean = false, ident: ID!): Identliste
-    hentIdenterBolk(grupper: [IdentGruppe!], historikk: Boolean = false, identer: [ID!]!): [HentIdenterBolkResult!]!
     hentPerson(ident: ID!): Person
     hentPersonBolk(identer: [ID!]!): [HentPersonBolkResult!]!
     sokAdresse(criteria: [Criterion], paging: Paging): AdresseSearchResult

@@ -12,7 +12,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.tilPersonMedAdresseBe
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlAnnenForelder
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdentGruppe
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
@@ -88,8 +87,6 @@ class PersonService(
         cacheManager.getValue("personidenter", ident) {
             pdlClient.hentPersonidenter(ident)
         }
-
-    fun hentIdenterBolk(identer: List<String>): Map<String, PdlIdent> = pdlClient.hentIdenterBolk(identer)
 
     /**
      * PDL gjør ingen tilgangskontroll i bolkoppslag, så bruker av denne metode må ha gjort tilgangskontroll

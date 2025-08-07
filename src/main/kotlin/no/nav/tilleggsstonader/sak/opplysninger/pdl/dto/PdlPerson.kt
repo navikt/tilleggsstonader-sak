@@ -67,25 +67,6 @@ interface PdlPerson {
     val bostedsadresse: List<Bostedsadresse>
 }
 
-data class PdlIdentBolkResponse(
-    val data: IdentBolk?,
-    val errors: List<PdlError>?,
-) {
-    fun errorMessages(): String = errors?.joinToString { it -> it.message } ?: ""
-}
-
-data class PdlIdenterBolk(
-    val code: String,
-    val ident: String,
-    val identer: List<PdlIdent>?,
-) {
-    fun gjeldende(): PdlIdent = this.identer?.first { !it.historisk } ?: PdlIdent(ident, false, "FOLKEREGISTERIDENT")
-}
-
-data class IdentBolk(
-    val hentIdenterBolk: List<PdlIdenterBolk>,
-)
-
 data class PdlIdent(
     val ident: String,
     val historisk: Boolean,
