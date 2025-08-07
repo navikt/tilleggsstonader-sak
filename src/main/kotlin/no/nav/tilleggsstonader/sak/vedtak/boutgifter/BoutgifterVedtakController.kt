@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperiodeBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
@@ -18,9 +19,10 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRe
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.VedtaksperioderOversiktService
 import org.springframework.web.bind.annotation.GetMapping
@@ -43,6 +45,8 @@ class BoutgifterVedtakController(
     private val steg: BoutgifterBeregnYtelseSteg,
     private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val vedtaksperiodeService: VedtaksperiodeService,
+    private val vedtakDtoMapper: VedtakDtoMapper,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -104,9 +108,9 @@ class BoutgifterVedtakController(
     ): VedtakResponse? {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
+        val behandling = behandlingService.hentBehandling(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
-        return VedtakDtoMapper.toDto(vedtak, revurderFra)
+        return vedtakDtoMapper.toDto(vedtak, behandling.revurderFra, behandling.forrigeIverksatteBehandlingId)
     }
 
     @GetMapping("/fullstendig-oversikt/{behandlingId}")
@@ -121,11 +125,22 @@ class BoutgifterVedtakController(
     @GetMapping("{behandlingId}/foresla")
     fun foreslåVedtaksperioder(
         @PathVariable behandlingId: BehandlingId,
-    ): List<VedtaksperiodeDto> {
+    ): List<LagretVedtaksperiodeDto> {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return foreslåVedtaksperiodeService.foreslåPerioder(behandlingId).map { it.tilDto() }
+        val behandling = behandlingService.hentBehandling(behandlingId)
+        val forrigeVedtaksperioder =
+            behandling.forrigeIverksatteBehandlingId?.let {
+                vedtaksperiodeService.finnVedtaksperioderForBehandling(
+                    behandlingId = it,
+                    revurdererFra = null,
+                )
+            }
+
+        return foreslåVedtaksperiodeService.foreslåPerioder(behandlingId).tilLagretVedtaksperiodeDto(
+            tidligereVedtaksperioder = forrigeVedtaksperioder,
+        )
     }
 }

@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 import java.util.UUID
@@ -37,18 +36,7 @@ data class Vedtaksperiode(
         fom: LocalDate,
         tom: LocalDate,
     ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
-
-    fun tilDto() =
-        VedtaksperiodeDto(
-            id = id,
-            fom = fom,
-            tom = tom,
-            målgruppeType = målgruppe,
-            aktivitetType = aktivitet,
-        )
 }
-
-fun List<Vedtaksperiode>.tilVedtaksperiodeDto() = map { it.tilDto() }
 
 fun List<Vedtaksperiode>.tilVedtaksperiodeBeregning() =
     map {

@@ -9,7 +9,13 @@ import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
+import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperioderLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
@@ -17,8 +23,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatLær
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeLæremidlerDto
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -39,6 +43,8 @@ class LæremidlerVedtakController(
     private val steg: LæremidlerBeregnYtelseSteg,
     private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val vedtakDtoMapper: VedtakDtoMapper,
+    private val vedtaksperiodeService: VedtaksperiodeService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -76,19 +82,19 @@ class LæremidlerVedtakController(
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtaksperioder: List<VedtaksperiodeLæremidlerDto>,
+        @RequestBody vedtaksperioder: List<VedtaksperiodeDto>,
     ): BeregningsresultatLæremidlerDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(
                 behandling.id,
-                vedtaksperioder.tilDomene().map { it.tilFellesDomeneVedtaksperiode() },
+                vedtaksperioder.tilDomene(),
             )
         return beregningService
             .beregn(
                 behandling,
-                vedtaksperioder.tilDomene(),
+                vedtaksperioder.tilVedtaksperioderLæremidler(),
                 tidligsteEndring,
             ).tilDto(tidligsteEndring = tidligsteEndring)
     }
@@ -99,9 +105,9 @@ class LæremidlerVedtakController(
     ): VedtakResponse? {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
+        val behandling = behandlingService.hentBehandling(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
-        return VedtakDtoMapper.toDto(vedtak, revurderFra)
+        return vedtakDtoMapper.toDto(vedtak, behandling.revurderFra, behandling.forrigeIverksatteBehandlingId)
     }
 
     @GetMapping("/fullstendig-oversikt/{behandlingId}")
@@ -110,18 +116,33 @@ class LæremidlerVedtakController(
     ): VedtakResponse? {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        val behandling = behandlingService.hentBehandling(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
-        return VedtakDtoMapper.toDto(vedtak, null)
+        return vedtakDtoMapper.toDto(vedtak, null, behandling.forrigeIverksatteBehandlingId)
     }
 
     @GetMapping("{behandlingId}/foresla")
     fun foreslåVedtaksperioder(
         @PathVariable behandlingId: BehandlingId,
-    ): List<VedtaksperiodeLæremidlerDto> {
+    ): List<LagretVedtaksperiodeDto> {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return foreslåVedtaksperiodeService.foreslåVedtaksperioderLæremidler(behandlingId).tilDto()
+        val behandling = behandlingService.hentBehandling(behandlingId)
+        val forrigeVedtaksperioder =
+            behandling.forrigeIverksatteBehandlingId?.let {
+                vedtaksperiodeService.finnVedtaksperioderForBehandling(
+                    behandlingId = it,
+                    revurdererFra = null,
+                )
+            }
+
+        return foreslåVedtaksperiodeService
+            .foreslåVedtaksperioderLæremidler(behandlingId)
+            .map { it.tilFellesDomeneVedtaksperiode() }
+            .tilLagretVedtaksperiodeDto(
+                tidligereVedtaksperioder = forrigeVedtaksperioder,
+            )
     }
 }

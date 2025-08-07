@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -245,7 +246,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             val oppsummertInnvilgelse = behandlingsoppsummering.vedtak as OppsummertVedtakInnvilgelse
 
-            assertThat(oppsummertInnvilgelse.vedtaksperioder).isEqualTo(vedtaksperioder.map { it.tilDto() })
+            assertThat(oppsummertInnvilgelse.vedtaksperioder).isEqualTo(vedtaksperioder.tilDto())
         }
 
         @Test

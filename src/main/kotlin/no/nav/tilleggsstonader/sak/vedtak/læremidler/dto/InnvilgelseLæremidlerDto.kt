@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.dto
 
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import java.time.LocalDate
 
 /**
@@ -10,7 +12,7 @@ import java.time.LocalDate
  * @param gjelderFraOgMed gjelder fra og med revurder-fra-dato, brukes til brevet for å vise fra når vedtaket gjelder fra
  */
 data class InnvilgelseLæremidlerResponse(
-    val vedtaksperioder: List<VedtaksperiodeLæremidlerDto>,
+    val vedtaksperioder: List<LagretVedtaksperiodeDto>,
     val beregningsresultat: BeregningsresultatLæremidlerDto,
     val gjelderFraOgMed: LocalDate?,
     val gjelderTilOgMed: LocalDate?,
@@ -19,7 +21,7 @@ data class InnvilgelseLæremidlerResponse(
     VedtakLæremidlerResponse
 
 data class InnvilgelseLæremidlerRequest(
-    val vedtaksperioder: List<VedtaksperiodeLæremidlerDto>,
+    val vedtaksperioder: List<VedtaksperiodeDto>,
     val begrunnelse: String? = null,
 ) : VedtakLæremidlerDto(TypeVedtak.INNVILGELSE),
     VedtakLæremidlerRequest
