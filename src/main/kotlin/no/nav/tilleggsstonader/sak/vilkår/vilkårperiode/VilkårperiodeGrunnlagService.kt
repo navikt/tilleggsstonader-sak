@@ -62,14 +62,17 @@ class VilkårperiodeGrunnlagService(
 
         val eksisterendeGrunnlag = vilkårperioderGrunnlagRepository.findByIdOrThrow(behandlingId)
 
-        val eksisterendeHentetFom = hentGrunnlagFom ?: eksisterendeGrunnlag.grunnlag.hentetInformasjon.fom
+        val forrigeHentetFom = eksisterendeGrunnlag.grunnlag.hentetInformasjon.fom
+        val nyHentetFom = hentGrunnlagFom ?: forrigeHentetFom
         val tom = YearMonth.now().plusYears(1).atEndOfMonth()
 
-        val nyGrunnlagsdata = hentGrunnlagsdata(behandlingId, eksisterendeHentetFom, tom)
+        val nyGrunnlagsdata = hentGrunnlagsdata(behandlingId, nyHentetFom, tom)
         vilkårperioderGrunnlagRepository.update(eksisterendeGrunnlag.copy(grunnlag = nyGrunnlagsdata))
         val tidSidenForrigeHenting =
             ChronoUnit.HOURS.between(nyGrunnlagsdata.hentetInformasjon.tidspunktHentet, LocalDateTime.now())
-        logger.info("Oppdatert grunnlagsdata for behandling=$behandlingId timerSidenForrige=$tidSidenForrigeHenting")
+        logger.info(
+            "Oppdatert grunnlagsdata for behandling=$behandlingId timerSidenForrige=$tidSidenForrigeHenting forrigeHentetFom=$forrigeHentetFom hentGrunnlagFom=$hentGrunnlagFom",
+        )
     }
 
     fun hentEllerOpprettGrunnlag(
