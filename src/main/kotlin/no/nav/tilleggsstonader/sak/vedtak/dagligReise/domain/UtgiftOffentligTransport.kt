@@ -37,7 +37,8 @@ fun <P : Periode<LocalDate>, VAL : Periode<LocalDate>> P.splitPer30DagersPeriode
     val perioder = mutableListOf<VAL>()
     var gjeldendeFom = fom
     while (gjeldendeFom <= tom) {
-        val nyTom = minOf(gjeldendeFom.plusDays(30), tom)
+        // Legger kun til 29 dager fordi nåværende dag teller med
+        val nyTom = minOf(gjeldendeFom.plusDays(29), tom)
 
         val nyPeriode = medNyPeriode(gjeldendeFom, nyTom)
         if (nyPeriode.inneholderUkedag()) {
