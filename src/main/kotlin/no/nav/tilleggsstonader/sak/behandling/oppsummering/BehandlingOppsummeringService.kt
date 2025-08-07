@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårUtil.slåSammenSammenhengende
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -97,11 +97,9 @@ class BehandlingOppsummeringService(
                 is Innvilgelse -> {
                     val vedtaksperioder =
                         vedtaksperiodeService.finnVedtaksperioderForBehandling(behandling.id, behandling.revurderFra)
-                    val forrigeVedtaksperioder =
-                        behandling.forrigeIverksatteBehandlingId?.let { vedtaksperiodeService.finnVedtaksperioderForBehandling(it, null) }
 
                     OppsummertVedtakInnvilgelse(
-                        vedtaksperioder = vedtaksperioder.tilLagretVedtaksperiodeDto(forrigeVedtaksperioder),
+                        vedtaksperioder = vedtaksperioder.tilDto(),
                     )
                 }
 

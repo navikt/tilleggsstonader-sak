@@ -81,6 +81,8 @@ fun Vedtaksperiode.tilLagretVedtaksperiodeDto(forrigeVedtaksperiode: Vedtaksperi
         vedtaksperiodeFraForrigeVedtak = forrigeVedtaksperiode?.tilDto(),
     )
 
+fun List<Vedtaksperiode>.tilDto() = map { it.tilDto() }.sorted()
+
 fun Vedtaksperiode.tilDto() =
     VedtaksperiodeDto(
         id = id,
