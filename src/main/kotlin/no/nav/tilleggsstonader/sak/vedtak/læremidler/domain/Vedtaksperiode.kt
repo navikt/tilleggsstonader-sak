@@ -12,40 +12,6 @@ import java.time.LocalDate
 import java.util.UUID
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode as FellesDomeneVedtaksperiode
 
-data class Vedtaksperiode(
-    override val id: UUID = UUID.randomUUID(),
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    val målgruppe: FaktiskMålgruppe,
-    val aktivitet: AktivitetType,
-    val status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
-) : Periode<LocalDate>,
-    KopierPeriode<Vedtaksperiode>,
-    PeriodeMedId {
-    init {
-        validatePeriode()
-    }
-
-    override fun kopier(
-        fom: LocalDate,
-        tom: LocalDate,
-    ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
-
-    override fun medPeriode(
-        fom: LocalDate,
-        tom: LocalDate,
-    ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
-
-    fun tilFellesDomeneVedtaksperiode(): FellesDomeneVedtaksperiode =
-        FellesDomeneVedtaksperiode(
-            id = id,
-            fom = fom,
-            tom = tom,
-            målgruppe = målgruppe,
-            aktivitet = aktivitet,
-        )
-}
-
 enum class VedtaksperiodeStatus {
     NY,
     ENDRET,
@@ -55,4 +21,4 @@ enum class VedtaksperiodeStatus {
 fun avkortVedtaksperiodeVedOpphør(
     forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørLæremidler>,
     revurderFra: LocalDate,
-): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(revurderFra.minusDays(1))
+): List<FellesDomeneVedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(revurderFra.minusDays(1))

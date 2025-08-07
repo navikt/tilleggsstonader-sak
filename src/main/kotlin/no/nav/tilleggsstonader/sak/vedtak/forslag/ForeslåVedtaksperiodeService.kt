@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode as VedtaksperiodeLæremidler
 
 /**
  * TODO 1 - Burde forholde seg til arenaTom når man foreslår vedtaksperioder
@@ -27,8 +26,7 @@ class ForeslåVedtaksperiodeService(
     private val unleashService: UnleashService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
-    fun foreslåVedtaksperioderLæremidler(behandlingId: BehandlingId): List<VedtaksperiodeLæremidler> =
-        foreslåPerioder(behandlingId).map { it.tilVedtaksperiodeLæremidler() }
+    fun foreslåVedtaksperioderLæremidler(behandlingId: BehandlingId): List<Vedtaksperiode> = foreslåPerioder(behandlingId)
 
     fun foreslåPerioder(behandlingId: BehandlingId): List<Vedtaksperiode> {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
@@ -75,15 +73,6 @@ class ForeslåVedtaksperiodeService(
             ForeslåVedtaksperiodeFraVilkårperioder.foreslåVedtaksperioder(vilkårperioder).map { it.tilVedtaksperiode() }
         }
     }
-
-    private fun Vedtaksperiode.tilVedtaksperiodeLæremidler() =
-        VedtaksperiodeLæremidler(
-            id = id,
-            fom = fom,
-            tom = tom,
-            målgruppe = målgruppe,
-            aktivitet = aktivitet,
-        )
 
     private fun Stønadstype.skalHenteStønadsvilkår(): Boolean =
         when (this) {

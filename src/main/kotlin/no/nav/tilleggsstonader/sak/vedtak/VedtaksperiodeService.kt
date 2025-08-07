@@ -46,7 +46,7 @@ class VedtaksperiodeService(
             null -> null
             is InnvilgelseEllerOpphørTilsynBarn -> vedtak.vedtaksperioder
             is InnvilgelseEllerOpphørBoutgifter -> vedtak.vedtaksperioder
-            is InnvilgelseEllerOpphørLæremidler -> vedtak.vedtaksperioder.map { it.tilFellesDomeneVedtaksperiode() }
+            is InnvilgelseEllerOpphørLæremidler -> vedtak.vedtaksperioder
             else ->
                 error(
                     "Kan ikke hente vedtaksperioder når vedtak var ${vedtak.type}",
@@ -71,7 +71,7 @@ class VedtaksperiodeService(
         val vedtaksperioder: List<Vedtaksperiode> =
             when (vedtak.data) {
                 is InnvilgelseEllerOpphørTilsynBarn -> vedtak.data.vedtaksperioder
-                is InnvilgelseEllerOpphørLæremidler -> vedtak.data.vedtaksperioder.map { it.tilFellesDomeneVedtaksperiode() }
+                is InnvilgelseEllerOpphørLæremidler -> vedtak.data.vedtaksperioder
                 is InnvilgelseEllerOpphørBoutgifter -> vedtak.data.vedtaksperioder
                 is Avslag -> emptyList()
             }

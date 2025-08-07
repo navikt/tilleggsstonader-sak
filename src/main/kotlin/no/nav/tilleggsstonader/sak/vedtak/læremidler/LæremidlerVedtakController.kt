@@ -15,7 +15,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperioderLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
@@ -94,7 +93,7 @@ class LæremidlerVedtakController(
         return beregningService
             .beregn(
                 behandling,
-                vedtaksperioder.tilVedtaksperioderLæremidler(),
+                vedtaksperioder.tilDomene(),
                 tidligsteEndring,
             ).tilDto(tidligsteEndring = tidligsteEndring)
     }
@@ -140,7 +139,6 @@ class LæremidlerVedtakController(
 
         return foreslåVedtaksperiodeService
             .foreslåVedtaksperioderLæremidler(behandlingId)
-            .map { it.tilFellesDomeneVedtaksperiode() }
             .tilLagretVedtaksperiodeDto(
                 tidligereVedtaksperioder = forrigeVedtaksperioder,
             )

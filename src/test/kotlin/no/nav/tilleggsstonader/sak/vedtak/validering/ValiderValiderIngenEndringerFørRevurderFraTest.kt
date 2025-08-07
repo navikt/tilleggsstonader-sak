@@ -59,10 +59,10 @@ class ValiderValiderIngenEndringerFørRevurderFraTest {
     }
 
     @Test
-    fun `kaster ikke feil ved ingen endringer, men oppdatert status`() {
+    fun `kaster ikke feil ved ingen endringer`() {
         assertDoesNotThrow {
             validerIngenEndringerFørRevurderFra(
-                innsendteVedtaksperioder = listOf(vedtaksperiodeLæremidlerJanFeb.copy(status = VedtaksperiodeStatus.UENDRET)),
+                innsendteVedtaksperioder = listOf(vedtaksperiodeLæremidlerJanFeb),
                 vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeLæremidlerJanFeb),
                 revurderFra = førsteMars,
             )
@@ -392,12 +392,10 @@ class ValiderValiderIngenEndringerFørRevurderFraTest {
     private fun lagVedtaksperiodeLæremidler(
         fom: LocalDate = LocalDate.of(2025, 1, 1),
         tom: LocalDate = LocalDate.of(2025, 1, 31),
-        status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
     ) = LæremidlerTestUtil.vedtaksperiode(
         id = UUID.randomUUID(),
         fom = fom,
         tom = tom,
-        status = status,
     )
 
     private fun lagVedtaksperiode(

@@ -106,15 +106,4 @@ private fun Vedtaksperiode.utledStatus(forrigeVedtaksperiode: Vedtaksperiode?): 
 
 fun List<VedtaksperiodeDto>.tilDomene() = map { it.tilDomene() }.sorted()
 
-fun List<VedtaksperiodeDto>.tilVedtaksperioderLæremidler() =
-    map {
-        no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode(
-            id = it.id,
-            fom = it.fom,
-            tom = it.tom,
-            målgruppe = it.målgruppeType,
-            aktivitet = it.aktivitetType,
-        )
-    }.sorted()
-
 fun List<VedtaksperiodeDto>.tilVedtaksperiodeBeregning() = map { VedtaksperiodeBeregning(it) }

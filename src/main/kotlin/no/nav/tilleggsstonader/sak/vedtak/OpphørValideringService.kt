@@ -66,11 +66,11 @@ class OpphørValideringService(
 
     // TODO: Fjern når læremidler er over på felles vedtaksperiode
     fun validerVedtaksperioderAvkortetVedOpphørLæremidler(
-        forrigeBehandlingsVedtaksperioder: List<no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode>,
+        forrigeBehandlingsVedtaksperioder: List<Vedtaksperiode>,
         opphørsdato: LocalDate,
     ) {
         validerVedtaksperioderAvkortetVedOpphør(
-            forrigeBehandlingsVedtaksperioder.map { it.tilFellesDomeneVedtaksperiode() },
+            forrigeBehandlingsVedtaksperioder,
             opphørsdato,
         )
     }

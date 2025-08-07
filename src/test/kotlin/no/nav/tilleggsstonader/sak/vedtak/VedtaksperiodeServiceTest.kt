@@ -13,7 +13,6 @@ import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 import java.util.UUID
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak as innvilgetVedtakTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode as VedtaksperiodeLæremidler
 
 class VedtaksperiodeServiceTest {
     val vedtakRepository = mockk<VedtakRepository>()
@@ -58,14 +57,14 @@ class VedtaksperiodeServiceTest {
     fun `skal finne alle vedtaksperioder i en læremidler behandling`() {
         val vedtaksperioderLæremidler =
             listOf(
-                VedtaksperiodeLæremidler(
+                Vedtaksperiode(
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
                     målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitet = AktivitetType.TILTAK,
                 ),
-                VedtaksperiodeLæremidler(
+                Vedtaksperiode(
                     id = UUID.randomUUID(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
@@ -83,7 +82,7 @@ class VedtaksperiodeServiceTest {
         val res =
             vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId = behandlingId, revurdererFra = null)
 
-        assertThat(res).isEqualTo(vedtaksperioderLæremidler.map { it.tilFellesDomeneVedtaksperiode() })
+        assertThat(res).isEqualTo(vedtaksperioderLæremidler)
     }
 
     @Test

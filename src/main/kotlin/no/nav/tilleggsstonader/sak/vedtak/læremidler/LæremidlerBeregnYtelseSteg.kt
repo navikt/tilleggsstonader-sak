@@ -22,11 +22,10 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilVedtaksperioderLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.VedtaksperiodeStatusMapper.settStatusPåVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.avkortVedtaksperiodeVedOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
@@ -59,7 +58,7 @@ class LæremidlerBeregnYtelseSteg(
             is InnvilgelseLæremidlerRequest ->
                 beregnOgLagreInnvilgelse(
                     saksbehandling = saksbehandling,
-                    vedtaksperioder = vedtak.vedtaksperioder.tilVedtaksperioderLæremidler(),
+                    vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                     begrunnelse = vedtak.begrunnelse,
                 )
 
@@ -73,15 +72,7 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
     ) {
-        val forrigeVedtaksperioder =
-            saksbehandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it).data.vedtaksperioder }
-        val vedtaksperioderMedStatus =
-            settStatusPåVedtaksperioder(
-                vedtaksperioder = vedtaksperioder,
-                vedtaksperioderForrigeBehandling = forrigeVedtaksperioder,
-            )
-
-        lagreVedtak(saksbehandling, vedtaksperioderMedStatus, begrunnelse)
+        lagreVedtak(saksbehandling, vedtaksperioder, begrunnelse)
     }
 
     private fun hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørLæremidler> =
@@ -97,9 +88,7 @@ class LæremidlerBeregnYtelseSteg(
         val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(
                 saksbehandling.id,
-                vedtaksperioder.map {
-                    it.tilFellesDomeneVedtaksperiode()
-                },
+                vedtaksperioder,
             )
 
         val beregningsresultat =

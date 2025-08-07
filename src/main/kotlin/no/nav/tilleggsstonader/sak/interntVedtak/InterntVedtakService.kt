@@ -38,7 +38,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgVurderingDto
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode as VedtaksperiodeLæremidler
 
 @Service
 class InterntVedtakService(
@@ -157,12 +156,9 @@ class InterntVedtakService(
 
     private fun mapVedtaksperioder(vedtak: Vedtak?): List<VedtaksperiodeInterntVedtak> =
         when (vedtak?.data) {
-            is InnvilgelseTilsynBarn -> mapVedtaksperioderTilsynBarnOgBoutgifter(vedtak.data.vedtaksperioder)
-
-            is InnvilgelseLæremidler -> mapVedtaksperioderLæremidler(vedtak.data.vedtaksperioder)
-
-            is InnvilgelseBoutgifter -> mapVedtaksperioderTilsynBarnOgBoutgifter(vedtak.data.vedtaksperioder)
-
+            is InnvilgelseTilsynBarn -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
+            is InnvilgelseLæremidler -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
+            is InnvilgelseBoutgifter -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is Avslag, is Opphør -> emptyList()
 
             else -> {
@@ -170,7 +166,7 @@ class InterntVedtakService(
             }
         }
 
-    private fun mapVedtaksperioderTilsynBarnOgBoutgifter(vedtaksperioder: List<Vedtaksperiode>): List<VedtaksperiodeInterntVedtak> =
+    private fun mapVedtaksperioder(vedtaksperioder: List<Vedtaksperiode>): List<VedtaksperiodeInterntVedtak> =
         vedtaksperioder.map {
             VedtaksperiodeInterntVedtak(
                 målgruppe = it.målgruppe,
@@ -179,16 +175,6 @@ class InterntVedtakService(
                 tom = it.tom,
             )
         }
-
-    private fun mapVedtaksperioderLæremidler(vedtaksperioder: List<VedtaksperiodeLæremidler>?): List<VedtaksperiodeInterntVedtak> =
-        vedtaksperioder?.map {
-            VedtaksperiodeInterntVedtak(
-                målgruppe = it.målgruppe,
-                aktivitet = it.aktivitet,
-                fom = it.fom,
-                tom = it.tom,
-            )
-        } ?: emptyList()
 
     private fun mapVilkår(
         behandlingId: BehandlingId,
