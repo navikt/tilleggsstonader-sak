@@ -95,7 +95,10 @@ fun Vedtaksperiode.tilDto() =
 private fun Vedtaksperiode.utledStatus(forrigeVedtaksperiode: Vedtaksperiode?): VedtaksperiodeStatus =
     when {
         forrigeVedtaksperiode == null -> VedtaksperiodeStatus.NY
-        this.fom == forrigeVedtaksperiode.fom && this.tom == forrigeVedtaksperiode.tom ->
+        this.fom == forrigeVedtaksperiode.fom &&
+            this.tom == forrigeVedtaksperiode.tom &&
+            this.målgruppe == forrigeVedtaksperiode.målgruppe &&
+            this.aktivitet == forrigeVedtaksperiode.aktivitet ->
             VedtaksperiodeStatus.UENDRET
 
         else -> VedtaksperiodeStatus.ENDRET
