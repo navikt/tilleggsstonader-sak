@@ -193,7 +193,7 @@ class OppgaveClientConfig {
                     oppgave.copy(
                         versjon = versjon,
                         beskrivelse = request.kommentar + "\n Tatt av vent\n" + oppgave.beskrivelse,
-                        fristFerdigstillelse = LocalDate.now(),
+                        fristFerdigstillelse = request.frist,
                         tilordnetRessurs = if (request.beholdOppgave) SikkerhetContext.hentSaksbehandler() else null,
                         mappeId = Optional.of(MAPPE_ID_KLAR),
                     ),

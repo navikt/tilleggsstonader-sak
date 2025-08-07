@@ -51,3 +51,12 @@ private fun lagOppgaveTekst(beskrivelse: String? = null): String {
     val beskrivelseMedNewLine = beskrivelse?.let { "\n$it" } ?: ""
     return prefix + beskrivelseMedNewLine
 }
+
+/**
+ * Oppretter frist for oppgave basert på kravMottatt eller behandlingOpprettet.
+ * Hvis kravMottatt er null, brukes behandlingOpprettet.
+ */
+fun fristBehandleSakOppgave(
+    kravMottatt: LocalDate?,
+    behandlingOpprettet: LocalDateTime,
+) = lagFristForOppgave((kravMottatt ?: behandlingOpprettet.toLocalDate()).atTime(behandlingOpprettet.toLocalTime()))

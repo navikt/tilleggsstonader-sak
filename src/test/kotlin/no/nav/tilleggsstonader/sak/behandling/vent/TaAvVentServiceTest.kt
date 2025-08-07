@@ -56,7 +56,7 @@ class TaAvVentServiceTest : IntegrationTest() {
     lateinit var behandlingFaktaService: BehandlingFaktaService
 
     val fagsak = fagsak()
-    val behandling = behandling(fagsak = fagsak)
+    val behandling = behandling(fagsak = fagsak, kravMottatt = LocalDate.of(2025, 1, 6))
     var oppgaveId: Long? = null
 
     val dummySaksbehandler = "saksbehandler1"
@@ -275,7 +275,9 @@ class TaAvVentServiceTest : IntegrationTest() {
         with(oppgaveService.hentOppgave(oppgaveId)) {
             assertThat(tilordnetRessurs).isEqualTo(tilordnetRessurs)
             assertThat(beskrivelse).contains("Tatt av vent")
-            assertThat(fristFerdigstillelse).isEqualTo(LocalDate.now())
+            val kravMottatt = behandling.kravMottatt!!
+            // between pga at fristen settes basert på klokkesless i [fristBasertPåKlokkeslett]
+            assertThat(fristFerdigstillelse).isBetween(kravMottatt.plusDays(1), kravMottatt.plusDays(2))
             assertThat(mappeId).isEqualTo(Optional.of(MAPPE_ID_KLAR))
         }
     }
