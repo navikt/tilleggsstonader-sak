@@ -47,9 +47,29 @@ class VedtakDtoMapper(
     ): VedtakResponse {
         val data = vedtak.data
         return when (data) {
-            is VedtakTilsynBarn -> mapVedtakTilsynBarn(vedtak, data, vedtak.tidligsteEndring ?: revurderFra, forrigeIverksatteBehandlingId)
-            is VedtakLæremidler -> mapVedtakLæremidler(vedtak, data, vedtak.tidligsteEndring ?: revurderFra, forrigeIverksatteBehandlingId)
-            is VedtakBoutgifter -> mapVedtakBoutgifter(vedtak, data, vedtak.tidligsteEndring ?: revurderFra, forrigeIverksatteBehandlingId)
+            is VedtakTilsynBarn ->
+                mapVedtakTilsynBarn(
+                    vedtak,
+                    data,
+                    vedtak.tidligsteEndring ?: revurderFra,
+                    forrigeIverksatteBehandlingId,
+                )
+
+            is VedtakLæremidler ->
+                mapVedtakLæremidler(
+                    vedtak,
+                    data,
+                    vedtak.tidligsteEndring ?: revurderFra,
+                    forrigeIverksatteBehandlingId,
+                )
+
+            is VedtakBoutgifter ->
+                mapVedtakBoutgifter(
+                    vedtak,
+                    data,
+                    vedtak.tidligsteEndring ?: revurderFra,
+                forrigeIverksatteBehandlingId
+            )
         }
     }
 
@@ -166,8 +186,8 @@ class VedtakDtoMapper(
     private fun hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId: BehandlingId?): List<Vedtaksperiode>? =
         forrigeIverksatteBehandlingId?.let {
             vedtaksperiodeService.finnVedtaksperioderForBehandling(
-                it,
-                null,
+                behandlingId = it,
+                revurdererFra = null,
             )
         }
 }

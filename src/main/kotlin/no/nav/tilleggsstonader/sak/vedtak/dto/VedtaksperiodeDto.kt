@@ -68,7 +68,7 @@ enum class VedtaksperiodeStatus {
 fun List<Vedtaksperiode>.tilLagretVedtaksperiodeDto(tidligereVedtaksperioder: List<Vedtaksperiode>?) =
     map {
         it.tilLagretVedtaksperiodeDto(tidligereVedtaksperioder?.find { v -> v.id == it.id })
-    }
+    }.sorted()
 
 fun Vedtaksperiode.tilLagretVedtaksperiodeDto(forrigeVedtaksperiode: Vedtaksperiode?) =
     LagretVedtaksperiodeDto(
@@ -99,7 +99,7 @@ private fun Vedtaksperiode.utledStatus(forrigeVedtaksperiode: Vedtaksperiode?): 
         else -> VedtaksperiodeStatus.ENDRET
     }
 
-fun List<VedtaksperiodeDto>.tilDomene() = map { it.tilDomene() }
+fun List<VedtaksperiodeDto>.tilDomene() = map { it.tilDomene() }.sorted()
 
 fun List<VedtaksperiodeDto>.tilVedtaksperioderLæremidler() =
     map {
@@ -110,6 +110,6 @@ fun List<VedtaksperiodeDto>.tilVedtaksperioderLæremidler() =
             målgruppe = it.målgruppeType,
             aktivitet = it.aktivitetType,
         )
-    }
+    }.sorted()
 
 fun List<VedtaksperiodeDto>.tilVedtaksperiodeBeregning() = map { VedtaksperiodeBeregning(it) }
