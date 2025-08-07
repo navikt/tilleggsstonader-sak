@@ -68,8 +68,8 @@ class VedtakDtoMapper(
                     vedtak,
                     data,
                     vedtak.tidligsteEndring ?: revurderFra,
-                forrigeIverksatteBehandlingId
-            )
+                    forrigeIverksatteBehandlingId,
+                )
         }
     }
 
