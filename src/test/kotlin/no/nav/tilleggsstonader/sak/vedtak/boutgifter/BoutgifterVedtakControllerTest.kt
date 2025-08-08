@@ -95,7 +95,7 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
         fun `skal lagre og hente avslag`() {
             val avslag =
                 AvslagBoutgifterDto(
-                    årsakerAvslag = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
+                    årsakerAvslag = listOf(ÅrsakAvslag.ANNET),
                     begrunnelse = "begrunnelse",
                 )
 
