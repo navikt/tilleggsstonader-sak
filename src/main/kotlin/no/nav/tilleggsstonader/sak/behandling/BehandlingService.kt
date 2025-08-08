@@ -149,6 +149,11 @@ class BehandlingService(
 
     fun hentSaksbehandling(behandlingId: BehandlingId): Saksbehandling = behandlingRepository.finnSaksbehandling(behandlingId)
 
+    fun fjernRevurderFra(saksbehandling: Saksbehandling): Saksbehandling {
+        behandlingRepository.nullstillRevurderFra(saksbehandling.id)
+        return hentSaksbehandling(saksbehandling.id)
+    }
+
     fun hentSaksbehandling(eksternBehandlingId: Long): Saksbehandling = behandlingRepository.finnSaksbehandling(eksternBehandlingId)
 
     fun hentEksternBehandlingId(behandlingId: BehandlingId) = eksternBehandlingIdRepository.findByBehandlingId(behandlingId)

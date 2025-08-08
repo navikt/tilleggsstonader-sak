@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling
 import BehandlingTilJournalføringDto
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.dto.BarnTilRevurderingDto
@@ -17,7 +18,10 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.TilordnetSaksbehandlerService
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.dto.tilDto
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
@@ -46,6 +50,8 @@ class BehandlingController(
     private val tilgangService: TilgangService,
     private val nullstillBehandlingService: NullstillBehandlingService,
     private val tilordnetSaksbehandlerService: TilordnetSaksbehandlerService,
+    private val unleashService: UnleashService,
+    private val oppgaveService: OppgaveService,
 ) {
     @GetMapping("{behandlingId}")
     fun hentBehandling(
@@ -53,7 +59,7 @@ class BehandlingController(
     ): BehandlingDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+        val saksbehandling: Saksbehandling = hentSaksbehandlingMedNullstiltRevurderFra(behandlingId)
         val tilordnetSaksbehandler = tilordnetSaksbehandlerService.finnTilordnetSaksbehandler(behandlingId).tilDto()
 
         if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
@@ -63,6 +69,23 @@ class BehandlingController(
             faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId)
         }
         return saksbehandling.tilDto(tilordnetSaksbehandler)
+    }
+
+    private fun hentSaksbehandlingMedNullstiltRevurderFra(behandlingId: BehandlingId): Saksbehandling {
+        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+        val statusErUnderArbeid =
+            saksbehandling.status == BehandlingStatus.OPPRETTET ||
+                saksbehandling.status == BehandlingStatus.UTREDES
+        return if (saksbehandling.revurderFra != null &&
+            statusErUnderArbeid &&
+            unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) &&
+            oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(saksbehandling.id)?.tilordnetSaksbehandler ==
+            SikkerhetContext.hentSaksbehandler()
+        ) {
+            behandlingService.fjernRevurderFra(saksbehandling)
+        } else {
+            saksbehandling
+        }
     }
 
     @GetMapping("fagsak-person/{fagsakPersonId}")
