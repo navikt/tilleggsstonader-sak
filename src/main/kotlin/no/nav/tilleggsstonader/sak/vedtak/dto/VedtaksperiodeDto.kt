@@ -23,7 +23,6 @@ data class LagretVedtaksperiodeDto(
     override val tom: LocalDate,
     override val målgruppeType: FaktiskMålgruppe,
     override val aktivitetType: AktivitetType,
-    val status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
     val vedtaksperiodeFraForrigeVedtak: VedtaksperiodeDto?,
 ) : VedtaksperiodeDtoInterface,
     KopierPeriode<LagretVedtaksperiodeDto> {
@@ -59,12 +58,6 @@ data class VedtaksperiodeDto(
         )
 }
 
-enum class VedtaksperiodeStatus {
-    NY,
-    ENDRET,
-    UENDRET,
-}
-
 fun List<Vedtaksperiode>.tilLagretVedtaksperiodeDto(tidligereVedtaksperioder: List<Vedtaksperiode>?) =
     map {
         it.tilLagretVedtaksperiodeDto(tidligereVedtaksperioder?.find { v -> v.id == it.id })
@@ -77,7 +70,6 @@ fun Vedtaksperiode.tilLagretVedtaksperiodeDto(forrigeVedtaksperiode: Vedtaksperi
         tom = tom,
         målgruppeType = målgruppe,
         aktivitetType = aktivitet,
-        status = utledStatus(forrigeVedtaksperiode),
         vedtaksperiodeFraForrigeVedtak = forrigeVedtaksperiode?.tilDto(),
     )
 
@@ -92,29 +84,6 @@ fun Vedtaksperiode.tilDto() =
         aktivitetType = aktivitet,
     )
 
-private fun Vedtaksperiode.utledStatus(forrigeVedtaksperiode: Vedtaksperiode?): VedtaksperiodeStatus =
-    when {
-        forrigeVedtaksperiode == null -> VedtaksperiodeStatus.NY
-        this.fom == forrigeVedtaksperiode.fom &&
-            this.tom == forrigeVedtaksperiode.tom &&
-            this.målgruppe == forrigeVedtaksperiode.målgruppe &&
-            this.aktivitet == forrigeVedtaksperiode.aktivitet ->
-            VedtaksperiodeStatus.UENDRET
-
-        else -> VedtaksperiodeStatus.ENDRET
-    }
-
 fun List<VedtaksperiodeDto>.tilDomene() = map { it.tilDomene() }.sorted()
-
-fun List<VedtaksperiodeDto>.tilVedtaksperioderLæremidler() =
-    map {
-        no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode(
-            id = it.id,
-            fom = it.fom,
-            tom = it.tom,
-            målgruppe = it.målgruppeType,
-            aktivitet = it.aktivitetType,
-        )
-    }.sorted()
 
 fun List<VedtaksperiodeDto>.tilVedtaksperiodeBeregning() = map { VedtaksperiodeBeregning(it) }

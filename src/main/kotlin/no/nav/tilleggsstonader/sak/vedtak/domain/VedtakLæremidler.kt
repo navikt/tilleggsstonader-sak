@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 
 enum class TypeVedtakLæremidler(
     override val typeVedtak: TypeVedtak,

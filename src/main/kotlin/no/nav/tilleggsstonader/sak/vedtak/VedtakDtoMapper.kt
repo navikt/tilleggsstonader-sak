@@ -117,7 +117,6 @@ class VedtakDtoMapper(
                 InnvilgelseLæremidlerResponse(
                     vedtaksperioder =
                         data.vedtaksperioder
-                            .map { it.tilFellesDomeneVedtaksperiode() }
                             .tilLagretVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
                     beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
@@ -138,9 +137,7 @@ class VedtakDtoMapper(
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder =
                         data.vedtaksperioder
-                            .map {
-                                it.tilFellesDomeneVedtaksperiode()
-                            }.tilLagretVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
+                            .tilLagretVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
                     opphørsdato = vedtak.opphørsdato,
                 )
         }

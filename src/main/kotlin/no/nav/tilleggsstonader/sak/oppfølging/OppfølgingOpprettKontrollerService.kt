@@ -149,7 +149,7 @@ class OppfølgingOpprettKontrollerService(
                 hentVedtak<InnvilgelseEllerOpphørTilsynBarn>(behandling).vedtaksperioder
 
             Stønadstype.LÆREMIDLER ->
-                hentVedtak<InnvilgelseEllerOpphørLæremidler>(behandling).vedtaksperioder.tilFellesFormat()
+                hentVedtak<InnvilgelseEllerOpphørLæremidler>(behandling).vedtaksperioder
 
             Stønadstype.BOUTGIFTER ->
                 hentVedtak<InnvilgelseEllerOpphørBoutgifter>(behandling).vedtaksperioder
@@ -246,19 +246,5 @@ class OppfølgingOpprettKontrollerService(
             MålgruppeType.SYKEPENGER_100_PROSENT,
             MålgruppeType.INGEN_MÅLGRUPPE,
             -> error("Skal ikke sjekke målgruppe=$this")
-        }
-
-    /**
-     * Mapper vedtaksperiode til felles format for å enklere kunne håndtere alle likt
-     */
-    private fun List<no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode>.tilFellesFormat() =
-        this.map {
-            Vedtaksperiode(
-                id = it.id,
-                fom = it.fom,
-                tom = it.tom,
-                målgruppe = it.målgruppe,
-                aktivitet = it.aktivitet,
-            )
         }
 }

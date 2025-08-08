@@ -5,8 +5,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.ENSLIG_FORSØ
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeStatus
-import no.nav.tilleggsstonader.sak.vedtak.validering.validerIngenEndringerFørRevurderFra
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -59,10 +57,10 @@ class ValiderValiderIngenEndringerFørRevurderFraTest {
     }
 
     @Test
-    fun `kaster ikke feil ved ingen endringer, men oppdatert status`() {
+    fun `kaster ikke feil ved ingen endringer`() {
         assertDoesNotThrow {
             validerIngenEndringerFørRevurderFra(
-                innsendteVedtaksperioder = listOf(vedtaksperiodeLæremidlerJanFeb.copy(status = VedtaksperiodeStatus.UENDRET)),
+                innsendteVedtaksperioder = listOf(vedtaksperiodeLæremidlerJanFeb),
                 vedtaksperioderForrigeBehandling = listOf(vedtaksperiodeLæremidlerJanFeb),
                 revurderFra = førsteMars,
             )
@@ -392,12 +390,10 @@ class ValiderValiderIngenEndringerFørRevurderFraTest {
     private fun lagVedtaksperiodeLæremidler(
         fom: LocalDate = LocalDate.of(2025, 1, 1),
         tom: LocalDate = LocalDate.of(2025, 1, 31),
-        status: VedtaksperiodeStatus = VedtaksperiodeStatus.NY,
     ) = LæremidlerTestUtil.vedtaksperiode(
         id = UUID.randomUUID(),
         fom = fom,
         tom = tom,
-        status = status,
     )
 
     private fun lagVedtaksperiode(
