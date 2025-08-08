@@ -138,7 +138,7 @@ class LæremidlerVedtakController(
             }
 
         return foreslåVedtaksperiodeService
-            .foreslåVedtaksperioderLæremidler(behandlingId)
+            .foreslåPerioder(behandlingId)
             .tilLagretVedtaksperiodeDto(
                 tidligereVedtaksperioder = forrigeVedtaksperioder,
             )

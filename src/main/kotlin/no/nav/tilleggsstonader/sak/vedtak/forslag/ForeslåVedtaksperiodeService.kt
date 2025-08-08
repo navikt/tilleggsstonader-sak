@@ -26,8 +26,6 @@ class ForeslåVedtaksperiodeService(
     private val unleashService: UnleashService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
-    fun foreslåVedtaksperioderLæremidler(behandlingId: BehandlingId): List<Vedtaksperiode> = foreslåPerioder(behandlingId)
-
     fun foreslåPerioder(behandlingId: BehandlingId): List<Vedtaksperiode> {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
