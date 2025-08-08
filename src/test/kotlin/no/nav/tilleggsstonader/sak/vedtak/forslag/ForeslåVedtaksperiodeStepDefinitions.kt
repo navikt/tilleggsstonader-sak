@@ -7,6 +7,7 @@ import io.cucumber.java.no.Så
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.TestIdTilUUIDHolder.testIdTilUUID
+import no.nav.tilleggsstonader.sak.cucumber.TestIdTilUUIDHolder.uuidTilTestId
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseEnum
@@ -159,8 +160,10 @@ class ForeslåVedtaksperiodeStepDefinitions {
                     assertThat(actual.id).isEqualTo(it.id)
                 }
                 if (idSomSkalIgnoreres.contains(it.id) && tidligereVedtaksperioder.any { it.id == actual.id }) {
+                    val actualId = uuidTilTestId(actual.id)
                     throw Error(
-                        "Feilet rad ${index + 1}. Hvis actual inneholder en id som eksisterer i tidligere vedtaksperioder må den assertes riktig",
+                        "Feilet rad ${index + 1}. " +
+                            "Hvis actual inneholder en id som eksisterer i tidligere vedtaksperioder må den assertes riktig actualId=$actualId",
                     )
                 }
                 assertThat(actual.fom).isEqualTo(it.fom)

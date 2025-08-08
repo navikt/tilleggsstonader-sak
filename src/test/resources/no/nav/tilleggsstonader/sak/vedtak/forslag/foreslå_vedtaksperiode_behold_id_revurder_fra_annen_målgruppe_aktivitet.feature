@@ -61,9 +61,7 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
       | 1  | 01.01.2023 | 31.01.2023 | UTDANNING | ENSLIG_FORSØRGER    |
       | 2  | 01.03.2023 | 13.03.2023 | UTDANNING | ENSLIG_FORSØRGER    |
-      # Denne blir lagt til pga at den prøver å beholde ID fra forrige periode men forrige id er allerede brukt?
-      | -1 | 14.03.2023 | 15.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
-      | -1 | 16.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | -1 | 14.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
 
   Scenario: Revurder fra TOM i tidligere vedtaksperiode
 
@@ -73,6 +71,4 @@ Egenskap: Forslag av vedtaksperioder med behold id for å kunne bruke i revurder
       | Id | Fom        | Tom        | aktivitet | målgruppe           |
       | 1  | 01.01.2023 | 31.01.2023 | UTDANNING | ENSLIG_FORSØRGER    |
       | 2  | 01.03.2023 | 14.03.2023 | UTDANNING | ENSLIG_FORSØRGER    |
-      # Denne blir lagt til pga at den prøver å beholde ID fra forrige periode men forrige id er allerede brukt?
-      | -1 | 15.03.2023 | 15.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
-      | -1 | 16.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |
+      | -1 | 15.03.2023 | 31.03.2023 | TILTAK    | NEDSATT_ARBEIDSEVNE |

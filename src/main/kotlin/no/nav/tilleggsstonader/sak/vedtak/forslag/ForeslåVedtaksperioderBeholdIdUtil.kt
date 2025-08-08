@@ -27,7 +27,7 @@ object ForeslåVedtaksperioderBeholdIdUtil {
                 initielleForslag = aktuelleVedtaksperioder.forslagEtterTidligsteEndring,
             ).beholdTidligereIdnForVedtaksperioder()
         return mergeHvisLikeOgSammeId(
-            forrigeVedtaksperioderSkalIkkeEndres = aktuelleVedtaksperioder.forrigeVedtaksperioderSkalIkkeEndres,
+            vedtaksperioder = aktuelleVedtaksperioder,
             nyttForslag = nyttForslag,
         )
     }
@@ -66,7 +66,9 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         val forrigeVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
         val forrigeVedtaksperioder: List<Vedtaksperiode>,
         val forslagEtterTidligsteEndring: List<Vedtaksperiode>,
-    )
+    ) {
+        val forrigeVedtaksperiodeIdn = forrigeVedtaksperioder.map { it.id }.toSet()
+    }
 
     /**
      * Slår sammen forrige vedtaksperioder og nye forslag
@@ -76,22 +78,32 @@ object ForeslåVedtaksperioderBeholdIdUtil {
      * Det håndteres gjennom å sjekke at ID'n ikke finnes flere ganger. Hvis de finnes flere ganger, så genereres en ny ID for den perioden.
      */
     private fun mergeHvisLikeOgSammeId(
-        forrigeVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
+        vedtaksperioder: Vedtaksperioder,
         nyttForslag: List<Vedtaksperiode>,
     ): List<Vedtaksperiode> {
-        val idn = mutableSetOf<UUID>()
+        val forrigeVedtaksperioderSkalIkkeEndres = vedtaksperioder.forrigeVedtaksperioderSkalIkkeEndres
+        val idnSomIkkeSkalMerges = vedtaksperioder.forrigeVedtaksperiodeIdn
+
+        val idnSomErBrukte = mutableSetOf<UUID>()
+
         return (forrigeVedtaksperioderSkalIkkeEndres + nyttForslag)
             .mergeSammenhengende { v1, v2 ->
                 v1.id == v2.id && v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2)
             }
             // Hvis 2 vedtaksperioder har samme ID har de ikke samme målgruppe eller aktivitet, og då skal kun den første beholdes
             .map {
-                val idFinnesIkkeFraFør = idn.add(it.id)
+                val idFinnesIkkeFraFør = idnSomErBrukte.add(it.id)
                 if (idFinnesIkkeFraFør) {
                     it
                 } else {
                     it.copy(id = UUID.randomUUID())
                 }
+            }
+            // Skal mergea nye vedtaksperioder som er sammenhengende
+            .mergeSammenhengende { v1, v2 ->
+                !idnSomIkkeSkalMerges.contains(v1.id) &&
+                    !idnSomIkkeSkalMerges.contains(v2.id) &&
+                    v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2)
             }
     }
 }
