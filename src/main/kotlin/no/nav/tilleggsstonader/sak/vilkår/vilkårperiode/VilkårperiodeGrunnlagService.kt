@@ -62,14 +62,17 @@ class VilkårperiodeGrunnlagService(
 
         val eksisterendeGrunnlag = vilkårperioderGrunnlagRepository.findByIdOrThrow(behandlingId)
 
-        val eksisterendeHentetFom = hentGrunnlagFom ?: eksisterendeGrunnlag.grunnlag.hentetInformasjon.fom
+        val forrigeHentetFom = eksisterendeGrunnlag.grunnlag.hentetInformasjon.fom
+        val nyHentetFom = hentGrunnlagFom ?: forrigeHentetFom
         val tom = YearMonth.now().plusYears(1).atEndOfMonth()
 
-        val nyGrunnlagsdata = hentGrunnlagsdata(behandlingId, eksisterendeHentetFom, tom)
+        val nyGrunnlagsdata = hentGrunnlagsdata(behandlingId, nyHentetFom, tom)
         vilkårperioderGrunnlagRepository.update(eksisterendeGrunnlag.copy(grunnlag = nyGrunnlagsdata))
         val tidSidenForrigeHenting =
             ChronoUnit.HOURS.between(nyGrunnlagsdata.hentetInformasjon.tidspunktHentet, LocalDateTime.now())
-        logger.info("Oppdatert grunnlagsdata for behandling=$behandlingId timerSidenForrige=$tidSidenForrigeHenting")
+        logger.info(
+            "Oppdatert grunnlagsdata for behandling=$behandlingId timerSidenForrige=$tidSidenForrigeHenting forrigeHentetFom=$forrigeHentetFom hentGrunnlagFom=$hentGrunnlagFom",
+        )
     }
 
     fun hentEllerOpprettGrunnlag(
@@ -118,10 +121,23 @@ class VilkårperiodeGrunnlagService(
         behandling: Saksbehandling,
         vilkårperioder: Vilkårperioder,
     ): LocalDate {
+        val startdatoVilkårperiode = startdatoPåFørsteEksisterendeVilkårperiode(vilkårperioder)
+
+        return startdatoVilkårperiode
+            ?.let { minOf(it, grunnlagsdatoBehandling(behandling)) }
+            ?: grunnlagsdatoBehandling(behandling)
+    }
+
+    /**
+     * Henter grunnlagsdatoen for en behandling,
+     * som er basert på mottatt eller opprettet tidspunkt minus antall måneder for stønadstypen.
+     * Hvis det gjelder en revurdering, så brukes datoen til første dag i måneden før revurderingsdatoen.
+     */
+    private fun grunnlagsdatoBehandling(behandling: Saksbehandling): LocalDate {
         if (behandling.revurderFra != null) {
-            return startdatoPåFørsteEksisterendeVilkårperiode(vilkårperioder)
-                ?: behandling.revurderFra.minusMonths(1).tilFørsteDagIMåneden()
+            return behandling.revurderFra.minusMonths(1).tilFørsteDagIMåneden()
         }
+
         val mottattTidspunkt =
             søknadService.hentSøknadMetadata(behandling.id)?.mottattTidspunkt
                 ?: behandling.opprettetTid

@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.arbeidsfordeling
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import no.nav.tilleggsstonader.kontrakter.felles.tilTema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
@@ -37,18 +37,16 @@ class ArbeidsfordelingService(
         ident: String,
         stønadstype: Stønadstype,
         oppgavetype: Oppgavetype,
-        tema: Tema = Tema.TSO,
     ) = when (oppgavetype) {
         Oppgavetype.VurderHenvendelse -> hentNavEnhetForOppfølging(ident, stønadstype, oppgavetype)?.enhetNr
-        else -> hentNavEnhet(ident, stønadstype, tema)?.enhetNr
+        else -> hentNavEnhet(ident, stønadstype)?.enhetNr
     }
 
     fun hentNavEnhet(
         ident: String,
         stønadstype: Stønadstype,
-        tema: Tema = Tema.TSO,
     ): Arbeidsfordelingsenhet? {
-        val kriterie = lagArbeidsfordelingKritierieForPerson(ident, stønadstype, tema)
+        val kriterie = lagArbeidsfordelingKritierieForPerson(ident, stønadstype)
         val enheter = finnArbeidsfordelingsenhet(kriterie)
         return enheter.firstOrNull()
     }
@@ -57,13 +55,11 @@ class ArbeidsfordelingService(
         ident: String,
         stønadstype: Stønadstype,
         oppgavetype: Oppgavetype,
-        tema: Tema = Tema.TSO,
     ): Arbeidsfordelingsenhet? {
         val arbeidsfordelingskriterie =
             lagArbeidsfordelingKritierieForPerson(
                 personIdent = ident,
                 stønadstype = stønadstype,
-                arbeidsfordelingstema = tema,
                 oppgavetype = oppgavetype,
             )
         return finnArbeidsfordelingsenhet(arbeidsfordelingskriterie)
@@ -87,7 +83,6 @@ class ArbeidsfordelingService(
     private fun lagArbeidsfordelingKritierieForPerson(
         personIdent: String,
         stønadstype: Stønadstype,
-        arbeidsfordelingstema: Tema,
         oppgavetype: Oppgavetype? = null,
     ): ArbeidsfordelingKriterie {
         val adressebeskyttelseForPerson = hentAdressebeskyttelse(personIdent, stønadstype)
@@ -95,7 +90,7 @@ class ArbeidsfordelingService(
         val diskresjonskode = høyesteGraderingen(adressebeskyttelseForPerson).tilDiskresjonskode()
 
         return ArbeidsfordelingKriterie(
-            tema = arbeidsfordelingstema.name,
+            tema = stønadstype.tilTema().name,
             diskresjonskode = diskresjonskode,
             geografiskOmraade = geografiskTilknytning ?: GEOGRAFISK_TILKNYTTING_OSLO,
             skjermet = erEgenAnsatt(adressebeskyttelseForPerson),

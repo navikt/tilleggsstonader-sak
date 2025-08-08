@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -47,7 +48,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
         val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
 
-        assertThat(behandlingOppsummering.finnesDataÅOppsummere).isFalse()
+        assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isFalse()
         assertThat(behandlingOppsummering.aktiviteter).isEmpty()
         assertThat(behandlingOppsummering.målgrupper).isEmpty()
         assertThat(behandlingOppsummering.vilkår).isEmpty()
@@ -76,7 +77,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
 
-            assertThat(behandlingOppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(behandlingOppsummering.målgrupper).hasSize(1)
             assertThat(behandlingOppsummering.målgrupper[0].fom).isEqualTo(LocalDate.of(2025, 1, 1))
             assertThat(behandlingOppsummering.målgrupper[0].tom).isEqualTo(LocalDate.of(2025, 1, 31))
@@ -112,7 +113,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
 
-            assertThat(behandlingOppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(behandlingOppsummering.målgrupper).hasSize(3)
         }
     }
@@ -145,7 +146,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
 
-            assertThat(behandlingOppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(behandlingOppsummering.vilkår).hasSize(1)
             assertThat(behandlingOppsummering.vilkår[0].barnId).isEqualTo(barn1)
             assertThat(behandlingOppsummering.vilkår[0].vilkår).hasSize(1)
@@ -176,7 +177,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
 
-            assertThat(behandlingOppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(behandlingOppsummering.vilkår).hasSize(1)
             assertThat(behandlingOppsummering.vilkår[0].vilkår).hasSize(2)
         }
@@ -208,7 +209,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
 
-            assertThat(behandlingOppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(behandlingOppsummering.vilkår).hasSize(2)
         }
     }
@@ -245,7 +246,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
             val oppsummertInnvilgelse = behandlingsoppsummering.vedtak as OppsummertVedtakInnvilgelse
 
-            assertThat(oppsummertInnvilgelse.vedtaksperioder).isEqualTo(vedtaksperioder.map { it.tilDto() })
+            assertThat(oppsummertInnvilgelse.vedtaksperioder).isEqualTo(vedtaksperioder.tilDto())
         }
 
         @Test
@@ -302,7 +303,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
             )
 
             val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
-            assertThat(oppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(oppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(oppsummering.aktiviteter).hasSize(1)
             assertThat(oppsummering.aktiviteter[0].fom).isEqualTo(LocalDate.of(2024, 8, 1))
         }
@@ -331,7 +332,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
             )
 
             val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
-            assertThat(oppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(oppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(oppsummering.vilkår).hasSize(1)
             assertThat(oppsummering.vilkår[0].type).isEqualTo(VilkårType.LØPENDE_UTGIFTER_EN_BOLIG)
 
@@ -363,7 +364,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
             )
 
             val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
-            assertThat(oppsummering.finnesDataÅOppsummere).isTrue()
+            assertThat(oppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(oppsummering.vilkår[0].vilkår[0].fom).isEqualTo(LocalDate.of(2025, 1, 1))
         }
     }

@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class NullstillBehandlingService(
     private val behandlingService: BehandlingService,
-    private val gjennbrukDataRevurderingService: GjennbrukDataRevurderingService,
+    private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
     private val vilkårRepository: VilkårRepository,
@@ -65,6 +65,12 @@ class NullstillBehandlingService(
         vilkårperioderGrunnlagRepository.deleteById(behandlingId)
     }
 
+    // TODO: Gjør det tydeligere at barna som skal med i nullstilt søknad SKAL VÆRE ALLE BARNA FRA GAMMEL BEHANDLING PLUSS ALLE BARN FRA NY BEHANDLING.
+    // Vi trenger fortsatt en oversikt over
+
+    fun flettBarn(behandlingId: BehandlingId) {
+    }
+
     /**
      * Nullstiller ikke barn, då barn gjenbrukes og har ev. med nye fra ny søknad
      */
@@ -81,14 +87,14 @@ class NullstillBehandlingService(
 
     private fun gjenbrukData(behandling: Behandling) {
         val behandlingIdForGjenbruk =
-            gjennbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
+            gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
                 ?: error("Fant ingen behandling å gjenbruke data fra")
-        kopierManglendeBarnFraForrgieBehandling(behandlingIdForGjenbruk, behandling)
-        val barnMap = gjennbrukDataRevurderingService.finnNyttIdForBarn(behandling.id, behandlingIdForGjenbruk)
-        gjennbrukDataRevurderingService.gjenbrukData(behandling, behandlingIdForGjenbruk, barnMap)
+        kopierManglendeBarnFraForrigeBehandling(behandlingIdForGjenbruk, behandling)
+        val barnMap = gjenbrukDataRevurderingService.finnNyttIdForBarn(behandling.id, behandlingIdForGjenbruk)
+        gjenbrukDataRevurderingService.gjenbrukData(behandling, behandlingIdForGjenbruk, barnMap)
     }
 
-    private fun kopierManglendeBarnFraForrgieBehandling(
+    private fun kopierManglendeBarnFraForrigeBehandling(
         behandlingIdForGjenbruk: BehandlingId,
         nyBehandling: Behandling,
     ) {

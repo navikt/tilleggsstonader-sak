@@ -29,11 +29,10 @@ enum class ResultatDelvilkårperiode {
     IKKE_AKTUELT,
 }
 
-data class VurderingLønnet private constructor(
+data class VurderingLønnet(
     override val svar: SvarJaNei?,
-    override val resultat: ResultatDelvilkårperiode,
 ) : Vurdering {
-    constructor(svar: SvarJaNei?) : this(svar, utledResultat(svar))
+    override val resultat: ResultatDelvilkårperiode = utledResultat(svar)
 
     companion object {
         private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =
@@ -47,11 +46,10 @@ data class VurderingLønnet private constructor(
     }
 }
 
-data class VurderingHarUtgifter private constructor(
+data class VurderingHarUtgifter(
     override val svar: SvarJaNei?,
-    override val resultat: ResultatDelvilkårperiode,
 ) : Vurdering {
-    constructor(svar: SvarJaNei?) : this(svar, utledResultat(svar))
+    override val resultat: ResultatDelvilkårperiode = utledResultat(svar)
 
     companion object {
         private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =
@@ -65,11 +63,10 @@ data class VurderingHarUtgifter private constructor(
     }
 }
 
-data class VurderingHarRettTilUtstyrsstipend private constructor(
+data class VurderingHarRettTilUtstyrsstipend(
     override val svar: SvarJaNei?,
-    override val resultat: ResultatDelvilkårperiode,
 ) : Vurdering {
-    constructor(svar: SvarJaNei?) : this(svar, utledResultat(svar))
+    override val resultat: ResultatDelvilkårperiode = utledResultat(svar)
 
     companion object {
         private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =
@@ -87,11 +84,10 @@ data class VurderingHarRettTilUtstyrsstipend private constructor(
     }
 }
 
-data class VurderingMedlemskap private constructor(
+data class VurderingMedlemskap(
     override val svar: SvarJaNei?,
-    override val resultat: ResultatDelvilkårperiode,
 ) : Vurdering {
-    constructor(svar: SvarJaNei?) : this(svar, utledResultat(svar))
+    override val resultat: ResultatDelvilkårperiode = utledResultat(svar)
 
     companion object {
         private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =
@@ -110,11 +106,10 @@ data class VurderingMedlemskap private constructor(
     }
 }
 
-data class VurderingDekketAvAnnetRegelverk private constructor(
+data class VurderingDekketAvAnnetRegelverk(
     override val svar: SvarJaNei?,
-    override val resultat: ResultatDelvilkårperiode,
 ) : Vurdering {
-    constructor(svar: SvarJaNei?) : this(svar, utledResultat(svar))
+    override val resultat: ResultatDelvilkårperiode = utledResultat(svar)
 
     companion object {
         private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =
@@ -167,7 +162,7 @@ data class VurderingAldersVilkår(
     }
 }
 
-data class VurderingMottarSykepengerForFulltidsstilling constructor(
+data class VurderingMottarSykepengerForFulltidsstilling(
     override val svar: SvarJaNei?,
     override val resultat: ResultatDelvilkårperiode,
 ) : Vurdering {

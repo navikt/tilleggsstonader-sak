@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.tilBehandlingstema
+import no.nav.tilleggsstonader.kontrakter.felles.tilTema
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
@@ -32,7 +32,7 @@ fun tilOpprettOppgaveRequest(
 ): OpprettOppgaveRequest =
     OpprettOppgaveRequest(
         ident = OppgaveIdentV2(ident = personIdent, gruppe = IdentGruppe.FOLKEREGISTERIDENT),
-        tema = Tema.TSO,
+        tema = stønadstype.tilTema(),
         journalpostId = oppgave.journalpostId,
         oppgavetype = oppgave.oppgavetype,
         fristFerdigstillelse = oppgave.fristFerdigstillelse ?: lagFristForOppgave(LocalDateTime.now()),
@@ -51,3 +51,12 @@ private fun lagOppgaveTekst(beskrivelse: String? = null): String {
     val beskrivelseMedNewLine = beskrivelse?.let { "\n$it" } ?: ""
     return prefix + beskrivelseMedNewLine
 }
+
+/**
+ * Oppretter frist for oppgave basert på kravMottatt eller behandlingOpprettet.
+ * Hvis kravMottatt er null, brukes behandlingOpprettet.
+ */
+fun fristBehandleSakOppgave(
+    kravMottatt: LocalDate?,
+    behandlingOpprettet: LocalDateTime,
+) = lagFristForOppgave((kravMottatt ?: behandlingOpprettet.toLocalDate()).atTime(behandlingOpprettet.toLocalTime()))

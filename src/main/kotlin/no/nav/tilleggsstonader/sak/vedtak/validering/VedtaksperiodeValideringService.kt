@@ -29,12 +29,12 @@ class VedtaksperiodeValideringService(
      * vedtaksperioder på lik måte
      */
     fun validerVedtaksperioderLæremidler(
-        vedtaksperioder: List<no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode>,
+        vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
         tidligsteEndring: LocalDate?,
     ) {
-        validerVedtaksperioder(vedtaksperioder.tilFellesVedtaksperiode(), behandling, typeVedtak, tidligsteEndring)
+        validerVedtaksperioder(vedtaksperioder, behandling, typeVedtak, tidligsteEndring)
     }
 
     fun validerVedtaksperioder(
@@ -80,23 +80,9 @@ class VedtaksperiodeValideringService(
             when (val forrigeVedtak = vedtakRepository.findByIdOrNull(it)?.data) {
                 is InnvilgelseEllerOpphørTilsynBarn -> forrigeVedtak.vedtaksperioder
                 is InnvilgelseEllerOpphørBoutgifter -> forrigeVedtak.vedtaksperioder
-                is InnvilgelseEllerOpphørLæremidler -> forrigeVedtak.vedtaksperioder.tilFellesVedtaksperiode()
+                is InnvilgelseEllerOpphørLæremidler -> forrigeVedtak.vedtaksperioder
                 is Avslag -> null
                 else -> error("Håndterer ikke ${forrigeVedtak?.javaClass?.simpleName}")
             }
         }
 }
-
-/**
- * For å kunne gjenbruke validering er det ønskelig å mappe vedtaksperiode til felles format for vedtaksperioder
- */
-private fun List<no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode>.tilFellesVedtaksperiode() =
-    this.map {
-        Vedtaksperiode(
-            id = it.id,
-            fom = it.fom,
-            tom = it.tom,
-            aktivitet = it.aktivitet,
-            målgruppe = it.målgruppe,
-        )
-    }

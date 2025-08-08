@@ -15,11 +15,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.JournalpostClientConfig
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.klage.KlageClient
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -44,12 +41,6 @@ class JournalpostControllerTest : IntegrationTest() {
     lateinit var taskService: TaskService
 
     @Autowired
-    lateinit var journalpostClient: JournalpostClient
-
-    @Autowired
-    lateinit var oppgaveClient: OppgaveClient
-
-    @Autowired
     lateinit var klageClient: KlageClient
 
     @BeforeEach
@@ -61,9 +52,8 @@ class JournalpostControllerTest : IntegrationTest() {
     @AfterEach
     override fun tearDown() {
         super.tearDown()
-
-        JournalpostClientConfig.resetMock(journalpostClient)
-        OppgaveClientConfig.resetMock(oppgaveClient)
+        mockService.resetJournalpostClient()
+        mockService.resetOppgaveClient()
     }
 
     @Test
@@ -104,14 +94,14 @@ class JournalpostControllerTest : IntegrationTest() {
             )
         assertThat(behandlesakOppgavePayload.behandlingId).isEqualTo(opprettetBehandling.id)
 
-        verify(exactly = 1) { journalpostClient.ferdigstillJournalpost("1", enhet, saksbehandler) }
+        verify(exactly = 1) { mockService.journalpostClient.ferdigstillJournalpost("1", enhet, saksbehandler) }
         verify(exactly = 1) {
-            journalpostClient.oppdaterLogiskeVedlegg(
+            mockService.journalpostClient.oppdaterLogiskeVedlegg(
                 "1",
                 BulkOppdaterLogiskVedleggRequest(listOf("ny tittel")),
             )
         }
-        verify(exactly = 1) { oppgaveClient.ferdigstillOppgave("123".toLong()) }
+        verify(exactly = 1) { mockService.oppgaveClient.ferdigstillOppgave("123".toLong()) }
     }
 
     @Test
@@ -150,14 +140,14 @@ class JournalpostControllerTest : IntegrationTest() {
             )
         }
 
-        verify(exactly = 1) { journalpostClient.ferdigstillJournalpost("1", enhet, saksbehandler) }
+        verify(exactly = 1) { mockService.journalpostClient.ferdigstillJournalpost("1", enhet, saksbehandler) }
         verify(exactly = 1) {
-            journalpostClient.oppdaterLogiskeVedlegg(
+            mockService.journalpostClient.oppdaterLogiskeVedlegg(
                 "1",
                 BulkOppdaterLogiskVedleggRequest(listOf("ny tittel")),
             )
         }
-        verify(exactly = 1) { oppgaveClient.ferdigstillOppgave("123".toLong()) }
+        verify(exactly = 1) { mockService.oppgaveClient.ferdigstillOppgave("123".toLong()) }
     }
 
     private fun fullførJournalpost(

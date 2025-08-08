@@ -93,7 +93,7 @@ class HåndterSøknadService(
         }
     }
 
-    private fun harÅpenBehandling(behandlinger: List<Behandling>): Boolean = behandlinger.any { !it.erAvsluttet() }
+    private fun harÅpenBehandling(behandlinger: List<Behandling>): Boolean = behandlinger.any { !it.erFerdigstilt() }
 
     private fun håndterSøknadSomIkkeKanAutomatiskJournalføres(
         personIdent: String,

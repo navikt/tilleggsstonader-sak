@@ -6,15 +6,10 @@ import no.nav.tilleggsstonader.kontrakter.pdl.PdlGeografiskTilknytningVariables
 import no.nav.tilleggsstonader.kontrakter.pdl.PdlHentGeografiskTilknytning
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlAnnenForelder
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBolkResponse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlHentIdenter
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdentBolkRequest
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdentBolkRequestVariables
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdentBolkResponse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdentRequest
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdentRequestVariables
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
@@ -107,25 +102,6 @@ class PdlClient(
         return pdlIdenter
     }
 
-    /**
-     * @param identer Identene til personene, samme hvilke type (Folkeregisterident, aktørid eller npid).
-     * For tiden (2020-03-22) maks 100 identer lovlig i spørring.
-     * @return map med søkeident som nøkkel og liste av folkeregisteridenter
-     */
-    fun hentIdenterBolk(identer: List<String>): Map<String, PdlIdent> {
-        feilHvis(identer.size > MAKS_ANTALL_IDENTER) {
-            "Feil i spørring mot PDL. Antall identer i spørring overstiger $MAKS_ANTALL_IDENTER"
-        }
-        val request =
-            PdlIdentBolkRequest(
-                variables = PdlIdentBolkRequestVariables(identer, "FOLKEREGISTERIDENT"),
-                query = PdlConfig.hentIdenterBolkQuery,
-            )
-        val pdlResponse = postForEntity<PdlIdentBolkResponse>(pdlUri, request, PdlUtil.httpHeaders)
-
-        return feilmeldOgReturnerData(pdlResponse)
-    }
-
     fun hentGeografiskTilknytning(ident: String): GeografiskTilknytningDto? {
         val request =
             PdlGeografiskTilknytningRequest(
@@ -136,9 +112,5 @@ class PdlClient(
         val response = postForEntity<PdlResponse<PdlHentGeografiskTilknytning>>(pdlUri, request, PdlUtil.httpHeaders)
 
         return feilsjekkOgReturnerData(ident, response) { it.hentGeografiskTilknytning }
-    }
-
-    companion object {
-        const val MAKS_ANTALL_IDENTER = 100
     }
 }

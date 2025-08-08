@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -20,6 +21,7 @@ class BehandlingsoversiktService(
     private val fagsakService: FagsakService,
     private val behandlingRepository: BehandlingRepository,
     private val vedtaksperiodeService: VedtaksperiodeService,
+    private val vedtakService: VedtakService,
 ) {
     fun hentOversikt(fagsakPersonId: FagsakPersonId): BehandlingsoversiktDto {
         val fagsak = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
@@ -66,6 +68,7 @@ class BehandlingsoversiktService(
                         henlagtBegrunnelse = it.henlagtBegrunnelse,
                         revurderFra = it.revurderFra,
                         vedtaksperiode = vedtaksperioder[it.id],
+                        opphørsdato = if (it.erOpphørt()) hentOpphørsdato(it) else null,
                     )
                 },
         )
@@ -86,6 +89,9 @@ class BehandlingsoversiktService(
             slåSammenVedtaksperioderForBehandling(behandlingId, revurderFra)
         }
     }
+
+    private fun hentOpphørsdato(behandling: Behandling): LocalDate? =
+        vedtakService.hentVedtak(behandling.id)?.opphørsdato ?: behandling.revurderFra
 
     /**
      * Slår sammen alle vedtaksperioder som finnes i en behandling slik at oversikten kun viser en periode.

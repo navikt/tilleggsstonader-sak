@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.hendelser.Hendelse
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.MockService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRouting
@@ -115,6 +116,9 @@ abstract class IntegrationTest {
 
     @Autowired
     private lateinit var cacheManagers: List<CacheManager>
+
+    @Autowired
+    protected lateinit var mockService: MockService
 
     val logger = LoggerFactory.getLogger(javaClass)
 

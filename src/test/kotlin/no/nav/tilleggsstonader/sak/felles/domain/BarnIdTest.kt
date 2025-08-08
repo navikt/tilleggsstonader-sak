@@ -22,6 +22,19 @@ class BarnIdTest {
         assertThat(objectMapper.readValue<Foo>(json)).isEqualTo(foo)
     }
 
+    /**
+     * Jackson håndterte ikke tidligere deserialisering av en map av eks Map<BarnId, AnnenData>
+     * https://github.com/FasterXML/jackson-databind/issues/4444
+     */
+    @Test
+    fun `skal kunne deserialisere som nøkkel i json`() {
+        val foo = mapOf(BarnId.fromString(id) to "id")
+        val json = objectMapper.writeValueAsString(foo)
+
+        assertThat(json).isEqualTo("""{"96673a99-1d90-4f22-abdf-faee57062432":"id"}""")
+        assertThat(objectMapper.readValue<Map<BarnId, String>>(json)).isEqualTo(foo)
+    }
+
     private data class Foo(
         val id: BarnId,
     )

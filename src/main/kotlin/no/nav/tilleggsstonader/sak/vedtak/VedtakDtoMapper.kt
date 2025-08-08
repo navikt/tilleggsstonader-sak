@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
@@ -24,25 +25,51 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
+import org.springframework.stereotype.Component
 import java.time.LocalDate
 
-object VedtakDtoMapper {
+@Component
+class VedtakDtoMapper(
+    private val vedtaksperiodeService: VedtaksperiodeService,
+) {
     fun toDto(
         vedtak: Vedtak,
         revurderFra: LocalDate?,
+        forrigeIverksatteBehandlingId: BehandlingId?,
     ): VedtakResponse {
         val data = vedtak.data
         return when (data) {
-            is VedtakTilsynBarn -> mapVedtakTilsynBarn(vedtak, data, vedtak.tidligsteEndring ?: revurderFra)
-            is VedtakLæremidler -> mapVedtakLæremidler(vedtak, data, vedtak.tidligsteEndring ?: revurderFra)
-            is VedtakBoutgifter -> mapVedtakBoutgifter(vedtak, data, vedtak.tidligsteEndring ?: revurderFra)
+            is VedtakTilsynBarn ->
+                mapVedtakTilsynBarn(
+                    vedtak,
+                    data,
+                    vedtak.tidligsteEndring ?: revurderFra,
+                    forrigeIverksatteBehandlingId,
+                )
+
+            is VedtakLæremidler ->
+                mapVedtakLæremidler(
+                    vedtak,
+                    data,
+                    vedtak.tidligsteEndring ?: revurderFra,
+                    forrigeIverksatteBehandlingId,
+                )
+
+            is VedtakBoutgifter ->
+                mapVedtakBoutgifter(
+                    vedtak,
+                    data,
+                    vedtak.tidligsteEndring ?: revurderFra,
+                    forrigeIverksatteBehandlingId,
+                )
         }
     }
 
@@ -50,21 +77,25 @@ object VedtakDtoMapper {
         vedtak: Vedtak,
         data: VedtakTilsynBarn,
         tidligsteEndring: LocalDate?,
+        forrigeIverksatteBehandlingId: BehandlingId?,
     ): VedtakTilsynBarnResponse =
         when (data) {
-            is InnvilgelseTilsynBarn ->
+            is InnvilgelseTilsynBarn -> {
                 InnvilgelseTilsynBarnResponse(
                     beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
-                    vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(),
+                    vedtaksperioder =
+                        data.vedtaksperioder.tilLagretVedtaksperiodeDto(
+                            hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
+                        ),
                     begrunnelse = data.begrunnelse,
                 )
-
+            }
             is OpphørTilsynBarn ->
                 OpphørTilsynBarnResponse(
                     beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
-                    vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(),
+                    vedtaksperioder = data.vedtaksperioder.tilLagretVedtaksperiodeDto(null),
                     opphørsdato = vedtak.opphørsdato,
                 )
 
@@ -79,16 +110,20 @@ object VedtakDtoMapper {
         vedtak: Vedtak,
         data: VedtakLæremidler,
         tidligsteEndring: LocalDate?,
+        forrigeIverksatteBehandlingId: BehandlingId?,
     ): VedtakLæremidlerResponse =
         when (data) {
-            is InnvilgelseLæremidler ->
+            is InnvilgelseLæremidler -> {
                 InnvilgelseLæremidlerResponse(
-                    vedtaksperioder = data.vedtaksperioder.tilDto(),
+                    vedtaksperioder =
+                        data.vedtaksperioder
+                            .tilLagretVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
                     beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
                 )
+            }
 
             is AvslagLæremidler ->
                 AvslagLæremidlerDto(
@@ -100,7 +135,9 @@ object VedtakDtoMapper {
                 OpphørLæremidlerResponse(
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
-                    vedtaksperioder = data.vedtaksperioder.tilDto(),
+                    vedtaksperioder =
+                        data.vedtaksperioder
+                            .tilLagretVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
                     opphørsdato = vedtak.opphørsdato,
                 )
         }
@@ -109,16 +146,21 @@ object VedtakDtoMapper {
         vedtak: Vedtak,
         data: VedtakBoutgifter,
         tidligsteEndring: LocalDate?,
+        forrigeIverksatteBehandlingId: BehandlingId?,
     ): VedtakBoutgifterResponse =
         when (data) {
-            is InnvilgelseBoutgifter ->
+            is InnvilgelseBoutgifter -> {
                 InnvilgelseBoutgifterResponse(
-                    vedtaksperioder = data.vedtaksperioder.tilVedtaksperiodeDto(),
+                    vedtaksperioder =
+                        data.vedtaksperioder.tilLagretVedtaksperiodeDto(
+                            hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
+                        ),
                     beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
                 )
+            }
 
             is AvslagBoutgifter ->
                 AvslagBoutgifterDto(
@@ -130,8 +172,19 @@ object VedtakDtoMapper {
                 OpphørBoutgifterResponse(
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
-                    vedtaksperioder = data.vedtaksperioder.tilDto(),
+                    vedtaksperioder =
+                        data.vedtaksperioder.tilLagretVedtaksperiodeDto(
+                            hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
+                        ),
                     opphørsdato = vedtak.opphørsdato,
                 )
+        }
+
+    private fun hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId: BehandlingId?): List<Vedtaksperiode>? =
+        forrigeIverksatteBehandlingId?.let {
+            vedtaksperiodeService.finnVedtaksperioderForBehandling(
+                behandlingId = it,
+                revurdererFra = null,
+            )
         }
 }

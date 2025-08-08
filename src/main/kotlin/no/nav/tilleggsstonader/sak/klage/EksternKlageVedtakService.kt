@@ -24,7 +24,7 @@ class EksternKlageVedtakService(
     private fun hentFerdigstilteBehandlinger(fagsak: Fagsak): List<FagsystemVedtak> =
         behandlingService
             .hentBehandlinger(fagsakId = fagsak.id)
-            .filter { it.erAvsluttet() && it.resultat != BehandlingResultat.HENLAGT }
+            .filter { it.erFerdigstilt() && it.resultat != BehandlingResultat.HENLAGT }
             .map { tilFagsystemVedtak(it) }
 
     private fun tilFagsystemVedtak(behandling: Behandling): FagsystemVedtak =

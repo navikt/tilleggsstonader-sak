@@ -36,7 +36,7 @@ class OpprettRevurderingBehandlingService(
     val vilkårperiodeService: VilkårperiodeService,
     val vilkårService: VilkårService,
     val unleashService: UnleashService,
-    val gjenbrukDataRevurderingService: GjennbrukDataRevurderingService,
+    val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
     val personService: PersonService,
     val fagsakService: FagsakService,
 ) {

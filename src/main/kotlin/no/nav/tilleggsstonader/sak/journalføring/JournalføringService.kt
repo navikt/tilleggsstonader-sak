@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
+import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -51,7 +51,7 @@ class JournalføringService(
     private val transactionHandler: TransactionHandler,
     private val personService: PersonService,
     private val oppgaveService: OppgaveService,
-    private val gjennbrukDataRevurderingService: GjennbrukDataRevurderingService,
+    private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
     private val klageService: KlageService,
 ) {
     @Transactional
@@ -122,10 +122,10 @@ class JournalføringService(
                 behandlingÅrsak = behandlingÅrsak,
             )
 
-        val behandlingIdForGjenbruk = gjennbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
+        val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
 
         if (behandlingIdForGjenbruk != null) {
-            gjennbrukDataRevurderingService.gjenbrukData(behandling, behandlingIdForGjenbruk)
+            gjenbrukDataRevurderingService.gjenbrukData(behandling, behandlingIdForGjenbruk)
         }
 
         if (journalpost.harStrukturertSøknad()) {

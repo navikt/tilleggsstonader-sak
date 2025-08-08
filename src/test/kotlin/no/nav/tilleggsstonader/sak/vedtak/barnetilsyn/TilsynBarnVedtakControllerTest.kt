@@ -111,7 +111,7 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
 
         val lagretDto = hentVedtak<InnvilgelseTilsynBarnResponse>(behandling.id).body!!
 
-        assertThat(lagretDto.vedtaksperioder).isEqualTo(vedtak.vedtaksperioder)
+        assertThat(lagretDto.vedtaksperioder?.map { it.tilVedtaksperiodeDto() }).isEqualTo(vedtak.vedtaksperioder)
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
         assertThat(lagretDto.type).isEqualTo(TypeVedtak.INNVILGELSE)
     }

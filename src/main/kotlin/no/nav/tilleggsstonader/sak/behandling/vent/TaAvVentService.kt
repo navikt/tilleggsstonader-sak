@@ -13,8 +13,10 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.fristBehandleSakOppgave
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class TaAvVentService(
@@ -58,6 +60,11 @@ class TaAvVentService(
         taOppgaveAvVent(
             settPåVent = påVentMetadata,
             skalTilordnesRessurs = taAvVentDto?.skalTilordnesRessurs ?: true,
+            frist =
+                fristBehandleSakOppgave(
+                    kravMottatt = behandling.kravMottatt,
+                    behandlingOpprettet = behandling.sporbar.opprettetTid,
+                ),
         )
     }
 
@@ -112,12 +119,14 @@ class TaAvVentService(
     private fun taOppgaveAvVent(
         settPåVent: SettPåVent,
         skalTilordnesRessurs: Boolean,
+        frist: LocalDate,
     ) {
         val taAvVent =
             TaAvVentRequest(
                 oppgaveId = settPåVent.oppgaveId,
                 beholdOppgave = skalTilordnesRessurs,
                 kommentar = settPåVent.taAvVentKommentar,
+                frist = frist,
             )
         oppgaveService.taAvVent(taAvVent)
     }

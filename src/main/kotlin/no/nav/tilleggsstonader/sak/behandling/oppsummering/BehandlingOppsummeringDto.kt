@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.oppsummering
 
+import com.fasterxml.jackson.annotation.JsonGetter
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
@@ -13,45 +14,18 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeT
 import java.time.LocalDate
 import java.util.UUID
 
-data class BehandlingOppsummeringDto private constructor(
+data class BehandlingOppsummeringDto(
     val aktiviteter: List<OppsummertVilkårperiode>,
     val målgrupper: List<OppsummertVilkårperiode>,
     val vilkår: List<Stønadsvilkår>,
     val vedtak: OppsummertVedtak?,
-    val finnesDataÅOppsummere: Boolean,
 ) {
-    constructor(
-        aktiviteter: List<OppsummertVilkårperiode>,
-        målgrupper: List<OppsummertVilkårperiode>,
-        vilkår: List<Stønadsvilkår>,
-        vedtak: OppsummertVedtak?,
-    ) :
-        this(
-            aktiviteter = aktiviteter,
-            målgrupper = målgrupper,
-            vilkår = vilkår,
-            vedtak = vedtak,
-            finnesDataÅOppsummere =
-                finnesDataÅOppsummere(
-                    aktiviteter,
-                    målgrupper,
-                    vilkår,
-                    vedtak,
-                ),
-        )
-
-    companion object {
-        private fun finnesDataÅOppsummere(
-            aktiviteter: List<OppsummertVilkårperiode>,
-            målgrupper: List<OppsummertVilkårperiode>,
-            vilkår: List<Stønadsvilkår>,
-            vedtak: OppsummertVedtak?,
-        ): Boolean =
-            aktiviteter.isNotEmpty() ||
-                målgrupper.isNotEmpty() ||
-                vilkår.isNotEmpty() ||
-                vedtak != null
-    }
+    @JsonGetter
+    fun finnesDataÅOppsummere(): Boolean =
+        aktiviteter.isNotEmpty() ||
+            målgrupper.isNotEmpty() ||
+            vilkår.isNotEmpty() ||
+            vedtak != null
 }
 
 data class OppsummertVilkårperiode(

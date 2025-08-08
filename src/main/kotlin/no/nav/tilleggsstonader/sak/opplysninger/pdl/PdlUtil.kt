@@ -2,8 +2,6 @@ package no.nav.tilleggsstonader.sak.opplysninger.pdl
 
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBolkResponse
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdentBolkResponse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -65,22 +63,4 @@ inline fun <reified RESULT : Any> feilsjekkOgReturnerData(pdlResponse: PdlBolkRe
         secureLogger.warn("Advarsel ved henting av ${RESULT::class} fra PDL: ${pdlResponse.extensions?.warnings}")
     }
     return pdlResponse.data.personBolk.associateBy({ it.ident }, { it.person!! })
-}
-
-fun feilmeldOgReturnerData(pdlResponse: PdlIdentBolkResponse): Map<String, PdlIdent> {
-    if (pdlResponse.data == null) {
-        secureLogger.error("Data fra pdl er null ved bolkoppslag av identer fra PDL: ${pdlResponse.errorMessages()}")
-        throw PdlRequestException("Data er null fra PDL -  ${PdlIdentBolkResponse::class}. Se secure logg for detaljer.")
-    }
-
-    val feil =
-        pdlResponse.data.hentIdenterBolk
-            .filter { it.code != "ok" }
-            .associate { it.ident to it.code }
-    if (feil.isNotEmpty()) {
-        // Logg feil og gå vider. Ved feil returneres nåværende ident.
-        logger.error("Feil ved henting av ${PdlIdentBolkResponse::class}. Nåværende ident returnert.")
-        secureLogger.error("Feil ved henting av ${PdlIdentBolkResponse::class} fra PDL: $feil. Nåværende ident returnert.")
-    }
-    return pdlResponse.data.hentIdenterBolk.associateBy({ it.ident }, { it.gjeldende() })
 }
