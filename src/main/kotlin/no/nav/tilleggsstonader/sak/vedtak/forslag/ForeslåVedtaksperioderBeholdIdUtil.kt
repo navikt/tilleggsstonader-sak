@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.forslag
 
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
@@ -82,15 +81,11 @@ object ForeslåVedtaksperioderBeholdIdUtil {
     ): List<Vedtaksperiode> {
         val idn = mutableSetOf<UUID>()
         return (forrigeVedtaksperioderSkalIkkeEndres + nyttForslag)
-            .mergeSammenhengende(
-                skalMerges = { v1, v2 ->
-                    v1.id == v2.id &&
-                        v1.målgruppe == v2.målgruppe &&
-                        v1.aktivitet == v2.aktivitet &&
-                        v1.overlapperEllerPåfølgesAv(v2)
-                },
-                merge = { v1, v2 -> v1.copy(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
-            ).map {
+            .mergeSammenhengende { v1, v2 ->
+                v1.id == v2.id && v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2)
+            }
+            // Hvis 2 vedtaksperioder har samme ID har de ikke samme målgruppe eller aktivitet, og då skal kun den første beholdes
+            .map {
                 val idFinnesIkkeFraFør = idn.add(it.id)
                 if (idFinnesIkkeFraFør) {
                     it

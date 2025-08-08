@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
+import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
@@ -26,7 +27,8 @@ data class Vedtaksperiode(
     val aktivitet: AktivitetType,
 ) : Periode<LocalDate>,
     KopierPeriode<Vedtaksperiode>,
-    PeriodeMedId {
+    PeriodeMedId,
+    Mergeable<LocalDate, Vedtaksperiode> {
     override fun medPeriode(
         fom: LocalDate,
         tom: LocalDate,
@@ -36,6 +38,21 @@ data class Vedtaksperiode(
         fom: LocalDate,
         tom: LocalDate,
     ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
+
+    fun erSammenhengendeMedLikMålgruppeOgAktivitet(other: Vedtaksperiode): Boolean =
+        this.målgruppe == other.målgruppe &&
+            this.aktivitet == other.aktivitet &&
+            this.overlapperEllerPåfølgesAv(other)
+
+    override fun merge(other: Vedtaksperiode): Vedtaksperiode {
+        require(this.målgruppe == other.målgruppe) {
+            "Kan ikke slå sammen vedtaksperioder med ulike målgrupper: $this og $other"
+        }
+        require(this.aktivitet == other.aktivitet) {
+            "Kan ikke slå sammen vedtaksperioder med ulike aktiviteter: $this og $other"
+        }
+        return this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
+    }
 }
 
 fun List<Vedtaksperiode>.tilVedtaksperiodeBeregning() =
@@ -51,11 +68,4 @@ fun List<Vedtaksperiode>.tilVedtaksperiodeBeregning() =
 fun List<Vedtaksperiode>.mergeSammenhengende() =
     this
         .sorted()
-        .mergeSammenhengende(
-            { v1, v2 ->
-                v1.overlapperEllerPåfølgesAv(v2) &&
-                    v1.målgruppe == v2.målgruppe &&
-                    v1.aktivitet == v2.aktivitet
-            },
-            { v1, v2 -> v1.medPeriode(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
-        )
+        .mergeSammenhengende { v1, v2 -> v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2) }
