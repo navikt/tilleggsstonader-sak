@@ -15,31 +15,23 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         forslag: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
     ): List<Vedtaksperiode> {
-        val aktuelleVedtaksperioder =
-            finnAktuelleVedtaksperioder(
+        val vedtaksperiodeBeregner =
+            lagVedtaksperiodeBeregner(
                 forrigeVedtaksperioder = forrigeVedtaksperioder,
                 forslag = forslag,
                 tidligsteEndring = tidligsteEndring,
             )
-        val nyttForslag =
-            ForeslåVedtaksperioderBeholdId(
-                forrigeVedtaksperioder = aktuelleVedtaksperioder.forrigeVedtaksperioder,
-                initielleForslag = aktuelleVedtaksperioder.forslagEtterTidligsteEndring,
-            ).beholdTidligereIdnForVedtaksperioder()
-        return mergeHvisLikeOgSammeId(
-            vedtaksperioder = aktuelleVedtaksperioder,
-            nyttForslag = nyttForslag,
-        )
+        return vedtaksperiodeBeregner.beregnNyeVedtaksperioder()
     }
 
     /**
      * Vi skal ikke foreslå perioder før revurder fra, der må vi beholde alle perioder som tidligere
      */
-    private fun finnAktuelleVedtaksperioder(
+    private fun lagVedtaksperiodeBeregner(
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
-    ): Vedtaksperioder {
+    ): VedtaksperiodeBeregner {
         val kanEndrePerioderFraOgMed = min(tidligsteEndring, forrigeVedtaksperioder.maxOfOrNull { it.tom }?.plusDays(1))
 
         val forrigeVedtaksperioderSkalIkkeEndres =
@@ -55,43 +47,51 @@ object ForeslåVedtaksperioderBeholdIdUtil {
             } else {
                 forslag
             }
-        return Vedtaksperioder(
+        return VedtaksperiodeBeregner(
             forrigeVedtaksperioderSkalIkkeEndres = forrigeVedtaksperioderSkalIkkeEndres,
             forrigeVedtaksperioder = forrigeVedtaksperioder,
             forslagEtterTidligsteEndring = forslagEtterTidligsteEndring,
         )
     }
 
-    private data class Vedtaksperioder(
-        val forrigeVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
-        val forrigeVedtaksperioder: List<Vedtaksperiode>,
-        val forslagEtterTidligsteEndring: List<Vedtaksperiode>,
+    private data class VedtaksperiodeBeregner(
+        private val forrigeVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
+        private val forrigeVedtaksperioder: List<Vedtaksperiode>,
+        private val forslagEtterTidligsteEndring: List<Vedtaksperiode>,
     ) {
-        val forrigeVedtaksperiodeIdn = forrigeVedtaksperioder.map { it.id }.toSet()
-    }
+        private val idnSomIkkeSkalMerges = forrigeVedtaksperioder.map { it.id }.toSet()
 
-    /**
-     * Slår sammen forrige vedtaksperioder og nye forslag
-     * Hvis man har en periode
-     * 01.01.01 - 31.01.01 og man revurderer fra 1 feb, men man får ny målgruppe/aktivitet så skal man ikke forlenge den første perioden
-     * Den første perioden finnes i [forrigeVedtaksperioderSkalIkkeEndres] samtidig har den blitt sendt inn til forslag, så ID på perioden finnes også i forslag
-     * Det håndteres gjennom å sjekke at ID'n ikke finnes flere ganger. Hvis de finnes flere ganger, så genereres en ny ID for den perioden.
-     */
-    private fun mergeHvisLikeOgSammeId(
-        vedtaksperioder: Vedtaksperioder,
-        nyttForslag: List<Vedtaksperiode>,
-    ): List<Vedtaksperiode> {
-        val forrigeVedtaksperioderSkalIkkeEndres = vedtaksperioder.forrigeVedtaksperioderSkalIkkeEndres
-        val idnSomIkkeSkalMerges = vedtaksperioder.forrigeVedtaksperiodeIdn
+        fun beregnNyeVedtaksperioder(): List<Vedtaksperiode> {
+            val nyttForslag =
+                ForeslåVedtaksperioderBeholdId(
+                    forrigeVedtaksperioder = forrigeVedtaksperioder,
+                    initielleForslag = forslagEtterTidligsteEndring,
+                ).beholdTidligereIdnForVedtaksperioder()
+            return mergeFOrrigeMedNyttForslagHvisLikeMedSammeId(nyttForslag = nyttForslag)
+                .korrigerIdnPåDuplikat()
+                .mergeNyeVedtaksperioder()
+        }
 
-        val idnSomErBrukte = mutableSetOf<UUID>()
+        /**
+         * Slår sammen forrige vedtaksperioder og nye forslag
+         * Hvis man har en periode
+         * 01.01.01 - 31.01.01 og man revurderer fra 1 feb, men man får ny målgruppe/aktivitet så skal man ikke forlenge den første perioden
+         * Den første perioden finnes i [forrigeVedtaksperioderSkalIkkeEndres] samtidig har den blitt sendt inn til forslag, så ID på perioden finnes også i forslag
+         * Det håndteres gjennom å sjekke at ID'n ikke finnes flere ganger. Hvis de finnes flere ganger, så genereres en ny ID for den perioden.
+         */
+        private fun mergeFOrrigeMedNyttForslagHvisLikeMedSammeId(nyttForslag: List<Vedtaksperiode>): List<Vedtaksperiode> =
+            (forrigeVedtaksperioderSkalIkkeEndres + nyttForslag)
+                .mergeSammenhengende { v1, v2 ->
+                    v1.id == v2.id && v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2)
+                }
 
-        return (forrigeVedtaksperioderSkalIkkeEndres + nyttForslag)
-            .mergeSammenhengende { v1, v2 ->
-                v1.id == v2.id && v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2)
-            }
-            // Hvis 2 vedtaksperioder har samme ID har de ikke samme målgruppe eller aktivitet, og då skal kun den første beholdes
-            .map {
+        /**
+         * Hvis man ikke slått sammen perioder med lik ID pga ulik målgruppe eller aktivitet så kan det oppstå duplikate ID'er
+         * Det korrigeres ved å generere en ny ID for de som har duplikat
+         */
+        private fun List<Vedtaksperiode>.korrigerIdnPåDuplikat(): List<Vedtaksperiode> {
+            val idnSomErBrukte = mutableSetOf<UUID>()
+            return this.map {
                 val idFinnesIkkeFraFør = idnSomErBrukte.add(it.id)
                 if (idFinnesIkkeFraFør) {
                     it
@@ -99,8 +99,14 @@ object ForeslåVedtaksperioderBeholdIdUtil {
                     it.copy(id = UUID.randomUUID())
                 }
             }
-            // Skal mergea nye vedtaksperioder som er sammenhengende
-            .mergeSammenhengende { v1, v2 ->
+        }
+
+        /**
+         * Pga at man kun slår sammen de som har lik ID og sen korrigerer idn på vedtaksperioder som har duplikate
+         * så merges alle nye sammenhengende vedtaksperioder sammen
+         */
+        private fun List<Vedtaksperiode>.mergeNyeVedtaksperioder() =
+            mergeSammenhengende { v1, v2 ->
                 !idnSomIkkeSkalMerges.contains(v1.id) &&
                     !idnSomIkkeSkalMerges.contains(v2.id) &&
                     v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2)
