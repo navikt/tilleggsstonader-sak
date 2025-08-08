@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
+import no.nav.tilleggsstonader.sak.util.enumTilVisningsnavn
+
 enum class ÅrsakAvslag {
     INGEN_AKTIVITET,
     IKKE_I_MÅLGRUPPE,
@@ -11,3 +13,5 @@ enum class ÅrsakAvslag {
     RETT_TIL_BOSTØTTE,
     ANNET,
 }
+
+fun List<ÅrsakAvslag>.formaterListe(): String = joinToString(separator = ", ") { enumTilVisningsnavn(it.name) }
