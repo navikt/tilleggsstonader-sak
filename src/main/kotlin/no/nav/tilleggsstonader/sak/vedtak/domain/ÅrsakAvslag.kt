@@ -12,6 +12,9 @@ enum class ÅrsakAvslag {
     HAR_IKKE_MERUTGIFTER,
     RETT_TIL_BOSTØTTE,
     ANNET,
+    ;
+
+    fun visningsnavn() = enumTilVisningsnavn(name)
 }
 
-fun List<ÅrsakAvslag>.formaterListe(): String = joinToString(separator = ", ") { enumTilVisningsnavn(it.name) }
+fun List<ÅrsakAvslag>.formaterListe(): String = joinToString(separator = ", ") { it.visningsnavn() }

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.validering
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.vedtak.domain.formaterListe
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
@@ -46,12 +47,12 @@ class ValiderGyldigÅrsakAvslag(
         behandlingId: BehandlingId,
         årsakerAvslag: List<ÅrsakAvslag>,
     ) {
-        if (!årsakerAvslag.contains(ÅrsakAvslag.IKKE_I_MÅLGRUPPE)) return
+        if (ÅrsakAvslag.IKKE_I_MÅLGRUPPE !in årsakerAvslag) return
 
         val målgrupper = vilkårperiodeService.hentVilkårperioder(behandlingId).målgrupper
 
-        brukerfeilHvisIkke(målgrupper.any { it.resultat == ResultatVilkårperiode.IKKE_OPPFYLT }) {
-            "Kan ikke avslå med årsak '${ÅrsakAvslag.IKKE_I_MÅLGRUPPE.displayName}' uten å legge inn minst én målgruppe som ikke er oppfylt."
+        brukerfeilHvis(målgrupper.none { it.resultat == ResultatVilkårperiode.IKKE_OPPFYLT }) {
+            "Kan ikke avslå med årsak '${ÅrsakAvslag.IKKE_I_MÅLGRUPPE.visningsnavn()}' uten å legge inn minst én målgruppe som ikke er oppfylt."
         }
     }
 }

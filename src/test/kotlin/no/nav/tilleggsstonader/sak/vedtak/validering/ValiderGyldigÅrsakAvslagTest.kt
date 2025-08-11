@@ -157,7 +157,7 @@ class ValiderGyldigÅrsakAvslagTest {
                     behandlingId,
                     listOf(ÅrsakAvslag.IKKE_I_MÅLGRUPPE),
                 )
-            }.hasMessageContaining("Kan ikke avslå med årsak '${ÅrsakAvslag.IKKE_I_MÅLGRUPPE.displayName}'")
+            }.hasMessageContaining("Kan ikke avslå med årsak 'Ikke i målgruppe'")
         }
     }
 
