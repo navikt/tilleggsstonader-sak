@@ -39,6 +39,7 @@ class TilsynBarnVedtakController(
     private val behandlingService: BehandlingService,
     private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val tilsynBarnValiderGyldigÅrsakAvslag: TilsynBarnValiderGyldigÅrsakAvslag,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val vedtaksperiodeService: VedtaksperiodeService,
 ) {
@@ -55,6 +56,7 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: AvslagTilsynBarnDto,
     ) {
+        tilsynBarnValiderGyldigÅrsakAvslag.validerGyldigAvslag(behandlingId, vedtak)
         lagreVedtak(behandlingId, vedtak)
     }
 

@@ -120,7 +120,7 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
     fun `skal lagre og hente avslag`() {
         val vedtak =
             AvslagTilsynBarnDto(
-                årsakerAvslag = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
+                årsakerAvslag = listOf(ÅrsakAvslag.ANNET),
                 begrunnelse = "begrunnelse",
             )
 
