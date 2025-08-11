@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -23,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.validering.ÅrsakAvslagValideringService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -44,6 +46,8 @@ class LæremidlerVedtakController(
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val vedtaksperiodeService: VedtaksperiodeService,
+    private val rsakAvslagValideringService: ÅrsakAvslagValideringService,
+    private val årsakAvslagValideringService: ÅrsakAvslagValideringService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -58,6 +62,11 @@ class LæremidlerVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: AvslagLæremidlerDto,
     ) {
+        årsakAvslagValideringService.validerAvslagErGyldig(
+            behandlingId = behandlingId,
+            årsakerAvslag = vedtak.årsakerAvslag,
+            stønadstype = Stønadstype.LÆREMIDLER,
+        )
         lagreVedtak(behandlingId, vedtak)
     }
 
