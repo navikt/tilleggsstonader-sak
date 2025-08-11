@@ -43,7 +43,7 @@ class ValiderGyldigÅrsakAvslagTest {
             assertDoesNotThrow {
                 validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
                     behandlingId,
-                    listOf(ÅrsakAvslag.INGEN_AKTIVITET),
+                    listOf(årsakAvslag),
                 )
             }
         }
