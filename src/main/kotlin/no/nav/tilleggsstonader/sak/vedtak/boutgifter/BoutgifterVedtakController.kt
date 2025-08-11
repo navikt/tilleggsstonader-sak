@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -24,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
+import no.nav.tilleggsstonader.sak.vedtak.validering.ÅrsakAvslagValideringService
 import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.VedtaksperioderOversiktService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -45,9 +47,10 @@ class BoutgifterVedtakController(
     private val steg: BoutgifterBeregnYtelseSteg,
     private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
-    private val validerGyldigÅrsakAvslag: BoutgifterValiderGyldigÅrsakAvslag,
     private val vedtaksperiodeService: VedtaksperiodeService,
     private val vedtakDtoMapper: VedtakDtoMapper,
+    private val rsakAvslagValideringService: ÅrsakAvslagValideringService,
+    private val årsakAvslagValideringService: ÅrsakAvslagValideringService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -62,7 +65,11 @@ class BoutgifterVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: AvslagBoutgifterDto,
     ) {
-        validerGyldigÅrsakAvslag.validerGyldigAvslag(behandlingId, vedtak)
+        årsakAvslagValideringService.validerAvslagErGyldig(
+            behandlingId = behandlingId,
+            årsakerAvslag = vedtak.årsakerAvslag,
+            stønadstype = Stønadstype.BOUTGIFTER,
+        )
         lagreVedtak(behandlingId, vedtak)
     }
 
