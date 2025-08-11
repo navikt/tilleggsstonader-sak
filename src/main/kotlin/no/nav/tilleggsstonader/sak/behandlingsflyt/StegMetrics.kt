@@ -33,7 +33,7 @@ class StegMetrics(
                     "steg",
                     it.stegType().name,
                     "beskrivelse",
-                    "${it.stegType().rekkefølge} ${it.stegType().displayName()}",
+                    "${it.stegType().rekkefølge} ${it.stegType().visningsnavn()}",
                 )
         }
 }
