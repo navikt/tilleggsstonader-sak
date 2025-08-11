@@ -166,7 +166,9 @@ class LæremidlerBeregningService(
         forrigeVedtak: InnvilgelseEllerOpphørLæremidler,
         tidligsteEndring: LocalDate?,
     ): BeregningsresultatLæremidler {
-        feilHvis(tidligsteEndring == null) { "Behandling=$saksbehandling mangler revurderFra eller dato for tidligste endring" }
+        feilHvis(tidligsteEndring == null) {
+            "Behandling=${saksbehandling.id} steg=${saksbehandling.steg} mangler revurderFra eller dato for tidligste endring"
+        }
 
         val forrigeBeregningsresultat = forrigeVedtak.beregningsresultat
 
