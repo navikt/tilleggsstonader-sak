@@ -50,8 +50,21 @@ fun gyldigeAvslagsårsaker(
                 Avslagskategori.GENERELL -> setOf(ANNET, INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE)
             }
 
-        Stønadstype.DAGLIG_REISE_TSO -> TODO()
-        Stønadstype.DAGLIG_REISE_TSR -> TODO()
+        Stønadstype.DAGLIG_REISE_TSO ->
+            when (basertPå) {
+                Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
+                Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
+                Avslagskategori.STØNADSVILKÅR -> emptySet()
+                Avslagskategori.GENERELL -> setOf(ANNET, INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE)
+            }
+
+        Stønadstype.DAGLIG_REISE_TSR ->
+            when (basertPå) {
+                Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
+                Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
+                Avslagskategori.STØNADSVILKÅR -> emptySet()
+                Avslagskategori.GENERELL -> setOf(ANNET, INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE)
+            }
     }
 
 fun gyldigeÅrsakerForStønadstype(stønadstype: Stønadstype): Set<ÅrsakAvslag> =
