@@ -32,7 +32,7 @@ class OffentligTransportBeregningStepDefinitions {
         vedtaksperioder = mapVedtaksperioder(dataTable)
     }
 
-    @Gitt("følgende beregnings input for offentlig transport")
+    @Gitt("følgende beregningsinput for offentlig transport")
     fun `følgende beregnins input offentlig transport`(dataTable: DataTable) {
         val reiseInformasjon =
             dataTable.mapRad { rad ->
