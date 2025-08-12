@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
@@ -124,6 +125,10 @@ data class AktivitetBoutgifterFaktaOgVurderingerDto(
     val lønnet: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
+data class AktivitetDagligReiseTsoFaktaOgVurderingerDto(
+    val lønnet: VurderingDto? = null,
+) : FaktaOgVurderingerDto()
+
 fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
     when (this) {
         is MålgruppeFaktaOgVurdering ->
@@ -183,6 +188,10 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
 
                 is FaktaOgVurderingBoutgifter ->
                     AktivitetBoutgifterFaktaOgVurderingerDto(
+                        lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
+                    )
+                is FaktaOgVurderingDagligReiseTso ->
+                    AktivitetDagligReiseTsoFaktaOgVurderingerDto(
                         lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
                     )
             }

@@ -147,7 +147,10 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
             return forventetTypeLæremidler(type)
         } else if (type is TypeFaktaOgVurderingBoutgifter) {
             return forventetTypeBoutgifter(type)
+        } else if (type is TypeFaktaOgVurderingDagligReiseTso) {
+            return forventetTypeDagligReiseTso(type)
         }
+
         error("Ukjent type")
     }
 
@@ -216,6 +219,17 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
                     AktivitetBoutgifterType.TILTAK_BOUTGIFTER -> TiltakBoutgifter::class
                     AktivitetBoutgifterType.UTDANNING_BOUTGIFTER -> UtdanningBoutgifter::class
                     AktivitetBoutgifterType.INGEN_AKTIVITET_BOUTGIFTER -> IngenAktivitetBoutgifter::class
+                }
+            }
+        }.java
+
+    private fun forventetTypeDagligReiseTso(type: TypeFaktaOgVurderingDagligReiseTso): Class<out FaktaOgVurderingDagligReiseTso> =
+        when (type) {
+            is AktivitetDagligReiseTsoType -> {
+                when (type) {
+                    AktivitetDagligReiseTsoType.TILTAK_DAGLIG_REISE_TSO -> TiltakDagligReiseTso::class
+                    AktivitetDagligReiseTsoType.UTDANNING_DAGLIG_REISE_TSO -> UtdanningDagligReiseTso::class
+                    AktivitetDagligReiseTsoType.INGEN_AKTIVITET_DAGLIG_REISE_TSO -> IngenAktivitetDagligReiseTso::class
                 }
             }
         }.java

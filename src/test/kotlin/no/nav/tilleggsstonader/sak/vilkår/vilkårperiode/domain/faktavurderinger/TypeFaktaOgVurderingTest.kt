@@ -18,11 +18,12 @@ val alleEnumTyperFaktaOgVurdering: List<Pair<Stønadstype, TypeFaktaOgVurdering>
         Stønadstype.LÆREMIDLER to MålgruppeLæremidlerType.entries,
         Stønadstype.BOUTGIFTER to AktivitetBoutgifterType.entries,
         Stønadstype.BOUTGIFTER to MålgruppeBoutgifterType.entries,
+        Stønadstype.DAGLIG_REISE_TSO to AktivitetDagligReiseTsoType.entries,
     ).flatMap { (stønadstype, enums) -> enums.map { stønadstype to it } }
 
 class TypeFaktaOgVurderingTest {
     /**
-     * Hvis [when] mangler noe, legg til der der og i [alleEnumTyperFaktaOgVurdering]
+     * Hvis det mangler noe, legg til der der og i [alleEnumTyperFaktaOgVurdering]
      */
     @Test
     fun `sjekk at alle har riktig navn`() {
@@ -31,6 +32,7 @@ class TypeFaktaOgVurderingTest {
                 is TypeFaktaOgVurderingTilsynBarn -> type.assertHarRiktigNavn(stønadstype)
                 is TypeFaktaOgVurderingLæremidler -> type.assertHarRiktigNavn(stønadstype)
                 is TypeFaktaOgVurderingBoutgifter -> type.assertHarRiktigNavn(stønadstype)
+                is TypeFaktaOgVurderingDagligReiseTso -> type.assertHarRiktigNavn(stønadstype)
             }
         }
     }
@@ -44,6 +46,12 @@ class TypeFaktaOgVurderingTest {
                 }
                 if (type == AktivitetLæremidlerType.UTDANNING_LÆREMIDLER) {
                     type.assertHarRiktigNavn(Stønadstype.BARNETILSYN)
+                }
+                if (type == AktivitetBoutgifterType.UTDANNING_BOUTGIFTER) {
+                    type.assertHarRiktigNavn(Stønadstype.LÆREMIDLER)
+                }
+                if (type == AktivitetDagligReiseTsoType.UTDANNING_DAGLIG_REISE_TSO) {
+                    type.assertHarRiktigNavn(Stønadstype.LÆREMIDLER)
                 }
             }
         }.hasMessageContaining("but was: \"UTDANNING_TILSYN_BARN\"")

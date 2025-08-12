@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
@@ -40,6 +41,7 @@ data class LagreVilkårperiode(
     JsonSubTypes.Type(FaktaOgSvarAktivitetBarnetilsynDto::class, name = "AKTIVITET_BARNETILSYN"),
     JsonSubTypes.Type(FaktaOgSvarAktivitetLæremidlerDto::class, name = "AKTIVITET_LÆREMIDLER"),
     JsonSubTypes.Type(FaktaOgSvarAktivitetBoutgifterDto::class, name = "AKTIVITET_BOUTGIFTER"),
+    JsonSubTypes.Type(FaktaOgSvarAktivitetDagligReiseTsoDto::class, name = "AKTIVITET_DAGLIG_REISE_TSO"),
 )
 sealed class FaktaOgSvarDto
 
@@ -62,6 +64,10 @@ data class FaktaOgSvarAktivitetLæremidlerDto(
 ) : FaktaOgSvarDto()
 
 data class FaktaOgSvarAktivitetBoutgifterDto(
+    val svarLønnet: SvarJaNei? = null,
+) : FaktaOgSvarDto()
+
+data class FaktaOgSvarAktivitetDagligReiseTsoDto(
     val svarLønnet: SvarJaNei? = null,
 ) : FaktaOgSvarDto()
 
@@ -114,6 +120,14 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
 
         is AktivitetBoutgifter ->
             FaktaOgSvarAktivitetBoutgifterDto(
+                svarLønnet =
+                    this.vurderinger
+                        .takeIfVurderinger<LønnetVurdering>()
+                        ?.lønnet
+                        ?.svar,
+            )
+        is AktivitetDagligReiseTso ->
+            FaktaOgSvarAktivitetDagligReiseTsoDto(
                 svarLønnet =
                     this.vurderinger
                         .takeIfVurderinger<LønnetVurdering>()

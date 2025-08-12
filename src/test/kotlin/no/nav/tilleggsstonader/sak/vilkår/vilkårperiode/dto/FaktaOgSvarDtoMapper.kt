@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
@@ -54,6 +55,10 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                     )
                 is FaktaOgVurderingBoutgifter ->
                     FaktaOgSvarAktivitetBoutgifterDto(
+                        svarLønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.svar,
+                    )
+                is FaktaOgVurderingDagligReiseTso ->
+                    FaktaOgSvarAktivitetDagligReiseTsoDto(
                         svarLønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.svar,
                     )
             }

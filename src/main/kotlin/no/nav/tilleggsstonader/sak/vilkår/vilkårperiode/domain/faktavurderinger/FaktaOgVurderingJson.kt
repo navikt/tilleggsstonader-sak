@@ -45,6 +45,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     JsonSubTypes.Type(NedsattArbeidsevneBoutgifter::class, name = "NEDSATT_ARBEIDSEVNE_BOUTGIFTER"),
     JsonSubTypes.Type(UføretrygdBoutgifter::class, name = "UFØRETRYGD_BOUTGIFTER"),
     JsonSubTypes.Type(IngenMålgruppeBoutgifter::class, name = "INGEN_MÅLGRUPPE_BOUTGIFTER"),
+    JsonSubTypes.Type(TiltakDagligReiseTso::class, name = "TILTAK_DAGLIG_REISE_TSO"),
+    JsonSubTypes.Type(UtdanningDagligReiseTso::class, name = "UTDANNING_DAGLIG_REISE_TSO"),
+    JsonSubTypes.Type(IngenAktivitetDagligReiseTso::class, name = "INGEN_AKTIVITET_DAGLIG_REISE_TSO"),
     failOnRepeatedNames = true,
 )
 sealed interface FaktaOgVurderingJson
