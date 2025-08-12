@@ -26,7 +26,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 class ValiderGyldigÅrsakAvslagTest {
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
     private val vilkårService = mockk<VilkårService>()
-    private val årsakAvslagValideringService = ÅrsakAvslagValideringService(vilkårperiodeService, vilkårService)
+    private val validerGyldigÅrsakAvslag = ValiderGyldigÅrsakAvslag(vilkårperiodeService, vilkårService)
 
     val behandlingId = BehandlingId.random()
 
@@ -196,7 +196,7 @@ class ValiderGyldigÅrsakAvslagTest {
         forventetFeilmelding: String,
     ) {
         assertThatThrownBy {
-            årsakAvslagValideringService.validerAvslagErGyldig(
+            validerGyldigÅrsakAvslag.validerAvslagErGyldig(
                 behandlingId = behandlingId,
                 årsakerAvslag = årsaker,
                 stønadstype = stønadstype,
@@ -209,7 +209,7 @@ class ValiderGyldigÅrsakAvslagTest {
         årsaker: List<ÅrsakAvslag>,
     ) {
         assertDoesNotThrow {
-            årsakAvslagValideringService.validerAvslagErGyldig(
+            validerGyldigÅrsakAvslag.validerAvslagErGyldig(
                 behandlingId = behandlingId,
                 årsakerAvslag = årsaker,
                 stønadstype = stønadstype,

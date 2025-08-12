@@ -25,7 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
-import no.nav.tilleggsstonader.sak.vedtak.validering.ÅrsakAvslagValideringService
+import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.VedtaksperioderOversiktService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -49,8 +49,7 @@ class BoutgifterVedtakController(
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     private val vedtaksperiodeService: VedtaksperiodeService,
     private val vedtakDtoMapper: VedtakDtoMapper,
-    private val rsakAvslagValideringService: ÅrsakAvslagValideringService,
-    private val årsakAvslagValideringService: ÅrsakAvslagValideringService,
+    private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -65,7 +64,7 @@ class BoutgifterVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: AvslagBoutgifterDto,
     ) {
-        årsakAvslagValideringService.validerAvslagErGyldig(
+        validerGyldigÅrsakAvslag.validerAvslagErGyldig(
             behandlingId = behandlingId,
             årsakerAvslag = vedtak.årsakerAvslag,
             stønadstype = Stønadstype.BOUTGIFTER,

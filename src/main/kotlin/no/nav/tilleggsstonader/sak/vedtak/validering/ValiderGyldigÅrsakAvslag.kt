@@ -13,10 +13,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 
-@Service
-class ÅrsakAvslagValideringService(
+@Component
+class ValiderGyldigÅrsakAvslag(
     private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
 ) {
