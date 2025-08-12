@@ -22,8 +22,18 @@ object MålgruppeValidering {
                         MålgruppeType.SYKEPENGER_100_PROSENT -> true
                         MålgruppeType.INGEN_MÅLGRUPPE -> true
                     }
+                Stønadstype.DAGLIG_REISE_TSO ->
+                    when (målgruppeType) {
+                        MålgruppeType.AAP -> true
+                        MålgruppeType.DAGPENGER -> false
+                        MålgruppeType.NEDSATT_ARBEIDSEVNE -> true
+                        MålgruppeType.OMSTILLINGSSTØNAD -> true
+                        MålgruppeType.OVERGANGSSTØNAD -> true
+                        MålgruppeType.UFØRETRYGD -> true
+                        MålgruppeType.SYKEPENGER_100_PROSENT -> false
+                        MålgruppeType.INGEN_MÅLGRUPPE -> true
+                    }
                 Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise er ikke implementert enda")
-                Stønadstype.DAGLIG_REISE_TSO -> TODO("Daglig reise er ikke implementert enda")
             }
         feilHvisIkke(gyldig) {
             "målgruppe=$målgruppeType er ikke gyldig for $stønadstype"

@@ -48,6 +48,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     JsonSubTypes.Type(TiltakDagligReiseTso::class, name = "TILTAK_DAGLIG_REISE_TSO"),
     JsonSubTypes.Type(UtdanningDagligReiseTso::class, name = "UTDANNING_DAGLIG_REISE_TSO"),
     JsonSubTypes.Type(IngenAktivitetDagligReiseTso::class, name = "INGEN_AKTIVITET_DAGLIG_REISE_TSO"),
+    JsonSubTypes.Type(AAPDagligReiseTso::class, name = "AAP_DAGLIG_REISE_TSO"),
+    JsonSubTypes.Type(OmstillingsstønadDagligReiseTso::class, name = "OMSTILLINGSSTØNAD_DAGLIG_REISE_TSO"),
+    JsonSubTypes.Type(OvergangssstønadDagligReiseTso::class, name = "OVERGANGSSTØNAD_DAGLIG_REISE_TSO"),
+    JsonSubTypes.Type(NedsattArbeidsevneDagligReiseTso::class, name = "NEDSATT_ARBEIDSEVNE_DAGLIG_REISE_TSO"),
+    JsonSubTypes.Type(UføretrygdDagligReiseTso::class, name = "UFØRETRYGD_DAGLIG_REISE_TSO"),
+    JsonSubTypes.Type(IngenMålgruppeDagligReiseTso::class, name = "INGEN_MÅLGRUPPE_DAGLIG_REISE_TSO"),
     failOnRepeatedNames = true,
 )
 sealed interface FaktaOgVurderingJson

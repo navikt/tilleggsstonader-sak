@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFa
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.AldersvilkårVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.AldersvilkårVurdering.vurderAldersvilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetBoutgifter
@@ -22,19 +23,24 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerTilsynBarn
@@ -45,6 +51,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningBoutgifter
@@ -146,7 +153,9 @@ private fun mapMålgruppe(
         Stønadstype.BOUTGIFTER -> {
             mapMålgruppeBoutgfiter(type, faktaOgSvar, målgruppe, fødselFaktaGrunnlag)
         }
-        Stønadstype.DAGLIG_REISE_TSO -> TODO("Daglig reise er ikke implementert enda")
+        Stønadstype.DAGLIG_REISE_TSO -> {
+            mapMålgruppeDagligReiseTso(type, faktaOgSvar, målgruppe, fødselFaktaGrunnlag)
+        }
         Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise er ikke implementert enda")
     }
 }
@@ -433,6 +442,68 @@ private fun mapMålgruppeBoutgfiter(
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
             NedsattArbeidsevneBoutgifter(
+                vurderinger =
+                    VurderingNedsattArbeidsevne(
+                        dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                        medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag),
+                        mottarSykepengerForFulltidsstilling =
+                            VurderingMottarSykepengerForFulltidsstilling(
+                                faktaOgVurderinger.svarMottarSykepengerForFulltidsstilling,
+                            ),
+                    ),
+            )
+        }
+
+        MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for boutgifter")
+        MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
+    }
+
+private fun mapMålgruppeDagligReiseTso(
+    type: MålgruppeType,
+    faktaOgVurderinger: FaktaOgSvarMålgruppeDto,
+    målgruppe: LagreVilkårperiode,
+    fødselFaktaGrunnlag: FødselFaktaGrunnlag?,
+): MålgruppeDagligReiseTso =
+    when (type) {
+        MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeDagligReiseTso
+        MålgruppeType.OMSTILLINGSSTØNAD -> {
+            OmstillingsstønadDagligReiseTso(
+                vurderinger =
+                    VurderingOmstillingsstønad(
+                        medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag),
+                    ),
+            )
+        }
+
+        MålgruppeType.OVERGANGSSTØNAD -> {
+            OvergangssstønadDagligReiseTso
+        }
+
+        MålgruppeType.AAP -> {
+            AAPDagligReiseTso(
+                vurderinger =
+                    VurderingAAP(
+                        dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                        aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag),
+                    ),
+            )
+        }
+
+        MålgruppeType.UFØRETRYGD -> {
+            UføretrygdDagligReiseTso(
+                vurderinger =
+                    VurderingUføretrygd(
+                        dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                        medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                        aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag),
+                    ),
+            )
+        }
+
+        MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
+            NedsattArbeidsevneDagligReiseTso(
                 vurderinger =
                     VurderingNedsattArbeidsevne(
                         dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),

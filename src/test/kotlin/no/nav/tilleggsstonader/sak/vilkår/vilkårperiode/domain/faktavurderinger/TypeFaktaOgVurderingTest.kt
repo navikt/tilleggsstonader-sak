@@ -19,6 +19,7 @@ val alleEnumTyperFaktaOgVurdering: List<Pair<Stønadstype, TypeFaktaOgVurdering>
         Stønadstype.BOUTGIFTER to AktivitetBoutgifterType.entries,
         Stønadstype.BOUTGIFTER to MålgruppeBoutgifterType.entries,
         Stønadstype.DAGLIG_REISE_TSO to AktivitetDagligReiseTsoType.entries,
+        Stønadstype.DAGLIG_REISE_TSO to MålgruppeDagligReiseTsoType.entries,
     ).flatMap { (stønadstype, enums) -> enums.map { stønadstype to it } }
 
 class TypeFaktaOgVurderingTest {

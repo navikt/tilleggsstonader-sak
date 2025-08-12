@@ -1,0 +1,25 @@
+{
+  "type": "NEDSATT_ARBEIDSEVNE_DAGLIG_REISE_TSO",
+  "fakta": {},
+  "vurderinger": {
+    "aldersvilkår": {
+      "resultat": "OPPFYLT",
+      "svar": "JA",
+      "vurderingFaktaEtterlevelse": {
+        "fødselsdato": "2000-01-01"
+      }
+    },
+    "dekketAvAnnetRegelverk": {
+      "svar": "NEI",
+      "resultat": "OPPFYLT"
+    },
+    "medlemskap": {
+      "svar": "JA",
+      "resultat": "OPPFYLT"
+    },
+    "mottarSykepengerForFulltidsstilling": {
+      "resultat": "OPPFYLT",
+      "svar": "NEI"
+    }
+  }
+}

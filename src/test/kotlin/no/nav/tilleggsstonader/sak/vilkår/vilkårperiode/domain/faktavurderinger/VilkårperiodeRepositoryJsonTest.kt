@@ -225,6 +225,16 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
 
     private fun forventetTypeDagligReiseTso(type: TypeFaktaOgVurderingDagligReiseTso): Class<out FaktaOgVurderingDagligReiseTso> =
         when (type) {
+            is MålgruppeDagligReiseTsoType -> {
+                when (type) {
+                    MålgruppeDagligReiseTsoType.AAP_DAGLIG_REISE_TSO -> AAPDagligReiseTso::class
+                    MålgruppeDagligReiseTsoType.UFØRETRYGD_DAGLIG_REISE_TSO -> UføretrygdDagligReiseTso::class
+                    MålgruppeDagligReiseTsoType.NEDSATT_ARBEIDSEVNE_DAGLIG_REISE_TSO -> NedsattArbeidsevneDagligReiseTso::class
+                    MålgruppeDagligReiseTsoType.OMSTILLINGSSTØNAD_DAGLIG_REISE_TSO -> OmstillingsstønadDagligReiseTso::class
+                    MålgruppeDagligReiseTsoType.OVERGANGSSTØNAD_DAGLIG_REISE_TSO -> OvergangssstønadDagligReiseTso::class
+                    MålgruppeDagligReiseTsoType.INGEN_MÅLGRUPPE_DAGLIG_REISE_TSO -> IngenMålgruppeDagligReiseTso::class
+                }
+            }
             is AktivitetDagligReiseTsoType -> {
                 when (type) {
                     AktivitetDagligReiseTsoType.TILTAK_DAGLIG_REISE_TSO -> TiltakDagligReiseTso::class
