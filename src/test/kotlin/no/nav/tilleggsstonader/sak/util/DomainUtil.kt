@@ -264,8 +264,8 @@ fun Fagsak.tilFagsakDomain() =
     )
 
 fun vilkår(
-    behandlingId: BehandlingId,
-    type: VilkårType,
+    behandlingId: BehandlingId = BehandlingId.random(),
+    type: VilkårType = VilkårType.EKSEMPEL,
     resultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
     status: VilkårStatus = VilkårStatus.NY,
     delvilkår: List<Delvilkår> = emptyList(),
