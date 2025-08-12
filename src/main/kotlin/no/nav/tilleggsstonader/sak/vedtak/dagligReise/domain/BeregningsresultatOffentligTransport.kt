@@ -1,33 +1,46 @@
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.ReiseInformasjon
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
+import java.util.UUID
 
-data class BeregningsresultatOffentligTransport(
-    val perioder: List<BeregningsresultatPer30Dagersperiode>,
+data class Beregningsresultat(
+    val reiser: List<BeregningsresultatForReise>,
 )
 
-data class BeregningsresultatPer30Dagersperiode(
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    val beregningsresultatTransportmiddel: List<BeregningsresultatTransportmiddel>,
-    val summertBeløp: Int,
-    val grunnlag: List<BergningsGrunnlag>,
-) : Periode<LocalDate>
+data class BeregningsresultatForReise(
+    val perioder: List<BeregningsresultatForPeriode>,
+)
 
-data class BeregningsresultatTransportmiddel(
-    val kilde: String,
+data class BeregningsresultatForPeriode(
+    val grunnlag: Beregningsgrunnlag,
     val beløp: Int,
-    // val bilettKombinasjonen: BilettKombinasjon,
 )
 
-// data class BilettKombinasjon(
-//    val antallEnkeltbilletter: Int,
-//    val antall7dagersbilletter: Int,
-//    val antall30dagersbilletter: Int,
-// )
-
-data class BergningsGrunnlag(
+data class Beregningsgrunnlag(
     val fom: LocalDate,
     val tom: LocalDate,
-    val reiseInformasjon: List<ReiseInformasjon>,
+    val prisEnkeltbillett: Int,
+    val pris30dagersbillett: Int,
+    val antallReisedagerPerUke: Int,
+    val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
+    val antallReisedager: Int,
 )
+
+data class VedtaksperiodeGrunnlag(
+    val id: UUID,
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val målgruppe: FaktiskMålgruppe,
+    val aktivitet: AktivitetType,
+    val antallReisedager: Int,
+) {
+    constructor(vedtaksperiode: Vedtaksperiode, antallReisedager: Int) : this(
+        id = vedtaksperiode.id,
+        fom = vedtaksperiode.fom,
+        tom = vedtaksperiode.tom,
+        målgruppe = vedtaksperiode.målgruppe,
+        aktivitet = vedtaksperiode.aktivitet,
+        antallReisedager = antallReisedager,
+    )
+}

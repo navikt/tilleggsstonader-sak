@@ -1,64 +1,31 @@
 # language: no
 # encoding: UTF-8
 
-Egenskap: Beregning av offentlig transport daglig reise
+Egenskap: Beregning av offentlig transport for daglig reise
 
   Scenario: Forventer at tretti-dagersbillett lønner seg
-
-    Gitt følgende vedtaksperioder
+    Gitt følgende vedtaksperioder for daglig reise offentlig transport
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
       | 01.01.2025 | 01.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende beregnings input for offentlig transport
-      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
-      | 01.01.2025 | 30.01.2025 | 44                 | 366                    | 778                       | 3                         |
+      | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 01.01.2025 | 30.01.2025 | 44                 | 778                       | 3                         |
 
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 778   |
-
-  Scenario: Forventer at tre tretti-dagersbillett lønner seg
-    Gitt følgende vedtaksperioder
-      | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
-      | 01.01.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
-
-    Gitt følgende beregnings input for offentlig transport
-      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
-      | 01.01.2025 | 15.03.2025 | 44                 | 366                    | 778                       | 3                         |
-
-    Når beregner for daglig reise offentlig transport
-
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
-      | Fom        | Tom        | Beløp |
-      | 01.01.2025 | 30.01.2025 | 778   |
-      | 31.01.2025 | 01.03.2025 | 778   |
-      | 02.03.2025 | 15.03.2025 | 528   |
-
-  Scenario: Forventer at syv-dagersbillett lønner seg
-    Gitt følgende vedtaksperioder
-      | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
-      | 01.01.2025 | 01.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
-
-    Gitt følgende beregnings input for offentlig transport
-      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
-      | 06.01.2025 | 12.01.2025 | 44                 | 366                    | 778                       | 5                         |
-
-    Når beregner for daglig reise offentlig transport
-
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
-      | Fom        | Tom        | Beløp |
-      | 06.01.2025 | 12.01.2025 | 366   |
 
   Scenario: Forventer at enkeltbillett lønner seg
-    Gitt følgende vedtaksperioder
+    Gitt følgende vedtaksperioder for daglig reise offentlig transport
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
-      | 01.01.2025 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 01.01.2025 | 30.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende beregnings input for offentlig transport
-      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
-      | 01.01.2025 | 30.01.2025 | 44                 | 366                    | 778                       | 1                         |
+      | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 01.01.2025 | 31.01.2025 | 44                 | 778                       | 1                         |
 
     Når beregner for daglig reise offentlig transport
 
@@ -66,87 +33,132 @@ Egenskap: Beregning av offentlig transport daglig reise
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 440   |
 
-  Scenario: Billigste alternativ over flere 30 dagers perioder
-    Gitt følgende vedtaksperioder
+  Scenario: Forventer at to mnd kort og enkeltbilletter lønner seg
+    Gitt følgende vedtaksperioder for daglig reise offentlig transport
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
-      | 01.01.2025 | 01.04.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 01.01.2025 | 08.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende beregnings input for offentlig transport
-      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
-      | 31.01.2025 | 15.03.2025 | 44                 | 366                    | 778                       | 3                         |
+      | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 01.01.2025 | 08.03.2025 | 44                 | 778                       | 3                         |
 
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
       | Fom        | Tom        | Beløp |
+      | 01.01.2025 | 30.01.2025 | 778   |
       | 31.01.2025 | 01.03.2025 | 778   |
-      | 02.03.2025 | 15.03.2025 | 528   |
+      | 02.03.2025 | 08.03.2025 | 264   |
 
-  Scenario: Vedtaksperiode er kortere enn utgiftsperiode
-    Gitt følgende vedtaksperioder
+
+    # Reisen er lengre enn vedtaksperioden, sjekke at reisen snippes til fom/tom på vedtaksperioden
+  Scenario: Forventer at fom og tom på reisen forkortes når den er lengre enn vedtaksperioden
+    Gitt følgende vedtaksperioder for daglig reise offentlig transport
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
-      | 01.01.2025 | 05.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 01.03.2025 | 30.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende beregnings input for offentlig transport
-      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
-      | 31.01.2025 | 15.03.2025 | 44                 | 366                    | 778                       | 3                         |
+      | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 15.02.2025 | 15.04.2025 | 44                 | 778                       | 1                         |
 
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
       | Fom        | Tom        | Beløp |
+      | 01.03.2025 | 30.03.2025 | 352   |
+
+  Scenario: Forventer at reisen deles opp i to 30-dagers perioder og en periode med enkeltbilletter
+    Gitt følgende vedtaksperioder for daglig reise offentlig transport
+      | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
+      | 01.01.2025 | 30.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 01.02.2025 | 12.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+
+    Gitt følgende beregnings input for offentlig transport
+      | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 01.01.2025 | 30.04.2025 | 44                 | 778                       | 5                         |
+
+    Når beregner for daglig reise offentlig transport
+
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+      | Fom        | Tom        | Beløp |
+      | 01.01.2025 | 30.01.2025 | 778   |
       | 31.01.2025 | 01.03.2025 | 778   |
-      | 02.03.2025 | 05.03.2025 | 264   |
+      | 02.03.2025 | 12.03.2025 | 704   |
 
-
-  Scenario: Forventer at ukeskort lønner seg på tvers av uker
-    Gitt følgende vedtaksperioder
+  Scenario: tester at reisenperioden har vedtaksperioder med opphold
+    Gitt følgende vedtaksperioder for daglig reise offentlig transport
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
-      | 01.01.2025 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 01.01.2025 | 30.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 01.04.2025 | 30.04.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende beregnings input for offentlig transport
-      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
-      | 09.01.2025 | 15.01.2025 | 44                 | 366                    | 778                       | 5                         |
+      | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 01.01.2025 | 31.05.2025 | 44                 | 778                       | 5                         |
 
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
       | Fom        | Tom        | Beløp |
-      | 09.01.2025 | 15.01.2025 | 366   |
+      | 01.01.2025 | 30.01.2025 | 778   |
+      | 31.01.2025 | 01.03.2025 | 0     |
+      | 02.03.2025 | 31.03.2025 | 0     |
+      | 01.04.2025 | 30.04.2025 | 778   |
 
-#  Scenario: TODO Forventer at månedskort og tre enkeltbilletter lønner seg på tvers av måneder
-#
-#    Gitt følgende beregnings input for offentlig transport
-#      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
-#      | 01.01.2025 | 05.02.2025 | 44                | 366                  | 778                     | 5                         |
-#
-#    Når beregner for daglig reise offentlig transport
-#
-#    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
-#      | Fom        | Tom        | Beløp |
-#      | 01.01.2025 | 31.01.2025 | 778   |
-#      | 01.02.2025 | 05.02.2025 | 264   |
-#
-#  Scenario: TODO ulike priser/reisedager som input
-#
-#    Gitt følgende beregnings input for offentlig transport
-#      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
-#      | 01.01.2025 | 15.01.2025 | 44                | 366                  | 778                     | 5                         |
-#      | 16.01.2025 | 31.02.2025 | 93                | 466                  | 1012                    | 2                         |
-#
-#    Når beregner for daglig reise offentlig transport
-#
-#    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
-#      | Fom | Tom | Beløp |
-#
-#  Scenario: TODO ulike priser og fremkomstmiddel (buss + tog) som input
-#
-#    Gitt følgende beregnings input for offentlig transport
-#      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
-#      | 01.01.2025 | 15.01.2025 | 44                | 366                  | 778                     | 5                         |
-#      | 01.01.2025 | 15.02.2025 | 364               | 1500                 | 2500                    | 5                         |
-#
-#    Når beregner for daglig reise offentlig transport
-#
-#    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
-#      | Fom | Tom | Beløp |
+  # To reiser i samme periode tog (Vy) + buss (ruter), her lønner det seg med mnd kort selv om det er opphold i periodene
+  Scenario: to identiske reiseperioder med ulike transportmiddel og vedtaksperioder med opphold
+    Gitt følgende vedtaksperioder for daglig reise offentlig transport
+      | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
+      | 01.01.2025 | 30.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 01.04.2025 | 30.04.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+
+    Gitt følgende beregnings input for offentlig transport
+      | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 01.01.2025 | 31.05.2025 | 44                 | 778                       | 5                         |
+      | 01.01.2025 | 31.05.2025 | 287                | 3369                      | 5                         |
+
+    Når beregner for daglig reise offentlig transport
+
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+      | Fom        | Tom        | Beløp |
+      | 01.01.2025 | 30.01.2025 | 4147  |
+      | 31.01.2025 | 01.03.2025 | 0     |
+      | 02.03.2025 | 31.03.2025 | 0     |
+      | 01.04.2025 | 30.04.2025 | 4147  |
+
+  # Lønner seg med mnd kort selv om det er opphold (f.eks tre dager på slutten første og 10 dager på starten av siste)
+  Scenario: Månedskort lønner seg selv om vedtaksperiodene har opphold og mer enn rene 30 dagersperioder
+    Gitt følgende vedtaksperioder for daglig reise offentlig transport
+      | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
+      | 01.01.2025 | 03.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 10.02.2025 | 21.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+
+    Gitt følgende beregnings input for offentlig transport
+      | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 01.01.2025 | 31.05.2025 | 44                 | 778                       | 5                         |
+
+    Når beregner for daglig reise offentlig transport
+
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+      | Fom        | Tom        | Beløp |
+      | 01.01.2025 | 30.01.2025 | 778   |
+      | 31.01.2025 | 01.03.2025 | 778   |
+      | 02.03.2025 | 21.03.2025 | 778   |
+
+  # Lønner seg IKKE mnd kort selv om det er opphold (f.eks tre dager på slutten første og to dager på starten av siste)
+  Scenario: Månedskort lønner IKKE hvor vedtaksperiodene har opphold
+    Gitt følgende vedtaksperioder for daglig reise offentlig transport
+      | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
+      | 01.01.2025 | 03.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 18.02.2025 | 21.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+
+    Gitt følgende beregnings input for offentlig transport
+      | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 01.01.2025 | 31.05.2025 | 44                 | 778                       | 3                         |
+
+    Når beregner for daglig reise offentlig transport
+
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+      | Fom        | Tom        | Beløp |
+      | 01.01.2025 | 30.01.2025 | 778   |
+      | 31.01.2025 | 01.03.2025 | 704   |
+      | 02.03.2025 | 21.03.2025 | 778   |

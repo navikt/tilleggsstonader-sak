@@ -2,35 +2,28 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.util.inneholderUkedag
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import java.time.LocalDate
+import kotlin.Int
 
 data class UtgiftOffentligTransport(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val reiseInformasjon: List<ReiseInformasjon>,
-    val vedtaksperioder: List<Vedtaksperiode>,
+    val antallReisedagerPerUke: Int,
+    val prisEnkelbillett: Int,
+    val pris30dagersbillett: Int,
 ) : Periode<LocalDate> {
     fun delTil30Dagersperioder(): List<UtgiftOffentligTransport> =
         this.splitPer30DagersPerioder { fom, tom ->
             UtgiftOffentligTransport(
                 fom = fom,
                 tom = tom,
-                reiseInformasjon = this.reiseInformasjon,
-                vedtaksperioder = this.vedtaksperioder,
+                antallReisedagerPerUke = antallReisedagerPerUke,
+                prisEnkelbillett = prisEnkelbillett,
+                pris30dagersbillett = pris30dagersbillett,
             )
         }
 }
 
-data class ReiseInformasjon(
-    val antallReisedagerPerUke: Int,
-    val prisEnkelbillett: Int,
-    val pris30dagersbillett: Int,
-    val pris7dagersbillett: Int,
-    val kilde: String,
-)
-
-// TODO: Skriv tester for denne
 fun <P : Periode<LocalDate>, VAL : Periode<LocalDate>> P.splitPer30DagersPerioder(
     medNyPeriode: (fom: LocalDate, tom: LocalDate) -> VAL,
 ): List<VAL> {
