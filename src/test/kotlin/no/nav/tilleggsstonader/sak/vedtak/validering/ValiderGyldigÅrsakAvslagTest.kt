@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslagskategori
 import no.nav.tilleggsstonader.sak.vedtak.domain.gyldigeAvslagsårsaker
+import no.nav.tilleggsstonader.sak.vedtak.domain.gyldigeÅrsakerForStønadstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
@@ -19,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -30,6 +32,14 @@ class ValiderGyldigÅrsakAvslagTest {
     private val årsakAvslagValideringService = ÅrsakAvslagValideringService(vilkårperiodeService, vilkårService)
 
     val behandlingId = BehandlingId.random()
+
+    @Test
+    fun `sjekk at alle avslagsårsakene er med i valideringen`() {
+        val alleÅrsakeneIValideringen = Stønadstype.entries.flatMap { gyldigeÅrsakerForStønadstype(it) }.toSet()
+        val alleAvslagsårsaker = ÅrsakAvslag.entries.toSet()
+
+        assertThat(alleAvslagsårsaker - alleÅrsakeneIValideringen).isEmpty()
+    }
 
     @Nested
     inner class `Valider at avslagsgrunn må være gyldig for stønadstype` {
