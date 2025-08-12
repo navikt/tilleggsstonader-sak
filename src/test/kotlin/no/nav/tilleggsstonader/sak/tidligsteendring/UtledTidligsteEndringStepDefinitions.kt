@@ -181,24 +181,28 @@ class UtledTidligsteEndringStepDefinitions {
         barnIderForBehandlingMap: MutableMap<String, BarnId>,
     ) = dataTable.mapRad { rad ->
         val valgtBarnId = parseValgfriString(VilkårNøkler.BARN_ID, rad)
+        val status =
+            parseValgfriEnum<VilkårStatus>(TidligsteEndringFellesNøkler.STATUS, rad) ?: VilkårStatus.NY
+
+        // slettet vilkår krever riktig kombinasjon, så bruker [markerSlettet] for å markere vilkår som slettet etterpå
+        val foreløpigStatus = if (status == VilkårStatus.SLETTET) VilkårStatus.UENDRET else status
         vilkår(
             behandlingId = BehandlingId.random(),
             fom = parseDato(DomenenøkkelFelles.FOM, rad),
             tom = parseDato(DomenenøkkelFelles.TOM, rad),
             resultat = parseEnum(TidligsteEndringFellesNøkler.RESULTAT, rad),
             type = parseValgfriEnum<VilkårType>(TidligsteEndringFellesNøkler.TYPE, rad) ?: VilkårType.PASS_BARN,
-            barnId =
-                valgtBarnId?.let {
-                    barnIderForBehandlingMap.getOrPut(it) { BarnId.random() }
-                },
-            status =
-                parseValgfriEnum<VilkårStatus>(
-                    TidligsteEndringFellesNøkler.STATUS,
-                    rad,
-                ) ?: VilkårStatus.NY,
+            barnId = valgtBarnId?.let { barnIderForBehandlingMap.getOrPut(it) { BarnId.random() } },
+            status = foreløpigStatus,
             utgift = parseValgfriInt(VilkårNøkler.UTGIFT, rad) ?: 1000,
             erFremtidigUtgift = parseValgfriBoolean(VilkårNøkler.ER_FREMTIDIG_UTGIFT, rad) ?: false,
-        )
+        ).let {
+            if (status == VilkårStatus.SLETTET) {
+                it.markerSlettet("Slettet")
+            } else {
+                it
+            }
+        }
     }
 
     private fun mapAktiviteter(dataTable: DataTable) =

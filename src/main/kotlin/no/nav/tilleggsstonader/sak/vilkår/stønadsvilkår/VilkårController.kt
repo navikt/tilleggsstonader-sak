@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårResponse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
@@ -68,13 +70,13 @@ class VilkårController(
 
     @DeleteMapping
     fun slettVilkår(
-        @RequestBody request: OppdaterVilkårDto,
-    ) {
+        @RequestBody request: SlettVilkårRequest,
+    ): SlettVilkårResponse {
         tilgangService.settBehandlingsdetaljerForRequest(request.behandlingId)
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.DELETE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        vilkårService.slettVilkår(request)
+        return vilkårService.slettVilkår(request).tilDto()
     }
 
     @PostMapping("ikkevurder")

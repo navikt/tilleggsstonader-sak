@@ -16,6 +16,8 @@ enum class Toggle(
 
     BOUTGIFTER_TILLAT_HOYERE_UTGIFTER("sak.boutgifter-tillat-hoyere-utgifter"),
 
+    KAN_SLETTE_VILKÅR("sak.kan-slette-vilkar"),
+
     SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK("sak.utled-endringsdato-revurdering"),
     BRUK_NY_FORESLÅ_VEDTAKSPERIODE("sak.bruk-ny-foresla-vedtaksperiode"),
 }

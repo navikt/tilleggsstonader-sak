@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -44,6 +45,7 @@ data class Vilkår(
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "opphavsvilkaar_")
     val opphavsvilkår: Opphavsvilkår?,
     val gitVersjon: String?,
+    val slettetKommentar: String? = null,
 ) {
     val delvilkårsett get() = delvilkårwrapper.delvilkårsett
 
@@ -56,6 +58,19 @@ data class Vilkår(
             require(utgift == null || utgift >= 0) { "Utgift må være positivt tall" }
 
             validerDataForType(fom, tom)
+            validerSlettefelter()
+        }
+    }
+
+    private fun validerSlettefelter() {
+        if (status == VilkårStatus.SLETTET) {
+            feilHvis(slettetKommentar.isNullOrBlank()) {
+                "Mangler kommentar for resultat=$resultat"
+            }
+        } else {
+            feilHvis(!slettetKommentar.isNullOrBlank()) {
+                "Kan ikke ha slettetkommentar med resultat=$resultat"
+            }
         }
     }
 
@@ -109,6 +124,13 @@ data class Vilkår(
         return true
     }
 
+    fun markerSlettet(slettetKommentar: String): Vilkår =
+        copy(
+            status = VilkårStatus.SLETTET,
+            resultat = Vilkårsresultat.SLETTET,
+            slettetKommentar = slettetKommentar,
+        )
+
     fun kopierTilBehandling(
         nyBehandlingId: BehandlingId,
         barnIdINyBehandling: BarnId? = null,
@@ -122,7 +144,11 @@ data class Vilkår(
             opphavsvilkår = opphavsvilkårForKopiertVilkår(),
         )
 
-    fun kanSlettes() = status == VilkårStatus.NY || erFremtidigUtgift
+    /**
+     * I tilfelle man endrer et vilkår fra [erFremtidigUtgift] fra true til false, så får vilkåret status [VilkårStatus.NY]
+     * Hvis man sen slettes vilkåret slettes det permanent
+     */
+    fun kanSlettesPemanent() = status == VilkårStatus.NY || erFremtidigUtgift
 
     /**
      * Brukes når man skal gjenbruke denne vilkårsvurderingen i en annan vilkårsvurdering
@@ -194,6 +220,7 @@ enum class Vilkårsresultat(
     IKKE_AKTUELL("Hvis søknaden/pdl data inneholder noe som gjør att delvilkåret ikke må besvares"),
     IKKE_TATT_STILLING_TIL("Init state, eller att brukeren ikke svaret på hele delvilkåret"),
     SKAL_IKKE_VURDERES("Saksbehandleren kan sette att ett delvilkår ikke skal vurderes"),
+    SLETTET("Vilkår er slettet"),
     ;
 
     fun erOppfylt() = this == OPPFYLT || this == AUTOMATISK_OPPFYLT

@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -38,6 +39,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.SKAL_IKKE_VURDERES
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -70,6 +72,7 @@ internal class VilkårServiceTest {
             behandlingService = behandlingService,
             vilkårRepository = vilkårRepository,
             barnService = barnService,
+            unleashService = mockUnleashService(),
         )
 
     private val barnUnder9år = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)
@@ -236,13 +239,34 @@ internal class VilkårServiceTest {
             val vilkår = vilkår(behandlingId = behandlingId, type = VilkårType.PASS_BARN)
             every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
-            vilkårService.slettVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
+            vilkårService.slettVilkår(SlettVilkårRequest(vilkår.id, behandlingId))
 
             verify { vilkårRepository.deleteById(vilkår.id) }
         }
 
         @Test
-        internal fun `skal ikke kunne slette vilkår opprettet i tidligere behandling`() {
+        internal fun `sletting av vilkår i tidligere behandling skal slettemarkere et vilkår`() {
+            val slotOppdaterVilkår = slot<Vilkår>()
+            val vilkår =
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.PASS_BARN,
+                    opphavsvilkår = Opphavsvilkår(BehandlingId.random(), LocalDateTime.now()),
+                    status = VilkårStatus.UENDRET,
+                )
+            every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
+            every { vilkårRepository.update(capture(slotOppdaterVilkår)) } answers { firstArg() }
+
+            vilkårService.slettVilkår(SlettVilkårRequest(vilkår.id, behandlingId, "En kommentar"))
+
+            val oppdatertVilkår = slotOppdaterVilkår.captured
+            assertThat(oppdatertVilkår.slettetKommentar).isEqualTo("En kommentar")
+            assertThat(oppdatertVilkår.status).isEqualTo(VilkårStatus.SLETTET)
+            assertThat(oppdatertVilkår.resultat).isEqualTo(Vilkårsresultat.SLETTET)
+        }
+
+        @Test
+        internal fun `sletting av vilkår i tidligere behandling har påkrevd slettekommentar`() {
             val vilkår =
                 vilkår(
                     behandlingId = behandlingId,
@@ -253,8 +277,8 @@ internal class VilkårServiceTest {
             every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
             assertThatThrownBy {
-                vilkårService.slettVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
-            }.hasMessageContaining("Kan ikke slette vilkår opprettet i tidligere behandling")
+                vilkårService.slettVilkår(SlettVilkårRequest(vilkår.id, behandlingId))
+            }.hasMessageContaining("Kommentar er påkrevd for å slettemarkere vilkår")
         }
 
         @Test
@@ -269,7 +293,7 @@ internal class VilkårServiceTest {
                 )
             every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
-            vilkårService.slettVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
+            vilkårService.slettVilkår(SlettVilkårRequest(vilkår.id, behandlingId))
 
             verify { vilkårRepository.deleteById(vilkår.id) }
         }
@@ -417,7 +441,7 @@ internal class VilkårServiceTest {
             every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
             assertThatThrownBy {
-                vilkårService.slettVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
+                vilkårService.slettVilkår(SlettVilkårRequest(vilkår.id, behandlingId))
             }.hasMessageContaining("Kan ikke slette periode")
         }
     }

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -39,6 +40,17 @@ data class OpphavsvilkårDto(
 data class OppdaterVilkårDto(
     val id: VilkårId,
     val behandlingId: BehandlingId,
+)
+
+data class SlettVilkårRequest(
+    val id: VilkårId,
+    val behandlingId: BehandlingId,
+    val kommentar: String? = null,
+)
+
+data class SlettVilkårResponse(
+    val slettetPermanent: Boolean,
+    val vilkår: VilkårDto,
 )
 
 data class DelvilkårDto(
@@ -85,3 +97,9 @@ fun Vilkår.tilDto() =
 fun DelvilkårDto.svarTilDomene() = this.vurderinger.map { it.tilDomene() }
 
 fun VurderingDto.tilDomene() = Vurdering(this.regelId, this.svar, this.begrunnelse)
+
+fun SlettetVilkårResultat.tilDto() =
+    SlettVilkårResponse(
+        slettetPermanent = this.slettetPermanent,
+        vilkår = this.vilkår.tilDto(),
+    )

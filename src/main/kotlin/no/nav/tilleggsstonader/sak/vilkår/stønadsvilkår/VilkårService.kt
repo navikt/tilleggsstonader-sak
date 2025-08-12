@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.NyttBarnId
@@ -12,20 +13,25 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårRevurderFraValidering.validerEndrePeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårRevurderFraValidering.validerNyPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
@@ -43,6 +49,7 @@ class VilkårService(
     private val behandlingService: BehandlingService,
     private val vilkårRepository: VilkårRepository,
     private val barnService: BarnService,
+    private val unleashService: UnleashService,
 ) {
     @Transactional
     fun oppdaterVilkår(svarPåVilkårDto: SvarPåVilkårDto): Vilkår {
@@ -103,21 +110,41 @@ class VilkårService(
     }
 
     @Transactional
-    fun slettVilkår(oppdaterVilkårDto: OppdaterVilkårDto) {
-        val vilkårId = oppdaterVilkårDto.id
+    fun slettVilkår(slettVilkårRequest: SlettVilkårRequest): SlettetVilkårResultat {
+        val vilkårId = slettVilkårRequest.id
         val vilkår = vilkårRepository.findByIdOrThrow(vilkårId)
         val behandlingId = vilkår.behandlingId
 
-        // TODO burde slettemarkeres hvis opprettet i tidligere behandling og ikke er fremtidig utgift?
-        feilHvis(!vilkår.kanSlettes()) {
-            "Kan ikke slette vilkår opprettet i tidligere behandling"
-        }
-        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)
+        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, slettVilkårRequest.behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
         validerSlettPeriodeRevurdering(behandling, vilkår)
+        brukerfeilHvis(vilkår.status == VilkårStatus.SLETTET) {
+            "Vilkår med id=$vilkårId er allerede slettet"
+        }
 
-        vilkårRepository.deleteById(vilkårId)
+        if (vilkår.kanSlettesPemanent()) {
+            require(slettVilkårRequest.kommentar.isNullOrBlank()) {
+                "Skal ikka ha kommentar når vilkår slettes permanent"
+            }
+            vilkårRepository.deleteById(vilkårId)
+            return SlettetVilkårResultat(
+                slettetPermanent = true,
+                vilkår = vilkår,
+            )
+        } else if (unleashService.isEnabled(Toggle.KAN_SLETTE_VILKÅR)) { // Endre til else når toggle er fjernet og fjerne else
+            val slettetKommentar = slettVilkårRequest.kommentar
+            require(slettetKommentar != null && slettetKommentar.isNotBlank()) {
+                "Kommentar er påkrevd for å slettemarkere vilkår"
+            }
+            val oppdatertVilkår = vilkårRepository.update(vilkår.markerSlettet(slettetKommentar = slettetKommentar))
+            return SlettetVilkårResultat(
+                slettetPermanent = false,
+                vilkår = oppdatertVilkår,
+            )
+        } else {
+            feil("Kan ikke slette vilkår opprettet i tidligere behandling")
+        }
     }
 
     @Transactional
