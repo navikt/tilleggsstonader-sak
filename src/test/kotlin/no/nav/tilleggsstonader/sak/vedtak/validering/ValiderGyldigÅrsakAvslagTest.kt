@@ -122,13 +122,12 @@ class ValiderGyldigÅrsakAvslagTest {
         }
 
         @Test
-        fun `skal kaste feil om avslaggrunn er aktivitet dersom det ikke finnes en aktivitet med resultat ikke oppfylt`() {
+        fun `skal kaste feil om avslaggrunn er aktivitet dersom det ikke finnes noen aktivitet med resultat IKKE_OPPFYLT`() {
             every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
                 Vilkårperioder(
                     aktiviteter =
                         listOf(
                             aktivitet(behandlingId = behandlingId, resultat = ResultatVilkårperiode.OPPFYLT),
-                            aktivitet(behandlingId = behandlingId, resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
                         ),
                     målgrupper = emptyList(),
                 )
@@ -143,7 +142,7 @@ class ValiderGyldigÅrsakAvslagTest {
                             årsakerAvslag = listOf(årsakAvslagSomGjelderAktivitet),
                             stønadstype = stønadstype,
                         )
-                    }.hasMessageContaining("asdasd")
+                    }.hasMessageContaining("Kan ikke avslå med følgende årsaker")
                 }
             }
         }
@@ -217,11 +216,11 @@ class ValiderGyldigÅrsakAvslagTest {
 
                 assertThatThrownBy {
                     årsakAvslagValideringService.validerAvslagErGyldig(
-                        behandlingId,
-                        listOf(ÅrsakAvslag.IKKE_I_MÅLGRUPPE),
-                        stønadstype,
+                        behandlingId = behandlingId,
+                        årsakerAvslag = listOf(ÅrsakAvslag.IKKE_I_MÅLGRUPPE),
+                        stønadstype = stønadstype,
                     )
-                }.hasMessageContaining("målgruppeårasdsadsaker")
+                }.hasMessageContaining("Kan ikke avslå med følgende årsaker")
             }
         }
     }
@@ -295,7 +294,7 @@ class ValiderGyldigÅrsakAvslagTest {
                             listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON),
                             Stønadstype.BOUTGIFTER,
                         )
-                    }.hasMessageContaining("stønadsvilkårårsaker")
+                    }.hasMessageContaining("Kan ikke avslå med følgende årsaker")
                 }
             }
         }

@@ -57,7 +57,7 @@ class ÅrsakAvslagValideringService(
         val målgrupper = vilkårperiodeService.hentVilkårperioder(behandlingId).målgrupper
 
         brukerfeilHvis(målgrupper.none { it.resultat == ResultatVilkårperiode.IKKE_OPPFYLT }) {
-            "Kan ikke avslå med målgruppeårsaker uten å legge inn minst én målgruppe som ikke er oppfylt: ${aktuelleÅrsaker.toList().formaterListe()}"
+            "Kan ikke avslå med følgende årsaker uten å legge inn minst én målgruppe som ikke er oppfylt: ${aktuelleÅrsaker.toList().formaterListe()}"
         }
     }
 
@@ -75,7 +75,7 @@ class ÅrsakAvslagValideringService(
         val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
 
         brukerfeilHvis(aktiviteter.none { it.resultat == ResultatVilkårperiode.IKKE_OPPFYLT }) {
-            "Kan ikke avslå med aktivitetsårsaker uten å legge minst én aktivitet der resultatet er 'ikke oppfylt': ${aktuelleÅrsaker.toList().formaterListe()}"
+            "Kan ikke avslå med følgende årsaker uten å legge minst én aktivitet der resultatet er 'ikke oppfylt': ${aktuelleÅrsaker.toList().formaterListe()}"
         }
     }
 
@@ -93,7 +93,7 @@ class ÅrsakAvslagValideringService(
         val stønadsvilkår = vilkårService.hentVilkår(behandlingId)
 
         brukerfeilHvis(stønadsvilkår.none { it.resultat == Vilkårsresultat.IKKE_OPPFYLT }) {
-            "Kan ikke avslå med stønadsvilkårårsaker uten minst ett ikke-oppfylt vilkår for ${stønadstype.visningsnavnStønadsvilkår()}: ${aktuelleÅrsaker.toList().formaterListe()}"
+            "Kan ikke avslå med følgende årsaker uten minst ett ikke-oppfylt vilkår for ${stønadstype.visningsnavnStønadsvilkår()}: ${aktuelleÅrsaker.toList().formaterListe()}"
         }
     }
 }
