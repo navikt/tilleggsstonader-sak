@@ -105,6 +105,7 @@ data class VilkårInternt(
     val fom: LocalDate?,
     val tom: LocalDate?,
     val utgift: Int?,
+    val slettetKommentar: String?,
 )
 
 data class DelvilkårInternt(
