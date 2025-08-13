@@ -98,7 +98,7 @@ class SøknadskjemaBoutgifterMapper(
                         adresse = it.adresse,
                         postnummer = it.postnummer,
                         poststed = it.bySted,
-                        landkode = kodeverkService.hentLandkodeIso2(it.land.value),
+                        landkode = it.land?.value?.let { land -> kodeverkService.hentLandkodeIso2(land) },
                     )
                 },
         )

@@ -78,7 +78,7 @@ data class FaktaPersonopplysninger(
 )
 
 data class FaktaPersonopplysningerSøknadsgrunnlag(
-    val adresse: String,
+    val adresse: String?,
 )
 
 data class SøknadsgrunnlagHovedytelse(
