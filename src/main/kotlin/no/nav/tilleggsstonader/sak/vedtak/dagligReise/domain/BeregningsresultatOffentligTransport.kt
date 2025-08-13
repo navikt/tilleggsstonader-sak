@@ -33,7 +33,7 @@ data class VedtaksperiodeGrunnlag(
     val tom: LocalDate,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
-    val antallReisedager: Int,
+    val antallReisedagerIVedtaksperioden: Int,
 ) {
     constructor(vedtaksperiode: Vedtaksperiode, antallReisedager: Int) : this(
         id = vedtaksperiode.id,
@@ -41,6 +41,6 @@ data class VedtaksperiodeGrunnlag(
         tom = vedtaksperiode.tom,
         målgruppe = vedtaksperiode.målgruppe,
         aktivitet = vedtaksperiode.aktivitet,
-        antallReisedager = antallReisedager,
+        antallReisedagerIVedtaksperioden = antallReisedager,
     )
 }

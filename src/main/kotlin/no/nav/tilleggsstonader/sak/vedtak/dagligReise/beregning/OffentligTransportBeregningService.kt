@@ -9,8 +9,8 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTran
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.antallDagerIPeriodeInklusiv
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.splitPerUke
-import org.apache.commons.lang3.math.NumberUtils.min
 import org.springframework.stereotype.Service
+import kotlin.math.min
 
 @Service
 class OffentligTransportBeregningService {
@@ -54,7 +54,16 @@ class OffentligTransportBeregningService {
     ): List<Vedtaksperiode> =
         vedtaksperioder
             .filter { it.overlapper(reise) }
-            .map { it.copy(fom = maxOf(it.fom, reise.fom), tom = minOf(it.tom, reise.tom)) }
+            .map { kuttVedtaksperiodeTilOverlapp(reise, it) }
+
+    private fun kuttVedtaksperiodeTilOverlapp(
+        reise: UtgiftOffentligTransport,
+        vedtaksperiode: Vedtaksperiode,
+    ): Vedtaksperiode =
+        vedtaksperiode.copy(
+            fom = maxOf(vedtaksperiode.fom, reise.fom),
+            tom = minOf(vedtaksperiode.tom, reise.tom),
+        )
 
     private fun beregnForPeriode(
         periode: UtgiftOffentligTransport,
@@ -76,7 +85,7 @@ class OffentligTransportBeregningService {
                 antallReisedagerPerUke = periode.antallReisedagerPerUke,
                 prisEnkeltbillett = periode.prisEnkelbillett,
                 pris30dagersbillett = periode.pris30dagersbillett,
-                antallReisedager = vedtaksperiodeGrunnlag.sumOf { it.antallReisedager },
+                antallReisedager = vedtaksperiodeGrunnlag.sumOf { it.antallReisedagerIVedtaksperioden },
                 vedtaksperioder = vedtaksperiodeGrunnlag,
             )
 
