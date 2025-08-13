@@ -24,14 +24,15 @@ enum class Avslagskategori {
 fun gyldigeAvslagsårsaker(
     stønadstype: Stønadstype,
     gjelder: Avslagskategori,
-): Set<ÅrsakAvslag> =
-    when (stønadstype) {
+): Set<ÅrsakAvslag> {
+    val generelleÅrsaker = setOf(ANNET, INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE)
+    return when (stønadstype) {
         Stønadstype.BARNETILSYN ->
             when (gjelder) {
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
                 Avslagskategori.STØNADSVILKÅR -> setOf(MANGELFULL_DOKUMENTASJON)
-                Avslagskategori.GENERELL -> setOf(ANNET)
+                Avslagskategori.GENERELL -> generelleÅrsaker
             }
 
         Stønadstype.LÆREMIDLER ->
@@ -39,7 +40,7 @@ fun gyldigeAvslagsårsaker(
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET, HAR_IKKE_UTGIFTER, RETT_TIL_UTSTYRSSTIPEND)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
                 Avslagskategori.STØNADSVILKÅR -> emptySet()
-                Avslagskategori.GENERELL -> setOf(ANNET)
+                Avslagskategori.GENERELL -> generelleÅrsaker
             }
 
         Stønadstype.BOUTGIFTER ->
@@ -47,7 +48,7 @@ fun gyldigeAvslagsårsaker(
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
                 Avslagskategori.STØNADSVILKÅR -> setOf(MANGELFULL_DOKUMENTASJON, HAR_IKKE_MERUTGIFTER, RETT_TIL_BOSTØTTE)
-                Avslagskategori.GENERELL -> setOf(ANNET, INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE)
+                Avslagskategori.GENERELL -> generelleÅrsaker
             }
 
         Stønadstype.DAGLIG_REISE_TSO -> // TODO: Denne må trolig fylles inn mer når vi lærer mer om hvordan vilkår på daglig reise ser ut
@@ -55,7 +56,7 @@ fun gyldigeAvslagsårsaker(
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
                 Avslagskategori.STØNADSVILKÅR -> emptySet()
-                Avslagskategori.GENERELL -> setOf(ANNET, INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE)
+                Avslagskategori.GENERELL -> generelleÅrsaker
             }
 
         Stønadstype.DAGLIG_REISE_TSR -> // TODO: Denne må trolig fylles inn mer når vi lærer mer om hvordan vilkår på daglig reise ser ut
@@ -63,9 +64,10 @@ fun gyldigeAvslagsårsaker(
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
                 Avslagskategori.STØNADSVILKÅR -> emptySet()
-                Avslagskategori.GENERELL -> setOf(ANNET, INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE)
+                Avslagskategori.GENERELL -> generelleÅrsaker
             }
     }
+}
 
 fun gyldigeÅrsakerForStønadstype(stønadstype: Stønadstype): Set<ÅrsakAvslag> =
     Avslagskategori.entries

@@ -35,7 +35,7 @@ class ValiderGyldigÅrsakAvslagTest {
         val alleÅrsakeneIValideringen = Stønadstype.entries.flatMap { gyldigeÅrsakerForStønadstype(it) }.toSet()
         val alleAvslagsårsaker = ÅrsakAvslag.entries.toSet()
 
-        assertThat(alleAvslagsårsaker - alleÅrsakeneIValideringen).isEmpty()
+        assertThat(alleAvslagsårsaker).containsExactlyInAnyOrderElementsOf(alleÅrsakeneIValideringen)
     }
 
     @Nested
@@ -51,6 +51,7 @@ class ValiderGyldigÅrsakAvslagTest {
 
         @Test
         fun `skal ikke kaste valideringsfeil dersom årsak er i kategorien GENERELL`() {
+            mockHentVilkårperioder()
             Stønadstype.entries.forEach { stønadstype ->
                 val årsakerSomIkkeValideres = gyldigeAvslagsårsaker(stønadstype, Avslagskategori.GENERELL)
 
