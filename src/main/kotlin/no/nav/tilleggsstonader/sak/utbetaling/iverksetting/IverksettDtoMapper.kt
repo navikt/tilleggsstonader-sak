@@ -55,7 +55,7 @@ object IverksettDtoMapper {
                     stønadsdata =
                         StønadsdataDto(
                             stønadstype = it.type.tilStønadstype(),
-                            brukersNavKontor = null, // TODO denne skal settes for reise?
+                            brukersNavKontor = null, // TODO denne skal settes for TSR-stønader (DAGLIG_REISE_TSR, etc),
                         ),
                 )
             }
