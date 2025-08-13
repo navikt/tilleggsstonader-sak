@@ -78,13 +78,7 @@ fun Vilkårperiode.tilDto() =
         faktaOgVurderinger = this.faktaOgVurdering.tilFaktaOgVurderingDto(),
     )
 
-// Returnerer ikke vurdering hvis resultatet er IKKE_AKTUELT
-fun Vurdering.tilDto() =
-    this
-        .takeIf { resultat != ResultatDelvilkårperiode.IKKE_AKTUELT }
-        ?.let {
-            VurderingDto(svar = svar, resultat = resultat)
-        }
+fun Vurdering.tilDto() = VurderingDto(svar = svar, resultat = resultat)
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(
