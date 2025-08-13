@@ -34,7 +34,7 @@ class LæremidlerVedtakControllerTest : IntegrationTest() {
     fun `skal lagre og hente avslag`() {
         val vedtak =
             AvslagLæremidlerDto(
-                årsakerAvslag = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
+                årsakerAvslag = listOf(ÅrsakAvslag.ANNET),
                 begrunnelse = "begrunnelse",
             )
 

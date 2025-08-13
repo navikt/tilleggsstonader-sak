@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
+import no.nav.tilleggsstonader.sak.util.enumTilVisningsnavn
 
 interface BehandlingSteg<T> {
     fun validerSteg(saksbehandling: Saksbehandling) {}
@@ -88,11 +89,7 @@ enum class StegType(
     ),
     ;
 
-    fun displayName(): String =
-        this.name
-            .replace('_', ' ')
-            .lowercase()
-            .replaceFirstChar { it.uppercase() }
+    fun visningsnavn(): String = enumTilVisningsnavn(name)
 
     fun kommerEtter(steg: StegType): Boolean = this.rekkefølge > steg.rekkefølge
 

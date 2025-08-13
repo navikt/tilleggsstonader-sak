@@ -175,7 +175,7 @@ class StegService(
         behandlingSteg.validerSteg(saksbehandling)
         feilHvis(!behandlingSteg.stegType().erGyldigIKombinasjonMedStatus(saksbehandling.status)) {
             "Kan ikke utføre '${
-                behandlingSteg.stegType().displayName()
+                behandlingSteg.stegType().visningsnavn()
             }' når behandlingstatus er ${saksbehandling.status.visningsnavn()}"
         }
     }
@@ -186,7 +186,7 @@ class StegService(
     ) {
         if (!nesteSteg.erGyldigIKombinasjonMedStatus(behandlingService.hentBehandling(saksbehandling.id).status)) {
             error(
-                "Steg '${nesteSteg.displayName()}' kan ikke settes " +
+                "Steg '${nesteSteg.visningsnavn()}' kan ikke settes " +
                     "på behandling i kombinasjon med status ${saksbehandling.status}",
             )
         }

@@ -17,4 +17,4 @@ enum class ÅrsakAvslag {
     fun visningsnavn() = enumTilVisningsnavn(name)
 }
 
-fun List<ÅrsakAvslag>.formaterListe(): String = joinToString(separator = ", ") { it.visningsnavn() }
+fun List<ÅrsakAvslag>.formaterListe(): String = joinToString(separator = ", ", prefix = "\"", postfix = "\"") { it.visningsnavn() }

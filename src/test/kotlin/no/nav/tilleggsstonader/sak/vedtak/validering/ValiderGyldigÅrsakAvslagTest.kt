@@ -2,177 +2,234 @@ package no.nav.tilleggsstonader.sak.vedtak.validering
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.domain.Avslagskategori
+import no.nav.tilleggsstonader.sak.vedtak.domain.gyldigeAvslagsårsaker
+import no.nav.tilleggsstonader.sak.vedtak.domain.gyldigeÅrsakerForStønadstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
 
 class ValiderGyldigÅrsakAvslagTest {
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
-    private val validerGyldigÅrsakAvslag = ValiderGyldigÅrsakAvslag(vilkårperiodeService)
+    private val vilkårService = mockk<VilkårService>()
+    private val validerGyldigÅrsakAvslag = ValiderGyldigÅrsakAvslag(vilkårperiodeService, vilkårService)
 
     val behandlingId = BehandlingId.random()
 
+    @Test
+    fun `sjekk at alle avslagsårsakene er med i valideringen`() {
+        val alleÅrsakeneIValideringen = Stønadstype.entries.flatMap { gyldigeÅrsakerForStønadstype(it) }.toSet()
+        val alleAvslagsårsaker = ÅrsakAvslag.entries.toSet()
+
+        assertThat(alleAvslagsårsaker).containsExactlyInAnyOrderElementsOf(alleÅrsakeneIValideringen)
+    }
+
     @Nested
-    inner class ValiderAktivitet {
-        @ParameterizedTest
-        @EnumSource(
-            value = ÅrsakAvslag::class,
-            names = [ "INGEN_AKTIVITET", "HAR_IKKE_UTGIFTER", "RETT_TIL_UTSTYRSSTIPEND"],
-            mode = EnumSource.Mode.INCLUDE,
-        )
-        fun `gyldig å avslå på aktivitet dersom det finnes en ikke oppfylt aktivitet`(årsakAvslag: ÅrsakAvslag) {
-            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
-                Vilkårperioder(
-                    aktiviteter =
-                        listOf(
-                            aktivitet(behandlingId = behandlingId, resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
-                        ),
-                    målgrupper = emptyList(),
-                )
-
-            assertDoesNotThrow {
-                validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
-                    behandlingId,
-                    listOf(årsakAvslag),
-                )
-            }
+    inner class `Valider at avslagsgrunn må være gyldig for stønadstype` {
+        @Test
+        fun `skal kaste feil dersom årsak ikke er gyldig for stønadstype`() {
+            validerOgForventFeil(
+                stønadstype = Stønadstype.LÆREMIDLER,
+                årsaker = listOf(ÅrsakAvslag.HAR_IKKE_MERUTGIFTER), // Kun gyldig for BOUTGIFTER
+                forventetFeilmelding = "ikke gyldige for LÆREMIDLER",
+            )
         }
 
-        @ParameterizedTest
-        @EnumSource(
-            value = ÅrsakAvslag::class,
-            names = [ "INGEN_AKTIVITET", "HAR_IKKE_UTGIFTER", "RETT_TIL_UTSTYRSSTIPEND"],
-            mode = EnumSource.Mode.INCLUDE,
-        )
-        fun `gyldig å avslå på aktivitet dersom det finnes minst en ikke oppfylt aktivitet`(årsakAvslag: ÅrsakAvslag) {
-            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
-                Vilkårperioder(
-                    aktiviteter =
-                        listOf(
-                            aktivitet(behandlingId = behandlingId, resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
-                            aktivitet(behandlingId = behandlingId, resultat = ResultatVilkårperiode.OPPFYLT),
-                        ),
-                    målgrupper = emptyList(),
-                )
+        @Test
+        fun `skal ikke kaste valideringsfeil dersom årsak er i kategorien GENERELL`() {
+            mockHentVilkårperioder()
+            Stønadstype.entries.forEach { stønadstype ->
+                val årsakerSomIkkeValideres = gyldigeAvslagsårsaker(stønadstype, Avslagskategori.GENERELL)
 
-            assertDoesNotThrow {
-                validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
-                    behandlingId,
-                    listOf(årsakAvslag),
-                )
+                årsakerSomIkkeValideres.forEach { avslagsårsak ->
+                    validerOgForventSuksess(
+                        stønadstype = stønadstype,
+                        årsaker = listOf(avslagsårsak),
+                    )
+                }
             }
-        }
-
-        @ParameterizedTest
-        @EnumSource(
-            value = ÅrsakAvslag::class,
-            names = [ "INGEN_AKTIVITET", "HAR_IKKE_UTGIFTER", "RETT_TIL_UTSTYRSSTIPEND"],
-            mode = EnumSource.Mode.INCLUDE,
-        )
-        fun `skal kaste feil om avslaggrunn er aktivitet dersom det ikke finnes en aktivitet med resultat ikke oppfylt`(
-            årsakAvslag: ÅrsakAvslag,
-        ) {
-            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
-                Vilkårperioder(
-                    aktiviteter =
-                        listOf(
-                            aktivitet(behandlingId = behandlingId, resultat = ResultatVilkårperiode.OPPFYLT),
-                        ),
-                    målgrupper = emptyList(),
-                )
-
-            assertThatThrownBy {
-                validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
-                    behandlingId,
-                    listOf(årsakAvslag),
-                )
-            }.hasMessageContaining("Kan ikke avslå med følgende årsak(er)")
         }
     }
 
     @Nested
-    inner class ValiderMålgruppe {
+    inner class `Valider avslag på grunn av aktivitet` {
         @Test
-        fun `IKKE I MÅLGRUPPE er gyldig avslagårsak dersom det finnes en ikke oppfylt målgruppe`() {
-            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
-                Vilkårperioder(
-                    aktiviteter = emptyList(),
-                    målgrupper =
-                        listOf(
-                            målgruppe(behandlingId = behandlingId, resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
-                        ),
-                )
+        fun `gyldig å avslå på aktivitet dersom det finnes en ikke-oppfylt aktivitet`() {
+            mockHentVilkårperioder(aktiviteter = listOf(ResultatVilkårperiode.IKKE_OPPFYLT))
+            mockHentVilkår()
 
-            assertDoesNotThrow {
-                validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
-                    behandlingId,
-                    listOf(ÅrsakAvslag.IKKE_I_MÅLGRUPPE),
+            Stønadstype.entries.forEach { stønadstype ->
+                gyldigeAvslagsårsaker(stønadstype, Avslagskategori.AKTIVITET).forEach { årsakAvslagSomGjelderAktivitet ->
+                    validerOgForventSuksess(
+                        stønadstype = stønadstype,
+                        årsaker = listOf(årsakAvslagSomGjelderAktivitet),
+                    )
+                }
+            }
+        }
+
+        @Test
+        fun `gyldig å avslå på aktivitet så lenge det finnes minst én ikke-oppfylt aktivitet`() {
+            mockHentVilkårperioder(aktiviteter = listOf(ResultatVilkårperiode.OPPFYLT, ResultatVilkårperiode.IKKE_OPPFYLT))
+            mockHentVilkår()
+
+            Stønadstype.entries.forEach { stønadstype ->
+                gyldigeAvslagsårsaker(stønadstype, Avslagskategori.AKTIVITET).forEach { årsakAvslagSomGjelderAktivitet ->
+                    validerOgForventSuksess(
+                        stønadstype = stønadstype,
+                        årsaker = listOf(årsakAvslagSomGjelderAktivitet),
+                    )
+                }
+            }
+        }
+
+        @Test
+        fun `skal kaste feil om avslaggrunn er aktivitet dersom det ikke finnes noen aktivitet med resultat IKKE_OPPFYLT`() {
+            mockHentVilkårperioder(aktiviteter = listOf(ResultatVilkårperiode.OPPFYLT))
+            mockHentVilkår()
+
+            Stønadstype.entries.forEach { stønadstype ->
+                gyldigeAvslagsårsaker(stønadstype, Avslagskategori.AKTIVITET).forEach { årsakAvslagSomGjelderAktivitet ->
+                    validerOgForventFeil(
+                        stønadstype = stønadstype,
+                        årsaker = listOf(årsakAvslagSomGjelderAktivitet),
+                        forventetFeilmelding = "Kan ikke avslå med følgende årsaker",
+                    )
+                }
+            }
+        }
+    }
+
+    @Nested
+    inner class `Valider avslag på grunn av målgruppe` {
+        @Test
+        fun `gyldig å avslå på målgruppe dersom det finnes en ikke-oppfylt målgruppe`() {
+            mockHentVilkårperioder(målgrupper = listOf(ResultatVilkårperiode.IKKE_OPPFYLT))
+            mockHentVilkår()
+
+            Stønadstype.entries.forEach { stønadstype ->
+                validerOgForventSuksess(
+                    stønadstype = stønadstype,
+                    årsaker = listOf(ÅrsakAvslag.IKKE_I_MÅLGRUPPE),
                 )
             }
         }
 
         @Test
         fun `IKKE I MÅLGRUPPE er gyldig avslagårsak dersom det finnes minst en ikke oppfylt målgruppe`() {
-            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
-                Vilkårperioder(
-                    aktiviteter = emptyList(),
-                    målgrupper =
-                        listOf(
-                            målgruppe(behandlingId = behandlingId, resultat = ResultatVilkårperiode.IKKE_OPPFYLT),
-                            målgruppe(behandlingId = behandlingId, resultat = ResultatVilkårperiode.OPPFYLT),
-                        ),
-                )
+            mockHentVilkårperioder(målgrupper = listOf(ResultatVilkårperiode.OPPFYLT, ResultatVilkårperiode.IKKE_OPPFYLT))
+            mockHentVilkår()
 
-            assertDoesNotThrow {
-                validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
-                    behandlingId,
-                    listOf(ÅrsakAvslag.IKKE_I_MÅLGRUPPE),
+            Stønadstype.entries.forEach { stønadstype ->
+                validerOgForventSuksess(
+                    stønadstype = stønadstype,
+                    årsaker = listOf(ÅrsakAvslag.IKKE_I_MÅLGRUPPE),
                 )
             }
         }
 
         @Test
         fun `IKKE I MÅLGRUPPE er ikke gyldig hvis det ikke er lagt inn en målgruppe som ikke er oppfylt`() {
-            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
-                Vilkårperioder(
-                    aktiviteter = emptyList(),
-                    målgrupper =
-                        listOf(
-                            målgruppe(behandlingId = behandlingId, resultat = ResultatVilkårperiode.OPPFYLT),
-                        ),
-                )
+            mockHentVilkårperioder(målgrupper = listOf(ResultatVilkårperiode.OPPFYLT))
+            mockHentVilkår()
 
-            assertThatThrownBy {
-                validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
-                    behandlingId,
-                    listOf(ÅrsakAvslag.IKKE_I_MÅLGRUPPE),
+            Stønadstype.entries.forEach { stønadstype ->
+                validerOgForventFeil(
+                    stønadstype = stønadstype,
+                    årsaker = listOf(ÅrsakAvslag.IKKE_I_MÅLGRUPPE),
+                    forventetFeilmelding = "Kan ikke avslå med følgende årsaker",
                 )
-            }.hasMessageContaining("Kan ikke avslå med årsak 'Ikke i målgruppe'")
+            }
         }
     }
 
-    @ParameterizedTest
-    @EnumSource(
-        value = ÅrsakAvslag::class,
-        names = ["IKKE_I_MÅLGRUPPE", "INGEN_AKTIVITET", "HAR_IKKE_UTGIFTER", "RETT_TIL_UTSTYRSSTIPEND"],
-        mode = EnumSource.Mode.EXCLUDE,
-    )
-    fun `skal ikke kaste valideringsfeil dersom årsak ikke gjelder aktivitet eller målgruppe`(årsakAvslag: ÅrsakAvslag) {
+    @Nested
+    inner class `Valider avslag på bakgrunn av stønadsvilkår` {
+        @Test
+        fun `avslag på bakgrunn av stønadsvilkår er gyldig dersom det finnes et ikke-oppfylt stønadsvilkår`() {
+            mockHentVilkårperioder()
+            mockHentVilkår(listOf(vilkår(resultat = Vilkårsresultat.IKKE_OPPFYLT)))
+
+            Stønadstype.entries.forEach { stønadstype ->
+                gyldigeAvslagsårsaker(stønadstype, Avslagskategori.STØNADSVILKÅR).forEach { avslagsgrunn ->
+                    validerOgForventSuksess(
+                        stønadstype = stønadstype,
+                        årsaker = listOf(avslagsgrunn),
+                    )
+                }
+            }
+        }
+
+        @Test
+        fun `avslag på bakgrunn av stønadsvilkår er ikke gyldig hvis det ikke finnes et ikke oppfylt stønadsvilkår`() {
+            mockHentVilkårperioder()
+            mockHentVilkår(listOf(vilkår(resultat = Vilkårsresultat.OPPFYLT)))
+
+            Stønadstype.entries.forEach { stønadstype ->
+                gyldigeAvslagsårsaker(stønadstype, Avslagskategori.STØNADSVILKÅR).forEach { avslagsgrunn ->
+                    validerOgForventFeil(
+                        stønadstype = stønadstype,
+                        årsaker = listOf(avslagsgrunn),
+                        forventetFeilmelding = "Kan ikke avslå med følgende årsaker",
+                    )
+                }
+            }
+        }
+    }
+
+    private fun validerOgForventFeil(
+        stønadstype: Stønadstype,
+        årsaker: List<ÅrsakAvslag>,
+        forventetFeilmelding: String,
+    ) {
+        assertThatThrownBy {
+            validerGyldigÅrsakAvslag.validerAvslagErGyldig(
+                behandlingId = behandlingId,
+                årsakerAvslag = årsaker,
+                stønadstype = stønadstype,
+            )
+        }.hasMessageContaining(forventetFeilmelding)
+    }
+
+    private fun validerOgForventSuksess(
+        stønadstype: Stønadstype,
+        årsaker: List<ÅrsakAvslag>,
+    ) {
         assertDoesNotThrow {
-            validerGyldigÅrsakAvslag.validerGyldigAvslagInngangsvilkår(
-                behandlingId,
-                listOf(årsakAvslag),
+            validerGyldigÅrsakAvslag.validerAvslagErGyldig(
+                behandlingId = behandlingId,
+                årsakerAvslag = årsaker,
+                stønadstype = stønadstype,
             )
         }
+    }
+
+    private fun mockHentVilkårperioder(
+        aktiviteter: List<ResultatVilkårperiode> = emptyList(),
+        målgrupper: List<ResultatVilkårperiode> = emptyList(),
+    ) {
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns
+            Vilkårperioder(
+                aktiviteter = aktiviteter.map { aktivitet(behandlingId = behandlingId, resultat = it) },
+                målgrupper = målgrupper.map { målgruppe(behandlingId = behandlingId, resultat = it) },
+            )
+    }
+
+    private fun mockHentVilkår(vilkår: List<Vilkår> = emptyList()) {
+        every { vilkårService.hentVilkår(behandlingId) } returns vilkår
     }
 }

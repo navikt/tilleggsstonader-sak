@@ -27,7 +27,7 @@ object StegValidering {
         )
 
         feilHvis(!harTilgangTilSteg) {
-            "$saksbehandlerIdent kan ikke utføre steg '${stegType.displayName()}' pga manglende rolle."
+            "$saksbehandlerIdent kan ikke utføre steg '${stegType.visningsnavn()}' pga manglende rolle."
         }
     }
 
@@ -42,13 +42,13 @@ object StegValidering {
 
         if (stegType.kommerEtter(saksbehandling.steg)) {
             error(
-                "$saksbehandlerIdent prøver å utføre steg '${stegType.displayName()}', " +
-                    "men behandlingen er på steg '${saksbehandling.steg.displayName()}'",
+                "$saksbehandlerIdent prøver å utføre steg '${stegType.visningsnavn()}', " +
+                    "men behandlingen er på steg '${saksbehandling.steg.visningsnavn()}'",
             )
         }
 
         if (saksbehandling.steg == StegType.BESLUTTE_VEDTAK && stegType != StegType.BESLUTTE_VEDTAK) {
-            error("Behandlingen er på steg '${saksbehandling.steg.displayName()}', og er da låst for alle andre type endringer.")
+            error("Behandlingen er på steg '${saksbehandling.steg.visningsnavn()}', og er da låst for alle andre type endringer.")
         }
     }
 
@@ -63,7 +63,7 @@ object StegValidering {
             val saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker()
             error(
                 "$saksbehandler kan ikke endre" +
-                    " fra steg=${behandling.steg.displayName()} til steg=${steg.displayName()}" +
+                    " fra steg=${behandling.steg.visningsnavn()} til steg=${steg.visningsnavn()}" +
                     " pga manglende rolle på behandling=$behandling.id",
             )
         }

@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.util.enumTilVisningsnavn
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
@@ -119,11 +120,7 @@ enum class BehandlingStatus {
 
     ;
 
-    fun visningsnavn(): String =
-        this.name
-            .replace('_', ' ')
-            .lowercase()
-            .replaceFirstChar { it.uppercase() }
+    fun visningsnavn(): String = enumTilVisningsnavn(name)
 
     fun behandlingErLåstForVidereRedigering(): Boolean = setOf(FATTER_VEDTAK, IVERKSETTER_VEDTAK, FERDIGSTILT, SATT_PÅ_VENT).contains(this)
 

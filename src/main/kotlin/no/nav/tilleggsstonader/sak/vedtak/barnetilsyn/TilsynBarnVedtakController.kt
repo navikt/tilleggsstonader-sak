@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
@@ -22,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
+import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -39,9 +41,9 @@ class TilsynBarnVedtakController(
     private val behandlingService: BehandlingService,
     private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
-    private val tilsynBarnValiderGyldigÅrsakAvslag: TilsynBarnValiderGyldigÅrsakAvslag,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val vedtaksperiodeService: VedtaksperiodeService,
+    private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -56,7 +58,7 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: AvslagTilsynBarnDto,
     ) {
-        tilsynBarnValiderGyldigÅrsakAvslag.validerGyldigAvslag(behandlingId, vedtak)
+        validerGyldigÅrsakAvslag.validerAvslagErGyldig(behandlingId, vedtak.årsakerAvslag, Stønadstype.BARNETILSYN)
         lagreVedtak(behandlingId, vedtak)
     }
 
