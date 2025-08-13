@@ -34,6 +34,7 @@ class TypeFaktaOgVurderingTest {
                 is TypeFaktaOgVurderingLæremidler -> type.assertHarRiktigNavn(stønadstype)
                 is TypeFaktaOgVurderingBoutgifter -> type.assertHarRiktigNavn(stønadstype)
                 is TypeFaktaOgVurderingDagligReiseTso -> type.assertHarRiktigNavn(stønadstype)
+                is TypeFaktaOgVurderingDagligReiseTsr -> type.assertHarRiktigNavn(stønadstype)
             }
         }
     }
