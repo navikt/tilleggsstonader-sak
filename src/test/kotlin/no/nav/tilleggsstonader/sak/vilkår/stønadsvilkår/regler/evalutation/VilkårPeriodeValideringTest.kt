@@ -95,4 +95,17 @@ class VilkårPeriodeValideringTest {
             validerIkkeOverlappendeVilkår(listOf(vilkår, vilkår))
         }.hasMessageContaining(" overlapper")
     }
+
+    @Test
+    fun `skal ikke kaste feil hvis 2 perioder for løpende utgifter overlapper, men en er slettet`() {
+        val vilkår =
+            vilkår(
+                behandlingId = behandlingId,
+                type = VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
+                fom = fom,
+                tom = tom,
+                utgift = 1,
+            )
+        validerIkkeOverlappendeVilkår(listOf(vilkår, vilkår.markerSlettet("abc")))
+    }
 }

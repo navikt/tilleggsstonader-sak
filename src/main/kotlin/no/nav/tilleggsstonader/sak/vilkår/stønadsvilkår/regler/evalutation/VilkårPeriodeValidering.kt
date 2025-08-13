@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 
 object VilkårPeriodeValidering {
@@ -16,6 +17,7 @@ object VilkårPeriodeValidering {
      */
     fun validerIkkeOverlappendeVilkår(values: List<Vilkår>) {
         values
+            .filterNot { it.status == VilkårStatus.SLETTET }
             .groupBy { Pair(it.type, it.barnId) }
             .mapValues { (_, vilkårliste) -> vilkårTilDatoperiode(vilkårliste) }
             .forEach { (vilkårType, vilkårliste) -> validerIkkeOverlappende(vilkårType.first, vilkårliste) }
