@@ -28,7 +28,6 @@ class SendTilBeslutterSteg(
     private val oppgaveService: OppgaveService,
     private val totrinnskontrollService: TotrinnskontrollService,
 ) : BehandlingSteg<SendTilBeslutterRequest> {
-
     override fun validerSteg(saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.steg != stegType()) {
             "Behandling er i feil steg=${saksbehandling.steg}"
