@@ -48,7 +48,7 @@ class ValiderGyldigÅrsakAvslag(
         årsakerAvslag: List<ÅrsakAvslag>,
         stønadstype: Stønadstype,
     ) {
-        val målgruppeÅrsaker = gyldigeAvslagsårsaker(forStønadstype = stønadstype, basertPå = Avslagskategori.MÅLGRUPPE)
+        val målgruppeÅrsaker = gyldigeAvslagsårsaker(stønadstype, gjelder = Avslagskategori.MÅLGRUPPE)
         val aktuelleÅrsaker = årsakerAvslag.intersect(målgruppeÅrsaker)
         if (aktuelleÅrsaker.isEmpty()) return
         val målgrupper = vilkårperiodeService.hentVilkårperioder(behandlingId).målgrupper
@@ -62,7 +62,7 @@ class ValiderGyldigÅrsakAvslag(
         årsakerAvslag: List<ÅrsakAvslag>,
         stønadstype: Stønadstype,
     ) {
-        val aktivitetÅrsaker = gyldigeAvslagsårsaker(forStønadstype = stønadstype, basertPå = Avslagskategori.AKTIVITET)
+        val aktivitetÅrsaker = gyldigeAvslagsårsaker(stønadstype, gjelder = Avslagskategori.AKTIVITET)
         val aktuelleÅrsaker = årsakerAvslag.intersect(aktivitetÅrsaker)
         if (aktuelleÅrsaker.isEmpty()) return
         val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
@@ -76,7 +76,7 @@ class ValiderGyldigÅrsakAvslag(
         årsakerAvslag: List<ÅrsakAvslag>,
         stønadstype: Stønadstype,
     ) {
-        val stønadsvilkårÅrsaker = gyldigeAvslagsårsaker(forStønadstype = stønadstype, basertPå = Avslagskategori.STØNADSVILKÅR)
+        val stønadsvilkårÅrsaker = gyldigeAvslagsårsaker(stønadstype, gjelder = Avslagskategori.STØNADSVILKÅR)
         val aktuelleÅrsaker = årsakerAvslag.intersect(stønadsvilkårÅrsaker)
         if (aktuelleÅrsaker.isEmpty()) return
         val stønadsvilkår = vilkårService.hentVilkår(behandlingId)

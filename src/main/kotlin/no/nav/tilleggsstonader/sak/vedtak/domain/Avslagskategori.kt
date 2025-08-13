@@ -22,12 +22,12 @@ enum class Avslagskategori {
 }
 
 fun gyldigeAvslagsårsaker(
-    forStønadstype: Stønadstype,
-    basertPå: Avslagskategori,
+    stønadstype: Stønadstype,
+    gjelder: Avslagskategori,
 ): Set<ÅrsakAvslag> =
-    when (forStønadstype) {
+    when (stønadstype) {
         Stønadstype.BARNETILSYN ->
-            when (basertPå) {
+            when (gjelder) {
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
                 Avslagskategori.STØNADSVILKÅR -> setOf(MANGELFULL_DOKUMENTASJON)
@@ -35,7 +35,7 @@ fun gyldigeAvslagsårsaker(
             }
 
         Stønadstype.LÆREMIDLER ->
-            when (basertPå) {
+            when (gjelder) {
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET, HAR_IKKE_UTGIFTER, RETT_TIL_UTSTYRSSTIPEND)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
                 Avslagskategori.STØNADSVILKÅR -> emptySet()
@@ -43,7 +43,7 @@ fun gyldigeAvslagsårsaker(
             }
 
         Stønadstype.BOUTGIFTER ->
-            when (basertPå) {
+            when (gjelder) {
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
                 Avslagskategori.STØNADSVILKÅR -> setOf(MANGELFULL_DOKUMENTASJON, HAR_IKKE_MERUTGIFTER, RETT_TIL_BOSTØTTE)
@@ -51,7 +51,7 @@ fun gyldigeAvslagsårsaker(
             }
 
         Stønadstype.DAGLIG_REISE_TSO -> // TODO: Denne må trolig fylles inn mer når vi lærer mer om hvordan vilkår på daglig reise ser ut
-            when (basertPå) {
+            when (gjelder) {
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
                 Avslagskategori.STØNADSVILKÅR -> emptySet()
@@ -59,7 +59,7 @@ fun gyldigeAvslagsårsaker(
             }
 
         Stønadstype.DAGLIG_REISE_TSR -> // TODO: Denne må trolig fylles inn mer når vi lærer mer om hvordan vilkår på daglig reise ser ut
-            when (basertPå) {
+            when (gjelder) {
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
                 Avslagskategori.STØNADSVILKÅR -> emptySet()
