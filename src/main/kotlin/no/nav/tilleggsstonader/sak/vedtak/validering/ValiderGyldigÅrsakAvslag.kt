@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import org.springframework.stereotype.Component
 
 @Component
@@ -26,9 +27,7 @@ class ValiderGyldigÅrsakAvslag(
         stønadstype: Stønadstype,
     ) {
         validerÅrsakerErGyldigeForStønadstype(årsakerAvslag, stønadstype)
-
-        validerAvslagSomGjelderAktivitet(behandlingId, årsakerAvslag, stønadstype)
-        validerAvslagSomGjelderMålgruppe(behandlingId, årsakerAvslag, stønadstype)
+        validerAvslagSomGjelderVilkårperioder(behandlingId, årsakerAvslag, stønadstype)
         validerAvslagSomGjelderStønadsvilkår(behandlingId, årsakerAvslag, stønadstype)
     }
 
@@ -43,31 +42,34 @@ class ValiderGyldigÅrsakAvslag(
         }
     }
 
-    private fun validerAvslagSomGjelderMålgruppe(
+    private fun validerAvslagSomGjelderVilkårperioder(
         behandlingId: BehandlingId,
         årsakerAvslag: List<ÅrsakAvslag>,
         stønadstype: Stønadstype,
     ) {
-        val målgruppeÅrsaker = gyldigeAvslagsårsaker(stønadstype, gjelder = Avslagskategori.MÅLGRUPPE)
-        val aktuelleÅrsaker = årsakerAvslag.intersect(målgruppeÅrsaker)
-        if (aktuelleÅrsaker.isEmpty()) return
-        val målgrupper = vilkårperiodeService.hentVilkårperioder(behandlingId).målgrupper
-        brukerfeilHvis(målgrupper.none { it.resultat == ResultatVilkårperiode.IKKE_OPPFYLT }) {
-            "Kan ikke avslå med følgende årsaker uten å legge inn minst én målgruppe som ikke er oppfylt: ${aktuelleÅrsaker.toList().formaterListe()}"
-        }
+        val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
+        validerAvslagSomGjelderVilkårperioder(stønadstype, årsakerAvslag, vilkårperioder.målgrupper, Avslagskategori.MÅLGRUPPE)
+        validerAvslagSomGjelderVilkårperioder(stønadstype, årsakerAvslag, vilkårperioder.aktiviteter, Avslagskategori.AKTIVITET)
     }
 
-    private fun validerAvslagSomGjelderAktivitet(
-        behandlingId: BehandlingId,
-        årsakerAvslag: List<ÅrsakAvslag>,
+    private fun validerAvslagSomGjelderVilkårperioder(
         stønadstype: Stønadstype,
+        årsakerAvslag: List<ÅrsakAvslag>,
+        vilkårperioder: List<Vilkårperiode>,
+        kategori: Avslagskategori,
     ) {
-        val aktivitetÅrsaker = gyldigeAvslagsårsaker(stønadstype, gjelder = Avslagskategori.AKTIVITET)
-        val aktuelleÅrsaker = årsakerAvslag.intersect(aktivitetÅrsaker)
+        val aktuelleÅrsaker = årsakerAvslag.intersect(gyldigeAvslagsårsaker(stønadstype, gjelder = kategori))
         if (aktuelleÅrsaker.isEmpty()) return
-        val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
-        brukerfeilHvis(aktiviteter.none { it.resultat == ResultatVilkårperiode.IKKE_OPPFYLT }) {
-            "Kan ikke avslå med følgende årsaker uten å legge minst én aktivitet der resultatet er 'ikke oppfylt': ${aktuelleÅrsaker.toList().formaterListe()}"
+        val type =
+            when (kategori) {
+                Avslagskategori.MÅLGRUPPE -> "målgruppe"
+                Avslagskategori.AKTIVITET -> "aktivitet"
+                else -> error("Ukjent kategori for vilkårperioder: $kategori")
+            }
+        brukerfeilHvis(vilkårperioder.none { it.resultat == ResultatVilkårperiode.IKKE_OPPFYLT }) {
+            "Kan ikke avslå med følgende årsaker uten å legge inn minst én $type som ikke er oppfylt: ${
+                aktuelleÅrsaker.toList().formaterListe()
+            }"
         }
     }
 
@@ -81,7 +83,9 @@ class ValiderGyldigÅrsakAvslag(
         if (aktuelleÅrsaker.isEmpty()) return
         val stønadsvilkår = vilkårService.hentVilkår(behandlingId)
         brukerfeilHvis(stønadsvilkår.none { it.resultat == Vilkårsresultat.IKKE_OPPFYLT }) {
-            "Kan ikke avslå med følgende årsaker uten minst ett ikke-oppfylt vilkår for ${stønadstype.visningsnavnStønadsvilkår()}: ${aktuelleÅrsaker.toList().formaterListe()}"
+            "Kan ikke avslå med følgende årsaker uten minst ett ikke-oppfylt vilkår for ${stønadstype.visningsnavnStønadsvilkår()}: ${
+                aktuelleÅrsaker.toList().formaterListe()
+            }"
         }
     }
 }
