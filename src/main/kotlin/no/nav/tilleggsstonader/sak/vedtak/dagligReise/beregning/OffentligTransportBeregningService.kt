@@ -5,6 +5,7 @@ import Beregningsresultat
 import BeregningsresultatForPeriode
 import BeregningsresultatForReise
 import VedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.antallDagerIPeriodeInklusiv
@@ -30,47 +31,40 @@ class OffentligTransportBeregningService {
         reise: UtgiftOffentligTransport,
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatForReise {
-        val relevanteVedtaksperioder = finnRelevanteVedtaksperioder(reise, vedtaksperioder)
-
-        val justertReiseperiode =
-            reise.copy(
-                fom = maxOf(relevanteVedtaksperioder.first().fom, reise.fom),
-                tom = minOf(relevanteVedtaksperioder.last().tom, reise.tom),
-            )
+        val justerteVedtaksperioder = finnSnittForVedtaksperioder(reise, vedtaksperioder)
+        val justertReiseperiode = finnSnittForReiseperioder(reise, justerteVedtaksperioder)
 
         val trettidagersperioder = justertReiseperiode.delTil30Dagersperioder()
 
         return BeregningsresultatForReise(
             perioder =
                 trettidagersperioder.map { periode ->
-                    beregnForPeriode(periode, relevanteVedtaksperioder)
+                    beregnForPeriode(periode, justerteVedtaksperioder)
                 },
         )
     }
 
-    private fun finnRelevanteVedtaksperioder(
+    private fun finnSnittForReiseperioder(
+        reise: UtgiftOffentligTransport,
+        vedtaksperioder: List<Vedtaksperiode>,
+    ) = reise.copy(
+        fom = maxOf(vedtaksperioder.first().fom, reise.fom),
+        tom = minOf(vedtaksperioder.last().tom, reise.tom),
+    )
+
+    private fun finnSnittForVedtaksperioder(
         reise: UtgiftOffentligTransport,
         vedtaksperioder: List<Vedtaksperiode>,
     ): List<Vedtaksperiode> =
         vedtaksperioder
-            .filter { it.overlapper(reise) }
-            .map { kuttVedtaksperiodeTilOverlapp(reise, it) }
-
-    private fun kuttVedtaksperiodeTilOverlapp(
-        reise: UtgiftOffentligTransport,
-        vedtaksperiode: Vedtaksperiode,
-    ): Vedtaksperiode =
-        vedtaksperiode.copy(
-            fom = maxOf(vedtaksperiode.fom, reise.fom),
-            tom = minOf(vedtaksperiode.tom, reise.tom),
-        )
+            .mapNotNull { it.beregnSnitt(reise) }
 
     private fun beregnForPeriode(
         periode: UtgiftOffentligTransport,
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatForPeriode {
         val vedtaksperiodeGrunnlag =
-            finnRelevanteVedtaksperioder(periode, vedtaksperioder)
+            finnSnittForVedtaksperioder(periode, vedtaksperioder)
                 .map {
                     VedtaksperiodeGrunnlag(
                         vedtaksperiode = it,
@@ -101,7 +95,7 @@ class OffentligTransportBeregningService {
     ): Int =
         vedtaksperiode
             .splitPerUke { fom, tom ->
-                kotlin.math.min(antallReisedagerPerUke, antallDagerIPeriodeInklusiv(fom, tom))
+                min(antallReisedagerPerUke, antallDagerIPeriodeInklusiv(fom, tom))
             }.values
             .sumOf { it.antallDager }
 
