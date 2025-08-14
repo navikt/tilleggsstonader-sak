@@ -19,11 +19,11 @@ data class Personopplysninger(
 )
 
 data class Adresse(
-    val gyldigFraOgMed: LocalDate,
-    val adresse: String,
-    val postnummer: String,
-    val poststed: String,
-    val landkode: String,
+    val gyldigFraOgMed: LocalDate?,
+    val adresse: String?,
+    val postnummer: String?,
+    val poststed: String?,
+    val landkode: String?,
 )
 
 data class BoligEllerOvernattingAvsnitt(

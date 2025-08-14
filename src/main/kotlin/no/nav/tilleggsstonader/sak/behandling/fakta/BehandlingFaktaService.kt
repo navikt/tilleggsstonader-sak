@@ -33,7 +33,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.UtdanningAvsnitt
 import no.nav.tilleggsstonader.sak.util.antallÅrSiden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
@@ -105,21 +104,11 @@ class BehandlingFaktaService(
                 FaktaBoligEllerOvernatting(
                     søknadsgrunnlag = søknad?.data?.boutgifter?.tilFakta(),
                 ),
-            personopplysninger = mapPersonopplysninger(søknad),
+            personopplysninger = mapPersonopplysninger(søknad?.data?.personopplysninger),
         )
     }
 
     private fun hentFaktaDTOForDagligreise(behandlingId: BehandlingId): BehandlingFaktaDagligreiseDto = BehandlingFaktaDagligreiseDto()
-
-    private fun mapPersonopplysninger(søknad: SøknadBoutgifter?): FaktaPersonopplysninger =
-        FaktaPersonopplysninger(
-            søknadsgrunnlag =
-                søknad?.data?.personopplysninger?.adresse?.let {
-                    FaktaPersonopplysningerSøknadsgrunnlag(
-                        adresse = listOfNotNull(it.adresse, it.postnummer, it.poststed).joinToString(", "),
-                    )
-                },
-        )
 
     private fun arenaFakta(grunnlagsdata: Grunnlag): ArenaFakta? =
         grunnlagsdata.arenaVedtak?.let {
