@@ -149,6 +149,8 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
             return forventetTypeBoutgifter(type)
         } else if (type is TypeFaktaOgVurderingDagligReiseTso) {
             return forventetTypeDagligReiseTso(type)
+        } else if (type is TypeFaktaOgVurderingDagligReiseTsr) {
+            return forventetTypeDagligReiseTsr(type)
         }
 
         error("Ukjent type")
@@ -240,6 +242,24 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
                     AktivitetDagligReiseTsoType.TILTAK_DAGLIG_REISE_TSO -> TiltakDagligReiseTso::class
                     AktivitetDagligReiseTsoType.UTDANNING_DAGLIG_REISE_TSO -> UtdanningDagligReiseTso::class
                     AktivitetDagligReiseTsoType.INGEN_AKTIVITET_DAGLIG_REISE_TSO -> IngenAktivitetDagligReiseTso::class
+                }
+            }
+        }.java
+
+    private fun forventetTypeDagligReiseTsr(type: TypeFaktaOgVurderingDagligReiseTsr): Class<out FaktaOgVurderingDagligReiseTsr> =
+        when (type) {
+            is MålgruppeDagligReiseTsrType -> {
+                when (type) {
+                    MålgruppeDagligReiseTsrType.DAGPENGER_DAGLIG_REISE_TSR -> DagpengerDagligReiseTsr::class
+                    MålgruppeDagligReiseTsrType.TILTAKSPENGER_DAGLIG_REISE_TSR -> TiltakspengerDagligReiseTsr::class
+                    MålgruppeDagligReiseTsrType.KVALIFISERINGSSTØNAD_DAGLIG_REISE_TSR -> KvalifiseringsstønadDagligReiseTsr::class
+                    MålgruppeDagligReiseTsrType.INGEN_MÅLGRUPPE_DAGLIG_REISE_TSR -> IngenMålgruppeDagligReiseTsr::class
+                }
+            }
+            is AktivitetDagligReiseTsrType -> {
+                when (type) {
+                    AktivitetDagligReiseTsrType.TILTAK_DAGLIG_REISE_TSR -> TiltakDagligReiseTsr::class
+                    AktivitetDagligReiseTsrType.INGEN_AKTIVITET_DAGLIG_REISE_TSR -> IngenAktivitetDagligReiseTsr::class
                 }
             }
         }.java
