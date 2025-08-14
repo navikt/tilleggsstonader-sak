@@ -23,6 +23,7 @@ class MålgruppeTypeTest {
                             MålgruppeType.UFØRETRYGD -> FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
                             MålgruppeType.SYKEPENGER_100_PROSENT -> null
                             MålgruppeType.INGEN_MÅLGRUPPE -> null
+                            MålgruppeType.TILTAKSPENGER -> null
                         }
                 }
 

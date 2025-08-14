@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
@@ -26,11 +27,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeDagligReiseTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenVurderinger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeDagligReiseTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeTilsynBarn
@@ -54,6 +56,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakspengerDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdLæremidler
@@ -164,7 +167,9 @@ private fun mapMålgruppe(
         Stønadstype.DAGLIG_REISE_TSO -> {
             mapMålgruppeDagligReiseTso(type, faktaOgSvar, målgruppe, fødselFaktaGrunnlag)
         }
-        Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise er ikke implementert enda")
+        Stønadstype.DAGLIG_REISE_TSR -> {
+            mapMålgruppeDagligReiseTsr(type)
+        }
     }
 }
 
@@ -274,9 +279,7 @@ private fun mapAktiviteterDagligReiseTso(
 private fun mapAktiviteterDagligReiseTsr(aktivitetType: AktivitetType): AktivitetDagligReiseTsr =
     when (aktivitetType) {
         AktivitetType.TILTAK -> {
-            TiltakDagligReiseTsr(
-                vurderinger = IngenVurderinger,
-            )
+            TiltakDagligReiseTsr()
         }
         AktivitetType.UTDANNING -> feil("Utdanning er ikke en gyldig aktivitet for daglig reise TSR")
 
@@ -357,6 +360,7 @@ private fun mapMålgruppeBarnetilsyn(
         }
 
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
+        MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
     }
 
 private fun mapMålgruppeLæremidler(
@@ -415,6 +419,7 @@ private fun mapMålgruppeLæremidler(
         }
 
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
+        MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
     }
 
 private fun mapMålgruppeBoutgfiter(
@@ -477,6 +482,7 @@ private fun mapMålgruppeBoutgfiter(
 
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for boutgifter")
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
+        MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
     }
 
 private fun mapMålgruppeDagligReiseTso(
@@ -539,4 +545,27 @@ private fun mapMålgruppeDagligReiseTso(
 
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for boutgifter")
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
+        MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
+    }
+
+private fun mapMålgruppeDagligReiseTsr(type: MålgruppeType): MålgruppeDagligReiseTsr =
+    when (type) {
+        MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeDagligReiseTsr
+        MålgruppeType.OMSTILLINGSSTØNAD -> error("Håndterer ikke omstillingstønad")
+
+        MålgruppeType.OVERGANGSSTØNAD -> error("Håndterer ikke overgangsstønad")
+
+        MålgruppeType.AAP -> error("Håndterer ikke aap")
+
+        MålgruppeType.UFØRETRYGD -> error("Håndterer ikke uføretrygd")
+
+        MålgruppeType.NEDSATT_ARBEIDSEVNE -> error("Håndterer ikke nedsattArbeidsevne")
+
+        MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for boutgifter")
+        MålgruppeType.DAGPENGER -> {
+            DagpengerDagligReiseTsr()
+        }
+        MålgruppeType.TILTAKSPENGER -> {
+            TiltakspengerDagligReiseTsr()
+        }
     }

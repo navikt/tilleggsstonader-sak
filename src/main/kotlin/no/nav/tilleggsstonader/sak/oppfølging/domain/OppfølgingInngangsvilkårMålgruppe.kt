@@ -39,6 +39,7 @@ data class OppfølgingInngangsvilkårMålgruppe(
             MålgruppeType.UFØRETRYGD,
             MålgruppeType.SYKEPENGER_100_PROSENT,
             MålgruppeType.INGEN_MÅLGRUPPE,
+            MålgruppeType.TILTAKSPENGER,
             -> false
         }
 
