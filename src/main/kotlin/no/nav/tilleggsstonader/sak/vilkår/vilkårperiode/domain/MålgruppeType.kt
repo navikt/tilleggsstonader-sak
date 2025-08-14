@@ -46,7 +46,7 @@ enum class MålgruppeType(
         faktiskMålgruppe = null,
     ),
     KVALIFISERINGSSTØNAD(
-        gyldigeAktiviter = gyldigeAktiviter = setOf(AktivitetType.TILTAK),
+        gyldigeAktiviter = setOf(AktivitetType.TILTAK),
         faktiskMålgruppe = null,
     ),
     ;
