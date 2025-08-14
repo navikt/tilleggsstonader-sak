@@ -22,7 +22,6 @@ class SimuleringDtoTest {
             .containsExactlyInAnyOrder(
                 OppsummeringForPeriodeDto(
                     måned = YearMonth.of(2024, 1),
-                    fom = LocalDate.of(2024, 1, 2),
                     tidligereUtbetalt = 11,
                     nyUtbetaling = 22,
                     totalEtterbetaling = 33,
@@ -30,7 +29,6 @@ class SimuleringDtoTest {
                 ),
                 OppsummeringForPeriodeDto(
                     måned = YearMonth.of(2024, 2),
-                    fom = LocalDate.of(2024, 2, 5),
                     tidligereUtbetalt = 101,
                     nyUtbetaling = 202,
                     totalEtterbetaling = 303,
