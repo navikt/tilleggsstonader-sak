@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.forslag
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
@@ -20,7 +19,6 @@ class ForeslåVedtaksperiodeService(
     private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
     private val vedtaksperiodeService: VedtaksperiodeService,
-    private val unleashService: UnleashService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
     fun foreslåPerioder(behandlingId: BehandlingId): List<Vedtaksperiode> {
@@ -35,14 +33,14 @@ class ForeslåVedtaksperiodeService(
         val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(saksbehandling.id)
         return if (saksbehandling.stønadstype.skalHenteStønadsvilkår()) {
-            ForeslåVedtaksperiode.finnVedtaksperiodeV2(
+            ForeslåVedtaksperiode.finnVedtaksperiode(
                 vilkårperioder = vilkårperioder,
                 vilkår = vilkårService.hentVilkår(saksbehandling.id),
                 forrigeVedtaksperioder = forrigeVedtaksperioder,
                 tidligsteEndring = tidligsteEndring,
             )
         } else {
-            ForeslåVedtaksperiode.finnVedtaksperiodeUtenVilkårV2(
+            ForeslåVedtaksperiode.finnVedtaksperiodeUtenVilkår(
                 vilkårperioder = vilkårperioder,
                 forrigeVedtaksperioder = forrigeVedtaksperioder,
                 tidligsteEndring = tidligsteEndring,

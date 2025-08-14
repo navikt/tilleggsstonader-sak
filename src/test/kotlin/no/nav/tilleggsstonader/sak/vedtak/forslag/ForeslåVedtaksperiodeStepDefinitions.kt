@@ -81,7 +81,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
     fun `forslag til vedtaksperioder lages`() {
         try {
             resultat =
-                ForeslåVedtaksperioderV2Util.foreslåPerioder(
+                ForeslåVedtaksperioderUtil.foreslåPerioder(
                     Vilkårperioder(
                         målgrupper = målgrupper,
                         aktiviteter = aktiviteter,
@@ -102,7 +102,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
     fun `forslag til vedtaksperioder behold id lages tidligsteEndring`(tidligsteEndring: String?) {
         try {
             resultat =
-                ForeslåVedtaksperiode.finnVedtaksperiodeV2(
+                ForeslåVedtaksperiode.finnVedtaksperiode(
                     Vilkårperioder(
                         målgrupper = målgrupper,
                         aktiviteter = aktiviteter,

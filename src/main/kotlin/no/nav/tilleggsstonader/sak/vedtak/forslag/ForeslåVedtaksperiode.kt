@@ -16,22 +16,22 @@ import java.time.LocalDate
  * Hvis man mangler eller har en [tidligsteEndring] frem i tiden, fylles hull etter den siste tidligere vedtaksperioden.
  */
 object ForeslåVedtaksperiode {
-    fun finnVedtaksperiodeV2(
+    fun finnVedtaksperiode(
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
     ): List<Vedtaksperiode> {
-        val forslag = ForeslåVedtaksperioderV2Util.foreslåPerioder(vilkårperioder, vilkår)
+        val forslag = ForeslåVedtaksperioderUtil.foreslåPerioder(vilkårperioder, vilkår)
         return beholdTidligereIdnForVedtaksperioder(forrigeVedtaksperioder, forslag, tidligsteEndring)
     }
 
-    fun finnVedtaksperiodeUtenVilkårV2(
+    fun finnVedtaksperiodeUtenVilkår(
         vilkårperioder: Vilkårperioder,
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
     ): List<Vedtaksperiode> {
-        val forslag = ForeslåVedtaksperioderV2Util.foreslåPerioderUtenVilkår(vilkårperioder)
+        val forslag = ForeslåVedtaksperioderUtil.foreslåPerioderUtenVilkår(vilkårperioder)
         return beholdTidligereIdnForVedtaksperioder(forrigeVedtaksperioder, forslag, tidligsteEndring)
     }
 }
