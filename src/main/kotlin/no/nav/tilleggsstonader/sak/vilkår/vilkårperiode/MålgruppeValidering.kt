@@ -39,6 +39,9 @@ object MålgruppeValidering {
                     }
                 Stønadstype.DAGLIG_REISE_TSR ->
                     when (målgruppeType) {
+                        MålgruppeType.INGEN_MÅLGRUPPE -> true
+                        MålgruppeType.TILTAKSPENGER -> true
+                        MålgruppeType.KVALIFISERINGSSTØNAD -> true
                         MålgruppeType.AAP -> false
                         MålgruppeType.DAGPENGER -> true
                         MålgruppeType.NEDSATT_ARBEIDSEVNE -> false
@@ -46,9 +49,6 @@ object MålgruppeValidering {
                         MålgruppeType.OVERGANGSSTØNAD -> false
                         MålgruppeType.UFØRETRYGD -> false
                         MålgruppeType.SYKEPENGER_100_PROSENT -> false
-                        MålgruppeType.INGEN_MÅLGRUPPE -> true
-                        MålgruppeType.TILTAKSPENGER -> true
-                        MålgruppeType.KVALIFISERINGSSTØNAD -> true
                     }
             }
         feilHvisIkke(gyldig) {
