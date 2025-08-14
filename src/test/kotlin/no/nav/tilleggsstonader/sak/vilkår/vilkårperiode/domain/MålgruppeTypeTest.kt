@@ -24,6 +24,7 @@ class MålgruppeTypeTest {
                             MålgruppeType.SYKEPENGER_100_PROSENT -> null
                             MålgruppeType.INGEN_MÅLGRUPPE -> null
                             MålgruppeType.TILTAKSPENGER -> null
+                            MålgruppeType.KVALIFISERINGSSTØNAD -> null
                         }
                 }
 

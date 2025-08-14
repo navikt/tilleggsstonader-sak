@@ -40,6 +40,7 @@ data class OppfølgingInngangsvilkårMålgruppe(
             MålgruppeType.SYKEPENGER_100_PROSENT,
             MålgruppeType.INGEN_MÅLGRUPPE,
             MålgruppeType.TILTAKSPENGER,
+            MålgruppeType.KVALIFISERINGSSTØNAD,
             -> false
         }
 

@@ -148,6 +148,7 @@ object VilkårperiodeTestUtil {
 
             MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
             MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
+            MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsstønad")
         }
 
     fun faktaOgVurderingMålgruppeLæremidler(
@@ -196,6 +197,7 @@ object VilkårperiodeTestUtil {
 
             MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
             MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
+            MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsstønad")
         }
 
     fun faktaOgVurderingerMålgruppeDto() =

@@ -30,6 +30,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.KvalifiseringsstønadDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeDagligReiseTsr
@@ -361,6 +362,7 @@ private fun mapMålgruppeBarnetilsyn(
 
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
+        MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
     }
 
 private fun mapMålgruppeLæremidler(
@@ -420,6 +422,7 @@ private fun mapMålgruppeLæremidler(
 
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
+        MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
     }
 
 private fun mapMålgruppeBoutgfiter(
@@ -483,6 +486,7 @@ private fun mapMålgruppeBoutgfiter(
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for boutgifter")
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
+        MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
     }
 
 private fun mapMålgruppeDagligReiseTso(
@@ -546,6 +550,7 @@ private fun mapMålgruppeDagligReiseTso(
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for boutgifter")
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
+        MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
     }
 
 private fun mapMålgruppeDagligReiseTsr(type: MålgruppeType): MålgruppeDagligReiseTsr =
@@ -562,10 +567,7 @@ private fun mapMålgruppeDagligReiseTsr(type: MålgruppeType): MålgruppeDagligR
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> error("Håndterer ikke nedsattArbeidsevne")
 
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for boutgifter")
-        MålgruppeType.DAGPENGER -> {
-            DagpengerDagligReiseTsr()
-        }
-        MålgruppeType.TILTAKSPENGER -> {
-            TiltakspengerDagligReiseTsr()
-        }
+        MålgruppeType.DAGPENGER -> DagpengerDagligReiseTsr()
+        MålgruppeType.TILTAKSPENGER -> TiltakspengerDagligReiseTsr()
+        MålgruppeType.KVALIFISERINGSSTØNAD -> KvalifiseringsstønadDagligReiseTsr()
     }

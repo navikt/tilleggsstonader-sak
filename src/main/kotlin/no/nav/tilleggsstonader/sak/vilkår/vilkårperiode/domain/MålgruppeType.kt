@@ -45,6 +45,10 @@ enum class MålgruppeType(
         gyldigeAktiviter = emptySet(),
         faktiskMålgruppe = null,
     ),
+    KVALIFISERINGSSTØNAD(
+        gyldigeAktiviter = emptySet(),
+        faktiskMålgruppe = null,
+    ),
     ;
 
     override fun tilDbType(): String = this.name
@@ -59,7 +63,7 @@ enum class MålgruppeType(
 
     fun skalVurdereAldersvilkår() =
         when (this) {
-            AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE, OMSTILLINGSSTØNAD, DAGPENGER, TILTAKSPENGER -> true
+            AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE, OMSTILLINGSSTØNAD, DAGPENGER, TILTAKSPENGER, KVALIFISERINGSSTØNAD -> true
             OVERGANGSSTØNAD, INGEN_MÅLGRUPPE, SYKEPENGER_100_PROSENT -> false
         }
 }
