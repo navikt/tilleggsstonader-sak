@@ -52,7 +52,6 @@ class BehandlingsoversiktService(
                     BehandlingDetaljer(
                         id = it.id,
                         forrigeIverksatteBehandlingId = it.forrigeIverksatteBehandlingId,
-                        forrigeBehandlingId = it.forrigeIverksatteBehandlingId,
                         fagsakId = it.fagsakId,
                         steg = it.steg,
                         kategori = it.kategori,
