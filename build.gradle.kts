@@ -3,13 +3,13 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20250728105838_1f618e2"
-val tilleggsstønaderLibsVersion = "2025.06.25-07.59.55db83b77624"
+val familieProsesseringVersion = "2.20250814122631_d951dfb"
+val tilleggsstønaderLibsVersion = "2025.08.11-14.15.9c7175a12117"
 val tilleggsstønaderKontrakterVersion = "2025.08.14-13.14.dd6381bee586"
 val avroVersion = "1.12.0"
 val confluentVersion = "8.0.0"
 val joarkHendelseVersion = "08271806"
-val tokenSupportVersion = "5.0.33"
+val tokenSupportVersion = "5.0.34"
 val wiremockVersion = "3.13.1"
 val mockkVersion = "1.14.5"
 val testcontainerVersion = "1.21.3"
@@ -24,14 +24,14 @@ ext["junit-jupiter.version"] = "5.13.4"
 plugins {
     application
 
-    kotlin("jvm") version "2.2.0"
+    kotlin("jvm") version "2.2.10"
     id("com.diffplug.spotless") version "7.2.1"
     id("com.github.ben-manes.versions") version "0.52.0"
-    id("se.patrikerdes.use-latest-versions") version "0.2.18"
+    id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
     id("org.springframework.boot") version "3.5.4"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.spring") version "2.2.0"
+    kotlin("plugin.spring") version "2.2.10"
 
     id("org.cyclonedx.bom") version "2.3.1"
 }
