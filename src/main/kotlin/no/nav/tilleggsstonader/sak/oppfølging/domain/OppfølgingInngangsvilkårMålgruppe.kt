@@ -27,7 +27,7 @@ data class OppfølgingInngangsvilkårMålgruppe(
     override fun merge(other: OppfølgingInngangsvilkårMålgruppe): OppfølgingInngangsvilkårMålgruppe =
         this.copy(fom = minOf(fom, other.fom), tom = maxOf(tom, other.tom))
 
-    fun skalKontrolleres() =
+    fun hentesFraEksterntSystem() =
         when (this.målgruppe) {
             MålgruppeType.AAP,
             MålgruppeType.OMSTILLINGSSTØNAD,
@@ -49,7 +49,7 @@ data class OppfølgingInngangsvilkårMålgruppe(
             vilkårperioder
                 .ofType<MålgruppeFaktaOgVurdering>()
                 .map { OppfølgingInngangsvilkårMålgruppe(it) }
-                .filter { it.skalKontrolleres() }
+                .filter { it.hentesFraEksterntSystem() }
                 .groupBy { it.målgruppe }
                 .mapValues {
                     it.value
