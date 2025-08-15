@@ -15,8 +15,6 @@ object PdlConfig {
 
     val hentIdentQuery = graphqlQuery("/pdl/hent_ident.graphql")
 
-    val søkPersonQuery = graphqlQuery("/pdl/søk_person.graphql")
-
     val hentGeografiskTilknytningQuery = graphqlQuery("/pdl/geografisk_tilknytning.graphql")
 
     private fun graphqlQuery(path: String) =
