@@ -16,7 +16,7 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.vilkår.VilkårTestUtils
+import no.nav.tilleggsstonader.sak.vilkår.VilkårTestUtils.opprettVilkårsvurderinger
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -115,7 +115,10 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
         @Test
         internal fun `kopierVilkårsettTilNyBehandling - skal ikke kopiere vilkår som er slettet`() {
-            lagreVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling, status = VilkårStatus.SLETTET).first()
+            val vilkårsvurderinger =
+                opprettVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling)
+                    .map { it.markerSlettet("slettet") }
+            vilkårRepository.insertAll(vilkårsvurderinger)
 
             vilkårService.kopierVilkårsettTilNyBehandling(
                 forrigeIverksatteBehandlingId = førstegangsbehandling.id,
@@ -123,9 +126,8 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
                 barnIdMap = barnIdMap,
             )
 
-            val vilkårForRevurdering = vilkårRepository.findByBehandlingId(revurdering.id)
-
-            assertThat(vilkårForRevurdering).isEmpty()
+            assertThat(vilkårRepository.findByBehandlingId(førstegangsbehandling.id)).hasSize(1)
+            assertThat(vilkårRepository.findByBehandlingId(revurdering.id)).isEmpty()
         }
 
         @Test
@@ -284,7 +286,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         fom: LocalDate? = YearMonth.now().atDay(1),
         tom: LocalDate? = YearMonth.now().atEndOfMonth(),
         status: VilkårStatus = VilkårStatus.NY,
-    ): List<Vilkår> = vilkårRepository.insertAll(VilkårTestUtils.opprettVilkårsvurderinger(behandling, barn, fom, tom, status))
+    ): List<Vilkår> = vilkårRepository.insertAll(opprettVilkårsvurderinger(behandling, barn, fom, tom, status))
 
     private fun assertVilkårErGjenbrukt(
         vilkårForBehandling: Vilkår,

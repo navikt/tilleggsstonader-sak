@@ -113,6 +113,7 @@ object OppdaterVilkår {
                 vilkårsresultat = vilkårsresultat,
                 oppdatering = oppdatering,
             )
+        validerKanIkkeEndreVilkårTilFremtidigUtgift(eksisterendeVilkår = vilkår, oppdatering = oppdatering)
         return vilkår.copy(
             resultat = vilkårsresultat.vilkår,
             status = utledStatus(vilkår, oppdatering),
@@ -123,6 +124,17 @@ object OppdaterVilkår {
             erFremtidigUtgift = oppdatering.erFremtidigUtgift == true,
             gitVersjon = Applikasjonsversjon.versjon,
         )
+    }
+
+    private fun validerKanIkkeEndreVilkårTilFremtidigUtgift(
+        eksisterendeVilkår: Vilkår,
+        oppdatering: LagreVilkårDto,
+    ) {
+        if (eksisterendeVilkår.opphavsvilkår != null) {
+            feilHvis(oppdatering.erFremtidigUtgift == true && !eksisterendeVilkår.erFremtidigUtgift) {
+                "Kan ikke endre vilkår til ikke fremtidig utgift når den er kopiert fra tidligere behandling"
+            }
+        }
     }
 
     private fun utledFom(

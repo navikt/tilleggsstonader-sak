@@ -196,7 +196,7 @@ object Testdata {
                     fom = LocalDate.of(2024, 2, 1),
                     tom = LocalDate.of(2024, 2, 29),
                     utgift = 200,
-                ),
+                ).markerSlettet("slettet dette vilkår"),
             )
 
         val vedtaksperiodeBeregningsgrunnlag =

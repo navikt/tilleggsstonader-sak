@@ -105,6 +105,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             behandlingService = behandlingServiceMock,
             vilkårRepository = vilkårRepositoryFake,
             barnService = mockk(relaxed = true),
+            unleashService = mockUnleashService(),
         )
     val boutgifterUtgiftService = BoutgifterUtgiftService(vilkårService = vilkårService)
     val vedtaksperiodeValideringService =

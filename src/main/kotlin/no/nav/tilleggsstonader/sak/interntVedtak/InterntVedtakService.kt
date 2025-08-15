@@ -191,6 +191,7 @@ class InterntVedtakService(
                     fom = vilkår.fom,
                     tom = vilkår.tom,
                     utgift = vilkår.utgift,
+                    slettetKommentar = vilkår.slettetKommentar,
                 )
             }.sortedWith(compareBy<VilkårInternt> { it.type }.thenBy { it.fødselsdatoBarn }.thenBy { it.fom })
 

@@ -1,0 +1,1 @@
+ALTER TABLE vilkar ADD COLUMN slettet_kommentar TEXT;
