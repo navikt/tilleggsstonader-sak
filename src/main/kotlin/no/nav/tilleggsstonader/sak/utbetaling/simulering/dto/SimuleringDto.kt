@@ -20,8 +20,6 @@ data class SimuleringOppsummering(
 
 data class OppsummeringForPeriodeDto(
     val måned: YearMonth,
-    @Deprecated("bruk måned når frontend tatt den i bruk")
-    val fom: LocalDate,
     val tidligereUtbetalt: Int,
     val nyUtbetaling: Int,
     val totalEtterbetaling: Int,
@@ -39,12 +37,15 @@ fun Simuleringsresultat.tilDto(): SimuleringDto =
         oppsummering = lagSimuleringOppsummering(this),
     )
 
+/**
+ * På grunn av at vi summerer perioder per måned, så må fom og tom være i samme måned.
+ * Hvis ikke burde man vurdere å endre til å bruke fom/tom i stedet
+ */
 private fun OppsummeringForPeriode.tilDto(): OppsummeringForPeriodeDto {
     val måned = YearMonth.from(fom)
     require(måned == YearMonth.from(tom))
     return OppsummeringForPeriodeDto(
         måned = måned,
-        fom = fom,
         tidligereUtbetalt = tidligereUtbetalt,
         nyUtbetaling = nyUtbetaling,
         totalEtterbetaling = totalEtterbetaling,
