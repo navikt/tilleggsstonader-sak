@@ -121,10 +121,10 @@ class FagsakRepositoryTest : IntegrationTest() {
     @Test
     internal fun `skal ikke være mulig med flere stønader av samme typen for samme person`() {
         val person = fagsakPersonRepository.insert(FagsakPerson(identer = setOf(PersonIdent("1"))))
-        Stønadstype.values().forEach {
+        Stønadstype.entries.forEach {
             fagsakRepository.insert(fagsakDomain(personId = person.id, stønadstype = it))
         }
-        Stønadstype.values().forEach {
+        Stønadstype.entries.forEach {
             assertThatThrownBy {
                 fagsakRepository.insert(
                     fagsakDomain(

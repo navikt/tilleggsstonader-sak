@@ -12,7 +12,7 @@ enum class PosteringType(
     ;
 
     companion object {
-        private val kodeMap = PosteringType.values().associateBy { it.kode }
+        private val kodeMap = entries.associateBy { it.kode }
 
         fun fraKode(kode: String): PosteringType =
             kodeMap[kode] ?: throw IllegalArgumentException("PosteringType finnes ikke for kode $kode")
