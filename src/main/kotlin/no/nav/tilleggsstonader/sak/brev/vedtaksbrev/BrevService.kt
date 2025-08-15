@@ -174,10 +174,6 @@ class BrevService(
 
     private fun validerRedigerbarBehandling(saksbehandling: Saksbehandling) = saksbehandling.status.validerKanBehandlingRedigeres()
 
-    fun slettVedtaksbrev(saksbehandling: Saksbehandling) {
-        vedtaksbrevRepository.deleteById(saksbehandling.id)
-    }
-
     fun hentBesluttetBrev(behandlingId: BehandlingId): Vedtaksbrev {
         val vedtaksbrev = vedtaksbrevRepository.findByIdOrThrow(behandlingId)
 
