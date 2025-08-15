@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -173,29 +172,6 @@ private fun validerMidlertidigeUtgifterStrekkerSegUtenforVedtaksperiodene(
     brukerfeilHvisIkke(alleUtgifterErInnenforVedtaksperioder) {
         "Vi har foreløpig ikke støtte for å beregne når utgifter til midlertidig overnatting strekker seg utenfor vedtaksperiodene."
     }
-}
-
-private fun List<UtbetalingPeriode>.validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(
-    utgifter: BoutgifterPerUtgiftstype,
-): List<UtbetalingPeriode> {
-    val fasteUtgifter =
-        (utgifter[TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG] ?: emptyList()) +
-            (utgifter[TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER] ?: emptyList())
-
-    val detFinnesUtbetalingsperioderSomOverlapperFlereLøpendeUtgifter =
-        any { utbetalingsperiode ->
-            fasteUtgifter.count { utbetalingsperiode.overlapper(it) } > 1
-        }
-
-    feilHvis(detFinnesUtbetalingsperioderSomOverlapperFlereLøpendeUtgifter) {
-        """
-        Vi støtter foreløpig ikke at utbetalingsperioder overlapper mer enn én løpende utgift. 
-        Utbetalingsperioder for denne behandlingen er: ${map { it.formatertPeriodeNorskFormat() }}, 
-        mens utgiftsperiodene er: ${fasteUtgifter.map { it.formatertPeriodeNorskFormat() }}
-        """.trimIndent()
-    }
-
-    return this
 }
 
 private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(

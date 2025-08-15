@@ -81,7 +81,7 @@ Egenskap: Beregning av faste utgifter
       | Fom        | Tom        | Aktivitet | Målgruppe           |
       | 15.01.2025 | 31.03.2025 | UTDANNING | NEDSATT_ARBEIDSEVNE |
 
-    Så forvent følgende feilmelding: Vi støtter foreløpig ikke at utbetalingsperioder overlapper mer enn én løpende utgift.
+    Så forvent følgende feilmelding: Vi støtter foreløpig ikke at utbetalingsperioder inneholder mer enn én løpende utgift
 
   Scenario: Vedtaksperiode krysser nyttår
 
