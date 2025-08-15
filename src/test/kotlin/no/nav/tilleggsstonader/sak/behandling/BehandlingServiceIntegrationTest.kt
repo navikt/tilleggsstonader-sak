@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.henlagtBehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -97,7 +98,7 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
                 behandling(fagsak, resultat = BehandlingResultat.AVSLÅTT, status = BehandlingStatus.FERDIGSTILT),
             )
         testoppsettService.lagre(
-            behandling(fagsak, resultat = BehandlingResultat.HENLAGT, status = BehandlingStatus.FERDIGSTILT),
+            henlagtBehandling(fagsak),
         )
         val sisteBehandling = behandlingService.finnSisteIverksatteBehandlingMedEventuellAvslått(fagsak.id)
         assertThat(sisteBehandling?.id).isEqualTo(avslag.id)
@@ -114,7 +115,7 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
             behandling(fagsak, resultat = BehandlingResultat.AVSLÅTT, status = BehandlingStatus.FERDIGSTILT),
         )
         testoppsettService.lagre(
-            behandling(fagsak, resultat = BehandlingResultat.HENLAGT, status = BehandlingStatus.FERDIGSTILT),
+            henlagtBehandling(fagsak),
         )
         val sisteBehandling = behandlingService.finnSisteIverksatteBehandlingMedEventuellAvslått(fagsak.id)
         assertThat(sisteBehandling?.id).isEqualTo(førstegang.id)

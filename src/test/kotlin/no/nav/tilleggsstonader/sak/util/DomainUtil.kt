@@ -89,8 +89,8 @@ fun behandling(
     opprettetTid: LocalDateTime = SporbarUtils.now(),
     forrigeIverksatteBehandlingId: BehandlingId? = null,
     årsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
-    henlagtÅrsak: HenlagtÅrsak? = HenlagtÅrsak.FEILREGISTRERT,
-    henlagtBegrunnelse: String? = "Registrert feil",
+    henlagtÅrsak: HenlagtÅrsak? = null,
+    henlagtBegrunnelse: String? = null,
     vedtakstidspunkt: LocalDateTime? = null,
     kravMottatt: LocalDate? = null,
     revurderFra: LocalDate? = null,
@@ -116,6 +116,44 @@ fun behandling(
         revurderFra = revurderFra,
         nyeOpplysningerMetadata = nyeOpplysningerMetadata,
     )
+
+fun henlagtBehandling(
+    fagsak: Fagsak = fagsak(),
+    status: BehandlingStatus = BehandlingStatus.FERDIGSTILT,
+    steg: StegType = StegType.INNGANGSVILKÅR,
+    kategori: BehandlingKategori = BehandlingKategori.NASJONAL,
+    id: BehandlingId = BehandlingId.random(),
+    type: BehandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
+    resultat: BehandlingResultat = BehandlingResultat.HENLAGT,
+    opprettetTid: LocalDateTime = SporbarUtils.now(),
+    forrigeIverksatteBehandlingId: BehandlingId? = null,
+    årsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
+    henlagtÅrsak: HenlagtÅrsak? = HenlagtÅrsak.FEILREGISTRERT,
+    henlagtBegrunnelse: String? = "Registrert feil",
+    vedtakstidspunkt: LocalDateTime? = SporbarUtils.now(),
+    kravMottatt: LocalDate? = null,
+    revurderFra: LocalDate? = null,
+    nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
+) = Behandling(
+    fagsakId = fagsak.id,
+    forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
+    id = id,
+    type = type,
+    status = status,
+    steg = steg,
+    kategori = kategori,
+    resultat = resultat,
+    sporbar = Sporbar(opprettetTid = opprettetTid),
+    årsak = årsak,
+    henlagtÅrsak = henlagtÅrsak,
+    henlagtBegrunnelse = henlagtBegrunnelse,
+    vedtakstidspunkt =
+        vedtakstidspunkt
+            ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
+    kravMottatt = kravMottatt,
+    revurderFra = revurderFra,
+    nyeOpplysningerMetadata = nyeOpplysningerMetadata,
+)
 
 fun saksbehandling(
     fagsak: Fagsak = fagsak(),

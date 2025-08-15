@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
+import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
@@ -115,6 +116,8 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
         behandlingRepository.update(
             behandling.copy(
                 resultat = BehandlingResultat.HENLAGT,
+                henlagtÅrsak = HenlagtÅrsak.FEILREGISTRERT,
+                henlagtBegrunnelse = "Feilregistrert",
                 vedtakstidspunkt = SporbarUtils.now(),
             ),
         )

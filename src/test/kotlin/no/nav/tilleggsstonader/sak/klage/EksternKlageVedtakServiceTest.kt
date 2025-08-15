@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.henlagtBehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -64,11 +65,9 @@ class EksternKlageVedtakServiceTest {
     @Test
     internal fun `skal ikke returnere henlagte behandlinger`() {
         val henlagtBehandling =
-            behandling(
+            henlagtBehandling(
                 fagsak = fagsak,
                 type = BehandlingType.REVURDERING,
-                status = BehandlingStatus.FERDIGSTILT,
-                resultat = BehandlingResultat.HENLAGT,
             )
         every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(henlagtBehandling)
 

@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.henlagtBehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -37,11 +38,7 @@ class GjennbrukDataRevurderingServiceTest {
 
     val fagsakId = FagsakId.random()
     val iverksattFerdigstiltBehandling = behandling()
-    val henlagtBehandling =
-        behandling(
-            status = BehandlingStatus.FERDIGSTILT,
-            resultat = BehandlingResultat.HENLAGT,
-        )
+    val henlagtBehandling = henlagtBehandling()
     val avslåttBehandling =
         behandling(
             status = BehandlingStatus.FERDIGSTILT,

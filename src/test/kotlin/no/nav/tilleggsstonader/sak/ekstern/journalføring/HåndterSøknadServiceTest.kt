@@ -37,6 +37,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.henlagtBehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -126,13 +127,7 @@ internal class HåndterSøknadServiceTest {
 
     @Test
     internal fun `kan opprette behandling hvis alle behandlinger i ny løsning er henlagt`() {
-        every { behandlingService.hentBehandlinger(fagsak.id) } returns
-            listOf(
-                behandling(
-                    resultat = BehandlingResultat.HENLAGT,
-                    status = BehandlingStatus.FERDIGSTILT,
-                ),
-            )
+        every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(henlagtBehandling())
         val kanOppretteBehandling =
             håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN, journalpost)
         assertThat(kanOppretteBehandling).isTrue

@@ -14,14 +14,9 @@ object BehandlingOppsettUtil {
     private val fagsak = fagsak(setOf(PersonIdent("1")))
 
     val henlagtFørstegangsbehandling =
-        behandling(fagsak)
-            .copy(
-                type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                status = BehandlingStatus.FERDIGSTILT,
-                resultat = BehandlingResultat.HENLAGT,
-                vedtakstidspunkt = SporbarUtils.now(),
-                sporbar = Sporbar(opprettetTid = LocalDateTime.now().minusDays(4)),
-            )
+        henlagtBehandling(fagsak = fagsak).copy(
+            sporbar = Sporbar(opprettetTid = LocalDateTime.now().minusDays(4)),
+        )
 
     val iverksattFørstegangsbehandling =
         behandling(fagsak)
@@ -34,29 +29,18 @@ object BehandlingOppsettUtil {
             )
 
     val henlagtRevurdering =
-        behandling(fagsak)
-            .copy(
-                type = BehandlingType.REVURDERING,
-                status = BehandlingStatus.FERDIGSTILT,
-                resultat = BehandlingResultat.HENLAGT,
-                vedtakstidspunkt = SporbarUtils.now(),
-                sporbar = Sporbar(opprettetTid = LocalDateTime.now().minusDays(1)),
-            )
+        henlagtBehandling(
+            fagsak = fagsak,
+            type = BehandlingType.REVURDERING,
+        ).copy(
+            sporbar = Sporbar(opprettetTid = LocalDateTime.now().minusDays(1)),
+        )
 
     private val revurderingUnderArbeid =
         behandling(fagsak)
             .copy(
                 type = BehandlingType.REVURDERING,
                 status = IVERKSETTER_VEDTAK,
-                resultat = BehandlingResultat.INNVILGET,
-                vedtakstidspunkt = SporbarUtils.now(),
-            )
-
-    val iverksattRevurdering =
-        behandling(fagsak)
-            .copy(
-                type = BehandlingType.REVURDERING,
-                status = BehandlingStatus.FERDIGSTILT,
                 resultat = BehandlingResultat.INNVILGET,
                 vedtakstidspunkt = SporbarUtils.now(),
             )

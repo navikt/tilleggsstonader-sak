@@ -31,6 +31,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.henlagtBehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterAll
@@ -101,24 +102,21 @@ internal class BehandlingServiceTest {
         internal fun `skal kunne henlegge behandling som er førstegangsbehandling`() {
             val behandling =
                 behandling(fagsak(), type = BehandlingType.FØRSTEGANGSBEHANDLING, status = BehandlingStatus.UTREDES)
-            henleggOgForventOk(behandling, henlagtÅrsak = FEILREGISTRERT)
+            henleggOgForventOk(behandling)
         }
 
         @Test
         internal fun `skal kunne henlegge behandling som er revurdering`() {
             val behandling = behandling(fagsak(), type = BehandlingType.REVURDERING, status = BehandlingStatus.UTREDES)
-            henleggOgForventOk(behandling, FEILREGISTRERT)
+            henleggOgForventOk(behandling)
         }
 
-        private fun henleggOgForventOk(
-            behandling: Behandling,
-            henlagtÅrsak: HenlagtÅrsak,
-        ) {
+        private fun henleggOgForventOk(behandling: Behandling) {
             every {
                 behandlingRepository.findByIdOrThrow(any())
             } returns behandling
 
-            behandlingService.henleggBehandling(behandling.id, HenlagtDto(henlagtÅrsak))
+            behandlingService.henleggBehandling(behandling.id, HenlagtDto(FEILREGISTRERT))
             assertThat(behandlingSlot.captured.status).isEqualTo(BehandlingStatus.FERDIGSTILT)
             assertThat(behandlingSlot.captured.resultat).isEqualTo(BehandlingResultat.HENLAGT)
             assertThat(behandlingSlot.captured.steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
@@ -286,14 +284,7 @@ internal class BehandlingServiceTest {
             val fagsak = fagsak()
             every {
                 behandlingRepository.findByFagsakId(fagsak.id)
-            } returns
-                listOf(
-                    behandling(
-                        fagsak,
-                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                        resultat = BehandlingResultat.HENLAGT,
-                    ),
-                )
+            } returns listOf(henlagtBehandling(fagsak))
 
             assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }

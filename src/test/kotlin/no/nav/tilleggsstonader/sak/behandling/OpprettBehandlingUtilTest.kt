@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.henlagtBehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -21,15 +22,14 @@ internal class OpprettBehandlingUtilTest {
     inner class UtledBehandlingType {
         @Test
         fun `hvis man kun har henlagte så skal neste type være førstegangsbehandling`() {
-            assertThat(utledBehandlingType(listOf(behandling(resultat = BehandlingResultat.HENLAGT))))
-                .isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+            assertThat(utledBehandlingType(listOf(henlagtBehandling()))).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
 
-            val behandlinger =
+            val henlangteBehandlinger =
                 listOf(
-                    behandling(resultat = BehandlingResultat.HENLAGT),
-                    behandling(resultat = BehandlingResultat.HENLAGT),
+                    henlagtBehandling(),
+                    henlagtBehandling(),
                 )
-            assertThat(utledBehandlingType(behandlinger)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+            assertThat(utledBehandlingType(henlangteBehandlinger)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
 
         // TODO: Slett når snike i køen er implementert
@@ -78,7 +78,7 @@ internal class OpprettBehandlingUtilTest {
         }
 
         @Test
-        fun `hvis man har en innvilget og sen en henlagt er det fortsatt revurdering`() {
+        fun `hvis man har en innvilget og senere en henlagt behandling er det fortsatt revurdering`() {
             assertThat(
                 utledBehandlingType(
                     listOf(
@@ -87,7 +87,7 @@ internal class OpprettBehandlingUtilTest {
                             vedtakstidspunkt = LocalDateTime.now().minusDays(1),
                             status = BehandlingStatus.FERDIGSTILT,
                         ),
-                        behandling(resultat = BehandlingResultat.HENLAGT),
+                        henlagtBehandling(),
                     ),
                 ),
             ).isEqualTo(BehandlingType.REVURDERING)
@@ -103,13 +103,7 @@ internal class OpprettBehandlingUtilTest {
 
         @Test
         fun `det skal være mulig å opprette hvis eksisterende behandling er henlagt førstegangsbehandling`() {
-            val behandling =
-                behandling(
-                    fagsak = fagsak,
-                    resultat = BehandlingResultat.HENLAGT,
-                    status = BehandlingStatus.FERDIGSTILT,
-                )
-            validerKanOppretteNyBehandling(BehandlingType.FØRSTEGANGSBEHANDLING, listOf(behandling))
+            validerKanOppretteNyBehandling(BehandlingType.FØRSTEGANGSBEHANDLING, listOf(henlagtBehandling()))
         }
 
         @Test
@@ -245,14 +239,8 @@ internal class OpprettBehandlingUtilTest {
 
         @Test
         fun `det skal ikke være mulig å opprette en revurdering om eksisterende behandling er henlagt`() {
-            val behandling =
-                behandling(
-                    fagsak = fagsak,
-                    resultat = BehandlingResultat.HENLAGT,
-                    status = BehandlingStatus.FERDIGSTILT,
-                )
             assertThatThrownBy {
-                validerKanOppretteNyBehandling(BehandlingType.REVURDERING, listOf(behandling))
+                validerKanOppretteNyBehandling(BehandlingType.REVURDERING, listOf(henlagtBehandling(fagsak = fagsak)))
             }.hasMessage("Det finnes ikke en tidligere behandling på fagsaken")
         }
 

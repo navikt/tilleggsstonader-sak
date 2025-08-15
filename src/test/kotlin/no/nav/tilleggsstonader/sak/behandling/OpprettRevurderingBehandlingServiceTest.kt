@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
+import no.nav.tilleggsstonader.sak.util.henlagtBehandling
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -96,10 +97,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         fun `ny behandling skal ikke peke riktig`() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(
-                    behandling(
-                        status = BehandlingStatus.FERDIGSTILT,
-                        resultat = BehandlingResultat.HENLAGT,
-                    ),
+                    henlagtBehandling(),
                     opprettGrunnlagsdata = false,
                 )
 
@@ -145,10 +143,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         fun `ny behandling med årsak NYE_OPPLYSNINGER skal kreve kilde og endringer`() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(
-                    behandling(
-                        status = BehandlingStatus.FERDIGSTILT,
-                        resultat = BehandlingResultat.HENLAGT,
-                    ),
+                    henlagtBehandling(),
                     stønadstype = Stønadstype.LÆREMIDLER,
                     opprettGrunnlagsdata = false,
                 )
@@ -167,10 +162,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         fun `ny behandling med årsak NYE_OPPLYSNINGER med metadata blir lagret korrekt`() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(
-                    behandling(
-                        status = BehandlingStatus.FERDIGSTILT,
-                        resultat = BehandlingResultat.HENLAGT,
-                    ),
+                    henlagtBehandling(),
                     stønadstype = Stønadstype.LÆREMIDLER,
                     opprettGrunnlagsdata = false,
                 )
@@ -379,22 +371,18 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
     @Nested
     inner class HåndteringAvBarnFørsteBehandlingErHenlagt {
-        val behandling =
-            behandling(
-                status = BehandlingStatus.FERDIGSTILT,
-                resultat = BehandlingResultat.HENLAGT,
-            )
+        val henlagtBehandling = henlagtBehandling()
 
         @Test
         fun `må minumum velge 1 barn i tilfelle første behandling er henlagt`() {
             val request =
                 opprettBehandlingDto(
-                    fagsakId = behandling.fagsakId,
+                    fagsakId = henlagtBehandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(),
                 )
 
-            testoppsettService.opprettBehandlingMedFagsak(behandling, opprettGrunnlagsdata = false)
+            testoppsettService.opprettBehandlingMedFagsak(henlagtBehandling, opprettGrunnlagsdata = false)
 
             assertThatThrownBy {
                 service.opprettBehandling(request)
