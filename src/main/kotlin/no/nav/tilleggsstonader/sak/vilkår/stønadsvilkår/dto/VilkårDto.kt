@@ -41,11 +41,6 @@ data class OppdaterVilkårDto(
     val behandlingId: BehandlingId,
 )
 
-data class GjenbrukVilkårDto(
-    val behandlingId: BehandlingId,
-    val kopierbehandlingId: BehandlingId,
-)
-
 data class DelvilkårDto(
     val resultat: Vilkårsresultat,
     val vurderinger: List<VurderingDto>,

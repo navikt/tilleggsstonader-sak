@@ -92,12 +92,6 @@ data class VilkårperiodeInterntVedtak(
     val slettetKommentar: String?,
 )
 
-data class DelvilkårVilkårperiode(
-    val medlemskap: VurderingVilkårperiode?,
-    val dekketAvAnnetRegelverk: VurderingVilkårperiode?,
-    val lønnet: VurderingVilkårperiode?,
-)
-
 data class VurderingVilkårperiode(
     val svar: String?,
     val resultat: ResultatDelvilkårperiode,

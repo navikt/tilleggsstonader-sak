@@ -128,11 +128,3 @@ class ArbeidsfordelingService(
             }
         }
 }
-
-/**
- * Brukes for å cachea data for
- */
-private data class IdentStønad(
-    val ident: String,
-    val stønadstype: Stønadstype,
-)

@@ -7,8 +7,3 @@ data class Søkeresultat(
     val visningsnavn: String,
     val fagsakPersonId: FagsakPersonId?,
 )
-
-data class SøkeresultatUtenFagsak(
-    val personIdent: String,
-    val navn: String,
-)
