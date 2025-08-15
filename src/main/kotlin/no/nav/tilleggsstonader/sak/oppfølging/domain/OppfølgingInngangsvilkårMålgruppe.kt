@@ -32,6 +32,7 @@ data class OppfølgingInngangsvilkårMålgruppe(
             MålgruppeType.AAP,
             MålgruppeType.OMSTILLINGSSTØNAD,
             MålgruppeType.OVERGANGSSTØNAD,
+            MålgruppeType.TILTAKSPENGER,
             -> true
 
             MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger ennå")
@@ -39,7 +40,6 @@ data class OppfølgingInngangsvilkårMålgruppe(
             MålgruppeType.UFØRETRYGD,
             MålgruppeType.SYKEPENGER_100_PROSENT,
             MålgruppeType.INGEN_MÅLGRUPPE,
-            MålgruppeType.TILTAKSPENGER,
             MålgruppeType.KVALIFISERINGSSTØNAD,
             -> false
         }
