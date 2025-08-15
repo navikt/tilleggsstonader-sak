@@ -65,12 +65,6 @@ class NullstillBehandlingService(
         vilkårperioderGrunnlagRepository.deleteById(behandlingId)
     }
 
-    // TODO: Gjør det tydeligere at barna som skal med i nullstilt søknad SKAL VÆRE ALLE BARNA FRA GAMMEL BEHANDLING PLUSS ALLE BARN FRA NY BEHANDLING.
-    // Vi trenger fortsatt en oversikt over
-
-    fun flettBarn(behandlingId: BehandlingId) {
-    }
-
     /**
      * Nullstiller ikke barn, då barn gjenbrukes og har ev. med nye fra ny søknad
      */

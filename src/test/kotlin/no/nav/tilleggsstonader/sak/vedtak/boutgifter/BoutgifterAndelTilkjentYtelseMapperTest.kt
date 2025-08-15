@@ -33,7 +33,7 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
         val beregningsgrunnlag =
             lagBeregningsgrunnlagMedEnkeltutgift(
                 fom = mandag10Mars,
-                tom = mandag17Mars, // TODO: Sjekk om dette er et reelt beregningsgrunnlag
+                tom = mandag17Mars,
             )
 
         val andeler = finnAndelTilkjentYtelse(beregningsgrunnlag)
