@@ -35,7 +35,7 @@ Egenskap: Beregning av vedtaksperioder
 
       Når forslag til vedtaksperioder lages
 
-      Så forvent følgende feil for vedtaksforsalg: Kunne ikke foreslå vedtaksperiode, ettersom det ikke er lagt inn noen utgiftsperioder der vilkårene er oppfylt.
+      Så forvent følgende feil for vedtaksforsalg: Fant ingen gyldig overlapp mellom aktivitet, målgruppe og utgiftsperiodene
 
     Scenario: Det finnes ikke noen vilkår oppfylte
       Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag
@@ -52,7 +52,7 @@ Egenskap: Beregning av vedtaksperioder
 
       Når forslag til vedtaksperioder lages
 
-      Så forvent følgende feil for vedtaksforsalg: Kunne ikke foreslå vedtaksperiode, ettersom det ikke er lagt inn noen utgiftsperioder der vilkårene er oppfylt.
+      Så forvent følgende feil for vedtaksforsalg: Fant ingen gyldig overlapp mellom aktivitet, målgruppe og utgiftsperiodene
 
     Scenario: Vilkåret er kortere enn vedtaksperioden
       Gitt følgende vilkårsperioder med aktiviteter for vedtaksforslag
