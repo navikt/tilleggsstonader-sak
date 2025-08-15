@@ -135,7 +135,6 @@ enum class ÅrsakKontroll {
 
 /**
  * Brukes for henting av aktiv behandling som joiner med andre tabeller også
- * @param harNyereBehandling er true hvis det er en behandling som er opprettet etter denne behandlingen
  */
 data class OppfølgingMedDetaljer(
     val id: UUID = UUID.randomUUID(),
@@ -149,6 +148,9 @@ data class OppfølgingMedDetaljer(
     val behandlingsdetaljer: Behandlingsdetaljer,
 )
 
+/**
+ * @param harNyereBehandling er true hvis det er en behandling som er opprettet etter denne behandlingen
+ */
 data class Behandlingsdetaljer(
     val saksnummer: Long,
     val fagsakPersonId: FagsakPersonId,
