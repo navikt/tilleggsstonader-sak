@@ -245,6 +245,8 @@ class OppfølgingOpprettKontrollerService(
             MålgruppeType.UFØRETRYGD,
             MålgruppeType.SYKEPENGER_100_PROSENT,
             MålgruppeType.INGEN_MÅLGRUPPE,
+            MålgruppeType.TILTAKSPENGER,
+            MålgruppeType.KVALIFISERINGSSTØNAD,
             -> error("Skal ikke sjekke målgruppe=$this")
         }
 }

@@ -37,8 +37,16 @@ enum class MålgruppeType(
         gyldigeAktiviter = emptySet(),
         faktiskMålgruppe = null,
     ),
+    TILTAKSPENGER(
+        gyldigeAktiviter = setOf(AktivitetType.TILTAK),
+        faktiskMålgruppe = null,
+    ),
     INGEN_MÅLGRUPPE(
         gyldigeAktiviter = emptySet(),
+        faktiskMålgruppe = null,
+    ),
+    KVALIFISERINGSSTØNAD(
+        gyldigeAktiviter = setOf(AktivitetType.TILTAK),
         faktiskMålgruppe = null,
     ),
     ;
@@ -55,7 +63,7 @@ enum class MålgruppeType(
 
     fun skalVurdereAldersvilkår() =
         when (this) {
-            AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE, OMSTILLINGSSTØNAD, DAGPENGER -> true
-            OVERGANGSSTØNAD, INGEN_MÅLGRUPPE, SYKEPENGER_100_PROSENT -> false
+            AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE, OMSTILLINGSSTØNAD -> true
+            OVERGANGSSTØNAD, INGEN_MÅLGRUPPE, SYKEPENGER_100_PROSENT, DAGPENGER, TILTAKSPENGER, KVALIFISERINGSSTØNAD -> false
         }
 }

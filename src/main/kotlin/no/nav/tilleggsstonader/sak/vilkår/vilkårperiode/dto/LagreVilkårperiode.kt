@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
@@ -42,6 +43,7 @@ data class LagreVilkårperiode(
     JsonSubTypes.Type(FaktaOgSvarAktivitetLæremidlerDto::class, name = "AKTIVITET_LÆREMIDLER"),
     JsonSubTypes.Type(FaktaOgSvarAktivitetBoutgifterDto::class, name = "AKTIVITET_BOUTGIFTER"),
     JsonSubTypes.Type(FaktaOgSvarAktivitetDagligReiseTsoDto::class, name = "AKTIVITET_DAGLIG_REISE_TSO"),
+    JsonSubTypes.Type(FaktaOgSvarAktivitetDagligReiseTsrDto::class, name = "AKTIVITET_DAGLIG_REISE_TSR"),
 )
 sealed class FaktaOgSvarDto
 
@@ -70,6 +72,8 @@ data class FaktaOgSvarAktivitetBoutgifterDto(
 data class FaktaOgSvarAktivitetDagligReiseTsoDto(
     val svarLønnet: SvarJaNei? = null,
 ) : FaktaOgSvarDto()
+
+data object FaktaOgSvarAktivitetDagligReiseTsrDto : FaktaOgSvarDto()
 
 fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
     when (this) {
@@ -134,4 +138,6 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                         ?.lønnet
                         ?.svar,
             )
+        is AktivitetDagligReiseTsr ->
+            FaktaOgSvarAktivitetDagligReiseTsrDto
     }
