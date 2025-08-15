@@ -58,11 +58,10 @@ class BeslutteVedtakSteg(
     ): StegType {
         fagsakService.fagsakMedOppdatertPersonIdent(saksbehandling.fagsakId)
         val saksbehandler = totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(saksbehandling, data)
-        val oppgaveId = ferdigstillOppgave(saksbehandling)
+        ferdigstillOppgave(saksbehandling)
 
         return if (data.godkjent) {
             oppdaterResultatPåBehandling(saksbehandling)
-            // opprettTaskForBehandlingsstatistikk(saksbehandling.id, oppgaveId)
 
             iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
             if (!saksbehandling.skalIkkeSendeBrev) {
