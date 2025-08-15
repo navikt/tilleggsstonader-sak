@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.fagsak
 
-import BehandlingTilJournalføringDto
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingTilJournalføringDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilBehandlingJournalDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakIdRepository

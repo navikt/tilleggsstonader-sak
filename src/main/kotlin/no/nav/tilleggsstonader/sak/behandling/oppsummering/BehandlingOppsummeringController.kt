@@ -1,8 +1,6 @@
-package no.nav.tilleggsstonader.sak.vilkår.vilkårsoppsummering
+package no.nav.tilleggsstonader.sak.behandling.oppsummering
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.sak.behandling.oppsummering.BehandlingOppsummeringDto
-import no.nav.tilleggsstonader.sak.behandling.oppsummering.BehandlingOppsummeringService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService

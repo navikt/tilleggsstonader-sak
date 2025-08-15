@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling.dto
 
-import BehandlingTilJournalføringDto
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori

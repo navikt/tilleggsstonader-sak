@@ -1,3 +1,5 @@
+package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
+
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
