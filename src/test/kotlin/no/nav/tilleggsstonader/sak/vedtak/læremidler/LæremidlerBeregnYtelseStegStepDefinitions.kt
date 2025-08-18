@@ -94,7 +94,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         }
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
-            vedtakRepository = vedtakRepository,
             vilkårperiodeService = vilkårperiodeService,
         )
 

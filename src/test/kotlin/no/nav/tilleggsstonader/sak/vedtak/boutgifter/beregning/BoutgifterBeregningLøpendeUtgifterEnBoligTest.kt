@@ -37,7 +37,6 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
             vilkårperiodeService = vilkårperiodeService,
-            vedtakRepository = vedtakRepository,
         )
 
     val boutgifterBeregningService =

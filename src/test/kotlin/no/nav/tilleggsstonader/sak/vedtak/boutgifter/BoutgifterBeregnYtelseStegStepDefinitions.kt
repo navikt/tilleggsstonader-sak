@@ -109,7 +109,6 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     val boutgifterUtgiftService = BoutgifterUtgiftService(vilkårService = vilkårService)
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
-            vedtakRepository = vedtakRepositoryFake,
             vilkårperiodeService = vilkårperiodeServiceMock,
         )
     val simuleringServiceMock = mockk<SimuleringService>(relaxed = true)
