@@ -55,7 +55,7 @@ class LæremidlerBeregningService(
         val beregningsresultatForMåned = beregn(behandling, vedtaksperioderBeregningsgrunnlag)
 
         return if (forrigeVedtak != null) {
-            settSammenGamleOgNyePerioder(behandling, beregningsresultatForMåned, forrigeVedtak, behandling.revurderFra ?: tidligsteEndring)
+            settSammenGamleOgNyePerioder(behandling, beregningsresultatForMåned, forrigeVedtak, tidligsteEndring)
         } else {
             BeregningsresultatLæremidler(beregningsresultatForMåned)
         }
@@ -154,10 +154,10 @@ class LæremidlerBeregningService(
 
     /**
      * Slår sammen perioder fra forrige og nytt vedtak.
-     * Beholder perioder fra forrige vedtak frem til og med revurder-fra
-     * Bruker reberegnede perioder fra og med revurder-fra dato
-     * Dette gjøres for at vi ikke skal reberegne perioder før revurder-fra datoet
-     * Men vi trenger å reberegne perioder som løper i revurder-fra datoet då en periode kan ha endrer % eller sats
+     * Beholder perioder fra forrige vedtak frem til og med tidligste endring
+     * Bruker reberegnede perioder fra og med tidligste endring dato
+     * Dette gjøres for at vi ikke skal reberegne perioder før tidligste endring datoet
+     * Men vi trenger å reberegne perioder som løper i tidligste endring datoet då en periode kan ha endrer % eller sats
      */
     private fun settSammenGamleOgNyePerioder(
         saksbehandling: Saksbehandling,
@@ -166,7 +166,7 @@ class LæremidlerBeregningService(
         tidligsteEndring: LocalDate?,
     ): BeregningsresultatLæremidler {
         feilHvis(tidligsteEndring == null) {
-            "Behandling=${saksbehandling.id} steg=${saksbehandling.steg} mangler revurderFra eller dato for tidligste endring"
+            "Behandling=${saksbehandling.id} steg=${saksbehandling.steg} mangler dato for tidligste endring"
         }
 
         val forrigeBeregningsresultat = forrigeVedtak.beregningsresultat
