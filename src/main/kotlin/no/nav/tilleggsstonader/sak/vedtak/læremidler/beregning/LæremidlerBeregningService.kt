@@ -47,7 +47,6 @@ class LæremidlerBeregningService(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             typeVedtak = TypeVedtak.INNVILGELSE,
-            tidligsteEndring = tidligsteEndring,
         )
 
         val vedtaksperioderBeregningsgrunnlag = vedtaksperioder.tilBeregningsgrunnlag()

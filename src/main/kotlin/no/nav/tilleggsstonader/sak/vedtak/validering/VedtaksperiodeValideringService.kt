@@ -22,7 +22,6 @@ import java.time.LocalDate
 @Service
 class VedtaksperiodeValideringService(
     private val vilkårperiodeService: VilkårperiodeService,
-    private val vedtakRepository: VedtakRepository,
 ) {
     /**
      * Felles format på Vedtaksperiode inneholder ennå ikke status så mapper til felles format for å kunne validere
@@ -32,16 +31,14 @@ class VedtaksperiodeValideringService(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
-        tidligsteEndring: LocalDate?,
     ) {
-        validerVedtaksperioder(vedtaksperioder, behandling, typeVedtak, tidligsteEndring)
+        validerVedtaksperioder(vedtaksperioder, behandling, typeVedtak)
     }
 
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
-        tidligsteEndring: LocalDate?,
     ) {
         if (typeVedtak != TypeVedtak.OPPHØR) {
             validerVedtaksperioderEksisterer(vedtaksperioder)
@@ -49,12 +46,6 @@ class VedtaksperiodeValideringService(
         validerIngenOverlappMellomVedtaksperioder(vedtaksperioder)
 
         validerVedtaksperioderMotVilkårperioder(behandling, vedtaksperioder)
-
-        validerIngenEndringerFørRevurderFra(
-            innsendteVedtaksperioder = vedtaksperioder,
-            vedtaksperioderForrigeBehandling = hentForrigeVedtaksperioder(behandling),
-            revurderFra = tidligsteEndring,
-        )
     }
 
     private fun validerVedtaksperioderMotVilkårperioder(
@@ -74,15 +65,4 @@ class VedtaksperiodeValideringService(
             )
         }
     }
-
-    private fun hentForrigeVedtaksperioder(behandling: Saksbehandling): List<Vedtaksperiode>? =
-        behandling.forrigeIverksatteBehandlingId?.let {
-            when (val forrigeVedtak = vedtakRepository.findByIdOrNull(it)?.data) {
-                is InnvilgelseEllerOpphørTilsynBarn -> forrigeVedtak.vedtaksperioder
-                is InnvilgelseEllerOpphørBoutgifter -> forrigeVedtak.vedtaksperioder
-                is InnvilgelseEllerOpphørLæremidler -> forrigeVedtak.vedtaksperioder
-                is Avslag -> null
-                else -> error("Håndterer ikke ${forrigeVedtak?.javaClass?.simpleName}")
-            }
-        }
 }

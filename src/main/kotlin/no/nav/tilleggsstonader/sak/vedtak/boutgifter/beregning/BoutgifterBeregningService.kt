@@ -56,7 +56,6 @@ class BoutgifterBeregningService(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             typeVedtak = typeVedtak,
-            tidligsteEndring = tidligsteEndring,
         )
 
         val vedtaksperioderBeregning =
