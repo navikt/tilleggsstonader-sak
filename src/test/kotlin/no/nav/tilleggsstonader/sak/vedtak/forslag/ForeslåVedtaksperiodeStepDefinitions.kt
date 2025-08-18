@@ -50,7 +50,6 @@ class ForeslåVedtaksperiodeStepDefinitions {
     var vilkår: List<Vilkår> = emptyList()
     var tidligereVedtaksperioder = emptyList<Vedtaksperiode>()
     var resultat: List<Vedtaksperiode> = emptyList()
-    var resultat2: List<Vedtaksperiode> = emptyList()
     var feil: ApiFeil? = null
     var idSomSkalIgnoreres = mutableSetOf<UUID>()
 
@@ -82,15 +81,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
     fun `forslag til vedtaksperioder lages`() {
         try {
             resultat =
-                ForeslåVedtaksperiode.finnVedtaksperiode(
-                    Vilkårperioder(
-                        målgrupper = målgrupper,
-                        aktiviteter = aktiviteter,
-                    ),
-                    vilkår,
-                )
-            resultat2 =
-                ForeslåVedtaksperioderV2Util.foreslåPerioder(
+                ForeslåVedtaksperioderUtil.foreslåPerioder(
                     Vilkårperioder(
                         målgrupper = målgrupper,
                         aktiviteter = aktiviteter,
@@ -111,7 +102,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
     fun `forslag til vedtaksperioder behold id lages tidligsteEndring`(tidligsteEndring: String?) {
         try {
             resultat =
-                ForeslåVedtaksperiode.finnVedtaksperiodeV2(
+                ForeslåVedtaksperiode.finnVedtaksperiode(
                     Vilkårperioder(
                         målgrupper = målgrupper,
                         aktiviteter = aktiviteter,
@@ -138,9 +129,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
         val uuid = UUID.randomUUID()
         val forventetVedtaksperioderMedSammeId = mapVedtaksperioder(dataTable).map { it.copy(id = uuid) }
         val resultatMedSammeId = resultat.map { it.copy(id = uuid) }
-        val resultatMedSammeId2 = resultat2.map { it.copy(id = uuid) }
         assertThat(resultatMedSammeId).isEqualTo(forventetVedtaksperioderMedSammeId)
-        assertThat(resultatMedSammeId2).isEqualTo(forventetVedtaksperioderMedSammeId)
     }
 
     @Så("forvent følgende vedtaksperioder med riktig id")

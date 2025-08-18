@@ -21,7 +21,7 @@ import java.time.LocalDate
 import java.util.UUID
 import kotlin.collections.forEach
 
-object ForeslåVedtaksperioderV2Util {
+object ForeslåVedtaksperioderUtil {
     fun foreslåPerioder(
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
