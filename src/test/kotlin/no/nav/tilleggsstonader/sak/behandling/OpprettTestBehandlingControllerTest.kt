@@ -71,7 +71,7 @@ class OpprettTestBehandlingControllerTest : IntegrationTest() {
         val behandlingId = controller.opprettBehandling(TestBehandlingRequest(ident, stønadstype = Stønadstype.DAGLIG_REISE_TSO))
 
         assertThat(behandlingRepository.findByIdOrNull(behandlingId)).isNotNull
-        val søknad = søknadService.hentSøknadDagligReiseTSO(behandlingId)!!
+        val søknad = søknadService.hentSøknadDagligReiseTso(behandlingId)!!
         assertThat(søknad).isNotNull
         assertThat(søknad).isInstanceOf(SøknadLæremidler::class.java)
     }
@@ -82,7 +82,7 @@ class OpprettTestBehandlingControllerTest : IntegrationTest() {
         val behandlingId = controller.opprettBehandling(TestBehandlingRequest(ident, stønadstype = Stønadstype.DAGLIG_REISE_TSR))
 
         assertThat(behandlingRepository.findByIdOrNull(behandlingId)).isNotNull
-        val søknad = søknadService.hentSøknadDagligReiseTSR(behandlingId)!!
+        val søknad = søknadService.hentSøknadDagligReiseTsr(behandlingId)!!
         assertThat(søknad).isNotNull
         assertThat(søknad).isInstanceOf(SøknadLæremidler::class.java)
     }

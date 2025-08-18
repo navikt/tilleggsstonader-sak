@@ -13,8 +13,8 @@ data class Fagsaker(
     val barnetilsyn: Fagsak?,
     val læremidler: Fagsak?,
     val boutgifter: Fagsak?,
-    val dagligReiseTSO: Fagsak?,
-    val dagligReiseTSR: Fagsak?,
+    val dagligReiseTso: Fagsak?,
+    val dagligReiseTsr: Fagsak?,
 )
 
 data class Fagsak(

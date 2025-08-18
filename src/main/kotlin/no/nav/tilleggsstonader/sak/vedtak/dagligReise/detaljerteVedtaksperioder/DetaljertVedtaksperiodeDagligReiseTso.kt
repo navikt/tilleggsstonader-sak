@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 
-class DetaljertVedtaksperiodeDagligReiseTSR(
+data class DetaljertVedtaksperiodeDagligReiseTso(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val aktivitet: AktivitetType,

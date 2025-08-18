@@ -51,12 +51,12 @@ class SøknadService(
             .findByIdOrNull(behandlingId)
             ?.let { søknadBoutgifterRepository.findByIdOrThrow(it.søknadId) }
 
-    fun hentSøknadDagligReiseTSO(behandlingId: BehandlingId): SøknadLæremidler? =
+    fun hentSøknadDagligReiseTso(behandlingId: BehandlingId): SøknadLæremidler? =
         søknadBehandlingRepository
             .findByIdOrNull(behandlingId)
             ?.let { søknadLæremidlerRepository.findByIdOrThrow(it.søknadId) }
 
-    fun hentSøknadDagligReiseTSR(behandlingId: BehandlingId): SøknadLæremidler? =
+    fun hentSøknadDagligReiseTsr(behandlingId: BehandlingId): SøknadLæremidler? =
         søknadBehandlingRepository
             .findByIdOrNull(behandlingId)
             ?.let { søknadLæremidlerRepository.findByIdOrThrow(it.søknadId) }

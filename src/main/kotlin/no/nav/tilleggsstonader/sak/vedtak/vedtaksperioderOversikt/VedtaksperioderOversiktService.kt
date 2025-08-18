@@ -10,8 +10,8 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder.
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder.DetaljertVedtaksperioderTilsynBarnMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperiodeBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperioderBoutgifterMapper.finnDetaljerteVedtaksperioder
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReiseTSO
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReiseTSR
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReiseTso
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
@@ -38,11 +38,11 @@ class VedtaksperioderOversiktService(
             tilsynBarn = fagsaker.barnetilsyn?.let { oppsummerVedtaksperioderTilsynBarn(it.id) } ?: emptyList(),
             læremidler = fagsaker.læremidler?.let { oppsummerVedtaksperioderLæremidler(it.id) } ?: emptyList(),
             boutgifter = fagsaker.boutgifter?.let { oppsummerVedtaksperioderBoutgifter(it.id) } ?: emptyList(),
-            dagligreiseTSO =
-                fagsaker.dagligReiseTSO?.let { oppsummerVedtaksperioderDagligReiseTSO(it.id) }
+            dagligreiseTso =
+                fagsaker.dagligReiseTso?.let { oppsummerVedtaksperioderDagligReiseTso(it.id) }
                     ?: emptyList(),
-            dagligreiseTSR =
-                fagsaker.dagligReiseTSR?.let { oppsummerVedtaksperioderDagligReiseTSR(it.id) }
+            dagligreiseTsr =
+                fagsaker.dagligReiseTsr?.let { oppsummerVedtaksperioderDagligReiseTsr(it.id) }
                     ?: emptyList(),
         )
     }
@@ -76,9 +76,9 @@ class VedtaksperioderOversiktService(
         return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder()
     }
 
-    private fun oppsummerVedtaksperioderDagligReiseTSO(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReiseTSO> = emptyList()
+    private fun oppsummerVedtaksperioderDagligReiseTso(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReiseTso> = emptyList()
 
-    private fun oppsummerVedtaksperioderDagligReiseTSR(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReiseTSR> = emptyList()
+    private fun oppsummerVedtaksperioderDagligReiseTsr(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReiseTsr> = emptyList()
 
     private inline fun <reified T : Vedtaksdata> hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): T? {
         val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId) ?: return null

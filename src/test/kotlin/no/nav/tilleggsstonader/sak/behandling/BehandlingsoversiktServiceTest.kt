@@ -53,8 +53,8 @@ class BehandlingsoversiktServiceTest {
                 barnetilsyn = fagsak,
                 læremidler = null,
                 boutgifter = null,
-                dagligReiseTSO = null,
-                dagligReiseTSR = null,
+                dagligReiseTso = null,
+                dagligReiseTsr = null,
             )
         every { behandlingRepository.findByFagsakId(fagsakId = fagsak.id) } returns listOf(behandling)
         every { fagsakService.erLøpende(fagsak.id) } returns true
