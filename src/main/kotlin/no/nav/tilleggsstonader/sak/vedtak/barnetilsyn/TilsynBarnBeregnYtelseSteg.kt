@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
@@ -94,12 +95,11 @@ class TilsynBarnBeregnYtelseSteg(
         brukerfeilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
+        feilHvis(vedtak.opphørsdato == null) {
+            "Opphørsdato er ikke satt"
+        }
 
-        val opphørsdato =
-            revurderFraEllerOpphørsdato(
-                revurderFra = saksbehandling.revurderFra,
-                opphørsdato = vedtak.opphørsdato,
-            )
+        val opphørsdato = vedtak.opphørsdato
 
         opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
 

@@ -135,6 +135,16 @@ class TilsynBarnBeregnYtelseStegTest {
     }
 
     @Test
+    fun `skal feile dersom man velger opphør og opphørsdato ikke er satt`() {
+        val revurdering = saksbehandling(type = BehandlingType.REVURDERING, forrigeIverksatteBehandlingId = BehandlingId.random())
+        val vedtak = opphørDto().copy(opphørsdato = null)
+
+        assertThatThrownBy {
+            steg.utførOgReturnerNesteSteg(revurdering, vedtak)
+        }.hasMessage("Opphørsdato er ikke satt")
+    }
+
+    @Test
     fun `skal returnere neste steg SIMULERING ved revurdering`() {
         val revurdering = saksbehandling(type = BehandlingType.REVURDERING)
 

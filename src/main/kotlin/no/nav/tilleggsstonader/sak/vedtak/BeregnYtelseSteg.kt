@@ -53,20 +53,5 @@ abstract class BeregnYtelseSteg<DTO : Any>(
         }
     }
 
-    protected fun revurderFraEllerOpphørsdato(
-        revurderFra: LocalDate?,
-        opphørsdato: LocalDate?,
-    ) = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
-        feilHvis(opphørsdato == null) {
-            "opphørsdato er påkrevd for opphør"
-        }
-        opphørsdato
-    } else {
-        feilHvis(revurderFra == null) {
-            "revurderFra-dato er påkrevd for opphør"
-        }
-        revurderFra
-    }
-
     override fun stegType(): StegType = StegType.BEREGNE_YTELSE
 }
