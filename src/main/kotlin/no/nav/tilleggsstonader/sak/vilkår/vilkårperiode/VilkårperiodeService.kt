@@ -17,12 +17,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFa
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtAldersvilkårErGyldig
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtKunTomErEndret
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerAtVilkårperiodeKanOppdateresIRevurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerRevurderFraErSatt
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -82,10 +76,6 @@ class VilkårperiodeService(
 
         validerBehandling(behandling)
 
-        if (!unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
-            validerNyPeriodeRevurdering(behandling, vilkårperiode.fom)
-        }
-
         if (vilkårperiode.type is MålgruppeType) {
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
         }
@@ -144,82 +134,11 @@ class VilkårperiodeService(
                 .hentEnkeltGrunnlag<FaktaGrunnlagPersonopplysninger>(behandling.id)
                 .data.fødsel
 
-        if (behandling.type != BehandlingType.REVURDERING || unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
-            return oppdaterVilkårperiodeHvorAltKanEndres(
-                eksisterendeVilkårperiode,
-                vilkårperiode,
-                behandling,
-                fødselFaktaGrunnlag,
-            )
-        }
-
-        return oppdaterVilkårperiodeIRevurdering(
-            vilkårperiode,
+        return oppdaterVilkårperiodeHvorAltKanEndres(
             eksisterendeVilkårperiode,
+            vilkårperiode,
             behandling,
             fødselFaktaGrunnlag,
-        )
-    }
-
-    private fun oppdaterVilkårperiodeIRevurdering(
-        vilkårperiode: LagreVilkårperiode,
-        eksisterendeVilkårperiode: Vilkårperiode,
-        behandling: Saksbehandling,
-        fødselFaktaGrunnlag: FødselFaktaGrunnlag?,
-    ): Vilkårperiode {
-        val revurderFra = behandling.revurderFra
-        validerRevurderFraErSatt(revurderFra)
-        validerAtVilkårperiodeKanOppdateresIRevurdering(eksisterendeVilkårperiode, revurderFra)
-
-        // Håndter vilkårsperioder hvor alle felter kan oppdateres
-        if (eksisterendeVilkårperiode.fom >= revurderFra) {
-            feilHvis(vilkårperiode.fom < revurderFra) {
-                "Kan ikke sette fom før revurder-fra(${revurderFra.norskFormat()})"
-            }
-            return oppdaterVilkårperiodeHvorAltKanEndres(
-                eksisterendeVilkårperiode,
-                vilkårperiode,
-                behandling,
-                fødselFaktaGrunnlag,
-            )
-        }
-
-        return oppdaterVilkårperiodeFørRevurderFra(
-            vilkårperiode,
-            eksisterendeVilkårperiode,
-            revurderFra,
-            fødselFaktaGrunnlag,
-        )
-    }
-
-    /**
-     * Håndterer alle perioder som enten er helt før eller krysser revurder fra datoen, dvs. perioder hvor kun tom kan endres.
-     * Dersom perioden inneholder vurderinger med svar GAMMEL_MANGLER_DATA får man kun lov å korte ned tom.
-     */
-    private fun oppdaterVilkårperiodeFørRevurderFra(
-        vilkårperiode: LagreVilkårperiode,
-        eksisterendeVilkårperiode: Vilkårperiode,
-        revurderFra: LocalDate,
-        fødselFaktaGrunnlag: FødselFaktaGrunnlag?,
-    ): Vilkårperiode {
-        val vurderingerMedGammelManglerData =
-            eksisterendeVilkårperiode.faktaOgVurdering.vurderinger.vurderingerMedSvarGammelManglerData()
-        val finnesGammelDataUtenomAldersVilkår = vurderingerMedGammelManglerData.any { it !is VurderingAldersVilkår }
-
-        if (finnesGammelDataUtenomAldersVilkår) {
-            brukerfeilHvis(vilkårperiode.tom > eksisterendeVilkårperiode.tom) {
-                "Det har kommet nye vilkår som må vurderes, og denne perioden er derfor ikke mulig å forlenge. Hvis du ønsker å forlenge perioden må du legge til en ny periode."
-            }
-        }
-
-        validerAtKunTomErEndret(eksisterendeVilkårperiode, vilkårperiode, revurderFra)
-        validerAtAldersvilkårErGyldig(eksisterendeVilkårperiode, vilkårperiode, fødselFaktaGrunnlag)
-
-        return vilkårperiodeRepository.update(
-            eksisterendeVilkårperiode.medNyTomOgBegrunnelse(
-                tom = vilkårperiode.tom,
-                begrunnelse = vilkårperiode.begrunnelse,
-            ),
         )
     }
 
@@ -255,10 +174,6 @@ class VilkårperiodeService(
 
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
         validerBehandling(behandling)
-
-        if (!unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
-            validerSlettPeriodeRevurdering(behandling, vilkårperiode)
-        }
 
         if (vilkårperiode.kanSlettesPermanent()) {
             vilkårperiodeRepository.deleteById(vilkårperiode.id)
