@@ -118,7 +118,7 @@ class BoutgifterVedtakController(
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val behandling = behandlingService.hentBehandling(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
-        return vedtakDtoMapper.toDto(vedtak, behandling.revurderFra, behandling.forrigeIverksatteBehandlingId)
+        return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)
     }
 
     @GetMapping("/fullstendig-oversikt/{behandlingId}")

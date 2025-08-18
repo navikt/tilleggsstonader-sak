@@ -110,7 +110,7 @@ class TilsynBarnVedtakController(
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
-        return vedtakDtoMapper.toDto(vedtak, saksbehandling.revurderFra, saksbehandling.forrigeIverksatteBehandlingId)
+        return vedtakDtoMapper.toDto(vedtak, saksbehandling.forrigeIverksatteBehandlingId)
     }
 
     @GetMapping("/fullstendig-oversikt/{behandlingId}")
@@ -120,7 +120,7 @@ class TilsynBarnVedtakController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
-        return vedtakDtoMapper.toDto(vedtak, null, behandlingService.hentBehandling(behandlingId).forrigeIverksatteBehandlingId)
+        return vedtakDtoMapper.toDto(vedtak, behandlingService.hentBehandling(behandlingId).forrigeIverksatteBehandlingId)
     }
 
     @GetMapping("{behandlingId}/foresla")
