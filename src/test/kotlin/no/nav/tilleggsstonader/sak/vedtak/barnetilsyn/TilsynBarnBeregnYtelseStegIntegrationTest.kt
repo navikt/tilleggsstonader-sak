@@ -286,7 +286,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : IntegrationTest() {
 
             val behandlingForOpphør =
                 testoppsettService.opprettRevurdering(
-                    revurderFra = LocalDate.of(2023, 2, 1),
                     forrigeBehandling = behandling,
                     fagsak = fagsak,
                 )
@@ -305,7 +304,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : IntegrationTest() {
             vilkårperiodeRepository.insert(målgruppeForOpphør)
             lagVilkårForPeriode(saksbehandlingForOpphør, januar, februar, 100, status = VilkårStatus.UENDRET)
 
-            val vedtakDto = opphørDto()
+            val vedtakDto = opphørDto(opphørsdato = LocalDate.of(2023, 2, 1))
             steg.utførOgReturnerNesteSteg(saksbehandlingForOpphør, vedtakDto)
 
             val vedtak = repository.findByIdOrThrow(saksbehandlingForOpphør.id).withTypeOrThrow<OpphørTilsynBarn>()
@@ -359,7 +358,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : IntegrationTest() {
             val behandlingForOpphør =
                 testoppsettService
                     .opprettRevurdering(
-                        revurderFra = LocalDate.of(2025, 2, 3),
                         forrigeBehandling = behandling,
                         fagsak = fagsak,
                     ).let { saksbehandling(behandling = it) }
@@ -371,7 +369,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : IntegrationTest() {
             vilkårperiodeRepository.insert(målgruppeForOpphør)
             lagVilkårForPeriode(behandlingForOpphør, januar, februar, 100, status = VilkårStatus.UENDRET)
 
-            val vedtakDto = opphørDto()
+            val vedtakDto = opphørDto(opphørsdato = LocalDate.of(2025, 2, 3))
             assertThatCode {
                 steg.utførOgReturnerNesteSteg(behandlingForOpphør, vedtakDto)
             }.doesNotThrowAnyException()

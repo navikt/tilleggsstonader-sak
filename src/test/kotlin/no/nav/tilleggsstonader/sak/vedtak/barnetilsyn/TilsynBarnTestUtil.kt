@@ -40,11 +40,11 @@ object TilsynBarnTestUtil {
         begrunnelse = begrunnelse,
     )
 
-    fun opphørDto() =
+    fun opphørDto(opphørsdato: LocalDate?) =
         OpphørTilsynBarnRequest(
             årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
             begrunnelse = "Endring i utgifter",
-            opphørsdato = defaultBehandling.revurderFra,
+            opphørsdato = opphørsdato,
         )
 
     val defaultBehandling = behandling()

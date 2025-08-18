@@ -135,7 +135,7 @@ class TestoppsettService(
         )
 
     fun opprettRevurdering(
-        revurderFra: LocalDate?,
+        revurderFra: LocalDate? = null,
         forrigeBehandling: Behandling,
         fagsak: Fagsak,
         steg: StegType = StegType.BEREGNE_YTELSE,

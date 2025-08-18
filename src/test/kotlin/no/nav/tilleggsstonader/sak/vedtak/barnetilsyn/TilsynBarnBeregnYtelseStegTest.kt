@@ -127,7 +127,7 @@ class TilsynBarnBeregnYtelseStegTest {
 
     @Test
     fun `skal feile dersom man velger opphør på en førstegangsbehandling`() {
-        val vedtak = opphørDto()
+        val vedtak = opphørDto(opphørsdato = LocalDate.now())
 
         assertThatThrownBy {
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtak)
@@ -137,7 +137,7 @@ class TilsynBarnBeregnYtelseStegTest {
     @Test
     fun `skal feile dersom man velger opphør og opphørsdato ikke er satt`() {
         val revurdering = saksbehandling(type = BehandlingType.REVURDERING, forrigeIverksatteBehandlingId = BehandlingId.random())
-        val vedtak = opphørDto().copy(opphørsdato = null)
+        val vedtak = opphørDto(opphørsdato = null)
 
         assertThatThrownBy {
             steg.utførOgReturnerNesteSteg(revurdering, vedtak)
