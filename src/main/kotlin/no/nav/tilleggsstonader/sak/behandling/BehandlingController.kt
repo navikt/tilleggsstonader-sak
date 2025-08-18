@@ -43,7 +43,6 @@ class BehandlingController(
     private val behandlingService: BehandlingService,
     private val behandlingsoversiktService: BehandlingsoversiktService,
     private val opprettRevurderingBehandlingService: OpprettRevurderingBehandlingService,
-    private val revurderFraService: RevurderFraService,
     private val faktaGrunnlagService: FaktaGrunnlagService,
     private val fagsakService: FagsakService,
     private val henleggService: HenleggService,
@@ -151,17 +150,6 @@ class BehandlingController(
         val saksbehandling = behandlingService.hentSaksbehandling(eksternBehandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.ACCESS)
         return saksbehandling.id
-    }
-
-    @PostMapping("{behandlingId}/revurder-fra/{revurderFra}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun oppdaterRevurderFra(
-        @PathVariable behandlingId: BehandlingId,
-        @PathVariable revurderFra: LocalDate,
-    ) {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        revurderFraService.oppdaterRevurderFra(behandlingId, revurderFra)
     }
 
     @PostMapping("{behandlingId}/nullstill")
