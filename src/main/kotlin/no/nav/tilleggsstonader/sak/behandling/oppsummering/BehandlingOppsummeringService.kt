@@ -96,7 +96,10 @@ class BehandlingOppsummeringService(
 
                 is Innvilgelse -> {
                     val vedtaksperioder =
-                        vedtaksperiodeService.finnVedtaksperioderForBehandling(behandling.id, behandling.revurderFra)
+                        vedtaksperiodeService.finnVedtaksperioderForBehandling(
+                            behandling.id,
+                            behandling.revurderFra ?: vedtak.tidligsteEndring,
+                        )
 
                     OppsummertVedtakInnvilgelse(
                         vedtaksperioder = vedtaksperioder.tilDto(),

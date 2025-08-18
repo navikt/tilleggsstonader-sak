@@ -84,10 +84,10 @@ object VedtaksperiodeBeregningUtil {
 
     fun <P> List<P>.brukPerioderFraOgMedRevurderFra(revurderFra: LocalDate?): List<P> where P : Periode<LocalDate>, P : KopierPeriode<P> =
         revurderFra?.let {
-            this.splitFraRevurderFra(revurderFra).filter { it.fom >= revurderFra }
+            this.splitFra(revurderFra).filter { it.fom >= revurderFra }
         } ?: this
 
-    fun <P> List<P>.splitFraRevurderFra(revurderFra: LocalDate?): List<P> where P : Periode<LocalDate>, P : KopierPeriode<P> {
+    fun <P> List<P>.splitFra(revurderFra: LocalDate?): List<P> where P : Periode<LocalDate>, P : KopierPeriode<P> {
         if (revurderFra == null) return this
         return this.flatMap {
             if (it.fom < revurderFra && revurderFra <= it.tom) {

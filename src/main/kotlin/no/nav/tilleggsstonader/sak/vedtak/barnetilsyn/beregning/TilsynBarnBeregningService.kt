@@ -28,7 +28,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Uke
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.splitFraRevurderFra
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.splitFra
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.tilUke
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
@@ -75,22 +75,23 @@ class TilsynBarnBeregningService(
         )
 
         val vedtaksperioderBeregning =
-            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFraRevurderFra(tidligsteEndring)
+            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(tidligsteEndring)
 
-        val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioderBeregning)
+        val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioderBeregning, tidligsteEndring)
         val relevantePerioderFraForrigeVedtak =
-            finnRelevantePerioderFraForrigeVedtak(behandling)
+            finnRelevantePerioderFraForrigeVedtak(behandling, tidligsteEndring)
         return BeregningsresultatTilsynBarn(relevantePerioderFraForrigeVedtak + perioder)
     }
 
     /**
-     * Dersom behandling er en revurdering beregnes perioder fra og med måneden for revurderFra
+     * Dersom behandling er en revurdering beregnes perioder fra og med måneden for tidligsteEndring
      * Ellers beregnes perioder for hele perioden som man har vedtaksperiode og utgifter
      */
     private fun beregnAktuellePerioder(
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
         vedtaksperioder: List<VedtaksperiodeBeregning>,
+        tidligsteEndring: LocalDate?,
     ): List<BeregningsresultatForMåned> {
         val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandling.id)
 
@@ -100,11 +101,14 @@ class TilsynBarnBeregningService(
 
         val beregningsgrunnlag =
             lagBeregningsgrunnlagPerMåned(vedtaksperioder, aktiviteter, utgifterPerBarn)
-                .brukPerioderFraOgMedRevurderFra(behandling.revurderFra)
+                .brukPerioderFraOgMedTidligsteEndring(tidligsteEndring)
         return beregn(beregningsgrunnlag)
     }
 
-    private fun finnRelevantePerioderFraForrigeVedtak(behandling: Saksbehandling): List<BeregningsresultatForMåned> =
+    private fun finnRelevantePerioderFraForrigeVedtak(
+        behandling: Saksbehandling,
+        tidligsteEndring: LocalDate?,
+    ): List<BeregningsresultatForMåned> =
         behandling.forrigeIverksatteBehandlingId?.let { forrigeIverksatteBehandlingId ->
             val beregningsresultat =
                 vedtakRepository
@@ -112,9 +116,9 @@ class TilsynBarnBeregningService(
                     .withTypeOrThrow<InnvilgelseEllerOpphørTilsynBarn>()
                     .data
                     .beregningsresultat
-            val revurderFraMåned = behandling.revurderFra?.toYearMonth() ?: YEAR_MONTH_MIN
+            val tidligsteEndringMåned = tidligsteEndring?.toYearMonth() ?: YEAR_MONTH_MIN
 
-            beregningsresultat.perioder.filter { it.grunnlag.måned < revurderFraMåned }
+            beregningsresultat.perioder.filter { it.grunnlag.måned < tidligsteEndringMåned }
         } ?: emptyList()
 
     private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<BeregningsresultatForMåned> =
@@ -243,7 +247,7 @@ class TilsynBarnBeregningService(
     }
 
     /**
-     * Dersom man har satt revurderFra så skal man kun beregne perioder fra og med den måneden
+     * Dersom revurdering så skal man kun beregne perioder fra og med måneden for tidligste endring
      * Hvis vi eks innvilget 1000kr for 1-31 august, så mappes hele beløpet til 1 august.
      * Dvs det lages en andel som har fom-tom 1-1 aug
      * Når man revurderer fra midten på måneden og eks skal endre målgruppe eller aktivitetsdager,
@@ -251,10 +255,10 @@ class TilsynBarnBeregningService(
      * For at beregningen då skal bli riktig må man ha med grunnlaget til hele måneden og beregne det på nytt, sånn at man får en ny periode som er
      * 1-14 aug, 500kr, 15-30 aug 700kr.
      */
-    private fun List<Beregningsgrunnlag>.brukPerioderFraOgMedRevurderFra(revurderFra: LocalDate?): List<Beregningsgrunnlag> {
-        val revurderFraMåned = revurderFra?.toYearMonth() ?: return this
+    private fun List<Beregningsgrunnlag>.brukPerioderFraOgMedTidligsteEndring(tidligsteEndring: LocalDate?): List<Beregningsgrunnlag> {
+        val tidligsteEndringMåned = tidligsteEndring?.toYearMonth() ?: return this
 
-        return this.filter { it.måned >= revurderFraMåned }
+        return this.filter { it.måned >= tidligsteEndringMåned }
     }
 
     private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> =
