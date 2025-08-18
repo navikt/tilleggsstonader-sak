@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto
 import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
-import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequestV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Sorteringsfelt
@@ -37,8 +37,8 @@ data class FinnOppgaveRequestDto(
         aktørid: String? = null,
         klarmappe: MappeDto,
         ventemappe: MappeDto,
-    ): FinnOppgaveRequest =
-        FinnOppgaveRequest(
+    ): FinnOppgaveRequestV2 =
+        FinnOppgaveRequestV2(
             tema = listOf(Tema.TSO, Tema.TSR),
             behandlingstema =
                 if (this.behandlingstema != null) {

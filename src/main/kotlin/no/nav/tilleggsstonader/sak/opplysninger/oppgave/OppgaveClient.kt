@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
-import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequestV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
@@ -62,8 +62,8 @@ class OppgaveClient(
         return getForEntity<Oppgave>(uri, uriVariables = oppgaveIdUriVariables(oppgaveId))
     }
 
-    fun hentOppgaver(finnOppgaveRequest: FinnOppgaveRequest): FinnOppgaveResponseDto {
-        val uri = UriComponentsBuilder.fromUri(oppgaveUri).pathSegment("finn").toUriString()
+    fun hentOppgaver(finnOppgaveRequest: FinnOppgaveRequestV2): FinnOppgaveResponseDto {
+        val uri = UriComponentsBuilder.fromUri(oppgaveUri).pathSegment("finnV2").toUriString()
 
         return postForEntity<FinnOppgaveResponseDto>(
             uri,

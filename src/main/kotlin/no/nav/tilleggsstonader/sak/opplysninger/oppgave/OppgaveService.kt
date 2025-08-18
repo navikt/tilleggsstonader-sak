@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
-import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequestV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
@@ -74,12 +74,12 @@ class OppgaveService(
 
     fun hentOppgaverForPerson(personIdent: String): FinnOppgaveresultatMedMetadata {
         val aktørId = personService.hentAktørId(personIdent)
-        val oppgaveRequest = FinnOppgaveRequest(aktørId = aktørId, tema = listOf(Tema.TSO, Tema.TSR))
+        val oppgaveRequest = FinnOppgaveRequestV2(aktørId = aktørId, tema = listOf(Tema.TSO, Tema.TSR))
 
         return finnOppgaver(oppgaveRequest)
     }
 
-    private fun finnOppgaver(request: FinnOppgaveRequest): FinnOppgaveresultatMedMetadata {
+    private fun finnOppgaver(request: FinnOppgaveRequestV2): FinnOppgaveresultatMedMetadata {
         val oppgaveResponse = oppgaveClient.hentOppgaver(request)
 
         val metadata = finnOppgaveMetadata(oppgaveResponse.oppgaver)
