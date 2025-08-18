@@ -22,7 +22,6 @@ class InngangsvilkårStegTest {
     val steg =
         InngangsvilkårSteg(
             behandlingService = behandlingService,
-            unleashService = mockUnleashService(false),
         )
 
     @BeforeEach

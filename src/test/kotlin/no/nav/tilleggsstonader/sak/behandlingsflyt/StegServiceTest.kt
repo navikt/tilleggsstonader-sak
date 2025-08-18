@@ -170,30 +170,6 @@ class StegServiceTest : IntegrationTest() {
         }
 
         @Test
-        internal fun `skal ikke kunne gå videre fra inngangsvilkår dersom revurder fra-dato mangler i revurdering`() {
-            val behandling =
-                testoppsettService.opprettBehandlingMedFagsak(
-                    behandling(steg = StegType.BEHANDLING_FERDIGSTILT, status = BehandlingStatus.FERDIGSTILT),
-                )
-            val revurdering =
-                testoppsettService.opprettRevurdering(
-                    revurderFra = null,
-                    forrigeBehandling = behandling,
-                    fagsak = fagsak(id = behandling.fagsakId),
-                    steg = StegType.INNGANGSVILKÅR,
-                )
-
-            val exception =
-                catchThrowableOfType<ApiFeil> {
-                    stegService.håndterSteg(
-                        saksbehandling(behandling = revurdering),
-                        inngangsvilkårSteg,
-                    )
-                }
-            assertThat(exception).hasMessage("Du må sette revurder fra-dato før du kan gå videre")
-        }
-
-        @Test
         internal fun `skal feile hvis behandling iverksettes og man prøver godkjenne saksbehandling`() {
             val behandling = behandlingSomIverksettes()
 

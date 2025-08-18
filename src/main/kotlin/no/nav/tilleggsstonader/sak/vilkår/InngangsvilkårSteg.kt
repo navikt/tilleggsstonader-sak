@@ -13,15 +13,8 @@ import org.springframework.stereotype.Service
 @Service
 class InngangsvilkårSteg(
     private val behandlingService: BehandlingService,
-    private val unleashService: UnleashService,
 ) : BehandlingSteg<Void?> {
-    override fun validerSteg(saksbehandling: Saksbehandling) {
-        if (!unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
-            brukerfeilHvis(saksbehandling.type == BehandlingType.REVURDERING && saksbehandling.revurderFra == null) {
-                "Du må sette revurder fra-dato før du kan gå videre"
-            }
-        }
-    }
+    override fun validerSteg(saksbehandling: Saksbehandling) {}
 
     override fun utførSteg(
         saksbehandling: Saksbehandling,
