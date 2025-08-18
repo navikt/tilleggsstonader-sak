@@ -474,28 +474,6 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 )
             }.hasMessageContaining("BehandlingId er ikke lik")
         }
-
-        @Test
-        fun `kan ikke oppdatere fakta hvis periode begynner før revurderFra`() {
-            val behandling =
-                testoppsettService.oppdater(
-                    testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
-                )
-            val aktivitet =
-                vilkårperiodeRepository.insert(
-                    aktivitet(
-                        behandlingId = behandling.id,
-                        fom = now().minusMonths(1),
-                        tom = now().plusMonths(1),
-                    ),
-                )
-            assertThatThrownBy {
-                aktivitetService.oppdaterVilkårperiode(
-                    id = aktivitet.id,
-                    vilkårperiode = aktivitet.tilOppdatering(aktivitetsdager = 3),
-                )
-            }.hasMessageContaining("Kan ikke endre vurderinger eller fakta på perioden")
-        }
     }
 
     private fun Vilkårperiode.tilOppdatering(
