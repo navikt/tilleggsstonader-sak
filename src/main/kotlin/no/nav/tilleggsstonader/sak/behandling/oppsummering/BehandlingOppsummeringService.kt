@@ -98,7 +98,7 @@ class BehandlingOppsummeringService(
                     val vedtaksperioder =
                         vedtaksperiodeService.finnVedtaksperioderForBehandling(
                             behandling.id,
-                            behandling.revurderFra ?: vedtak.tidligsteEndring,
+                            vedtak.tidligsteEndring,
                         )
 
                     OppsummertVedtakInnvilgelse(
@@ -109,7 +109,7 @@ class BehandlingOppsummeringService(
                 is Opphør ->
                     OppsummertVedtakOpphør(
                         årsaker = data.årsaker,
-                        opphørsdato = vedtak.opphørsdato ?: behandling.revurderFra!!,
+                        opphørsdato = vedtak.opphørsdato!!,
                     )
             }
         }

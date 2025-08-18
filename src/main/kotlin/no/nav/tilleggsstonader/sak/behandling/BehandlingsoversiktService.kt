@@ -89,8 +89,7 @@ class BehandlingsoversiktService(
         }
     }
 
-    private fun hentOpphørsdato(behandling: Behandling): LocalDate? =
-        vedtakService.hentVedtak(behandling.id)?.opphørsdato ?: behandling.revurderFra
+    private fun hentOpphørsdato(behandling: Behandling): LocalDate? = vedtakService.hentVedtak(behandling.id)?.opphørsdato
 
     /**
      * Slår sammen alle vedtaksperioder som finnes i en behandling slik at oversikten kun viser en periode.
