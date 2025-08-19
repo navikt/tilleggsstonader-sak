@@ -155,8 +155,8 @@ Egenskap: Innvilgelse av boutgifter - revurdering
       | Fom        | Beløp | Type           | Utbetalingsdato |
       | 03.02.2025 | 1000  | BOUTGIFTER_AAP | 03.02.2025      |
 
-  Scenario: Har faste utgifter fra før, legger inn en midlertidig overnatting
-  Resultat: Forventer feilmelding, ettersom det ikke er støttet i løsningen enda
+  Scenario: Har faste utgifter fra før, legger inn en midlertidig overnatting som ikke overlapper med tidligere utgift
+  Resultat: Forventer dette skal gå bra da periodene ikke overlapper
     Gitt følgende boutgifter av type LØPENDE_UTGIFTER_EN_BOLIG for behandling=1
       | Fom        | Tom        | Utgift |
       | 01.01.2025 | 31.01.2025 | 1000   |
@@ -176,4 +176,29 @@ Egenskap: Innvilgelse av boutgifter - revurdering
       | 01.01.2025 | 31.01.2025 |
       | 15.02.2025 | 16.02.2025 |
 
-    Så forvent følgende feilmelding: Foreløpig støtter vi ikke løpende og midlertidige utgifter i samme behandling
+    Så kan vi forvente følgende andeler for behandling=2
+      | Fom        | Beløp | Type           | Utbetalingsdato |
+      | 01.01.2025 | 1000  | BOUTGIFTER_AAP | 01.01.2025      |
+      | 03.02.2025 | 1000  | BOUTGIFTER_AAP | 17.02.2025      |
+
+  Scenario: Har faste utgifter fra før, legger inn en midlertidig overnatting som overlapper med tidligere utgift
+  Resultat: Forventer feilmelding, ettersom det ikke er støttet i løsningen enda
+    Gitt følgende boutgifter av type LØPENDE_UTGIFTER_EN_BOLIG for behandling=1
+      | Fom        | Tom        | Utgift |
+      | 01.01.2025 | 31.03.2025 | 1000   |
+
+    Og vi innvilger boutgifter for behandling=1 med følgende vedtaksperioder
+      | Fom        | Tom        |
+      | 01.01.2025 | 31.03.2025 |
+
+    Og vi kopierer perioder fra forrige behandling for behandling=2
+
+    Og vi legger inn følgende nye utgifter av type UTGIFTER_OVERNATTING for behandling=2
+      | Fom        | Tom        | Utgift |
+      | 15.02.2025 | 16.02.2025 | 1000   |
+
+    Når vi innvilger boutgifter behandling=2 med revurderFra=15.02.2025 med følgende vedtaksperioder
+      | Fom        | Tom        |
+      | 01.01.2025 | 31.03.2025 |
+
+    Så forvent følgende feilmelding: Det er foreløpig ikke mulig å legge både løpende utgifter og utgifter til overnatting i samme utbetalingsperiode.

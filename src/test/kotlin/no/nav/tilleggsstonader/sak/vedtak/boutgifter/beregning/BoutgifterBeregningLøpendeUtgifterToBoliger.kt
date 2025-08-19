@@ -32,7 +32,7 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
     val boutgifterUtgiftService = mockk<BoutgifterUtgiftService>()
     val vedtakRepository = mockk<VedtakRepository>()
     val vilkårperiodeService = mockk<VilkårperiodeService>()
-    val unleashService = mockk<UnleashService>()
+    val unleashService = mockk<UnleashService>(relaxed = true)
 
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
@@ -45,6 +45,7 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepository,
+            unleashService = unleashService,
         )
 
     val løpendeUtgifterToBoliger: BoutgifterPerUtgiftstype =

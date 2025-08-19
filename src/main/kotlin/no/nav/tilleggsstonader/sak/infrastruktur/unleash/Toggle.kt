@@ -17,4 +17,6 @@ enum class Toggle(
     BOUTGIFTER_TILLAT_HOYERE_UTGIFTER("sak.boutgifter-tillat-hoyere-utgifter"),
 
     SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK("sak.utled-endringsdato-revurdering"),
+
+    TILLAT_LØPENDE_OG_MIDLERTIDIG_UTGIFT_SAMME_BEHANDLING("sak.tillat-lopende-og-midlertidig-utgift-samme-behandling"),
 }
