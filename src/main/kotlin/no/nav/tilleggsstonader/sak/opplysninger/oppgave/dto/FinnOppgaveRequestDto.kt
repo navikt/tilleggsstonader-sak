@@ -39,7 +39,7 @@ data class FinnOppgaveRequestDto(
         ventemappe: MappeDto,
     ): FinnOppgaveRequest =
         FinnOppgaveRequest(
-            tema = Tema.TSO,
+            tema = listOf(Tema.TSO, Tema.TSR),
             behandlingstema =
                 if (this.behandlingstema != null) {
                     Behandlingstema.entries.find { it.value == this.behandlingstema }
