@@ -5,18 +5,35 @@ import no.nav.tilleggsstonader.libs.log.SecureLogger
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.core.NestedExceptionUtils
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.ProblemDetail
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.context.request.WebRequest
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeoutException
 
 @ControllerAdvice
-class ApiExceptionHandler {
+class ApiExceptionHandler : ResponseEntityExceptionHandler() {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val secureLogger = SecureLogger.secureLogger
+
+    override fun handleExceptionInternal(
+        ex: Exception,
+        body: Any?,
+        headers: HttpHeaders,
+        status: HttpStatusCode,
+        request: WebRequest,
+    ): ResponseEntity<Any>? {
+        secureLogger.error("En feil har oppstått", ex)
+        logger.error("En feil har oppstått - throwable=${rootCause(ex)} status=${status.value()}")
+        return super.handleExceptionInternal(ex, body, headers, status, request)
+    }
 
     @ExceptionHandler(Throwable::class)
     fun handleThrowable(throwable: Throwable): ProblemDetail {
