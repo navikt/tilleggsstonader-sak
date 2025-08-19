@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class SatsLæremidlerTest {
+    private val satsLæremidlerService = SatsLæremidlerService()
+
     @Test
     fun `høyere utdanning 2024`() {
         val periode =
@@ -18,8 +20,8 @@ class SatsLæremidlerTest {
                 tom = LocalDate.of(2024, 2, 1),
             )
         val sats =
-            finnSatsForStudienivå(
-                finnSatsForPeriode(periode),
+            satsLæremidlerService.finnSatsForStudienivå(
+                satsLæremidlerService.finnSatsForPeriode(periode),
                 Studienivå.HØYERE_UTDANNING,
             )
         assertThat(sats).isEqualTo(875)
@@ -33,8 +35,8 @@ class SatsLæremidlerTest {
                 tom = LocalDate.of(2023, 5, 1),
             )
         val sats =
-            finnSatsForStudienivå(
-                finnSatsForPeriode(periode),
+            satsLæremidlerService.finnSatsForStudienivå(
+                satsLæremidlerService.finnSatsForPeriode(periode),
                 Studienivå.HØYERE_UTDANNING,
             )
         assertThat(sats).isEqualTo(822)
@@ -48,8 +50,8 @@ class SatsLæremidlerTest {
                 tom = LocalDate.of(2024, 12, 1),
             )
         val sats =
-            finnSatsForStudienivå(
-                finnSatsForPeriode(periode),
+            satsLæremidlerService.finnSatsForStudienivå(
+                satsLæremidlerService.finnSatsForPeriode(periode),
                 Studienivå.VIDEREGÅENDE,
             )
         assertThat(sats).isEqualTo(438)
@@ -63,8 +65,8 @@ class SatsLæremidlerTest {
                 tom = LocalDate.of(2023, 12, 1),
             )
         val sats =
-            finnSatsForStudienivå(
-                finnSatsForPeriode(periode),
+            satsLæremidlerService.finnSatsForStudienivå(
+                satsLæremidlerService.finnSatsForPeriode(periode),
                 Studienivå.VIDEREGÅENDE,
             )
         assertThat(sats).isEqualTo(411)
@@ -73,7 +75,7 @@ class SatsLæremidlerTest {
     @Test
     fun `skal ikke kunne hente sats for en periode som strekker seg over periode for sats`() {
         assertThatThrownBy {
-            finnSatsForPeriode(Datoperiode(LocalDate.of(2024, 12, 31), LocalDate.of(2025, 1, 1)))
+            satsLæremidlerService.finnSatsForPeriode(Datoperiode(LocalDate.of(2024, 12, 31), LocalDate.of(2025, 1, 1)))
         }.hasMessageContaining("Finner ikke satser for")
     }
 
