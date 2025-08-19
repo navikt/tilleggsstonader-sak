@@ -8,11 +8,14 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerNyeMålgrupperOverlapperIkkeMedEksisterendeMålgrupper
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 
 @Service
 class InngangsvilkårSteg(
     private val behandlingService: BehandlingService,
+    private val vilkårperiodeService: VilkårperiodeService,
     private val unleashService: UnleashService,
 ) : BehandlingSteg<Void?> {
     override fun validerSteg(saksbehandling: Saksbehandling) {
@@ -21,6 +24,8 @@ class InngangsvilkårSteg(
                 "Du må sette revurder fra-dato før du kan gå videre"
             }
         }
+        val vilkårperioder = vilkårperiodeService.hentVilkårperioder(saksbehandling.id)
+        validerNyeMålgrupperOverlapperIkkeMedEksisterendeMålgrupper(vilkårperioder)
     }
 
     override fun utførSteg(
