@@ -201,6 +201,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 utgift = parseInt(BoutgifterDomenenøkkel.UTGIFT, rad),
                 erFremtidigUtgift = false,
+                offentligTransport = null,
             )
         }
 

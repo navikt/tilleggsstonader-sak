@@ -63,6 +63,7 @@ object VilkårUtil {
                 VilkårType.UTGIFTER_OVERNATTING -> false
                 VilkårType.LØPENDE_UTGIFTER_EN_BOLIG -> true
                 VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER -> true
+                VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> false
                 VilkårType.EKSEMPEL2 -> false
                 VilkårType.EKSEMPEL -> false
             }

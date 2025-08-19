@@ -40,6 +40,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterR
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårController
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
@@ -320,6 +321,12 @@ class BehandlingFlytTest : IntegrationTest() {
                 tom = LocalDate.of(2024, 1, 31),
                 utgift = 1000,
                 erFremtidigUtgift = false,
+                offentligTransport =
+                    OffentligTransport(
+                        reisedagerPerUke = 2,
+                        prisEnkelbillett = 44,
+                        prisTrettidagersbillett = 750,
+                    ),
             ),
         )
         stegService.håndterSteg(behandlingId, StegType.VILKÅR)
@@ -346,7 +353,10 @@ class BehandlingFlytTest : IntegrationTest() {
         kommentarTilBeslutter: String? = null,
     ) {
         kjørTasks()
-        totrinnskontrollController.sendTilBeslutter(behandlingId, SendTilBeslutterRequest(kommentarTilBeslutter = kommentarTilBeslutter))
+        totrinnskontrollController.sendTilBeslutter(
+            behandlingId,
+            SendTilBeslutterRequest(kommentarTilBeslutter = kommentarTilBeslutter),
+        )
         kjørTasks()
     }
 

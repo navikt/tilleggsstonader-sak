@@ -38,6 +38,8 @@ data class Vilkår(
     val utgift: Int? = null,
     val barnId: BarnId? = null,
     val erFremtidigUtgift: Boolean,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "offentlig_transport_")
+    val offentligTransport: OffentligTransport?,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     @Column("delvilkar")
@@ -89,6 +91,10 @@ data class Vilkår(
 
             VilkårType.UTGIFTER_OVERNATTING -> {
                 validerPåkrevdBeløpHvisOppfylt()
+            }
+
+            VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> {
+                // Dette er kun for tester foreløpig
             }
 
             VilkårType.EKSEMPEL -> {
@@ -209,6 +215,12 @@ data class Vurdering(
     val begrunnelse: String? = null,
 )
 
+data class OffentligTransport(
+    val reisedagerPerUke: Int,
+    val prisEnkelbillett: Int,
+    val prisTrettidagersbillett: Int,
+)
+
 fun List<Vurdering>.harSvar(svarId: SvarId) = this.any { it.svar == svarId }
 
 enum class Vilkårsresultat(
@@ -247,6 +259,12 @@ enum class VilkårType(
     UTGIFTER_OVERNATTING("Utgifter overnatting", listOf(Stønadstype.BOUTGIFTER)),
     LØPENDE_UTGIFTER_EN_BOLIG("Løpende utgifter en bolig", listOf(Stønadstype.BOUTGIFTER)),
     LØPENDE_UTGIFTER_TO_BOLIGER("Løpende utgifter to boliger", listOf(Stønadstype.BOUTGIFTER)),
+
+    //
+    DAGLIG_REISE_OFFENTLIG_TRANSPORT(
+        "Offentlig transport daglig reise",
+        listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSO),
+    ),
     ;
 
     fun gjelderFlereBarn(): Boolean = this == PASS_BARN

@@ -54,6 +54,7 @@ internal class OppdaterVilkårTest {
                     tom = LocalDate.now().plusDays(1),
                     utgift = 1,
                     erFremtidigUtgift = false,
+                    offentligTransport = null,
                 )
 
             @Test
@@ -94,6 +95,7 @@ internal class OppdaterVilkårTest {
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
                         erFremtidigUtgift = false,
+                        offentligTransport = null,
                     )
                 val utgifterOvernattingVilkår =
                     vilkår(
@@ -110,6 +112,7 @@ internal class OppdaterVilkårTest {
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
                         erFremtidigUtgift = false,
+                        offentligTransport = null,
                     )
                 val utgifterFremtidigUtgiftVilkår =
                     vilkår(
@@ -202,6 +205,7 @@ internal class OppdaterVilkårTest {
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
                         erFremtidigUtgift = false,
+                        offentligTransport = null,
                     )
                 val vilkår =
                     vilkår(
@@ -250,6 +254,7 @@ internal class OppdaterVilkårTest {
                         tom = LocalDate.now().plusDays(1),
                         utgift = 1,
                         erFremtidigUtgift = false,
+                        offentligTransport = null,
                     )
                 val vilkår =
                     vilkår(
@@ -370,6 +375,7 @@ internal class OppdaterVilkårTest {
                 tom = originaltVilkår.tom,
                 utgift = 100,
                 erFremtidigUtgift = false,
+                offentligTransport = null,
             )
     }
 }
