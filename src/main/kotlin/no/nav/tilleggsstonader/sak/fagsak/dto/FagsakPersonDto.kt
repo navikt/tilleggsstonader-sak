@@ -8,4 +8,6 @@ class FagsakPersonDto(
     val tilsynBarn: FagsakId?,
     val læremidler: FagsakId?,
     val boutgifter: FagsakId?,
+    val dagligReiseTso: FagsakId?,
+    val dagligReiseTsr: FagsakId?,
 )
