@@ -31,10 +31,11 @@ class BehandlingOppsummeringService(
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
         val vedtak = oppsummerVedtak(behandling)
 
+        // TODO - ble tidligere kuttet med revurderFra som nå er fjernet
         return BehandlingOppsummeringDto(
-            aktiviteter = vilkårperioder.aktiviteter.oppsummer(behandling.revurderFra),
-            målgrupper = vilkårperioder.målgrupper.oppsummer(behandling.revurderFra),
-            vilkår = oppsummerStønadsvilkår(behandlingId, behandling.revurderFra),
+            aktiviteter = vilkårperioder.aktiviteter.oppsummer(null),
+            målgrupper = vilkårperioder.målgrupper.oppsummer(null),
+            vilkår = oppsummerStønadsvilkår(behandlingId, null),
             vedtak = vedtak,
         )
     }
