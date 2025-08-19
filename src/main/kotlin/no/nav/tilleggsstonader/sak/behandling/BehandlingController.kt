@@ -49,8 +49,6 @@ class BehandlingController(
     private val tilgangService: TilgangService,
     private val nullstillBehandlingService: NullstillBehandlingService,
     private val tilordnetSaksbehandlerService: TilordnetSaksbehandlerService,
-    private val unleashService: UnleashService,
-    private val oppgaveService: OppgaveService,
 ) {
     @GetMapping("{behandlingId}")
     fun hentBehandling(
@@ -58,7 +56,7 @@ class BehandlingController(
     ): BehandlingDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        val saksbehandling: Saksbehandling = hentSaksbehandlingMedNullstiltRevurderFra(behandlingId)
+        val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val tilordnetSaksbehandler = tilordnetSaksbehandlerService.finnTilordnetSaksbehandler(behandlingId).tilDto()
 
         if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
@@ -68,23 +66,6 @@ class BehandlingController(
             faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId)
         }
         return saksbehandling.tilDto(tilordnetSaksbehandler)
-    }
-
-    private fun hentSaksbehandlingMedNullstiltRevurderFra(behandlingId: BehandlingId): Saksbehandling {
-        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        val statusErUnderArbeid =
-            saksbehandling.status == BehandlingStatus.OPPRETTET ||
-                saksbehandling.status == BehandlingStatus.UTREDES
-        return if (saksbehandling.revurderFra != null &&
-            statusErUnderArbeid &&
-            unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) &&
-            oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(saksbehandling.id)?.tilordnetSaksbehandler ==
-            SikkerhetContext.hentSaksbehandler()
-        ) {
-            behandlingService.fjernRevurderFra(saksbehandling)
-        } else {
-            saksbehandling
-        }
     }
 
     @GetMapping("fagsak-person/{fagsakPersonId}")

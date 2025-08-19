@@ -59,9 +59,6 @@ data class Behandling(
         if (erHenlagt()) {
             feilHvis(henlagtÅrsak == null) { "Kan ikke henlegge behandling uten en årsak" }
         }
-        feilHvis(revurderFra != null && type != BehandlingType.REVURDERING) {
-            "Kan ikke sette revurder fra når behandlingen ikke er en revurdering"
-        }
     }
 }
 

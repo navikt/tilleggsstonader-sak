@@ -76,15 +76,6 @@ class UtledTidligsteEndringService(
     ): TidligsteEndringResultat? {
         val behandling = behandlingService.hentBehandling(behandlingId)
 
-        if (!unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
-            return behandling.revurderFra?.let {
-                TidligsteEndringResultat(
-                    tidligsteEndring = it,
-                    tidligsteEndringSomPåvirkerUtbetalinger = it,
-                )
-            }
-        }
-
         val sisteIverksatteBehandling = behandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentBehandling(it) }
 
         if (sisteIverksatteBehandling == null) {

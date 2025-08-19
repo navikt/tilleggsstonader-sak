@@ -134,10 +134,6 @@ class VilkårperiodeGrunnlagService(
      * Hvis det gjelder en revurdering, så brukes datoen til første dag i måneden før revurderingsdatoen.
      */
     private fun grunnlagsdatoBehandling(behandling: Saksbehandling): LocalDate {
-        if (behandling.revurderFra != null) {
-            return behandling.revurderFra.minusMonths(1).tilFørsteDagIMåneden()
-        }
-
         val mottattTidspunkt =
             søknadService.hentSøknadMetadata(behandling.id)?.mottattTidspunkt
                 ?: behandling.opprettetTid

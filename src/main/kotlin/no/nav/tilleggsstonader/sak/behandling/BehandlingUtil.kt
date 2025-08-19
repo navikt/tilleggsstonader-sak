@@ -30,18 +30,6 @@ object BehandlingUtil {
             BehandlingType.FØRSTEGANGSBEHANDLING
         }
 
-    fun skalNullstilleBehandling(
-        behandling: Behandling,
-        nyRevurderFra: LocalDate?,
-    ): Boolean {
-        val forrigeRevurdererFra = behandling.revurderFra
-        return when {
-            nyRevurderFra == null -> false
-            forrigeRevurdererFra == null -> true
-            else -> nyRevurderFra > forrigeRevurdererFra
-        }
-    }
-
     fun validerBehandlingIdErLik(
         behandlingIdParam: BehandlingId,
         behandlingIdRequest: BehandlingId,

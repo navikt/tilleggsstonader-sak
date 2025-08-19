@@ -127,7 +127,6 @@ class InterntVedtakService(
             vedtakstidspunkt = behandling.vedtakstidspunkt ?: error("Finner ikke vedtakstidspunkt"),
             saksbehandler = saksbehandler,
             beslutter = totrinnskontroll?.beslutter,
-            revurderFra = behandling.revurderFra,
         )
     }
 

@@ -135,15 +135,6 @@ class UtledTidligsteEndringServiceTest {
 
         assertThat(result).isNull()
     }
-
-    @Test
-    fun `utled tidligste endring, feature-toggle er av, returnerer revurderFra`() {
-        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling // Må initialiseres
-        every { unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) } returns false
-        behandling = behandling.copy(type = BehandlingType.REVURDERING, revurderFra = LocalDate.of(2023, 1, 1))
-        assertThat(utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandling.id, vedtaksperioder))
-            .isEqualTo(behandling.revurderFra)
-    }
 }
 
 private fun vilkårperioder(block: VilkårperioderBuilder.() -> Unit): Vilkårperioder = VilkårperioderBuilder().apply(block).build()

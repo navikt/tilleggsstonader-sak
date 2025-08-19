@@ -65,7 +65,6 @@ class BehandlingsoversiktService(
                         vedtaksdato = it.vedtakstidspunkt,
                         henlagtÅrsak = it.henlagtÅrsak,
                         henlagtBegrunnelse = it.henlagtBegrunnelse,
-                        revurderFra = it.revurderFra,
                         vedtaksperiode = vedtaksperioder[it.id],
                         opphørsdato = if (it.erOpphørt()) hentOpphørsdato(it) else null,
                     )
