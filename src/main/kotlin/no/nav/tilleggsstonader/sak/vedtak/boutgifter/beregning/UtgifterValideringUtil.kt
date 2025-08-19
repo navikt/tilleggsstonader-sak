@@ -13,12 +13,17 @@ object UtgifterValideringUtil {
      * gir rett på stønad (hhv. 3/6 mnd for utgifter overnatting/løpende utgifter).
      *
      */
-    fun validerUtgifter(utgifter: BoutgifterPerUtgiftstype) {
+    fun validerUtgifter(
+        utgifter: BoutgifterPerUtgiftstype,
+        tillatLøpendeOgMidlertidigUtgiftSammeBehandling: Boolean,
+    ) {
         brukerfeilHvis(utgifter.values.flatten().isEmpty()) {
             "Det er ikke lagt inn noen oppfylte utgiftsperioder"
         }
-        brukerfeilHvis(detFinnesBådeLøpendeOgMidlertidigeUtgifter(utgifter)) {
-            "Foreløpig støtter vi ikke løpende og midlertidige utgifter i samme behandling"
+        if (!tillatLøpendeOgMidlertidigUtgiftSammeBehandling) {
+            brukerfeilHvis(detFinnesBådeLøpendeOgMidlertidigeUtgifter(utgifter)) {
+                "Foreløpig støtter vi ikke løpende og midlertidige utgifter i samme behandling"
+            }
         }
         utgifter.entries.forEach { (type, utgiftsperioderAvGittType) ->
             feilHvis(utgiftsperioderAvGittType.overlapper()) {

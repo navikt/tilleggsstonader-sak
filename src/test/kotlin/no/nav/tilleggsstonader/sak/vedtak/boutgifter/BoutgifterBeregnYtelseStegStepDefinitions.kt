@@ -119,6 +119,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepositoryFake,
+            unleashService = unleashService,
         )
     val opphørValideringService =
         OpphørValideringService(
