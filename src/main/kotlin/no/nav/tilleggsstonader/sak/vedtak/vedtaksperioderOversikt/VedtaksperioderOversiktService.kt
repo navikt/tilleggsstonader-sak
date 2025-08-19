@@ -38,10 +38,10 @@ class VedtaksperioderOversiktService(
             tilsynBarn = fagsaker.barnetilsyn?.let { oppsummerVedtaksperioderTilsynBarn(it.id) } ?: emptyList(),
             læremidler = fagsaker.læremidler?.let { oppsummerVedtaksperioderLæremidler(it.id) } ?: emptyList(),
             boutgifter = fagsaker.boutgifter?.let { oppsummerVedtaksperioderBoutgifter(it.id) } ?: emptyList(),
-            dagligreiseTso =
+            dagligReiseTso =
                 fagsaker.dagligReiseTso?.let { oppsummerVedtaksperioderDagligReiseTso(it.id) }
                     ?: emptyList(),
-            dagligreiseTsr =
+            dagligReiseTsr =
                 fagsaker.dagligReiseTsr?.let { oppsummerVedtaksperioderDagligReiseTsr(it.id) }
                     ?: emptyList(),
         )

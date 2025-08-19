@@ -10,6 +10,6 @@ data class VedtaksperioderOversikt(
     val tilsynBarn: List<DetaljertVedtaksperiodeTilsynBarn>,
     val læremidler: List<DetaljertVedtaksperiodeLæremidler>,
     val boutgifter: List<DetaljertVedtaksperiodeBoutgifter>,
-    val dagligreiseTso: List<DetaljertVedtaksperiodeDagligReiseTso>,
-    val dagligreiseTsr: List<DetaljertVedtaksperiodeDagligReiseTsr>,
+    val dagligReiseTso: List<DetaljertVedtaksperiodeDagligReiseTso>,
+    val dagligReiseTsr: List<DetaljertVedtaksperiodeDagligReiseTsr>,
 )
