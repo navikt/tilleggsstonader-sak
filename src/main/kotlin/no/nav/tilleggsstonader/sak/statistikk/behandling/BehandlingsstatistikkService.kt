@@ -183,7 +183,7 @@ class BehandlingsstatistikkService(
             avsender = "Nav Tilleggstønader",
             behandlingType = saksbehandling.type.name,
             sakYtelse = SakYtelseDvh.fraStønadstype(saksbehandling.stønadstype),
-            behandlingResultat = saksbehandling.resultat.name,
+            behandlingResultat = if (Hendelse.FERDIG == hendelse) saksbehandling.resultat.name else null,
             resultatBegrunnelse = utledResultatBegrunnelse(saksbehandling),
             ansvarligBeslutter = finnAnsvarligBeslutter(beslutterId, søkerHarStrengtFortroligAdresse),
             vedtakTid = if (Hendelse.VEDTATT == hendelse) hendelseTidspunkt else null,
