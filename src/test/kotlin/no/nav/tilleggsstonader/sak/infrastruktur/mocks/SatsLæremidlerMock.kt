@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
-import io.mockk.mockk
 import io.mockk.spyk
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.SatsLæremidlerService
 import org.springframework.context.annotation.Bean

@@ -19,4 +19,6 @@ enum class Toggle(
     SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK("sak.utled-endringsdato-revurdering"),
 
     TILLAT_LØPENDE_OG_MIDLERTIDIG_UTGIFT_SAMME_BEHANDLING("sak.tillat-lopende-og-midlertidig-utgift-samme-behandling"),
+
+    SKAL_VALIDERE_ÅRSAK_TIL_AVSLAG("sak.skal-validere-arsak-til-avslag"),
 }
