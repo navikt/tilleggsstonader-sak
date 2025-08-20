@@ -10,8 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
-import no.nav.tilleggsstonader.sak.behandling.dto.NyeOpplysningerMetadataDto
-import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
+import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -65,7 +64,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
 
             assertThatThrownBy {
-                service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling.fagsakId))
+                service.opprettBehandling(opprettRevurdering(fagsakId = behandling.fagsakId))
             }.hasMessage("Det finnes en behandling på fagsaken som hverken er ferdigstilt eller satt på vent")
         }
 
@@ -83,7 +82,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
             val nyBehandlingId =
-                service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling.fagsakId))
+                service.opprettBehandling(opprettRevurdering(fagsakId = behandling.fagsakId))
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
             assertThat(nyBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
@@ -104,7 +103,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
             val request =
-                opprettBehandlingDto(
+                opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(PdlClientConfig.BARN_FNR),
@@ -133,7 +132,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
             val nyBehandlingId =
-                service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling.fagsakId))
+                service.opprettBehandling(opprettRevurdering(fagsakId = behandling.fagsakId))
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
             assertThat(nyBehandling.forrigeIverksatteBehandlingId).isNull()
@@ -150,7 +149,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
             assertThatThrownBy {
                 service.opprettBehandling(
-                    opprettBehandlingDto(
+                    opprettRevurdering(
                         fagsakId = behandling.fagsakId,
                         årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
                     ).copy(nyeOpplysningerMetadata = null),
@@ -168,7 +167,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 )
 
             val opprettBehandlingDto =
-                opprettBehandlingDto(
+                opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
                 )
@@ -234,7 +233,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         @Test
         fun `skal gjenbruke barn fra forrige behandlingen`() {
             val nyBehandlingId =
-                service.opprettBehandling(opprettBehandlingDto(fagsakId = tidligereBehandling!!.fagsakId))
+                service.opprettBehandling(opprettRevurdering(fagsakId = tidligereBehandling!!.fagsakId))
 
             with(barnService.finnBarnPåBehandling(tidligereBehandling!!.id)) {
                 assertThat(this).hasSize(1)
@@ -249,7 +248,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         @Test
         fun `skal gjenbruke informasjon fra forrige behandling`() {
             val revurderingId =
-                service.opprettBehandling(opprettBehandlingDto(fagsakId = tidligereBehandling!!.fagsakId))
+                service.opprettBehandling(opprettRevurdering(fagsakId = tidligereBehandling!!.fagsakId))
 
             assertThat(vilkårperiodeRepository.findByBehandlingId(revurderingId)).hasSize(2)
             assertThat(vilkårRepository.findByBehandlingId(revurderingId)).hasSize(1)
@@ -296,7 +295,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         @Test
         fun `skal opprette behandling med nytt barn`() {
             val request =
-                opprettBehandlingDto(
+                opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(PdlClientConfig.BARN2_FNR),
@@ -313,7 +312,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         @Test
         fun `hvis man ikke sender inn noen barn skal man kun beholde barn fra forrige behandling`() {
             val request =
-                opprettBehandlingDto(
+                opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(),
@@ -329,7 +328,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         @Test
         fun `skal feile hvis man sender inn barn på årsak nye opplysninger`() {
             val request =
-                opprettBehandlingDto(
+                opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
                     valgteBarn = setOf(PdlClientConfig.BARN2_FNR),
@@ -343,7 +342,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         @Test
         fun `skal feile hvis man prøver å sende inn barn som ikke finnes på personen`() {
             val request =
-                opprettBehandlingDto(
+                opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf("ukjent ident"),
@@ -357,7 +356,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         @Test
         fun `skal feile hvis man prøver å sende inn barn som allerede finnes på behandlingen`() {
             val request =
-                opprettBehandlingDto(
+                opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(PdlClientConfig.BARN_FNR),
@@ -376,7 +375,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         @Test
         fun `må minumum velge 1 barn i tilfelle første behandling er henlagt`() {
             val request =
-                opprettBehandlingDto(
+                opprettRevurdering(
                     fagsakId = henlagtBehandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(),
@@ -392,21 +391,21 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         }
     }
 
-    private fun opprettBehandlingDto(
+    private fun opprettRevurdering(
         fagsakId: FagsakId,
         årsak: BehandlingÅrsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
         valgteBarn: Set<String> = emptySet(),
-    ) = OpprettBehandlingDto(
+    ) = OpprettRevurdering(
         fagsakId = fagsakId,
         årsak = årsak,
         valgteBarn = valgteBarn,
         kravMottatt = null,
-        nyeOpplysningerMetadata =
-            if (årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) opprettNyeOpplysningerMetadata() else null,
+        nyeOpplysningerMetadata = if (årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) opprettNyeOpplysningerMetadata() else null,
+        skalOppretteOppgave = true,
     )
 
     private fun opprettNyeOpplysningerMetadata() =
-        NyeOpplysningerMetadataDto(
+        NyeOpplysningerMetadata(
             kilde = NyeOpplysningerKilde.ETTERSENDING,
             endringer = listOf(NyeOpplysningerEndring.AKTIVITET, NyeOpplysningerEndring.MÅLGRUPPE),
             beskrivelse = "Tittei",

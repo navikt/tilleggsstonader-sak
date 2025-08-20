@@ -6,8 +6,8 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.behandling.dto.BarnTilRevurderingDto
-import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -43,33 +43,33 @@ class OpprettRevurderingBehandlingService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun opprettBehandling(request: OpprettBehandlingDto): BehandlingId {
+    fun opprettBehandling(opprettRevurdering: OpprettRevurdering): BehandlingId {
         feilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING)) {
             "Feature toggle for å kunne opprette revurdering er slått av"
         }
-        logger.info("Oppretter revurdering for fagsak=${request.fagsakId}")
+        logger.info("Oppretter revurdering for fagsak=${opprettRevurdering.fagsakId}")
 
-        if (request.årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) {
-            feilHvis(request.nyeOpplysningerMetadata == null) {
+        if (opprettRevurdering.årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) {
+            feilHvis(opprettRevurdering.nyeOpplysningerMetadata == null) {
                 "Krever metadata ved behandlingsårsak NYE_OPPLYSNINGER"
             }
         }
 
-        val fagsakId = request.fagsakId
+        val fagsakId = opprettRevurdering.fagsakId
         val behandling =
             behandlingService.opprettBehandling(
                 fagsakId = fagsakId,
-                behandlingsårsak = request.årsak,
-                kravMottatt = request.kravMottatt,
-                nyeOpplysningerMetadata = request.nyeOpplysningerMetadata?.tilDomene(),
+                behandlingsårsak = opprettRevurdering.årsak,
+                kravMottatt = opprettRevurdering.kravMottatt,
+                nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
             )
 
         val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
 
-        validerValgteBarn(request, behandlingIdForGjenbruk)
+        validerValgteBarn(opprettRevurdering, behandlingIdForGjenbruk)
 
         behandlingIdForGjenbruk?.let { gjenbrukDataRevurderingService.gjenbrukData(behandling, it) }
-        barnService.opprettBarn(request.valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) })
+        barnService.opprettBarn(opprettRevurdering.valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) })
 
         taskService.save(
             OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
@@ -86,7 +86,7 @@ class OpprettRevurderingBehandlingService(
     }
 
     private fun validerValgteBarn(
-        request: OpprettBehandlingDto,
+        request: OpprettRevurdering,
         behandlingIdForGjenbruk: BehandlingId?,
     ) {
         val stønadstype: Stønadstype by lazy { fagsakService.hentFagsak(request.fagsakId).stønadstype }
