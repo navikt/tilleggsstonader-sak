@@ -38,7 +38,7 @@ import java.time.LocalDate
 
 @Component
 class VedtakDtoMapper(
-    private val vedtaksperiodeService: VedtaksperiodeService,
+    private val vedtakService: VedtakService,
 ) {
     fun toDto(
         vedtak: Vedtak,
@@ -182,9 +182,6 @@ class VedtakDtoMapper(
 
     private fun hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId: BehandlingId?): List<Vedtaksperiode>? =
         forrigeIverksatteBehandlingId?.let {
-            vedtaksperiodeService.finnVedtaksperioderForBehandling(
-                behandlingId = it,
-                revurdererFra = null,
-            )
+            vedtakService.hentVedtaksperioder(behandlingId = it)
         }
 }
