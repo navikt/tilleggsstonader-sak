@@ -72,18 +72,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
         assertThat(behandlingRepository.findByFagsakIdAndStatus(fagsak.id, OPPRETTET)).containsOnly(behandling)
     }
 
-    @Test
-    fun nullstillRevurderFra() {
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling =
-            testoppsettService.lagre(
-                behandling(fagsak, type = BehandlingType.REVURDERING, revurderFra = LocalDate.now()),
-            )
-        behandlingRepository.nullstillRevurderFra(behandling.id)
-
-        assertThat(behandlingRepository.findByIdOrThrow(behandling.id).revurderFra).isNull()
-    }
-
     @Nested
     inner class FinnSaksbehandling {
         val fagsak =

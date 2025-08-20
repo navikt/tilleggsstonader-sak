@@ -85,10 +85,6 @@ interface BehandlingRepository :
     )
     fun finnSaksbehandling(behandlingId: BehandlingId): Saksbehandling
 
-    @Modifying
-    @Query("UPDATE behandling SET revurder_fra = null WHERE id = :behandlingId")
-    fun nullstillRevurderFra(behandlingId: BehandlingId)
-
     // language=PostgreSQL
     @Query(
         """SELECT
