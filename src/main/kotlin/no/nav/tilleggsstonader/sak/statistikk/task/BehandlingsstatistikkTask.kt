@@ -70,6 +70,20 @@ class BehandlingsstatistikkTask(
                 hendelseTidspunkt = LocalDateTime.now(),
             )
 
+        fun opprettAngretSendtTilBeslutterTask(behandlingId: BehandlingId): Task =
+            opprettTask(
+                behandlingId = behandlingId,
+                hendelse = Hendelse.ANGRET_SENDT_TIL_BESLUTTER,
+                hendelseTidspunkt = LocalDateTime.now(),
+            )
+
+        fun opprettUnderkjentBeslutterTask(behandlingId: BehandlingId): Task =
+            opprettTask(
+                behandlingId = behandlingId,
+                hendelse = Hendelse.UNDERKJENT_BESLUTTER,
+                hendelseTidspunkt = LocalDateTime.now(),
+            )
+
         fun opprettBesluttetTask(behandlingId: BehandlingId): Task =
             opprettTask(
                 behandlingId = behandlingId,

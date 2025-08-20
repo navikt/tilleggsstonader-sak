@@ -107,7 +107,7 @@ class BehandlingsstatistikkService(
         totrinnskontroll: Totrinnskontroll?,
     ): String =
         when (hendelse) {
-            Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER ->
+            Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER, Hendelse.ANGRET_SENDT_TIL_BESLUTTER, Hendelse.UNDERKJENT_BESLUTTER ->
                 gjeldendeSaksbehandler ?: error("Mangler saksbehandler for hendelse=$hendelse")
 
             Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG ->
@@ -183,7 +183,7 @@ class BehandlingsstatistikkService(
             avsender = "Nav Tilleggstønader",
             behandlingType = saksbehandling.type.name,
             sakYtelse = SakYtelseDvh.fraStønadstype(saksbehandling.stønadstype),
-            behandlingResultat = saksbehandling.resultat.name,
+            behandlingResultat = if (Hendelse.FERDIG == hendelse) saksbehandling.resultat.name else null,
             resultatBegrunnelse = utledResultatBegrunnelse(saksbehandling),
             ansvarligBeslutter = finnAnsvarligBeslutter(beslutterId, søkerHarStrengtFortroligAdresse),
             vedtakTid = if (Hendelse.VEDTATT == hendelse) hendelseTidspunkt else null,
@@ -206,7 +206,7 @@ class BehandlingsstatistikkService(
         ) = if (!beslutterId.isNullOrEmpty()) {
             maskerVerdiHvisStrengtFortrolig(
                 erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
-                verdi = beslutterId.toString(),
+                verdi = beslutterId,
             )
         } else {
             null

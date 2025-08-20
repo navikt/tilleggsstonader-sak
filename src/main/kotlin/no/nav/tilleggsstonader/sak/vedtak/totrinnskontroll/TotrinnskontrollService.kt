@@ -89,7 +89,7 @@ class TotrinnskontrollService(
         }
         oppdaterStatusPåTotrinnskontroll(TotrinnInternStatus.ANGRET, eksisterandeTotrinnskontroll)
 
-        // TODO: Vurder om denne endringen skal trigge behandlingsstatistikk til DVH (med status PÅBEGYNT)
+        taskService.save(BehandlingsstatistikkTask.opprettAngretSendtTilBeslutterTask(behandlingId))
     }
 
     /**
@@ -131,14 +131,15 @@ class TotrinnskontrollService(
             metadata = beslutteVedtak,
         )
 
-        behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, nyStatus)
         if (nyTotrinnsKontrollStatus == TotrinnInternStatus.UNDERKJENT) {
             oppdaterUtfallogÅrsakPåTotrinnskontroll(beslutteVedtak, sisteTotrinnskontroll, nyTotrinnsKontrollStatus)
-            // TODO: Vurder om vi skal sende behandlingsstatistikk her
+            taskService.save(BehandlingsstatistikkTask.opprettUnderkjentBeslutterTask(saksbehandling.id))
         } else {
             oppdaterStatusPåTotrinnskontroll(nyTotrinnsKontrollStatus, sisteTotrinnskontroll)
             taskService.save(BehandlingsstatistikkTask.opprettBesluttetTask(behandlingId = saksbehandling.id))
         }
+
+        behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, nyStatus)
 
         return sisteTotrinnskontroll.saksbehandler
     }
