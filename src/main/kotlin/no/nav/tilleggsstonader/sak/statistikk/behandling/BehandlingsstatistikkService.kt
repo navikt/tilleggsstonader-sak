@@ -107,7 +107,7 @@ class BehandlingsstatistikkService(
         totrinnskontroll: Totrinnskontroll?,
     ): String =
         when (hendelse) {
-            Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER ->
+            Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER, Hendelse.ANGRET_SENDT_TIL_BESLUTTER, Hendelse.UNDERKJENT_BESLUTTER ->
                 gjeldendeSaksbehandler ?: error("Mangler saksbehandler for hendelse=$hendelse")
 
             Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG ->
@@ -206,7 +206,7 @@ class BehandlingsstatistikkService(
         ) = if (!beslutterId.isNullOrEmpty()) {
             maskerVerdiHvisStrengtFortrolig(
                 erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
-                verdi = beslutterId.toString(),
+                verdi = beslutterId,
             )
         } else {
             null
