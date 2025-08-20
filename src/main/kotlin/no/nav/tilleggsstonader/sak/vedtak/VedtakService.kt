@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -28,6 +29,9 @@ class VedtakService(
     @JvmName("hentTypetVedtak")
     final inline fun <reified T : Vedtaksdata> hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<T>? =
         hentVedtak(behandlingId)?.withTypeOrThrow<T>()
+
+    fun hentVedtaksperioder(behandlingId: BehandlingId): List<Vedtaksperiode> =
+        hentVedtak(behandlingId)?.vedtaksperioderHvisFinnes() ?: emptyList()
 
     fun håndterSteg(
         behandling: BehandlingId,

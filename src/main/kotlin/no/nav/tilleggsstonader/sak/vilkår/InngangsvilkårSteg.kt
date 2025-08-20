@@ -8,13 +8,19 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerNyeMålgrupperOverlapperIkkeMedEksisterendeMålgrupper
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 
 @Service
 class InngangsvilkårSteg(
     private val behandlingService: BehandlingService,
+    private val vilkårperiodeService: VilkårperiodeService,
 ) : BehandlingSteg<Void?> {
-    override fun validerSteg(saksbehandling: Saksbehandling) {}
+    override fun validerSteg(saksbehandling: Saksbehandling) {
+        val vilkårperioder = vilkårperiodeService.hentVilkårperioder(saksbehandling.id)
+        validerNyeMålgrupperOverlapperIkkeMedEksisterendeMålgrupper(vilkårperioder)
+    }
 
     override fun utførSteg(
         saksbehandling: Saksbehandling,

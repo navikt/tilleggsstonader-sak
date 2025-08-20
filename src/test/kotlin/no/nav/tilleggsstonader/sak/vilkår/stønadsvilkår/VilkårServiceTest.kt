@@ -146,6 +146,7 @@ internal class VilkårServiceTest {
                             tom = null,
                             utgift = null,
                             erFremtidigUtgift = false,
+                            offentligTransport = null,
                         ),
                     )
                 },
@@ -166,6 +167,7 @@ internal class VilkårServiceTest {
                     tom = LocalDate.of(2024, 1, 31),
                     utgift = 1,
                     erFremtidigUtgift = false,
+                    offentligTransport = null,
                 ),
             )
 
@@ -200,6 +202,7 @@ internal class VilkårServiceTest {
                     tom = LocalDate.of(2024, 1, 31),
                     utgift = 100,
                     erFremtidigUtgift = true,
+                    offentligTransport = null,
                 ),
             )
 
@@ -326,6 +329,7 @@ internal class VilkårServiceTest {
                         tom = null,
                         utgift = null,
                         erFremtidigUtgift = false,
+                        offentligTransport = null,
                     ),
                 )
             },
@@ -362,6 +366,7 @@ internal class VilkårServiceTest {
                         tom = null,
                         utgift = null,
                         erFremtidigUtgift = false,
+                        offentligTransport = null,
                     ),
                 )
             },

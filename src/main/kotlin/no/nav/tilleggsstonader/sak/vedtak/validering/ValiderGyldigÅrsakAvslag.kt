@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.validering
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslagskategori
 import no.nav.tilleggsstonader.sak.vedtak.domain.formaterListe
 import no.nav.tilleggsstonader.sak.vedtak.domain.gyldigeAvslagsårsaker
@@ -20,15 +22,18 @@ import org.springframework.stereotype.Component
 class ValiderGyldigÅrsakAvslag(
     private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
+    private val unleashService: UnleashService,
 ) {
     fun validerAvslagErGyldig(
         behandlingId: BehandlingId,
         årsakerAvslag: List<ÅrsakAvslag>,
         stønadstype: Stønadstype,
     ) {
-        validerÅrsakerErGyldigeForStønadstype(årsakerAvslag, stønadstype)
-        validerAvslagSomGjelderVilkårperioder(behandlingId, årsakerAvslag, stønadstype)
-        validerAvslagSomGjelderStønadsvilkår(behandlingId, årsakerAvslag, stønadstype)
+        if (unleashService.isEnabled(Toggle.SKAL_VALIDERE_ÅRSAK_TIL_AVSLAG)) {
+            validerÅrsakerErGyldigeForStønadstype(årsakerAvslag, stønadstype)
+            validerAvslagSomGjelderVilkårperioder(behandlingId, årsakerAvslag, stønadstype)
+            validerAvslagSomGjelderStønadsvilkår(behandlingId, årsakerAvslag, stønadstype)
+        }
     }
 
     private fun validerÅrsakerErGyldigeForStønadstype(

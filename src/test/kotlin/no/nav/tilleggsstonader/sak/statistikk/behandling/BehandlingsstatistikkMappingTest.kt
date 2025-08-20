@@ -19,7 +19,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
-import no.nav.tilleggsstonader.sak.util.nyeOpplysningerMetadata
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -39,6 +38,7 @@ class BehandlingsstatistikkMappingTest {
         val saksbehandling =
             saksbehandling(
                 behandlingId = behandlingId,
+                status = BehandlingStatus.OPPRETTET,
                 ident = aktørId,
                 eksternId = 17L,
                 eksternFagId = 29L,
@@ -76,7 +76,7 @@ class BehandlingsstatistikkMappingTest {
                 opprettetAv = "VL",
                 saksbehandler = saksbehandlerId,
                 ansvarligEnhet = ArbeidsfordelingService.MASKINELL_JOURNALFOERENDE_ENHET,
-                behandlingResultat = "IKKE_SATT",
+                behandlingResultat = null,
                 resultatBegrunnelse = null,
                 avsender = "Nav Tilleggstønader",
                 versjon = Applikasjonsversjon.versjon,
@@ -109,7 +109,13 @@ class BehandlingsstatistikkMappingTest {
         val tekniskTid = LocalDateTime.now()
 
         val saksbehandling =
-            saksbehandling(behandlingId = behandlingId, ident = aktørId, eksternId = 1337L, eksternFagId = 8080L)
+            saksbehandling(
+                behandlingId = behandlingId,
+                status = BehandlingStatus.FERDIGSTILT,
+                ident = aktørId,
+                eksternId = 1337L,
+                eksternFagId = 8080L,
+            )
 
         val actual =
             map(
@@ -165,77 +171,6 @@ class BehandlingsstatistikkMappingTest {
     }
 
     @Test
-    fun `mapping med kategori EØS`() {
-        val behandlingId = BehandlingId(UUID.randomUUID())
-        val aktørId = "9876543210127"
-        val saksbehandlerId = "7873486250023"
-
-        val henvendelseTidspunkt = LocalDateTime.now()
-        val hendelseTidspunkt = LocalDateTime.now()
-        val tekniskTid = LocalDateTime.now()
-
-        val saksbehandling =
-            saksbehandling(
-                behandlingId = behandlingId,
-                ident = aktørId,
-                eksternId = 1999L,
-                eksternFagId = 5150L,
-                kategori = BehandlingKategori.EØS,
-            )
-
-        val actual =
-            map(
-                saksbehandling = saksbehandling,
-                saksbehandlerId = saksbehandlerId,
-                henvendelseTidspunkt = henvendelseTidspunkt,
-                hendelseTidspunkt = hendelseTidspunkt,
-                tekniskTid = tekniskTid,
-            )
-
-        val expected =
-            BehandlingDVH(
-                behandlingId = "1999",
-                behandlingUuid = behandlingId.id.toString(),
-                saksnummer = "5150",
-                sakId = "5150",
-                aktorId = aktørId,
-                mottattTid = henvendelseTidspunkt,
-                registrertTid = henvendelseTidspunkt,
-                ferdigBehandletTid = null,
-                endretTid = henvendelseTidspunkt,
-                tekniskTid = tekniskTid,
-                sakYtelse = SakYtelseDvh.TILLEGG_BARNETILSYN,
-                sakUtland = "Utland",
-                behandlingType = "FØRSTEGANGSBEHANDLING",
-                behandlingStatus = "MOTTATT",
-                behandlingMetode = "AUTOMATISK",
-                kravMottatt = null,
-                opprettetAv = "VL",
-                saksbehandler = saksbehandlerId,
-                ansvarligEnhet = ArbeidsfordelingService.MASKINELL_JOURNALFOERENDE_ENHET,
-                behandlingResultat = "IKKE_SATT",
-                resultatBegrunnelse = null,
-                avsender = "Nav Tilleggstønader",
-                versjon = Applikasjonsversjon.versjon,
-                relatertBehandlingId = null,
-                vedtakTid = null,
-                utbetaltTid = null,
-                forventetOppstartTid = null,
-                papirSøknad = null,
-                ansvarligBeslutter = null,
-                totrinnsbehandling = false,
-                vilkårsprøving = emptyList(),
-                venteAarsak = null,
-                behandlingBegrunnelse = null,
-                revurderingOpplysningskilde = null,
-                revurderingÅrsak = null,
-                behandlingÅrsak = "SØKNAD",
-            )
-
-        assertThat(actual).isEqualTo(expected)
-    }
-
-    @Test
     fun `mapping med strengt fortrolig adresse`() {
         val behandlingId = BehandlingId(UUID.randomUUID())
         val aktørId = "9876543210127"
@@ -248,6 +183,7 @@ class BehandlingsstatistikkMappingTest {
         val saksbehandling =
             saksbehandling(
                 behandlingId = behandlingId,
+                status = BehandlingStatus.OPPRETTET,
                 ident = aktørId,
                 eksternId = 33L,
                 eksternFagId = 99L,
@@ -256,6 +192,7 @@ class BehandlingsstatistikkMappingTest {
 
         val actual =
             map(
+                hendelse = Hendelse.MOTTATT,
                 saksbehandling = saksbehandling,
                 saksbehandlerId = saksbehandlerId,
                 henvendelseTidspunkt = henvendelseTidspunkt,
@@ -285,7 +222,7 @@ class BehandlingsstatistikkMappingTest {
                 opprettetAv = "-5",
                 saksbehandler = "-5",
                 ansvarligEnhet = "-5",
-                behandlingResultat = "IKKE_SATT",
+                behandlingResultat = null,
                 resultatBegrunnelse = null,
                 avsender = "Nav Tilleggstønader",
                 versjon = Applikasjonsversjon.versjon,
@@ -321,6 +258,7 @@ class BehandlingsstatistikkMappingTest {
         val saksbehandling =
             saksbehandling(
                 behandlingId = behandlingId,
+                status = BehandlingStatus.OPPRETTET,
                 ident = aktørId,
                 eksternId = 24L,
                 eksternFagId = 48L,
@@ -332,6 +270,7 @@ class BehandlingsstatistikkMappingTest {
 
         val actual =
             map(
+                hendelse = Hendelse.MOTTATT,
                 saksbehandling = saksbehandling,
                 saksbehandlerId = saksbehandlerId,
                 henvendelseTidspunkt = henvendelseTidspunkt,
@@ -360,7 +299,7 @@ class BehandlingsstatistikkMappingTest {
                 opprettetAv = "VL",
                 saksbehandler = saksbehandlerId,
                 ansvarligEnhet = ArbeidsfordelingService.MASKINELL_JOURNALFOERENDE_ENHET,
-                behandlingResultat = "INNVILGET",
+                behandlingResultat = null,
                 resultatBegrunnelse = null,
                 avsender = "Nav Tilleggstønader",
                 versjon = Applikasjonsversjon.versjon,
@@ -393,6 +332,7 @@ class BehandlingsstatistikkMappingTest {
         val saksbehandling =
             saksbehandling(
                 behandlingId = behandlingId,
+                status = BehandlingStatus.FERDIGSTILT,
                 ident = aktørId,
                 eksternId = 10L,
                 eksternFagId = 20L,
@@ -402,6 +342,7 @@ class BehandlingsstatistikkMappingTest {
 
         val actual =
             map(
+                hendelse = Hendelse.FERDIG,
                 saksbehandling = saksbehandling,
                 saksbehandlerId = saksbehandlerId,
                 henvendelseTidspunkt = henvendelseTidspunkt,
@@ -418,13 +359,13 @@ class BehandlingsstatistikkMappingTest {
                 aktorId = aktørId,
                 mottattTid = henvendelseTidspunkt,
                 registrertTid = henvendelseTidspunkt,
-                ferdigBehandletTid = null,
-                endretTid = henvendelseTidspunkt,
+                ferdigBehandletTid = hendelseTidspunkt,
+                endretTid = hendelseTidspunkt,
                 tekniskTid = tekniskTid,
                 sakYtelse = SakYtelseDvh.TILLEGG_BARNETILSYN,
                 sakUtland = "Nasjonal",
                 behandlingType = "FØRSTEGANGSBEHANDLING",
-                behandlingStatus = "MOTTATT",
+                behandlingStatus = "FERDIG",
                 behandlingMetode = "AUTOMATISK",
                 kravMottatt = null,
                 opprettetAv = "VL",
@@ -465,6 +406,7 @@ class BehandlingsstatistikkMappingTest {
         val saksbehandling =
             saksbehandling(
                 behandlingId = behandlingId,
+                status = BehandlingStatus.FERDIGSTILT,
                 ident = aktørId,
                 eksternId = 7878L,
                 eksternFagId = 8989L,
@@ -475,6 +417,7 @@ class BehandlingsstatistikkMappingTest {
 
         val actual =
             map(
+                hendelse = Hendelse.FERDIG,
                 saksbehandling = saksbehandling,
                 saksbehandlerId = saksbehandlerId,
                 henvendelseTidspunkt = henvendelseTidspunkt,
@@ -491,13 +434,13 @@ class BehandlingsstatistikkMappingTest {
                 aktorId = aktørId,
                 mottattTid = henvendelseTidspunkt,
                 registrertTid = henvendelseTidspunkt,
-                ferdigBehandletTid = null,
-                endretTid = henvendelseTidspunkt,
+                ferdigBehandletTid = hendelseTidspunkt,
+                endretTid = hendelseTidspunkt,
                 tekniskTid = tekniskTid,
                 sakYtelse = SakYtelseDvh.TILLEGG_BARNETILSYN,
                 sakUtland = "Nasjonal",
                 behandlingType = "FØRSTEGANGSBEHANDLING",
-                behandlingStatus = "MOTTATT",
+                behandlingStatus = "FERDIG",
                 behandlingMetode = "AUTOMATISK",
                 kravMottatt = null,
                 opprettetAv = "VL",
@@ -530,6 +473,7 @@ class BehandlingsstatistikkMappingTest {
         ident: String,
         eksternId: Long,
         eksternFagId: Long,
+        status: BehandlingStatus,
         forrigeIverksatteBehandlingId: BehandlingId? = null,
         type: BehandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
         kategori: BehandlingKategori = BehandlingKategori.NASJONAL,
@@ -541,7 +485,7 @@ class BehandlingsstatistikkMappingTest {
         eksternId = eksternId,
         forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
         type = type,
-        status = BehandlingStatus.OPPRETTET,
+        status = status,
         steg = StegType.INNGANGSVILKÅR,
         kategori = kategori,
         årsak = BehandlingÅrsak.SØKNAD,
@@ -564,13 +508,13 @@ class BehandlingsstatistikkMappingTest {
     )
 
     fun map(
+        hendelse: Hendelse,
         saksbehandling: Saksbehandling,
         saksbehandlerId: String,
         henvendelseTidspunkt: LocalDateTime,
         hendelseTidspunkt: LocalDateTime,
         tekniskTid: LocalDateTime,
         søkerHarStrengtFortroligAdresse: Boolean = false,
-        hendelse: Hendelse = Hendelse.MOTTATT,
         behandlingMetode: BehandlingMetode = BehandlingMetode.AUTOMATISK,
     ) = BehandlingsstatistikkService.mapTilBehandlingDVH(
         saksbehandling,

@@ -74,7 +74,7 @@ class OppgaveService(
 
     fun hentOppgaverForPerson(personIdent: String): FinnOppgaveresultatMedMetadata {
         val aktørId = personService.hentAktørId(personIdent)
-        val oppgaveRequest = FinnOppgaveRequest(aktørId = aktørId, tema = Tema.TSO)
+        val oppgaveRequest = FinnOppgaveRequest(aktørId = aktørId, tema = listOf(Tema.TSO, Tema.TSR))
 
         return finnOppgaver(oppgaveRequest)
     }

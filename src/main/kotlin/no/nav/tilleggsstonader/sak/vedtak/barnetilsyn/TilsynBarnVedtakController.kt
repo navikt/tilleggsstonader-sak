@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
@@ -42,7 +41,6 @@ class TilsynBarnVedtakController(
     private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     private val vedtakDtoMapper: VedtakDtoMapper,
-    private val vedtaksperiodeService: VedtaksperiodeService,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
@@ -134,10 +132,7 @@ class TilsynBarnVedtakController(
         val behandling = behandlingService.hentBehandling(behandlingId)
         val forrigeVedtaksperioder =
             behandling.forrigeIverksatteBehandlingId?.let {
-                vedtaksperiodeService.finnVedtaksperioderForBehandling(
-                    behandlingId = it,
-                    revurdererFra = null,
-                )
+                vedtakService.hentVedtaksperioder(it)
             }
 
         return foreslåVedtaksperiodeService.foreslåPerioder(behandlingId).tilLagretVedtaksperiodeDto(

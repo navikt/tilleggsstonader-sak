@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -14,7 +15,6 @@ import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -35,7 +36,6 @@ import java.time.LocalDate
 class TilsynBarnBeregnYtelseSteg(
     private val beregningService: TilsynBarnBeregningService,
     private val opphørValideringService: OpphørValideringService,
-    private val vedtaksperiodeService: VedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     unleashService: UnleashService,
     vedtakRepository: VedtakRepository,
@@ -103,7 +103,7 @@ class TilsynBarnBeregnYtelseSteg(
 
         opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
 
-        val vedtaksperioder = vedtaksperiodeService.finnNyeVedtaksperioderForOpphør(saksbehandling, opphørsdato)
+        val vedtaksperioder = finnNyeVedtaksperioderForOpphør(saksbehandling, opphørsdato)
 
         val beregningsresultat =
             beregningService.beregn(
@@ -134,6 +134,24 @@ class TilsynBarnBeregnYtelseSteg(
         )
 
         lagreAndeler(saksbehandling, beregningsresultat)
+    }
+
+    private fun finnNyeVedtaksperioderForOpphør(
+        behandling: Saksbehandling,
+        opphørsdato: LocalDate,
+    ): List<Vedtaksperiode> {
+        feilHvis(behandling.forrigeIverksatteBehandlingId == null) {
+            "Kan ikke finne nye vedtaksperioder for opphør fordi behandlingen er en førstegangsbehandling"
+        }
+
+        val forrigeVedtaksperioder = vedtakRepository.findByIdOrNull(behandling.forrigeIverksatteBehandlingId)?.vedtaksperioderHvisFinnes()
+
+        feilHvis(forrigeVedtaksperioder == null) {
+            "Kan ikke opphøre fordi data fra forrige vedtak mangler"
+        }
+
+        // .minusDays(1) fordi dagen før opphørsdato blir siste dag i vedtaksperioden
+        return forrigeVedtaksperioder.avkortFraOgMed(opphørsdato.minusDays(1))
     }
 
     private fun lagreAvslag(

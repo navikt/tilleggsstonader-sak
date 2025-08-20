@@ -32,6 +32,7 @@ class LæremidlerBeregningService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val vedtakRepository: VedtakRepository,
+    private val satsLæremidlerService: SatsLæremidlerService,
 ) {
     /**
      * Kjente begrensninger i beregningen:
@@ -255,14 +256,14 @@ class LæremidlerBeregningService(
             }
 
     private fun lagBeregningsGrunnlag(periode: UtbetalingPeriode): Beregningsgrunnlag {
-        val sats = finnSatsForPeriode(periode)
+        val sats = satsLæremidlerService.finnSatsForPeriode(periode)
 
         return Beregningsgrunnlag(
             fom = periode.fom,
             tom = periode.tom,
             studienivå = periode.studienivå,
             studieprosent = periode.prosent,
-            sats = finnSatsForStudienivå(sats, periode.studienivå),
+            sats = satsLæremidlerService.finnSatsForStudienivå(sats, periode.studienivå),
             satsBekreftet = sats.bekreftet,
             utbetalingsdato = periode.utbetalingsdato,
             målgruppe = periode.målgruppe,

@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -77,6 +78,7 @@ object OppdaterVilkår {
             vilkårType in vilkårMedUtgift &&
                 oppdatering.erFremtidigUtgift != true &&
                 resultat == Vilkårsresultat.OPPFYLT &&
+                oppdatering.offentligTransport == null &&
                 oppdatering.utgift == null,
         ) {
             "Mangler utgift på vilkår"
@@ -123,6 +125,7 @@ object OppdaterVilkår {
             utgift = oppdatering.utgift,
             erFremtidigUtgift = oppdatering.erFremtidigUtgift == true,
             gitVersjon = Applikasjonsversjon.versjon,
+            offentligTransport = oppdatering.offentligTransport,
         )
     }
 
@@ -155,6 +158,10 @@ object OppdaterVilkår {
                     it
                 }
 
+                VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> {
+                    it
+                }
+
                 else -> error("Har ikke tatt stilling til type dato for ${vilkår.type}")
             }
         }
@@ -174,6 +181,10 @@ object OppdaterVilkår {
                 }
 
                 VilkårType.UTGIFTER_OVERNATTING -> {
+                    it
+                }
+
+                VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> {
                     it
                 }
 
@@ -254,6 +265,7 @@ object OppdaterVilkår {
         metadata: HovedregelMetadata,
         behandlingId: BehandlingId,
         barnId: BarnId? = null,
+        offentligTransport: OffentligTransport? = null,
     ): Vilkår {
         val delvilkårsett = vilkårsregel.initiereDelvilkår(metadata, barnId = barnId)
         return Vilkår(
@@ -265,6 +277,7 @@ object OppdaterVilkår {
             resultat = utledResultat(vilkårsregel, delvilkårsett.map { it.tilDto() }).vilkår,
             status = VilkårStatus.NY,
             opphavsvilkår = null,
+            offentligTransport = offentligTransport,
             gitVersjon = Applikasjonsversjon.versjon,
         )
     }

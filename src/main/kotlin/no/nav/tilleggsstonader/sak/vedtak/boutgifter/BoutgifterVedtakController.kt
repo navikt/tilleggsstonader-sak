@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperiodeBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
@@ -47,7 +46,6 @@ class BoutgifterVedtakController(
     private val steg: BoutgifterBeregnYtelseSteg,
     private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
-    private val vedtaksperiodeService: VedtaksperiodeService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
 ) {
@@ -141,10 +139,7 @@ class BoutgifterVedtakController(
         val behandling = behandlingService.hentBehandling(behandlingId)
         val forrigeVedtaksperioder =
             behandling.forrigeIverksatteBehandlingId?.let {
-                vedtaksperiodeService.finnVedtaksperioderForBehandling(
-                    behandlingId = it,
-                    revurdererFra = null,
-                )
+                vedtakService.hentVedtaksperioder(it)
             }
 
         return foreslåVedtaksperiodeService.foreslåPerioder(behandlingId).tilLagretVedtaksperiodeDto(

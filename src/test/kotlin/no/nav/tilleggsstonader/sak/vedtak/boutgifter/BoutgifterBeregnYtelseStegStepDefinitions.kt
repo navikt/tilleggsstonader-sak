@@ -118,6 +118,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepositoryFake,
+            unleashService = unleashService,
         )
     val opphørValideringService =
         OpphørValideringService(
@@ -199,6 +200,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 utgift = parseInt(BoutgifterDomenenøkkel.UTGIFT, rad),
                 erFremtidigUtgift = false,
+                offentligTransport = null,
             )
         }
 

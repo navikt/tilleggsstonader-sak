@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 /**
@@ -53,12 +54,15 @@ val satser: List<SatsLæremidler> =
         },
     ) + bekreftedeSatser
 
-fun finnSatsForPeriode(periode: Periode<LocalDate>): SatsLæremidler =
-    satser.find {
-        it.inneholder(periode)
-    } ?: error("Finner ikke satser for $periode")
+@Component
+class SatsLæremidlerService {
+    fun finnSatsForPeriode(periode: Periode<LocalDate>): SatsLæremidler =
+        satser.find {
+            it.inneholder(periode)
+        } ?: error("Finner ikke satser for $periode")
 
-fun finnSatsForStudienivå(
-    sats: SatsLæremidler,
-    studienivå: Studienivå,
-): Int = sats.beløp[studienivå] ?: error("Finner ikke studienivå=$studienivå for sats=$sats")
+    fun finnSatsForStudienivå(
+        sats: SatsLæremidler,
+        studienivå: Studienivå,
+    ): Int = sats.beløp[studienivå] ?: error("Finner ikke studienivå=$studienivå for sats=$sats")
+}

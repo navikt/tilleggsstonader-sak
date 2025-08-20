@@ -154,7 +154,7 @@ Egenskap: Beregning av faste utgifter
         | 15.01.2025 | 14.02.2025 | 4000         | 4953      | 15.01.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
         | 15.02.2025 | 20.02.2025 | 4000         | 4953      | 15.02.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
 
-    Scenario: Kan ikke ha midlertidige utgifter og faste utgifter i samme behandling
+    Scenario: Kan ikke ha midlertidige utgifter og faste utgifter i samme utbetalingsperiode
       Gitt følgende boutgifter av type LØPENDE_UTGIFTER_EN_BOLIG for behandling=1
         | Fom        | Tom        | Utgift |
         | 01.01.2025 | 31.03.2025 | 3000   |
@@ -167,7 +167,27 @@ Egenskap: Beregning av faste utgifter
         | Fom        | Tom        | Aktivitet | Målgruppe           |
         | 01.01.2025 | 31.01.2025 | UTDANNING | NEDSATT_ARBEIDSEVNE |
 
-      Så forvent følgende feilmelding: Foreløpig støtter vi ikke løpende og midlertidige utgifter i samme behandling
+      Så forvent følgende feilmelding: Det er foreløpig ikke mulig å legge både løpende utgifter og utgifter til overnatting i samme utbetalingsperiode.
+
+    Scenario: Kan ha midlertidige utgifter og faste utgifter i samme behandling hvis forskjellige utbetalingsperioder
+      Gitt følgende boutgifter av type LØPENDE_UTGIFTER_EN_BOLIG for behandling=1
+        | Fom        | Tom        | Utgift |
+        | 01.01.2025 | 31.03.2025 | 3000   |
+
+      Og følgende boutgifter av type UTGIFTER_OVERNATTING for behandling=1
+        | Fom        | Tom        | Utgift |
+        | 01.04.2025 | 03.04.2025 | 1000   |
+
+      Når vi innvilger boutgifter for behandling=1 med følgende vedtaksperioder
+        | Fom        | Tom        | Aktivitet | Målgruppe           |
+        | 01.01.2025 | 03.04.2025 | UTDANNING | NEDSATT_ARBEIDSEVNE |
+
+      Så kan vi forvente følgende beregningsresultat for behandling=1
+        | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet |
+        | 01.01.2025 | 31.01.2025 | 3000         | 4953      | 01.01.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
+        | 01.02.2025 | 28.02.2025 | 3000         | 4953      | 01.02.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
+        | 01.03.2025 | 31.03.2025 | 3000         | 4953      | 01.03.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
+        | 01.04.2025 | 30.04.2025 | 1000         | 4953      | 02.04.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING |
 
     Scenario: Skal få dekket for faktiske utgifter
 
@@ -177,8 +197,8 @@ Egenskap: Beregning av faste utgifter
 
       Når vi innvilger boutgifter for behandling=1 med følgende vedtaksperioder
         | Fom        | Tom        | Aktivitet | Målgruppe           |
-        | 01.01.2025 | 31.01.2025 | UTDANNING    | NEDSATT_ARBEIDSEVNE |
+        | 01.01.2025 | 31.01.2025 | UTDANNING | NEDSATT_ARBEIDSEVNE |
 
       Så kan vi forvente følgende beregningsresultat for behandling=1
         | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Målgruppe           | Aktivitet | Høyere utgifter |
-        | 01.01.2025 | 31.01.2025 | 20000        | 4953      | 01.01.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING    | Ja              |
+        | 01.01.2025 | 31.01.2025 | 20000        | 4953      | 01.01.2025      | NEDSATT_ARBEIDSEVNE | UTDANNING | Ja              |

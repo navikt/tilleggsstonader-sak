@@ -18,8 +18,8 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class VedtakDtoMapperTest {
-    val vedtaksperiodeService: VedtaksperiodeService = mockk()
-    val vedtakDtoMapper = VedtakDtoMapper(vedtaksperiodeService)
+    val vedtakService: VedtakService = mockk()
+    val vedtakDtoMapper = VedtakDtoMapper(vedtakService)
 
     @Nested
     inner class TilsynBarn {
@@ -42,7 +42,7 @@ class VedtakDtoMapperTest {
 
             val vedtak = innvilgetVedtak(vedtaksperioder = listOf(vedtaksperiode))
 
-            every { vedtaksperiodeService.finnVedtaksperioderForBehandling(tidligereInnvilgetVedtak.behandlingId, any()) } returns
+            every { vedtakService.hentVedtaksperioder(tidligereInnvilgetVedtak.behandlingId) } returns
                 tidligereInnvilgetVedtak.data.vedtaksperioder
 
             val dto =

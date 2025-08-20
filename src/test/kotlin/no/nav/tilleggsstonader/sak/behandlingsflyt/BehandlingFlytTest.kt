@@ -320,6 +320,7 @@ class BehandlingFlytTest : IntegrationTest() {
                 tom = LocalDate.of(2024, 1, 31),
                 utgift = 1000,
                 erFremtidigUtgift = false,
+                offentligTransport = null,
             ),
         )
         stegService.håndterSteg(behandlingId, StegType.VILKÅR)
@@ -346,7 +347,10 @@ class BehandlingFlytTest : IntegrationTest() {
         kommentarTilBeslutter: String? = null,
     ) {
         kjørTasks()
-        totrinnskontrollController.sendTilBeslutter(behandlingId, SendTilBeslutterRequest(kommentarTilBeslutter = kommentarTilBeslutter))
+        totrinnskontrollController.sendTilBeslutter(
+            behandlingId,
+            SendTilBeslutterRequest(kommentarTilBeslutter = kommentarTilBeslutter),
+        )
         kjørTasks()
     }
 

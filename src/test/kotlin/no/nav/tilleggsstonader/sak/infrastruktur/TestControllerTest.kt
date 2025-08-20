@@ -96,6 +96,21 @@ class TestControllerTest : IntegrationTest() {
         assertInternalServerError(response as InternalServerError)
     }
 
+    @Test
+    fun `endepunkt som ikke eksisterer skal kaste 404`() {
+        val response = catchException { restTemplate.exchange<TestObject>(localhost("api/eksistererIkke"), HttpMethod.GET) }
+        assertThat(response).isInstanceOf(HttpClientErrorException.NotFound::class.java)
+
+        response as HttpClientErrorException.NotFound
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+        assertThat(response.responseHeaders?.contentType).isEqualTo(APPLICATION_PROBLEM_JSON)
+        assertThat(response.responseBodyAsString).isEqualTo(
+            """
+            {"type":"about:blank","title":"Not Found","status":404,"detail":"No static resource api/eksistererIkke.","instance":"/api/eksistererIkke"}
+            """.trimIndent(),
+        )
+    }
+
     @Nested
     inner class PrimtiveFelter {
         val headers =

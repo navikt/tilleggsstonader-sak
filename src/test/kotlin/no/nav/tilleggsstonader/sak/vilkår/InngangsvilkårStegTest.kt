@@ -11,6 +11,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -18,16 +20,19 @@ import org.junit.jupiter.api.Test
 
 class InngangsvilkårStegTest {
     val behandlingService = mockk<BehandlingService>()
+    val vilkårperiodeService = mockk<VilkårperiodeService>()
 
     val steg =
         InngangsvilkårSteg(
             behandlingService = behandlingService,
+            vilkårperiodeService = vilkårperiodeService,
         )
 
     @BeforeEach
     fun setUp() {
         every { behandlingService.oppdaterStatusPåBehandling(any(), any()) } returns behandling()
         justRun { behandlingService.markerBehandlingSomPåbegynt(any(), any(), any()) }
+        every { vilkårperiodeService.hentVilkårperioder(any()) } returns Vilkårperioder(emptyList(), emptyList())
     }
 
     @Nested
