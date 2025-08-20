@@ -106,7 +106,7 @@ data class Vilkår(
     }
 
     private fun validerPåkrevdBeløpHvisOppfylt() {
-        if (resultat == Vilkårsresultat.OPPFYLT && !erFremtidigUtgift) {
+        if (resultat == Vilkårsresultat.OPPFYLT && !erFremtidigUtgift && offentligTransport == null) {
             require(utgift != null) { "Utgift er påkrevd når resultat er oppfylt" }
         }
     }

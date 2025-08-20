@@ -78,6 +78,7 @@ object OppdaterVilkår {
             vilkårType in vilkårMedUtgift &&
                 oppdatering.erFremtidigUtgift != true &&
                 resultat == Vilkårsresultat.OPPFYLT &&
+                oppdatering.offentligTransport == null &&
                 oppdatering.utgift == null,
         ) {
             "Mangler utgift på vilkår"

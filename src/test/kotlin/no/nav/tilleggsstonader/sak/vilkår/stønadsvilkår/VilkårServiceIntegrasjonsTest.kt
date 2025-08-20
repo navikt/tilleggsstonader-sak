@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.VilkårTestUtils.opprettVilkårsvurderinger
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -280,6 +281,41 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             assertThat(vilkårFraDb.delvilkårsett.map { it.hovedregel })
                 .containsExactlyInAnyOrderElementsOf(opprettOppfyltDelvilkår.delvilkårsett.map { it.hovedregel() })
             assertThat(vilkårFraDb.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
+        }
+
+        @Test
+        fun `skal kunne oppdatere vilkår med offentlig transport uten utgift`() {
+            val gitVersjon = UUID.randomUUID().toString()
+            val vilkår = vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår)
+            jdbcTemplate.update("UPDATE vilkar SET git_versjon=:versjon", mapOf("versjon" to gitVersjon))
+            vilkårService.oppdaterVilkår(
+                SvarPåVilkårDto(
+                    id = vilkår.id,
+                    behandlingId = behandling.id,
+                    delvilkårsett = vilkår.delvilkårsett.map { it.tilDto() },
+                    fom = LocalDate.of(2025, 1, 1),
+                    tom = LocalDate.of(2025, 1, 31),
+                    utgift = null,
+                    erFremtidigUtgift = false,
+                    offentligTransport =
+                        OffentligTransport(
+                            reisedagerPerUke = 3,
+                            prisEnkelbillett = 44,
+                            prisTrettidagersbillett = 750,
+                        ),
+                ),
+            )
+
+            val vilkårFraDb = vilkårRepository.findByBehandlingId(behandling.id).single()
+            assertThat(vilkårFraDb.utgift).isNull()
+            assertThat(vilkårFraDb.offentligTransport).isEqualTo(
+                OffentligTransport(
+                    reisedagerPerUke = 3,
+                    prisEnkelbillett = 44,
+                    prisTrettidagersbillett = 750,
+                ),
+            )
+            assertThat(vilkårFraDb.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
         }
     }
 
