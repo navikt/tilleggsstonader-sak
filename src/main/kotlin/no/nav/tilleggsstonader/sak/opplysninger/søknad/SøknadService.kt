@@ -2,15 +2,16 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad
 
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadskjemaDagligreise
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.SøknadskjemaBoutgifterMapper
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.SøknadskjemaDagligReiseMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknad
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
@@ -31,6 +32,7 @@ class SøknadService(
     private val søknadBoutgifterRepository: SøknadBoutgifterRepository,
     private val søknadLæremidlerRepository: SøknadLæremidlerRepository,
     private val søknadskjemaBoutgifterMapper: SøknadskjemaBoutgifterMapper,
+    private val søknadsskjemaDagligReiseMapper: SøknadskjemaDagligReiseMapper,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -66,9 +68,8 @@ class SøknadService(
         journalpost: Journalpost,
         skjema: Søknadsskjema<out Skjema>,
     ): Søknad<*> {
-        val søknadsskjema = skjema.skjema
         val søknad =
-            when (søknadsskjema) {
+            when (val søknadsskjema = skjema.skjema) {
                 is SøknadsskjemaBarnetilsyn ->
                     SøknadsskjemaBarnetilsynMapper.map(
                         skjema.mottattTidspunkt,
@@ -93,7 +94,13 @@ class SøknadService(
                         søknadsskjema,
                     )
 
-                is SøknadskjemaDagligreise -> TODO()
+                is SøknadsskjemaDagligReiseFyllUtSendInn ->
+                    søknadsskjemaDagligReiseMapper.map(
+                        skjema.mottattTidspunkt,
+                        skjema.språk,
+                        journalpost,
+                        søknadsskjema,
+                    )
             }
         val lagretSøknad =
             when (søknad) {
