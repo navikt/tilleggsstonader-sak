@@ -71,16 +71,18 @@ class OpprettRevurderingBehandlingService(
         behandlingIdForGjenbruk?.let { gjenbrukDataRevurderingService.gjenbrukData(behandling, it) }
         barnService.opprettBarn(opprettRevurdering.valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) })
 
-        taskService.save(
-            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
-                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                    behandlingId = behandling.id,
-                    saksbehandler = SikkerhetContext.hentSaksbehandler(),
-                    beskrivelse = "Skal behandles i TS-Sak",
-                    hendelseTidspunkt = behandling.kravMottatt?.atStartOfDay() ?: LocalDateTime.now(),
+        if (opprettRevurdering.skalOppretteOppgave) {
+            taskService.save(
+                OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                    OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                        behandlingId = behandling.id,
+                        saksbehandler = SikkerhetContext.hentSaksbehandler(),
+                        beskrivelse = "Skal behandles i TS-Sak",
+                        hendelseTidspunkt = behandling.kravMottatt?.atStartOfDay() ?: LocalDateTime.now(),
+                    ),
                 ),
-            ),
-        )
+            )
+        }
 
         return behandling.id
     }

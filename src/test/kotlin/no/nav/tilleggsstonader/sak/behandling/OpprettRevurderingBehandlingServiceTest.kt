@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -11,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
+import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -33,6 +35,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
 class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
+    @Autowired
+    private lateinit var taskService: TaskService
+
     @Autowired
     lateinit var service: OpprettRevurderingBehandlingService
 
@@ -102,13 +107,13 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
             vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
-            val request =
+            val opprettRevurdering =
                 opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(PdlClientConfig.BARN_FNR),
                 )
-            val nyBehandlingId = service.opprettBehandling(request)
+            val nyBehandlingId = service.opprettBehandling(opprettRevurdering)
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
             assertThat(nyBehandling.forrigeIverksatteBehandlingId).isNull()
@@ -294,13 +299,13 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
         @Test
         fun `skal opprette behandling med nytt barn`() {
-            val request =
+            val opprettRevurdering =
                 opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(PdlClientConfig.BARN2_FNR),
                 )
-            val behandlingIdRevurdering = service.opprettBehandling(request)
+            val behandlingIdRevurdering = service.opprettBehandling(opprettRevurdering)
 
             with(barnService.finnBarnPåBehandling(behandlingIdRevurdering)) {
                 assertThat(this).hasSize(2)
@@ -311,13 +316,13 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
         @Test
         fun `hvis man ikke sender inn noen barn skal man kun beholde barn fra forrige behandling`() {
-            val request =
+            val opprettRevurdering =
                 opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(),
                 )
-            val behandlingIdRevurdering = service.opprettBehandling(request)
+            val behandlingIdRevurdering = service.opprettBehandling(opprettRevurdering)
 
             with(barnService.finnBarnPåBehandling(behandlingIdRevurdering)) {
                 assertThat(this).hasSize(1)
@@ -327,7 +332,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
         @Test
         fun `skal feile hvis man sender inn barn på årsak nye opplysninger`() {
-            val request =
+            val opprettRevurdering =
                 opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
@@ -335,13 +340,13 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 )
 
             assertThatThrownBy {
-                service.opprettBehandling(request)
+                service.opprettBehandling(opprettRevurdering)
             }.hasMessage("Kan ikke sende med barn på annet enn årsak Søknad")
         }
 
         @Test
         fun `skal feile hvis man prøver å sende inn barn som ikke finnes på personen`() {
-            val request =
+            val opprettRevurdering =
                 opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
@@ -349,13 +354,13 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 )
 
             assertThatThrownBy {
-                service.opprettBehandling(request)
+                service.opprettBehandling(opprettRevurdering)
             }.hasMessage("Kan ikke velge barn som ikke er valgbare.")
         }
 
         @Test
         fun `skal feile hvis man prøver å sende inn barn som allerede finnes på behandlingen`() {
-            val request =
+            val opprettRevurdering =
                 opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
@@ -363,7 +368,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 )
 
             assertThatThrownBy {
-                service.opprettBehandling(request)
+                service.opprettBehandling(opprettRevurdering)
             }.hasMessage("Kan ikke velge barn som ikke er valgbare.")
         }
     }
@@ -374,7 +379,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
         @Test
         fun `må minumum velge 1 barn i tilfelle første behandling er henlagt`() {
-            val request =
+            val opprettRevurdering =
                 opprettRevurdering(
                     fagsakId = henlagtBehandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
@@ -384,10 +389,59 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             testoppsettService.opprettBehandlingMedFagsak(henlagtBehandling, opprettGrunnlagsdata = false)
 
             assertThatThrownBy {
-                service.opprettBehandling(request)
+                service.opprettBehandling(opprettRevurdering)
             }.hasMessage(
                 "Behandling må opprettes med minimum 1 barn. Dersom alle tidligere behandlinger er henlagt, må ny behandling opprettes som søknad eller papirsøknad.",
             )
+        }
+    }
+
+    @Nested
+    inner class OpprettOppgave {
+        @Test
+        fun `skal ikke opprette oppgave hvis skalOppretteOppgave=false`() {
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.FERDIGSTILT,
+                        resultat = BehandlingResultat.AVSLÅTT,
+                    ),
+                    opprettGrunnlagsdata = false,
+                )
+
+            vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
+
+            service.opprettBehandling(
+                opprettRevurdering(
+                    fagsakId = behandling.fagsakId,
+                    skalOppretteOppgave = false,
+                ),
+            )
+            assertThat(taskService.finnAlleTaskerMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE))
+                .isEmpty()
+        }
+
+        @Test
+        fun `skal opprette oppgave hvis skalOppretteOppgave=true`() {
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.FERDIGSTILT,
+                        resultat = BehandlingResultat.AVSLÅTT,
+                    ),
+                    opprettGrunnlagsdata = false,
+                )
+
+            vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
+
+            service.opprettBehandling(
+                opprettRevurdering(
+                    fagsakId = behandling.fagsakId,
+                    skalOppretteOppgave = true,
+                ),
+            )
+            assertThat(taskService.finnAlleTaskerMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE))
+                .hasSize(1)
         }
     }
 
@@ -395,13 +449,14 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         fagsakId: FagsakId,
         årsak: BehandlingÅrsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
         valgteBarn: Set<String> = emptySet(),
+        skalOppretteOppgave: Boolean = true,
     ) = OpprettRevurdering(
         fagsakId = fagsakId,
         årsak = årsak,
         valgteBarn = valgteBarn,
         kravMottatt = null,
         nyeOpplysningerMetadata = if (årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) opprettNyeOpplysningerMetadata() else null,
-        skalOppretteOppgave = true,
+        skalOppretteOppgave = skalOppretteOppgave,
     )
 
     private fun opprettNyeOpplysningerMetadata() =
