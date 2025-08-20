@@ -56,18 +56,18 @@ class ArbeidsfordelingService(
         stønadstype: Stønadstype,
         oppgavetype: Oppgavetype,
     ): Arbeidsfordelingsenhet? {
-        val arbeidsfordelingskriterie =
-            lagArbeidsfordelingKritierieForPerson(
-                personIdent = ident,
-                stønadstype = stønadstype,
-                oppgavetype = oppgavetype,
-            )
         if (stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
             return Arbeidsfordelingsenhet(
                 enhetNr = "0387",
                 navn = "0387 - Nav tiltak Oslo",
             )
         }
+        val arbeidsfordelingskriterie =
+            lagArbeidsfordelingKritierieForPerson(
+                personIdent = ident,
+                stønadstype = stønadstype,
+                oppgavetype = oppgavetype,
+            )
         return finnArbeidsfordelingsenhet(arbeidsfordelingskriterie)
             .firstOrNull() ?: error("Fant ikke Nav-enhet for oppgave av type $oppgavetype")
     }
