@@ -61,12 +61,12 @@ data class Beregningsgrunnlag(
 
 fun avkortBeregningsresultatVedOpphør(
     forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørLæremidler>,
-    revurderFra: LocalDate,
+    opphørsdato: LocalDate,
 ): AvkortResult<BeregningsresultatForMåned> =
     forrigeVedtak
         .data
         .beregningsresultat
         .perioder
-        .avkortFraOgMed(revurderFra.minusDays(1)) { periode, nyttTom ->
+        .avkortFraOgMed(opphørsdato.minusDays(1)) { periode, nyttTom ->
             periode.copy(grunnlag = periode.grunnlag.copy(tom = nyttTom))
         }

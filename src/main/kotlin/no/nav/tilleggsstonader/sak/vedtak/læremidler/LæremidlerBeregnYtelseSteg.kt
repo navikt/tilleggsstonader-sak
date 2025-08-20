@@ -157,8 +157,8 @@ class LæremidlerBeregnYtelseSteg(
 
     fun avkortVedtaksperiodeVedOpphør(
         forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørLæremidler>,
-        revurderFra: LocalDate,
-    ): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(revurderFra.minusDays(1))
+        opphørsdato: LocalDate,
+    ): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(opphørsdato.minusDays(1))
 
     private fun lagreAvslag(
         saksbehandling: Saksbehandling,

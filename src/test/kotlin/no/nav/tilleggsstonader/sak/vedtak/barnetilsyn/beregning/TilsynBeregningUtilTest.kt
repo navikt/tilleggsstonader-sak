@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningTestUtil.vedtaksperiodeBeregning
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.brukPerioderFraOgMedRevurderFra
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.brukPerioderFraOgMedTidligsteEndring
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
@@ -184,7 +184,7 @@ class TilsynBeregningUtilTest {
         inner class BrukPerioderFraOgMedRevurderFra {
             @Test
             fun `skal returnere orginal liste uten revurder fra`() {
-                assertThat(vedtaksperioder.brukPerioderFraOgMedRevurderFra(null)).isEqualTo(vedtaksperioder)
+                assertThat(vedtaksperioder.brukPerioderFraOgMedTidligsteEndring(null)).isEqualTo(vedtaksperioder)
             }
 
             @Test
@@ -203,7 +203,7 @@ class TilsynBeregningUtilTest {
 
                 assertThat(
                     vedtaksperioder
-                        .brukPerioderFraOgMedRevurderFra(revurderFra),
+                        .brukPerioderFraOgMedTidligsteEndring(revurderFra),
                 ).isEqualTo(forventedeVedtaksperioder)
             }
         }

@@ -82,18 +82,20 @@ object VedtaksperiodeBeregningUtil {
         tom: LocalDate,
     ): Int = ChronoUnit.DAYS.between(fom, tom).toInt() + 1
 
-    fun <P> List<P>.brukPerioderFraOgMedRevurderFra(revurderFra: LocalDate?): List<P> where P : Periode<LocalDate>, P : KopierPeriode<P> =
-        revurderFra?.let {
-            this.splitFra(revurderFra).filter { it.fom >= revurderFra }
+    fun <P> List<P>.brukPerioderFraOgMedTidligsteEndring(
+        tidligsteEndring: LocalDate?,
+    ): List<P> where P : Periode<LocalDate>, P : KopierPeriode<P> =
+        tidligsteEndring?.let {
+            this.splitFra(tidligsteEndring).filter { it.fom >= tidligsteEndring }
         } ?: this
 
-    fun <P> List<P>.splitFra(revurderFra: LocalDate?): List<P> where P : Periode<LocalDate>, P : KopierPeriode<P> {
-        if (revurderFra == null) return this
+    fun <P> List<P>.splitFra(dato: LocalDate?): List<P> where P : Periode<LocalDate>, P : KopierPeriode<P> {
+        if (dato == null) return this
         return this.flatMap {
-            if (it.fom < revurderFra && revurderFra <= it.tom) {
+            if (it.fom < dato && dato <= it.tom) {
                 listOf(
-                    it.medPeriode(fom = it.fom, tom = revurderFra.minusDays(1)),
-                    it.medPeriode(fom = revurderFra, tom = it.tom),
+                    it.medPeriode(fom = it.fom, tom = dato.minusDays(1)),
+                    it.medPeriode(fom = dato, tom = it.tom),
                 )
             } else {
                 listOf(it)

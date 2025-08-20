@@ -125,8 +125,8 @@ class BoutgifterBeregnYtelseSteg(
 
     private fun avkortVedtaksperiodeVedOpphør(
         forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørBoutgifter>,
-        revurderFra: LocalDate,
-    ): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(revurderFra.minusDays(1))
+        opphørsdato: LocalDate,
+    ): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(opphørsdato.minusDays(1))
 
     private fun hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørBoutgifter> =
         vedtakRepository
