@@ -44,6 +44,9 @@ class SatsjusteringTest : IntegrationTest() {
     @Autowired
     lateinit var finnBehandlingerForSatsjusteringService: FinnBehandlingerForSatsjusteringService
 
+    @Autowired
+    lateinit var satsjusteringService: SatsjusteringService
+
     val fom = LocalDate.of(2025, 8, 1)
     val tom = LocalDate.of(2026, 6, 30)
 
@@ -97,7 +100,7 @@ class SatsjusteringTest : IntegrationTest() {
         val behandlingerForSatsjustering = finnBehandlingerForSatsjusteringService.sjekkBehandlingerForSatsjustering(Stønadstype.LÆREMIDLER)
         assertThat(behandlingerForSatsjustering).containsExactly(behandling.id)
 
-        // TODO: Kjør jobb for å justere sats
+        satsjusteringService.kjørSatsjustering(behandling.id)
 
         val sistIverksatteBehandling = behandlingRepository.finnSisteIverksatteBehandling(behandling.fagsakId)!!
         assertThat(behandling.id).isNotEqualTo(sistIverksatteBehandling.id)

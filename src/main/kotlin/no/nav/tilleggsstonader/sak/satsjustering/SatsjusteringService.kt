@@ -2,7 +2,18 @@ package no.nav.tilleggsstonader.sak.satsjustering
 
 import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettRevurderingBehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
+import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingSteg
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerBeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -11,6 +22,10 @@ import java.time.LocalDate
 @Service
 class SatsjusteringService(
     private val behandlingService: BehandlingService,
+    private val revurderingBehandlingService: OpprettRevurderingBehandlingService,
+    private val vedtakservice: VedtakService,
+    private val beregnYtelseSteg: LæremidlerBeregnYtelseSteg,
+    private val ferdigstillBehandlingSteg: FerdigstillBehandlingSteg,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -25,8 +40,10 @@ class SatsjusteringService(
              * Hvis man kun skal ha en task per behandling, og at cron-job sjekker for at det ikke finnes en task for den behandlingId
              * så kan man kaste RekjørSenereException her, og tasken er ansvarlig for å kjøre på nytt dagen etter.
              */
-            throw RekjørSenereException("Fagsak=${fagsakId} har en ikke ferdigstilt behandling, kan ikke kjøre satsjustering.",
-                LocalDate.now().plusDays(1).atTime(7,0))
+            throw RekjørSenereException(
+                "Fagsak=$fagsakId har en ikke ferdigstilt behandling, kan ikke kjøre satsjustering.",
+                LocalDate.now().plusDays(1).atTime(7, 0),
+            )
         }
         val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId)
         if (sisteIverksatteBehandling?.id != behandlingId) {
@@ -36,7 +53,39 @@ class SatsjusteringService(
             return
         }
 
-        // behandlingService.finnSisteBehandlingSomHarVedtakPåFagsaken()
-        // sjekk om det finnes en nyere behandling på fagsaken
+        opprettRevurderingOgKjørSatsendring(fagsakId)
+    }
+
+    private fun opprettRevurderingOgKjørSatsendring(fagsakId: FagsakId) {
+        val revurderingId =
+            revurderingBehandlingService.opprettBehandling(
+                OpprettRevurdering(
+                    fagsakId = fagsakId,
+                    årsak = BehandlingÅrsak.SATSENDRING,
+                    valgteBarn = emptySet(),
+                    nyeOpplysningerMetadata = null,
+                    kravMottatt = null,
+                    skalOppretteOppgave = false,
+                ),
+            )
+        val revurdering = behandlingService.hentSaksbehandling(revurderingId)
+
+        val forrigeIverksatteBehandlingId =
+            revurdering.forrigeIverksatteBehandlingId
+                ?: error("Revurdering for fagsak=${revurdering.fagsakId} har ikke fått forrigeIverksattBehandlingId")
+        val vedtaksperioder =
+            vedtakservice
+                .hentVedtak(behandlingId = forrigeIverksatteBehandlingId)!!
+                .withTypeOrThrow<InnvilgelseEllerOpphørLæremidler>()
+                .data.vedtaksperioder
+                .tilDto()
+
+        // TODO håndter tidligst endring
+        beregnYtelseSteg.utførSteg(revurdering, InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder))
+        // totrinnskontroll
+        // iverksett
+
+        // TODO slett ferdigstillBehandlingSteg - den burde bli håndtert automatisk etter at behandlingen er iverksatt
+        ferdigstillBehandlingSteg.utførSteg(revurdering, null)
     }
 }
