@@ -49,7 +49,7 @@ class UtledTidligsteEndringService(
                 behandlingId = behandlingId,
                 vedtaksperioder = vedtaksperioder,
                 hentVedtaksperioderTidligereBehandlingFunction = { behandlingId ->
-                    vedtakRepository.findByIdOrThrow(behandlingId).data.hentVedtaksperioder()
+                    vedtakRepository.findByIdOrThrow(behandlingId).vedtaksperioderHvisFinnes() ?: emptyList()
                 },
             )
 

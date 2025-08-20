@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
@@ -27,4 +28,6 @@ data class GeneriskVedtak<T : Vedtaksdata>(
     init {
         require(data.type.typeVedtak == type) { "$type på vedtak er ikke lik vedtak på data(${data.type.typeVedtak})" }
     }
+
+    fun vedtaksperioderHvisFinnes(): List<Vedtaksperiode>? = takeIfType<HarVedtaksperioder>()?.data?.vedtaksperioder
 }

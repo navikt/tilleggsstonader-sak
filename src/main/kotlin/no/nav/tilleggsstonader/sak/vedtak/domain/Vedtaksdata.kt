@@ -9,8 +9,10 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
  */
 sealed interface Vedtaksdata : VedtaksdataJson {
     val type: TypeVedtaksdata
+}
 
-    fun hentVedtaksperioder(): List<Vedtaksperiode>
+sealed interface HarVedtaksperioder : Vedtaksdata {
+    val vedtaksperioder: List<Vedtaksperiode>
 }
 
 @JsonDeserialize(using = TypeVedtaksdataDeserializer::class)
@@ -18,20 +20,20 @@ sealed interface TypeVedtaksdata {
     val typeVedtak: TypeVedtak
 }
 
-sealed interface Innvilgelse : Vedtaksdata
+sealed interface Innvilgelse :
+    Vedtaksdata,
+    HarVedtaksperioder
 
-sealed interface Opphør : Vedtaksdata {
+sealed interface Opphør :
+    Vedtaksdata,
+    HarVedtaksperioder {
     val årsaker: List<ÅrsakOpphør>
     val begrunnelse: String
-
-    override fun hentVedtaksperioder(): List<Vedtaksperiode> = emptyList()
 }
 
 sealed interface Avslag : Vedtaksdata {
     val årsaker: List<ÅrsakAvslag>
     val begrunnelse: String
-
-    override fun hentVedtaksperioder(): List<Vedtaksperiode> = emptyList()
 }
 
 fun Avslag.validerÅrsakerOgBegrunnelse() {

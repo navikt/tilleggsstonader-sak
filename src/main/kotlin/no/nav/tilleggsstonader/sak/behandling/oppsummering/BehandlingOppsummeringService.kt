@@ -94,7 +94,7 @@ class BehandlingOppsummeringService(
 
                 is Innvilgelse -> {
                     OppsummertVedtakInnvilgelse(
-                        vedtaksperioder = data.hentVedtaksperioder().tilDto(),
+                        vedtaksperioder = data.vedtaksperioder.tilDto(),
                     )
                 }
 

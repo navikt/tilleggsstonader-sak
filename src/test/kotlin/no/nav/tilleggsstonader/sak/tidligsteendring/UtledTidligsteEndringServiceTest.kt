@@ -98,7 +98,7 @@ class UtledTidligsteEndringServiceTest {
 
     private fun mockVedtakMedVedtaksperioder(vedtaksperioder: List<Vedtaksperiode>): Vedtak =
         mockk<Vedtak> {
-            every { data.hentVedtaksperioder() } returns vedtaksperioder
+            every { vedtaksperioderHvisFinnes() } returns vedtaksperioder
         }
 
     @Test

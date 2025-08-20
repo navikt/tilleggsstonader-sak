@@ -25,8 +25,6 @@ data class InnvilgelseLæremidler(
 ) : InnvilgelseEllerOpphørLæremidler,
     Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakLæremidler.INNVILGELSE_LÆREMIDLER
-
-    override fun hentVedtaksperioder() = vedtaksperioder
 }
 
 data class AvslagLæremidler(

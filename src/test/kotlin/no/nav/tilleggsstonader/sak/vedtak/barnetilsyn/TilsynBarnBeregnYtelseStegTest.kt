@@ -63,12 +63,12 @@ class TilsynBarnBeregnYtelseStegTest {
     val steg =
         TilsynBarnBeregnYtelseSteg(
             beregningService = tilsynBarnBeregningService,
-            vedtakRepository = repository,
-            tilkjentytelseService = tilkjentYtelseService,
-            simuleringService = simuleringService,
             opphørValideringService = opphørValideringService,
             utledTidligsteEndringService = utledTidligsteEndringService,
             unleashService = unleashService,
+            vedtakRepository = repository,
+            tilkjentytelseService = tilkjentYtelseService,
+            simuleringService = simuleringService,
         )
 
     val saksbehandling = saksbehandling()

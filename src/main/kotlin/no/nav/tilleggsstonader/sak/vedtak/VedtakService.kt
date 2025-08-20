@@ -31,7 +31,7 @@ class VedtakService(
         hentVedtak(behandlingId)?.withTypeOrThrow<T>()
 
     fun hentVedtaksperioder(behandlingId: BehandlingId): List<Vedtaksperiode> =
-        hentVedtak(behandlingId)?.data?.hentVedtaksperioder() ?: emptyList()
+        hentVedtak(behandlingId)?.vedtaksperioderHvisFinnes() ?: emptyList()
 
     fun håndterSteg(
         behandling: BehandlingId,
