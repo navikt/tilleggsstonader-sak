@@ -50,6 +50,8 @@ data class InnvilgelseBoutgifter(
 ) : InnvilgelseEllerOpphørBoutgifter,
     Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakBoutgifter.INNVILGELSE_BOUTGIFTER
+
+    override fun hentVedtaksperioder() = vedtaksperioder
 }
 
 data class AvslagBoutgifter(

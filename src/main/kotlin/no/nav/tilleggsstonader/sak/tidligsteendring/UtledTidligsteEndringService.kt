@@ -7,8 +7,9 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
@@ -26,7 +27,7 @@ class UtledTidligsteEndringService(
     private val behandlingService: BehandlingService,
     private val vilkårService: VilkårService,
     private val vilkårperiodeService: VilkårperiodeService,
-    private val vedtaksperiodeService: VedtaksperiodeService,
+    private val vedtakRepository: VedtakRepository,
     private val barnService: BarnService,
     private val unleashService: UnleashService,
 ) {
@@ -48,7 +49,7 @@ class UtledTidligsteEndringService(
                 behandlingId = behandlingId,
                 vedtaksperioder = vedtaksperioder,
                 hentVedtaksperioderTidligereBehandlingFunction = { behandlingId ->
-                    vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, null)
+                    vedtakRepository.findByIdOrThrow(behandlingId).data.hentVedtaksperioder()
                 },
             )
 

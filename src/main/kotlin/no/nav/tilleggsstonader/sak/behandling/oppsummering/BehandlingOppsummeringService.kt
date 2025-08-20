@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
@@ -23,7 +22,6 @@ class BehandlingOppsummeringService(
     private val behandlingService: BehandlingService,
     private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
-    private val vedtaksperiodeService: VedtaksperiodeService,
     private val vedtakService: VedtakService,
 ) {
     fun hentBehandlingOppsummering(behandlingId: BehandlingId): BehandlingOppsummeringDto {
@@ -95,14 +93,8 @@ class BehandlingOppsummeringService(
                 is Avslag -> OppsummertVedtakAvslag(årsaker = data.årsaker)
 
                 is Innvilgelse -> {
-                    val vedtaksperioder =
-                        vedtaksperiodeService.finnVedtaksperioderForBehandling(
-                            behandling.id,
-                            behandling.revurderFra ?: vedtak.tidligsteEndring,
-                        )
-
                     OppsummertVedtakInnvilgelse(
-                        vedtaksperioder = vedtaksperioder.tilDto(),
+                        vedtaksperioder = data.hentVedtaksperioder().tilDto(),
                     )
                 }
 

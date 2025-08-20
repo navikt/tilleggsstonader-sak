@@ -25,6 +25,8 @@ data class InnvilgelseTilsynBarn(
 ) : InnvilgelseEllerOpphørTilsynBarn,
     Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakTilsynBarn.INNVILGELSE_TILSYN_BARN
+
+    override fun hentVedtaksperioder() = vedtaksperioder
 }
 
 data class AvslagTilsynBarn(

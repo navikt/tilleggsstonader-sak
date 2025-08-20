@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -12,7 +13,6 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -20,7 +20,6 @@ import java.time.LocalDate
 class BehandlingsoversiktService(
     private val fagsakService: FagsakService,
     private val behandlingRepository: BehandlingRepository,
-    private val vedtaksperiodeService: VedtaksperiodeService,
     private val vedtakService: VedtakService,
 ) {
     fun hentOversikt(fagsakPersonId: FagsakPersonId): BehandlingsoversiktDto {
@@ -101,7 +100,7 @@ class BehandlingsoversiktService(
         behandlingId: BehandlingId,
         revurdererFra: LocalDate?,
     ): Vedtaksperiode {
-        val vedtaksperioder = vedtaksperiodeService.finnVedtaksperioderForBehandling(behandlingId, revurdererFra)
+        val vedtaksperioder = vedtakService.hentVedtaksperioder(behandlingId).avkortPerioderFør(revurdererFra)
         val minFom = vedtaksperioder.minOfOrNull { it.fom }
         val maksTom = vedtaksperioder.maxOfOrNull { it.tom }
 
