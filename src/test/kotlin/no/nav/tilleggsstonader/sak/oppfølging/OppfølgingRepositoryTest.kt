@@ -175,7 +175,6 @@ class OppfølgingRepositoryTest : IntegrationTest() {
 
     private fun opprettRevurdering(): Behandling =
         testoppsettService.opprettRevurdering(
-            revurderFra = LocalDate.now(),
             forrigeBehandling = behandling,
             fagsak = testoppsettService.hentFagsak(behandling.fagsakId),
         )

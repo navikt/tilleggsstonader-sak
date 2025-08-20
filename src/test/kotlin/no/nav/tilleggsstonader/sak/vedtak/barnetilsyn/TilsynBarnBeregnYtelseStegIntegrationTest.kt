@@ -397,7 +397,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : IntegrationTest() {
                     behandling(
                         fagsak = fagsak(id = behandling.fagsakId),
                         type = BehandlingType.REVURDERING,
-                        revurderFra = revurderFra,
                         forrigeIverksatteBehandlingId = behandling.id,
                     ),
                     opprettGrunnlagsdata = true,

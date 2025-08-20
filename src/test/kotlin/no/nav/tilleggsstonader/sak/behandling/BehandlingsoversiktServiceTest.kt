@@ -127,7 +127,7 @@ class BehandlingsoversiktServiceTest {
         @Test
         fun `ved et opphør så skal vedtaksperiode være tom og opphørsdato skal være satt`() {
             every { behandlingRepository.findByFagsakId(fagsak.id) } returns
-                listOf(behandling.copy(type = BehandlingType.REVURDERING, revurderFra = LocalDate.of(2024, 4, 1)))
+                listOf(behandling.copy(type = BehandlingType.REVURDERING))
             vedtak =
                 opphørVedtak(
                     årsaker = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),

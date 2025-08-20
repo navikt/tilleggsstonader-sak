@@ -39,7 +39,6 @@ data class Behandling(
     val henlagtÅrsak: HenlagtÅrsak? = null,
     val henlagtBegrunnelse: String? = null,
     val vedtakstidspunkt: LocalDateTime? = null,
-    val revurderFra: LocalDate? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
 ) {

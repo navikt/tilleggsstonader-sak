@@ -112,7 +112,6 @@ class LæremidlerBeregnYtelseStegTest : IntegrationTest() {
             val behandlingForOpphør =
                 testoppsettService
                     .opprettRevurdering(
-                        revurderFra = LocalDate.of(2025, 2, 1),
                         forrigeBehandling = behandling,
                         fagsak = fagsak,
                     ).let { testoppsettService.hentSaksbehandling(it.id) }
@@ -121,7 +120,7 @@ class LæremidlerBeregnYtelseStegTest : IntegrationTest() {
                 OpphørLæremidlerRequest(
                     årsakerOpphør = listOf(ÅrsakOpphør.ANNET),
                     begrunnelse = "en begrunnelse",
-                    opphørsdato = behandlingForOpphør.revurderFra,
+                    opphørsdato = LocalDate.of(2025, 2, 1),
                 )
             steg.utførSteg(behandlingForOpphør, opphør)
 

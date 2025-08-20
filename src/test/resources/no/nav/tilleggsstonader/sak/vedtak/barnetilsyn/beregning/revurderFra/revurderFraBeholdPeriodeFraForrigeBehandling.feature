@@ -27,7 +27,7 @@ Egenskap: Beregning - med revurderFra - behold perioder fra forrige behandling
       | Fom     | Tom     | Utgift |
       | 02.2024 | 02.2024 | 1000   |
 
-    Når beregner med revurderFra=2024-02-05
+    Når beregner med tidligsteEndring=2024-02-05
 
     Så forvent følgende beregningsresultat
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
@@ -59,7 +59,7 @@ Egenskap: Beregning - med revurderFra - behold perioder fra forrige behandling
       | Fom     | Tom     | Utgift |
       | 02.2024 | 02.2024 | 1000   |
 
-    Når beregner med revurderFra=2024-02-05
+    Når beregner med tidligsteEndring=2024-02-05
 
     Så forvent følgende beregningsresultat
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |

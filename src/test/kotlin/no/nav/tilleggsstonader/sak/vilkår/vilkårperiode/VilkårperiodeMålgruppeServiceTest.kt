@@ -432,11 +432,8 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         }
     }
 
-    private fun lagRevurderingMedKopiertMålgruppe(
-        opprinneligMålgruppe: VilkårperiodeMålgruppe = målgruppe(),
-        revurderFra: LocalDate = now(),
-    ): Behandling {
-        val revurdering = testoppsettService.lagBehandlingOgRevurdering(revurderFra = revurderFra)
+    private fun lagRevurderingMedKopiertMålgruppe(opprinneligMålgruppe: VilkårperiodeMålgruppe = målgruppe()): Behandling {
+        val revurdering = testoppsettService.lagBehandlingOgRevurdering()
 
         vilkårperiodeRepository.insert(
             opprinneligMålgruppe.copy(behandlingId = revurdering.forrigeIverksatteBehandlingId!!),

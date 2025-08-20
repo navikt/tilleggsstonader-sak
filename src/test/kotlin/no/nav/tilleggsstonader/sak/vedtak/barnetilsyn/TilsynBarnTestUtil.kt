@@ -195,7 +195,7 @@ object TilsynBarnTestUtil {
         type = TypeVedtak.INNVILGELSE,
         data = vedtak,
         gitVersjon = Applikasjonsversjon.versjon,
-        tidligsteEndring = defaultBehandling.revurderFra,
+        tidligsteEndring = null,
         opphørsdato = null,
     )
 

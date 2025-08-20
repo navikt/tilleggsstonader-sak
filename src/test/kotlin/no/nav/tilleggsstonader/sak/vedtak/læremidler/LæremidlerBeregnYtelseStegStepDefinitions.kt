@@ -386,7 +386,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             id = behandlingId,
             fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER),
             forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
-            revurderFra = revurderFra,
             type = if (forrigeIverksatteBehandlingId != null) BehandlingType.REVURDERING else BehandlingType.FØRSTEGANGSBEHANDLING,
         )
     }

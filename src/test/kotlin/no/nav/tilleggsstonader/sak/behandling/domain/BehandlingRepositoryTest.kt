@@ -94,7 +94,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
                     fagsak,
                     status = OPPRETTET,
                     resultat = INNVILGET,
-                    revurderFra = LocalDate.of(2023, 1, 1),
                     type = BehandlingType.REVURDERING,
                     årsak = BehandlingÅrsak.SØKNAD,
                     henlagtÅrsak = HenlagtÅrsak.FEILREGISTRERT,
@@ -146,7 +145,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
         assertThat(endretAv).isEqualTo(behandling.sporbar.endret.endretAv)
         assertThat(endretTid).isEqualTo(behandling.sporbar.endret.endretTid)
         assertThat(vedtakstidspunkt).isEqualTo(behandling.vedtakstidspunkt)
-        assertThat(revurderFra).isEqualTo(behandling.revurderFra)
         assertThat(nyeOpplysningerMetadata).isEqualTo(behandling.nyeOpplysningerMetadata)
     }
 

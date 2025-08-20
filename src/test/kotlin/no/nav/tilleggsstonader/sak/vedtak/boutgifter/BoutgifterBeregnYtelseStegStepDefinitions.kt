@@ -400,7 +400,6 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             steg = steg,
             fagsak = fagsak(stønadstype = Stønadstype.BOUTGIFTER),
             forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
-            revurderFra = revurderFra,
             type = if (forrigeIverksatteBehandlingId != null) BehandlingType.REVURDERING else BehandlingType.FØRSTEGANGSBEHANDLING,
         )
     }

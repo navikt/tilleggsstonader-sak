@@ -135,7 +135,6 @@ class TestoppsettService(
         )
 
     fun opprettRevurdering(
-        revurderFra: LocalDate? = null,
         forrigeBehandling: Behandling,
         fagsak: Fagsak,
         steg: StegType = StegType.BEREGNE_YTELSE,
@@ -144,14 +143,13 @@ class TestoppsettService(
             behandling(
                 fagsak = fagsak,
                 type = BehandlingType.REVURDERING,
-                revurderFra = revurderFra,
                 forrigeIverksatteBehandlingId = forrigeBehandling.id,
                 status = BehandlingStatus.UTREDES,
                 steg = steg,
             ),
         )
 
-    fun lagBehandlingOgRevurdering(revurderFra: LocalDate = now()): Behandling {
+    fun lagBehandlingOgRevurdering(): Behandling {
         val fagsak = fagsak()
         lagreFagsak(fagsak)
         val førsteBehandling =
@@ -161,7 +159,6 @@ class TestoppsettService(
                 fagsak = fagsak,
                 forrigeIverksatteBehandlingId = førsteBehandling.id,
                 type = BehandlingType.REVURDERING,
-                revurderFra = revurderFra,
             )
         return lagre(revurdering)
     }

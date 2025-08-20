@@ -197,23 +197,6 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             }.hasMessageContaining("Kan ikke registrere aktivitetsdager på ingen aktivitet")
         }
 
-        @Test
-        fun `kan ikke opprette aktivitet hvis periode begynner før revurderFra`() {
-            val behandling =
-                testoppsettService.oppdater(
-                    testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
-                )
-
-            assertThatThrownBy {
-                aktivitetService.opprettVilkårperiode(
-                    dummyVilkårperiodeAktivitet(
-                        behandlingId = behandling.id,
-                        fom = now().plusDays(1),
-                    ),
-                )
-            }.hasMessageContaining("Til-og-med før fra-og-med")
-        }
-
         @Nested
         inner class Læremidler {
             @Test

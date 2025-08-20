@@ -135,7 +135,6 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
             val revurdering =
                 testoppsettService.opprettRevurdering(
                     forrigeBehandling = dummyBehandling,
-                    revurderFra = revurderFraDato,
                     fagsak = dummyFagsak,
                 )
 

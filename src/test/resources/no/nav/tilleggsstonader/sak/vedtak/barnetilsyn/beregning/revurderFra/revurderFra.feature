@@ -20,7 +20,7 @@ Egenskap: Beregning - med revurderFra
       | Fom     | Tom     | Utgift |
       | 01.2024 | 02.2024 | 1000   |
 
-    Når beregner med revurderFra=2024-02-15
+    Når beregner med tidligsteEndring=2024-02-15
 
     Så forvent følgende beregningsresultat
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
@@ -43,7 +43,7 @@ Egenskap: Beregning - med revurderFra
       | Fom     | Tom     | Utgift |
       | 01.2024 | 01.2024 | 1000   |
 
-    Når beregner med revurderFra=2023-12-15
+    Når beregner med tidligsteEndring=2023-12-15
 
     Så forvent følgende beregningsresultat
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
@@ -78,7 +78,7 @@ Egenskap: Beregning - med revurderFra
       | Dato       | Beløp | Målgruppe           |
       | 01.02.2024 | 413   | NEDSATT_ARBEIDSEVNE |
 
-    Når beregner med revurderFra=2024-02-15
+    Når beregner med tidligsteEndring=2024-02-15
 
     # Disse tallene skal være de samme som når man ikke bruker revurderFra,
     # då beregningsresultatet skal gi de nye tallene for selve måneden, sånn at ev. andeler blir oppdaterte for den måneden
@@ -117,7 +117,7 @@ Egenskap: Beregning - med revurderFra
       | Fom     | Tom     | Utgift |
       | 01.2024 | 01.2024 | 1000   |
 
-    Når beregner med revurderFra=2024-01-15
+    Når beregner med tidligsteEndring=2024-01-15
 
     Så forvent følgende beregningsresultat
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
@@ -142,7 +142,7 @@ Egenskap: Beregning - med revurderFra
       | Fom     | Tom     | Utgift |
       | 01.2024 | 01.2024 | 1000   |
 
-    Når beregner med revurderFra=2024-01-15
+    Når beregner med tidligsteEndring=2024-01-15
 
     Så forvent følgende beregningsresultat
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
@@ -172,7 +172,7 @@ Egenskap: Beregning - med revurderFra
       | Fom     | Tom     | Utgift |
       | 01.2024 | 01.2024 | 1000   |
 
-    Når beregner med revurderFra=2024-01-15
+    Når beregner med tidligsteEndring=2024-01-15
 
     Så forvent følgende beregningsresultat
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |

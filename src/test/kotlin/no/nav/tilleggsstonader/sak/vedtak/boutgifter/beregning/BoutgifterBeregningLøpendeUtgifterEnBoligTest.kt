@@ -206,17 +206,18 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
 
         val saksbehandling =
             saksbehandling(
-                revurderFra = LocalDate.of(2025, 4, 1),
                 forrigeIverksatteBehandlingId = BehandlingId.random(),
                 type = BehandlingType.REVURDERING,
             )
+        val tidligsteEndring = LocalDate.of(2025, 4, 1)
+
         val res =
             boutgifterBeregningService
                 .beregn(
                     behandling = saksbehandling,
                     vedtaksperioder = vedtaksperioderRevurdering,
                     typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = saksbehandling.revurderFra,
+                    tidligsteEndring = tidligsteEndring,
                 ).perioder
 
         assertThat(res.size).isEqualTo(4)
