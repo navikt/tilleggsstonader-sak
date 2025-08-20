@@ -260,10 +260,10 @@ enum class VilkårType(
     LØPENDE_UTGIFTER_EN_BOLIG("Løpende utgifter en bolig", listOf(Stønadstype.BOUTGIFTER)),
     LØPENDE_UTGIFTER_TO_BOLIGER("Løpende utgifter to boliger", listOf(Stønadstype.BOUTGIFTER)),
 
-    //
+    // Daglig reise
     DAGLIG_REISE_OFFENTLIG_TRANSPORT(
         "Offentlig transport daglig reise",
-        listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSO),
+        listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
     ),
     ;
 

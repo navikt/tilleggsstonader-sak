@@ -321,12 +321,7 @@ class BehandlingFlytTest : IntegrationTest() {
                 tom = LocalDate.of(2024, 1, 31),
                 utgift = 1000,
                 erFremtidigUtgift = false,
-                offentligTransport =
-                    OffentligTransport(
-                        reisedagerPerUke = 2,
-                        prisEnkelbillett = 44,
-                        prisTrettidagersbillett = 750,
-                    ),
+                offentligTransport = null,
             ),
         )
         stegService.håndterSteg(behandlingId, StegType.VILKÅR)

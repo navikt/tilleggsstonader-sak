@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.VilkårPeriodeValidering.validerIkkeOverlappendeVilkår
 import org.springframework.stereotype.Service
@@ -33,7 +34,7 @@ class VilkårSteg(
         val manglerVerdierPåOppfylteVilkår =
             vilkår
                 .filter { it.resultat == Vilkårsresultat.OPPFYLT }
-                .any { it.fom == null || it.tom == null || (!it.erFremtidigUtgift && it.offentligTransport == null && it.utgift == null) }
+                .any { it.fom == null || it.tom == null || (manglerPåkrevdUtgift(it)) }
         brukerfeilHvis(manglerVerdierPåOppfylteVilkår) {
             "Mangler fom, tom eller utgift på et eller flere vilkår. " +
                 "Vennligst ta stilling til hvilken periode vilkåret gjelder for."
@@ -49,4 +50,11 @@ class VilkårSteg(
     }
 
     override fun stegType(): StegType = StegType.VILKÅR
+
+    private fun manglerPåkrevdUtgift(vilkår: Vilkår): Boolean =
+        !vilkår.erFremtidigUtgift &&
+            harIkkeOffentligTransport(vilkår) &&
+            vilkår.utgift == null
+
+    private fun harIkkeOffentligTransport(vilkår: Vilkår) = vilkår.offentligTransport == null
 }
