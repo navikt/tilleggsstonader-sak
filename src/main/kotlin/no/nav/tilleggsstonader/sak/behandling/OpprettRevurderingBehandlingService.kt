@@ -21,8 +21,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -30,15 +28,13 @@ import java.time.LocalDateTime
 
 @Service
 class OpprettRevurderingBehandlingService(
-    val taskService: TaskService,
-    val behandlingService: BehandlingService,
-    val barnService: BarnService,
-    val vilkårperiodeService: VilkårperiodeService,
-    val vilkårService: VilkårService,
-    val unleashService: UnleashService,
-    val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
-    val personService: PersonService,
-    val fagsakService: FagsakService,
+    private val taskService: TaskService,
+    private val behandlingService: BehandlingService,
+    private val barnService: BarnService,
+    private val unleashService: UnleashService,
+    private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
+    private val personService: PersonService,
+    private val fagsakService: FagsakService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
