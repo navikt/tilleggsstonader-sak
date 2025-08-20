@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknad
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadskjemaLæremidlerMapper
@@ -33,6 +34,7 @@ class SøknadService(
     private val søknadLæremidlerRepository: SøknadLæremidlerRepository,
     private val søknadskjemaBoutgifterMapper: SøknadskjemaBoutgifterMapper,
     private val søknadsskjemaDagligReiseMapper: SøknadskjemaDagligReiseMapper,
+    private val søknadDagligReiseRepository: SøknadDagligReiseRepository,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -107,6 +109,7 @@ class SøknadService(
                 is SøknadBarnetilsyn -> søknadBarnetilsynRepository.insert(søknad)
                 is SøknadLæremidler -> søknadLæremidlerRepository.insert(søknad)
                 is SøknadBoutgifter -> søknadBoutgifterRepository.insert(søknad)
+                is SøknadDagligReise -> søknadDagligReiseRepository.insert(søknad)
             }
         søknadBehandlingRepository.insert(SøknadBehandling(behandlingId, søknad.id))
         return lagretSøknad
