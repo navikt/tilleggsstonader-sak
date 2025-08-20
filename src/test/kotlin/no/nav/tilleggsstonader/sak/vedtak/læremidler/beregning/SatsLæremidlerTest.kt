@@ -19,11 +19,7 @@ class SatsLæremidlerTest {
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 1),
             )
-        val sats =
-            satsLæremidlerService.finnSatsForStudienivå(
-                satsLæremidlerService.finnSatsForPeriode(periode),
-                Studienivå.HØYERE_UTDANNING,
-            )
+        val sats = satsLæremidlerService.finnSatsForPeriode(periode).finnSatsForStudienivå(Studienivå.HØYERE_UTDANNING)
         assertThat(sats).isEqualTo(875)
     }
 
@@ -34,11 +30,7 @@ class SatsLæremidlerTest {
                 fom = LocalDate.of(2023, 3, 1),
                 tom = LocalDate.of(2023, 5, 1),
             )
-        val sats =
-            satsLæremidlerService.finnSatsForStudienivå(
-                satsLæremidlerService.finnSatsForPeriode(periode),
-                Studienivå.HØYERE_UTDANNING,
-            )
+        val sats = satsLæremidlerService.finnSatsForPeriode(periode).finnSatsForStudienivå(Studienivå.HØYERE_UTDANNING)
         assertThat(sats).isEqualTo(822)
     }
 
@@ -49,11 +41,7 @@ class SatsLæremidlerTest {
                 fom = LocalDate.of(2024, 11, 1),
                 tom = LocalDate.of(2024, 12, 1),
             )
-        val sats =
-            satsLæremidlerService.finnSatsForStudienivå(
-                satsLæremidlerService.finnSatsForPeriode(periode),
-                Studienivå.VIDEREGÅENDE,
-            )
+        val sats = satsLæremidlerService.finnSatsForPeriode(periode).finnSatsForStudienivå(Studienivå.VIDEREGÅENDE)
         assertThat(sats).isEqualTo(438)
     }
 
@@ -64,11 +52,7 @@ class SatsLæremidlerTest {
                 fom = LocalDate.of(2023, 10, 1),
                 tom = LocalDate.of(2023, 12, 1),
             )
-        val sats =
-            satsLæremidlerService.finnSatsForStudienivå(
-                satsLæremidlerService.finnSatsForPeriode(periode),
-                Studienivå.VIDEREGÅENDE,
-            )
+        val sats = satsLæremidlerService.finnSatsForPeriode(periode).finnSatsForStudienivå(Studienivå.VIDEREGÅENDE)
         assertThat(sats).isEqualTo(411)
     }
 
