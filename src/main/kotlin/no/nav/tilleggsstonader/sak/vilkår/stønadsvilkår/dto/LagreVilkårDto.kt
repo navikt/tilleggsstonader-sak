@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import java.time.LocalDate
 
@@ -13,6 +14,7 @@ sealed interface LagreVilkårDto {
     val tom: LocalDate?
     val utgift: Int?
     val erFremtidigUtgift: Boolean?
+    val offentligTransport: OffentligTransport?
 }
 
 data class SvarPåVilkårDto(
@@ -23,6 +25,7 @@ data class SvarPåVilkårDto(
     override val tom: LocalDate?,
     override val utgift: Int?,
     override val erFremtidigUtgift: Boolean?,
+    override val offentligTransport: OffentligTransport?,
 ) : LagreVilkårDto
 
 data class OpprettVilkårDto(
@@ -34,4 +37,5 @@ data class OpprettVilkårDto(
     override val tom: LocalDate?,
     override val utgift: Int?,
     override val erFremtidigUtgift: Boolean?,
+    override val offentligTransport: OffentligTransport?,
 ) : LagreVilkårDto

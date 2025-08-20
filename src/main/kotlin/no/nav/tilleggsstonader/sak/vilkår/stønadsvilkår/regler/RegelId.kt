@@ -27,4 +27,9 @@ enum class RegelId(
     HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER("Har søker høyere utgifter grunnet helsemessige årsaker?"),
     DOKUMENTERT_UTGIFTER_BOLIG("Har søker dokumentert utgifter til bolig tilfredsstillende?"),
     DOKUMENTERT_DELTAKELSE("Har søker dokumentert at de har samling/eksamen/opptaksprøve/kurs på datoene for overnatting?"),
+
+    // DAGLIG REISE
+    AVSTAND_OVER_SEKS_KM("Er avstanden mellom brukers aktivitet og hjemadresse lengre enn seks km?"),
+    KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT("Kan bruker reise med offentlig transport?"),
+    KAN_BRUKER_KJØRE_SELV("Kan bruker kjøre med egen bil?"),
 }
