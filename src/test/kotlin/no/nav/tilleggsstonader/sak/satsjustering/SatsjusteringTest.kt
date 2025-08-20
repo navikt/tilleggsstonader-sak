@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.satsjustering
 
+import io.mockk.clearMocks
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
@@ -19,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
@@ -39,8 +41,16 @@ class SatsjusteringTest : IntegrationTest() {
     @Autowired
     lateinit var læremidlerBeregnYtelseSteg: LæremidlerBeregnYtelseSteg
 
+    @Autowired
+    lateinit var finnBehandlingerForSatsjusteringService: FinnBehandlingerForSatsjusteringService
+
     val fom = LocalDate.of(2025, 8, 1)
     val tom = LocalDate.of(2026, 6, 30)
+
+    @AfterEach
+    override fun tearDown() {
+        clearMocks(satsLæremidlerService)
+    }
 
     @Test
     fun `skal justere sats i revurderinger som har tilkjent ytelse som venter på satsjustering`() {
@@ -83,6 +93,9 @@ class SatsjusteringTest : IntegrationTest() {
                 beløp = mapOf(Studienivå.VIDEREGÅENDE to 1000, Studienivå.HØYERE_UTDANNING to 1500),
                 bekreftet = true,
             )
+
+        val behandlingerForSatsjustering = finnBehandlingerForSatsjusteringService.sjekkBehandlingerForSatsjustering(Stønadstype.LÆREMIDLER)
+        assertThat(behandlingerForSatsjustering).containsExactly(behandling.id)
 
         // TODO: Kjør jobb for å justere sats
 

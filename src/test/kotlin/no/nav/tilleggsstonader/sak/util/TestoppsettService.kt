@@ -24,17 +24,20 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtakBeregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.tilBehandlingResult
 import org.springframework.context.annotation.Profile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDate.now
+import java.time.LocalDateTime
 
 @Profile("integrasjonstest")
 @Service
@@ -47,6 +50,7 @@ class TestoppsettService(
     private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
     private val faktaGrunnlagService: FaktaGrunnlagService,
     private val vedtakRepository: VedtakRepository,
+    private val vedtaksresultatService: VedtaksresultatService,
 ) {
     fun hentFagsak(fagsakId: FagsakId) = fagsakService.hentFagsak(fagsakId)
 
@@ -129,10 +133,22 @@ class TestoppsettService(
         return vedtak
     }
 
-    fun ferdigstillBehandling(behandling: Behandling): Behandling =
-        oppdater(
-            behandling.copy(status = BehandlingStatus.FERDIGSTILT),
+    fun ferdigstillBehandling(behandling: Behandling): Behandling {
+        val resultat =
+            vedtakRepository.findByIdOrNull(behandling.id)?.type?.tilBehandlingResult()
+                ?: behandling.resultat
+        return oppdater(
+            behandling.copy(
+                status = BehandlingStatus.FERDIGSTILT,
+                resultat = resultat,
+                vedtakstidspunkt =
+                    when {
+                        resultat != BehandlingResultat.IKKE_SATT -> LocalDateTime.now()
+                        else -> null
+                    },
+            ),
         )
+    }
 
     fun opprettRevurdering(
         revurderFra: LocalDate?,
