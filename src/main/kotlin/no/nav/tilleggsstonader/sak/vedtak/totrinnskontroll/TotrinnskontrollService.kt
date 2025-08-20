@@ -131,7 +131,6 @@ class TotrinnskontrollService(
             metadata = beslutteVedtak,
         )
 
-        behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, nyStatus)
         if (nyTotrinnsKontrollStatus == TotrinnInternStatus.UNDERKJENT) {
             oppdaterUtfallogÅrsakPåTotrinnskontroll(beslutteVedtak, sisteTotrinnskontroll, nyTotrinnsKontrollStatus)
             taskService.save(BehandlingsstatistikkTask.opprettUnderkjentBeslutterTask(saksbehandling.id))
@@ -139,6 +138,8 @@ class TotrinnskontrollService(
             oppdaterStatusPåTotrinnskontroll(nyTotrinnsKontrollStatus, sisteTotrinnskontroll)
             taskService.save(BehandlingsstatistikkTask.opprettBesluttetTask(behandlingId = saksbehandling.id))
         }
+
+        behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, nyStatus)
 
         return sisteTotrinnskontroll.saksbehandler
     }
