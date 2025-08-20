@@ -27,7 +27,6 @@ class ForeslåVedtaksperiodeService(
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(saksbehandling.id)
         val forrigeVedtaksperioder =
             saksbehandling.forrigeIverksatteBehandlingId?.let {
-                // skal hente alle vedtaksperioder fra forrige behandling, så setter revurderFra til null
                 vedtakService.hentVedtaksperioder(it)
             } ?: emptyList()
         val tidligsteEndring =
