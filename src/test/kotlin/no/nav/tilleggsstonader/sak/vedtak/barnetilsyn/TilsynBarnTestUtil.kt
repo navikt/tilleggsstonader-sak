@@ -173,6 +173,7 @@ object TilsynBarnTestUtil {
         behandlingId: BehandlingId = defaultBehandling.id,
         beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
         vedtaksperioder: List<Vedtaksperiode> = emptyList(),
+        tidligsteEndring: LocalDate? = null,
     ) = GeneriskVedtak(
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,
@@ -182,7 +183,7 @@ object TilsynBarnTestUtil {
                 vedtaksperioder = vedtaksperioder,
             ),
         gitVersjon = Applikasjonsversjon.versjon,
-        tidligsteEndring = defaultBehandling.revurderFra,
+        tidligsteEndring = tidligsteEndring,
         opphørsdato = null,
     )
 

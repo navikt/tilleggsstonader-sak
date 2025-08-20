@@ -290,10 +290,11 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
     }
 
     @Nested
-    inner class AvkortVedRevurderFra {
+    inner class AvkortVedTidligsteEndring {
         @Test
-        fun `skal beholde hele perioden om den overlapper med revurderFra datoen`() {
-            val behandling = testoppsettService.lagBehandlingOgRevurdering(revurderFra = LocalDate.of(2025, 1, 1))
+        fun `skal beholde hele perioden om den overlapper med tidligsteEndring datoen`() {
+            val behandling = testoppsettService.lagBehandlingOgRevurdering()
+            vedtakRepository.insert(innvilgetVedtak(behandlingId = behandling.id, tidligsteEndring = LocalDate.of(2025, 1, 1)))
             vilkårperiodeRepository.insert(
                 aktivitet(
                     behandlingId = behandling.id,
@@ -309,8 +310,9 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `stønadsvilkår skal fjernes helt fra oppsummeringen om det er før revurderFra`() {
+        fun `stønadsvilkår skal fjernes helt fra oppsummeringen om det er før tidligsteEndring`() {
             val behandling = testoppsettService.lagBehandlingOgRevurdering(revurderFra = LocalDate.of(2025, 1, 1))
+            vedtakRepository.insert(innvilgetVedtak(behandlingId = behandling.id, tidligsteEndring = LocalDate.of(2025, 1, 1)))
 
             vilkårRepository.insertAll(
                 listOf(
@@ -342,8 +344,8 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
 
         @Test
         fun `stønadsvilkår skal ikke slås sammen om annen periode er før revurderFra`() {
-            val behandling = testoppsettService.lagBehandlingOgRevurdering(revurderFra = LocalDate.of(2025, 1, 1))
-
+            val behandling = testoppsettService.lagBehandlingOgRevurdering()
+            vedtakRepository.insert(innvilgetVedtak(behandlingId = behandling.id, tidligsteEndring = LocalDate.of(2025, 1, 1)))
             vilkårRepository.insertAll(
                 listOf(
                     vilkår(
