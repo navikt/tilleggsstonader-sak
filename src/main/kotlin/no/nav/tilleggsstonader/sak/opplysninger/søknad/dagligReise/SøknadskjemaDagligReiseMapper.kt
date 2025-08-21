@@ -37,7 +37,7 @@ import java.time.LocalDateTime
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge as OppholdUtenforNorgeKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reise as ReiseKontrakt
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.SkjemaDagligreise as SkjemaDagligReiseKontrakt
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.SkjemaDagligReise as SkjemaDagligReiseKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.UtgifterBil as UtgifterBilKontrakt
 
 @Service
@@ -210,7 +210,7 @@ class SøknadskjemaDagligReiseMapper(
             )
         }
 
-    private fun mapOffentligTransport(reise: ReiseKontrakt): OffentligTransport? {
+    private fun mapOffentligTransport(reise: ReiseKontrakt): OffentligTransport {
         val billettTyper =
             reise.hvaSlagsTypeBillettMaDuKjope
                 ?.filter { it.value }
@@ -255,17 +255,17 @@ class SøknadskjemaDagligReiseMapper(
             PrivatTransport(
                 årsakIkkeOffentligTransport = årsakIkkeOffentligTransport,
                 kanKjøreMedEgenBil = reise.kanDuKjoreMedEgenBil?.let(::mapJaNei),
-                bilUtgifter = bilUtgifter,
-                taxi = taxiUtgifter,
+                utgifterBil = bilUtgifter,
+                utgifterTaxi = taxiUtgifter,
             )
         } else {
             null
         }
     }
 
-    private fun mapBilUtgifter(utgifterBil: UtgifterBilKontrakt?): BilUtgifter? =
+    private fun mapBilUtgifter(utgifterBil: UtgifterBilKontrakt?): UtgifterBil? =
         utgifterBil?.let {
-            BilUtgifter(
+            UtgifterBil(
                 parkering = it.parkering,
                 bompenger = it.bompenger,
                 ferge = it.ferge,
@@ -273,7 +273,7 @@ class SøknadskjemaDagligReiseMapper(
             )
         }
 
-    private fun mapTaxiUtgifter(drosje: Drosje?): TaxiUtgifter? =
+    private fun mapTaxiUtgifter(drosje: Drosje?): UtgifterTaxi? =
         drosje?.let {
             val årsakIkkeKjøreBil =
                 it.hvaErViktigsteGrunnerTilAtDuIkkeKanKjoreBil
@@ -287,7 +287,7 @@ class SøknadskjemaDagligReiseMapper(
                         }
                     }
 
-            TaxiUtgifter(
+            UtgifterTaxi(
                 årsakIkkeKjøreBil = årsakIkkeKjøreBil,
                 ønskerSøkeOmTaxi = mapJaNei(it.onskerDuASokeOmFaDekketUtgifterTilReiseMedTaxi),
             )
