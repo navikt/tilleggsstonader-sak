@@ -343,7 +343,7 @@ class BehandlingOppsummeringServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `stønadsvilkår skal ikke slås sammen om annen periode er før revurderFra`() {
+        fun `stønadsvilkår skal ikke slås sammen om annen periode er før tidligsteEndring`() {
             val behandling = testoppsettService.lagBehandlingOgRevurdering()
             vedtakRepository.insert(innvilgetVedtak(behandlingId = behandling.id, tidligsteEndring = LocalDate.of(2025, 1, 1)))
             vilkårRepository.insertAll(
