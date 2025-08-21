@@ -14,18 +14,22 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -216,6 +220,8 @@ class InterntVedtakService(
                 is VedtakLæremidler -> mapVedtakLæremidler(vedtak.data)
 
                 is VedtakBoutgifter -> mapVedtakBoutgifter(vedtak.data)
+
+                is VedtakDagligReise -> mapVedtakDagligReise(vedtak.data)
             }
         }
 
@@ -268,6 +274,13 @@ class InterntVedtakService(
                     årsakerOpphør = vedtak.årsaker,
                     opphørBegrunnelse = vedtak.begrunnelse,
                 )
+        }
+
+    private fun mapVedtakDagligReise(vedtak: VedtakDagligReise) =
+        when (vedtak) {
+            is InnvilgelseDagligReise -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
+            is AvslagDagligReise -> TODO()
+            is OpphørDagligReise -> TODO()
         }
 
     private fun Map<BarnId, GrunnlagBarn>.finnFødselsdato(barnId: BarnId): LocalDate {

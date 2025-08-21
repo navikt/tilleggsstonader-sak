@@ -64,6 +64,8 @@ object VilkårUtil {
                 VilkårType.LØPENDE_UTGIFTER_EN_BOLIG -> true
                 VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER -> true
                 VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> true
+                VilkårType.DAGLIG_REISE_KJØRELISTE -> TODO()
+                VilkårType.DAGLIG_REISE_TAXI -> TODO()
                 VilkårType.EKSEMPEL2 -> false
                 VilkårType.EKSEMPEL -> false
             }

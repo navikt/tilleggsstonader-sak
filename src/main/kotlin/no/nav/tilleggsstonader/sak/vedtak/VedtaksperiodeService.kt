@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -73,6 +74,7 @@ class VedtaksperiodeService(
                 is InnvilgelseEllerOpphørTilsynBarn -> vedtak.data.vedtaksperioder
                 is InnvilgelseEllerOpphørLæremidler -> vedtak.data.vedtaksperioder
                 is InnvilgelseEllerOpphørBoutgifter -> vedtak.data.vedtaksperioder
+                is InnvilgelseEllerOpphørDagligReise -> vedtak.data.vedtaksperioder
                 is Avslag -> emptyList()
             }
 

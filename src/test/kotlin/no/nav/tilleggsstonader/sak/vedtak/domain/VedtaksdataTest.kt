@@ -28,6 +28,9 @@ class VedtaksdataTest {
                 is TypeVedtakTilsynBarn -> type.assertHarRiktigNavn(stønadstype)
                 is TypeVedtakLæremidler -> type.assertHarRiktigNavn(stønadstype)
                 is TypeVedtakBoutgifter -> type.assertHarRiktigNavn(stønadstype)
+                TypeVedtakDagligReise.INNVILGELSE_DAGLIG_REISE -> TODO()
+                TypeVedtakDagligReise.AVSLAG_DAGLIG_REISE -> TODO()
+                TypeVedtakDagligReise.OPPHØR_DAGLIG_REISE -> TODO()
             }
         }
     }
