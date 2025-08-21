@@ -1,0 +1,75 @@
+{
+  "dineOpplysninger": {
+    "fornavn": "FORNUFTIG",
+    "etternavn": "SØNNAVIND",
+    "identitet": {
+      "identitetsnummer": "29500474120"
+    },
+    "adresse": {
+      "gyldigFraOgMed": "2004-10-29",
+      "adresse": "Hestehagen 2",
+      "postnummer": "2069",
+      "bySted": "JESSHEIM",
+      "landkode": "NOR",
+      "land": {
+        "label": "Norge",
+        "value": "NO"
+      }
+    }
+  },
+  "hovedytelse": {
+    "arbeidsavklaringspenger": false,
+    "overgangsstonad": true,
+    "gjenlevendepensjon": false,
+    "uforetrygd": false,
+    "tiltakspenger": false,
+    "dagpenger": false,
+    "sykepenger": false,
+    "kvalifiseringsstonad": false,
+    "mottarIngenPengestotte": false,
+    "ingenAvAlternativenePasserForMeg": false
+  },
+  "aktiviteter": {
+    "aktiviteterOgMaalgruppe": {
+      "aktivitet": {
+        "aktivitetId": "ingenAktivitet",
+        "text": "Ingen relevant aktivitet registrert på meg"
+      }
+    },
+    "arbeidsrettetAktivitet": "tiltakArbeidsrettetUtredning",
+    "reiseperiode": {
+      "fom": "2025-07-01",
+      "tom": "2025-09-30"
+    },
+    "mottarLonnGjennomTiltak": "ja"
+  },
+  "reise": [
+    {
+      "kanDuReiseMedOffentligTransport": "nei",
+      "harDu6KmReisevei": "ja",
+      "reiseAdresse": {
+        "gateadresse": "Osloveien 42",
+        "postnr": "0482",
+        "poststed": "Oslo"
+      },
+      "hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet": {
+        "label": "4",
+        "value": "4"
+      },
+      "hvorLangErReiseveienDin": 14,
+      "hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport": {
+        "helsemessigeArsaker": false,
+        "darligTransporttilbud": true,
+        "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": false,
+        "annet": false
+      },
+      "kanDuKjoreMedEgenBil": "ja",
+      "utgifterBil": {
+        "parkering": 100,
+        "bompenger": 43,
+        "ferge": 0,
+        "piggdekkavgift": 22
+      }
+    }
+  ]
+}
