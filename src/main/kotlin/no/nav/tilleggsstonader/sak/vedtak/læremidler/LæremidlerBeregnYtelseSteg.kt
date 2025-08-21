@@ -42,13 +42,11 @@ class LæremidlerBeregnYtelseSteg(
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
-    unleashService: UnleashService,
 ) : BeregnYtelseSteg<VedtakLæremidlerRequest>(
         stønadstype = Stønadstype.LÆREMIDLER,
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
-        unleashService = unleashService,
     ) {
     override fun lagreVedtak(
         saksbehandling: Saksbehandling,
@@ -204,6 +202,6 @@ class LæremidlerBeregnYtelseSteg(
                     begrunnelse = begrunnelse,
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
-            tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
+            tidligsteEndring = tidligsteEndring,
         )
 }

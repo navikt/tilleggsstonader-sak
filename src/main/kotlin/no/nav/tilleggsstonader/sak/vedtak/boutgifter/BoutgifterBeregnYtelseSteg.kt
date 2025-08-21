@@ -38,7 +38,6 @@ class BoutgifterBeregnYtelseSteg(
     private val beregningService: BoutgifterBeregningService,
     private val opphørValideringService: OpphørValideringService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
-    unleashService: UnleashService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -47,7 +46,6 @@ class BoutgifterBeregnYtelseSteg(
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
-        unleashService = unleashService,
     ) {
     override fun lagreVedtak(
         saksbehandling: Saksbehandling,
@@ -170,7 +168,7 @@ class BoutgifterBeregnYtelseSteg(
                         beregningsresultat = BeregningsresultatBoutgifter(beregningsresultat.perioder),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
+                tidligsteEndring = tidligsteEndring,
             ),
         )
     }

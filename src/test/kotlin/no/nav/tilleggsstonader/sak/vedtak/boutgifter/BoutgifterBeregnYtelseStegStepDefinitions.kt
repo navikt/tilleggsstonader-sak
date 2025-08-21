@@ -26,7 +26,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepos
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
@@ -96,10 +95,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 )
             }
         }
-    val unleashService =
-        mockUnleashService().apply {
-            every { isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) } returns true
-        }
+    val unleashService = mockUnleashService()
     val vilkårService =
         VilkårService(
             behandlingService = behandlingServiceMock,
@@ -134,7 +130,6 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             vedtakRepository = vedtakRepositoryFake,
             tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepositoryFake),
             simuleringService = simuleringServiceMock,
-            unleashService = unleashService,
         )
 
     var feil: Exception? = null

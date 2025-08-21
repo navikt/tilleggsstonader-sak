@@ -29,7 +29,6 @@ class UtledTidligsteEndringService(
     private val vilkårperiodeService: VilkårperiodeService,
     private val vedtakRepository: VedtakRepository,
     private val barnService: BarnService,
-    private val unleashService: UnleashService,
 ) {
     /**
      * Sammenligner gitt behandling med tidligere iverksatte behandling, for å finne tidligste endring i vilkårsperioder,

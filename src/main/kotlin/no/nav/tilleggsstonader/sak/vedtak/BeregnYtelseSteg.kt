@@ -19,7 +19,6 @@ import java.time.LocalDate
  */
 abstract class BeregnYtelseSteg<DTO : Any>(
     private val stønadstype: Stønadstype,
-    open val unleashService: UnleashService,
     open val vedtakRepository: VedtakRepository,
     open val tilkjentYtelseService: TilkjentYtelseService,
     open val simuleringService: SimuleringService,
