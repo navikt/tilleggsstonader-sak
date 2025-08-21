@@ -32,7 +32,9 @@ data class UtgiftBoutgifterMedAndelTilUtbetalingDto(
     override val tom: LocalDate,
     val utgift: Int,
     val tilUtbetaling: Int,
+    // TODO - fjernes når frontend er oppdatert
     val erFørRevurderFra: Boolean,
+    val erFørTidligsteEndring: Boolean,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -62,13 +64,13 @@ private fun BeregningsresultatBoutgifter.inneholderUtgifterOvernatting(): Boolea
             .contains(TypeBoutgift.UTGIFTER_OVERNATTING)
     }
 
-fun BeregningsresultatForLøpendeMåned.tilDto(revurderFra: LocalDate?): BeregningsresultatForPeriodeDto =
+fun BeregningsresultatForLøpendeMåned.tilDto(tidligsteEndring: LocalDate?): BeregningsresultatForPeriodeDto =
     BeregningsresultatForPeriodeDto(
         fom = fom,
         tom = tom,
         stønadsbeløp = stønadsbeløp,
         sumUtgifter = grunnlag.summerUtgifter(),
-        utgifter = finnUtgifterMedAndelTilUtbetaling(revurderFra),
+        utgifter = finnUtgifterMedAndelTilUtbetaling(tidligsteEndring),
         målgruppe = grunnlag.målgruppe,
         aktivitet = grunnlag.aktivitet,
         makssatsBekreftet = grunnlag.makssatsBekreftet,
@@ -76,7 +78,7 @@ fun BeregningsresultatForLøpendeMåned.tilDto(revurderFra: LocalDate?): Beregni
     )
 
 fun BeregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(
-    revurderFra: LocalDate?,
+    tidligsteEndring: LocalDate?,
 ): List<UtgiftBoutgifterMedAndelTilUtbetalingDto> {
     var totalSum = 0
     return grunnlag.utgifter.values
@@ -90,12 +92,14 @@ fun BeregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(
                     minOf(utgift.utgift, grunnlag.makssats - totalSum)
                 }
             totalSum += skalUtbetales
+            val erFørTidligsteEndring = tidligsteEndring != null && utgift.tom < tidligsteEndring
             UtgiftBoutgifterMedAndelTilUtbetalingDto(
                 fom = utgift.fom,
                 tom = utgift.tom,
                 utgift = utgift.utgift,
                 tilUtbetaling = skalUtbetales,
-                erFørRevurderFra = revurderFra != null && utgift.tom < revurderFra,
+                erFørRevurderFra = erFørTidligsteEndring,
+                erFørTidligsteEndring = erFørTidligsteEndring,
             )
         }
 }
