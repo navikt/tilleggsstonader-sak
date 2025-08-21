@@ -279,43 +279,43 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         vedtakRepositoryFake.insert(vedtak)
     }
 
-    @Når("vi opphører boutgifter behandling={} med revurderFra={}")
-    fun `opphør med revurderFra`(
+    @Når("vi opphører boutgifter behandling={} med opphørsdato={}")
+    fun `opphør med opphørsdato`(
         behandlingIdTall: Int,
-        revurderFraStr: String,
+        opphørsdatoStr: String,
     ) {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
-        val revurderFra = parseDato(revurderFraStr)
+        val opphørsdato = parseDato(opphørsdatoStr)
 
-        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns revurderFra
+        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns opphørsdato
 
         kjørMedFeilkontekst {
             steg.utførSteg(
-                dummyBehandling(behandlingId, revurderFra = revurderFra),
+                dummyBehandling(behandlingId),
                 OpphørBoutgifterRequest(
                     årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
                     begrunnelse = "begrunnelse",
-                    opphørsdato = revurderFra,
+                    opphørsdato = opphørsdato,
                 ),
             )
         }
     }
 
-    @Når("vi innvilger boutgifter behandling={} med revurderFra={} med følgende vedtaksperioder")
-    fun `innvilgelse med revurderFra`(
+    @Når("vi innvilger boutgifter behandling={} med tidligsteEndring={} med følgende vedtaksperioder")
+    fun `innvilgelse med tidligsteEndring`(
         behandlingIdTall: Int,
-        revurderFraStr: String,
+        tidligsteEndringStr: String,
         vedtaksperiodeData: DataTable,
     ) {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
-        val revurderFra = parseDato(revurderFraStr)
+        val tidligsteEndring = parseDato(tidligsteEndringStr)
         val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto() }
 
-        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns revurderFra
+        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns tidligsteEndring
 
         kjørMedFeilkontekst {
             steg.utførSteg(
-                dummyBehandling(behandlingId, revurderFra = revurderFra),
+                dummyBehandling(behandlingId),
                 InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder),
             )
         }
@@ -392,7 +392,6 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     private fun dummyBehandling(
         behandlingId: BehandlingId,
         steg: StegType = StegType.BEREGNE_YTELSE,
-        revurderFra: LocalDate? = null,
     ): Saksbehandling {
         val forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId(behandlingId)
         return saksbehandling(

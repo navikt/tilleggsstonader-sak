@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
+import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.TilsynBarn.vedtak
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -379,19 +380,21 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : IntegrationTest() {
     @Nested
     inner class RevurderingSkalBeholdePerioderFraForrigeBehandling {
         @Test
-        fun `skal beholde perioder fra forrige behandling som er før måneden for revurderFra`() {
+        fun `skal beholde perioder fra forrige behandling som er før måneden til tidligsteEndring`() {
             innvilgPerioderForJanuarOgFebruar(behandling.id)
             assertHarPerioderForJanuarOgFebruar(behandling.id)
 
             testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.FERDIGSTILT))
-            val revurdering = opprettRevurdering(revurderFra = mars.atDay(1))
+            val revurdering = opprettRevurdering()
 
             innvilgPerioderForMars(revurdering)
+            // Verifiser tidligste endring 1.mars, da man har innvilget ny vedtaksperiode i mars
+            assertThat(vedtakService.hentVedtak(revurdering.id)?.tidligsteEndring).isEqualTo(mars.atDay(1))
 
             assertHarPerioderForJanuarTilMars(revurdering.id)
         }
 
-        private fun opprettRevurdering(revurderFra: LocalDate?) =
+        private fun opprettRevurdering() =
             testoppsettService
                 .lagre(
                     behandling(
@@ -463,7 +466,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : IntegrationTest() {
                 assertHarPerioderForJanuarOgFebruar(this)
 
                 /**
-                 * På grunn av at man revurder fra den 15 mars splittes vedtakssperioder i 2
+                 * På grunn av at man har endret fra den 15 mars splittes vedtakssperioder i 2
                  * Det er fordi man i beregningsresultat i behandlingen kun ønsker å se
                  * beløp som blir innvilget fra datoet man revurderer fra
                  */

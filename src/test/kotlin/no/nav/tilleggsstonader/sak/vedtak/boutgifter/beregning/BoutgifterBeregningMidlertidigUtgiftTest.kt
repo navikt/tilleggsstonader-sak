@@ -199,7 +199,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
     }
 
     @Test
-    fun `Beholder perioder fra før revuderFra, og beregner nye perioder ved revurdering`() {
+    fun `Beholder perioder fra før tidligsteEndring, og beregner nye perioder ved revurdering`() {
         val utgifterRevurdering: BoutgifterPerUtgiftstype =
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
@@ -229,7 +229,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 ),
             )
 
-        val utgiftEtterRevurderFra: BoutgifterPerUtgiftstype =
+        val utgiftEtterTidligsteEndring: BoutgifterPerUtgiftstype =
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
@@ -251,7 +251,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 3, 10),
                     tom = LocalDate.of(2025, 4, 9),
-                    utgifter = utgiftEtterRevurderFra,
+                    utgifter = utgiftEtterTidligsteEndring,
                 ),
             )
 

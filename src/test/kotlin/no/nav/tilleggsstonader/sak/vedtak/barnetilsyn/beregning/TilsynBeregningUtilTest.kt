@@ -181,15 +181,15 @@ class TilsynBeregningUtilTest {
             )
 
         @Nested
-        inner class BrukPerioderFraOgMedRevurderFra {
+        inner class BrukPerioderFraOgMedTidligsteEndring {
             @Test
-            fun `skal returnere orginal liste uten revurder fra`() {
+            fun `skal returnere orginal liste uten tidligste endring`() {
                 assertThat(vedtaksperioder.brukPerioderFraOgMedTidligsteEndring(null)).isEqualTo(vedtaksperioder)
             }
 
             @Test
-            fun `skal returnere perioder etter revurder fra`() {
-                val revurderFra = LocalDate.of(2025, 2, 1)
+            fun `skal returnere perioder etter tidligste endring`() {
+                val tidligsteEndring = LocalDate.of(2025, 2, 1)
 
                 val forventedeVedtaksperioder =
                     listOf(
@@ -203,7 +203,7 @@ class TilsynBeregningUtilTest {
 
                 assertThat(
                     vedtaksperioder
-                        .brukPerioderFraOgMedTidligsteEndring(revurderFra),
+                        .brukPerioderFraOgMedTidligsteEndring(tidligsteEndring),
                 ).isEqualTo(forventedeVedtaksperioder)
             }
         }

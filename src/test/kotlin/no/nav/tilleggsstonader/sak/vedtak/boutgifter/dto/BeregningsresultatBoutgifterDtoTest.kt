@@ -126,7 +126,7 @@ class BeregningsresultatBoutgifterDtoTest {
     }
 
     @Test
-    fun `finnUtgifterMedAndelTilUtbetaling skal markere utgifter med før revurder fra`() {
+    fun `finnUtgifterMedAndelTilUtbetaling skal markere utgifter med før tidligsteEndring`() {
         val utgift =
             listOf(
                 lagUtgiftBeregningBoutgifter(
@@ -164,7 +164,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     utgift = 1000,
                     tilUtbetaling = 1000,
                     erFørRevurderFra = true,
-                    erFørTidligsteEndring = false,
+                    erFørTidligsteEndring = true,
                 ),
                 UtgiftBoutgifterMedAndelTilUtbetalingDto(
                     fom = LocalDate.of(2023, 1, 11),
@@ -176,10 +176,10 @@ class BeregningsresultatBoutgifterDtoTest {
                 ),
             )
 
-        val revurderFra = LocalDate.of(2023, 1, 10)
+        val tidligsteEndring = LocalDate.of(2023, 1, 10)
 
         val result =
-            beregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(revurderFra)
+            beregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(tidligsteEndring)
 
         assertEquals(forventetResultat, result)
     }
@@ -219,14 +219,14 @@ class BeregningsresultatBoutgifterDtoTest {
                     utgift = 20_000,
                     tilUtbetaling = 20_000,
                     erFørRevurderFra = true,
-                    erFørTidligsteEndring = false,
+                    erFørTidligsteEndring = true,
                 ),
             )
 
-        val revurderFra = LocalDate.of(2023, 1, 10)
+        val tidligsteEndring = LocalDate.of(2023, 1, 10)
 
         val result =
-            beregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(revurderFra)
+            beregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(tidligsteEndring)
 
         assertEquals(forventetResultat, result)
     }

@@ -125,7 +125,7 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
     inner class Opphør {
         @Test
         fun `skal lagre og hente opphør`() {
-            val revurderFraDato = dummyFom.plusDays(4)
+            val opphørsdato = dummyFom.plusDays(4)
             innvilgeVedtak(
                 behandling = dummyBehandling,
                 vedtak = InnvilgelseBoutgifterRequest(listOf(vedtaksperiode.tilDto())),
@@ -141,7 +141,7 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
             vilkårRepository.insert(
                 vilkår.copy(
                     fom = dummyFom,
-                    tom = revurderFraDato.minusDays(1),
+                    tom = opphørsdato.minusDays(1),
                     id = VilkårId.random(),
                     behandlingId = revurdering.id,
                     status = VilkårStatus.ENDRET,
@@ -167,7 +167,7 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
                 OpphørBoutgifterRequest(
                     årsakerOpphør = listOf(ÅrsakOpphør.ANNET),
                     begrunnelse = "Statsbudsjettet er tomt",
-                    opphørsdato = revurderFraDato,
+                    opphørsdato = opphørsdato,
                 )
 
             opphørVedtak(revurdering, opphørVedtak)

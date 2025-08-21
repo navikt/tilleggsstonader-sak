@@ -198,6 +198,6 @@ class TilsynBarnBeregnYtelseSteg(
                     beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
-            tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
+            tidligsteEndring = tidligsteEndring,
         )
 }

@@ -1,9 +1,9 @@
 # language: no
 # encoding: UTF-8
 
-Egenskap: Beregning - med revurderFra - behold perioder fra forrige behandling
+Egenskap: Beregning - med tidligsteEndring - behold perioder fra forrige behandling
 
-  Scenario: Skal gjenbruke perioder for måneder før revurderFra
+  Scenario: Skal gjenbruke perioder for måneder før tidligsteEndring
 
     Gitt beregningsperioder fra forrige behandling
       | Måned   |
@@ -35,7 +35,7 @@ Egenskap: Beregning - med revurderFra - behold perioder fra forrige behandling
       | 02.2024 | 29.53   | 3            | 1000   | 89          |
 
 
-  Scenario: Skal gjenbruke perioder for måneder før revurderFra
+  Scenario: Skal gjenbruke perioder for måneder før tidligsteEndring
 
     Gitt beregningsperioder fra forrige behandling
       | Måned   |

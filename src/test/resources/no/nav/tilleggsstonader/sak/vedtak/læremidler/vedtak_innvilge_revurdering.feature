@@ -21,7 +21,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
-    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med tidligsteEndring=01.02.2025
       | Fom        | Tom        | Målgruppe           | Aktivitet |
       | 01.01.2025 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
       | 01.02.2025 | 28.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
@@ -65,7 +65,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Målgruppe |
       | 01.12.2024 | 31.03.2025 | AAP       |
 
-    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med tidligsteEndring=01.02.2025
       | Fom        | Tom        | Målgruppe           | Aktivitet |
       | 01.01.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
@@ -97,7 +97,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
-    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=20.02.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med tidligsteEndring=20.02.2025
       | Fom        | Tom        | Målgruppe           | Aktivitet |
       | 01.01.2025 | 10.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
       # Ny vedtaksperiode
@@ -137,7 +137,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 01.12.2024 | 31.01.2025 | AAP             |
       | 01.02.2024 | 31.03.2025 | OVERGANGSSTØNAD |
 
-    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med tidligsteEndring=01.02.2025
       | Fom        | Tom        | Målgruppe           | Aktivitet |
       | 01.01.2025 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | UTDANNING |
       | 01.02.2025 | 28.02.2025 | ENSLIG_FORSØRGER    | UTDANNING |
@@ -172,7 +172,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
     Når kopierer perioder fra forrige behandling for behandling=2
 
     # Legger til ny vedtaksperiode etter nyttår
-    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.01.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med tidligsteEndring=01.01.2025
       | Fom        | Tom        | Målgruppe           | Aktivitet |
       | 20.12.2024 | 31.12.2024 | NEDSATT_ARBEIDSEVNE | TILTAK    |
       | 01.01.2025 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
@@ -213,7 +213,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Målgruppe |
       | 01.12.2024 | 31.03.2025 | AAP       |
 
-    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.01.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med tidligsteEndring=01.01.2025
       | Fom        | Tom        | Målgruppe           | Aktivitet |
       | 20.12.2024 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
@@ -245,7 +245,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
 
     Gitt kopierer perioder fra forrige behandling for behandling=2
 
-    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med tidligsteEndring=01.02.2025
       | Fom        | Tom        | Målgruppe           | Aktivitet |
       | 01.01.2025 | 31.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
       | 01.02.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
@@ -282,7 +282,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Målgruppe |
       | 01.01.2025 | 31.03.2025 | AAP       |
 
-    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med tidligsteEndring=01.02.2025
       | Fom        | Tom        | Målgruppe           | Aktivitet |
       | 01.01.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
@@ -318,7 +318,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Målgruppe |
       | 01.01.2025 | 31.03.2025 | AAP       |
 
-    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=31.01.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med tidligsteEndring=31.01.2025
       | Fom        | Tom        | Målgruppe           | Aktivitet |
       | 01.01.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
@@ -349,7 +349,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
-    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=06.01.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med tidligsteEndring=06.01.2025
       | Fom        | Tom        | Målgruppe           | Aktivitet |
       | 06.01.2025 | 10.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
@@ -380,7 +380,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
-    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=06.01.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med tidligsteEndring=06.01.2025
       | Fom        | Tom        | Målgruppe           | Aktivitet |
       | 01.02.2025 | 09.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
       | 10.02.2025 | 10.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
@@ -411,7 +411,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
-    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=06.01.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med tidligsteEndring=06.01.2025
       | Fom        | Tom        | Målgruppe           | Aktivitet |
       | 20.01.2025 | 09.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
       | 10.02.2025 | 31.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |

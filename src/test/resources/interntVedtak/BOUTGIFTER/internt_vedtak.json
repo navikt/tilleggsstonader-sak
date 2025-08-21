@@ -212,7 +212,8 @@
         "tom" : "2024-01-31",
         "utgift" : 3000,
         "tilUtbetaling" : 3000,
-        "erFørRevurderFra" : false
+        "erFørRevurderFra" : false,
+        "erFørTidligsteEndring" : false
       } ],
       "sumUtgifter" : 3000,
       "målgruppe" : "NEDSATT_ARBEIDSEVNE",
@@ -228,7 +229,8 @@
         "tom" : "2024-02-29",
         "utgift" : 4000,
         "tilUtbetaling" : 4000,
-        "erFørRevurderFra" : false
+        "erFørRevurderFra" : false,
+        "erFørTidligsteEndring" : false
       } ],
       "sumUtgifter" : 4000,
       "målgruppe" : "NEDSATT_ARBEIDSEVNE",

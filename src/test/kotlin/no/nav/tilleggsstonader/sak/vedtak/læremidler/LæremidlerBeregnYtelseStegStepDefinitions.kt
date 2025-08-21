@@ -149,20 +149,20 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseLæremidlerRequest(vedtaksperioder))
     }
 
-    @Når("innvilger revurdering med vedtaksperioder for behandling={} med revurderFra={}")
-    fun `innvilger vedtaksperioder for behandling={} med revurderFra={}`(
+    @Når("innvilger revurdering med vedtaksperioder for behandling={} med tidligsteEndring={}")
+    fun `innvilger vedtaksperioder for behandling={} med tidligsteEndring={}`(
         behandlingIdTall: Int,
-        revurderFraStr: String,
+        tidligsteEndringStr: String,
         dataTable: DataTable,
     ) {
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
-        val revurderFra = parseDato(revurderFraStr)
+        val tidligsteEndring = parseDato(tidligsteEndringStr)
 
-        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns revurderFra
+        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns tidligsteEndring
 
         val vedtaksperioder = mapVedtaksperioderDto(dataTable)
-        steg.utførSteg(dummyBehandling(behandlingId, revurderFra), InnvilgelseLæremidlerRequest(vedtaksperioder))
+        steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseLæremidlerRequest(vedtaksperioder))
     }
 
     @Når("kopierer perioder fra forrige behandling for behandling={}")
@@ -216,19 +216,19 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         tilkjentYtelseRepository.insert(TilkjentYtelse(behandlingId = behandlingId, andelerTilkjentYtelse = andeler))
     }
 
-    @Når("opphør behandling={} med revurderFra={}")
-    fun `opphør med revurderFra`(
+    @Når("opphør behandling={} med opphørsdato={}")
+    fun `opphør med opphørsdato`(
         behandlingIdTall: Int,
-        revurderFraStr: String,
+        opphørsdatoStr: String,
     ) {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
-        val revurderFra = parseDato(revurderFraStr)
+        val opphørsdato = parseDato(opphørsdatoStr)
         steg.utførSteg(
-            dummyBehandling(behandlingId, revurderFra = revurderFra),
+            dummyBehandling(behandlingId),
             OpphørLæremidlerRequest(
                 årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
                 begrunnelse = "begrunnelse",
-                opphørsdato = revurderFra,
+                opphørsdato = opphørsdato,
             ),
         )
     }
@@ -377,10 +377,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             )
         }
 
-    private fun dummyBehandling(
-        behandlingId: BehandlingId,
-        revurderFra: LocalDate? = null,
-    ): Saksbehandling {
+    private fun dummyBehandling(behandlingId: BehandlingId): Saksbehandling {
         val forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId(behandlingId)
         return saksbehandling(
             id = behandlingId,
