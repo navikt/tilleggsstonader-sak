@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
@@ -92,7 +92,7 @@ class BoutgifterBeregningService(
 
         return if (forrigeVedtak != null) {
             settSammenGamleOgNyePerioder(
-                revurderFra = tidligsteEndring ?: feil("Behandlingen mangler revurder fra-dato"),
+                tidligsteEndring = behandling.revurderFra ?: tidligsteEndring,
                 nyttBeregningsresultat = beregningsresultat,
                 forrigeBeregningsresultat = forrigeVedtak.beregningsresultat,
             )
@@ -132,19 +132,22 @@ class BoutgifterBeregningService(
      * Vi trenger derimot å reberegne alle perioder som ligger etter revurder fra-datoen, da utgiftene, antall samlinger osv kan ha endret seg.
      */
     private fun settSammenGamleOgNyePerioder(
-        revurderFra: LocalDate,
+        tidligsteEndring: LocalDate?,
         nyttBeregningsresultat: List<BeregningsresultatForLøpendeMåned>,
         forrigeBeregningsresultat: BeregningsresultatBoutgifter,
     ): BeregningsresultatBoutgifter {
+        feilHvis(tidligsteEndring == null) {
+            "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
+        }
         val perioderFraForrigeVedtakSomSkalBeholdes =
             forrigeBeregningsresultat.perioder
-                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < revurderFra }
+                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < tidligsteEndring }
                 .markerSomDelAvTidligereUtbetaling()
 
         val reberegnedePerioder =
             nyttBeregningsresultat
                 .filter {
-                    it.fom.sisteDagenILøpendeMåned() >= revurderFra
+                    it.fom.sisteDagenILøpendeMåned() >= tidligsteEndring
                 }.markerSomDelAvTidligereUtbetaling(forrigeBeregningsresultat.perioder)
         return BeregningsresultatBoutgifter(perioderFraForrigeVedtakSomSkalBeholdes + reberegnedePerioder)
     }
