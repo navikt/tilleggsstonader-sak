@@ -168,7 +168,7 @@ class LæremidlerBeregningService(
         tidligsteEndring: LocalDate?,
     ): BeregningsresultatLæremidler {
         feilHvis(tidligsteEndring == null) {
-            "Behandling=${saksbehandling.id} steg=${saksbehandling.steg} Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
+            "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
         }
 
         val forrigeBeregningsresultat = forrigeVedtak.beregningsresultat
