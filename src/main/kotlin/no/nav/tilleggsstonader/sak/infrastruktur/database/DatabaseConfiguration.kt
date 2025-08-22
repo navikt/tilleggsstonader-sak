@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.IdConverters.alleValue
 import no.nav.tilleggsstonader.sak.oppfølging.OppfølgingData
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagData
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.SkjemaBoutgifter
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.SkjemaDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaLæremidler
@@ -91,6 +92,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             SkjemaLæremidlerWriter(),
             SkjemaBoutgifterReader(),
             SkjemaBoutgifterWriter(),
+            SkjemaDagligReiseReader(),
+            SkjemaDagligReiseWriter(),
             BarnMedBarnepassReader(),
             BarnMedBarnepassWriter(),
             FilTilBytearrayConverter(),
@@ -195,6 +198,10 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class SkjemaBoutgifterReader : JsonReader<SkjemaBoutgifter>(SkjemaBoutgifter::class)
 
     class SkjemaBoutgifterWriter : JsonWriter<SkjemaBoutgifter>()
+
+    class SkjemaDagligReiseReader : JsonReader<SkjemaDagligReise>(SkjemaDagligReise::class)
+
+    class SkjemaDagligReiseWriter : JsonWriter<SkjemaDagligReise>()
 
     class BarnMedBarnepassReader : JsonReader<BarnMedBarnepass>(BarnMedBarnepass::class)
 
