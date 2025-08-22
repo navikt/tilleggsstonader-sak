@@ -80,6 +80,10 @@ class TilsynBarnBeregningService(
         val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioderBeregning, tidligsteEndring)
         val relevantePerioderFraForrigeVedtak =
             finnRelevantePerioderFraForrigeVedtak(behandling, tidligsteEndring)
+
+        feilHvis(tidligsteEndring == null) {
+            "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
+        }
         return BeregningsresultatTilsynBarn(relevantePerioderFraForrigeVedtak + perioder)
     }
 
