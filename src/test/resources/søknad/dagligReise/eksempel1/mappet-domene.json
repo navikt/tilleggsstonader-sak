@@ -1,0 +1,86 @@
+{
+  "personopplysninger" : {
+    "adresse" : {
+      "gyldigFraOgMed" : "2004-10-29",
+      "adresse" : "En vei 2",
+      "postnummer" : "2069",
+      "poststed" : "JESSHEIM",
+      "landkode" : "Land1"
+    }
+  },
+  "hovedytelse" : {
+    "hovedytelse" : [ "AAP", "OVERGANGSSTØNAD", "GJENLEVENDEPENSJON", "UFØRETRYGD", "TILTAKSPENGER", "DAGPENGER", "SYKEPENGER", "KVALIFISERINGSSTØNAD", "INGEN_PENGESTØTTE", "INGEN_PASSENDE_ALTERNATIVER" ],
+    "harNedsattArbeidsevne" : null,
+    "arbeidOgOpphold" : {
+      "jobberIAnnetLand" : "JA",
+      "jobbAnnetLand" : "Land1",
+      "harPengestøtteAnnetLand" : [ "SYKEPENGER", "PENSJON", "ANNEN_PENGESTØTTE", "MOTTAR_IKKE" ],
+      "pengestøtteAnnetLand" : "Land1",
+      "harOppholdUtenforNorgeSiste12mnd" : "JA",
+      "oppholdUtenforNorgeSiste12mnd" : [ {
+        "land" : "AF",
+        "årsak" : [ "JOBB", "STUDIER", "MEDISINSK_BEHANDLING", "FERIE", "FAMILIE_BESØK", "ANNET" ],
+        "fom" : "2025-01-01",
+        "tom" : "2025-01-01"
+      } ],
+      "harOppholdUtenforNorgeNeste12mnd" : "JA",
+      "oppholdUtenforNorgeNeste12mnd" : [ {
+        "land" : "AF",
+        "årsak" : [ "JOBB", "STUDIER", "MEDISINSK_BEHANDLING", "FERIE", "FAMILIE_BESØK", "ANNET" ],
+        "fom" : "2025-01-01",
+        "tom" : "2025-01-01"
+      } ]
+    }
+  },
+  "aktivitet" : {
+    "aktivitet" : {
+      "aktiviteter" : [ {
+        "id" : "123",
+        "label" : "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
+      } ],
+      "annenAktivitet" : "TILTAK",
+      "lønnetAktivitet" : "JA"
+    },
+    "reiseTilAktivitetsstedHelePerioden" : "JA",
+    "reiseperiode" : {
+      "fom" : "2025-01-01",
+      "tom" : "2025-01-01"
+    }
+  },
+  "reiser" : [ {
+    "reiseAdresse" : {
+      "gateadresse" : "EksempelSvar",
+      "postnummer" : "EksempelSvar",
+      "poststed" : "EksempelSvar"
+    },
+    "dagerPerUke" : {
+      "id" : "3",
+      "label" : "3"
+    },
+    "harMerEnn6KmReisevei" : "JA",
+    "lengdeReisevei" : 100,
+    "harBehovForTransportUavhengigAvReisensLengde" : "JA",
+    "kanReiseMedOffentligTransport" : "JA",
+    "offentligTransport" : {
+      "billettTyperValgt" : [ "ENKELTBILLETT", "SYVDAGERSBILLETT", "MÅNEDSKORT" ],
+      "enkeltbillettPris" : 100,
+      "syvdagersbillettPris" : 100,
+      "månedskortPris" : 100
+    },
+    "privatTransport" : {
+      "årsakIkkeOffentligTransport" : [ "HELSEMESSIGE_ÅRSAKER", "DÅRLIG_TRANSPORTTILBUD", "LEVERING_HENTING_BARNEHAGE_SKOLE", "ANNET" ],
+      "kanKjøreMedEgenBil" : "JA",
+      "utgifterBil" : {
+        "parkering" : 100,
+        "bompenger" : 100,
+        "ferge" : 100,
+        "piggdekkavgift" : 100
+      },
+      "utgifterTaxi" : {
+        "årsakIkkeKjøreBil" : [ "HELSEMESSIGE_ÅRSAKER", "DÅRLIG_TRANSPORTTILBUD", "ANNET" ],
+        "ønskerSøkeOmTaxi" : "JA"
+      }
+    }
+  } ],
+  "dokumentasjon" : [ ]
+}
