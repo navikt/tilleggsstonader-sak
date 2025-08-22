@@ -92,7 +92,7 @@ class BoutgifterBeregningService(
 
         return if (forrigeVedtak != null) {
             settSammenGamleOgNyePerioder(
-                tidligsteEndring = behandling.revurderFra ?: tidligsteEndring,
+                tidligsteEndring = tidligsteEndring,
                 nyttBeregningsresultat = beregningsresultat,
                 forrigeBeregningsresultat = forrigeVedtak.beregningsresultat,
             )
