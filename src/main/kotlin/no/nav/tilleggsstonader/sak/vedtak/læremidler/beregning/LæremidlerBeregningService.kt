@@ -57,7 +57,7 @@ class LæremidlerBeregningService(
         val beregningsresultatForMåned = beregn(behandling, vedtaksperioderBeregningsgrunnlag)
 
         return if (forrigeVedtak != null) {
-            settSammenGamleOgNyePerioder(beregningsresultatForMåned, forrigeVedtak, behandling.revurderFra ?: tidligsteEndring)
+            settSammenGamleOgNyePerioder(beregningsresultatForMåned, forrigeVedtak, tidligsteEndring)
         } else {
             BeregningsresultatLæremidler(beregningsresultatForMåned)
         }
