@@ -26,29 +26,29 @@ class SøknadskjemaDagligReiseMapperTest {
 
     @Test
     fun `skal kunne mappe skjema-eksempel fra fyllUtSendInn som inneholder alle felter`() {
-        val skjema = mapSkjemadata("søknad/dagligreise/eksempel1/skjema-eksempel.json")
+        val skjema = mapSkjemadata("søknad/dagligReise/eksempel1/skjema-eksempel-alle-felter.json")
         val mappetSkjema = mapper.mapSkjema(skjema, emptyList())
 
         val mappetJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
-        assertFileIsEqual("søknad/dagligreise/eksempel1/mappet-domene.json", mappetJson)
+        assertFileIsEqual("søknad/dagligReise/eksempel1/mappet-domene.json", mappetJson)
     }
 
     @Test
     fun `skal kunne mappe skjema-eksempel fra fyllUtSendInn som har bare offentlig transport`() {
-        val skjema = mapSkjemadata("søknad/dagligreise/eksempel2/skjema-eksempel-offentlig-transport.json")
+        val skjema = mapSkjemadata("søknad/dagligReise/eksempel2/skjema-eksempel-offentlig-transport.json")
         val mappetSkjema = mapper.mapSkjema(skjema, emptyList())
 
         val mappetJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
-        assertFileIsEqual("søknad/dagligreise/eksempel2/mappet-domene.json", mappetJson)
+        assertFileIsEqual("søknad/dagligReise/eksempel2/mappet-domene.json", mappetJson)
     }
 
     @Test
     fun `skal kunne mappe skjema-eksempel fra fyllUtSendInn med bare egen bil`() {
-        val skjema = mapSkjemadata("søknad/dagligreise/eksempel3/skjema-eksempel-egen-bil.json")
+        val skjema = mapSkjemadata("søknad/dagligReise/eksempel3/skjema-eksempel-egen-bil.json")
         val mappetSkjema = mapper.mapSkjema(skjema, emptyList())
 
         val mappetJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
-        assertFileIsEqual("søknad/dagligreise/eksempel3/mappet-domene.json", mappetJson)
+        assertFileIsEqual("søknad/dagligReise/eksempel3/mappet-domene.json", mappetJson)
     }
 
     private fun mapSkjemadata(skjemaJsonFil: String): SøknadsskjemaDagligReiseFyllUtSendInn {
