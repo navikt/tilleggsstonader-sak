@@ -1,12 +1,18 @@
 DROP VIEW IF EXISTS gjeldende_iverksatte_behandlinger;
 
+-- For å markere at systemet ikke har utledet tidligste endring, men migrert fra behandling.revurder_fra
+ALTER TABLE vedtak ADD COLUMN migrert_fra_revurder_fra BOOLEAN DEFAULT FALSE;
+
 UPDATE vedtak v
-SET tidligste_endring = (SELECT revurder_fra FROM behandling b WHERE b.id = v.behandling_id)
+SET
+    tidligste_endring = (SELECT revurder_fra FROM behandling b WHERE b.id = v.behandling_id),
+    migrert_fra_revurder_fra = TRUE
 WHERE tidligste_endring IS NOT NULL
   AND type = 'INNVILGELSE';
 
 UPDATE vedtak v
-SET opphorsdato = (SELECT revurder_fra FROM behandling b WHERE b.id = v.behandling_id)
+SET opphorsdato = (SELECT revurder_fra FROM behandling b WHERE b.id = v.behandling_id),
+    migrert_fra_revurder_fra = TRUE
 WHERE opphorsdato IS NOT NULL
   AND type = 'OPPHØR';
 
