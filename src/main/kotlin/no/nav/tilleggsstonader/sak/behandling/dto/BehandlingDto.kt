@@ -15,7 +15,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.dto.TilordnetSaksbehandlerDto
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class BehandlingDto(

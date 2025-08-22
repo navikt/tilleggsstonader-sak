@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import java.time.LocalDate
 
 object BehandlingUtil {
     fun utledBehandlingTypeV2(tidligereBehandlinger: List<Behandling>): BehandlingType {

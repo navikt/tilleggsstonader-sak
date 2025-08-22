@@ -239,7 +239,7 @@ class BeregningsresultatLæremidlerTest {
     }
 
     @Test
-    fun `perioder midt i tidligsteEndring blir kuttet - tester med lengre periode - kutter i maanedsskiftet februar-mars i skuddåret 2024`() {
+    fun `perioder midt i tidligsteEndring blir kuttet - tester med lengre periode - kutter i mndskifte februar-mars i skuddåret 2024`() {
         val innvilgelseLæremidlerMedLangPeriode =
             InnvilgelseLæremidler(
                 vedtaksperioder =

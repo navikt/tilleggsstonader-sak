@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDetaljer
@@ -10,14 +9,12 @@ import no.nav.tilleggsstonader.sak.behandling.dto.FagsakMedBehandlinger
 import no.nav.tilleggsstonader.sak.behandling.dto.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class BehandlingsoversiktService(
