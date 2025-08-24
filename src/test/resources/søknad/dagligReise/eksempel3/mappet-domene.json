@@ -1,0 +1,59 @@
+{
+  "personopplysninger" : {
+    "adresse" : {
+      "gyldigFraOgMed" : "2004-10-29",
+      "adresse" : "Hestehagen 2",
+      "postnummer" : "2069",
+      "poststed" : "JESSHEIM",
+      "landkode" : "Land1"
+    }
+  },
+  "hovedytelse" : {
+    "hovedytelse" : [ "OVERGANGSSTØNAD" ],
+    "harNedsattArbeidsevne" : null,
+    "arbeidOgOpphold" : null
+  },
+  "aktivitet" : {
+    "aktivitet" : {
+      "aktiviteter" : [ {
+        "id" : "ANNET",
+        "label" : "Ingen relevant aktivitet registrert på meg"
+      } ],
+      "annenAktivitet" : "TILTAK",
+      "lønnetAktivitet" : "JA"
+    },
+    "reiseTilAktivitetsstedHelePerioden" : null,
+    "reiseperiode" : {
+      "fom" : "2025-07-01",
+      "tom" : "2025-09-30"
+    }
+  },
+  "reiser" : [ {
+    "reiseAdresse" : {
+      "gateadresse" : "Osloveien 42",
+      "postnummer" : "0482",
+      "poststed" : "Oslo"
+    },
+    "dagerPerUke" : {
+      "id" : "4",
+      "label" : "4"
+    },
+    "harMerEnn6KmReisevei" : "JA",
+    "lengdeReisevei" : 14,
+    "harBehovForTransportUavhengigAvReisensLengde" : null,
+    "kanReiseMedOffentligTransport" : "NEI",
+    "offentligTransport" : null,
+    "privatTransport" : {
+      "årsakIkkeOffentligTransport" : [ "DÅRLIG_TRANSPORTTILBUD" ],
+      "kanKjøreMedEgenBil" : "JA",
+      "utgifterBil" : {
+        "parkering" : 100,
+        "bompenger" : 43,
+        "ferge" : 0,
+        "piggdekkavgift" : 22
+      },
+      "utgifterTaxi" : null
+    }
+  } ],
+  "dokumentasjon" : [ ]
+}
