@@ -47,4 +47,5 @@ val typerVedtaksdata: Map<String, TypeVedtaksdata> =
         TypeVedtakTilsynBarn.entries,
         TypeVedtakLæremidler.entries,
         TypeVedtakBoutgifter.entries,
+        TypeVedtakDagligReise.entries,
     ).flatten().associateBy { it.name }

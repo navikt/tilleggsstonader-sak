@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
+import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -43,6 +44,7 @@ sealed interface InnvilgelseEllerOpphørDagligReise : VedtakDagligReise {
     val vedtaksperioder: List<Vedtaksperiode>
 }
 
+@JsonTypeName("INNVILGELSE_DAGLIG_REISE")
 data class InnvilgelseDagligReise(
     override val beregningsresultat: Beregningsresultat,
     override val vedtaksperioder: List<Vedtaksperiode>,

@@ -1,0 +1,119 @@
+package no.nav.tilleggsstonader.sak.vedtak.dagligReise
+
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.test.httpclient.ProblemDetailUtil.catchProblemDetailException
+import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseResponse
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeTestUtil.vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
+import org.springframework.web.client.exchange
+import java.time.LocalDate
+
+class DagligReiseVedtakControllerTest : IntegrationTest() {
+    @Autowired
+    lateinit var vilkårperiodeRepository: VilkårperiodeRepository
+
+    @Autowired
+    lateinit var vilkårRepository: VilkårRepository
+
+    val dummyFom: LocalDate = LocalDate.now()
+    val dummyTom: LocalDate = LocalDate.now().plusDays(29)
+    val dummyFagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+    val dummyBehandling =
+        behandling(fagsak = dummyFagsak, steg = StegType.BEREGNE_YTELSE, status = BehandlingStatus.UTREDES)
+    val dummyOffentligTransport =
+        OffentligTransport(reisedagerPerUke = 4, prisEnkelbillett = 44, prisTrettidagersbillett = 750)
+
+    val vedtaksperiode = vedtaksperiode(fom = dummyFom, tom = dummyTom)
+    val aktivitet = aktivitet(dummyBehandling.id, fom = dummyFom, tom = dummyTom)
+    val målgruppe = målgruppe(dummyBehandling.id, fom = dummyFom, tom = dummyTom)
+
+    val vilkår =
+        vilkår(
+            behandlingId = dummyBehandling.id,
+            type = VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
+            fom = dummyFom,
+            tom = dummyTom,
+            offentligTransport = dummyOffentligTransport,
+        )
+
+    @BeforeEach
+    fun setUp() {
+        headers.setBearerAuth(onBehalfOfToken())
+        testoppsettService.opprettBehandlingMedFagsak(dummyBehandling, stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+        vilkårperiodeRepository.insert(aktivitet)
+        vilkårperiodeRepository.insert(målgruppe)
+        vilkårRepository.insert(vilkår)
+    }
+
+    @Test
+    fun `skal validere token`() {
+        headers.clear()
+        val exception =
+            catchProblemDetailException { hentVedtak<InnvilgelseDagligReiseResponse>(BehandlingId.random()) }
+
+        assertThat(exception.httpStatus).isEqualTo(HttpStatus.UNAUTHORIZED)
+    }
+
+    @Test
+    fun `hent vedtak skal returnere tom body når det ikke finnes noen lagrede vedtak`() {
+        val response = hentVedtak<InnvilgelseDagligReiseResponse>(dummyBehandling.id)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body).isNull()
+    }
+
+    @Test
+    fun `hent ut lagrede vedtak av type innvilgelse`() {
+        val vedtakRequest = InnvilgelseDagligReiseRequest(listOf(vedtaksperiode.tilDto()))
+        val lagreVedtak =
+            innvilgeVedtak<InnvilgelseDagligReiseResponse>(
+                dummyBehandling,
+                vedtakRequest,
+            )
+        assertThat(lagreVedtak.statusCode).isEqualTo(HttpStatus.OK)
+
+        val response = hentVedtak<InnvilgelseDagligReiseResponse>(dummyBehandling.id)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body).isNotNull
+    }
+
+    private inline fun <reified T> innvilgeVedtak(
+        behandling: Behandling,
+        vedtak: InnvilgelseDagligReiseRequest,
+    ) = restTemplate.exchange<T>(
+        localhost("api/vedtak/daglig-reise/${behandling.id}/innvilgelse"),
+        HttpMethod.POST,
+        HttpEntity(vedtak, headers),
+    )
+
+    private inline fun <reified T : VedtakDagligReiseResponse> hentVedtak(behandlingId: BehandlingId) =
+        restTemplate.exchange<T>(
+            localhost("api/vedtak/daglig-reise/$behandlingId"),
+            HttpMethod.GET,
+            HttpEntity(null, headers),
+        )
+}

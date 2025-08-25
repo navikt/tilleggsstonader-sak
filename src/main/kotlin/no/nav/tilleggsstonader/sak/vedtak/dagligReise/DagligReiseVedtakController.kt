@@ -41,7 +41,6 @@ class DagligReiseVedtakController(
     private val vedtaksperiodeService: VedtaksperiodeService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
-    private val utledTidligsteEndringService: UtledTidligsteEndringService,
     private val vilkårService: VilkårService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
