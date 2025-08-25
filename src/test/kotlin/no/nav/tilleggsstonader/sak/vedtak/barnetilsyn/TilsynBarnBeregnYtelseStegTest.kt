@@ -138,6 +138,7 @@ class TilsynBarnBeregnYtelseStegTest {
         val vedtak = innvilgelseDto(listOf(vedtaksperiode))
 
         mockVilkårperioder(behandlingId = revurdering.id)
+        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(any(), any()) } returns LocalDate.now()
 
         val nesteSteg = steg.utførOgReturnerNesteSteg(revurdering, vedtak)
         assertThat(revurdering.type).isEqualTo(BehandlingType.REVURDERING)
