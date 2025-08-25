@@ -28,6 +28,7 @@ class VedtaksdataTest {
                 is TypeVedtakTilsynBarn -> type.assertHarRiktigNavn(stønadstype)
                 is TypeVedtakLæremidler -> type.assertHarRiktigNavn(stønadstype)
                 is TypeVedtakBoutgifter -> type.assertHarRiktigNavn(stønadstype)
+                is TypeVedtakDagligReise -> type.assertHarRiktigNavn(stønadstype)
             }
         }
     }

@@ -5,9 +5,11 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
@@ -52,7 +54,12 @@ data class VedtaksperioderDvh(
 
                 is InnvilgelseEllerOpphørBoutgifter -> mapVedtaksperioderBoutgifter(vedtaksdata)
 
-                is AvslagBoutgifter, is AvslagLæremidler, is AvslagTilsynBarn -> JsonWrapper(vedtaksperioder = emptyList())
+                is InnvilgelseEllerOpphørDagligReise -> mapVedtaksperioderDagligReise(vedtaksdata)
+
+                is AvslagBoutgifter, is AvslagLæremidler, is AvslagTilsynBarn, is AvslagDagligReise ->
+                    JsonWrapper(
+                        vedtaksperioder = emptyList(),
+                    )
             }
 
         private fun mapVedtaksperioderLæremidler(beregningsresultat: BeregningsresultatLæremidler): JsonWrapper =
@@ -91,6 +98,19 @@ data class VedtaksperioderDvh(
         )
 
         private fun mapVedtaksperioderBoutgifter(vedtaksdata: InnvilgelseEllerOpphørBoutgifter) =
+            JsonWrapper(
+                vedtaksperioder =
+                    vedtaksdata.vedtaksperioder.map {
+                        VedtaksperioderDvh(
+                            fom = it.fom,
+                            tom = it.tom,
+                            aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                            lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
+                        )
+                    },
+            )
+
+        private fun mapVedtaksperioderDagligReise(vedtaksdata: InnvilgelseEllerOpphørDagligReise) =
             JsonWrapper(
                 vedtaksperioder =
                     vedtaksdata.vedtaksperioder.map {

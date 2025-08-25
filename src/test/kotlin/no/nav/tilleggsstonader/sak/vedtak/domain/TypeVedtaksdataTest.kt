@@ -11,6 +11,7 @@ class TypeVedtaksdataTest {
                 TypeVedtakTilsynBarn.entries,
                 TypeVedtakLæremidler.entries,
                 TypeVedtakBoutgifter.entries,
+                TypeVedtakDagligReise.entries,
             ).flatten()
         assertThat(typerVedtaksdata.keys)
             .hasSize(alleEnums.size)
