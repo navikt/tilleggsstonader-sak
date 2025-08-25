@@ -32,7 +32,7 @@ Egenskap: Innvilgelse av boutgifter - revurdering
       | Fom        | Tom        | Utgift |
       | 15.02.2025 | 18.02.2025 | 3000   |
 
-    Og vi innvilger boutgifter behandling=2 med revurderFra=2025-01-09 med følgende vedtaksperioder
+    Og vi innvilger boutgifter behandling=2 med tidligsteEndring=2025-01-09 med følgende vedtaksperioder
       | Fom        | Tom        |
       | 07.01.2025 | 09.01.2025 |
       | 15.02.2025 | 18.02.2025 |
@@ -68,7 +68,7 @@ Egenskap: Innvilgelse av boutgifter - revurdering
       | Fom        | Tom        | Utgift |
       | 04.03.2025 | 06.03.2025 | 4000   |
 
-    Og vi innvilger boutgifter behandling=2 med revurderFra=2025-01-09 med følgende vedtaksperioder
+    Og vi innvilger boutgifter behandling=2 med tidligsteEndring=2025-01-09 med følgende vedtaksperioder
       | Fom        | Tom        |
       | 25.02.2025 | 25.02.2025 |
       | 04.03.2025 | 06.03.2025 |
@@ -115,7 +115,7 @@ Egenskap: Innvilgelse av boutgifter - revurdering
       | Fom        | Tom        | Utgift |
       | 01.08.2024 | 31.10.2024 | 4500   |
 
-    Og vi innvilger boutgifter behandling=2 med revurderFra=2024-08-17 med følgende vedtaksperioder
+    Og vi innvilger boutgifter behandling=2 med tidligsteEndring=2024-08-17 med følgende vedtaksperioder
       | Fom        | Tom        |
       | 17.08.2024 | 20.10.2024 |
 
@@ -147,7 +147,7 @@ Egenskap: Innvilgelse av boutgifter - revurdering
 
     Når vi kopierer perioder fra forrige behandling for behandling=2
 
-    Og vi innvilger boutgifter behandling=2 med revurderFra=2025-01-25 med følgende vedtaksperioder
+    Og vi innvilger boutgifter behandling=2 med tidligsteEndring=2025-01-25 med følgende vedtaksperioder
       | Fom        | Tom        |
       | 03.02.2025 | 04.02.2025 |
 
@@ -171,7 +171,7 @@ Egenskap: Innvilgelse av boutgifter - revurdering
       | Fom        | Tom        | Utgift |
       | 15.02.2025 | 16.02.2025 | 1000   |
 
-    Når vi innvilger boutgifter behandling=2 med revurderFra=15.02.2025 med følgende vedtaksperioder
+    Når vi innvilger boutgifter behandling=2 med tidligsteEndring=15.02.2025 med følgende vedtaksperioder
       | Fom        | Tom        |
       | 01.01.2025 | 31.01.2025 |
       | 15.02.2025 | 16.02.2025 |
@@ -197,7 +197,7 @@ Egenskap: Innvilgelse av boutgifter - revurdering
       | Fom        | Tom        | Utgift |
       | 15.02.2025 | 16.02.2025 | 1000   |
 
-    Når vi innvilger boutgifter behandling=2 med revurderFra=15.02.2025 med følgende vedtaksperioder
+    Når vi innvilger boutgifter behandling=2 med tidligsteEndring=15.02.2025 med følgende vedtaksperioder
       | Fom        | Tom        |
       | 01.01.2025 | 31.03.2025 |
 

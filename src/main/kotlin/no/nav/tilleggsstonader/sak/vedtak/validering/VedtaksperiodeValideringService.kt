@@ -2,11 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.validering
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUtils.validerAtVedtaksperioderIkkeOverlapperMedVilkårPeriodeUtenRett
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUtils.validerEnkeltperiode
@@ -15,14 +10,11 @@ import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUti
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mergeSammenhengendeOppfylteAktiviteter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mergeSammenhengendeOppfylteMålgrupper
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class VedtaksperiodeValideringService(
     private val vilkårperiodeService: VilkårperiodeService,
-    private val vedtakRepository: VedtakRepository,
 ) {
     /**
      * Felles format på Vedtaksperiode inneholder ennå ikke status så mapper til felles format for å kunne validere
@@ -32,16 +24,14 @@ class VedtaksperiodeValideringService(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
-        tidligsteEndring: LocalDate?,
     ) {
-        validerVedtaksperioder(vedtaksperioder, behandling, typeVedtak, tidligsteEndring)
+        validerVedtaksperioder(vedtaksperioder, behandling, typeVedtak)
     }
 
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
-        tidligsteEndring: LocalDate?,
     ) {
         if (typeVedtak != TypeVedtak.OPPHØR) {
             validerVedtaksperioderEksisterer(vedtaksperioder)
@@ -49,12 +39,6 @@ class VedtaksperiodeValideringService(
         validerIngenOverlappMellomVedtaksperioder(vedtaksperioder)
 
         validerVedtaksperioderMotVilkårperioder(behandling, vedtaksperioder)
-
-        validerIngenEndringerFørRevurderFra(
-            innsendteVedtaksperioder = vedtaksperioder,
-            vedtaksperioderForrigeBehandling = hentForrigeVedtaksperioder(behandling),
-            revurderFra = tidligsteEndring,
-        )
     }
 
     private fun validerVedtaksperioderMotVilkårperioder(
@@ -74,15 +58,4 @@ class VedtaksperiodeValideringService(
             )
         }
     }
-
-    private fun hentForrigeVedtaksperioder(behandling: Saksbehandling): List<Vedtaksperiode>? =
-        behandling.forrigeIverksatteBehandlingId?.let {
-            when (val forrigeVedtak = vedtakRepository.findByIdOrNull(it)?.data) {
-                is InnvilgelseEllerOpphørTilsynBarn -> forrigeVedtak.vedtaksperioder
-                is InnvilgelseEllerOpphørBoutgifter -> forrigeVedtak.vedtaksperioder
-                is InnvilgelseEllerOpphørLæremidler -> forrigeVedtak.vedtaksperioder
-                is Avslag -> null
-                else -> error("Håndterer ikke ${forrigeVedtak?.javaClass?.simpleName}")
-            }
-        }
 }

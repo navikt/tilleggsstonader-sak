@@ -22,7 +22,7 @@ Egenskap: Opphør av læremidler
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
-    Når opphør behandling=2 med revurderFra=15.02.2025
+    Når opphør behandling=2 med opphørsdato=15.02.2025
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
@@ -57,7 +57,7 @@ Egenskap: Opphør av læremidler
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
-    Når opphør behandling=2 med revurderFra=15.01.2025
+    Når opphør behandling=2 med opphørsdato=15.01.2025
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
@@ -92,7 +92,7 @@ Egenskap: Opphør av læremidler
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
-    Når opphør behandling=2 med revurderFra=10.01.2025
+    Når opphør behandling=2 med opphørsdato=10.01.2025
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe        | Aktivitet | Utbetalingsdato |
@@ -126,7 +126,7 @@ Egenskap: Opphør av læremidler
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
-    Når opphør behandling=2 med revurderFra=15.02.2025
+    Når opphør behandling=2 med opphørsdato=15.02.2025
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
@@ -160,7 +160,7 @@ Egenskap: Opphør av læremidler
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
-    Når opphør behandling=2 med revurderFra=03.02.2025
+    Når opphør behandling=2 med opphørsdato=03.02.2025
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |

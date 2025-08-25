@@ -79,20 +79,20 @@ class InterntVedtakService(
             when (data) {
                 is InnvilgelseTilsynBarn ->
                     BeregningsresultatInterntVedtakDto(
-                        tilsynBarn = data.beregningsresultat.tilDto(vedtak.tidligsteEndring ?: behandling.revurderFra).perioder,
+                        tilsynBarn = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
                     )
 
                 is InnvilgelseLæremidler ->
                     BeregningsresultatInterntVedtakDto(
                         læremidler =
                             data.beregningsresultat
-                                .tilDto(vedtak.tidligsteEndring ?: behandling.revurderFra)
+                                .tilDto(vedtak.tidligsteEndring)
                                 .perioder,
                     )
 
                 is InnvilgelseBoutgifter ->
                     BeregningsresultatInterntVedtakDto(
-                        boutgifter = data.beregningsresultat.tilDto(vedtak.tidligsteEndring ?: behandling.revurderFra).perioder,
+                        boutgifter = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
                     )
 
                 is Innvilgelse -> error("Mangler mapping av beregningsresultat for ${data.type}")
@@ -127,7 +127,6 @@ class InterntVedtakService(
             vedtakstidspunkt = behandling.vedtakstidspunkt ?: error("Finner ikke vedtakstidspunkt"),
             saksbehandler = saksbehandler,
             beslutter = totrinnskontroll?.beslutter,
-            revurderFra = behandling.revurderFra,
         )
     }
 

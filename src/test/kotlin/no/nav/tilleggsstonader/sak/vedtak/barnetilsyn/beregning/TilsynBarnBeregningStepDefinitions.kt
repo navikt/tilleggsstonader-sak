@@ -118,26 +118,29 @@ class TilsynBarnBeregningStepDefinitions {
 
     @Når("beregner")
     fun beregner() {
-        beregn(saksbehandling(id = behandlingId))
+        beregn(saksbehandling(id = behandlingId), tidligsteEndring = null)
     }
 
-    @Når("beregner med revurderFra={}")
-    fun `beregner med revurder fra`(revurderFraStr: String) {
-        val revurderFra = parseDato(revurderFraStr)
+    @Når("beregner med tidligsteEndring={}")
+    fun `beregner med revurder fra`(tidligsteEndringStr: String) {
+        val tidligsteEndring = parseDato(tidligsteEndringStr)
         beregn(
             saksbehandling(
                 id = behandlingId,
                 type = BehandlingType.REVURDERING,
-                revurderFra = revurderFra,
                 forrigeIverksatteBehandlingId = BehandlingId.random(),
             ),
+            tidligsteEndring = tidligsteEndring,
         )
     }
 
-    private fun beregn(behandling: Saksbehandling) {
+    private fun beregn(
+        behandling: Saksbehandling,
+        tidligsteEndring: LocalDate?,
+    ) {
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
         try {
-            beregningsresultat = service.beregn(vedtaksperioder, behandling, TypeVedtak.INNVILGELSE, behandling.revurderFra)
+            beregningsresultat = service.beregn(vedtaksperioder, behandling, TypeVedtak.INNVILGELSE, tidligsteEndring)
         } catch (e: Exception) {
             exception = e
         }

@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningTestUtil.vedtaksperiodeBeregning
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.brukPerioderFraOgMedRevurderFra
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.brukPerioderFraOgMedTidligsteEndring
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
@@ -181,15 +181,15 @@ class TilsynBeregningUtilTest {
             )
 
         @Nested
-        inner class BrukPerioderFraOgMedRevurderFra {
+        inner class BrukPerioderFraOgMedTidligsteEndring {
             @Test
-            fun `skal returnere orginal liste uten revurder fra`() {
-                assertThat(vedtaksperioder.brukPerioderFraOgMedRevurderFra(null)).isEqualTo(vedtaksperioder)
+            fun `skal returnere orginal liste uten tidligste endring`() {
+                assertThat(vedtaksperioder.brukPerioderFraOgMedTidligsteEndring(null)).isEqualTo(vedtaksperioder)
             }
 
             @Test
-            fun `skal returnere perioder etter revurder fra`() {
-                val revurderFra = LocalDate.of(2025, 2, 1)
+            fun `skal returnere perioder etter tidligste endring`() {
+                val tidligsteEndring = LocalDate.of(2025, 2, 1)
 
                 val forventedeVedtaksperioder =
                     listOf(
@@ -203,7 +203,7 @@ class TilsynBeregningUtilTest {
 
                 assertThat(
                     vedtaksperioder
-                        .brukPerioderFraOgMedRevurderFra(revurderFra),
+                        .brukPerioderFraOgMedTidligsteEndring(tidligsteEndring),
                 ).isEqualTo(forventedeVedtaksperioder)
             }
         }

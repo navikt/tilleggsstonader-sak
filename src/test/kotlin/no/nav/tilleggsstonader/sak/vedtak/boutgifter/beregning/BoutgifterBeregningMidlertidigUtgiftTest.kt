@@ -38,7 +38,6 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
             vilkårperiodeService = vilkårperiodeService,
-            vedtakRepository = vedtakRepository,
         )
 
     val boutgifterBeregningService =
@@ -200,7 +199,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
     }
 
     @Test
-    fun `Beholder perioder fra før revuderFra, og beregner nye perioder ved revurdering`() {
+    fun `Beholder perioder fra før tidligsteEndring, og beregner nye perioder ved revurdering`() {
         val utgifterRevurdering: BoutgifterPerUtgiftstype =
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
@@ -230,7 +229,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 ),
             )
 
-        val utgiftEtterRevurderFra: BoutgifterPerUtgiftstype =
+        val utgiftEtterTidligsteEndring: BoutgifterPerUtgiftstype =
             mapOf(
                 TypeBoutgift.UTGIFTER_OVERNATTING to
                     listOf(
@@ -252,7 +251,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 lagBeregningsresultatMåned(
                     fom = LocalDate.of(2025, 3, 10),
                     tom = LocalDate.of(2025, 4, 9),
-                    utgifter = utgiftEtterRevurderFra,
+                    utgifter = utgiftEtterTidligsteEndring,
                 ),
             )
 
@@ -268,10 +267,10 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
 
         val saksbehandling =
             saksbehandling(
-                revurderFra = LocalDate.of(2025, 3, 10),
                 forrigeIverksatteBehandlingId = BehandlingId.random(),
                 type = BehandlingType.REVURDERING,
             )
+        val tidligsteEndring = LocalDate.of(2025, 3, 10)
 
         val res =
             boutgifterBeregningService
@@ -279,7 +278,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                     behandling = saksbehandling,
                     vedtaksperioder = vedtaksperioderRevurdering,
                     typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = saksbehandling.revurderFra,
+                    tidligsteEndring = tidligsteEndring,
                 ).perioder
 
         assertThat(res.size).isEqualTo(2)

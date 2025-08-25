@@ -32,7 +32,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.exchange
-import java.time.LocalDate
 
 internal class BehandlingControllerTest : IntegrationTest() {
     @Autowired
@@ -87,31 +86,6 @@ internal class BehandlingControllerTest : IntegrationTest() {
         val oppdatert = eksternBehandlingIdRepository.findByIdOrThrow(eskternBehandlingId.id)
         assertThat(oppdatert.id).isEqualTo(eskternBehandlingId.id)
         assertThat(oppdatert.behandlingId.id).isEqualTo(respons.body!!.id)
-    }
-
-    @Test
-    internal fun `Skal sette revurder fra dato`() {
-        val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("12345678901"))))
-        val førstegangsbehandling =
-            testoppsettService.lagre(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
-        testoppsettService.ferdigstillBehandling(førstegangsbehandling)
-
-        val revurdering =
-            testoppsettService.lagre(
-                behandling(
-                    fagsak,
-                    type = BehandlingType.REVURDERING,
-                    forrigeIverksatteBehandlingId = førstegangsbehandling.id,
-                ),
-            )
-
-        val revurderFraDato = LocalDate.of(2025, 1, 1)
-        val respons = revurderFra(revurdering.id, revurderFraDato)
-
-        assertThat(respons.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
-
-        val oppdatert = behandlingRepository.findByIdOrThrow(revurdering.id)
-        assertThat(oppdatert.revurderFra).isEqualTo(revurderFraDato)
     }
 
     @Test
@@ -198,17 +172,6 @@ internal class BehandlingControllerTest : IntegrationTest() {
             localhost("/api/behandling/ekstern/$eksternBehandlingId"),
             HttpMethod.GET,
             HttpEntity<BehandlingId>(headers),
-        )
-
-    private fun revurderFra(
-        behandlingId: BehandlingId,
-        revurderFra: LocalDate,
-    ): ResponseEntity<Void> =
-        restTemplate.exchange(
-            localhost("/api/behandling/$behandlingId/revurder-fra/$revurderFra"),
-            HttpMethod.POST,
-            HttpEntity<Void>(null, headers),
-            Void::class.java,
         )
 
     private fun henlegg(

@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 class OppfølgingRepositoryTest : IntegrationTest() {
@@ -175,7 +174,6 @@ class OppfølgingRepositoryTest : IntegrationTest() {
 
     private fun opprettRevurdering(): Behandling =
         testoppsettService.opprettRevurdering(
-            revurderFra = LocalDate.now(),
             forrigeBehandling = behandling,
             fagsak = testoppsettService.hentFagsak(behandling.fagsakId),
         )

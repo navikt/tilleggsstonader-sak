@@ -72,14 +72,14 @@ class InnvilgelseTilsynBarnDtoKtTest {
     }
 
     @Nested
-    inner class RevurderFraMånedsbeløp {
+    inner class TidligsteEndringMånedsbeløp {
         /*
-         * skal mappe beløp fra perioder som gjelder fra og med revurderingsdatoet då det ikke er ønskelig å vise
+         * skal mappe beløp fra perioder som gjelder fra og med tidligste endring då det ikke er ønskelig å vise
          * beløp som allerede er innvilget
          */
         @Test
-        fun `skal mappe beløp fra perioder som gjelder fra og med revurderingsdatoet`() {
-            val revurderFra = LocalDate.of(2024, 1, 17)
+        fun `skal mappe beløp fra perioder som gjelder fra og med tidligste endring`() {
+            val tidligsteEndring = LocalDate.of(2024, 1, 17)
             val dto =
                 BeregningsresultatTilsynBarn(
                     perioder =
@@ -87,44 +87,44 @@ class InnvilgelseTilsynBarnDtoKtTest {
                             beregningsresultatForMåned(
                                 beløpsperioder =
                                     listOf(
-                                        Beløpsperiode(revurderFra.minusDays(1), 10, NEDSATT_ARBEIDSEVNE),
-                                        Beløpsperiode(revurderFra, 20, NEDSATT_ARBEIDSEVNE),
-                                        Beløpsperiode(revurderFra.plusDays(1), 30, NEDSATT_ARBEIDSEVNE),
+                                        Beløpsperiode(tidligsteEndring.minusDays(1), 10, NEDSATT_ARBEIDSEVNE),
+                                        Beløpsperiode(tidligsteEndring, 20, NEDSATT_ARBEIDSEVNE),
+                                        Beløpsperiode(tidligsteEndring.plusDays(1), 30, NEDSATT_ARBEIDSEVNE),
                                     ),
                             ),
                         ),
-                ).tilDto(revurderFra)
+                ).tilDto(tidligsteEndring)
 
             assertThat(dto.perioder.single().månedsbeløp).isEqualTo(50)
         }
     }
 
     @Nested
-    inner class RevurderFraGjelderFraOgTil {
-        val revurderFra = LocalDate.of(2024, 1, 17)
+    inner class TidligsteEndringGjelderFraOgTil {
+        val tidligsteEndring = LocalDate.of(2024, 1, 17)
 
         @Test
-        fun `periode som overlapper skal bruke revurderFra som startdato`() {
+        fun `periode som overlapper skal bruke tidligsteEndring som startdato`() {
             val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 18))
-            val dto = resultatMedEnVedtaksperiode(periode).tilDto(revurderFra)
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(tidligsteEndring)
 
-            assertThat(dto.gjelderFraOgMed).isEqualTo(revurderFra)
+            assertThat(dto.gjelderFraOgMed).isEqualTo(tidligsteEndring)
             assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 18))
         }
 
         @Test
-        fun `periode som begynner før revurderFra skal ikke brukes til gjelderFra eller gjelderTil`() {
+        fun `periode som begynner før tidligsteEndring skal ikke brukes til gjelderFra eller gjelderTil`() {
             val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 16))
-            val dto = resultatMedEnVedtaksperiode(periode).tilDto(revurderFra)
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(tidligsteEndring)
 
             assertThat(dto.gjelderFraOgMed).isNull()
             assertThat(dto.gjelderTilOgMed).isNull()
         }
 
         @Test
-        fun `periode som begynner fra og med revurderFra brukes til gjelderFra og gjelderTil`() {
+        fun `periode som begynner fra og med tidligsteEndring brukes til gjelderFra og gjelderTil`() {
             val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 17), tom = LocalDate.of(2024, 1, 19))
-            val dto = resultatMedEnVedtaksperiode(periode).tilDto(revurderFra)
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(tidligsteEndring)
 
             assertThat(dto.gjelderFraOgMed).isEqualTo(LocalDate.of(2024, 1, 17))
             assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 19))

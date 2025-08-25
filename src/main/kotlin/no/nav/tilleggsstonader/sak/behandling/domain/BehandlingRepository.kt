@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
-import org.springframework.data.jdbc.repository.query.Modifying
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
 
@@ -63,7 +62,6 @@ interface BehandlingRepository :
               b.vedtakstidspunkt,
               b.henlagt_arsak,
               b.henlagt_begrunnelse,
-              b.revurder_fra,
               b.opprettet_av,
               b.opprettet_tid,
               b.endret_av,
@@ -85,10 +83,6 @@ interface BehandlingRepository :
     )
     fun finnSaksbehandling(behandlingId: BehandlingId): Saksbehandling
 
-    @Modifying
-    @Query("UPDATE behandling SET revurder_fra = null WHERE id = :behandlingId")
-    fun nullstillRevurderFra(behandlingId: BehandlingId)
-
     // language=PostgreSQL
     @Query(
         """SELECT
@@ -108,7 +102,6 @@ interface BehandlingRepository :
               b.vedtakstidspunkt,
               b.henlagt_arsak,
               b.henlagt_begrunnelse,
-              b.revurder_fra,
               b.opprettet_av,
               b.opprettet_tid,
               b.endret_av,

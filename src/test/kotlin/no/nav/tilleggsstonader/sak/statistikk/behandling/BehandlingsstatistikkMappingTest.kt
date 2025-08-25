@@ -500,7 +500,6 @@ class BehandlingsstatistikkMappingTest {
         fagsakPersonId = FagsakPersonId(UUID.randomUUID()),
         eksternFagsakId = eksternFagId,
         stønadstype = Stønadstype.BARNETILSYN,
-        revurderFra = null,
         opprettetAv = "VL",
         opprettetTid = LocalDateTime.now(),
         endretAv = "<endret-av-test>",

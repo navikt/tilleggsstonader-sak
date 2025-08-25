@@ -136,7 +136,6 @@ object Testdata {
                         fagsak = fagsak,
                         resultat = BehandlingResultat.INNVILGET,
                         type = BehandlingType.REVURDERING,
-                        revurderFra = LocalDate.of(2024, 1, 1),
                     ),
                 fagsak = fagsak,
             )
@@ -241,7 +240,7 @@ object Testdata {
                             ),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = behandling.revurderFra,
+                tidligsteEndring = LocalDate.of(2024, 1, 1),
                 opphørsdato = null,
             )
 
@@ -285,7 +284,6 @@ object Testdata {
                         fagsak = fagsak,
                         resultat = BehandlingResultat.INNVILGET,
                         type = BehandlingType.REVURDERING,
-                        revurderFra = LocalDate.of(2024, 1, 1),
                     ),
                 fagsak = fagsak,
             )
@@ -349,7 +347,7 @@ object Testdata {
                         begrunnelse = "Sånn her vil en begrunnelse se ut",
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = behandling.revurderFra,
+                tidligsteEndring = LocalDate.of(2024, 1, 1),
                 opphørsdato = null,
             )
 
@@ -542,7 +540,7 @@ object Testdata {
                         begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = behandling.revurderFra,
+                tidligsteEndring = null,
                 opphørsdato = null,
             )
         val avslåttVedtak =
@@ -571,7 +569,7 @@ object Testdata {
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
-                opphørsdato = behandling.revurderFra ?: LocalDate.now(),
+                opphørsdato = null,
             )
 
         private val aktivitetererBoutgifter =

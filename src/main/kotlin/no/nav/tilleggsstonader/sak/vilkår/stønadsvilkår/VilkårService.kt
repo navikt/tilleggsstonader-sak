@@ -16,9 +16,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårRevurderFraValidering.validerEndrePeriodeRevurdering
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårRevurderFraValidering.validerNyPeriodeRevurdering
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -57,7 +54,6 @@ class VilkårService(
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, svarPåVilkårDto.behandlingId)
 
         val oppdatertVilkår = flettVilkårOgVurderResultat(vilkår, svarPåVilkårDto)
-        validerEndrePeriodeRevurdering(behandling, vilkår, oppdatertVilkår)
 
         return vilkårRepository.update(oppdatertVilkår)
     }
@@ -82,7 +78,6 @@ class VilkårService(
                 barnId = opprettVilkårDto.barnId,
             )
         val oppdatertVilkår = flettVilkårOgVurderResultat(nyttVilkår, opprettVilkårDto)
-        validerNyPeriodeRevurdering(behandling, oppdatertVilkår)
 
         return vilkårRepository.insert(oppdatertVilkår)
     }
@@ -114,7 +109,6 @@ class VilkårService(
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, slettVilkårRequest.behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
-        validerSlettPeriodeRevurdering(behandling, vilkår)
         brukerfeilHvis(vilkår.status == VilkårStatus.SLETTET) {
             "Vilkår med id=$vilkårId er allerede slettet"
         }

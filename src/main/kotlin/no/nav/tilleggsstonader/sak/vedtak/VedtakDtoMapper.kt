@@ -42,7 +42,6 @@ class VedtakDtoMapper(
 ) {
     fun toDto(
         vedtak: Vedtak,
-        revurderFra: LocalDate?,
         forrigeIverksatteBehandlingId: BehandlingId?,
     ): VedtakResponse {
         val data = vedtak.data
@@ -51,7 +50,7 @@ class VedtakDtoMapper(
                 mapVedtakTilsynBarn(
                     vedtak,
                     data,
-                    vedtak.tidligsteEndring ?: revurderFra,
+                    vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
                 )
 
@@ -59,7 +58,7 @@ class VedtakDtoMapper(
                 mapVedtakLæremidler(
                     vedtak,
                     data,
-                    vedtak.tidligsteEndring ?: revurderFra,
+                    vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
                 )
 
@@ -67,7 +66,7 @@ class VedtakDtoMapper(
                 mapVedtakBoutgifter(
                     vedtak,
                     data,
-                    vedtak.tidligsteEndring ?: revurderFra,
+                    vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
                 )
         }

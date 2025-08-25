@@ -28,7 +28,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYte
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -95,7 +94,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         }
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
-            vedtakRepository = vedtakRepository,
             vilkårperiodeService = vilkårperiodeService,
         )
 
@@ -117,7 +115,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepository),
             simuleringService = simuleringService,
             utledTidligsteEndringService = utledTidligsteEndringService,
-            unleashService = mockUnleashService(),
         )
     val vedtaksperiodeId: UUID = UUID.randomUUID()
 
@@ -150,20 +147,20 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseLæremidlerRequest(vedtaksperioder))
     }
 
-    @Når("innvilger revurdering med vedtaksperioder for behandling={} med revurderFra={}")
-    fun `innvilger vedtaksperioder for behandling={} med revurderFra={}`(
+    @Når("innvilger revurdering med vedtaksperioder for behandling={} med tidligsteEndring={}")
+    fun `innvilger vedtaksperioder for behandling={} med tidligsteEndring={}`(
         behandlingIdTall: Int,
-        revurderFraStr: String,
+        tidligsteEndringStr: String,
         dataTable: DataTable,
     ) {
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns saksbehandling()
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
-        val revurderFra = parseDato(revurderFraStr)
+        val tidligsteEndring = parseDato(tidligsteEndringStr)
 
-        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns revurderFra
+        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns tidligsteEndring
 
         val vedtaksperioder = mapVedtaksperioderDto(dataTable)
-        steg.utførSteg(dummyBehandling(behandlingId, revurderFra), InnvilgelseLæremidlerRequest(vedtaksperioder))
+        steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseLæremidlerRequest(vedtaksperioder))
     }
 
     @Når("kopierer perioder fra forrige behandling for behandling={}")
@@ -217,19 +214,19 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         tilkjentYtelseRepository.insert(TilkjentYtelse(behandlingId = behandlingId, andelerTilkjentYtelse = andeler))
     }
 
-    @Når("opphør behandling={} med revurderFra={}")
-    fun `opphør med revurderFra`(
+    @Når("opphør behandling={} med opphørsdato={}")
+    fun `opphør med opphørsdato`(
         behandlingIdTall: Int,
-        revurderFraStr: String,
+        opphørsdatoStr: String,
     ) {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
-        val revurderFra = parseDato(revurderFraStr)
+        val opphørsdato = parseDato(opphørsdatoStr)
         steg.utførSteg(
-            dummyBehandling(behandlingId, revurderFra = revurderFra),
+            dummyBehandling(behandlingId),
             OpphørLæremidlerRequest(
                 årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
                 begrunnelse = "begrunnelse",
-                opphørsdato = revurderFra,
+                opphørsdato = opphørsdato,
             ),
         )
     }
@@ -378,16 +375,12 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             )
         }
 
-    private fun dummyBehandling(
-        behandlingId: BehandlingId,
-        revurderFra: LocalDate? = null,
-    ): Saksbehandling {
+    private fun dummyBehandling(behandlingId: BehandlingId): Saksbehandling {
         val forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId(behandlingId)
         return saksbehandling(
             id = behandlingId,
             fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER),
             forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
-            revurderFra = revurderFra,
             type = if (forrigeIverksatteBehandlingId != null) BehandlingType.REVURDERING else BehandlingType.FØRSTEGANGSBEHANDLING,
         )
     }

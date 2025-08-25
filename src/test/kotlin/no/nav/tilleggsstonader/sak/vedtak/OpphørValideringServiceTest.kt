@@ -40,14 +40,12 @@ class OpphørValideringServiceTest {
 
     val saksbehandlingBoutgifter =
         saksbehandling(
-            revurderFra = opphørsdato,
             type = BehandlingType.REVURDERING,
             fagsak = fagsakBoutgifter(),
         )
 
     val saksbehandling =
         saksbehandling(
-            revurderFra = opphørsdato,
             type = BehandlingType.REVURDERING,
         )
     val opphørValideringService = OpphørValideringService(vilkårperiodeService, vilkårService)
@@ -254,7 +252,7 @@ class OpphørValideringServiceTest {
             listOf(
                 vilkårBoutgifter.copy(
                     status = VilkårStatus.ENDRET,
-                    tom = YearMonth.from(saksbehandlingBoutgifter.revurderFra).atEndOfMonth(),
+                    tom = YearMonth.from(opphørsdato).atEndOfMonth(),
                 ),
             )
 

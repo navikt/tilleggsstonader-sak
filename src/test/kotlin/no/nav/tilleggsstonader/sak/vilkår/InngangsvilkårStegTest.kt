@@ -7,7 +7,6 @@ import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -26,7 +25,6 @@ class InngangsvilkårStegTest {
         InngangsvilkårSteg(
             behandlingService = behandlingService,
             vilkårperiodeService = vilkårperiodeService,
-            unleashService = mockUnleashService(false),
         )
 
     @BeforeEach

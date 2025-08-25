@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDetaljer
@@ -10,11 +9,12 @@ import no.nav.tilleggsstonader.sak.behandling.dto.FagsakMedBehandlinger
 import no.nav.tilleggsstonader.sak.behandling.dto.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class BehandlingsoversiktService(
@@ -39,8 +39,6 @@ class BehandlingsoversiktService(
         if (fagsak == null) return null
         val behandlinger = behandlingRepository.findByFagsakId(fagsakId = fagsak.id)
 
-        val vedtaksperioder = hentVedtaksperioder(behandlinger)
-
         return FagsakMedBehandlinger(
             fagsakId = fagsak.id,
             eksternFagsakId = fagsak.eksternId.id,
@@ -48,6 +46,8 @@ class BehandlingsoversiktService(
             erLøpende = fagsakService.erLøpende(fagsak.id),
             behandlinger =
                 behandlinger.map {
+                    val vedtak = vedtakService.hentVedtak(behandlingId = it.id)
+
                     BehandlingDetaljer(
                         id = it.id,
                         forrigeIverksatteBehandlingId = it.forrigeIverksatteBehandlingId,
@@ -64,43 +64,25 @@ class BehandlingsoversiktService(
                         vedtaksdato = it.vedtakstidspunkt,
                         henlagtÅrsak = it.henlagtÅrsak,
                         henlagtBegrunnelse = it.henlagtBegrunnelse,
-                        revurderFra = it.revurderFra,
-                        vedtaksperiode = vedtaksperioder[it.id],
-                        opphørsdato = if (it.erOpphørt()) hentOpphørsdato(it) else null,
+                        vedtaksperiode =
+                            if (it.resultat != BehandlingResultat.HENLAGT) {
+                                vedtak?.let { v -> slåSammenVedtaksperioder(v) }
+                            } else {
+                                null
+                            },
+                        opphørsdato = vedtak?.takeIfType<Opphør>()?.opphørsdato,
                     )
                 },
         )
     }
 
     /**
-     * Denne henter alle vedtaken for de behandlinger som finnes
-     * Ønsket om å vise vedtaksperiode i behandlingsoversikten føles ikke helt landet.
-     * Man burde kanskje haft en vedtaksperiode på behandling eller direkt på vedtaket for å enkelt hente ut informasjonen
-     */
-    private fun hentVedtaksperioder(behandlinger: List<Behandling>): Map<BehandlingId, Vedtaksperiode?> {
-        val revurderFraPåBehandlingId =
-            behandlinger
-                .filter { it.resultat != BehandlingResultat.HENLAGT }
-                .associate { it.id to it.revurderFra }
-
-        return revurderFraPåBehandlingId.mapValues { (behandlingId, revurderFra) ->
-            slåSammenVedtaksperioderForBehandling(behandlingId, revurderFra)
-        }
-    }
-
-    private fun hentOpphørsdato(behandling: Behandling): LocalDate? =
-        vedtakService.hentVedtak(behandling.id)?.opphørsdato ?: behandling.revurderFra
-
-    /**
      * Slår sammen alle vedtaksperioder som finnes i en behandling slik at oversikten kun viser en periode.
      * Hvis det er innvilget flere vedtaksperioder med mellomrom i samme behandling, vil disse vises
      * som en sammenhengende periode, med en fom = første fom-dato og tom = siste tom-dato.
      */
-    private fun slåSammenVedtaksperioderForBehandling(
-        behandlingId: BehandlingId,
-        revurdererFra: LocalDate?,
-    ): Vedtaksperiode {
-        val vedtaksperioder = vedtakService.hentVedtaksperioder(behandlingId).avkortPerioderFør(revurdererFra)
+    private fun slåSammenVedtaksperioder(vedtak: Vedtak): Vedtaksperiode {
+        val vedtaksperioder = vedtak.vedtaksperioderHvisFinnes()?.avkortPerioderFør(vedtak.tidligsteEndring) ?: emptyList()
         val minFom = vedtaksperioder.minOfOrNull { it.fom }
         val maksTom = vedtaksperioder.maxOfOrNull { it.tom }
 

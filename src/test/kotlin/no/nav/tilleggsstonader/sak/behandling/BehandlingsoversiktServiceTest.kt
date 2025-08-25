@@ -9,20 +9,21 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
@@ -31,7 +32,6 @@ class BehandlingsoversiktServiceTest {
     val fagsakService = mockk<FagsakService>()
     val vedtakService = mockk<VedtakService>()
     val behandlingRepository = mockk<BehandlingRepository>()
-    val vedtakRepository = mockk<VedtakRepository>()
 
     val service =
         BehandlingsoversiktService(
@@ -42,6 +42,51 @@ class BehandlingsoversiktServiceTest {
 
     val fagsak = fagsak()
     val behandling = behandling(fagsak)
+
+    val vedtaksperiode =
+        Vedtaksperiode(
+            id = UUID.randomUUID(),
+            fom = LocalDate.of(2024, 3, 1),
+            tom = LocalDate.of(2024, 3, 14),
+            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+            aktivitet = AktivitetType.TILTAK,
+        )
+
+    val vedtaksperiodeGrunnlag =
+        VedtaksperiodeGrunnlag(
+            VedtaksperiodeBeregning(
+                fom = LocalDate.of(2024, 3, 1),
+                tom = LocalDate.of(2024, 3, 13),
+                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                aktivitet = AktivitetType.TILTAK,
+            ),
+            emptyList(),
+            10,
+        )
+    val vedtaksperiodeGrunnlag2 =
+        VedtaksperiodeGrunnlag(
+            VedtaksperiodeBeregning(
+                fom = LocalDate.of(2024, 3, 2),
+                tom = LocalDate.of(2024, 3, 14),
+                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                aktivitet = AktivitetType.TILTAK,
+            ),
+            emptyList(),
+            10,
+        )
+    val beregningsresultatForMåned =
+        beregningsresultatForMåned(
+            YearMonth.of(2024, 3),
+            vedtaksperioder = listOf(vedtaksperiodeGrunnlag, vedtaksperiodeGrunnlag2),
+        )
+    val beregningsresultat = BeregningsresultatTilsynBarn(perioder = listOf(beregningsresultatForMåned))
+
+    var vedtak: Vedtak =
+        innvilgetVedtak(
+            beregningsresultat = beregningsresultat,
+            behandlingId = behandling.id,
+            vedtaksperioder = listOf(vedtaksperiode),
+        )
 
     @BeforeEach
     fun setUp() {
@@ -55,7 +100,7 @@ class BehandlingsoversiktServiceTest {
             )
         every { behandlingRepository.findByFagsakId(fagsakId = fagsak.id) } returns listOf(behandling)
         every { fagsakService.erLøpende(fagsak.id) } returns true
-        mockVedtakRepository()
+        every { vedtakService.hentVedtak(any()) } answers { vedtak }
     }
 
     @Test
@@ -78,9 +123,15 @@ class BehandlingsoversiktServiceTest {
         }
 
         @Test
-        fun `ved et opphør så skal revurderFra bruker som vedtaksperiode dersom revurderFra er etter vedtaksperioder som er igjen`() {
+        fun `ved et opphør så skal vedtaksperiode være tom og opphørsdato skal være satt`() {
             every { behandlingRepository.findByFagsakId(fagsak.id) } returns
-                listOf(behandling.copy(type = BehandlingType.REVURDERING, revurderFra = LocalDate.of(2024, 4, 1)))
+                listOf(behandling.copy(type = BehandlingType.REVURDERING))
+            vedtak =
+                opphørVedtak(
+                    årsaker = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
+                    begrunnelse = "opphør nuuuuu",
+                    opphørsdato = LocalDate.of(2024, 4, 1),
+                )
 
             val oversikt = service.hentOversikt(fagsak.fagsakPersonId)
 
@@ -88,54 +139,5 @@ class BehandlingsoversiktServiceTest {
             assertThat(behandling.vedtaksperiode?.fom).isNull()
             assertThat(behandling.vedtaksperiode?.tom).isNull()
         }
-    }
-
-    private fun mockVedtakRepository() {
-        val vedtaksperiode =
-            Vedtaksperiode(
-                id = UUID.randomUUID(),
-                fom = LocalDate.of(2024, 3, 1),
-                tom = LocalDate.of(2024, 3, 14),
-                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                aktivitet = AktivitetType.TILTAK,
-            )
-
-        val vedtaksperiodeGrunnlag =
-            VedtaksperiodeGrunnlag(
-                VedtaksperiodeBeregning(
-                    fom = LocalDate.of(2024, 3, 1),
-                    tom = LocalDate.of(2024, 3, 13),
-                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                    aktivitet = AktivitetType.TILTAK,
-                ),
-                emptyList(),
-                10,
-            )
-        val vedtaksperiodeGrunnlag2 =
-            VedtaksperiodeGrunnlag(
-                VedtaksperiodeBeregning(
-                    fom = LocalDate.of(2024, 3, 2),
-                    tom = LocalDate.of(2024, 3, 14),
-                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                    aktivitet = AktivitetType.TILTAK,
-                ),
-                emptyList(),
-                10,
-            )
-        val beregningsresultatForMåned =
-            beregningsresultatForMåned(
-                YearMonth.of(2024, 3),
-                vedtaksperioder = listOf(vedtaksperiodeGrunnlag, vedtaksperiodeGrunnlag2),
-            )
-        val beregningsresultat = BeregningsresultatTilsynBarn(perioder = listOf(beregningsresultatForMåned))
-
-        every { vedtakRepository.findByIdOrNull(any()) } returns
-            innvilgetVedtak(
-                beregningsresultat = beregningsresultat,
-                behandlingId = behandling.id,
-                vedtaksperioder = listOf(vedtaksperiode),
-            )
-
-        every { vedtakService.hentVedtaksperioder(any()) } returns listOf(vedtaksperiode)
     }
 }

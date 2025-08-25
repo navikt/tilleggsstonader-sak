@@ -1,10 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
-import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -30,7 +28,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -112,7 +109,6 @@ class LæremidlerBeregnYtelseStegTest : IntegrationTest() {
             val behandlingForOpphør =
                 testoppsettService
                     .opprettRevurdering(
-                        revurderFra = LocalDate.of(2025, 2, 1),
                         forrigeBehandling = behandling,
                         fagsak = fagsak,
                     ).let { testoppsettService.hentSaksbehandling(it.id) }
@@ -121,7 +117,7 @@ class LæremidlerBeregnYtelseStegTest : IntegrationTest() {
                 OpphørLæremidlerRequest(
                     årsakerOpphør = listOf(ÅrsakOpphør.ANNET),
                     begrunnelse = "en begrunnelse",
-                    opphørsdato = behandlingForOpphør.revurderFra,
+                    opphørsdato = LocalDate.of(2025, 2, 1),
                 )
             steg.utførSteg(behandlingForOpphør, opphør)
 
@@ -133,54 +129,6 @@ class LæremidlerBeregnYtelseStegTest : IntegrationTest() {
                 assertThat(this.tom).isEqualTo(LocalDate.of(2025, 1, 31))
             }
             assertThat(vedtak.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
-        }
-
-        @Test
-        fun `feiler hvis feature-toggle for utleding av endringsdato er av og revurderFra er null`() {
-            testoppsettService.ferdigstillBehandling(behandling = behandling)
-            val behandlingForOpphør =
-                testoppsettService
-                    .opprettRevurdering(
-                        revurderFra = null,
-                        forrigeBehandling = behandling,
-                        fagsak = fagsak,
-                    ).let { testoppsettService.hentSaksbehandling(it.id) }
-
-            val opphør =
-                OpphørLæremidlerRequest(
-                    årsakerOpphør = listOf(ÅrsakOpphør.ANNET),
-                    begrunnelse = "en begrunnelse",
-                    opphørsdato = LocalDate.of(2025, 2, 1),
-                )
-
-            every { unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) } returns false
-            assertThatThrownBy {
-                steg.utførSteg(behandlingForOpphør, opphør)
-            }.hasMessage("revurderFra-dato er påkrevd for opphør")
-        }
-
-        @Test
-        fun `feiler hvis feature-toggle for utleding av endringsdato er på og opphørsdato er null`() {
-            testoppsettService.ferdigstillBehandling(behandling = behandling)
-            val behandlingForOpphør =
-                testoppsettService
-                    .opprettRevurdering(
-                        revurderFra = LocalDate.of(2025, 2, 1),
-                        forrigeBehandling = behandling,
-                        fagsak = fagsak,
-                    ).let { testoppsettService.hentSaksbehandling(it.id) }
-
-            val opphør =
-                OpphørLæremidlerRequest(
-                    årsakerOpphør = listOf(ÅrsakOpphør.ANNET),
-                    begrunnelse = "en begrunnelse",
-                    opphørsdato = null,
-                )
-
-            every { unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) } returns true
-            assertThatThrownBy {
-                steg.utførSteg(behandlingForOpphør, opphør)
-            }.hasMessage("opphørsdato er påkrevd for opphør")
         }
     }
 

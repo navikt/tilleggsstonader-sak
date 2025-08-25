@@ -50,7 +50,6 @@ data class Behandlinginfo(
     val vedtakstidspunkt: LocalDateTime,
     val saksbehandler: String,
     val beslutter: String?,
-    val revurderFra: LocalDate?,
 )
 
 data class Søknadsinformasjon(

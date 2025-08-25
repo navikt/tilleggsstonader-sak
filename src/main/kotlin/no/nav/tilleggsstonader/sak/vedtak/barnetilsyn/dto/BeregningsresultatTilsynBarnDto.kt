@@ -44,7 +44,7 @@ data class BeregningsgrunnlagDto(
 
 /**
  * Beregningsresultat inneholder perioder for nytt vedtak inklusive perioder som er kopiert fra forrige behandling
- * Men det er i de fleste tilfeller kun interessant å vise perioder fra og med revurderFra
+ * Men det er i de fleste tilfeller kun interessant å vise perioder fra og med tidligsteEndring.
  */
 fun BeregningsresultatTilsynBarn.tilDto(tidligsteEndring: LocalDate?): BeregningsresultatTilsynBarnDto {
     val filtrertPerioder =
@@ -75,8 +75,8 @@ private fun VedtaksperiodeTilsynBarn.tilDto() =
         antallBarn = antallBarn,
     )
 
-private fun BeregningsresultatForMåned.tilDto(revurderFra: LocalDate?): BeregningsresultatForMånedDto {
-    val filtrerteBeløpsperioder = this.beløpsperioder.filtrerBeløpsperioderFra(revurderFra)
+private fun BeregningsresultatForMåned.tilDto(tidligsteEndring: LocalDate?): BeregningsresultatForMånedDto {
+    val filtrerteBeløpsperioder = this.beløpsperioder.filtrerBeløpsperioderFra(tidligsteEndring)
 
     return BeregningsresultatForMånedDto(
         dagsats = this.dagsats,
@@ -93,26 +93,26 @@ private fun Beregningsgrunnlag.tilDto() =
     )
 
 /**
- * Skal kun ha med beløpsperioder som er lik eller etter revurderFra
+ * Skal kun ha med beløpsperioder som er lik eller etter tidligsteendring
  */
-private fun List<Beløpsperiode>.filtrerBeløpsperioderFra(revurderFra: LocalDate?) =
+private fun List<Beløpsperiode>.filtrerBeløpsperioderFra(tidligsteendring: LocalDate?) =
     mapNotNull {
         when {
-            revurderFra == null -> it
-            it.dato < revurderFra -> null
+            tidligsteendring == null -> it
+            it.dato < tidligsteendring -> null
             else -> it
         }
     }
 
 /**
- * Skal kun ha med vedtaksperioden som er etter [revurderFra]
- * Dersom vedtaksperioden overlapper med [revurderFra] så skal den avkortes fra og med revurderFra-dato
+ * Skal kun ha med vedtaksperioden som er etter [tidligsteEndring]
+ * Dersom vedtaksperioden overlapper med [tidligsteEndring] så skal den avkortes fra og med tidligsteEndring-dato
  */
-private fun List<VedtaksperiodeTilsynBarn>.filtrerVedtaksperioderFra(revurderFra: LocalDate?): List<VedtaksperiodeTilsynBarn> =
+private fun List<VedtaksperiodeTilsynBarn>.filtrerVedtaksperioderFra(tidligsteEndring: LocalDate?): List<VedtaksperiodeTilsynBarn> =
     mapNotNull {
         when {
-            revurderFra == null -> it
-            it.tom < revurderFra -> null
-            else -> it.copy(fom = maxOf(it.fom, revurderFra))
+            tidligsteEndring == null -> it
+            it.tom < tidligsteEndring -> null
+            else -> it.copy(fom = maxOf(it.fom, tidligsteEndring))
         }
     }

@@ -2,16 +2,12 @@ package no.nav.tilleggsstonader.sak.vedtak.validering
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeTestUtil.vedtaksperiode
@@ -33,11 +29,9 @@ import java.util.UUID
 
 class VedtaksperiodeValideringServiceTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
-    val vedtakRepository = mockk<VedtakRepository>()
     val vedtaksperiodeValidingerService =
         VedtaksperiodeValideringService(
             vilkårperiodeService = vilkårperiodeService,
-            vedtakRepository = vedtakRepository,
         )
 
     val behandling = saksbehandling()
@@ -155,35 +149,6 @@ class VedtaksperiodeValideringServiceTest {
         }
     }
 
-    /**
-     * Fler tester finnes i [no.nav.tilleggsstonader.sak.vedtak.ValiderValiderIngenEndringerFørRevurderFraTest]
-     */
-    @Nested
-    inner class ValiderIngenEndringerFørRevurderFra {
-        val behandling = behandling()
-        val revurdering =
-            saksbehandling(
-                type = BehandlingType.REVURDERING,
-                revurderFra = LocalDate.of(2025, 2, 1),
-                forrigeIverksatteBehandlingId = behandling.id,
-            )
-
-        val vedtaksperiode = vedtaksperiode(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 31))
-
-        @BeforeEach
-        fun setUp() {
-            every { vedtakRepository.findByIdOrThrow(behandling.id) } returns
-                innvilgetVedtak(vedtaksperioder = listOf(vedtaksperiode()))
-        }
-
-        @Test
-        fun `skal kaste feil hvis det finnes endring før revurder fra`() {
-            assertThatThrownBy {
-                validerInnvilgelse(listOf(vedtaksperiode.copy(tom = LocalDate.of(2025, 1, 15))), revurdering)
-            }.hasMessageContaining("Det er ikke tillat å legge til, endre eller slette vedtaksperioder fra før revurder fra dato")
-        }
-    }
-
     @Nested
     inner class ValiderIkkeOverlappMedMålgruppeSomIkkeGirRettPåStønad {
         val målgruppeUtenRett =
@@ -229,7 +194,6 @@ class VedtaksperiodeValideringServiceTest {
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             typeVedtak = TypeVedtak.INNVILGELSE,
-            tidligsteEndring = behandling.revurderFra,
         )
     }
 
@@ -238,7 +202,6 @@ class VedtaksperiodeValideringServiceTest {
             vedtaksperioder = vedtaksperioder,
             behandling = saksbehandling(),
             typeVedtak = TypeVedtak.OPPHØR,
-            tidligsteEndring = behandling.revurderFra,
         )
     }
 

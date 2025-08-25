@@ -17,14 +17,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMottarSykepengerForFulltidsstilling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
@@ -156,25 +154,6 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                     ),
                 )
             }.hasMessageContaining("Mangler begrunnelse for ingen målgruppe")
-        }
-
-        @Test
-        fun `kan ikke opprette målgruppe hvis den begynner før revurderFra`() {
-            val behandling =
-                testoppsettService.oppdater(
-                    testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
-                )
-
-            assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiode(
-                    dummyVilkårperiodeMålgruppe(
-                        begrunnelse = "Begrunnelse",
-                        type = MålgruppeType.AAP,
-                        behandlingId = behandling.id,
-                        fom = now().minusDays(1),
-                    ),
-                )
-            }.hasMessageContaining("Kan ikke opprette periode")
         }
     }
 
@@ -367,43 +346,6 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `kan ikke oppdatere vurdering hvis periode begynner før revurderFra`() {
-            val målgruppe =
-                målgruppe(
-                    faktaOgVurdering = faktaOgVurderingMålgruppe(medlemskap = VurderingMedlemskap(svar = SvarJaNei.NEI)),
-                    fom = now().minusMonths(1),
-                    tom = now().plusMonths(1),
-                )
-
-            val behandling = lagRevurderingMedKopiertMålgruppe(målgruppe)
-            val vilkårperiodeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
-
-            assertThatThrownBy {
-                vilkårperiodeService.oppdaterVilkårperiode(
-                    vilkårperiodeFørOppdatering.id,
-                    vilkårperiodeFørOppdatering
-                        .tilOppdatering()
-                        .copy(faktaOgSvar = FaktaOgSvarMålgruppeDto(svarMedlemskap = SvarJaNei.JA)),
-                )
-            }.hasMessageContaining("Kan ikke endre vurderinger eller fakta på perioden.")
-        }
-
-        @Test
-        fun `kan oppdatere tom-dato hvis periode krysser revurderFra dato`() {
-            val originalMålgruppe =
-                målgruppe(
-                    fom = now().minusMonths(1),
-                    tom = now().plusMonths(1),
-                )
-            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe)
-            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
-
-            val nyTom = now().plusMonths(2)
-
-            validerHarEndretTom(målgruppeFørOppdatering, nyTom, nyBegrunnelse = "Test")
-        }
-
-        @Test
         fun `kan ikke fjerne begrunnelse hvis den er obligatorisk pga eksisterende svar`() {
             val originalMålgruppe =
                 målgruppe(
@@ -425,68 +367,6 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                         .copy(tom = nyTom, begrunnelse = null),
                 )
             }.hasMessageContaining("Mangler begrunnelse")
-        }
-
-        @Test
-        fun `kan ikke endre målgruppe dersom hele perioden er før revurderFra`() {
-            val originalMålgruppe =
-                målgruppe(
-                    fom = now().minusMonths(2),
-                    tom = now().minusMonths(1),
-                )
-            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe, revurderFra = now())
-            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
-
-            assertThatThrownBy {
-                vilkårperiodeService.oppdaterVilkårperiode(
-                    målgruppeFørOppdatering.id,
-                    målgruppeFørOppdatering
-                        .tilOppdatering()
-                        .copy(tom = målgruppeFørOppdatering.tom.plusMonths(1)),
-                )
-            }.hasMessageContaining("Kan ikke endre vilkårperiode som er ferdig før revurderingsdato.")
-        }
-
-        @Test
-        fun `kan endre tom på målgruppe til et senere dato dersom eksisterende tom er dagen før før revurderFra`() {
-            val revurderFra = now()
-            val originalMålgruppe =
-                målgruppe(
-                    fom = revurderFra.minusMonths(2),
-                    tom = revurderFra.minusDays(1),
-                )
-            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe, revurderFra = revurderFra)
-            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
-
-            vilkårperiodeService.oppdaterVilkårperiode(
-                målgruppeFørOppdatering.id,
-                målgruppeFørOppdatering
-                    .tilOppdatering()
-                    .copy(tom = revurderFra),
-            )
-
-            validerHarEndretTom(målgruppeFørOppdatering, målgruppeFørOppdatering.tom.plusMonths(1))
-        }
-
-        @Test
-        fun `kan ikke endre tom på målgruppe til et tidligere dato dersom eksisterende tom er dagen før før revurderFra`() {
-            val revurderFra = now()
-            val originalMålgruppe =
-                målgruppe(
-                    fom = revurderFra.minusMonths(2),
-                    tom = revurderFra.minusDays(1),
-                )
-            val behandling = lagRevurderingMedKopiertMålgruppe(originalMålgruppe, revurderFra = revurderFra)
-            val målgruppeFørOppdatering = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
-
-            assertThatThrownBy {
-                vilkårperiodeService.oppdaterVilkårperiode(
-                    målgruppeFørOppdatering.id,
-                    målgruppeFørOppdatering
-                        .tilOppdatering()
-                        .copy(tom = revurderFra.minusDays(2)),
-                )
-            }.hasMessageContaining("Kan ikke sette tom tidligere enn dagen før revurder-fra")
         }
 
         @Test
@@ -516,7 +396,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                         .tilOppdatering()
                         .copy(tom = målgruppeFørOppdatering.tom.plusMonths(1)),
                 )
-            }.hasMessageContaining("Det har kommet nye vilkår som må vurderes")
+            }.hasMessageContaining("${SvarJaNei.GAMMEL_MANGLER_DATA.name} er ugyldig for nye eller oppdaterte vurderinger")
         }
 
         @Test
@@ -546,38 +426,12 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                         .tilOppdatering()
                         .copy(tom = målgruppeFørOppdatering.tom.plusMonths(1)),
                 )
-            }.hasMessageContaining("Det har kommet nye vilkår som må vurderes")
+            }.hasMessageContaining("${SvarJaNei.GAMMEL_MANGLER_DATA.name} er ugyldig for nye eller oppdaterte vurderinger")
         }
     }
 
-    private fun validerHarEndretTom(
-        målgruppeFørOppdatering: Vilkårperiode,
-        nyTom: LocalDate,
-        nyBegrunnelse: String? = målgruppeFørOppdatering.begrunnelse,
-    ) {
-        val oppdatertPeriode =
-            vilkårperiodeService.oppdaterVilkårperiode(
-                målgruppeFørOppdatering.id,
-                målgruppeFørOppdatering
-                    .tilOppdatering()
-                    .copy(tom = nyTom, begrunnelse = nyBegrunnelse),
-            )
-
-        assertThat(oppdatertPeriode)
-            .usingRecursiveComparison()
-            .ignoringFields("sporbar", "tom", "status", "begrunnelse")
-            .isEqualTo(målgruppeFørOppdatering)
-
-        assertThat(oppdatertPeriode.tom).isEqualTo(nyTom)
-        assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
-        assertThat(oppdatertPeriode.begrunnelse).isEqualTo(nyBegrunnelse)
-    }
-
-    private fun lagRevurderingMedKopiertMålgruppe(
-        opprinneligMålgruppe: VilkårperiodeMålgruppe = målgruppe(),
-        revurderFra: LocalDate = now(),
-    ): Behandling {
-        val revurdering = testoppsettService.lagBehandlingOgRevurdering(revurderFra = revurderFra)
+    private fun lagRevurderingMedKopiertMålgruppe(opprinneligMålgruppe: VilkårperiodeMålgruppe = målgruppe()): Behandling {
+        val revurdering = testoppsettService.lagBehandlingOgRevurdering()
 
         vilkårperiodeRepository.insert(
             opprinneligMålgruppe.copy(behandlingId = revurdering.forrigeIverksatteBehandlingId!!),

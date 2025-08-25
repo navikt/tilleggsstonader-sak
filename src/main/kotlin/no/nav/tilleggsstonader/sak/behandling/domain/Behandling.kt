@@ -39,7 +39,6 @@ data class Behandling(
     val henlagtÅrsak: HenlagtÅrsak? = null,
     val henlagtBegrunnelse: String? = null,
     val vedtakstidspunkt: LocalDateTime? = null,
-    val revurderFra: LocalDate? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
 ) {
@@ -58,9 +57,6 @@ data class Behandling(
     init {
         if (erHenlagt()) {
             feilHvis(henlagtÅrsak == null) { "Kan ikke henlegge behandling uten en årsak" }
-        }
-        feilHvis(revurderFra != null && type != BehandlingType.REVURDERING) {
-            "Kan ikke sette revurder fra når behandlingen ikke er en revurdering"
         }
     }
 }

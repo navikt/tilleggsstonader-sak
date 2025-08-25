@@ -40,11 +40,11 @@ object TilsynBarnTestUtil {
         begrunnelse = begrunnelse,
     )
 
-    fun opphørDto() =
+    fun opphørDto(opphørsdato: LocalDate?) =
         OpphørTilsynBarnRequest(
             årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
             begrunnelse = "Endring i utgifter",
-            opphørsdato = defaultBehandling.revurderFra,
+            opphørsdato = opphørsdato,
         )
 
     val defaultBehandling = behandling()
@@ -173,6 +173,7 @@ object TilsynBarnTestUtil {
         behandlingId: BehandlingId = defaultBehandling.id,
         beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
         vedtaksperioder: List<Vedtaksperiode> = emptyList(),
+        tidligsteEndring: LocalDate? = null,
     ) = GeneriskVedtak(
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,
@@ -182,7 +183,7 @@ object TilsynBarnTestUtil {
                 vedtaksperioder = vedtaksperioder,
             ),
         gitVersjon = Applikasjonsversjon.versjon,
-        tidligsteEndring = defaultBehandling.revurderFra,
+        tidligsteEndring = tidligsteEndring,
         opphørsdato = null,
     )
 
@@ -194,7 +195,7 @@ object TilsynBarnTestUtil {
         type = TypeVedtak.INNVILGELSE,
         data = vedtak,
         gitVersjon = Applikasjonsversjon.versjon,
-        tidligsteEndring = defaultBehandling.revurderFra,
+        tidligsteEndring = null,
         opphørsdato = null,
     )
 
