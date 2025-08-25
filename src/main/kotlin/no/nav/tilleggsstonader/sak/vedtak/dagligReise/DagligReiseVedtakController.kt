@@ -4,12 +4,10 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.OffentligTransportBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
@@ -38,7 +36,6 @@ class DagligReiseVedtakController(
     private val stegService: StegService,
     private val steg: DagligReiseBeregnYtelseSteg,
     private val vedtakService: VedtakService,
-    private val vedtaksperiodeService: VedtaksperiodeService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val vilkårService: VilkårService,
@@ -98,12 +95,10 @@ class DagligReiseVedtakController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         val behandling = behandlingService.hentBehandling(behandlingId)
+
         val forrigeVedtaksperioder =
             behandling.forrigeIverksatteBehandlingId?.let {
-                vedtaksperiodeService.finnVedtaksperioderForBehandling(
-                    behandlingId = it,
-                    revurdererFra = null,
-                )
+                vedtakService.hentVedtaksperioder(it)
             }
 
         return foreslåVedtaksperiodeService.foreslåPerioder(behandlingId).tilLagretVedtaksperiodeDto(
