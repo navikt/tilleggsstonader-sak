@@ -25,6 +25,7 @@ data class BeregningsresultatForPeriodeDto(
     val aktivitet: AktivitetType,
     val makssatsBekreftet: Boolean,
     val delAvTidligereUtbetaling: Boolean,
+    val skalFåDekketFaktiskeUtgifter: Boolean,
 ) : Periode<LocalDate>
 
 data class UtgiftBoutgifterMedAndelTilUtbetalingDto(
@@ -33,6 +34,7 @@ data class UtgiftBoutgifterMedAndelTilUtbetalingDto(
     val utgift: Int,
     val tilUtbetaling: Int,
     val erFørRevurderFra: Boolean,
+    val skalFåDekketFaktiskeUtgifter: Boolean,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -73,6 +75,7 @@ fun BeregningsresultatForLøpendeMåned.tilDto(revurderFra: LocalDate?): Beregni
         aktivitet = grunnlag.aktivitet,
         makssatsBekreftet = grunnlag.makssatsBekreftet,
         delAvTidligereUtbetaling = delAvTidligereUtbetaling,
+        skalFåDekketFaktiskeUtgifter = grunnlag.skalFåDekketFaktiskeUtgifter(),
     )
 
 fun BeregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(
@@ -96,6 +99,7 @@ fun BeregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(
                 utgift = utgift.utgift,
                 tilUtbetaling = skalUtbetales,
                 erFørRevurderFra = revurderFra != null && utgift.tom < revurderFra,
+                skalFåDekketFaktiskeUtgifter = utgift.skalFåDekketFaktiskeUtgifter,
             )
         }
 }

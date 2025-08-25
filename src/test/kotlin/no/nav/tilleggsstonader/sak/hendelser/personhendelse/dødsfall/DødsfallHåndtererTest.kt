@@ -24,7 +24,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.Test
@@ -39,7 +39,7 @@ class DødsfallHåndtererTest {
     private val taskService = mockk<TaskService>(relaxed = true)
     private val personService = mockk<PersonService>()
     private val behandlingService = mockk<BehandlingService>()
-    private val vedtaksperiodeService = mockk<VedtaksperiodeService>()
+    private val vedtakService = mockk<VedtakService>()
     private val hendelseRepository = mockk<HendelseRepository>()
     private val oppgaveService = mockk<OppgaveService>()
     private val dødsfallHåndterer =
@@ -47,7 +47,7 @@ class DødsfallHåndtererTest {
             fagsakService,
             taskService,
             behandlingService,
-            vedtaksperiodeService,
+            vedtakService,
             hendelseRepository,
             oppgaveService,
         )
@@ -71,7 +71,7 @@ class DødsfallHåndtererTest {
         every { hendelseRepository.existsByTypeAndId(any(), any()) } returns false
         every { fagsakService.finnFagsaker(dødsfallHendelse.personidenter) } returns listOf(fagsak)
         every { behandlingService.finnSisteIverksatteBehandling(fagsak.id) } returns behandling
-        every { vedtaksperiodeService.finnVedtaksperioderForBehandling(behandling.id, null) } returns listOf(vedtaksperiode)
+        every { vedtakService.hentVedtaksperioder(behandling.id) } returns listOf(vedtaksperiode)
         every { personService.hentFolkeregisterIdenter(any()).gjeldende().ident } returns "12345678901"
         every { hendelseRepository.insert(any()) } returnsArgument 0
         every { oppgaveService.lagBeskrivelseMelding(any(), any()) } returnsArgument 0
@@ -98,7 +98,7 @@ class DødsfallHåndtererTest {
         every { hendelseRepository.existsByTypeAndId(any(), any()) } returns false
         every { fagsakService.finnFagsaker(dødsfallHendelse.personidenter) } returns listOf(fagsak)
         every { behandlingService.finnSisteIverksatteBehandling(fagsak.id) } returns behandling
-        every { vedtaksperiodeService.finnVedtaksperioderForBehandling(behandling.id, null) } returns emptyList()
+        every { vedtakService.hentVedtaksperioder(behandling.id) } returns emptyList()
 
         dødsfallHåndterer.håndter(dødsfallHendelse)
 
@@ -124,7 +124,7 @@ class DødsfallHåndtererTest {
         every { hendelseRepository.existsByTypeAndId(any(), any()) } returns false
         every { fagsakService.finnFagsaker(dødsfallHendelse.personidenter) } returns listOf(fagsak)
         every { behandlingService.finnSisteIverksatteBehandling(fagsak.id) } returns behandling
-        every { vedtaksperiodeService.finnVedtaksperioderForBehandling(behandling.id, null) } returns listOf(vedtaksperiode)
+        every { vedtakService.hentVedtaksperioder(behandling.id) } returns listOf(vedtaksperiode)
 
         dødsfallHåndterer.håndter(dødsfallHendelse)
 

@@ -50,6 +50,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     utgift = 1000,
                     tilUtbetaling = 1000,
                     erFørRevurderFra = false,
+                    skalFåDekketFaktiskeUtgifter = false,
                 ),
                 UtgiftBoutgifterMedAndelTilUtbetalingDto(
                     fom = LocalDate.of(2023, 1, 11),
@@ -57,6 +58,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     utgift = 2000,
                     tilUtbetaling = 2000,
                     erFørRevurderFra = false,
+                    skalFåDekketFaktiskeUtgifter = false,
                 ),
             )
 
@@ -105,6 +107,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     utgift = 4000,
                     tilUtbetaling = 4000,
                     erFørRevurderFra = false,
+                    skalFåDekketFaktiskeUtgifter = false,
                 ),
                 UtgiftBoutgifterMedAndelTilUtbetalingDto(
                     fom = LocalDate.of(2023, 1, 11),
@@ -112,6 +115,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     utgift = 2000,
                     tilUtbetaling = 953,
                     erFørRevurderFra = false,
+                    skalFåDekketFaktiskeUtgifter = false,
                 ),
             )
 
@@ -160,6 +164,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     utgift = 1000,
                     tilUtbetaling = 1000,
                     erFørRevurderFra = true,
+                    skalFåDekketFaktiskeUtgifter = false,
                 ),
                 UtgiftBoutgifterMedAndelTilUtbetalingDto(
                     fom = LocalDate.of(2023, 1, 11),
@@ -167,6 +172,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     utgift = 2000,
                     tilUtbetaling = 2000,
                     erFørRevurderFra = false,
+                    skalFåDekketFaktiskeUtgifter = false,
                 ),
             )
 
@@ -213,6 +219,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     utgift = 20_000,
                     tilUtbetaling = 20_000,
                     erFørRevurderFra = true,
+                    skalFåDekketFaktiskeUtgifter = true,
                 ),
             )
 

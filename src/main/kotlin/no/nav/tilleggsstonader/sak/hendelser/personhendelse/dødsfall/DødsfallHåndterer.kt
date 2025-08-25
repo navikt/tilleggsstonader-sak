@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.hendelser.HendelseRepository
 import no.nav.tilleggsstonader.sak.hendelser.TypeHendelse
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.util.erÅpen
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,7 +25,7 @@ class DødsfallHåndterer(
     private val fagsakService: FagsakService,
     private val taskService: TaskService,
     private val behandlingService: BehandlingService,
-    private val vedtaksperiodeService: VedtaksperiodeService,
+    private val vedtakService: VedtakService,
     private val hendelseRepository: HendelseRepository,
     private val oppgaveService: OppgaveService,
 ) {
@@ -86,8 +86,8 @@ class DødsfallHåndterer(
     ): Boolean {
         val behandling = behandlingService.finnSisteIverksatteBehandling(fagsak.id)
         if (behandling != null) {
-            return vedtaksperiodeService
-                .finnVedtaksperioderForBehandling(behandling.id, null)
+            return vedtakService
+                .hentVedtaksperioder(behandling.id)
                 .any { dødsdato <= it.tom }
         }
         return false

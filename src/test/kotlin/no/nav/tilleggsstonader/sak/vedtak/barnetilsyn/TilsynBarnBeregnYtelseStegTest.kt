@@ -17,7 +17,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
@@ -47,7 +46,6 @@ class TilsynBarnBeregnYtelseStegTest {
     private val opphørValideringService = mockk<OpphørValideringService>(relaxed = true)
     private val tilsynBarnVedtaksperiodeValidingerService =
         mockk<VedtaksperiodeValideringService>(relaxed = true)
-    private val vedtaksperiodeService = mockk<VedtaksperiodeService>(relaxed = true)
     private val utledTidligsteEndringService =
         mockk<UtledTidligsteEndringService> {
             every { utledTidligsteEndringForBeregning(any(), any()) } returns null
@@ -65,13 +63,12 @@ class TilsynBarnBeregnYtelseStegTest {
     val steg =
         TilsynBarnBeregnYtelseSteg(
             beregningService = tilsynBarnBeregningService,
+            opphørValideringService = opphørValideringService,
+            utledTidligsteEndringService = utledTidligsteEndringService,
+            unleashService = unleashService,
             vedtakRepository = repository,
             tilkjentytelseService = tilkjentYtelseService,
             simuleringService = simuleringService,
-            opphørValideringService = opphørValideringService,
-            vedtaksperiodeService = vedtaksperiodeService,
-            utledTidligsteEndringService = utledTidligsteEndringService,
-            unleashService = unleashService,
         )
 
     val saksbehandling = saksbehandling()

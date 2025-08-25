@@ -11,14 +11,22 @@ sealed interface Vedtaksdata : VedtaksdataJson {
     val type: TypeVedtaksdata
 }
 
+sealed interface HarVedtaksperioder : Vedtaksdata {
+    val vedtaksperioder: List<Vedtaksperiode>
+}
+
 @JsonDeserialize(using = TypeVedtaksdataDeserializer::class)
 sealed interface TypeVedtaksdata {
     val typeVedtak: TypeVedtak
 }
 
-sealed interface Innvilgelse : Vedtaksdata
+sealed interface Innvilgelse :
+    Vedtaksdata,
+    HarVedtaksperioder
 
-sealed interface Opphør : Vedtaksdata {
+sealed interface Opphør :
+    Vedtaksdata,
+    HarVedtaksperioder {
     val årsaker: List<ÅrsakOpphør>
     val begrunnelse: String
 }

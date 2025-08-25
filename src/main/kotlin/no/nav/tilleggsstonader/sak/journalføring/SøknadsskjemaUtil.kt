@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import java.time.LocalDateTime
 
@@ -22,8 +23,8 @@ object SøknadsskjemaUtil {
             Stønadstype.BARNETILSYN -> objectMapper.readValue<Søknadsskjema<SøknadsskjemaBarnetilsyn>>(data)
             Stønadstype.LÆREMIDLER -> objectMapper.readValue<Søknadsskjema<SøknadsskjemaLæremidler>>(data)
             Stønadstype.BOUTGIFTER -> håndterBoutgifter(data, mottattTidspunkt)
-            Stønadstype.DAGLIG_REISE_TSO -> TODO("Daglig reise er ikke implementert enda")
-            Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise er ikke implementert enda")
+            Stønadstype.DAGLIG_REISE_TSO -> håndterDagligReise(data, mottattTidspunkt)
+            Stønadstype.DAGLIG_REISE_TSR -> håndterDagligReise(data, mottattTidspunkt)
         }
 
     private fun håndterBoutgifter(
@@ -31,6 +32,19 @@ object SøknadsskjemaUtil {
         mottattTidspunkt: LocalDateTime,
     ): Søknadsskjema<SøknadsskjemaBoutgifterFyllUtSendInn> {
         val skjema = objectMapperFailOnUnknownProperties.readValue<SøknadsskjemaBoutgifterFyllUtSendInn>(data)
+        return Søknadsskjema(
+            ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
+            mottattTidspunkt = mottattTidspunkt,
+            språk = mapFyllUtSpråk(skjema.language),
+            skjema = skjema,
+        )
+    }
+
+    private fun håndterDagligReise(
+        data: ByteArray,
+        mottattTidspunkt: LocalDateTime,
+    ): Søknadsskjema<SøknadsskjemaDagligReiseFyllUtSendInn> {
+        val skjema = objectMapperFailOnUnknownProperties.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(data)
         return Søknadsskjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
             mottattTidspunkt = mottattTidspunkt,

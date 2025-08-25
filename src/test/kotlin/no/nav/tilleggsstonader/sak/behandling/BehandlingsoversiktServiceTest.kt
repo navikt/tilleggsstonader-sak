@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
@@ -33,13 +32,11 @@ class BehandlingsoversiktServiceTest {
     val vedtakService = mockk<VedtakService>()
     val behandlingRepository = mockk<BehandlingRepository>()
     val vedtakRepository = mockk<VedtakRepository>()
-    val vedtaksperiodeService = VedtaksperiodeService(vedtakRepository)
 
     val service =
         BehandlingsoversiktService(
             fagsakService = fagsakService,
             behandlingRepository = behandlingRepository,
-            vedtaksperiodeService = vedtaksperiodeService,
             vedtakService = vedtakService,
         )
 
@@ -138,5 +135,7 @@ class BehandlingsoversiktServiceTest {
                 behandlingId = behandling.id,
                 vedtaksperioder = listOf(vedtaksperiode),
             )
+
+        every { vedtakService.hentVedtaksperioder(any()) } returns listOf(vedtaksperiode)
     }
 }
