@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -80,6 +81,10 @@ class TilsynBarnBeregningService(
         val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioderBeregning, tidligsteEndring)
         val relevantePerioderFraForrigeVedtak =
             finnRelevantePerioderFraForrigeVedtak(behandling, tidligsteEndring)
+
+        feilHvis(tidligsteEndring == null && behandling.type == BehandlingType.REVURDERING) {
+            "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
+        }
         return BeregningsresultatTilsynBarn(relevantePerioderFraForrigeVedtak + perioder)
     }
 

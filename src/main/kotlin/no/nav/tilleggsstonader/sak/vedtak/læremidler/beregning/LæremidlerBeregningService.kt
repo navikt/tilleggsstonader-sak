@@ -57,7 +57,7 @@ class LæremidlerBeregningService(
         val beregningsresultatForMåned = beregn(behandling, vedtaksperioderBeregningsgrunnlag)
 
         return if (forrigeVedtak != null) {
-            settSammenGamleOgNyePerioder(behandling, beregningsresultatForMåned, forrigeVedtak, behandling.revurderFra ?: tidligsteEndring)
+            settSammenGamleOgNyePerioder(beregningsresultatForMåned, forrigeVedtak, tidligsteEndring)
         } else {
             BeregningsresultatLæremidler(beregningsresultatForMåned)
         }
@@ -162,13 +162,12 @@ class LæremidlerBeregningService(
      * Men vi trenger å reberegne perioder som løper i revurder-fra datoet då en periode kan ha endrer % eller sats
      */
     private fun settSammenGamleOgNyePerioder(
-        saksbehandling: Saksbehandling,
         beregningsresultat: List<BeregningsresultatForMåned>,
         forrigeVedtak: InnvilgelseEllerOpphørLæremidler,
         tidligsteEndring: LocalDate?,
     ): BeregningsresultatLæremidler {
         feilHvis(tidligsteEndring == null) {
-            "Behandling=${saksbehandling.id} steg=${saksbehandling.steg} mangler revurderFra eller dato for tidligste endring"
+            "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
         }
 
         val forrigeBeregningsresultat = forrigeVedtak.beregningsresultat
