@@ -26,6 +26,7 @@ data class BeregningsresultatForPeriodeDto(
     val makssatsBekreftet: Boolean,
     val delAvTidligereUtbetaling: Boolean,
     val skalFåDekketFaktiskeUtgifter: Boolean,
+    val inneholderUtgifterOvernatting: Boolean,
 ) : Periode<LocalDate>
 
 data class UtgiftBoutgifterMedAndelTilUtbetalingDto(
@@ -76,6 +77,7 @@ fun BeregningsresultatForLøpendeMåned.tilDto(revurderFra: LocalDate?): Beregni
         makssatsBekreftet = grunnlag.makssatsBekreftet,
         delAvTidligereUtbetaling = delAvTidligereUtbetaling,
         skalFåDekketFaktiskeUtgifter = grunnlag.skalFåDekketFaktiskeUtgifter(),
+        inneholderUtgifterOvernatting = !grunnlag.utgifter[TypeBoutgift.UTGIFTER_OVERNATTING].isNullOrEmpty(),
     )
 
 fun BeregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(

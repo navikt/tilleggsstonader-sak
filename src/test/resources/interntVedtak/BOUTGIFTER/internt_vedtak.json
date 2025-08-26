@@ -221,7 +221,8 @@
       "aktivitet" : "TILTAK",
       "makssatsBekreftet" : true,
       "delAvTidligereUtbetaling" : false,
-      "skalFåDekketFaktiskeUtgifter" : false
+      "skalFåDekketFaktiskeUtgifter" : false,
+      "inneholderUtgifterOvernatting" : true
     }, {
       "fom" : "2024-02-01",
       "tom" : "2024-02-29",
@@ -239,7 +240,8 @@
       "aktivitet" : "TILTAK",
       "makssatsBekreftet" : true,
       "delAvTidligereUtbetaling" : false,
-      "skalFåDekketFaktiskeUtgifter" : false
+      "skalFåDekketFaktiskeUtgifter" : false,
+      "inneholderUtgifterOvernatting" : true
     } ]
   }
 }
