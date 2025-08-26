@@ -68,8 +68,6 @@ management:
   endpoints.web:
     exposure.include: info, health, metrics, prometheus
     base-path: "/internal"
-    path-mapping:
-      info: "status/isAlive"
   prometheus.metrics.export.enabled: true
 
 prosessering:
