@@ -36,8 +36,7 @@ class DagligReiseBeregnYtelseSteg(
     simuleringService: SimuleringService,
     unleashService: UnleashService,
 ) : BeregnYtelseSteg<VedtakDagligReiseRequest>(
-        // TODO - legge inn TSR
-        stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        stønadstype = listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,

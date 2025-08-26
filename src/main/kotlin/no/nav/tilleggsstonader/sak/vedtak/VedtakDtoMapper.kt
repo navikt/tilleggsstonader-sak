@@ -81,7 +81,7 @@ class VedtakDtoMapper(
                 mapVedtakDagligReise(
                     vedtak,
                     data,
-                    vedtak.tidligsteEndring ?: revurderFra,
+                    vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
                 )
         }
