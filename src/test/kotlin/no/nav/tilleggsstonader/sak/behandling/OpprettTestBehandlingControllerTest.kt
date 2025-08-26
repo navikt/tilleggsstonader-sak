@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import org.assertj.core.api.Assertions.assertThat
@@ -73,7 +74,7 @@ class OpprettTestBehandlingControllerTest : IntegrationTest() {
         assertThat(behandlingRepository.findByIdOrNull(behandlingId)).isNotNull
         val søknad = søknadService.hentSøknadDagligReiseTso(behandlingId)!!
         assertThat(søknad).isNotNull
-        assertThat(søknad).isInstanceOf(SøknadLæremidler::class.java)
+        assertThat(søknad).isInstanceOf(SøknadDagligReise::class.java)
     }
 
     @Test
@@ -84,6 +85,6 @@ class OpprettTestBehandlingControllerTest : IntegrationTest() {
         assertThat(behandlingRepository.findByIdOrNull(behandlingId)).isNotNull
         val søknad = søknadService.hentSøknadDagligReiseTsr(behandlingId)!!
         assertThat(søknad).isNotNull
-        assertThat(søknad).isInstanceOf(SøknadLæremidler::class.java)
+        assertThat(søknad).isInstanceOf(SøknadDagligReise::class.java)
     }
 }
