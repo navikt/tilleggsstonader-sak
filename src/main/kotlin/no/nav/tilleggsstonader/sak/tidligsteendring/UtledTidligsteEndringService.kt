@@ -230,8 +230,7 @@ data class TidligsteEndringIBehandlingUtleder(
     ): Boolean =
         vilkårperiode.resultat != tidligereVilkårperiode.resultat ||
             vilkårperiode.type != tidligereVilkårperiode.type ||
-            vilkårperiode.faktaOgVurdering.fakta != tidligereVilkårperiode.faktaOgVurdering.fakta ||
-            vilkårperiode.kildeId != tidligereVilkårperiode.kildeId
+            vilkårperiode.faktaOgVurdering.fakta != tidligereVilkårperiode.faktaOgVurdering.fakta
 
     private fun erVedtaksperiodeEndret(
         vedtaksperiode: Vedtaksperiode,

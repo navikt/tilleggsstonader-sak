@@ -299,7 +299,7 @@ Egenskap: Utled tidligste endring av aktivitet
 
       Så forvent følgende dato for tidligste endring: 20.03.2024
 
-  Regel: Aktiviteter som får endret kildeId skal håndteres som endringer
+  Regel: Aktiviteter som får endret kildeId skal ikke håndteres som endringer
     Scenario: Aktivitet blir slettet og ny legges til med samme data men annen kildeId
       Gitt følgende aktiviteter i forrige behandling - utledTidligsteEndring
         | Fom        | Tom        | Stønadstype | Type   | Resultat | Status | Kilde Id |
@@ -313,7 +313,7 @@ Egenskap: Utled tidligste endring av aktivitet
 
       Når utleder tidligste endring
 
-      Så forvent følgende dato for tidligste endring: 01.02.2024
+      Så forvent ingen endring
 
     Scenario: Aktivitet blir slettet og ny legges til med samme data og samme kildeId
       Gitt følgende aktiviteter i forrige behandling - utledTidligsteEndring
