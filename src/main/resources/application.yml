@@ -60,7 +60,11 @@ spring:
 
 
 management:
-  endpoint.health.show-details: always
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
   endpoints.web:
     exposure.include: info, health, metrics, prometheus
     base-path: "/internal"
