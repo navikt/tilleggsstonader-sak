@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -13,7 +12,6 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.OffentligTransportBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
@@ -58,17 +56,6 @@ class DagligReiseBeregnYtelseSteg(
         vedtak: InnvilgelseDagligReiseRequest,
     ) {
         val vedtaksperioder = vedtak.vedtaksperioder.tilDomene()
-        val utgifter =
-            vilkårService.hentVilkår(saksbehandling.id).map { vilkår ->
-                val offentligTransport = vilkår.offentligTransport!!
-                UtgiftOffentligTransport(
-                    fom = vilkår.fom!!,
-                    tom = vilkår.tom!!,
-                    antallReisedagerPerUke = offentligTransport.reisedagerPerUke,
-                    prisEnkelbillett = offentligTransport.prisEnkelbillett,
-                    pris30dagersbillett = offentligTransport.prisTrettidagersbillett,
-                )
-            }
 
         val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(
@@ -77,7 +64,7 @@ class DagligReiseBeregnYtelseSteg(
             )
         val beregningsresultat =
             beregningService.beregn(
-                utgifter = utgifter,
+                behandlingId = saksbehandling.id,
                 vedtaksperioder = vedtaksperioder,
             )
         lagreInnvilgetVedtak(
@@ -107,8 +94,7 @@ class DagligReiseBeregnYtelseSteg(
                         beregningsresultat = beregningsresultat,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                // TODO - få denne forklart
-                tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
+                tidligsteEndring = tidligsteEndring,
             ),
         )
     }

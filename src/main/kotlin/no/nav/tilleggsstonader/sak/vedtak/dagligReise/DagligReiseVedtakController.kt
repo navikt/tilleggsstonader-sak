@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.OffentligTransportBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
@@ -18,7 +17,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -38,7 +36,6 @@ class DagligReiseVedtakController(
     private val vedtakService: VedtakService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
-    private val vilkårService: VilkårService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -65,23 +62,9 @@ class DagligReiseVedtakController(
         @RequestBody vedtak: InnvilgelseDagligReiseRequest,
     ): Beregningsresultat {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        val vilkår = vilkårService.hentVilkår(behandlingId)
-        val utgifter =
-            vilkår
-                .filter { it.offentligTransport != null }
-                .map { vilkår ->
-                    UtgiftOffentligTransport(
-                        fom = vilkår.fom!!,
-                        tom = vilkår.tom!!,
-                        antallReisedagerPerUke = vilkår.offentligTransport?.reisedagerPerUke!!,
-                        prisEnkelbillett = vilkår.offentligTransport.prisEnkelbillett,
-                        pris30dagersbillett = vilkår.offentligTransport.prisTrettidagersbillett,
-                    )
-                }
-
         return beregningService
             .beregn(
-                utgifter = utgifter,
+                behandlingId = behandlingId,
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
             )
     }

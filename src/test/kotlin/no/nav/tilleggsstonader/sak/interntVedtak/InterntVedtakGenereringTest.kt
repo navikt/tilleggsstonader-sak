@@ -103,6 +103,8 @@ class InterntVedtakGenereringTest {
             Stønadstype.BARNETILSYN -> mockTilsynBarn()
             Stønadstype.LÆREMIDLER -> mockLæremidler()
             Stønadstype.BOUTGIFTER -> mockBoutgifter()
+            Stønadstype.DAGLIG_REISE_TSO -> mockDagligReise()
+            Stønadstype.DAGLIG_REISE_TSR -> mockDagligReise()
             else -> error("Har ikke mapping for ${type.stønadstype}")
         }
     }
@@ -132,6 +134,10 @@ class InterntVedtakGenereringTest {
         every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
         every { vilkårService.hentVilkår(behandlingId) } returns Testdata.Boutgifter.vilkår
         every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Boutgifter.innvilgetVedtak
+    }
+
+    private fun mockDagligReise() {
+        every { vilkårService.hentOppfylteDagligReiseVilkår(behandlingId) } returns Testdata.DagligReise.vilkårOffentligTransport
     }
 
     @Test
