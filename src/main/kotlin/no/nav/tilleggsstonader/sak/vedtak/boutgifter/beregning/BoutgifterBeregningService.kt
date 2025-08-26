@@ -134,7 +134,7 @@ class BoutgifterBeregningService(
      * Vi trenger derimot å reberegne alle perioder som ligger etter revurder fra-datoen, da utgiftene, antall samlinger osv kan ha endret seg.
      */
     private fun settSammenGamleOgNyePerioder(
-        tidligsteEndring: LocalDate?,
+        tidligsteEndring: LocalDate,
         nyttBeregningsresultat: List<BeregningsresultatForLøpendeMåned>,
         forrigeBeregningsresultat: BeregningsresultatBoutgifter,
     ): BeregningsresultatBoutgifter {
