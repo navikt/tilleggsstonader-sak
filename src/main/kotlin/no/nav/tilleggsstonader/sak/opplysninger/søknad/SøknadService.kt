@@ -55,15 +55,15 @@ class SøknadService(
             .findByIdOrNull(behandlingId)
             ?.let { søknadBoutgifterRepository.findByIdOrThrow(it.søknadId) }
 
-    fun hentSøknadDagligReiseTso(behandlingId: BehandlingId): SøknadLæremidler? =
+    fun hentSøknadDagligReiseTso(behandlingId: BehandlingId): SøknadDagligReise? =
         søknadBehandlingRepository
             .findByIdOrNull(behandlingId)
-            ?.let { søknadLæremidlerRepository.findByIdOrThrow(it.søknadId) }
+            ?.let { søknadDagligReiseRepository.findByIdOrThrow(it.søknadId) }
 
-    fun hentSøknadDagligReiseTsr(behandlingId: BehandlingId): SøknadLæremidler? =
+    fun hentSøknadDagligReiseTsr(behandlingId: BehandlingId): SøknadDagligReise? =
         søknadBehandlingRepository
             .findByIdOrNull(behandlingId)
-            ?.let { søknadLæremidlerRepository.findByIdOrThrow(it.søknadId) }
+            ?.let { søknadDagligReiseRepository.findByIdOrThrow(it.søknadId) }
 
     fun lagreSøknad(
         behandlingId: BehandlingId,
