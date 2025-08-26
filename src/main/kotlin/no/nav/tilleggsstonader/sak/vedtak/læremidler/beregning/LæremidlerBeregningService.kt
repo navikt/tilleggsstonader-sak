@@ -168,7 +168,7 @@ class LæremidlerBeregningService(
     private fun settSammenGamleOgNyePerioder(
         beregningsresultat: List<BeregningsresultatForMåned>,
         forrigeVedtak: InnvilgelseEllerOpphørLæremidler,
-        tidligsteEndring: LocalDate,
+        tidligsteEndring: LocalDate?,
     ): BeregningsresultatLæremidler {
         val forrigeBeregningsresultat = forrigeVedtak.beregningsresultat
 
