@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
@@ -82,7 +83,7 @@ class TilsynBarnBeregningService(
         val relevantePerioderFraForrigeVedtak =
             finnRelevantePerioderFraForrigeVedtak(behandling, tidligsteEndring)
 
-        feilHvis(tidligsteEndring == null && behandling.type == BehandlingType.REVURDERING) {
+        brukerfeilHvis(tidligsteEndring == null && behandling.type == BehandlingType.REVURDERING) {
             "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
         }
         return BeregningsresultatTilsynBarn(relevantePerioderFraForrigeVedtak + perioder)
