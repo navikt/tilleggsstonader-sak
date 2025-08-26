@@ -26,6 +26,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer
     JsonSubTypes.Type(InnvilgelseBoutgifter::class, name = "INNVILGELSE_BOUTGIFTER"),
     JsonSubTypes.Type(AvslagBoutgifter::class, name = "AVSLAG_BOUTGIFTER"),
     JsonSubTypes.Type(OpphørBoutgifter::class, name = "OPPHØR_BOUTGIFTER"),
+    JsonSubTypes.Type(InnvilgelseDagligReise::class, name = "INNVILGELSE_DAGLIG_REISE"),
+    JsonSubTypes.Type(AvslagDagligReise::class, name = "AVSLAG_DAGLIG_REISE"),
+    JsonSubTypes.Type(OpphørDagligReise::class, name = "OPPHØR_DAGLIG_REISE"),
     failOnRepeatedNames = true,
 )
 sealed interface VedtaksdataJson
