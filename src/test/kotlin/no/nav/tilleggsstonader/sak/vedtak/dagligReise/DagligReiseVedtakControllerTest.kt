@@ -7,19 +7,27 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeTestUtil.vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -41,18 +49,76 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
     val dummyFom: LocalDate = LocalDate.now()
     val dummyTom: LocalDate = LocalDate.now().plusDays(29)
     val dummyFagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+    val dummyBehandlingId = BehandlingId.random()
     val dummyBehandling =
-        behandling(fagsak = dummyFagsak, steg = StegType.BEREGNE_YTELSE, status = BehandlingStatus.UTREDES)
+        behandling(
+            id = dummyBehandlingId,
+            fagsak = dummyFagsak,
+            steg = StegType.BEREGNE_YTELSE,
+            status = BehandlingStatus.UTREDES,
+        )
     val dummyOffentligTransport =
         OffentligTransport(reisedagerPerUke = 4, prisEnkelbillett = 44, prisTrettidagersbillett = 750)
 
     val vedtaksperiode = vedtaksperiode(fom = dummyFom, tom = dummyTom)
-    val aktivitet = aktivitet(dummyBehandling.id, fom = dummyFom, tom = dummyTom)
-    val målgruppe = målgruppe(dummyBehandling.id, fom = dummyFom, tom = dummyTom)
+    val aktivitet = aktivitet(dummyBehandlingId, fom = dummyFom, tom = dummyTom)
+    val målgruppe = målgruppe(dummyBehandlingId, fom = dummyFom, tom = dummyTom)
+
+    val dummyInnvilgelse =
+        InnvilgelseDagligReiseResponse(
+            vedtaksperioder =
+                listOf(
+                    LagretVedtaksperiodeDto(
+                        id = vedtaksperiode.id,
+                        fom = dummyFom,
+                        tom = dummyTom,
+                        målgruppeType = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                        aktivitetType = AktivitetType.TILTAK,
+                        vedtaksperiodeFraForrigeVedtak = null,
+                    ),
+                ),
+            beregningsresultat =
+                Beregningsresultat(
+                    reiser =
+                        listOf(
+                            BeregningsresultatForReise(
+                                perioder =
+                                    listOf(
+                                        BeregningsresultatForPeriode(
+                                            grunnlag =
+                                                Beregningsgrunnlag(
+                                                    fom = dummyFom,
+                                                    tom = dummyTom,
+                                                    prisEnkeltbillett = 44,
+                                                    pris30dagersbillett = 750,
+                                                    antallReisedagerPerUke = 4,
+                                                    vedtaksperioder =
+                                                        listOf(
+                                                            VedtaksperiodeGrunnlag(
+                                                                id = vedtaksperiode.id,
+                                                                fom = dummyFom,
+                                                                tom = dummyTom,
+                                                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                                                                aktivitet = AktivitetType.TILTAK,
+                                                                antallReisedagerIVedtaksperioden = 19,
+                                                            ),
+                                                        ),
+                                                    antallReisedager = 19,
+                                                ),
+                                            beløp = 750,
+                                        ),
+                                    ),
+                            ),
+                        ),
+                ),
+            gjelderFraOgMed = dummyFom,
+            gjelderTilOgMed = dummyTom,
+            begrunnelse = null,
+        )
 
     val vilkår =
         vilkår(
-            behandlingId = dummyBehandling.id,
+            behandlingId = dummyBehandlingId,
             type = VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
             fom = dummyFom,
             tom = dummyTom,
@@ -79,7 +145,7 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
 
     @Test
     fun `hent vedtak skal returnere tom body når det ikke finnes noen lagrede vedtak`() {
-        val response = hentVedtak<InnvilgelseDagligReiseResponse>(dummyBehandling.id)
+        val response = hentVedtak<InnvilgelseDagligReiseResponse>(dummyBehandlingId)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(response.body).isNull()
@@ -94,11 +160,10 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
                 vedtakRequest,
             )
         assertThat(lagreVedtak.statusCode).isEqualTo(HttpStatus.OK)
-
-        val response = hentVedtak<InnvilgelseDagligReiseResponse>(dummyBehandling.id)
+        val response = hentVedtak<InnvilgelseDagligReiseResponse>(dummyBehandlingId)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body).isNotNull
+        assertThat(response.body).isEqualTo(dummyInnvilgelse)
     }
 
     private inline fun <reified T> innvilgeVedtak(
