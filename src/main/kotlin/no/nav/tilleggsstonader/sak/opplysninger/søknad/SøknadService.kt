@@ -55,12 +55,7 @@ class SøknadService(
             .findByIdOrNull(behandlingId)
             ?.let { søknadBoutgifterRepository.findByIdOrThrow(it.søknadId) }
 
-    fun hentSøknadDagligReiseTso(behandlingId: BehandlingId): SøknadDagligReise? =
-        søknadBehandlingRepository
-            .findByIdOrNull(behandlingId)
-            ?.let { søknadDagligReiseRepository.findByIdOrThrow(it.søknadId) }
-
-    fun hentSøknadDagligReiseTsr(behandlingId: BehandlingId): SøknadDagligReise? =
+    fun hentSøknadDagligReise(behandlingId: BehandlingId): SøknadDagligReise? =
         søknadBehandlingRepository
             .findByIdOrNull(behandlingId)
             ?.let { søknadDagligReiseRepository.findByIdOrThrow(it.søknadId) }
