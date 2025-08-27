@@ -31,6 +31,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
@@ -220,13 +221,15 @@ class UtledTidligsteEndringStepDefinitions {
 
     private fun mapMålgrupper(dataTable: DataTable) =
         dataTable.mapRad { rad ->
+            val type: MålgruppeType = parseEnum(VilkårperiodeNøkler.TYPE, rad)
             målgruppe(
                 behandlingId = behandlingId,
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                faktaOgVurdering = faktaOgVurderingMålgruppe(type = parseEnum(VilkårperiodeNøkler.TYPE, rad)),
+                faktaOgVurdering = faktaOgVurderingMålgruppe(type = type),
                 resultat = parseEnum(TidligsteEndringFellesNøkler.RESULTAT, rad),
                 status = parseEnum(TidligsteEndringFellesNøkler.STATUS, rad),
+                begrunnelse = if (type == MålgruppeType.NEDSATT_ARBEIDSEVNE) "test" else null,
             )
         }
 

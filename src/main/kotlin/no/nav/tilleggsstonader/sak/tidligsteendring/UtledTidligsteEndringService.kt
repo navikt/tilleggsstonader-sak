@@ -1,7 +1,10 @@
 package no.nav.tilleggsstonader.sak.tidligsteendring
 
+import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.førstePeriodeEtter
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -16,6 +19,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.springframework.stereotype.Service
@@ -147,6 +153,12 @@ data class TidligsteEndringIBehandlingUtleder(
                 )
             }
 
+    private val forenkletMålgruppeComparator =
+        Comparator
+            .comparing<ForenkletMålgruppe, LocalDate> { it.fom }
+            .thenComparing { o1, o2 -> o1.tom.compareTo(o2.tom) }
+            .thenComparing { o1, o2 -> o1.type.toString().compareTo(o2.type.toString()) }
+
     /**
      * Utleder tidligste endring i vilkår, aktiviteter, målgrupper og vedtaksperioder.
      * Gjør dette ved å sortere listene med perioder og sammenligne med periode i tidligere behandling
@@ -197,11 +209,29 @@ data class TidligsteEndringIBehandlingUtleder(
             erEndret = ::erMålgruppeEllerAktivitetEndret,
         )
 
-    private fun utledTidligsteEndringForMålgrupper(): LocalDate? =
+    private fun utledTidligsteEndringForMålgrupper() =
         utledEndringIPeriode(
-            perioderNå = vilkårsperioder.målgrupper.fjernSlettede().sortedWith(vilkårsperioderComparator),
-            perioderTidligere = vilkårsperioderTidligereBehandling.målgrupper.fjernSlettede().sortedWith(vilkårsperioderComparator),
-            erEndret = ::erMålgruppeEllerAktivitetEndret,
+            perioderNå = vilkårsperioder.målgrupper.mapTilForenkletMålgruppeOgMergeOverlappendeOgSammenhengende(),
+            perioderTidligere = vilkårsperioderTidligereBehandling.målgrupper.mapTilForenkletMålgruppeOgMergeOverlappendeOgSammenhengende(),
+            erEndret = ::erMålgruppeEndret,
+        )
+
+    private fun List<VilkårperiodeMålgruppe>.mapTilForenkletMålgruppeOgMergeOverlappendeOgSammenhengende() =
+        fjernSlettede()
+            .map { tilForenkletMålgruppe(it) }
+            .sortedWith(forenkletMålgruppeComparator)
+            .groupBy { it.type }
+            .values
+            .map { it.mergeSammenhengende { m1, m2 -> m1.overlapperEllerPåfølgesAv(m2) } }
+            .flatten()
+            .sortedWith(forenkletMålgruppeComparator)
+
+    private fun tilForenkletMålgruppe(vilkårperiode: GeneriskVilkårperiode<*>): ForenkletMålgruppe =
+        ForenkletMålgruppe(
+            type = vilkårperiode.type as MålgruppeType,
+            fom = vilkårperiode.fom,
+            tom = vilkårperiode.tom,
+            resultat = vilkårperiode.resultat,
         )
 
     private fun List<GeneriskVilkårperiode<*>>.fjernSlettede() = this.filterNot { it.status == Vilkårstatus.SLETTET }
@@ -231,6 +261,13 @@ data class TidligsteEndringIBehandlingUtleder(
         vilkårperiode.resultat != tidligereVilkårperiode.resultat ||
             vilkårperiode.type != tidligereVilkårperiode.type ||
             vilkårperiode.faktaOgVurdering.fakta != tidligereVilkårperiode.faktaOgVurdering.fakta
+
+    private fun erMålgruppeEndret(
+        vilkårperiode: ForenkletMålgruppe,
+        tidligereVilkårperiode: ForenkletMålgruppe,
+    ): Boolean =
+        vilkårperiode.resultat != tidligereVilkårperiode.resultat ||
+            vilkårperiode.type != tidligereVilkårperiode.type
 
     private fun erVedtaksperiodeEndret(
         vedtaksperiode: Vedtaksperiode,
@@ -289,3 +326,19 @@ data class PeriodeWrapper<T>(
     override val fom: LocalDate,
     override val tom: LocalDate,
 ) : Periode<LocalDate>
+
+data class ForenkletMålgruppe(
+    val type: MålgruppeType,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val resultat: ResultatVilkårperiode,
+) : Periode<LocalDate>,
+    Mergeable<LocalDate, ForenkletMålgruppe> {
+    override fun merge(other: ForenkletMålgruppe) =
+        ForenkletMålgruppe(
+            type = type,
+            fom = minOf(this.fom, other.fom),
+            tom = maxOf(this.tom, other.tom),
+            resultat = this.resultat,
+        )
+}
