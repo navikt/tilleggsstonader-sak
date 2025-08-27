@@ -207,18 +207,19 @@ Egenskap: Utled tidligste endring endring av målgruppe
 
       Så forvent følgende dato for tidligste endring: 12.03.2024
 
-    Scenario: Eksisterer AAP påfulgt av nedsatt arbeidsevne som erstattes av AAP
+    Scenario: Flere sammenhengende og overlappende AAP-perioder lagt inn hver for seg, gjøres om til en sammenhengende i revurdering
       Gitt følgende målgrupper i forrige behandling - utledTidligsteEndring
-        | Fom        | Tom        | Type                | Resultat | Status |
-        | 01.03.2024 | 30.04.2024 | AAP                 | OPPFYLT  | NY     |
-        | 01.05.2024 | 30.06.2024 | NEDSATT_ARBEIDSEVNE | OPPFYLT  | NY     |
+        | Fom        | Tom        | Type | Resultat | Status |
+        | 01.03.2024 | 30.04.2024 | AAP  | OPPFYLT  | NY     |
+        | 01.05.2024 | 30.06.2024 | AAP  | OPPFYLT  | NY     |
+        | 01.06.2024 | 30.07.2024 | AAP  | OPPFYLT  | NY     |
 
       Gitt følgende målgrupper i revurdering - utledTidligsteEndring
-        | Fom        | Tom        | Type                | Resultat | Status  |
-        | 01.03.2024 | 30.04.2024 | AAP                 | OPPFYLT  | SLETTET |
-        | 01.05.2024 | 30.06.2024 | NEDSATT_ARBEIDSEVNE | OPPFYLT  | SLETTET |
-        | 01.03.2024 | 30.08.2024 | AAP                 | OPPFYLT  | NY      |
+        | Fom        | Tom        | Type | Resultat | Status  |
+        | 01.03.2024 | 30.04.2024 | AAP  | OPPFYLT  | SLETTET |
+        | 01.05.2024 | 30.06.2024 | AAP  | OPPFYLT  | SLETTET |
+        | 01.03.2024 | 30.07.2024 | AAP  | OPPFYLT  | NY      |
 
       Når utleder tidligste endring
 
-      Så forvent følgende dato for tidligste endring: 01.07.2024
+      Så forvent ingen endring

@@ -226,26 +226,13 @@ data class TidligsteEndringIBehandlingUtleder(
             .flatten()
             .sortedWith(forenkletMålgruppeComparator)
 
-    private fun tilForenkletMålgruppe(vilkårperiode: GeneriskVilkårperiode<*>): ForenkletMålgruppe {
-        // I tilfeller hvor bruker har AAP men søker om stønad utover hva som per nå er innvilget har saksbehandler tidligere (AAP ikke forlenget enda)
-        // har man tidligere hatt praksis å legge inn NEDSATT_ARBEIDSEVNE for å anta at AAP blir forlenget.
-        // Når saksbehandler i en revurdering ønsker å rydde opp i dette, så fører det til at vi utleder en for tidlige endringsdato.
-        // Dette er da et forsøk på å rydde opp i det, slik at vi ikke får en for tidlig endringsdato.
-        // Kan være en mulighet å generelt bruke MålgruppeType.faktiskMålgruppe() istedenfor.
-        val type =
-            if (vilkårperiode.type == MålgruppeType.NEDSATT_ARBEIDSEVNE) {
-                MålgruppeType.AAP
-            } else {
-                vilkårperiode.type as MålgruppeType
-            }
-
-        return ForenkletMålgruppe(
-            type = type,
+    private fun tilForenkletMålgruppe(vilkårperiode: GeneriskVilkårperiode<*>): ForenkletMålgruppe =
+        ForenkletMålgruppe(
+            type = vilkårperiode.type as MålgruppeType,
             fom = vilkårperiode.fom,
             tom = vilkårperiode.tom,
             resultat = vilkårperiode.resultat,
         )
-    }
 
     private fun List<GeneriskVilkårperiode<*>>.fjernSlettede() = this.filterNot { it.status == Vilkårstatus.SLETTET }
 
