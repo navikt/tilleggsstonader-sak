@@ -25,7 +25,7 @@ class VedtakController(
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
         return SluttdatoForVedtakDto(
-            sluttdato = vedtakService.hentVedtak(behandlingId)?.vedtaksperioderHvisFinnes()?.maxOf { it.tom },
+            sluttdato = vedtakService.hentVedtak(behandlingId)?.vedtaksperioderHvisFinnes()?.maxOfOrNull { it.tom },
         )
     }
 }
