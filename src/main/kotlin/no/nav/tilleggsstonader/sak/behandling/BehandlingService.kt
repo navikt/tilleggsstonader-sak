@@ -176,7 +176,7 @@ class BehandlingService(
                 "fra ${behandling.status} til $status",
         )
 
-        if (BehandlingStatus.UTREDES == status) {
+        if (UTREDES == status) {
             taskService.save(BehandlingsstatistikkTask.opprettPåbegyntTask(behandlingId))
         }
 

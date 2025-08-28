@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.periode.AvkortResult
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
@@ -57,7 +58,10 @@ class LæremidlerBeregningService(
         val beregningsresultatForMåned = beregn(behandling, vedtaksperioderBeregningsgrunnlag)
 
         return if (forrigeVedtak != null) {
-            settSammenGamleOgNyePerioder(behandling, beregningsresultatForMåned, forrigeVedtak, behandling.revurderFra ?: tidligsteEndring)
+            brukerfeilHvis(tidligsteEndring == null) {
+                "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
+            }
+            settSammenGamleOgNyePerioder(beregningsresultatForMåned, forrigeVedtak, tidligsteEndring)
         } else {
             BeregningsresultatLæremidler(beregningsresultatForMåned)
         }
@@ -162,15 +166,10 @@ class LæremidlerBeregningService(
      * Men vi trenger å reberegne perioder som løper i revurder-fra datoet då en periode kan ha endrer % eller sats
      */
     private fun settSammenGamleOgNyePerioder(
-        saksbehandling: Saksbehandling,
         beregningsresultat: List<BeregningsresultatForMåned>,
         forrigeVedtak: InnvilgelseEllerOpphørLæremidler,
         tidligsteEndring: LocalDate?,
     ): BeregningsresultatLæremidler {
-        feilHvis(tidligsteEndring == null) {
-            "Behandling=${saksbehandling.id} steg=${saksbehandling.steg} mangler revurderFra eller dato for tidligste endring"
-        }
-
         val forrigeBeregningsresultat = forrigeVedtak.beregningsresultat
 
         val perioderFraForrigeVedtakSomSkalBeholdes =

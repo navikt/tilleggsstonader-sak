@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
@@ -49,6 +50,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Skjem
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeUtgifterType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterFlereSteder
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterNyBolig
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.SkjemaDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOpphold
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.OppholdUtenforNorge
@@ -81,6 +83,22 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdBoutgifter
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.OppholdUtenforNorge as OppholdUtenforNorgeBoutgifter
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Aktivitet as AktivitetDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Aktiviteter as AktiviteterDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktiviteterOgMålgruppe as AktiviteterOgMålgruppeDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArsakOppholdUtenforNorgeType as ArsakOppholdUtenforNorgeTypeDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData as DagligReiseFyllUtSendInnData
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DineOpplysninger as DineOpplysningerDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HarPengestotteAnnetLandType as HarPengestotteAnnetLandTypeDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType as HovedytelseTypeDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Identitet as IdentitetDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.JaNeiType as JaNeiTypeDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Landvelger as LandvelgerDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.NavAdresse as NavAdresseDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge as OppholdUtenforNorgeDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Periode as PeriodeDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reiseperiode as ReiseperiodeDagligReise
 
 @RestController
 @RequestMapping(path = ["/api/test/opprett-behandling"])
@@ -128,8 +146,8 @@ class OpprettTestBehandlingController(
             Stønadstype.BARNETILSYN -> opprettSøknadBarnetilsyn(fagsak, behandling)
             Stønadstype.LÆREMIDLER -> opprettSøknadLæremidler(fagsak, behandling)
             Stønadstype.BOUTGIFTER -> opprettSøknadBoutgifter(fagsak, behandling)
-            Stønadstype.DAGLIG_REISE_TSO -> opprettSøknadDagligeReiseTSO(fagsak, behandling)
-            Stønadstype.DAGLIG_REISE_TSR -> opprettSøknadDagligeReiseTSR(fagsak, behandling)
+            Stønadstype.DAGLIG_REISE_TSO -> opprettSøknadDagligeReise(fagsak, behandling)
+            Stønadstype.DAGLIG_REISE_TSR -> opprettSøknadDagligeReise(fagsak, behandling)
         }
     }
 
@@ -365,123 +383,101 @@ class OpprettTestBehandlingController(
         søknadService.lagreSøknad(behandling.id, journalpost, skjema)
     }
 
-    private fun opprettSøknadDagligeReiseTSO(
+    private fun opprettSøknadDagligeReise(
         fagsak: Fagsak,
         behandling: Behandling,
     ) {
-        val skjemaLæremidler =
-            SøknadsskjemaLæremidler(
-                hovedytelse =
-                    HovedytelseAvsnitt(
-                        hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
-                        arbeidOgOpphold = arbeidOgOpphold(),
+        val dineOpplysninger =
+            DineOpplysningerDagligReise(
+                fornavn = "Fornavn",
+                etternavn = "Etternavn",
+                identitet =
+                    IdentitetDagligReise(identitetsnummer = "11111122222"),
+                adresse =
+                    NavAdresseDagligReise(
+                        gyldigFraOgMed = LocalDate.of(2025, 1, 1),
+                        adresse = "Nisseveien 3",
+                        postnummer = "0011",
+                        bySted = "OSLO",
+                        landkode = "NO",
+                        land =
+                            LandvelgerDagligReise(
+                                value = "Norge",
+                                label = "NO",
+                            ),
                     ),
-                utdanning =
-                    UtdanningAvsnitt(
-                        aktiviteter =
-                            EnumFlereValgFelt(
-                                "Hvilken utdanning eller opplæring søker du om støtte til læremidler for",
-                                listOf(
-                                    VerdiFelt("1", "Høyere utdanning: 25. februar 2024 - 25. juli 2024"),
+            )
+        val aktiviteter =
+            AktiviteterDagligReise(
+                aktiviteterOgMaalgruppe =
+                    AktiviteterOgMålgruppeDagligReise(
+                        aktivitet =
+                            AktivitetDagligReise(
+                                aktivitetId = "ingenAktivitet",
+                                text = "",
+                                periode = null,
+                                maalgruppe = null,
+                            ),
+                    ),
+                arbeidsrettetAktivitet = null,
+                mottarLonnGjennomTiltak = null,
+                reiseTilAktivitetsstedHelePerioden = JaNeiTypeDagligReise.nei,
+                reiseperiode =
+                    ReiseperiodeDagligReise(
+                        LocalDate.of(2025, 6, 20),
+                        LocalDate.of(2025, 5, 20),
+                    ),
+            )
+        val skjemaDagligReise =
+            SøknadsskjemaDagligReiseFyllUtSendInn(
+                language = "nb-NO",
+                data =
+                    DagligReiseFyllUtSendInnData(
+                        SkjemaDagligReise(
+                            dineOpplysninger = dineOpplysninger,
+                            hovedytelse =
+                                mapOf(
+                                    HovedytelseTypeDagligReise.arbeidsavklaringspenger to
+                                        true,
                                 ),
-                                listOf("Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
-                            ),
-                        annenUtdanning =
-                            EnumFelt(
-                                "Annen utdanning tekst",
-                                AnnenUtdanningType.INGEN_UTDANNING,
-                                "Ja",
-                                emptyList(),
-                            ),
-                        harRettTilUtstyrsstipend =
-                            HarRettTilUtstyrsstipend(
-                                erLærlingEllerLiknende =
-                                    EnumFelt(
-                                        "Er lærling eller liknende?",
-                                        JaNei.JA,
-                                        "Ja",
-                                        emptyList(),
-                                    ),
-                                harTidligereFullførtVgs =
-                                    EnumFelt(
-                                        "Har du tidligere fullført videregående skole?",
-                                        JaNei.JA,
-                                        "Ja",
-                                        emptyList(),
-                                    ),
-                            ),
-                        harFunksjonsnedsettelse = EnumFelt("Har funksjonsnedsettelse?", JaNei.JA, "Ja", emptyList()),
+                            arbeidOgOpphold = arbeidOgOppholdDagligReise(),
+                            aktiviteter = aktiviteter,
+                            reise = emptyList(),
+                        ),
                     ),
                 dokumentasjon = emptyList(),
             )
-        val skjema =
-            Søknadsskjema(
-                ident = fagsak.hentAktivIdent(),
-                mottattTidspunkt = LocalDateTime.of(2020, 1, 1, 0, 0),
-                språk = Språkkode.NB,
-                skjema = skjemaLæremidler,
-            )
-        val journalpost = Journalpost("TESTJPID", Journalposttype.I, Journalstatus.FERDIGSTILT)
-        søknadService.lagreSøknad(behandling.id, journalpost, skjema)
-    }
 
-    private fun opprettSøknadDagligeReiseTSR(
-        fagsak: Fagsak,
-        behandling: Behandling,
-    ) {
-        val skjemaLæremidler =
-            SøknadsskjemaLæremidler(
-                hovedytelse =
-                    HovedytelseAvsnitt(
-                        hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
-                        arbeidOgOpphold = arbeidOgOpphold(),
-                    ),
-                utdanning =
-                    UtdanningAvsnitt(
-                        aktiviteter =
-                            EnumFlereValgFelt(
-                                "Hvilken utdanning eller opplæring søker du om støtte til læremidler for",
-                                listOf(
-                                    VerdiFelt("1", "Høyere utdanning: 25. februar 2024 - 25. juli 2024"),
-                                ),
-                                listOf("Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
-                            ),
-                        annenUtdanning =
-                            EnumFelt(
-                                "Annen utdanning tekst",
-                                AnnenUtdanningType.INGEN_UTDANNING,
-                                "Ja",
-                                emptyList(),
-                            ),
-                        harRettTilUtstyrsstipend =
-                            HarRettTilUtstyrsstipend(
-                                erLærlingEllerLiknende =
-                                    EnumFelt(
-                                        "Er lærling eller liknende?",
-                                        JaNei.JA,
-                                        "Ja",
-                                        emptyList(),
-                                    ),
-                                harTidligereFullførtVgs =
-                                    EnumFelt(
-                                        "Har du tidligere fullført videregående skole?",
-                                        JaNei.JA,
-                                        "Ja",
-                                        emptyList(),
-                                    ),
-                            ),
-                        harFunksjonsnedsettelse = EnumFelt("Har funksjonsnedsettelse?", JaNei.JA, "Ja", emptyList()),
-                    ),
-                dokumentasjon = emptyList(),
-            )
         val skjema =
             Søknadsskjema(
                 ident = fagsak.hentAktivIdent(),
-                mottattTidspunkt = LocalDateTime.of(2020, 1, 1, 0, 0),
+                mottattTidspunkt = LocalDateTime.now(),
                 språk = Språkkode.NB,
-                skjema = skjemaLæremidler,
+                skjema = skjemaDagligReise,
             )
-        val journalpost = Journalpost("TESTJPID", Journalposttype.I, Journalstatus.FERDIGSTILT)
+        val (tittel, brevkode) =
+            when (fagsak.stønadstype) {
+                Stønadstype.DAGLIG_REISE_TSO ->
+                    "Søknad om Daglig reise tso" to "DAGLIG_REISE_TSO"
+                Stønadstype.DAGLIG_REISE_TSR ->
+                    "Søknad om Daglig reise tsr" to "DAGLIG_REISE_TSR"
+                else -> error("Ugyldig stønadstype for daglig reise: ${fagsak.stønadstype}")
+            }
+
+        val journalpost =
+            Journalpost(
+                "TESTJPID",
+                Journalposttype.I,
+                Journalstatus.FERDIGSTILT,
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            tittel = tittel,
+                            dokumentInfoId = "dokumentInfoId",
+                            brevkode = brevkode,
+                        ),
+                    ),
+            )
         søknadService.lagreSøknad(behandling.id, journalpost, skjema)
     }
 
@@ -538,6 +534,37 @@ class OpprettTestBehandlingController(
                     Landvelger("SWE", "Sverige"),
                     mapOf(ArsakOppholdUtenforNorgeType.besokteFamilie to true),
                     Periode(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 1, 1)),
+                ),
+        )
+
+    private fun arbeidOgOppholdDagligReise() =
+        ArbeidOgOppholdDagligReise(
+            jobberIAnnetLand = JaNeiTypeDagligReise.ja,
+            jobbAnnetLand =
+                LandvelgerDagligReise("SWE", "Sverige"),
+            harPengestotteAnnetLand =
+                mapOf(
+                    HarPengestotteAnnetLandTypeDagligReise.sykepenger to true,
+                ),
+            pengestotteAnnetLand =
+                LandvelgerDagligReise("SWE", "Sverige"),
+            harOppholdUtenforNorgeSiste12mnd = JaNeiTypeDagligReise.ja,
+            oppholdUtenforNorgeSiste12mnd =
+                OppholdUtenforNorgeDagligReise(
+                    LandvelgerDagligReise("SWE", "Sverige"),
+                    mapOf(
+                        ArsakOppholdUtenforNorgeTypeDagligReise.besokteFamilie to true,
+                    ),
+                    PeriodeDagligReise(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 1, 1)),
+                ),
+            harOppholdUtenforNorgeNeste12mnd = JaNeiTypeDagligReise.ja,
+            oppholdUtenforNorgeNeste12mnd =
+                OppholdUtenforNorgeDagligReise(
+                    LandvelgerDagligReise("SWE", "Sverige"),
+                    mapOf(
+                        ArsakOppholdUtenforNorgeTypeDagligReise.besokteFamilie to true,
+                    ),
+                    PeriodeDagligReise(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 1, 1)),
                 ),
         )
 

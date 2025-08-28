@@ -3,9 +3,9 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20250814122631_d951dfb"
-val tilleggsstønaderLibsVersion = "2025.08.11-14.15.9c7175a12117"
-val tilleggsstønaderKontrakterVersion = "2025.08.19-12.23.e5e354546578"
+val familieProsesseringVersion = "2.20250818112609_c5f9e80"
+val tilleggsstønaderLibsVersion = "2025.08.18-09.30.6e87d5f8ea6d"
+val tilleggsstønaderKontrakterVersion = "2025.08.21-12.42.72fabd5a724c"
 val avroVersion = "1.12.0"
 val confluentVersion = "8.0.0"
 val joarkHendelseVersion = "08271806"
@@ -29,7 +29,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.52.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
-    id("org.springframework.boot") version "3.5.4"
+    id("org.springframework.boot") version "3.5.5"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.2.10"
 

@@ -1,16 +1,21 @@
 package no.nav.tilleggsstonader.sak.service
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
+import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -295,6 +300,54 @@ internal class TotrinnskontrollServiceTest {
             )
         }
         assertThat(oppdaterSlot.captured.årsakerUnderkjent?.årsaker!!).containsExactly(ÅrsakUnderkjent.VEDTAKSBREV)
+    }
+
+    @Nested
+    inner class `Utsendelse av behandlingsstatistikk i totrinnskontroll` {
+        private val taskSlot = slot<Task>()
+
+        @BeforeEach
+        fun setUp() {
+            every { taskService.save(capture(taskSlot)) } answers { firstArg() }
+        }
+
+        @Test
+        internal fun `skal sende behandlingsstatistikk hvis beslutter underkjenner vedtaket`() {
+            testWithBrukerContext(beslutter) {
+                totrinnskontrollService
+                    .lagreTotrinnskontrollOgReturnerSaksbehandler(
+                        saksbehandling(status = BehandlingStatus.UTREDES),
+                        BeslutteVedtakDto(godkjent = false, begrunnelse = "", årsakerUnderkjent = listOf(ÅrsakUnderkjent.VEDTAKSBREV)),
+                    )
+            }
+
+            verifiserSendingAvBehandlingsstatistikk(Hendelse.UNDERKJENT_BESLUTTER)
+        }
+
+        @Test
+        fun `skal sende statistikk når saksbehandler angrer send til beslutter`() {
+            totrinnskontrollService.angreSendTilBeslutter(BehandlingId.random())
+            verifiserSendingAvBehandlingsstatistikk(Hendelse.ANGRET_SENDT_TIL_BESLUTTER)
+        }
+
+        @Test
+        fun `skal sende statistikk når beslutter godkjenner vedtaket`() {
+            testWithBrukerContext(beslutter) {
+                totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(
+                    saksbehandling = saksbehandling(status = BehandlingStatus.UTREDES),
+                    beslutteVedtak = BeslutteVedtakDto(godkjent = true),
+                )
+            }
+            verifiserSendingAvBehandlingsstatistikk(Hendelse.BESLUTTET)
+        }
+
+        private fun verifiserSendingAvBehandlingsstatistikk(hendelse: Hendelse) {
+            verify(exactly = 1) { taskService.save(any()) }
+            assertThat(taskSlot.captured.type).isEqualTo("behandlingsstatistikkTask")
+
+            val payload = objectMapper.readValue<BehandlingsstatistikkTask.BehandlingsstatistikkTaskPayload>(taskSlot.captured.payload)
+            assertThat(payload.hendelse).isEqualTo(hendelse)
+        }
     }
 
     @Nested

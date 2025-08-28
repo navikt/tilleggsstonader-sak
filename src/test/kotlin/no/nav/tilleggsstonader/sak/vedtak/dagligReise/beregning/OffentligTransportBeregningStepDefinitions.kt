@@ -4,11 +4,15 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
+import io.mockk.mockk
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
+import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.behandlingId
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
@@ -16,11 +20,21 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.assertj.core.api.Assertions.assertThat
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class OffentligTransportBeregningStepDefinitions {
-    val offentligTransportBeregningService = OffentligTransportBeregningService()
+    val behandlingServiceMock = mockk<BehandlingService>()
+    val vilkårRepositoryFake = VilkårRepositoryFake()
+
+    val vilkårService =
+        VilkårService(
+            behandlingService = behandlingServiceMock,
+            vilkårRepository = vilkårRepositoryFake,
+            barnService = mockk(relaxed = true),
+        )
+    val offentligTransportBeregningService = OffentligTransportBeregningService(vilkårService)
 
     var utgiftOffentligTransport: UtgiftOffentligTransport? = null
     var beregningsResultat: Beregningsresultat? = null
@@ -67,7 +81,7 @@ class OffentligTransportBeregningStepDefinitions {
     fun `beregner for daglig reise offentlig transport`() {
         beregningsResultat =
             offentligTransportBeregningService.beregn(
-                utgifter = listOf(utgiftOffentligTransport!!),
+                behandlingId = behandlingId,
                 vedtaksperioder = vedtaksperioder,
             )
     }

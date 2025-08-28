@@ -38,6 +38,8 @@ data class Vilkår(
     val utgift: Int? = null,
     val barnId: BarnId? = null,
     val erFremtidigUtgift: Boolean,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "offentlig_transport_")
+    val offentligTransport: OffentligTransport?,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     @Column("delvilkar")
@@ -91,6 +93,10 @@ data class Vilkår(
                 validerPåkrevdBeløpHvisOppfylt()
             }
 
+            VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> {
+                // Dette er kun for tester foreløpig
+            }
+
             VilkårType.EKSEMPEL -> {
                 // Dette er kun for tester foreløpig
             }
@@ -100,7 +106,7 @@ data class Vilkår(
     }
 
     private fun validerPåkrevdBeløpHvisOppfylt() {
-        if (resultat == Vilkårsresultat.OPPFYLT && !erFremtidigUtgift) {
+        if (resultat == Vilkårsresultat.OPPFYLT && !erFremtidigUtgift && offentligTransport == null) {
             require(utgift != null) { "Utgift er påkrevd når resultat er oppfylt" }
         }
     }
@@ -209,6 +215,12 @@ data class Vurdering(
     val begrunnelse: String? = null,
 )
 
+data class OffentligTransport(
+    val reisedagerPerUke: Int,
+    val prisEnkelbillett: Int,
+    val prisTrettidagersbillett: Int,
+)
+
 fun List<Vurdering>.harSvar(svarId: SvarId) = this.any { it.svar == svarId }
 
 enum class Vilkårsresultat(
@@ -247,6 +259,20 @@ enum class VilkårType(
     UTGIFTER_OVERNATTING("Utgifter overnatting", listOf(Stønadstype.BOUTGIFTER)),
     LØPENDE_UTGIFTER_EN_BOLIG("Løpende utgifter en bolig", listOf(Stønadstype.BOUTGIFTER)),
     LØPENDE_UTGIFTER_TO_BOLIGER("Løpende utgifter to boliger", listOf(Stønadstype.BOUTGIFTER)),
+
+    // Daglig reise
+    DAGLIG_REISE_OFFENTLIG_TRANSPORT(
+        "Daglig reise med offentlig transport",
+        listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
+    ),
+    DAGLIG_REISE_KJØRELISTE(
+        "Daglig reise bil og kjøreliste",
+        listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
+    ),
+    DAGLIG_REISE_TAXI(
+        "Daglig reise med taxi",
+        listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
+    ),
     ;
 
     fun gjelderFlereBarn(): Boolean = this == PASS_BARN
