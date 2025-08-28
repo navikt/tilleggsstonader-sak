@@ -46,8 +46,8 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
     @Autowired
     lateinit var vilkårRepository: VilkårRepository
 
-    val dummyFom: LocalDate = LocalDate.now()
-    val dummyTom: LocalDate = LocalDate.now().plusDays(29)
+    val dummyFom: LocalDate = LocalDate.parse("2025-01-01")
+    val dummyTom: LocalDate = LocalDate.parse("2025-01-30")
     val dummyFagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO)
     val dummyBehandlingId = BehandlingId.random()
     val dummyBehandling =

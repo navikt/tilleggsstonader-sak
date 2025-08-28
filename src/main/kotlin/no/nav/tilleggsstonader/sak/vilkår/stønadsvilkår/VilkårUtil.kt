@@ -54,6 +54,7 @@ object VilkårUtil {
                 vilkår.type == other.vilkår.type &&
                 vilkår.resultat == other.vilkår.resultat &&
                 vilkår.utgift == other.vilkår.utgift &&
+                vilkår.offentligTransport == other.vilkår.offentligTransport &&
                 vilkår.barnId == other.vilkår.barnId &&
                 overlapperEllerPåfølgesAv(other)
 
