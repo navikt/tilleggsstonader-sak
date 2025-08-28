@@ -18,7 +18,7 @@ import java.time.LocalDate
  * Denne håndterer sletting av tidligere vedtak og andeler
  */
 abstract class BeregnYtelseSteg<DTO : Any>(
-    private val stønadstype: Stønadstype,
+    private val stønadstype: List<Stønadstype>,
     open val unleashService: UnleashService,
     open val vedtakRepository: VedtakRepository,
     open val tilkjentYtelseService: TilkjentYtelseService,
@@ -48,7 +48,7 @@ abstract class BeregnYtelseSteg<DTO : Any>(
     }
 
     private fun validerStønadstype(saksbehandling: Saksbehandling) {
-        feilHvisIkke(saksbehandling.stønadstype == stønadstype) {
+        feilHvisIkke(stønadstype.contains(saksbehandling.stønadstype)) {
             "${this::class.java.simpleName} tillater kun $stønadstype"
         }
     }

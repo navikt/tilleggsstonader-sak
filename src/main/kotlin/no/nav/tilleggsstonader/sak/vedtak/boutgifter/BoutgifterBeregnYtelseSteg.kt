@@ -43,7 +43,7 @@ class BoutgifterBeregnYtelseSteg(
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
 ) : BeregnYtelseSteg<VedtakBoutgifterRequest>(
-        stønadstype = Stønadstype.BOUTGIFTER,
+        stønadstype = listOf(Stønadstype.BOUTGIFTER),
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
@@ -10,22 +11,39 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.antallDagerIPeriodeInklusiv
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.splitPerUke
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.springframework.stereotype.Service
 import kotlin.math.min
 
 @Service
-class OffentligTransportBeregningService {
+class OffentligTransportBeregningService(
+    private val vilkårService: VilkårService,
+) {
     fun beregn(
-        utgifter: List<UtgiftOffentligTransport>,
+        behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): Beregningsresultat =
+    ): Beregningsresultat {
+        val oppfylteVilkår = vilkårService.hentOppfylteDagligReiseVilkår(behandlingId)
+        val utgifter =
+            oppfylteVilkår
+                .filter { it.offentligTransport != null }
+                .map { vilkår ->
+                    UtgiftOffentligTransport(
+                        fom = vilkår.fom!!,
+                        tom = vilkår.tom!!,
+                        antallReisedagerPerUke = vilkår.offentligTransport?.reisedagerPerUke!!,
+                        prisEnkelbillett = vilkår.offentligTransport.prisEnkelbillett,
+                        pris30dagersbillett = vilkår.offentligTransport.prisTrettidagersbillett,
+                    )
+                }
 
-        Beregningsresultat(
+        return Beregningsresultat(
             reiser =
                 utgifter.map { reise ->
                     beregnForReise(reise, vedtaksperioder)
                 },
         )
+    }
 
     private fun beregnForReise(
         reise: UtgiftOffentligTransport,

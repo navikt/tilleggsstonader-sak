@@ -42,7 +42,7 @@ class TilsynBarnBeregnYtelseSteg(
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
 ) : BeregnYtelseSteg<VedtakTilsynBarnRequest>(
-        stønadstype = Stønadstype.BARNETILSYN,
+        stønadstype = listOf(Stønadstype.BARNETILSYN),
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentytelseService,
         simuleringService = simuleringService,
@@ -145,7 +145,8 @@ class TilsynBarnBeregnYtelseSteg(
             "Kan ikke finne nye vedtaksperioder for opphør fordi behandlingen er en førstegangsbehandling"
         }
 
-        val forrigeVedtaksperioder = vedtakRepository.findByIdOrNull(behandling.forrigeIverksatteBehandlingId)?.vedtaksperioderHvisFinnes()
+        val forrigeVedtaksperioder =
+            vedtakRepository.findByIdOrNull(behandling.forrigeIverksatteBehandlingId)?.vedtaksperioderHvisFinnes()
 
         feilHvis(forrigeVedtaksperioder == null) {
             "Kan ikke opphøre fordi data fra forrige vedtak mangler"
