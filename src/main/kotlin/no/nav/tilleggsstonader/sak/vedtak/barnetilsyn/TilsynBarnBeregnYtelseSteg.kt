@@ -48,6 +48,14 @@ class TilsynBarnBeregnYtelseSteg(
         simuleringService = simuleringService,
         unleashService = unleashService,
     ) {
+    override fun lagreVedtakForSatsjustering(
+        saksbehandling: Saksbehandling,
+        vedtak: VedtakTilsynBarnRequest,
+        satsjusteringFra: LocalDate,
+    ) {
+        TODO("Not yet implemented")
+    }
+
     override fun lagreVedtak(
         saksbehandling: Saksbehandling,
         vedtak: VedtakTilsynBarnRequest,

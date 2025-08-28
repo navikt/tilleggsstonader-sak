@@ -36,6 +36,12 @@ abstract class BeregnYtelseSteg<DTO : Any>(
         lagreVedtak(saksbehandling, data)
     }
 
+    abstract fun lagreVedtakForSatsjustering(
+        saksbehandling: Saksbehandling,
+        vedtak: DTO,
+        satsjusteringFra: LocalDate,
+    )
+
     protected abstract fun lagreVedtak(
         saksbehandling: Saksbehandling,
         vedtak: DTO,

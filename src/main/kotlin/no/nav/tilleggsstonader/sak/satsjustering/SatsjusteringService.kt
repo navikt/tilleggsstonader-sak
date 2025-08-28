@@ -3,17 +3,25 @@ package no.nav.tilleggsstonader.sak.satsjustering
 import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.OpprettRevurderingBehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingSteg
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.BeslutteVedtakSteg
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -26,6 +34,9 @@ class SatsjusteringService(
     private val vedtakservice: VedtakService,
     private val beregnYtelseSteg: LæremidlerBeregnYtelseSteg,
     private val ferdigstillBehandlingSteg: FerdigstillBehandlingSteg,
+    private val tilkjentYtelseService: TilkjentYtelseService,
+    private val beslutteVedtakSteg: BeslutteVedtakSteg,
+    private val stegService: StegService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -74,18 +85,27 @@ class SatsjusteringService(
             revurdering.forrigeIverksatteBehandlingId
                 ?: error("Revurdering for fagsak=${revurdering.fagsakId} har ikke fått forrigeIverksattBehandlingId")
         val vedtaksperioder =
-            vedtakservice
-                .hentVedtak(behandlingId = forrigeIverksatteBehandlingId)!!
-                .withTypeOrThrow<InnvilgelseEllerOpphørLæremidler>()
-                .data.vedtaksperioder
-                .tilDto()
+            vedtakservice.hentVedtaksperioder(behandlingId = forrigeIverksatteBehandlingId).tilDto()
 
-        // TODO håndter tidligst endring
-        beregnYtelseSteg.utførSteg(revurdering, InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder))
+        beregnYtelseSteg.lagreVedtakForSatsjustering(
+            saksbehandling = revurdering,
+            vedtak = InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder),
+            satsjusteringFra = finnDatoForSatsjustering(revurdering),
+        )
         // totrinnskontroll
         // iverksett
+        behandlingService.oppdaterStegPåBehandling(revurdering.id, StegType.BESLUTTE_VEDTAK)
+        behandlingService.oppdaterStatusPåBehandling(revurdering.id, BehandlingStatus.FATTER_VEDTAK)
+        stegService.håndterSteg(revurdering.id, beslutteVedtakSteg, BeslutteVedtakDto(godkjent = true))
 
         // TODO slett ferdigstillBehandlingSteg - den burde bli håndtert automatisk etter at behandlingen er iverksatt
         ferdigstillBehandlingSteg.utførSteg(revurdering, null)
     }
+
+    private fun finnDatoForSatsjustering(revurdering: Saksbehandling): LocalDate =
+        tilkjentYtelseService
+            .hentForBehandling(revurdering.forrigeIverksatteBehandlingId!!)
+            .andelerTilkjentYtelse
+            .filter { it.statusIverksetting == StatusIverksetting.VENTER_PÅ_SATS_ENDRING }
+            .minOf { it.fom }
 }

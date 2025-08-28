@@ -49,6 +49,14 @@ class BoutgifterBeregnYtelseSteg(
         simuleringService = simuleringService,
         unleashService = unleashService,
     ) {
+    override fun lagreVedtakForSatsjustering(
+        saksbehandling: Saksbehandling,
+        vedtak: VedtakBoutgifterRequest,
+        satsjusteringFra: LocalDate,
+    ) {
+        TODO("Not yet implemented")
+    }
+
     override fun lagreVedtak(
         saksbehandling: Saksbehandling,
         vedtak: VedtakBoutgifterRequest,

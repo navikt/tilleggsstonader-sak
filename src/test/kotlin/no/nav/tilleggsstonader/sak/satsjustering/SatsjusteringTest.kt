@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.SatsLæremidler
@@ -46,6 +47,9 @@ class SatsjusteringTest : IntegrationTest() {
 
     @Autowired
     lateinit var satsjusteringService: SatsjusteringService
+
+    @Autowired
+    lateinit var vedtakService: VedtakService
 
     val fom = LocalDate.of(2025, 8, 1)
     val tom = LocalDate.of(2026, 6, 30)

@@ -67,12 +67,37 @@ class LæremidlerBeregnYtelseSteg(
         }
     }
 
+    override fun lagreVedtakForSatsjustering(
+        saksbehandling: Saksbehandling,
+        vedtak: VedtakLæremidlerRequest,
+        satsjusteringFra: LocalDate,
+    ) {
+        logger.info("Lagrer vedtak for satsjustering for behandling=${saksbehandling.id}, satsjusteringFra=$satsjusteringFra")
+
+        val innvilgelse = vedtak as InnvilgelseLæremidlerRequest
+        lagreVedtak(
+            saksbehandling = saksbehandling,
+            vedtaksperioder = innvilgelse.vedtaksperioder.tilDomene(),
+            begrunnelse = null,
+            tidligsteEndring = satsjusteringFra,
+        )
+    }
+
     private fun beregnOgLagreInnvilgelse(
         saksbehandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
     ) {
-        lagreVedtak(saksbehandling, vedtaksperioder, begrunnelse)
+        lagreVedtak(
+            saksbehandling = saksbehandling,
+            vedtaksperioder = vedtaksperioder,
+            begrunnelse = begrunnelse,
+            tidligsteEndring =
+                utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                    saksbehandling.id,
+                    vedtaksperioder,
+                ),
+        )
     }
 
     private fun hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørLæremidler> =
@@ -84,13 +109,8 @@ class LæremidlerBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
+        tidligsteEndring: LocalDate?,
     ) {
-        val tidligsteEndring =
-            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
-                saksbehandling.id,
-                vedtaksperioder,
-            )
-
         val beregningsresultat =
             beregningService.beregn(
                 behandling = saksbehandling,
