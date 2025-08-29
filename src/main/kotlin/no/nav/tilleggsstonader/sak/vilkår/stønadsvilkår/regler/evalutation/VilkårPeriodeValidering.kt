@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
@@ -28,6 +29,12 @@ object VilkårPeriodeValidering {
         vilkårliste: List<Datoperiode>,
     ) {
         val overlappendePeriode = vilkårliste.førsteOverlappendePeriode()
+        // Hopp over validering da det må være lov, dersom man f.eks først skal reise med tog så buss.
+        if (vilkårType.gjelderStønader.contains(Stønadstype.DAGLIG_REISE_TSO) ||
+            vilkårType.gjelderStønader.contains(Stønadstype.DAGLIG_REISE_TSR)
+        ) {
+            return
+        }
         if (overlappendePeriode != null) {
             brukerfeil(
                 "Det er ikke gyldig med overlappende perioder for ${vilkårType.tilFeilmeldingTekst()}. " +
