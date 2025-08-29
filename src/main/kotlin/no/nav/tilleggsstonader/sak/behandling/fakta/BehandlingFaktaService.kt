@@ -29,6 +29,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.TypeUtgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterFlereSteder
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterIForbindelseMedSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterNyBolig
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.AktivitetDagligReiseAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.DokumentasjonDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
@@ -108,7 +110,17 @@ class BehandlingFaktaService(
         )
     }
 
-    private fun hentFaktaDTOForDagligreise(behandlingId: BehandlingId): BehandlingFaktaDagligreiseDto = BehandlingFaktaDagligreiseDto()
+    private fun hentFaktaDTOForDagligreise(behandlingId: BehandlingId): BehandlingFaktaDagligreiseDto {
+        val søknad = søknadService.hentSøknadDagligReise(behandlingId)
+        val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
+        return BehandlingFaktaDagligreiseDto(
+            søknadMottattTidspunkt = søknad?.mottattTidspunkt,
+            hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
+            dokumentasjon = søknad?.let { mapDokumentasjonDagligReise(it.data.dokumentasjon, it.journalpostId) },
+            arena = arenaFakta(grunnlagsdata),
+            aktiviteter = mapAktivitetForDagligReise(søknad?.data?.aktivitet),
+        )
+    }
 
     private fun arenaFakta(grunnlagsdata: Grunnlag): ArenaFakta? =
         grunnlagsdata.arenaVedtak?.let {
@@ -129,6 +141,13 @@ class BehandlingFaktaService(
                         lønnetAktivitet = it.lønnetAktivitet,
                     )
                 },
+        )
+
+    private fun mapAktivitetForDagligReise(aktivitet: AktivitetDagligReiseAvsnitt?) =
+        FaktaAktivtetDagligReise(
+            aktivitet = mapAktivitet(aktivitet?.aktivitet),
+            reiseTilAktivitetsstedHelePerioden = aktivitet?.reiseTilAktivitetsstedHelePerioden,
+            reiseperiode = aktivitet?.reiseperiode,
         )
 
     private fun mapBoligEllerOvernatting(boutgifter: BoligEllerOvernattingAvsnitt?) =
@@ -334,6 +353,17 @@ class BehandlingFaktaService(
 
     private fun mapDokumentasjon(
         dokumentasjonListe: List<DokumentasjonBoutgifter>,
+        journalpostId: String,
+    ): FaktaDokumentasjon {
+        val dokumentasjon =
+            dokumentasjonListe.map {
+                Dokumentasjon(type = it.tittel, dokumenter = listOf(Dokument(it.dokumentInfoId)))
+            }
+        return FaktaDokumentasjon(journalpostId, dokumentasjon)
+    }
+
+    private fun mapDokumentasjonDagligReise(
+        dokumentasjonListe: List<DokumentasjonDagligReise>,
         journalpostId: String,
     ): FaktaDokumentasjon {
         val dokumentasjon =
