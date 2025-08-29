@@ -57,12 +57,8 @@ class BeslutteVedtakSteg(
         data: BeslutteVedtakDto,
     ): StegType {
         fagsakService.fagsakMedOppdatertPersonIdent(saksbehandling.fagsakId)
-        val saksbehandler =
-            if (!saksbehandling.erSatsendring) {
-                totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(saksbehandling, data)
-            } else {
-                ""
-            }
+        val saksbehandler = totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(saksbehandling, data)
+
         ferdigstillOppgave(saksbehandling)
 
         return if (data.godkjent) {

@@ -111,13 +111,7 @@ class SatsjusteringTest : IntegrationTest() {
         assertThat(sistIverksatteBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
 
         with(tilkjentYtelseRepository.findByBehandlingId(sistIverksatteBehandling.id)!!) {
-            assertThat(
-                andelerTilkjentYtelse
-                    .filter {
-                        it.statusIverksetting ==
-                            StatusIverksetting.VENTER_PÅ_SATS_ENDRING
-                    },
-            ).isEmpty()
+            assertThat(andelerTilkjentYtelse).noneMatch { it.statusIverksetting == StatusIverksetting.VENTER_PÅ_SATS_ENDRING }
         }
     }
 }

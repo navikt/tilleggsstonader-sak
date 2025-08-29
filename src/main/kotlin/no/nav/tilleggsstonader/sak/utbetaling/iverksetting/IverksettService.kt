@@ -57,7 +57,7 @@ class IverksettService(
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandlingMedLås(behandlingId)
         val andeler = andelerForFørsteIverksettingAvBehandling(tilkjentYtelse)
 
-        val totrinnskontroll = hentTotrinnskontroll(behandlingId)
+        val totrinnskontroll = hentTotrinnskontroll(behandling)
 
         val iverksettingId = behandlingId.id
         val dto =
@@ -109,7 +109,7 @@ class IverksettService(
         }
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandlingMedLås(behandlingId)
 
-        val totrinnskontroll = hentTotrinnskontroll(behandlingId)
+        val totrinnskontroll = hentTotrinnskontroll(behandling)
 
         val andelerTilkjentYtelse =
             finnAndelerTilIverksetting(tilkjentYtelse, iverksettingId, utbetalingsdato = utbetalingsdato)
@@ -204,10 +204,15 @@ class IverksettService(
         andelTilkjentYtelseRepository.updateAll(andelerSomSkalOppdateres)
     }
 
-    private fun hentTotrinnskontroll(behandlingId: BehandlingId): Totrinnskontroll {
+    private fun hentTotrinnskontroll(saksbehandling: Saksbehandling): Totrinnskontroll {
         val totrinnskontroll =
-            totrinnskontrollService.hentTotrinnskontroll(behandlingId)
-                ?: error("Finner ikke totrinnskontroll for behandling=$behandlingId")
+            if (saksbehandling.erSatsendring) {
+                Totrinnskontroll.maskineltBesluttet(saksbehandling.id)
+            } else {
+                totrinnskontrollService.hentTotrinnskontroll(saksbehandling.id)
+                    ?: error("Finner ikke totrinnskontroll for behandling=${saksbehandling.id}")
+            }
+
         feilHvis(totrinnskontroll.status != TotrinnInternStatus.GODKJENT) {
             "Totrinnskontroll må være godkjent for å kunne iverksette"
         }
