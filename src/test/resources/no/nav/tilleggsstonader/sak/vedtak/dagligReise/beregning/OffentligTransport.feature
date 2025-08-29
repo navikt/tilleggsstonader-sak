@@ -14,7 +14,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 778   |
 
@@ -29,7 +29,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 778   |
 
@@ -44,7 +44,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 440   |
 
@@ -59,7 +59,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 778   |
       | 31.01.2025 | 01.03.2025 | 778   |
@@ -78,7 +78,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 01.03.2025 | 30.03.2025 | 352   |
 
@@ -94,7 +94,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 778   |
       | 31.01.2025 | 01.03.2025 | 778   |
@@ -112,7 +112,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 778   |
       | 31.01.2025 | 01.03.2025 | 0     |
@@ -133,12 +133,19 @@ Egenskap: Beregning av offentlig transport for daglig reise
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
-      | 01.01.2025 | 30.01.2025 | 4147  |
+      | 01.01.2025 | 30.01.2025 | 778   |
       | 31.01.2025 | 01.03.2025 | 0     |
       | 02.03.2025 | 31.03.2025 | 0     |
-      | 01.04.2025 | 30.04.2025 | 4147  |
+      | 01.04.2025 | 30.04.2025 | 778   |
+
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=2
+      | Fom        | Tom        | Beløp |
+      | 01.01.2025 | 30.01.2025 | 3369  |
+      | 31.01.2025 | 01.03.2025 | 0     |
+      | 02.03.2025 | 31.03.2025 | 0     |
+      | 01.04.2025 | 30.04.2025 | 3369  |
 
   # Lønner seg med mnd kort selv om det er opphold (f.eks tre dager på slutten første og 10 dager på starten av siste)
   Scenario: Månedskort lønner seg selv om vedtaksperiodene har opphold og mer enn rene 30 dagersperioder
@@ -153,7 +160,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 778   |
       | 31.01.2025 | 01.03.2025 | 778   |
@@ -172,7 +179,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport
+    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 778   |
       | 31.01.2025 | 01.03.2025 | 704   |

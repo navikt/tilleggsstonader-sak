@@ -13,10 +13,13 @@ object DagligReiseRegelTestUtil {
                 Vurdering(
                     regelId = RegelId.AVSTAND_OVER_SEKS_KM,
                     svar = SvarId.JA,
+                ),
+                Vurdering(
+                    regelId = RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT,
+                    svar = SvarId.JA,
                     begrunnelse = "En begrunnelse på delvilkåret",
                 ),
             ),
-            delvilkår(Vurdering(regelId = RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT, svar = SvarId.JA)),
         )
 
     private fun delvilkår(vararg vurderinger: Vurdering) =
