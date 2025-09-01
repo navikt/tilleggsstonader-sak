@@ -4,8 +4,16 @@ import io.mockk.clearMocks
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktaGrunnlagId
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GeneriskFaktaGrunnlag
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagData
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -25,8 +33,12 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.util.UUID
 
 class SatsjusteringTest : IntegrationTest() {
+    @Autowired
+    private lateinit var faktaGrunnlagService: FaktaGrunnlagService
+
     @Autowired
     private lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 
@@ -61,33 +73,7 @@ class SatsjusteringTest : IntegrationTest() {
 
     @Test
     fun `skal justere sats i revurderinger som har tilkjent ytelse som venter på satsjustering`() {
-        var behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), stønadstype = Stønadstype.LÆREMIDLER)
-
-        vilkårsperiodeRepository.insertAll(
-            listOf(
-                målgruppe(behandlingId = behandling.id, fom = fom, tom = tom, faktaOgVurdering = faktaOgVurderingMålgruppeLæremidler()),
-                aktivitet(behandlingId = behandling.id, fom = fom, tom = tom, faktaOgVurdering = faktaOgVurderingAktivitetLæremidler()),
-            ),
-        )
-
-        læremidlerBeregnYtelseSteg.utførSteg(
-            saksbehandling = behandlingRepository.finnSaksbehandling(behandling.id),
-            InnvilgelseLæremidlerRequest(
-                vedtaksperioder = listOf(vedtaksperiodeDto(fom = fom, tom = tom)),
-            ),
-        )
-
-        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandling.id)
-        assertThat(
-            tilkjentYtelse!!
-                .andelerTilkjentYtelse
-                .filter {
-                    it.statusIverksetting ==
-                        StatusIverksetting.VENTER_PÅ_SATS_ENDRING
-                },
-        ).hasSize(1)
-
-        behandling = testoppsettService.ferdigstillBehandling(behandling)
+        val behandling = opprettBehandlingMedAndelerTilSatsjustering()
 
         every {
             satsLæremidlerService.finnSatsForPeriode(
@@ -110,8 +96,65 @@ class SatsjusteringTest : IntegrationTest() {
         assertThat(behandling.id).isNotEqualTo(sistIverksatteBehandling.id)
         assertThat(sistIverksatteBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
 
-        with(tilkjentYtelseRepository.findByBehandlingId(sistIverksatteBehandling.id)!!) {
-            assertThat(andelerTilkjentYtelse).noneMatch { it.statusIverksetting == StatusIverksetting.VENTER_PÅ_SATS_ENDRING }
-        }
+        val tilkjentYtelseRevurdering = tilkjentYtelseRepository.findByBehandlingId(sistIverksatteBehandling.id)!!
+
+        validerHarKopiertOverFaktagrunnlagFraForrigeBehandling(sistIverksatteBehandling)
+        validerHarIngenAndelserSomVenterPåSatsEndring(sistIverksatteBehandling.id)
+        assertThat(tilkjentYtelseRevurdering.andelerTilkjentYtelse)
+            .noneMatch {
+                it.statusIverksetting ==
+                    StatusIverksetting.VENTER_PÅ_SATS_ENDRING
+            }
+    }
+
+    private fun opprettBehandlingMedAndelerTilSatsjustering(): Behandling {
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), stønadstype = Stønadstype.LÆREMIDLER)
+
+        vilkårsperiodeRepository.insertAll(
+            listOf(
+                målgruppe(behandlingId = behandling.id, fom = fom, tom = tom, faktaOgVurdering = faktaOgVurderingMålgruppeLæremidler()),
+                aktivitet(behandlingId = behandling.id, fom = fom, tom = tom, faktaOgVurdering = faktaOgVurderingAktivitetLæremidler()),
+            ),
+        )
+
+        læremidlerBeregnYtelseSteg.utførSteg(
+            saksbehandling = behandlingRepository.finnSaksbehandling(behandling.id),
+            InnvilgelseLæremidlerRequest(
+                vedtaksperioder = listOf(vedtaksperiodeDto(fom = fom, tom = tom)),
+            ),
+        )
+
+        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!
+        validerHarAndelerTilSatsjustering(tilkjentYtelse)
+
+        return testoppsettService.ferdigstillBehandling(behandling)
+    }
+
+    private fun validerHarKopiertOverFaktagrunnlagFraForrigeBehandling(sistIverksatteBehandling: Behandling) {
+        val grunnlagSistIverksatte = faktaGrunnlagService.hentGrunnlagsdata(sistIverksatteBehandling.id)
+        val grunnlagForrigeBehandling =
+            faktaGrunnlagService.hentGrunnlagsdata(sistIverksatteBehandling.forrigeIverksatteBehandlingId!!)
+
+        assertThat(grunnlagSistIverksatte).isEqualTo(grunnlagForrigeBehandling)
+    }
+
+    private fun validerHarAndelerTilSatsjustering(tilkjentYtelse: TilkjentYtelse) {
+        assertThat(
+            tilkjentYtelse
+                .andelerTilkjentYtelse
+                .filter {
+                    it.statusIverksetting ==
+                        StatusIverksetting.VENTER_PÅ_SATS_ENDRING
+                },
+        ).hasSize(1)
+    }
+
+    private fun validerHarIngenAndelserSomVenterPåSatsEndring(behandlingId: BehandlingId) {
+        val tilkjentYtelseRevurdering = tilkjentYtelseRepository.findByBehandlingId(behandlingId)!!
+        assertThat(tilkjentYtelseRevurdering.andelerTilkjentYtelse)
+            .noneMatch {
+                it.statusIverksetting ==
+                    StatusIverksetting.VENTER_PÅ_SATS_ENDRING
+            }
     }
 }

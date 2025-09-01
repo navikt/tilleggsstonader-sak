@@ -7,9 +7,11 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktaGrunnlagId
 import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.database.AdvisoryLockService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagUtil.ofType
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagUtil.singleOfType
@@ -72,6 +74,23 @@ class FaktaGrunnlagService(
         opprettGrunnlagPersonopplysninger(behandling)
         opprettGrunnlagBarnAnnenForelder(behandling)
         opprettGrunnlagArenaVedtak(behandling)
+    }
+
+    fun kopierGrunnlagsdataFraForrigeIverksatteBehandling(behandlingId: BehandlingId) {
+        val behandling = behandlingService.hentBehandling(behandlingId)
+        feilHvis(behandling.forrigeIverksatteBehandlingId == null) {
+            "Kan ikke kopiere faktagrunnlag da det ikke finnes en forrige iverksatte behandling"
+        }
+        faktaGrunnlagRepository.insertAll(
+            faktaGrunnlagRepository
+                .findByBehandlingId(behandling.forrigeIverksatteBehandlingId)
+                .map { faktaGrunnlag ->
+                    faktaGrunnlag.copy(
+                        id = FaktaGrunnlagId.random(),
+                        behandlingId = behandlingId,
+                    )
+                },
+        )
     }
 
     fun hentGrunnlagsdata(behandlingId: BehandlingId): Grunnlag {

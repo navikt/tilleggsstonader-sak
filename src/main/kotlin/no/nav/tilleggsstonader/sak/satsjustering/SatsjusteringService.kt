@@ -9,22 +9,17 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingSteg
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.BeslutteVedtakSteg
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -38,10 +33,8 @@ class SatsjusteringService(
     private val beregnYtelseSteg: LæremidlerBeregnYtelseSteg,
     private val ferdigstillBehandlingSteg: FerdigstillBehandlingSteg,
     private val tilkjentYtelseService: TilkjentYtelseService,
-    private val beslutteVedtakSteg: BeslutteVedtakSteg,
-    private val stegService: StegService,
-    private val totrinnskontrollService: TotrinnskontrollService,
     private val iverksettService: IverksettService,
+    private val faktaGrunnlagService: FaktaGrunnlagService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -73,18 +66,7 @@ class SatsjusteringService(
     }
 
     private fun opprettRevurderingOgKjørSatsendring(fagsakId: FagsakId) {
-        val revurderingId =
-            revurderingBehandlingService.opprettBehandling(
-                OpprettRevurdering(
-                    fagsakId = fagsakId,
-                    årsak = BehandlingÅrsak.SATSENDRING,
-                    valgteBarn = emptySet(),
-                    nyeOpplysningerMetadata = null,
-                    kravMottatt = null,
-                    skalOppretteOppgave = false,
-                ),
-            )
-        val revurdering = behandlingService.hentSaksbehandling(revurderingId)
+        val revurdering = opprettRevurderingForSatsendring(fagsakId)
 
         val forrigeIverksatteBehandlingId =
             revurdering.forrigeIverksatteBehandlingId
@@ -98,17 +80,31 @@ class SatsjusteringService(
             satsjusteringFra = finnDatoForSatsjustering(revurdering),
         )
 
-        // TODO finne ut hva vi gjør med totrinnskontroll ved satsjustering
+        // Kaller disse direkte for å hoppe over totrinnskontroll
         behandlingService.oppdaterStatusPåBehandling(revurdering.id, BehandlingStatus.FATTER_VEDTAK)
         behandlingService.oppdaterResultatPåBehandling(revurdering.id, BehandlingResultat.INNVILGET)
+        behandlingService.oppdaterStegPåBehandling(revurdering.id, StegType.BESLUTTE_VEDTAK)
         iverksettService.iverksettBehandlingFørsteGang(revurdering.id)
 
-        // totrinnskontroll
-        // iverksett
-        // behandlingService.oppdaterStegPåBehandling(revurdering.id, StegType.BESLUTTE_VEDTAK)
-
-        // TODO slett ferdigstillBehandlingSteg - den burde bli håndtert automatisk etter at behandlingen er iverksatt
+        // Her lages også internt vedtak og behandling- og vedtaksstatistikk
         ferdigstillBehandlingSteg.utførSteg(revurdering, null)
+    }
+
+    private fun opprettRevurderingForSatsendring(fagsakId: FagsakId): Saksbehandling {
+        val revurderingId =
+            revurderingBehandlingService.opprettBehandling(
+                OpprettRevurdering(
+                    fagsakId = fagsakId,
+                    årsak = BehandlingÅrsak.SATSENDRING,
+                    valgteBarn = emptySet(), // TODO - kopier over barn
+                    nyeOpplysningerMetadata = null,
+                    kravMottatt = null,
+                    skalOppretteOppgave = false,
+                ),
+            )
+        // Gjenbruker grunnlag fra forrige behandling ved satsjustering
+        faktaGrunnlagService.kopierGrunnlagsdataFraForrigeIverksatteBehandling(revurderingId)
+        return behandlingService.hentSaksbehandling(revurderingId)
     }
 
     private fun finnDatoForSatsjustering(revurdering: Saksbehandling): LocalDate =
