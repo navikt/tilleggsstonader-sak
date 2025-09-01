@@ -35,6 +35,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilMålgruppe
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -224,15 +225,6 @@ class OppfølgingOpprettKontrollerService(
             "Feil ved henting av ytelser fra andre systemer: ${test.joinToString(", ") { it.type.name }}. Prøv å laste inn siden på nytt."
         }
     }
-
-    private fun TypeYtelsePeriode.tilMålgruppe() =
-        when (this) {
-            TypeYtelsePeriode.AAP -> MålgruppeType.AAP
-            TypeYtelsePeriode.DAGPENGER -> MålgruppeType.DAGPENGER
-            TypeYtelsePeriode.ENSLIG_FORSØRGER -> MålgruppeType.OVERGANGSSTØNAD
-            TypeYtelsePeriode.OMSTILLINGSSTØNAD -> MålgruppeType.OMSTILLINGSSTØNAD
-            TypeYtelsePeriode.TILTAKSPENGER -> TODO()
-        }
 
     private fun MålgruppeType.tilTypeYtelsePeriode() =
         when (this) {

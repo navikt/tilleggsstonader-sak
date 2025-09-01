@@ -69,10 +69,11 @@ class VilkårperiodeService(
         val vilkårperioder = hentVilkårperioder(behandlingId)
         val grunnlagsdataVilkårsperioder =
             vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandlingId, vilkårperioder)
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
 
         return VilkårperioderResponse(
             vilkårperioder = vilkårperioder.tilDto(),
-            grunnlag = grunnlagsdataVilkårsperioder?.tilDto(),
+            grunnlag = grunnlagsdataVilkårsperioder?.tilDto(stønadstype = behandling.stønadstype),
         )
     }
 
