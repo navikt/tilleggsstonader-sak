@@ -177,22 +177,22 @@ class OppgaveService(
         feilHvis(oppgave.oppgavetype == Oppgavetype.BehandleSak && behandlingId == null) {
             "Må ha behandlingId når man oppretter oppgave for behandle sak"
         }
-        val opprettetOppgaveId = opprettOppgaveUtenÅLagreIRepository(personIdent, stønadstype, oppgave)
+        val enhetsnummer = arbeidsfordelingService.hentNavEnhetId(personIdent, stønadstype, oppgave.oppgavetype)
+        val mappeId = utledMappeId(personIdent, oppgave, enhetsnummer)
+        val opprettetOppgaveId = opprettOppgaveUtenÅLagreIRepository(personIdent, stønadstype, oppgave, enhetsnummer, mappeId)
         val oppgave =
             OppgaveDomain(
                 gsakOppgaveId = opprettetOppgaveId,
                 behandlingId = behandlingId,
                 type = oppgave.oppgavetype,
                 tilordnetSaksbehandler = oppgave.tilordnetNavIdent,
+                status = Oppgavestatus.ÅPEN,
+                tildeltEnhetsnummer = enhetsnummer,
+                enhetsmappeId = mappeId,
             )
         oppgaveRepository.insert(oppgave)
         return opprettetOppgaveId
     }
-
-    private fun getOppgaveFinnesFraFør(
-        oppgavetype: Oppgavetype,
-        behandlingId: BehandlingId,
-    ) = oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
 
     fun oppdaterOppgave(oppgave: Oppgave): OppdatertOppgaveResponse = oppgaveClient.oppdaterOppgave(oppgave)
 
@@ -203,11 +203,9 @@ class OppgaveService(
         personIdent: String,
         stønadstype: Stønadstype,
         oppgave: OpprettOppgave,
+        enhetsnummer: String?,
+        mappeId: Long? = null,
     ): Long {
-        val enhetsnummer =
-            arbeidsfordelingService.hentNavEnhetId(personIdent, stønadstype, oppgave.oppgavetype)
-
-        val mappeId = utledMappeId(personIdent, oppgave, enhetsnummer)
         val opprettOppgave =
             tilOpprettOppgaveRequest(
                 oppgave = oppgave,
@@ -256,12 +254,13 @@ class OppgaveService(
     fun hentOppgaveSomIkkeErFerdigstilt(
         behandlingId: BehandlingId,
         oppgavetype: Oppgavetype,
-    ): OppgaveDomain? = oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
+    ): OppgaveDomain? = oppgaveRepository.findByBehandlingIdAndTypeAndStatus(behandlingId, oppgavetype, Oppgavestatus.ÅPEN)
 
     fun hentBehandleSakOppgaveSomIkkeErFerdigstilt(behandlingId: BehandlingId): OppgaveDomain? =
-        oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(
-            behandlingId,
-            setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak),
+        oppgaveRepository.findByBehandlingIdAndStatusAndTypeIn(
+            behandlingId = behandlingId,
+            status = Oppgavestatus.ÅPEN,
+            oppgavetype = setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak),
         )
 
     fun hentOppgave(gsakOppgaveId: Long): Oppgave = oppgaveClient.finnOppgaveMedId(gsakOppgaveId)
@@ -271,7 +270,7 @@ class OppgaveService(
         oppgavetype: Oppgavetype,
     ) {
         val oppgave =
-            oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
+            oppgaveRepository.findByBehandlingIdAndTypeAndStatus(behandlingId, oppgavetype, Oppgavestatus.ÅPEN)
                 ?: error("Finner ikke oppgave for behandling $behandlingId type=$oppgavetype")
         ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave)
     }
@@ -279,8 +278,7 @@ class OppgaveService(
     private fun ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave: OppgaveDomain) {
         ferdigstillOppgave(oppgave.gsakOppgaveId)
 
-        oppgave.erFerdigstilt = true
-        oppgaveRepository.update(oppgave)
+        oppgaveRepository.update(oppgave.copy(status = Oppgavestatus.FERDIGSTILT))
     }
 
     /**
@@ -290,15 +288,15 @@ class OppgaveService(
         behandlingId: BehandlingId,
         oppgavetype: Oppgavetype,
     ) {
-        val oppgave = oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
+        val oppgave = oppgaveRepository.findByBehandlingIdAndTypeAndStatus(behandlingId, oppgavetype, Oppgavestatus.ÅPEN)
         oppgave?.let {
             try {
                 ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave)
             } catch (e: Exception) {
                 val oppgaveStatus = hentOppgave(oppgave.gsakOppgaveId).status
                 if (oppgaveStatus == StatusEnum.FEILREGISTRERT) {
-                    logger.warn("Ferdigstilling - oppgave=${oppgave.id} er feilregistrert. Markerer oppgave som ferdigstilt")
-                    oppgaveRepository.update(oppgave.copy(erFerdigstilt = true))
+                    logger.warn("Ferdigstilling - oppgave=${oppgave.id} er feilregistrert. Oppdaterer OppgaveDomain")
+                    oppgaveRepository.update(oppgave.copy(status = Oppgavestatus.FEILREGISTRERT))
                 } else {
                     throw e
                 }

@@ -41,6 +41,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
@@ -58,25 +59,29 @@ import java.util.UUID
 
 fun oppgave(
     behandling: Behandling,
-    erFerdigstilt: Boolean = false,
+    status: Oppgavestatus = Oppgavestatus.ÅPEN,
     gsakOppgaveId: Long = 123,
     type: Oppgavetype = Oppgavetype.Journalføring,
     tilordnetSaksbehandler: String? = null,
-): OppgaveDomain = oppgave(behandling.id, erFerdigstilt, gsakOppgaveId, type, tilordnetSaksbehandler)
+): OppgaveDomain = oppgave(behandling.id, gsakOppgaveId, type, status, tilordnetSaksbehandler)
 
 fun oppgave(
     behandlingId: BehandlingId?,
-    erFerdigstilt: Boolean = false,
     gsakOppgaveId: Long = 123,
     type: Oppgavetype = Oppgavetype.Journalføring,
+    status: Oppgavestatus = Oppgavestatus.ÅPEN,
     tilordnetSaksbehandler: String? = null,
+    tildeltEnhetsnr: String? = "4462",
+    enhetsmappeId: Long? = null,
 ): OppgaveDomain =
     OppgaveDomain(
         behandlingId = behandlingId,
         gsakOppgaveId = gsakOppgaveId,
         type = type,
-        erFerdigstilt = erFerdigstilt,
+        status = status,
         tilordnetSaksbehandler = tilordnetSaksbehandler,
+        tildeltEnhetsnummer = tildeltEnhetsnr,
+        enhetsmappeId = enhetsmappeId,
     )
 
 fun behandling(

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.hendelser.oppgave
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppdatertOppgaveHendelse
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -13,10 +14,21 @@ data class OppgavehendelseRecord(
 ) {
     fun erEndret() = hendelse.hendelsestype == Hendelsestype.OPPGAVE_ENDRET
 
+    fun erFeilregistrert() = hendelse.hendelsestype == Hendelsestype.OPPGAVE_FEILREGISTRERT
+
     fun tilDomene() =
         OppdatertOppgaveHendelse(
             gsakOppgaveId = oppgave.oppgaveId,
             tilordnetSaksbehandler = oppgave.tilordning.navIdent,
+            status =
+                when (hendelse.hendelsestype) {
+                    Hendelsestype.OPPGAVE_ENDRET -> Oppgavestatus.ÅPEN
+                    Hendelsestype.OPPGAVE_OPPRETTET -> Oppgavestatus.ÅPEN
+                    Hendelsestype.OPPGAVE_FEILREGISTRERT -> Oppgavestatus.FEILREGISTRERT
+                    Hendelsestype.OPPGAVE_FERDIGSTILT -> Oppgavestatus.FERDIGSTILT
+                },
+            tildeltEnhetsnummer = oppgave.tilordning.enhetsnr,
+            enhetsmappeId = oppgave.tilordning.enhetsmappeId,
         )
 }
 

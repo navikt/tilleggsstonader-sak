@@ -12,20 +12,17 @@ import java.util.UUID
 interface OppgaveRepository :
     RepositoryInterface<OppgaveDomain, UUID>,
     InsertUpdateRepository<OppgaveDomain> {
-    fun findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(
+    fun findByBehandlingIdAndTypeAndStatus(
         behandlingId: BehandlingId,
         oppgavetype: Oppgavetype,
+        status: Oppgavestatus,
     ): OppgaveDomain?
 
     fun findByType(oppgavetype: Oppgavetype): List<OppgaveDomain>
 
-    fun findByBehandlingIdAndType(
+    fun findByBehandlingIdAndStatusAndTypeIn(
         behandlingId: BehandlingId,
-        oppgavetype: Oppgavetype,
-    ): List<OppgaveDomain>?
-
-    fun findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(
-        behandlingId: BehandlingId,
+        status: Oppgavestatus,
         oppgavetype: Set<Oppgavetype>,
     ): OppgaveDomain?
 
