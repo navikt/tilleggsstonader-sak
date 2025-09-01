@@ -249,8 +249,6 @@ class OppgaveService(
         versjon: Int,
     ): Oppgave = oppgaveClient.fordelOppgave(gsakOppgaveId, null, versjon = versjon)
 
-    fun hentOppgaveDomain(oppgaveId: Long): OppgaveDomain? = oppgaveRepository.findByGsakOppgaveId(oppgaveId)
-
     fun hentOppgaveSomIkkeErFerdigstilt(
         behandlingId: BehandlingId,
         oppgavetype: Oppgavetype,
@@ -307,12 +305,6 @@ class OppgaveService(
     fun ferdigstillOppgave(gsakOppgaveId: Long) {
         oppgaveClient.ferdigstillOppgave(gsakOppgaveId)
     }
-
-    fun finnSisteBehandleSakOppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
-        oppgaveRepository.findTopByBehandlingIdAndTypeOrderBySporbarOpprettetTidDesc(
-            behandlingId,
-            Oppgavetype.BehandleSak,
-        )
 
     fun finnSisteOppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
         oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandlingId)
