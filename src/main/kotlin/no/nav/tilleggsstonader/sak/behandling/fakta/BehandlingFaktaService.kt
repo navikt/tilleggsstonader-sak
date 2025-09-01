@@ -24,7 +24,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.BoligEllerOve
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.DelerUtgifterFlereStederType
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.DokumentasjonBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.FasteUtgifter
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.Personopplysninger
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.TypeFasteUtgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.TypeUtgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterFlereSteder
@@ -122,6 +121,7 @@ class BehandlingFaktaService(
             arena = arenaFakta(grunnlagsdata),
             aktiviteter = mapAktivitetForDagligReise(søknad?.data?.aktivitet),
             reise = mapReise(søknad?.data?.reiser),
+            personopplysninger = mapPersonopplysninger(søknad?.data?.personopplysninger),
         )
     }
 
@@ -404,9 +404,4 @@ class BehandlingFaktaService(
             error("Mangler grunnlagsdata for barn i søknad ($kommaseparerteIdenter)")
         }
     }
-
-    private fun mapDineOpplysninger(dineOpplysninger: Personopplysninger?) =
-        Personopplysninger(
-            adresse = dineOpplysninger?.adresse,
-        )
 }
