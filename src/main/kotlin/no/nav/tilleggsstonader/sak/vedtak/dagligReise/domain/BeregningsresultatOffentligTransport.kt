@@ -23,6 +23,7 @@ data class Beregningsgrunnlag(
     val fom: LocalDate,
     val tom: LocalDate,
     val prisEnkeltbillett: Int,
+    val prisSyvdagersbillett: Int?,
     val pris30dagersbillett: Int,
     val antallReisedagerPerUke: Int,
     val vedtaksperioder: List<VedtaksperiodeGrunnlag>,

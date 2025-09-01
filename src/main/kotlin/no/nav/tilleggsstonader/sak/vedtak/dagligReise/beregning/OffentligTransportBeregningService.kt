@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
-import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
@@ -9,11 +8,8 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.antallDagerIPeriodeInklusiv
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.splitPerUke
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.springframework.stereotype.Service
-import kotlin.math.min
 
 @Service
 class OffentligTransportBeregningService(
@@ -33,6 +29,7 @@ class OffentligTransportBeregningService(
                         tom = vilkår.tom!!,
                         antallReisedagerPerUke = vilkår.offentligTransport?.reisedagerPerUke!!,
                         prisEnkelbillett = vilkår.offentligTransport.prisEnkelbillett,
+                        prisSyvdagersbillett = vilkår.offentligTransport.prisSyvdagersbillett,
                         pris30dagersbillett = vilkår.offentligTransport.prisTrettidagersbillett,
                     )
                 }
@@ -49,54 +46,48 @@ class OffentligTransportBeregningService(
         reise: UtgiftOffentligTransport,
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatForReise {
-        val justerteVedtaksperioder = finnSnittForVedtaksperioder(reise, vedtaksperioder)
-        val justertReiseperiode = finnSnittForReiseperioder(reise, justerteVedtaksperioder)
+        val (justerteVedtaksperioder, justertReiseperiode) =
+            finnSnittMellomReiseOgVedtaksperioder(
+                reise,
+                vedtaksperioder,
+            )
 
-        val trettidagersperioder = justertReiseperiode.delTil30Dagersperioder()
+        val trettidagerReisePerioder = justertReiseperiode.delTil30Dagersperioder()
 
         return BeregningsresultatForReise(
             perioder =
-                trettidagersperioder.map { periode ->
-                    beregnForPeriode(periode, justerteVedtaksperioder)
+                trettidagerReisePerioder.map { trettidagerReiseperiode ->
+                    beregnForTrettiDagersPeriode(trettidagerReiseperiode, justerteVedtaksperioder)
                 },
         )
     }
 
-    private fun finnSnittForReiseperioder(
-        reise: UtgiftOffentligTransport,
-        vedtaksperioder: List<Vedtaksperiode>,
-    ) = reise.copy(
-        fom = maxOf(vedtaksperioder.first().fom, reise.fom),
-        tom = minOf(vedtaksperioder.last().tom, reise.tom),
-    )
-
-    private fun finnSnittForVedtaksperioder(
-        reise: UtgiftOffentligTransport,
-        vedtaksperioder: List<Vedtaksperiode>,
-    ): List<Vedtaksperiode> =
-        vedtaksperioder
-            .mapNotNull { it.beregnSnitt(reise) }
-
-    private fun beregnForPeriode(
-        periode: UtgiftOffentligTransport,
+    private fun beregnForTrettiDagersPeriode(
+        trettidagerReisePeriode: UtgiftOffentligTransport,
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatForPeriode {
         val vedtaksperiodeGrunnlag =
-            finnSnittForVedtaksperioder(periode, vedtaksperioder)
-                .map {
+            finnSnittMellomReiseOgVedtaksperioder(trettidagerReisePeriode, vedtaksperioder)
+                .justerteVedtaksperioder
+                .map { vedtaksperiode ->
                     VedtaksperiodeGrunnlag(
-                        vedtaksperiode = it,
-                        antallReisedager = finnReisedagerIPeriode(it, periode.antallReisedagerPerUke),
+                        vedtaksperiode = vedtaksperiode,
+                        antallReisedager =
+                            finnReisedagerIPeriode(
+                                vedtaksperiode,
+                                trettidagerReisePeriode.antallReisedagerPerUke,
+                            ),
                     )
                 }
 
         val grunnlag =
             Beregningsgrunnlag(
-                fom = periode.fom,
-                tom = periode.tom,
-                antallReisedagerPerUke = periode.antallReisedagerPerUke,
-                prisEnkeltbillett = periode.prisEnkelbillett,
-                pris30dagersbillett = periode.pris30dagersbillett,
+                fom = trettidagerReisePeriode.fom,
+                tom = trettidagerReisePeriode.tom,
+                antallReisedagerPerUke = trettidagerReisePeriode.antallReisedagerPerUke,
+                prisEnkeltbillett = trettidagerReisePeriode.prisEnkelbillett,
+                prisSyvdagersbillett = trettidagerReisePeriode.prisSyvdagersbillett,
+                pris30dagersbillett = trettidagerReisePeriode.pris30dagersbillett,
                 antallReisedager = vedtaksperiodeGrunnlag.sumOf { it.antallReisedagerIVedtaksperioden },
                 vedtaksperioder = vedtaksperiodeGrunnlag,
             )
@@ -107,20 +98,15 @@ class OffentligTransportBeregningService(
         )
     }
 
-    private fun finnReisedagerIPeriode(
-        vedtaksperiode: Vedtaksperiode,
-        antallReisedagerPerUke: Int,
-    ): Int =
-        vedtaksperiode
-            .splitPerUke { fom, tom ->
-                min(antallReisedagerPerUke, antallDagerIPeriodeInklusiv(fom, tom))
-            }.values
-            .sumOf { it.antallDager }
-
     private fun finnBilligsteAlternativ(grunnlag: Beregningsgrunnlag): Int {
         val prisEnkeltbilletter = grunnlag.antallReisedager * grunnlag.prisEnkeltbillett * 2
-        val pris30dagersbillett = grunnlag.pris30dagersbillett
+        val antallSyvDagersPerioder = finnAntallSyvDagersPerioder(grunnlag)
+        val prisUkesBiletter = grunnlag.prisSyvdagersbillett?.times(antallSyvDagersPerioder)
 
-        return min(prisEnkeltbilletter, pris30dagersbillett)
+        return listOfNotNull(
+            prisEnkeltbilletter,
+            prisUkesBiletter,
+            grunnlag.pris30dagersbillett,
+        ).min()
     }
 }
