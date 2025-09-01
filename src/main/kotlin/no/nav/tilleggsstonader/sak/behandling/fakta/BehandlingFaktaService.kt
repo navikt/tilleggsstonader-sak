@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Bolig
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.DelerBoutgifterType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HarUtgifterTilBoligToStederType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.JaNeiType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.PeriodeForSamling
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Samling
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeUtgifterType
 import no.nav.tilleggsstonader.libs.utils.fnr.Fødselsnummer
@@ -43,6 +44,7 @@ import java.time.LocalDate
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.FasteUtgifter as FasteUtgifterKontraktor
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterFlereSteder as UtgifterFlereStederKontraktor
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterNyBolig as UtgifterNyBoligKontrakt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reise as ReiseDagligReise
 
 /**
  * Denne klassen håndterer henting av VilkårGrunnlagDto
@@ -119,6 +121,7 @@ class BehandlingFaktaService(
             dokumentasjon = søknad?.let { mapDokumentasjonDagligReise(it.data.dokumentasjon, it.journalpostId) },
             arena = arenaFakta(grunnlagsdata),
             aktiviteter = mapAktivitetForDagligReise(søknad?.data?.aktivitet),
+            reise = mapReise(søknad?.data?.reiser),
         )
     }
 
@@ -149,6 +152,20 @@ class BehandlingFaktaService(
             reiseTilAktivitetsstedHelePerioden = aktivitet?.reiseTilAktivitetsstedHelePerioden,
             reiseperiode = aktivitet?.reiseperiode,
         )
+
+    private fun mapReise(reiser: List<ReiseDagligReise>?): List<FaktaReise>? =
+        reiser?.map { reise ->
+            FaktaReise(
+                reiseAdresse = reise.reiseAdresse,
+                dagerPerUke = reise.dagerPerUke,
+                harMerEnn6KmReisevei = reise.harMerEnn6KmReisevei,
+                lengdeReisevei = reise.lengdeReisevei,
+                harBehovForTransportUavhengigAvReisensLengde = reise.harBehovForTransportUavhengigAvReisensLengde,
+                kanReiseMedOffentligTransport = reise.kanReiseMedOffentligTransport,
+                offentligTransport = reise.offentligTransport,
+                privatTransport = reise.privatTransport,
+            )
+        }
 
     private fun mapBoligEllerOvernatting(boutgifter: BoligEllerOvernattingAvsnitt?) =
         BoligEllerOvernatting(
@@ -224,7 +241,7 @@ class BehandlingFaktaService(
             Samling(
                 periodeForSamling =
                     it.periodeForSamling.map { periode ->
-                        no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.PeriodeForSamling(
+                        PeriodeForSamling(
                             fom = periode.fom,
                             tom = periode.tom,
                             trengteEkstraOvernatting = mapJaNei(periode.trengteEkstraOvernatting),

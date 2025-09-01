@@ -9,11 +9,15 @@ import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ReiseAdresse
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.OffentligTransport
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.PrivatTransport
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reiseperiode
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ValgtAktivitetDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Utgifter
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -67,6 +71,7 @@ data class BehandlingFaktaDagligreiseDto(
     override val dokumentasjon: FaktaDokumentasjon? = null,
     override val arena: ArenaFakta? = null,
     val aktiviteter: FaktaAktivtetDagligReise,
+    val reise: List<FaktaReise>?,
 ) : BehandlingFaktaDto
 
 data class FaktaHovedytelse(
@@ -144,6 +149,26 @@ data class FaktaBarn(
     val søknadgrunnlag: SøknadsgrunnlagBarn?,
     val vilkårFakta: VilkårFaktaBarn,
 )
+
+data class FaktaReise(
+    val reiseAdresse: no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse?,
+    val dagerPerUke: ValgtAktivitetDagligReise,
+    val harMerEnn6KmReisevei: JaNei,
+    val lengdeReisevei: Int?,
+    val harBehovForTransportUavhengigAvReisensLengde: JaNei?,
+    val kanReiseMedOffentligTransport: JaNei,
+    val offentligTransport: OffentligTransport?,
+    val privatTransport: PrivatTransport?,
+)
+
+// val reiseAdresse: no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse,
+// val dagerPerUke: ValgtAktivitetDagligReise,
+// val harMerEnn6KmReisevei: JaNei,
+// val lengdeReisevei: Int?,
+// val harBehovForTransportUavhengigAvReisensLengde: JaNei?,
+// val kanReiseMedOffentligTransport: JaNei,
+// val offentligTransport: OffentligTransport?,
+// val privatTransport: PrivatTransport?,
 
 /**
  * Kan brukes for å automatisk sette info på vilkår
