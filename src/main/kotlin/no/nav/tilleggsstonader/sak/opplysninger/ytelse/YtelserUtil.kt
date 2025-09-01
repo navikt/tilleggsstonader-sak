@@ -9,6 +9,13 @@ object YtelserUtil {
             Stønadstype.BARNETILSYN,
             Stønadstype.LÆREMIDLER,
             Stønadstype.BOUTGIFTER,
+            ->
+                listOf(
+                    TypeYtelsePeriode.AAP,
+                    TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                    TypeYtelsePeriode.OMSTILLINGSSTØNAD,
+                )
+
             Stønadstype.DAGLIG_REISE_TSO,
             Stønadstype.DAGLIG_REISE_TSR,
             ->
@@ -16,6 +23,8 @@ object YtelserUtil {
                     TypeYtelsePeriode.AAP,
                     TypeYtelsePeriode.ENSLIG_FORSØRGER,
                     TypeYtelsePeriode.OMSTILLINGSSTØNAD,
+                    TypeYtelsePeriode.TILTAKSPENGER,
+                    TypeYtelsePeriode.DAGPENGER,
                 )
 
             else -> error("Finner ikke relevante ytelser for stønadstype $type")
