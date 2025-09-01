@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse.KildeResultatYtelse
@@ -32,6 +33,7 @@ data class PeriodeGrunnlagYtelseDto(
     val fom: LocalDate,
     val tom: LocalDate?,
     val subtype: PeriodeGrunnlagYtelse.YtelseSubtype?,
+    val kanYtelseBrukesIBehandling: Boolean,
 )
 
 data class HentetInformasjonDto(
@@ -40,10 +42,10 @@ data class HentetInformasjonDto(
     val tidspunktHentet: LocalDateTime,
 )
 
-fun VilkårperioderGrunnlag.tilDto() =
+fun VilkårperioderGrunnlag.tilDto(stønadstype: Stønadstype) =
     VilkårperioderGrunnlagDto(
         aktivitet = this.aktivitet.tilDto(),
-        ytelse = this.ytelse.tilDto(),
+        ytelse = this.ytelse.tilDto(stønadstype = stønadstype),
         hentetInformasjon = this.hentetInformasjon.tilDto(),
     )
 
@@ -69,9 +71,9 @@ private fun RegisterAktivitet.tilDto() =
         kilde = kilde,
     )
 
-fun GrunnlagYtelse.tilDto() =
+fun GrunnlagYtelse.tilDto(stønadstype: Stønadstype) =
     GrunnlagYtelseDto(
-        perioder = this.perioder.map { it.tilDto() },
+        perioder = this.perioder.map { it.tilDto(stønadstype = stønadstype) },
         kildeResultat = this.kildeResultat.map { it.tilDto() },
     )
 
@@ -81,12 +83,17 @@ private fun KildeResultatYtelse.tilDto() =
         resultat = this.resultat,
     )
 
-fun PeriodeGrunnlagYtelse.tilDto() =
+fun PeriodeGrunnlagYtelse.tilDto(stønadstype: Stønadstype) =
     PeriodeGrunnlagYtelseDto(
         type = this.type,
         fom = this.fom,
         tom = this.tom,
         subtype = this.subtype,
+        kanYtelseBrukesIBehandling =
+            kanYtelseBrukesIBehandling(
+                stønadstype = stønadstype,
+                ytelse = this,
+            ),
     )
 
 fun HentetInformasjon.tilDto() =
