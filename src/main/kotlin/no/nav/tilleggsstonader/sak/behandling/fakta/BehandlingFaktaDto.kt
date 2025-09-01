@@ -161,15 +161,6 @@ data class FaktaReise(
     val privatTransport: PrivatTransport?,
 )
 
-// val reiseAdresse: no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse,
-// val dagerPerUke: ValgtAktivitetDagligReise,
-// val harMerEnn6KmReisevei: JaNei,
-// val lengdeReisevei: Int?,
-// val harBehovForTransportUavhengigAvReisensLengde: JaNei?,
-// val kanReiseMedOffentligTransport: JaNei,
-// val offentligTransport: OffentligTransport?,
-// val privatTransport: PrivatTransport?,
-
 /**
  * Kan brukes for å automatisk sette info på vilkår
  */
