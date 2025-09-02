@@ -372,17 +372,15 @@ class OppgaveService(
 
     fun håndterOppdatertOppgaveHendelse(oppdatertOppgaveHendelse: OppdatertOppgaveHendelse) {
         oppgaveRepository.findByGsakOppgaveId(oppdatertOppgaveHendelse.gsakOppgaveId)?.let { oppgave ->
-            if (oppgave.tilordnetSaksbehandler != oppdatertOppgaveHendelse.tilordnetSaksbehandler) {
-                oppgaveRepository.update(
-                    oppgave.copy(
-                        tilordnetSaksbehandler = oppdatertOppgaveHendelse.tilordnetSaksbehandler,
-                        status = oppdatertOppgaveHendelse.status,
-                        tildeltEnhetsnummer = oppdatertOppgaveHendelse.tildeltEnhetsnummer,
-                        enhetsmappeId = oppdatertOppgaveHendelse.enhetsmappeId,
-                    ),
-                )
-                logger.info("Oppdatert oppgave med gsakOppgaveId ${oppdatertOppgaveHendelse.gsakOppgaveId} med tilordnet saksbehandler")
-            }
+            oppgaveRepository.update(
+                oppgave.copy(
+                    tilordnetSaksbehandler = oppdatertOppgaveHendelse.tilordnetSaksbehandler,
+                    status = oppdatertOppgaveHendelse.status,
+                    tildeltEnhetsnummer = oppdatertOppgaveHendelse.tildeltEnhetsnummer,
+                    enhetsmappeId = oppdatertOppgaveHendelse.enhetsmappeId,
+                ),
+            )
+            logger.info("Oppdatert oppgave med gsakOppgaveId ${oppdatertOppgaveHendelse.gsakOppgaveId}")
         }
     }
 }
