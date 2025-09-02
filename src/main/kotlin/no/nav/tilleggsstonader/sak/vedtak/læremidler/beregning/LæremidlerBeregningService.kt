@@ -49,7 +49,6 @@ class LæremidlerBeregningService(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             typeVedtak = TypeVedtak.INNVILGELSE,
-            tidligsteEndring = tidligsteEndring,
         )
 
         val vedtaksperioderBeregningsgrunnlag = vedtaksperioder.tilBeregningsgrunnlag()
@@ -160,10 +159,10 @@ class LæremidlerBeregningService(
 
     /**
      * Slår sammen perioder fra forrige og nytt vedtak.
-     * Beholder perioder fra forrige vedtak frem til og med revurder-fra
-     * Bruker reberegnede perioder fra og med revurder-fra dato
-     * Dette gjøres for at vi ikke skal reberegne perioder før revurder-fra datoet
-     * Men vi trenger å reberegne perioder som løper i revurder-fra datoet då en periode kan ha endrer % eller sats
+     * Beholder perioder fra forrige vedtak frem til og med tidligste endring
+     * Bruker reberegnede perioder fra og med tidligste endring dato
+     * Dette gjøres for at vi ikke skal reberegne perioder før tidligste endring datoet
+     * Men vi trenger å reberegne perioder som løper i tidligste endring datoet då en periode kan ha endrer % eller sats
      */
     private fun settSammenGamleOgNyePerioder(
         beregningsresultat: List<BeregningsresultatForMåned>,

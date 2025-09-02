@@ -197,23 +197,6 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             }.hasMessageContaining("Kan ikke registrere aktivitetsdager på ingen aktivitet")
         }
 
-        @Test
-        fun `kan ikke opprette aktivitet hvis periode begynner før revurderFra`() {
-            val behandling =
-                testoppsettService.oppdater(
-                    testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
-                )
-
-            assertThatThrownBy {
-                aktivitetService.opprettVilkårperiode(
-                    dummyVilkårperiodeAktivitet(
-                        behandlingId = behandling.id,
-                        fom = now().plusDays(1),
-                    ),
-                )
-            }.hasMessageContaining("Til-og-med før fra-og-med")
-        }
-
         @Nested
         inner class Læremidler {
             @Test
@@ -473,28 +456,6 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                     vilkårperiode = endretBehandlingId,
                 )
             }.hasMessageContaining("BehandlingId er ikke lik")
-        }
-
-        @Test
-        fun `kan ikke oppdatere fakta hvis periode begynner før revurderFra`() {
-            val behandling =
-                testoppsettService.oppdater(
-                    testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
-                )
-            val aktivitet =
-                vilkårperiodeRepository.insert(
-                    aktivitet(
-                        behandlingId = behandling.id,
-                        fom = now().minusMonths(1),
-                        tom = now().plusMonths(1),
-                    ),
-                )
-            assertThatThrownBy {
-                aktivitetService.oppdaterVilkårperiode(
-                    id = aktivitet.id,
-                    vilkårperiode = aktivitet.tilOppdatering(aktivitetsdager = 3),
-                )
-            }.hasMessageContaining("Kan ikke endre vurderinger eller fakta på perioden")
         }
     }
 

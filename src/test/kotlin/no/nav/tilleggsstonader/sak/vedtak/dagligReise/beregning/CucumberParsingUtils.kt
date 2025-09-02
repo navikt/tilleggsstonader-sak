@@ -19,7 +19,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteDelvilkårDagligReiseOffentligTransport
-import java.time.LocalDate
 
 fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
     dataTable.mapRad { rad ->
@@ -41,14 +40,12 @@ fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
 fun dummyBehandling(
     behandlingId: BehandlingId,
     steg: StegType = StegType.BEREGNE_YTELSE,
-    revurderFra: LocalDate? = null,
 ): Saksbehandling =
     saksbehandling(
         id = behandlingId,
         steg = steg,
         fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO),
         forrigeIverksatteBehandlingId = null,
-        revurderFra = revurderFra,
         type = BehandlingType.FØRSTEGANGSBEHANDLING,
     )
 

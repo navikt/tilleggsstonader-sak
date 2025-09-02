@@ -94,7 +94,6 @@ fun behandling(
     henlagtBegrunnelse: String? = null,
     vedtakstidspunkt: LocalDateTime? = null,
     kravMottatt: LocalDate? = null,
-    revurderFra: LocalDate? = null,
     nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
 ): Behandling =
     Behandling(
@@ -114,7 +113,6 @@ fun behandling(
             vedtakstidspunkt
                 ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
         kravMottatt = kravMottatt,
-        revurderFra = revurderFra,
         nyeOpplysningerMetadata = nyeOpplysningerMetadata,
     )
 
@@ -133,7 +131,6 @@ fun henlagtBehandling(
     henlagtBegrunnelse: String? = "Registrert feil",
     vedtakstidspunkt: LocalDateTime? = SporbarUtils.now(),
     kravMottatt: LocalDate? = null,
-    revurderFra: LocalDate? = null,
     nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
 ) = Behandling(
     fagsakId = fagsak.id,
@@ -152,7 +149,6 @@ fun henlagtBehandling(
         vedtakstidspunkt
             ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
     kravMottatt = kravMottatt,
-    revurderFra = revurderFra,
     nyeOpplysningerMetadata = nyeOpplysningerMetadata,
 )
 
@@ -168,7 +164,6 @@ fun saksbehandling(
     årsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
     henlagtÅrsak: HenlagtÅrsak? = HenlagtÅrsak.FEILREGISTRERT,
     kravMottatt: LocalDate? = null,
-    revurderFra: LocalDate? = null,
 ): Saksbehandling =
     saksbehandling(
         fagsak,
@@ -185,7 +180,6 @@ fun saksbehandling(
             henlagtÅrsak = henlagtÅrsak,
             kravMottatt = kravMottatt,
             kategori = BehandlingKategori.NASJONAL,
-            revurderFra = revurderFra,
         ),
     )
 
@@ -216,7 +210,6 @@ fun saksbehandling(
         endretAv = behandling.sporbar.endret.endretAv,
         endretTid = behandling.sporbar.endret.endretTid,
         kravMottatt = behandling.kravMottatt,
-        revurderFra = behandling.revurderFra,
     )
 
 fun behandlingBarn(

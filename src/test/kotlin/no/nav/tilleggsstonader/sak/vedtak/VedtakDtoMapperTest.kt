@@ -27,7 +27,7 @@ class VedtakDtoMapperTest {
         fun `skal mappe innvilget vedtak til dto`() {
             val vedtak = innvilgetVedtak()
 
-            val dto = vedtakDtoMapper.toDto(vedtak, revurderFra = null, forrigeIverksatteBehandlingId = null)
+            val dto = vedtakDtoMapper.toDto(vedtak, forrigeIverksatteBehandlingId = null)
 
             assertThat(dto).isInstanceOf(InnvilgelseTilsynBarnResponse::class.java)
         }
@@ -48,7 +48,6 @@ class VedtakDtoMapperTest {
             val dto =
                 vedtakDtoMapper.toDto(
                     vedtak,
-                    revurderFra = null,
                     forrigeIverksatteBehandlingId = tidligereInnvilgetVedtak.behandlingId,
                 )
 
@@ -76,7 +75,7 @@ class VedtakDtoMapperTest {
                     begrunnelse = "begrunnelse",
                 )
 
-            val dto = vedtakDtoMapper.toDto(vedtak, revurderFra = null, forrigeIverksatteBehandlingId = null) as AvslagTilsynBarnDto
+            val dto = vedtakDtoMapper.toDto(vedtak, forrigeIverksatteBehandlingId = null) as AvslagTilsynBarnDto
 
             assertThat(dto.begrunnelse).isEqualTo(vedtak.data.begrunnelse)
             assertThat(dto.type).isEqualTo(vedtak.type)
@@ -89,7 +88,7 @@ class VedtakDtoMapperTest {
 
         @Test
         fun `skal mappe innvilget vedtak til dto`() {
-            val dto = vedtakDtoMapper.toDto(innvilgelse, revurderFra = null, forrigeIverksatteBehandlingId = null)
+            val dto = vedtakDtoMapper.toDto(innvilgelse, forrigeIverksatteBehandlingId = null)
 
             assertThat(dto).isInstanceOf(InnvilgelseLæremidlerResponse::class.java)
 
@@ -100,7 +99,11 @@ class VedtakDtoMapperTest {
 
         @Test
         fun `skal mappe revurdert innvilget vedtak til dto`() {
-            val dto = vedtakDtoMapper.toDto(innvilgelse, revurderFra = LocalDate.of(2024, 1, 3), forrigeIverksatteBehandlingId = null)
+            val dto =
+                vedtakDtoMapper.toDto(
+                    innvilgelse.copy(tidligsteEndring = LocalDate.of(2024, 1, 3)),
+                    forrigeIverksatteBehandlingId = null,
+                )
 
             val innvilgetDto = dto as InnvilgelseLæremidlerResponse
             assertThat(innvilgetDto.gjelderFraOgMed).isEqualTo(LocalDate.of(2024, 1, 3))

@@ -29,7 +29,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDate.now
 import java.util.UUID
 
 class VilkårperiodeServiceTest : IntegrationTest() {
@@ -144,26 +143,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 assertThat(oppdatertPeriode.resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
                 assertThat(oppdatertPeriode.sporbar.endret.endretAv).isEqualTo(saksbehandler)
                 assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.SLETTET)
-            }
-
-            @Test
-            fun `kan ikke slette periode hvis periode begynner før revurderFra`() {
-                val behandling = testoppsettService.oppdater(revurdering.copy(revurderFra = now()))
-
-                val aktivitet =
-                    aktivitet(
-                        behandlingId = behandling.id,
-                        fom = now().minusMonths(1),
-                        tom = now().plusMonths(1),
-                    )
-                val periode = vilkårperiodeRepository.insert(aktivitet)
-
-                assertThatThrownBy {
-                    vilkårperiodeService.slettVilkårperiode(
-                        periode.id,
-                        SlettVikårperiode(revurdering.id, "kommentar"),
-                    )
-                }.hasMessageContaining("Kan ikke slette periode")
             }
         }
     }

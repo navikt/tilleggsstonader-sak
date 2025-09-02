@@ -2,11 +2,9 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -37,7 +35,6 @@ class TilsynBarnBeregnYtelseSteg(
     private val beregningService: TilsynBarnBeregningService,
     private val opphørValideringService: OpphørValideringService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
-    unleashService: UnleashService,
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -46,7 +43,6 @@ class TilsynBarnBeregnYtelseSteg(
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentytelseService,
         simuleringService = simuleringService,
-        unleashService = unleashService,
     ) {
     override fun lagreVedtak(
         saksbehandling: Saksbehandling,
@@ -95,12 +91,11 @@ class TilsynBarnBeregnYtelseSteg(
         brukerfeilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
+        feilHvis(vedtak.opphørsdato == null) {
+            "Opphørsdato er ikke satt"
+        }
 
-        val opphørsdato =
-            revurderFraEllerOpphørsdato(
-                revurderFra = saksbehandling.revurderFra,
-                opphørsdato = vedtak.opphørsdato,
-            )
+        val opphørsdato = vedtak.opphørsdato
 
         opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
 
@@ -200,6 +195,6 @@ class TilsynBarnBeregnYtelseSteg(
                     beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
-            tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
+            tidligsteEndring = tidligsteEndring,
         )
 }

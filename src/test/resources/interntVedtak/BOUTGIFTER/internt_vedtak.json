@@ -9,8 +9,7 @@
     "resultat" : "INNVILGET",
     "vedtakstidspunkt" : "2024-01-01T00:00:00",
     "saksbehandler" : "saksbehandler",
-    "beslutter" : "saksbeh2",
-    "revurderFra" : null
+    "beslutter" : "saksbeh2"
   },
   "søknad" : {
     "mottattTidspunkt" : "2023-01-01T00:00:00"
@@ -214,6 +213,7 @@
         "utgift" : 3000,
         "tilUtbetaling" : 3000,
         "erFørRevurderFra" : false,
+        "erFørTidligsteEndring" : false,
         "skalFåDekketFaktiskeUtgifter" : false
       } ],
       "sumUtgifter" : 3000,
@@ -233,6 +233,7 @@
         "utgift" : 4000,
         "tilUtbetaling" : 4000,
         "erFørRevurderFra" : false,
+        "erFørTidligsteEndring" : false,
         "skalFåDekketFaktiskeUtgifter" : false
       } ],
       "sumUtgifter" : 4000,

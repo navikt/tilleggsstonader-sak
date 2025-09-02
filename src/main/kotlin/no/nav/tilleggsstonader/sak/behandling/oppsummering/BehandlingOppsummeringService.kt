@@ -2,13 +2,12 @@ package no.nav.tilleggsstonader.sak.behandling.oppsummering
 
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårUtil.slåSammenSammenhengende
@@ -19,32 +18,31 @@ import java.time.LocalDate
 
 @Service
 class BehandlingOppsummeringService(
-    private val behandlingService: BehandlingService,
     private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
     private val vedtakService: VedtakService,
 ) {
     fun hentBehandlingOppsummering(behandlingId: BehandlingId): BehandlingOppsummeringDto {
-        val behandling = behandlingService.hentBehandling(behandlingId)
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
-        val vedtak = oppsummerVedtak(behandling)
+        val vedtak = vedtakService.hentVedtak(behandlingId)
 
+        // TODO - ble tidligere kuttet med revurderFra som nå er fjernet. Gjør at man ikke får kuttet før man har lagret vedtak
         return BehandlingOppsummeringDto(
-            aktiviteter = vilkårperioder.aktiviteter.oppsummer(behandling.revurderFra),
-            målgrupper = vilkårperioder.målgrupper.oppsummer(behandling.revurderFra),
-            vilkår = oppsummerStønadsvilkår(behandlingId, behandling.revurderFra),
-            vedtak = vedtak,
+            aktiviteter = vilkårperioder.aktiviteter.oppsummer(vedtak?.tidligsteEndring),
+            målgrupper = vilkårperioder.målgrupper.oppsummer(vedtak?.tidligsteEndring),
+            vilkår = oppsummerStønadsvilkår(behandlingId, vedtak?.tidligsteEndring),
+            vedtak = oppsummerVedtak(vedtak),
         )
     }
 
     /**
      * Slår sammen vilkårperioder med likt resultat og samme type, dersom de overlapper.
      */
-    private fun List<Vilkårperiode>.oppsummer(revurderFra: LocalDate?): List<OppsummertVilkårperiode> =
+    private fun List<Vilkårperiode>.oppsummer(tidligsteEndring: LocalDate?): List<OppsummertVilkårperiode> =
         this
             .map { it.tilOppsummertVilkårperiode() }
             .sortedBy { it.fom }
-            .filter { tomLikEllerEtterRevurderFra(revurderFra = revurderFra, tom = it.tom) }
+            .filter { tomLikEllerEtterDatoForTidligsteEndring(tidligsteEndring = tidligsteEndring, tom = it.tom) }
             .mergeSammenhengende(
                 skalMerges = { v1, v2 ->
                     v1.type == v2.type &&
@@ -58,13 +56,13 @@ class BehandlingOppsummeringService(
 
     private fun oppsummerStønadsvilkår(
         behandlingId: BehandlingId,
-        revurderFra: LocalDate?,
+        tidligsteEndring: LocalDate?,
     ): List<Stønadsvilkår> {
         val vilkår = vilkårService.hentVilkår(behandlingId)
 
-        // Tar kun med vilkår som overlapper eller er etter revurderFra
+        // Tar kun med vilkår som overlapper eller er etter tidligsteEndring
         val relevanteVilkårIRevurdering =
-            vilkår.filter { tomLikEllerEtterRevurderFra(revurderFra = revurderFra, tom = it.tom) }
+            vilkår.filter { tomLikEllerEtterDatoForTidligsteEndring(tidligsteEndring = tidligsteEndring, tom = it.tom) }
 
         // Lager en map per type slik at sammenhendende vilkår kan slås sammen ved like verdier
         // Grupperes også på barnId slik at PASS_BARN vilkår ikke slås sammen på tvers av barn.
@@ -85,10 +83,8 @@ class BehandlingOppsummeringService(
         }
     }
 
-    private fun oppsummerVedtak(behandling: Behandling): OppsummertVedtak? {
-        val vedtak = vedtakService.hentVedtak(behandling.id)
-
-        return vedtak?.data?.let { data ->
+    private fun oppsummerVedtak(vedtak: Vedtak?): OppsummertVedtak? =
+        vedtak?.data?.let { data ->
             when (data) {
                 is Avslag -> OppsummertVedtakAvslag(årsaker = data.årsaker)
 
@@ -101,19 +97,18 @@ class BehandlingOppsummeringService(
                 is Opphør ->
                     OppsummertVedtakOpphør(
                         årsaker = data.årsaker,
-                        opphørsdato = vedtak.opphørsdato ?: behandling.revurderFra!!,
+                        opphørsdato = vedtak.opphørsdato!!,
                     )
             }
         }
-    }
 
-    private fun tomLikEllerEtterRevurderFra(
-        revurderFra: LocalDate?,
+    private fun tomLikEllerEtterDatoForTidligsteEndring(
+        tidligsteEndring: LocalDate?,
         tom: LocalDate?,
     ): Boolean {
-        if (revurderFra == null || tom == null) {
+        if (tidligsteEndring == null || tom == null) {
             return true
         }
-        return revurderFra <= tom
+        return tidligsteEndring <= tom
     }
 }

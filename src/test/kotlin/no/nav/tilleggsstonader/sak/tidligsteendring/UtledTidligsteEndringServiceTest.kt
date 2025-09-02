@@ -5,10 +5,7 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
@@ -37,7 +34,6 @@ class UtledTidligsteEndringServiceTest {
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
     private val vedtakRepository = mockk<VedtakRepository>()
     private val barnService = mockk<BarnService>()
-    private val unleashService = mockUnleashService(false)
     private val utledTidligsteEndringService =
         UtledTidligsteEndringService(
             behandlingService,
@@ -45,7 +41,6 @@ class UtledTidligsteEndringServiceTest {
             vilkårperiodeService,
             vedtakRepository,
             barnService,
-            unleashService,
         )
 
     var sisteIverksatteBehandling: Behandling = behandling()
@@ -103,8 +98,6 @@ class UtledTidligsteEndringServiceTest {
 
     @Test
     fun `utled tidligste endring, lagt på nye perioder, data hentes ut fra servicer og tidligste endring blir fom-dato på ny periode`() {
-        every { unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) } returns true
-
         val nyttFom = originalTom.plusDays(1)
         val nyttTom = originalTom.plusMonths(1)
         val nyttVilkår =
@@ -132,8 +125,6 @@ class UtledTidligsteEndringServiceTest {
 
     @Test
     fun `utled tidligste endring ignorer vedtaksperiode, ingen endring utenom vedtaksperioder, forvent ingen endring`() {
-        every { unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) } returns true
-
         vilkår = vilkårSisteIverksatteBehandling
         vilkårperioder = vilkårperioderSisteIverksattBehandling
         // vedtaksperioderSisteIverksatteBehandling har verdi og ville slått ut som endring om det sammenlignes
@@ -141,15 +132,6 @@ class UtledTidligsteEndringServiceTest {
         val result = utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(behandling.id)
 
         assertThat(result).isNull()
-    }
-
-    @Test
-    fun `utled tidligste endring, feature-toggle er av, returnerer revurderFra`() {
-        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling // Må initialiseres
-        every { unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) } returns false
-        behandling = behandling.copy(type = BehandlingType.REVURDERING, revurderFra = LocalDate.of(2023, 1, 1))
-        assertThat(utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandling.id, vedtaksperioder))
-            .isEqualTo(behandling.revurderFra)
     }
 }
 
