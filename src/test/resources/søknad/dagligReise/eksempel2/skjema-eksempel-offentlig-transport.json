@@ -1,0 +1,101 @@
+{
+"dineOpplysninger": {
+        "fornavn": "FORNUFTIG",
+        "etternavn": "SØNNAVIND",
+        "identitet": {
+          "identitetsnummer": "29500474120"
+        },
+        "adresse": {
+          "gyldigFraOgMed": "2004-10-29",
+          "adresse": "Hestehagen 2",
+          "postnummer": "2069",
+          "bySted": "JESSHEIM",
+          "landkode": "NOR",
+          "land": {
+            "label": "Norge",
+            "value": "NO"
+          }
+        }
+      },
+      "aktiviteter": {
+        "aktiviteterOgMaalgruppe": {
+          "aktivitet": {
+            "aktivitetId": "134120740",
+            "maalgruppe": {
+              "maalgruppetype": "NEDSARBEVN",
+              "gyldighetsperiode": {
+                "fom": "2025-03-01",
+                "tom": "2025-10-06"
+              },
+              "maalgruppenavn": "Person med nedsatt arbeidsevne pga. sykdom"
+            },
+            "periode": {
+              "fom": "2025-03-11",
+              "tom": "2025-09-30"
+            },
+            "text": "Arbeidstrening: 11. mars 2025 - 30. september 2025"
+          }
+        },
+        "mottarLonnGjennomTiltak": "nei",
+        "reiseTilAktivitetsstedHelePerioden": "nei",
+        "reiseperiode": {
+          "fom": "2025-04-01",
+          "tom": "2025-09-30"
+        }
+      },
+      "reise": [
+        {
+          "reiseAdresse": {
+            "gateadresse": "Oslogate 42",
+            "postnr": "0482",
+            "poststed": "Olso"
+          },
+          "kanDuReiseMedOffentligTransport": "ja",
+          "hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet": {
+            "label": "4",
+            "value": "4"
+          },
+          "harDu6KmReisevei": "ja",
+          "hvorLangErReiseveienDin": 18,
+          "hvaSlagsTypeBillettMaDuKjope": {
+            "enkeltbillett": true,
+            "ukeskort": false,
+            "manedskort": true
+          },
+          "enkeltbilett": 44,
+          "manedskort": 788
+        },
+        {
+          "reiseAdresse": {
+            "gateadresse": "Drammensveien 42",
+            "postnr": "0482",
+            "poststed": "Oslo"
+          },
+          "harDu6KmReisevei": "nei",
+          "harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde": "nei",
+          "kanDuReiseMedOffentligTransport": "ja",
+          "hvaSlagsTypeBillettMaDuKjope": {
+            "enkeltbillett": false,
+            "ukeskort": true,
+            "manedskort": false
+          },
+          "hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet": {
+            "label": "1",
+            "value": "1"
+          },
+          "syvdagersbilett": 233
+        }
+      ],
+      "hovedytelse": {
+        "arbeidsavklaringspenger": true,
+        "overgangsstonad": false,
+        "gjenlevendepensjon": false,
+        "uforetrygd": false,
+        "tiltakspenger": false,
+        "dagpenger": false,
+        "sykepenger": false,
+        "kvalifiseringsstonad": false,
+        "mottarIngenPengestotte": false,
+        "ingenAvAlternativenePasserForMeg": false
+      }
+    }

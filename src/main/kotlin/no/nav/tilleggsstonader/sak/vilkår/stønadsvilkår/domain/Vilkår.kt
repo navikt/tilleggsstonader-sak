@@ -262,7 +262,15 @@ enum class VilkårType(
 
     // Daglig reise
     DAGLIG_REISE_OFFENTLIG_TRANSPORT(
-        "Offentlig transport daglig reise",
+        "Daglig reise med offentlig transport",
+        listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
+    ),
+    DAGLIG_REISE_KJØRELISTE(
+        "Daglig reise bil og kjøreliste",
+        listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
+    ),
+    DAGLIG_REISE_TAXI(
+        "Daglig reise med taxi",
         listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
     ),
     ;

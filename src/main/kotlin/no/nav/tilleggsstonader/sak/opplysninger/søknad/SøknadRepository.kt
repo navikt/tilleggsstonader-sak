@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknad
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import org.springframework.data.jdbc.repository.query.Query
@@ -53,3 +54,7 @@ interface SøknadBoutgifterRepository :
 interface SøknadBehandlingRepository :
     RepositoryInterface<SøknadBehandling, BehandlingId>,
     InsertUpdateRepository<SøknadBehandling>
+
+interface SøknadDagligReiseRepository :
+    RepositoryInterface<SøknadDagligReise, UUID>,
+    InsertUpdateRepository<SøknadDagligReise>

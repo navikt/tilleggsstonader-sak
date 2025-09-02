@@ -2,19 +2,21 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad
 
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadskjemaDagligreise
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.SøknadskjemaBoutgifterMapper
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.SøknadskjemaDagligReiseMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknad
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadskjemaLæremidlerMapper
@@ -31,6 +33,8 @@ class SøknadService(
     private val søknadBoutgifterRepository: SøknadBoutgifterRepository,
     private val søknadLæremidlerRepository: SøknadLæremidlerRepository,
     private val søknadskjemaBoutgifterMapper: SøknadskjemaBoutgifterMapper,
+    private val søknadsskjemaDagligReiseMapper: SøknadskjemaDagligReiseMapper,
+    private val søknadDagligReiseRepository: SøknadDagligReiseRepository,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -51,24 +55,18 @@ class SøknadService(
             .findByIdOrNull(behandlingId)
             ?.let { søknadBoutgifterRepository.findByIdOrThrow(it.søknadId) }
 
-    fun hentSøknadDagligReiseTso(behandlingId: BehandlingId): SøknadLæremidler? =
+    fun hentSøknadDagligReise(behandlingId: BehandlingId): SøknadDagligReise? =
         søknadBehandlingRepository
             .findByIdOrNull(behandlingId)
-            ?.let { søknadLæremidlerRepository.findByIdOrThrow(it.søknadId) }
-
-    fun hentSøknadDagligReiseTsr(behandlingId: BehandlingId): SøknadLæremidler? =
-        søknadBehandlingRepository
-            .findByIdOrNull(behandlingId)
-            ?.let { søknadLæremidlerRepository.findByIdOrThrow(it.søknadId) }
+            ?.let { søknadDagligReiseRepository.findByIdOrThrow(it.søknadId) }
 
     fun lagreSøknad(
         behandlingId: BehandlingId,
         journalpost: Journalpost,
         skjema: Søknadsskjema<out Skjema>,
     ): Søknad<*> {
-        val søknadsskjema = skjema.skjema
         val søknad =
-            when (søknadsskjema) {
+            when (val søknadsskjema = skjema.skjema) {
                 is SøknadsskjemaBarnetilsyn ->
                     SøknadsskjemaBarnetilsynMapper.map(
                         skjema.mottattTidspunkt,
@@ -93,13 +91,20 @@ class SøknadService(
                         søknadsskjema,
                     )
 
-                is SøknadskjemaDagligreise -> TODO()
+                is SøknadsskjemaDagligReiseFyllUtSendInn ->
+                    søknadsskjemaDagligReiseMapper.map(
+                        skjema.mottattTidspunkt,
+                        skjema.språk,
+                        journalpost,
+                        søknadsskjema,
+                    )
             }
         val lagretSøknad =
             when (søknad) {
                 is SøknadBarnetilsyn -> søknadBarnetilsynRepository.insert(søknad)
                 is SøknadLæremidler -> søknadLæremidlerRepository.insert(søknad)
                 is SøknadBoutgifter -> søknadBoutgifterRepository.insert(søknad)
+                is SøknadDagligReise -> søknadDagligReiseRepository.insert(søknad)
             }
         søknadBehandlingRepository.insert(SøknadBehandling(behandlingId, søknad.id))
         return lagretSøknad

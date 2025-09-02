@@ -46,6 +46,12 @@ class ArbeidsfordelingService(
         ident: String,
         stønadstype: Stønadstype,
     ): Arbeidsfordelingsenhet? {
+        if (stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
+            return Arbeidsfordelingsenhet(
+                enhetNr = "0387",
+                navn = "0387 - Nav tiltak Oslo",
+            )
+        }
         val kriterie = lagArbeidsfordelingKritierieForPerson(ident, stønadstype)
         val enheter = finnArbeidsfordelingsenhet(kriterie)
         return enheter.firstOrNull()

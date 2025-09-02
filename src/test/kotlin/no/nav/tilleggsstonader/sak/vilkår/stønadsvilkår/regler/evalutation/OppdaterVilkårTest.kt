@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -21,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.Boutgi
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterToBoliger
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteDelvilkårDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
@@ -309,6 +311,37 @@ internal class OppdaterVilkårTest {
                         .isEqualTo(Vilkårsresultat.OPPFYLT)
                 }
             }
+        }
+    }
+
+    @Nested
+    inner class DagligReise {
+        val opprettVilkårDto =
+            OpprettVilkårDto(
+                vilkårType = VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
+                behandlingId = behandlingId,
+                delvilkårsett = oppfylteDelvilkårDagligReiseOffentligTransport().map { it.tilDto() },
+                fom = LocalDate.now(),
+                tom = LocalDate.now().plusDays(1),
+                utgift = null,
+                erFremtidigUtgift = false,
+                offentligTransport =
+                    OffentligTransport(
+                        reisedagerPerUke = 5,
+                        prisEnkelbillett = 44,
+                        prisTrettidagersbillett = 780,
+                    ),
+            )
+        val vilkårDagligReise =
+            vilkår(
+                behandlingId = behandlingId,
+                type = VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
+                delvilkår = oppfylteDelvilkårDagligReiseOffentligTransport(),
+            )
+
+        @Test
+        fun `skal skal ikke kaste feil på et gyldig vilkår`() {
+            validerVilkårOgBeregnResultat(vilkårDagligReise, opprettVilkårDto)
         }
     }
 

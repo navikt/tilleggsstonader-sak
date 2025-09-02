@@ -41,7 +41,7 @@ class LæremidlerBeregnYtelseSteg(
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
 ) : BeregnYtelseSteg<VedtakLæremidlerRequest>(
-        stønadstype = Stønadstype.LÆREMIDLER,
+        stønadstype = listOf(Stønadstype.LÆREMIDLER),
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,

@@ -1,0 +1,31 @@
+package no.nav.tilleggsstonader.sak.vedtak
+
+import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
+import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.vedtak.dto.SluttdatoForVedtakDto
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+
+@RestController
+@RequestMapping("/api/vedtak")
+@ProtectedWithClaims(issuer = "azuread")
+class VedtakController(
+    private val tilgangService: TilgangService,
+    private val vedtakService: VedtakService,
+) {
+    @GetMapping("{behandlingId}/sluttdato")
+    fun hentSluttdatoForVedtakPåBehandling(
+        @PathVariable behandlingId: BehandlingId,
+    ): SluttdatoForVedtakDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+
+        return SluttdatoForVedtakDto(
+            sluttdato = vedtakService.hentVedtak(behandlingId)?.vedtaksperioderHvisFinnes()?.maxOfOrNull { it.tom },
+        )
+    }
+}

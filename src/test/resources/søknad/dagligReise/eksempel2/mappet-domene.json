@@ -1,0 +1,75 @@
+{
+  "personopplysninger" : {
+    "adresse" : {
+      "gyldigFraOgMed" : "2004-10-29",
+      "adresse" : "Hestehagen 2",
+      "postnummer" : "2069",
+      "poststed" : "JESSHEIM",
+      "landkode" : "Land1"
+    }
+  },
+  "hovedytelse" : {
+    "hovedytelse" : [ "AAP" ],
+    "harNedsattArbeidsevne" : null,
+    "arbeidOgOpphold" : null
+  },
+  "aktivitet" : {
+    "aktivitet" : {
+      "aktiviteter" : [ {
+        "id" : "134120740",
+        "label" : "Arbeidstrening: 11. mars 2025 - 30. september 2025"
+      } ],
+      "annenAktivitet" : null,
+      "lønnetAktivitet" : "NEI"
+    },
+    "reiseTilAktivitetsstedHelePerioden" : "NEI",
+    "reiseperiode" : {
+      "fom" : "2025-04-01",
+      "tom" : "2025-09-30"
+    }
+  },
+  "reiser" : [ {
+    "reiseAdresse" : {
+      "gateadresse" : "Oslogate 42",
+      "postnummer" : "0482",
+      "poststed" : "Olso"
+    },
+    "dagerPerUke" : {
+      "id" : "4",
+      "label" : "4"
+    },
+    "harMerEnn6KmReisevei" : "JA",
+    "lengdeReisevei" : 18,
+    "harBehovForTransportUavhengigAvReisensLengde" : null,
+    "kanReiseMedOffentligTransport" : "JA",
+    "offentligTransport" : {
+      "billettTyperValgt" : [ "ENKELTBILLETT", "MÅNEDSKORT" ],
+      "enkeltbillettPris" : 44,
+      "syvdagersbillettPris" : null,
+      "månedskortPris" : 788
+    },
+    "privatTransport" : null
+  }, {
+    "reiseAdresse" : {
+      "gateadresse" : "Drammensveien 42",
+      "postnummer" : "0482",
+      "poststed" : "Oslo"
+    },
+    "dagerPerUke" : {
+      "id" : "1",
+      "label" : "1"
+    },
+    "harMerEnn6KmReisevei" : "NEI",
+    "lengdeReisevei" : null,
+    "harBehovForTransportUavhengigAvReisensLengde" : "NEI",
+    "kanReiseMedOffentligTransport" : "JA",
+    "offentligTransport" : {
+      "billettTyperValgt" : [ "SYVDAGERSBILLETT" ],
+      "enkeltbillettPris" : null,
+      "syvdagersbillettPris" : 233,
+      "månedskortPris" : null
+    },
+    "privatTransport" : null
+  } ],
+  "dokumentasjon" : [ ]
+}

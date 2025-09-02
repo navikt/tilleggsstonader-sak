@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
@@ -90,8 +89,11 @@ class BoutgifterBeregningService(
             )
 
         return if (forrigeVedtak != null) {
+            brukerfeilHvis(tidligsteEndring == null) {
+                "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
+            }
             settSammenGamleOgNyePerioder(
-                tidligsteEndring = tidligsteEndring ?: feil("Behandlingen mangler revurder fra-dato"),
+                tidligsteEndring = tidligsteEndring,
                 nyttBeregningsresultat = beregningsresultat,
                 forrigeBeregningsresultat = forrigeVedtak.beregningsresultat,
             )

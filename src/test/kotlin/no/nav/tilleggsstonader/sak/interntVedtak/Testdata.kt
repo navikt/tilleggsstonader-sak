@@ -43,8 +43,11 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatL
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteDelvilkårDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetBoutgifter
@@ -592,6 +595,27 @@ object Testdata {
             Vilkårperioder(
                 målgrupper = målgrupper,
                 aktiviteter = aktivitetererBoutgifter,
+            )
+    }
+
+    object DagligReise {
+        val vilkårOffentligTransport =
+            listOf(
+                vilkår(
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    behandlingId = behandlingId,
+                    type = VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
+                    delvilkår = oppfylteDelvilkårDagligReiseOffentligTransport(),
+                    fom = LocalDate.of(2024, FEBRUARY, 1),
+                    tom = LocalDate.of(2024, FEBRUARY, 2),
+                    utgift = null,
+                    offentligTransport =
+                        OffentligTransport(
+                            reisedagerPerUke = 5,
+                            prisEnkelbillett = 44,
+                            prisTrettidagersbillett = 750,
+                        ),
+                ),
             )
     }
 }

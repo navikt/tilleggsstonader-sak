@@ -12,17 +12,23 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRe
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -69,6 +75,14 @@ class VedtakDtoMapper(
                     vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
                 )
+
+            is VedtakDagligReise ->
+                mapVedtakDagligReise(
+                    vedtak,
+                    data,
+                    vedtak.tidligsteEndring,
+                    forrigeIverksatteBehandlingId,
+                )
         }
     }
 
@@ -89,6 +103,7 @@ class VedtakDtoMapper(
                     begrunnelse = data.begrunnelse,
                 )
             }
+
             is OpphørTilsynBarn ->
                 OpphørTilsynBarnResponse(
                     beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
@@ -177,6 +192,30 @@ class VedtakDtoMapper(
                         ),
                     opphørsdato = vedtak.opphørsdato,
                 )
+        }
+
+    private fun mapVedtakDagligReise(
+        vedtak: Vedtak,
+        data: VedtakDagligReise,
+        tidligsteEndring: LocalDate?,
+        forrigeIverksatteBehandlingId: BehandlingId?,
+    ): VedtakDagligReiseResponse =
+        when (data) {
+            is InnvilgelseDagligReise -> {
+                InnvilgelseDagligReiseResponse(
+                    vedtaksperioder =
+                        data.vedtaksperioder.tilLagretVedtaksperiodeDto(
+                            hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
+                        ),
+                    beregningsresultat = data.beregningsresultat,
+                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
+                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
+                    begrunnelse = data.begrunnelse,
+                )
+            }
+
+            is AvslagDagligReise -> TODO()
+            is OpphørDagligReise -> TODO()
         }
 
     private fun hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId: BehandlingId?): List<Vedtaksperiode>? =

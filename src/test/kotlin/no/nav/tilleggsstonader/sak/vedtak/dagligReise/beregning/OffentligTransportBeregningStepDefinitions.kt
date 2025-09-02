@@ -4,28 +4,39 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
+import io.mockk.every
+import io.mockk.mockk
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
-import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
-import no.nav.tilleggsstonader.sak.cucumber.parseDato
-import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.assertj.core.api.Assertions.assertThat
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class OffentligTransportBeregningStepDefinitions {
-    val offentligTransportBeregningService = OffentligTransportBeregningService()
+    val behandlingServiceMock = mockk<BehandlingService>()
+    val vilkårRepositoryFake = VilkårRepositoryFake()
 
-    var utgiftOffentligTransport: UtgiftOffentligTransport? = null
+    val vilkårService =
+        VilkårService(
+            behandlingService = behandlingServiceMock,
+            vilkårRepository = vilkårRepositoryFake,
+            barnService = mockk(relaxed = true),
+        )
+    val offentligTransportBeregningService = OffentligTransportBeregningService(vilkårService)
+
     var beregningsResultat: Beregningsresultat? = null
     var forventetBeregningsresultat: Beregningsresultat? = null
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
+
+    val behandlingId = BehandlingId.random()
 
     @Gitt("følgende vedtaksperioder for daglig reise offentlig transport")
     fun `følgende vedtaksperioder`(dataTable: DataTable) {
@@ -33,73 +44,45 @@ class OffentligTransportBeregningStepDefinitions {
     }
 
     @Gitt("følgende beregningsinput for offentlig transport")
-    fun `følgende beregnins input offentlig transport`(dataTable: DataTable) {
-        val reiseInformasjon =
-            dataTable.mapRad { rad ->
-                UtgiftOffentligTransport(
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    antallReisedagerPerUke =
-                        parseInt(
-                            DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE,
-                            rad,
-                        ),
-                    prisEnkelbillett = parseInt(DomenenøkkelOffentligtransport.PRIS_ENKELTBILLETT, rad),
-                    pris30dagersbillett =
-                        parseInt(
-                            DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT,
-                            rad,
-                        ),
-                )
-            }
-
-        utgiftOffentligTransport =
-            UtgiftOffentligTransport(
-                fom = reiseInformasjon.first().fom,
-                tom = reiseInformasjon.first().tom,
-                antallReisedagerPerUke = reiseInformasjon.sumOf { it.antallReisedagerPerUke },
-                prisEnkelbillett = reiseInformasjon.sumOf { it.prisEnkelbillett },
-                pris30dagersbillett = reiseInformasjon.sumOf { it.pris30dagersbillett },
+    fun `følgende beregnins input offentlig transport`(utgiftData: DataTable) {
+        every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
+            dummyBehandling(
+                behandlingId = behandlingId,
+                steg = StegType.VILKÅR,
             )
+
+        utgiftData.mapRad { rad ->
+            val nyttVilkår = mapTilVilkår(rad, behandlingId)
+            vilkårService.opprettNyttVilkår(opprettVilkårDto = nyttVilkår)
+        }
     }
 
     @Når("beregner for daglig reise offentlig transport")
     fun `beregner for daglig reise offentlig transport`() {
         beregningsResultat =
             offentligTransportBeregningService.beregn(
-                utgifter = listOf(utgiftOffentligTransport!!),
+                behandlingId = behandlingId,
                 vedtaksperioder = vedtaksperioder,
             )
     }
 
-    @Så("forventer vi følgende beregningsrsultat for daglig resie offentlig transport")
-    fun `forventer vi følgende beregningsrsultat for daglig resie offentlig transport`(dataTable: DataTable) {
-        val forventetBeregninsresultat =
-            Beregningsresultat(
-                reiser =
-                    listOf(
-                        BeregningsresultatForReise(
-                            perioder = mapBeregningsresultatForPeriode(dataTable),
-                        ),
-                    ),
+    @Så("forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr={}")
+    fun `forventer vi følgende beregningsrsultat for daglig resie offentlig transport`(
+        reiserNummer: Int,
+        dataTable: DataTable,
+    ) {
+        val forventetBeregningsresultatForReise =
+            BeregningsresultatForReise(
+                perioder = mapBeregningsresultatForPeriode(dataTable),
             )
+        val beregningsreulsresultatForReise =
+            beregningsResultat!!.reiser[reiserNummer - 1]
 
-        beregningsResultat!!.reiser.forEachIndexed { index, reise ->
-            reise.perioder.forEachIndexed { index2, periode ->
-                assertThat(periode.grunnlag.fom).isEqualTo(
-                    forventetBeregninsresultat.reiser[index]
-                        .perioder[index2]
-                        .grunnlag.fom,
-                )
-                assertThat(periode.grunnlag.tom).isEqualTo(
-                    forventetBeregninsresultat.reiser[index]
-                        .perioder[index2]
-                        .grunnlag.tom,
-                )
-                assertThat(periode.beløp).isEqualTo(
-                    forventetBeregninsresultat.reiser[index].perioder[index2].beløp,
-                )
-            }
+        assertThat(beregningsreulsresultatForReise.perioder.size).isEqualTo(forventetBeregningsresultatForReise.perioder.size)
+        forventetBeregningsresultatForReise.perioder.forEachIndexed { index, periode ->
+            assertThat(beregningsreulsresultatForReise.perioder[index].grunnlag.fom).isEqualTo(periode.grunnlag.fom)
+            assertThat(beregningsreulsresultatForReise.perioder[index].grunnlag.tom).isEqualTo(periode.grunnlag.tom)
+            assertThat(beregningsreulsresultatForReise.perioder[index].beløp).isEqualTo(periode.beløp)
         }
     }
 }
@@ -113,20 +96,3 @@ enum class DomenenøkkelOffentligtransport(
         "Pris tretti-dagersbillett",
     ),
 }
-
-private fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
-    dataTable.mapRad { rad ->
-        BeregningsresultatForPeriode(
-            grunnlag =
-                Beregningsgrunnlag(
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    prisEnkeltbillett = 0,
-                    pris30dagersbillett = 0,
-                    antallReisedagerPerUke = 0,
-                    antallReisedager = 0,
-                    vedtaksperioder = emptyList(),
-                ),
-            beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
-        )
-    }

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
  * Denne håndterer sletting av tidligere vedtak og andeler
  */
 abstract class BeregnYtelseSteg<DTO : Any>(
-    private val stønadstype: Stønadstype,
+    private val stønadstype: List<Stønadstype>,
     open val vedtakRepository: VedtakRepository,
     open val tilkjentYtelseService: TilkjentYtelseService,
     open val simuleringService: SimuleringService,
@@ -43,7 +43,7 @@ abstract class BeregnYtelseSteg<DTO : Any>(
     }
 
     private fun validerStønadstype(saksbehandling: Saksbehandling) {
-        feilHvisIkke(saksbehandling.stønadstype == stønadstype) {
+        feilHvisIkke(stønadstype.contains(saksbehandling.stønadstype)) {
             "${this::class.java.simpleName} tillater kun $stønadstype"
         }
     }

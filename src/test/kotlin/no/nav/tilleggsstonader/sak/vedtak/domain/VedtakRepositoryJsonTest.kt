@@ -121,6 +121,9 @@ class VedtakRepositoryJsonTest : IntegrationTest() {
             TypeVedtakBoutgifter.INNVILGELSE_BOUTGIFTER -> InnvilgelseBoutgifter::class
             TypeVedtakBoutgifter.AVSLAG_BOUTGIFTER -> AvslagBoutgifter::class
             TypeVedtakBoutgifter.OPPHØR_BOUTGIFTER -> OpphørBoutgifter::class
+            TypeVedtakDagligReise.INNVILGELSE_DAGLIG_REISE -> InnvilgelseDagligReise::class
+            TypeVedtakDagligReise.AVSLAG_DAGLIG_REISE -> AvslagDagligReise::class
+            TypeVedtakDagligReise.OPPHØR_DAGLIG_REISE -> OpphørDagligReise::class
         }.java
 
     companion object {

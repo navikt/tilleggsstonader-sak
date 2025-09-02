@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 
 /**
@@ -65,5 +66,50 @@ enum class MålgruppeType(
         when (this) {
             AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE, OMSTILLINGSSTØNAD -> true
             OVERGANGSSTØNAD, INGEN_MÅLGRUPPE, SYKEPENGER_100_PROSENT, DAGPENGER, TILTAKSPENGER, KVALIFISERINGSSTØNAD -> false
+        }
+
+    fun kanBrukesForStønad(stønadstype: Stønadstype): Boolean =
+        when (stønadstype) {
+            Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER, Stønadstype.BOUTGIFTER ->
+                when (this) {
+                    AAP -> true
+                    DAGPENGER -> false
+                    NEDSATT_ARBEIDSEVNE -> true
+                    OMSTILLINGSSTØNAD -> true
+                    OVERGANGSSTØNAD -> true
+                    UFØRETRYGD -> true
+                    SYKEPENGER_100_PROSENT -> true
+                    INGEN_MÅLGRUPPE -> true
+                    TILTAKSPENGER -> false
+                    KVALIFISERINGSSTØNAD -> false
+                }
+
+            Stønadstype.DAGLIG_REISE_TSO ->
+                when (this) {
+                    AAP -> true
+                    DAGPENGER -> false
+                    NEDSATT_ARBEIDSEVNE -> true
+                    OMSTILLINGSSTØNAD -> true
+                    OVERGANGSSTØNAD -> true
+                    UFØRETRYGD -> true
+                    SYKEPENGER_100_PROSENT -> false
+                    INGEN_MÅLGRUPPE -> true
+                    TILTAKSPENGER -> false
+                    KVALIFISERINGSSTØNAD -> false
+                }
+
+            Stønadstype.DAGLIG_REISE_TSR ->
+                when (this) {
+                    INGEN_MÅLGRUPPE -> true
+                    TILTAKSPENGER -> true
+                    KVALIFISERINGSSTØNAD -> true
+                    AAP -> false
+                    DAGPENGER -> true
+                    NEDSATT_ARBEIDSEVNE -> false
+                    OMSTILLINGSSTØNAD -> false
+                    OVERGANGSSTØNAD -> false
+                    UFØRETRYGD -> false
+                    SYKEPENGER_100_PROSENT -> false
+                }
         }
 }
