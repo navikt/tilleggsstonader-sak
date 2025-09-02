@@ -7,13 +7,13 @@ UPDATE vedtak v
 SET
     tidligste_endring = (SELECT revurder_fra FROM behandling b WHERE b.id = v.behandling_id),
     migrert_fra_revurder_fra = TRUE
-WHERE tidligste_endring IS NOT NULL
+WHERE tidligste_endring IS NULL
   AND type = 'INNVILGELSE';
 
 UPDATE vedtak v
 SET opphorsdato = (SELECT revurder_fra FROM behandling b WHERE b.id = v.behandling_id),
     migrert_fra_revurder_fra = TRUE
-WHERE opphorsdato IS NOT NULL
+WHERE opphorsdato IS NULL
   AND type = 'OPPHØR';
 
 ALTER TABLE behandling
