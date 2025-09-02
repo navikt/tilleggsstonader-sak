@@ -120,7 +120,7 @@ class BehandlingFaktaService(
             dokumentasjon = søknad?.let { mapDokumentasjonDagligReise(it.data.dokumentasjon, it.journalpostId) },
             arena = arenaFakta(grunnlagsdata),
             aktiviteter = mapAktivitetForDagligReise(søknad?.data?.aktivitet),
-            reise = mapReise(søknad?.data?.reiser),
+            reiser = mapReise(søknad?.data?.reiser),
             personopplysninger = mapPersonopplysninger(søknad?.data?.personopplysninger),
         )
     }
