@@ -294,10 +294,10 @@ class BeregningsresultatBoutgifterDtoTest {
                     inneholderUtgifterOvernatting = true,
                 )
 
-            val revurderFra = LocalDate.of(2023, 1, 10)
+            val tidligsteEndring = LocalDate.of(2023, 1, 10)
 
             val result =
-                beregningsresultatForLøpendeMåned.tilDto(revurderFra)
+                beregningsresultatForLøpendeMåned.tilDto(tidligsteEndring)
 
             assertEquals(forventetResultat, result)
         }
@@ -359,10 +359,10 @@ class BeregningsresultatBoutgifterDtoTest {
                     inneholderUtgifterOvernatting = false,
                 )
 
-            val revurderFra = LocalDate.of(2023, 1, 10)
+            val tidligsteEndring = LocalDate.of(2023, 1, 10)
 
             val result =
-                beregningsresultatForLøpendeMåned.tilDto(revurderFra)
+                beregningsresultatForLøpendeMåned.tilDto(tidligsteEndring)
 
             assertEquals(forventetResultat, result)
         }

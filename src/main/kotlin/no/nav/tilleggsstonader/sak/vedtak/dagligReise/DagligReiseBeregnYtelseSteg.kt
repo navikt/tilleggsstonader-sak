@@ -27,18 +27,15 @@ import java.time.LocalDate
 @Service
 class DagligReiseBeregnYtelseSteg(
     private val beregningService: OffentligTransportBeregningService,
-    private val vilkårService: VilkårService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
-    unleashService: UnleashService,
 ) : BeregnYtelseSteg<VedtakDagligReiseRequest>(
         stønadstype = listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
-        unleashService = unleashService,
     ) {
     override fun lagreVedtak(
         saksbehandling: Saksbehandling,

@@ -41,14 +41,12 @@ fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
 fun dummyBehandling(
     behandlingId: BehandlingId,
     steg: StegType = StegType.BEREGNE_YTELSE,
-    revurderFra: LocalDate? = null,
 ): Saksbehandling =
     saksbehandling(
         id = behandlingId,
         steg = steg,
         fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO),
         forrigeIverksatteBehandlingId = null,
-        revurderFra = revurderFra,
         type = BehandlingType.FØRSTEGANGSBEHANDLING,
     )
 
