@@ -148,6 +148,51 @@ query($ident: ID!){
                 matrikkelId
             }
         }
+        kontaktinformasjonForDoedsbo {
+            adresse {
+                adresselinje1
+                adresselinje2
+                landkode
+                postnummer
+                poststedsnavn
+            }
+            advokatSomKontakt {
+                organisasjonsnavn
+                organisasjonsnummer
+                personnavn {
+                    fornavn
+                    mellomnavn
+                    etternavn
+                }
+            }
+            attestutstedelsesdato
+            folkeregistermetadata {
+                gyldighetstidspunkt
+                opphoerstidspunkt
+            }
+            metadata {
+                historisk
+            }
+            organisasjonSomKontakt {
+                organisasjonsnavn
+                organisasjonsnummer
+                kontaktperson {
+                    fornavn
+                    mellomnavn
+                    etternavn
+                }
+            }
+            personSomKontakt {
+                identifikasjonsnummer
+                foedselsdato
+                personnavn {
+                    fornavn
+                    mellomnavn
+                    etternavn
+                }
+            }
+            skifteform
+        }
         oppholdsadresse(historikk: true) {
             gyldigFraOgMed
             gyldigTilOgMed

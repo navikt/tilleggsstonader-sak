@@ -16,6 +16,12 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.IdentifiserendeInformasj
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktadresseType
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktinformasjonForDoedsbo
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktinformasjonForDoedsboAdresse
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktinformasjonForDoedsboAdvokatSomKontakt
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktinformasjonForDoedsboOrganisasjonSomKontakt
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktinformasjonForDoedsboPersonSomKontakt
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktinformasjonForDoedsboSkifteform
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Matrikkeladresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Metadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
@@ -115,6 +121,57 @@ object PdlTestdata {
 
     private val utflyttingFraNorge = listOf(UtflyttingFraNorge("", "", LocalDate.now(), folkeregistermetadata))
 
+    private val kontaktinformasjonForDoedsbo =
+        listOf(
+            KontaktinformasjonForDoedsbo(
+                adresse =
+                    KontaktinformasjonForDoedsboAdresse(
+                        adresselinje1 = "Fyrstikkalleen 1, Helsfyr",
+                        adresselinje2 = "",
+                        landkode = "",
+                        postnummer = "0001",
+                        poststedsnavn = "OSLO",
+                    ),
+                advokatSomKontakt =
+                    KontaktinformasjonForDoedsboAdvokatSomKontakt(
+                        organisasjonsnavn = "",
+                        organisasjonsnummer = "",
+                        personnavn =
+                            Personnavn(
+                                etternavn = "",
+                                fornavn = "",
+                                mellomnavn = "",
+                            ),
+                    ),
+                attestutstedelsesdato = LocalDate.now(),
+                folkeregistermetadata = folkeregistermetadata,
+                metadata = metadataGjeldende,
+                organisasjonSomKontakt =
+                    KontaktinformasjonForDoedsboOrganisasjonSomKontakt(
+                        kontaktperson =
+                            Personnavn(
+                                etternavn = "",
+                                fornavn = "",
+                                mellomnavn = "",
+                            ),
+                        organisasjonsnavn = "",
+                        organisasjonsnummer = "",
+                    ),
+                personSomKontakt =
+                    KontaktinformasjonForDoedsboPersonSomKontakt(
+                        foedselsdato = LocalDate.of(2000, 1, 1),
+                        identifikasjonsnummer = "1",
+                        personnavn =
+                            Personnavn(
+                                etternavn = "",
+                                fornavn = "",
+                                mellomnavn = "",
+                            ),
+                    ),
+                skifteform = KontaktinformasjonForDoedsboSkifteform.ANNET,
+            ),
+        )
+
     val søkerIdentifikator = "1"
 
     val folkeregisteridentifikatorSøker =
@@ -150,6 +207,7 @@ object PdlTestdata {
                             vegadresse = vegadresse,
                         ),
                     ),
+                kontaktinformasjonForDoedsbo = kontaktinformasjonForDoedsbo,
                 navn = navn,
                 opphold = opphold,
                 oppholdsadresse = oppholdsadresse,
