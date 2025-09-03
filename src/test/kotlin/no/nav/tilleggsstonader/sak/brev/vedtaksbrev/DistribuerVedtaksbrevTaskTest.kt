@@ -157,7 +157,7 @@ class DistribuerVedtaksbrevTaskTest {
     }
 
     @Nested
-    inner class `Mottaker er død og mangler adresse` {
+    inner class `Rekjøring senere` {
         @Test
         internal fun `skal rekjøre senere hvis man får GONE fra dokdist`() {
             val distribuerrequestSlots = mutableListOf<DistribuerJournalpostRequest>()

@@ -13,6 +13,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.IdentifiserendeInformasj
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktinformasjonForDoedsbo
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktinformasjonForDoedsboAdresse
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktinformasjonForDoedsboSkifteform
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Metadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Opphold
@@ -171,4 +173,29 @@ object PdlTestdataHelper {
         identifiserendeInformasjon = IdentifiserendeInformasjon(navn = navn),
         omfang = omfang,
     )
+
+    fun folkeregistermetadata() =
+        Folkeregistermetadata(
+            gyldighetstidspunkt = java.time.LocalDateTime.now(),
+            opphørstidspunkt = null,
+        )
+
+    fun kontaktinformasjonDødsbo() =
+        KontaktinformasjonForDoedsbo(
+            adresse =
+                KontaktinformasjonForDoedsboAdresse(
+                    adresselinje1 = "Dødsbogate 1",
+                    adresselinje2 = null,
+                    landkode = "NO",
+                    postnummer = "0123",
+                    poststedsnavn = "OSLO",
+                ),
+            advokatSomKontakt = null,
+            attestutstedelsesdato = LocalDate.now(),
+            folkeregistermetadata = folkeregistermetadata(),
+            metadata = metadataGjeldende,
+            organisasjonSomKontakt = null,
+            personSomKontakt = null,
+            skifteform = KontaktinformasjonForDoedsboSkifteform.OFFENTLIG,
+        )
 }
