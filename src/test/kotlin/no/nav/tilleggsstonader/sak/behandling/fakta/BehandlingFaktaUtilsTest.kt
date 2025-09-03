@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.fakta
-
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.Adresse
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.Personopplysninger
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Personopplysninger
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate

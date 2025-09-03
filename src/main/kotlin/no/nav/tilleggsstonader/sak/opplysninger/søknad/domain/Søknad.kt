@@ -135,6 +135,18 @@ data class HovedytelseAvsnitt(
     val arbeidOgOpphold: ArbeidOgOpphold?,
 )
 
+data class Personopplysninger(
+    val adresse: Adresse?,
+)
+
+data class Adresse(
+    val gyldigFraOgMed: LocalDate?,
+    val adresse: String?,
+    val postnummer: String?,
+    val poststed: String?,
+    val landkode: String?,
+)
+
 data class ArbeidOgOpphold(
     val jobberIAnnetLand: JaNei?,
     val jobbAnnetLand: String?,
