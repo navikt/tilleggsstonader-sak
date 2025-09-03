@@ -421,7 +421,7 @@ class OpprettTestBehandlingController(
                             AktivitetDagligReise(
                                 aktivitetId = "ingenAktivitet",
                                 text = "AAP",
-                                periode = PeriodeAktivitet(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)),
+                                periode = PeriodeAktivitet(LocalDate.of(2025, 5, 20), LocalDate.of(2025, 7, 20)),
                                 maalgruppe = null,
                             ),
                     ),
