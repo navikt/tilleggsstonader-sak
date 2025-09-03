@@ -34,8 +34,6 @@ data class UtgiftBoutgifterMedAndelTilUtbetalingDto(
     override val tom: LocalDate,
     val utgift: Int,
     val tilUtbetaling: Int,
-    // TODO - fjernes når frontend er oppdatert
-    val erFørRevurderFra: Boolean,
     val erFørTidligsteEndring: Boolean,
     val skalFåDekketFaktiskeUtgifter: Boolean,
 ) : Periode<LocalDate> {
@@ -103,7 +101,6 @@ fun BeregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(
                 tom = utgift.tom,
                 utgift = utgift.utgift,
                 tilUtbetaling = skalUtbetales,
-                erFørRevurderFra = erFørTidligsteEndring,
                 erFørTidligsteEndring = erFørTidligsteEndring,
                 skalFåDekketFaktiskeUtgifter = utgift.skalFåDekketFaktiskeUtgifter,
             )
