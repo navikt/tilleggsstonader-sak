@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
@@ -84,8 +85,10 @@ class BeslutteVedtakStegTest {
             behandlingId = behandlingId,
             gsakOppgaveId = 123L,
             type = Oppgavetype.BehandleSak,
-            erFerdigstilt = false,
+            status = Oppgavestatus.ÅPEN,
             tilordnetSaksbehandler = null,
+            tildeltEnhetsnummer = "1234",
+            enhetsmappeId = null,
         )
     private lateinit var taskSlot: MutableList<Task>
 

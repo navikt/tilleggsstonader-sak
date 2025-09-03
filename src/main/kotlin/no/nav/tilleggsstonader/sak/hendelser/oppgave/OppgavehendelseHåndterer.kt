@@ -12,7 +12,7 @@ class OppgavehendelseHåndterer(
     // For å kunne teste mottak av ConsumerRecord uten å måtte initialisere Kafka
     fun behandleOppgavehendelser(consumerRecords: List<OppgavehendelseRecord>) {
         consumerRecords
-            .filter { it.erEndret() }
+            .filter { it.erEndret() || it.erFeilregistrert() }
             .filter { it.erAktueltBehandlingstema() }
             .forEach {
                 oppgaveService.håndterOppdatertOppgaveHendelse(

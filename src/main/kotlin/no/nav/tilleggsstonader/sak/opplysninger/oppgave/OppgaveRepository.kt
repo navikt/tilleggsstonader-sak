@@ -6,26 +6,24 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdat
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Repository
 interface OppgaveRepository :
     RepositoryInterface<OppgaveDomain, UUID>,
     InsertUpdateRepository<OppgaveDomain> {
-    fun findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(
+    fun findByBehandlingIdAndTypeAndStatus(
         behandlingId: BehandlingId,
         oppgavetype: Oppgavetype,
+        status: Oppgavestatus,
     ): OppgaveDomain?
 
     fun findByType(oppgavetype: Oppgavetype): List<OppgaveDomain>
 
-    fun findByBehandlingIdAndType(
+    fun findByBehandlingIdAndStatusAndTypeIn(
         behandlingId: BehandlingId,
-        oppgavetype: Oppgavetype,
-    ): List<OppgaveDomain>?
-
-    fun findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(
-        behandlingId: BehandlingId,
+        status: Oppgavestatus,
         oppgavetype: Set<Oppgavetype>,
     ): OppgaveDomain?
 
@@ -54,4 +52,9 @@ interface OppgaveRepository :
         """,
     )
     fun finnOppgaveMetadata(oppgaveIder: Collection<Long>): List<OppgaveBehandlingMetadata>
+
+    fun findByStatusAndSporbarOpprettetTidBefore(
+        status: Oppgavestatus,
+        førTid: LocalDateTime,
+    ): List<OppgaveDomain>
 }

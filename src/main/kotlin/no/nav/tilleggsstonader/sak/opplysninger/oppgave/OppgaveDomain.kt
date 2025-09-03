@@ -15,11 +15,15 @@ data class OppgaveDomain(
     val behandlingId: BehandlingId?,
     val gsakOppgaveId: Long,
     val type: Oppgavetype,
-    var erFerdigstilt: Boolean = false,
+    val status: Oppgavestatus,
+    val tildeltEnhetsnummer: String?,
+    val enhetsmappeId: Long?,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     val tilordnetSaksbehandler: String?,
-)
+) {
+    fun erFerdigstilt() = status == Oppgavestatus.FERDIGSTILT
+}
 
 /**
  *
@@ -34,3 +38,9 @@ data class OppgaveBehandlingMetadata(
     val sendtTilTotrinnskontrollAv: String? = null,
     val erOpphor: Boolean? = false,
 )
+
+enum class Oppgavestatus {
+    ÅPEN,
+    FEILREGISTRERT,
+    FERDIGSTILT,
+}

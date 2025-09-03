@@ -47,7 +47,7 @@ class OpprettOppgaveConfig(
         val oppgaver = oppgaveRepository.findAll()
         val oppgaverUnderArbeid =
             oppgaver
-                .filterNot { it.erFerdigstilt }
+                .filterNot { it.erFerdigstilt() }
                 .filter { oppgavetyper.contains(it.type) }
         oppgaverUnderArbeid.forEach { oppgave ->
             oppgave.behandlingId?.let { behandlingId ->
