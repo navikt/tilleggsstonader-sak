@@ -21,7 +21,7 @@ data class PdlBolkResponse<T>(
     val errors: List<PdlError>?,
     val extensions: PdlExtensions?,
 ) {
-    fun errorMessages(): String = errors?.joinToString { it -> it.message } ?: ""
+    fun errorMessages(): String = errors?.joinToString { it.message } ?: ""
 
     fun harAdvarsel(): Boolean = !extensions?.warnings.isNullOrEmpty()
 }
@@ -106,6 +106,7 @@ data class PdlSøker(
     @JsonProperty("foedselsdato") override val fødselsdato: List<Fødselsdato>,
     val folkeregisterpersonstatus: List<Folkeregisterpersonstatus>,
     val kontaktadresse: List<Kontaktadresse>,
+    val kontaktinformasjonForDoedsbo: List<KontaktinformasjonForDoedsbo>,
     val navn: List<Navn>,
     val opphold: List<Opphold>,
     val oppholdsadresse: List<Oppholdsadresse>,
@@ -377,3 +378,45 @@ data class VergemaalEllerFremtidsfullmakt(
     val type: String?,
     val vergeEllerFullmektig: VergeEllerFullmektig,
 )
+
+data class KontaktinformasjonForDoedsbo(
+    val adresse: KontaktinformasjonForDoedsboAdresse,
+    val advokatSomKontakt: KontaktinformasjonForDoedsboAdvokatSomKontakt?,
+    val attestutstedelsesdato: LocalDate,
+    val folkeregistermetadata: Folkeregistermetadata,
+    val metadata: Metadata,
+    val organisasjonSomKontakt: KontaktinformasjonForDoedsboOrganisasjonSomKontakt?,
+    val personSomKontakt: KontaktinformasjonForDoedsboPersonSomKontakt?,
+    val skifteform: KontaktinformasjonForDoedsboSkifteform,
+)
+
+data class KontaktinformasjonForDoedsboAdresse(
+    val adresselinje1: String,
+    val adresselinje2: String?,
+    val landkode: String?,
+    val postnummer: String,
+    val poststedsnavn: String,
+)
+
+data class KontaktinformasjonForDoedsboAdvokatSomKontakt(
+    val organisasjonsnavn: String?,
+    val organisasjonsnummer: String?,
+    val personnavn: Personnavn,
+)
+
+data class KontaktinformasjonForDoedsboOrganisasjonSomKontakt(
+    val kontaktperson: Personnavn?,
+    val organisasjonsnavn: String,
+    val organisasjonsnummer: String?,
+)
+
+data class KontaktinformasjonForDoedsboPersonSomKontakt(
+    val foedselsdato: LocalDate?,
+    val identifikasjonsnummer: String?,
+    val personnavn: Personnavn?,
+)
+
+enum class KontaktinformasjonForDoedsboSkifteform {
+    ANNET,
+    OFFENTLIG,
+}
