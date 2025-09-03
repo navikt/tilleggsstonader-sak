@@ -23,7 +23,7 @@ import java.util.Properties
 @Service
 @TaskStepBeskrivelse(
     taskStepType = DistribuerVedtaksbrevTask.TYPE,
-    maxAntallFeil = 75,
+    maxAntallFeil = 50,
     settTilManuellOppfølgning = true,
     triggerTidVedFeilISekunder = 3 * 60L,
     beskrivelse = "Distribuerer vedtaksbrev etter journalføring",
@@ -49,13 +49,7 @@ class DistribuerVedtaksbrevTask(
     private fun List<ResultatBrevutsendelse>.håndterRekjøringSenereHvisMottakerErDød(task: Task) {
         filterIsInstance<ResultatBrevutsendelse.FeiletFordiMottakerErDødOgManglerAdresse>()
             .firstOrNull()
-            ?.let {
-                taskService.stoppTaskOgRekjørSenere(
-                    task,
-                    årsak = "Mottaker er død og har ikke fått dødsbo. Forsøker å rekjøre tasken automatisk om et gitt antall dager.",
-                    melding = it.feilmelding,
-                )
-            }
+            ?.let { taskService.stoppTaskOgRekjørSenere(task, årsak = "Mottaker er død", melding = it.feilmelding) }
     }
 
     companion object {
