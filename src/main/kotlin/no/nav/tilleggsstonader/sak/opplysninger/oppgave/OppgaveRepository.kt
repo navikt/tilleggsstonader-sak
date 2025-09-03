@@ -52,10 +52,4 @@ interface OppgaveRepository :
         """,
     )
     fun finnOppgaveMetadata(oppgaveIder: Collection<Long>): List<OppgaveBehandlingMetadata>
-
-    fun findByStatusAndTypeInAndSporbarOpprettetTidBefore(
-        status: Oppgavestatus,
-        type: Set<Oppgavetype>,
-        førTid: LocalDateTime,
-    ): List<OppgaveDomain>
 }
