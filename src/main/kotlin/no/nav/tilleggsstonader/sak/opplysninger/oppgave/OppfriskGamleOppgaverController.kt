@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.security.token.support.core.api.Unprotected
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.GetMapping
@@ -20,8 +21,9 @@ class OppfriskGamleOppgaverController(
     fun oppfriskGamleOppgaver() {
         Executors.newVirtualThreadPerTaskExecutor().submit {
             oppgaveRepository
-                .findByStatusAndSporbarOpprettetTidBefore(
+                .findByStatusAndTypeInAndSporbarOpprettetTidBefore(
                     status = Oppgavestatus.ÅPEN,
+                    type = setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak, Oppgavetype.GodkjenneVedtak),
                     førTid = LocalDate.of(2025, 7, 1).atStartOfDay(),
                 ).forEach { lagretOppgave ->
                     logger.info("Oppfrisker oppgave ${lagretOppgave.gsakOppgaveId} for behandling ${lagretOppgave.behandlingId}")

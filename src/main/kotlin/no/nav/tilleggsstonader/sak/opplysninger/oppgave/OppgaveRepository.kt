@@ -53,8 +53,9 @@ interface OppgaveRepository :
     )
     fun finnOppgaveMetadata(oppgaveIder: Collection<Long>): List<OppgaveBehandlingMetadata>
 
-    fun findByStatusAndSporbarOpprettetTidBefore(
+    fun findByStatusAndTypeInAndSporbarOpprettetTidBefore(
         status: Oppgavestatus,
+        type: Set<Oppgavetype>,
         førTid: LocalDateTime,
     ): List<OppgaveDomain>
 }
