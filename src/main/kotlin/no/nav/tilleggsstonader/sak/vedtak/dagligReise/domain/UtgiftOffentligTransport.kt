@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.util.inneholderUkedag
 import java.time.LocalDate
-import kotlin.Int
 
 data class UtgiftOffentligTransport(
     override val fom: LocalDate,

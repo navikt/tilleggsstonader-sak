@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -20,15 +21,15 @@ data class BeregningsresultatForPeriode(
 )
 
 data class Beregningsgrunnlag(
-    val fom: LocalDate,
-    val tom: LocalDate,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
     val prisEnkeltbillett: Int,
     val prisSyvdagersbillett: Int?,
     val pris30dagersbillett: Int,
     val antallReisedagerPerUke: Int,
     val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
     val antallReisedager: Int,
-)
+) : Periode<LocalDate>
 
 data class VedtaksperiodeGrunnlag(
     val id: UUID,

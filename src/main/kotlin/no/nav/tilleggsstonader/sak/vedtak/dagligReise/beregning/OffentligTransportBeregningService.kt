@@ -94,19 +94,7 @@ class OffentligTransportBeregningService(
 
         return BeregningsresultatForPeriode(
             grunnlag = grunnlag,
-            beløp = finnBilligsteAlternativ(grunnlag),
+            beløp = finnBilligsteAlternativForTrettidagersPeriode(grunnlag),
         )
-    }
-
-    private fun finnBilligsteAlternativ(grunnlag: Beregningsgrunnlag): Int {
-        val prisEnkeltbilletter = grunnlag.antallReisedager * grunnlag.prisEnkeltbillett * 2
-        val antallSyvDagersPerioder = finnAntallSyvDagersPerioder(grunnlag)
-        val prisUkesBiletter = grunnlag.prisSyvdagersbillett?.times(antallSyvDagersPerioder)
-
-        return listOfNotNull(
-            prisEnkeltbilletter,
-            prisUkesBiletter,
-            grunnlag.pris30dagersbillett,
-        ).min()
     }
 }
