@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdat
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
 import java.util.UUID
 
 @Repository
