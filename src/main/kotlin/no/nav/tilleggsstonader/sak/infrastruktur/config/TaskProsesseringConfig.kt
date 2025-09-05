@@ -27,6 +27,6 @@ class TaskProsesseringConfig(
                     throw Feil("Mangler preferred_username på request")
                 }
 
-            override fun harTilgang(): Boolean = SikkerhetContext.hentGrupperFraToken().contains(rolleConfig.prosessering)
+            override fun harTilgang(): Boolean = SikkerhetContext.hentGrupperFraToken().contains(rolleConfig.utvikler)
         }
 }

@@ -13,6 +13,7 @@ val tokenSupportVersion = "5.0.34"
 val wiremockVersion = "3.13.1"
 val mockkVersion = "1.14.5"
 val testcontainerVersion = "1.21.3"
+val springDocVersion = "2.8.12"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -81,6 +82,8 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:8.1")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
 
     implementation("no.nav.familie:prosessering-core:$familieProsesseringVersion")
 
