@@ -66,8 +66,8 @@ class OffentligTransportBeregningStepDefinitions {
             )
     }
 
-    @Så("forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr={}")
-    fun `forventer vi følgende beregningsrsultat for daglig resie offentlig transport`(
+    @Så("forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr={}")
+    fun `forventer vi følgende beregningsrsultat for daglig reise offentlig transport`(
         reiserNummer: Int,
         dataTable: DataTable,
     ) {

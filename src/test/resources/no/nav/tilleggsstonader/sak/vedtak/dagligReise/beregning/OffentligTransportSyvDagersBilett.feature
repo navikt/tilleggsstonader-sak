@@ -14,7 +14,7 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 06.01.2025 | 12.01.2025 | 366   |
 
@@ -29,7 +29,7 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 06.01.2025 | 12.01.2025 | 264   |
 
@@ -46,7 +46,7 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 06.01.2025 | 09.01.2025 | 340   |
 
@@ -63,7 +63,7 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 06.01.2025 | 12.01.2025 | 340   |
 
@@ -79,11 +79,11 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 06.01.2025 | 12.01.2025 | 366   |
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=2
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=2
       | Fom        | Tom        | Beløp |
       | 06.01.2025 | 12.01.2025 | 767   |
 
@@ -99,7 +99,7 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 06.01.2025 | 19.01.2025 | 732   |
 
@@ -114,7 +114,7 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 06.01.2025 | 19.01.2025 | 528   |
 
@@ -129,7 +129,7 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 06.01.2025 | 07.01.2025 | 176   |
 
@@ -146,7 +146,7 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 06.01.2025 | 16.01.2025 | 680   |
 
@@ -161,7 +161,7 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 08.01.2025 | 14.01.2025 | 366   |
 
@@ -176,7 +176,7 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 06.01.2025 | 14.01.2025 | 542   |
 
@@ -191,7 +191,7 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 778   |
       | 31.01.2025 | 06.02.2025 | 366   |
@@ -207,7 +207,7 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
 
     Når beregner for daglig reise offentlig transport
 
-    Så forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr=1
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 14.01.2025 | 12.02.2025 | 778   |
       | 13.02.2025 | 24.02.2025 | 630   |
