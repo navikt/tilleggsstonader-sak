@@ -82,7 +82,7 @@ class SatsjusteringTest : IntegrationTest() {
                 bekreftet = true,
             )
 
-        val behandlingerForSatsjustering = finnBehandlingerForSatsjusteringService.sjekkBehandlingerForSatsjustering(Stønadstype.LÆREMIDLER)
+        val behandlingerForSatsjustering = finnBehandlingerForSatsjusteringService.finnBehandlingerForSatsjustering(Stønadstype.LÆREMIDLER)
         assertThat(behandlingerForSatsjustering).containsExactly(behandling.id)
 
         satsjusteringService.kjørSatsjustering(behandling.id)

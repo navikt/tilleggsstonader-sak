@@ -12,7 +12,7 @@ class FinnBehandlingerForSatsjusteringService(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun sjekkBehandlingerForSatsjustering(stønadstype: Stønadstype): List<BehandlingId> {
+    fun finnBehandlingerForSatsjustering(stønadstype: Stønadstype): List<BehandlingId> {
         val idn = behandlingRepository.finnBehandlingerMedAndelerSomVenterPåSatsjustering(stønadstype)
         logger.info("Finner ${idn.size} behandlinger av stønadstype=$stønadstype som venter på satsjustering.")
         return idn

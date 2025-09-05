@@ -55,9 +55,9 @@ class SatsjusteringService(
             )
         }
         val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId)
-        if (sisteIverksatteBehandling?.id != behandlingId) {
+        if (sisteIverksatteBehandling?.id != behandlingSomTrengerSatsjustering.id) {
             logger.info(
-                "Siste iverksatte behandling=${sisteIverksatteBehandling?.id} er ikke lik behandlingId=$behandlingId, kan ikke kjøre satsjustering.",
+                "Siste iverksatte behandling=${sisteIverksatteBehandling?.id} er ikke lik behandlingId=${behandlingSomTrengerSatsjustering.id}, kan ikke kjøre satsjustering.",
             )
             return
         }
