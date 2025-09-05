@@ -176,6 +176,8 @@ class TilgangService(
         validerTilgangTilRolle(BehandlerRolle.BESLUTTER)
     }
 
+    fun validerHarUtviklerrolle() = SikkerhetContext.harRolle(rolleConfig.utvikler)
+
     fun validerTilgangTilRolle(minimumsrolle: BehandlerRolle) {
         if (!harTilgangTilRolle(minimumsrolle)) {
             throw ManglerTilgang(
