@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Personopplysninger
 import java.time.LocalDate
 
 data class SkjemaDagligReise(
@@ -11,18 +12,6 @@ data class SkjemaDagligReise(
     val aktivitet: AktivitetDagligReiseAvsnitt,
     val reiser: List<Reise>,
     val dokumentasjon: List<DokumentasjonDagligReise>,
-)
-
-data class Personopplysninger(
-    val adresse: Adresse?,
-)
-
-data class Adresse(
-    val gyldigFraOgMed: LocalDate?,
-    val adresse: String?,
-    val postnummer: String?,
-    val poststed: String?,
-    val landkode: String?,
 )
 
 data class AktivitetDagligReiseAvsnitt(

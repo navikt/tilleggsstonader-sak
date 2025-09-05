@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.dto.BarnTilRevurderingDto
@@ -18,10 +17,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.TilordnetSaksbehandlerService
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.dto.tilDto
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
@@ -34,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDate
 
 @RestController
 @RequestMapping(path = ["/api/behandling"])
@@ -43,15 +38,12 @@ class BehandlingController(
     private val behandlingService: BehandlingService,
     private val behandlingsoversiktService: BehandlingsoversiktService,
     private val opprettRevurderingBehandlingService: OpprettRevurderingBehandlingService,
-    private val revurderFraService: RevurderFraService,
     private val faktaGrunnlagService: FaktaGrunnlagService,
     private val fagsakService: FagsakService,
     private val henleggService: HenleggService,
     private val tilgangService: TilgangService,
     private val nullstillBehandlingService: NullstillBehandlingService,
     private val tilordnetSaksbehandlerService: TilordnetSaksbehandlerService,
-    private val unleashService: UnleashService,
-    private val oppgaveService: OppgaveService,
 ) {
     @GetMapping("{behandlingId}")
     fun hentBehandling(
@@ -59,7 +51,7 @@ class BehandlingController(
     ): BehandlingDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        val saksbehandling: Saksbehandling = hentSaksbehandlingMedNullstiltRevurderFra(behandlingId)
+        val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val tilordnetSaksbehandler = tilordnetSaksbehandlerService.finnTilordnetSaksbehandler(behandlingId).tilDto()
 
         if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
@@ -69,23 +61,6 @@ class BehandlingController(
             faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId)
         }
         return saksbehandling.tilDto(tilordnetSaksbehandler)
-    }
-
-    private fun hentSaksbehandlingMedNullstiltRevurderFra(behandlingId: BehandlingId): Saksbehandling {
-        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        val statusErUnderArbeid =
-            saksbehandling.status == BehandlingStatus.OPPRETTET ||
-                saksbehandling.status == BehandlingStatus.UTREDES
-        return if (saksbehandling.revurderFra != null &&
-            statusErUnderArbeid &&
-            unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK) &&
-            oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(saksbehandling.id)?.tilordnetSaksbehandler ==
-            SikkerhetContext.hentSaksbehandler()
-        ) {
-            behandlingService.fjernRevurderFra(saksbehandling)
-        } else {
-            saksbehandling
-        }
     }
 
     @GetMapping("fagsak-person/{fagsakPersonId}")
@@ -151,17 +126,6 @@ class BehandlingController(
         val saksbehandling = behandlingService.hentSaksbehandling(eksternBehandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.ACCESS)
         return saksbehandling.id
-    }
-
-    @PostMapping("{behandlingId}/revurder-fra/{revurderFra}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun oppdaterRevurderFra(
-        @PathVariable behandlingId: BehandlingId,
-        @PathVariable revurderFra: LocalDate,
-    ) {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        revurderFraService.oppdaterRevurderFra(behandlingId, revurderFra)
     }
 
     @PostMapping("{behandlingId}/nullstill")

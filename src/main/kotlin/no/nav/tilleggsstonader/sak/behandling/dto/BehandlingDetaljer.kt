@@ -47,7 +47,6 @@ data class BehandlingDetaljer(
     val vedtaksdato: LocalDateTime?,
     val henlagtÅrsak: HenlagtÅrsak?,
     val henlagtBegrunnelse: String?,
-    val revurderFra: LocalDate?,
     val vedtaksperiode: Vedtaksperiode?,
     val opphørsdato: LocalDate?,
 )

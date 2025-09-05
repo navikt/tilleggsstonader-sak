@@ -35,7 +35,7 @@ Egenskap: Beregning ved opphør av boutgifter
 
       Når vi kopierer perioder fra forrige behandling for behandling=2
 
-      Og vi opphører boutgifter behandling=2 med revurderFra=15.02.2025
+      Og vi opphører boutgifter behandling=2 med opphørsdato=15.02.2025
 
       Så kan vi forvente følgende beregningsresultat for behandling=2
         | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Del av tidligere utbetaling |
@@ -64,7 +64,7 @@ Egenskap: Beregning ved opphør av boutgifter
 
       Og vi kopierer perioder fra forrige behandling for behandling=2
 
-      Når vi opphører boutgifter behandling=2 med revurderFra=01.02.2025
+      Når vi opphører boutgifter behandling=2 med opphørsdato=01.02.2025
 
       Så kan vi forvente følgende beregningsresultat for behandling=2
         | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Del av tidligere utbetaling |
@@ -93,7 +93,7 @@ Egenskap: Beregning ved opphør av boutgifter
 
       Når vi kopierer perioder fra forrige behandling for behandling=2
 
-      Og vi opphører boutgifter behandling=2 med revurderFra=2025-01-10
+      Og vi opphører boutgifter behandling=2 med opphørsdato=2025-01-10
 
       Så kan vi forvente følgende beregningsresultat for behandling=2
         | Fom        | Tom        | Stønadsbeløp | Maks sats | Utbetalingsdato | Del av tidligere utbetaling |

@@ -35,28 +35,30 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
     }
 
     @Test
-    internal fun findByBehandlingIdAndTypeAndErFerdigstiltIsFalse() {
+    internal fun findByBehandlingIdAndTypeAndStatus() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
-        val oppgave = oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = true))
+        val oppgave = oppgaveRepository.insert(oppgave(behandling, status = Oppgavestatus.FERDIGSTILT))
 
         assertThat(
-            oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(
+            oppgaveRepository.findByBehandlingIdAndTypeAndStatus(
                 BehandlingId.random(),
                 Oppgavetype.BehandleSak,
+                Oppgavestatus.ÅPEN,
             ),
         ).isNull()
         assertThat(
-            oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(
+            oppgaveRepository.findByBehandlingIdAndTypeAndStatus(
                 behandling.id,
                 Oppgavetype.BehandleSak,
+                Oppgavestatus.ÅPEN,
             ),
         ).isNull()
-        assertThat(oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandling.id, oppgave.type))
+        assertThat(oppgaveRepository.findByBehandlingIdAndTypeAndStatus(behandling.id, oppgave.type, Oppgavestatus.ÅPEN))
             .isNull()
 
         val oppgaveIkkeFerdigstilt = oppgaveRepository.insert(oppgave(behandling))
-        assertThat(oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandling.id, oppgave.type))
+        assertThat(oppgaveRepository.findByBehandlingIdAndTypeAndStatus(behandling.id, oppgave.type, Oppgavestatus.ÅPEN))
             .isEqualTo(oppgaveIkkeFerdigstilt)
     }
 
@@ -64,20 +66,21 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
     internal fun findByBehandlingIdAndTypeInAndErFerdigstiltIsFalse() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
-        oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = false, type = Oppgavetype.Journalføring))
-        oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = true, type = Oppgavetype.BehandleSak))
+        oppgaveRepository.insert(oppgave(behandling, type = Oppgavetype.Journalføring))
+        oppgaveRepository.insert(oppgave(behandling, status = Oppgavestatus.FERDIGSTILT, type = Oppgavetype.BehandleSak))
         oppgaveRepository.insert(
             oppgave(
-                behandling,
-                erFerdigstilt = false,
+                behandling = behandling,
+                status = Oppgavestatus.ÅPEN,
                 type = Oppgavetype.BehandleUnderkjentVedtak,
             ),
         )
 
         val oppgave =
-            oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(
-                behandling.id,
-                setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak),
+            oppgaveRepository.findByBehandlingIdAndStatusAndTypeIn(
+                behandlingId = behandling.id,
+                status = Oppgavestatus.ÅPEN,
+                oppgavetype = setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak),
             )
         assertThat(oppgave).isNotNull
         assertThat(oppgave?.type).isEqualTo(Oppgavetype.BehandleUnderkjentVedtak)
@@ -88,10 +91,10 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
         val sporbar = Sporbar(opprettetTid = LocalDateTime.now().plusDays(1))
-        oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = true, gsakOppgaveId = 1))
-        oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = true, gsakOppgaveId = 2).copy(sporbar = sporbar))
-        oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = true, gsakOppgaveId = 3))
-        oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = true, gsakOppgaveId = 4))
+        oppgaveRepository.insert(oppgave(behandling, status = Oppgavestatus.FERDIGSTILT, gsakOppgaveId = 1))
+        oppgaveRepository.insert(oppgave(behandling, status = Oppgavestatus.FERDIGSTILT, gsakOppgaveId = 2).copy(sporbar = sporbar))
+        oppgaveRepository.insert(oppgave(behandling, status = Oppgavestatus.FERDIGSTILT, gsakOppgaveId = 3))
+        oppgaveRepository.insert(oppgave(behandling, status = Oppgavestatus.FERDIGSTILT, gsakOppgaveId = 4))
 
         assertThat(oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandling.id)).isNotNull
         assertThat(oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandling.id)?.gsakOppgaveId)
@@ -104,8 +107,8 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
         val behandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
         val behandling2 = testoppsettService.lagre(behandling(fagsak))
 
-        oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = true, gsakOppgaveId = 1))
-        oppgaveRepository.insert(oppgave(behandling2, erFerdigstilt = true, gsakOppgaveId = 2))
+        oppgaveRepository.insert(oppgave(behandling, status = Oppgavestatus.FERDIGSTILT, gsakOppgaveId = 1))
+        oppgaveRepository.insert(oppgave(behandling2, status = Oppgavestatus.FERDIGSTILT, gsakOppgaveId = 2))
 
         assertThat(oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandling.id)).isNotNull()
         assertThat(oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandling.id)?.gsakOppgaveId)
@@ -122,6 +125,9 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
                 type = Oppgavetype.InnhentDokumentasjon,
                 gsakOppgaveId = 1,
                 tilordnetSaksbehandler = null,
+                status = Oppgavestatus.ÅPEN,
+                tildeltEnhetsnummer = null,
+                enhetsmappeId = null,
             ),
         )
         oppgaveRepository.insert(
@@ -130,6 +136,9 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
                 type = Oppgavetype.BehandleSak,
                 gsakOppgaveId = 1,
                 tilordnetSaksbehandler = null,
+                status = Oppgavestatus.ÅPEN,
+                tildeltEnhetsnummer = null,
+                enhetsmappeId = null,
             ),
         )
 
@@ -172,6 +181,9 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
                     type = Oppgavetype.Journalføring,
                     gsakOppgaveId = 1,
                     tilordnetSaksbehandler = null,
+                    status = Oppgavestatus.ÅPEN,
+                    tildeltEnhetsnummer = null,
+                    enhetsmappeId = null,
                 ),
             )
 
@@ -232,6 +244,9 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
                     type = Oppgavetype.BehandleSak,
                     gsakOppgaveId = 1,
                     tilordnetSaksbehandler = null,
+                    status = Oppgavestatus.ÅPEN,
+                    tildeltEnhetsnummer = null,
+                    enhetsmappeId = null,
                 ),
             )
             oppgaveRepository.insert(
@@ -240,6 +255,9 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
                     type = Oppgavetype.BehandleSak,
                     gsakOppgaveId = 2,
                     tilordnetSaksbehandler = null,
+                    status = Oppgavestatus.ÅPEN,
+                    tildeltEnhetsnummer = null,
+                    enhetsmappeId = null,
                 ),
             )
         }

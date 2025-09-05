@@ -72,7 +72,6 @@ class TilsynBarnBeregningService(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             typeVedtak = typeVedtak,
-            tidligsteEndring = tidligsteEndring,
         )
 
         val vedtaksperioderBeregning =

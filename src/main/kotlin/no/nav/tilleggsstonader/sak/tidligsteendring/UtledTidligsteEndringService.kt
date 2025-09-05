@@ -5,13 +5,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.førstePeriodeEtter
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -35,7 +33,6 @@ class UtledTidligsteEndringService(
     private val vilkårperiodeService: VilkårperiodeService,
     private val vedtakRepository: VedtakRepository,
     private val barnService: BarnService,
-    private val unleashService: UnleashService,
 ) {
     /**
      * Sammenligner gitt behandling med tidligere iverksatte behandling, for å finne tidligste endring i vilkårsperioder,
@@ -82,15 +79,6 @@ class UtledTidligsteEndringService(
         hentVedtaksperioderTidligereBehandlingFunction: (BehandlingId) -> List<Vedtaksperiode>,
     ): TidligsteEndringResultat? {
         val behandling = behandlingService.hentBehandling(behandlingId)
-
-        if (!unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) {
-            return behandling.revurderFra?.let {
-                TidligsteEndringResultat(
-                    tidligsteEndring = it,
-                    tidligsteEndringSomPåvirkerUtbetalinger = it,
-                )
-            }
-        }
 
         val sisteIverksatteBehandling = behandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentBehandling(it) }
 

@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.domain.TilordnetSaksbehandler
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.domain.TilordnetSaksbehandlerPåOppgave
 import org.springframework.stereotype.Service
@@ -31,9 +32,10 @@ class TilordnetSaksbehandlerService(
                 Oppgavetype.BehandleUnderkjentVedtak,
                 Oppgavetype.GodkjenneVedtak,
             )
-        return oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(
-            behandlingId,
-            oppgavetyper,
+        return oppgaveRepository.findByBehandlingIdAndStatusAndTypeIn(
+            behandlingId = behandlingId,
+            status = Oppgavestatus.ÅPEN,
+            oppgavetype = oppgavetyper,
         )
     }
 

@@ -53,7 +53,7 @@ class DagligReiseVedtakController(
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val behandling = behandlingService.hentBehandling(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
-        return vedtakDtoMapper.toDto(vedtak, null, behandling.forrigeIverksatteBehandlingId)
+        return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)
     }
 
     @PostMapping("{behandlingId}/beregn")

@@ -58,7 +58,7 @@ object BoutgifterTestUtil {
             ),
         type = TypeVedtak.INNVILGELSE,
         gitVersjon = "versjon-test",
-        tidligsteEndring = defaultBehandling.revurderFra,
+        tidligsteEndring = null,
         opphørsdato = null,
     )
 

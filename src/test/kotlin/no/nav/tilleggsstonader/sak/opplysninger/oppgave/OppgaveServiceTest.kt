@@ -190,7 +190,7 @@ internal class OppgaveServiceTest {
     @Test
     fun `Ferdigstill oppgave`() {
         every {
-            oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(any(), any())
+            oppgaveRepository.findByBehandlingIdAndTypeAndStatus(any(), any(), any())
         } returns lagTestOppgave()
         every { oppgaveRepository.update(any()) } returns lagTestOppgave()
         val slot = slot<Long>()
@@ -203,7 +203,7 @@ internal class OppgaveServiceTest {
     @Test
     fun `Ferdigstill oppgave feiler fordi den ikke finner oppgave på behandlingen`() {
         every {
-            oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(any(), any())
+            oppgaveRepository.findByBehandlingIdAndTypeAndStatus(any(), any(), any())
         } returns null
         every { oppgaveRepository.insert(any()) } returns lagTestOppgave()
 
@@ -219,7 +219,7 @@ internal class OppgaveServiceTest {
     @Test
     fun `Ferdigstill oppgave hvis oppgave ikke finnes - kaster ikke feil`() {
         every {
-            oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(any(), any())
+            oppgaveRepository.findByBehandlingIdAndTypeAndStatus(any(), any(), any())
         } returns null
         oppgaveService.ferdigstillOppgaveOgsåHvisFeilregistrert(BEHANDLING_ID, Oppgavetype.BehandleSak)
     }
@@ -227,7 +227,7 @@ internal class OppgaveServiceTest {
     @Test
     fun `Ferdigstill oppgave - hvis oppgave finnes`() {
         every {
-            oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(any(), any())
+            oppgaveRepository.findByBehandlingIdAndTypeAndStatus(any(), any(), any())
         } returns lagTestOppgave()
         every { oppgaveRepository.update(any()) } returns lagTestOppgave()
         val slot = slot<Long>()
@@ -240,7 +240,7 @@ internal class OppgaveServiceTest {
     @Test
     fun `Ferdigstill oppgave - oppgaven er feilregistrert`() {
         every {
-            oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(any(), any())
+            oppgaveRepository.findByBehandlingIdAndTypeAndStatus(any(), any(), any())
         } returns lagTestOppgave()
 
         every { oppgaveClient.ferdigstillOppgave(any()) } throws Exception("Oppgaven er allerede ferdigstilt")
@@ -252,7 +252,7 @@ internal class OppgaveServiceTest {
 
         oppgaveService.ferdigstillOppgaveOgsåHvisFeilregistrert(BEHANDLING_ID, Oppgavetype.BehandleSak)
 
-        assertThat(slot.captured.erFerdigstilt).isTrue()
+        assertThat(slot.captured.status).isEqualTo(Oppgavestatus.FEILREGISTRERT)
     }
 
     @Test
@@ -435,7 +435,7 @@ internal class OppgaveServiceTest {
         every { fagsakService.hentFagsakForBehandling(BEHANDLING_ID) } returns lagTestFagsak()
 
         every {
-            oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(any(), any())
+            oppgaveRepository.findByBehandlingIdAndTypeAndStatus(any(), any(), any())
         } returns null
         every { arbeidsfordelingService.hentNavEnhetId(any(), any(), any()) } returns ENHETSNUMMER
         every { oppgaveClient.opprettOppgave(capture(slot)) } answers {
@@ -462,6 +462,9 @@ internal class OppgaveServiceTest {
             type = Oppgavetype.BehandleSak,
             gsakOppgaveId = GSAK_OPPGAVE_ID,
             tilordnetSaksbehandler = null,
+            status = Oppgavestatus.ÅPEN,
+            tildeltEnhetsnummer = ENHETSNUMMER,
+            enhetsmappeId = OppgaveClientConfig.MAPPE_ID_KLAR,
         )
 
     private fun lagEksternTestOppgave(): Oppgave = Oppgave(id = GSAK_OPPGAVE_ID, versjon = 0)

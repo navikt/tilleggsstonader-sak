@@ -22,6 +22,8 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerRolle
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlSøker
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -40,13 +42,21 @@ class DistribuerVedtaksbrevTaskTest {
     val taskService = mockk<TaskService>(relaxed = true)
     val brevSteg = BrevSteg(taskService)
     val behandlingSerice = mockk<BehandlingService>()
+    val personService = mockk<PersonService>()
+
+    val distribuerVedtaksbrevService =
+        DistribuerVedtaksbrevService(
+            journalpostClient = journalpostClient,
+            brevmottakerVedtaksbrevRepository = brevmottakerVedtaksbrevRepository,
+            personService = personService,
+            transactionHandler = TransactionHandler(),
+        )
 
     val saksbehandling = saksbehandling(steg = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
     val distribuerVedtaksbrevTask =
         DistribuerVedtaksbrevTask(
             brevmottakerVedtaksbrevRepository,
-            journalpostClient,
-            TransactionHandler(),
+            distribuerVedtaksbrevService,
             taskService,
         )
     val task = Task(type = DistribuerVedtaksbrevTask.TYPE, payload = saksbehandling.id.toString())
@@ -58,6 +68,7 @@ class DistribuerVedtaksbrevTaskTest {
     fun setUp() {
         every { behandlingSerice.hentSaksbehandling(saksbehandling.id) } returns saksbehandling
         every { stegService.håndterSteg(any<BehandlingId>(), brevSteg) } returns mockk()
+        every { personService.hentSøker(any()) } returns pdlSøker()
     }
 
     @Test
@@ -146,7 +157,7 @@ class DistribuerVedtaksbrevTaskTest {
     }
 
     @Nested
-    inner class `Mottaker er død og mangler adresse` {
+    inner class `Rekjøring senere` {
         @Test
         internal fun `skal rekjøre senere hvis man får GONE fra dokdist`() {
             val distribuerrequestSlots = mutableListOf<DistribuerJournalpostRequest>()

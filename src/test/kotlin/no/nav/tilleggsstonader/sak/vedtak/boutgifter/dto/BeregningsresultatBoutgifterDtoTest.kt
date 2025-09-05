@@ -50,7 +50,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     tom = LocalDate.of(2023, 1, 5),
                     utgift = 1000,
                     tilUtbetaling = 1000,
-                    erFørRevurderFra = false,
+                    erFørTidligsteEndring = false,
                     skalFåDekketFaktiskeUtgifter = false,
                 ),
                 UtgiftBoutgifterMedAndelTilUtbetalingDto(
@@ -58,7 +58,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     tom = LocalDate.of(2023, 1, 16),
                     utgift = 2000,
                     tilUtbetaling = 2000,
-                    erFørRevurderFra = false,
+                    erFørTidligsteEndring = false,
                     skalFåDekketFaktiskeUtgifter = false,
                 ),
             )
@@ -107,7 +107,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     tom = LocalDate.of(2023, 1, 5),
                     utgift = 4000,
                     tilUtbetaling = 4000,
-                    erFørRevurderFra = false,
+                    erFørTidligsteEndring = false,
                     skalFåDekketFaktiskeUtgifter = false,
                 ),
                 UtgiftBoutgifterMedAndelTilUtbetalingDto(
@@ -115,7 +115,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     tom = LocalDate.of(2023, 1, 16),
                     utgift = 2000,
                     tilUtbetaling = 953,
-                    erFørRevurderFra = false,
+                    erFørTidligsteEndring = false,
                     skalFåDekketFaktiskeUtgifter = false,
                 ),
             )
@@ -127,7 +127,7 @@ class BeregningsresultatBoutgifterDtoTest {
     }
 
     @Test
-    fun `finnUtgifterMedAndelTilUtbetaling skal markere utgifter med før revurder fra`() {
+    fun `finnUtgifterMedAndelTilUtbetaling skal markere utgifter med før tidligsteEndring`() {
         val utgift =
             listOf(
                 lagUtgiftBeregningBoutgifter(
@@ -164,7 +164,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     tom = LocalDate.of(2023, 1, 5),
                     utgift = 1000,
                     tilUtbetaling = 1000,
-                    erFørRevurderFra = true,
+                    erFørTidligsteEndring = true,
                     skalFåDekketFaktiskeUtgifter = false,
                 ),
                 UtgiftBoutgifterMedAndelTilUtbetalingDto(
@@ -172,15 +172,15 @@ class BeregningsresultatBoutgifterDtoTest {
                     tom = LocalDate.of(2023, 1, 16),
                     utgift = 2000,
                     tilUtbetaling = 2000,
-                    erFørRevurderFra = false,
+                    erFørTidligsteEndring = false,
                     skalFåDekketFaktiskeUtgifter = false,
                 ),
             )
 
-        val revurderFra = LocalDate.of(2023, 1, 10)
+        val tidligsteEndring = LocalDate.of(2023, 1, 10)
 
         val result =
-            beregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(revurderFra)
+            beregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(tidligsteEndring)
 
         assertEquals(forventetResultat, result)
     }
@@ -219,15 +219,15 @@ class BeregningsresultatBoutgifterDtoTest {
                     tom = LocalDate.of(2023, 1, 5),
                     utgift = 20_000,
                     tilUtbetaling = 20_000,
-                    erFørRevurderFra = true,
+                    erFørTidligsteEndring = true,
                     skalFåDekketFaktiskeUtgifter = true,
                 ),
             )
 
-        val revurderFra = LocalDate.of(2023, 1, 10)
+        val tidligsteEndring = LocalDate.of(2023, 1, 10)
 
         val result =
-            beregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(revurderFra)
+            beregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(tidligsteEndring)
 
         assertEquals(forventetResultat, result)
     }
@@ -273,7 +273,7 @@ class BeregningsresultatBoutgifterDtoTest {
                                 tom = LocalDate.of(2023, 1, 5),
                                 utgift = 3000,
                                 tilUtbetaling = 3000,
-                                erFørRevurderFra = true,
+                                erFørTidligsteEndring = true,
                                 skalFåDekketFaktiskeUtgifter = false,
                             ),
                         ),
@@ -286,10 +286,10 @@ class BeregningsresultatBoutgifterDtoTest {
                     inneholderUtgifterOvernatting = true,
                 )
 
-            val revurderFra = LocalDate.of(2023, 1, 10)
+            val tidligsteEndring = LocalDate.of(2023, 1, 10)
 
             val result =
-                beregningsresultatForLøpendeMåned.tilDto(revurderFra)
+                beregningsresultatForLøpendeMåned.tilDto(tidligsteEndring)
 
             assertEquals(forventetResultat, result)
         }
@@ -337,7 +337,7 @@ class BeregningsresultatBoutgifterDtoTest {
                                 tom = LocalDate.of(2023, 1, 31),
                                 utgift = 3000,
                                 tilUtbetaling = 3000,
-                                erFørRevurderFra = false,
+                                erFørTidligsteEndring = false,
                                 skalFåDekketFaktiskeUtgifter = false,
                             ),
                         ),
@@ -350,10 +350,10 @@ class BeregningsresultatBoutgifterDtoTest {
                     inneholderUtgifterOvernatting = false,
                 )
 
-            val revurderFra = LocalDate.of(2023, 1, 10)
+            val tidligsteEndring = LocalDate.of(2023, 1, 10)
 
             val result =
-                beregningsresultatForLøpendeMåned.tilDto(revurderFra)
+                beregningsresultatForLøpendeMåned.tilDto(tidligsteEndring)
 
             assertEquals(forventetResultat, result)
         }

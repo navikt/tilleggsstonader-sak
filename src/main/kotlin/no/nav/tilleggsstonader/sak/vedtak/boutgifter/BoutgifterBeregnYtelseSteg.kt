@@ -2,12 +2,10 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -38,7 +36,6 @@ class BoutgifterBeregnYtelseSteg(
     private val beregningService: BoutgifterBeregningService,
     private val opphørValideringService: OpphørValideringService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
-    unleashService: UnleashService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -47,7 +44,6 @@ class BoutgifterBeregnYtelseSteg(
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
-        unleashService = unleashService,
     ) {
     override fun lagreVedtakForSatsjustering(
         saksbehandling: Saksbehandling,
@@ -102,12 +98,11 @@ class BoutgifterBeregnYtelseSteg(
         feilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
+        feilHvis(vedtak.opphørsdato == null) {
+            "Opphørsdato er ikke satt"
+        }
 
-        val opphørsdato =
-            revurderFraEllerOpphørsdato(
-                revurderFra = saksbehandling.revurderFra,
-                opphørsdato = vedtak.opphørsdato,
-            )
+        val opphørsdato = vedtak.opphørsdato
 
         opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
 
@@ -134,8 +129,8 @@ class BoutgifterBeregnYtelseSteg(
 
     private fun avkortVedtaksperiodeVedOpphør(
         forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørBoutgifter>,
-        revurderFra: LocalDate,
-    ): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(revurderFra.minusDays(1))
+        opphørsdato: LocalDate,
+    ): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(opphørsdato.minusDays(1))
 
     private fun hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørBoutgifter> =
         vedtakRepository
@@ -179,7 +174,7 @@ class BoutgifterBeregnYtelseSteg(
                         beregningsresultat = BeregningsresultatBoutgifter(beregningsresultat.perioder),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
+                tidligsteEndring = tidligsteEndring,
             ),
         )
     }

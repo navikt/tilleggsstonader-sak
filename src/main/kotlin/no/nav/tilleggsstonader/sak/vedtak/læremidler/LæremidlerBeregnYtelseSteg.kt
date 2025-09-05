@@ -2,12 +2,10 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -42,13 +40,11 @@ class LæremidlerBeregnYtelseSteg(
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
-    unleashService: UnleashService,
 ) : BeregnYtelseSteg<VedtakLæremidlerRequest>(
         stønadstype = listOf(Stønadstype.LÆREMIDLER),
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
-        unleashService = unleashService,
     ) {
     override fun lagreVedtak(
         saksbehandling: Saksbehandling,
@@ -137,12 +133,11 @@ class LæremidlerBeregnYtelseSteg(
         feilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
+        feilHvis(vedtak.opphørsdato == null) {
+            "Opphørsdato er ikke satt"
+        }
 
-        val opphørsdato =
-            revurderFraEllerOpphørsdato(
-                revurderFra = saksbehandling.revurderFra,
-                opphørsdato = vedtak.opphørsdato,
-            )
+        val opphørsdato = vedtak.opphørsdato
         val forrigeVedtak = hentVedtak(saksbehandling.forrigeIverksatteBehandlingId)
 
         opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
@@ -178,8 +173,8 @@ class LæremidlerBeregnYtelseSteg(
 
     fun avkortVedtaksperiodeVedOpphør(
         forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørLæremidler>,
-        revurderFra: LocalDate,
-    ): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(revurderFra.minusDays(1))
+        opphørsdato: LocalDate,
+    ): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(opphørsdato.minusDays(1))
 
     private fun lagreAvslag(
         saksbehandling: Saksbehandling,
@@ -225,6 +220,6 @@ class LæremidlerBeregnYtelseSteg(
                     begrunnelse = begrunnelse,
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
-            tidligsteEndring = if (unleashService.isEnabled(Toggle.SKAL_UTLEDE_ENDRINGSDATO_AUTOMATISK)) tidligsteEndring else null,
+            tidligsteEndring = tidligsteEndring,
         )
 }

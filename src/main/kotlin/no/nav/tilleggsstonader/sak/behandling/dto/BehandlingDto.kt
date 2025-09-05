@@ -15,7 +15,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.dto.TilordnetSaksbehandlerDto
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class BehandlingDto(
@@ -36,7 +35,6 @@ data class BehandlingDto(
     val vedtaksdato: LocalDateTime?,
     val henlagtÅrsak: HenlagtÅrsak?,
     val henlagtBegrunnelse: String?,
-    val revurderFra: LocalDate?,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata?,
     val tilordnetSaksbehandler: TilordnetSaksbehandlerDto?,
 )
@@ -64,7 +62,6 @@ fun Behandling.tilDto(
         henlagtBegrunnelse = this.henlagtBegrunnelse,
         stønadstype = stønadstype,
         vedtaksdato = this.vedtakstidspunkt,
-        revurderFra = this.revurderFra,
         nyeOpplysningerMetadata = this.nyeOpplysningerMetadata,
         tilordnetSaksbehandler = tilordnetSaksbehandler,
     )
@@ -88,7 +85,6 @@ fun Saksbehandling.tilDto(tilordnetSaksbehandler: TilordnetSaksbehandlerDto?): B
         henlagtBegrunnelse = this.henlagtBegrunnelse,
         stønadstype = stønadstype,
         vedtaksdato = this.vedtakstidspunkt,
-        revurderFra = this.revurderFra,
         nyeOpplysningerMetadata = this.nyeOpplysningerMetadata,
         tilordnetSaksbehandler = tilordnetSaksbehandler,
     )

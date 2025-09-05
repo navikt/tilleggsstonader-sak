@@ -67,6 +67,13 @@ spec:
   secureLogs:
     enabled: true
   azure:
+    sidecar:
+      enabled: true
+      autoLogin: true
+      autoLoginIgnorePaths:
+        - /internal/**
+        - /api/**
+
     application:
       enabled: true
       claims:

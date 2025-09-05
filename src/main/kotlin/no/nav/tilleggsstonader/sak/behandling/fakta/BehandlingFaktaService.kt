@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Bolig
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.DelerBoutgifterType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HarUtgifterTilBoligToStederType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.JaNeiType
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.PeriodeForSamling
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Samling
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeUtgifterType
 import no.nav.tilleggsstonader.libs.utils.fnr.Fødselsnummer
@@ -23,12 +24,13 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.BoligEllerOve
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.DelerUtgifterFlereStederType
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.DokumentasjonBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.FasteUtgifter
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.Personopplysninger
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.TypeFasteUtgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.TypeUtgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterFlereSteder
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterIForbindelseMedSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterNyBolig
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.AktivitetDagligReiseAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.DokumentasjonDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
@@ -41,6 +43,7 @@ import java.time.LocalDate
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.FasteUtgifter as FasteUtgifterKontraktor
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterFlereSteder as UtgifterFlereStederKontraktor
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterNyBolig as UtgifterNyBoligKontrakt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reise as ReiseDagligReise
 
 /**
  * Denne klassen håndterer henting av VilkårGrunnlagDto
@@ -108,7 +111,19 @@ class BehandlingFaktaService(
         )
     }
 
-    private fun hentFaktaDTOForDagligreise(behandlingId: BehandlingId): BehandlingFaktaDagligreiseDto = BehandlingFaktaDagligreiseDto()
+    private fun hentFaktaDTOForDagligreise(behandlingId: BehandlingId): BehandlingFaktaDagligreiseDto {
+        val søknad = søknadService.hentSøknadDagligReise(behandlingId)
+        val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
+        return BehandlingFaktaDagligreiseDto(
+            søknadMottattTidspunkt = søknad?.mottattTidspunkt,
+            hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
+            dokumentasjon = søknad?.let { mapDokumentasjonDagligReise(it.data.dokumentasjon, it.journalpostId) },
+            arena = arenaFakta(grunnlagsdata),
+            aktiviteter = mapAktivitetForDagligReise(søknad?.data?.aktivitet),
+            reiser = mapReise(søknad?.data?.reiser),
+            personopplysninger = mapPersonopplysninger(søknad?.data?.personopplysninger),
+        )
+    }
 
     private fun arenaFakta(grunnlagsdata: Grunnlag): ArenaFakta? =
         grunnlagsdata.arenaVedtak?.let {
@@ -130,6 +145,27 @@ class BehandlingFaktaService(
                     )
                 },
         )
+
+    private fun mapAktivitetForDagligReise(aktivitet: AktivitetDagligReiseAvsnitt?) =
+        FaktaAktivtetDagligReise(
+            aktivitet = mapAktivitet(aktivitet?.aktivitet),
+            reiseTilAktivitetsstedHelePerioden = aktivitet?.reiseTilAktivitetsstedHelePerioden,
+            reiseperiode = aktivitet?.reiseperiode,
+        )
+
+    private fun mapReise(reiser: List<ReiseDagligReise>?): List<FaktaReise>? =
+        reiser?.map { reise ->
+            FaktaReise(
+                reiseAdresse = reise.reiseAdresse,
+                dagerPerUke = reise.dagerPerUke,
+                harMerEnn6KmReisevei = reise.harMerEnn6KmReisevei,
+                lengdeReisevei = reise.lengdeReisevei,
+                harBehovForTransportUavhengigAvReisensLengde = reise.harBehovForTransportUavhengigAvReisensLengde,
+                kanReiseMedOffentligTransport = reise.kanReiseMedOffentligTransport,
+                offentligTransport = reise.offentligTransport,
+                privatTransport = reise.privatTransport,
+            )
+        }
 
     private fun mapBoligEllerOvernatting(boutgifter: BoligEllerOvernattingAvsnitt?) =
         BoligEllerOvernatting(
@@ -205,7 +241,7 @@ class BehandlingFaktaService(
             Samling(
                 periodeForSamling =
                     it.periodeForSamling.map { periode ->
-                        no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.PeriodeForSamling(
+                        PeriodeForSamling(
                             fom = periode.fom,
                             tom = periode.tom,
                             trengteEkstraOvernatting = mapJaNei(periode.trengteEkstraOvernatting),
@@ -343,6 +379,17 @@ class BehandlingFaktaService(
         return FaktaDokumentasjon(journalpostId, dokumentasjon)
     }
 
+    private fun mapDokumentasjonDagligReise(
+        dokumentasjonListe: List<DokumentasjonDagligReise>,
+        journalpostId: String,
+    ): FaktaDokumentasjon {
+        val dokumentasjon =
+            dokumentasjonListe.map {
+                Dokumentasjon(type = it.tittel, dokumenter = listOf(Dokument(it.dokumentInfoId)))
+            }
+        return FaktaDokumentasjon(journalpostId, dokumentasjon)
+    }
+
     private fun validerFinnesGrunnlagsdataForAlleBarnISøknad(
         grunnlagsdata: Grunnlag,
         søknadBarnPåIdent: Map<String, SøknadBarn>,
@@ -357,9 +404,4 @@ class BehandlingFaktaService(
             error("Mangler grunnlagsdata for barn i søknad ($kommaseparerteIdenter)")
         }
     }
-
-    private fun mapDineOpplysninger(dineOpplysninger: Personopplysninger?) =
-        Personopplysninger(
-            adresse = dineOpplysninger?.adresse,
-        )
 }

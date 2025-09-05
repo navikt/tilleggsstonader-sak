@@ -58,7 +58,6 @@ class BoutgifterBeregningService(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             typeVedtak = typeVedtak,
-            tidligsteEndring = tidligsteEndring,
         )
 
         val vedtaksperioderBeregning =
@@ -128,10 +127,10 @@ class BoutgifterBeregningService(
 
     /**
      * Slår sammen perioder fra forrige og nytt vedtak.
-     * Beholder perioder fra forrige vedtak frem til revurder fra-datoen.
-     * Bruker reberegnede perioder fra og med revurder fra-datoen
+     * Beholder perioder fra forrige vedtak frem til tidligsteEndring-datoen.
+     * Bruker reberegnede perioder fra og med tidligsteEndring-datoen
      * Dette gjøres for at vi ikke skal reberegne perioder som ikke er med i revurderingen, i tilfelle beregningskoden har endret seg siden sist.
-     * Vi trenger derimot å reberegne alle perioder som ligger etter revurder fra-datoen, da utgiftene, antall samlinger osv kan ha endret seg.
+     * Vi trenger derimot å reberegne alle perioder som ligger etter tidligsteEndring-datoen, da utgiftene, antall samlinger osv kan ha endret seg.
      */
     private fun settSammenGamleOgNyePerioder(
         tidligsteEndring: LocalDate,

@@ -9,10 +9,15 @@ import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ReiseAdresse
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.OffentligTransport
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.PrivatTransport
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reiseperiode
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ValgtAktivitetDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Utgifter
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -22,6 +27,8 @@ import java.time.LocalDateTime
     JsonSubTypes.Type(BehandlingFaktaTilsynBarnDto::class, name = "BARNETILSYN"),
     JsonSubTypes.Type(BehandlingFaktaLæremidlerDto::class, name = "LÆREMIDLER"),
     JsonSubTypes.Type(BehandlingFaktaBoutgifterDto::class, name = "BOUTGIFTER"),
+    JsonSubTypes.Type(BehandlingFaktaDagligreiseDto::class, name = "DAGLIG_REISE_TSO"),
+    JsonSubTypes.Type(BehandlingFaktaDagligreiseDto::class, name = "DAGLIG_REISE_TSR"),
 )
 sealed interface BehandlingFaktaDto {
     val søknadMottattTidspunkt: LocalDateTime?
@@ -63,6 +70,9 @@ data class BehandlingFaktaDagligreiseDto(
     override val hovedytelse: FaktaHovedytelse? = null,
     override val dokumentasjon: FaktaDokumentasjon? = null,
     override val arena: ArenaFakta? = null,
+    val aktiviteter: FaktaAktivtetDagligReise,
+    val reiser: List<FaktaReise>?,
+    val personopplysninger: FaktaPersonopplysninger,
 ) : BehandlingFaktaDto
 
 data class FaktaHovedytelse(
@@ -121,6 +131,12 @@ data class FaktaAktivtet(
     val søknadsgrunnlag: SøknadsgrunnlagAktivitet?,
 )
 
+data class FaktaAktivtetDagligReise(
+    val aktivitet: FaktaAktivtet,
+    val reiseTilAktivitetsstedHelePerioden: JaNei?,
+    val reiseperiode: Reiseperiode?,
+)
+
 data class SøknadsgrunnlagAktivitet(
     val aktiviteter: List<String>?,
     val annenAktivitet: AnnenAktivitetType?,
@@ -133,6 +149,17 @@ data class FaktaBarn(
     val registergrunnlag: RegistergrunnlagBarn,
     val søknadgrunnlag: SøknadsgrunnlagBarn?,
     val vilkårFakta: VilkårFaktaBarn,
+)
+
+data class FaktaReise(
+    val reiseAdresse: no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse?,
+    val dagerPerUke: ValgtAktivitetDagligReise,
+    val harMerEnn6KmReisevei: JaNei,
+    val lengdeReisevei: Int?,
+    val harBehovForTransportUavhengigAvReisensLengde: JaNei?,
+    val kanReiseMedOffentligTransport: JaNei,
+    val offentligTransport: OffentligTransport?,
+    val privatTransport: PrivatTransport?,
 )
 
 /**

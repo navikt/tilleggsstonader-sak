@@ -50,7 +50,11 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Skjem
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeUtgifterType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterFlereSteder
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterNyBolig
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransportType
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaSlagsTypeBillettMaDuKjopeType
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.PeriodeAktivitet
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.SkjemaDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Valgfelt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOpphold
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.OppholdUtenforNorge
@@ -98,6 +102,8 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Land
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.NavAdresse as NavAdresseDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge as OppholdUtenforNorgeDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Periode as PeriodeDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reise as ReiseDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ReiseAdresse as ReiseAdresseDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reiseperiode as ReiseperiodeDagligReise
 
 @RestController
@@ -414,20 +420,40 @@ class OpprettTestBehandlingController(
                         aktivitet =
                             AktivitetDagligReise(
                                 aktivitetId = "ingenAktivitet",
-                                text = "",
-                                periode = null,
+                                text = "AAP",
+                                periode = PeriodeAktivitet(LocalDate.of(2025, 5, 20), LocalDate.of(2025, 7, 20)),
                                 maalgruppe = null,
                             ),
                     ),
                 arbeidsrettetAktivitet = null,
-                mottarLonnGjennomTiltak = null,
-                reiseTilAktivitetsstedHelePerioden = JaNeiTypeDagligReise.nei,
+                mottarLonnGjennomTiltak = JaNeiTypeDagligReise.ja,
+                reiseTilAktivitetsstedHelePerioden = JaNeiTypeDagligReise.ja,
                 reiseperiode =
                     ReiseperiodeDagligReise(
                         LocalDate.of(2025, 6, 20),
                         LocalDate.of(2025, 5, 20),
                     ),
             )
+        val reise =
+            ReiseDagligReise(
+                reiseAdresse =
+                    ReiseAdresseDagligReise(gateadresse = "Nisseveien 3", postnr = "0011", poststed = "OSLO"),
+                hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet = Valgfelt("dager", "5"),
+                harDu6KmReisevei = JaNeiTypeDagligReise.ja,
+                hvorLangErReiseveienDin = 8,
+                harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde = JaNeiTypeDagligReise.nei,
+                kanDuReiseMedOffentligTransport = JaNeiTypeDagligReise.ja,
+                hvaSlagsTypeBillettMaDuKjope = mapOf(HvaSlagsTypeBillettMaDuKjopeType.enkeltbillett to true),
+                enkeltbilett = 1,
+                syvdagersbilett = 0,
+                manedskort = 0,
+                hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport =
+                    mapOf(HvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransportType.annet to false),
+                kanDuKjoreMedEgenBil = JaNeiTypeDagligReise.nei,
+                utgifterBil = null,
+                drosje = null,
+            )
+
         val skjemaDagligReise =
             SøknadsskjemaDagligReiseFyllUtSendInn(
                 language = "nb-NO",
@@ -442,7 +468,7 @@ class OpprettTestBehandlingController(
                                 ),
                             arbeidOgOpphold = arbeidOgOppholdDagligReise(),
                             aktiviteter = aktiviteter,
-                            reise = emptyList(),
+                            reise = listOf(reise),
                         ),
                     ),
                 dokumentasjon = emptyList(),

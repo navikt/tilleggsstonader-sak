@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.oppgave
 import org.assertj.core.api.Assertions.assertThat
@@ -41,10 +42,23 @@ class OppgavehendelseHåndtererTest : IntegrationTest() {
     @Test
     fun `skal oppdatere intern oppgave om tilhørende oppgave blir oppdatert`() {
         val tilordnetSaksbehandler = "Z999999"
-        val oppgaveHendelse = lagOppgavehendelse(tilordnetSaksbehandler, oppgave.gsakOppgaveId)
+        val enhetsnummer = "999999"
+        val enhetsmappeId = 888888L
+        val oppgaveHendelse =
+            lagOppgavehendelse(
+                tilordnetSaksbehandler = tilordnetSaksbehandler,
+                gsakOppgaveId = oppgave.gsakOppgaveId,
+                hendelsestype = Hendelsestype.OPPGAVE_FEILREGISTRERT,
+                tildeltEnhetsnummer = enhetsnummer,
+                enhetsmappeId = enhetsmappeId,
+            )
         oppgavehendelseHåndterer.behandleOppgavehendelser(listOf(oppgaveHendelse))
 
-        assertThat(oppgaveRepository.findByIdOrThrow(oppgave.id).tilordnetSaksbehandler).isEqualTo(tilordnetSaksbehandler)
+        val lagretOppgave = oppgaveRepository.findByIdOrThrow(oppgave.id)
+        assertThat(lagretOppgave.tilordnetSaksbehandler).isEqualTo(tilordnetSaksbehandler)
+        assertThat(lagretOppgave.enhetsmappeId).isEqualTo(enhetsmappeId)
+        assertThat(lagretOppgave.tildeltEnhetsnummer).isEqualTo(enhetsnummer)
+        assertThat(lagretOppgave.status).isEqualTo(Oppgavestatus.FEILREGISTRERT)
     }
 
     @Test
@@ -60,6 +74,8 @@ class OppgavehendelseHåndtererTest : IntegrationTest() {
         tilordnetSaksbehandler: String?,
         gsakOppgaveId: Long,
         hendelsestype: Hendelsestype = Hendelsestype.OPPGAVE_ENDRET,
+        tildeltEnhetsnummer: String = "1234",
+        enhetsmappeId: Long? = null,
     ) = OppgavehendelseRecord(
         hendelse =
             Hendelse(
@@ -70,7 +86,7 @@ class OppgavehendelseHåndtererTest : IntegrationTest() {
         oppgave =
             Oppgave(
                 oppgaveId = gsakOppgaveId,
-                tilordning = Tilordning(navIdent = "Z999999", enhetsnr = "4462", enhetsmappeId = null),
+                tilordning = Tilordning(navIdent = "Z999999", enhetsnr = tildeltEnhetsnummer, enhetsmappeId = enhetsmappeId),
                 kategorisering =
                     Kategorisering(
                         behandlingstema = Stønadstype.LÆREMIDLER.tilBehandlingstema().value,

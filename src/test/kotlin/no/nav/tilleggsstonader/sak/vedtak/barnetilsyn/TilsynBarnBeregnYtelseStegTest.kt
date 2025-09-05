@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -50,7 +49,6 @@ class TilsynBarnBeregnYtelseStegTest {
         mockk<UtledTidligsteEndringService> {
             every { utledTidligsteEndringForBeregning(any(), any()) } returns null
         }
-    private val unleashService = mockUnleashService()
 
     val tilsynBarnBeregningService =
         TilsynBarnBeregningService(
@@ -65,7 +63,6 @@ class TilsynBarnBeregnYtelseStegTest {
             beregningService = tilsynBarnBeregningService,
             opphørValideringService = opphørValideringService,
             utledTidligsteEndringService = utledTidligsteEndringService,
-            unleashService = unleashService,
             vedtakRepository = repository,
             tilkjentytelseService = tilkjentYtelseService,
             simuleringService = simuleringService,
@@ -124,11 +121,21 @@ class TilsynBarnBeregnYtelseStegTest {
 
     @Test
     fun `skal feile dersom man velger opphør på en førstegangsbehandling`() {
-        val vedtak = opphørDto()
+        val vedtak = opphørDto(opphørsdato = LocalDate.now())
 
         assertThatThrownBy {
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtak)
         }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling")
+    }
+
+    @Test
+    fun `skal feile dersom man velger opphør og opphørsdato ikke er satt`() {
+        val revurdering = saksbehandling(type = BehandlingType.REVURDERING, forrigeIverksatteBehandlingId = BehandlingId.random())
+        val vedtak = opphørDto(opphørsdato = null)
+
+        assertThatThrownBy {
+            steg.utførOgReturnerNesteSteg(revurdering, vedtak)
+        }.hasMessage("Opphørsdato er ikke satt")
     }
 
     @Test
