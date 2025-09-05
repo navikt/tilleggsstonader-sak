@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import org.slf4j.LoggerFactory
+import java.time.LocalDate
 
 /**
  * Splitter opp BeregnYtelseSteg for ulike stønadstyper
@@ -30,6 +31,12 @@ abstract class BeregnYtelseSteg<DTO : Any>(
         nullstillEksisterendeVedtakPåBehandling(saksbehandling)
         lagreVedtak(saksbehandling, data)
     }
+
+    abstract fun lagreVedtakForSatsjustering(
+        saksbehandling: Saksbehandling,
+        vedtak: DTO,
+        satsjusteringFra: LocalDate,
+    )
 
     protected abstract fun lagreVedtak(
         saksbehandling: Saksbehandling,

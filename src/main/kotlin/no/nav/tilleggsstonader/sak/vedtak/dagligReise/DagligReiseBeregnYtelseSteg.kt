@@ -35,6 +35,14 @@ class DagligReiseBeregnYtelseSteg(
         tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
     ) {
+    override fun lagreVedtakForSatsjustering(
+        saksbehandling: Saksbehandling,
+        vedtak: VedtakDagligReiseRequest,
+        satsjusteringFra: LocalDate,
+    ) {
+        TODO("Not yet implemented")
+    }
+
     override fun lagreVedtak(
         saksbehandling: Saksbehandling,
         vedtak: VedtakDagligReiseRequest,

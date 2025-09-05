@@ -23,6 +23,8 @@ interface FaktaGrunnlagRepository :
         typer: List<TypeFaktaGrunnlag>,
     ): List<FaktaGrunnlag>
 
+    fun findByBehandlingId(behandlingId: BehandlingId): List<FaktaGrunnlag>
+
     fun existsByBehandlingId(behandlingId: BehandlingId): Boolean
 
     @Modifying

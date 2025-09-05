@@ -20,6 +20,8 @@ data class SatsLæremidler(
     init {
         validatePeriode()
     }
+
+    fun finnSatsForStudienivå(studienivå: Studienivå): Int = beløp[studienivå] ?: error("Finner ikke studienivå=$studienivå for sats=$this")
 }
 
 private val MAX = LocalDate.of(2099, 12, 31)
@@ -60,9 +62,4 @@ class SatsLæremidlerService {
         satser.find {
             it.inneholder(periode)
         } ?: error("Finner ikke satser for $periode")
-
-    fun finnSatsForStudienivå(
-        sats: SatsLæremidler,
-        studienivå: Studienivå,
-    ): Int = sats.beløp[studienivå] ?: error("Finner ikke studienivå=$studienivå for sats=$sats")
 }

@@ -45,6 +45,14 @@ class BoutgifterBeregnYtelseSteg(
         tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
     ) {
+    override fun lagreVedtakForSatsjustering(
+        saksbehandling: Saksbehandling,
+        vedtak: VedtakBoutgifterRequest,
+        satsjusteringFra: LocalDate,
+    ) {
+        TODO("Not yet implemented")
+    }
+
     override fun lagreVedtak(
         saksbehandling: Saksbehandling,
         vedtak: VedtakBoutgifterRequest,

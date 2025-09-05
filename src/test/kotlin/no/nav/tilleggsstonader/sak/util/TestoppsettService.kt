@@ -30,9 +30,11 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.tilBehandlingResult
 import org.springframework.context.annotation.Profile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Profile("integrasjonstest")
 @Service
@@ -127,10 +129,22 @@ class TestoppsettService(
         return vedtak
     }
 
-    fun ferdigstillBehandling(behandling: Behandling): Behandling =
-        oppdater(
-            behandling.copy(status = BehandlingStatus.FERDIGSTILT),
+    fun ferdigstillBehandling(behandling: Behandling): Behandling {
+        val resultat =
+            vedtakRepository.findByIdOrNull(behandling.id)?.type?.tilBehandlingResult()
+                ?: behandling.resultat
+        return oppdater(
+            behandling.copy(
+                status = BehandlingStatus.FERDIGSTILT,
+                resultat = resultat,
+                vedtakstidspunkt =
+                    when {
+                        resultat != BehandlingResultat.IKKE_SATT -> LocalDateTime.now()
+                        else -> null
+                    },
+            ),
         )
+    }
 
     fun opprettRevurdering(
         forrigeBehandling: Behandling,

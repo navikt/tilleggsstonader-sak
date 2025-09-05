@@ -6,8 +6,8 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.behandling.dto.BarnTilRevurderingDto
-import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -21,8 +21,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -30,63 +28,63 @@ import java.time.LocalDateTime
 
 @Service
 class OpprettRevurderingBehandlingService(
-    val taskService: TaskService,
-    val behandlingService: BehandlingService,
-    val barnService: BarnService,
-    val vilkårperiodeService: VilkårperiodeService,
-    val vilkårService: VilkårService,
-    val unleashService: UnleashService,
-    val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
-    val personService: PersonService,
-    val fagsakService: FagsakService,
+    private val taskService: TaskService,
+    private val behandlingService: BehandlingService,
+    private val barnService: BarnService,
+    private val unleashService: UnleashService,
+    private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
+    private val personService: PersonService,
+    private val fagsakService: FagsakService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun opprettBehandling(request: OpprettBehandlingDto): BehandlingId {
+    fun opprettBehandling(opprettRevurdering: OpprettRevurdering): BehandlingId {
         feilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING)) {
             "Feature toggle for å kunne opprette revurdering er slått av"
         }
-        logger.info("Oppretter revurdering for fagsak=${request.fagsakId}")
+        logger.info("Oppretter revurdering for fagsak=${opprettRevurdering.fagsakId}")
 
-        if (request.årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) {
-            feilHvis(request.nyeOpplysningerMetadata == null) {
+        if (opprettRevurdering.årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) {
+            feilHvis(opprettRevurdering.nyeOpplysningerMetadata == null) {
                 "Krever metadata ved behandlingsårsak NYE_OPPLYSNINGER"
             }
         }
 
-        val fagsakId = request.fagsakId
+        val fagsakId = opprettRevurdering.fagsakId
         val behandling =
             behandlingService.opprettBehandling(
                 fagsakId = fagsakId,
-                behandlingsårsak = request.årsak,
-                kravMottatt = request.kravMottatt,
-                nyeOpplysningerMetadata = request.nyeOpplysningerMetadata?.tilDomene(),
+                behandlingsårsak = opprettRevurdering.årsak,
+                kravMottatt = opprettRevurdering.kravMottatt,
+                nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
             )
 
         val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
 
-        validerValgteBarn(request, behandlingIdForGjenbruk)
+        validerValgteBarn(opprettRevurdering, behandlingIdForGjenbruk)
 
         behandlingIdForGjenbruk?.let { gjenbrukDataRevurderingService.gjenbrukData(behandling, it) }
-        barnService.opprettBarn(request.valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) })
+        barnService.opprettBarn(opprettRevurdering.valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) })
 
-        taskService.save(
-            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
-                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                    behandlingId = behandling.id,
-                    saksbehandler = SikkerhetContext.hentSaksbehandler(),
-                    beskrivelse = "Skal behandles i TS-Sak",
-                    hendelseTidspunkt = behandling.kravMottatt?.atStartOfDay() ?: LocalDateTime.now(),
+        if (opprettRevurdering.skalOppretteOppgave) {
+            taskService.save(
+                OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                    OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                        behandlingId = behandling.id,
+                        saksbehandler = SikkerhetContext.hentSaksbehandler(),
+                        beskrivelse = "Skal behandles i TS-Sak",
+                        hendelseTidspunkt = behandling.kravMottatt?.atStartOfDay() ?: LocalDateTime.now(),
+                    ),
                 ),
-            ),
-        )
+            )
+        }
 
         return behandling.id
     }
 
     private fun validerValgteBarn(
-        request: OpprettBehandlingDto,
+        request: OpprettRevurdering,
         behandlingIdForGjenbruk: BehandlingId?,
     ) {
         val stønadstype: Stønadstype by lazy { fagsakService.hentFagsak(request.fagsakId).stønadstype }

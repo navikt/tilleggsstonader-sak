@@ -88,7 +88,7 @@ class BehandlingController(
         tilgangService.validerTilgangTilFagsak(request.fagsakId, AuditLoggerEvent.CREATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return opprettRevurderingBehandlingService.opprettBehandling(request)
+        return opprettRevurderingBehandlingService.opprettBehandling(request.tilDomene())
     }
 
     @PostMapping("person")
