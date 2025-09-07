@@ -55,7 +55,7 @@ class TestoppsettService(
     fun hentSaksbehandling(behandlingId: BehandlingId) = behandlingRepository.finnSaksbehandling(behandlingId)
 
     fun opprettBehandlingMedFagsak(
-        behandling: Behandling,
+        behandling: Behandling = behandling(),
         stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
         opprettGrunnlagsdata: Boolean = true,
         identer: Set<PersonIdent> = defaultIdenter,
