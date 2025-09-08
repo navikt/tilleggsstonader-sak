@@ -25,7 +25,7 @@ import java.util.Properties
     taskStepType = GjenopprettOppgavePåBehandlingTask.TYPE,
     maxAntallFeil = 1,
     settTilManuellOppfølgning = true,
-    beskrivelse = "Finn og logg metadata for oppgave knyttet til behandling",
+    beskrivelse = "Brukes for å gjenopprette oppgave på behandling hvor oppgaven har blitt feilregistrert eller flyttet",
 )
 class GjenopprettOppgavePåBehandlingTask(
     private val behandligService: BehandlingService,
@@ -83,7 +83,7 @@ class GjenopprettOppgavePåBehandlingTask(
         }
 
     companion object {
-        const val TYPE = "GjenopprettOppgavePåBehandlingForvaltningsTask"
+        const val TYPE = "GjenopprettOppgavePåBehandlingTask"
 
         fun opprettTask(behandlingId: BehandlingId): Task =
             Task(
