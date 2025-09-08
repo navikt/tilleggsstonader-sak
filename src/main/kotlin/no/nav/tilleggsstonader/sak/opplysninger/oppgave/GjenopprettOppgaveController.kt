@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.GjennoprettOppgavePåBehandlingTask
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.GjenopprettOppgavePåBehandlingTask
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PathVariable
@@ -26,7 +26,7 @@ class GjenopprettOppgaveController(
     ) {
         tilgangService.validerHarUtviklerrolle()
         taskService.save(
-            GjennoprettOppgavePåBehandlingTask.opprettTask(behandlingId),
+            GjenopprettOppgavePåBehandlingTask.opprettTask(behandlingId),
         )
     }
 }

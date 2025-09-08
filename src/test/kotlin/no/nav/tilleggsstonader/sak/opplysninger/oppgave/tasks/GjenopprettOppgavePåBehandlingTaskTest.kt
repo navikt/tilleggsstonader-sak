@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks
 
-import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -17,20 +16,19 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.util.oppgave
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class GjennoprettOppgavePåBehandlingTaskTest {
+class GjenopprettOppgavePåBehandlingTaskTest {
     private val behandlingService: BehandlingService = mockk()
     private val oppgaveService: OppgaveService = mockk()
     private val oppgaveRepository: OppgaveRepository = mockk()
-    private lateinit var taskStep: GjennoprettOppgavePåBehandlingTask
+    private lateinit var taskStep: GjenopprettOppgavePåBehandlingTask
 
     @BeforeEach
     fun setUp() {
         taskStep =
-            GjennoprettOppgavePåBehandlingTask(
+            GjenopprettOppgavePåBehandlingTask(
                 behandligService = behandlingService,
                 oppgaveService = oppgaveService,
                 oppgaveRepository = oppgaveRepository,
@@ -58,7 +56,7 @@ class GjennoprettOppgavePåBehandlingTaskTest {
 
         every { oppgaveRepository.update(any()) } returns sisteOppgave.copy(status = Oppgavestatus.IGNORERT)
 
-        val task: Task = GjennoprettOppgavePåBehandlingTask.opprettTask(behandlingId)
+        val task: Task = GjenopprettOppgavePåBehandlingTask.opprettTask(behandlingId)
 
         taskStep.doTask(task)
 
@@ -99,7 +97,7 @@ class GjennoprettOppgavePåBehandlingTaskTest {
         // Skal ikke kalles
         every { oppgaveRepository.update(any()) } throws AssertionError("Skal ikke oppdatere eksisterende oppgave")
 
-        val task: Task = GjennoprettOppgavePåBehandlingTask.opprettTask(behandlingId)
+        val task: Task = GjenopprettOppgavePåBehandlingTask.opprettTask(behandlingId)
 
         taskStep.doTask(task)
 

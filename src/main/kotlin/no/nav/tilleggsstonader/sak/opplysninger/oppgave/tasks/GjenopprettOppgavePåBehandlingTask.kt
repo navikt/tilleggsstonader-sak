@@ -22,12 +22,12 @@ import java.util.Properties
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = GjennoprettOppgavePåBehandlingTask.TYPE,
+    taskStepType = GjenopprettOppgavePåBehandlingTask.TYPE,
     maxAntallFeil = 1,
     settTilManuellOppfølgning = true,
     beskrivelse = "Finn og logg metadata for oppgave knyttet til behandling",
 )
-class GjennoprettOppgavePåBehandlingTask(
+class GjenopprettOppgavePåBehandlingTask(
     private val behandligService: BehandlingService,
     private val oppgaveService: OppgaveService,
     private val oppgaveRepository: OppgaveRepository,
@@ -83,7 +83,7 @@ class GjennoprettOppgavePåBehandlingTask(
         }
 
     companion object {
-        const val TYPE = "GjennoprettOppgavePåBehandlingForvaltningsTask"
+        const val TYPE = "GjenopprettOppgavePåBehandlingForvaltningsTask"
 
         fun opprettTask(behandlingId: BehandlingId): Task =
             Task(

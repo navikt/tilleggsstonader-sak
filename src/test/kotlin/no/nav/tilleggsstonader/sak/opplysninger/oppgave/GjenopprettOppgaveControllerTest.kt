@@ -4,7 +4,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.GjennoprettOppgavePåBehandlingTask
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.GjenopprettOppgavePåBehandlingTask
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,7 +31,7 @@ class GjenopprettOppgaveControllerTest : IntegrationTest() {
 
         assertThat(res.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
 
-        assertThat(taskService.findAll().filter { it.type == GjennoprettOppgavePåBehandlingTask.TYPE }).hasSize(1)
+        assertThat(taskService.findAll().filter { it.type == GjenopprettOppgavePåBehandlingTask.TYPE }).hasSize(1)
     }
 
     @Test
