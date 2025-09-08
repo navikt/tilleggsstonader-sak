@@ -208,4 +208,13 @@ interface BehandlingRepository :
         """,
     )
     fun finnBehandlingerMedAndelerSomVenterPåSatsjustering(stønadstype: Stønadstype): List<BehandlingId>
+
+    @Query(
+        """
+            select id from behandling
+            where status != 'FERDIGSTILT'
+            and id not in (select behandling_id from oppgave where status = 'ÅPEN');
+        """,
+    )
+    fun finnBehandlingerUtenOppgave(): List<BehandlingId>
 }
