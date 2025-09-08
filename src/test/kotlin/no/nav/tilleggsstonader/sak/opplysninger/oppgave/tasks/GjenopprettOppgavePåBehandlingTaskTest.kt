@@ -54,20 +54,11 @@ class GjenopprettOppgavePåBehandlingTaskTest {
         val opprettOppgaveSlot = slot<OpprettOppgave>()
         every { oppgaveService.opprettOppgave(behandlingId, capture(opprettOppgaveSlot)) } returns 1L
 
-        every { oppgaveRepository.update(any()) } returns sisteOppgave.copy(status = Oppgavestatus.IGNORERT)
-
         val task: Task = GjenopprettOppgavePåBehandlingTask.opprettTask(behandlingId)
 
         taskStep.doTask(task)
 
-        verify(exactly = 1) {
-            oppgaveRepository.update(
-                withArg {
-                    assertThat(it.status).isEqualTo(Oppgavestatus.IGNORERT)
-                    assertThat(it.id).isEqualTo(sisteOppgave.id)
-                },
-            )
-        }
+        verify(exactly = 0) { oppgaveRepository.update(any()) }
         verify(exactly = 1) { oppgaveService.opprettOppgave(behandlingId, any()) }
 
         val ny = opprettOppgaveSlot.captured
@@ -93,15 +84,20 @@ class GjenopprettOppgavePåBehandlingTaskTest {
 
         val opprettOppgaveSlot = slot<OpprettOppgave>()
         every { oppgaveService.opprettOppgave(behandlingId, capture(opprettOppgaveSlot)) } returns 1L
-
-        // Skal ikke kalles
-        every { oppgaveRepository.update(any()) } throws AssertionError("Skal ikke oppdatere eksisterende oppgave")
+        every { oppgaveRepository.update(any()) } returns sisteOppgave.copy(status = Oppgavestatus.IGNORERT)
 
         val task: Task = GjenopprettOppgavePåBehandlingTask.opprettTask(behandlingId)
 
         taskStep.doTask(task)
 
-        verify(exactly = 0) { oppgaveRepository.update(any()) }
+        verify(exactly = 1) {
+            oppgaveRepository.update(
+                withArg {
+                    assertThat(it.status).isEqualTo(Oppgavestatus.IGNORERT)
+                    assertThat(it.id).isEqualTo(sisteOppgave.id)
+                },
+            )
+        }
         verify(exactly = 1) { oppgaveService.opprettOppgave(behandlingId, any()) }
 
         val ny = opprettOppgaveSlot.captured

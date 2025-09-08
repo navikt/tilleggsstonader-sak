@@ -49,7 +49,7 @@ class GjenopprettOppgavePåBehandlingTask(
                     "Opprinnelig oppgave har blitt flyttet eller endret. For å kunne utføre behandling har det blitt opprettet en ny oppgave."
             }
 
-        if (sisteOppgavePåBehandling?.status == Oppgavestatus.FEILREGISTRERT) {
+        if (sisteOppgavePåBehandling?.status == Oppgavestatus.ÅPEN) {
             settOppgaveTilIgnorert(sisteOppgavePåBehandling)
         }
 
