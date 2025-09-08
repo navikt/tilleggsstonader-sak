@@ -3,6 +3,9 @@ package no.nav.tilleggsstonader.sak.hendelser.journalføring
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
+import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.BOUTGIFTER
+import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.DAGLIG_REISE_TSO
+import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.DAGLIG_REISE_TSR
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.brevkoder
@@ -28,7 +31,8 @@ class JournalhendelseKafkaHåndtererService(
         val kanBehandles = journalpost.kanBehandles()
 
         val brevkode = journalpost.dokumentBrevkode()
-        if (kanBehandles && brevkode == DokumentBrevkode.BOUTGIFTER) {
+        if (kanBehandles && brevkode?.kanBehandles() == true) {
+            // TODO Skill mellom TSO og TSR
             val stønadstype = brevkode.stønadstype
             logSkalBehandles(journalpost, kanBehandles = true)
             håndterSøknadService.håndterSøknad(journalpost, stønadstype)
@@ -37,6 +41,8 @@ class JournalhendelseKafkaHåndtererService(
         }
         // Trenger ikke å logge andre journalposter av typen utgående eller notat
     }
+
+    fun DokumentBrevkode.kanBehandles(): Boolean = this in listOf(BOUTGIFTER, DAGLIG_REISE_TSO, DAGLIG_REISE_TSR)
 
     private fun Journalpost.kanBehandles() =
         Tema.gjelderTemaTilleggsstønader(this.tema) &&
