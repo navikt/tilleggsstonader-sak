@@ -81,4 +81,24 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
             assertThat(utbetalingsdato).isEqualTo(tirsdag)
         }
     }
+
+    @Test
+    fun `to reiser som starter på ulike helgedager, skal begge summeres og utbetales fredagen før`() {
+        val fredag = 5 september 2025
+        val lørdag = 6 september 2025
+        val søndag = 7 september 2025
+        val beregningsresultat =
+            Beregningsresultat(
+                reiser = listOf(lagBeregningsresultatForReise(lørdag), lagBeregningsresultatForReise(søndag)),
+            )
+
+        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId)
+
+        with(andeler.single()) {
+            assertThat(fom).isEqualTo(fredag)
+            assertThat(tom).isEqualTo(fredag)
+            assertThat(beløp).isEqualTo(200)
+            assertThat(utbetalingsdato).isEqualTo(fredag)
+        }
+    }
 }

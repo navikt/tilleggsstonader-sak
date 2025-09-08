@@ -14,7 +14,7 @@ import java.time.temporal.TemporalAdjusters
 fun Beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId: BehandlingId): List<AndelTilkjentYtelse> =
     reiser
         .flatMap { it.perioder }
-        .groupBy { it.grunnlag.fom }
+        .groupBy { it.grunnlag.fom.datoEllerForrigeUkedagHvisHelg() }
         .map { (fom, reiseperioder) ->
             val målgrupper = reiseperioder.flatMap { it.grunnlag.vedtaksperioder }.map { it.målgruppe }
 
@@ -24,7 +24,7 @@ fun Beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId: BehandlingId): Li
 
             lagAndelForDagligReise(
                 behandlingId = behandlingId,
-                fom = fom,
+                fomUkedag = fom,
                 beløp = reiseperioder.sumOf { it.beløp },
                 målgruppe = målgrupper.first(),
             )
@@ -32,20 +32,19 @@ fun Beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId: BehandlingId): Li
 
 private fun lagAndelForDagligReise(
     behandlingId: BehandlingId,
-    fom: LocalDate,
+    fomUkedag: LocalDate,
     beløp: Int,
     målgruppe: FaktiskMålgruppe,
 ): AndelTilkjentYtelse {
     // TODO: Vurder om vi skal ha engangsutbetaling i stedet for dagsats.
-    val ukedagFom = fom.datoEllerForrigeUkedagHvisHelg()
     return AndelTilkjentYtelse(
         beløp = beløp,
-        fom = ukedagFom,
-        tom = ukedagFom,
+        fom = fomUkedag,
+        tom = fomUkedag,
         satstype = Satstype.DAG,
         type = målgruppe.tilTypeAndel(Stønadstype.DAGLIG_REISE_TSO),
         kildeBehandlingId = behandlingId,
-        utbetalingsdato = ukedagFom,
+        utbetalingsdato = fomUkedag,
     )
 }
 

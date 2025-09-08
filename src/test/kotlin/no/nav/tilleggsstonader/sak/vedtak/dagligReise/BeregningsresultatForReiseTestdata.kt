@@ -23,23 +23,28 @@ fun lagBeregningsresultatForReise(
             ),
     )
 
-fun lagBeregningsgrunnlag(fom: LocalDate): Beregningsgrunnlag =
+fun lagVedtaksperiodeGrunnlag(fom: LocalDate) =
+    listOf(
+        VedtaksperiodeGrunnlag(
+            id = UUID.randomUUID(),
+            fom = fom,
+            tom = fom,
+            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+            aktivitet = AktivitetType.TILTAK,
+            antallReisedagerIVedtaksperioden = 5,
+        ),
+    )
+
+fun lagBeregningsgrunnlag(
+    fom: LocalDate,
+    vedtaksperioder: List<VedtaksperiodeGrunnlag> = lagVedtaksperiodeGrunnlag(fom),
+): Beregningsgrunnlag =
     Beregningsgrunnlag(
         fom = fom,
         tom = fom.plusWeeks(1),
         prisEnkeltbillett = 50,
         pris30dagersbillett = 1000,
         antallReisedagerPerUke = 5,
-        vedtaksperioder =
-            listOf(
-                VedtaksperiodeGrunnlag(
-                    id = UUID.randomUUID(),
-                    fom = fom,
-                    tom = fom,
-                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                    aktivitet = AktivitetType.TILTAK,
-                    antallReisedagerIVedtaksperioden = 5,
-                ),
-            ),
+        vedtaksperioder = vedtaksperioder,
         antallReisedager = 20,
     )
