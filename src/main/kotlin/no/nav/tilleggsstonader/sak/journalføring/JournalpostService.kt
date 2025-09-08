@@ -200,11 +200,4 @@ class JournalpostService(
     }
 }
 
-private fun Stønadstype.tilDokumentBrevkode(): DokumentBrevkode =
-    when (this) {
-        Stønadstype.BARNETILSYN -> DokumentBrevkode.BARNETILSYN
-        Stønadstype.LÆREMIDLER -> DokumentBrevkode.LÆREMIDLER
-        Stønadstype.BOUTGIFTER -> DokumentBrevkode.BOUTGIFTER
-        Stønadstype.DAGLIG_REISE_TSO -> TODO("Daglig reise er ikke implementert enda")
-        Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise er ikke implementert enda")
-    }
+private fun Stønadstype.tilDokumentBrevkode(): DokumentBrevkode = DokumentBrevkode.entries.first { it.stønadstype == this }
