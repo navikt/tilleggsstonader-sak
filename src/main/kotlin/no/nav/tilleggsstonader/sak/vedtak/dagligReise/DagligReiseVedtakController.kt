@@ -1,14 +1,12 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.util.logger
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.OffentligTransportBeregningService
@@ -57,18 +55,14 @@ class DagligReiseVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: AvslagDagligReiseDto,
     ) {
-        val fagsakId = behandlingService.hentBehandling(behandlingId).fagsakId
-        val stønadsType = fagsakService.hentFagsak(fagsakId).stønadstype
+        val stønadsType = behandlingService.hentSaksbehandling(behandlingId).stønadstype
 
-        when (stønadsType) {
-            Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR ->
-                validerGyldigÅrsakAvslag.validerAvslagErGyldig(
-                    behandlingId,
-                    vedtak.årsakerAvslag,
-                    stønadsType,
-                )
-            else -> logger.info("ingen avlag for daglig reise ")
-        }
+        validerGyldigÅrsakAvslag.validerAvslagErGyldig(
+            behandlingId,
+            vedtak.årsakerAvslag,
+            stønadsType,
+        )
+
         lagreVedtak(behandlingId, vedtak)
     }
 
