@@ -1,8 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -10,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.OffentligTransportBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
@@ -17,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
+import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -36,12 +40,40 @@ class DagligReiseVedtakController(
     private val vedtakService: VedtakService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
+    private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
+    private val fagsakService: FagsakService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseDagligReiseRequest,
     ) {
+        lagreVedtak(behandlingId, vedtak)
+    }
+
+    @PostMapping("{behandlingId}/avslag")
+    fun avslå(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: AvslagDagligReiseDto,
+    ) {
+        val fagsakId = behandlingService.hentBehandling(behandlingId).fagsakId
+        val stønadsType = fagsakService.hentFagsak(fagsakId).stønadstype
+        if (stønadsType == Stønadstype.DAGLIG_REISE_TSO) {
+            validerGyldigÅrsakAvslag.validerAvslagErGyldig(
+                behandlingId,
+                vedtak.årsakerAvslag,
+                Stønadstype.DAGLIG_REISE_TSO,
+            )
+        } else if (
+            stønadsType == Stønadstype.DAGLIG_REISE_TSR
+        ) {
+            validerGyldigÅrsakAvslag.validerAvslagErGyldig(
+                behandlingId,
+                vedtak.årsakerAvslag,
+                Stønadstype.DAGLIG_REISE_TSR,
+            )
+        }
+
         lagreVedtak(behandlingId, vedtak)
     }
 

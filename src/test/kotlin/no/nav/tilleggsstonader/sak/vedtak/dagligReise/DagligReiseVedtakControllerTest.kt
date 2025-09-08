@@ -11,15 +11,18 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeTestUtil.vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
@@ -31,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
@@ -164,6 +168,37 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(response.body).isEqualTo(dummyInnvilgelse)
+    }
+
+    @Nested
+    inner class Avslag {
+        @Test
+        fun `skal lagre og hente avslag`() {
+            val avslag =
+                AvslagDagligReiseDto(
+                    årsakerAvslag = listOf(ÅrsakAvslag.ANNET),
+                    begrunnelse = "begrunnelse",
+                )
+
+            avslåVedtak(dummyBehandling, avslag)
+
+            val lagretDto = hentVedtak<AvslagDagligReiseDto>(dummyBehandling.id).body!!
+
+            assertThat(lagretDto.årsakerAvslag).isEqualTo(avslag.årsakerAvslag)
+            assertThat(lagretDto.begrunnelse).isEqualTo(avslag.begrunnelse)
+            assertThat(lagretDto.type).isEqualTo(TypeVedtak.AVSLAG)
+        }
+
+        private fun avslåVedtak(
+            behandling: Behandling,
+            vedtak: AvslagDagligReiseDto,
+        ) {
+            restTemplate.exchange<Map<String, Any>?>(
+                localhost("api/vedtak/daglig-reise/${behandling.id}/avslag"),
+                HttpMethod.POST,
+                HttpEntity(vedtak, headers),
+            )
+        }
     }
 
     private inline fun <reified T> innvilgeVedtak(

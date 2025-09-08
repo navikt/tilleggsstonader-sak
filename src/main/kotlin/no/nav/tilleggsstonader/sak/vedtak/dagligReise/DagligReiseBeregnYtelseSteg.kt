@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.OffentligTransportBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
@@ -49,7 +50,7 @@ class DagligReiseBeregnYtelseSteg(
     ) {
         when (vedtak) {
             is InnvilgelseDagligReiseRequest -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
-            is AvslagDagligReise -> TODO()
+            is AvslagDagligReiseDto -> lagreAvslag(saksbehandling, vedtak)
             is OpphørDagligReise -> TODO()
         }
     }
@@ -76,6 +77,25 @@ class DagligReiseBeregnYtelseSteg(
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
             tidligsteEndring = tidligsteEndring,
+        )
+    }
+
+    private fun lagreAvslag(
+        saksbehandling: Saksbehandling,
+        vedtak: AvslagDagligReiseDto,
+    ) {
+        vedtakRepository.insert(
+            GeneriskVedtak(
+                behandlingId = saksbehandling.id,
+                type = TypeVedtak.AVSLAG,
+                data =
+                    AvslagDagligReise(
+                        årsaker = vedtak.årsakerAvslag,
+                        begrunnelse = vedtak.begrunnelse,
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = null,
+            ),
         )
     }
 

@@ -5,9 +5,13 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.ANNET
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.HAR_IKKE_MERUTGIFTER
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.HAR_IKKE_UTGIFTER
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.IKKE_I_MÅLGRUPPE
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.IKKE_I_TILTAK
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.IKKE_RETT_TIL_YTELSE
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.INGEN_AKTIVITET
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.LØNN_I_TILTAK_ELLER_ORDINAR_LØNN
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.MANGELFULL_DOKUMENTASJON
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.REISEAVSTAND_UNDER_6_KM
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.RETT_TIL_BOSTØTTE
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND
 
@@ -55,7 +59,7 @@ fun gyldigeAvslagsårsaker(
             when (gjelder) {
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
-                Avslagskategori.STØNADSVILKÅR -> emptySet()
+                Avslagskategori.STØNADSVILKÅR -> setOf(MANGELFULL_DOKUMENTASJON, REISEAVSTAND_UNDER_6_KM, LØNN_I_TILTAK_ELLER_ORDINAR_LØNN)
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
 
@@ -63,7 +67,13 @@ fun gyldigeAvslagsårsaker(
             when (gjelder) {
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
-                Avslagskategori.STØNADSVILKÅR -> emptySet()
+                Avslagskategori.STØNADSVILKÅR ->
+                    setOf(
+                        MANGELFULL_DOKUMENTASJON,
+                        REISEAVSTAND_UNDER_6_KM,
+                        IKKE_I_TILTAK,
+                        IKKE_RETT_TIL_YTELSE,
+                    )
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
     }
