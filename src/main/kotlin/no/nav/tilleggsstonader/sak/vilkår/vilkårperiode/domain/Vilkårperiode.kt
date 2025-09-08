@@ -56,6 +56,7 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
     val status: Vilkårstatus? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
+    // Brukes for å knytte aktivitet i TS-Sak opp mot aktivitet i Arena. Foreløpig har vi ikke tilsvarende knytning for målgrupper.
     val kildeId: String? = null,
     // TODO kilde burde kunne fjernes, den brukes aldri til noe annet enn manuell. Må fjernes i frontend og.
     @InsertOnlyProperty

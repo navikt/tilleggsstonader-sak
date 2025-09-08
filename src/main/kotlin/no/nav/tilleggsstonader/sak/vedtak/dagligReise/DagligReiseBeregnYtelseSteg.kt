@@ -77,6 +77,10 @@ class DagligReiseBeregnYtelseSteg(
             begrunnelse = vedtak.begrunnelse,
             tidligsteEndring = tidligsteEndring,
         )
+        tilkjentYtelseService.lagreTilkjentYtelse(
+            behandlingId = saksbehandling.id,
+            andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling.id),
+        )
     }
 
     private fun lagreInnvilgetVedtak(
