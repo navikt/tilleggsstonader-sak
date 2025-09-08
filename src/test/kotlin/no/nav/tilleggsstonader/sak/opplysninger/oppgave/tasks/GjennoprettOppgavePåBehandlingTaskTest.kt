@@ -37,11 +37,6 @@ class GjennoprettOppgavePåBehandlingTaskTest {
             )
     }
 
-    @AfterEach
-    fun tearDown() {
-        clearAllMocks()
-    }
-
     @Test
     fun `skal ignorere tidligere oppgave og opprette ny når siste er feilregistrert`() {
         val behandlingId = BehandlingId.random()
