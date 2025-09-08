@@ -2,9 +2,11 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class DagligReiseAndelTilkjentYtelseMapperTest {
     val behandlingId = BehandlingId.random()
@@ -100,5 +102,40 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
             assertThat(beløp).isEqualTo(200)
             assertThat(utbetalingsdato).isEqualTo(fredag)
         }
+    }
+
+    @Test
+    fun `to ulike målgrupper på samme dag er ikke støttet enda, og skal derfor feile`() {
+        val fredag = 5 september 2025
+        val vedtaksperiodeEnsligForsørger = listOf(lagVedtaksperiodeGrunnlag(fredag, målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER))
+        val vedtaksperioderNedsattArbeidsevne =
+            listOf(
+                lagVedtaksperiodeGrunnlag(fredag, målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE),
+            )
+        val beregningsresultat =
+            Beregningsresultat(
+                reiser =
+                    listOf(
+                        lagBeregningsresultatForReise(
+                            fredag,
+                            beregningsgrunnlag =
+                                lagBeregningsgrunnlag(
+                                    fom = fredag,
+                                    vedtaksperioder = vedtaksperiodeEnsligForsørger,
+                                ),
+                        ),
+                        lagBeregningsresultatForReise(
+                            fredag,
+                            beregningsgrunnlag =
+                                lagBeregningsgrunnlag(
+                                    fom = fredag,
+                                    vedtaksperioder = vedtaksperioderNedsattArbeidsevne,
+                                ),
+                        ),
+                    ),
+            )
+
+        val message = assertThrows<IllegalArgumentException> { beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId) }.message
+        assertThat(message).isEqualTo("Støtter foreløpig ikke ulike målgrupper på samme utbetalingsdato")
     }
 }

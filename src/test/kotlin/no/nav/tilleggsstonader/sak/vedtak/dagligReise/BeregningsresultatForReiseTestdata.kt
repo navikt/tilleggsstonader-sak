@@ -12,32 +12,33 @@ import java.util.UUID
 fun lagBeregningsresultatForReise(
     fom: LocalDate,
     beløp: Int = 100,
+    beregningsgrunnlag: Beregningsgrunnlag = lagBeregningsgrunnlag(fom),
 ): BeregningsresultatForReise =
     BeregningsresultatForReise(
         perioder =
             listOf(
                 BeregningsresultatForPeriode(
-                    grunnlag = lagBeregningsgrunnlag(fom),
+                    grunnlag = beregningsgrunnlag,
                     beløp = beløp,
                 ),
             ),
     )
 
-fun lagVedtaksperiodeGrunnlag(fom: LocalDate) =
-    listOf(
-        VedtaksperiodeGrunnlag(
-            id = UUID.randomUUID(),
-            fom = fom,
-            tom = fom,
-            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-            aktivitet = AktivitetType.TILTAK,
-            antallReisedagerIVedtaksperioden = 5,
-        ),
-    )
+fun lagVedtaksperiodeGrunnlag(
+    fom: LocalDate,
+    målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+) = VedtaksperiodeGrunnlag(
+    id = UUID.randomUUID(),
+    fom = fom,
+    tom = fom,
+    målgruppe = målgruppe,
+    aktivitet = AktivitetType.TILTAK,
+    antallReisedagerIVedtaksperioden = 5,
+)
 
 fun lagBeregningsgrunnlag(
     fom: LocalDate,
-    vedtaksperioder: List<VedtaksperiodeGrunnlag> = lagVedtaksperiodeGrunnlag(fom),
+    vedtaksperioder: List<VedtaksperiodeGrunnlag> = listOf(lagVedtaksperiodeGrunnlag(fom)),
 ): Beregningsgrunnlag =
     Beregningsgrunnlag(
         fom = fom,
