@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.util.logger
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.OffentligTransportBeregningService
@@ -58,22 +59,16 @@ class DagligReiseVedtakController(
     ) {
         val fagsakId = behandlingService.hentBehandling(behandlingId).fagsakId
         val stønadsType = fagsakService.hentFagsak(fagsakId).stønadstype
-        if (stønadsType == Stønadstype.DAGLIG_REISE_TSO) {
-            validerGyldigÅrsakAvslag.validerAvslagErGyldig(
-                behandlingId,
-                vedtak.årsakerAvslag,
-                Stønadstype.DAGLIG_REISE_TSO,
-            )
-        } else if (
-            stønadsType == Stønadstype.DAGLIG_REISE_TSR
-        ) {
-            validerGyldigÅrsakAvslag.validerAvslagErGyldig(
-                behandlingId,
-                vedtak.årsakerAvslag,
-                Stønadstype.DAGLIG_REISE_TSR,
-            )
-        }
 
+        when (stønadsType) {
+            Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR ->
+                validerGyldigÅrsakAvslag.validerAvslagErGyldig(
+                    behandlingId,
+                    vedtak.årsakerAvslag,
+                    stønadsType,
+                )
+            else -> logger.info("ingen avlag for daglig reise ")
+        }
         lagreVedtak(behandlingId, vedtak)
     }
 
