@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ManglerTilgang
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.logging.BehandlingLogService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
@@ -177,10 +176,14 @@ class TilgangService(
         validerTilgangTilRolle(BehandlerRolle.BESLUTTER)
     }
 
-    fun validerHarUtviklerrolle() =
-        feilHvisIkke(SikkerhetContext.harRolle(rolleConfig.utvikler)) {
-            "Innlogget bruker har ikke utviklerrolle"
+    fun validerHarUtviklerrolle() {
+        if (!SikkerhetContext.harRolle(rolleConfig.utvikler)) {
+            throw ManglerTilgang(
+                melding = "Innlogget bruker har ikke utviklerrolle",
+                frontendFeilmelding = "Innlogget bruker har ikke utviklerrolle",
+            )
         }
+    }
 
     fun validerTilgangTilRolle(minimumsrolle: BehandlerRolle) {
         if (!harTilgangTilRolle(minimumsrolle)) {

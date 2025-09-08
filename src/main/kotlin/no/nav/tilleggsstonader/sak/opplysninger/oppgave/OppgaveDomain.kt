@@ -23,6 +23,10 @@ data class OppgaveDomain(
     val tilordnetSaksbehandler: String?,
 ) {
     fun erFerdigstilt() = status == Oppgavestatus.FERDIGSTILT
+
+    fun erÅpen() = status == Oppgavestatus.ÅPEN
+
+    fun erIgnorert() = status == Oppgavestatus.IGNORERT
 }
 
 /**
@@ -39,8 +43,12 @@ data class OppgaveBehandlingMetadata(
     val erOpphor: Boolean? = false,
 )
 
+/**
+ * Intern representasjon av oppgavestatus, reflekterer ikke nøyaktig status i oppgave ved ÅPEN eller IGNORERT
+ */
 enum class Oppgavestatus {
     ÅPEN,
     FEILREGISTRERT,
     FERDIGSTILT,
+    IGNORERT, // Brukes i tilfeller hvor vi skal se bort fra oppgaven, selv om den fortsatt er åpen-status i oppgave
 }
