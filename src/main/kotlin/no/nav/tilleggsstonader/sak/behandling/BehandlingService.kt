@@ -325,7 +325,7 @@ class BehandlingService(
         behandlingshistorikkService.slettFritekstMetadataVedFerdigstillelse(behandlingId)
     }
 
-    fun markerBehandlingSomPåbegynt(
+    fun markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(
         behandlingId: BehandlingId,
         behandlingStatus: BehandlingStatus,
         behandlingSteg: StegType,

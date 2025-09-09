@@ -30,7 +30,7 @@ class InngangsvilkårStegTest {
     @BeforeEach
     fun setUp() {
         every { behandlingService.oppdaterStatusPåBehandling(any(), any()) } returns behandling()
-        justRun { behandlingService.markerBehandlingSomPåbegynt(any(), any(), any()) }
+        justRun { behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(any(), any(), any()) }
         every { vilkårperiodeService.hentVilkårperioder(any()) } returns Vilkårperioder(emptyList(), emptyList())
     }
 
@@ -43,7 +43,7 @@ class InngangsvilkårStegTest {
 
             assertThat(nesteSteg).isEqualTo(StegType.VILKÅR)
             verify(exactly = 1) {
-                behandlingService.markerBehandlingSomPåbegynt(any(), any(), any())
+                behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(any(), any(), any())
             }
         }
 
@@ -56,7 +56,7 @@ class InngangsvilkårStegTest {
 
                 assertThat(nesteSteg).isEqualTo(StegType.BEREGNE_YTELSE)
                 verify(exactly = 1) {
-                    behandlingService.markerBehandlingSomPåbegynt(any(), any(), any())
+                    behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(any(), any(), any())
                 }
             }
         }

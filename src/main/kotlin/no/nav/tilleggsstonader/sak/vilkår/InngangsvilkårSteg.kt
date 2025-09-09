@@ -22,7 +22,7 @@ class InngangsvilkårSteg(
         saksbehandling: Saksbehandling,
         data: Void?,
     ) {
-        behandlingService.markerBehandlingSomPåbegynt(
+        behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(
             behandlingId = saksbehandling.id,
             saksbehandling.status,
             saksbehandling.steg,

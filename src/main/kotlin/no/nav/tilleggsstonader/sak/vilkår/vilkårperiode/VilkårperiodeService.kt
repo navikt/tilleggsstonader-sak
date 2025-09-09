@@ -81,7 +81,7 @@ class VilkårperiodeService(
             kildeId = vilkårperiode.kildeId,
         )
 
-        behandlingService.markerBehandlingSomPåbegynt(behandling.id, behandling.status, behandling.steg)
+        behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandling.id, behandling.status, behandling.steg)
 
         val fødselFaktaGrunnlag =
             faktaGrunnlagService
@@ -122,7 +122,7 @@ class VilkårperiodeService(
         validerBehandling(behandling)
         validerKildeIdOgType(vilkårperiode, eksisterendeVilkårperiode)
 
-        behandlingService.markerBehandlingSomPåbegynt(behandling.id, behandling.status, behandling.steg)
+        behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandling.id, behandling.status, behandling.steg)
 
         val fødselFaktaGrunnlag =
             faktaGrunnlagService

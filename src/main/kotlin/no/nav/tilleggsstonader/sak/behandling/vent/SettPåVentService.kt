@@ -52,7 +52,7 @@ class SettPåVentService(
         val behandling = behandlingService.hentBehandling(behandlingId)
         behandling.status.validerKanBehandlingRedigeres()
 
-        behandlingService.markerBehandlingSomPåbegynt(behandlingId, behandling.status, behandling.steg)
+        behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId, behandling.status, behandling.steg)
 
         opprettHistorikkInnslag(behandling, årsaker = dto.årsaker, kommentar = dto.kommentar)
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT)
