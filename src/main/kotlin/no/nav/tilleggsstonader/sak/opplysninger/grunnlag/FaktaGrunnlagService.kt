@@ -70,7 +70,6 @@ class FaktaGrunnlagService(
         logger.info("Oppretter faktaGrunnlag for behandling=$behandlingId")
 
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        // TODO dette burde kun gjøres hvis behandlingen er redigerbar men akkurat nå gjøres dette fra BehandlingController som er greit
         opprettGrunnlagPersonopplysninger(behandling)
         opprettGrunnlagBarnAnnenForelder(behandling)
         opprettGrunnlagArenaVedtak(behandling)
