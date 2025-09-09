@@ -52,7 +52,7 @@ fun gyldigeAvslagsårsaker(
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
 
-        Stønadstype.DAGLIG_REISE_TSO -> // TODO: Denne må trolig fylles inn mer når vi lærer mer om hvordan vilkår på daglig reise ser ut
+        Stønadstype.DAGLIG_REISE_TSO ->
             when (gjelder) {
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
@@ -60,7 +60,7 @@ fun gyldigeAvslagsårsaker(
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
 
-        Stønadstype.DAGLIG_REISE_TSR -> // TODO: Denne må trolig fylles inn mer når vi lærer mer om hvordan vilkår på daglig reise ser ut
+        Stønadstype.DAGLIG_REISE_TSR ->
             when (gjelder) {
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
