@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
 
@@ -213,8 +214,11 @@ interface BehandlingRepository :
         """
             select id from behandling
             where status != 'FERDIGSTILT'
-            and id not in (select behandling_id from oppgave where status = 'ÅPEN');
+            and id not in (select behandling_id from oppgave where status = :status and tildelt_enhetsnummer in (:gyldigeEnheterForOppgave));
         """,
     )
-    fun finnBehandlingerUtenOppgave(): List<BehandlingId>
+    fun finnÅpneBehandlingerUtenOppgaveMedStatusOgTildeltEnhetsnummer(
+        status: Oppgavestatus,
+        gyldigeEnheterForOppgave: Collection<String>,
+    ): List<BehandlingId>
 }
