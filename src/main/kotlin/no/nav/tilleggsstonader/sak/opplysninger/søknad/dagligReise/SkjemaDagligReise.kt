@@ -8,6 +8,7 @@ import java.time.LocalDate
 
 data class SkjemaDagligReise(
     val personopplysninger: Personopplysninger,
+    val annenAdresseDetSkalReisesFra: ReiseAdresse?,
     val hovedytelse: HovedytelseAvsnitt,
     val aktivitet: AktivitetDagligReiseAvsnitt,
     val reiser: List<Reise>,
@@ -75,7 +76,7 @@ enum class ÅrsakIkkeOffentligTransport {
 }
 
 data class UtgifterBil(
-    val parkering: Int?,
+    val merEnn6kmReisevei: JaNei?,
     val bompenger: Int?,
     val ferge: Int?,
     val piggdekkavgift: Int?,

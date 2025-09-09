@@ -412,6 +412,8 @@ class OpprettTestBehandlingController(
                                 label = "NO",
                             ),
                     ),
+                reiseFraAnnetEnnFolkeregistrertAdr = JaNeiTypeDagligReise.nei,
+                adresseJegSkalReiseFra = null,
             )
         val aktiviteter =
             AktiviteterDagligReise(

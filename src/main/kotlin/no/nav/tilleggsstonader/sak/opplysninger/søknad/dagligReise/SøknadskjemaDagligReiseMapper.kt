@@ -86,6 +86,7 @@ class SøknadskjemaDagligReiseMapper(
     ): SkjemaDagligReise =
         SkjemaDagligReise(
             personopplysninger = mapPersonopplysninger(skjemaDagligReise.dineOpplysninger),
+            annenAdresseDetSkalReisesFra = mapAnnenAdresseDetSkalReisesFra(skjemaDagligReise.dineOpplysninger),
             hovedytelse = mapHovedytelse(skjemaDagligReise),
             aktivitet = mapAktivitet(skjemaDagligReise.aktiviteter),
             reiser = mapReiser(skjemaDagligReise.reise),
@@ -105,6 +106,19 @@ class SøknadskjemaDagligReiseMapper(
                     )
                 },
         )
+
+    private fun mapAnnenAdresseDetSkalReisesFra(opplysninger: DineOpplysninger): ReiseAdresse? =
+        if (opplysninger.reiseFraAnnetEnnFolkeregistrertAdr == JaNeiType.ja) {
+            opplysninger.adresseJegSkalReiseFra?.let {
+                ReiseAdresse(
+                    gateadresse = it.gateadresse,
+                    postnummer = it.postnr,
+                    poststed = it.poststed,
+                )
+            }
+        } else {
+            null
+        }
 
     private fun mapHovedytelse(skjemaDagligReise: SkjemaDagligReiseKontrakt) =
         HovedytelseAvsnitt(
@@ -242,6 +256,7 @@ class SøknadskjemaDagligReiseMapper(
                         darligTransporttilbud -> ÅrsakIkkeOffentligTransport.DÅRLIG_TRANSPORTTILBUD
                         leveringHentingIBarnehageEllerSkolefritidsordningSfoAks,
                         -> ÅrsakIkkeOffentligTransport.LEVERING_HENTING_BARNEHAGE_SKOLE
+
                         annet -> ÅrsakIkkeOffentligTransport.ANNET
                     }
                 } ?: emptyList()
@@ -268,7 +283,7 @@ class SøknadskjemaDagligReiseMapper(
     private fun mapBilUtgifter(utgifterBil: UtgifterBilKontrakt?): UtgifterBil? =
         utgifterBil?.let {
             UtgifterBil(
-                parkering = it.parkering,
+                merEnn6kmReisevei = it.harDu6KmReisevei.let(::mapJaNei),
                 bompenger = it.bompenger,
                 ferge = it.ferge,
                 piggdekkavgift = it.piggdekkavgift,

@@ -15,7 +15,8 @@
         "label": "Norge",
         "value": "NO"
       }
-    }
+    },
+    "reiseFraAnnetEnnFolkeregistrertAdr": "nei"
   },
   "hovedytelse": {
     "arbeidsavklaringspenger": false,
@@ -65,7 +66,7 @@
       },
       "kanDuKjoreMedEgenBil": "ja",
       "utgifterBil": {
-        "parkering": 100,
+        "harDu6KmReisevei": "ja",
         "bompenger": 43,
         "ferge": 0,
         "piggdekkavgift": 22

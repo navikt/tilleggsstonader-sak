@@ -1,158 +1,166 @@
 {
-  "dineOpplysninger" : {
-    "fornavn" : "Fornavn",
-    "etternavn" : "Etternavn",
-    "identitet" : {
-      "identitetsnummer" : "1111111111"
+  "dineOpplysninger": {
+    "fornavn": "Fornavn",
+    "etternavn": "Etternavn",
+    "identitet": {
+      "identitetsnummer": "1111111111"
     },
-    "adresse" : {
-      "gyldigFraOgMed" : "2004-10-29",
-      "adresse" : "En vei 2",
-      "postnummer" : "2069",
-      "bySted" : "JESSHEIM",
-      "landkode" : "NOR",
-      "land" : {
-        "label" : "Norge",
-        "value" : "NO"
+    "adresse": {
+      "gyldigFraOgMed": "2004-10-29",
+      "adresse": "En vei 2",
+      "postnummer": "2069",
+      "bySted": "JESSHEIM",
+      "landkode": "NOR",
+      "land": {
+        "label": "Norge",
+        "value": "NO"
+      }
+    },
+    "reiseFraAnnetEnnFolkeregistrertAdr": "ja",
+    "adresseJegSkalReiseFra": {
+      "gateadresse": "Osloveien 1",
+      "postnr": "0482",
+      "poststed": "Oslo"
+    }
+  },
+  "hovedytelse": {
+    "arbeidsavklaringspenger": true,
+    "overgangsstonad": true,
+    "gjenlevendepensjon": true,
+    "uforetrygd": true,
+    "tiltakspenger": true,
+    "dagpenger": true,
+    "sykepenger": true,
+    "kvalifiseringsstonad": true,
+    "mottarIngenPengestotte": true,
+    "ingenAvAlternativenePasserForMeg": true
+  },
+  "arbeidOgOpphold": {
+    "jobberIAnnetLand": "ja",
+    "jobbAnnetLand": {
+      "value": "AF",
+      "label": "Afghanistan"
+    },
+    "harPengestotteAnnetLand": {
+      "sykepenger": true,
+      "pensjon": true,
+      "annenPengestotte": true,
+      "mottarIkkePengestotte": true
+    },
+    "pengestotteAnnetLand": {
+      "value": "AF",
+      "label": "Afghanistan"
+    },
+    "harOppholdUtenforNorgeSiste12mnd": "ja",
+    "oppholdUtenforNorgeSiste12mnd": {
+      "land": {
+        "value": "AF",
+        "label": "Afghanistan"
+      },
+      "arsakOppholdUtenforNorge": {
+        "jobbet": true,
+        "studerte": true,
+        "fikkMedisinskBehandling": true,
+        "varPaFerie": true,
+        "besokteFamilie": true,
+        "annet": true
+      },
+      "periode": {
+        "fom": "2025-01-01",
+        "tom": "2025-01-01"
+      }
+    },
+    "harOppholdUtenforNorgeNeste12mnd": "ja",
+    "oppholdUtenforNorgeNeste12mnd": {
+      "land": {
+        "value": "AF",
+        "label": "Afghanistan"
+      },
+      "arsakOppholdUtenforNorge": {
+        "jobbet": true,
+        "studerte": true,
+        "fikkMedisinskBehandling": true,
+        "varPaFerie": true,
+        "besokteFamilie": true,
+        "annet": true
+      },
+      "periode": {
+        "fom": "2025-01-01",
+        "tom": "2025-01-01"
       }
     }
   },
-  "hovedytelse" : {
-    "arbeidsavklaringspenger" : true,
-    "overgangsstonad" : true,
-    "gjenlevendepensjon" : true,
-    "uforetrygd" : true,
-    "tiltakspenger" : true,
-    "dagpenger" : true,
-    "sykepenger" : true,
-    "kvalifiseringsstonad" : true,
-    "mottarIngenPengestotte" : true,
-    "ingenAvAlternativenePasserForMeg" : true
-  },
-  "arbeidOgOpphold" : {
-    "jobberIAnnetLand" : "ja",
-    "jobbAnnetLand" : {
-      "value" : "AF",
-      "label" : "Afghanistan"
-    },
-    "harPengestotteAnnetLand" : {
-      "sykepenger" : true,
-      "pensjon" : true,
-      "annenPengestotte" : true,
-      "mottarIkkePengestotte" : true
-    },
-    "pengestotteAnnetLand" : {
-      "value" : "AF",
-      "label" : "Afghanistan"
-    },
-    "harOppholdUtenforNorgeSiste12mnd" : "ja",
-    "oppholdUtenforNorgeSiste12mnd" : {
-      "land" : {
-        "value" : "AF",
-        "label" : "Afghanistan"
-      },
-      "arsakOppholdUtenforNorge" : {
-        "jobbet" : true,
-        "studerte" : true,
-        "fikkMedisinskBehandling" : true,
-        "varPaFerie" : true,
-        "besokteFamilie" : true,
-        "annet" : true
-      },
-      "periode" : {
-        "fom" : "2025-01-01",
-        "tom" : "2025-01-01"
-      }
-    },
-    "harOppholdUtenforNorgeNeste12mnd" : "ja",
-    "oppholdUtenforNorgeNeste12mnd" : {
-      "land" : {
-        "value" : "AF",
-        "label" : "Afghanistan"
-      },
-      "arsakOppholdUtenforNorge" : {
-        "jobbet" : true,
-        "studerte" : true,
-        "fikkMedisinskBehandling" : true,
-        "varPaFerie" : true,
-        "besokteFamilie" : true,
-        "annet" : true
-      },
-      "periode" : {
-        "fom" : "2025-01-01",
-        "tom" : "2025-01-01"
-      }
-    }
-  },
-  "aktiviteter" : {
-    "aktiviteterOgMaalgruppe" : {
-      "aktivitet" : {
-        "aktivitetId" : "123",
-        "periode" : {
-          "fom" : "2025-01-01",
-          "tom" : "2025-01-01"
+  "aktiviteter": {
+    "aktiviteterOgMaalgruppe": {
+      "aktivitet": {
+        "aktivitetId": "123",
+        "periode": {
+          "fom": "2025-01-01",
+          "tom": "2025-01-01"
         },
-        "maalgruppe" : {
-          "maalgruppetype" : "NEDSARBEVN",
-          "gyldighetsperiode" : {
-            "fom" : "2025-01-01",
-            "tom" : "2025-01-01"
+        "maalgruppe": {
+          "maalgruppetype": "NEDSARBEVN",
+          "gyldighetsperiode": {
+            "fom": "2025-01-01",
+            "tom": "2025-01-01"
           },
-          "maalgruppenavn" : "maalgruppenavn"
+          "maalgruppenavn": "maalgruppenavn"
         },
-        "text" : "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
+        "text": "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
       }
     },
-    "arbeidsrettetAktivitet" : "tiltakArbeidsrettetUtredning",
-    "mottarLonnGjennomTiltak" : "ja",
-    "reiseTilAktivitetsstedHelePerioden" : "ja",
-    "reiseperiode" : {
-      "fom" : "2025-01-01",
-      "tom" : "2025-01-01"
+    "arbeidsrettetAktivitet": "tiltakArbeidsrettetUtredning",
+    "mottarLonnGjennomTiltak": "ja",
+    "reiseTilAktivitetsstedHelePerioden": "ja",
+    "reiseperiode": {
+      "fom": "2025-01-01",
+      "tom": "2025-01-01"
     }
   },
-  "reise" : [ {
-    "reiseAdresse" : {
-      "gateadresse" : "EksempelSvar",
-      "postnr" : "EksempelSvar",
-      "poststed" : "EksempelSvar"
-    },
-    "hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet" : {
-      "label" : "3",
-      "value" : "3"
-    },
-    "harDu6KmReisevei" : "ja",
-    "hvorLangErReiseveienDin" : 100,
-    "harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde" : "ja",
-    "kanDuReiseMedOffentligTransport" : "ja",
-    "hvaSlagsTypeBillettMaDuKjope" : {
-      "enkeltbillett" : true,
-      "ukeskort" : true,
-      "manedskort" : true
-    },
-    "enkeltbilett" : 100,
-    "syvdagersbilett" : 100,
-    "manedskort" : 100,
-    "hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport" : {
-      "helsemessigeArsaker" : true,
-      "darligTransporttilbud" : true,
-      "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks" : true,
-      "annet" : true
-    },
-    "kanDuKjoreMedEgenBil" : "ja",
-    "utgifterBil" : {
-      "parkering" : 100,
-      "bompenger" : 100,
-      "ferge" : 100,
-      "piggdekkavgift" : 100
-    },
-    "drosje" : {
-      "hvaErViktigsteGrunnerTilAtDuIkkeKanKjoreBil" : {
-        "helsemessigeArsaker" : true,
-        "darligTransporttilbud" : true,
-        "annet" : true
+  "reise": [
+    {
+      "reiseAdresse": {
+        "gateadresse": "EksempelSvar",
+        "postnr": "EksempelSvar",
+        "poststed": "EksempelSvar"
       },
-      "onskerDuASokeOmFaDekketUtgifterTilReiseMedTaxi" : "ja"
+      "hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet": {
+        "label": "3",
+        "value": "3"
+      },
+      "harDu6KmReisevei": "ja",
+      "hvorLangErReiseveienDin": 100,
+      "harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde": "ja",
+      "kanDuReiseMedOffentligTransport": "ja",
+      "hvaSlagsTypeBillettMaDuKjope": {
+        "enkeltbillett": true,
+        "ukeskort": true,
+        "manedskort": true
+      },
+      "enkeltbilett": 100,
+      "syvdagersbilett": 100,
+      "manedskort": 100,
+      "hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport": {
+        "helsemessigeArsaker": true,
+        "darligTransporttilbud": true,
+        "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": true,
+        "annet": true
+      },
+      "kanDuKjoreMedEgenBil": "ja",
+      "utgifterBil": {
+        "harDu6KmReisevei": "ja",
+        "bompenger": 100,
+        "ferge": 100,
+        "piggdekkavgift": 100
+      },
+      "drosje": {
+        "hvaErViktigsteGrunnerTilAtDuIkkeKanKjoreBil": {
+          "helsemessigeArsaker": true,
+          "darligTransporttilbud": true,
+          "annet": true
+        },
+        "onskerDuASokeOmFaDekketUtgifterTilReiseMedTaxi": "ja"
+      }
     }
-  } ]
+  ]
 }
