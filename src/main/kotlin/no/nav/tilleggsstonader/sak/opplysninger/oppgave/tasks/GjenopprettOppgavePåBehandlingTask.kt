@@ -92,7 +92,7 @@ class GjenopprettOppgavePåBehandlingTask(
         }
 
     companion object {
-        const val TYPE = "GjenopprettOppgavePåBehandlingTask"
+        const val TYPE = "gjenopprettOppgavePåBehandlingTask"
 
         fun opprettTask(behandlingId: BehandlingId): Task =
             Task(
