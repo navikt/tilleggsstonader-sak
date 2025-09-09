@@ -15,6 +15,8 @@ object OppgaveUtil {
     val ENHET_NR_EGEN_ANSATT = "4483" // NAV Arbeid og ytelser Egne ansatte
     val ENHET_NR_STRENGT_FORTROLIG = "2103" // NAV Vikafossen
 
+    val GYLDIGE_ENHETER_TILLEGGSTØNADER = setOf(ENHET_NR_NAY, ENHET_NR_EGEN_ANSATT, ENHET_NR_STRENGT_FORTROLIG)
+
     fun utledBehandlesAvApplikasjon(oppgavetype: Oppgavetype) =
         when (oppgavetype) {
             Oppgavetype.Journalføring,
