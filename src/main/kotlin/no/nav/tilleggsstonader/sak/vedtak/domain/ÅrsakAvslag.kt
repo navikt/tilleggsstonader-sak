@@ -11,6 +11,7 @@ enum class ÅrsakAvslag {
     RETT_TIL_UTSTYRSSTIPEND,
     HAR_IKKE_MERUTGIFTER,
     RETT_TIL_BOSTØTTE,
+    REISEAVSTAND_UNDER_6_KM,
     ANNET,
     ;
 

@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.IKKE_I_MÅLGRUPPE
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.INGEN_AKTIVITET
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.MANGELFULL_DOKUMENTASJON
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.REISEAVSTAND_UNDER_6_KM
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.RETT_TIL_BOSTØTTE
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND
 
@@ -51,19 +52,23 @@ fun gyldigeAvslagsårsaker(
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
 
-        Stønadstype.DAGLIG_REISE_TSO -> // TODO: Denne må trolig fylles inn mer når vi lærer mer om hvordan vilkår på daglig reise ser ut
+        Stønadstype.DAGLIG_REISE_TSO ->
             when (gjelder) {
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
-                Avslagskategori.STØNADSVILKÅR -> emptySet()
+                Avslagskategori.STØNADSVILKÅR -> setOf(MANGELFULL_DOKUMENTASJON, REISEAVSTAND_UNDER_6_KM)
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
 
-        Stønadstype.DAGLIG_REISE_TSR -> // TODO: Denne må trolig fylles inn mer når vi lærer mer om hvordan vilkår på daglig reise ser ut
+        Stønadstype.DAGLIG_REISE_TSR ->
             when (gjelder) {
                 Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
-                Avslagskategori.STØNADSVILKÅR -> emptySet()
+                Avslagskategori.STØNADSVILKÅR ->
+                    setOf(
+                        MANGELFULL_DOKUMENTASJON,
+                        REISEAVSTAND_UNDER_6_KM,
+                    )
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
     }
