@@ -28,7 +28,6 @@ class SimuleringSteg(
             TypeVedtak.INNVILGELSE -> true
             TypeVedtak.AVSLAG -> false
             TypeVedtak.OPPHØR -> true
-            else -> error("Simulering støtter ikke resultat $type")
         }
 
     override fun stegType(): StegType = StegType.SIMULERING

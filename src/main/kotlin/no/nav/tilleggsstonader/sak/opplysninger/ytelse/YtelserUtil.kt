@@ -26,7 +26,5 @@ object YtelserUtil {
                     TypeYtelsePeriode.TILTAKSPENGER,
                     TypeYtelsePeriode.DAGPENGER,
                 )
-
-            else -> error("Finner ikke relevante ytelser for stønadstype $type")
         }
 }

@@ -17,7 +17,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseReque
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import org.springframework.stereotype.Service
@@ -51,7 +50,7 @@ class DagligReiseBeregnYtelseSteg(
         when (vedtak) {
             is InnvilgelseDagligReiseRequest -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
             is AvslagDagligReiseDto -> lagreAvslag(saksbehandling, vedtak)
-            is OpphørDagligReise -> TODO()
+            // is OpphørDagligReise -> TODO()
         }
     }
 
