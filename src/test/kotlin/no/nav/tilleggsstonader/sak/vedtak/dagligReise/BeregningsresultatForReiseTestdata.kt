@@ -44,6 +44,7 @@ fun lagBeregningsgrunnlag(
         fom = fom,
         tom = fom.plusWeeks(1),
         prisEnkeltbillett = 50,
+        prisSyvdagersbillett = null,
         pris30dagersbillett = 1000,
         antallReisedagerPerUke = 5,
         vedtaksperioder = vedtaksperioder,
