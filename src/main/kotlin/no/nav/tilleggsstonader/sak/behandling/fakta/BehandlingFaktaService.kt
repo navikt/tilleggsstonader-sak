@@ -59,15 +59,15 @@ class BehandlingFaktaService(
     fun hentFakta(behandlingId: BehandlingId): BehandlingFaktaDto {
         val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
         return when (stønadstype) {
-            Stønadstype.BARNETILSYN -> hentFaktaDTOForBarneTilsyn(behandlingId)
-            Stønadstype.LÆREMIDLER -> hentFaktaDTOForLæremidler(behandlingId)
-            Stønadstype.BOUTGIFTER -> hentFaktaDTOForBoutgifter(behandlingId)
-            Stønadstype.DAGLIG_REISE_TSO -> hentFaktaDTOForDagligreise(behandlingId)
-            Stønadstype.DAGLIG_REISE_TSR -> hentFaktaDTOForDagligreise(behandlingId)
+            Stønadstype.BARNETILSYN -> hentFaktaDtoForBarneTilsyn(behandlingId)
+            Stønadstype.LÆREMIDLER -> hentFaktaDtoForLæremidler(behandlingId)
+            Stønadstype.BOUTGIFTER -> hentFaktaDtoForBoutgifter(behandlingId)
+            Stønadstype.DAGLIG_REISE_TSO -> hentFaktaDtoForDagligReise(behandlingId)
+            Stønadstype.DAGLIG_REISE_TSR -> hentFaktaDtoForDagligReise(behandlingId)
         }
     }
 
-    fun hentFaktaDTOForBarneTilsyn(behandlingId: BehandlingId): BehandlingFaktaTilsynBarnDto {
+    fun hentFaktaDtoForBarneTilsyn(behandlingId: BehandlingId): BehandlingFaktaTilsynBarnDto {
         val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
         val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
         return BehandlingFaktaTilsynBarnDto(
@@ -80,7 +80,7 @@ class BehandlingFaktaService(
         )
     }
 
-    fun hentFaktaDTOForLæremidler(behandlingId: BehandlingId): BehandlingFaktaLæremidlerDto {
+    fun hentFaktaDtoForLæremidler(behandlingId: BehandlingId): BehandlingFaktaLæremidlerDto {
         val søknad = søknadService.hentSøknadLæremidler(behandlingId)
         val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
         val fødselsdato = grunnlagsdata.personopplysninger.fødsel?.fødselsdatoEller1JanForFødselsår()
@@ -94,7 +94,7 @@ class BehandlingFaktaService(
         )
     }
 
-    private fun hentFaktaDTOForBoutgifter(behandlingId: BehandlingId): BehandlingFaktaBoutgifterDto {
+    private fun hentFaktaDtoForBoutgifter(behandlingId: BehandlingId): BehandlingFaktaBoutgifterDto {
         val søknad = søknadService.hentSøknadBoutgifter(behandlingId)
         val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
         return BehandlingFaktaBoutgifterDto(
@@ -111,10 +111,10 @@ class BehandlingFaktaService(
         )
     }
 
-    private fun hentFaktaDTOForDagligreise(behandlingId: BehandlingId): BehandlingFaktaDagligreiseDto {
+    private fun hentFaktaDtoForDagligReise(behandlingId: BehandlingId): BehandlingFaktaDagligReiseDto {
         val søknad = søknadService.hentSøknadDagligReise(behandlingId)
         val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
-        return BehandlingFaktaDagligreiseDto(
+        return BehandlingFaktaDagligReiseDto(
             søknadMottattTidspunkt = søknad?.mottattTidspunkt,
             hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
             dokumentasjon = søknad?.let { mapDokumentasjonDagligReise(it.data.dokumentasjon, it.journalpostId) },

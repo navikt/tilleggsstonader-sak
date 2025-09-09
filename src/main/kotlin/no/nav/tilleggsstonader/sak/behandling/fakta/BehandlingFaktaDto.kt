@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ReiseAdresse
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
@@ -27,8 +26,8 @@ import java.time.LocalDateTime
     JsonSubTypes.Type(BehandlingFaktaTilsynBarnDto::class, name = "BARNETILSYN"),
     JsonSubTypes.Type(BehandlingFaktaLæremidlerDto::class, name = "LÆREMIDLER"),
     JsonSubTypes.Type(BehandlingFaktaBoutgifterDto::class, name = "BOUTGIFTER"),
-    JsonSubTypes.Type(BehandlingFaktaDagligreiseDto::class, name = "DAGLIG_REISE_TSO"),
-    JsonSubTypes.Type(BehandlingFaktaDagligreiseDto::class, name = "DAGLIG_REISE_TSR"),
+    JsonSubTypes.Type(BehandlingFaktaDagligReiseDto::class, name = "DAGLIG_REISE_TSO"),
+    JsonSubTypes.Type(BehandlingFaktaDagligReiseDto::class, name = "DAGLIG_REISE_TSR"),
 )
 sealed interface BehandlingFaktaDto {
     val søknadMottattTidspunkt: LocalDateTime?
@@ -65,7 +64,7 @@ data class BehandlingFaktaBoutgifterDto(
     val boligEllerOvernatting: FaktaBoligEllerOvernatting?,
 ) : BehandlingFaktaDto
 
-data class BehandlingFaktaDagligreiseDto(
+data class BehandlingFaktaDagligReiseDto(
     override val søknadMottattTidspunkt: LocalDateTime? = LocalDateTime.now(),
     override val hovedytelse: FaktaHovedytelse? = null,
     override val dokumentasjon: FaktaDokumentasjon? = null,

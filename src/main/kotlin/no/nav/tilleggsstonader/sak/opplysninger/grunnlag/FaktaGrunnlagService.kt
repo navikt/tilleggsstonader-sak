@@ -129,7 +129,7 @@ class FaktaGrunnlagService(
         val behandlingBarn = barnService.finnBarnPåBehandling(behandling.id)
         lagreFaktaGrunnlag(
             behandling.id,
-            FaktaGrunnlagPersonopplysninger.Companion.fraSøkerMedBarn(person, behandlingBarn),
+            FaktaGrunnlagPersonopplysninger.fraSøkerMedBarn(person, behandlingBarn),
         )
     }
 
@@ -160,7 +160,7 @@ class FaktaGrunnlagService(
 
     private fun opprettGrunnlagArenaVedtak(behandling: Saksbehandling) {
         val statusArena = arenaService.hentStatus(behandling.ident, behandling.stønadstype)
-        val vedtakArena = FaktaGrunnlagArenaVedtak.Companion.map(statusArena, behandling.stønadstype)
+        val vedtakArena = FaktaGrunnlagArenaVedtak.map(statusArena, behandling.stønadstype)
         lagreFaktaGrunnlag(behandling.id, vedtakArena)
     }
 
