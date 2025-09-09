@@ -8,6 +8,7 @@
       "landkode" : "Land1"
     }
   },
+  "annenAdresseDetSkalReisesFra" : null,
   "hovedytelse" : {
     "hovedytelse" : [ "OVERGANGSSTØNAD" ],
     "harNedsattArbeidsevne" : null,
@@ -47,7 +48,7 @@
       "årsakIkkeOffentligTransport" : [ "DÅRLIG_TRANSPORTTILBUD" ],
       "kanKjøreMedEgenBil" : "JA",
       "utgifterBil" : {
-        "parkering" : 100,
+        "merEnn6kmReisevei" : "JA",
         "bompenger" : 43,
         "ferge" : 0,
         "piggdekkavgift" : 22

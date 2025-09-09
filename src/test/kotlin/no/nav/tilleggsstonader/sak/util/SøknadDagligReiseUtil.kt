@@ -72,6 +72,8 @@ object SøknadDagligReiseUtil {
                             value = "NO",
                         ),
                 ),
+            reiseFraAnnetEnnFolkeregistrertAdr = JaNeiType.nei,
+            adresseJegSkalReiseFra = null,
         )
 
     private fun aktiviteter(): Aktiviteter =

@@ -8,6 +8,11 @@
       "landkode" : "Land1"
     }
   },
+  "annenAdresseDetSkalReisesFra" : {
+    "gateadresse" : "Osloveien 1",
+    "postnummer" : "0482",
+    "poststed" : "Oslo"
+  },
   "hovedytelse" : {
     "hovedytelse" : [ "AAP", "OVERGANGSSTØNAD", "GJENLEVENDEPENSJON", "UFØRETRYGD", "TILTAKSPENGER", "DAGPENGER", "SYKEPENGER", "KVALIFISERINGSSTØNAD", "INGEN_PENGESTØTTE", "INGEN_PASSENDE_ALTERNATIVER" ],
     "harNedsattArbeidsevne" : null,
@@ -71,7 +76,7 @@
       "årsakIkkeOffentligTransport" : [ "HELSEMESSIGE_ÅRSAKER", "DÅRLIG_TRANSPORTTILBUD", "LEVERING_HENTING_BARNEHAGE_SKOLE", "ANNET" ],
       "kanKjøreMedEgenBil" : "JA",
       "utgifterBil" : {
-        "parkering" : 100,
+        "merEnn6kmReisevei" : "JA",
         "bompenger" : 100,
         "ferge" : 100,
         "piggdekkavgift" : 100
