@@ -126,6 +126,7 @@ kotlin {
 
     compilerOptions {
         freeCompilerArgs.add("-Xjsr305=strict")
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
     }
 }
 
