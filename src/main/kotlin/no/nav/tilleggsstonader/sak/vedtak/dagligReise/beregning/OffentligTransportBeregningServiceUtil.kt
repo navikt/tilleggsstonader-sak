@@ -145,7 +145,6 @@ private fun finnAntallDagerISnittetMellomUkeOgVedtaksperioder(
     uke: Datoperiode,
     vedtaksperioder: List<VedtaksperiodeGrunnlag>,
 ): Int =
-    vedtaksperioder.sumOf { vedtaksperiode ->
-        val snitt = Datoperiode(vedtaksperiode.fom, vedtaksperiode.tom).beregnSnitt(uke)
-        snitt?.let { antallHverdagerIPeriodeInklusiv(snitt.fom, snitt.tom) } ?: 0
-    }
+    vedtaksperioder
+        .mapNotNull { Datoperiode(it.fom, it.tom).beregnSnitt(uke) }
+        .sumOf { antallHverdagerIPeriodeInklusiv(it.fom, it.tom) }
