@@ -23,7 +23,7 @@ data class SkalRouteAlleSøkereTilNyLøsning(
     }
 }
 
-data class FeatureTogglet(
+data class SkalRouteEnkelteSøkereTilNyLøsning(
     override val ident: String,
     override val stønadstype: Stønadstype,
     val toggleId: ToggleId,
@@ -34,7 +34,7 @@ data class FeatureTogglet(
             identStønadstype: IdentStønadstype,
             toggleId: ToggleId,
             harGyldigStateIArena: (ArenaStatusDto) -> Boolean,
-        ) = FeatureTogglet(
+        ) = SkalRouteEnkelteSøkereTilNyLøsning(
             ident = identStønadstype.ident,
             stønadstype = identStønadstype.stønadstype,
             toggleId = toggleId,

@@ -64,7 +64,7 @@ class SøknadRoutingServiceTest {
 
     private val skalRouteAlleSøkereTilNyLøsning = SkalRouteAlleSøkereTilNyLøsning(ident, stønadstype)
     private val featureToggletHarGyldigStateIArena =
-        FeatureTogglet(
+        SkalRouteEnkelteSøkereTilNyLøsning(
             ident = ident,
             stønadstype = stønadstype,
             toggleId = SØKNAD_ROUTING_BOUTGIFTER,
@@ -72,7 +72,7 @@ class SøknadRoutingServiceTest {
         )
 
     private val featureToggletHarUgyldigStateIArena =
-        FeatureTogglet(
+        SkalRouteEnkelteSøkereTilNyLøsning(
             ident = ident,
             stønadstype = stønadstype,
             toggleId = SØKNAD_ROUTING_BOUTGIFTER,

@@ -39,9 +39,9 @@ class RoutingContextTest {
     fun `skal route daglig reise til arena hvis man ikke har aktivt vedtak`() {
         val routingContext = Stønadstype.BARNETILSYN.tilRoutingContext()
 
-        assertThat(routingContext).isInstanceOf(FeatureTogglet::class.java)
+        assertThat(routingContext).isInstanceOf(SkalRouteEnkelteSøkereTilNyLøsning::class.java)
 
-        with(routingContext as FeatureTogglet) {
+        with(routingContext as SkalRouteEnkelteSøkereTilNyLøsning) {
             assertThat(this.toggleId).isEqualTo(MockToggle.MOCK_TOGGLE)
             assertThat(this.harGyldigStateIArena(arenaStatus(harAktivtVedtak = false))).isTrue
             assertThat(this.harGyldigStateIArena(arenaStatus(harAktivtVedtak = true))).isFalse

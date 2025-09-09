@@ -52,13 +52,13 @@ class SøknadRoutingService(
                 lagreRouting(context, mapOf("ruterAlleSøkere" to true))
                 return true
             }
-            is FeatureTogglet -> {
-                return kontrollerFeatureToggle(context)
+            is SkalRouteEnkelteSøkereTilNyLøsning -> {
+                return vurderRoutingTilNyLøsning(context)
             }
         }
     }
 
-    private fun kontrollerFeatureToggle(context: FeatureTogglet): Boolean {
+    private fun vurderRoutingTilNyLøsning(context: SkalRouteEnkelteSøkereTilNyLøsning): Boolean {
         if (harBehandling(context)) {
             lagreRouting(context, mapOf("harBehandling" to true))
             return true
@@ -75,7 +75,7 @@ class SøknadRoutingService(
         return false
     }
 
-    private fun maksAntallErNådd(context: FeatureTogglet): Boolean {
+    private fun maksAntallErNådd(context: SkalRouteEnkelteSøkereTilNyLøsning): Boolean {
         val maksAntall = unleashService.getVariantWithNameOrDefault(context.toggleId, "antall", 0)
         val antall = søknadRoutingRepository.countByType(context.stønadstype)
         logger.info("routing - stønadstype=${context.stønadstype} antallIDatabase=$antall toggleMaksAntall=$maksAntall")
@@ -83,7 +83,7 @@ class SøknadRoutingService(
     }
 
     private fun harGyldigStateIArena(
-        context: FeatureTogglet,
+        context: SkalRouteEnkelteSøkereTilNyLøsning,
         arenaStatus: ArenaStatusDto,
     ): Boolean {
         val harAktivtVedtak = arenaStatus.vedtak.harAktivtVedtak
