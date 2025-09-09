@@ -103,6 +103,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "mockito-core")
     }
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux")
     testImplementation("org.junit.platform:junit-platform-suite")
     testImplementation("org.wiremock:wiremock-standalone:$wiremockVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")

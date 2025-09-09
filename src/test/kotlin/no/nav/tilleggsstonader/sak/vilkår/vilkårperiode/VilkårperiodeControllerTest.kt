@@ -1,39 +1,29 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
-import no.nav.tilleggsstonader.libs.test.httpclient.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.kall.hentVilkårperioder
+import no.nav.tilleggsstonader.sak.kall.oppdaterGrunnlagKall
+import no.nav.tilleggsstonader.sak.kall.oppdaterVikårperiode
+import no.nav.tilleggsstonader.sak.kall.opprettVilkårperiode
+import no.nav.tilleggsstonader.sak.kall.slettVilkårperiodeKall
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingerMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
-import org.springframework.web.client.exchange
 import java.time.LocalDate
-import java.util.UUID
 
 class VilkårperiodeControllerTest : IntegrationTest() {
-    @BeforeEach
-    fun setUp() {
-        headers.setBearerAuth(onBehalfOfToken())
-    }
-
     @Test
     fun `skal kunne lagre og hente vilkarperioder for AAP`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-        kallOpprettVilkårperiode(
+        opprettVilkårperiode(
             LagreVilkårperiode(
                 type = MålgruppeType.AAP,
                 fom = LocalDate.now(),
@@ -43,7 +33,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
             ),
         )
 
-        val hentedeVilkårperioder = kallHentVilkårperioder(behandling)
+        val hentedeVilkårperioder = hentVilkårperioder(behandling)
 
         assertThat(hentedeVilkårperioder.målgrupper).hasSize(1)
         assertThat(hentedeVilkårperioder.aktiviteter).isEmpty()
@@ -65,16 +55,16 @@ class VilkårperiodeControllerTest : IntegrationTest() {
                 behandlingId = behandling.id,
             )
 
-        val response = kallOpprettVilkårperiode(originalLagreRequest)
+        val response = opprettVilkårperiode(originalLagreRequest)
 
         val nyTom = LocalDate.now()
 
-        kallOppdaterVikårperiode(
+        oppdaterVikårperiode(
             lagreVilkårperiode = originalLagreRequest.copy(behandlingId = behandling.id, tom = nyTom),
             vilkårperiodeId = response.periode!!.id,
         )
 
-        val lagredeVilkårperioder = kallHentVilkårperioder(behandling)
+        val lagredeVilkårperioder = hentVilkårperioder(behandling)
 
         assertThat(lagredeVilkårperioder.målgrupper.single().tom).isEqualTo(nyTom)
     }
@@ -88,7 +78,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
             }
 
         val response =
-            kallOpprettVilkårperiode(
+            opprettVilkårperiode(
                 LagreVilkårperiode(
                     type = MålgruppeType.AAP,
                     fom = LocalDate.now(),
@@ -97,14 +87,17 @@ class VilkårperiodeControllerTest : IntegrationTest() {
                     behandlingId = behandling.id,
                 ),
             )
-        val exception =
-            catchProblemDetailException {
-                kallSlettVilkårperiode(
-                    vilkårperiodeId = response.periode!!.id,
-                    SlettVikårperiode(behandlingForAnnenFagsak.id, "test"),
-                )
+
+        slettVilkårperiodeKall(
+            vilkårperiodeId = response.periode!!.id,
+            SlettVikårperiode(behandlingForAnnenFagsak.id, "test"),
+        ).expectStatus()
+            .is5xxServerError
+            .expectBody()
+            .jsonPath("$.detail")
+            .value<String> {
+                assertThat(it).startsWith("BehandlingId er ikke lik")
             }
-        assertThat(exception.detail.detail).contains("BehandlingId er ikke lik")
     }
 
     @Nested
@@ -112,58 +105,15 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         @Test
         fun `må ha saksbehandlerrolle for å kunne oppdatere grunnlag`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            headers.setBearerAuth(onBehalfOfToken(rolleConfig.veilederRolle))
-            val exception =
-                catchProblemDetailException {
-                    kallOppdaterGrunnlag(behandling.id)
+
+            oppdaterGrunnlagKall(behandling.id, rolleConfig.veilederRolle)
+                .expectStatus()
+                .isForbidden
+                .expectBody()
+                .jsonPath("$.detail")
+                .value<String> {
+                    assertThat(it).startsWith("Mangler nødvendig saksbehandlerrolle for å utføre handlingen")
                 }
-            assertThat(exception.detail.detail)
-                .contains("Mangler nødvendig saksbehandlerrolle for å utføre handlingen")
         }
     }
-
-    private fun kallHentVilkårperioder(behandling: Behandling) =
-        restTemplate
-            .exchange<VilkårperioderResponse>(
-                localhost("api/vilkarperiode/behandling/${behandling.id}"),
-                HttpMethod.GET,
-                HttpEntity(null, headers),
-            ).body!!
-            .vilkårperioder
-
-    private fun kallOpprettVilkårperiode(lagreVilkårperiode: LagreVilkårperiode) =
-        restTemplate
-            .exchange<LagreVilkårperiodeResponse>(
-                localhost("api/vilkarperiode/v2"),
-                HttpMethod.POST,
-                HttpEntity(lagreVilkårperiode, headers),
-            ).body!!
-
-    private fun kallOppdaterVikårperiode(
-        lagreVilkårperiode: LagreVilkårperiode,
-        vilkårperiodeId: UUID,
-    ) = restTemplate
-        .exchange<LagreVilkårperiodeResponse>(
-            localhost("api/vilkarperiode/v2/$vilkårperiodeId"),
-            HttpMethod.POST,
-            HttpEntity(lagreVilkårperiode, headers),
-        ).body!!
-
-    private fun kallSlettVilkårperiode(
-        vilkårperiodeId: UUID,
-        slettVikårperiode: SlettVikårperiode,
-    ) = restTemplate
-        .exchange<LagreVilkårperiodeResponse>(
-            localhost("api/vilkarperiode/$vilkårperiodeId"),
-            HttpMethod.DELETE,
-            HttpEntity(slettVikårperiode, headers),
-        ).body!!
-
-    private fun kallOppdaterGrunnlag(behandlingId: BehandlingId) =
-        restTemplate
-            .exchange<LagreVilkårperiodeResponse>(
-                localhost("api/vilkarperiode/behandling/$behandlingId/oppdater-grunnlag"),
-                HttpMethod.POST,
-                HttpEntity(null, headers),
-            ).body!!
 }

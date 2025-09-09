@@ -42,6 +42,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -57,6 +58,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.client.RestTemplate
 
 // Slett denne når RestTemplateConfiguration er tatt i bruk?
@@ -106,7 +108,7 @@ abstract class IntegrationTest {
     protected lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
-    protected lateinit var rolleConfig: RolleConfig
+    lateinit var rolleConfig: RolleConfig
 
     @Autowired
     protected lateinit var testoppsettService: TestoppsettService
@@ -121,6 +123,17 @@ abstract class IntegrationTest {
     protected lateinit var mockService: MockService
 
     val logger = LoggerFactory.getLogger(javaClass)
+
+    lateinit var webTestClient: WebTestClient
+
+    @BeforeEach
+    fun setup() {
+        webTestClient =
+            WebTestClient
+                .bindToServer()
+                .baseUrl(localhost("/"))
+                .build()
+    }
 
     @AfterEach
     fun tearDown() {
@@ -193,5 +206,12 @@ abstract class IntegrationTest {
 
     companion object {
         private const val LOCALHOST = "http://localhost:"
+    }
+
+    fun WebTestClient.RequestHeadersSpec<*>.medOnBehalfOfToken(
+        role: String = rolleConfig.beslutterRolle,
+        saksbehandler: String = "julenissen",
+    ) = this.headers {
+        it.setBearerAuth(onBehalfOfToken(role, saksbehandler))
     }
 }
