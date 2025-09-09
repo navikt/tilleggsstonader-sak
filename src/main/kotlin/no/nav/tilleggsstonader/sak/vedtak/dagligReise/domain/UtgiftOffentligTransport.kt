@@ -3,13 +3,13 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.util.inneholderUkedag
 import java.time.LocalDate
-import kotlin.Int
 
 data class UtgiftOffentligTransport(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val antallReisedagerPerUke: Int,
     val prisEnkelbillett: Int,
+    val prisSyvdagersbillett: Int?,
     val pris30dagersbillett: Int,
 ) : Periode<LocalDate> {
     fun delTil30Dagersperioder(): List<UtgiftOffentligTransport> =
@@ -19,6 +19,7 @@ data class UtgiftOffentligTransport(
                 tom = tom,
                 antallReisedagerPerUke = antallReisedagerPerUke,
                 prisEnkelbillett = prisEnkelbillett,
+                prisSyvdagersbillett = prisSyvdagersbillett,
                 pris30dagersbillett = pris30dagersbillett,
             )
         }

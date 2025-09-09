@@ -218,6 +218,7 @@ data class Vurdering(
 data class OffentligTransport(
     val reisedagerPerUke: Int,
     val prisEnkelbillett: Int,
+    val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int,
 )
 

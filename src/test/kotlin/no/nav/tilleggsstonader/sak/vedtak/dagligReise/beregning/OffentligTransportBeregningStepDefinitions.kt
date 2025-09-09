@@ -66,8 +66,8 @@ class OffentligTransportBeregningStepDefinitions {
             )
     }
 
-    @Så("forventer vi følgende beregningsrsultat for daglig resie offentlig transport, reiseNr={}")
-    fun `forventer vi følgende beregningsrsultat for daglig resie offentlig transport`(
+    @Så("forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr={}")
+    fun `forventer vi følgende beregningsrsultat for daglig reise offentlig transport`(
         reiserNummer: Int,
         dataTable: DataTable,
     ) {
@@ -92,6 +92,7 @@ enum class DomenenøkkelOffentligtransport(
 ) : Domenenøkkel {
     ANTALL_REISEDAGER_PER_UKE("Antall reisedager per uke"),
     PRIS_ENKELTBILLETT("Pris enkeltbillett"),
+    PRIS_SYV_DAGERS_BILLETT("Pris syv-dagersbillett"),
     PRIS_TRETTI_DAGERS_BILLETT(
         "Pris tretti-dagersbillett",
     ),

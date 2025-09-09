@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -28,6 +29,7 @@ fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
                     prisEnkeltbillett = 0,
+                    prisSyvdagersbillett = 0,
                     pris30dagersbillett = 0,
                     antallReisedagerPerUke = 0,
                     antallReisedager = 0,
@@ -70,6 +72,7 @@ fun mapTilVilkår(
                         rad,
                     ),
                 prisEnkelbillett = parseInt(DomenenøkkelOffentligtransport.PRIS_ENKELTBILLETT, rad),
+                prisSyvdagersbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_SYV_DAGERS_BILLETT, rad),
                 prisTrettidagersbillett =
                     parseInt(
                         DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT,

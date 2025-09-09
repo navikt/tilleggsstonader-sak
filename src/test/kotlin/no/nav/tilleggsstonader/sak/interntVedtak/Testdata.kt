@@ -613,6 +613,7 @@ object Testdata {
                         OffentligTransport(
                             reisedagerPerUke = 5,
                             prisEnkelbillett = 44,
+                            prisSyvdagersbillett = null,
                             prisTrettidagersbillett = 750,
                         ),
                 ),

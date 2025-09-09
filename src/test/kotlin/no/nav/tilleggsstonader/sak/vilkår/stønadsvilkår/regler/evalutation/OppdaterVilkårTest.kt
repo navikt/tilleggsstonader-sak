@@ -329,6 +329,7 @@ internal class OppdaterVilkårTest {
                     OffentligTransport(
                         reisedagerPerUke = 5,
                         prisEnkelbillett = 44,
+                        prisSyvdagersbillett = null,
                         prisTrettidagersbillett = 780,
                     ),
             )

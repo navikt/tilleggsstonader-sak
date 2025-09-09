@@ -58,7 +58,7 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
             status = BehandlingStatus.UTREDES,
         )
     val dummyOffentligTransport =
-        OffentligTransport(reisedagerPerUke = 4, prisEnkelbillett = 44, prisTrettidagersbillett = 750)
+        OffentligTransport(reisedagerPerUke = 4, prisEnkelbillett = 44, prisSyvdagersbillett = null, prisTrettidagersbillett = 750)
 
     val vedtaksperiode = vedtaksperiode(fom = dummyFom, tom = dummyTom)
     val aktivitet = aktivitet(dummyBehandlingId, fom = dummyFom, tom = dummyTom)
@@ -90,6 +90,7 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
                                                     fom = dummyFom,
                                                     tom = dummyTom,
                                                     prisEnkeltbillett = 44,
+                                                    prisSyvdagersbillett = null,
                                                     pris30dagersbillett = 750,
                                                     antallReisedagerPerUke = 4,
                                                     vedtaksperioder =

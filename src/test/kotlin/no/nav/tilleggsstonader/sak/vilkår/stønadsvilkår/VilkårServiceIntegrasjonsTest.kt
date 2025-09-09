@@ -301,6 +301,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
                         OffentligTransport(
                             reisedagerPerUke = 3,
                             prisEnkelbillett = 44,
+                            prisSyvdagersbillett = null,
                             prisTrettidagersbillett = 750,
                         ),
                 ),
@@ -312,6 +313,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
                 OffentligTransport(
                     reisedagerPerUke = 3,
                     prisEnkelbillett = 44,
+                    prisSyvdagersbillett = null,
                     prisTrettidagersbillett = 750,
                 ),
             )
