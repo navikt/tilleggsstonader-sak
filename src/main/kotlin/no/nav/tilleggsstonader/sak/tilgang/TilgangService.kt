@@ -176,6 +176,15 @@ class TilgangService(
         validerTilgangTilRolle(BehandlerRolle.BESLUTTER)
     }
 
+    fun validerHarUtviklerrolle() {
+        if (!SikkerhetContext.harRolle(rolleConfig.utvikler)) {
+            throw ManglerTilgang(
+                melding = "Innlogget bruker har ikke utviklerrolle",
+                frontendFeilmelding = "Innlogget bruker har ikke utviklerrolle",
+            )
+        }
+    }
+
     fun validerTilgangTilRolle(minimumsrolle: BehandlerRolle) {
         if (!harTilgangTilRolle(minimumsrolle)) {
             throw ManglerTilgang(

@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20250818112609_c5f9e80"
-val tilleggsstønaderLibsVersion = "2025.08.18-09.30.6e87d5f8ea6d"
+val tilleggsstønaderLibsVersion = "2025.09.05-14.10.9ee8a6889a7b"
 val tilleggsstønaderKontrakterVersion = "2025.08.21-12.42.72fabd5a724c"
 val avroVersion = "1.12.0"
 val confluentVersion = "8.0.0"
@@ -13,6 +13,7 @@ val tokenSupportVersion = "5.0.34"
 val wiremockVersion = "3.13.1"
 val mockkVersion = "1.14.5"
 val testcontainerVersion = "1.21.3"
+val springDocVersion = "2.8.12"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -81,6 +82,8 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:8.1")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
 
     implementation("no.nav.familie:prosessering-core:$familieProsesseringVersion")
 

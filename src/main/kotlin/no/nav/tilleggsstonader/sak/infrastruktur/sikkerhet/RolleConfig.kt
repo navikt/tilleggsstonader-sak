@@ -17,8 +17,8 @@ data class RolleConfig(
     val kode7: String,
     @Value("\${rolle.egenAnsatt}")
     val egenAnsatt: String,
-    @Value("\${rolle.prosessering}")
-    val prosessering: String,
+    @Value("\${rolle.utvikler}")
+    val utvikler: String,
 ) {
     val rollerMedBeskrivelse: AdRoller by lazy {
         AdRoller(
@@ -28,6 +28,7 @@ data class RolleConfig(
             kode6 = AdRolle(rolleId = kode6, beskrivelse = "Strengt fortrolig adresse"),
             kode7 = AdRolle(rolleId = kode7, beskrivelse = "Fortrolig adresse"),
             egenAnsatt = AdRolle(rolleId = egenAnsatt, beskrivelse = "Nav-ansatt"),
+            utvikler = AdRolle(rolleId = utvikler, beskrivelse = "Utvikler"),
         )
     }
 }
@@ -39,6 +40,7 @@ data class AdRoller(
     val kode6: AdRolle,
     val kode7: AdRolle,
     val egenAnsatt: AdRolle,
+    val utvikler: AdRolle,
 )
 
 data class AdRolle(

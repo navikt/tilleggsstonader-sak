@@ -14,6 +14,13 @@ class WebConfig(
             "/api/task/**",
             "/api/v2/task/**",
             "/internal/**",
+            "/swagger-resources/**",
+            "/swagger-resources",
+            "/swagger-ui/**",
+            "/swagger-ui",
+            "/v3/api-docs/**",
+            "/v3/api-docs",
+            "/api/forvaltning/**",
         )
 
     override fun addInterceptors(registry: InterceptorRegistry) {

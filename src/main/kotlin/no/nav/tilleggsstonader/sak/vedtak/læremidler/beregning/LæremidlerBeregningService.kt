@@ -262,7 +262,7 @@ class LæremidlerBeregningService(
             tom = periode.tom,
             studienivå = periode.studienivå,
             studieprosent = periode.prosent,
-            sats = satsLæremidlerService.finnSatsForStudienivå(sats, periode.studienivå),
+            sats = sats.finnSatsForStudienivå(periode.studienivå),
             satsBekreftet = sats.bekreftet,
             utbetalingsdato = periode.utbetalingsdato,
             målgruppe = periode.målgruppe,

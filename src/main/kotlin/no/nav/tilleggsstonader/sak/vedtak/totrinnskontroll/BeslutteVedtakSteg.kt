@@ -58,6 +58,7 @@ class BeslutteVedtakSteg(
     ): StegType {
         fagsakService.fagsakMedOppdatertPersonIdent(saksbehandling.fagsakId)
         val saksbehandler = totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(saksbehandling, data)
+
         ferdigstillOppgave(saksbehandling)
 
         return if (data.godkjent) {

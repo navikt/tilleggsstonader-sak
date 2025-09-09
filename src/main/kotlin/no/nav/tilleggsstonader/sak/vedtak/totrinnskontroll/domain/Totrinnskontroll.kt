@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -20,7 +21,17 @@ data class Totrinnskontroll(
     val årsakerUnderkjent: Årsaker? = null,
     val begrunnelse: String? = null,
     val beslutter: String? = null,
-)
+) {
+    companion object {
+        fun maskineltBesluttet(behandlingId: BehandlingId) =
+            Totrinnskontroll(
+                behandlingId = behandlingId,
+                saksbehandler = SikkerhetContext.SYSTEM_FORKORTELSE,
+                status = TotrinnInternStatus.GODKJENT,
+                beslutter = SikkerhetContext.SYSTEM_FORKORTELSE,
+            )
+    }
+}
 
 data class Årsaker(
     val årsaker: List<ÅrsakUnderkjent>,

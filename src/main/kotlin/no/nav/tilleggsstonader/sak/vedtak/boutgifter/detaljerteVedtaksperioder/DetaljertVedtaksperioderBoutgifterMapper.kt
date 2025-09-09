@@ -82,7 +82,7 @@ object DetaljertVedtaksperioderBoutgifterMapper {
      * For hver overnatting ønsker man å se beløpet som dekkes, som baserer seg på hvor mye man har fått før
      * og kan begrenses av makssats.
      *
-     * Utgifter fra samlinger trekkes fra makssats først, slik at det som dekkes på samlinger beregnes på det gjenstående den måneden.
+     * Løpende utgifter trekkes fra makssats først, slik at det som dekkes på samlinger beregnes på det gjenstående den måneden.
      */
     private fun beregnAndelAvUtgifterSomDekkes(
         utgifter: BoutgifterPerUtgiftstype,
@@ -98,7 +98,6 @@ object DetaljertVedtaksperioderBoutgifterMapper {
                 .flatten()
                 .sumOf { it.utgift }
 
-        // Todo - kommentere hvorfor vi må ta hensyn til løpende utgifter
         var alleredeSummerteUtgifter = sumLøpendeUtgifter
 
         return utgifterOvernatting

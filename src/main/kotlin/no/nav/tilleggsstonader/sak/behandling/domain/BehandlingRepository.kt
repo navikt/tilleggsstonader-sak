@@ -197,4 +197,15 @@ interface BehandlingRepository :
         """,
     )
     fun antallGjeldendeIverksatteBehandlinger(stønadstype: Stønadstype = Stønadstype.BARNETILSYN): Int
+
+    @Query(
+        """
+            select distinct b.id
+            from gjeldende_iverksatte_behandlinger b
+            join tilkjent_ytelse ty on ty.behandling_id = b.id
+            join andel_tilkjent_ytelse aty on ty.id = aty.tilkjent_ytelse_id
+            where b.stonadstype = :stønadstype and aty.status_iverksetting = 'VENTER_PÅ_SATS_ENDRING'
+        """,
+    )
+    fun finnBehandlingerMedAndelerSomVenterPåSatsjustering(stønadstype: Stønadstype): List<BehandlingId>
 }
