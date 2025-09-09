@@ -128,9 +128,7 @@ private fun finnReisekostnadForNySyvdagersbillett(
     grunnlag: Beregningsgrunnlag,
 ): Int? = grunnlag.prisSyvdagersbillett?.let { reisekostnader[max(0, gjeldendeDag - 7)] + grunnlag.prisSyvdagersbillett }
 
-private typealias Dag = Int
-
-private fun Dag.skalIkkeReise(
+private fun Int.skalIkkeReise(
     reisedagerListe: List<Int>,
     reisedagIndeks: Int,
 ): Boolean = this < reisedagerListe[reisedagIndeks]
