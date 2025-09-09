@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.satsjustering
 
 import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.OpprettRevurderingBehandlingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -28,7 +28,7 @@ import java.time.LocalDate
 @Service
 class SatsjusteringService(
     private val behandlingService: BehandlingService,
-    private val revurderingBehandlingService: OpprettRevurderingBehandlingService,
+    private val revurderingBehandlingService: OpprettRevurderingService,
     private val vedtakservice: VedtakService,
     private val beregnYtelseSteg: LæremidlerBeregnYtelseSteg,
     private val ferdigstillBehandlingSteg: FerdigstillBehandlingSteg,
@@ -92,7 +92,7 @@ class SatsjusteringService(
 
     private fun opprettRevurderingForSatsendring(fagsakId: FagsakId): Saksbehandling {
         val revurderingId =
-            revurderingBehandlingService.opprettBehandling(
+            revurderingBehandlingService.opprettRevurdering(
                 OpprettRevurdering(
                     fagsakId = fagsakId,
                     årsak = BehandlingÅrsak.SATSENDRING,

@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController
 class BehandlingController(
     private val behandlingService: BehandlingService,
     private val behandlingsoversiktService: BehandlingsoversiktService,
-    private val opprettRevurderingBehandlingService: OpprettRevurderingBehandlingService,
+    private val opprettRevurderingService: OpprettRevurderingService,
     private val faktaGrunnlagService: FaktaGrunnlagService,
     private val fagsakService: FagsakService,
     private val henleggService: HenleggService,
@@ -78,17 +78,17 @@ class BehandlingController(
     ): BarnTilRevurderingDto {
         tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
-        return opprettRevurderingBehandlingService.hentBarnTilRevurdering(fagsakId)
+        return opprettRevurderingService.hentBarnTilRevurdering(fagsakId)
     }
 
     @PostMapping
-    fun opprettBehandling(
+    fun opprettRevurdering(
         @RequestBody request: OpprettBehandlingDto,
     ): BehandlingId {
         tilgangService.validerTilgangTilFagsak(request.fagsakId, AuditLoggerEvent.CREATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return opprettRevurderingBehandlingService.opprettBehandling(request.tilDomene())
+        return opprettRevurderingService.opprettRevurdering(request.tilDomene())
     }
 
     @PostMapping("person")

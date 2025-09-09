@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
-class OpprettRevurderingBehandlingService(
+class OpprettRevurderingService(
     private val taskService: TaskService,
     private val behandlingService: BehandlingService,
     private val barnService: BarnService,
@@ -39,7 +39,7 @@ class OpprettRevurderingBehandlingService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun opprettBehandling(opprettRevurdering: OpprettRevurdering): BehandlingId {
+    fun opprettRevurdering(opprettRevurdering: OpprettRevurdering): BehandlingId {
         feilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING)) {
             "Feature toggle for å kunne opprette revurdering er slått av"
         }

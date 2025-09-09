@@ -39,7 +39,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
     private lateinit var taskService: TaskService
 
     @Autowired
-    lateinit var service: OpprettRevurderingBehandlingService
+    lateinit var service: OpprettRevurderingService
 
     @Autowired
     lateinit var barnService: BarnService
@@ -69,7 +69,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
 
             assertThatThrownBy {
-                service.opprettBehandling(opprettRevurdering(fagsakId = behandling.fagsakId))
+                service.opprettRevurdering(opprettRevurdering(fagsakId = behandling.fagsakId))
             }.hasMessage("Det finnes en behandling på fagsaken som hverken er ferdigstilt eller satt på vent")
         }
 
@@ -87,7 +87,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
             val nyBehandlingId =
-                service.opprettBehandling(opprettRevurdering(fagsakId = behandling.fagsakId))
+                service.opprettRevurdering(opprettRevurdering(fagsakId = behandling.fagsakId))
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
             assertThat(nyBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
@@ -113,7 +113,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(PdlClientConfig.BARN_FNR),
                 )
-            val nyBehandlingId = service.opprettBehandling(opprettRevurdering)
+            val nyBehandlingId = service.opprettRevurdering(opprettRevurdering)
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
             assertThat(nyBehandling.forrigeIverksatteBehandlingId).isNull()
@@ -137,7 +137,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
             val nyBehandlingId =
-                service.opprettBehandling(opprettRevurdering(fagsakId = behandling.fagsakId))
+                service.opprettRevurdering(opprettRevurdering(fagsakId = behandling.fagsakId))
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
             assertThat(nyBehandling.forrigeIverksatteBehandlingId).isNull()
@@ -153,7 +153,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 )
 
             assertThatThrownBy {
-                service.opprettBehandling(
+                service.opprettRevurdering(
                     opprettRevurdering(
                         fagsakId = behandling.fagsakId,
                         årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
@@ -176,7 +176,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
                 )
-            val nyBehandlingId = service.opprettBehandling(opprettBehandlingDto)
+            val nyBehandlingId = service.opprettRevurdering(opprettBehandlingDto)
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
             assertThat(nyBehandling.nyeOpplysningerMetadata).isEqualTo(
@@ -238,7 +238,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         @Test
         fun `skal gjenbruke barn fra forrige behandlingen`() {
             val nyBehandlingId =
-                service.opprettBehandling(opprettRevurdering(fagsakId = tidligereBehandling!!.fagsakId))
+                service.opprettRevurdering(opprettRevurdering(fagsakId = tidligereBehandling!!.fagsakId))
 
             with(barnService.finnBarnPåBehandling(tidligereBehandling!!.id)) {
                 assertThat(this).hasSize(1)
@@ -253,7 +253,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         @Test
         fun `skal gjenbruke informasjon fra forrige behandling`() {
             val revurderingId =
-                service.opprettBehandling(opprettRevurdering(fagsakId = tidligereBehandling!!.fagsakId))
+                service.opprettRevurdering(opprettRevurdering(fagsakId = tidligereBehandling!!.fagsakId))
 
             assertThat(vilkårperiodeRepository.findByBehandlingId(revurderingId)).hasSize(2)
             assertThat(vilkårRepository.findByBehandlingId(revurderingId)).hasSize(1)
@@ -305,7 +305,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(PdlClientConfig.BARN2_FNR),
                 )
-            val behandlingIdRevurdering = service.opprettBehandling(opprettRevurdering)
+            val behandlingIdRevurdering = service.opprettRevurdering(opprettRevurdering)
 
             with(barnService.finnBarnPåBehandling(behandlingIdRevurdering)) {
                 assertThat(this).hasSize(2)
@@ -322,7 +322,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(),
                 )
-            val behandlingIdRevurdering = service.opprettBehandling(opprettRevurdering)
+            val behandlingIdRevurdering = service.opprettRevurdering(opprettRevurdering)
 
             with(barnService.finnBarnPåBehandling(behandlingIdRevurdering)) {
                 assertThat(this).hasSize(1)
@@ -340,7 +340,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 )
 
             assertThatThrownBy {
-                service.opprettBehandling(opprettRevurdering)
+                service.opprettRevurdering(opprettRevurdering)
             }.hasMessage("Kan ikke sende med barn på annet enn årsak Søknad")
         }
 
@@ -354,7 +354,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 )
 
             assertThatThrownBy {
-                service.opprettBehandling(opprettRevurdering)
+                service.opprettRevurdering(opprettRevurdering)
             }.hasMessage("Kan ikke velge barn som ikke er valgbare.")
         }
 
@@ -368,7 +368,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 )
 
             assertThatThrownBy {
-                service.opprettBehandling(opprettRevurdering)
+                service.opprettRevurdering(opprettRevurdering)
             }.hasMessage("Kan ikke velge barn som ikke er valgbare.")
         }
     }
@@ -389,7 +389,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             testoppsettService.opprettBehandlingMedFagsak(henlagtBehandling, opprettGrunnlagsdata = false)
 
             assertThatThrownBy {
-                service.opprettBehandling(opprettRevurdering)
+                service.opprettRevurdering(opprettRevurdering)
             }.hasMessage(
                 "Behandling må opprettes med minimum 1 barn. Dersom alle tidligere behandlinger er henlagt, må ny behandling opprettes som søknad eller papirsøknad.",
             )
@@ -411,7 +411,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
             vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
-            service.opprettBehandling(
+            service.opprettRevurdering(
                 opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     skalOppretteOppgave = false,
@@ -434,7 +434,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
             vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
-            service.opprettBehandling(
+            service.opprettRevurdering(
                 opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     skalOppretteOppgave = true,
