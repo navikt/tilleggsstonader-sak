@@ -93,27 +93,24 @@ private fun finnReisedagerPerUke(grunnlag: Beregningsgrunnlag): Map<Uke, Periode
 private fun lagReisedagerListe(reisedagerPerUke: Map<Uke, PeriodeMedDager>): List<Int> =
     reisedagerPerUke.values.flatMapIndexed { indeks, periodeMedDager ->
         val startDag = reisedagerPerUke.firstNotNullOf { it.value.fom }
-        val dagerTilMandag = finnDagerTilMandagIUke(startDag, indeks)
+        val dagerTilMandag = tellDagerTilStartenAvUke(startDag, indeks)
         // dag + 1 for å 1-indeksere tellingen av dager
         val list = List(periodeMedDager.antallDager) { dag -> dagerTilMandag + dag + 1 }
         list
     }
 
 /**
- * Retunerer 0 for `ukeNr` = 0,
- * derreter antall dager fra `startDag` til mandag i `ukeNr`
+ * Teller opp antall dager fra startDag til mandagen i en gitt uke (ukeNr).
+ * For den første uken (ukeNr = 0) returneres 0.
+ * For påfølgende uker beregnes antall dager til mandagen i den gitte uken.
  */
-private fun finnDagerTilMandagIUke(
+private fun tellDagerTilStartenAvUke(
     startDag: LocalDate,
     ukeNr: Int,
 ): Int {
-    val nesteMandag = startDag.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
-    val dagerTilMandag = ChronoUnit.DAYS.between(startDag, nesteMandag).toInt()
-    return when (ukeNr) {
-        0 -> 0
-        1 -> dagerTilMandag
-        else -> (ukeNr - 1) * 7 + dagerTilMandag
-    }
+    if (ukeNr == 0) return 0
+    val startenAvGittUke = startDag.plusWeeks(ukeNr - 1L).with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+    return ChronoUnit.DAYS.between(startDag, startenAvGittUke).toInt()
 }
 
 private fun finnReisekostnadForNyEnkeltbillett(
