@@ -55,9 +55,6 @@ class SatsjusteringTest : IntegrationTest() {
     @Autowired
     lateinit var satsjusteringService: SatsjusteringService
 
-    @Autowired
-    lateinit var vedtakService: VedtakService
-
     val fom = LocalDate.of(2025, 8, 1)
     val tom = LocalDate.of(2026, 6, 30)
 
