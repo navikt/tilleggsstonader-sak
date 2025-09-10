@@ -4,8 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.arena.oppgave.ArenaOppgaveDto
 import no.nav.tilleggsstonader.kontrakter.arena.vedtak.ArenaSakOgVedtakDto
 import no.nav.tilleggsstonader.kontrakter.felles.IdenterRequest
-import no.nav.tilleggsstonader.kontrakter.felles.IdenterStønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.IdenterStønadstyper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -25,7 +26,15 @@ class ArenaService(
         stønadstype: Stønadstype,
     ): ArenaStatusDto {
         val identer = personService.hentFolkeregisterOgNpidIdenter(ident).identer()
-        return arenaClient.hentStatus(IdenterStønadstype(identer, stønadstype))
+
+        val stønadstyperSomSkalSøkesOpp =
+            if (stønadstype.gjelderDagligReise()) {
+                setOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR)
+            } else {
+                setOf(stønadstype)
+            }
+
+        return arenaClient.hentStatus(IdenterStønadstyper(identer, stønadstyperSomSkalSøkesOpp))
     }
 
     @Cacheable("arena-vedtak", cacheManager = "5secCache")
