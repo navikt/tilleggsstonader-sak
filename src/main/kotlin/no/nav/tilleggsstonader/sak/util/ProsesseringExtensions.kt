@@ -5,11 +5,8 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.familie.prosessering.error.TaskExceptionUtenStackTrace
 import no.nav.familie.prosessering.internal.TaskService
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import no.nav.tilleggsstonader.libs.log.logger
 import java.time.LocalDateTime
-
-val logger: Logger = LoggerFactory.getLogger(TaskService::class.java)
 
 /**
  * Avbryter opprinnelig task, og setter opp ny kjøring etter et spesifisert antall dager.
