@@ -2,44 +2,41 @@ package no.nav.tilleggsstonader.sak.infrastruktur
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
-import no.nav.tilleggsstonader.libs.test.httpclient.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.catchException
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.http.ProblemDetail
 import org.springframework.http.converter.HttpMessageConversionException
+import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.HttpServerErrorException.InternalServerError
 import org.springframework.web.client.exchange
-import org.springframework.web.client.getForEntity
-import org.springframework.web.client.postForEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
+import kotlin.collections.mapOf
 
 class TestControllerTest : IntegrationTest() {
     val json = """{"tekst":"abc","dato":"2023-01-01","tidspunkt":"2023-01-01T12:00:03"}"""
-    val feilJson =
-        """{"type":"about:blank","title":"Internal Server Error","status":500,"detail":"Ukjent feil","instance":"/api/test/error"}"""
 
     @Test
     fun `skal kunne hente json fra endepunkt`() {
-        val response = restTemplate.getForEntity<String>(localhost("api/test"))
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body!!).isEqualTo(json)
+        webTestClient
+            .get()
+            .uri("/api/test")
+            .medOnBehalfOfToken()
+            .exchange()
+            .expectStatus()
+            .isOk
+            .expectBody()
+            .json(json)
     }
 
     @Test
@@ -51,9 +48,16 @@ class TestControllerTest : IntegrationTest() {
                 tidspunkt = LocalDateTime.of(2023, 1, 1, 12, 0, 3),
             )
 
-        val response = restTemplate.postForEntity<TestObject>(localhost("api/test"), json)
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body!!).isEqualTo(json)
+        webTestClient
+            .post()
+            .uri("/api/test")
+            .bodyValue(json)
+            .medOnBehalfOfToken()
+            .exchange()
+            .expectStatus()
+            .isOk
+            .expectBody<TestObject>()
+            .isEqualTo(json)
     }
 
     @Test
@@ -70,45 +74,45 @@ class TestControllerTest : IntegrationTest() {
                 accept = listOf(APPLICATION_JSON)
             }
 
-        val response = restTemplate.postForEntity<TestObject>(localhost("api/test"), HttpEntity(json, jsonHeaders))
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body!!).isEqualTo(json)
+        webTestClient
+            .post()
+            .uri("/api/test")
+            .headers { it.addAll(jsonHeaders) }
+            .bodyValue(json)
+            .medOnBehalfOfToken()
+            .exchange()
+            .expectStatus()
+            .isOk
+            .expectBody<TestObject>()
+            .isEqualTo(json)
     }
 
     @Test
     fun `skal håndtere ukjent feil`() {
-        var response = catchException { restTemplate.getForEntity<String>(localhost("api/test/error")) }
-        assertThat(response).isInstanceOf(InternalServerError::class.java)
-        assertInternalServerError(response as InternalServerError)
-    }
-
-    @Test
-    fun `skal håndtere ukjent feil med forventet responstype`() {
-        val response = catchException { restTemplate.getForEntity<TestObject>(localhost("api/test/error")) }
-        assertThat(response).isInstanceOf(InternalServerError::class.java)
-        assertInternalServerError(response as InternalServerError)
-    }
-
-    @Test
-    fun `skal håndtere ukjent feil med forventet responstype med exchange`() {
-        val response = catchException { restTemplate.exchange<TestObject>(localhost("api/test/error"), HttpMethod.GET) }
-        assertThat(response).isInstanceOf(InternalServerError::class.java)
-        assertInternalServerError(response as InternalServerError)
+        webTestClient
+            .get()
+            .uri("/api/test/error")
+            .medOnBehalfOfToken()
+            .exchange()
+            .expectStatus()
+            .is5xxServerError
     }
 
     @Test
     fun `endepunkt som ikke eksisterer skal kaste 404`() {
-        val response = catchException { restTemplate.exchange<TestObject>(localhost("api/eksistererIkke"), HttpMethod.GET) }
-        assertThat(response).isInstanceOf(HttpClientErrorException.NotFound::class.java)
-
-        response as HttpClientErrorException.NotFound
-        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
-        assertThat(response.responseHeaders?.contentType).isEqualTo(APPLICATION_PROBLEM_JSON)
-        assertThat(response.responseBodyAsString).isEqualTo(
-            """
-            {"type":"about:blank","title":"Not Found","status":404,"detail":"No static resource api/eksistererIkke.","instance":"/api/eksistererIkke"}
-            """.trimIndent(),
-        )
+        webTestClient
+            .get()
+            .uri("/api/eksistererIkke")
+            .medOnBehalfOfToken()
+            .exchange()
+            .expectStatus()
+            .isNotFound
+            .expectBody()
+            .json(
+                """
+                {"type":"about:blank","title":"Not Found","status":404,"detail":"No static resource api/eksistererIkke.","instance":"/api/eksistererIkke"}
+                """.trimIndent(),
+            )
     }
 
     @Nested
@@ -121,43 +125,64 @@ class TestControllerTest : IntegrationTest() {
 
         @Test
         fun `skal feile hvis påkrevd booleanfelt er null`() {
-            val entity = HttpEntity("{}", headers)
-
-            val exception =
-                catchProblemDetailException {
-                    restTemplate.postForEntity<TestObjectBoolean>(localhost("api/test/boolean"), entity)
+            webTestClient
+                .post()
+                .uri("/api/test/boolean")
+                .bodyValue(mapOf<Any, Any>())
+                .medOnBehalfOfToken()
+                .exchange()
+                .expectStatus()
+                .is5xxServerError
+                .expectBody()
+                .jsonPath("$.detail")
+                .value<String> {
+                    assertThat(it).contains("Missing required creator property 'verdi'")
                 }
-            assertThat(exception.detail.detail).contains("Missing required creator property 'verdi'")
         }
 
         @Test
         fun `skal feile hvis påkrevd booleanfelt sendes inn som null`() {
-            val entity = HttpEntity("""{"verdi": null}""", headers)
-
-            val exception =
-                catchProblemDetailException {
-                    restTemplate.postForEntity<TestObjectBoolean>(localhost("api/test/boolean"), entity)
+            webTestClient
+                .post()
+                .uri("/api/test/boolean")
+                .bodyValue(mapOf("verdi" to null))
+                .medOnBehalfOfToken()
+                .exchange()
+                .expectStatus()
+                .is5xxServerError
+                .expectBody()
+                .jsonPath("$.detail")
+                .value<String> {
+                    assertThat(it).startsWith("JSON parse error: Cannot map `null` into type `boolean`")
                 }
-            assertThat(exception.detail.detail).contains("JSON parse error: Cannot map `null` into type `boolean`")
         }
 
         @Test
         fun `skal ikke feile hvis påkrevd booleanfelt med default-verdi er null `() {
-            val entity = HttpEntity("{}", headers)
-
-            val response =
-                restTemplate.postForEntity<TestObjectBooleanDefault>(localhost("api/test/boolean-default"), entity)
-            assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-            assertThat(response.body).isEqualTo(TestObjectBooleanDefault(true))
+            webTestClient
+                .post()
+                .uri("/api/test/boolean-default")
+                .bodyValue(mapOf<Any, Any>())
+                .medOnBehalfOfToken()
+                .exchange()
+                .expectStatus()
+                .isOk
+                .expectBody<TestObjectBooleanDefault>()
+                .isEqualTo(TestObjectBooleanDefault(true))
         }
 
         @Test
         fun `skal ikke feile hvis valgfritt booleanfelt er null `() {
-            val entity = HttpEntity("{}", headers)
-            val response =
-                restTemplate.postForEntity<TestObjectBooleanOptional>(localhost("api/test/boolean-optional"), entity)
-            assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-            assertThat(response.body).isEqualTo(TestObjectBooleanOptional(null))
+            webTestClient
+                .post()
+                .uri("/api/test/boolean-optional")
+                .bodyValue(mapOf<Any, Any>())
+                .medOnBehalfOfToken()
+                .exchange()
+                .expectStatus()
+                .isOk
+                .expectBody<TestObjectBooleanOptional>()
+                .isEqualTo(TestObjectBooleanOptional(null))
         }
     }
 
@@ -166,47 +191,33 @@ class TestControllerTest : IntegrationTest() {
         @Test
         fun `autorisert token, men mangler saksbehandler-relatert rolle`() {
             listOf(rolleConfig.kode6, rolleConfig.kode7, rolleConfig.egenAnsatt).forEach {
-                val response =
-                    catchException {
-                        restTemplate.exchange<TestObject>(
-                            localhost("api/test/azuread"),
-                            HttpMethod.GET,
-                            HttpEntity(null, headers.apply { setBearerAuth(onBehalfOfToken(it)) }),
-                        )
-                    }
-                assertThat(response).isInstanceOf(HttpClientErrorException.Forbidden::class.java)
-                assertManglerTilgang(response as HttpClientErrorException.Forbidden)
+                medBrukercontext(rolle = it) {
+                    webTestClient
+                        .get()
+                        .uri("/api/test/azuread")
+                        .medOnBehalfOfToken()
+                        .exchange()
+                        .expectStatus()
+                        .isForbidden
+                }
             }
         }
 
         @Test
         fun `autorisert token med saksbehandler-relatert rolle kan gjøre kall`() {
             listOf(rolleConfig.saksbehandlerRolle, rolleConfig.beslutterRolle, rolleConfig.veilederRolle).forEach {
-                val response =
-                    restTemplate.exchange<TestObject>(
-                        localhost("api/test/azuread"),
-                        HttpMethod.GET,
-                        HttpEntity(null, headers.apply { setBearerAuth(onBehalfOfToken(it)) }),
-                    )
-                assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-                assertThat(response.body).isNotNull
+                medBrukercontext(rolle = it) {
+                    webTestClient
+                        .get()
+                        .uri("/api/test/azuread")
+                        .medOnBehalfOfToken()
+                        .exchange()
+                        .expectStatus()
+                        .isOk
+                        .expectBody<String>()
+                }
             }
         }
-    }
-
-    private fun assertInternalServerError(response: InternalServerError) {
-        assertThat(response.statusCode).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR)
-        assertThat(response.responseHeaders?.contentType).isEqualTo(APPLICATION_PROBLEM_JSON)
-        assertThat(response.responseBodyAsString).isEqualTo(feilJson)
-    }
-
-    private fun assertManglerTilgang(response: HttpClientErrorException.Forbidden) {
-        assertThat(response.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
-        assertThat(response.responseHeaders?.contentType).isEqualTo(APPLICATION_PROBLEM_JSON)
-        assertThat(response.responseBodyAsString)
-            .isEqualTo(
-                """{"type":"about:blank","title":"Forbidden","status":403,"detail":"Du mangler tilgang til denne saksbehandlingsløsningen","instance":"/api/test/azuread"}""",
-            )
     }
 }
 

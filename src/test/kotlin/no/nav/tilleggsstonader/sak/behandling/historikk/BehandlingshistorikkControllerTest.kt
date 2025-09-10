@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.historikk
 
 import no.nav.security.mock.oauth2.http.objectMapper
-import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -10,25 +9,18 @@ import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
-import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
+import no.nav.tilleggsstonader.sak.kall.hentBehandlingKall
+import no.nav.tilleggsstonader.sak.kall.hentBehandlingshistorikk
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.exchange
 import java.time.LocalDateTime
 
 internal class BehandlingshistorikkControllerTest : IntegrationTest() {
@@ -38,18 +30,14 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
     @Autowired
     private lateinit var behandlingshistorikkRepository: BehandlingshistorikkRepository
 
-    @BeforeEach
-    fun setUp() {
-        headers.setBearerAuth(onBehalfOfToken())
-    }
-
     @Test
     internal fun `Skal returnere 403 dersom man ikke har tilgang til brukeren`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("ikkeTilgang"))))
         val behandling = testoppsettService.lagre(behandling(fagsak))
-        val respons = catchThrowableOfType<HttpClientErrorException.Forbidden> { hentHistorikk(behandling.id) }
 
-        assertThat(respons.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
+        hentBehandlingKall(behandling.id)
+            .expectStatus()
+            .isForbidden
     }
 
     @Test
@@ -61,8 +49,8 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
         leggInnHistorikk(behandling, "2", LocalDateTime.now().minusDays(1), StegType.INNGANGSVILKÅR)
         leggInnHistorikk(behandling, "3", LocalDateTime.now().plusDays(1), StegType.INNGANGSVILKÅR)
 
-        val respons = hentHistorikk(behandling.id)
-        assertThat(respons.body!!.map { it.endretAvNavn }).containsExactly("2")
+        val respons = hentBehandlingshistorikk(behandling.id)
+        assertThat(respons.map { it.endretAvNavn }).containsExactly("2")
     }
 
     @Test
@@ -91,8 +79,8 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
                 vedtakstidspunkt = SporbarUtils.now(),
             ),
         )
-        val respons = hentHistorikk(behandling.id)
-        assertThat(respons.body!!.map { it.endretAvNavn }).containsExactly("7", "5", "4", "1")
+        val respons = hentBehandlingshistorikk(behandling.id)
+        assertThat(respons.map { it.endretAvNavn }).containsExactly("7", "5", "4", "1")
     }
 
     @Test
@@ -121,8 +109,8 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
                 vedtakstidspunkt = SporbarUtils.now(),
             ),
         )
-        val respons = hentHistorikk(behandling.id)
-        assertThat(respons.body!!.map { it.endretAvNavn }).containsExactly("7", "5", "4", "1")
+        val respons = hentBehandlingshistorikk(behandling.id)
+        assertThat(respons.map { it.endretAvNavn }).containsExactly("7", "5", "4", "1")
     }
 
     /*
@@ -154,8 +142,8 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
             stegUtfall = StegUtfall.BESLUTTE_VEDTAK_GODKJENT,
         )
 
-        val respons = hentHistorikk(behandling.id)
-        assertThat(respons.body!!.map { it.endretAvNavn }).containsExactly("7", "6", "5", "4", "1")
+        val respons = hentBehandlingshistorikk(behandling.id)
+        assertThat(respons.map { it.endretAvNavn }).containsExactly("7", "6", "5", "4", "1")
     }
 
     @Test
@@ -174,8 +162,8 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
             ),
         )
 
-        val respons = hentHistorikk(behandling.id)
-        assertThat(respons.body?.first()?.metadata).isEqualTo(jsonMap)
+        val respons = hentBehandlingshistorikk(behandling.id)
+        assertThat(respons.first().metadata).isEqualTo(jsonMap)
     }
 
     private fun leggInnHistorikk(
@@ -197,11 +185,4 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
             ),
         )
     }
-
-    private fun hentHistorikk(id: BehandlingId): ResponseEntity<List<BehandlingshistorikkDto>> =
-        restTemplate.exchange(
-            localhost("/api/behandlingshistorikk/$id"),
-            HttpMethod.GET,
-            HttpEntity(null, headers),
-        )
 }

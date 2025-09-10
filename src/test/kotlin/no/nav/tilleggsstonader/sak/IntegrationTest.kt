@@ -42,29 +42,20 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.cache.CacheManager
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.data.jdbc.core.JdbcAggregateOperations
-import org.springframework.http.HttpHeaders
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.web.client.RestTemplate
-
-// Slett denne når RestTemplateConfiguration er tatt i bruk?
-@Configuration
-class DefaultRestTemplateConfiguration {
-    @Bean
-    fun restTemplate(restTemplateBuilder: RestTemplateBuilder) = restTemplateBuilder.build()
-}
+import org.springframework.test.web.reactive.server.WebTestClient
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(initializers = [DbContainerInitializer::class])
@@ -88,11 +79,8 @@ class DefaultRestTemplateConfiguration {
     "mock-klage",
 )
 @EnableMockOAuth2Server
+@AutoConfigureWebTestClient
 abstract class IntegrationTest {
-    @Autowired
-    protected lateinit var restTemplate: RestTemplate
-    protected val headers = HttpHeaders()
-
     @LocalServerPort
     private var port: Int? = 0
 
@@ -106,7 +94,7 @@ abstract class IntegrationTest {
     protected lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
-    protected lateinit var rolleConfig: RolleConfig
+    lateinit var rolleConfig: RolleConfig
 
     @Autowired
     protected lateinit var testoppsettService: TestoppsettService
@@ -122,9 +110,22 @@ abstract class IntegrationTest {
 
     val logger = LoggerFactory.getLogger(javaClass)
 
+    @Autowired
+    lateinit var webTestClient: WebTestClient
+
+    private lateinit var testBrukerkontekst: TestBrukerKontekst
+
+    @BeforeEach
+    fun setup() {
+        testBrukerkontekst =
+            TestBrukerKontekst(
+                defaultBruker = "julenissen",
+                defaultRolle = rolleConfig.beslutterRolle,
+            )
+    }
+
     @AfterEach
     fun tearDown() {
-        headers.clear()
         clearClientMocks()
         resetDatabase()
         clearCaches()
@@ -193,5 +194,41 @@ abstract class IntegrationTest {
 
     companion object {
         private const val LOCALHOST = "http://localhost:"
+    }
+
+    fun <T : Any> medBrukercontext(
+        bruker: String = testBrukerkontekst.defaultBruker,
+        rolle: String = testBrukerkontekst.rolle,
+        fn: () -> T,
+    ): T {
+        testBrukerkontekst.bruker = bruker
+        testBrukerkontekst.rolle = rolle
+
+        return fn().also { testBrukerkontekst.reset() }
+    }
+
+    fun WebTestClient.RequestHeadersSpec<*>.medOnBehalfOfToken() =
+        this.headers {
+            it.setBearerAuth(onBehalfOfToken(testBrukerkontekst.rolle, testBrukerkontekst.bruker))
+        }
+
+    fun WebTestClient.RequestHeadersSpec<*>.medClientCredentials(
+        clientId: String,
+        accessAsApplication: Boolean,
+    ) = this.headers {
+        it.setBearerAuth(clientCredential(clientId, accessAsApplication))
+    }
+
+    private data class TestBrukerKontekst(
+        val defaultBruker: String,
+        val defaultRolle: String,
+    ) {
+        var bruker: String = defaultBruker
+        var rolle: String = defaultRolle
+
+        fun reset() {
+            bruker = defaultBruker
+            rolle = defaultRolle
+        }
     }
 }

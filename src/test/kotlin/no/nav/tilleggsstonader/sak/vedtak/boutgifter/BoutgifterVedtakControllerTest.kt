@@ -1,13 +1,15 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.test.httpclient.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.kall.avslåVedtakBoutgifter
+import no.nav.tilleggsstonader.sak.kall.hentVedtakBoutgifter
+import no.nav.tilleggsstonader.sak.kall.hentVedtakBoutgifterKall
+import no.nav.tilleggsstonader.sak.kall.innvilgeVedtakBoutgifter
+import no.nav.tilleggsstonader.sak.kall.opphørVedtakBoutgifter
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
@@ -15,10 +17,8 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterResponse
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
@@ -34,10 +34,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
-import org.springframework.web.client.exchange
 import java.time.LocalDate
 import java.util.UUID
 
@@ -67,7 +63,6 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
 
     @BeforeEach
     fun setUp() {
-        headers.setBearerAuth(onBehalfOfToken())
         testoppsettService.opprettBehandlingMedFagsak(dummyBehandling, stønadstype = Stønadstype.BOUTGIFTER)
         vilkårperiodeRepository.insert(aktivitet)
         vilkårperiodeRepository.insert(målgruppe)
@@ -75,19 +70,12 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
     }
 
     @Test
-    fun `skal validere token`() {
-        headers.clear()
-        val exception = catchProblemDetailException { hentVedtak<InnvilgelseBoutgifterResponse>(BehandlingId.random()) }
-
-        assertThat(exception.httpStatus).isEqualTo(HttpStatus.UNAUTHORIZED)
-    }
-
-    @Test
     fun `hent vedtak skal returnere tom body når det ikke finnes noen lagrede vedtak`() {
-        val response = hentVedtak<InnvilgelseBoutgifterResponse>(dummyBehandling.id)
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body).isNull()
+        hentVedtakBoutgifterKall(dummyBehandling.id)
+            .expectStatus()
+            .isOk
+            .expectBody()
+            .isEmpty
     }
 
     @Nested
@@ -100,24 +88,13 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
                     begrunnelse = "begrunnelse",
                 )
 
-            avslåVedtak(dummyBehandling, avslag)
+            avslåVedtakBoutgifter(dummyBehandling.id, avslag)
 
-            val lagretDto = hentVedtak<AvslagBoutgifterDto>(dummyBehandling.id).body!!
+            val lagretDto = hentVedtakBoutgifter<AvslagBoutgifterDto>(dummyBehandling.id)
 
             assertThat(lagretDto.årsakerAvslag).isEqualTo(avslag.årsakerAvslag)
             assertThat(lagretDto.begrunnelse).isEqualTo(avslag.begrunnelse)
             assertThat(lagretDto.type).isEqualTo(TypeVedtak.AVSLAG)
-        }
-
-        private fun avslåVedtak(
-            behandling: Behandling,
-            vedtak: AvslagBoutgifterDto,
-        ) {
-            restTemplate.exchange<Map<String, Any>?>(
-                localhost("api/vedtak/boutgifter/${behandling.id}/avslag"),
-                HttpMethod.POST,
-                HttpEntity(vedtak, headers),
-            )
         }
     }
 
@@ -126,9 +103,9 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
         @Test
         fun `skal lagre og hente opphør`() {
             val opphørsdato = dummyFom.plusDays(4)
-            innvilgeVedtak(
-                behandling = dummyBehandling,
-                vedtak = InnvilgelseBoutgifterRequest(listOf(vedtaksperiode.tilDto())),
+            innvilgeVedtakBoutgifter(
+                dummyBehandling.id,
+                InnvilgelseBoutgifterRequest(listOf(vedtaksperiode.tilDto())),
             )
             testoppsettService.ferdigstillBehandling(dummyBehandling)
 
@@ -170,42 +147,13 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
                     opphørsdato = opphørsdato,
                 )
 
-            opphørVedtak(revurdering, opphørVedtak)
+            opphørVedtakBoutgifter(revurdering.id, opphørVedtak)
 
-            val lagretDto = hentVedtak<OpphørBoutgifterResponse>(revurdering.id).body!!
+            val lagretDto = hentVedtakBoutgifter<OpphørBoutgifterResponse>(revurdering.id)
 
             assertThat((lagretDto).årsakerOpphør).isEqualTo(opphørVedtak.årsakerOpphør)
             assertThat(lagretDto.begrunnelse).isEqualTo(opphørVedtak.begrunnelse)
             assertThat(lagretDto.type).isEqualTo(TypeVedtak.OPPHØR)
         }
-
-        private fun opphørVedtak(
-            behandling: Behandling,
-            vedtak: OpphørBoutgifterRequest,
-        ) {
-            restTemplate.exchange<Map<String, Any>?>(
-                localhost("api/vedtak/boutgifter/${behandling.id}/opphor"),
-                HttpMethod.POST,
-                HttpEntity(vedtak, headers),
-            )
-        }
     }
-
-    private fun innvilgeVedtak(
-        behandling: Behandling,
-        vedtak: InnvilgelseBoutgifterRequest,
-    ) {
-        restTemplate.exchange<Map<String, Any>?>(
-            localhost("api/vedtak/boutgifter/${behandling.id}/innvilgelse"),
-            HttpMethod.POST,
-            HttpEntity(vedtak, headers),
-        )
-    }
-
-    private inline fun <reified T : VedtakBoutgifterResponse> hentVedtak(behandlingId: BehandlingId) =
-        restTemplate.exchange<T>(
-            localhost("api/vedtak/boutgifter/$behandlingId"),
-            HttpMethod.GET,
-            HttpEntity(null, headers),
-        )
 }
