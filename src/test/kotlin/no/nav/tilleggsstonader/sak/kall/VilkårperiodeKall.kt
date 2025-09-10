@@ -72,11 +72,9 @@ fun IntegrationTest.slettVilkårperiode(
     .returnResult()
     .responseBody!!
 
-fun IntegrationTest.oppdaterGrunnlagKall(
-    behandlingId: BehandlingId,
-    role: String = rolleConfig.beslutterRolle,
-) = webTestClient
-    .post()
-    .uri("/api/vilkarperiode/behandling/$behandlingId/oppdater-grunnlag")
-    .medOnBehalfOfToken(role)
-    .exchange()
+fun IntegrationTest.oppdaterGrunnlagKall(behandlingId: BehandlingId) =
+    webTestClient
+        .post()
+        .uri("/api/vilkarperiode/behandling/$behandlingId/oppdater-grunnlag")
+        .medOnBehalfOfToken()
+        .exchange()

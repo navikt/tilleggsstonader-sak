@@ -126,6 +126,8 @@ abstract class IntegrationTest {
 
     lateinit var webTestClient: WebTestClient
 
+    private lateinit var testBrukerkontekst: TestBrukerKontekst
+
     @BeforeEach
     fun setup() {
         webTestClient =
@@ -133,6 +135,12 @@ abstract class IntegrationTest {
                 .bindToServer()
                 .baseUrl(localhost("/"))
                 .build()
+
+        testBrukerkontekst =
+            TestBrukerKontekst(
+                defaultBruker = "julenissen",
+                defaultRolle = rolleConfig.beslutterRolle,
+            )
     }
 
     @AfterEach
@@ -208,10 +216,32 @@ abstract class IntegrationTest {
         private const val LOCALHOST = "http://localhost:"
     }
 
-    fun WebTestClient.RequestHeadersSpec<*>.medOnBehalfOfToken(
-        role: String = rolleConfig.beslutterRolle,
-        saksbehandler: String = "julenissen",
-    ) = this.headers {
-        it.setBearerAuth(onBehalfOfToken(role, saksbehandler))
+    fun <T : Any> medBrukercontext(
+        bruker: String = testBrukerkontekst.defaultBruker,
+        rolle: String = testBrukerkontekst.rolle,
+        fn: () -> T,
+    ): T {
+        testBrukerkontekst.bruker = bruker
+        testBrukerkontekst.rolle = rolle
+
+        return fn().also { testBrukerkontekst.reset() }
+    }
+
+    fun WebTestClient.RequestHeadersSpec<*>.medOnBehalfOfToken() =
+        this.headers {
+            it.setBearerAuth(onBehalfOfToken(testBrukerkontekst.rolle, testBrukerkontekst.bruker))
+        }
+
+    private data class TestBrukerKontekst(
+        val defaultBruker: String,
+        val defaultRolle: String,
+    ) {
+        var bruker: String = defaultBruker
+        var rolle: String = defaultRolle
+
+        fun reset() {
+            bruker = defaultBruker
+            rolle = defaultRolle
+        }
     }
 }

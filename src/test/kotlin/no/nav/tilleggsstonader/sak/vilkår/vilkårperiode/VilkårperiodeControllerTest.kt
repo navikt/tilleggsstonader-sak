@@ -106,14 +106,16 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         fun `må ha saksbehandlerrolle for å kunne oppdatere grunnlag`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            oppdaterGrunnlagKall(behandling.id, rolleConfig.veilederRolle)
-                .expectStatus()
-                .isForbidden
-                .expectBody()
-                .jsonPath("$.detail")
-                .value<String> {
-                    assertThat(it).startsWith("Mangler nødvendig saksbehandlerrolle for å utføre handlingen")
-                }
+            medBrukercontext(rolle = rolleConfig.veilederRolle) {
+                oppdaterGrunnlagKall(behandling.id)
+                    .expectStatus()
+                    .isForbidden
+                    .expectBody()
+                    .jsonPath("$.detail")
+                    .value<String> {
+                        assertThat(it).startsWith("Mangler nødvendig saksbehandlerrolle for å utføre handlingen")
+                    }
+            }
         }
     }
 }
