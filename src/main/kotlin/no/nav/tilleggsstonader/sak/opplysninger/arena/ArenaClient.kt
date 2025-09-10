@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusHarSakerDto
 import no.nav.tilleggsstonader.kontrakter.arena.oppgave.ArenaOppgaveDto
 import no.nav.tilleggsstonader.kontrakter.arena.vedtak.ArenaSakOgVedtakDto
 import no.nav.tilleggsstonader.kontrakter.felles.IdenterRequest
-import no.nav.tilleggsstonader.kontrakter.felles.IdenterStønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.IdenterStønadstyper
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -16,10 +16,10 @@ import java.net.URI
 
 @Service
 class ArenaClient(
-    @Value("\${clients.arena.uri}") private val arenaUri: URI,
+    @Value($$"${clients.arena.uri}") private val arenaUri: URI,
     @Qualifier("azureClientCredential") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
-    val statusUri = UriComponentsBuilder.fromUri(arenaUri).pathSegment("api", "status").toUriString()
+    val statusV2Uri = UriComponentsBuilder.fromUri(arenaUri).pathSegment("api", "status", "v2").toUriString()
 
     val vedtakUri = UriComponentsBuilder.fromUri(arenaUri).pathSegment("api", "vedtak").toUriString()
 
@@ -27,7 +27,7 @@ class ArenaClient(
 
     val oppgaverUri = UriComponentsBuilder.fromUri(arenaUri).pathSegment("api", "oppgave").toUriString()
 
-    fun hentStatus(request: IdenterStønadstype): ArenaStatusDto = postForEntity(statusUri, request)
+    fun hentStatus(request: IdenterStønadstyper): ArenaStatusDto = postForEntity(statusV2Uri, request)
 
     fun hentVedtak(request: IdenterRequest): ArenaSakOgVedtakDto = postForEntity(vedtakUri, request)
 
