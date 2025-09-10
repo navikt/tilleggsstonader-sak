@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
-import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -14,11 +13,8 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
-import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -38,9 +34,7 @@ class DagligReiseVedtakController(
     private val steg: DagligReiseBeregnYtelseSteg,
     private val vedtakService: VedtakService,
     private val vedtakDtoMapper: VedtakDtoMapper,
-    private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
-    private val fagsakService: FagsakService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -88,26 +82,6 @@ class DagligReiseVedtakController(
                 behandlingId = behandlingId,
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
             )
-    }
-
-    @GetMapping("{behandlingId}/foresla")
-    fun foreslåVedtaksperioder(
-        @PathVariable behandlingId: BehandlingId,
-    ): List<LagretVedtaksperiodeDto> {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        tilgangService.validerHarSaksbehandlerrolle()
-
-        val behandling = behandlingService.hentBehandling(behandlingId)
-
-        val forrigeVedtaksperioder =
-            behandling.forrigeIverksatteBehandlingId?.let {
-                vedtakService.hentVedtaksperioder(it)
-            }
-
-        return foreslåVedtaksperiodeService.foreslåPerioder(behandlingId).tilLagretVedtaksperiodeDto(
-            tidligereVedtaksperioder = forrigeVedtaksperioder,
-        )
     }
 
     private fun lagreVedtak(

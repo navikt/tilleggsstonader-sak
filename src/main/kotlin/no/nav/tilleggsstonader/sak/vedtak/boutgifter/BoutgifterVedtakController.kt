@@ -19,11 +19,8 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRe
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.VedtaksperioderOversiktService
 import org.springframework.web.bind.annotation.GetMapping
@@ -44,7 +41,6 @@ class BoutgifterVedtakController(
     private val behandlingService: BehandlingService,
     private val stegService: StegService,
     private val steg: BoutgifterBeregnYtelseSteg,
-    private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
@@ -126,24 +122,5 @@ class BoutgifterVedtakController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return vedtakOversiktService.hentDetaljerteVedtaksperioderForBehandlingBoutgifter(behandlingId)
-    }
-
-    @GetMapping("{behandlingId}/foresla")
-    fun foreslåVedtaksperioder(
-        @PathVariable behandlingId: BehandlingId,
-    ): List<LagretVedtaksperiodeDto> {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        tilgangService.validerHarSaksbehandlerrolle()
-
-        val behandling = behandlingService.hentBehandling(behandlingId)
-        val forrigeVedtaksperioder =
-            behandling.forrigeIverksatteBehandlingId?.let {
-                vedtakService.hentVedtaksperioder(it)
-            }
-
-        return foreslåVedtaksperiodeService.foreslåPerioder(behandlingId).tilLagretVedtaksperiodeDto(
-            tidligereVedtaksperioder = forrigeVedtaksperioder,
-        )
     }
 }

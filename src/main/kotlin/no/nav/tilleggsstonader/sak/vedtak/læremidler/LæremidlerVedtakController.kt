@@ -10,12 +10,9 @@ import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vedtak.forslag.ForeslåVedtaksperiodeService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatLæremidlerDto
@@ -41,7 +38,6 @@ class LæremidlerVedtakController(
     private val behandlingService: BehandlingService,
     private val stegService: StegService,
     private val steg: LæremidlerBeregnYtelseSteg,
-    private val foreslåVedtaksperiodeService: ForeslåVedtaksperiodeService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
@@ -124,26 +120,5 @@ class LæremidlerVedtakController(
         val behandling = behandlingService.hentBehandling(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
         return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)
-    }
-
-    @GetMapping("{behandlingId}/foresla")
-    fun foreslåVedtaksperioder(
-        @PathVariable behandlingId: BehandlingId,
-    ): List<LagretVedtaksperiodeDto> {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        tilgangService.validerHarSaksbehandlerrolle()
-
-        val behandling = behandlingService.hentBehandling(behandlingId)
-        val forrigeVedtaksperioder =
-            behandling.forrigeIverksatteBehandlingId?.let {
-                vedtakService.hentVedtaksperioder(it)
-            }
-
-        return foreslåVedtaksperiodeService
-            .foreslåPerioder(behandlingId)
-            .tilLagretVedtaksperiodeDto(
-                tidligereVedtaksperioder = forrigeVedtaksperioder,
-            )
     }
 }
