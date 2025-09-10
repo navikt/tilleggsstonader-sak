@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling
 
-import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
-import no.nav.tilleggsstonader.libs.test.httpclient.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -14,11 +12,14 @@ import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
-import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.kall.henleggBehandling
+import no.nav.tilleggsstonader.sak.kall.hentBehandling
+import no.nav.tilleggsstonader.sak.kall.hentBehandlingKall
+import no.nav.tilleggsstonader.sak.kall.hentBehandlingMedEksternId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -26,12 +27,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.exchange
 
 internal class BehandlingControllerTest : IntegrationTest() {
     @Autowired
@@ -40,18 +35,14 @@ internal class BehandlingControllerTest : IntegrationTest() {
     @Autowired
     private lateinit var eksternBehandlingIdRepository: EksternBehandlingIdRepository
 
-    @BeforeEach
-    fun setUp() {
-        headers.setBearerAuth(onBehalfOfToken())
-    }
-
     @Test
     internal fun `Skal returnere 403 dersom man ikke har tilgang til brukeren`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("ikkeTilgang"))))
         val behandling = testoppsettService.lagre(behandling(fagsak))
-        val respons = catchThrowableOfType<HttpClientErrorException.Forbidden> { hentBehandling(behandling.id) }
 
-        assertThat(respons.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
+        hentBehandlingKall(behandling.id)
+            .expectStatus()
+            .isForbidden
     }
 
     @Test
@@ -59,10 +50,8 @@ internal class BehandlingControllerTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("12345678901"))))
         val behandling = testoppsettService.lagre(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
         val henlagtBegrunnelse = "Registert feil"
-        val respons =
-            henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
 
-        assertThat(respons.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+        henleggBehandling(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
 
         val oppdatert = behandlingRepository.findByIdOrThrow(behandling.id)
         assertThat(oppdatert.resultat).isEqualTo(BehandlingResultat.HENLAGT)
@@ -79,13 +68,11 @@ internal class BehandlingControllerTest : IntegrationTest() {
                 EksternBehandlingId(fagsak.eksternId.id, BehandlingId(behandling.id.id)),
             )
 
-        val respons = hentBehandlingByEksternId(eskternBehandlingId.id)
-
-        assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
+        val respons = hentBehandlingMedEksternId(eskternBehandlingId.id)
 
         val oppdatert = eksternBehandlingIdRepository.findByIdOrThrow(eskternBehandlingId.id)
         assertThat(oppdatert.id).isEqualTo(eskternBehandlingId.id)
-        assertThat(oppdatert.behandlingId.id).isEqualTo(respons.body!!.id)
+        assertThat(oppdatert.behandlingId.id).isEqualTo(respons.id)
     }
 
     @Test
@@ -93,10 +80,8 @@ internal class BehandlingControllerTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("12345678901"))))
         val behandling = testoppsettService.lagre(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
         val henlagtBegrunnelse = "Registert feil"
-        val respons =
-            henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
 
-        assertThat(respons.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+        henleggBehandling(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
 
         val oppdatert = behandlingRepository.findByIdOrThrow(behandling.id)
 
@@ -120,13 +105,11 @@ internal class BehandlingControllerTest : IntegrationTest() {
                         ),
                 ),
             )
-        val response = hentBehandling(behandling.id)
+        val hentetBehandling = hentBehandling(behandling.id)
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body?.nyeOpplysningerMetadata).isNotNull
-        assertThat(response.body?.nyeOpplysningerMetadata?.kilde).isEqualTo(NyeOpplysningerKilde.ETTERSENDING)
-        assertThat(response.body?.nyeOpplysningerMetadata?.endringer).containsExactly(NyeOpplysningerEndring.MÅLGRUPPE)
-        assertThat(response.body?.nyeOpplysningerMetadata?.beskrivelse).isEqualTo("Hello world")
+        assertThat(hentetBehandling.nyeOpplysningerMetadata?.kilde).isEqualTo(NyeOpplysningerKilde.ETTERSENDING)
+        assertThat(hentetBehandling.nyeOpplysningerMetadata?.endringer).containsExactly(NyeOpplysningerEndring.MÅLGRUPPE)
+        assertThat(hentetBehandling.nyeOpplysningerMetadata?.beskrivelse).isEqualTo("Hello world")
     }
 
     @Nested
@@ -140,18 +123,25 @@ internal class BehandlingControllerTest : IntegrationTest() {
 
         @Test
         fun `behandlingStatus=OPPRETTET og veileder skal ikke hentes då det opprettes grunnlag`() {
-            headers.setBearerAuth(onBehalfOfToken(role = rolleConfig.veilederRolle))
-
-            val exception = catchProblemDetailException { hentBehandling(behandling.id) }
-            assertThat(exception.detail.detail).contains("Behandlingen er ikke påbegynt")
+            medBrukercontext(rolle = rolleConfig.veilederRolle) {
+                hentBehandlingKall(behandling.id)
+                    .expectStatus()
+                    .isBadRequest
+                    .expectBody()
+                    .jsonPath("$.detail")
+                    .value<String> {
+                        assertThat(it).contains("Behandlingen er ikke påbegynt")
+                    }
+            }
         }
 
         @Test
         fun `behandlingStatus=UTREDES og veilder skal kunne hente behandlingen hvis statusen er annet enn UTREDES`() {
             testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.UTREDES))
-            headers.setBearerAuth(onBehalfOfToken(role = rolleConfig.veilederRolle))
 
-            hentBehandling(behandling.id)
+            medBrukercontext(rolle = rolleConfig.veilederRolle) {
+                hentBehandling(behandling.id)
+            }
         }
 
         @Test
@@ -159,28 +149,4 @@ internal class BehandlingControllerTest : IntegrationTest() {
             hentBehandling(behandling.id)
         }
     }
-
-    private fun hentBehandling(id: BehandlingId): ResponseEntity<BehandlingDto> =
-        restTemplate.exchange(
-            localhost("/api/behandling/$id"),
-            HttpMethod.GET,
-            HttpEntity<BehandlingDto>(headers),
-        )
-
-    private fun hentBehandlingByEksternId(eksternBehandlingId: Long): ResponseEntity<BehandlingId> =
-        restTemplate.exchange(
-            localhost("/api/behandling/ekstern/$eksternBehandlingId"),
-            HttpMethod.GET,
-            HttpEntity<BehandlingId>(headers),
-        )
-
-    private fun henlegg(
-        id: BehandlingId,
-        henlagt: HenlagtDto,
-    ): ResponseEntity<BehandlingDto> =
-        restTemplate.exchange<BehandlingDto>(
-            localhost("/api/behandling/$id/henlegg"),
-            HttpMethod.POST,
-            HttpEntity(henlagt, headers),
-        )
 }

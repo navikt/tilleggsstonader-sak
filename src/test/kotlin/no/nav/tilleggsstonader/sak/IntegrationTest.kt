@@ -46,27 +46,16 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.cache.CacheManager
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.data.jdbc.core.JdbcAggregateOperations
-import org.springframework.http.HttpHeaders
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.web.client.RestTemplate
-
-// Slett denne når RestTemplateConfiguration er tatt i bruk?
-@Configuration
-class DefaultRestTemplateConfiguration {
-    @Bean
-    fun restTemplate(restTemplateBuilder: RestTemplateBuilder) = restTemplateBuilder.build()
-}
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(initializers = [DbContainerInitializer::class])
@@ -90,11 +79,8 @@ class DefaultRestTemplateConfiguration {
     "mock-klage",
 )
 @EnableMockOAuth2Server
+@AutoConfigureWebTestClient
 abstract class IntegrationTest {
-    @Autowired
-    protected lateinit var restTemplate: RestTemplate
-    protected val headers = HttpHeaders()
-
     @LocalServerPort
     private var port: Int? = 0
 
@@ -124,18 +110,13 @@ abstract class IntegrationTest {
 
     val logger = LoggerFactory.getLogger(javaClass)
 
+    @Autowired
     lateinit var webTestClient: WebTestClient
 
     private lateinit var testBrukerkontekst: TestBrukerKontekst
 
     @BeforeEach
     fun setup() {
-        webTestClient =
-            WebTestClient
-                .bindToServer()
-                .baseUrl(localhost("/"))
-                .build()
-
         testBrukerkontekst =
             TestBrukerKontekst(
                 defaultBruker = "julenissen",
@@ -145,7 +126,6 @@ abstract class IntegrationTest {
 
     @AfterEach
     fun tearDown() {
-        headers.clear()
         clearClientMocks()
         resetDatabase()
         clearCaches()
@@ -231,6 +211,13 @@ abstract class IntegrationTest {
         this.headers {
             it.setBearerAuth(onBehalfOfToken(testBrukerkontekst.rolle, testBrukerkontekst.bruker))
         }
+
+    fun WebTestClient.RequestHeadersSpec<*>.medClientCredentials(
+        clientId: String,
+        accessAsApplication: Boolean,
+    ) = this.headers {
+        it.setBearerAuth(clientCredential(clientId, accessAsApplication))
+    }
 
     private data class TestBrukerKontekst(
         val defaultBruker: String,

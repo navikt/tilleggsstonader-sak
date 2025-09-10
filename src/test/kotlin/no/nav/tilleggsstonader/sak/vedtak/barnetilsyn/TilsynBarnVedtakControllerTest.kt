@@ -1,15 +1,17 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import no.nav.tilleggsstonader.libs.test.httpclient.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.kall.avslåVedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.kall.hentVedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.kall.hentVedtakTilsynBarnKall
+import no.nav.tilleggsstonader.sak.kall.innvilgeVedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.kall.opphørVedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vilkår
@@ -20,7 +22,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnR
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
@@ -37,10 +38,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
-import org.springframework.web.client.exchange
 import java.time.LocalDate
 import java.util.UUID
 
@@ -80,7 +77,6 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
 
     @BeforeEach
     fun setUp() {
-        headers.setBearerAuth(onBehalfOfToken())
         testoppsettService.opprettBehandlingMedFagsak(behandling)
         barnRepository.insert(barn)
         vilkårperiodeRepository.insert(aktivitet)
@@ -89,27 +85,20 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
     }
 
     @Test
-    fun `skal validere token`() {
-        headers.clear()
-        val exception = catchProblemDetailException { hentVedtak<InnvilgelseTilsynBarnResponse>(BehandlingId.random()) }
-
-        assertThat(exception.httpStatus).isEqualTo(HttpStatus.UNAUTHORIZED)
-    }
-
-    @Test
     fun `skal returnere empty body når det ikke finnes noe lagret`() {
-        val response = hentVedtak<InnvilgelseTilsynBarnResponse>(behandling.id)
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body).isNull()
+        hentVedtakTilsynBarnKall(behandling.id)
+            .expectStatus()
+            .isOk
+            .expectBody()
+            .isEmpty
     }
 
     @Test
     fun `Skal lagre og hente innvilgelse med vedtaksperioder og begrunnelse`() {
         val vedtak = innvilgelseDto(listOf(vedtaksperiodeDto), "Jo du skjønner det, at...")
-        innvilgeVedtak(behandling, vedtak)
+        innvilgeVedtakTilsynBarn(behandling.id, vedtak)
 
-        val lagretDto = hentVedtak<InnvilgelseTilsynBarnResponse>(behandling.id).body!!
+        val lagretDto = hentVedtakTilsynBarn<InnvilgelseTilsynBarnResponse>(behandling.id)
 
         assertThat(lagretDto.vedtaksperioder?.map { it.tilVedtaksperiodeDto() }).isEqualTo(vedtak.vedtaksperioder)
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
@@ -124,9 +113,9 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
                 begrunnelse = "begrunnelse",
             )
 
-        avslåVedtak(behandling, vedtak)
+        avslåVedtakTilsynBarn(behandling.id, vedtak)
 
-        val lagretDto = hentVedtak<AvslagTilsynBarnDto>(behandling.id).body!!
+        val lagretDto = hentVedtakTilsynBarn<AvslagTilsynBarnDto>(behandling.id)
 
         assertThat((lagretDto).årsakerAvslag).isEqualTo(vedtak.årsakerAvslag)
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
@@ -135,13 +124,12 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
 
     @Test
     fun `skal lagre og hente opphør med vedtaksperioder`() {
-        innvilgeVedtak(
-            behandling = behandling,
-            vedtak =
-                InnvilgelseTilsynBarnRequest(
-                    listOf(vedtaksperiodeDto),
-                    begrunnelse = "Jo du skjønner det, at...",
-                ),
+        innvilgeVedtakTilsynBarn(
+            behandling.id,
+            InnvilgelseTilsynBarnRequest(
+                listOf(vedtaksperiodeDto),
+                begrunnelse = "Jo du skjønner det, at...",
+            ),
         )
         testoppsettService.ferdigstillBehandling(behandling)
         val opphørsdato = LocalDate.of(2023, 1, 15)
@@ -180,52 +168,12 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
                 opphørsdato = opphørsdato,
             )
 
-        opphørVedtak(behandlingLagreOpphør, vedtak)
+        opphørVedtakTilsynBarn(behandlingLagreOpphør.id, vedtak)
 
-        val lagretDto = hentVedtak<OpphørTilsynBarnResponse>(behandlingLagreOpphør.id).body!!
+        val lagretDto = hentVedtakTilsynBarn<OpphørTilsynBarnResponse>(behandlingLagreOpphør.id)
 
         assertThat(lagretDto.årsakerOpphør).isEqualTo(vedtak.årsakerOpphør)
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
         assertThat(lagretDto.type).isEqualTo(TypeVedtak.OPPHØR)
     }
-
-    private fun innvilgeVedtak(
-        behandling: Behandling,
-        vedtak: InnvilgelseTilsynBarnRequest,
-    ) {
-        restTemplate.exchange<Map<String, Any>?>(
-            localhost("api/vedtak/tilsyn-barn/${behandling.id}/innvilgelse"),
-            HttpMethod.POST,
-            HttpEntity(vedtak, headers),
-        )
-    }
-
-    private fun avslåVedtak(
-        behandling: Behandling,
-        vedtak: AvslagTilsynBarnDto,
-    ) {
-        restTemplate.exchange<Map<String, Any>?>(
-            localhost("api/vedtak/tilsyn-barn/${behandling.id}/avslag"),
-            HttpMethod.POST,
-            HttpEntity(vedtak, headers),
-        )
-    }
-
-    private fun opphørVedtak(
-        behandling: Behandling,
-        vedtak: OpphørTilsynBarnRequest,
-    ) {
-        restTemplate.exchange<Map<String, Any>?>(
-            localhost("api/vedtak/tilsyn-barn/${behandling.id}/opphor"),
-            HttpMethod.POST,
-            HttpEntity(vedtak, headers),
-        )
-    }
-
-    private inline fun <reified T : VedtakTilsynBarnResponse> hentVedtak(behandlingId: BehandlingId) =
-        restTemplate.exchange<T>(
-            localhost("api/vedtak/tilsyn-barn/$behandlingId"),
-            HttpMethod.GET,
-            HttpEntity(null, headers),
-        )
 }

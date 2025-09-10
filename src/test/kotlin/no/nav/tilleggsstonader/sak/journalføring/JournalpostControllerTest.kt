@@ -16,14 +16,13 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
+import no.nav.tilleggsstonader.sak.kall.fullførJournalpost
 import no.nav.tilleggsstonader.sak.klage.KlageClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
 import java.time.LocalDate
 
 class JournalpostControllerTest : IntegrationTest() {
@@ -45,7 +44,6 @@ class JournalpostControllerTest : IntegrationTest() {
 
     @BeforeEach
     fun setUp() {
-        headers.setBearerAuth(onBehalfOfToken(saksbehandler = saksbehandler))
         testoppsettService.opprettPerson(ident)
     }
 
@@ -59,17 +57,19 @@ class JournalpostControllerTest : IntegrationTest() {
     @Test
     fun `fullfør journalpost - skal ferdigstille journalpost, og opprette behandling og oppgave`() {
         val journalpostId =
-            fullførJournalpost(
-                "1",
-                JournalføringRequest(
-                    stønadstype = Stønadstype.BARNETILSYN,
-                    aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
-                    årsak = JournalføringRequest.Journalføringsårsak.DIGITAL_SØKNAD,
-                    oppgaveId = "123",
-                    journalførendeEnhet = enhet,
-                    logiskeVedlegg = mapOf("1" to listOf(LogiskVedlegg("1", "ny tittel"))),
-                ),
-            )
+            medBrukercontext(bruker = saksbehandler) {
+                fullførJournalpost(
+                    "1",
+                    JournalføringRequest(
+                        stønadstype = Stønadstype.BARNETILSYN,
+                        aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
+                        årsak = JournalføringRequest.Journalføringsårsak.DIGITAL_SØKNAD,
+                        oppgaveId = "123",
+                        journalførendeEnhet = enhet,
+                        logiskeVedlegg = mapOf("1" to listOf(LogiskVedlegg("1", "ny tittel"))),
+                    ),
+                )
+            }
 
         assertThat(journalpostId).isEqualTo("1")
 
@@ -107,17 +107,19 @@ class JournalpostControllerTest : IntegrationTest() {
     @Test
     fun `fullfør journalpost - skal ferdigstille journalpost, og opprette klage`() {
         val journalpostId =
-            fullførJournalpost(
-                "1",
-                JournalføringRequest(
-                    stønadstype = Stønadstype.BARNETILSYN,
-                    aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
-                    årsak = JournalføringRequest.Journalføringsårsak.KLAGE,
-                    oppgaveId = "123",
-                    journalførendeEnhet = enhet,
-                    logiskeVedlegg = mapOf("1" to listOf(LogiskVedlegg("1", "ny tittel"))),
-                ),
-            )
+            medBrukercontext(bruker = saksbehandler) {
+                fullførJournalpost(
+                    "1",
+                    JournalføringRequest(
+                        stønadstype = Stønadstype.BARNETILSYN,
+                        aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
+                        årsak = JournalføringRequest.Journalføringsårsak.KLAGE,
+                        oppgaveId = "123",
+                        journalførendeEnhet = enhet,
+                        logiskeVedlegg = mapOf("1" to listOf(LogiskVedlegg("1", "ny tittel"))),
+                    ),
+                )
+            }
 
         assertThat(journalpostId).isEqualTo("1")
 
@@ -149,16 +151,4 @@ class JournalpostControllerTest : IntegrationTest() {
         }
         verify(exactly = 1) { mockService.oppgaveClient.ferdigstillOppgave("123".toLong()) }
     }
-
-    private fun fullførJournalpost(
-        journalpostId: String,
-        request: JournalføringRequest,
-    ): String =
-        restTemplate
-            .exchange(
-                localhost("api/journalpost/$journalpostId/fullfor"),
-                HttpMethod.POST,
-                HttpEntity(request, headers),
-                String::class.java,
-            ).body!!
 }
