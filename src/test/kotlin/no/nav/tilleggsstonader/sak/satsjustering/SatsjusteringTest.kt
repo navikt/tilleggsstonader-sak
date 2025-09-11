@@ -7,8 +7,9 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.kall.kjørSatsjusteringForStønadstype
-import no.nav.tilleggsstonader.sak.kall.kjørSatsjusteringForStønadstypeKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.kjørSatsjusteringForStønadstype
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.kjørSatsjusteringForStønadstypeKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
@@ -69,6 +70,8 @@ class SatsjusteringTest : IntegrationTest() {
                 kjørSatsjusteringForStønadstype(Stønadstype.LÆREMIDLER)
             }
 
+        kjørTasksKlareForProsessering()
+
         assertThat(behandlingerForSatsjustering).containsExactly(behandling.id)
 
         val sistIverksatteBehandling = behandlingRepository.finnSisteIverksatteBehandling(behandling.fagsakId)!!
@@ -88,7 +91,7 @@ class SatsjusteringTest : IntegrationTest() {
 
     @Test
     fun `kaller satsjustering-endepunkt uten utvikler-rolle, kaster feil`() {
-        medBrukercontext {
+        medBrukercontext(rolle = rolleConfig.beslutterRolle) {
             kjørSatsjusteringForStønadstypeKall(Stønadstype.LÆREMIDLER)
                 .expectStatus()
                 .isForbidden
@@ -98,16 +101,6 @@ class SatsjusteringTest : IntegrationTest() {
     private fun mockSatser() {
         val nyMakssats = 10_000
         val ubekreftetSats = satsLæremidlerProvider.satser.first { !it.bekreftet }
-        val nyUbekreftetSats =
-            ubekreftetSats.copy(
-                fom = ubekreftetSats.fom.plusYears(1),
-                beløp =
-                    ubekreftetSats.beløp
-                        .map {
-                            it.key to
-                                nyMakssats
-                        }.toMap(),
-            )
         val nyBekreftetSats =
             ubekreftetSats.copy(
                 tom =
@@ -118,10 +111,16 @@ class SatsjusteringTest : IntegrationTest() {
                 bekreftet = true,
                 beløp =
                     ubekreftetSats.beløp
-                        .map {
-                            it.key to
-                                nyMakssats
-                        }.toMap(),
+                        .map { it.key to nyMakssats }
+                        .toMap(),
+            )
+        val nyUbekreftetSats =
+            ubekreftetSats.copy(
+                fom = ubekreftetSats.fom.plusYears(1),
+                beløp =
+                    ubekreftetSats.beløp
+                        .map { it.key to nyMakssats }
+                        .toMap(),
             )
 
         every {
