@@ -25,10 +25,10 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Utgif
 import java.time.LocalDate
 
 object SøknadBoutgifterUtil {
-    fun søknadBoutgifter(): SøknadsskjemaBoutgifterFyllUtSendInn {
+    fun søknadBoutgifter(ident: String = "11111122222"): SøknadsskjemaBoutgifterFyllUtSendInn {
         val skjemaBoutgifter =
             SkjemaBoutgifter(
-                dineOpplysninger = dineOpplysninger(),
+                dineOpplysninger = dineOpplysninger(ident),
                 hovedytelse = mapOf(HovedytelseType.arbeidsavklaringspenger to true),
                 harNedsattArbeidsevne = JaNeiType.ja,
                 arbeidOgOpphold = null,
@@ -81,13 +81,13 @@ object SøknadBoutgifterUtil {
                 ),
         )
 
-    private fun dineOpplysninger(): DineOpplysninger =
+    private fun dineOpplysninger(ident: String): DineOpplysninger =
         DineOpplysninger(
             fornavn = "Fornavn",
             etternavn = "Etternavn",
             identitet =
                 Identitet(
-                    identitetsnummer = "11111122222",
+                    identitetsnummer = ident,
                 ),
             adresse =
                 NavAdresse(
