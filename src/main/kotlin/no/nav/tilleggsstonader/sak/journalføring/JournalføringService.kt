@@ -36,6 +36,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilMålgruppeType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -111,14 +113,17 @@ class JournalføringService(
         logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
         avsenderMottaker: AvsenderMottaker? = null,
     ) {
-        val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
+        val korrigertStønadstype = korrigerStønadstype(journalpost, stønadstype)
+        val journalpostMedOppdatertTema = oppdaterJournalpostTema(journalpost, korrigertStønadstype)
 
-        validerKanOppretteBehandling(journalpost, fagsak, behandlingÅrsak, gjelderKlage = false)
+        val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, korrigertStønadstype)
+
+        validerKanOppretteBehandling(journalpostMedOppdatertTema, fagsak, behandlingÅrsak, gjelderKlage = false)
 
         val behandling =
             opprettBehandlingOgPopulerGrunnlagsdataForJournalpost(
                 fagsak = fagsak,
-                journalpost = journalpost,
+                journalpost = journalpostMedOppdatertTema,
                 behandlingÅrsak = behandlingÅrsak,
             )
 
@@ -128,12 +133,12 @@ class JournalføringService(
             gjenbrukDataRevurderingService.gjenbrukData(behandling, behandlingIdForGjenbruk)
         }
 
-        if (journalpost.harStrukturertSøknad()) {
-            lagreSøknadOgNyeBarn(journalpost, behandling, stønadstype)
+        if (journalpostMedOppdatertTema.harStrukturertSøknad()) {
+            lagreSøknadOgNyeBarn(journalpostMedOppdatertTema, behandling, korrigertStønadstype)
         }
 
         ferdigstillJournalpost(
-            journalpost = journalpost,
+            journalpost = journalpostMedOppdatertTema,
             journalførendeEnhet = journalførendeEnhet,
             fagsak = fagsak,
             dokumentTitler = dokumentTitler,
@@ -152,6 +157,45 @@ class JournalføringService(
         )
     }
 
+    private fun korrigerStønadstype(
+        journalpost: Journalpost,
+        stønadstype: Stønadstype,
+    ): Stønadstype {
+        if (stønadstype in listOf(Stønadstype.DAGLIG_REISE_TSR, Stønadstype.DAGLIG_REISE_TSO)) {
+            val søknadsskjema = journalpostService.hentSøknadFraJournalpost(journalpost, stønadstype)
+            val søknad = søknadService.mapSøknad(søknadsskjema, journalpost)
+            if (søknad is SøknadDagligReise) {
+                val målgruppe = søknad.data.hovedytelse.hovedytelse
+                // Sender til TSR hvis flere målgrupper eller TSR sin målgrupper
+                return if (målgruppe.size > 1 ||
+                    målgruppe
+                        .single()
+                        .tilMålgruppeType()
+                        .kanBrukesForStønad(Stønadstype.DAGLIG_REISE_TSR)
+                ) {
+                    Stønadstype.DAGLIG_REISE_TSR
+                } else {
+                    Stønadstype.DAGLIG_REISE_TSO
+                }
+            }
+        }
+        return stønadstype
+    }
+
+    private fun oppdaterJournalpostTema(
+        journalpost: Journalpost,
+        stønadstype: Stønadstype,
+    ): Journalpost {
+        val nyttTema =
+            when (stønadstype) {
+                Stønadstype.DAGLIG_REISE_TSR -> "TSR"
+                Stønadstype.DAGLIG_REISE_TSO -> "TSO"
+                else ->
+                    journalpost.tema
+            }
+        return journalpost.copy(tema = nyttTema)
+    }
+
     private fun journalførTilNyKlage(
         journalpost: Journalpost,
         journalføringRequest: JournalføringRequest,
@@ -164,7 +208,10 @@ class JournalføringService(
 
         feilHvis(journalpost.harStrukturertSøknad()) { "Journalpost med id=${journalpost.journalpostId} gjelder ikke en Klagebehandling." }
 
-        klageService.opprettKlage(fagsakId = fagsak.id, OpprettKlageDto(journalpost.datoMottatt?.toLocalDate() ?: LocalDate.now()))
+        klageService.opprettKlage(
+            fagsakId = fagsak.id,
+            OpprettKlageDto(journalpost.datoMottatt?.toLocalDate() ?: LocalDate.now()),
+        )
 
         ferdigstillJournalpost(
             journalpost = journalpost,
