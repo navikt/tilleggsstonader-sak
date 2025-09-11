@@ -51,11 +51,12 @@ class SatsjusteringTest : IntegrationTest() {
     @Autowired
     lateinit var læremidlerBeregnYtelseSteg: LæremidlerBeregnYtelseSteg
 
-    val fom = LocalDate.of(2025, 8, 1)
-    val tom = LocalDate.of(2026, 6, 30)
+    val sisteBekreftedeSatsÅr = bekreftedeSatser.maxOf { it.fom.year }
+    val fom = LocalDate.of(sisteBekreftedeSatsÅr, 8, 1)
+    val tom = LocalDate.of(sisteBekreftedeSatsÅr + 1, 6, 30)
 
     @AfterEach
-    override fun tearDown() {
+    fun resetMock() {
         clearMocks(satsLæremidlerProvider)
     }
 
@@ -87,6 +88,21 @@ class SatsjusteringTest : IntegrationTest() {
                 it.statusIverksetting ==
                     StatusIverksetting.VENTER_PÅ_SATS_ENDRING
             }
+    }
+
+    @Test
+    fun `kaller satsjustering-endepunkt, finnes behandling uten andeler til satsjustering, ingen behandlinger blir behandlet`() {
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), stønadstype = Stønadstype.LÆREMIDLER)
+        lagreVilkårOgVedtak(behandling, fom = fom, tom = fom.toYearMonth().withMonth(12).atEndOfMonth())
+        validerHarIngenAndelserSomVenterPåSatsEndring(behandling.id)
+        testoppsettService.ferdigstillBehandling(behandling)
+
+        val behandlingerTilSatsjustering =
+            medBrukercontext(rolle = rolleConfig.utvikler) {
+                kjørSatsjusteringForStønadstype(Stønadstype.LÆREMIDLER)
+            }
+
+        assertThat(behandlingerTilSatsjustering).isEmpty()
     }
 
     @Test
@@ -131,6 +147,19 @@ class SatsjusteringTest : IntegrationTest() {
     private fun opprettBehandlingMedAndelerTilSatsjustering(): Behandling {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), stønadstype = Stønadstype.LÆREMIDLER)
 
+        lagreVilkårOgVedtak(behandling, fom, tom)
+
+        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!
+        validerHarAndelerTilSatsjustering(tilkjentYtelse)
+
+        return testoppsettService.ferdigstillBehandling(behandling)
+    }
+
+    private fun lagreVilkårOgVedtak(
+        behandling: Behandling,
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
         vilkårsperiodeRepository.insertAll(
             listOf(
                 målgruppe(behandlingId = behandling.id, fom = fom, tom = tom, faktaOgVurdering = faktaOgVurderingMålgruppeLæremidler()),
@@ -144,11 +173,6 @@ class SatsjusteringTest : IntegrationTest() {
                 vedtaksperioder = listOf(vedtaksperiodeDto(fom = fom, tom = tom)),
             ),
         )
-
-        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!
-        validerHarAndelerTilSatsjustering(tilkjentYtelse)
-
-        return testoppsettService.ferdigstillBehandling(behandling)
     }
 
     private fun validerHarKopiertOverFaktagrunnlagFraForrigeBehandling(sistIverksatteBehandling: Behandling) {
