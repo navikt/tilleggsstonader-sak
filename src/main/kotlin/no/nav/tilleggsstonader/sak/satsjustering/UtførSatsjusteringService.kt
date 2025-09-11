@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Service
-class SatsjusteringService(
+class UtførSatsjusteringService(
     private val behandlingService: BehandlingService,
     private val revurderingBehandlingService: OpprettRevurderingService,
     private val vedtakservice: VedtakService,

@@ -14,10 +14,10 @@ import org.springframework.stereotype.Service
     beskrivelse = "Oppretter revurdering og iverksetter vedtak med satsjustering",
 )
 class SatsjusteringTask(
-    private val satsjusteringService: SatsjusteringService,
+    private val utførSatsjusteringService: UtførSatsjusteringService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        satsjusteringService.kjørSatsjustering(behandlingId = BehandlingId.fromString(task.payload))
+        utførSatsjusteringService.kjørSatsjustering(behandlingId = BehandlingId.fromString(task.payload))
     }
 
     companion object {
