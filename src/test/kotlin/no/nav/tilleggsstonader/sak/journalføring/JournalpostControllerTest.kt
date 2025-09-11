@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.journalføring
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.verify
-import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
@@ -35,9 +34,6 @@ class JournalpostControllerTest : IntegrationTest() {
 
     @Autowired
     lateinit var behandlingService: BehandlingService
-
-    @Autowired
-    lateinit var taskService: TaskService
 
     @Autowired
     lateinit var klageClient: KlageClient

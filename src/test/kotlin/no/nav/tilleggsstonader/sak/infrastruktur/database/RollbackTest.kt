@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database
 
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import org.assertj.core.api.Assertions.assertThat
@@ -21,9 +20,6 @@ import kotlin.reflect.full.findAnnotation
 class RollbackTest : IntegrationTest() {
     @Autowired
     private lateinit var transactionHandler: TransactionHandler
-
-    @Autowired
-    private lateinit var taskService: TaskService
 
     @AfterEach
     override fun tearDown() {

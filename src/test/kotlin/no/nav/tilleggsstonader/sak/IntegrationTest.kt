@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak
 
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskLogg
+import no.nav.familie.prosessering.internal.TaskService
+import no.nav.familie.prosessering.internal.TaskWorker
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
@@ -107,6 +109,12 @@ abstract class IntegrationTest {
 
     @Autowired
     protected lateinit var mockService: MockService
+
+    @Autowired
+    lateinit var taskService: TaskService
+
+    @Autowired
+    lateinit var taskWorker: TaskWorker
 
     val logger = LoggerFactory.getLogger(javaClass)
 
