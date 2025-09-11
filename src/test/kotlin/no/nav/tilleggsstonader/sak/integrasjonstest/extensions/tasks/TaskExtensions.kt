@@ -13,7 +13,6 @@ fun IntegrationTest.kjørTasksKlareForProsessering() {
     logger.info("Kjører tasks klare for prosessering")
     taskService
         .finnAlleTasksKlareForProsessering(Pageable.unpaged())
-//        .filterNot { it.type == BehandlingsstatistikkTask.TYPE } // Tester ikke statistikkutsendelse her todo fjerne?
         .forEach { kjørTask(it) }
     logger.info("Tasks kjørt OK")
 }
