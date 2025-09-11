@@ -7,17 +7,18 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.kall.kjørSatsjusteringForStønadstype
+import no.nav.tilleggsstonader.sak.kall.kjørSatsjusteringForStønadstypeKall
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.SatsLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.SatsLæremidlerService
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.SatsLæremidlerProvider
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.bekreftedeSatser
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
@@ -44,45 +45,31 @@ class SatsjusteringTest : IntegrationTest() {
     lateinit var vilkårsperiodeRepository: VilkårperiodeRepository
 
     @Autowired
-    lateinit var satsLæremidlerService: SatsLæremidlerService
+    lateinit var satsLæremidlerProvider: SatsLæremidlerProvider
 
     @Autowired
     lateinit var læremidlerBeregnYtelseSteg: LæremidlerBeregnYtelseSteg
-
-    @Autowired
-    lateinit var finnBehandlingerForSatsjusteringService: FinnBehandlingerForSatsjusteringService
-
-    @Autowired
-    lateinit var satsjusteringService: SatsjusteringService
 
     val fom = LocalDate.of(2025, 8, 1)
     val tom = LocalDate.of(2026, 6, 30)
 
     @AfterEach
     override fun tearDown() {
-        clearMocks(satsLæremidlerService)
+        clearMocks(satsLæremidlerProvider)
     }
 
     @Test
     fun `skal justere sats i revurderinger som har tilkjent ytelse som venter på satsjustering`() {
         val behandling = opprettBehandlingMedAndelerTilSatsjustering()
 
-        every {
-            satsLæremidlerService.finnSatsForPeriode(
-                match { it.fom > fom },
-            )
-        } returns
-            SatsLæremidler(
-                fom = tom.withMonth(1).withDayOfMonth(1),
-                tom = LocalDate.MAX,
-                beløp = mapOf(Studienivå.VIDEREGÅENDE to 1000, Studienivå.HØYERE_UTDANNING to 1500),
-                bekreftet = true,
-            )
+        mockSatser()
 
-        val behandlingerForSatsjustering = finnBehandlingerForSatsjusteringService.finnBehandlingerForSatsjustering(Stønadstype.LÆREMIDLER)
+        val behandlingerForSatsjustering =
+            medBrukercontext(rolle = rolleConfig.utvikler) {
+                kjørSatsjusteringForStønadstype(Stønadstype.LÆREMIDLER)
+            }
+
         assertThat(behandlingerForSatsjustering).containsExactly(behandling.id)
-
-        satsjusteringService.kjørSatsjustering(behandling.id)
 
         val sistIverksatteBehandling = behandlingRepository.finnSisteIverksatteBehandling(behandling.fagsakId)!!
         assertThat(behandling.id).isNotEqualTo(sistIverksatteBehandling.id)
@@ -97,6 +84,49 @@ class SatsjusteringTest : IntegrationTest() {
                 it.statusIverksetting ==
                     StatusIverksetting.VENTER_PÅ_SATS_ENDRING
             }
+    }
+
+    @Test
+    fun `kaller satsjustering-endepunkt uten utvikler-rolle, kaster feil`() {
+        medBrukercontext {
+            kjørSatsjusteringForStønadstypeKall(Stønadstype.LÆREMIDLER)
+                .expectStatus()
+                .isForbidden
+        }
+    }
+
+    private fun mockSatser() {
+        val nyMakssats = 10_000
+        val ubekreftetSats = satsLæremidlerProvider.satser.first { !it.bekreftet }
+        val nyUbekreftetSats =
+            ubekreftetSats.copy(
+                fom = ubekreftetSats.fom.plusYears(1),
+                beløp =
+                    ubekreftetSats.beløp
+                        .map {
+                            it.key to
+                                nyMakssats
+                        }.toMap(),
+            )
+        val nyBekreftetSats =
+            ubekreftetSats.copy(
+                tom =
+                    ubekreftetSats.fom
+                        .toYearMonth()
+                        .withMonth(12)
+                        .atEndOfMonth(),
+                bekreftet = true,
+                beløp =
+                    ubekreftetSats.beløp
+                        .map {
+                            it.key to
+                                nyMakssats
+                        }.toMap(),
+            )
+
+        every {
+            satsLæremidlerProvider.satser
+        } returns bekreftedeSatser + nyBekreftetSats + nyUbekreftetSats
     }
 
     private fun opprettBehandlingMedAndelerTilSatsjustering(): Behandling {

@@ -78,7 +78,7 @@ class LæremidlerBeregningStepDefinitions {
             vilkårperiodeRepository = vilkårperiodeRepository,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = VedtakRepositoryFake(),
-            satsLæremidlerService = SatsLæremidlerService(),
+            satsLæremidlerService = SatsLæremidlerService(SatsLæremidlerProvider()),
         )
 
     val behandlingId = BehandlingId(UUID.randomUUID())

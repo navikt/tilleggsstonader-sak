@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class SatsLæremidlerTest {
-    private val satsLæremidlerService = SatsLæremidlerService()
+    private val satsLæremidlerService = SatsLæremidlerService(SatsLæremidlerProvider())
 
     @Test
     fun `høyere utdanning 2024`() {
@@ -65,8 +65,8 @@ class SatsLæremidlerTest {
 
     @Test
     fun `skal kun ha 1 sats som er ubekreftet, for å kunne markere perioder etter nyttår som at de ikke skal utbetales ennå`() {
-        val ubekreftedeSatser = satser.filterNot { it.bekreftet }
-        val sisteBekreftetSats = satser.filter { it.bekreftet }.maxBy { it.tom }
+        val ubekreftedeSatser = satsLæremidlerService.alleSatser().filterNot { it.bekreftet }
+        val sisteBekreftetSats = satsLæremidlerService.alleSatser().filter { it.bekreftet }.maxBy { it.tom }
 
         assertThat(ubekreftedeSatser).hasSize(1)
         assertThat(ubekreftedeSatser[0].fom).isEqualTo(LocalDate.of(2026, 1, 1))
@@ -76,13 +76,13 @@ class SatsLæremidlerTest {
 
     @Test
     fun `skal ikke ha overlappende satser`() {
-        val overlappendePeriode = satser.førsteOverlappendePeriode()
+        val overlappendePeriode = satsLæremidlerService.alleSatser().førsteOverlappendePeriode()
         assertThat(overlappendePeriode).isNull()
     }
 
     @Test
     fun `perioder skal være påfølgende`() {
-        satser.sorted().zipWithNext().forEach { (sats1, sats2) ->
+        satsLæremidlerService.alleSatser().sorted().zipWithNext().forEach { (sats1, sats2) ->
             assertThat(sats1.tom.plusDays(1)).isEqualTo(sats2.fom)
         }
     }
