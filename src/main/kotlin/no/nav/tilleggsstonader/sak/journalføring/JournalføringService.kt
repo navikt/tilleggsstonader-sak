@@ -4,6 +4,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.tilTema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
@@ -36,8 +37,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilMålgruppeType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -113,10 +112,9 @@ class JournalføringService(
         logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
         avsenderMottaker: AvsenderMottaker? = null,
     ) {
-        val korrigertStønadstype = korrigerStønadstype(journalpost, stønadstype)
-        val journalpostMedOppdatertTema = oppdaterJournalpostTema(journalpost, korrigertStønadstype)
+        val journalpostMedOppdatertTema = journalpost.copy(tema = stønadstype.tilTema().toString())
 
-        val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, korrigertStønadstype)
+        val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
 
         validerKanOppretteBehandling(journalpostMedOppdatertTema, fagsak, behandlingÅrsak, gjelderKlage = false)
 
@@ -134,7 +132,7 @@ class JournalføringService(
         }
 
         if (journalpostMedOppdatertTema.harStrukturertSøknad()) {
-            lagreSøknadOgNyeBarn(journalpostMedOppdatertTema, behandling, korrigertStønadstype)
+            lagreSøknadOgNyeBarn(journalpostMedOppdatertTema, behandling, stønadstype)
         }
 
         ferdigstillJournalpost(
@@ -155,45 +153,6 @@ class JournalføringService(
                 ),
             ),
         )
-    }
-
-    private fun korrigerStønadstype(
-        journalpost: Journalpost,
-        stønadstype: Stønadstype,
-    ): Stønadstype {
-        if (stønadstype in listOf(Stønadstype.DAGLIG_REISE_TSR, Stønadstype.DAGLIG_REISE_TSO)) {
-            val søknadsskjema = journalpostService.hentSøknadFraJournalpost(journalpost, stønadstype)
-            val søknad = søknadService.mapSøknad(søknadsskjema, journalpost)
-            if (søknad is SøknadDagligReise) {
-                val målgruppe = søknad.data.hovedytelse.hovedytelse
-                // Sender til TSR hvis flere målgrupper eller TSR sin målgrupper
-                return if (målgruppe.size > 1 ||
-                    målgruppe
-                        .single()
-                        .tilMålgruppeType()
-                        .kanBrukesForStønad(Stønadstype.DAGLIG_REISE_TSR)
-                ) {
-                    Stønadstype.DAGLIG_REISE_TSR
-                } else {
-                    Stønadstype.DAGLIG_REISE_TSO
-                }
-            }
-        }
-        return stønadstype
-    }
-
-    private fun oppdaterJournalpostTema(
-        journalpost: Journalpost,
-        stønadstype: Stønadstype,
-    ): Journalpost {
-        val nyttTema =
-            when (stønadstype) {
-                Stønadstype.DAGLIG_REISE_TSR -> "TSR"
-                Stønadstype.DAGLIG_REISE_TSO -> "TSO"
-                else ->
-                    journalpost.tema
-            }
-        return journalpost.copy(tema = nyttTema)
     }
 
     private fun journalførTilNyKlage(
