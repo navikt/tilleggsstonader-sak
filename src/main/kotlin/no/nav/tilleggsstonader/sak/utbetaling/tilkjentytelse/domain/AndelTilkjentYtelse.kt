@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
@@ -56,8 +57,6 @@ data class AndelTilkjentYtelse(
         feilHvisIkke(fom <= tom) {
             "Forventer at fom($fom) er mindre eller lik tom($tom)"
         }
-
-        validerAndelHarFåttRettSatstype()
         when (satstype) {
             Satstype.DAG -> {
                 validerLikFomOgTom()
@@ -67,7 +66,7 @@ data class AndelTilkjentYtelse(
             Satstype.ENGANGSBELØP -> validerKrysserIkkeÅrsskifte()
             Satstype.UGYLDIG -> {}
         }
-
+        validerAndelHarFåttRettSatstype()
         validerUtbetalingMaksFørsteArbeidsdagNesteMåned()
     }
 
@@ -103,7 +102,7 @@ data class AndelTilkjentYtelse(
 
     private infix fun Satstype.skalVære(forventetSatstype: Satstype) {
         feilHvis(this != forventetSatstype) {
-            "Forventet satstype=$forventetSatstype for type=$type, men fikk $this "
+            "Forventet satstype=$forventetSatstype for type=$type, men fikk $this"
         }
     }
 
@@ -115,7 +114,8 @@ data class AndelTilkjentYtelse(
 
     private fun validerFørsteOgSisteIMåneden() {
         feilHvisIkke(fom.erFørsteDagIMåneden()) {
-            "Forventer at fom($fom) er første dagen i måneden for type=$type"
+            "Forventer at fom($fom) er første dagen i måneden for ty" +
+                "pe=$type"
         }
         feilHvisIkke(tom.erSisteDagIMåneden()) {
             "Forventer at tom($tom) er siste dagen i måneden for type=$type"
@@ -133,9 +133,10 @@ data class AndelTilkjentYtelse(
     }
 
     private fun validerKrysserIkkeÅrsskifte() {
-        feilHvis(fom.year != tom.year) {
-            "Utbetalingen kan ikke krysse et årsskifte, den må da splittes i to"
-        }.also { logger.error("andel med id ${this.id} strekker seg over et årsskifte, men det tillater ikke OS for satstype=ENG") }
+        if (fom.year != tom.year) {
+            logger.error("andel med id ${this.id} strekker seg over et årsskifte, men det tillater ikke OS for satstype=ENG")
+            feil("Utbetalingen kan ikke krysse et årsskifte, den må da splittes i to")
+        }
     }
 }
 

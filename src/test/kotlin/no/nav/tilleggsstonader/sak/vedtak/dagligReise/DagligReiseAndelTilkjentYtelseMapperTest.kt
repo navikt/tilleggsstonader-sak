@@ -27,22 +27,6 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
     }
 
     @Test
-    fun `utbetalingsdato settes til fredagen før dersom fom er i helg`() {
-        val lørdag = 6 september 2025
-        val fredag = 5 september 2025
-        val beregningsresultat =
-            Beregningsresultat(
-                reiser = listOf(lagBeregningsresultatForReise(lørdag)),
-            )
-        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId)
-        with(andeler.single()) {
-            assertThat(fom).isEqualTo(fredag)
-            assertThat(tom).isEqualTo(fredag)
-            assertThat(utbetalingsdato).isEqualTo(fredag)
-        }
-    }
-
-    @Test
     fun `flere reiser med samme fom aggregeres til én andel med summert beløp`() {
         val mandag = 1 september 2025
         val beregningsresultat =
@@ -85,8 +69,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
     }
 
     @Test
-    fun `to reiser som starter på ulike helgedager, skal begge summeres og utbetales fredagen før`() {
-        val fredag = 5 september 2025
+    fun `to reiser som starter på ulike helgedager, skal begge fredagen på de respektive helgedagene`() {
         val lørdag = 6 september 2025
         val søndag = 7 september 2025
         val beregningsresultat =
@@ -96,11 +79,18 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
 
         val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId)
 
-        with(andeler.single()) {
-            assertThat(fom).isEqualTo(fredag)
-            assertThat(tom).isEqualTo(fredag)
-            assertThat(beløp).isEqualTo(200)
-            assertThat(utbetalingsdato).isEqualTo(fredag)
+        assertThat(andeler).hasSize(2)
+        with(andeler.first()) {
+            assertThat(fom).isEqualTo(lørdag)
+            assertThat(tom).isEqualTo(lørdag)
+            assertThat(beløp).isEqualTo(100)
+            assertThat(utbetalingsdato).isEqualTo(lørdag)
+        }
+        with(andeler.last()) {
+            assertThat(fom).isEqualTo(søndag)
+            assertThat(tom).isEqualTo(søndag)
+            assertThat(beløp).isEqualTo(100)
+            assertThat(utbetalingsdato).isEqualTo(søndag)
         }
     }
 
