@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.kall
+package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling

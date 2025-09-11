@@ -2,8 +2,8 @@ package no.nav.tilleggsstonader.sak.migrering.arena
 
 import no.nav.tilleggsstonader.kontrakter.arena.vedtak.Rettighet
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.kall.hentStatusFraArena
-import no.nav.tilleggsstonader.sak.kall.hentStatusFraArenaKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentStatusFraArena
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentStatusFraArenaKall
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 

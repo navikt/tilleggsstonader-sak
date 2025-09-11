@@ -5,8 +5,8 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.kall.hentKanTaAvVent
-import no.nav.tilleggsstonader.sak.kall.settPåVent
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentKanTaAvVent
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.settPåVent
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.util.behandling

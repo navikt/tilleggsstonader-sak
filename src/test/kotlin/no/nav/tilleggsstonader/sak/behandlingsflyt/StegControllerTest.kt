@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.behandlingsflyt
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.kall.resetSteg
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.resetSteg
 import no.nav.tilleggsstonader.sak.util.behandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

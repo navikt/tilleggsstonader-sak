@@ -6,10 +6,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.ArenaClientConfig
-import no.nav.tilleggsstonader.sak.kall.søkPerson
-import no.nav.tilleggsstonader.sak.kall.søkPersonKall
-import no.nav.tilleggsstonader.sak.kall.søkPersonPåEksternFagsakId
-import no.nav.tilleggsstonader.sak.kall.søkPersonPåEksternFagsakIdKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.søkPerson
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.søkPersonKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.søkPersonPåEksternFagsakId
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.søkPersonPåEksternFagsakIdKall
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat

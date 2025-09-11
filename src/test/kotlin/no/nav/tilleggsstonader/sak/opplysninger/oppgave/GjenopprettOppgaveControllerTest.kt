@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.kall.gjenopprettOppgaveKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.gjenopprettOppgaveKall
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.GjenopprettOppgavePåBehandlingTask
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

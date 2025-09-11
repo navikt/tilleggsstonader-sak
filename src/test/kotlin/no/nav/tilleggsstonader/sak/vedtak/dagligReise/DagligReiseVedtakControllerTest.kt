@@ -6,10 +6,10 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.kall.avslåVedtakDagligReise
-import no.nav.tilleggsstonader.sak.kall.hentVedtakDagligReise
-import no.nav.tilleggsstonader.sak.kall.hentVedtakDagligReiseKall
-import no.nav.tilleggsstonader.sak.kall.innvilgeVedtakDagligReise
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.avslåVedtakDagligReise
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakDagligReise
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakDagligReiseKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.innvilgeVedtakDagligReise
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vilkår

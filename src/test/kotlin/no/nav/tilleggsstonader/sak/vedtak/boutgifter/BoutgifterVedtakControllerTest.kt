@@ -5,11 +5,11 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
-import no.nav.tilleggsstonader.sak.kall.avslåVedtakBoutgifter
-import no.nav.tilleggsstonader.sak.kall.hentVedtakBoutgifter
-import no.nav.tilleggsstonader.sak.kall.hentVedtakBoutgifterKall
-import no.nav.tilleggsstonader.sak.kall.innvilgeVedtakBoutgifter
-import no.nav.tilleggsstonader.sak.kall.opphørVedtakBoutgifter
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.avslåVedtakBoutgifter
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakBoutgifter
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakBoutgifterKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.innvilgeVedtakBoutgifter
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.opphørVedtakBoutgifter
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
