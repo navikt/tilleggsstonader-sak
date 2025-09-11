@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
+import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
+@Tag(name = "Forvaltning")
 @RestController
 @RequestMapping("/api/forvaltning/oppgave")
 @ProtectedWithClaims(issuer = "azuread")

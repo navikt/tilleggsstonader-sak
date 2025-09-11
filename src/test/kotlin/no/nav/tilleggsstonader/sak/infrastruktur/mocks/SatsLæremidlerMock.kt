@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
 import io.mockk.spyk
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.SatsLæremidlerService
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.SatsLæremidlerProvider
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -10,5 +10,5 @@ import org.springframework.context.annotation.Primary
 class SatsLæremidlerMock {
     @Bean
     @Primary
-    fun satsLæremidlerServiceMock(): SatsLæremidlerService = spyk<SatsLæremidlerService>()
+    fun satsLæremidlerProviderMock(): SatsLæremidlerProvider = spyk<SatsLæremidlerProvider>()
 }

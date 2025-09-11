@@ -49,6 +49,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtak
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.BeregningNøkler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.SatsLæremidlerProvider
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.SatsLæremidlerService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapAktiviteter
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapBeregningsresultat
@@ -108,7 +109,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                     vilkårperiodeRepository = vilkårperiodeRepository,
                     vedtaksperiodeValideringService = vedtaksperiodeValideringService,
                     vedtakRepository = vedtakRepository,
-                    satsLæremidlerService = SatsLæremidlerService(),
+                    satsLæremidlerService = SatsLæremidlerService(SatsLæremidlerProvider()),
                 ),
             opphørValideringService = mockk<OpphørValideringService>(relaxed = true),
             vedtakRepository = vedtakRepository,

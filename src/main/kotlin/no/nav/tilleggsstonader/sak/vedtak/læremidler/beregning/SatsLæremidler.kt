@@ -26,7 +26,7 @@ data class SatsLæremidler(
 
 private val MAX = LocalDate.of(2099, 12, 31)
 
-private val bekreftedeSatser =
+val bekreftedeSatser =
     listOf(
         SatsLæremidler(
             fom = LocalDate.of(2025, 1, 1),
@@ -45,21 +45,29 @@ private val bekreftedeSatser =
         ),
     )
 
-val satser: List<SatsLæremidler> =
-    listOf(
-        bekreftedeSatser.first().let {
-            it.copy(
-                fom = it.tom.plusDays(1),
-                tom = MAX,
-                bekreftet = false,
-            )
-        },
-    ) + bekreftedeSatser
+@Component
+class SatsLæremidlerProvider {
+    val satser: List<SatsLæremidler>
+        get() =
+            listOf(
+                bekreftedeSatser.first().let {
+                    it.copy(
+                        fom = it.tom.plusDays(1),
+                        tom = MAX,
+                        bekreftet = false,
+                    )
+                },
+            ) + bekreftedeSatser
+}
 
 @Component
-class SatsLæremidlerService {
+class SatsLæremidlerService(
+    private val satsLæremidlerProvider: SatsLæremidlerProvider,
+) {
+    fun alleSatser() = satsLæremidlerProvider.satser
+
     fun finnSatsForPeriode(periode: Periode<LocalDate>): SatsLæremidler =
-        satser.find {
+        satsLæremidlerProvider.satser.find {
             it.inneholder(periode)
         } ?: error("Finner ikke satser for $periode")
 }
