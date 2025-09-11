@@ -56,7 +56,8 @@ class VilkårSteg(
             vilkår
                 .filter { it.resultat == Vilkårsresultat.OPPFYLT }
                 .any {
-                    it.offentligTransport?.prisEnkelbillett!! < 0 || it.offentligTransport.prisSyvdagersbillett!! < 0 ||
+                    it.offentligTransport?.prisEnkelbillett!! < 0 ||
+                        it.offentligTransport.prisSyvdagersbillett!! < 0 ||
                         it.offentligTransport.prisTrettidagersbillett < 0
                 }
         brukerfeilHvis(negativeBillettpriser) {
