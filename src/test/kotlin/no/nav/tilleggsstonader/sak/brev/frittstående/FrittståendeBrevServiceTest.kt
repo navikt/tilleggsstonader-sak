@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.brev.frittstående
 
-import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerFrittståendeBrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
@@ -32,9 +31,6 @@ internal class FrittståendeBrevServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var mellomlagerFrittståendeBrevRepository: MellomlagerFrittståendeBrevRepository
-
-    @Autowired
-    lateinit var taskService: TaskService
 
     private val fagsak = fagsak(setOf(PersonIdent("123")))
 

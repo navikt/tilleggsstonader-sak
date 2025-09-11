@@ -16,10 +16,10 @@ import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.kall.henleggBehandling
-import no.nav.tilleggsstonader.sak.kall.hentBehandling
-import no.nav.tilleggsstonader.sak.kall.hentBehandlingKall
-import no.nav.tilleggsstonader.sak.kall.hentBehandlingMedEksternId
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.henleggBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentBehandlingKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentBehandlingMedEksternId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat

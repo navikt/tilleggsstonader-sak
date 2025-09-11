@@ -2,9 +2,6 @@ package no.nav.tilleggsstonader.sak.behandlingsflyt
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.domene.Status
-import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.internal.TaskService
-import no.nav.familie.prosessering.internal.TaskWorker
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -24,10 +21,9 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksb
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.BrevController
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
-import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringStegService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
@@ -56,8 +52,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.Pageable
-import org.springframework.test.context.transaction.TestTransaction
 import java.time.LocalDate
 import java.util.UUID
 
@@ -90,13 +84,7 @@ class BehandlingFlytTest : IntegrationTest() {
     lateinit var totrinnskontrollService: TotrinnskontrollService
 
     @Autowired
-    lateinit var taskService: TaskService
-
-    @Autowired
     lateinit var stegService: StegService
-
-    @Autowired
-    lateinit var taskWorker: TaskWorker
 
     @Autowired
     lateinit var vilkårperiodeService: VilkårperiodeService
@@ -233,7 +221,7 @@ class BehandlingFlytTest : IntegrationTest() {
         somBeslutter {
             godkjennTotrinnskontroll(behandlingId)
         }
-        kjørTasks()
+        kjørTasksKlareForProsessering()
         assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
 
         with(testoppsettService.hentBehandling(behandlingId)) {
@@ -242,17 +230,9 @@ class BehandlingFlytTest : IntegrationTest() {
         }
     }
 
-    private fun newTransaction() {
-        if (TestTransaction.isActive()) {
-            TestTransaction.flagForCommit() // need this, otherwise the next line does a rollback
-            TestTransaction.end()
-            TestTransaction.start()
-        }
-    }
-
     private fun angreSendTilBeslutter(behandlingId: BehandlingId) {
         totrinnskontrollController.angreSendTilBeslutter(behandlingId)
-        kjørTasks()
+        kjørTasksKlareForProsessering()
     }
 
     private fun godkjennTotrinnskontroll(behandlingId: BehandlingId) {
@@ -264,7 +244,7 @@ class BehandlingFlytTest : IntegrationTest() {
             behandlingId,
             BeslutteVedtakDto(false, "", listOf(ÅrsakUnderkjent.VEDTAK_OG_BEREGNING)),
         )
-        kjørTasks()
+        kjørTasksKlareForProsessering()
     }
 
     private fun opprettBehandlingOgSendTilBeslutter(personIdent: String): BehandlingId {
@@ -338,7 +318,7 @@ class BehandlingFlytTest : IntegrationTest() {
                 ),
             )
         testoppsettService.opprettGrunnlagsdata(behandlingId)
-        kjørTasks()
+        kjørTasksKlareForProsessering()
         return behandlingId
     }
 
@@ -346,42 +326,13 @@ class BehandlingFlytTest : IntegrationTest() {
         behandlingId: BehandlingId,
         kommentarTilBeslutter: String? = null,
     ) {
-        kjørTasks()
+        kjørTasksKlareForProsessering()
         totrinnskontrollController.sendTilBeslutter(
             behandlingId,
             SendTilBeslutterRequest(kommentarTilBeslutter = kommentarTilBeslutter),
         )
-        kjørTasks()
+        kjørTasksKlareForProsessering()
     }
-
-    private fun kjørTasks() {
-        newTransaction()
-        logger.info("Kjører tasks")
-        taskService
-            .finnAlleTasksKlareForProsessering(Pageable.unpaged())
-            .filterNot { it.type == BehandlingsstatistikkTask.TYPE } // Tester ikke statistikkutsendelse her
-            .forEach {
-                taskWorker.markerPlukket(it.id)
-                logger.info("Kjører task ${it.id} type=${it.type} msg=${taskMsg(it)}")
-                taskWorker.doActualWork(it.id)
-            }
-        logger.info("Tasks kjørt OK")
-    }
-
-    private fun taskMsg(it: Task): String =
-        when (it.type) {
-            OpprettOppgaveTask.TYPE ->
-                objectMapper
-                    .readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(it.payload)
-                    .let { "type=${it.oppgave.oppgavetype} kobling=${it.kobling}" }
-
-            FerdigstillOppgaveTask.TYPE ->
-                objectMapper
-                    .readValue<FerdigstillOppgaveTask.FerdigstillOppgaveTaskData>(it.payload)
-                    .let { "type=${it.oppgavetype} behandling=${it.behandlingId}" }
-
-            else -> it.payload
-        }
 
     private fun verifiserBehandlingIverksettes(behandlingId: BehandlingId) {
         with(testoppsettService.hentBehandling(behandlingId)) {
@@ -456,7 +407,7 @@ class BehandlingFlytTest : IntegrationTest() {
         preferredUsername: String = "saksbehandler",
         fn: () -> T,
     ): T {
-        kjørTasks()
+        kjørTasksKlareForProsessering()
         return testWithBrukerContext(
             preferredUsername = preferredUsername,
             groups = listOf(rolleConfig.saksbehandlerRolle),
@@ -469,7 +420,7 @@ class BehandlingFlytTest : IntegrationTest() {
         preferredUsername: String = "beslutter",
         fn: () -> T,
     ): T {
-        kjørTasks()
+        kjørTasksKlareForProsessering()
         return testWithBrukerContext(
             preferredUsername = preferredUsername,
             groups = listOf(rolleConfig.beslutterRolle),

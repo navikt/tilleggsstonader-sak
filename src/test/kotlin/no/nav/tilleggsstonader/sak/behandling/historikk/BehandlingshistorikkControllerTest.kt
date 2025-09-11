@@ -13,8 +13,8 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
-import no.nav.tilleggsstonader.sak.kall.hentBehandlingKall
-import no.nav.tilleggsstonader.sak.kall.hentBehandlingshistorikk
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentBehandlingKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentBehandlingshistorikk
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak

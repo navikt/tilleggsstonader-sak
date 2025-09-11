@@ -2,11 +2,11 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
-import no.nav.tilleggsstonader.sak.kall.hentVilkårperioder
-import no.nav.tilleggsstonader.sak.kall.oppdaterGrunnlagKall
-import no.nav.tilleggsstonader.sak.kall.oppdaterVikårperiode
-import no.nav.tilleggsstonader.sak.kall.opprettVilkårperiode
-import no.nav.tilleggsstonader.sak.kall.slettVilkårperiodeKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVilkårperioder
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.oppdaterGrunnlagKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.oppdaterVikårperiode
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.opprettVilkårperiode
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.slettVilkårperiodeKall
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingerMålgruppeDto

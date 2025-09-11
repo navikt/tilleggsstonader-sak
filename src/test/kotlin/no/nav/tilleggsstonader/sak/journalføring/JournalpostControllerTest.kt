@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.journalføring
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.verify
-import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
@@ -15,8 +14,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.fullførJournalpost
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
-import no.nav.tilleggsstonader.sak.kall.fullførJournalpost
 import no.nav.tilleggsstonader.sak.klage.KlageClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -35,9 +34,6 @@ class JournalpostControllerTest : IntegrationTest() {
 
     @Autowired
     lateinit var behandlingService: BehandlingService
-
-    @Autowired
-    lateinit var taskService: TaskService
 
     @Autowired
     lateinit var klageClient: KlageClient

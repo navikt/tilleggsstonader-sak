@@ -6,7 +6,6 @@ import io.mockk.justRun
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.prosessering.domene.Status
-import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
@@ -57,9 +56,6 @@ class IverksettServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var totrinnskontrollRepository: TotrinnskontrollRepository
-
-    @Autowired
-    lateinit var taskService: TaskService
 
     val forrigeMåned = YearMonth.now().minusMonths(1)
     val nåværendeMåned = YearMonth.now()

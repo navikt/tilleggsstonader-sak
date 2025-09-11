@@ -7,11 +7,11 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
-import no.nav.tilleggsstonader.sak.kall.avslåVedtakTilsynBarn
-import no.nav.tilleggsstonader.sak.kall.hentVedtakTilsynBarn
-import no.nav.tilleggsstonader.sak.kall.hentVedtakTilsynBarnKall
-import no.nav.tilleggsstonader.sak.kall.innvilgeVedtakTilsynBarn
-import no.nav.tilleggsstonader.sak.kall.opphørVedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.avslåVedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakTilsynBarnKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.innvilgeVedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.opphørVedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vilkår
