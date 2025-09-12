@@ -11,10 +11,15 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 
 class InngangsvilkårStegTest {
     val behandlingService = mockk<BehandlingService>()
@@ -52,6 +57,28 @@ class InngangsvilkårStegTest {
         assertThat(nesteSteg).isEqualTo(StegType.BEREGNE_YTELSE)
         verify(exactly = 1) {
             behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(any(), any(), any())
+        }
+    }
+
+    @Nested
+    inner class Validering {
+        @Test
+        fun `skal kaste feil dersom det ikke er lagt inn noen vilkårperioder`() {
+            assertThatThrownBy {
+                steg.validerSteg(saksbehandling())
+            }.hasMessageContaining("Du må registrere minst én målgruppe og én aktivitet for å kunne gå videre.")
+        }
+
+        @Test
+        fun `skal ikke kaste feil dersom det er registrert minst én aktivitet og én målgruppe`() {
+            every { vilkårperiodeService.hentVilkårperioder(any()) } returns
+                Vilkårperioder(
+                    listOf(målgruppe()),
+                    listOf(aktivitet()),
+                )
+            assertDoesNotThrow {
+                steg.validerSteg(saksbehandling())
+            }
         }
     }
 }
