@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class InngangsvilkårStegTest {
@@ -34,31 +33,25 @@ class InngangsvilkårStegTest {
         every { vilkårperiodeService.hentVilkårperioder(any()) } returns Vilkårperioder(emptyList(), emptyList())
     }
 
-    @Nested
-    inner class TilsynBarn {
-        @Test
-        fun `Neste steg - skal innom vilkår`() {
-            val behandling = saksbehandling()
-            val nesteSteg = steg.utførOgReturnerNesteSteg(behandling, null)
+    @Test
+    fun `Neste steg - skal innom vilkår`() {
+        val behandling = saksbehandling()
+        val nesteSteg = steg.utførOgReturnerNesteSteg(behandling, null)
 
-            assertThat(nesteSteg).isEqualTo(StegType.VILKÅR)
-            verify(exactly = 1) {
-                behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(any(), any(), any())
-            }
+        assertThat(nesteSteg).isEqualTo(StegType.VILKÅR)
+        verify(exactly = 1) {
+            behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(any(), any(), any())
         }
+    }
 
-        @Nested
-        inner class Læremidler {
-            @Test
-            fun `Neste steg - har ikke noen vilkår og kan hoppe direkte til beregne ytelse`() {
-                val behandling = saksbehandling(fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER))
-                val nesteSteg = steg.utførOgReturnerNesteSteg(behandling, null)
+    @Test
+    fun `Neste steg - har ikke noen vilkår og kan hoppe direkte til beregne ytelse`() {
+        val behandling = saksbehandling(fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER))
+        val nesteSteg = steg.utførOgReturnerNesteSteg(behandling, null)
 
-                assertThat(nesteSteg).isEqualTo(StegType.BEREGNE_YTELSE)
-                verify(exactly = 1) {
-                    behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(any(), any(), any())
-                }
-            }
+        assertThat(nesteSteg).isEqualTo(StegType.BEREGNE_YTELSE)
+        verify(exactly = 1) {
+            behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(any(), any(), any())
         }
     }
 }
