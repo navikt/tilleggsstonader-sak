@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 
@@ -113,3 +114,17 @@ enum class MålgruppeType(
                 }
         }
 }
+
+fun Hovedytelse.tilMålgruppeType(): MålgruppeType =
+    when (this) {
+        Hovedytelse.AAP -> MålgruppeType.AAP
+        Hovedytelse.OVERGANGSSTØNAD -> MålgruppeType.OVERGANGSSTØNAD
+        Hovedytelse.GJENLEVENDEPENSJON -> MålgruppeType.OMSTILLINGSSTØNAD
+        Hovedytelse.UFØRETRYGD -> MålgruppeType.UFØRETRYGD
+        Hovedytelse.TILTAKSPENGER -> MålgruppeType.TILTAKSPENGER
+        Hovedytelse.DAGPENGER -> MålgruppeType.DAGPENGER
+        Hovedytelse.SYKEPENGER -> MålgruppeType.SYKEPENGER_100_PROSENT
+        Hovedytelse.KVALIFISERINGSSTØNAD -> MålgruppeType.KVALIFISERINGSSTØNAD
+        Hovedytelse.INGEN_PENGESTØTTE -> MålgruppeType.INGEN_MÅLGRUPPE
+        Hovedytelse.INGEN_PASSENDE_ALTERNATIVER -> MålgruppeType.INGEN_MÅLGRUPPE
+    }

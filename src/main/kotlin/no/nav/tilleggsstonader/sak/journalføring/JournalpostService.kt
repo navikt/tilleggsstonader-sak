@@ -200,4 +200,12 @@ class JournalpostService(
     }
 }
 
-private fun Stønadstype.tilDokumentBrevkode(): DokumentBrevkode = DokumentBrevkode.entries.first { it.stønadstype == this }
+private fun Stønadstype.tilDokumentBrevkode(): DokumentBrevkode =
+    when (this) {
+        Stønadstype.BARNETILSYN -> DokumentBrevkode.BARNETILSYN
+        Stønadstype.LÆREMIDLER -> DokumentBrevkode.LÆREMIDLER
+        Stønadstype.BOUTGIFTER -> DokumentBrevkode.BOUTGIFTER
+        Stønadstype.DAGLIG_REISE_TSO,
+        Stønadstype.DAGLIG_REISE_TSR,
+        -> DokumentBrevkode.DAGLIG_REISE
+    }

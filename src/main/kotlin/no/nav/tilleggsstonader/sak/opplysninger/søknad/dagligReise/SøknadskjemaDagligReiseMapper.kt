@@ -62,8 +62,7 @@ class SøknadskjemaDagligReiseMapper(
     private fun mapDokumentasjon(dokumenter: List<DokumentInfo>?): List<DokumentasjonDagligReise> {
         if (dokumenter == null) return emptyList()
         return dokumenter
-            .filter { it.brevkode != DokumentBrevkode.DAGLIG_REISE_TSO.verdi }
-            .filter { it.brevkode != DokumentBrevkode.DAGLIG_REISE_TSR.verdi }
+            .filter { it.brevkode != DokumentBrevkode.DAGLIG_REISE.verdi }
             .filter { it.brevkode != BrevkodeVedlegg.INNSENDINGSKVITTERING.kode }
             .mapNotNull { dokument ->
                 dokument.tittel?.let {

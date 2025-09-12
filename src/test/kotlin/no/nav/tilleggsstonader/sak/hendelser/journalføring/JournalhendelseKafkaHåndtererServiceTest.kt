@@ -4,7 +4,6 @@ import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
@@ -29,7 +28,7 @@ class JournalhendelseKafkaHåndtererServiceTest {
 
     @BeforeEach
     fun setUp() {
-        justRun { håndterSøknadService.håndterSøknad(any(), any()) }
+        justRun { håndterSøknadService.håndterSøknad(any<Journalpost>()) }
     }
 
     @Nested
@@ -46,7 +45,7 @@ class JournalhendelseKafkaHåndtererServiceTest {
 
             service.behandleJournalhendelse(journalpost.journalpostId)
 
-            verify(exactly = 1) { håndterSøknadService.håndterSøknad(journalpost, Stønadstype.BOUTGIFTER) }
+            verify(exactly = 1) { håndterSøknadService.håndterSøknad(journalpost) }
         }
 
         @Test
@@ -61,7 +60,7 @@ class JournalhendelseKafkaHåndtererServiceTest {
 
             service.behandleJournalhendelse(journalpost.journalpostId)
 
-            verify(exactly = 1) { håndterSøknadService.håndterSøknad(journalpost, Stønadstype.BOUTGIFTER) }
+            verify(exactly = 1) { håndterSøknadService.håndterSøknad(journalpost) }
         }
     }
 
@@ -77,7 +76,7 @@ class JournalhendelseKafkaHåndtererServiceTest {
 
         service.behandleJournalhendelse(journalpost.journalpostId)
 
-        verify(exactly = 0) { håndterSøknadService.håndterSøknad(any(), any()) }
+        verify(exactly = 0) { håndterSøknadService.håndterSøknad(any<Journalpost>()) }
     }
 
     private fun journalpost(

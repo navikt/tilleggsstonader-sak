@@ -4,6 +4,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.tilTema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
@@ -111,14 +112,16 @@ class JournalføringService(
         logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
         avsenderMottaker: AvsenderMottaker? = null,
     ) {
+        val journalpostMedOppdatertTema = journalpost.copy(tema = stønadstype.tilTema().toString())
+
         val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
 
-        validerKanOppretteBehandling(journalpost, fagsak, behandlingÅrsak, gjelderKlage = false)
+        validerKanOppretteBehandling(journalpostMedOppdatertTema, fagsak, behandlingÅrsak, gjelderKlage = false)
 
         val behandling =
             opprettBehandlingOgPopulerGrunnlagsdataForJournalpost(
                 fagsak = fagsak,
-                journalpost = journalpost,
+                journalpost = journalpostMedOppdatertTema,
                 behandlingÅrsak = behandlingÅrsak,
             )
 
@@ -128,12 +131,12 @@ class JournalføringService(
             gjenbrukDataRevurderingService.gjenbrukData(behandling, behandlingIdForGjenbruk)
         }
 
-        if (journalpost.harStrukturertSøknad()) {
-            lagreSøknadOgNyeBarn(journalpost, behandling, stønadstype)
+        if (journalpostMedOppdatertTema.harStrukturertSøknad()) {
+            lagreSøknadOgNyeBarn(journalpostMedOppdatertTema, behandling, stønadstype)
         }
 
         ferdigstillJournalpost(
-            journalpost = journalpost,
+            journalpost = journalpostMedOppdatertTema,
             journalførendeEnhet = journalførendeEnhet,
             fagsak = fagsak,
             dokumentTitler = dokumentTitler,
@@ -164,7 +167,10 @@ class JournalføringService(
 
         feilHvis(journalpost.harStrukturertSøknad()) { "Journalpost med id=${journalpost.journalpostId} gjelder ikke en Klagebehandling." }
 
-        klageService.opprettKlage(fagsakId = fagsak.id, OpprettKlageDto(journalpost.datoMottatt?.toLocalDate() ?: LocalDate.now()))
+        klageService.opprettKlage(
+            fagsakId = fagsak.id,
+            OpprettKlageDto(journalpost.datoMottatt?.toLocalDate() ?: LocalDate.now()),
+        )
 
         ferdigstillJournalpost(
             journalpost = journalpost,

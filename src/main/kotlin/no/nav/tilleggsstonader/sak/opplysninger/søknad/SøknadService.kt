@@ -65,40 +65,7 @@ class SøknadService(
         journalpost: Journalpost,
         skjema: Søknadsskjema<out Skjema>,
     ): Søknad<*> {
-        val søknad =
-            when (val søknadsskjema = skjema.skjema) {
-                is SøknadsskjemaBarnetilsyn ->
-                    SøknadsskjemaBarnetilsynMapper.map(
-                        skjema.mottattTidspunkt,
-                        skjema.språk,
-                        journalpost,
-                        søknadsskjema,
-                    )
-
-                is SøknadsskjemaLæremidler ->
-                    SøknadskjemaLæremidlerMapper.map(
-                        skjema.mottattTidspunkt,
-                        skjema.språk,
-                        journalpost,
-                        søknadsskjema,
-                    )
-
-                is SøknadsskjemaBoutgifterFyllUtSendInn ->
-                    søknadskjemaBoutgifterMapper.map(
-                        skjema.mottattTidspunkt,
-                        skjema.språk,
-                        journalpost,
-                        søknadsskjema,
-                    )
-
-                is SøknadsskjemaDagligReiseFyllUtSendInn ->
-                    søknadsskjemaDagligReiseMapper.map(
-                        skjema.mottattTidspunkt,
-                        skjema.språk,
-                        journalpost,
-                        søknadsskjema,
-                    )
-            }
+        val søknad = mapSøknad(skjema, journalpost)
         val lagretSøknad =
             when (søknad) {
                 is SøknadBarnetilsyn -> søknadBarnetilsynRepository.insert(søknad)
@@ -109,6 +76,44 @@ class SøknadService(
         søknadBehandlingRepository.insert(SøknadBehandling(behandlingId, søknad.id))
         return lagretSøknad
     }
+
+    fun mapSøknad(
+        skjema: Søknadsskjema<out Skjema>,
+        journalpost: Journalpost,
+    ): Søknad<out Any> =
+        when (val søknadsskjema = skjema.skjema) {
+            is SøknadsskjemaBarnetilsyn ->
+                SøknadsskjemaBarnetilsynMapper.map(
+                    skjema.mottattTidspunkt,
+                    skjema.språk,
+                    journalpost,
+                    søknadsskjema,
+                )
+
+            is SøknadsskjemaLæremidler ->
+                SøknadskjemaLæremidlerMapper.map(
+                    skjema.mottattTidspunkt,
+                    skjema.språk,
+                    journalpost,
+                    søknadsskjema,
+                )
+
+            is SøknadsskjemaBoutgifterFyllUtSendInn ->
+                søknadskjemaBoutgifterMapper.map(
+                    skjema.mottattTidspunkt,
+                    skjema.språk,
+                    journalpost,
+                    søknadsskjema,
+                )
+
+            is SøknadsskjemaDagligReiseFyllUtSendInn ->
+                søknadsskjemaDagligReiseMapper.map(
+                    skjema.mottattTidspunkt,
+                    skjema.språk,
+                    journalpost,
+                    søknadsskjema,
+                )
+        }
 
     fun kopierSøknad(
         forrigeIverksatteBehandlingId: BehandlingId,

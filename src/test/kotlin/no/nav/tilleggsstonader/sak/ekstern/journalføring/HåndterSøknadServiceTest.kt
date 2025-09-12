@@ -61,6 +61,7 @@ internal class HåndterSøknadServiceTest {
             journalføringService = journalføringService,
             fagsakService = fagsakService,
             behandlingService = behandlingService,
+            søknadService = søknadService,
         )
 
     val enhet = ArbeidsfordelingService.MASKINELL_JOURNALFOERENDE_ENHET
