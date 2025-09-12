@@ -54,7 +54,7 @@ class VilkårSteg(
         }
         val negativeBillettpriser =
             vilkår
-                .filter { it.resultat == Vilkårsresultat.OPPFYLT }
+                .filter { it.resultat == Vilkårsresultat.OPPFYLT && it.offentligTransport != null }
                 .any {
                     it.offentligTransport?.prisEnkelbillett!! < 0 ||
                         it.offentligTransport.prisSyvdagersbillett!! < 0 ||
@@ -65,7 +65,7 @@ class VilkårSteg(
         }
         val negativeReisedager =
             vilkår
-                .filter { it.resultat == Vilkårsresultat.OPPFYLT }
+                .filter { it.resultat == Vilkårsresultat.OPPFYLT && it.offentligTransport != null }
                 .any { it.offentligTransport?.reisedagerPerUke!! < 0 }
         brukerfeilHvis(negativeReisedager) {
             "Det er oppgitt et ugyldig antall reisedager per uke. Verdien kan ikke være negativ."
