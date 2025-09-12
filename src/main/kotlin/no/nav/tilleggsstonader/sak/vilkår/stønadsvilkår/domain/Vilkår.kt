@@ -220,7 +220,10 @@ data class OffentligTransport(
     val prisEnkelbillett: Int,
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int,
-)
+) {
+    fun priserErGyldige(): Boolean =
+        prisEnkelbillett > 0 && (prisSyvdagersbillett == null || prisSyvdagersbillett > 0) && prisTrettidagersbillett > 0
+}
 
 fun List<Vurdering>.harSvar(svarId: SvarId) = this.any { it.svar == svarId }
 
