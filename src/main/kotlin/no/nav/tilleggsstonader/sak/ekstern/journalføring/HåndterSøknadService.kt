@@ -65,7 +65,7 @@ class HåndterSøknadService(
         } ?: error("Fant ikke dokument brevkode for journalpost")
 
     private fun finnStønadstypeForDagligReise(journalpost: Journalpost): Stønadstype {
-        // Alle daglig reise stønder legges på TSO fra fyll ut send inn
+        // Alle daglig reise støknader legges på TSO fra fyll ut send inn
         val søknadsskjema = journalpostService.hentSøknadFraJournalpost(journalpost, Stønadstype.DAGLIG_REISE_TSO)
         val søknad = søknadService.mapSøknad(søknadsskjema, journalpost)
 
