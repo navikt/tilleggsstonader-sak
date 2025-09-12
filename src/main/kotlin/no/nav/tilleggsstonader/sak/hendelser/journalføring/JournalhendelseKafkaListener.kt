@@ -13,8 +13,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
-import org.springframework.context.annotation.Profile
-import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Service
 
@@ -25,7 +23,6 @@ import org.springframework.stereotype.Service
  * https://confluence.adeo.no/display/BOA/Joarkhendelser
  */
 @Service
-@Profile("!local & !integrasjonstest")
 class JournalhendelseKafkaListener(
     private val hendelseRepository: HendelseRepository,
     private val transactionHandler: TransactionHandler,
@@ -33,11 +30,6 @@ class JournalhendelseKafkaListener(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    @KafkaListener(
-        groupId = "tilleggsstonader-sak",
-        topics = ["\${topics.journalhendelser}"],
-        containerFactory = "journalhendelserListenerContainerFactory",
-    )
     fun listen(
         consumerRecord: ConsumerRecord<String, JournalfoeringHendelseRecord>,
         ack: Acknowledgment,
@@ -81,7 +73,7 @@ class JournalhendelseKafkaListener(
         hendelseRecord.kanalReferanseId?.takeIf { it.isNotBlank() } ?: IdUtils.generateId()
 }
 
-private enum class JournalpostHendelseType {
+enum class JournalpostHendelseType {
     JournalpostMottatt,
     TemaEndret,
     EndeligJournalført,

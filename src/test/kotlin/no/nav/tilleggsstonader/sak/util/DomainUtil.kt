@@ -387,6 +387,7 @@ fun journalpost(
     tema: String = Tema.TSO.toString(),
     dokumenter: List<DokumentInfo>? = null,
     bruker: Bruker? = null,
+    kanal: String? = null,
 ) = Journalpost(
     journalpostId = journalpostId,
     journalposttype = journalposttype,
@@ -394,14 +395,17 @@ fun journalpost(
     tema = tema,
     dokumenter = dokumenter,
     bruker = bruker,
+    kanal = kanal,
 )
 
 fun dokumentInfo(
     dokumentInfoId: String = UUID.randomUUID().toString(),
     dokumentvarianter: List<Dokumentvariant>? = null,
+    brevkode: String? = null,
 ) = DokumentInfo(
     dokumentInfoId = dokumentInfoId,
     dokumentvarianter = dokumentvarianter,
+    brevkode = brevkode,
 )
 
 fun dokumentvariant(
