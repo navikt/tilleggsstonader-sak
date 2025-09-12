@@ -54,19 +54,15 @@ class VilkårSteg(
         }
         val negativeBillettpriser =
             vilkår
-                .filter { it.resultat == Vilkårsresultat.OPPFYLT && it.offentligTransport != null }
-                .any {
-                    it.offentligTransport?.prisEnkelbillett!! < 0 ||
-                        it.offentligTransport.prisSyvdagersbillett!! < 0 ||
-                        it.offentligTransport.prisTrettidagersbillett < 0
-                }
+                .mapNotNull { it.offentligTransport }
+                .any { !it.priserErGyldige() }
         brukerfeilHvis(negativeBillettpriser) {
             "Det er oppgitt en ugyldig billettpris. Beløpet kan ikke være negativt."
         }
         val negativeReisedager =
             vilkår
-                .filter { it.resultat == Vilkårsresultat.OPPFYLT && it.offentligTransport != null }
-                .any { it.offentligTransport?.reisedagerPerUke!! < 0 }
+                .mapNotNull { it.offentligTransport?.reisedagerPerUke }
+                .any { it < 0 }
         brukerfeilHvis(negativeReisedager) {
             "Det er oppgitt et ugyldig antall reisedager per uke. Verdien kan ikke være negativ."
         }
