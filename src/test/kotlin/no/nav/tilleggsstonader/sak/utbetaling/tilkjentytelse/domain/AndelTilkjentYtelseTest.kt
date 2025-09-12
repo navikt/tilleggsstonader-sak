@@ -112,7 +112,7 @@ class AndelTilkjentYtelseTest {
                     fom = måned.atDay(1),
                     tom = måned.atEndOfMonth(),
                 )
-            }.hasMessageContaining("Ugyldig satstype=MÅNED forventetSatsType=DAG for type=TILSYN_BARN_AAP")
+            }.hasMessageContaining("Forventet satstype=DAG for type=TILSYN_BARN_AAP, men fikk MÅNED")
         }
     }
 
@@ -127,7 +127,7 @@ class AndelTilkjentYtelseTest {
                     fom = måned.atDay(1),
                     tom = måned.atEndOfMonth(),
                 )
-            }.hasMessageContaining("Ugyldig satstype=MÅNED forventetSatsType=DAG for type=LÆREMIDLER_AAP")
+            }.hasMessageContaining("Forventet satstype=DAG for type=LÆREMIDLER_AAP, men fikk MÅNED")
         }
     }
 
@@ -158,6 +158,21 @@ class AndelTilkjentYtelseTest {
                     utbetalingsdato = utbetalingsdato,
                 )
             }.hasMessageContaining("Utbetalingsdato($utbetalingsdato) må være i samme måned")
+        }
+    }
+
+    @Nested
+    inner class DagligReiseAndel {
+        @Test
+        fun `skal kaste feil hvis satstype ikke er enkeltbeløp`() {
+            assertThatThrownBy {
+                andelTilkjentYtelse(
+                    type = TypeAndel.DAGLIG_REISE_AAP,
+                    satstype = Satstype.DAG,
+                    fom = måned.atDay(1),
+                    tom = måned.atDay(1),
+                )
+            }.hasMessageContaining("Forventet satstype=ENGANGSBELØP for type=DAGLIG_REISE_AAP, men fikk DAG")
         }
     }
 }

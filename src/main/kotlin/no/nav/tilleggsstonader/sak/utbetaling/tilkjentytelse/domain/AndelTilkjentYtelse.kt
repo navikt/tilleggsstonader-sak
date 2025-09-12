@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
+import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
@@ -24,8 +26,10 @@ import java.util.UUID
  * Når man iverksetter lagres informasjon ned i [iverksetting] og [statusIverksetting] blir oppdatert
  * Når man fått kvittering fra økonomi oppdateres [statusIverksetting] på nytt
  *
+ * @fom styrer når betalingen skal inntreffe i OS. For dagsats må dette være en dag OS er åpent (altså ikke en helge- eller helligdag).
+ * Denne begrensningen gjelder ikke for engangsbeløp.
  * @param iverksetting når vi iverksetter en andel så oppdateres dette feltet med id og tidspunkt
- * @param utbetalingsdato datoen perioden skal iverksettes
+ * @param utbetalingsdato bestemmer når prosessering skal plukke opp betalingen og sende den til utsjekk.
  */
 data class AndelTilkjentYtelse(
     @Id
@@ -53,20 +57,20 @@ data class AndelTilkjentYtelse(
         feilHvisIkke(fom <= tom) {
             "Forventer at fom($fom) er mindre eller lik tom($tom)"
         }
-        if (satstype == Satstype.MÅNED) {
-            validerFørsteOgSisteIMåneden()
+        when (satstype) {
+            Satstype.DAG -> {
+                validerLikFomOgTom()
+                validerFomIkkeLørdagEllerSøndag()
+            }
+            Satstype.MÅNED -> validerFørsteOgSisteIMåneden()
+            Satstype.ENGANGSBELØP -> validerKrysserIkkeÅrsskifte()
+            Satstype.UGYLDIG -> {}
         }
-        if (satstype == Satstype.DAG) {
-            validerLikFomOgTom()
-            validerFomIkkeLørdagEllerSøndag()
-        }
-
-        validerDataForType()
-
+        validerAndelHarFåttRettSatstype()
         validerUtbetalingMaksFørsteArbeidsdagNesteMåned()
     }
 
-    private fun validerDataForType() {
+    private fun validerAndelHarFåttRettSatstype() {
         when (type) {
             TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER,
             TypeAndel.TILSYN_BARN_AAP,
@@ -79,10 +83,12 @@ data class AndelTilkjentYtelse(
             TypeAndel.BOUTGIFTER_AAP,
             TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER,
             TypeAndel.BOUTGIFTER_ETTERLATTE,
+            -> satstype skalVære Satstype.DAG
+
             TypeAndel.DAGLIG_REISE_AAP,
             TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER,
             TypeAndel.DAGLIG_REISE_ETTERLATTE,
-            -> validerErDagsats()
+            -> satstype skalVære Satstype.ENGANGSBELØP
 
             TypeAndel.UGYLDIG -> {}
         }
@@ -94,9 +100,9 @@ data class AndelTilkjentYtelse(
         }
     }
 
-    private fun validerErDagsats() {
-        feilHvis(satstype != Satstype.DAG) {
-            "Ugyldig satstype=$satstype forventetSatsType=${Satstype.DAG} for type=$type"
+    private infix fun Satstype.skalVære(forventetSatstype: Satstype) {
+        feilHvis(this != forventetSatstype) {
+            "Forventet satstype=$forventetSatstype for type=$type, men fikk $this"
         }
     }
 
@@ -108,7 +114,8 @@ data class AndelTilkjentYtelse(
 
     private fun validerFørsteOgSisteIMåneden() {
         feilHvisIkke(fom.erFørsteDagIMåneden()) {
-            "Forventer at fom($fom) er første dagen i måneden for type=$type"
+            "Forventer at fom($fom) er første dagen i måneden for ty" +
+                "pe=$type"
         }
         feilHvisIkke(tom.erSisteDagIMåneden()) {
             "Forventer at tom($tom) er siste dagen i måneden for type=$type"
@@ -122,6 +129,13 @@ data class AndelTilkjentYtelse(
 
         feilHvis(utbetalingsdato != førsteArbeidsdagNesteMåned && utbetalingsdato.toYearMonth() != fomMåned) {
             "Utbetalingsdato($utbetalingsdato) må være i samme måned ($fomMåned) som andelen gjelder for, eller første arbeidsdag i måneden etter."
+        }
+    }
+
+    private fun validerKrysserIkkeÅrsskifte() {
+        if (fom.year != tom.year) {
+            logger.error("andel med id ${this.id} strekker seg over et årsskifte, men det tillater ikke OS for satstype=ENG")
+            feil("Utbetalingen kan ikke krysse et årsskifte, den må da splittes i to")
         }
     }
 }
