@@ -55,16 +55,14 @@ class HåndterSøknadService(
     }
 
     private fun finnStønadstype(journalpost: Journalpost): Stønadstype =
-        when (journalpost.dokumentBrevkode()) {
-            DokumentBrevkode.BARNETILSYN -> Stønadstype.BARNETILSYN
-            DokumentBrevkode.LÆREMIDLER -> Stønadstype.LÆREMIDLER
-            DokumentBrevkode.BOUTGIFTER -> Stønadstype.BOUTGIFTER
-            DokumentBrevkode.DAGLIG_REISE -> finnStønadstypeForDagligReise(journalpost)
-
-            else -> {
-                error("Fant ikke dokument brevkode for journalpost")
+        journalpost.dokumentBrevkode()?.let {
+            when (it) {
+                DokumentBrevkode.BARNETILSYN -> Stønadstype.BARNETILSYN
+                DokumentBrevkode.LÆREMIDLER -> Stønadstype.LÆREMIDLER
+                DokumentBrevkode.BOUTGIFTER -> Stønadstype.BOUTGIFTER
+                DokumentBrevkode.DAGLIG_REISE -> finnStønadstypeForDagligReise(journalpost)
             }
-        }
+        } ?: error("Fant ikke dokument brevkode for journalpost")
 
     private fun finnStønadstypeForDagligReise(journalpost: Journalpost): Stønadstype {
         // Alle daglig reise stønder legges på TSO fra fyll ut send inn
