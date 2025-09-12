@@ -44,8 +44,17 @@ fun finnReisedagerIPeriode(
         }.values
         .sumOf { it.antallDager }
 
-fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): Int =
-    min(finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag), grunnlag.pris30dagersbillett)
+// fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): Int =
+//    min(finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag), grunnlag.pris30dagersbillett)
+fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): Int {
+    val alternativer =
+        listOfNotNull(
+            finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag),
+            grunnlag.pris30dagersbillett.takeIf { it > 0 },
+        ).filter { it > 0 }
+
+    return alternativer.minOrNull() ?: 0 // If all were 0/null, treat as empty = 0
+}
 
 /**
  * Minimum Cost For Tickets.
@@ -113,17 +122,34 @@ private fun tellDagerTilStartenAvUke(
     return ChronoUnit.DAYS.between(startDag, startenAvGittUke).toInt()
 }
 
+// private fun finnReisekostnadForNyEnkeltbillett(
+//    gjeldendeDag: Int,
+//    reisekostnader: MutableList<Int>,
+//    grunnlag: Beregningsgrunnlag,
+// ): Int = reisekostnader[max(0, gjeldendeDag - 1)] + (grunnlag.prisEnkeltbillett * 2)
 private fun finnReisekostnadForNyEnkeltbillett(
     gjeldendeDag: Int,
     reisekostnader: MutableList<Int>,
     grunnlag: Beregningsgrunnlag,
-): Int = reisekostnader[max(0, gjeldendeDag - 1)] + (grunnlag.prisEnkeltbillett * 2)
+): Int? =
+    grunnlag.prisEnkeltbillett
+        .takeIf { it > 0 } // ✅ ignore 0
+        ?.let { reisekostnader[max(0, gjeldendeDag - 1)] + (it * 2) }
+
+// private fun finnReisekostnadForNySyvdagersbillett(
+//    gjeldendeDag: Int,
+//    reisekostnader: MutableList<Int>,
+//    grunnlag: Beregningsgrunnlag,
+// ): Int? = grunnlag.prisSyvdagersbillett?.let { reisekostnader[max(0, gjeldendeDag - 7)] + grunnlag.prisSyvdagersbillett }
 
 private fun finnReisekostnadForNySyvdagersbillett(
     gjeldendeDag: Int,
     reisekostnader: MutableList<Int>,
     grunnlag: Beregningsgrunnlag,
-): Int? = grunnlag.prisSyvdagersbillett?.let { reisekostnader[max(0, gjeldendeDag - 7)] + grunnlag.prisSyvdagersbillett }
+): Int? =
+    grunnlag.prisSyvdagersbillett
+        ?.takeIf { it > 0 } // ✅ ignore 0
+        ?.let { reisekostnader[max(0, gjeldendeDag - 7)] + it }
 
 private fun Int.skalIkkeReise(
     reisedagerListe: List<Int>,
