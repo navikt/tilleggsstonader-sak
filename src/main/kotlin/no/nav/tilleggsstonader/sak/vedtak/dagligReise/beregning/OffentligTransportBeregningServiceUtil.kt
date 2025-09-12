@@ -44,8 +44,17 @@ fun finnReisedagerIPeriode(
         }.values
         .sumOf { it.antallDager }
 
-fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): Int =
-    min(finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag), grunnlag.pris30dagersbillett)
+// fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): Int =
+//    min(finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag), grunnlag.pris30dagersbillett)
+fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): Int {
+    val alternativer =
+        listOfNotNull(
+            finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag).takeIf { it > 0 },
+            grunnlag.pris30dagersbillett.takeIf { it > 0 },
+        )
+
+    return alternativer.minOrNull() ?: 0
+}
 
 /**
  * Minimum Cost For Tickets.
@@ -71,7 +80,7 @@ private fun finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag: 
                 listOfNotNull(
                     finnReisekostnadForNyEnkeltbillett(gjeldeneDag, reisekostnader, grunnlag),
                     finnReisekostnadForNySyvdagersbillett(gjeldeneDag, reisekostnader, grunnlag),
-                ).min()
+                ).filter { it > 0 }.minOrNull() ?: 0
         }
     }
     return reisekostnader[sisteReiseDag]
