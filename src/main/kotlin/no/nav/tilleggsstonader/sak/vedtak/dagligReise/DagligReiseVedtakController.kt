@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.OffentligTransportBeregningService
@@ -77,10 +78,13 @@ class DagligReiseVedtakController(
         @RequestBody vedtak: InnvilgelseDagligReiseRequest,
     ): Beregningsresultat {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
         return beregningService
             .beregn(
                 behandlingId = behandlingId,
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
+                behandling = behandling,
+                typeVedtak = TypeVedtak.INNVILGELSE,
             )
     }
 

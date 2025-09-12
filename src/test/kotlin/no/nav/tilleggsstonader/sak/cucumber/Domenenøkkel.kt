@@ -11,6 +11,8 @@ enum class DomenenøkkelFelles(
     FOM("Fom"),
     TOM("Tom"),
     BELØP("Beløp"),
+    MÅLGRUPPE("FaktiskMålgruppe"),
+    AKTIVITET("Aktivitet"),
 }
 
 enum class DomenenøkkelAndelTilkjentYtelse(

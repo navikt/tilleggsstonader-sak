@@ -175,7 +175,11 @@ object VilkårperiodeTestUtil {
             MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadLæremidler
             MålgruppeType.AAP ->
                 AAPLæremidler(
-                    vurderinger = VurderingAAPLæremidler(dekketAvAnnetRegelverk = dekketAvAnnetRegelverk, aldersvilkår = aldersvilkår),
+                    vurderinger =
+                        VurderingAAPLæremidler(
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
+                            aldersvilkår = aldersvilkår,
+                        ),
                 )
 
             MålgruppeType.UFØRETRYGD ->

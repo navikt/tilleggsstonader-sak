@@ -69,6 +69,8 @@ class DagligReiseBeregnYtelseSteg(
             beregningService.beregn(
                 behandlingId = saksbehandling.id,
                 vedtaksperioder = vedtaksperioder,
+                behandling = saksbehandling,
+                typeVedtak = TypeVedtak.INNVILGELSE,
             )
         lagreInnvilgetVedtak(
             behandling = saksbehandling,

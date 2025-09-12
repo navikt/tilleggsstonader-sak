@@ -12,17 +12,40 @@ import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
+import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import org.assertj.core.api.Assertions.assertThat
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class OffentligTransportBeregningStepDefinitions {
     val behandlingServiceMock = mockk<BehandlingService>()
     val vilkårRepositoryFake = VilkårRepositoryFake()
+    val vilkårperiodeRepositoryFake = VilkårperiodeRepositoryFake()
+    val behandlingId = BehandlingId.random()
+
+    val vilkårperiodeServiceMock =
+        mockk<VilkårperiodeService>().apply {
+            every { hentVilkårperioder(any()) } answers {
+                val vilkårsperioder =
+                    vilkårperiodeRepositoryFake.findByBehandlingId(behandlingId).sorted()
+                Vilkårperioder(
+                    målgrupper = vilkårsperioder.ofType<MålgruppeFaktaOgVurdering>(),
+                    aktiviteter = vilkårsperioder.ofType<AktivitetFaktaOgVurdering>(),
+                )
+            }
+        }
 
     val vilkårService =
         VilkårService(
@@ -30,17 +53,26 @@ class OffentligTransportBeregningStepDefinitions {
             vilkårRepository = vilkårRepositoryFake,
             barnService = mockk(relaxed = true),
         )
-    val offentligTransportBeregningService = OffentligTransportBeregningService(vilkårService)
+
+    val vedtaksperiodeValideringService =
+        VedtaksperiodeValideringService(vilkårperiodeService = vilkårperiodeServiceMock)
+
+    val offentligTransportBeregningService =
+        OffentligTransportBeregningService(
+            vilkårService = vilkårService,
+            vedtaksperiodeValideringService = vedtaksperiodeValideringService,
+        )
 
     var beregningsResultat: Beregningsresultat? = null
     var forventetBeregningsresultat: Beregningsresultat? = null
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
-
-    val behandlingId = BehandlingId.random()
+    var vilkårperioder: List<Vilkårperioder> = emptyList()
 
     @Gitt("følgende vedtaksperioder for daglig reise offentlig transport")
     fun `følgende vedtaksperioder`(dataTable: DataTable) {
         vedtaksperioder = mapVedtaksperioder(dataTable)
+        vilkårperiodeRepositoryFake.insertAll(mapAktiviteter(behandlingId, dataTable))
+        vilkårperiodeRepositoryFake.insertAll(mapMålgrupper(behandlingId, dataTable))
     }
 
     @Gitt("følgende beregningsinput for offentlig transport")
@@ -63,6 +95,8 @@ class OffentligTransportBeregningStepDefinitions {
             offentligTransportBeregningService.beregn(
                 behandlingId = behandlingId,
                 vedtaksperioder = vedtaksperioder,
+                behandling = saksbehandling(),
+                typeVedtak = TypeVedtak.INNVILGELSE,
             )
     }
 
