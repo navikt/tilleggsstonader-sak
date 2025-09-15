@@ -31,11 +31,6 @@ class VilkårSteg(
 
         validerIkkeOverlappendeVilkår(vilkår)
 
-        val manglerVilkår = vilkår.isEmpty()
-        brukerfeilHvis(manglerVilkår) {
-            "Mangler vilkår, vennligst legg til et vilkår for reiseperioden."
-        }
-
         val manglerVerdierPåOppfylteVilkår =
             vilkår
                 .filter { it.resultat == Vilkårsresultat.OPPFYLT }
