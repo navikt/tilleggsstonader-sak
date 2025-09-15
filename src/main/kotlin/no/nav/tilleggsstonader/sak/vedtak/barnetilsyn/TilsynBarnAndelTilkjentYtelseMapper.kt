@@ -27,3 +27,17 @@ fun BeregningsresultatTilsynBarn.mapTilAndelTilkjentYtelse(saksbehandling: Saksb
             )
         }
     }
+
+fun finnPeriodeFraAndel(
+    beregningsresultat: BeregningsresultatTilsynBarn,
+    andelTilkjentYtelse: AndelTilkjentYtelse,
+) = beregningsresultat.perioder
+    .flatMap {
+        // Lages andel per beløpsperiode, som igjen lages fra vedtaksperiodeGrunnlag
+        it.grunnlag.vedtaksperiodeGrunnlag.mapIndexed { index, grunnlag ->
+            grunnlag to it.beløpsperioder[index]
+        }
+    }.single {
+        // Fom og tom på andel er beløpsperiode sin dato
+        it.second.dato == andelTilkjentYtelse.fom
+    }.first.vedtaksperiode
