@@ -46,6 +46,7 @@ fun finnReisedagerIPeriode(
         .sumOf { it.antallDager }
 
 fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): Int {
+    if (grunnlag.antallReisedager == 0) return 0
     val alternativer =
         listOfNotNull(
             finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag).takeIf { it > 0 },

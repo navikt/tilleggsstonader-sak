@@ -132,9 +132,29 @@ Egenskap: Beregning av offentlig transport for daglig reise
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 778   |
-      | 31.01.2025 | 01.03.2025 | 778   |
-      | 02.03.2025 | 31.03.2025 | 778   |
+      | 31.01.2025 | 01.03.2025 | 0   |
+      | 02.03.2025 | 31.03.2025 | 0  |
       | 01.04.2025 | 30.04.2025 | 778   |
+
+  Scenario: Forventer to trettidagersperioder og to perioder med 0 i beløp på grunn av opphold i vedtaksperiodene
+    Gitt følgende vedtaksperioder for daglig reise offentlig transport
+      | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
+      | 01.01.2025 | 30.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+      | 01.04.2025 | 30.04.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+
+    Gitt følgende beregningsinput for offentlig transport
+      | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 01.01.2025 | 31.05.2025 | 44                 | 778                       | 5                         |
+
+    Når beregner for daglig reise offentlig transport
+
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
+      | Fom        | Tom        | Beløp |
+      | 01.01.2025 | 30.01.2025 | 778   |
+      | 31.01.2025 | 01.03.2025 | 0     |
+      | 02.03.2025 | 31.03.2025 | 0     |
+      | 01.04.2025 | 30.04.2025 | 778   |
+
 
   # To reiser i samme periode tog (Vy) + buss (ruter), her lønner det seg med mnd kort selv om det er opphold i periodene
   Scenario: to identiske reiseperioder med ulike transportmiddel og vedtaksperioder med opphold
@@ -153,15 +173,15 @@ Egenskap: Beregning av offentlig transport for daglig reise
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 778   |
-      | 31.01.2025 | 01.03.2025 | 778     |
-      | 02.03.2025 | 31.03.2025 | 778    |
+      | 31.01.2025 | 01.03.2025 | 0     |
+      | 02.03.2025 | 31.03.2025 | 0     |
       | 01.04.2025 | 30.04.2025 | 778   |
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=2
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 3369  |
-      | 31.01.2025 | 01.03.2025 | 3369  |
-      | 02.03.2025 | 31.03.2025 |3369   |
+      | 31.01.2025 | 01.03.2025 | 0     |
+      | 02.03.2025 | 31.03.2025 |0      |
       | 01.04.2025 | 30.04.2025 | 3369  |
 
   # Lønner seg med mnd kort selv om det er opphold (f.eks tre dager på slutten første og 10 dager på starten av siste)
