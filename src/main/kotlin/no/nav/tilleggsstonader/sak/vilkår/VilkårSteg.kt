@@ -47,20 +47,6 @@ class VilkårSteg(
             "Mangler fom eller tom på et eller flere vilkår. " +
                 "Vennligst ta stilling til hvilken periode vilkåret gjelder for."
         }
-        val negativeBillettpriser =
-            vilkår
-                .mapNotNull { it.offentligTransport }
-                .any { !it.priserErGyldige() }
-        brukerfeilHvis(negativeBillettpriser) {
-            "Det er oppgitt en ugyldig billettpris. Beløpet kan ikke være negativt."
-        }
-        val negativeReisedager =
-            vilkår
-                .mapNotNull { it.offentligTransport?.reisedagerPerUke }
-                .any { it < 0 }
-        brukerfeilHvis(negativeReisedager) {
-            "Det er oppgitt et ugyldig antall reisedager per uke. Verdien kan ikke være negativ."
-        }
     }
 
     override fun stegType(): StegType = StegType.VILKÅR

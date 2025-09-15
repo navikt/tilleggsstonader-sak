@@ -4,11 +4,11 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
@@ -326,7 +326,7 @@ internal class OppdaterVilkårTest {
                 utgift = null,
                 erFremtidigUtgift = false,
                 offentligTransport =
-                    OffentligTransport(
+                    OffentligTransportDto(
                         reisedagerPerUke = 5,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = null,
@@ -391,7 +391,13 @@ internal class OppdaterVilkårTest {
 
         @Test
         fun `Vilkår som er fremtidig utgift skal få status ny når de gjøres om til vanlig vilkår`() {
-            val vilkår = vilkår(behandling.id, type = VilkårType.PASS_BARN, status = VilkårStatus.UENDRET, erFremtidigUtgift = true)
+            val vilkår =
+                vilkår(
+                    behandling.id,
+                    type = VilkårType.PASS_BARN,
+                    status = VilkårStatus.UENDRET,
+                    erFremtidigUtgift = true,
+                )
             val innsendtOppdatering = innsendtOppdatering(vilkår.copy(erFremtidigUtgift = false))
 
             val oppdaterVilkår =

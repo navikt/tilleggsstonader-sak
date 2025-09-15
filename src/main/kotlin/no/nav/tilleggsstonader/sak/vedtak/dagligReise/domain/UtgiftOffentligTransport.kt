@@ -8,9 +8,9 @@ data class UtgiftOffentligTransport(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val antallReisedagerPerUke: Int,
-    val prisEnkelbillett: Int,
+    val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
-    val pris30dagersbillett: Int,
+    val pris30dagersbillett: Int?,
 ) : Periode<LocalDate> {
     fun delTil30Dagersperioder(): List<UtgiftOffentligTransport> =
         this.splitPer30DagersPerioder { fom, tom ->
