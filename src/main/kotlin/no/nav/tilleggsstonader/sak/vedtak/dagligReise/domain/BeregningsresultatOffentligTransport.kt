@@ -23,9 +23,9 @@ data class BeregningsresultatForPeriode(
 data class Beregningsgrunnlag(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val prisEnkeltbillett: Int,
+    val prisEnkeltbillett: Int?,
     val prisSyvdagersbillett: Int?,
-    val pris30dagersbillett: Int,
+    val pris30dagersbillett: Int?,
     val antallReisedagerPerUke: Int,
     val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
     val antallReisedager: Int,

@@ -45,7 +45,10 @@ fun finnReisedagerIPeriode(
         .sumOf { it.antallDager }
 
 fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): Int =
-    min(finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag), grunnlag.pris30dagersbillett)
+    listOfNotNull(
+        finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag),
+        grunnlag.pris30dagersbillett,
+    ).min()
 
 /**
  * Minimum Cost For Tickets.
@@ -117,7 +120,7 @@ private fun finnReisekostnadForNyEnkeltbillett(
     gjeldendeDag: Int,
     reisekostnader: MutableList<Int>,
     grunnlag: Beregningsgrunnlag,
-): Int = reisekostnader[max(0, gjeldendeDag - 1)] + (grunnlag.prisEnkeltbillett * 2)
+): Int? = grunnlag.prisEnkeltbillett?.times(2)?.let { reisekostnader[max(0, gjeldendeDag - 1)] + (it) }
 
 private fun finnReisekostnadForNySyvdagersbillett(
     gjeldendeDag: Int,

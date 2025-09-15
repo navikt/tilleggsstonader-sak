@@ -10,7 +10,22 @@ Egenskap: Beregning av offentlig transport for daglig reise
 
     Gitt følgende beregningsinput for offentlig transport
       | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
-      | 01.01.2025 | 30.01.2025 | 44                 | 778                       | 3                         |
+      | 01.01.2025 | 30.01.2025 | 0                 | 778                       | 3                         |
+
+    Når beregner for daglig reise offentlig transport
+
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
+      | Fom        | Tom        | Beløp |
+      | 01.01.2025 | 30.01.2025 | 778   |
+
+  Scenario: Forventer at tretti-dagersbillett lønner seg
+    Gitt følgende vedtaksperioder for daglig reise offentlig transport
+      | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
+      | 01.01.2025 | 01.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+
+    Gitt følgende beregningsinput for offentlig transport
+      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 01.01.2025 | 30.01.2025 | 0                 | 0                  |100                       | 3                         |
 
     Når beregner for daglig reise offentlig transport
 

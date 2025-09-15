@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.svarTilDomene
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
@@ -125,7 +126,7 @@ object OppdaterVilkår {
             utgift = oppdatering.utgift,
             erFremtidigUtgift = oppdatering.erFremtidigUtgift == true,
             gitVersjon = Applikasjonsversjon.versjon,
-            offentligTransport = oppdatering.offentligTransport,
+            offentligTransport = oppdatering.offentligTransport?.mapOffentligTransport(),
         )
     }
 
@@ -290,4 +291,15 @@ object OppdaterVilkår {
                 begrunnelse = null,
             )
         }
+
+    private fun OffentligTransportDto?.mapOffentligTransport(): OffentligTransport? {
+        if (this == null) return null
+
+        return OffentligTransport(
+            reisedagerPerUke = this.reisedagerPerUke,
+            prisEnkelbillett = this.prisEnkelbillett?.takeIf { it > 0 },
+            prisSyvdagersbillett = this.prisSyvdagersbillett?.takeIf { it > 0 },
+            prisTrettidagersbillett = this.prisTrettidagersbillett?.takeIf { it > 0 },
+        )
+    }
 }

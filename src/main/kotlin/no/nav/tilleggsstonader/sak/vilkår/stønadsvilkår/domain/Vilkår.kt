@@ -217,12 +217,18 @@ data class Vurdering(
 
 data class OffentligTransport(
     val reisedagerPerUke: Int,
-    val prisEnkelbillett: Int,
+    val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
-    val prisTrettidagersbillett: Int,
+    val prisTrettidagersbillett: Int?,
 ) {
-    fun priserErGyldige(): Boolean =
-        prisEnkelbillett > 0 && (prisSyvdagersbillett == null || prisSyvdagersbillett > 0) && prisTrettidagersbillett > 0
+    init {
+        require(reisedagerPerUke > 0) {
+            "Reisedager per uke må være større enn 0"
+        }
+        require(prisEnkelbillett != null || prisSyvdagersbillett != null || prisTrettidagersbillett != null) {
+            "Minst én billettpris må være satt"
+        }
+    }
 }
 
 fun List<Vurdering>.harSvar(svarId: SvarId) = this.any { it.svar == svarId }
