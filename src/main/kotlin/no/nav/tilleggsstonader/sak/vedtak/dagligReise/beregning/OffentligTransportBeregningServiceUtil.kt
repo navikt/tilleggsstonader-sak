@@ -51,7 +51,7 @@ fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag):
             finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag).takeIf { it > 0 },
             grunnlag.pris30dagersbillett.takeIf { it > 0 },
         ).filter { it > 0 }
-    feilHvis(alternativer.isEmpty()) { "alle billet priser er 0" }
+    feilHvis(alternativer.isEmpty()) { "Alle billet priser er 0 Kr" }
     return alternativer.minOrNull()!!
 }
 
