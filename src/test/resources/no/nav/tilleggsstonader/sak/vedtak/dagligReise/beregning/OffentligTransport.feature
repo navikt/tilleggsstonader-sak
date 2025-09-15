@@ -18,20 +18,20 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | Fom        | Tom        | Beløp |
       | 01.01.2025 | 30.01.2025 | 778   |
 
-  Scenario: Alle billettpriser inkludert ukesbillett = 0
+  Scenario: Skal ikke ta med 0kr som en ekte billetpris
     Gitt følgende vedtaksperioder for daglig reise offentlig transport
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
       | 01.06.2025 | 30.06.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende beregningsinput for offentlig transport
       | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
-      | 01.06.2025 | 30.06.2025 | 100                  | 0                     | 0                      | 3                        |
+      | 01.06.2025 | 30.06.2025 | 0                  | 100                    | 0                    | 3                        |
 
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp |
-      | 01.06.2025 | 30.06.2025 |   300   |
+      | 01.06.2025 | 30.06.2025 |   500   |
 
 
 

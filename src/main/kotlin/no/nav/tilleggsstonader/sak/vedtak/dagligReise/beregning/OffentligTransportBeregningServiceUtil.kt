@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
@@ -44,16 +45,14 @@ fun finnReisedagerIPeriode(
         }.values
         .sumOf { it.antallDager }
 
-// fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): Int =
-//    min(finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag), grunnlag.pris30dagersbillett)
 fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): Int {
     val alternativer =
         listOfNotNull(
-            finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag),
+            finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag).takeIf { it > 0 },
             grunnlag.pris30dagersbillett.takeIf { it > 0 },
         ).filter { it > 0 }
-
-    return alternativer.minOrNull() ?: 0 // If all were 0/null, treat as empty = 0
+    feilHvis(alternativer.isEmpty()) { "alle billet priser er 0" }
+    return alternativer.minOrNull()!!
 }
 
 /**
@@ -66,11 +65,12 @@ private fun finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag: 
 
     // Hvis ingen reisedager er billigste pris 0kr
     if (reisedagerListe.isEmpty()) return 0
-
     val sisteReiseDag = reisedagerListe.last()
     val reisekostnader = MutableList(sisteReiseDag + 1) { 0 }
 
     var reisedagIndeks = 0
+    if (grunnlag.prisEnkeltbillett == 0 && grunnlag.prisSyvdagersbillett == 0) return 0
+
     for (gjeldeneDag in 1..sisteReiseDag) {
         if (gjeldeneDag.skalIkkeReise(reisedagerListe, reisedagIndeks)) {
             reisekostnader[gjeldeneDag] = reisekostnader[gjeldeneDag - 1]
@@ -122,25 +122,14 @@ private fun tellDagerTilStartenAvUke(
     return ChronoUnit.DAYS.between(startDag, startenAvGittUke).toInt()
 }
 
-// private fun finnReisekostnadForNyEnkeltbillett(
-//    gjeldendeDag: Int,
-//    reisekostnader: MutableList<Int>,
-//    grunnlag: Beregningsgrunnlag,
-// ): Int = reisekostnader[max(0, gjeldendeDag - 1)] + (grunnlag.prisEnkeltbillett * 2)
 private fun finnReisekostnadForNyEnkeltbillett(
     gjeldendeDag: Int,
     reisekostnader: MutableList<Int>,
     grunnlag: Beregningsgrunnlag,
 ): Int? =
     grunnlag.prisEnkeltbillett
-        .takeIf { it > 0 } // ✅ ignore 0
+        .takeIf { it > 0 }
         ?.let { reisekostnader[max(0, gjeldendeDag - 1)] + (it * 2) }
-
-// private fun finnReisekostnadForNySyvdagersbillett(
-//    gjeldendeDag: Int,
-//    reisekostnader: MutableList<Int>,
-//    grunnlag: Beregningsgrunnlag,
-// ): Int? = grunnlag.prisSyvdagersbillett?.let { reisekostnader[max(0, gjeldendeDag - 7)] + grunnlag.prisSyvdagersbillett }
 
 private fun finnReisekostnadForNySyvdagersbillett(
     gjeldendeDag: Int,
@@ -148,7 +137,7 @@ private fun finnReisekostnadForNySyvdagersbillett(
     grunnlag: Beregningsgrunnlag,
 ): Int? =
     grunnlag.prisSyvdagersbillett
-        ?.takeIf { it > 0 } // ✅ ignore 0
+        ?.takeIf { it > 0 }
         ?.let { reisekostnader[max(0, gjeldendeDag - 7)] + it }
 
 private fun Int.skalIkkeReise(
