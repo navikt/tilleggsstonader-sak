@@ -82,7 +82,7 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
 
         val andeler = finnAndelTilkjentYtelse(beregningsgrunnlagApril, beregningsgrunnlagMai)
 
-        assertThat { andeler.size == 2 }
+        assertThat(andeler).hasSize(2)
 
         with(andeler.first()) {
             assertThat(fom).isEqualTo(tirsdag1April)
@@ -113,16 +113,16 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
 
         val andel = finnAndelTilkjentYtelse(aap, overgangsstønad)
 
-        assertThat { andel.size == 2 }
+        assertThat(andel).hasSize(2)
 
         with(andel.first()) {
-            assertThat { type == TypeAndel.BOUTGIFTER_AAP }
-            assertThat { beløp == 1000 }
+            assertThat(type).isEqualTo(TypeAndel.BOUTGIFTER_AAP)
+            assertThat(beløp).isEqualTo(1000)
         }
 
         with(andel.last()) {
-            assertThat { type == TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER }
-            assertThat { beløp == 1000 }
+            assertThat(type).isEqualTo(TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER)
+            assertThat(beløp).isEqualTo(1000)
         }
     }
 
