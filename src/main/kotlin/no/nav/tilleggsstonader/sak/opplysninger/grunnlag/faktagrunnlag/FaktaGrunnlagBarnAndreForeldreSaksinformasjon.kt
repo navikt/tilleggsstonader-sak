@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GeneriskFaktaGrunnlag
@@ -43,12 +44,12 @@ data class BehandlingsinformasjonAnnenForelder(
     val iverksattBehandling: IverksattBehandlingForelder?,
 ) {
     class IverksattBehandlingForelder(
-        private val barn: Map<BarnId, IdentBarn>,
-        private val vedtak: InnvilgelseEllerOpphørTilsynBarn,
+        private val barnFraTidligereVedtak: Map<BarnId, IdentBarn>,
+        private val tidligereVedtak: InnvilgelseEllerOpphørTilsynBarn,
     ) {
         val perioderPerBarnIdent: Map<IdentBarn, List<Datoperiode>> by lazy {
             val perioderForBarn: MutableMap<BarnId, MutableList<Datoperiode>> = mutableMapOf()
-            vedtak.beregningsresultat.perioder
+            tidligereVedtak.beregningsresultat.perioder
                 .forEach { perioder ->
 
                     perioder.grunnlag.vedtaksperiodeGrunnlag.forEach { vedtaksperiode ->
@@ -61,8 +62,12 @@ data class BehandlingsinformasjonAnnenForelder(
                         }
                     }
                 }
+            secureLogger.info("Barn fra tidligere vedtak: {}", barnFraTidligereVedtak)
+            secureLogger.info("perioderForBarn: {}", perioderForBarn)
+            secureLogger.info("tidligereVedtak: {}", tidligereVedtak)
+
             perioderForBarn
-                .mapKeys { barn[it.key]!! }
+                .mapKeys { barnFraTidligereVedtak[it.key]!! }
                 .mapValues { it.value.sorted().mergeSammenhengende { d1, d2 -> d1.overlapperEllerPåfølgesAv(d2) } }
         }
     }

@@ -196,8 +196,8 @@ class FaktaGrunnlagService(
                 .findByIdOrThrow(this.id)
                 .withTypeOrThrow<InnvilgelseEllerOpphørTilsynBarn>()
         return BehandlingsinformasjonAnnenForelder.IverksattBehandlingForelder(
-            barn = barnService.finnBarnPåBehandling(id).associate { it.id to it.ident },
-            vedtak = vedtak.data,
+            barnFraTidligereVedtak = barnService.finnBarnPåBehandling(id).associate { it.id to it.ident },
+            tidligereVedtak = vedtak.data,
         )
     }
 
@@ -207,7 +207,7 @@ class FaktaGrunnlagService(
     ): Map<String, List<String>> =
         personService
             .hentBarn(barnIdenter.toList())
-            .map { (ident, barn) -> ident to identerAndreForeldre(barn, behandling) }
+            .map { (barnIdent, barn) -> barnIdent to identerAndreForeldre(barn, behandling) }
             .toMap()
 
     private fun identerAndreForeldre(

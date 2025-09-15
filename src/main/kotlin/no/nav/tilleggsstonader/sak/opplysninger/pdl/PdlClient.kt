@@ -47,11 +47,11 @@ class PdlClient(
         return feilsjekkOgReturnerData(personIdent, pdlResponse) { it.person }
     }
 
-    fun hentBarn(personIdenter: List<String>): Map<String, PdlBarn> {
-        if (personIdenter.isEmpty()) return emptyMap()
+    fun hentBarn(barnIdenter: List<String>): Map<String, PdlBarn> {
+        if (barnIdenter.isEmpty()) return emptyMap()
         val request =
             PdlPersonBolkRequest(
-                variables = PdlPersonBolkRequestVariables(personIdenter),
+                variables = PdlPersonBolkRequestVariables(barnIdenter),
                 query = PdlConfig.forelderBarnQuery,
             )
 

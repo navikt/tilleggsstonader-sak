@@ -38,8 +38,8 @@ class FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapperTest {
                 finnesIkkeFerdigstiltBehandling = true,
                 iverksattBehandling =
                     BehandlingsinformasjonAnnenForelder.IverksattBehandlingForelder(
-                        barn = mapBarnIdTilIdent,
-                        vedtak = vedtak,
+                        barnFraTidligereVedtak = mapBarnIdTilIdent,
+                        tidligereVedtak = vedtak,
                     ),
             )
         val resultat =
@@ -77,8 +77,8 @@ class FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapperTest {
                 finnesIkkeFerdigstiltBehandling = true,
                 iverksattBehandling =
                     BehandlingsinformasjonAnnenForelder.IverksattBehandlingForelder(
-                        barn = mapBarnIdTilIdent,
-                        vedtak = vedtak,
+                        barnFraTidligereVedtak = mapBarnIdTilIdent,
+                        tidligereVedtak = vedtak,
                     ),
             )
         val resultat =
@@ -130,8 +130,8 @@ class FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapperTest {
                 finnesIkkeFerdigstiltBehandling = false,
                 iverksattBehandling =
                     BehandlingsinformasjonAnnenForelder.IverksattBehandlingForelder(
-                        barn = mapBarnIdTilIdent,
-                        vedtak = vedtak,
+                        barnFraTidligereVedtak = mapBarnIdTilIdent,
+                        tidligereVedtak = vedtak,
                     ),
             )
         val resultat =
