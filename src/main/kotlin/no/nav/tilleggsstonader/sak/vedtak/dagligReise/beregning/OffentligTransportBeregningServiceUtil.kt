@@ -65,7 +65,6 @@ private fun finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag: 
     val reisekostnader = MutableList(sisteReiseDag + 1) { 0 }
 
     if (grunnlag.prisEnkeltbillett == null && grunnlag.prisSyvdagersbillett == null) return null
-//    if (grunnlag.prisEnkeltbillett == 0 && grunnlag.prisSyvdagersbillett == 0) return null
 
     var reisedagIndeks = 0
     for (gjeldeneDag in 1..sisteReiseDag) {
@@ -123,13 +122,13 @@ private fun finnReisekostnadForNyEnkeltbillett(
     gjeldendeDag: Int,
     reisekostnader: MutableList<Int>,
     grunnlag: Beregningsgrunnlag,
-): Int? = grunnlag.prisEnkeltbillett?.times(2)?.let { reisekostnader[max(0, gjeldendeDag - 1)] + (it) }
+): Int? = grunnlag.prisEnkeltbillett?.let { reisekostnader[max(0, gjeldendeDag - 1)] + (grunnlag.prisEnkeltbillett * 2) }
 
 private fun finnReisekostnadForNySyvdagersbillett(
     gjeldendeDag: Int,
     reisekostnader: MutableList<Int>,
     grunnlag: Beregningsgrunnlag,
-): Int? = grunnlag.prisEnkeltbillett?.let { reisekostnader[max(0, gjeldendeDag - 1)] + (grunnlag.prisEnkeltbillett * 2) }
+): Int? = grunnlag.prisSyvdagersbillett?.let { reisekostnader[max(0, gjeldendeDag - 7)] + grunnlag.prisSyvdagersbillett }
 
 private fun Int.skalIkkeReise(
     reisedagerListe: List<Int>,
