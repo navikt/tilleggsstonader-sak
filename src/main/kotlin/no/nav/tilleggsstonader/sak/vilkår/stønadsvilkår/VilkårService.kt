@@ -296,6 +296,17 @@ class VilkårService(
         vilkårRepository
             .findByBehandlingId(behandlingId)
             .filter { it.resultat == Vilkårsresultat.OPPFYLT }
+            .also { it.kstFeilHvisTypeIkkeGlederForDagligReise() }
+}
+
+private fun List<Vilkår>.kstFeilHvisTypeIkkeGlederForDagligReise() {
+    feilHvis(
+        none {
+            it.type == VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT
+        },
+    ) {
+        "Forventet at vilkåret var av type daglig reise, fikk i stedet ${map { it.type }}"
+    }
 }
 
 private fun List<Vilkår>.kastFeilHvisTypeIkkeGjelderBoutgifter() {
