@@ -225,6 +225,7 @@ data class OffentligTransport(
         require(reisedagerPerUke > 0) {
             "Reisedager per uke må være større enn 0"
         }
+        
         require(prisEnkelbillett != null || prisSyvdagersbillett != null || prisTrettidagersbillett != null) {
             "Minst én billettpris må være satt"
         }
