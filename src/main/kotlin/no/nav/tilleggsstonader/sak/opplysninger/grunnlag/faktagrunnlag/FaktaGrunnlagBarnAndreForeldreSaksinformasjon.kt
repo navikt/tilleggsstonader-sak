@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
-import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GeneriskFaktaGrunnlag
@@ -62,9 +61,6 @@ data class BehandlingsinformasjonAnnenForelder(
                         }
                     }
                 }
-            secureLogger.info("Barn fra tidligere vedtak: {}", barnFraTidligereVedtak)
-            secureLogger.info("perioderForBarn: {}", perioderForBarn)
-            secureLogger.info("tidligereVedtak: {}", tidligereVedtak)
 
             /*
             perioderForBarn inneholder alle perioder for barn som har hatt utgifter i tidligere vedtak.
