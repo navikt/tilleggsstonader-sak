@@ -111,16 +111,6 @@ class TilsynBarnVedtakController(
         return vedtakDtoMapper.toDto(vedtak, saksbehandling.forrigeIverksatteBehandlingId)
     }
 
-    @GetMapping("/fullstendig-oversikt/{behandlingId}")
-    fun hentFullstendigVedtaksoversikt(
-        @PathVariable behandlingId: BehandlingId,
-    ): VedtakResponse? {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
-        return vedtakDtoMapper.toDto(vedtak, behandlingService.hentBehandling(behandlingId).forrigeIverksatteBehandlingId)
-    }
-
     @GetMapping("/oversikt/{fagsakId}")
     fun hentDetaljertVedtaksperioder(
         @PathVariable fagsakId: FagsakId,
