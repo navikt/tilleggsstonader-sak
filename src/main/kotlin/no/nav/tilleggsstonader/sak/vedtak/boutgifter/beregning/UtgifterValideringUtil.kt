@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -22,7 +20,7 @@ object UtgifterValideringUtil {
         vedtakstype: TypeVedtak,
     ) {
         // Tillat opphør av hele saken
-        if(vedtakstype == TypeVedtak.OPPHØR && utgifter.values.flatten().isEmpty()) return
+        if (vedtakstype == TypeVedtak.OPPHØR && utgifter.values.flatten().isEmpty()) return
 
         brukerfeilHvis(utgifter.values.flatten().isEmpty()) {
             "Det er ikke lagt inn noen oppfylte utgiftsperioder"
