@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -123,4 +124,9 @@ class BoutgifterVedtakController(
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return vedtakOversiktService.hentDetaljerteVedtaksperioderForBehandlingBoutgifter(behandlingId)
     }
+
+    @GetMapping("/oversikt/{fagsakId}")
+    fun hentDetaljertVedtaksperioder(
+        @PathVariable fagsakId: FagsakId,
+    ): List<DetaljertVedtaksperiodeBoutgifter> = vedtakOversiktService.oppsummerVedtaksperioderBoutgifter(fagsakId)
 }
