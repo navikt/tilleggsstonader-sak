@@ -41,11 +41,6 @@ class TilbakekrevingAndelerController(
     fun hentEndringIVedtakForTilbakekreving(
         @PathVariable("eksternBehandlingId") eksternBehandlingId: Long,
     ): AndelerUtbetalingDto {
-        val kallendeApplikasjonErTilbakekreving = SikkerhetContext.kallKommerFra(EksternApplikasjon.TILBAKE)
-        feilHvisIkke(kallendeApplikasjonErTilbakekreving) {
-            "Kun kall fra tilbakekreving er tillatt"
-        }
-
         val behandlingId =
             eksternBehandlingIdRepository
                 .findById(eksternBehandlingId)
