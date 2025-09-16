@@ -74,6 +74,7 @@ class BoutgifterBeregningService(
         validerUtgifter(
             utgifter = utgifterPerVilkårtype,
             tillatLøpendeOgMidlertidigUtgiftSammeBehandling = tillatLøpendeOgMidlertidigUtgiftSammeBehandling,
+            vedtakstype = typeVedtak,
         )
 
         validerUtgiftHeleVedtaksperioden(vedtaksperioder, utgifterPerVilkårtype)
