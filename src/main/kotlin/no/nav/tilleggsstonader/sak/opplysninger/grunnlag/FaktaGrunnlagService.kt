@@ -196,7 +196,7 @@ class FaktaGrunnlagService(
                 .findByIdOrThrow(this.id)
                 .withTypeOrThrow<InnvilgelseEllerOpphørTilsynBarn>()
         return BehandlingsinformasjonAnnenForelder.IverksattBehandlingForelder(
-            barnFraTidligereVedtak = barnService.finnBarnPåBehandling(id).associate { it.id to it.ident },
+            barnFraTidligereVedtak = barnService.finnBarnPåFagsak(fagsakId).associate { it.id to it.ident },
             tidligereVedtak = vedtak.data,
         )
     }

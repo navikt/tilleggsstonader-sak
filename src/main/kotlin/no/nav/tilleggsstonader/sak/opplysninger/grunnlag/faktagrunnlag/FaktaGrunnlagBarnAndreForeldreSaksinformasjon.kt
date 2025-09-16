@@ -66,9 +66,20 @@ data class BehandlingsinformasjonAnnenForelder(
             secureLogger.info("perioderForBarn: {}", perioderForBarn)
             secureLogger.info("tidligereVedtak: {}", tidligereVedtak)
 
+            /*
+            perioderForBarn inneholder alle perioder for barn som har hatt utgifter i tidligere vedtak.
+            Hvis forrige vedtak er en revurdering, kan det være at det er flere barnId som peker på samme barnIdent,
+            da man ved en revurdering kopierer fra forrige vedtak.
+             */
             perioderForBarn
-                .mapKeys { barnFraTidligereVedtak[it.key]!! }
-                .mapValues { it.value.sorted().mergeSammenhengende { d1, d2 -> d1.overlapperEllerPåfølgesAv(d2) } }
+                .map { barnFraTidligereVedtak.getValue(it.key) to it.value }
+                .groupBy { it.first }
+                .mapValues { (_, pairs: List<Pair<IdentBarn, MutableList<Datoperiode>>>) ->
+                    pairs
+                        .flatMap { it.second }
+                        .sorted()
+                        .mergeSammenhengende { d1, d2 -> d1.overlapperEllerPåfølgesAv(d2) }
+                }
         }
     }
 }

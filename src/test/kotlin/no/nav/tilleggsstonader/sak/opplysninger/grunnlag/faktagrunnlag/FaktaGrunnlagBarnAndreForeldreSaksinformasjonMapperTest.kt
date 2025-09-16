@@ -21,6 +21,7 @@ class FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapperTest {
     val identAnnenForeldre1 = "forelder"
 
     val barnId1 = BarnId.random()
+    val barnId1FraTidligereVedtak = BarnId.random()
     val barnId2 = BarnId.random()
     val mapBarnIdTilIdent = mapOf(barnId1 to identBarn1, barnId2 to identBarn2)
 
@@ -31,6 +32,47 @@ class FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapperTest {
         val barnAnnenForelder = mapOf(identBarn1 to listOf(identAnnenForeldre1))
 
         val vedtak = lagVedtak()
+
+        val behandlingsinformasjonAnnenForelder =
+            BehandlingsinformasjonAnnenForelder(
+                identForelder = identAnnenForeldre1,
+                finnesIkkeFerdigstiltBehandling = true,
+                iverksattBehandling =
+                    BehandlingsinformasjonAnnenForelder.IverksattBehandlingForelder(
+                        barnFraTidligereVedtak = mapBarnIdTilIdent,
+                        tidligereVedtak = vedtak,
+                    ),
+            )
+        val resultat =
+            mapBarnAndreForeldreSaksinformasjon(
+                behandlingId = behandlingId,
+                barnAnnenForelder = barnAnnenForelder,
+                behandlingsinformasjonAnnenForelder = listOf(behandlingsinformasjonAnnenForelder),
+            )
+        with(resultat.single()) {
+            assertThat(this.type).isEqualTo(TypeFaktaGrunnlag.BARN_ANDRE_FORELDRE_SAKSINFORMASJON)
+            assertThat(this.typeId).isEqualTo(identBarn1)
+            assertThat(this.data.identBarn).isEqualTo(identBarn1)
+            with(this.data.andreForeldre.single()) {
+                assertThat(this.ident).isEqualTo(identAnnenForeldre1)
+                assertThat(this.harBehandlingUnderArbeid).isTrue()
+                assertThat(this.vedtaksperioderBarn)
+                    .containsExactly(Datoperiode(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 4)))
+            }
+        }
+    }
+
+    @Test
+    fun `skal mappe behandlingsinformasjon til FaktaGrunnlag og slå sammen vedtaksperioder når samme barn har to barnId'er`() {
+        val barnAnnenForelder = mapOf(identBarn1 to listOf(identAnnenForeldre1))
+        val mapBarnIdTilIdent =
+            mapOf(
+                barnId1 to identBarn1,
+                barnId1FraTidligereVedtak to identBarn1,
+                barnId2 to identBarn2,
+            )
+
+        val vedtak = lagVedtakMedSammeBarnMedForskjelligeBarnId()
 
         val behandlingsinformasjonAnnenForelder =
             BehandlingsinformasjonAnnenForelder(
@@ -180,6 +222,30 @@ class FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapperTest {
         val beregningsresultat = beregningsresultatForMåned(grunnlag = beregningsgrunnlag)
         return InnvilgelseTilsynBarn(
             beregningsresultat = BeregningsresultatTilsynBarn(listOf(beregningsresultat)),
+            vedtaksperioder = emptyList(),
+        )
+    }
+
+    private fun lagVedtakMedSammeBarnMedForskjelligeBarnId(): InnvilgelseTilsynBarn {
+        val beregningsgrunnlagBarn1 =
+            beregningsgrunnlag(
+                vedtaksperioder = listOf(lagVedtaksperiodeGrunnlag(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 1))),
+                utgifter = listOf(UtgiftBarn(barnId = barnId1, 100)),
+            )
+        val beregningsresultatBarn1 = beregningsresultatForMåned(grunnlag = beregningsgrunnlagBarn1)
+
+        val beregningsgrunnlagBarn1GammelId =
+            beregningsgrunnlag(
+                vedtaksperioder =
+                    listOf(
+                        lagVedtaksperiodeGrunnlag(fom = LocalDate.of(2025, 1, 2), tom = LocalDate.of(2025, 1, 3)),
+                        lagVedtaksperiodeGrunnlag(fom = LocalDate.of(2025, 1, 3), tom = LocalDate.of(2025, 1, 4)),
+                    ),
+                utgifter = listOf(UtgiftBarn(barnId = barnId1FraTidligereVedtak, 100)),
+            )
+        val beregningsresultatBarn1GammelId = beregningsresultatForMåned(grunnlag = beregningsgrunnlagBarn1GammelId)
+        return InnvilgelseTilsynBarn(
+            beregningsresultat = BeregningsresultatTilsynBarn(listOf(beregningsresultatBarn1, beregningsresultatBarn1GammelId)),
             vedtaksperioder = emptyList(),
         )
     }
