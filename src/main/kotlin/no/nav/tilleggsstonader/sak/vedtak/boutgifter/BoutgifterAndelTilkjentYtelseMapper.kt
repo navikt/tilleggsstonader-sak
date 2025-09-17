@@ -25,3 +25,11 @@ fun BeregningsresultatBoutgifter.mapTilAndelTilkjentYtelse(behandlingId: Behandl
                 utbetalingsdato = it.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
             )
         }
+
+fun finnPeriodeFraAndel(
+    beregningsresultat: BeregningsresultatBoutgifter,
+    andelTilkjentYtelse: AndelTilkjentYtelse,
+) = beregningsresultat.perioder
+    .first {
+        it.fom.datoEllerNesteMandagHvisLørdagEllerSøndag() == andelTilkjentYtelse.utbetalingsdato
+    }

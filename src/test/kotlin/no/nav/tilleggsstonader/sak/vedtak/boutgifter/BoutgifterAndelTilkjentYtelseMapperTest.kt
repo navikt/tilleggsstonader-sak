@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -17,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatFo
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.Month.APRIL
@@ -154,6 +157,40 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
 
         val andel = finnAndelTilkjentYtelse(beregningsgrunnlag)
         assertThat(andel.single().statusIverksetting).isEqualTo(StatusIverksetting.VENTER_PÅ_SATS_ENDRING)
+    }
+
+    @Nested
+    inner class FinnPeriodeFraAndel {
+        @Test
+        fun `skal finne riktig periode for andel tilkjent ytelse`() {
+            // lørdag, gjør at utbetalingsdato blir 3. februar (første mandag i måneden)
+            val fom = 1 februar 2025
+
+            val beregningsgrunnlag =
+                listOf(
+                    lagBeregningsgrunnlagMedEnkeltutgift(
+                        fom = fom,
+                        tom = fom.plusDays(30),
+                    ),
+                    lagBeregningsgrunnlagMedEnkeltutgift(
+                        fom = fom.plusDays(31),
+                        tom = fom.plusDays(61),
+                    ),
+                )
+
+            val beregningsresultat =
+                BeregningsresultatBoutgifter(
+                    perioder = beregningsgrunnlag.map { BeregningsresultatForLøpendeMåned(it, it.beregnStønadsbeløp()) },
+                )
+
+            val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(BehandlingId.random())
+
+            andeler.forEachIndexed { index, andel ->
+                val periodeFraAndel = finnPeriodeFraAndel(beregningsresultat, andel)
+                assertThat(periodeFraAndel.fom).isEqualTo(beregningsgrunnlag[index].fom)
+                assertThat(periodeFraAndel.tom).isEqualTo(beregningsgrunnlag[index].tom)
+            }
+        }
     }
 }
 

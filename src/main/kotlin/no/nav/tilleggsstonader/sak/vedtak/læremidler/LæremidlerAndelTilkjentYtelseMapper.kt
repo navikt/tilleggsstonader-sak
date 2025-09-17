@@ -48,3 +48,11 @@ private fun mapTilYtelse(
                 utbetalingsdato = utbetalingsdato,
             )
         }
+
+fun finnPerioderFraAndel(
+    beregningsresultat: BeregningsresultatLæremidler,
+    andelTilkjentYtelse: AndelTilkjentYtelse,
+) = beregningsresultat.perioder
+    .filter {
+        it.grunnlag.utbetalingsdato == andelTilkjentYtelse.utbetalingsdato
+    }
