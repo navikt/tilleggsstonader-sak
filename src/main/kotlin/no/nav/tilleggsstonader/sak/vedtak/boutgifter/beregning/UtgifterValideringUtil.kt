@@ -19,7 +19,7 @@ object UtgifterValideringUtil {
         utgifter: BoutgifterPerUtgiftstype,
         tillatLøpendeOgMidlertidigUtgiftSammeBehandling: Boolean,
         vedtakstype: TypeVedtak,
-        vedtaksperioder: List<Vedtaksperiode>
+        vedtaksperioder: List<Vedtaksperiode>,
     ) {
         // Tillat opphør av hele saken
         if (vedtakstype == TypeVedtak.OPPHØR && utgifter.values.flatten().isEmpty() && vedtaksperioder.isEmpty()) return
