@@ -70,7 +70,7 @@ class TilbakekrevingAndelerController(
                         fom = it.fom,
                         tom = it.tom,
                     ),
-                vedtaksperiode = lagFaktiskPeriode(it, vedtak),
+                vedtaksperiode = if (it.erNullandel()) null else lagFaktiskPeriode(it, vedtak),
                 beløp = it.beløp,
                 typeAndel = it.type,
             )
@@ -105,7 +105,7 @@ data class AndelerUtbetalingDto(
 
 data class AndelUtbetalingMedVedtaksperiodeDto(
     val utbetalingsperiode: PeriodeDto,
-    val vedtaksperiode: PeriodeDto,
+    val vedtaksperiode: PeriodeDto?,
     val beløp: Int,
     val typeAndel: TypeAndel,
 )

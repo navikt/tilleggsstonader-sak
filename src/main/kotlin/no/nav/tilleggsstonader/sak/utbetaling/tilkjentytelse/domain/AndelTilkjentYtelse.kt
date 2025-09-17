@@ -138,6 +138,8 @@ data class AndelTilkjentYtelse(
             feil("Utbetalingen kan ikke krysse et årsskifte, den må da splittes i to")
         }
     }
+
+    fun erNullandel() = beløp == 0 && satstype == Satstype.UGYLDIG && type == TypeAndel.UGYLDIG
 }
 
 data class Iverksetting(
