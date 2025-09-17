@@ -40,4 +40,23 @@ object TilkjentYtelseUtil {
         iverksetting = iverksetting,
         utbetalingsdato = utbetalingsdato,
     )
+
+    fun nullAndel(
+        kildeBehandlingId: BehandlingId = BehandlingId.random(),
+        fom: LocalDate = LocalDate.now(),
+        tom: LocalDate = fom,
+        statusIverksetting: StatusIverksetting = StatusIverksetting.SENDT,
+        iverksetting: Iverksetting? = null,
+        utbetalingsdato: LocalDate = fom,
+    ) = AndelTilkjentYtelse(
+        beløp = 0,
+        fom = fom,
+        tom = tom,
+        satstype = Satstype.UGYLDIG,
+        type = TypeAndel.UGYLDIG,
+        kildeBehandlingId = kildeBehandlingId,
+        statusIverksetting = statusIverksetting,
+        iverksetting = iverksetting,
+        utbetalingsdato = utbetalingsdato,
+    )
 }
