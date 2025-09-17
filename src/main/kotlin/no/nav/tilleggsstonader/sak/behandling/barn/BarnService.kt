@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.barn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.stereotype.Service
@@ -16,6 +17,8 @@ class BarnService(
     fun opprettBarn(barn: List<BehandlingBarn>): List<BehandlingBarn> = barnRepository.insertAll(barn)
 
     fun finnBarnPåBehandling(behandlingId: BehandlingId): List<BehandlingBarn> = barnRepository.findByBehandlingId(behandlingId)
+
+    fun finnBarnPåFagsak(fagsakId: FagsakId): List<BehandlingBarn> = barnRepository.finnAlleBarnPåFagsakId(fagsakId)
 
     fun finnIdenterTilFagsakPersonId(fagsakPersonId: FagsakPersonId) = barnRepository.finnIdenterTilFagsakPersonId(fagsakPersonId)
 

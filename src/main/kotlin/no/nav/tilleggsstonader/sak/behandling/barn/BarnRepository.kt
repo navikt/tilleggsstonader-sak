@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling.barn
 
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
@@ -24,4 +25,12 @@ interface BarnRepository :
     """,
     )
     fun finnIdenterTilFagsakPersonId(fagsakPersonId: FagsakPersonId): Set<String>
+
+    @Query(
+        """
+        select * from behandling_barn 
+        where behandling_id in (select id from behandling where fagsak_id=:fagsakId)
+    """,
+    )
+    fun finnAlleBarnPåFagsakId(fagsakId: FagsakId): List<BehandlingBarn>
 }
