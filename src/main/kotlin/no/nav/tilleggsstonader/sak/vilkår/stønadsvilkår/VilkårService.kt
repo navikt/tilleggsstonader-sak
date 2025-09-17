@@ -296,16 +296,18 @@ class VilkårService(
         vilkårRepository
             .findByBehandlingId(behandlingId)
             .filter { it.resultat == Vilkårsresultat.OPPFYLT }
-            .also { it.kstFeilHvisTypeIkkeGlederForDagligReise() }
+            .also { it.kastFeilHvisTypeIkkeGjelderForDagligReise() }
 }
 
-private fun List<Vilkår>.kstFeilHvisTypeIkkeGlederForDagligReise() {
+private fun List<Vilkår>.kastFeilHvisTypeIkkeGjelderForDagligReise() {
     feilHvis(
         none {
-            it.type == VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT
+            it.type == VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT ||
+                it.type == VilkårType.DAGLIG_REISE_KJØRELISTE ||
+                it.type == VilkårType.DAGLIG_REISE_TAXI
         },
     ) {
-        "Forventet at vilkåret var av type daglig reise, fikk i stedet ${map { it.type }}"
+        "Det må finnes minst ett vilkår av typen Daglig reise. Fant i stedet: ${map { it.type }}"
     }
 }
 
@@ -317,6 +319,6 @@ private fun List<Vilkår>.kastFeilHvisTypeIkkeGjelderBoutgifter() {
                 it.type == VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER
         },
     ) {
-        "Forventet at vilkåret var av type boutgift, fikk i stedet ${map { it.type }}"
+        "Det må finnes minst ett vilkår av typen Daglig reise. Fant i stedet ${map { it.type }}"
     }
 }
