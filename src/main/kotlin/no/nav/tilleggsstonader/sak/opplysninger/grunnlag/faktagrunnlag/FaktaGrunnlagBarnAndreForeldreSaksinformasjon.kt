@@ -9,6 +9,11 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GeneriskFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 
 /**
+ *
+ * For å kunne vilkårsvurdere "Mottar annen foreldre stønad til barnet", viser vi i frontend om andre
+ * foreldre mottar stønad til barnet. Ettersom dette er info saksbehandler bruker til å vilkårsvurdere,
+ * er vi pliktet til å lagre det ned for etterlevelse.
+ *
  * @param andreForeldre gjelder andre foreldre som denne saken ikke gjelder.
  * Dvs hvis denne saken gjelder mor vil annenForelder inneholde FAR
  */
