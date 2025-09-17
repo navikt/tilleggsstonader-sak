@@ -3,8 +3,10 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 
 object UtgifterValideringUtil {
     /**
@@ -16,7 +18,12 @@ object UtgifterValideringUtil {
     fun validerUtgifter(
         utgifter: BoutgifterPerUtgiftstype,
         tillatLøpendeOgMidlertidigUtgiftSammeBehandling: Boolean,
+        vedtakstype: TypeVedtak,
+        vedtaksperioder: List<Vedtaksperiode>,
     ) {
+        // Tillat opphør av hele saken
+        if (vedtakstype == TypeVedtak.OPPHØR && utgifter.values.flatten().isEmpty() && vedtaksperioder.isEmpty()) return
+
         brukerfeilHvis(utgifter.values.flatten().isEmpty()) {
             "Det er ikke lagt inn noen oppfylte utgiftsperioder"
         }
