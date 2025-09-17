@@ -55,7 +55,7 @@ fun finnPeriodeFraAndel(
         throw IllegalStateException("Forventet å finne nøyaktig én periode for andel, fant ${periodeMedBeløpsperiodeTilhørendeAndel.size}")
     }
 
-    return perioderMedBeløpsperiode.single().vedtaksperiodeGrunnlag.vedtaksperiode
+    return periodeMedBeløpsperiodeTilhørendeAndel.single().vedtaksperiodeGrunnlag.vedtaksperiode
 }
 
 private data class VedtaksperiodeGrunnlagMedBeløpsperiode(
