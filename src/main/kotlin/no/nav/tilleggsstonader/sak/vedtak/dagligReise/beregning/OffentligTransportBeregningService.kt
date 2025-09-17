@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
@@ -12,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import org.springframework.stereotype.Service
 
 @Service
@@ -26,6 +28,12 @@ class OffentligTransportBeregningService(
         typeVedtak: TypeVedtak,
     ): Beregningsresultat {
         val oppfylteVilkår = vilkårService.hentOppfylteDagligReiseVilkår(behandlingId)
+
+        val vilkårOffentligTransport = oppfylteVilkår.filter { it.type == VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT }
+
+        brukerfeilHvis(vilkårOffentligTransport.isEmpty()) {
+            "Innvilgelse er ikke et gyldig vedtaksresultat når det ikke er lagt inn perioder med reise"
+        }
 
         vedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,

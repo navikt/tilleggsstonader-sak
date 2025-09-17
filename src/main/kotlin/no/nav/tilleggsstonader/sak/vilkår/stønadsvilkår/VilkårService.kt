@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
@@ -290,35 +289,9 @@ class VilkårService(
     fun hentBoutgiftVilkår(behandlingId: BehandlingId): List<Vilkår> =
         vilkårRepository
             .findByBehandlingId(behandlingId)
-            .also { it.kastFeilHvisTypeIkkeGjelderBoutgifter() }
 
     fun hentOppfylteDagligReiseVilkår(behandlingId: BehandlingId): List<Vilkår> =
         vilkårRepository
             .findByBehandlingId(behandlingId)
             .filter { it.resultat == Vilkårsresultat.OPPFYLT }
-            .also { it.kastFeilHvisTypeIkkeGjelderForDagligReise() }
-}
-
-private fun List<Vilkår>.kastFeilHvisTypeIkkeGjelderForDagligReise() {
-    feilHvis(
-        none {
-            it.type == VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT ||
-                it.type == VilkårType.DAGLIG_REISE_KJØRELISTE ||
-                it.type == VilkårType.DAGLIG_REISE_TAXI
-        },
-    ) {
-        "Det må finnes minst ett vilkår av typen Daglig reise. Fant i stedet: ${map { it.type }}"
-    }
-}
-
-private fun List<Vilkår>.kastFeilHvisTypeIkkeGjelderBoutgifter() {
-    feilHvis(
-        none {
-            it.type == VilkårType.UTGIFTER_OVERNATTING ||
-                it.type == VilkårType.LØPENDE_UTGIFTER_EN_BOLIG ||
-                it.type == VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER
-        },
-    ) {
-        "Det må finnes minst ett vilkår av typen Daglig reise. Fant i stedet ${map { it.type }}"
-    }
 }

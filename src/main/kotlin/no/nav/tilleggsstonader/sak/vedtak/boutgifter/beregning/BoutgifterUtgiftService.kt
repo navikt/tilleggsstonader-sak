@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
@@ -16,11 +17,19 @@ import org.springframework.stereotype.Service
 class BoutgifterUtgiftService(
     private val vilkårService: VilkårService,
 ) {
-    fun hentUtgifterTilBeregning(behandlingId: BehandlingId): BoutgifterPerUtgiftstype =
-        vilkårService
-            .hentOppfylteBoutgiftVilkår(behandlingId)
+    fun hentUtgifterTilBeregning(behandlingId: BehandlingId): BoutgifterPerUtgiftstype {
+        val oppfylteVilkår =
+            vilkårService
+                .hentOppfylteBoutgiftVilkår(behandlingId)
+
+        brukerfeilHvis(oppfylteVilkår.isEmpty()) {
+            "Innvilgelse er ikke et gyldig vedtaksresultat når det ikke er lagt inn noen boligutgifter."
+        }
+
+        return oppfylteVilkår
             .groupBy { TypeBoutgift.fraVilkårType(it.type) }
             .mapValues { (_, values) -> values.map { it.tilUtgiftBeregning() } }
+    }
 
     private fun Vilkår.tilUtgiftBeregning(): UtgiftBeregningBoutgifter {
         feilHvis(fom == null || tom == null || utgift == null) {
