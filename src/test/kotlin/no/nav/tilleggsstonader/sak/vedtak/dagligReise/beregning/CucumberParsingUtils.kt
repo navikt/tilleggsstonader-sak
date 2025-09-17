@@ -16,8 +16,8 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteDelvilkårDagligReiseOffentligTransport
@@ -72,16 +72,16 @@ fun mapTilVilkår(
         utgift = null,
         erFremtidigUtgift = false,
         offentligTransport =
-            OffentligTransport(
+            OffentligTransportDto(
                 reisedagerPerUke =
                     parseInt(
                         DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE,
                         rad,
                     ),
-                prisEnkelbillett = parseInt(DomenenøkkelOffentligtransport.PRIS_ENKELTBILLETT, rad),
+                prisEnkelbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_ENKELTBILLETT, rad),
                 prisSyvdagersbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_SYV_DAGERS_BILLETT, rad),
                 prisTrettidagersbillett =
-                    parseInt(
+                    parseValgfriInt(
                         DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT,
                         rad,
                     ),

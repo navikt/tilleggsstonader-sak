@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårReposit
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
@@ -298,7 +299,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
                     utgift = null,
                     erFremtidigUtgift = false,
                     offentligTransport =
-                        OffentligTransport(
+                        OffentligTransportDto(
                             reisedagerPerUke = 3,
                             prisEnkelbillett = 44,
                             prisSyvdagersbillett = null,

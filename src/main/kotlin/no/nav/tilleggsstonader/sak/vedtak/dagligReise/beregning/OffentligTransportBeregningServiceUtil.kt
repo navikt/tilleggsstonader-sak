@@ -45,13 +45,17 @@ fun finnReisedagerIPeriode(
         .sumOf { it.antallDager }
 
 fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): Int =
-    min(finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag), grunnlag.pris30dagersbillett)
+    listOfNotNull(
+        finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag),
+        grunnlag.pris30dagersbillett,
+    ).min()
 
 /**
  * Minimum Cost For Tickets.
  * Doc: https://docs.vultr.com/problem-set/minimum-cost-for-tickets
  */
-private fun finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag: Beregningsgrunnlag): Int {
+private fun finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag: Beregningsgrunnlag): Int? {
+    if (grunnlag.prisEnkeltbillett == null && grunnlag.prisSyvdagersbillett == null) return null
     val reisedagerPerUke = finnReisedagerPerUke(grunnlag)
     val reisedagerListe = lagReisedagerListe(reisedagerPerUke)
 
@@ -117,7 +121,7 @@ private fun finnReisekostnadForNyEnkeltbillett(
     gjeldendeDag: Int,
     reisekostnader: MutableList<Int>,
     grunnlag: Beregningsgrunnlag,
-): Int = reisekostnader[max(0, gjeldendeDag - 1)] + (grunnlag.prisEnkeltbillett * 2)
+): Int? = grunnlag.prisEnkeltbillett?.let { reisekostnader[max(0, gjeldendeDag - 1)] + (grunnlag.prisEnkeltbillett * 2) }
 
 private fun finnReisekostnadForNySyvdagersbillett(
     gjeldendeDag: Int,
