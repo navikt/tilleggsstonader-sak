@@ -13,14 +13,13 @@ import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
-import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
@@ -58,21 +57,17 @@ class OffentligTransportBeregningStepDefinitions {
         VedtaksperiodeValideringService(vilkårperiodeService = vilkårperiodeServiceMock)
 
     val offentligTransportBeregningService =
-        OffentligTransportBeregningService(
-            vilkårService = vilkårService,
-            vedtaksperiodeValideringService = vedtaksperiodeValideringService,
-        )
+        OffentligTransportBeregningService()
 
     var beregningsResultat: Beregningsresultat? = null
     var forventetBeregningsresultat: Beregningsresultat? = null
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
     var vilkårperioder: List<Vilkårperioder> = emptyList()
+    var vilkår: List<Vilkår> = emptyList()
 
     @Gitt("følgende vedtaksperioder for daglig reise offentlig transport")
     fun `følgende vedtaksperioder`(dataTable: DataTable) {
         vedtaksperioder = mapVedtaksperioder(dataTable)
-        vilkårperiodeRepositoryFake.insertAll(mapAktiviteter(behandlingId, dataTable))
-        vilkårperiodeRepositoryFake.insertAll(mapMålgrupper(behandlingId, dataTable))
     }
 
     @Gitt("følgende beregningsinput for offentlig transport")
@@ -83,20 +78,19 @@ class OffentligTransportBeregningStepDefinitions {
                 steg = StegType.VILKÅR,
             )
 
-        utgiftData.mapRad { rad ->
-            val nyttVilkår = mapTilVilkår(rad, behandlingId)
-            vilkårService.opprettNyttVilkår(opprettVilkårDto = nyttVilkår)
-        }
+        vilkår =
+            utgiftData.mapRad { rad ->
+                val nyttVilkår = mapTilVilkår(rad, behandlingId)
+                vilkårService.opprettNyttVilkår(opprettVilkårDto = nyttVilkår)
+            }
     }
 
     @Når("beregner for daglig reise offentlig transport")
     fun `beregner for daglig reise offentlig transport`() {
         beregningsResultat =
             offentligTransportBeregningService.beregn(
-                behandlingId = behandlingId,
                 vedtaksperioder = vedtaksperioder,
-                behandling = saksbehandling(),
-                typeVedtak = TypeVedtak.INNVILGELSE,
+                oppfylteVilkår = vilkår,
             )
     }
 

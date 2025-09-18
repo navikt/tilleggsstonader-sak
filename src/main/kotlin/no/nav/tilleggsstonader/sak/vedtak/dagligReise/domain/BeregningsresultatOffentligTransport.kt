@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 import java.util.UUID
 
+// TODO: Rename til BeregningsresultatOffentligTransport i egen PR
 data class Beregningsresultat(
     val reiser: List<BeregningsresultatForReise>,
 )

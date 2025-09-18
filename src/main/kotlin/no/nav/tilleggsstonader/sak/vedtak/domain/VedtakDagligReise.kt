@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 
 enum class TypeVedtakDagligReise(
@@ -31,7 +31,7 @@ enum class TypeDagligReise {
                 VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> OFFENTLIG_TRANSPORT
                 VilkårType.DAGLIG_REISE_KJØRELISTE -> KJØRELISTE
                 VilkårType.DAGLIG_REISE_TAXI -> TAXI
-                else -> error("$vilkårType er ikke en gyldig utgiftstype for boutgifter")
+                else -> error("$vilkårType er ikke et gyldig vilkår for daglig reise")
             }
     }
 }
@@ -39,12 +39,12 @@ enum class TypeDagligReise {
 sealed interface VedtakDagligReise : Vedtaksdata
 
 sealed interface InnvilgelseEllerOpphørDagligReise : VedtakDagligReise {
-    val beregningsresultat: Beregningsresultat
+    val beregningsresultat: BeregningsresultatDagligReise
     val vedtaksperioder: List<Vedtaksperiode>
 }
 
 data class InnvilgelseDagligReise(
-    override val beregningsresultat: Beregningsresultat,
+    override val beregningsresultat: BeregningsresultatDagligReise,
     override val vedtaksperioder: List<Vedtaksperiode>,
     val begrunnelse: String? = null,
 ) : InnvilgelseEllerOpphørDagligReise,
@@ -70,7 +70,7 @@ data class AvslagDagligReise(
 
 data class OpphørDagligReise(
     override val vedtaksperioder: List<Vedtaksperiode>,
-    override val beregningsresultat: Beregningsresultat,
+    override val beregningsresultat: BeregningsresultatDagligReise,
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
 ) : InnvilgelseEllerOpphørDagligReise,

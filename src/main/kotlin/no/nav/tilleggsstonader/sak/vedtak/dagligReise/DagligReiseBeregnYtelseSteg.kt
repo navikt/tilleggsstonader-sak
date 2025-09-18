@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -9,8 +10,8 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.OffentligTransportBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
@@ -24,7 +25,7 @@ import java.time.LocalDate
 
 @Service
 class DagligReiseBeregnYtelseSteg(
-    private val beregningService: OffentligTransportBeregningService,
+    private val beregningService: DagligReiseBeregningService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
@@ -79,9 +80,14 @@ class DagligReiseBeregnYtelseSteg(
             begrunnelse = vedtak.begrunnelse,
             tidligsteEndring = tidligsteEndring,
         )
+
+        feilHvis(beregningsresultat.offentligTransport == null) {
+            "Foreløpig støttes kun beregning av offentlig transport."
+        }
+
         tilkjentYtelseService.lagreTilkjentYtelse(
             behandlingId = saksbehandling.id,
-            andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling.id),
+            andeler = beregningsresultat.offentligTransport.mapTilAndelTilkjentYtelse(saksbehandling.id),
         )
     }
 
@@ -106,7 +112,7 @@ class DagligReiseBeregnYtelseSteg(
 
     private fun lagreInnvilgetVedtak(
         behandling: Saksbehandling,
-        beregningsresultat: Beregningsresultat,
+        beregningsresultat: BeregningsresultatDagligReise,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
         tidligsteEndring: LocalDate?,

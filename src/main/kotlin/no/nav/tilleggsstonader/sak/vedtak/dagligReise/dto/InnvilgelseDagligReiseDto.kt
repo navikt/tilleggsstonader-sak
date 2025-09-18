@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto
 
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import java.time.LocalDate
@@ -11,7 +11,7 @@ import java.time.LocalDate
  */
 data class InnvilgelseDagligReiseResponse(
     val vedtaksperioder: List<LagretVedtaksperiodeDto>?,
-    val beregningsresultat: Beregningsresultat,
+    val beregningsresultat: BeregningsresultatDagligReise,
     val gjelderFraOgMed: LocalDate?,
     val gjelderTilOgMed: LocalDate?,
     val begrunnelse: String? = null,

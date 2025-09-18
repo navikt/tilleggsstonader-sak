@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
@@ -84,38 +85,41 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
                     ),
                 ),
             beregningsresultat =
-                Beregningsresultat(
-                    reiser =
-                        listOf(
-                            BeregningsresultatForReise(
-                                perioder =
-                                    listOf(
-                                        BeregningsresultatForPeriode(
-                                            grunnlag =
-                                                Beregningsgrunnlag(
-                                                    fom = dummyFom,
-                                                    tom = dummyTom,
-                                                    prisEnkeltbillett = 44,
-                                                    prisSyvdagersbillett = null,
-                                                    pris30dagersbillett = 750,
-                                                    antallReisedagerPerUke = 4,
-                                                    vedtaksperioder =
-                                                        listOf(
-                                                            VedtaksperiodeGrunnlag(
-                                                                id = vedtaksperiode.id,
-                                                                fom = dummyFom,
-                                                                tom = dummyTom,
-                                                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                                                                aktivitet = AktivitetType.TILTAK,
-                                                                antallReisedagerIVedtaksperioden = 19,
-                                                            ),
+                BeregningsresultatDagligReise(
+                    offentligTransport =
+                        Beregningsresultat(
+                            reiser =
+                                listOf(
+                                    BeregningsresultatForReise(
+                                        perioder =
+                                            listOf(
+                                                BeregningsresultatForPeriode(
+                                                    grunnlag =
+                                                        Beregningsgrunnlag(
+                                                            fom = dummyFom,
+                                                            tom = dummyTom,
+                                                            prisEnkeltbillett = 44,
+                                                            prisSyvdagersbillett = null,
+                                                            pris30dagersbillett = 750,
+                                                            antallReisedagerPerUke = 4,
+                                                            vedtaksperioder =
+                                                                listOf(
+                                                                    VedtaksperiodeGrunnlag(
+                                                                        id = vedtaksperiode.id,
+                                                                        fom = dummyFom,
+                                                                        tom = dummyTom,
+                                                                        målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                                                                        aktivitet = AktivitetType.TILTAK,
+                                                                        antallReisedagerIVedtaksperioden = 19,
+                                                                    ),
+                                                                ),
+                                                            antallReisedager = 19,
                                                         ),
-                                                    antallReisedager = 19,
+                                                    beløp = 750,
                                                 ),
-                                            beløp = 750,
-                                        ),
+                                            ),
                                     ),
-                            ),
+                                ),
                         ),
                 ),
             gjelderFraOgMed = dummyFom,
