@@ -1,9 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
-import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
@@ -11,36 +7,15 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import org.springframework.stereotype.Service
 
 @Service
-class OffentligTransportBeregningService(
-    private val vilkårService: VilkårService,
-    private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
-) {
+class OffentligTransportBeregningService {
     fun beregn(
-        behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
-        behandling: Saksbehandling,
-        typeVedtak: TypeVedtak,
+        oppfylteVilkår: List<Vilkår>,
     ): Beregningsresultat {
-        val oppfylteVilkår = vilkårService.hentOppfylteDagligReiseVilkår(behandlingId)
-
-        val vilkårOffentligTransport = oppfylteVilkår.filter { it.type == VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT }
-
-        brukerfeilHvis(vilkårOffentligTransport.isEmpty()) {
-            "Innvilgelse er ikke et gyldig vedtaksresultat når det ikke er lagt inn perioder med reise"
-        }
-
-        vedtaksperiodeValideringService.validerVedtaksperioder(
-            vedtaksperioder = vedtaksperioder,
-            behandling = behandling,
-            typeVedtak = typeVedtak,
-        )
-
         val utgifter =
             oppfylteVilkår
                 .filter { it.offentligTransport != null }

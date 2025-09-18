@@ -4,34 +4,36 @@
   ],
   "begrunnelse": "En begrunnelse",
   "beregningsresultat": {
-    "reiser": [
-      {
-        "perioder": [
-          {
-            "grunnlag": {
-              "fom": "2025-08-21",
-              "tom": "2025-08-31",
-              "prisEnkeltbillett": 44,
-              "prisSyvdagersbillett": null,
-              "pris30dagersbillett": 750,
-              "antallReisedagerPerUke": 4,
-              "vedtaksperioder": [
-                {
-                  "id": "d4c1944d-3ee5-435e-9618-8ae667b965a7",
-                  "fom": "2025-08-21",
-                  "tom": "2025-08-31",
-                  "målgruppe": "NEDSATT_ARBEIDSEVNE",
-                  "aktivitet": "TILTAK",
-                  "antallReisedagerIVedtaksperioden": 6
-                }
-              ],
-              "antallReisedager": 6
-            },
-            "beløp": 528
-          }
-        ]
-      }
-    ]
+    "offentligTransport": {
+      "reiser": [
+        {
+          "perioder": [
+            {
+              "grunnlag": {
+                "fom": "2025-08-21",
+                "tom": "2025-08-31",
+                "prisEnkeltbillett": 44,
+                "prisSyvdagersbillett": null,
+                "pris30dagersbillett": 750,
+                "antallReisedagerPerUke": 4,
+                "vedtaksperioder": [
+                  {
+                    "id": "d4c1944d-3ee5-435e-9618-8ae667b965a7",
+                    "fom": "2025-08-21",
+                    "tom": "2025-08-31",
+                    "målgruppe": "NEDSATT_ARBEIDSEVNE",
+                    "aktivitet": "TILTAK",
+                    "antallReisedagerIVedtaksperioden": 6
+                  }
+                ],
+                "antallReisedager": 6
+              },
+              "beløp": 528
+            }
+          ]
+        }
+      ]
+    }
   },
   "type": "OPPHØR_DAGLIG_REISE",
   "vedtaksperioder": [
