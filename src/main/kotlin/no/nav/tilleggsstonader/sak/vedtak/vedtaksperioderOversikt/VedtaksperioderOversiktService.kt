@@ -52,7 +52,7 @@ class VedtaksperioderOversiktService(
         return vedtak.data.finnDetaljerteVedtaksperioder()
     }
 
-    private fun oppsummerVedtaksperioderTilsynBarn(fagsakId: FagsakId): List<DetaljertVedtaksperiodeTilsynBarn> {
+    fun oppsummerVedtaksperioderTilsynBarn(fagsakId: FagsakId): List<DetaljertVedtaksperiodeTilsynBarn> {
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørTilsynBarn>(fagsakId)
                 ?: return emptyList()
@@ -60,7 +60,7 @@ class VedtaksperioderOversiktService(
         return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder()
     }
 
-    private fun oppsummerVedtaksperioderLæremidler(fagsakId: FagsakId): List<DetaljertVedtaksperiodeLæremidler> {
+    fun oppsummerVedtaksperioderLæremidler(fagsakId: FagsakId): List<DetaljertVedtaksperiodeLæremidler> {
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørLæremidler>(fagsakId)
                 ?: return emptyList()
@@ -68,7 +68,7 @@ class VedtaksperioderOversiktService(
         return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder()
     }
 
-    private fun oppsummerVedtaksperioderBoutgifter(fagsakId: FagsakId): List<DetaljertVedtaksperiodeBoutgifter> {
+    fun oppsummerVedtaksperioderBoutgifter(fagsakId: FagsakId): List<DetaljertVedtaksperiodeBoutgifter> {
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørBoutgifter>(fagsakId)
                 ?: return emptyList()
