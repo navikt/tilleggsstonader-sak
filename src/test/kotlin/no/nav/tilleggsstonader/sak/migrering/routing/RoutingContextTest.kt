@@ -37,7 +37,7 @@ class RoutingContextTest {
     @Disabled
     @Test
     fun `skal route daglig reise til arena hvis man ikke har aktivt vedtak`() {
-        val routingContext = Stønadstype.BARNETILSYN.tilRoutingContext()
+        val routingContext = Stønadstype.DAGLIG_REISE_TSO.tilRoutingContext()
 
         assertThat(routingContext).isInstanceOf(SkalRouteEnkelteSøkereTilNyLøsning::class.java)
 
@@ -53,6 +53,8 @@ class RoutingContextTest {
             Stønadstype.BARNETILSYN to SkalRouteAlleSøkereTilNyLøsning::class,
             Stønadstype.LÆREMIDLER to SkalRouteAlleSøkereTilNyLøsning::class,
             Stønadstype.BOUTGIFTER to SkalRouteAlleSøkereTilNyLøsning::class,
+            Stønadstype.DAGLIG_REISE_TSO to SkalRouteEnkelteSøkereTilNyLøsning::class,
+            Stønadstype.DAGLIG_REISE_TSR to SkalRouteEnkelteSøkereTilNyLøsning::class,
         )
 
     private fun Stønadstype.tilRoutingContext() = IdentStønadstype(ident = ident, stønadstype = this).tilRoutingContext()

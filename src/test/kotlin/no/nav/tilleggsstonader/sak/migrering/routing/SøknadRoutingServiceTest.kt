@@ -63,6 +63,9 @@ class SøknadRoutingServiceTest {
     private val søknadRouting = SøknadRouting(ident = ident, type = stønadstype, detaljer = JsonWrapper(""))
 
     private val skalRouteAlleSøkereTilNyLøsning = SkalRouteAlleSøkereTilNyLøsning(ident, stønadstype)
+    private val skalRouteEnkelteSøkereTilNyLøsning =
+        SkalRouteEnkelteSøkereTilNyLøsning(ident, stønadstype, SØKNAD_ROUTING_BOUTGIFTER, { false })
+
     private val featureToggletHarGyldigStateIArena =
         SkalRouteEnkelteSøkereTilNyLøsning(
             ident = ident,
@@ -236,6 +239,30 @@ class SøknadRoutingServiceTest {
             verify {
                 søknadRoutingRepository.findByIdentAndType(ident, stønadstype)
 
+                fagsakService wasNot called
+                behandlingService wasNot called
+                arenaService wasNot called
+            }
+            verify(exactly = 1) {
+                søknadRoutingRepository.insert(any())
+            }
+        }
+    }
+
+    @Nested
+    inner class SkalRuteDagligReiseTsoTilGammelSøknad {
+        @Test
+        fun `skal alltid rute DAGLIG_REISE_TSO til gammel søknadsløype`() {
+            val ident = "12345678910"
+            val stønadstype = Stønadstype.DAGLIG_REISE_TSO
+            val request = IdentStønadstype(ident, stønadstype)
+
+            val resultat = service.sjekkRoutingForPerson(request.tilRoutingContext())
+
+            assertThat(resultat.skalBehandlesINyLøsning).isFalse()
+
+            verify {
+                søknadRoutingRepository.findByIdentAndType(ident, stønadstype)
                 fagsakService wasNot called
                 behandlingService wasNot called
                 arenaService wasNot called

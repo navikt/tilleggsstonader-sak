@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.migrering.routing
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
@@ -9,7 +8,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 @Repository
 interface SøknadRoutingRepository :
@@ -17,10 +16,10 @@ interface SøknadRoutingRepository :
     InsertUpdateRepository<SøknadRouting> {
     fun findByIdentAndType(
         ident: String,
-        type: Stønadstype,
+        type: SøknadsType,
     ): SøknadRouting?
 
-    fun countByType(type: Stønadstype): Int
+    fun countByType(type: SøknadsType): Int
 }
 
 @Table("soknad_routing")
@@ -28,7 +27,7 @@ data class SøknadRouting(
     @Id
     val id: UUID = UUID.randomUUID(),
     val ident: String,
-    val type: Stønadstype,
+    val type: SøknadsType,
     val detaljer: JsonWrapper,
     val opprettetTid: LocalDateTime = SporbarUtils.now(),
 )

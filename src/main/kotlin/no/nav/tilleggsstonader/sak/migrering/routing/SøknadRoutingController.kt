@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.migrering.routing
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -20,7 +19,7 @@ class SøknadRoutingController(
     @PostMapping()
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun sjekkRoutingForPerson(
-        @RequestBody request: IdentStønadstype,
+        @RequestBody request: RoutingContext,
     ): SøknadRoutingResponse {
         feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.SOKNAD_API), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
