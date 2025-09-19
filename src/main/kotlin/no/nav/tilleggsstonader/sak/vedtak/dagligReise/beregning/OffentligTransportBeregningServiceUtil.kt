@@ -134,14 +134,6 @@ private fun Int.skalIkkeReise(
     reisedagIndeks: Int,
 ): Boolean = this < reisedagerListe[reisedagIndeks]
 
-private fun antallHverdagerIPeriodeInklusiv(
-    fom: LocalDate,
-    tom: LocalDate,
-): Int =
-    generateSequence(fom) { it.plusDays(1) }
-        .takeWhile { !it.isAfter(tom) }
-        .count { it.dayOfWeek.value in 1..5 }
-
 private fun finnAntallDagerISnittetMellomUkeOgVedtaksperioder(
     uke: Datoperiode,
     vedtaksperioder: List<VedtaksperiodeGrunnlag>,
