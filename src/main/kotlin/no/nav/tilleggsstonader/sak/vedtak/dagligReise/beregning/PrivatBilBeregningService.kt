@@ -25,6 +25,7 @@ data class DummyReiseMedBil(
 // Ta hensyn til vedtaksperioder
 // Ta det i bruk
 // Skrive tester - dukker nok opp flere caser som ikke fungerer om man gjør det
+// Tilpasse slik at beregningen kan brukes basert på kjørelister
 
 class PrivateBilBeregningService {
     fun beregn(reiser: List<DummyReiseMedBil>): BeregningsresultatPrivatBil =
