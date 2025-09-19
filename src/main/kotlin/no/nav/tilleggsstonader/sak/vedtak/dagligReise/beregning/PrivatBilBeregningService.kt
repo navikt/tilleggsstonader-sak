@@ -27,7 +27,7 @@ data class DummyReiseMedBil(
 // Skrive tester - dukker nok opp flere caser som ikke fungerer om man gjør det
 // Tilpasse slik at beregningen kan brukes basert på kjørelister
 
-class PrivateBilBeregningService {
+class PrivatBilBeregningService {
     fun beregn(reiser: List<DummyReiseMedBil>): BeregningsresultatPrivatBil =
         BeregningsresultatPrivatBil(
             reiser = reiser.map { beregnForReise(it) },
