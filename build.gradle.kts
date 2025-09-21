@@ -9,7 +9,7 @@ val tilleggsstønaderKontrakterVersion = "2025.09.12-08.29.0d631c2cbe22"
 val avroVersion = "1.12.0"
 val confluentVersion = "8.0.0"
 val joarkHendelseVersion = "1.1.6"
-val tokenSupportVersion = "5.0.36"
+val tokenSupportVersion = "5.0.37"
 val wiremockVersion = "3.13.1"
 val mockkVersion = "1.14.5"
 val testcontainerVersion = "1.21.3"
@@ -30,11 +30,11 @@ plugins {
     id("com.github.ben-manes.versions") version "0.52.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
-    id("org.springframework.boot") version "3.5.5"
+    id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.2.20"
 
-    id("org.cyclonedx.bom") version "2.3.1"
+    id("org.cyclonedx.bom") version "2.4.0"
 }
 
 repositories {
@@ -119,8 +119,8 @@ dependencies {
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 
     // Transitiv avhengighet fra mock-oauth2-server -> bcpix. Disse under er definert som dynamisk versjon, noe bygget vårt ikke vil ha noe av
-    testImplementation("org.bouncycastle:bcutil-jdk18on:1.81")
-    testImplementation("org.bouncycastle:bcprov-jdk18on:1.81")
+    testImplementation("org.bouncycastle:bcutil-jdk18on:1.82")
+    testImplementation("org.bouncycastle:bcprov-jdk18on:1.82")
 }
 
 kotlin {
