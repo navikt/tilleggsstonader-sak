@@ -27,6 +27,7 @@ import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.support.Acknowledgment
 import java.time.Instant
 import java.util.UUID
+import kotlin.random.Random
 
 class TilbakekrevingKafkaListenerTest {
     val behandlingService = mockk<BehandlingService>()
@@ -68,7 +69,7 @@ class TilbakekrevingKafkaListenerTest {
 
         val payload =
             TilbakekrevingFagsysteminfoBehov(
-                eksternFagsakId = UUID.randomUUID().toString(),
+                eksternFagsakId = Random.nextLong(10, 10000).toString(),
                 kravgrunnlagReferanse = eksternBehandlingId.toString(),
                 hendelseOpprettet = Instant.now(),
                 versjon = 1,
@@ -99,7 +100,7 @@ class TilbakekrevingKafkaListenerTest {
 
         val payload =
             TilbakekrevingFagsysteminfoBehov(
-                eksternFagsakId = UUID.randomUUID().toString(),
+                eksternFagsakId = Random.nextLong(10, 10000).toString(),
                 kravgrunnlagReferanse = eksternBehandlingId.toString(),
                 hendelseOpprettet = Instant.now(),
                 versjon = 1,
