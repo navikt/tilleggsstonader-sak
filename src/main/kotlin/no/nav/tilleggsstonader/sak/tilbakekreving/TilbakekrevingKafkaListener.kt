@@ -106,10 +106,14 @@ class TilbakekrevingKafkaListener(
         when (saksbehandling.årsak) {
             BehandlingÅrsak.KLAGE -> TilbakekrevingRevurderingÅrsak.KLAGE
             BehandlingÅrsak.NYE_OPPLYSNINGER -> TilbakekrevingRevurderingÅrsak.NYE_OPPLYSNINGER
-            BehandlingÅrsak.KORRIGERING_UTEN_BREV -> TilbakekrevingRevurderingÅrsak.KORRIGERING
-            BehandlingÅrsak.MANUELT_OPPRETTET -> TilbakekrevingRevurderingÅrsak.KORRIGERING
-            BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV -> TilbakekrevingRevurderingÅrsak.KORRIGERING
-            BehandlingÅrsak.SØKNAD, BehandlingÅrsak.PAPIRSØKNAD, BehandlingÅrsak.SATSENDRING -> TilbakekrevingRevurderingÅrsak.UKJENT
+            BehandlingÅrsak.KORRIGERING_UTEN_BREV,
+            BehandlingÅrsak.MANUELT_OPPRETTET,
+            BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
+            -> TilbakekrevingRevurderingÅrsak.KORRIGERING
+            BehandlingÅrsak.SØKNAD,
+            BehandlingÅrsak.PAPIRSØKNAD,
+            BehandlingÅrsak.SATSENDRING,
+            -> TilbakekrevingRevurderingÅrsak.UKJENT
         }
 
     private fun mapUtvidedePerioder(behandlingId: BehandlingId): List<UtvidetPeriode> =
