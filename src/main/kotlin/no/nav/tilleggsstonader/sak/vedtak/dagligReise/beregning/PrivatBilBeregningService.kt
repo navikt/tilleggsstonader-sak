@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
 
 data class DummyReiseMedBil(
@@ -60,7 +61,7 @@ class PrivatBilBeregningService {
     private fun beregnStønadsbeløp(
         grunnlagForReise: BeregningsgrunnlagForReiseMedPrivatBil,
         grunnlagForUke: BeregningsgrunnlagForUke,
-    ): BigDecimal {
+    ): Int {
         val kostnadKjøring =
             grunnlagForReise.reiseavstandEnVei
                 .toBigDecimal()
@@ -75,7 +76,9 @@ class PrivatBilBeregningService {
 
         val sumEkstrakostnader = grunnlagForReise.ekstrakostnader.beregnTotalEkstrakostnadForEnDag().toBigDecimal()
 
-        return listOfNotNull(kostnadKjøring, parkeringskostnad, sumEkstrakostnader).sumOf { it }
+        val totaltBeløp = listOfNotNull(kostnadKjøring, parkeringskostnad, sumEkstrakostnader).sumOf { it }
+
+        return totaltBeløp.setScale(0, RoundingMode.HALF_UP).toInt()
     }
 
     private fun lagBeregningsgrunnlagForReise(reise: DummyReiseMedBil): BeregningsgrunnlagForReiseMedPrivatBil =

@@ -20,7 +20,7 @@ data class BeregningsresultatForReiseMedPrivatBil(
 // Vedtaksperiode inn her?
 data class BeregningsresultatForUke(
     val grunnlag: BeregningsgrunnlagForUke,
-    val stønadsbeløp: BigDecimal, // TODO: Vurder navn - Gir dette navnet mening når det er etterbetaling?
+    val stønadsbeløp: Int, // TODO: Vurder navn - Gir dette navnet mening når det er etterbetaling?
 )
 
 // TODO: Finn ut om tall generelt skal være heltall eller desimaltall
