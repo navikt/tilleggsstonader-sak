@@ -2,15 +2,18 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.HåndterSøknadRequest
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
@@ -35,6 +38,7 @@ class HåndterSøknadService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
     private val søknadService: SøknadService,
+    private val unleashService: UnleashService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -50,19 +54,40 @@ class HåndterSøknadService(
     @Transactional
     fun håndterSøknad(journalpost: Journalpost) {
         val personIdent = journalpostService.hentIdentFraJournalpost(journalpost)
-        val stønadstype = finnStønadstype(journalpost)
+        val stønadstype =
+            finnStønadstyperSomKanOpprettesFraJournalpost(journalpost).defaultStønadstype
+                ?: error("Fant ikke dokument brevkode for journalpost")
         håndterSøknad(personIdent = personIdent, stønadstype = stønadstype, journalpost = journalpost)
     }
 
-    private fun finnStønadstype(journalpost: Journalpost): Stønadstype =
-        journalpost.dokumentBrevkode()?.let {
-            when (it) {
-                DokumentBrevkode.BARNETILSYN -> Stønadstype.BARNETILSYN
-                DokumentBrevkode.LÆREMIDLER -> Stønadstype.LÆREMIDLER
-                DokumentBrevkode.BOUTGIFTER -> Stønadstype.BOUTGIFTER
-                DokumentBrevkode.DAGLIG_REISE -> finnStønadstypeForDagligReise(journalpost)
-            }
-        } ?: error("Fant ikke dokument brevkode for journalpost")
+    fun finnStønadstyperSomKanOpprettesFraJournalpost(journalpost: Journalpost): ValgbareStønadstyperForJournalpost {
+        val dokumentbrevkode = journalpost.dokumentBrevkode()
+        if (dokumentbrevkode == null) {
+            val valgbareStønadstyper =
+                if (unleashService.isEnabled(Toggle.KAN_SAKSBEHANDLE_DAGLIG_REISE_TSO) &&
+                    unleashService.isEnabled(Toggle.KAN_SAKSBEHANDLE_DAGLIG_REISE_TSR)
+                ) {
+                    Stønadstype.entries
+                } else {
+                    Stønadstype.entries.filterNot { it.gjelderDagligReise() }
+                }
+            return ValgbareStønadstyperForJournalpost(
+                defaultStønadstype = null,
+                valgbareStønadstyper = valgbareStønadstyper,
+            )
+        }
+
+        return when (dokumentbrevkode) {
+            DokumentBrevkode.BARNETILSYN -> ValgbareStønadstyperForJournalpost(Stønadstype.BARNETILSYN)
+            DokumentBrevkode.LÆREMIDLER -> ValgbareStønadstyperForJournalpost(Stønadstype.LÆREMIDLER)
+            DokumentBrevkode.BOUTGIFTER -> ValgbareStønadstyperForJournalpost(Stønadstype.BOUTGIFTER)
+            DokumentBrevkode.DAGLIG_REISE ->
+                ValgbareStønadstyperForJournalpost(
+                    finnStønadstypeForDagligReise(journalpost),
+                    Stønadstype.entries.filter { it.gjelderDagligReise() },
+                )
+        }
+    }
 
     private fun finnStønadstypeForDagligReise(journalpost: Journalpost): Stønadstype {
         // Alle daglig reise støknader legges på TSO fra fyll ut send inn
@@ -157,4 +182,14 @@ class HåndterSøknadService(
         val dokumentTittel = journalpost.dokumenter!!.firstOrNull { it.brevkode != null }?.tittel ?: ""
         return "Må behandles i ny løsning - $dokumentTittel"
     }
+}
+
+data class ValgbareStønadstyperForJournalpost(
+    val defaultStønadstype: Stønadstype?,
+    val valgbareStønadstyper: List<Stønadstype>,
+) {
+    constructor(stønadstype: Stønadstype) : this(
+        defaultStønadstype = stønadstype,
+        valgbareStønadstyper = listOf(stønadstype),
+    )
 }
