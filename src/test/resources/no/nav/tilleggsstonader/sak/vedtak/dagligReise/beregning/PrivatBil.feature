@@ -49,3 +49,25 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Beløp | Inkluderer helg |
       | 1       | 01.05.2025 | 04.05.2025 | 4                       | 430   | Ja              |
       | 1       | 05.05.2025 | 11.05.2025 | 5                       | 538   | Nei             |
+
+  Scenario: skal legge til ekstrakostnader i tillegg til kjøring
+    Gitt følgende dummyperioder for daglig reise privat bil
+      | Fom        | Tom        | Antall reisedager per uke | Reiseavstand | Parkering | Bompenger | Piggdekkavgift | Fergekostnad |
+      | 06.01.2025 | 12.01.2025 | 5                         | 10           | 50        | 100       | 100            | 100          |
+
+    Når beregner for daglig reise privat bil
+
+    Så forventer vi følgende beregningsrsultat for daglig reise privatBil
+      | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Beløp | Inkluderer helg |
+      | 1       | 06.01.2025 | 12.01.2025 | 5                       | 1038  | Nei             |
+
+  Scenario: skal ikke få høyere sum dersom ekstrakostnader er 0
+    Gitt følgende dummyperioder for daglig reise privat bil
+      | Fom        | Tom        | Antall reisedager per uke | Reiseavstand | Parkering | Bompenger | Piggdekkavgift | Fergekostnad |
+      | 06.01.2025 | 12.01.2025 | 5                         | 10           | 0         | 0         | 0              | 0            |
+
+    Når beregner for daglig reise privat bil
+
+    Så forventer vi følgende beregningsrsultat for daglig reise privatBil
+      | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Beløp | Inkluderer helg |
+      | 1       | 06.01.2025 | 12.01.2025 | 5                       | 288   | Nei             |
