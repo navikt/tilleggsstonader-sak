@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
@@ -36,8 +37,8 @@ data class AndelTilkjentYtelse(
     val id: UUID = UUID.randomUUID(),
     @Column("belop")
     val beløp: Int,
-    val fom: LocalDate,
-    val tom: LocalDate,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
     val satstype: Satstype,
     val type: TypeAndel,
     val kildeBehandlingId: BehandlingId,
@@ -49,7 +50,7 @@ data class AndelTilkjentYtelse(
     @LastModifiedDate
     val endretTid: LocalDateTime = SporbarUtils.now(),
     val utbetalingsdato: LocalDate,
-) {
+) : Periode<LocalDate> {
     init {
         feilHvis(YearMonth.from(fom) != YearMonth.from(tom)) {
             "Forventer at fom($fom) og tom($tom) er i den samme måneden"
