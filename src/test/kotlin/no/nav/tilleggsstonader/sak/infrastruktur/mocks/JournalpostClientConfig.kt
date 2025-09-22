@@ -33,15 +33,14 @@ class JournalpostClientConfig {
     @Bean
     @Primary
     fun journalpostClient(): JournalpostClient {
-        val journalpostClient = mockk<JournalpostClient>()
-
-        resetMock(journalpostClient)
-
-        return journalpostClient
+        resetMock(journalpostClientMock)
+        return journalpostClientMock
     }
 
     companion object {
         const val JOURNALPOST_ID_MED_FEIL = "journalpostIdMedFeil"
+
+        private val journalpostClientMock = mockk<JournalpostClient>()
 
         private val dummyPdf =
             this::class.java.classLoader
@@ -115,13 +114,38 @@ class JournalpostClientConfig {
                     ),
             )
 
+        val journalposter = mutableMapOf<Long, Journalpost>()
+
+        fun resetJournalposter() {
+            journalposter.clear()
+            journalposter[journalpost.journalpostId.toLong()] = journalpost
+        }
+
+        // Journalpost må ha dokumentinfo med variant ORIGINAL
+        fun leggTilJournalpostMedSøknadIMock(
+            journalpost: Journalpost,
+            originaldokument: ByteArray,
+        ) {
+            journalposter[journalpost.journalpostId.toLong()] = journalpost
+            val dokumentInfoIdMedOriginalVariant =
+                journalpost.dokumenter
+                    ?.first { dokumentInfo ->
+                        dokumentInfo.dokumentvarianter?.any { it.variantformat == Dokumentvariantformat.ORIGINAL } == true
+                    }?.dokumentInfoId ?: error("Journalpost mangler dokument med variant ORIGINAL")
+
+            every {
+                journalpostClientMock.hentDokument(
+                    journalpost.journalpostId,
+                    dokumentInfoIdMedOriginalVariant,
+                    Dokumentvariantformat.ORIGINAL,
+                )
+            } returns
+                originaldokument
+        }
+
         fun resetMock(journalpostClient: JournalpostClient) {
             clearMocks(journalpostClient)
-
-            val journalposter: MutableMap<Long, Journalpost> =
-                listOf(journalpost)
-                    .associateBy { it.journalpostId.toLong() }
-                    .toMutableMap()
+            resetJournalposter()
 
             every { journalpostClient.hentJournalpost(any()) } answers {
                 val journalpostId = firstArg<String>()
@@ -134,7 +158,7 @@ class JournalpostClientConfig {
                     any(),
                 )
             } returns ArkiverDokumentResponse(journalpostId = "journalpostId", ferdigstilt = true)
-            every { journalpostClient.hentDokument(any(), any(), any()) } returns dummyPdf
+            every { journalpostClient.hentDokument(any(), any(), eq(Dokumentvariantformat.ARKIV)) } returns dummyPdf
             every { journalpostClient.oppdaterJournalpost(any(), any(), any()) } answers {
                 val journalpostId = secondArg<String>()
                 OppdaterJournalpostResponse(journalpostId)

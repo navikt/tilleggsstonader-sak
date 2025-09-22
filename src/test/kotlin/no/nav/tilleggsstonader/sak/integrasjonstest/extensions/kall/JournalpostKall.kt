@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
+import no.nav.tilleggsstonader.sak.journalføring.dto.JournalpostResponse
 import org.springframework.test.web.reactive.server.expectBody
 
 fun IntegrationTest.fullførJournalpost(
@@ -18,3 +19,15 @@ fun IntegrationTest.fullførJournalpost(
     .expectBody<String>()
     .returnResult()
     .responseBody!!
+
+fun IntegrationTest.hentJournalpost(journalpostId: String) =
+    webTestClient
+        .get()
+        .uri("/api/journalpost/$journalpostId")
+        .medOnBehalfOfToken()
+        .exchange()
+        .expectStatus()
+        .isOk
+        .expectBody<JournalpostResponse>()
+        .returnResult()
+        .responseBody!!
