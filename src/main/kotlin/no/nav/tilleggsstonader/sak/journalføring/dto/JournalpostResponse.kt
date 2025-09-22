@@ -8,5 +8,6 @@ data class JournalpostResponse(
     val personIdent: String,
     val navn: String,
     val harStrukturertSøknad: Boolean,
+    val defaultStønadstype: Stønadstype?,
     val valgbareStønadstyper: List<Stønadstype>,
 )

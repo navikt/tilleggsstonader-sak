@@ -43,12 +43,14 @@ class JournalpostController(
     ): JournalpostResponse {
         val (journalpost, personIdent) = journalpostService.finnJournalpostOgPersonIdent(journalpostId)
         tilgangService.validerTilgangTilPerson(personIdent, AuditLoggerEvent.ACCESS)
+        val valgbareStønadstyperForJournalpost = håndterSøknadService.finnStønadstyperSomKanOpprettesFraJournalpost(journalpost)
         return JournalpostResponse(
             journalpost = journalpost,
             personIdent = personIdent,
             navn = journalpostService.hentBrukersNavn(journalpost, personIdent),
             harStrukturertSøknad = journalpost.harStrukturertSøknad(),
-            valgbareStønadstyper = håndterSøknadService.finnStønadstyperSomKanOpprettesFraJournalpost(journalpost).valgbareStønadstyper,
+            defaultStønadstype = valgbareStønadstyperForJournalpost.defaultStønadstype,
+            valgbareStønadstyper = valgbareStønadstyperForJournalpost.valgbareStønadstyper,
         )
     }
 

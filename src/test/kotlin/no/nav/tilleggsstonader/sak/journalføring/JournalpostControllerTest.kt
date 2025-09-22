@@ -169,6 +169,8 @@ class JournalpostControllerTest : IntegrationTest() {
 
             val journalpostResponse = hentJournalpost(journalpost.journalpostId)
 
+            assertThat(journalpostResponse.defaultStønadstype).isEqualTo(Stønadstype.DAGLIG_REISE_TSO)
+
             assertThat(journalpostResponse.valgbareStønadstyper).containsExactlyInAnyOrder(
                 Stønadstype.DAGLIG_REISE_TSO,
                 Stønadstype.DAGLIG_REISE_TSR,
