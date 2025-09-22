@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Profile
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.ContainerProperties
-import org.springframework.kafka.support.serializer.JsonDeserializer
 import org.springframework.kafka.transaction.KafkaTransactionManager
 import java.time.Duration
 
@@ -32,7 +31,7 @@ class TilbakekrevingKravgrunnlagOppslagListenerContainerFactoryConfig {
                 this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
                 this[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = false
                 this[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
-                this[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java
+                this[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
             }
 
         return ConcurrentKafkaListenerContainerFactory<Long, String>().apply {
