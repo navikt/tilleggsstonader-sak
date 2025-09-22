@@ -36,7 +36,7 @@ data class TilbakekrevingMottaker(
 data class TilbakekrevingFagsysteminfoSvarRevurdering(
     val behandlingId: String,
     val årsak: TilbakekrevingRevurderingÅrsak,
-    val årsakTilFeilutbetaling: String,
+    val årsakTilFeilutbetaling: String?,
     val vedtaksdato: LocalDate,
 )
 

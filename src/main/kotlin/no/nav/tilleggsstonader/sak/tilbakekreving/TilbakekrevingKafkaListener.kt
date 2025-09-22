@@ -97,7 +97,7 @@ class TilbakekrevingKafkaListener(
         return TilbakekrevingFagsysteminfoSvarRevurdering(
             behandlingId = eksternBehandlingId,
             årsak = mapÅrsak(saksbehandling),
-            årsakTilFeilutbetaling = (vedtak.data as Opphør).begrunnelse,
+            årsakTilFeilutbetaling = if (vedtak.data is Opphør) vedtak.data.begrunnelse else null,
             vedtaksdato = saksbehandling.vedtakstidspunkt!!.toLocalDate(),
         )
     }
