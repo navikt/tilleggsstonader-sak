@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.support.Acknowledgment
@@ -24,6 +25,7 @@ import java.time.Instant
 import java.time.LocalDate
 
 @Component
+@Profile("!local & !integrasjonstest")
 class TilbakekrevingKafkaListener(
     private val behandlingService: BehandlingService,
     private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
