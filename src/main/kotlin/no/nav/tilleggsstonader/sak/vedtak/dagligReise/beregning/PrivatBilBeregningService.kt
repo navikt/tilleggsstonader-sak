@@ -114,7 +114,7 @@ class PrivatBilBeregningService {
             antallDagerInkludererHelg = true
         } else {
             antallDager = totaltAntallDagerIUke
-            antallDagerInkludererHelg = true
+            antallDagerInkludererHelg = uke.antallHelgedager > 0
         }
 
         return BeregningsgrunnlagForUke(
