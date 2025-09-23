@@ -50,7 +50,7 @@ class TilbakekrevingKafkaListener(
         ack: Acknowledgment,
     ) {
         val payload = objectMapper.readTree(consumerRecord.value())
-        val hendelsestype = payload.get("hendelsestype")?.asText() ?: error("Mangler felt 'hendelsestype' i melding fra tilbakekreving")
+        val hendelsestype = payload.get("hendelsestype")?.asText()
 
         if (hendelsestype == HENDELSESTYPE_FAGSYSTEMINFO_BEHOV) {
             val fagsystemBehovMelding = objectMapper.treeToValue<TilbakekrevingFagsysteminfoBehov>(payload)
