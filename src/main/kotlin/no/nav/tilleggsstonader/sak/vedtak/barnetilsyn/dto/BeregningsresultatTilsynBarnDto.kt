@@ -58,7 +58,7 @@ fun BeregningsresultatTilsynBarn.tilDto(tidligsteEndring: LocalDate?): Beregning
             .map { it.tilDto() }
 
     return BeregningsresultatTilsynBarnDto(
-        perioder = filtrertPerioder.map { it.tilDto(tidligsteEndring) },
+        perioder = filtrertPerioder.map { it.tilDto() },
         vedtaksperioder = vedtaksperioder,
         gjelderFraOgMed = vedtaksperioder.minOfOrNull { it.fom },
         gjelderTilOgMed = vedtaksperioder.maxOfOrNull { it.tom },
@@ -75,15 +75,12 @@ private fun VedtaksperiodeTilsynBarn.tilDto() =
         antallBarn = antallBarn,
     )
 
-private fun BeregningsresultatForMåned.tilDto(tidligsteEndring: LocalDate?): BeregningsresultatForMånedDto {
-    val filtrerteBeløpsperioder = this.beløpsperioder.filtrerBeløpsperioderFra(tidligsteEndring)
-
-    return BeregningsresultatForMånedDto(
+private fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForMånedDto =
+    BeregningsresultatForMånedDto(
         dagsats = this.dagsats,
-        månedsbeløp = filtrerteBeløpsperioder.sumOf { it.beløp },
+        månedsbeløp = beløpsperioder.sumOf { it.beløp },
         grunnlag = this.grunnlag.tilDto(),
     )
-}
 
 private fun Beregningsgrunnlag.tilDto() =
     BeregningsgrunnlagDto(
