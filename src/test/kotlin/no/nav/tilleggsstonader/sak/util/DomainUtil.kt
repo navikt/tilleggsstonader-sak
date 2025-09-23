@@ -169,6 +169,7 @@ fun saksbehandling(
     årsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
     henlagtÅrsak: HenlagtÅrsak? = HenlagtÅrsak.FEILREGISTRERT,
     kravMottatt: LocalDate? = null,
+    vedtakstidspunkt: LocalDateTime? = LocalDateTime.now(),
 ): Saksbehandling =
     saksbehandling(
         fagsak,
@@ -185,6 +186,7 @@ fun saksbehandling(
             henlagtÅrsak = henlagtÅrsak,
             kravMottatt = kravMottatt,
             kategori = BehandlingKategori.NASJONAL,
+            vedtakstidspunkt = vedtakstidspunkt,
         ),
     )
 
