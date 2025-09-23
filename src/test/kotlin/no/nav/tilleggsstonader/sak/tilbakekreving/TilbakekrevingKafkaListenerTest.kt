@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.support.Acknowledgment
-import java.time.Instant
+import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.random.Random
 
@@ -71,7 +71,7 @@ class TilbakekrevingKafkaListenerTest {
             TilbakekrevingFagsysteminfoBehov(
                 eksternFagsakId = Random.nextLong(10, 10000).toString(),
                 kravgrunnlagReferanse = eksternBehandlingId.toString(),
-                hendelseOpprettet = Instant.now(),
+                hendelseOpprettet = LocalDateTime.now(),
                 versjon = 1,
             )
 
@@ -102,7 +102,7 @@ class TilbakekrevingKafkaListenerTest {
             TilbakekrevingFagsysteminfoBehov(
                 eksternFagsakId = Random.nextLong(10, 10000).toString(),
                 kravgrunnlagReferanse = eksternBehandlingId.toString(),
-                hendelseOpprettet = Instant.now(),
+                hendelseOpprettet = LocalDateTime.now(),
                 versjon = 1,
             )
 

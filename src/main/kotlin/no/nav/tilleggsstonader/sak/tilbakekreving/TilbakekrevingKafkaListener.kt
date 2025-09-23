@@ -21,8 +21,8 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
-import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Component
 @Profile("!local & !integrasjonstest")
@@ -90,7 +90,7 @@ class TilbakekrevingKafkaListener(
         val svarTilbakekrevingKravgrunnlagOppslagRecord =
             TilbakekrevingFagsysteminfoSvar(
                 eksternFagsakId = fagsystemBehovMelding.eksternFagsakId,
-                hendelseOpprettet = Instant.now(),
+                hendelseOpprettet = LocalDateTime.now(),
                 mottaker = TilbakekrevingMottaker(ident = behandling.ident),
                 revurdering = mapRevurderinginformsjon(saksbehandling = behandling, eksternBehandlingId = referanse),
                 utvidPerioder = mapUtvidedePerioder(behandling.forrigeIverksatteBehandlingId),
