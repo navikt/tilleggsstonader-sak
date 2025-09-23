@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
@@ -10,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
@@ -56,6 +58,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.UUID
+import kotlin.random.Random
 
 fun oppgave(
     behandling: Behandling,
@@ -382,6 +385,17 @@ fun vedtaksbrev(
     beslutterIdent = beslutterIdent,
 )
 
+fun journalpostMedStrukturertSøknad(dokumentBrevkode: DokumentBrevkode) =
+    journalpost(
+        journalpostId = Random.nextLong(10000L, 10000000L).toString(),
+        journalposttype = Journalposttype.I,
+        journalstatus = Journalstatus.UNDER_ARBEID,
+        tema = Tema.TSO.name,
+        dokumenter = listOf(dokumentInfoMedOriginalVariant(dokumentBrevkode)),
+        bruker = Bruker("12345678910", BrukerIdType.FNR),
+        kanal = "NAV_NO",
+    )
+
 fun journalpost(
     journalpostId: String = UUID.randomUUID().toString(),
     journalposttype: Journalposttype = Journalposttype.U,
@@ -399,6 +413,12 @@ fun journalpost(
     bruker = bruker,
     kanal = kanal,
 )
+
+fun dokumentInfoMedOriginalVariant(dokumentBrevkode: DokumentBrevkode) =
+    dokumentInfo(
+        dokumentvarianter = listOf(dokumentvariantOriginal()),
+        brevkode = dokumentBrevkode.verdi,
+    )
 
 fun dokumentInfo(
     dokumentInfoId: String = UUID.randomUUID().toString(),
@@ -419,6 +439,8 @@ fun dokumentvariant(
     saksbehandlerHarTilgang = saksbehandlerHarTilgang,
     filnavn = filnavn,
 )
+
+fun dokumentvariantOriginal() = dokumentvariant(variantformat = Dokumentvariantformat.ORIGINAL, filnavn = "original.json")
 
 fun nyeOpplysningerMetadata(
     kilde: NyeOpplysningerKilde = NyeOpplysningerKilde.ETTERSENDING,

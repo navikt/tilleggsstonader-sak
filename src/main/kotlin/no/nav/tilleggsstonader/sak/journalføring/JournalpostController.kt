@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalpostResponse
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
@@ -22,6 +23,7 @@ class JournalpostController(
     private val journalpostService: JournalpostService,
     private val tilgangService: TilgangService,
     private val journalføringService: JournalføringService,
+    private val håndterSøknadService: HåndterSøknadService,
 ) {
     @GetMapping("/{journalpostId}/dokument-pdf/{dokumentInfoId}", produces = [MediaType.APPLICATION_PDF_VALUE])
     fun hentDokumentSomPdf(
@@ -36,16 +38,19 @@ class JournalpostController(
     }
 
     @GetMapping("/{journalpostId}")
-    fun hentJournalPost(
+    fun hentJournalpost(
         @PathVariable journalpostId: String,
     ): JournalpostResponse {
         val (journalpost, personIdent) = journalpostService.finnJournalpostOgPersonIdent(journalpostId)
         tilgangService.validerTilgangTilPerson(personIdent, AuditLoggerEvent.ACCESS)
+        val valgbareStønadstyperForJournalpost = håndterSøknadService.finnStønadstyperSomKanOpprettesFraJournalpost(journalpost)
         return JournalpostResponse(
-            journalpost,
-            personIdent,
-            journalpostService.hentBrukersNavn(journalpost, personIdent),
-            journalpost.harStrukturertSøknad(),
+            journalpost = journalpost,
+            personIdent = personIdent,
+            navn = journalpostService.hentBrukersNavn(journalpost, personIdent),
+            harStrukturertSøknad = journalpost.harStrukturertSøknad(),
+            defaultStønadstype = valgbareStønadstyperForJournalpost.defaultStønadstype,
+            valgbareStønadstyper = valgbareStønadstyperForJournalpost.valgbareStønadstyper,
         )
     }
 
