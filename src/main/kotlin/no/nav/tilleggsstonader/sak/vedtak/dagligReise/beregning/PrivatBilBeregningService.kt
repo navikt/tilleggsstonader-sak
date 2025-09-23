@@ -15,10 +15,8 @@ data class DummyReiseMedBil(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val reisedagerPerUke: Int,
-    val reiseavstandEnVei: Int,
-    val dagligParkeringsutgift: Int?,
+    val reiseavstandEnVei: BigDecimal,
     val bompengerEnVei: Int?,
-    val dagligPiggdekkavgift: Int?,
     val fergekostnadEnVei: Int?,
 ) : Periode<LocalDate>
 
@@ -64,19 +62,13 @@ class PrivatBilBeregningService {
     ): Int {
         val kostnadKjøring =
             grunnlagForReise.reiseavstandEnVei
-                .toBigDecimal()
                 .multiply(BigDecimal.valueOf(2))
                 .multiply(grunnlagForReise.kilometersats)
                 .multiply(grunnlagForUke.antallDagerDenneUkaSomKanDekkes.toBigDecimal())
 
-        val parkeringskostnad =
-            grunnlagForReise.dagligParkeringsutgift
-                ?.times(grunnlagForUke.antallDagerDenneUkaSomKanDekkes)
-                ?.toBigDecimal()
-
         val sumEkstrakostnader = grunnlagForReise.ekstrakostnader.beregnTotalEkstrakostnadForEnDag().toBigDecimal()
 
-        val totaltBeløp = listOfNotNull(kostnadKjøring, parkeringskostnad, sumEkstrakostnader).sumOf { it }
+        val totaltBeløp = listOfNotNull(kostnadKjøring, sumEkstrakostnader).sumOf { it }
 
         return totaltBeløp.setScale(0, RoundingMode.HALF_UP).toInt()
     }
@@ -87,13 +79,11 @@ class PrivatBilBeregningService {
             tom = reise.tom,
             reisedagerPerUke = reise.reisedagerPerUke,
             reiseavstandEnVei = reise.reiseavstandEnVei,
-            dagligParkeringsutgift = reise.dagligParkeringsutgift,
             kilometersats = finnRelevantKilometerSats(periode = reise),
             ekstrakostnader =
                 Ekstrakostnader(
                     fergekostnadEnVei = reise.fergekostnadEnVei,
                     bompengerEnVei = reise.bompengerEnVei,
-                    dagligPiggdekkavgift = reise.dagligPiggdekkavgift,
                 ),
         )
 

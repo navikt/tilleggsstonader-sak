@@ -29,9 +29,8 @@ data class BeregningsgrunnlagForReiseMedPrivatBil(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val reisedagerPerUke: Int,
-    val reiseavstandEnVei: Int,
+    val reiseavstandEnVei: BigDecimal,
     val kilometersats: BigDecimal, // TODO: Vurder om denne burde ligge på uke. Avhenger av hvor vi vil splitte en reise
-    val dagligParkeringsutgift: Int?, // TODO: Vurder om denne burde ligge inni Ekstrakostnader
     val ekstrakostnader: Ekstrakostnader,
 ) : Periode<LocalDate>
 
@@ -48,16 +47,14 @@ data class BeregningsgrunnlagForUke(
 
 data class Ekstrakostnader(
     val bompengerEnVei: Int?, // TODO: Kan man ha noe abonnement/månedskort her? Tar vi hensyn til det?
-    val dagligPiggdekkavgift: Int?, // TODO: Legges denne inn som en fast sum per dag eller totalsum for periode?
     val fergekostnadEnVei: Int?, // Månedskort?
 ) {
     // TODO: Spør om hjelp til å skrive denne penere
     fun beregnTotalEkstrakostnadForEnDag(): Int {
         val bompengerEnDag = bompengerEnVei?.times(2) ?: 0
         val fergekostnadEnDag = fergekostnadEnVei?.times(2) ?: 0
-        val piggdekk = dagligPiggdekkavgift ?: 0
 
-        return bompengerEnDag + fergekostnadEnDag + piggdekk
+        return bompengerEnDag + fergekostnadEnDag
     }
 
 // Er dette feks bedre?
