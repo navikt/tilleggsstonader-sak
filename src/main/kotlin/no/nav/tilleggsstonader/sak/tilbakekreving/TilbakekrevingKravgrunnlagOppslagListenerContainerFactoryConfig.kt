@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Profile
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.ContainerProperties
-import org.springframework.kafka.transaction.KafkaTransactionManager
 import java.time.Duration
 
 @Configuration
@@ -23,7 +22,6 @@ class TilbakekrevingKravgrunnlagOppslagListenerContainerFactoryConfig {
         properties: KafkaProperties,
         kafkaErrorHandler: KafkaErrorHandler,
         sslBundles: ObjectProvider<SslBundles>,
-        kafkaTransactionManager: KafkaTransactionManager<String, Any>,
     ): ConcurrentKafkaListenerContainerFactory<Long, String> {
         val consumerProperties =
             properties.buildConsumerProperties(sslBundles.getIfAvailable()).apply {
@@ -37,7 +35,6 @@ class TilbakekrevingKravgrunnlagOppslagListenerContainerFactoryConfig {
         return ConcurrentKafkaListenerContainerFactory<Long, String>().apply {
             containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
             containerProperties.setAuthExceptionRetryInterval(Duration.ofSeconds(2))
-            containerProperties.kafkaAwareTransactionManager = kafkaTransactionManager
             setCommonErrorHandler(kafkaErrorHandler)
             consumerFactory = DefaultKafkaConsumerFactory(consumerProperties)
         }
