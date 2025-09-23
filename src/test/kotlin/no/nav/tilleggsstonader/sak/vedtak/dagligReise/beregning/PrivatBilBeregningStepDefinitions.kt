@@ -7,6 +7,7 @@ import io.cucumber.java.no.Så
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
+import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
 import no.nav.tilleggsstonader.sak.cucumber.parseBoolean
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
@@ -33,10 +34,8 @@ class PrivatBilBeregningStepDefinitions {
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
                     reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, rad),
-                    reiseavstandEnVei = parseInt(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
-                    dagligParkeringsutgift = parseValgfriInt(DomenenøkkelPrivatBil.PARKERINGSUTGIFT, rad),
+                    reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
                     bompengerEnVei = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, rad),
-                    dagligPiggdekkavgift = parseValgfriInt(DomenenøkkelPrivatBil.PIGGDEKKAVGIFT, rad),
                     fergekostnadEnVei = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, rad),
                 )
             }
@@ -85,9 +84,7 @@ enum class DomenenøkkelPrivatBil(
 ) : Domenenøkkel {
     ANTALL_REISEDAGER_PER_UKE("Antall reisedager per uke"),
     REISEAVSTAND_EN_VEI("Reiseavstand"),
-    PARKERINGSUTGIFT("Parkering"),
     BOMPENGER("Bompenger"),
-    PIGGDEKKAVGIFT("Piggdekkavgift"),
     FERGEKOSTNAD("Fergekostnad"),
     REISENR("Reisenr"),
     ANTALL_DAGER_DEKT_UKE("Antall dager dekt i uke"),
