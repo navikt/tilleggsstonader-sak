@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.hendelser.ConsumerRecordUtil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -15,6 +16,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.utbetaling.AndelMedVedtaksperioder
 import no.nav.tilleggsstonader.sak.utbetaling.AndelTilkjentYtelseTilPeriodeService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -35,6 +37,7 @@ class TilbakekrevingKafkaListenerTest {
     val kafkaTemplate = mockk<KafkaTemplate<String, String>>(relaxed = true)
     val andelTilkjentYtelseTilPeriodeService = mockk<AndelTilkjentYtelseTilPeriodeService>()
     val vedtakService = mockk<VedtakService>()
+    val fagsakService = mockk<FagsakService>()
 
     val tilbakekrevingKafkaListener =
         TilbakekrevingKafkaListener(
@@ -43,6 +46,7 @@ class TilbakekrevingKafkaListenerTest {
             kafkaTemplate = kafkaTemplate,
             andelTilkjentYtelseTilPeriodeService = andelTilkjentYtelseTilPeriodeService,
             vedtakService = vedtakService,
+            fagsakService = fagsakService,
         )
 
     val ack = mockk<Acknowledgment>()
@@ -53,9 +57,32 @@ class TilbakekrevingKafkaListenerTest {
     }
 
     @Test
-    fun `mottar ukjent hendelsestype, gjør ingenting`() {
+    fun `mottar ukjent hendelsestype, gjør ingenting og acker`() {
         val payload = mapOf("hendelsestype" to "ukjent_type")
         val consumerRecord = ConsumerRecordUtil.lagConsumerRecord(UUID.randomUUID().toString(), objectMapper.writeValueAsString(payload))
+        tilbakekrevingKafkaListener.listen(consumerRecord, ack)
+
+        verify(exactly = 0) { kafkaTemplate.send(any(), any(), any()) }
+        verify(exactly = 1) { ack.acknowledge() }
+    }
+
+    @Test
+    fun `mottar hendelsestype fagsysteminfo_behov med ukjent fagsystemId, gjør ingenting og acker`() {
+        val tilbakekrevingFagsysteminfoBehov =
+            TilbakekrevingFagsysteminfoBehov(
+                eksternFagsakId = Random.nextLong(10, 10000).toString(),
+                kravgrunnlagReferanse = "10",
+                hendelseOpprettet = LocalDateTime.now(),
+                versjon = 1,
+            )
+        val consumerRecord =
+            ConsumerRecordUtil.lagConsumerRecord(
+                UUID.randomUUID().toString(),
+                objectMapper.writeValueAsString(tilbakekrevingFagsysteminfoBehov),
+            )
+
+        every { fagsakService.hentFagsakPåEksternIdHvisEksisterer(any()) } returns null
+
         tilbakekrevingKafkaListener.listen(consumerRecord, ack)
 
         verify(exactly = 0) { kafkaTemplate.send(any(), any(), any()) }
@@ -75,6 +102,7 @@ class TilbakekrevingKafkaListenerTest {
                 versjon = 1,
             )
 
+        every { fagsakService.hentFagsakPåEksternIdHvisEksisterer(payload.eksternFagsakId.toLong()) } returns fagsak()
         every { eksternBehandlingIdRepository.findByIdOrThrow(eksternBehandlingId) } returns
             EksternBehandlingId(eksternBehandlingId, behandling.id)
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
@@ -106,6 +134,7 @@ class TilbakekrevingKafkaListenerTest {
                 versjon = 1,
             )
 
+        every { fagsakService.hentFagsakPåEksternIdHvisEksisterer(payload.eksternFagsakId.toLong()) } returns fagsak()
         every { eksternBehandlingIdRepository.findByIdOrThrow(eksternBehandlingId) } returns
             EksternBehandlingId(eksternBehandlingId, behandling.id)
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling

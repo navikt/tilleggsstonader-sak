@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -32,6 +33,7 @@ class TilbakekrevingKafkaListener(
     private val kafkaTemplate: KafkaTemplate<String, String>,
     private val andelTilkjentYtelseTilPeriodeService: AndelTilkjentYtelseTilPeriodeService,
     private val vedtakService: VedtakService,
+    private val fagsakService: FagsakService,
 ) {
     companion object {
         const val TILBAKEKREVING_TOPIC = "tilbake.privat-tilbakekreving-tilleggsstonad"
@@ -56,12 +58,14 @@ class TilbakekrevingKafkaListener(
             val fagsystemBehovMelding = objectMapper.treeToValue<TilbakekrevingFagsysteminfoBehov>(payload)
 
             // Team tilbake bruker også kafka-topic til intern testing i dev, filtrerer vekk meldinger ikke ment for oss
-            if (fagsystemBehovMelding.eksternFagsakId.all { it.isDigit() }) {
-                behandleFagsystemInfoBehov(consumerRecord.key(), fagsystemBehovMelding)
-            } else {
+            if (!fagsystemBehovMelding.eksternFagsakId.all { it.isDigit() }) {
                 logger.debug(
                     "Mottatt hendelse $HENDELSESTYPE_FAGSYSTEMINFO_BEHOV med ugyldig eksternFagsakId=${fagsystemBehovMelding.eksternFagsakId}, ignorerer melding",
                 )
+            } else if (fagsakService.hentFagsakPåEksternIdHvisEksisterer(fagsystemBehovMelding.eksternFagsakId.toLong()) == null) {
+                logger.warn("Finner ikke faksak med eksternId ${fagsystemBehovMelding.eksternFagsakId}")
+            } else {
+                behandleFagsystemInfoBehov(consumerRecord.key(), fagsystemBehovMelding)
             }
         } else {
             // Vi lytter og produserer til samme topic, dvs vi leser inne våre egne meldinger
