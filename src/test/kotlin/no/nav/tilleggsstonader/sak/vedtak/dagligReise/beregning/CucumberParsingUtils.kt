@@ -43,6 +43,7 @@ fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
                     vedtaksperioder = emptyList(),
                 ),
             beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
+            billetDetalijer = emptyMap(),
         )
     }
 

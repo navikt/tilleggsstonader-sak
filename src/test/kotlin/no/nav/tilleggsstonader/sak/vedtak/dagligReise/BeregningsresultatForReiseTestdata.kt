@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.BillettType
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
@@ -13,6 +14,7 @@ fun lagBeregningsresultatForReise(
     fom: LocalDate,
     beløp: Int = 100,
     beregningsgrunnlag: Beregningsgrunnlag = lagBeregningsgrunnlag(fom),
+    billetDetajler: Map<BillettType, Int> = emptyMap(),
 ): BeregningsresultatForReise =
     BeregningsresultatForReise(
         perioder =
@@ -20,6 +22,7 @@ fun lagBeregningsresultatForReise(
                 BeregningsresultatForPeriode(
                     grunnlag = beregningsgrunnlag,
                     beløp = beløp,
+                    billetDetajler,
                 ),
             ),
     )

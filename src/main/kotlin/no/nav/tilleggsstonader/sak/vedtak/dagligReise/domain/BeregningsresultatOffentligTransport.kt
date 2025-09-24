@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.BillettType
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
@@ -19,6 +20,7 @@ data class BeregningsresultatForReise(
 data class BeregningsresultatForPeriode(
     val grunnlag: Beregningsgrunnlag,
     val beløp: Int,
+    val billetDetalijer: Map<BillettType, Int>,
 )
 
 data class Beregningsgrunnlag(
