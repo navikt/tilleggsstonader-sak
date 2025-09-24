@@ -7,6 +7,9 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
@@ -27,6 +30,7 @@ class OppfølgingController(
     private val oppfølgingService: OppfølgingService,
     private val oppfølgingOpprettKontrollerService: OppfølgingOpprettKontrollerService,
     private val unleashService: UnleashService,
+    private val personService: PersonService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -38,7 +42,7 @@ class OppfølgingController(
             "Feature toggle ${Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING} er ikke aktivert"
         }
 
-        return oppfølgingService.hentAktiveOppfølginger().map { it.tilDto() }
+        return oppfølgingService.hentAktiveOppfølginger().tilDto()
     }
 
     @PostMapping("kontroller")
@@ -51,7 +55,11 @@ class OppfølgingController(
             "Feature toggle ${Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING} er ikke aktivert"
         }
 
-        return oppfølgingService.kontroller(request).tilDto()
+        return oppfølgingService.kontroller(request).let {
+            it.tilDto(
+                navn = personService.hentVisningsnavnForPerson(it.behandlingsdetaljer.fagsakPersonIdent),
+            )
+        }
     }
 
     @PostMapping("start")
@@ -70,4 +78,40 @@ class OppfølgingController(
             }
         }
     }
+
+    private fun Collection<OppfølgingMedDetaljer>.tilDto(): List<KontrollerOppfølgingResponse> {
+        val identer = this.map { it.behandlingsdetaljer.fagsakPersonIdent }.distinct()
+        val identerMedNavn = hentNavnForIdenter(identer)
+
+        return this.map { it.tilDto(identerMedNavn[it.behandlingsdetaljer.fagsakPersonIdent] ?: "") }
+    }
+
+    private fun OppfølgingMedDetaljer.tilDto(navn: String) =
+        KontrollerOppfølgingResponse(
+            id = id,
+            behandlingId = behandlingId,
+            version = version,
+            opprettetTidspunkt = opprettetTidspunkt,
+            perioderTilKontroll = data.perioderTilKontroll,
+            kontrollert = kontrollert,
+            behandlingsdetaljer = behandlingsdetaljer.tilDto(navn),
+        )
+
+    private fun Behandlingsdetaljer.tilDto(navn: String): OppfølgingBehandlingDetaljerDto =
+        OppfølgingBehandlingDetaljerDto(
+            saksnummer = saksnummer,
+            fagsakPersonId = fagsakPersonId,
+            fagsakPersonIdent = fagsakPersonIdent,
+            fagsakPersonNavn = navn,
+            stønadstype = stønadstype,
+            vedtakstidspunkt = vedtakstidspunkt,
+            harNyereBehandling = harNyereBehandling,
+        )
+
+    private fun hentNavnForIdenter(identer: List<String>): Map<String, String> =
+        personService.hentPersonKortBolk(identer).mapValues {
+            it.value.navn
+                .gjeldende()
+                .visningsnavn()
+        }
 }
