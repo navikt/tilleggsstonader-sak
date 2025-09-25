@@ -46,13 +46,21 @@ fun finnReisedagerIPeriode(
         .sumOf { it.antallDager }
 
 fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): BillettKombinasjonResultat {
+    val prisKombinasjonAvEnkeltBillettOgSyvdagersBillett = finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag)?.beløp
+    val pris30dagerBillet = grunnlag.pris30dagersbillett
     val beløp =
         listOfNotNull(
-            finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag)?.beløp,
-            grunnlag.pris30dagersbillett,
+            prisKombinasjonAvEnkeltBillettOgSyvdagersBillett,
+            pris30dagerBillet,
         ).min()
-    val billettDetaljer = finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag)?.billettDetaljer
-    return BillettKombinasjonResultat(beløp, billettDetaljer ?: emptyMap())
+
+    if (beløp == prisKombinasjonAvEnkeltBillettOgSyvdagersBillett) {
+        return BillettKombinasjonResultat(
+            beløp = beløp,
+            billettDetaljer = finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag)?.billettDetaljer,
+        )
+    }
+    return BillettKombinasjonResultat(beløp, mapOf(BillettType.MÅNEDSKORT to 1))
 }
 
 /**
@@ -64,13 +72,15 @@ private fun finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag: 
     val reisedagerPerUke = finnReisedagerPerUke(grunnlag)
     val reisedagerListe = lagReisedagerListe(reisedagerPerUke)
 
+    // Hvis ingen reisedager er billigste pris 0kr
+    // Vi returnerer også en tom map for billettdetaljer siden ingen billetter er kjøpt.
     if (reisedagerListe.isEmpty()) {
-        return BillettKombinasjonResultat(0, emptyMap())
+        return BillettKombinasjonResultat(beløp = 0, billettDetaljer = emptyMap())
     }
 
     val sisteReiseDag = reisedagerListe.last()
     val reisekostnader = MutableList(sisteReiseDag + 1) { 0 }
-    val billettDetaljerPerDag = MutableList(sisteReiseDag + 1) { mutableMapOf<BillettType, Int>() }
+    val billettDetaljerPerDag = MutableList(sisteReiseDag + 1) { mapOf<BillettType, Int>() }
 
     var reisedagIndeks = 0
     for (gjeldeneDag in 1..sisteReiseDag) {
