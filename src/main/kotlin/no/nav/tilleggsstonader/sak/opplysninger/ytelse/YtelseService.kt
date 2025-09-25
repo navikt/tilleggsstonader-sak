@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
+import no.nav.familie.prosessering.rest.RestTaskService.Companion.logger
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
@@ -40,6 +41,42 @@ class YtelseService(
                     typer = typer,
                 ),
             ).tilDto()
+    }
+
+    fun harAktivtAapVedtak(fagsakPersonId: FagsakPersonId): HarAktivtVedtakDto {
+        val ident = fagsakPersonService.hentAktivIdent(fagsakPersonId)
+        val aktiveAapVedtak =
+            ytelseClient
+                .hentYtelser(
+                    YtelsePerioderRequest(
+                        ident = ident,
+                        fom = LocalDate.now(),
+                        tom = LocalDate.now(),
+                        typer = listOf(TypeYtelsePeriode.AAP),
+                    ),
+                )
+
+        feilHvis(aktiveAapVedtak.perioder.size > 1) {
+            "Forventer maks én periode ettersom perioden vi etterspør er én spesifikk dato"
+        }
+        feilHvis(aktiveAapVedtak.kildeResultat.isEmpty()) {
+            error("Forventer å få ett og bare ett resultat, ettersom vi spør om én enkelt ytelse")
+        }
+        val resultatType = aktiveAapVedtak.kildeResultat.single().type
+        feilHvis(resultatType != TypeYtelsePeriode.AAP) {
+            "Etterspurte AAP, men fikk resultat fra $resultatType"
+        }
+
+        val harAktivtAapVedtak = aktiveAapVedtak.perioder.isNotEmpty()
+        val kalletsStatus = aktiveAapVedtak.kildeResultat.first().resultat
+
+        logger.info("Hentet AAP-status fra Arena. resultat='$aktiveAapVedtak'")
+
+        return HarAktivtVedtakDto(
+            type = TypeYtelsePeriode.AAP,
+            harAktivtVedtak = harAktivtAapVedtak,
+            resultatKilde = kalletsStatus,
+        )
     }
 
     fun hentYtelseForGrunnlag(
