@@ -35,6 +35,7 @@ class OppfølgingRepositoryFake :
             Behandlingsdetaljer(
                 saksnummer = 1,
                 fagsakPersonId = FagsakPersonId.random(),
+                fagsakPersonIdent = "12345678901",
                 stønadstype = Stønadstype.BARNETILSYN,
                 vedtakstidspunkt = LocalDateTime.now(),
                 harNyereBehandling = true,
