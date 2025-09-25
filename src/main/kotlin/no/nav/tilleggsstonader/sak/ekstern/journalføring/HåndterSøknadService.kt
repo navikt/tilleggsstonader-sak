@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -18,6 +19,7 @@ import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
 import no.nav.tilleggsstonader.sak.journalføring.gjelderKanalNavNo
+import no.nav.tilleggsstonader.sak.journalføring.harStrukturertSøknad
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -90,6 +92,14 @@ class HåndterSøknadService(
     }
 
     private fun finnStønadstypeForDagligReise(journalpost: Journalpost): Stønadstype {
+        if (!journalpost.harStrukturertSøknad()) {
+            return if (journalpost.tema == Tema.TSO.name) {
+                Stønadstype.DAGLIG_REISE_TSO
+            } else {
+                Stønadstype.DAGLIG_REISE_TSR
+            }
+        }
+
         // Alle daglig reise støknader legges på TSO fra fyll ut send inn
         val søknadsskjema = journalpostService.hentSøknadFraJournalpost(journalpost, Stønadstype.DAGLIG_REISE_TSO)
         val søknad = søknadService.mapSøknad(søknadsskjema, journalpost)
@@ -170,18 +180,28 @@ class HåndterSøknadService(
                 oppgave =
                     OpprettOppgave(
                         oppgavetype = Oppgavetype.Journalføring,
-                        beskrivelse = lagOppgavebeskrivelseForJournalføringsoppgave(journalpost),
+                        beskrivelse = lagOppgavebeskrivelseForJournalføringsoppgave(journalpost, stønadstype),
                         journalpostId = journalpost.journalpostId,
                     ),
             ),
         )
     }
 
-    private fun lagOppgavebeskrivelseForJournalføringsoppgave(journalpost: Journalpost): String {
+    private fun lagOppgavebeskrivelseForJournalføringsoppgave(
+        journalpost: Journalpost,
+        stønadstype: Stønadstype,
+    ): String {
+        // FIXME - for å håndtere at daglig-reise søknader/ettsersendelser kommer som brevkode NAV 11-12.21 og ikke NAV 11-12.21b https://nav-it.slack.com/archives/C049HPU424F/p1758780000577149
+        if (journalpost.dokumentBrevkode() == DokumentBrevkode.DAGLIG_REISE && !journalpost.harStrukturertSøknad()) {
+            return journalpost.førsteDokumentMedBrevkode()?.tittel ?: "Ny søknad eller ettersendelse for ${stønadstype.visningsnavn}"
+        }
+
         if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
         val dokumentTittel = journalpost.dokumenter!!.firstOrNull { it.brevkode != null }?.tittel ?: ""
         return "Må behandles i ny løsning - $dokumentTittel"
     }
+
+    private fun Journalpost.førsteDokumentMedBrevkode() = this.dokumenter?.firstOrNull { it.brevkode != null }
 }
 
 data class ValgbareStønadstyperForJournalpost(
