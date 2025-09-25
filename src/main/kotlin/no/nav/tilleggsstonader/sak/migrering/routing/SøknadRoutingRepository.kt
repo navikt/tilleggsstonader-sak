@@ -16,10 +16,10 @@ interface SøknadRoutingRepository :
     InsertUpdateRepository<SøknadRouting> {
     fun findByIdentAndType(
         ident: String,
-        type: SøknadsType,
+        type: Søknadstype,
     ): SøknadRouting?
 
-    fun countByType(type: SøknadsType): Int
+    fun countByType(type: Søknadstype): Int
 }
 
 @Table("soknad_routing")
@@ -27,7 +27,7 @@ data class SøknadRouting(
     @Id
     val id: UUID = UUID.randomUUID(),
     val ident: String,
-    val type: SøknadsType,
+    val type: Søknadstype,
     val detaljer: JsonWrapper,
     val opprettetTid: LocalDateTime = SporbarUtils.now(),
 )

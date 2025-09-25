@@ -6,10 +6,10 @@ import no.nav.tilleggsstonader.libs.unleash.ToggleId
 
 sealed interface RoutingContext {
     val ident: String
-    val søknadsType: SøknadsType
+    val søknadstype: Søknadstype
 }
 
-enum class SøknadsType {
+enum class Søknadstype {
     BARNETILSYN,
     LÆREMIDLER,
     BOUTGIFTER,
@@ -18,20 +18,20 @@ enum class SøknadsType {
 
 data class SkalRouteAlleSøkereTilNyLøsning(
     override val ident: String,
-    override val søknadsType: SøknadsType,
+    override val søknadstype: Søknadstype,
 ) : RoutingContext {
     companion object {
         fun fraIdentStønadstype(identStønadstype: RoutingContext) =
             SkalRouteAlleSøkereTilNyLøsning(
                 ident = identStønadstype.ident,
-                søknadsType = identStønadstype.søknadsType,
+                søknadstype = identStønadstype.søknadstype,
             )
     }
 }
 
 data class SkalRouteEnkelteSøkereTilNyLøsning(
     override val ident: String,
-    override val søknadsType: SøknadsType,
+    override val søknadstype: Søknadstype,
     val toggleId: ToggleId,
     val harGyldigStateIArena: (ArenaStatusDto) -> Boolean,
 ) : RoutingContext {
@@ -42,25 +42,24 @@ data class SkalRouteEnkelteSøkereTilNyLøsning(
             harGyldigStateIArena: (ArenaStatusDto) -> Boolean,
         ) = SkalRouteEnkelteSøkereTilNyLøsning(
             ident = identStønadstype.ident,
-            søknadsType = identStønadstype.søknadsType,
+            søknadstype = identStønadstype.søknadstype,
             toggleId = toggleId,
             harGyldigStateIArena = harGyldigStateIArena,
         )
     }
 }
 
-// Extension som gir deg mappingen
-fun SøknadsType.tilStønadstyper(): Set<Stønadstype> =
+fun Søknadstype.tilStønadstyper(): Set<Stønadstype> =
     when (this) {
-        SøknadsType.DAGLIG_REISE ->
+        Søknadstype.DAGLIG_REISE ->
             setOf(
                 Stønadstype.DAGLIG_REISE_TSO,
                 Stønadstype.DAGLIG_REISE_TSR,
             )
 
-        SøknadsType.BOUTGIFTER -> setOf(Stønadstype.BOUTGIFTER)
-        SøknadsType.LÆREMIDLER -> setOf(Stønadstype.LÆREMIDLER)
-        SøknadsType.BARNETILSYN -> setOf(Stønadstype.BARNETILSYN)
+        Søknadstype.BOUTGIFTER -> setOf(Stønadstype.BOUTGIFTER)
+        Søknadstype.LÆREMIDLER -> setOf(Stønadstype.LÆREMIDLER)
+        Søknadstype.BARNETILSYN -> setOf(Stønadstype.BARNETILSYN)
     }
 
 fun RoutingContext.tilRoutingContext() =

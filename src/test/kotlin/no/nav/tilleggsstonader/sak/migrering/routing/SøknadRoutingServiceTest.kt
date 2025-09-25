@@ -64,23 +64,19 @@ class SøknadRoutingServiceTest {
 
     private val skalRouteAlleSøkereTilNyLøsning = SkalRouteAlleSøkereTilNyLøsning(ident, stønadstype)
     private val skalRouteEnkelteSøkereTilNyLøsning =
-        SkalRouteEnkelteSøkereTilNyLøsning(ident, stønadstype, SØKNAD_ROUTING_BOUTGIFTER, { false })
+        SkalRouteEnkelteSøkereTilNyLøsning(ident, stønadstype, SØKNAD_ROUTING_BOUTGIFTER,) { false }
 
     private val featureToggletHarGyldigStateIArena =
         SkalRouteEnkelteSøkereTilNyLøsning(
-            ident = ident,
-            stønadstype = stønadstype,
-            toggleId = SØKNAD_ROUTING_BOUTGIFTER,
-            harGyldigStateIArena = { true },
-        )
+            ident = ident,,
+            toggleId = SØKNAD_ROUTING_BOUTGIFTER,,
+        ) { true }
 
     private val featureToggletHarUgyldigStateIArena =
         SkalRouteEnkelteSøkereTilNyLøsning(
-            ident = ident,
-            stønadstype = stønadstype,
-            toggleId = SØKNAD_ROUTING_BOUTGIFTER,
-            harGyldigStateIArena = { false },
-        )
+            ident = ident,,
+            toggleId = SØKNAD_ROUTING_BOUTGIFTER,,
+        ) { false }
 
     @BeforeEach
     fun setUp() {

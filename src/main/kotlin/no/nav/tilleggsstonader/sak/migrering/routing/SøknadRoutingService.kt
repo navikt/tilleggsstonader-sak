@@ -26,7 +26,7 @@ class SøknadRoutingService(
         val skalBehandlesINyLøsning = skalBehandlesINyLøsning(context)
         logger.info(
             "routing - " +
-                "stønadstype=${context.søknadsType} " +
+                "stønadstype=${context.søknadstype} " +
                 "skalBehandlesINyLøsning=$skalBehandlesINyLøsning",
         )
         return SøknadRoutingResponse(skalBehandlesINyLøsning = skalBehandlesINyLøsning)
@@ -34,21 +34,21 @@ class SøknadRoutingService(
 
     fun harLagretRouting(
         ident: String,
-        stønadstypeRouting: SøknadsType,
+        stønadstypeRouting: Søknadstype,
     ): Boolean {
         val søknadRouting = søknadRoutingRepository.findByIdentAndType(ident, stønadstypeRouting)
         return søknadRouting != null
     }
 
     private fun skalBehandlesINyLøsning(context: RoutingContext): Boolean {
-        if (harLagretRouting(context.ident, context.søknadsType)) {
-            logger.info("routing - stønadstype=${context.søknadsType} harLagretRouting=true")
+        if (harLagretRouting(context.ident, context.søknadstype)) {
+            logger.info("routing - stønadstype=${context.søknadstype} harLagretRouting=true")
             return true
         }
 
         when (context) {
             is SkalRouteAlleSøkereTilNyLøsning -> {
-                logger.info("routing - stønadstype=${context.søknadsType} skalRuteAlleSøkere=true")
+                logger.info("routing - stønadstype=${context.søknadstype} skalRuteAlleSøkere=true")
                 lagreRouting(context, mapOf("ruterAlleSøkere" to true))
                 return true
             }
@@ -67,7 +67,7 @@ class SøknadRoutingService(
         if (maksAntallErNådd(context)) {
             return false
         }
-        val arenaStatus = arenaService.hentStatus(context.ident, context.søknadsType.tilStønadstyper().first())
+        val arenaStatus = arenaService.hentStatus(context.ident, context.søknadstype.tilStønadstyper().first())
         val målgruppeAAP = arenaService.hentVedtak(FagsakPersonId.fromString(context.ident))
 
         if (harGyldigStateIArena(context, arenaStatus)) {
@@ -79,8 +79,8 @@ class SøknadRoutingService(
 
     private fun maksAntallErNådd(context: SkalRouteEnkelteSøkereTilNyLøsning): Boolean {
         val maksAntall = unleashService.getVariantWithNameOrDefault(context.toggleId, "antall", 0)
-        val antall = søknadRoutingRepository.countByType(context.søknadsType)
-        logger.info("routing - stønadstype=${context.søknadsType} antallIDatabase=$antall toggleMaksAntall=$maksAntall")
+        val antall = søknadRoutingRepository.countByType(context.søknadstype)
+        logger.info("routing - stønadstype=${context.søknadstype} antallIDatabase=$antall toggleMaksAntall=$maksAntall")
         return antall >= maksAntall
     }
 
@@ -93,7 +93,7 @@ class SøknadRoutingService(
         val harVedtak = arenaStatus.vedtak.harVedtak
         val harAktivSakUtenVedtak = arenaStatus.sak.harAktivSakUtenVedtak
 
-        val søknadsType = context.søknadsType
+        val søknadsType = context.søknadstype
         val harGyldigStatus = context.harGyldigStateIArena(arenaStatus)
 
         logger.info(
@@ -114,7 +114,7 @@ class SøknadRoutingService(
         søknadRoutingRepository.insert(
             SøknadRouting(
                 ident = context.ident,
-                type = context.søknadsType,
+                type = context.søknadstype,
                 detaljer = JsonWrapper(objectMapper.writeValueAsString(detaljer)),
             ),
         )
@@ -122,13 +122,13 @@ class SøknadRoutingService(
 
     private fun harBehandling(context: RoutingContext): Boolean {
         val harBehandling =
-            context.søknadsType
+            context.søknadstype
                 .tilStønadstyper()
                 .map { it ->
                     fagsakService.finnFagsak(setOf(context.ident), it)
                 }.isNotEmpty()
 
-        logger.info("routing - stønadstype=${context.søknadsType} harBehandling=$harBehandling")
+        logger.info("routing - stønadstype=${context.søknadstype} harBehandling=$harBehandling")
         return harBehandling
     }
 }
