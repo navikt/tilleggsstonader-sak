@@ -181,5 +181,5 @@ private fun finnAntallDagerISnittetMellomUkeOgVedtaksperioder(
 
 data class BillettKombinasjonResultat(
     val beløp: Int,
-    val billettDetaljer: Map<BillettType, Int>,
+    val billettDetaljer: Map<BillettType, Int>?,
 )

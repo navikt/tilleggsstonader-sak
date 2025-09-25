@@ -20,7 +20,7 @@ data class BeregningsresultatForReise(
 data class BeregningsresultatForPeriode(
     val grunnlag: Beregningsgrunnlag,
     val beløp: Int,
-    val billetDetalijer: Map<BillettType, Int>,
+    val billetDetalijer: Map<BillettType, Int>?,
 )
 
 data class Beregningsgrunnlag(

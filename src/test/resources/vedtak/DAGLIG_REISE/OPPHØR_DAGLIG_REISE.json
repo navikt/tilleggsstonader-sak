@@ -28,7 +28,8 @@
                 ],
                 "antallReisedager": 6
               },
-              "beløp": 528
+              "beløp": 528,
+              "billetDetalijer" : null
             }
           ]
         }

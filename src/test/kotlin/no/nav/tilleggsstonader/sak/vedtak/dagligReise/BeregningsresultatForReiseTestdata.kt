@@ -22,7 +22,7 @@ fun lagBeregningsresultatForReise(
                 BeregningsresultatForPeriode(
                     grunnlag = beregningsgrunnlag,
                     beløp = beløp,
-                    billetDetajler,
+                    billetDetalijer = billetDetajler,
                 ),
             ),
     )
