@@ -155,7 +155,7 @@ class MottaSøknadTest : IntegrationTest() {
     }
 
     @Test
-    fun `mottar daglig-reise-ettersendelse fra kafka, opprettes journalføringsoppgave`() {
+    fun `mottar daglig-reise-ettersendelse fra kafka, opprettes journalføringsoppgave uten mappetilknytting`() {
         val hendelse = JournalfoeringHendelseRecord()
         hendelse.journalpostId = journalpostId
         hendelse.mottaksKanal = "SKAN_IM"
@@ -181,6 +181,7 @@ class MottaSøknadTest : IntegrationTest() {
         assertThat(oppgave.journalpostId).isEqualTo(journalpostId.toString())
         assertThat(oppgave.tema.name).isEqualTo(journalpost.tema)
         assertThat(oppgave.beskrivelse).contains(journalpost.dokumenter?.first()?.tittel)
+        assertThat(oppgave.mappeId).isNull()
     }
 
     private fun mockJournalpost(

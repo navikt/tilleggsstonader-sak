@@ -173,29 +173,37 @@ class HåndterSøknadService(
         stønadstype: Stønadstype,
         journalpost: Journalpost,
     ) {
+        val opprettOppgave =
+            if (stønadstype.gjelderDagligReise() && !journalpost.harStrukturertSøknad()) {
+                // Kommer journalposter på daglig reise inn fra skanning før vi har tatt i bruk i prod, ønsker ikke å legge de i vår mappe
+                // Kan fjernes etter daglig reise er i prod. Se https://nav-it.slack.com/archives/C049HPU424F/p1758780000577149
+                OpprettOppgave(
+                    oppgavetype = Oppgavetype.Journalføring,
+                    beskrivelse =
+                        journalpost.førsteDokumentMedBrevkode()?.tittel
+                            ?: "Ny søknad eller ettersendelse for ${stønadstype.visningsnavn}",
+                    journalpostId = journalpost.journalpostId,
+                    skalOpprettesIMappe = false,
+                )
+            } else {
+                OpprettOppgave(
+                    oppgavetype = Oppgavetype.Journalføring,
+                    beskrivelse = lagOppgavebeskrivelseForJournalføringsoppgave(journalpost),
+                    journalpostId = journalpost.journalpostId,
+                    skalOpprettesIMappe = true,
+                )
+            }
+
         taskService.save(
             OpprettOppgaveTask.opprettTask(
                 personIdent = personIdent,
                 stønadstype = stønadstype,
-                oppgave =
-                    OpprettOppgave(
-                        oppgavetype = Oppgavetype.Journalføring,
-                        beskrivelse = lagOppgavebeskrivelseForJournalføringsoppgave(journalpost, stønadstype),
-                        journalpostId = journalpost.journalpostId,
-                    ),
+                oppgave = opprettOppgave,
             ),
         )
     }
 
-    private fun lagOppgavebeskrivelseForJournalføringsoppgave(
-        journalpost: Journalpost,
-        stønadstype: Stønadstype,
-    ): String {
-        // FIXME - for å håndtere at daglig-reise søknader/ettsersendelser kommer som brevkode NAV 11-12.21 og ikke NAV 11-12.21b https://nav-it.slack.com/archives/C049HPU424F/p1758780000577149
-        if (journalpost.dokumentBrevkode() == DokumentBrevkode.DAGLIG_REISE && !journalpost.harStrukturertSøknad()) {
-            return journalpost.førsteDokumentMedBrevkode()?.tittel ?: "Ny søknad eller ettersendelse for ${stønadstype.visningsnavn}"
-        }
-
+    private fun lagOppgavebeskrivelseForJournalføringsoppgave(journalpost: Journalpost): String {
         if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
         val dokumentTittel = journalpost.dokumenter!!.firstOrNull { it.brevkode != null }?.tittel ?: ""
         return "Må behandles i ny løsning - $dokumentTittel"
