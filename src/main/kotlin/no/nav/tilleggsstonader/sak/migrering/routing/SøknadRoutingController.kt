@@ -19,11 +19,11 @@ class SøknadRoutingController(
     @PostMapping()
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun sjekkRoutingForPerson(
-        @RequestBody request: RoutingContext,
+        @RequestBody request: SøknadRoutingDto,
     ): SøknadRoutingResponse {
         feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.SOKNAD_API), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
-        return søknadRoutingService.sjekkRoutingForPerson(request.tilRoutingContext())
+        return søknadRoutingService.sjekkRoutingForPerson(bestemRoutingStrategi(request))
     }
 }

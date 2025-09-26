@@ -43,8 +43,7 @@ class YtelseService(
             ).tilDto()
     }
 
-    fun harAktivtAapVedtak(fagsakPersonId: FagsakPersonId): HarAktivtVedtakDto {
-        val ident = fagsakPersonService.hentAktivIdent(fagsakPersonId)
+    fun harAktivtAapVedtak(ident: String): HarAktivtVedtakDto {
         val aktiveAapVedtak =
             ytelseClient
                 .hentYtelser(
