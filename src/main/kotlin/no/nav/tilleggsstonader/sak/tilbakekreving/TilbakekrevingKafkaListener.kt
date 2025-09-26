@@ -80,6 +80,11 @@ class TilbakekrevingKafkaListener(
         fagsystemBehovMelding: TilbakekrevingFagsysteminfoBehov,
     ) {
         val referanse = fagsystemBehovMelding.kravgrunnlagReferanse ?: error("Ikke mottatt referanse fra tilbakekreving")
+
+        logger.info(
+            "Mottatt hendelse ${fagsystemBehovMelding.hendelsestype} fra tilbakekreving for behandlingId=$referanse og fagsak=${fagsystemBehovMelding.eksternFagsakId}",
+        )
+
         val behandlingId =
             eksternBehandlingIdRepository
                 .findByIdOrThrow(referanse.toLong())
