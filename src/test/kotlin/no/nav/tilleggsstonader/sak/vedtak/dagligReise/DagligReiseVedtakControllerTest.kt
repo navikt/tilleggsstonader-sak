@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.avslåVedtak
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakDagligReise
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakDagligReiseKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.innvilgeVedtakDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.BillettType
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vilkår
@@ -116,6 +117,7 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
                                                             antallReisedager = 19,
                                                         ),
                                                     beløp = 750,
+                                                    billetDetalijer = mapOf(BillettType.MÅNEDSKORT to 1),
                                                 ),
                                             ),
                                     ),

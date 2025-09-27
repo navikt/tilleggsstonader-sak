@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.BillettType
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
@@ -44,41 +45,79 @@ fun finnReisedagerIPeriode(
         }.values
         .sumOf { it.antallDager }
 
-fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): Int =
-    listOfNotNull(
-        finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag),
-        grunnlag.pris30dagersbillett,
-    ).min()
+fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): BillettKombinasjonResultat {
+    val prisKombinasjonAvEnkeltBillettOgSyvdagersBillett = finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag)?.beløp
+    val pris30dagerBillet = grunnlag.pris30dagersbillett
+    val beløp =
+        listOfNotNull(
+            prisKombinasjonAvEnkeltBillettOgSyvdagersBillett,
+            pris30dagerBillet,
+        ).min()
+
+    if (beløp == prisKombinasjonAvEnkeltBillettOgSyvdagersBillett) {
+        return BillettKombinasjonResultat(
+            beløp = beløp,
+            billettDetaljer = finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag)?.billettDetaljer,
+        )
+    }
+    return BillettKombinasjonResultat(beløp, mapOf(BillettType.MÅNEDSKORT to 1))
+}
 
 /**
  * Minimum Cost For Tickets.
  * Doc: https://docs.vultr.com/problem-set/minimum-cost-for-tickets
  */
-private fun finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag: Beregningsgrunnlag): Int? {
+private fun finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag: Beregningsgrunnlag): BillettKombinasjonResultat? {
     if (grunnlag.prisEnkeltbillett == null && grunnlag.prisSyvdagersbillett == null) return null
     val reisedagerPerUke = finnReisedagerPerUke(grunnlag)
     val reisedagerListe = lagReisedagerListe(reisedagerPerUke)
 
     // Hvis ingen reisedager er billigste pris 0kr
-    if (reisedagerListe.isEmpty()) return 0
+    // Vi returnerer også en tom map for billettdetaljer siden ingen billetter er kjøpt.
+    if (reisedagerListe.isEmpty()) {
+        return BillettKombinasjonResultat(beløp = 0, billettDetaljer = emptyMap())
+    }
 
     val sisteReiseDag = reisedagerListe.last()
     val reisekostnader = MutableList(sisteReiseDag + 1) { 0 }
+    val billettDetaljerPerDag = MutableList(sisteReiseDag + 1) { mapOf<BillettType, Int>() }
 
     var reisedagIndeks = 0
     for (gjeldeneDag in 1..sisteReiseDag) {
         if (gjeldeneDag.skalIkkeReise(reisedagerListe, reisedagIndeks)) {
             reisekostnader[gjeldeneDag] = reisekostnader[gjeldeneDag - 1]
+            billettDetaljerPerDag[gjeldeneDag] = billettDetaljerPerDag[gjeldeneDag - 1].toMutableMap()
         } else {
             reisedagIndeks++
-            reisekostnader[gjeldeneDag] =
-                listOfNotNull(
-                    finnReisekostnadForNyEnkeltbillett(gjeldeneDag, reisekostnader, grunnlag),
-                    finnReisekostnadForNySyvdagersbillett(gjeldeneDag, reisekostnader, grunnlag),
-                ).min()
+            val enkelPris =
+                grunnlag.prisEnkeltbillett?.let {
+                    reisekostnader[max(0, gjeldeneDag - 1)] + (it * 2)
+                }
+            val ukePris =
+                grunnlag.prisSyvdagersbillett?.let {
+                    reisekostnader[max(0, gjeldeneDag - 7)] + it
+                }
+
+            val minPris = listOfNotNull(enkelPris, ukePris).min()
+            reisekostnader[gjeldeneDag] = minPris
+
+            val detaljer =
+                if (minPris == enkelPris) {
+                    billettDetaljerPerDag[max(0, gjeldeneDag - 1)].toMutableMap().apply {
+                        this[BillettType.ENKELTBILLETT] = (this[BillettType.ENKELTBILLETT] ?: 0) + 2
+                    }
+                } else {
+                    billettDetaljerPerDag[max(0, gjeldeneDag - 7)].toMutableMap().apply {
+                        this[BillettType.SYVDAGERSBILLETT] = (this[BillettType.SYVDAGERSBILLETT] ?: 0) + 1
+                    }
+                }
+            billettDetaljerPerDag[gjeldeneDag] = detaljer
         }
     }
-    return reisekostnader[sisteReiseDag]
+    return BillettKombinasjonResultat(
+        beløp = reisekostnader[sisteReiseDag],
+        billettDetaljer = billettDetaljerPerDag[sisteReiseDag],
+    )
 }
 
 private fun finnReisedagerPerUke(grunnlag: Beregningsgrunnlag): Map<Uke, PeriodeMedDager> =
@@ -149,3 +188,8 @@ private fun finnAntallDagerISnittetMellomUkeOgVedtaksperioder(
     vedtaksperioder
         .mapNotNull { Datoperiode(it.fom, it.tom).beregnSnitt(uke) }
         .sumOf { antallHverdagerIPeriodeInklusiv(it.fom, it.tom) }
+
+data class BillettKombinasjonResultat(
+    val beløp: Int,
+    val billettDetaljer: Map<BillettType, Int>?,
+)
