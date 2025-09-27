@@ -22,6 +22,9 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.tilFagsakMedPerson
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRouting
+import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingRepository
+import no.nav.tilleggsstonader.sak.migrering.routing.Søknadstype
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
@@ -47,6 +50,7 @@ class TestoppsettService(
     private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
     private val faktaGrunnlagService: FaktaGrunnlagService,
     private val vedtakRepository: VedtakRepository,
+    private val søknadRoutingRepository: SøknadRoutingRepository,
 ) {
     fun hentFagsak(fagsakId: FagsakId) = fagsakService.hentFagsak(fagsakId)
 
@@ -174,6 +178,13 @@ class TestoppsettService(
             )
         return lagre(revurdering)
     }
+
+    fun lagreSøknadRouting(søknadRouting: SøknadRouting) = søknadRoutingRepository.insert(søknadRouting)
+
+    fun hentSøknadRouting(
+        ident: String,
+        type: Søknadstype,
+    ) = søknadRoutingRepository.findByIdentAndType(ident, type)
 
     private fun hentEllerOpprettPerson(fagsak: Fagsak): FagsakPerson =
         fagsakPersonRepository.findByIdOrNull(fagsak.fagsakPersonId)
