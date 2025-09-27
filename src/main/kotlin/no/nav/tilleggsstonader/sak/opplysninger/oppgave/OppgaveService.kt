@@ -178,7 +178,7 @@ class OppgaveService(
             "Må ha behandlingId når man oppretter oppgave for behandle sak"
         }
         val enhetsnummer = arbeidsfordelingService.hentNavEnhetId(personIdent, stønadstype, oppgave.oppgavetype)
-        val mappeId = utledMappeId(personIdent, oppgave, enhetsnummer)
+        val mappeId = if (oppgave.skalOpprettesIMappe) utledMappeId(personIdent, oppgave, enhetsnummer) else null
         val opprettetOppgaveId = opprettOppgaveUtenÅLagreIRepository(personIdent, stønadstype, oppgave, enhetsnummer, mappeId)
         val oppgave =
             OppgaveDomain(

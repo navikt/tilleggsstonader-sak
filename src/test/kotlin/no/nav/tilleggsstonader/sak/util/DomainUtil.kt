@@ -428,6 +428,7 @@ fun dokumentInfo(
     dokumentInfoId = dokumentInfoId,
     dokumentvarianter = dokumentvarianter,
     brevkode = brevkode,
+    tittel = "dokumenttittel",
 )
 
 fun dokumentvariant(

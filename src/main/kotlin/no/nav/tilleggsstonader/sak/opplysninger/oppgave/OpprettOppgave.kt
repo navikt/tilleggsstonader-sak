@@ -21,6 +21,7 @@ data class OpprettOppgave(
     val prioritet: OppgavePrioritet = OppgavePrioritet.NORM,
     val fristFerdigstillelse: LocalDate? = null,
     val journalpostId: String? = null,
+    val skalOpprettesIMappe: Boolean = true,
 )
 
 fun tilOpprettOppgaveRequest(

@@ -164,6 +164,16 @@ internal class OppgaveServiceTest {
 
             assertThat(slot.captured.mappeId).isNull()
         }
+
+        @Test
+        fun `Skal ikke opprette i mappe når skalOpprettesIMappe er false`() {
+            val slot = slot<OpprettOppgaveRequest>()
+            mockOpprettOppgave(slot)
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak, skalOpprettesIMappe = false))
+
+            assertThat(slot.captured.mappeId).isNull()
+        }
     }
 
     @Test
