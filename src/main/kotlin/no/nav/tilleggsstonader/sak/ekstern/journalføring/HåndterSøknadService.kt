@@ -43,15 +43,6 @@ class HåndterSøknadService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun håndterSøknad(request: HåndterSøknadRequest) {
-        val personIdent = request.personIdent
-        val stønadstype = request.stønadstype
-
-        val journalpost = journalpostService.hentJournalpost(request.journalpostId)
-        håndterSøknad(personIdent = personIdent, stønadstype = stønadstype, journalpost = journalpost)
-    }
-
-    @Transactional
     fun håndterSøknad(journalpost: Journalpost) {
         val personIdent = journalpostService.hentIdentFraJournalpost(journalpost)
         val stønadstype =

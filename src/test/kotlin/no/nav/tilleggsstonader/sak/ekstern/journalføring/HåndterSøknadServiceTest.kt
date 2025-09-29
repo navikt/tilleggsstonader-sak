@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.HåndterSøknadRequest
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -77,7 +78,7 @@ internal class HåndterSøknadServiceTest {
             journalpostId = journalpostId,
             journalposttype = Journalposttype.I,
             journalstatus = Journalstatus.MOTTATT,
-            dokumenter = listOf(DokumentInfo("", brevkode = "1")),
+            dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.BARNETILSYN.verdi)),
             bruker = Bruker(personIdent, BrukerIdType.FNR),
             journalforendeEnhet = "123",
             kanal = "NAV_NO",
@@ -164,8 +165,9 @@ internal class HåndterSøknadServiceTest {
     }
 
     @Test
-    internal fun `skal kunne automatisk journalføre`() {
+    internal fun `skal kunne automatisk journalføre hvis det ikke finnes eksisterende sak på person`() {
         every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
+        every { journalpostService.hentIdentFraJournalpost(journalpost) } returns personIdent
 
         justRun {
             journalføringService.journalførTilNyBehandling(
@@ -178,13 +180,7 @@ internal class HåndterSøknadServiceTest {
             )
         }
 
-        håndterSøknadService.håndterSøknad(
-            HåndterSøknadRequest(
-                personIdent = personIdent,
-                journalpostId = journalpostId,
-                stønadstype = Stønadstype.BARNETILSYN,
-            ),
-        )
+        håndterSøknadService.håndterSøknad(journalpost)
 
         verify(exactly = 1) {
             journalføringService.journalførTilNyBehandling(
@@ -199,15 +195,12 @@ internal class HåndterSøknadServiceTest {
     }
 
     @Test
-    fun `skal opprette journalføringsoppgave hvis man ikke kan automatisk journalføre`() {
+    fun `skal opprette journalføringsoppgave hvis det allered finnes aktiv behandling og man ikke kan automatisk journalføre`() {
         every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(behandling())
+        every { journalpostService.hentIdentFraJournalpost(journalpost) } returns personIdent
 
         håndterSøknadService.håndterSøknad(
-            HåndterSøknadRequest(
-                personIdent,
-                journalpostId,
-                Stønadstype.BARNETILSYN,
-            ),
+            journalpost,
         )
 
         assertThat(taskSlot.captured.type).isEqualTo(OpprettOppgaveTask.TYPE)
