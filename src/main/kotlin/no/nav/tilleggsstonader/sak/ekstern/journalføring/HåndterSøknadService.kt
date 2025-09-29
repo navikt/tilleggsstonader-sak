@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -17,6 +18,7 @@ import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
 import no.nav.tilleggsstonader.sak.journalføring.gjelderKanalNavNo
+import no.nav.tilleggsstonader.sak.journalføring.harStrukturertSøknad
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -80,6 +82,14 @@ class HåndterSøknadService(
     }
 
     private fun finnStønadstypeForDagligReise(journalpost: Journalpost): Stønadstype {
+        if (!journalpost.harStrukturertSøknad()) {
+            return if (journalpost.tema == Tema.TSO.name) {
+                Stønadstype.DAGLIG_REISE_TSO
+            } else {
+                Stønadstype.DAGLIG_REISE_TSR
+            }
+        }
+
         // Alle daglig reise støknader legges på TSO fra fyll ut send inn
         val søknadsskjema = journalpostService.hentSøknadFraJournalpost(journalpost, Stønadstype.DAGLIG_REISE_TSO)
         val søknad = søknadService.mapSøknad(søknadsskjema, journalpost)
@@ -153,16 +163,32 @@ class HåndterSøknadService(
         stønadstype: Stønadstype,
         journalpost: Journalpost,
     ) {
+        val opprettOppgave =
+            if (stønadstype.gjelderDagligReise() && !journalpost.harStrukturertSøknad()) {
+                // Kommer journalposter på daglig reise inn fra skanning før vi har tatt i bruk i prod, ønsker ikke å legge de i vår mappe
+                // Kan fjernes etter daglig reise er i prod. Se https://nav-it.slack.com/archives/C049HPU424F/p1758780000577149
+                OpprettOppgave(
+                    oppgavetype = Oppgavetype.Journalføring,
+                    beskrivelse =
+                        journalpost.førsteDokumentMedBrevkode()?.tittel
+                            ?: "Ny søknad eller ettersendelse for ${stønadstype.visningsnavn}",
+                    journalpostId = journalpost.journalpostId,
+                    skalOpprettesIMappe = false,
+                )
+            } else {
+                OpprettOppgave(
+                    oppgavetype = Oppgavetype.Journalføring,
+                    beskrivelse = lagOppgavebeskrivelseForJournalføringsoppgave(journalpost),
+                    journalpostId = journalpost.journalpostId,
+                    skalOpprettesIMappe = true,
+                )
+            }
+
         taskService.save(
             OpprettOppgaveTask.opprettTask(
                 personIdent = personIdent,
                 stønadstype = stønadstype,
-                oppgave =
-                    OpprettOppgave(
-                        oppgavetype = Oppgavetype.Journalføring,
-                        beskrivelse = lagOppgavebeskrivelseForJournalføringsoppgave(journalpost),
-                        journalpostId = journalpost.journalpostId,
-                    ),
+                oppgave = opprettOppgave,
             ),
         )
     }
@@ -172,6 +198,8 @@ class HåndterSøknadService(
         val dokumentTittel = journalpost.dokumenter!!.firstOrNull { it.brevkode != null }?.tittel ?: ""
         return "Må behandles i ny løsning - $dokumentTittel"
     }
+
+    private fun Journalpost.førsteDokumentMedBrevkode() = this.dokumenter?.firstOrNull { it.brevkode != null }
 }
 
 data class ValgbareStønadstyperForJournalpost(
