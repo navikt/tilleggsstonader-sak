@@ -59,7 +59,9 @@ class YtelseService(
             "Forventer maks én periode ettersom perioden vi etterspør er én spesifikk dato"
         }
         feilHvis(aktiveAapVedtak.kildeResultat.isEmpty()) {
-            error("Forventer å få ett og bare ett resultat, ettersom vi spør om én enkelt ytelse")
+            error(
+                "Forventer ett og bare ett resultat, ettersom vi spør om én enkelt ytelse og det ikke gir mening å ha flere aktive AAP-vedtak samtidig",
+            )
         }
         val resultatType = aktiveAapVedtak.kildeResultat.single().type
         feilHvis(resultatType != TypeYtelsePeriode.AAP) {
