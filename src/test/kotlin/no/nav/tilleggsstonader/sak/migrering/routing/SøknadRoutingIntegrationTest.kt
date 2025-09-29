@@ -26,7 +26,6 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -39,8 +38,8 @@ class SøknadRoutingIntegrationTest(
     @Autowired private val arenaClient: ArenaClient,
     @Autowired private val pdlClient: PdlClient,
 ) : IntegrationTest() {
-    val jonas = "12345678910"
-    val erna = "10987654321"
+    val jonasIdent = "12345678910"
+    val ernaIdent = "10987654321"
 
     @ParameterizedTest
     @EnumSource(
@@ -48,122 +47,117 @@ class SøknadRoutingIntegrationTest(
         names = ["BARNETILSYN", "LÆREMIDLER", "BOUTGIFTER"],
     )
     fun `visse stønadstyper skal alltid routes til ny løsning`(søknadstype: Søknadstype) {
-        val routingSjekk = sjekkRoutingForPerson(SøknadRoutingDto(jonas, søknadstype))
+        val routingSjekk = sjekkRoutingForPerson(SøknadRoutingDto(jonasIdent, søknadstype))
 
         assertTrue(routingSjekk.skalBehandlesINyLøsning)
+        assertTrue(routingHarBlittLagret(søknadstype))
     }
 
     @Nested
     inner class DagligReise {
-        @BeforeEach
-        fun beforeEach() {
-            // Trengs fordi arenaService.hentStatus først henter identer fra PDL
-            mockHentIdenterFraPdl()
-        }
+        val søknadRoutingDagligReise =
+            SøknadRouting(
+                ident = jonasIdent,
+                type = Søknadstype.DAGLIG_REISE,
+                detaljer = JsonWrapper("{}"),
+            )
+        val dagligReiseRoutingRequest =
+            SøknadRoutingDto(
+                ident = jonasIdent,
+                søknadstype = Søknadstype.DAGLIG_REISE,
+            )
 
         @AfterEach
         fun afterEach() {
             clearAllMocks()
         }
 
-        val dagligReiseFagsak = fagsak(identer = setOf(PersonIdent(jonas)), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
-        val dagligReiseBehandling = behandling(dagligReiseFagsak)
-
         @Test
         fun `skal alltid svare ja hvis personen har blitt routet til ny løsning tidligere`() {
-            testoppsettService.lagreSøknadRouting(søknadRoutingDagligReise())
+            testoppsettService.lagreSøknadRouting(søknadRoutingDagligReise)
 
-            val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest())
+            val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
 
             assertTrue(routingSjekk.skalBehandlesINyLøsning)
         }
 
         @Test
-        fun `skal lagre routing og svare true hvis det finnes en behandling på personen for gitt stønad`() {
+        fun `skal lagre routing og svare true hvis det finnes en daglig reise-behandling på personen`() {
+            val dagligReiseFagsak = fagsak(identer = setOf(PersonIdent(jonasIdent)), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+            val dagligReiseBehandling = behandling(dagligReiseFagsak)
+
             testoppsettService.lagreFagsak(dagligReiseFagsak)
             testoppsettService.lagre(behandling = dagligReiseBehandling, opprettGrunnlagsdata = false)
 
-            val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest())
+            val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
 
             assertTrue(routingSjekk.skalBehandlesINyLøsning)
             assertTrue(routingHarBlittLagret())
         }
 
         @Test
-        fun `skal route til gammel løsning hvis person har aktivt vedtak i Arena på daglig reise`() {
-            mockMaksAntallSomSkalRoutesPåDagligReise(maksAntall = 10)
-            mockBrukerHarDagligReiseVedtakIArena(erAktivt = true)
+        fun `skal route til gammel løsning hvis person har aktivt vedtak i Arena`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
+            mockDagligReiseVedtakIArena(erAktivt = true)
 
-            val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest())
+            val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
 
             assertFalse(routingSjekk.skalBehandlesINyLøsning)
         }
 
         @Test
         fun `skal svare nei hvis feature toggle sier at ingen skal slippe gjennom`() {
-            mockMaksAntallSomSkalRoutesPåDagligReise(0)
+            mockMaksAntallSomKanRoutesPåDagligReise(0)
 
-            val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest())
+            val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
 
             assertFalse(routingSjekk.skalBehandlesINyLøsning)
         }
 
         @Test
         fun `brukere med aktiv AAP skal bli routet til ny løsning`() {
-            mockMaksAntallSomSkalRoutesPåDagligReise(maksAntall = 10)
-            mockBrukerHarDagligReiseVedtakIArena(erAktivt = false)
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
+            mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = true)
 
-            val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest())
+            val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
             assertTrue(routingSjekk.skalBehandlesINyLøsning)
+            assertTrue(routingHarBlittLagret())
         }
 
         @Test
         fun `brukere uten aktiv AAP skal routet til gammel løsning`() {
-            mockMaksAntallSomSkalRoutesPåDagligReise(maksAntall = 10)
-            mockBrukerHarDagligReiseVedtakIArena(erAktivt = false)
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
+            mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = false)
 
-            val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest())
+            val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
             assertFalse(routingSjekk.skalBehandlesINyLøsning)
         }
 
         @Test
-        fun `skal slippe gjennom til ny løsning bare til maks antall er nådd`() {
-            mockMaksAntallSomSkalRoutesPåDagligReise(maksAntall = 1)
-            mockBrukerHarDagligReiseVedtakIArena(erAktivt = false)
+        fun `skal slippe gjennom personer til ny løsning, men bare til maks antall er nådd`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 1)
+            mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = true)
 
-            val routingSjekkFørsteRouting = sjekkRoutingForPerson(SøknadRoutingDto(jonas, Søknadstype.DAGLIG_REISE))
-            val routingSjekkAndreRouting = sjekkRoutingForPerson(SøknadRoutingDto(erna, Søknadstype.DAGLIG_REISE))
+            val routingSjekkFørsteRouting = sjekkRoutingForPerson(SøknadRoutingDto(jonasIdent, Søknadstype.DAGLIG_REISE))
+            val routingSjekkAndreRouting = sjekkRoutingForPerson(SøknadRoutingDto(ernaIdent, Søknadstype.DAGLIG_REISE))
 
             assertTrue(routingSjekkFørsteRouting.skalBehandlesINyLøsning)
+            assertTrue(routingHarBlittLagret(ident = jonasIdent))
             assertFalse(routingSjekkAndreRouting.skalBehandlesINyLøsning)
+            assertFalse(routingHarBlittLagret(ident = ernaIdent))
         }
 
-        private fun søknadRoutingDagligReise() =
-            SøknadRouting(
-                ident = jonas,
-                type = Søknadstype.DAGLIG_REISE,
-                detaljer = JsonWrapper("{}"),
-            )
-
-        fun dagligReiseRoutingRequest() =
-            SøknadRoutingDto(
-                ident = jonas,
-                søknadstype = Søknadstype.DAGLIG_REISE,
-            )
-
-        private fun routingHarBlittLagret() = testoppsettService.hentSøknadRouting(jonas, Søknadstype.DAGLIG_REISE) != null
-
-        fun mockMaksAntallSomSkalRoutesPåDagligReise(maksAntall: Int) {
+        private fun mockMaksAntallSomKanRoutesPåDagligReise(maksAntall: Int) {
             unleashService.mockGetVariant(
                 Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
                 Variant("antall", maksAntall.toString(), true),
             )
         }
 
-        fun mockBrukerHarDagligReiseVedtakIArena(erAktivt: Boolean) {
+        private fun mockDagligReiseVedtakIArena(erAktivt: Boolean) {
             val arenaVedtak =
                 ArenaStatusDtoUtil
                     .vedtakStatus(harVedtak = true, harAktivtVedtak = erAktivt, harVedtakUtenUtfall = false)
@@ -173,9 +167,10 @@ class SøknadRoutingIntegrationTest(
                     vedtak = arenaVedtak,
                 )
             every { arenaClient.hentStatus(any()) } returns statusFraArena
+            mockHentIdenterFraPdl() // Trengs fordi ArenaClient:hentStatus først henter identer fra PDL
         }
 
-        fun mockAapVedtak(erAktivt: Boolean) {
+        private fun mockAapVedtak(erAktivt: Boolean) {
             val pågåendePeriode =
                 periodeAAP(
                     fom = LocalDate.now().minusDays(1),
@@ -187,10 +182,15 @@ class SøknadRoutingIntegrationTest(
                     kildeResultat = listOf(kildeResultatAAP()),
                 )
         }
+
+        private fun mockHentIdenterFraPdl() {
+            every { pdlClient.hentPersonidenter(any()) } answers
+                { PdlIdenter(listOf(PdlIdent(ident = firstArg(), historisk = false, gruppe = "FOLKEREGISTERIDENT"))) }
+        }
     }
 
-    fun mockHentIdenterFraPdl() {
-        every { pdlClient.hentPersonidenter(any()) } answers
-            { PdlIdenter(listOf(PdlIdent(firstArg(), false, "FOLKEREGISTERIDENT"))) }
-    }
+    private fun routingHarBlittLagret(
+        søknadstype: Søknadstype = Søknadstype.DAGLIG_REISE,
+        ident: String = jonasIdent,
+    ) = testoppsettService.hentSøknadRouting(ident, søknadstype) != null
 }
