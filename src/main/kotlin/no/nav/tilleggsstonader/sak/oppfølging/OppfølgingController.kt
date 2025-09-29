@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
-import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -24,7 +23,6 @@ import java.util.concurrent.Executors
 @RestController
 @RequestMapping(path = ["/api/oppfolging"])
 @ProtectedWithClaims(issuer = "azuread")
-@Validated
 class OppfølgingController(
     private val tilgangService: TilgangService,
     private val oppfølgingService: OppfølgingService,

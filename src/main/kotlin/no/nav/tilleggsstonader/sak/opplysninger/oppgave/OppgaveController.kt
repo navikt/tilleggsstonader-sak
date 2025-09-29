@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.tilDto
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/oppgave")
 @ProtectedWithClaims(issuer = "azuread")
-@Validated
 class OppgaveController(
     private val oppgaveService: OppgaveService,
     private val tilgangService: TilgangService,
