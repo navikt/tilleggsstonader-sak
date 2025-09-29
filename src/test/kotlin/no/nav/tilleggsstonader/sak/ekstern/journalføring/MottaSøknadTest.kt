@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingsjournalpostRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
 import no.nav.tilleggsstonader.sak.hendelser.ConsumerRecordUtil
@@ -53,6 +54,9 @@ class MottaSøknadTest : IntegrationTest() {
     @Autowired
     lateinit var hendelseRepository: HendelseRepository
 
+    @Autowired
+    lateinit var behandlingsjournalpostRepository: BehandlingsjournalpostRepository
+
     val journalpostId = 123321L
     val ident = "12345678901"
 
@@ -75,15 +79,7 @@ class MottaSøknadTest : IntegrationTest() {
         mockJournalpost(brevkode = DokumentBrevkode.BOUTGIFTER, søknad = søknadBoutgifter(ident = ident))
         kjørTasksKlareForProsessering()
 
-        val fagsakerPåBruker = fagsakRepository.findBySøkerIdent(setOf(ident))
-        assertThat(fagsakerPåBruker).hasSize(1)
-        val fagsak = fagsakerPåBruker.single()
-        assertThat(fagsak.stønadstype).isEqualTo(Stønadstype.BOUTGIFTER)
-
-        val behandlinger = behandlingRepository.findByFagsakId(fagsak.id)
-        assertThat(behandlinger).hasSize(1)
-        val behandling = behandlinger.single()
-        assertThat(behandling.årsak).isEqualTo(BehandlingÅrsak.SØKNAD)
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.BOUTGIFTER, journalpostId.toString())
     }
 
     @Test
@@ -105,15 +101,7 @@ class MottaSøknadTest : IntegrationTest() {
         mockJournalpost(brevkode = DokumentBrevkode.BARNETILSYN, søknad = søknadskjemaBarnetilsyn())
         kjørTasksKlareForProsessering()
 
-        val fagsakerPåBruker = fagsakRepository.findBySøkerIdent(setOf(ident))
-        assertThat(fagsakerPåBruker).hasSize(1)
-        val fagsak = fagsakerPåBruker.single()
-        assertThat(fagsak.stønadstype).isEqualTo(Stønadstype.BARNETILSYN)
-
-        val behandlinger = behandlingRepository.findByFagsakId(fagsak.id)
-        assertThat(behandlinger).hasSize(1)
-        val behandling = behandlinger.single()
-        assertThat(behandling.årsak).isEqualTo(BehandlingÅrsak.SØKNAD)
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.BARNETILSYN, journalpostId.toString())
     }
 
     @Test
@@ -135,15 +123,7 @@ class MottaSøknadTest : IntegrationTest() {
         mockJournalpost(brevkode = DokumentBrevkode.LÆREMIDLER, søknad = søknadskjemaLæremidler())
         kjørTasksKlareForProsessering()
 
-        val fagsakerPåBruker = fagsakRepository.findBySøkerIdent(setOf(ident))
-        assertThat(fagsakerPåBruker).hasSize(1)
-        val fagsak = fagsakerPåBruker.single()
-        assertThat(fagsak.stønadstype).isEqualTo(Stønadstype.LÆREMIDLER)
-
-        val behandlinger = behandlingRepository.findByFagsakId(fagsak.id)
-        assertThat(behandlinger).hasSize(1)
-        val behandling = behandlinger.single()
-        assertThat(behandling.årsak).isEqualTo(BehandlingÅrsak.SØKNAD)
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.LÆREMIDLER, journalpostId.toString())
     }
 
     @Test
@@ -167,15 +147,7 @@ class MottaSøknadTest : IntegrationTest() {
         mockJournalpost(brevkode = DokumentBrevkode.DAGLIG_REISE, søknad = søknadDagligReise(hovedytelse = hovedytelse))
         kjørTasksKlareForProsessering()
 
-        val fagsakerPåBruker = fagsakRepository.findBySøkerIdent(setOf(ident))
-        assertThat(fagsakerPåBruker).hasSize(1)
-        val fagsak = fagsakerPåBruker.single()
-        assertThat(fagsak.stønadstype).isEqualTo(Stønadstype.DAGLIG_REISE_TSR)
-
-        val behandlinger = behandlingRepository.findByFagsakId(fagsak.id)
-        assertThat(behandlinger).hasSize(1)
-        val behandling = behandlinger.single()
-        assertThat(behandling.årsak).isEqualTo(BehandlingÅrsak.SØKNAD)
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.DAGLIG_REISE_TSR, journalpostId.toString())
     }
 
     @Test
@@ -197,15 +169,7 @@ class MottaSøknadTest : IntegrationTest() {
         mockJournalpost(brevkode = DokumentBrevkode.DAGLIG_REISE, søknad = søknadDagligReise())
         kjørTasksKlareForProsessering()
 
-        val fagsakerPåBruker = fagsakRepository.findBySøkerIdent(setOf(ident))
-        assertThat(fagsakerPåBruker).hasSize(1)
-        val fagsak = fagsakerPåBruker.single()
-        assertThat(fagsak.stønadstype).isEqualTo(Stønadstype.DAGLIG_REISE_TSO)
-
-        val behandlinger = behandlingRepository.findByFagsakId(fagsak.id)
-        assertThat(behandlinger).hasSize(1)
-        val behandling = behandlinger.single()
-        assertThat(behandling.årsak).isEqualTo(BehandlingÅrsak.SØKNAD)
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.DAGLIG_REISE_TSO, journalpostId.toString())
     }
 
     private fun mockJournalpost(
@@ -237,5 +201,25 @@ class MottaSøknadTest : IntegrationTest() {
             )
         } returns
             objectMapper.writeValueAsBytes(søknad)
+    }
+
+    private fun validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(
+        ident: String,
+        stønadstype: Stønadstype,
+        journalpostId: String,
+    ) {
+        val fagsakerPåBruker = fagsakRepository.findBySøkerIdent(setOf(ident))
+        assertThat(fagsakerPåBruker).hasSize(1)
+        val fagsak = fagsakerPåBruker.single()
+        assertThat(fagsak.stønadstype).isEqualTo(stønadstype)
+
+        val behandlinger = behandlingRepository.findByFagsakId(fagsak.id)
+        assertThat(behandlinger).hasSize(1)
+        val behandling = behandlinger.single()
+        assertThat(behandling.årsak).isEqualTo(BehandlingÅrsak.SØKNAD)
+
+        val behandlingsJournalpost = behandlingsjournalpostRepository.findAllByBehandlingId(behandling.id)
+        assertThat(behandlingsJournalpost).hasSize(1)
+        assertThat(behandlingsJournalpost.first().journalpostId).isEqualTo(journalpostId)
     }
 }
