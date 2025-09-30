@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.migrering.routing
 
+import no.nav.tilleggsstonader.kontrakter.felles.Søknadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository

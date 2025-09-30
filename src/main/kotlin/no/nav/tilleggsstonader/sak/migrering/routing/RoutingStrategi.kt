@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.migrering.routing
 
+import no.nav.tilleggsstonader.kontrakter.felles.Søknadstype
 import no.nav.tilleggsstonader.libs.unleash.ToggleId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 

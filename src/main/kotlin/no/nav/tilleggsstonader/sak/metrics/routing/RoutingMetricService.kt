@@ -4,9 +4,9 @@ import io.micrometer.core.instrument.Metrics
 import io.micrometer.core.instrument.MultiGauge
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
+import no.nav.tilleggsstonader.kontrakter.felles.Søknadstype
 import no.nav.tilleggsstonader.sak.metrics.MetricUtil
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingRepository
-import no.nav.tilleggsstonader.sak.migrering.routing.Søknadstype
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 

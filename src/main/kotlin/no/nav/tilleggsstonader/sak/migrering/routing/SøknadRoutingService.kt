@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.migrering.routing
 
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.Søknadstype
+import no.nav.tilleggsstonader.kontrakter.felles.tilStønadstyper
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.libs.unleash.ToggleId

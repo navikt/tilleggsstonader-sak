@@ -1,14 +1,14 @@
 package no.nav.tilleggsstonader.sak.migrering.arena
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Søknadstype
+import no.nav.tilleggsstonader.kontrakter.felles.tilSøknadstype
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingService
-import no.nav.tilleggsstonader.sak.migrering.routing.Søknadstype
-import no.nav.tilleggsstonader.sak.migrering.routing.tilSøknadstype
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import org.slf4j.LoggerFactory
