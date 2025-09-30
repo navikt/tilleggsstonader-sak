@@ -35,15 +35,16 @@ class SøknadRoutingService(
         val routingStrategi = bestemRoutingStrategi(søknadstype)
 
         return when (routingStrategi) {
-            SkalRouteAlleSøkereTilNyLøsning -> true
-            is SkalRouteEnkelteSøkereTilNyLøsning -> skalBrukerRoutesTilNyLøsning(ident, søknadstype, routingStrategi)
+            RoutingStrategi.RouteAlleSøkereTilNyLøsning -> true
+            is RoutingStrategi.RouteEnkelteSøkereTilNyLøsning ->
+                skalBrukerRoutesTilNyLøsning(ident, søknadstype, routingStrategi)
         }.also { loggRoutingResultatet(søknadstype, it) }
     }
 
     private fun skalBrukerRoutesTilNyLøsning(
         ident: String,
         søknadstype: Søknadstype,
-        kontekst: SkalRouteEnkelteSøkereTilNyLøsning,
+        kontekst: RoutingStrategi.RouteEnkelteSøkereTilNyLøsning,
     ): Boolean {
         if (harLagretRouting(ident, søknadstype)) {
             logger.info("routing - søknadstype=$søknadstype harLagretRouting=true")
@@ -80,37 +81,12 @@ class SøknadRoutingService(
     private fun harAktivtVedtakIArena(
         søknadstype: Søknadstype,
         ident: String,
-    ): Boolean {
-        val arenaStatuserForRelevanteStønadstyper =
-            søknadstype.tilStønadstyper().map {
-                arenaService.hentStatus(ident, it)
-            }
-        return arenaStatuserForRelevanteStønadstyper
-            .map { arenaStatus ->
-                arenaStatus.vedtak.harAktivtVedtak
-                    .also { loggArenaStatus(arenaStatus, søknadstype, it) }
-            }.any { it }
-    }
-
-    private fun loggArenaStatus(
-        arenaStatus: ArenaStatusDto,
-        søknadstype: Søknadstype,
-        harGyldigStatus: Boolean,
-    ) {
-        val harAktivtVedtak = arenaStatus.vedtak.harAktivtVedtak
-        val harVedtakUtenUtfall = arenaStatus.vedtak.harVedtakUtenUtfall
-        val harVedtak = arenaStatus.vedtak.harVedtak
-        val harAktivSakUtenVedtak = arenaStatus.sak.harAktivSakUtenVedtak
-
-        logger.info(
-            "routing - søknadstype=$søknadstype harGyldigStatusArena=$harGyldigStatus - " +
-                "harAktivSakUtenVedtak=$harAktivSakUtenVedtak " +
-                "harVedtak=$harVedtak " +
-                "harAktivtVedtak=$harAktivtVedtak " +
-                "harVedtakUtenUtfall=$harVedtakUtenUtfall " +
-                "vedtakTom=${arenaStatus.vedtak.vedtakTom}",
-        )
-    }
+    ): Boolean =
+        søknadstype.tilStønadstyper().any { stønadstype ->
+            val arenaStatus = arenaService.hentStatus(ident, stønadstype)
+            return arenaStatus.vedtak.harAktivtVedtak
+                .also { loggArenaStatus(arenaStatus, søknadstype, it) }
+        }
 
     private fun lagreRouting(
         ident: String,
@@ -150,6 +126,23 @@ class SøknadRoutingService(
 
         logger.info("routing - søknadstype=$søknadstype harBehandling=$harBehandling")
         return harBehandling
+    }
+
+    private fun loggArenaStatus(
+        arenaStatus: ArenaStatusDto,
+        søknadstype: Søknadstype,
+        harGyldigStatus: Boolean,
+    ) {
+        with(arenaStatus) {
+            logger.info(
+                "routing - søknadstype=$søknadstype harGyldigStatusArena=$harGyldigStatus " +
+                    "harAktivSakUtenVedtak=${sak.harAktivSakUtenVedtak} " +
+                    "harVedtak=${vedtak.harVedtak} " +
+                    "harAktivtVedtak=${vedtak.harAktivtVedtak} " +
+                    "harVedtakUtenUtfall=${vedtak.harVedtakUtenUtfall} " +
+                    "vedtakTom=${vedtak.vedtakTom}",
+            )
+        }
     }
 
     private fun harAktivtAapVedtak(ident: String): Boolean =
