@@ -3,39 +3,25 @@ package no.nav.tilleggsstonader.sak.migrering.routing
 import no.nav.tilleggsstonader.libs.unleash.ToggleId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 
-sealed interface RoutingContext {
-    val ident: String
-    val søknadstype: Søknadstype
-}
+sealed interface RoutingStrategi
 
-data class SkalRouteAlleSøkereTilNyLøsning(
-    override val ident: String,
-    override val søknadstype: Søknadstype,
-) : RoutingContext {
-    companion object {
-        fun fraSøknadRoutingDto(identStønadstype: SøknadRoutingDto) =
-            SkalRouteAlleSøkereTilNyLøsning(
-                ident = identStønadstype.ident,
-                søknadstype = identStønadstype.søknadstype,
-            )
-    }
-}
+data object SkalRouteAlleSøkereTilNyLøsning : RoutingStrategi
 
 data class SkalRouteEnkelteSøkereTilNyLøsning(
-    override val ident: String,
-    override val søknadstype: Søknadstype,
-    val toggleId: ToggleId,
-) : RoutingContext
+    val featureToggleMaksAntall: ToggleId,
+    val kreverAtSøkerErUtenAktivtVedtakIArena: Boolean,
+    val kreverAktivtAapVedtak: Boolean,
+) : RoutingStrategi
 
-fun bestemRoutingStrategi(routingRequest: SøknadRoutingDto) =
-    when (routingRequest.søknadstype) {
-        Søknadstype.BARNETILSYN -> SkalRouteAlleSøkereTilNyLøsning.fraSøknadRoutingDto(routingRequest)
-        Søknadstype.LÆREMIDLER -> SkalRouteAlleSøkereTilNyLøsning.fraSøknadRoutingDto(routingRequest)
-        Søknadstype.BOUTGIFTER -> SkalRouteAlleSøkereTilNyLøsning.fraSøknadRoutingDto(routingRequest)
+fun bestemRoutingStrategi(søknadstype: Søknadstype): RoutingStrategi =
+    when (søknadstype) {
+        Søknadstype.BARNETILSYN -> SkalRouteAlleSøkereTilNyLøsning
+        Søknadstype.LÆREMIDLER -> SkalRouteAlleSøkereTilNyLøsning
+        Søknadstype.BOUTGIFTER -> SkalRouteAlleSøkereTilNyLøsning
         Søknadstype.DAGLIG_REISE ->
             SkalRouteEnkelteSøkereTilNyLøsning(
-                ident = routingRequest.ident,
-                søknadstype = routingRequest.søknadstype,
-                toggleId = Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
+                featureToggleMaksAntall = Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
+                kreverAtSøkerErUtenAktivtVedtakIArena = true,
+                kreverAktivtAapVedtak = true,
             )
     }

@@ -4,13 +4,13 @@ import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.libs.log.logger
+import no.nav.tilleggsstonader.libs.unleash.ToggleId
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.UnleashUtil.getVariantWithNameOrDefault
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.HarAktivtVedtakDto
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import org.springframework.stereotype.Service
 
@@ -23,87 +23,74 @@ class SøknadRoutingService(
     private val unleashService: UnleashService,
     private val ytelseService: YtelseService,
 ) {
-    fun sjekkRoutingForPerson(routingContext: RoutingContext): SøknadRoutingResponse {
-        val skalBehandlesINyLøsning = skalBehandlesINyLøsning(routingContext)
-        logger.info(
-            "routing - " +
-                "stønadstype=${routingContext.søknadstype} " +
-                "skalBehandlesINyLøsning=$skalBehandlesINyLøsning",
-        )
-        return SøknadRoutingResponse(skalBehandlesINyLøsning = skalBehandlesINyLøsning)
-    }
-
     fun harLagretRouting(
         ident: String,
         søknadstype: Søknadstype,
+    ) = søknadRoutingRepository.findByIdentAndType(ident, søknadstype) != null
+
+    fun skalRoutesTilNyLøsning(
+        ident: String,
+        søknadstype: Søknadstype,
     ): Boolean {
-        // TODO: Trenger vi å strukture dette litt annerledes slik at vi slipper strategi.ident osv?🤔
-        val søknadRouting = søknadRoutingRepository.findByIdentAndType(ident, søknadstype)
-        return søknadRouting != null
+        val routingStrategi = bestemRoutingStrategi(søknadstype)
+
+        return when (routingStrategi) {
+            SkalRouteAlleSøkereTilNyLøsning -> true
+            is SkalRouteEnkelteSøkereTilNyLøsning -> skalBrukerRoutesTilNyLøsning(ident, søknadstype, routingStrategi)
+        }.also { loggRoutingResultatet(søknadstype, it) }
     }
 
-    private fun skalBehandlesINyLøsning(context: RoutingContext): Boolean {
-        if (harLagretRouting(context.ident, context.søknadstype)) {
-            logger.info("routing - søknadstype=${context.søknadstype} harLagretRouting=true")
+    private fun skalBrukerRoutesTilNyLøsning(
+        ident: String,
+        søknadstype: Søknadstype,
+        kontekst: SkalRouteEnkelteSøkereTilNyLøsning,
+    ): Boolean {
+        if (harLagretRouting(ident, søknadstype)) {
+            logger.info("routing - søknadstype=$søknadstype harLagretRouting=true")
+            return true
+        }
+        if (harBehandling(ident, søknadstype)) {
+            lagreRouting(ident, søknadstype, mapOf("harBehandling" to true))
+            return true
+        }
+        if (maksAntallErNådd(søknadstype, toggleId = kontekst.featureToggleMaksAntall)) {
+            return false
+        }
+        if (kontekst.kreverAtSøkerErUtenAktivtVedtakIArena && harAktivtVedtakIArena(søknadstype, ident)) {
+            return false
+        }
+        if (kontekst.kreverAktivtAapVedtak && harAktivtAapVedtak(ident)) {
+            lagreRouting(ident, søknadstype, mapOf("harAktivAAP" to true))
             return true
         }
 
-        when (context) { // TODO: Dette er kode som burde ligge inni hver strategi i stedet for ?🤔
-            is SkalRouteAlleSøkereTilNyLøsning -> {
-                logger.info("routing - søknadstype=${context.søknadstype} skalRuteAlleSøkere=true")
-                lagreRouting(context, mapOf("ruterAlleSøkere" to true))
-                return true
-            }
-
-            is SkalRouteEnkelteSøkereTilNyLøsning -> {
-                return vurderRoutingTilNyLøsning(context)
-            }
-        }
+        return false
     }
 
-    private fun vurderRoutingTilNyLøsning(context: SkalRouteEnkelteSøkereTilNyLøsning): Boolean {
-        if (harBehandling(context)) {
-            lagreRouting(context, mapOf("harBehandling" to true))
-            return true
-        }
-        if (maksAntallErNådd(context)) {
-            return false
-        }
-        val arenaStatuser =
-            context.søknadstype.tilStønadstyper().map {
-                arenaService.hentStatus(context.ident, it)
-            }
-        if (harAktivtVedtakIArena(context.søknadstype, arenaStatuser).any { it }) {
-            return false
-        }
-        if (context.søknadstype == Søknadstype.DAGLIG_REISE) {
-            if (harAktivtAapVedtak(ytelseService.harAktivtAapVedtak(context.ident))) {
-                lagreRouting(context, arenaStatuser)
-                return true
-            } else {
-                return false
-            }
-        }
-
-        lagreRouting(context, arenaStatuser)
-        return true
-    }
-
-    private fun maksAntallErNådd(contekst: SkalRouteEnkelteSøkereTilNyLøsning): Boolean {
-        val maksAntall = unleashService.getVariantWithNameOrDefault(contekst.toggleId, "antall", 0)
-        val antall = søknadRoutingRepository.countByType(contekst.søknadstype)
-        logger.info("routing - stønadstype=${contekst.søknadstype} antallIDatabase=$antall toggleMaksAntall=$maksAntall")
+    private fun maksAntallErNådd(
+        søknadstype: Søknadstype,
+        toggleId: ToggleId,
+    ): Boolean {
+        val maksAntall = unleashService.getVariantWithNameOrDefault(toggleId, "antall", 0)
+        val antall = søknadRoutingRepository.countByType(søknadstype)
+        logger.info("routing - stønadstype=$søknadstype antallIDatabase=$antall toggleMaksAntall=$maksAntall")
         return antall >= maksAntall
     }
 
     private fun harAktivtVedtakIArena(
         søknadstype: Søknadstype,
-        arenaStatuser: Collection<ArenaStatusDto>,
-    ): List<Boolean> =
-        arenaStatuser.map { arenaStatus ->
-            arenaStatus.vedtak.harAktivtVedtak
-                .also { loggArenaStatus(arenaStatus, søknadstype, it) }
-        }
+        ident: String,
+    ): Boolean {
+        val arenaStatuserForRelevanteStønadstyper =
+            søknadstype.tilStønadstyper().map {
+                arenaService.hentStatus(ident, it)
+            }
+        return arenaStatuserForRelevanteStønadstyper
+            .map { arenaStatus ->
+                arenaStatus.vedtak.harAktivtVedtak
+                    .also { loggArenaStatus(arenaStatus, søknadstype, it) }
+            }.any { it }
+    }
 
     private fun loggArenaStatus(
         arenaStatus: ArenaStatusDto,
@@ -126,31 +113,47 @@ class SøknadRoutingService(
     }
 
     private fun lagreRouting(
-        context: RoutingContext,
+        ident: String,
+        søknadstype: Søknadstype,
         detaljer: Any,
     ) {
         søknadRoutingRepository.insert(
             SøknadRouting(
-                ident = context.ident,
-                type = context.søknadstype,
+                ident = ident,
+                type = søknadstype,
                 detaljer = JsonWrapper(objectMapper.writeValueAsString(detaljer)),
             ),
         )
     }
 
-    // Nå blir brukere som har en behandlig på daglig reise (enten det er TSO eller TSR) rutet til ny søknad
-    private fun harBehandling(context: RoutingContext): Boolean {
+    private fun loggRoutingResultatet(
+        søknadstype: Søknadstype,
+        skalBehandlesINyLøsning: Boolean,
+    ) {
+        logger.info(
+            "routing - " +
+                "stønadstype=$søknadstype " +
+                "skalBehandlesINyLøsning=$skalBehandlesINyLøsning",
+        )
+    }
+
+    private fun harBehandling(
+        ident: String,
+        søknadstype: Søknadstype,
+    ): Boolean {
         val harBehandling =
-            context.søknadstype
+            søknadstype
                 .tilStønadstyper()
-                .mapNotNull { fagsakService.finnFagsak(personIdenter = setOf(context.ident), stønadstype = it) }
+                .mapNotNull { fagsakService.finnFagsak(personIdenter = setOf(ident), stønadstype = it) }
                 .map { behandlingService.hentBehandlinger(fagsakId = it.id) }
                 .isNotEmpty()
 
-        logger.info("routing - stønadstype=${context.søknadstype} harBehandling=$harBehandling")
+        logger.info("routing - søknadstype=$søknadstype harBehandling=$harBehandling")
         return harBehandling
     }
 
-    private fun harAktivtAapVedtak(vedtakStatus: HarAktivtVedtakDto): Boolean =
-        vedtakStatus.type == TypeYtelsePeriode.AAP && vedtakStatus.harAktivtVedtak
+    private fun harAktivtAapVedtak(ident: String): Boolean =
+        with(ytelseService.harAktivtAapVedtak(ident)) {
+            return type == TypeYtelsePeriode.AAP && harAktivtVedtak
+        }
 }

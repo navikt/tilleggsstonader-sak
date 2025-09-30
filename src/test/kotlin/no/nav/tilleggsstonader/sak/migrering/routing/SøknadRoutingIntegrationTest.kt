@@ -50,7 +50,7 @@ class SøknadRoutingIntegrationTest(
         val routingSjekk = sjekkRoutingForPerson(SøknadRoutingDto(jonasIdent, søknadstype))
 
         assertTrue(routingSjekk.skalBehandlesINyLøsning)
-        assertTrue(routingHarBlittLagret(søknadstype))
+        assertFalse(routingHarBlittLagret(søknadstype))
     }
 
     @Nested
@@ -103,6 +103,7 @@ class SøknadRoutingIntegrationTest(
             val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
 
             assertFalse(routingSjekk.skalBehandlesINyLøsning)
+            assertFalse(routingHarBlittLagret())
         }
 
         @Test
@@ -112,6 +113,7 @@ class SøknadRoutingIntegrationTest(
             val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
 
             assertFalse(routingSjekk.skalBehandlesINyLøsning)
+            assertFalse(routingHarBlittLagret())
         }
 
         @Test
@@ -123,6 +125,17 @@ class SøknadRoutingIntegrationTest(
             val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
             assertTrue(routingSjekk.skalBehandlesINyLøsning)
             assertTrue(routingHarBlittLagret())
+        }
+
+        @Test
+        fun `brukere uten aktiv AAP skal bli routet til gammel løsning`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
+            mockDagligReiseVedtakIArena(erAktivt = false)
+            mockAapVedtak(erAktivt = false)
+
+            val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
+            assertFalse(routingSjekk.skalBehandlesINyLøsning)
+            assertFalse(routingHarBlittLagret())
         }
 
         @Test
