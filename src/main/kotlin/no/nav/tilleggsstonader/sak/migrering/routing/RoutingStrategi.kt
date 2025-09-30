@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.migrering.routing
 
-import no.nav.tilleggsstonader.kontrakter.felles.Søknadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.libs.unleash.ToggleId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 
@@ -14,12 +14,12 @@ sealed interface RoutingStrategi {
     ) : RoutingStrategi
 }
 
-fun bestemRoutingStrategi(søknadstype: Søknadstype): RoutingStrategi =
-    when (søknadstype) {
-        Søknadstype.BARNETILSYN -> RoutingStrategi.RouteAlleSøkereTilNyLøsning
-        Søknadstype.LÆREMIDLER -> RoutingStrategi.RouteAlleSøkereTilNyLøsning
-        Søknadstype.BOUTGIFTER -> RoutingStrategi.RouteAlleSøkereTilNyLøsning
-        Søknadstype.DAGLIG_REISE ->
+fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
+    when (skjematype) {
+        Skjematype.BARNETILSYN -> RoutingStrategi.RouteAlleSøkereTilNyLøsning
+        Skjematype.LÆREMIDLER -> RoutingStrategi.RouteAlleSøkereTilNyLøsning
+        Skjematype.BOUTGIFTER -> RoutingStrategi.RouteAlleSøkereTilNyLøsning
+        Skjematype.DAGLIG_REISE ->
             RoutingStrategi.RouteEnkelteSøkereTilNyLøsning(
                 featureToggleMaksAntall = Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
                 kreverAtSøkerErUtenAktivtVedtakIArena = true,

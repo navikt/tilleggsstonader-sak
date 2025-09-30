@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.migrering.routing
 
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.kontrakter.felles.Søknadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.tilStønadstyper
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.libs.log.logger
@@ -27,43 +27,43 @@ class SøknadRoutingService(
 ) {
     fun harLagretRouting(
         ident: String,
-        søknadstype: Søknadstype,
-    ) = søknadRoutingRepository.findByIdentAndType(ident, søknadstype) != null
+        skjematype: Skjematype,
+    ) = søknadRoutingRepository.findByIdentAndType(ident, skjematype) != null
 
     fun skalRoutesTilNyLøsning(
         ident: String,
-        søknadstype: Søknadstype,
+        skjematype: Skjematype,
     ): Boolean {
-        val routingStrategi = bestemRoutingStrategi(søknadstype)
+        val routingStrategi = bestemRoutingStrategi(skjematype)
 
         return when (routingStrategi) {
             RoutingStrategi.RouteAlleSøkereTilNyLøsning -> true
             is RoutingStrategi.RouteEnkelteSøkereTilNyLøsning ->
-                skalBrukerRoutesTilNyLøsning(ident, søknadstype, routingStrategi)
-        }.also { loggRoutingResultatet(søknadstype, it) }
+                skalBrukerRoutesTilNyLøsning(ident, skjematype, routingStrategi)
+        }.also { loggRoutingResultatet(skjematype, it) }
     }
 
     private fun skalBrukerRoutesTilNyLøsning(
         ident: String,
-        søknadstype: Søknadstype,
+        skjematype: Skjematype,
         kontekst: RoutingStrategi.RouteEnkelteSøkereTilNyLøsning,
     ): Boolean {
-        if (harLagretRouting(ident, søknadstype)) {
-            logger.info("routing - søknadstype=$søknadstype harLagretRouting=true")
+        if (harLagretRouting(ident, skjematype)) {
+            logger.info("routing - skjematype=$skjematype harLagretRouting=true")
             return true
         }
-        if (harBehandling(ident, søknadstype)) {
-            lagreRouting(ident, søknadstype, mapOf("harBehandling" to true))
+        if (harBehandling(ident, skjematype)) {
+            lagreRouting(ident, skjematype, mapOf("harBehandling" to true))
             return true
         }
-        if (maksAntallErNådd(søknadstype, toggleId = kontekst.featureToggleMaksAntall)) {
+        if (maksAntallErNådd(skjematype, toggleId = kontekst.featureToggleMaksAntall)) {
             return false
         }
-        if (kontekst.kreverAtSøkerErUtenAktivtVedtakIArena && harAktivtVedtakIArena(søknadstype, ident)) {
+        if (kontekst.kreverAtSøkerErUtenAktivtVedtakIArena && harAktivtVedtakIArena(skjematype, ident)) {
             return false
         }
         if (kontekst.kreverAktivtAapVedtak && harAktivtAapVedtak(ident)) {
-            lagreRouting(ident, søknadstype, mapOf("harAktivAAP" to true))
+            lagreRouting(ident, skjematype, mapOf("harAktivAAP" to true))
             return true
         }
 
@@ -71,73 +71,73 @@ class SøknadRoutingService(
     }
 
     private fun maksAntallErNådd(
-        søknadstype: Søknadstype,
+        skjematype: Skjematype,
         toggleId: ToggleId,
     ): Boolean {
         val maksAntall = unleashService.getVariantWithNameOrDefault(toggleId, "antall", 0)
-        val antall = søknadRoutingRepository.countByType(søknadstype)
-        logger.info("routing - stønadstype=$søknadstype antallIDatabase=$antall toggleMaksAntall=$maksAntall")
+        val antall = søknadRoutingRepository.countByType(skjematype)
+        logger.info("routing - stønadstype=$skjematype antallIDatabase=$antall toggleMaksAntall=$maksAntall")
         return antall >= maksAntall
     }
 
     private fun harAktivtVedtakIArena(
-        søknadstype: Søknadstype,
+        skjematype: Skjematype,
         ident: String,
     ): Boolean =
-        søknadstype.tilStønadstyper().any { stønadstype ->
+        skjematype.tilStønadstyper().any { stønadstype ->
             val arenaStatus = arenaService.hentStatus(ident, stønadstype)
             return arenaStatus.vedtak.harAktivtVedtak
-                .also { loggArenaStatus(arenaStatus, søknadstype, it) }
+                .also { loggArenaStatus(arenaStatus, skjematype, it) }
         }
 
     private fun lagreRouting(
         ident: String,
-        søknadstype: Søknadstype,
+        skjematype: Skjematype,
         detaljer: Any,
     ) {
         søknadRoutingRepository.insert(
             SøknadRouting(
                 ident = ident,
-                type = søknadstype,
+                type = skjematype,
                 detaljer = JsonWrapper(objectMapper.writeValueAsString(detaljer)),
             ),
         )
     }
 
     private fun loggRoutingResultatet(
-        søknadstype: Søknadstype,
+        skjematype: Skjematype,
         skalBehandlesINyLøsning: Boolean,
     ) {
         logger.info(
             "routing - " +
-                "stønadstype=$søknadstype " +
+                "stønadstype=$skjematype " +
                 "skalBehandlesINyLøsning=$skalBehandlesINyLøsning",
         )
     }
 
     private fun harBehandling(
         ident: String,
-        søknadstype: Søknadstype,
+        skjematype: Skjematype,
     ): Boolean {
         val harBehandling =
-            søknadstype
+            skjematype
                 .tilStønadstyper()
                 .mapNotNull { fagsakService.finnFagsak(personIdenter = setOf(ident), stønadstype = it) }
                 .map { behandlingService.hentBehandlinger(fagsakId = it.id) }
                 .isNotEmpty()
 
-        logger.info("routing - søknadstype=$søknadstype harBehandling=$harBehandling")
+        logger.info("routing - skjematype=$skjematype harBehandling=$harBehandling")
         return harBehandling
     }
 
     private fun loggArenaStatus(
         arenaStatus: ArenaStatusDto,
-        søknadstype: Søknadstype,
+        skjematype: Skjematype,
         harGyldigStatus: Boolean,
     ) {
         with(arenaStatus) {
             logger.info(
-                "routing - søknadstype=$søknadstype harGyldigStatusArena=$harGyldigStatus " +
+                "routing - skjematype=$skjematype harGyldigStatusArena=$harGyldigStatus " +
                     "harAktivSakUtenVedtak=${sak.harAktivSakUtenVedtak} " +
                     "harVedtak=${vedtak.harVedtak} " +
                     "harAktivtVedtak=${vedtak.harAktivtVedtak} " +

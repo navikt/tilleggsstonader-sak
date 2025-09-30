@@ -5,8 +5,9 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.arena.SakStatus
+import no.nav.tilleggsstonader.kontrakter.felles.IdentSkjematype
+import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.Søknadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
@@ -44,14 +45,14 @@ class SøknadRoutingIntegrationTest(
 
     @ParameterizedTest
     @EnumSource(
-        value = Søknadstype::class,
+        value = Skjematype::class,
         names = ["BARNETILSYN", "LÆREMIDLER", "BOUTGIFTER"],
     )
-    fun `visse stønadstyper skal alltid routes til ny løsning`(søknadstype: Søknadstype) {
-        val routingSjekk = sjekkRoutingForPerson(SøknadRoutingDto(jonasIdent, søknadstype))
+    fun `visse stønadstyper skal alltid routes til ny løsning`(skjematype: Skjematype) {
+        val routingSjekk = sjekkRoutingForPerson(IdentSkjematype(jonasIdent, skjematype))
 
         assertTrue(routingSjekk.skalBehandlesINyLøsning)
-        assertFalse(routingHarBlittLagret(søknadstype))
+        assertFalse(routingHarBlittLagret(skjematype))
     }
 
     @Nested
@@ -59,13 +60,13 @@ class SøknadRoutingIntegrationTest(
         val søknadRoutingDagligReise =
             SøknadRouting(
                 ident = jonasIdent,
-                type = Søknadstype.DAGLIG_REISE,
+                type = Skjematype.DAGLIG_REISE,
                 detaljer = JsonWrapper("{}"),
             )
         val dagligReiseRoutingRequest =
-            SøknadRoutingDto(
+            IdentSkjematype(
                 ident = jonasIdent,
-                søknadstype = Søknadstype.DAGLIG_REISE,
+                skjematype = Skjematype.DAGLIG_REISE,
             )
 
         @AfterEach
@@ -155,8 +156,8 @@ class SøknadRoutingIntegrationTest(
             mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = true)
 
-            val routingSjekkFørsteRouting = sjekkRoutingForPerson(SøknadRoutingDto(jonasIdent, Søknadstype.DAGLIG_REISE))
-            val routingSjekkAndreRouting = sjekkRoutingForPerson(SøknadRoutingDto(ernaIdent, Søknadstype.DAGLIG_REISE))
+            val routingSjekkFørsteRouting = sjekkRoutingForPerson(IdentSkjematype(jonasIdent, Skjematype.DAGLIG_REISE))
+            val routingSjekkAndreRouting = sjekkRoutingForPerson(IdentSkjematype(ernaIdent, Skjematype.DAGLIG_REISE))
 
             assertTrue(routingSjekkFørsteRouting.skalBehandlesINyLøsning)
             assertTrue(routingHarBlittLagret(ident = jonasIdent))
@@ -204,7 +205,7 @@ class SøknadRoutingIntegrationTest(
     }
 
     private fun routingHarBlittLagret(
-        søknadstype: Søknadstype = Søknadstype.DAGLIG_REISE,
+        skjematype: Skjematype = Skjematype.DAGLIG_REISE,
         ident: String = jonasIdent,
-    ) = testoppsettService.hentSøknadRouting(ident, søknadstype) != null
+    ) = testoppsettService.hentSøknadRouting(ident, skjematype) != null
 }

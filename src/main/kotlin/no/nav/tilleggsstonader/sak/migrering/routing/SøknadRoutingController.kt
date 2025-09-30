@@ -1,9 +1,10 @@
 package no.nav.tilleggsstonader.sak.migrering.routing
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.IdentSkjematype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.kallKommerFra
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -19,11 +20,11 @@ class SøknadRoutingController(
     @PostMapping()
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun sjekkRoutingForPerson(
-        @RequestBody request: SøknadRoutingDto,
+        @RequestBody request: IdentSkjematype,
     ): SøknadRoutingResponse {
-        feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.SOKNAD_API), HttpStatus.UNAUTHORIZED) {
+        feilHvisIkke(kallKommerFra(EksternApplikasjon.SOKNAD_API), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
-        return with(request) { SøknadRoutingResponse(søknadRoutingService.skalRoutesTilNyLøsning(ident, søknadstype)) }
+        return with(request) { SøknadRoutingResponse(søknadRoutingService.skalRoutesTilNyLøsning(ident, skjematype)) }
     }
 }

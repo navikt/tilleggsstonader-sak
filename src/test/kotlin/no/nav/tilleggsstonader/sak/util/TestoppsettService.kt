@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.Søknadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -183,7 +183,7 @@ class TestoppsettService(
 
     fun hentSøknadRouting(
         ident: String,
-        type: Søknadstype,
+        type: Skjematype,
     ) = søknadRoutingRepository.findByIdentAndType(ident, type)
 
     private fun hentEllerOpprettPerson(fagsak: Fagsak): FagsakPerson =
