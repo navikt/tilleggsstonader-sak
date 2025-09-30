@@ -55,9 +55,9 @@ class ArenaStatusService(
             logger.info("$logPrefix finnes=true skalAlltidBehandlesITsSak")
             return true
         }
-        // TODO: Routingen skiller ikke mellom TSO og TSR, men i starten vil alle routunger på daglig reise bare gjelde TSO. Etter hvert
-        //  som TSR også slipper gjennom i routingen må vi diskutere hvorvidt vi ønsker å låse en person på både TSO og TSR, eller skille
-        //  dem fra hverandre.
+        // I routingen skiller vi ikke mellom TSO og TSR for daglig reise, men i starten vil alle routinger på daglig reise bare gjelde TSO.
+        // Etter hvert som TSR også slipper gjennom i routingen må vi diskutere hvorvidt vi ønsker å låse en person på både TSO og TSR,
+        // eller skille dem fra hverandre.
         val requestGjelderDagligReiseTiltaksenheten = request.stønadstype == Stønadstype.DAGLIG_REISE_TSR
         if (harRouting(identer, request.stønadstype.tilSøknadstype()) && !requestGjelderDagligReiseTiltaksenheten) {
             logger.info("$logPrefix finnes=true harRouting")
