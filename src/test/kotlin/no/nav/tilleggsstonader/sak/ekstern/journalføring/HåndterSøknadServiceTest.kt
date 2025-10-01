@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
@@ -62,6 +63,7 @@ internal class HåndterSøknadServiceTest {
             fagsakService = fagsakService,
             behandlingService = behandlingService,
             søknadService = søknadService,
+            unleashService = mockUnleashService(),
         )
 
     val enhet = ArbeidsfordelingService.MASKINELL_JOURNALFOERENDE_ENHET

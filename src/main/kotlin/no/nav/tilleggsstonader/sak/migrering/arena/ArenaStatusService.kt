@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
-import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
@@ -43,10 +42,6 @@ class ArenaStatusService(
         )
 
         val logPrefix = "Sjekker om person finnes i ny løsning stønadstype=${request.stønadstype}"
-        if (skalKunneOppretteSakIArenaForPerson(fagsak)) {
-            logger.info("$logPrefix unntakFagsakSjekk")
-            return false
-        }
         if (harBehandling(fagsak)) {
             logger.info("$logPrefix finnes=true harRouting harBehandling")
             return true
@@ -66,11 +61,6 @@ class ArenaStatusService(
         return false
     }
 
-    private fun skalKunneOppretteSakIArenaForPerson(fagsak: Fagsak?): Boolean {
-        val fagsakId = fagsak?.id
-        return fagsakId in setOf<FagsakId>()
-    }
-
     /**
      * Denne håndterer at gitt stønadstype alltid svarer med at personen finnes i ny løsning.
      * Eks for Barnetilsyn er det ønskelig at personen skal håndteres i ny løsning og at det ikke fattes nye vedtak i Arena
@@ -79,9 +69,9 @@ class ArenaStatusService(
         when (stønadstype) {
             Stønadstype.BARNETILSYN -> true
             Stønadstype.LÆREMIDLER -> true
-            Stønadstype.BOUTGIFTER -> false
-            Stønadstype.DAGLIG_REISE_TSO -> TODO("Daglig reise er ikke implementert enda")
-            Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise er ikke implementert enda")
+            Stønadstype.BOUTGIFTER -> true
+            Stønadstype.DAGLIG_REISE_TSO -> false
+            Stønadstype.DAGLIG_REISE_TSR -> false
         }
 
     private fun harBehandling(fagsak: Fagsak?): Boolean =

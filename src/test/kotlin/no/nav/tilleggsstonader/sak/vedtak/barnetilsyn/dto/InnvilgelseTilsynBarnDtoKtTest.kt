@@ -78,7 +78,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
          * beløp som allerede er innvilget
          */
         @Test
-        fun `skal mappe beløp fra perioder som gjelder fra og med tidligste endring`() {
+        fun `skal mappe beløp fra hele måneden når tidligste endring er satt`() {
             val tidligsteEndring = LocalDate.of(2024, 1, 17)
             val dto =
                 BeregningsresultatTilsynBarn(
@@ -95,7 +95,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
                         ),
                 ).tilDto(tidligsteEndring)
 
-            assertThat(dto.perioder.single().månedsbeløp).isEqualTo(50)
+            assertThat(dto.perioder.single().månedsbeløp).isEqualTo(60)
         }
     }
 

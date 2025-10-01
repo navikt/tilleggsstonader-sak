@@ -21,6 +21,8 @@ enum class Toggle(
     TILLAT_LØPENDE_OG_MIDLERTIDIG_UTGIFT_SAMME_BEHANDLING("sak.tillat-lopende-og-midlertidig-utgift-samme-behandling"),
 
     SKAL_VALIDERE_ÅRSAK_TIL_AVSLAG("sak.skal-validere-arsak-til-avslag"),
+    KAN_SAKSBEHANDLE_DAGLIG_REISE_TSO("sak.frontend.kan-saksbehandle.daglig-reise-tso"),
+    KAN_SAKSBEHANDLE_DAGLIG_REISE_TSR("sak.frontend.kan-saksbehandle.daglig-reise-tsr"),
 
     SØKNAD_ROUTING_DAGLIG_REISE("sak.soknad-routing.daglig-reise"),
 }

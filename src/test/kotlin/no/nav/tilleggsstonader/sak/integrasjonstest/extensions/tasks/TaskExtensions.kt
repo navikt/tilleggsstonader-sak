@@ -8,7 +8,12 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import org.springframework.data.domain.Pageable
 
-// Returnerer tasks som er blitt kjørt
+fun IntegrationTest.kjørTasksKlareForProsesseringTilIngenTasksIgjen() {
+    do {
+        kjørTasksKlareForProsessering()
+    } while (taskService.finnAlleTasksKlareForProsessering(Pageable.unpaged()).isNotEmpty())
+}
+
 fun IntegrationTest.kjørTasksKlareForProsessering() {
     logger.info("Kjører tasks klare for prosessering")
     taskService

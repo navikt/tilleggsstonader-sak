@@ -25,11 +25,11 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Valg
 import java.time.LocalDate
 
 object SøknadDagligReiseUtil {
-    fun søknadDagligReise(): SøknadsskjemaDagligReiseFyllUtSendInn {
+    fun søknadDagligReise(hovedytelse: Map<HovedytelseType, Boolean> = defaultHovedytelse): SøknadsskjemaDagligReiseFyllUtSendInn {
         val skjemaDagligReise =
             SkjemaDagligReise(
                 dineOpplysninger = dineOpplysninger(),
-                hovedytelse = mapOf(HovedytelseType.arbeidsavklaringspenger to true),
+                hovedytelse = hovedytelse,
                 aktiviteter = aktiviteter(),
                 reise = listOf(reise()),
                 arbeidOgOpphold =
@@ -50,6 +50,8 @@ object SøknadDagligReiseUtil {
             dokumentasjon = emptyList(),
         )
     }
+
+    private val defaultHovedytelse = mapOf(HovedytelseType.arbeidsavklaringspenger to true)
 
     private fun dineOpplysninger(): DineOpplysninger =
         DineOpplysninger(

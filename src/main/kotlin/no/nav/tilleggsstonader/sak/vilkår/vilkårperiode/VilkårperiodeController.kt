@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.OppdaterGrunnlagDto
-import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -23,7 +22,6 @@ import java.util.UUID
 @RestController
 @RequestMapping(path = ["/api/vilkarperiode"])
 @ProtectedWithClaims(issuer = "azuread")
-@Validated
 class VilkårperiodeController(
     private val tilgangService: TilgangService,
     private val vilkårperiodeService: VilkårperiodeService,

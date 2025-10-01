@@ -47,12 +47,14 @@ interface OppfølgingRepository :
         fe.id AS saksnummer,
         f.stonadstype,
         f.fagsak_person_id,
+        pid.ident AS fagsak_person_ident,
         b.vedtakstidspunkt,
         (select count(*) > 0 from behandling b where b.forrige_iverksatte_behandling_id = o.behandling_id) har_nyere_behandling
         FROM oppfolging o
         JOIN behandling b ON b.id = o.behandling_id
         JOIN fagsak f ON f.id = b.fagsak_id
         JOIN fagsak_ekstern fe ON fe.fagsak_id = f.id
+        JOIN person_ident pid on f.fagsak_person_id = pid.fagsak_person_id
         WHERE o.aktiv=true
     """,
     )
@@ -65,12 +67,14 @@ interface OppfølgingRepository :
         fe.id AS saksnummer,
         f.stonadstype,
         f.fagsak_person_id,
+        pid.ident AS fagsak_person_ident,
         b.vedtakstidspunkt,
         (select count(*) > 0 from behandling b where b.forrige_iverksatte_behandling_id = o.behandling_id) har_nyere_behandling
         FROM oppfolging o 
         JOIN behandling b ON b.id = o.behandling_id
         JOIN fagsak f ON f.id = b.fagsak_id
         JOIN fagsak_ekstern fe ON fe.fagsak_id = f.id
+        JOIN person_ident pid on f.fagsak_person_id = pid.fagsak_person_id
         WHERE o.aktiv=true
         AND o.behandling_id = :behandlingId
     """,
@@ -154,6 +158,7 @@ data class OppfølgingMedDetaljer(
 data class Behandlingsdetaljer(
     val saksnummer: Long,
     val fagsakPersonId: FagsakPersonId,
+    val fagsakPersonIdent: String,
     @Column("stonadstype")
     val stønadstype: Stønadstype,
     val vedtakstidspunkt: LocalDateTime,
