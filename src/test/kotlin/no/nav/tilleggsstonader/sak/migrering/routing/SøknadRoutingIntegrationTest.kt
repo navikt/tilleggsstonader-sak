@@ -25,9 +25,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.period
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -51,8 +50,8 @@ class SøknadRoutingIntegrationTest(
     fun `visse stønadstyper skal alltid routes til ny løsning`(skjematype: Skjematype) {
         val routingSjekk = sjekkRoutingForPerson(IdentSkjematype(jonasIdent, skjematype))
 
-        assertTrue(routingSjekk.skalBehandlesINyLøsning)
-        assertFalse(routingHarBlittLagret(skjematype))
+        assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+        assertThat(routingHarBlittLagret(skjematype)).isFalse()
     }
 
     @Nested
@@ -80,7 +79,7 @@ class SøknadRoutingIntegrationTest(
 
             val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
 
-            assertTrue(routingSjekk.skalBehandlesINyLøsning)
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
         }
 
         @ParameterizedTest
@@ -97,8 +96,8 @@ class SøknadRoutingIntegrationTest(
 
             val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
 
-            assertTrue(routingSjekk.skalBehandlesINyLøsning)
-            assertTrue(routingHarBlittLagret())
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+            assertThat(routingHarBlittLagret()).isTrue()
         }
 
         @Test
@@ -108,8 +107,8 @@ class SøknadRoutingIntegrationTest(
 
             val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
 
-            assertFalse(routingSjekk.skalBehandlesINyLøsning)
-            assertFalse(routingHarBlittLagret())
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingHarBlittLagret()).isFalse()
         }
 
         @Test
@@ -118,8 +117,8 @@ class SøknadRoutingIntegrationTest(
 
             val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
 
-            assertFalse(routingSjekk.skalBehandlesINyLøsning)
-            assertFalse(routingHarBlittLagret())
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingHarBlittLagret()).isFalse()
         }
 
         @Test
@@ -129,8 +128,8 @@ class SøknadRoutingIntegrationTest(
             mockAapVedtak(erAktivt = true)
 
             val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
-            assertTrue(routingSjekk.skalBehandlesINyLøsning)
-            assertTrue(routingHarBlittLagret())
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+            assertThat(routingHarBlittLagret()).isTrue()
         }
 
         @Test
@@ -140,8 +139,8 @@ class SøknadRoutingIntegrationTest(
             mockAapVedtak(erAktivt = false)
 
             val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
-            assertFalse(routingSjekk.skalBehandlesINyLøsning)
-            assertFalse(routingHarBlittLagret())
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingHarBlittLagret()).isFalse()
         }
 
         @Test
@@ -153,10 +152,10 @@ class SøknadRoutingIntegrationTest(
             val routingSjekkFørsteRouting = sjekkRoutingForPerson(IdentSkjematype(jonasIdent, Skjematype.DAGLIG_REISE))
             val routingSjekkAndreRouting = sjekkRoutingForPerson(IdentSkjematype(ernaIdent, Skjematype.DAGLIG_REISE))
 
-            assertTrue(routingSjekkFørsteRouting.skalBehandlesINyLøsning)
-            assertTrue(routingHarBlittLagret(ident = jonasIdent))
-            assertFalse(routingSjekkAndreRouting.skalBehandlesINyLøsning)
-            assertFalse(routingHarBlittLagret(ident = ernaIdent))
+            assertThat(routingSjekkFørsteRouting.skalBehandlesINyLøsning).isTrue()
+            assertThat(routingHarBlittLagret(ident = jonasIdent)).isTrue()
+            assertThat(routingSjekkAndreRouting.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingHarBlittLagret(ident = ernaIdent)).isFalse()
         }
 
         private fun mockMaksAntallSomKanRoutesPåDagligReise(maksAntall: Int) {
