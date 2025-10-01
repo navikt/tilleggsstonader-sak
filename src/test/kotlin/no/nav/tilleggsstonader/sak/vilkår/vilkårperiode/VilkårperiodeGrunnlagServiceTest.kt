@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.RegisterAktivitetClientConfig
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
@@ -33,7 +32,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.Vilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.grunnlagYtelseOk
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -58,12 +56,6 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
     lateinit var ytelseClient: YtelseClient
 
     val ingenVilkårperioder = Vilkårperioder(emptyList(), emptyList())
-
-    @AfterEach
-    override fun tearDown() {
-        super.tearDown()
-        RegisterAktivitetClientConfig.resetMock(registerAktivitetClient)
-    }
 
     @Test
     internal fun `skal lagre ned grunnlagsadata på aktiviteter når man henter vilkårsperioder`() {

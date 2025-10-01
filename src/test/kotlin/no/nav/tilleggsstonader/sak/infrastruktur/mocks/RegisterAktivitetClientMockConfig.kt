@@ -12,17 +12,13 @@ import org.springframework.context.annotation.Profile
 
 @Configuration
 @Profile("mock-register-aktivitet")
-class RegisterAktivitetClientConfig {
+class RegisterAktivitetClientMockConfig {
     @Bean
     @Primary
-    fun registerAktivitetClient(): RegisterAktivitetClient {
-        val client = mockk<RegisterAktivitetClient>()
-        resetMock(client)
-        return client
-    }
+    fun registerAktivitetClient() = mockk<RegisterAktivitetClient>().apply { resetTilDefault(this) }
 
     companion object {
-        fun resetMock(client: RegisterAktivitetClient) {
+        fun resetTilDefault(client: RegisterAktivitetClient) {
             clearMocks(client)
             every { client.hentAktiviteter(any(), any(), any()) } returns listOf(aktivitetArenaDto())
         }

@@ -29,121 +29,13 @@ import java.time.LocalDateTime
 
 @Configuration
 @Profile("mock-journalpost")
-class JournalpostClientConfig {
+class JournalpostClientMockConfig {
     @Bean
     @Primary
-    fun journalpostClient(): JournalpostClient {
-        resetMock(journalpostClientMock)
-        return journalpostClientMock
-    }
+    fun journalpostClient() = mockk<JournalpostClient>().apply { resetTilDefault(this) }
 
     companion object {
-        const val JOURNALPOST_ID_MED_FEIL = "journalpostIdMedFeil"
-
-        private val journalpostClientMock = mockk<JournalpostClient>()
-
-        private val dummyPdf =
-            this::class.java.classLoader
-                .getResource("interntVedtak/BARNETILSYN/internt_vedtak.pdf")!!
-                .readBytes()
-
-        private fun avsenderMottaker() =
-            AvsenderMottaker(
-                id = "12345678910",
-                type = AvsenderMottakerIdType.FNR,
-                navn = "Ola Nordmann",
-                land = "NOR",
-                erLikBruker = true,
-            )
-
-        private fun mockFeiletDistribusjon(journalpostClient: JournalpostClient) {
-            every {
-                journalpostClient.distribuerJournalpost(
-                    match { it.journalpostId == JOURNALPOST_ID_MED_FEIL },
-                    any(),
-                )
-            } throws RestClientException("noe feilet")
-        }
-
-        private val journalpost =
-            Journalpost(
-                "1",
-                Journalposttype.I,
-                journalstatus = Journalstatus.MOTTATT,
-                tema = Tema.TSO.toString(),
-                behandlingstema = "ab0300",
-                tittel = "Søknad om barnetilsyn",
-                bruker = Bruker("12345678910", BrukerIdType.FNR),
-                avsenderMottaker = avsenderMottaker(),
-                journalforendeEnhet = "tilleggsstonader-sak",
-                relevanteDatoer =
-                    listOf(
-                        RelevantDato(LocalDateTime.now().minusDays(7), "DATO_REGISTRERT"),
-                        RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT"),
-                    ),
-                dokumenter =
-                    listOf(
-                        DokumentInfo(
-                            dokumentInfoId = "1",
-                            tittel = "Dummy dokument 1",
-                            logiskeVedlegg =
-                                listOf(
-                                    LogiskVedlegg("1", "Dokumentasjon på sykdom"),
-                                    LogiskVedlegg("2", "Inntektsendring"),
-                                    LogiskVedlegg("3", "Samværsmelding"),
-                                ),
-                            dokumentvarianter =
-                                listOf(
-                                    Dokumentvariant(
-                                        variantformat = Dokumentvariantformat.ARKIV,
-                                        saksbehandlerHarTilgang = true,
-                                    ),
-                                ),
-                        ),
-                        DokumentInfo(
-                            dokumentInfoId = "2",
-                            tittel = "Dummy dokument 2",
-                            dokumentvarianter =
-                                listOf(
-                                    Dokumentvariant(
-                                        variantformat = Dokumentvariantformat.ARKIV,
-                                        saksbehandlerHarTilgang = true,
-                                    ),
-                                ),
-                        ),
-                    ),
-            )
-
-        val journalposter = mutableMapOf<Long, Journalpost>()
-
-        fun resetJournalposter() {
-            journalposter.clear()
-            journalposter[journalpost.journalpostId.toLong()] = journalpost
-        }
-
-        // Journalpost må ha dokumentinfo med variant ORIGINAL
-        fun leggTilJournalpostMedSøknadIMock(
-            journalpost: Journalpost,
-            originaldokument: ByteArray,
-        ) {
-            journalposter[journalpost.journalpostId.toLong()] = journalpost
-            val dokumentInfoIdMedOriginalVariant =
-                journalpost.dokumenter
-                    ?.first { dokumentInfo ->
-                        dokumentInfo.dokumentvarianter?.any { it.variantformat == Dokumentvariantformat.ORIGINAL } == true
-                    }?.dokumentInfoId ?: error("Journalpost mangler dokument med variant ORIGINAL")
-
-            every {
-                journalpostClientMock.hentDokument(
-                    journalpost.journalpostId,
-                    dokumentInfoIdMedOriginalVariant,
-                    Dokumentvariantformat.ORIGINAL,
-                )
-            } returns
-                originaldokument
-        }
-
-        fun resetMock(journalpostClient: JournalpostClient) {
+        fun resetTilDefault(journalpostClient: JournalpostClient) {
             clearMocks(journalpostClient)
             resetJournalposter()
 
@@ -261,5 +153,86 @@ class JournalpostClientConfig {
                     )
             }
         }
+
+        val journalposter = mutableMapOf<Long, Journalpost>()
+
+        const val JOURNALPOST_ID_MED_FEIL = "journalpostIdMedFeil"
+
+        private val dummyPdf =
+            this::class.java.classLoader
+                .getResource("interntVedtak/BARNETILSYN/internt_vedtak.pdf")!!
+                .readBytes()
+
+        private fun avsenderMottaker() =
+            AvsenderMottaker(
+                id = "12345678910",
+                type = AvsenderMottakerIdType.FNR,
+                navn = "Ola Nordmann",
+                land = "NOR",
+                erLikBruker = true,
+            )
+
+        private fun mockFeiletDistribusjon(journalpostClient: JournalpostClient) {
+            every {
+                journalpostClient.distribuerJournalpost(
+                    match { it.journalpostId == JOURNALPOST_ID_MED_FEIL },
+                    any(),
+                )
+            } throws RestClientException("noe feilet")
+        }
+
+        private fun resetJournalposter() {
+            journalposter.clear()
+            journalposter[journalpost.journalpostId.toLong()] = journalpost
+        }
+
+        private val journalpost =
+            Journalpost(
+                "1",
+                Journalposttype.I,
+                journalstatus = Journalstatus.MOTTATT,
+                tema = Tema.TSO.toString(),
+                behandlingstema = "ab0300",
+                tittel = "Søknad om barnetilsyn",
+                bruker = Bruker("12345678910", BrukerIdType.FNR),
+                avsenderMottaker = avsenderMottaker(),
+                journalforendeEnhet = "tilleggsstonader-sak",
+                relevanteDatoer =
+                    listOf(
+                        RelevantDato(LocalDateTime.now().minusDays(7), "DATO_REGISTRERT"),
+                        RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT"),
+                    ),
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            dokumentInfoId = "1",
+                            tittel = "Dummy dokument 1",
+                            logiskeVedlegg =
+                                listOf(
+                                    LogiskVedlegg("1", "Dokumentasjon på sykdom"),
+                                    LogiskVedlegg("2", "Inntektsendring"),
+                                    LogiskVedlegg("3", "Samværsmelding"),
+                                ),
+                            dokumentvarianter =
+                                listOf(
+                                    Dokumentvariant(
+                                        variantformat = Dokumentvariantformat.ARKIV,
+                                        saksbehandlerHarTilgang = true,
+                                    ),
+                                ),
+                        ),
+                        DokumentInfo(
+                            dokumentInfoId = "2",
+                            tittel = "Dummy dokument 2",
+                            dokumentvarianter =
+                                listOf(
+                                    Dokumentvariant(
+                                        variantformat = Dokumentvariantformat.ARKIV,
+                                        saksbehandlerHarTilgang = true,
+                                    ),
+                                ),
+                        ),
+                    ),
+            )
     }
 }

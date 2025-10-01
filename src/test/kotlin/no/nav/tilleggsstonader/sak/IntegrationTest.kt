@@ -24,7 +24,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.hendelser.Hendelse
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.MockService
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.MockClientService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRouting
@@ -64,21 +64,22 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @SpringBootTest(classes = [App::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(
     "integrasjonstest",
-    "mock-pdl",
-    "mock-egen-ansatt",
-    "mock-familie-dokument",
-    "mock-iverksett",
-    "mock-oppgave",
-    "mock-journalpost",
-    "mock-featuretoggle",
-    "mock-htmlify",
-    "mock-arena",
-    "mock-register-aktivitet",
-    "mock-kodeverk",
     "mock-arbeidsfordeling",
+    "mock-arena",
+    "mock-egen-ansatt",
+    "mock-featuretoggle",
+    "mock-familie-dokument",
+    "mock-fullmakt",
+    "mock-htmlify",
+    "mock-iverksett",
+    "mock-journalpost",
     "mock-kafka",
-    "mock-ytelse-client",
     "mock-klage",
+    "mock-kodeverk",
+    "mock-oppgave",
+    "mock-pdl",
+    "mock-register-aktivitet",
+    "mock-ytelse-client",
 )
 @EnableMockOAuth2Server
 @AutoConfigureWebTestClient
@@ -108,7 +109,7 @@ abstract class IntegrationTest {
     private lateinit var cacheManagers: List<CacheManager>
 
     @Autowired
-    protected lateinit var mockService: MockService
+    protected lateinit var mockClientService: MockClientService
 
     @Autowired
     lateinit var taskService: TaskService
@@ -134,9 +135,9 @@ abstract class IntegrationTest {
 
     @AfterEach
     fun tearDown() {
-        clearClientMocks()
         resetDatabase()
         clearCaches()
+        mockClientService.resetAlleTilDefaults()
         resetMock(unleashService)
     }
 
@@ -175,9 +176,6 @@ abstract class IntegrationTest {
             PersonIdent::class,
             FagsakPerson::class,
         ).forEach { jdbcAggregateOperations.deleteAll(it.java) }
-    }
-
-    private fun clearClientMocks() {
     }
 
     private fun clearCaches() {

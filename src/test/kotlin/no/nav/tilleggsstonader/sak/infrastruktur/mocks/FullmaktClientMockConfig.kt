@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.opplysninger.fullmakt.FullmaktClient
@@ -11,14 +12,15 @@ import org.springframework.context.annotation.Profile
 
 @Configuration
 @Profile("mock-fullmakt")
-class FullmaktClientConfig {
+class FullmaktClientMockConfig {
     @Bean
     @Primary
-    fun fullmaktClient(): FullmaktClient {
-        val fullmaktClient = mockk<FullmaktClient>()
+    fun fullmaktClient() = mockk<FullmaktClient>().apply { resetTilDefault(this) }
 
-        every { fullmaktClient.hentFullmektige(any()) } returns listOf(FullmektigStubs.gyldig)
-
-        return fullmaktClient
+    companion object {
+        fun resetTilDefault(fullmaktClient: FullmaktClient) {
+            clearMocks(fullmaktClient)
+            every { fullmaktClient.hentFullmektige(any()) } returns listOf(FullmektigStubs.gyldig)
+        }
     }
 }

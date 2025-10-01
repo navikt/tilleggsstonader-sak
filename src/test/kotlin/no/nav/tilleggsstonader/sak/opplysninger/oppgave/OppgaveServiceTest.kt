@@ -31,7 +31,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientMockConfig
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMedMetadata
@@ -85,8 +85,8 @@ internal class OppgaveServiceTest {
             FinnMappeResponseDto(
                 2,
                 listOf(
-                    MappeDto(OppgaveClientConfig.MAPPE_ID_KLAR, OppgaveMappe.KLAR.navn.first(), "4462"),
-                    MappeDto(OppgaveClientConfig.MAPPE_ID_PÅ_VENT, OppgaveMappe.PÅ_VENT.navn.first(), "4462"),
+                    MappeDto(OppgaveClientMockConfig.MAPPE_ID_KLAR, OppgaveMappe.KLAR.navn.first(), "4462"),
+                    MappeDto(OppgaveClientMockConfig.MAPPE_ID_PÅ_VENT, OppgaveMappe.PÅ_VENT.navn.first(), "4462"),
                 ),
             )
         mockkObject(OppgaveUtil)
@@ -150,7 +150,7 @@ internal class OppgaveServiceTest {
 
             oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
 
-            assertThat(slot.captured.mappeId).isEqualTo(OppgaveClientConfig.MAPPE_ID_KLAR)
+            assertThat(slot.captured.mappeId).isEqualTo(OppgaveClientMockConfig.MAPPE_ID_KLAR)
         }
 
         @Test
@@ -407,7 +407,7 @@ internal class OppgaveServiceTest {
 
         oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, oppgaverPåVent = true, enhet = ENHET_NR_NAY))
 
-        verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == false && it.mappeId == OppgaveClientConfig.MAPPE_ID_PÅ_VENT }) }
+        verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == false && it.mappeId == OppgaveClientMockConfig.MAPPE_ID_PÅ_VENT }) }
     }
 
     @Test
@@ -474,7 +474,7 @@ internal class OppgaveServiceTest {
             tilordnetSaksbehandler = null,
             status = Oppgavestatus.ÅPEN,
             tildeltEnhetsnummer = ENHETSNUMMER,
-            enhetsmappeId = OppgaveClientConfig.MAPPE_ID_KLAR,
+            enhetsmappeId = OppgaveClientMockConfig.MAPPE_ID_KLAR,
         )
 
     private fun lagEksternTestOppgave(): Oppgave = Oppgave(id = GSAK_OPPGAVE_ID, versjon = 0)

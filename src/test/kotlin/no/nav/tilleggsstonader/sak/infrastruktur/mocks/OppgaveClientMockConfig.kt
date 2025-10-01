@@ -38,12 +38,12 @@ import kotlin.jvm.optionals.getOrNull
 
 @Configuration
 @Profile("mock-oppgave")
-class OppgaveClientConfig {
+class OppgaveClientMockConfig {
     @Bean
     @Primary
     fun oppgaveClient(oppgavelager: Oppgavelager): OppgaveClient {
         val oppgaveClient = mockk<OppgaveClient>()
-        resetMock(oppgaveClient, oppgavelager)
+        resetTilDefault(oppgaveClient, oppgavelager)
         return oppgaveClient
     }
 
@@ -51,7 +51,7 @@ class OppgaveClientConfig {
         const val MAPPE_ID_PÅ_VENT = 10L
         const val MAPPE_ID_KLAR = 20L
 
-        fun resetMock(
+        fun resetTilDefault(
             oppgaveClient: OppgaveClient,
             oppgavelager: Oppgavelager,
         ) {
@@ -284,7 +284,7 @@ class Oppgavelager {
 
     /**
      * Skal ikke skrive over maxOppgaveId hvis id er null.
-     * [oppdaterMaxOppgaveId] kjører etter at man har lagt inn 2 dummyoppgaver i [OppgaveClientConfig]
+     * [oppdaterMaxOppgaveId] kjører etter at man har lagt inn 2 dummyoppgaver i [OppgaveClientMockConfig]
      * så man skal ikke resette den til 0 hvis det ikke finnes noen oppgaver i repository
      */
     fun oppdaterMaxOppgaveId(id: Long?) {

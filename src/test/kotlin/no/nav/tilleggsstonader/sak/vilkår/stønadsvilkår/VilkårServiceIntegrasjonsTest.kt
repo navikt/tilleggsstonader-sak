@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
@@ -152,7 +152,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     @Nested
     inner class OpprettVilkår {
         val behandling = behandling(status = BehandlingStatus.UTREDES, steg = StegType.VILKÅR)
-        val barn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.BARN_FNR)
+        val barn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientMockConfig.BARN_FNR)
 
         val opprettOppfyltDelvilkår =
             OpprettVilkårDto(
@@ -229,7 +229,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     @Nested
     inner class OppdaterVilkår {
         val behandling = behandling(status = BehandlingStatus.UTREDES, steg = StegType.VILKÅR)
-        val barn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.BARN_FNR)
+        val barn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientMockConfig.BARN_FNR)
 
         val opprettOppfyltDelvilkår =
             OpprettVilkårDto(

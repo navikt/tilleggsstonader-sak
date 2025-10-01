@@ -7,9 +7,8 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig.Companion.familierelasjonerBarn
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig.Companion.resetMock
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig.Companion.familierelasjonerBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAndreForeldreSaksinformasjon
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagPersonopplysninger
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GeneriskFaktaGrunnlagTestUtil.faktaGrunnlagBarnAnnenForelder
@@ -29,7 +28,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningTestUtil.vedtaksperiodeBeregning
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -55,7 +53,7 @@ class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
     @Autowired
     lateinit var pdlClient: PdlClient
 
-    val fagsak = fagsak(identer = fagsakpersoner(PdlClientConfig.SØKER_FNR))
+    val fagsak = fagsak(identer = fagsakpersoner(PdlClientMockConfig.SØKER_FNR))
     val behandling = behandling(fagsak)
 
     @BeforeEach
@@ -64,14 +62,8 @@ class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
         testoppsettService.lagre(behandling, opprettGrunnlagsdata = false)
         every { pdlClient.hentBarn(any()) } returns
             mapOf(
-                PdlClientConfig.BARN_FNR to pdlBarn(forelderBarnRelasjon = familierelasjonerBarn()),
+                PdlClientMockConfig.BARN_FNR to pdlBarn(forelderBarnRelasjon = familierelasjonerBarn()),
             )
-    }
-
-    @AfterEach
-    override fun tearDown() {
-        super.tearDown()
-        resetMock(pdlClient)
     }
 
     @Test
@@ -87,7 +79,7 @@ class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
     inner class FaktaGrunnlagPersonopplysningerTest {
         @Test
         fun `skal opprette grunnlag til behandlingBarn`() {
-            barnRepository.insert(behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.BARN_FNR))
+            barnRepository.insert(behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientMockConfig.BARN_FNR))
 
             faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandling.id)
 
@@ -112,7 +104,7 @@ class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
 
     @Nested
     inner class FaktaGrunnlagBarnAndreForeldreSaksinformasjonTest {
-        val fagsakAnnenForelder = fagsak(identer = fagsakpersoner(PdlClientConfig.ANNEN_FORELDER_FNR))
+        val fagsakAnnenForelder = fagsak(identer = fagsakpersoner(PdlClientMockConfig.ANNEN_FORELDER_FNR))
         val behandlingAnnenForelder =
             behandling(
                 fagsakAnnenForelder,
@@ -124,7 +116,7 @@ class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
 
         @BeforeEach
         fun setUp() {
-            val barn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.BARN_FNR)
+            val barn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientMockConfig.BARN_FNR)
             barnService.opprettBarn(listOf(barn))
         }
 
@@ -147,9 +139,9 @@ class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
             val grunnlagAndreForeldre = hentGrunnlag()
             assertThat(grunnlagAndreForeldre).hasSize(1)
             with(grunnlagAndreForeldre.single().data) {
-                assertThat(this.identBarn).isEqualTo(PdlClientConfig.BARN_FNR)
+                assertThat(this.identBarn).isEqualTo(PdlClientMockConfig.BARN_FNR)
                 assertThat(this.andreForeldre).hasSize(1)
-                assertThat(this.andreForeldre[0].ident).isEqualTo(PdlClientConfig.ANNEN_FORELDER_FNR)
+                assertThat(this.andreForeldre[0].ident).isEqualTo(PdlClientMockConfig.ANNEN_FORELDER_FNR)
                 assertThat(this.andreForeldre[0].vedtaksperioderBarn).containsExactly(vedtakperiode)
             }
         }
@@ -158,7 +150,7 @@ class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
         fun `skal opprette grunnlag selv om annen forelder ikke har vedtak`() {
             every { pdlClient.hentBarn(any()) } returns
                 mapOf(
-                    PdlClientConfig.BARN_FNR to pdlBarn(),
+                    PdlClientMockConfig.BARN_FNR to pdlBarn(),
                 )
 
             faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId = behandling.id)
@@ -167,7 +159,7 @@ class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
 
             assertThat(grunnlagAndreForeldre).hasSize(1)
             grunnlagAndreForeldre.forEach { grunnlag ->
-                assertThat(grunnlag.data.identBarn).isEqualTo(PdlClientConfig.BARN_FNR)
+                assertThat(grunnlag.data.identBarn).isEqualTo(PdlClientMockConfig.BARN_FNR)
                 assertThat(grunnlag.data.andreForeldre).isEmpty()
             }
         }
@@ -177,7 +169,7 @@ class FaktaGrunnlagServiceIntegrationTest : IntegrationTest() {
         private fun opprettVedtakAnnenForelder() {
             testoppsettService.lagreFagsak(fagsakAnnenForelder)
             testoppsettService.lagre(behandlingAnnenForelder, opprettGrunnlagsdata = false)
-            val barn = behandlingBarn(behandlingId = behandlingAnnenForelder.id, personIdent = PdlClientConfig.BARN_FNR)
+            val barn = behandlingBarn(behandlingId = behandlingAnnenForelder.id, personIdent = PdlClientMockConfig.BARN_FNR)
             barnService.opprettBarn(listOf(barn))
 
             val vedtaksperiodeBeregning = vedtaksperiodeBeregning(fom = vedtakperiode.fom, tom = vedtakperiode.tom)

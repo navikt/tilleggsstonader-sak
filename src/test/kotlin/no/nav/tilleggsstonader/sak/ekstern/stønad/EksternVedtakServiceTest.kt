@@ -9,12 +9,10 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.ArenaClientConfig.Companion.resetMock
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,15 +29,8 @@ class EksternVedtakServiceTest : IntegrationTest() {
 
     @BeforeEach
     fun setUp() {
-        resetMock(arenaClient)
         testoppsettService.lagreFagsak(fagsak)
         mockArena(harInnvilgetVedtak = false)
-    }
-
-    @AfterEach
-    override fun tearDown() {
-        super.tearDown()
-        resetMock(arenaClient)
     }
 
     @Test

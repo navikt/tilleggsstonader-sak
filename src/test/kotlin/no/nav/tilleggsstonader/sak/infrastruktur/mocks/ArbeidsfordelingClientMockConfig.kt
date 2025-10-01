@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingClient
@@ -11,14 +12,15 @@ import org.springframework.context.annotation.Profile
 
 @Configuration
 @Profile("mock-arbeidsfordeling")
-class ArbeidsfordelingClientConfig {
+class ArbeidsfordelingClientMockConfig {
     @Bean
     @Primary
-    fun arbedisfordelingClient(): ArbeidsfordelingClient {
-        val client = mockk<ArbeidsfordelingClient>()
+    fun arbedisfordelingClient() = mockk<ArbeidsfordelingClient>().apply { resetTilDefault(this) }
 
-        every { client.finnArbeidsfordelingsenhet(any()) } returns listOf(Arbeidsfordelingsenhet("4462", "NAY Nasjonal"))
-
-        return client
+    companion object {
+        fun resetTilDefault(client: ArbeidsfordelingClient) {
+            clearMocks(client)
+            every { client.finnArbeidsfordelingsenhet(any()) } returns listOf(Arbeidsfordelingsenhet("4462", "NAY Nasjonal"))
+        }
     }
 }

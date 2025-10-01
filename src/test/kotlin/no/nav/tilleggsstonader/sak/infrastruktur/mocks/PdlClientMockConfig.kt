@@ -6,6 +6,9 @@ import io.mockk.mockk
 import io.mockk.slot
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
+import no.nav.tilleggsstonader.libs.utils.dato.august
+import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlClient
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlNotFoundException
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
@@ -44,30 +47,23 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.Month
 
 @Configuration
 @Profile("mock-pdl")
-class PdlClientConfig {
+class PdlClientMockConfig {
     @Bean
     @Primary
-    fun pdlClient(): PdlClient {
-        val pdlClient: PdlClient = mockk()
-        resetMock(pdlClient)
-        return pdlClient
-    }
+    fun pdlClient() = mockk<PdlClient>().apply { resetTilDefault(this) }
 
     companion object {
-        private val startdato = LocalDate.of(2020, 1, 1)
-        private val sluttdato = LocalDate.of(2021, 1, 1)
+        private val startdato = 1 januar 2020
+        private val sluttdato = 1 januar 2021
         const val BARN_FNR = "01012067050"
         const val BARN2_FNR = "14041385481"
         const val SØKER_FNR = "01010172272"
         const val ANNEN_FORELDER_FNR = "17097926735"
 
-        fun resetMock(pdlClient: PdlClient) {
+        fun resetTilDefault(pdlClient: PdlClient) {
             clearMocks(pdlClient)
 
             every { pdlClient.hentPersonKortBolk(any()) } answers {
@@ -159,7 +155,7 @@ class PdlClientConfig {
                         UtflyttingFraNorge(
                             tilflyttingsland = "SWE",
                             tilflyttingsstedIUtlandet = "Stockholm",
-                            utflyttingsdato = LocalDate.of(2021, 1, 1),
+                            utflyttingsdato = 1 januar 2021,
                             folkeregistermetadata = folkeregistermetadata,
                         ),
                     ),
@@ -168,8 +164,8 @@ class PdlClientConfig {
 
         private val folkeregistermetadata =
             Folkeregistermetadata(
-                LocalDateTime.of(2010, Month.AUGUST, 30, 10, 10),
-                LocalDateTime.of(2018, Month.JANUARY, 15, 12, 55),
+                30.august(2010).atTime(10, 10),
+                15.januar(2018).atTime(12, 55),
             )
 
         private fun barn(): Map<String, PdlBarn> =
@@ -194,7 +190,7 @@ class PdlClientConfig {
             PdlAnnenForelder(
                 adressebeskyttelse = emptyList(),
                 bostedsadresse = bostedsadresse(),
-                dødsfall = listOf(Dødsfall(LocalDate.of(2021, 9, 22))),
+                dødsfall = listOf(Dødsfall(22 september 2021)),
                 fødselsdato = listOf(fødsel(1994, 11, 1)),
                 navn = listOf(Navn("Bob", "", "Burger", metadataGjeldende)),
                 folkeregisteridentifikator =
@@ -269,7 +265,7 @@ class PdlClientConfig {
                 Bostedsadresse(
                     angittFlyttedato = startdato.plusDays(1),
                     gyldigFraOgMed = startdato,
-                    gyldigTilOgMed = LocalDate.of(2199, 1, 1),
+                    gyldigTilOgMed = 1 januar 2199,
                     utenlandskAdresse = null,
                     coAdressenavn = "CONAVN",
                     vegadresse = vegadresse(),

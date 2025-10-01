@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.interntVedtak.HtmlifyClient
@@ -11,12 +12,15 @@ import org.springframework.context.annotation.Profile
 
 @Configuration
 @Profile("mock-htmlify")
-class HtmlifyClientConfig {
+class HtmlifyClientMockConfig {
     @Bean
     @Primary
-    fun htmlifyClient(): HtmlifyClient {
-        val client = mockk<HtmlifyClient>()
-        every { client.generateHtml(any<InterntVedtak>()) } returns "<body>body</body>"
-        return client
+    fun htmlifyClient() = mockk<HtmlifyClient>().apply { resetTilDefault(this) }
+
+    companion object {
+        fun resetTilDefault(client: HtmlifyClient) {
+            clearMocks(client)
+            every { client.generateHtml(any<InterntVedtak>()) } returns "<body>body</body>"
+        }
     }
 }

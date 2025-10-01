@@ -8,8 +8,6 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.RegisterAktivitetClientConfig.Companion.resetMock
-import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -24,7 +22,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -42,16 +39,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
     lateinit var vilkårperiodeRepository: VilkårperiodeRepository
 
     @Autowired
-    lateinit var registerAktivitetClient: RegisterAktivitetClient
-
-    @Autowired
     lateinit var behandlingshistorikkService: BehandlingshistorikkService
-
-    @AfterEach
-    override fun tearDown() {
-        super.tearDown()
-        resetMock(registerAktivitetClient)
-    }
 
     @Nested
     inner class SlettVilkårperiode {
@@ -156,12 +144,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val eksisterendeVilkårperioder =
                 listOf(
                     målgruppe(behandlingId = revurdering.forrigeIverksatteBehandlingId!!),
-                    aktivitet(behandlingId = revurdering.forrigeIverksatteBehandlingId!!),
+                    aktivitet(behandlingId = revurdering.forrigeIverksatteBehandlingId),
                 )
 
             vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
 
-            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId, revurdering.id)
 
             val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
             assertThat(res).hasSize(2)
@@ -189,7 +177,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 )
             vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
 
-            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId, revurdering.id)
 
             val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
             assertThat(res).hasSize(1)
@@ -204,13 +192,13 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 listOf(
                     målgruppe(behandlingId = revurdering.forrigeIverksatteBehandlingId!!),
                     målgruppe(
-                        behandlingId = revurdering.forrigeIverksatteBehandlingId!!,
+                        behandlingId = revurdering.forrigeIverksatteBehandlingId,
                         resultat = ResultatVilkårperiode.SLETTET,
                         slettetKommentar = "slettet",
                     ),
-                    aktivitet(behandlingId = revurdering.forrigeIverksatteBehandlingId!!),
+                    aktivitet(behandlingId = revurdering.forrigeIverksatteBehandlingId),
                     aktivitet(
-                        behandlingId = revurdering.forrigeIverksatteBehandlingId!!,
+                        behandlingId = revurdering.forrigeIverksatteBehandlingId,
                         resultat = ResultatVilkårperiode.SLETTET,
                         slettetKommentar = "slettet",
                     ),
@@ -218,7 +206,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
 
-            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId, revurdering.id)
 
             val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
             assertThat(res).hasSize(2)

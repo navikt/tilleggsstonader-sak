@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service
 class TilordnetSaksbehandlerService(
     private val oppgaveRepository: OppgaveRepository,
     private val behandlingRepository: BehandlingRepository,
-    private val saksbehandlerClient: TilordnetSaksbehandlerClient,
+    private val tilordnetSaksbehandlerClient: TilordnetSaksbehandlerClient,
 ) {
     fun finnTilordnetSaksbehandler(behandlingId: BehandlingId): TilordnetSaksbehandler {
         val oppgave = hentOppgaveMedTypeSomIkkeErFerdigstilt(behandlingId)
@@ -65,7 +65,7 @@ class TilordnetSaksbehandlerService(
         )
     }
 
-    fun hentSaksbehandlerInfo(navIdent: String): Saksbehandler = saksbehandlerClient.hentSaksbehandlerInfo(navIdent)
+    fun hentSaksbehandlerInfo(navIdent: String): Saksbehandler = tilordnetSaksbehandlerClient.hentSaksbehandlerInfo(navIdent)
 
     /**
      *  I tilfeller hvor saksbehandler manuelt oppretter en revurdering eller en førstegangsbehandling vil oppgaven
