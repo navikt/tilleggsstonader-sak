@@ -9,7 +9,7 @@ import org.springframework.test.web.reactive.server.expectBody
 fun IntegrationTest.sjekkRoutingForPerson(identSkjematype: IdentSkjematype) =
     webTestClient
         .post()
-        .uri("/api/ekstern/routing-soknad")
+        .uri("/api/ekstern/skjema-routing")
         .bodyValue(identSkjematype)
         .medClientCredentials(
             clientId = EksternApplikasjon.SOKNAD_API.namespaceAppNavn,
