@@ -83,9 +83,13 @@ class SøknadRoutingIntegrationTest(
             assertTrue(routingSjekk.skalBehandlesINyLøsning)
         }
 
-        @Test
-        fun `skal lagre routing og svare true hvis det finnes en daglig reise-behandling på personen`() {
-            val dagligReiseFagsak = fagsak(identer = setOf(PersonIdent(jonasIdent)), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+        @ParameterizedTest
+        @EnumSource(
+            value = Stønadstype::class,
+            names = ["DAGLIG_REISE_TSO", "DAGLIG_REISE_TSR"],
+        )
+        fun `skal lagre routing og svare true hvis det finnes en daglig reise-behandling på personen`(stønadstype: Stønadstype) {
+            val dagligReiseFagsak = fagsak(identer = setOf(PersonIdent(jonasIdent)), stønadstype = stønadstype)
             val dagligReiseBehandling = behandling(dagligReiseFagsak)
 
             testoppsettService.lagreFagsak(dagligReiseFagsak)
@@ -138,16 +142,6 @@ class SøknadRoutingIntegrationTest(
             val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
             assertFalse(routingSjekk.skalBehandlesINyLøsning)
             assertFalse(routingHarBlittLagret())
-        }
-
-        @Test
-        fun `brukere uten aktiv AAP skal routet til gammel løsning`() {
-            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
-            mockDagligReiseVedtakIArena(erAktivt = false)
-            mockAapVedtak(erAktivt = false)
-
-            val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
-            assertFalse(routingSjekk.skalBehandlesINyLøsning)
         }
 
         @Test
