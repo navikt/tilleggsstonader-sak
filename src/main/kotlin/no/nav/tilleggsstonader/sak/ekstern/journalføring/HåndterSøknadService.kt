@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
-import no.nav.tilleggsstonader.kontrakter.sak.journalføring.HåndterSøknadRequest
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -43,15 +42,6 @@ class HåndterSøknadService(
     private val unleashService: UnleashService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
-
-    @Transactional
-    fun håndterSøknad(request: HåndterSøknadRequest) {
-        val personIdent = request.personIdent
-        val stønadstype = request.stønadstype
-
-        val journalpost = journalpostService.hentJournalpost(request.journalpostId)
-        håndterSøknad(personIdent = personIdent, stønadstype = stønadstype, journalpost = journalpost)
-    }
 
     @Transactional
     fun håndterSøknad(journalpost: Journalpost) {
