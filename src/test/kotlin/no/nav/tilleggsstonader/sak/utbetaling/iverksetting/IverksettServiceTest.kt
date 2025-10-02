@@ -15,7 +15,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.IverksettClientConfig.Companion.clearMock
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -32,7 +31,6 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil.totrinnskontroll
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -66,14 +64,7 @@ class IverksettServiceTest : IntegrationTest() {
 
     @BeforeEach
     fun setUp() {
-        clearMock(iverksettClient)
         justRun { iverksettClient.iverksett(capture(iverksettingDto)) }
-    }
-
-    @AfterEach
-    override fun tearDown() {
-        super.tearDown()
-        clearMock(iverksettClient)
     }
 
     private fun IverksettService.iverksett(

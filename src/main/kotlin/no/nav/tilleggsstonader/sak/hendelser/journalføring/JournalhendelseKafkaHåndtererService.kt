@@ -2,8 +2,10 @@ package no.nav.tilleggsstonader.sak.hendelser.journalføring
 
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.BARNETILSYN
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.BOUTGIFTER
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.DAGLIG_REISE
+import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.LÆREMIDLER
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.brevkoder
@@ -40,7 +42,7 @@ class JournalhendelseKafkaHåndtererService(
         Tema.gjelderTemaTilleggsstønader(this.tema) &&
             this.erInnkommende() &&
             this.gjelderKanalSkanningEllerNavNo() &&
-            this.dokumentBrevkode() in listOf(BOUTGIFTER, DAGLIG_REISE)
+            this.dokumentBrevkode() in listOf(BARNETILSYN, LÆREMIDLER, BOUTGIFTER, DAGLIG_REISE)
 
     private fun logSkalBehandles(
         journalpost: Journalpost,

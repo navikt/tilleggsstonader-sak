@@ -5,8 +5,6 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.RegisterAktivitetClientConfig.Companion.resetMock
-import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
@@ -43,7 +41,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.Vilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.grunnlagYtelseOk
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -66,15 +63,6 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository
-
-    @Autowired
-    lateinit var registerAktivitetClient: RegisterAktivitetClient
-
-    @AfterEach
-    override fun tearDown() {
-        super.tearDown()
-        resetMock(registerAktivitetClient)
-    }
 
     @Nested
     inner class OpprettAktivitet {
@@ -410,7 +398,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                         behandlingId = revurdering.forrigeIverksatteBehandlingId!!,
                     ),
                 )
-            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId, revurdering.id)
             val vilkårperiode = vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()
             val oppdatertPeriode =
                 aktivitetService.oppdaterVilkårperiode(

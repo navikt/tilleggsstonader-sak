@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepo
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerRolle
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.JournalpostClientConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.JournalpostClientMockConfig
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTask
 import no.nav.tilleggsstonader.sak.util.behandling
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
@@ -36,7 +36,7 @@ class DistribuerVedtaksbrevTaskIntegrationTest : IntegrationTest() {
                             mottakerRolle = MottakerRolle.VERGE,
                             ident = "identAnnenMottaker",
                         ),
-                    journalpostId = JournalpostClientConfig.JOURNALPOST_ID_MED_FEIL,
+                    journalpostId = JournalpostClientMockConfig.JOURNALPOST_ID_MED_FEIL,
                     bestillingId = null,
                 ),
             ),

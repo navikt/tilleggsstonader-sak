@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
@@ -55,7 +55,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
     override fun tearDown() {
         super.tearDown()
         BrukerContextUtil.clearBrukerContext()
-        PdlClientConfig.opprettPdlSøker()
+        PdlClientMockConfig.opprettPdlSøker()
     }
 
     @Nested
@@ -107,7 +107,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
-                    valgteBarn = setOf(PdlClientConfig.BARN_FNR),
+                    valgteBarn = setOf(PdlClientMockConfig.BARN_FNR),
                 )
             val nyBehandlingId = service.opprettRevurdering(opprettRevurdering)
 
@@ -188,7 +188,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
     @Nested
     inner class GjenbrukDataFraForrigeBehandling {
         var tidligereBehandling: Behandling? = null
-        val barnIdent = PdlClientConfig.BARN_FNR
+        val barnIdent = PdlClientMockConfig.BARN_FNR
         val fom = LocalDate.of(2024, 1, 1)
         val tom = LocalDate.of(2024, 1, 31)
 
@@ -264,7 +264,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 resultat = BehandlingResultat.INNVILGET,
             )
 
-        val eksisterendeBarn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.BARN_FNR)
+        val eksisterendeBarn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientMockConfig.BARN_FNR)
 
         @BeforeEach
         fun setUp() {
@@ -289,7 +289,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             assertThat(barnTilRevurdering.barn.single { it.ident == eksisterendeBarn.ident }.finnesPåForrigeBehandling)
                 .isTrue()
 
-            assertThat(barnTilRevurdering.barn.single { it.ident == PdlClientConfig.BARN2_FNR }.finnesPåForrigeBehandling)
+            assertThat(barnTilRevurdering.barn.single { it.ident == PdlClientMockConfig.BARN2_FNR }.finnesPåForrigeBehandling)
                 .isFalse()
         }
 
@@ -299,14 +299,14 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
-                    valgteBarn = setOf(PdlClientConfig.BARN2_FNR),
+                    valgteBarn = setOf(PdlClientMockConfig.BARN2_FNR),
                 )
             val behandlingIdRevurdering = service.opprettRevurdering(opprettRevurdering)
 
             with(barnService.finnBarnPåBehandling(behandlingIdRevurdering)) {
                 assertThat(this).hasSize(2)
                 assertThat(this.map { it.ident })
-                    .containsExactlyInAnyOrder(PdlClientConfig.BARN_FNR, PdlClientConfig.BARN2_FNR)
+                    .containsExactlyInAnyOrder(PdlClientMockConfig.BARN_FNR, PdlClientMockConfig.BARN2_FNR)
             }
         }
 
@@ -322,7 +322,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
             with(barnService.finnBarnPåBehandling(behandlingIdRevurdering)) {
                 assertThat(this).hasSize(1)
-                assertThat(this.map { it.ident }).containsExactlyInAnyOrder(PdlClientConfig.BARN_FNR)
+                assertThat(this.map { it.ident }).containsExactlyInAnyOrder(PdlClientMockConfig.BARN_FNR)
             }
         }
 
@@ -332,7 +332,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
-                    valgteBarn = setOf(PdlClientConfig.BARN2_FNR),
+                    valgteBarn = setOf(PdlClientMockConfig.BARN2_FNR),
                 )
 
             assertThatThrownBy {
@@ -360,7 +360,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 opprettRevurdering(
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.SØKNAD,
-                    valgteBarn = setOf(PdlClientConfig.BARN_FNR),
+                    valgteBarn = setOf(PdlClientMockConfig.BARN_FNR),
                 )
 
             assertThatThrownBy {

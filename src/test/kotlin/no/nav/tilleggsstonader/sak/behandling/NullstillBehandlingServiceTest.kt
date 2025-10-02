@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringTestUtil.simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
@@ -75,9 +75,9 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
     val behandling = behandling(fagsak, status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET)
     val revurdering = behandling(fagsak, forrigeIverksatteBehandlingId = behandling.id)
 
-    val behandlingBarn1 = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.BARN_FNR)
-    val revurderingBarn1 = behandlingBarn(behandlingId = revurdering.id, personIdent = PdlClientConfig.BARN_FNR)
-    val revurderingBarn2 = behandlingBarn(behandlingId = revurdering.id, personIdent = PdlClientConfig.BARN2_FNR)
+    val behandlingBarn1 = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientMockConfig.BARN_FNR)
+    val revurderingBarn1 = behandlingBarn(behandlingId = revurdering.id, personIdent = PdlClientMockConfig.BARN_FNR)
+    val revurderingBarn2 = behandlingBarn(behandlingId = revurdering.id, personIdent = PdlClientMockConfig.BARN2_FNR)
 
     @BeforeEach
     fun setUp() {

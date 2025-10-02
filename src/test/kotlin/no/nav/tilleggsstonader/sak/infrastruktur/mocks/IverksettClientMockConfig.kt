@@ -17,27 +17,23 @@ import org.springframework.context.annotation.Profile
 
 @Configuration
 @Profile("mock-iverksett")
-class IverksettClientConfig {
+class IverksettClientMockConfig {
     @Bean
     @Primary
-    fun iverksettClient(): IverksettClient {
-        val iverksettClient = mockk<IverksettClient>(relaxed = true)
-        clearMock(iverksettClient)
-        return iverksettClient
-    }
+    fun iverksettClient() = mockk<IverksettClient>(relaxed = true).apply { resetTilDefault(this) }
 
     companion object {
-        private val simuleringsresultat =
-            objectMapper.readValue<SimuleringResponseDto>(
-                readFile("mock/iverksett/simuleringsresultat.json"),
-            )
-
-        fun clearMock(iverksettClient: IverksettClient) {
+        fun resetTilDefault(iverksettClient: IverksettClient) {
             clearMocks(iverksettClient)
             justRun { iverksettClient.iverksett(any()) }
             every { iverksettClient.hentStatus(any(), any(), any()) } returns IverksettStatus.OK
             every { iverksettClient.simuler(any()) } returns simuleringsresultat
             every { iverksettClient.simuler(match { it.personident == "identIngenEndring" }) } returns null
         }
+
+        private val simuleringsresultat =
+            objectMapper.readValue<SimuleringResponseDto>(
+                readFile("mock/iverksett/simuleringsresultat.json"),
+            )
     }
 }

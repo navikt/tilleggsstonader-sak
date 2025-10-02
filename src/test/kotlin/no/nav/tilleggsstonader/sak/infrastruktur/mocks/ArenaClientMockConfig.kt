@@ -27,17 +27,13 @@ import java.time.LocalDateTime
 
 @Configuration
 @Profile("mock-arena")
-class ArenaClientConfig {
+class ArenaClientMockConfig {
     @Bean
     @Primary
-    fun arenaClient(): ArenaClient {
-        val client = mockk<ArenaClient>()
-        resetMock(client)
-        return client
-    }
+    fun arenaClient() = mockk<ArenaClient>().apply { resertTilDefault(this) }
 
     companion object {
-        fun resetMock(client: ArenaClient) {
+        fun resertTilDefault(client: ArenaClient) {
             clearMocks(client)
             every { client.hentStatus(any()) } returns
                 ArenaStatusDto(

@@ -11,8 +11,8 @@ import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaTilsynBarnDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_KLAR
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientMockConfig.Companion.MAPPE_ID_KLAR
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
@@ -230,11 +230,11 @@ class TaAvVentServiceTest : IntegrationTest() {
                 )
             testoppsettService.lagre(behandlingSomBlirIverksatt)
 
-            val barnPåIverksattBehandling = dummyBarn(behandlingSomBlirIverksatt.id, PdlClientConfig.BARN_FNR)
+            val barnPåIverksattBehandling = dummyBarn(behandlingSomBlirIverksatt.id, PdlClientMockConfig.BARN_FNR)
             barnService.opprettBarn(listOf(barnPåIverksattBehandling))
 
             // Legg til et annet barn på behandlingen som tas av vent
-            val barnPåBehandlingSomTasAvVent = dummyBarn(behandling.id, PdlClientConfig.BARN2_FNR)
+            val barnPåBehandlingSomTasAvVent = dummyBarn(behandling.id, PdlClientMockConfig.BARN2_FNR)
             barnService.opprettBarn(listOf(barnPåBehandlingSomTasAvVent))
 
             // Iverksett behandlingen med barn1
@@ -248,8 +248,8 @@ class TaAvVentServiceTest : IntegrationTest() {
             val barnEtterTaAvVent = barnService.finnBarnPåBehandling(behandling.id)
             assertThat(barnEtterTaAvVent).hasSize(2)
             assertThat(barnEtterTaAvVent.map { it.ident }).containsExactlyInAnyOrder(
-                PdlClientConfig.BARN_FNR,
-                PdlClientConfig.BARN2_FNR,
+                PdlClientMockConfig.BARN_FNR,
+                PdlClientMockConfig.BARN2_FNR,
             )
 
             // Sjekk at fakta har blitt kopiert rett for barn
