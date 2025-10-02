@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperiodeLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
@@ -21,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequ
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.VedtaksperioderOversiktService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -41,6 +43,7 @@ class LæremidlerVedtakController(
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
+    private val vedtakOversiktService: VedtaksperioderOversiktService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -111,14 +114,8 @@ class LæremidlerVedtakController(
         return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)
     }
 
-    @GetMapping("/fullstendig-oversikt/{behandlingId}")
-    fun hentFullstendigVedtaksoversikt(
+    @GetMapping("/oversikt/{behandlingId}")
+    fun hentDetaljertVedtaksperioder(
         @PathVariable behandlingId: BehandlingId,
-    ): VedtakResponse? {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        val behandling = behandlingService.hentBehandling(behandlingId)
-        val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
-        return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)
-    }
+    ): List<DetaljertVedtaksperiodeLæremidler> = vedtakOversiktService.vedtaksperiodeForForrigeIverksatteBehandlingLæremidler(behandlingId)
 }

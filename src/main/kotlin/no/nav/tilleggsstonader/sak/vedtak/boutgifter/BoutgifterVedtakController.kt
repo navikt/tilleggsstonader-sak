@@ -115,12 +115,8 @@ class BoutgifterVedtakController(
         return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)
     }
 
-    @GetMapping("/fullstendig-oversikt/{behandlingId}")
-    fun hentFullstendigVedtaksoversikt(
+    @GetMapping("/oversikt/{behandlingId}")
+    fun hentDetaljertVedtaksperioder(
         @PathVariable behandlingId: BehandlingId,
-    ): List<DetaljertVedtaksperiodeBoutgifter>? {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        return vedtakOversiktService.hentDetaljerteVedtaksperioderForBehandlingBoutgifter(behandlingId)
-    }
+    ): List<DetaljertVedtaksperiodeBoutgifter> = vedtakOversiktService.vedtaksperiodeForForrigeIverksatteBehandlingBoutgifter(behandlingId)
 }
