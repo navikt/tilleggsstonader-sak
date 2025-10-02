@@ -90,7 +90,8 @@ class OffentligTransportBeregningService {
 
         return BeregningsresultatForPeriode(
             grunnlag = grunnlag,
-            beløp = finnBilligsteAlternativForTrettidagersPeriode(grunnlag),
+            beløp = finnBilligsteAlternativForTrettidagersPeriode(grunnlag).beløp,
+            billetDetalijer = finnBilligsteAlternativForTrettidagersPeriode(grunnlag).billettDetaljer,
         )
     }
 }
