@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.migrering.routing
 
 import io.getunleash.variant.Variant
-import io.mockk.clearAllMocks
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.arena.SakStatus
@@ -26,7 +25,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelse
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -67,11 +65,6 @@ class SøknadRoutingIntegrationTest(
                 ident = jonasIdent,
                 skjematype = Skjematype.DAGLIG_REISE,
             )
-
-        @AfterEach
-        fun afterEach() {
-            clearAllMocks()
-        }
 
         @Test
         fun `skal alltid svare ja hvis personen har blitt routet til ny løsning tidligere`() {
