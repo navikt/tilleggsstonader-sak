@@ -23,4 +23,6 @@ enum class Toggle(
     SKAL_VALIDERE_ÅRSAK_TIL_AVSLAG("sak.skal-validere-arsak-til-avslag"),
     KAN_SAKSBEHANDLE_DAGLIG_REISE_TSO("sak.frontend.kan-saksbehandle.daglig-reise-tso"),
     KAN_SAKSBEHANDLE_DAGLIG_REISE_TSR("sak.frontend.kan-saksbehandle.daglig-reise-tsr"),
+
+    SØKNAD_ROUTING_DAGLIG_REISE("sak.soknad-routing.daglig-reise"),
 }

@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController
 @ProtectedWithClaims(issuer = "azuread")
 class YtelseController(
     private val tilgangService: TilgangService,
-    private val aktivitetService: YtelseService,
+    private val ytelseService: YtelseService,
 ) {
     @GetMapping("{fagsakPersonId}")
     fun hentYtelser(
         @PathVariable fagsakPersonId: FagsakPersonId,
     ): YtelserRegisterDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
-        return aktivitetService.hentYtelser(fagsakPersonId)
+        return ytelseService.hentYtelser(fagsakPersonId)
     }
 }

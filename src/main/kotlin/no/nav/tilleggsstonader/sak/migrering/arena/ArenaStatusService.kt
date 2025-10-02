@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.migrering.arena
 
+import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.tilSkjematype
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -48,7 +50,11 @@ class ArenaStatusService(
             logger.info("$logPrefix finnes=true skalAlltidBehandlesITsSak")
             return true
         }
-        if (harRouting(identer, request.stønadstype)) {
+        // I routingen skiller vi ikke mellom TSO og TSR for daglig reise, men i starten vil alle routinger på daglig reise bare gjelde TSO.
+        // Etter hvert som TSR også slipper gjennom i routingen må vi diskutere hvorvidt vi ønsker å låse en person på både TSO og TSR,
+        // eller skille dem fra hverandre.
+        val requestGjelderDagligReiseTiltaksenheten = request.stønadstype == Stønadstype.DAGLIG_REISE_TSR
+        if (harRouting(identer, request.stønadstype.tilSkjematype()) && !requestGjelderDagligReiseTiltaksenheten) {
             logger.info("$logPrefix finnes=true harRouting")
             return true
         }
@@ -74,9 +80,9 @@ class ArenaStatusService(
 
     private fun harRouting(
         identer: Set<String>,
-        stønadstype: Stønadstype,
+        skjematype: Skjematype,
     ): Boolean =
         identer.any { ident ->
-            søknadRoutingService.harLagretRouting(ident, stønadstype)
+            søknadRoutingService.harLagretRouting(ident, skjematype)
         }
 }

@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.migrering.routing
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
@@ -17,10 +17,10 @@ interface SøknadRoutingRepository :
     InsertUpdateRepository<SøknadRouting> {
     fun findByIdentAndType(
         ident: String,
-        type: Stønadstype,
+        type: Skjematype,
     ): SøknadRouting?
 
-    fun countByType(type: Stønadstype): Int
+    fun countByType(type: Skjematype): Int
 }
 
 @Table("soknad_routing")
@@ -28,7 +28,7 @@ data class SøknadRouting(
     @Id
     val id: UUID = UUID.randomUUID(),
     val ident: String,
-    val type: Stønadstype,
+    val type: Skjematype,
     val detaljer: JsonWrapper,
     val opprettetTid: LocalDateTime = SporbarUtils.now(),
 )
