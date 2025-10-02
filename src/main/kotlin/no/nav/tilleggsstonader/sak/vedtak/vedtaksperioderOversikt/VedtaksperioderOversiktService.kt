@@ -47,12 +47,39 @@ class VedtaksperioderOversiktService(
         )
     }
 
-    fun hentDetaljerteVedtaksperioderForBehandlingBoutgifter(behandlingId: BehandlingId): List<DetaljertVedtaksperiodeBoutgifter>? {
-        val vedtak = vedtakService.hentVedtak<InnvilgelseEllerOpphørBoutgifter>(behandlingId) ?: return null
-        return vedtak.data.finnDetaljerteVedtaksperioder()
+    fun vedtaksperiodeForForrigeIverksatteBehandlingTilsynBarn(behandlingId: BehandlingId): List<DetaljertVedtaksperiodeTilsynBarn> {
+        val vedtakForForrigeIverksatteBehandling =
+            hentVedtaksdataForForrigeIverksatteBehandling<InnvilgelseEllerOpphørTilsynBarn>(behandlingId)
+                ?: return emptyList()
+
+        return vedtakForForrigeIverksatteBehandling.finnDetaljerteVedtaksperioder()
     }
 
-    fun oppsummerVedtaksperioderTilsynBarn(fagsakId: FagsakId): List<DetaljertVedtaksperiodeTilsynBarn> {
+    fun vedtaksperiodeForForrigeIverksatteBehandlingLæremidler(behandlingId: BehandlingId): List<DetaljertVedtaksperiodeLæremidler> {
+        val vedtakForForrigeIverksatteBehandling =
+            hentVedtaksdataForForrigeIverksatteBehandling<InnvilgelseEllerOpphørLæremidler>(behandlingId)
+                ?: return emptyList()
+
+        return vedtakForForrigeIverksatteBehandling.finnDetaljerteVedtaksperioder()
+    }
+
+    fun vedtaksperiodeForForrigeIverksatteBehandlingBoutgifter(behandlingId: BehandlingId): List<DetaljertVedtaksperiodeBoutgifter> {
+        val vedtakForForrigeIverksatteBehandling =
+            hentVedtaksdataForForrigeIverksatteBehandling<InnvilgelseEllerOpphørBoutgifter>(behandlingId)
+                ?: return emptyList()
+
+        return vedtakForForrigeIverksatteBehandling.finnDetaljerteVedtaksperioder()
+    }
+
+    fun vedtaksperiodeForForrigeIverksatteBehandlingDagligReiseTso(
+        behandlingId: BehandlingId,
+    ): List<DetaljertVedtaksperiodeDagligReiseTso> = emptyList()
+
+    fun vedtaksperiodeForForrigeIverksatteBehandlingDagligReiseTsr(
+        behandlingId: BehandlingId,
+    ): List<DetaljertVedtaksperiodeDagligReiseTsr> = emptyList()
+
+    private fun oppsummerVedtaksperioderTilsynBarn(fagsakId: FagsakId): List<DetaljertVedtaksperiodeTilsynBarn> {
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørTilsynBarn>(fagsakId)
                 ?: return emptyList()
@@ -60,7 +87,7 @@ class VedtaksperioderOversiktService(
         return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder()
     }
 
-    fun oppsummerVedtaksperioderLæremidler(fagsakId: FagsakId): List<DetaljertVedtaksperiodeLæremidler> {
+    private fun oppsummerVedtaksperioderLæremidler(fagsakId: FagsakId): List<DetaljertVedtaksperiodeLæremidler> {
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørLæremidler>(fagsakId)
                 ?: return emptyList()
@@ -68,7 +95,7 @@ class VedtaksperioderOversiktService(
         return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder()
     }
 
-    fun oppsummerVedtaksperioderBoutgifter(fagsakId: FagsakId): List<DetaljertVedtaksperiodeBoutgifter> {
+    private fun oppsummerVedtaksperioderBoutgifter(fagsakId: FagsakId): List<DetaljertVedtaksperiodeBoutgifter> {
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørBoutgifter>(fagsakId)
                 ?: return emptyList()
@@ -83,7 +110,11 @@ class VedtaksperioderOversiktService(
     private inline fun <reified T : Vedtaksdata> hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): T? {
         val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId) ?: return null
         val vedtak = vedtakService.hentVedtak<T>(sisteIverksatteBehandling.id) ?: return null
+        return vedtak.data
+    }
 
+    private inline fun <reified T : Vedtaksdata> hentVedtaksdataForForrigeIverksatteBehandling(behandlingId: BehandlingId): T? {
+        val vedtak = vedtakService.hentVedtak<T>(behandlingId) ?: return null
         return vedtak.data
     }
 }

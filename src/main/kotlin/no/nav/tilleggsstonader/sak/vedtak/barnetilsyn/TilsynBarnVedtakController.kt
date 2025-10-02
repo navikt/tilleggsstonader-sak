@@ -4,7 +4,6 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -111,8 +110,8 @@ class TilsynBarnVedtakController(
         return vedtakDtoMapper.toDto(vedtak, saksbehandling.forrigeIverksatteBehandlingId)
     }
 
-    @GetMapping("/oversikt/{fagsakId}")
+    @GetMapping("/oversikt/{behandlingId}")
     fun hentDetaljertVedtaksperioder(
-        @PathVariable fagsakId: FagsakId,
-    ): List<DetaljertVedtaksperiodeTilsynBarn> = vedtakOversiktService.oppsummerVedtaksperioderTilsynBarn(fagsakId)
+        @PathVariable behandlingId: BehandlingId,
+    ): List<DetaljertVedtaksperiodeTilsynBarn> = vedtakOversiktService.vedtaksperiodeForForrigeIverksatteBehandlingTilsynBarn(behandlingId)
 }
