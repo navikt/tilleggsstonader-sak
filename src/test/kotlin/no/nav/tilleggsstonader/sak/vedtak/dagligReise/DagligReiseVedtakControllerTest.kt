@@ -116,6 +116,7 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
                                                             antallReisedager = 19,
                                                         ),
                                                     beløp = 750,
+                                                    billetDetalijer = emptyMap(),
                                                 ),
                                             ),
                                     ),

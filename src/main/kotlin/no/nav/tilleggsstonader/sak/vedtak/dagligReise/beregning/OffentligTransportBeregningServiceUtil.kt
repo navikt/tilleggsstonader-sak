@@ -44,23 +44,33 @@ fun finnReisedagerIPeriode(
         }.values
         .sumOf { it.antallDager }
 
-fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): Int =
-    listOfNotNull(
-        finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag),
-        grunnlag.pris30dagersbillett,
-    ).min()
+fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): BilligsteBillettRespons {
+    val kombinasjonBillet = finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag)
+    val billigestePris =
+        listOfNotNull(
+            kombinasjonBillet?.pris,
+            grunnlag.pris30dagersbillett,
+        ).min()
+    if (billigestePris == kombinasjonBillet?.pris) {
+        return kombinasjonBillet.tilRespons()
+    }
+    return BilligsteBillettRespons(
+        billigsteBelop = billigestePris,
+        billettyper = mapOf(Billettype.TRETTIDAGERSBILLETT to 1),
+    )
+}
 
 /**
  * Minimum Cost For Tickets.
  * Doc: https://docs.vultr.com/problem-set/minimum-cost-for-tickets
  */
-private fun finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag: Beregningsgrunnlag): Int? {
+private fun finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag: Beregningsgrunnlag): BillettyperMedPris? {
     if (grunnlag.prisEnkeltbillett == null && grunnlag.prisSyvdagersbillett == null) return null
     val reisedagerPerUke = finnReisedagerPerUke(grunnlag)
     val reisedagerListe = lagReisedagerListe(reisedagerPerUke)
 
     // Hvis ingen reisedager er billigste pris 0kr
-    if (reisedagerListe.isEmpty()) return 0
+    if (reisedagerListe.isEmpty()) return BillettyperMedPris.tom()
 
     val sisteReiseDag = reisedagerListe.last()
     val reisekostnader = MutableList(sisteReiseDag + 1) { BillettyperMedPris.tom() }
@@ -78,7 +88,7 @@ private fun finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag: 
                 ).min()
         }
     }
-    return reisekostnader[sisteReiseDag].also { println(it) }.pris
+    return reisekostnader[sisteReiseDag]
 }
 
 data class BillettyperMedPris(
@@ -95,6 +105,17 @@ data class BillettyperMedPris(
         fun tom() = BillettyperMedPris(emptyList(), 0)
     }
 }
+
+data class BilligsteBillettRespons(
+    val billigsteBelop: Int,
+    val billettyper: Map<Billettype, Int>,
+)
+
+fun BillettyperMedPris.tilRespons(): BilligsteBillettRespons =
+    BilligsteBillettRespons(
+        billigsteBelop = this.pris,
+        billettyper = this.typer.groupingBy { it }.eachCount(),
+    )
 
 enum class Billettype {
     ENKELTBILLETT,
