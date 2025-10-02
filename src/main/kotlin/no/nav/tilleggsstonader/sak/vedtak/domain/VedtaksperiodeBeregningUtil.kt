@@ -45,6 +45,13 @@ object VedtaksperiodeBeregningUtil {
             this.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
         }
 
+    private fun LocalDate.nærmesteSøndagFremITid(): LocalDate =
+        if (this.dayOfWeek == DayOfWeek.SATURDAY || this.dayOfWeek == DayOfWeek.SUNDAY) {
+            this.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+        } else {
+            this.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        }
+
     /**
      * Splitter en periode opp i uker (kun hverdager inkludert)
      * Tar inn en funksjon for å beregne hvor mange dager man ønsker å telle i uken
