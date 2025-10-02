@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad
 
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
@@ -113,6 +114,8 @@ class SøknadService(
                     journalpost,
                     søknadsskjema,
                 )
+
+            is KjørelisteSkjema -> TODO()
         }
 
     fun kopierSøknad(

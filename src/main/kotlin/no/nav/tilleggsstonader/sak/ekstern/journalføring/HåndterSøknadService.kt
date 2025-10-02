@@ -78,6 +78,7 @@ class HåndterSøknadService(
                     finnStønadstypeForDagligReise(journalpost),
                     Stønadstype.entries.filter { it.gjelderDagligReise() },
                 )
+            DokumentBrevkode.DAGLIG_REISE_KJØRELISTE -> TODO()
         }
     }
 

@@ -25,4 +25,5 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
                 kreverAtSøkerErUtenAktivtVedtakIArena = true,
                 kreverAktivtAapVedtak = true,
             )
+        Skjematype.DAGLIG_REISE_KJØRELISTE -> TODO()
     }
