@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
@@ -116,7 +117,7 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
                                                             antallReisedager = 19,
                                                         ),
                                                     beløp = 750,
-                                                    billetDetalijer = emptyMap(),
+                                                    billetDetalijer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1),
                                                 ),
                                             ),
                                     ),
