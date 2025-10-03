@@ -15,8 +15,8 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp |
-      | 06.01.2025 | 12.01.2025 | 366   |
+      | Fom        | Tom        | Beløp | Syvdagersbillett-antall |
+      | 06.01.2025 | 12.01.2025 | 366   | 1                       |
 
   Scenario: Enkeltbillett skal ikke lønne seg innenfor en uke pga reisedager
     Gitt følgende vedtaksperioder for daglig reise offentlig transport
@@ -30,8 +30,8 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp |
-      | 06.01.2025 | 12.01.2025 | 264   |
+      | Fom        | Tom        | Beløp | Enkeltbillett-antall |
+      | 06.01.2025 | 12.01.2025 | 264   | 6                    |
 
 
   Scenario: Syvdagers bilett skal lønne seg selv om det ikke er reise hele uken
@@ -47,8 +47,8 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp |
-      | 06.01.2025 | 09.01.2025 | 340   |
+      | Fom        | Tom        | Beløp | Syvdagersbillett-antall |
+      | 06.01.2025 | 09.01.2025 | 340   | 1                       |
 
   Scenario: Syvdageres billett skal lønne seg med flere vedtaksperioder
     # Setter prisen på syv-dageresbilett til 340 for at det skal lønne seg selv om det kun er 4 reisdager i løpet av uka
@@ -64,8 +64,8 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp |
-      | 06.01.2025 | 12.01.2025 | 340   |
+      | Fom        | Tom        | Beløp | Syvdagersbillett-antall |
+      | 06.01.2025 | 12.01.2025 | 340   | 1                       |
 
   Scenario: Syvdageres billett skal lønne seg med flere reiser
     #E.g. Ruter og Vy
@@ -80,12 +80,12 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp |
-      | 06.01.2025 | 12.01.2025 | 366   |
+      | Fom        | Tom        | Beløp | Syvdagersbillett-antall |
+      | 06.01.2025 | 12.01.2025 | 366   | 1                       |
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=2
-      | Fom        | Tom        | Beløp |
-      | 06.01.2025 | 12.01.2025 | 767   |
+      | Fom        | Tom        | Beløp | Syvdagersbillett-antall |
+      | 06.01.2025 | 12.01.2025 | 767   | 1                       |
 
 
   Scenario: Syvdagers bilett skal lønne seg på tvers av to uker
@@ -100,8 +100,8 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp |
-      | 06.01.2025 | 19.01.2025 | 732   |
+      | Fom        | Tom        | Beløp | Syvdagersbillett-antall |
+      | 06.01.2025 | 19.01.2025 | 732   | 2                       |
 
   Scenario: Syvdagers bilett skal ikke lønne seg på tvers av to uker pga resiedager
     Gitt følgende vedtaksperioder for daglig reise offentlig transport
@@ -115,8 +115,8 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp |
-      | 06.01.2025 | 19.01.2025 | 528   |
+      | Fom        | Tom        | Beløp | Enkeltbillett-antall |
+      | 06.01.2025 | 19.01.2025 | 528   | 12                   |
 
   Scenario: Syvdagers bilett skal ikke lønne seg pga ikke reise hele uken
     Gitt følgende vedtaksperioder for daglig reise offentlig transport
@@ -130,8 +130,8 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp |
-      | 06.01.2025 | 07.01.2025 | 176   |
+      | Fom        | Tom        | Beløp | Enkeltbillett-antall |
+      | 06.01.2025 | 07.01.2025 | 176   | 4                    |
 
 
   Scenario: To syvdagers biletter skal lønne seg selv om ikke 14 dager
@@ -147,8 +147,8 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp |
-      | 06.01.2025 | 16.01.2025 | 680   |
+      | Fom        | Tom        | Beløp | Syvdagersbillett-antall |
+      | 06.01.2025 | 16.01.2025 | 680   | 2                       |
 
   Scenario: Syvdagersbilett skal lønne seg på tvers av uker
     Gitt følgende vedtaksperioder for daglig reise offentlig transport
@@ -162,8 +162,8 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp |
-      | 08.01.2025 | 14.01.2025 | 366   |
+      | Fom        | Tom        | Beløp | Syvdagersbillett-antall |
+      | 08.01.2025 | 14.01.2025 | 366   | 1                       |
 
   Scenario: Syvdagers bilett skal lønne seg i kombinasjon med enkeltbilletter
     Gitt følgende vedtaksperioder for daglig reise offentlig transport
@@ -177,8 +177,8 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp |
-      | 06.01.2025 | 14.01.2025 | 542   |
+      | Fom        | Tom        | Beløp | Syvdagersbillett-antall | Enkeltbillett-antall |
+      | 06.01.2025 | 14.01.2025 | 542   | 1                       | 4                    |
 
   Scenario: Syvdagersbilett skal lønne seg i kombinasjon med månedskort
     Gitt følgende vedtaksperioder for daglig reise offentlig transport
@@ -192,9 +192,9 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp |
-      | 01.01.2025 | 30.01.2025 | 778   |
-      | 31.01.2025 | 06.02.2025 | 366   |
+      | Fom        | Tom        | Beløp | Syvdagersbillett-antall | Trettidagersbillett-antall |
+      | 01.01.2025 | 30.01.2025 | 778   | 0                       | 1                          |
+      | 31.01.2025 | 06.02.2025 | 366   | 1                       | 0                          |
 
   Scenario: Syvdagersbilett skal lønne seg i kombinasjon med månedskort og enkelbiletter
     Gitt følgende vedtaksperioder for daglig reise offentlig transport
@@ -208,6 +208,6 @@ Egenskap: Beregning av offentlig transport med 7-dagers billett innefor en uke
     Når beregner for daglig reise offentlig transport
 
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp |
-      | 14.01.2025 | 12.02.2025 | 778   |
-      | 13.02.2025 | 24.02.2025 | 630   |
+      | Fom        | Tom        | Beløp | Trettidagersbillett-antall | Syvdagersbillett-antall | Enkeltbillett-antall |
+      | 14.01.2025 | 12.02.2025 | 778   | 1                          | 0                       |0                    |
+      | 13.02.2025 | 24.02.2025 | 630   | 0                          | 1                       |6                    |

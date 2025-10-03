@@ -111,6 +111,8 @@ class OffentligTransportBeregningStepDefinitions {
             assertThat(beregningsreulsresultatForReise.perioder[index].grunnlag.fom).isEqualTo(periode.grunnlag.fom)
             assertThat(beregningsreulsresultatForReise.perioder[index].grunnlag.tom).isEqualTo(periode.grunnlag.tom)
             assertThat(beregningsreulsresultatForReise.perioder[index].beløp).isEqualTo(periode.beløp)
+            assertThat(beregningsreulsresultatForReise.perioder[index].billetDetalijer)
+                .isEqualTo(periode.billetDetalijer)
         }
     }
 }

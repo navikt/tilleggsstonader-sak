@@ -13,6 +13,9 @@ enum class DomenenøkkelFelles(
     BELØP("Beløp"),
     MÅLGRUPPE("FaktiskMålgruppe"),
     AKTIVITET("Aktivitet"),
+    ENKELTBILLETT_ANTALL("Enkeltbillett-antall"),
+    SYVDAGERSBILLETT_ANTALL("Syvdagersbillett-antall"),
+    TRETTIDAGERSBILLETT_ANTALL("Trettidagersbillett-antall"),
 }
 
 enum class DomenenøkkelAndelTilkjentYtelse(
