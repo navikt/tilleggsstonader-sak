@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.D
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReiseTso
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vedtak.domain.DetaljertVedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
@@ -50,13 +49,12 @@ class VedtaksperioderOversiktService(
     }
 
     fun hentDetaljerteVedtaksperioderForBehandling(behandlingId: BehandlingId): List<DetaljertVedtaksperiode> {
-        val vedtakForForrigeIverksatteBehandling =
-            hentVedtaksdataForForrigeIverksatteBehandling<InnvilgelseEllerOpphør>(behandlingId)
-                ?: return emptyList()
-        return when (vedtakForForrigeIverksatteBehandling) {
-            is InnvilgelseEllerOpphørTilsynBarn -> vedtakForForrigeIverksatteBehandling.finnDetaljerteVedtaksperioder()
-            is InnvilgelseEllerOpphørLæremidler -> vedtakForForrigeIverksatteBehandling.finnDetaljerteVedtaksperioder()
-            is InnvilgelseEllerOpphørBoutgifter -> vedtakForForrigeIverksatteBehandling.finnDetaljerteVedtaksperioder()
+        val vedtaksdata = vedtakService.hentVedtak(behandlingId)?.data
+        return when (vedtaksdata) {
+            is InnvilgelseEllerOpphørTilsynBarn -> vedtaksdata.finnDetaljerteVedtaksperioder()
+            is InnvilgelseEllerOpphørLæremidler -> vedtaksdata.finnDetaljerteVedtaksperioder()
+            is InnvilgelseEllerOpphørBoutgifter -> vedtaksdata.finnDetaljerteVedtaksperioder()
+            null -> emptyList()
             else -> error("Vi støtter ikke å hente detaljertevedtaksperioder for denne stønadstypen enda")
         }
     }
@@ -92,11 +90,6 @@ class VedtaksperioderOversiktService(
     private inline fun <reified T : Vedtaksdata> hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): T? {
         val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId) ?: return null
         val vedtak = vedtakService.hentVedtak<T>(sisteIverksatteBehandling.id) ?: return null
-        return vedtak.data
-    }
-
-    private inline fun <reified T : Vedtaksdata> hentVedtaksdataForForrigeIverksatteBehandling(behandlingId: BehandlingId): T? {
-        val vedtak = vedtakService.hentVedtak<T>(behandlingId) ?: return null
         return vedtak.data
     }
 }
