@@ -82,7 +82,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | Fom        | Tom        | Beløp | Enkeltbillett-antall |
       | 01.03.2025 | 30.03.2025 | 352   | 8                    |
 
-  Scenario: Forventer at reisen beregnes til to tretti-dagersbilletter og åtte enkeltbilletter
+  Scenario: Forventer at reisen beregnes til to tretti-dagersbilletter og seksten enkeltbilletter
     Gitt følgende vedtaksperioder for daglig reise offentlig transport
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
       | 01.01.2025 | 30.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
