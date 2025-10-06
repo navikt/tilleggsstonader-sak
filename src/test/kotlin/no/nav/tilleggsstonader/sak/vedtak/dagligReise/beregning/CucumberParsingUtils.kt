@@ -43,6 +43,15 @@ fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
                     vedtaksperioder = emptyList(),
                 ),
             beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
+            billetdetalijer =
+                mapOf(
+                    Billettype.ENKELTBILLETT to
+                        (parseValgfriInt(DomenenøkkelFelles.ENKELTBILLETT_ANTALL, rad) ?: 0),
+                    Billettype.SYVDAGERSBILLETT to
+                        (parseValgfriInt(DomenenøkkelFelles.SYVDAGERSBILLETT_ANTALL, rad) ?: 0),
+                    Billettype.TRETTIDAGERSBILLETT to
+                        (parseValgfriInt(DomenenøkkelFelles.TRETTIDAGERSBILLETT_ANTALL, rad) ?: 0),
+                ).filterValues { it > 0 },
         )
     }
 
