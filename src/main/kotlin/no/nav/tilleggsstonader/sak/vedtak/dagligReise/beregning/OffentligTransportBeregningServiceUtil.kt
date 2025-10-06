@@ -95,7 +95,7 @@ data class BillettyperMedPris(
     val typer: List<Billettype>,
     val pris: Int,
 ) : Comparable<BillettyperMedPris> {
-    constructor(Billettype: Billettype, pris: Int) : this(listOf(Billettype), pris)
+    constructor(billettype: Billettype, pris: Int) : this(listOf(billettype), pris)
 
     override fun compareTo(other: BillettyperMedPris): Int = pris.compareTo(other.pris)
 
