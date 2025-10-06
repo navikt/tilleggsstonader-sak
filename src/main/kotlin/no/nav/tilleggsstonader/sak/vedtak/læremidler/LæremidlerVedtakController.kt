@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequ
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.VedtaksperioderOversiktService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -41,6 +42,7 @@ class LæremidlerVedtakController(
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
+    private val vedtakOversiktService: VedtaksperioderOversiktService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -102,17 +104,6 @@ class LæremidlerVedtakController(
 
     @GetMapping("{behandlingId}")
     fun hentVedtak(
-        @PathVariable behandlingId: BehandlingId,
-    ): VedtakResponse? {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        val behandling = behandlingService.hentBehandling(behandlingId)
-        val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
-        return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)
-    }
-
-    @GetMapping("/fullstendig-oversikt/{behandlingId}")
-    fun hentFullstendigVedtaksoversikt(
         @PathVariable behandlingId: BehandlingId,
     ): VedtakResponse? {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)

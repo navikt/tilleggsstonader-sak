@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.domain.DetaljertVedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 
@@ -19,6 +20,7 @@ data class DetaljertVedtaksperiodeBoutgifter(
     val stønadsbeløpMnd: Int,
     val utgifterTilOvernatting: List<UtgiftTilOvernatting>? = null,
 ) : Periode<LocalDate>,
+    DetaljertVedtaksperiode,
     Mergeable<LocalDate, DetaljertVedtaksperiodeBoutgifter> {
     override fun merge(other: DetaljertVedtaksperiodeBoutgifter): DetaljertVedtaksperiodeBoutgifter =
         this.copy(

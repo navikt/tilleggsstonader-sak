@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.D
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperioderBoutgifterMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReiseTso
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReiseTsr
+import no.nav.tilleggsstonader.sak.vedtak.domain.DetaljertVedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
@@ -47,9 +48,15 @@ class VedtaksperioderOversiktService(
         )
     }
 
-    fun hentDetaljerteVedtaksperioderForBehandlingBoutgifter(behandlingId: BehandlingId): List<DetaljertVedtaksperiodeBoutgifter>? {
-        val vedtak = vedtakService.hentVedtak<InnvilgelseEllerOpphørBoutgifter>(behandlingId) ?: return null
-        return vedtak.data.finnDetaljerteVedtaksperioder()
+    fun hentDetaljerteVedtaksperioderForBehandling(behandlingId: BehandlingId): List<DetaljertVedtaksperiode> {
+        val vedtaksdata = vedtakService.hentVedtak(behandlingId)?.data
+        return when (vedtaksdata) {
+            is InnvilgelseEllerOpphørTilsynBarn -> vedtaksdata.finnDetaljerteVedtaksperioder()
+            is InnvilgelseEllerOpphørLæremidler -> vedtaksdata.finnDetaljerteVedtaksperioder()
+            is InnvilgelseEllerOpphørBoutgifter -> vedtaksdata.finnDetaljerteVedtaksperioder()
+            null -> emptyList()
+            else -> error("Vi støtter ikke å hente detaljertevedtaksperioder for denne stønadstypen enda")
+        }
     }
 
     private fun oppsummerVedtaksperioderTilsynBarn(fagsakId: FagsakId): List<DetaljertVedtaksperiodeTilsynBarn> {
@@ -83,7 +90,6 @@ class VedtaksperioderOversiktService(
     private inline fun <reified T : Vedtaksdata> hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): T? {
         val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId) ?: return null
         val vedtak = vedtakService.hentVedtak<T>(sisteIverksatteBehandling.id) ?: return null
-
         return vedtak.data
     }
 }

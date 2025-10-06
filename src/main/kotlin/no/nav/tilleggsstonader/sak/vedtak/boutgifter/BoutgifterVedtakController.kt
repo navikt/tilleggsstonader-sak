@@ -12,7 +12,6 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperiodeBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.BeregningsresultatBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
@@ -113,14 +112,5 @@ class BoutgifterVedtakController(
         val behandling = behandlingService.hentBehandling(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
         return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)
-    }
-
-    @GetMapping("/fullstendig-oversikt/{behandlingId}")
-    fun hentFullstendigVedtaksoversikt(
-        @PathVariable behandlingId: BehandlingId,
-    ): List<DetaljertVedtaksperiodeBoutgifter>? {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        return vedtakOversiktService.hentDetaljerteVedtaksperioderForBehandlingBoutgifter(behandlingId)
     }
 }

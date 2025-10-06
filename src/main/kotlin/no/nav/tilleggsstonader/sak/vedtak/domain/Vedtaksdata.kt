@@ -20,12 +20,14 @@ sealed interface TypeVedtaksdata {
     val typeVedtak: TypeVedtak
 }
 
+sealed interface InnvilgelseEllerOpphør : Vedtaksdata
+
 sealed interface Innvilgelse :
-    Vedtaksdata,
-    HarVedtaksperioder
+    HarVedtaksperioder,
+    InnvilgelseEllerOpphør
 
 sealed interface Opphør :
-    Vedtaksdata,
+    InnvilgelseEllerOpphør,
     HarVedtaksperioder {
     val årsaker: List<ÅrsakOpphør>
     val begrunnelse: String
