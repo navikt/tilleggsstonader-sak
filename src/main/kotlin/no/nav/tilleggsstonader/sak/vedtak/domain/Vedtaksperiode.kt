@@ -69,3 +69,5 @@ fun List<Vedtaksperiode>.mergeSammenhengende() =
     this
         .sorted()
         .mergeSammenhengende { v1, v2 -> v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2) }
+
+interface DetaljertVedtaksperiode

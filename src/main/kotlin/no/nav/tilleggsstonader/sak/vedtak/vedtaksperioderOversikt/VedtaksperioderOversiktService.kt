@@ -12,6 +12,8 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.D
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperioderBoutgifterMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReiseTso
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReiseTsr
+import no.nav.tilleggsstonader.sak.vedtak.domain.DetaljertVedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
@@ -47,37 +49,17 @@ class VedtaksperioderOversiktService(
         )
     }
 
-    fun vedtaksperiodeForForrigeIverksatteBehandlingTilsynBarn(behandlingId: BehandlingId): List<DetaljertVedtaksperiodeTilsynBarn> {
+    fun hentDetaljerteVedtaksperioderForBehandling(behandlingId: BehandlingId): List<DetaljertVedtaksperiode> {
         val vedtakForForrigeIverksatteBehandling =
-            hentVedtaksdataForForrigeIverksatteBehandling<InnvilgelseEllerOpphørTilsynBarn>(behandlingId)
+            hentVedtaksdataForForrigeIverksatteBehandling<InnvilgelseEllerOpphør>(behandlingId)
                 ?: return emptyList()
-
-        return vedtakForForrigeIverksatteBehandling.finnDetaljerteVedtaksperioder()
+        return when (vedtakForForrigeIverksatteBehandling) {
+            is InnvilgelseEllerOpphørTilsynBarn -> vedtakForForrigeIverksatteBehandling.finnDetaljerteVedtaksperioder()
+            is InnvilgelseEllerOpphørLæremidler -> vedtakForForrigeIverksatteBehandling.finnDetaljerteVedtaksperioder()
+            is InnvilgelseEllerOpphørBoutgifter -> vedtakForForrigeIverksatteBehandling.finnDetaljerteVedtaksperioder()
+            else -> error("Vi støtter ikke å hente detaljertevedtaksperioder for denne stønadstypen enda")
+        }
     }
-
-    fun vedtaksperiodeForForrigeIverksatteBehandlingLæremidler(behandlingId: BehandlingId): List<DetaljertVedtaksperiodeLæremidler> {
-        val vedtakForForrigeIverksatteBehandling =
-            hentVedtaksdataForForrigeIverksatteBehandling<InnvilgelseEllerOpphørLæremidler>(behandlingId)
-                ?: return emptyList()
-
-        return vedtakForForrigeIverksatteBehandling.finnDetaljerteVedtaksperioder()
-    }
-
-    fun vedtaksperiodeForForrigeIverksatteBehandlingBoutgifter(behandlingId: BehandlingId): List<DetaljertVedtaksperiodeBoutgifter> {
-        val vedtakForForrigeIverksatteBehandling =
-            hentVedtaksdataForForrigeIverksatteBehandling<InnvilgelseEllerOpphørBoutgifter>(behandlingId)
-                ?: return emptyList()
-
-        return vedtakForForrigeIverksatteBehandling.finnDetaljerteVedtaksperioder()
-    }
-
-    fun vedtaksperiodeForForrigeIverksatteBehandlingDagligReiseTso(
-        behandlingId: BehandlingId,
-    ): List<DetaljertVedtaksperiodeDagligReiseTso> = emptyList()
-
-    fun vedtaksperiodeForForrigeIverksatteBehandlingDagligReiseTsr(
-        behandlingId: BehandlingId,
-    ): List<DetaljertVedtaksperiodeDagligReiseTsr> = emptyList()
 
     private fun oppsummerVedtaksperioderTilsynBarn(fagsakId: FagsakId): List<DetaljertVedtaksperiodeTilsynBarn> {
         val vedtakForSisteIverksatteBehandling =
