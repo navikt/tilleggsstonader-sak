@@ -29,9 +29,7 @@
                 "antallReisedager": 6
               },
               "beløp": 528,
-              "billetDetalijer" : {
-                "ENKELTBILLETT": 12
-              }
+              "billetDetalijer" : {"ENKELTBILLETT": 12}
             }
           ]
         }
