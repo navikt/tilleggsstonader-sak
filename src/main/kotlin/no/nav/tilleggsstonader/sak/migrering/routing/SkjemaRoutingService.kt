@@ -17,7 +17,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import org.springframework.stereotype.Service
 
 @Service
-class SøknadRoutingService(
+class SkjemaRoutingService(
     private val søknadRoutingRepository: SøknadRoutingRepository,
     private val fagsakService: FagsakService,
     private val arenaService: ArenaService,
