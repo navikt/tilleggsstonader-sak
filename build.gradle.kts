@@ -184,6 +184,7 @@ tasks.bootJar {
     archiveFileName.set("app.jar")
 }
 
-tasks.cyclonedxBom {
-    setIncludeConfigs(listOf("runtimeClasspath", "compileClasspath"))
+tasks.cyclonedxDirectBom {
+    includeConfigs = listOf("runtimeClasspath", "compileClasspath")
+    skipConfigs = listOf("testRuntimeClasspath", "testCompileClasspath")
 }
