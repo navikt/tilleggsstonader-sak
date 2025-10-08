@@ -20,7 +20,9 @@ object DetaljertVedtaksperioderBoutgifterMapper {
             vedtak.beregningsresultat.perioder
                 .filter { it.grunnlag.utgifter.containsKey(TypeBoutgift.UTGIFTER_OVERNATTING) }
 
-        return relevantePerioder.map { it.mapBeregningsresultatMndOvernatting() }
+        return relevantePerioder
+            .map { it.mapBeregningsresultatMndOvernatting() }
+            .filter { it.totalUtgiftMåned > 0 || it.stønadsbeløpMnd > 0 }
     }
 
     private fun finnVedtaksperioderMedLøpendeUtgifter(vedtak: InnvilgelseEllerOpphørBoutgifter): List<DetaljertVedtaksperiodeBoutgifter> {
@@ -35,6 +37,7 @@ object DetaljertVedtaksperioderBoutgifterMapper {
 
         return relevantePerioder
             .map { it.mapBeregningsresultatMndLøpendeUtgift() }
+            .filter { it.totalUtgiftMåned > 0 || it.stønadsbeløpMnd > 0 }
             .sorterOgMergeSammenhengende()
     }
 
