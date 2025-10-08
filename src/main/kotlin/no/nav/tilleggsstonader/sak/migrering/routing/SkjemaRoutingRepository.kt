@@ -12,19 +12,19 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Repository
-interface SøknadRoutingRepository :
-    RepositoryInterface<SøknadRouting, UUID>,
-    InsertUpdateRepository<SøknadRouting> {
+interface SkjemaRoutingRepository :
+    RepositoryInterface<SkjemaRouting, UUID>,
+    InsertUpdateRepository<SkjemaRouting> {
     fun findByIdentAndType(
         ident: String,
         type: Skjematype,
-    ): SøknadRouting?
+    ): SkjemaRouting?
 
     fun countByType(type: Skjematype): Int
 }
 
 @Table("soknad_routing")
-data class SøknadRouting(
+data class SkjemaRouting(
     @Id
     val id: UUID = UUID.randomUUID(),
     val ident: String,
