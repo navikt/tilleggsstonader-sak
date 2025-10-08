@@ -43,7 +43,7 @@ class SøknadRoutingIntegrationTest(
     @ParameterizedTest
     @EnumSource(
         value = Skjematype::class,
-        names = ["BARNETILSYN", "LÆREMIDLER", "BOUTGIFTER"],
+        names = ["SØKNAD_BARNETILSYN", "SØKNAD_LÆREMIDLER", "SØKNAD_BOUTGIFTER"],
     )
     fun `visse stønadstyper skal alltid routes til ny løsning`(skjematype: Skjematype) {
         val routingSjekk = sjekkRoutingForPerson(IdentSkjematype(jonasIdent, skjematype))
@@ -57,13 +57,13 @@ class SøknadRoutingIntegrationTest(
         val søknadRoutingDagligReise =
             SøknadRouting(
                 ident = jonasIdent,
-                type = Skjematype.DAGLIG_REISE,
+                type = Skjematype.SØKNAD_DAGLIG_REISE,
                 detaljer = JsonWrapper("{}"),
             )
         val dagligReiseRoutingRequest =
             IdentSkjematype(
                 ident = jonasIdent,
-                skjematype = Skjematype.DAGLIG_REISE,
+                skjematype = Skjematype.SØKNAD_DAGLIG_REISE,
             )
 
         @Test
@@ -142,8 +142,8 @@ class SøknadRoutingIntegrationTest(
             mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = true)
 
-            val routingSjekkFørsteRouting = sjekkRoutingForPerson(IdentSkjematype(jonasIdent, Skjematype.DAGLIG_REISE))
-            val routingSjekkAndreRouting = sjekkRoutingForPerson(IdentSkjematype(ernaIdent, Skjematype.DAGLIG_REISE))
+            val routingSjekkFørsteRouting = sjekkRoutingForPerson(IdentSkjematype(jonasIdent, Skjematype.SØKNAD_DAGLIG_REISE))
+            val routingSjekkAndreRouting = sjekkRoutingForPerson(IdentSkjematype(ernaIdent, Skjematype.SØKNAD_DAGLIG_REISE))
 
             assertThat(routingSjekkFørsteRouting.skalBehandlesINyLøsning).isTrue()
             assertThat(routingHarBlittLagret(ident = jonasIdent)).isTrue()
@@ -191,7 +191,7 @@ class SøknadRoutingIntegrationTest(
     }
 
     private fun routingHarBlittLagret(
-        skjematype: Skjematype = Skjematype.DAGLIG_REISE,
+        skjematype: Skjematype = Skjematype.SØKNAD_DAGLIG_REISE,
         ident: String = jonasIdent,
     ) = testoppsettService.hentSøknadRouting(ident, skjematype) != null
 }
