@@ -16,10 +16,10 @@ sealed interface RoutingStrategi {
 
 fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
     when (skjematype) {
-        Skjematype.BARNETILSYN -> RoutingStrategi.RouteAlleSøkereTilNyLøsning
-        Skjematype.LÆREMIDLER -> RoutingStrategi.RouteAlleSøkereTilNyLøsning
-        Skjematype.BOUTGIFTER -> RoutingStrategi.RouteAlleSøkereTilNyLøsning
-        Skjematype.DAGLIG_REISE ->
+        Skjematype.BARNETILSYN, Skjematype.SØKNAD_BARNETILSYN -> RoutingStrategi.RouteAlleSøkereTilNyLøsning
+        Skjematype.LÆREMIDLER, Skjematype.SØKNAD_LÆREMIDLER -> RoutingStrategi.RouteAlleSøkereTilNyLøsning
+        Skjematype.BOUTGIFTER, Skjematype.SØKNAD_BOUTGIFTER -> RoutingStrategi.RouteAlleSøkereTilNyLøsning
+        Skjematype.DAGLIG_REISE, Skjematype.SØKNAD_DAGLIG_REISE ->
             RoutingStrategi.RouteEnkelteSøkereTilNyLøsning(
                 featureToggleMaksAntall = Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
                 kreverAtSøkerErUtenAktivtVedtakIArena = true,
