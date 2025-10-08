@@ -26,7 +26,12 @@ object DetaljertVedtaksperioderBoutgifterMapper {
     private fun finnVedtaksperioderMedLøpendeUtgifter(vedtak: InnvilgelseEllerOpphørBoutgifter): List<DetaljertVedtaksperiodeBoutgifter> {
         val relevantePerioder =
             vedtak.beregningsresultat.perioder
-                .filter { it.grunnlag.utgifter.containsKey(TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG) }
+                .filter {
+                    it.grunnlag.utgifter.keys.any { key ->
+                        key == TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG ||
+                            key == TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER
+                    }
+                }
 
         return relevantePerioder
             .map { it.mapBeregningsresultatMndLøpendeUtgift() }
