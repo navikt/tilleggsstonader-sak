@@ -12,9 +12,9 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.søknad.DatoFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
+import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
-import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
@@ -206,7 +206,7 @@ class OpprettTestBehandlingController(
                 dokumentasjon = emptyList(),
             )
         val skjema =
-            Søknadsskjema(
+            InnsendtSkjema(
                 ident = fagsak.hentAktivIdent(),
                 mottattTidspunkt = LocalDateTime.now(),
                 språk = Språkkode.NB,
@@ -267,7 +267,7 @@ class OpprettTestBehandlingController(
                 dokumentasjon = emptyList(),
             )
         val skjema =
-            Søknadsskjema(
+            InnsendtSkjema(
                 ident = fagsak.hentAktivIdent(),
                 mottattTidspunkt = LocalDateTime.of(2020, 1, 1, 0, 0),
                 språk = Språkkode.NB,
@@ -366,7 +366,7 @@ class OpprettTestBehandlingController(
             )
 
         val skjema =
-            Søknadsskjema(
+            InnsendtSkjema(
                 ident = fagsak.hentAktivIdent(),
                 mottattTidspunkt = LocalDateTime.now(),
                 språk = Språkkode.NB,
@@ -477,7 +477,7 @@ class OpprettTestBehandlingController(
             )
 
         val skjema =
-            Søknadsskjema(
+            InnsendtSkjema(
                 ident = fagsak.hentAktivIdent(),
                 mottattTidspunkt = LocalDateTime.now(),
                 språk = Språkkode.NB,

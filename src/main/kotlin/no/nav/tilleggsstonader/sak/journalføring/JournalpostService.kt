@@ -13,8 +13,8 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequ
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
-import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
-import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
+import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
+import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -129,7 +129,7 @@ class JournalpostService(
     fun hentSøknadFraJournalpost(
         søknadJournalpost: Journalpost,
         stønadstype: Stønadstype,
-    ): Søknadsskjema<out Skjema> {
+    ): InnsendtSkjema<out Skjemadata> {
         val dokumentinfo =
             JournalføringHelper.plukkUtOriginaldokument(søknadJournalpost, stønadstype.tilDokumentBrevkode())
         val data =

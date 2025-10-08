@@ -7,10 +7,10 @@ import no.nav.tilleggsstonader.kontrakter.søknad.Dokument
 import no.nav.tilleggsstonader.kontrakter.søknad.DokumentasjonFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
+import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
-import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
-import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
+import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
@@ -41,7 +41,7 @@ object SøknadUtil {
         mottattTidspunkt: LocalDateTime = LocalDateTime.now(),
         barnMedBarnepass: List<BarnMedBarnepass> = listOf(barnMedBarnepass()),
         dokumentasjon: List<DokumentasjonFelt> = emptyList(),
-    ): Søknadsskjema<Skjema> {
+    ): InnsendtSkjema<Skjemadata> {
         val skjemaBarnetilsyn =
             SøknadsskjemaBarnetilsyn(
                 hovedytelse =
@@ -69,7 +69,7 @@ object SøknadUtil {
                 barn = BarnAvsnitt(barnMedBarnepass = barnMedBarnepass),
                 dokumentasjon = dokumentasjon,
             )
-        return Søknadsskjema(
+        return InnsendtSkjema(
             ident = ident,
             mottattTidspunkt = mottattTidspunkt,
             språk = Språkkode.NB,
@@ -81,7 +81,7 @@ object SøknadUtil {
         ident: String = "søker",
         mottattTidspunkt: LocalDateTime = LocalDateTime.now(),
         dokumentasjon: List<DokumentasjonFelt> = emptyList(),
-    ): Søknadsskjema<Skjema> {
+    ): InnsendtSkjema<Skjemadata> {
         val skjemaBarnetilsyn =
             SøknadsskjemaLæremidler(
                 hovedytelse =
@@ -119,7 +119,7 @@ object SøknadUtil {
                         harFunksjonsnedsettelse = EnumFelt("Har funksjonsnedsettelse?", JaNei.JA, "Ja", emptyList()),
                     ),
             )
-        return Søknadsskjema(
+        return InnsendtSkjema(
             ident = ident,
             mottattTidspunkt = mottattTidspunkt,
             språk = Språkkode.NB,

@@ -5,8 +5,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapperFailOnUnknownProperties
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
-import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
+import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
+import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
@@ -18,10 +18,10 @@ object SøknadsskjemaUtil {
         stønadstype: Stønadstype,
         data: ByteArray,
         mottattTidspunkt: LocalDateTime,
-    ): Søknadsskjema<out Skjema> =
+    ): InnsendtSkjema<out Skjemadata> =
         when (stønadstype) {
-            Stønadstype.BARNETILSYN -> objectMapper.readValue<Søknadsskjema<SøknadsskjemaBarnetilsyn>>(data)
-            Stønadstype.LÆREMIDLER -> objectMapper.readValue<Søknadsskjema<SøknadsskjemaLæremidler>>(data)
+            Stønadstype.BARNETILSYN -> objectMapper.readValue<InnsendtSkjema<SøknadsskjemaBarnetilsyn>>(data)
+            Stønadstype.LÆREMIDLER -> objectMapper.readValue<InnsendtSkjema<SøknadsskjemaLæremidler>>(data)
             Stønadstype.BOUTGIFTER -> håndterBoutgifter(data, mottattTidspunkt)
             Stønadstype.DAGLIG_REISE_TSO -> håndterDagligReise(data, mottattTidspunkt)
             Stønadstype.DAGLIG_REISE_TSR -> håndterDagligReise(data, mottattTidspunkt)
@@ -30,9 +30,9 @@ object SøknadsskjemaUtil {
     private fun håndterBoutgifter(
         data: ByteArray,
         mottattTidspunkt: LocalDateTime,
-    ): Søknadsskjema<SøknadsskjemaBoutgifterFyllUtSendInn> {
+    ): InnsendtSkjema<SøknadsskjemaBoutgifterFyllUtSendInn> {
         val skjema = objectMapperFailOnUnknownProperties.readValue<SøknadsskjemaBoutgifterFyllUtSendInn>(data)
-        return Søknadsskjema(
+        return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
             mottattTidspunkt = mottattTidspunkt,
             språk = mapFyllUtSpråk(skjema.language),
@@ -43,9 +43,9 @@ object SøknadsskjemaUtil {
     private fun håndterDagligReise(
         data: ByteArray,
         mottattTidspunkt: LocalDateTime,
-    ): Søknadsskjema<SøknadsskjemaDagligReiseFyllUtSendInn> {
+    ): InnsendtSkjema<SøknadsskjemaDagligReiseFyllUtSendInn> {
         val skjema = objectMapperFailOnUnknownProperties.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(data)
-        return Søknadsskjema(
+        return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
             mottattTidspunkt = mottattTidspunkt,
             språk = mapFyllUtSpråk(skjema.language),

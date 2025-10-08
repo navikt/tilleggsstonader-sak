@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper
 
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
-import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
+import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon
 
@@ -11,7 +11,7 @@ object DokumentasjonMapper {
      * Lagrer [Dokumentasjon] i databasen med referanse til vedlegget i journalposten, for å enkelt kunne åpne det fra frontend
      */
     fun mapDokumentasjon(
-        skjema: Skjema,
+        skjema: Skjemadata,
         journalpost: Journalpost,
     ): List<Dokumentasjon> {
         val vedlegg = mapVedleggPåId(journalpost)

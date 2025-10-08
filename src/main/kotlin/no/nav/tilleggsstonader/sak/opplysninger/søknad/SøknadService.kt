@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad
 
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
-import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
-import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
+import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
@@ -64,7 +64,7 @@ class SøknadService(
     fun lagreSøknad(
         behandlingId: BehandlingId,
         journalpost: Journalpost,
-        skjema: Søknadsskjema<out Skjema>,
+        skjema: InnsendtSkjema<out Skjemadata>,
     ): Søknad<*> {
         val søknad = mapSøknad(skjema, journalpost)
         val lagretSøknad =
@@ -79,7 +79,7 @@ class SøknadService(
     }
 
     fun mapSøknad(
-        skjema: Søknadsskjema<out Skjema>,
+        skjema: InnsendtSkjema<out Skjemadata>,
         journalpost: Journalpost,
     ): Søknad<out Any> =
         when (val søknadsskjema = skjema.skjema) {
