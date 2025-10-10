@@ -39,6 +39,21 @@ private val bekreftedeSatser =
             tom = LocalDate.of(2023, 12, 31),
             beløp = 4519,
         ),
+        MakssatsBoutgifter(
+            fom = LocalDate.of(2022, 1, 1),
+            tom = LocalDate.of(2022, 12, 31),
+            beløp = 4396,
+        ),
+        MakssatsBoutgifter(
+            fom = LocalDate.of(2021, 1, 1),
+            tom = LocalDate.of(2021, 12, 31),
+            beløp = 4340,
+        ),
+        MakssatsBoutgifter(
+            fom = LocalDate.of(2020, 1, 1),
+            tom = LocalDate.of(2020, 12, 31),
+            beløp = 4193,
+        ),
     )
 
 private val satser: List<MakssatsBoutgifter> =
