@@ -369,6 +369,93 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
             assertThat(løpende.stønadsbeløpMnd).isEqualTo(4000)
             assertThat(løpende.totalUtgiftMåned).isEqualTo(4000)
         }
+
+        @Test
+        fun `skal slå sammen løpende og overnatting men filtrere vekk 0 verdier`() {
+            val beregningsresultat =
+                BoutgifterTestUtil.lagBeregningsresultatMåned(
+                    fom = førsteJan,
+                    tom = sisteJan,
+                    utgifter =
+                        listOf(
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 1, 3),
+                                tom = LocalDate.of(2024, 1, 4),
+                                utgift = 8000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 1, 7),
+                                tom = LocalDate.of(2024, 1, 8),
+                                utgift = 1000,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                            UtgifterMedType(
+                                fom = førsteJan,
+                                tom = sisteJan,
+                                utgift = 4000,
+                                type = TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG,
+                            ),
+                        ).tilUtgiftMap(),
+                )
+
+            val beregningsresultatMedNull =
+                BoutgifterTestUtil.lagBeregningsresultatMåned(
+                    fom = førsteJan.plusMonths(1),
+                    tom = sisteJan.plusMonths(1),
+                    utgifter =
+                        listOf(
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 2, 1),
+                                tom = LocalDate.of(2024, 2, 28),
+                                utgift = 0,
+                                type = TypeBoutgift.UTGIFTER_OVERNATTING,
+                            ),
+                            UtgifterMedType(
+                                fom = LocalDate.of(2024, 2, 1),
+                                tom = LocalDate.of(2024, 2, 28),
+                                utgift = 0,
+                                type = TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG,
+                            ),
+                        ).tilUtgiftMap(),
+                )
+
+            val vedtak =
+                innvilgelseBoutgifter(
+                    listOf(
+                        beregningsresultat,
+                        beregningsresultatMedNull,
+                    ),
+                )
+
+            // Verifiser at det finnes vedtak med stønadbeløp = 0
+            assertThat(
+                vedtak.beregningsresultat.perioder
+                    .last()
+                    .stønadsbeløp == 0,
+            )
+
+            val res = vedtak.finnDetaljerteVedtaksperioder()
+
+            // Verifiser at perioder med stønadbeløp = 0 er filtrert bort
+            assertThat(res.none { it.totalUtgiftMåned == 0 && it.stønadsbeløpMnd == 0 }).isTrue()
+
+            val overnatting = res.first()
+            assertThat(overnatting.fom).isEqualTo(førsteJan)
+            assertThat(overnatting.tom).isEqualTo(sisteJan)
+            assertThat(overnatting.erLøpendeUtgift).isFalse()
+            assertThat(overnatting.utgifterTilOvernatting).hasSize(2)
+            assertThat(overnatting.totalUtgiftMåned).isEqualTo(9000)
+            assertThat(overnatting.stønadsbeløpMnd).isEqualTo(809)
+
+            val løpende = res.last()
+            assertThat(løpende.fom).isEqualTo(førsteJan)
+            assertThat(løpende.tom).isEqualTo(sisteJan)
+            assertThat(løpende.erLøpendeUtgift).isTrue()
+            assertThat(løpende.utgifterTilOvernatting).isNullOrEmpty()
+            assertThat(løpende.stønadsbeløpMnd).isEqualTo(4000)
+            assertThat(løpende.totalUtgiftMåned).isEqualTo(4000)
+        }
     }
 
     data class UtgifterMedType(
