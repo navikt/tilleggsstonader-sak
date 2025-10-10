@@ -43,6 +43,11 @@ val bekreftedeSatser =
             tom = LocalDate.of(2023, 12, 31),
             beløp = mapOf(Studienivå.VIDEREGÅENDE to 411, Studienivå.HØYERE_UTDANNING to 822),
         ),
+        SatsLæremidler(
+            fom = LocalDate.of(2022, 1, 1),
+            tom = LocalDate.of(2022, 12, 31),
+            beløp = mapOf(Studienivå.VIDEREGÅENDE to 400, Studienivå.HØYERE_UTDANNING to 800),
+        ),
     )
 
 @Component
