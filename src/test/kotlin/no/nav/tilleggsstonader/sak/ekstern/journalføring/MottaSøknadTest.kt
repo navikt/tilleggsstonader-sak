@@ -16,6 +16,9 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
+import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingsjournalpostRepository
@@ -30,6 +33,10 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksK
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.tomYtelsePerioderDto
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspenger
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
@@ -41,6 +48,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.support.Acknowledgment
+import java.time.LocalDate
 import java.util.UUID
 
 class MottaSøknadTest : IntegrationTest() {
@@ -64,6 +72,9 @@ class MottaSøknadTest : IntegrationTest() {
 
     @Autowired
     lateinit var behandlingsjournalpostRepository: BehandlingsjournalpostRepository
+
+    @Autowired
+    lateinit var ytelseClient: YtelseClient
 
     val journalpostId = 123321L
     val ident = "12345678901"
@@ -151,8 +162,9 @@ class MottaSøknadTest : IntegrationTest() {
 
         assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse.hendelsesId)).isNotNull
 
-        val hovedytelse = mapOf(HovedytelseType.tiltakspenger to true)
-        mockJournalpost(brevkode = DokumentBrevkode.DAGLIG_REISE, søknad = søknadDagligReise(hovedytelse = hovedytelse))
+        every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoTiltakspenger()
+
+        mockJournalpost(brevkode = DokumentBrevkode.DAGLIG_REISE, søknad = søknadDagligReise())
         kjørTasksKlareForProsessering()
 
         validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.DAGLIG_REISE_TSR, journalpostId.toString())
@@ -174,7 +186,35 @@ class MottaSøknadTest : IntegrationTest() {
 
         assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse.hendelsesId)).isNotNull
 
+        every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
         mockJournalpost(brevkode = DokumentBrevkode.DAGLIG_REISE, søknad = søknadDagligReise())
+        kjørTasksKlareForProsessering()
+
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.DAGLIG_REISE_TSO, journalpostId.toString())
+    }
+
+    @Test
+    fun `mottar daglig-reise-søknad fra kafka på person uten ytelser i register, journalføres og oppretter sak på TSO`() {
+        val hendelse = JournalfoeringHendelseRecord()
+        hendelse.journalpostId = journalpostId
+        hendelse.mottaksKanal = "NAV_NO"
+        hendelse.hendelsesType = JournalpostHendelseType.JournalpostMottatt.name
+        hendelse.temaNytt = Tema.TSO.name
+        hendelse.hendelsesId = UUID.randomUUID().toString()
+
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+
+        assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse.hendelsesId)).isNotNull
+
+        every { ytelseClient.hentYtelser(any()) } returns tomYtelsePerioderDto()
+        // Default AAP
+        mockJournalpost(
+            brevkode = DokumentBrevkode.DAGLIG_REISE,
+            søknad = søknadDagligReise(mapOf(HovedytelseType.arbeidsavklaringspenger to true)),
+        )
         kjørTasksKlareForProsessering()
 
         validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.DAGLIG_REISE_TSO, journalpostId.toString())

@@ -7,12 +7,14 @@ import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
+import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
@@ -25,10 +27,14 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilMålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilMålgruppe
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class HåndterSøknadService(
@@ -40,6 +46,7 @@ class HåndterSøknadService(
     private val behandlingService: BehandlingService,
     private val søknadService: SøknadService,
     private val unleashService: UnleashService,
+    private val ytelseService: YtelseService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -99,19 +106,41 @@ class HåndterSøknadService(
             error("Søknaden fra journalposten er ikke en daglig reise søknad")
         }
 
-        val målgrupper = søknad.data.hovedytelse.hovedytelse
+        val målgrupper =
+            hentMålgrupperFraRegister(journalpost, søknad).takeIf { it.isNotEmpty() }
+                ?: søknad.data.hovedytelse.hovedytelse
+                    .map { it.tilMålgruppeType() }
 
         // Sender til TSR hvis flere målgrupper eller TSR sine målgrupper
         return if (målgrupper.size > 1 ||
             målgrupper
                 .single()
-                .tilMålgruppeType()
                 .kanBrukesForStønad(Stønadstype.DAGLIG_REISE_TSR)
         ) {
             Stønadstype.DAGLIG_REISE_TSR
         } else {
             Stønadstype.DAGLIG_REISE_TSO
         }
+    }
+
+    private fun hentMålgrupperFraRegister(
+        journalpost: Journalpost,
+        søknad: SøknadDagligReise,
+    ): List<MålgruppeType> {
+        feilHvis(journalpost.bruker == null) {
+            "Forventer at bruker skal være satt på journalpost"
+        }
+
+        // TODO - fom og tom påkrevd i søknaden, skal ikke være nullable
+        return ytelseService
+            .hentYtelser(
+                journalpost.bruker!!.id,
+                søknad.data.aktivitet.reiseperiode!!
+                    .fom,
+                søknad.data.aktivitet.reiseperiode.tom,
+                TypeYtelsePeriode.entries.toList(),
+            ).perioder
+            .map { it.type.tilMålgruppe() }
     }
 
     private fun håndterSøknad(
