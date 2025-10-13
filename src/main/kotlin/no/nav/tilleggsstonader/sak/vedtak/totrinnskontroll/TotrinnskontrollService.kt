@@ -219,8 +219,7 @@ class TotrinnskontrollService(
                 begrunnelse = totrinnskontroll.begrunnelse,
             )
 
-        return if (beslutterErLikBehandler(totrinnskontroll) || !tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER)
-        ) {
+        return if (beslutterErLikBehandler(totrinnskontroll) || !tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER)) {
             StatusTotrinnskontrollDto(
                 TotrinnkontrollStatus.IKKE_AUTORISERT,
                 totrinnskontrollDto,
