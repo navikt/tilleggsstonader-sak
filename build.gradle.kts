@@ -33,8 +33,6 @@ plugins {
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.2.20"
-
-    id("org.cyclonedx.bom") version "3.0.0"
 }
 
 repositories {
@@ -182,9 +180,4 @@ tasks.test {
 
 tasks.bootJar {
     archiveFileName.set("app.jar")
-}
-
-tasks.cyclonedxDirectBom {
-    includeConfigs = listOf("runtimeClasspath", "compileClasspath")
-    skipConfigs = listOf("testRuntimeClasspath", "testCompileClasspath")
 }
