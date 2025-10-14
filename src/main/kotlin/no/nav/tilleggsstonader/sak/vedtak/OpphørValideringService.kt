@@ -64,17 +64,6 @@ class OpphørValideringService(
         }
     }
 
-    // TODO: Fjern når læremidler er over på felles vedtaksperiode
-    fun validerVedtaksperioderAvkortetVedOpphørLæremidler(
-        forrigeBehandlingsVedtaksperioder: List<Vedtaksperiode>,
-        opphørsdato: LocalDate,
-    ) {
-        validerVedtaksperioderAvkortetVedOpphør(
-            forrigeBehandlingsVedtaksperioder,
-            opphørsdato,
-        )
-    }
-
     private fun validerIngenNyeOppfylteVilkårEllerVilkårperioder(
         vilkår: List<Vilkår>,
         vilkårperioder: Vilkårperioder,

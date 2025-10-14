@@ -2,6 +2,9 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.fagsakBoutgifter
@@ -11,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregni
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -243,6 +247,34 @@ class OpphørValideringServiceTest {
             assertThatCode {
                 opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
             }.doesNotThrowAnyException()
+        }
+    }
+
+    @Nested
+    inner class `Valider at vedtaksperioden er avkortet ved opphør` {
+        val vedtaksperiodeJanuar = vedtaksperiode(fom = 1 januar 2025, tom = 31 januar 2025)
+        val vedtaksperiodeFebruar = vedtaksperiode(fom = 1 februar 2025, tom = 28 februar 2025)
+
+        @Test
+        fun `Kaster ikke feil når vedtaksperioden er avkortet`() {
+            assertThatCode {
+                opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
+                    forrigeBehandlingsVedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
+                    opphørsdato = vedtaksperiodeFebruar.tom,
+                )
+            }.doesNotThrowAnyException()
+        }
+
+        @Test
+        fun `Kaster feil når vedtaksperioden ikke er avkortet`() {
+            assertThatThrownBy {
+                opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
+                    forrigeBehandlingsVedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
+                    opphørsdato = 1 mars 2025,
+                )
+            }.hasMessage(
+                "Opphør er et ugyldig valg fordi ønsket opphørsdato ikke korter ned vedtaket.",
+            )
         }
     }
 
