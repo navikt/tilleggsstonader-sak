@@ -190,7 +190,7 @@ class MottaSøknadTest : IntegrationTest() {
     }
 
     @Test
-    fun `mottar daglig-reise-ettersendelse fra kafka, opprettes journalføringsoppgave uten mappetilknytting`() {
+    fun `mottar scannet daglig-reise søknad fra kafka, opprettes journalføringsoppgave uten mappetilknytting`() {
         val hendelse = journalfoeringHendelseRecord(mottaksKanal = "SKAN_IM")
 
         journalhendelseKafkaListener.listen(
