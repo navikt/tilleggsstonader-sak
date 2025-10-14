@@ -10,7 +10,22 @@
           "begrunnelseType" : "UTEN"
         },
         "NEI" : {
+          "regelId" : "UNNTAK_SEKS_KM",
+          "begrunnelseType" : "UTEN"
+        }
+      }
+    },
+    "UNNTAK_SEKS_KM" : {
+      "regelId" : "UNNTAK_SEKS_KM",
+      "erHovedregel" : false,
+      "svarMapping" : {
+        "JA" : {
+          "regelId" : "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
+          "begrunnelseType" : "UTEN"
+        },
+        "NEI" : {
           "begrunnelseType" : "PÅKREVD",
+          "triggerFakta" : null,
           "regelId" : "SLUTT_NODE"
         }
       }
@@ -21,6 +36,7 @@
       "svarMapping" : {
         "JA" : {
           "begrunnelseType" : "VALGFRI",
+          "triggerFakta" : "DAGLIG_REISE_OFFENTLIG_TRANSPORT",
           "regelId" : "SLUTT_NODE"
         },
         "NEI" : {
@@ -35,10 +51,12 @@
       "svarMapping" : {
         "JA" : {
           "begrunnelseType" : "VALGFRI",
+          "triggerFakta" : "DAGLIG_REISE_PRIVAT_BIL",
           "regelId" : "SLUTT_NODE"
         },
         "NEI" : {
           "begrunnelseType" : "VALGFRI",
+          "triggerFakta" : null,
           "regelId" : "SLUTT_NODE"
         }
       }
