@@ -81,12 +81,7 @@ class MottaSøknadTest : IntegrationTest() {
 
     @Test
     fun `mottar boutgifter-søknad fra kafka, journalføres og oppretter sak`() {
-        val hendelse = JournalfoeringHendelseRecord()
-        hendelse.journalpostId = journalpostId
-        hendelse.mottaksKanal = "NAV_NO"
-        hendelse.hendelsesType = JournalpostHendelseType.JournalpostMottatt.name
-        hendelse.temaNytt = Tema.TSO.name
-        hendelse.hendelsesId = UUID.randomUUID().toString()
+        val hendelse = journalfoeringHendelseRecord()
 
         journalhendelseKafkaListener.listen(
             ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
@@ -103,12 +98,7 @@ class MottaSøknadTest : IntegrationTest() {
 
     @Test
     fun `mottar barnetilsyn-søknad fra kafka, journalføres og oppretter sak`() {
-        val hendelse = JournalfoeringHendelseRecord()
-        hendelse.journalpostId = journalpostId
-        hendelse.mottaksKanal = "NAV_NO"
-        hendelse.hendelsesType = JournalpostHendelseType.JournalpostMottatt.name
-        hendelse.temaNytt = Tema.TSO.name
-        hendelse.hendelsesId = UUID.randomUUID().toString()
+        val hendelse = journalfoeringHendelseRecord()
 
         journalhendelseKafkaListener.listen(
             ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
@@ -125,12 +115,7 @@ class MottaSøknadTest : IntegrationTest() {
 
     @Test
     fun `mottar læremidler-søknad fra kafka, journalføres og oppretter sak`() {
-        val hendelse = JournalfoeringHendelseRecord()
-        hendelse.journalpostId = journalpostId
-        hendelse.mottaksKanal = "NAV_NO"
-        hendelse.hendelsesType = JournalpostHendelseType.JournalpostMottatt.name
-        hendelse.temaNytt = Tema.TSO.name
-        hendelse.hendelsesId = UUID.randomUUID().toString()
+        val hendelse = journalfoeringHendelseRecord()
 
         journalhendelseKafkaListener.listen(
             ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
@@ -146,14 +131,8 @@ class MottaSøknadTest : IntegrationTest() {
     }
 
     @Test
-    fun `mottar daglig-resise-søknad fra kafka, journalføres og oppretter sak på TSR`() {
-        val hendelse = JournalfoeringHendelseRecord()
-        hendelse.journalpostId = journalpostId
-        hendelse.mottaksKanal = "NAV_NO"
-        hendelse.hendelsesType = JournalpostHendelseType.JournalpostMottatt.name
-        // Daglig reise TSR har tema TSO fra FyllUtSendInn. De blir flyttet over til TSR i journalføringen
-        hendelse.temaNytt = Tema.TSO.name
-        hendelse.hendelsesId = UUID.randomUUID().toString()
+    fun `mottar daglig-resise-søknad fra kafka, bruker mottar tiltakspenger, journalføres og oppretter sak på TSR`() {
+        val hendelse = journalfoeringHendelseRecord()
 
         journalhendelseKafkaListener.listen(
             ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
@@ -171,13 +150,8 @@ class MottaSøknadTest : IntegrationTest() {
     }
 
     @Test
-    fun `mottar daglig-resise-søknad fra kafka, journalføres og oppretter sak på TSO`() {
-        val hendelse = JournalfoeringHendelseRecord()
-        hendelse.journalpostId = journalpostId
-        hendelse.mottaksKanal = "NAV_NO"
-        hendelse.hendelsesType = JournalpostHendelseType.JournalpostMottatt.name
-        hendelse.temaNytt = Tema.TSO.name
-        hendelse.hendelsesId = UUID.randomUUID().toString()
+    fun `mottar daglig-resise-søknad fra kafka, bruker mottar AAP, journalføres og oppretter sak på TSO`() {
+        val hendelse = journalfoeringHendelseRecord()
 
         journalhendelseKafkaListener.listen(
             ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
@@ -195,12 +169,7 @@ class MottaSøknadTest : IntegrationTest() {
 
     @Test
     fun `mottar daglig-reise-søknad fra kafka på person uten ytelser i register, journalføres og oppretter sak på TSO`() {
-        val hendelse = JournalfoeringHendelseRecord()
-        hendelse.journalpostId = journalpostId
-        hendelse.mottaksKanal = "NAV_NO"
-        hendelse.hendelsesType = JournalpostHendelseType.JournalpostMottatt.name
-        hendelse.temaNytt = Tema.TSO.name
-        hendelse.hendelsesId = UUID.randomUUID().toString()
+        val hendelse = journalfoeringHendelseRecord()
 
         journalhendelseKafkaListener.listen(
             ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
@@ -222,12 +191,7 @@ class MottaSøknadTest : IntegrationTest() {
 
     @Test
     fun `mottar daglig-reise-ettersendelse fra kafka, opprettes journalføringsoppgave uten mappetilknytting`() {
-        val hendelse = JournalfoeringHendelseRecord()
-        hendelse.journalpostId = journalpostId
-        hendelse.mottaksKanal = "SKAN_IM"
-        hendelse.hendelsesType = JournalpostHendelseType.JournalpostMottatt.name
-        hendelse.temaNytt = Tema.TSO.name
-        hendelse.hendelsesId = UUID.randomUUID().toString()
+        val hendelse = journalfoeringHendelseRecord(mottaksKanal = "SKAN_IM")
 
         journalhendelseKafkaListener.listen(
             ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
@@ -248,6 +212,18 @@ class MottaSøknadTest : IntegrationTest() {
         assertThat(oppgave.tema.name).isEqualTo(journalpost.tema)
         assertThat(oppgave.beskrivelse).contains(journalpost.dokumenter?.first()?.tittel)
         assertThat(oppgave.mappeId).isNull()
+    }
+
+    private fun journalfoeringHendelseRecord(
+        journalpostId: Long = this.journalpostId,
+        mottaksKanal: String = "NAV_NO",
+        tema: Tema = Tema.TSO,
+    ) = JournalfoeringHendelseRecord().apply {
+        this.journalpostId = journalpostId
+        this.mottaksKanal = mottaksKanal
+        this.hendelsesType = JournalpostHendelseType.JournalpostMottatt.name
+        this.temaNytt = tema.name
+        this.hendelsesId = UUID.randomUUID().toString()
     }
 
     private fun mockJournalpost(
