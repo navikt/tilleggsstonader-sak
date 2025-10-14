@@ -27,7 +27,7 @@ import no.nav.tilleggsstonader.sak.hendelser.Hendelse
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.MockClientService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
-import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRouting
+import no.nav.tilleggsstonader.sak.migrering.routing.SkjemaRouting
 import no.nav.tilleggsstonader.sak.oppfølging.Oppfølging
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
@@ -146,7 +146,7 @@ abstract class IntegrationTest {
             Hendelse::class,
             TaskLogg::class,
             Task::class,
-            SøknadRouting::class,
+            SkjemaRouting::class,
             BrevmottakerFrittståendeBrev::class,
             FrittståendeBrev::class,
             Oppfølging::class,

@@ -32,7 +32,7 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
-class SøknadRoutingIntegrationTest(
+class SkjemaRoutingIntegrationTest(
     @Autowired private val ytelseClient: YtelseClient,
     @Autowired private val arenaClient: ArenaClient,
     @Autowired private val pdlClient: PdlClient,
@@ -43,7 +43,7 @@ class SøknadRoutingIntegrationTest(
     @ParameterizedTest
     @EnumSource(
         value = Skjematype::class,
-        names = ["BARNETILSYN", "LÆREMIDLER", "BOUTGIFTER"],
+        names = ["SØKNAD_BARNETILSYN", "SØKNAD_LÆREMIDLER", "SØKNAD_BOUTGIFTER"],
     )
     fun `visse stønadstyper skal alltid routes til ny løsning`(skjematype: Skjematype) {
         val routingSjekk = sjekkRoutingForPerson(IdentSkjematype(jonasIdent, skjematype))
@@ -54,21 +54,21 @@ class SøknadRoutingIntegrationTest(
 
     @Nested
     inner class DagligReise {
-        val søknadRoutingDagligReise =
-            SøknadRouting(
+        val skjemaRoutingDagligReise =
+            SkjemaRouting(
                 ident = jonasIdent,
-                type = Skjematype.DAGLIG_REISE,
+                type = Skjematype.SØKNAD_DAGLIG_REISE,
                 detaljer = JsonWrapper("{}"),
             )
         val dagligReiseRoutingRequest =
             IdentSkjematype(
                 ident = jonasIdent,
-                skjematype = Skjematype.DAGLIG_REISE,
+                skjematype = Skjematype.SØKNAD_DAGLIG_REISE,
             )
 
         @Test
         fun `skal alltid svare ja hvis personen har blitt routet til ny løsning tidligere`() {
-            testoppsettService.lagreSøknadRouting(søknadRoutingDagligReise)
+            testoppsettService.lagreSøknadRouting(skjemaRoutingDagligReise)
 
             val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
 
@@ -142,8 +142,8 @@ class SøknadRoutingIntegrationTest(
             mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = true)
 
-            val routingSjekkFørsteRouting = sjekkRoutingForPerson(IdentSkjematype(jonasIdent, Skjematype.DAGLIG_REISE))
-            val routingSjekkAndreRouting = sjekkRoutingForPerson(IdentSkjematype(ernaIdent, Skjematype.DAGLIG_REISE))
+            val routingSjekkFørsteRouting = sjekkRoutingForPerson(IdentSkjematype(jonasIdent, Skjematype.SØKNAD_DAGLIG_REISE))
+            val routingSjekkAndreRouting = sjekkRoutingForPerson(IdentSkjematype(ernaIdent, Skjematype.SØKNAD_DAGLIG_REISE))
 
             assertThat(routingSjekkFørsteRouting.skalBehandlesINyLøsning).isTrue()
             assertThat(routingHarBlittLagret(ident = jonasIdent)).isTrue()
@@ -191,7 +191,7 @@ class SøknadRoutingIntegrationTest(
     }
 
     private fun routingHarBlittLagret(
-        skjematype: Skjematype = Skjematype.DAGLIG_REISE,
+        skjematype: Skjematype = Skjematype.SØKNAD_DAGLIG_REISE,
         ident: String = jonasIdent,
     ) = testoppsettService.hentSøknadRouting(ident, skjematype) != null
 }

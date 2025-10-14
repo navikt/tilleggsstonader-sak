@@ -117,7 +117,7 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
                                                             antallReisedager = 19,
                                                         ),
                                                     beløp = 750,
-                                                    billetdetalijer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1),
+                                                    billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1),
                                                 ),
                                             ),
                                     ),

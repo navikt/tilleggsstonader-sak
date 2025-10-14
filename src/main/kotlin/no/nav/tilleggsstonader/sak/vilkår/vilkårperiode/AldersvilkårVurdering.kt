@@ -64,8 +64,7 @@ object AldersvilkårVurdering {
         fødselsdato: LocalDate,
         vilkårperiode: LagreVilkårperiode,
     ): SvarJaNei =
-        if (heleVilkårsperiodenErFørBrukerFyller67År(fødselsdato, vilkårperiode)
-        ) {
+        if (heleVilkårsperiodenErFørBrukerFyller67År(fødselsdato, vilkårperiode)) {
             SvarJaNei.JA
         } else {
             SvarJaNei.NEI

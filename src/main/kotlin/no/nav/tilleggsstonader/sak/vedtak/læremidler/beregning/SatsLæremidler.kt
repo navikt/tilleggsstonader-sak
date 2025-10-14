@@ -43,6 +43,21 @@ val bekreftedeSatser =
             tom = LocalDate.of(2023, 12, 31),
             beløp = mapOf(Studienivå.VIDEREGÅENDE to 411, Studienivå.HØYERE_UTDANNING to 822),
         ),
+        SatsLæremidler(
+            fom = LocalDate.of(2022, 1, 1),
+            tom = LocalDate.of(2022, 12, 31),
+            beløp = mapOf(Studienivå.VIDEREGÅENDE to 400, Studienivå.HØYERE_UTDANNING to 800),
+        ),
+        SatsLæremidler(
+            fom = LocalDate.of(2021, 1, 1),
+            tom = LocalDate.of(2021, 12, 31),
+            beløp = mapOf(Studienivå.VIDEREGÅENDE to 395, Studienivå.HØYERE_UTDANNING to 760),
+        ),
+        SatsLæremidler(
+            fom = LocalDate.of(2020, 1, 1),
+            tom = LocalDate.of(2020, 12, 31),
+            beløp = mapOf(Studienivå.VIDEREGÅENDE to 382, Studienivå.HØYERE_UTDANNING to 763),
+        ),
     )
 
 @Component

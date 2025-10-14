@@ -17,8 +17,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import org.springframework.stereotype.Service
 
 @Service
-class SøknadRoutingService(
-    private val søknadRoutingRepository: SøknadRoutingRepository,
+class SkjemaRoutingService(
+    private val routingRepository: SkjemaRoutingRepository,
     private val fagsakService: FagsakService,
     private val arenaService: ArenaService,
     private val behandlingService: BehandlingService,
@@ -28,7 +28,7 @@ class SøknadRoutingService(
     fun harLagretRouting(
         ident: String,
         skjematype: Skjematype,
-    ) = søknadRoutingRepository.findByIdentAndType(ident, skjematype) != null
+    ) = routingRepository.findByIdentAndType(ident, skjematype) != null
 
     fun skalRoutesTilNyLøsning(
         ident: String,
@@ -37,8 +37,8 @@ class SøknadRoutingService(
         val routingStrategi = bestemRoutingStrategi(skjematype)
 
         return when (routingStrategi) {
-            RoutingStrategi.RouteAlleSøkereTilNyLøsning -> true
-            is RoutingStrategi.RouteEnkelteSøkereTilNyLøsning ->
+            RoutingStrategi.SendAlleBrukereTilNyLøsning -> true
+            is RoutingStrategi.SendEnkelteBrukereTilNyLøsning ->
                 skalBrukerRoutesTilNyLøsning(ident, skjematype, routingStrategi)
         }.also { loggRoutingResultatet(skjematype, it) }
     }
@@ -46,7 +46,7 @@ class SøknadRoutingService(
     private fun skalBrukerRoutesTilNyLøsning(
         ident: String,
         skjematype: Skjematype,
-        kontekst: RoutingStrategi.RouteEnkelteSøkereTilNyLøsning,
+        kontekst: RoutingStrategi.SendEnkelteBrukereTilNyLøsning,
     ): Boolean {
         if (harLagretRouting(ident, skjematype)) {
             logger.info("routing - skjematype=$skjematype harLagretRouting=true")
@@ -75,7 +75,7 @@ class SøknadRoutingService(
         toggleId: ToggleId,
     ): Boolean {
         val maksAntall = unleashService.getVariantWithNameOrDefault(toggleId, "antall", 0)
-        val antall = søknadRoutingRepository.countByType(skjematype)
+        val antall = routingRepository.countByType(skjematype)
         logger.info("routing - stønadstype=$skjematype antallIDatabase=$antall toggleMaksAntall=$maksAntall")
         return antall >= maksAntall
     }
@@ -95,8 +95,8 @@ class SøknadRoutingService(
         skjematype: Skjematype,
         detaljer: Any,
     ) {
-        søknadRoutingRepository.insert(
-            SøknadRouting(
+        routingRepository.insert(
+            SkjemaRouting(
                 ident = ident,
                 type = skjematype,
                 detaljer = JsonWrapper(objectMapper.writeValueAsString(detaljer)),

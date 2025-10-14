@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20250922094930_4bb329c"
 val tilleggsstønaderLibsVersion = "2025.09.11-09.26.d3123ecc47ce"
-val tilleggsstønaderKontrakterVersion = "2025.10.08-11.06.6210ec684be9"
+val tilleggsstønaderKontrakterVersion = "2025.10.08-13.08.8d7e483d0404"
 val avroVersion = "1.12.0"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.6"
@@ -33,8 +33,6 @@ plugins {
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.2.20"
-
-    id("org.cyclonedx.bom") version "3.0.0"
 }
 
 repositories {
@@ -49,7 +47,7 @@ apply(plugin = "com.diffplug.spotless")
 
 spotless {
     kotlin {
-        ktlint("1.5.0")
+        ktlint("1.7.1")
     }
 }
 
@@ -182,9 +180,4 @@ tasks.test {
 
 tasks.bootJar {
     archiveFileName.set("app.jar")
-}
-
-tasks.cyclonedxDirectBom {
-    includeConfigs = listOf("runtimeClasspath", "compileClasspath")
-    skipConfigs = listOf("testRuntimeClasspath", "testCompileClasspath")
 }

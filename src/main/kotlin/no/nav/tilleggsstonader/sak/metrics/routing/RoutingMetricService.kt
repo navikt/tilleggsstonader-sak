@@ -6,13 +6,13 @@ import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
 import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.sak.metrics.MetricUtil
-import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingRepository
+import no.nav.tilleggsstonader.sak.migrering.routing.SkjemaRoutingRepository
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Service
 class RoutingMetricService(
-    private val søknadRoutingRepository: SøknadRoutingRepository,
+    private val skjemaRoutingRepository: SkjemaRoutingRepository,
 ) {
     private val antallRoutingsGauge = MultiGauge.builder("routing_antall").register(Metrics.globalRegistry)
 
@@ -20,7 +20,7 @@ class RoutingMetricService(
     fun antallRoutings() {
         val rows =
             Skjematype.entries.map {
-                val antall = søknadRoutingRepository.countByType(it)
+                val antall = skjemaRoutingRepository.countByType(it)
                 MultiGauge.Row.of(Tags.of(Tag.of("ytelse", it.name)), antall)
             }
         antallRoutingsGauge.register(rows, true)
