@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping(path = ["/api/vilkar/daglig-reise"])
 @ProtectedWithClaims(issuer = "azuread")
-class DagligReiseVilkårController() {
+class DagligReiseVilkårController {
     @GetMapping("regler")
     fun regler(): RegelstrukturDto = DagligReiseOffentiligTransportRegel().tilRegelstruktur()
 }
