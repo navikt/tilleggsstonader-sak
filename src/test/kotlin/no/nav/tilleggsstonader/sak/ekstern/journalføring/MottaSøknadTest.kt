@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
@@ -206,7 +207,7 @@ class MottaSøknadTest : IntegrationTest() {
         val oppgaveSlot = mutableListOf<OpprettOppgaveRequest>()
         verify { oppgaveClient.opprettOppgave(capture(oppgaveSlot)) }
 
-        val oppgave = oppgaveSlot.first { it.journalpostId == journalpostId.toString() }
+        val oppgave = oppgaveSlot.first { it.journalpostId == journalpostId.toString() && it.oppgavetype == Oppgavetype.Journalføring }
 
         assertThat(oppgave.journalpostId).isEqualTo(journalpostId.toString())
         assertThat(oppgave.tema.name).isEqualTo(journalpost.tema)
