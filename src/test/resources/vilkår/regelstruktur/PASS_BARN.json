@@ -1,0 +1,79 @@
+{
+  "UTGIFTER_DOKUMENTERT" : {
+    "erHovedregel" : true,
+    "nullstillingsinfo" : {
+      "plasseringIHierarki" : 1,
+      "hovedregel" : "UTGIFTER_DOKUMENTERT"
+    },
+    "svaralternativer" : [ {
+      "svarId" : "JA",
+      "nesteRegelId" : null,
+      "begrunnelseType" : "VALGFRI",
+      "triggerFakta" : null
+    }, {
+      "svarId" : "NEI",
+      "nesteRegelId" : null,
+      "begrunnelseType" : "PÅKREVD",
+      "triggerFakta" : null
+    } ]
+  },
+  "ANNEN_FORELDER_MOTTAR_STØTTE" : {
+    "erHovedregel" : true,
+    "nullstillingsinfo" : {
+      "plasseringIHierarki" : 1,
+      "hovedregel" : "ANNEN_FORELDER_MOTTAR_STØTTE"
+    },
+    "svaralternativer" : [ {
+      "svarId" : "JA",
+      "nesteRegelId" : null,
+      "begrunnelseType" : "PÅKREVD",
+      "triggerFakta" : null
+    }, {
+      "svarId" : "NEI",
+      "nesteRegelId" : null,
+      "begrunnelseType" : "VALGFRI",
+      "triggerFakta" : null
+    } ]
+  },
+  "HAR_FULLFØRT_FJERDEKLASSE" : {
+    "erHovedregel" : true,
+    "nullstillingsinfo" : {
+      "plasseringIHierarki" : 1,
+      "hovedregel" : "HAR_FULLFØRT_FJERDEKLASSE"
+    },
+    "svaralternativer" : [ {
+      "svarId" : "JA",
+      "nesteRegelId" : "UNNTAK_ALDER",
+      "begrunnelseType" : "UTEN",
+      "triggerFakta" : null
+    }, {
+      "svarId" : "NEI",
+      "nesteRegelId" : null,
+      "begrunnelseType" : "VALGFRI",
+      "triggerFakta" : null
+    } ]
+  },
+  "UNNTAK_ALDER" : {
+    "erHovedregel" : false,
+    "nullstillingsinfo" : {
+      "plasseringIHierarki" : 2,
+      "hovedregel" : "HAR_FULLFØRT_FJERDEKLASSE"
+    },
+    "svaralternativer" : [ {
+      "svarId" : "TRENGER_MER_TILSYN_ENN_JEVNALDRENDE",
+      "nesteRegelId" : null,
+      "begrunnelseType" : "VALGFRI",
+      "triggerFakta" : null
+    }, {
+      "svarId" : "FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID",
+      "nesteRegelId" : null,
+      "begrunnelseType" : "VALGFRI",
+      "triggerFakta" : null
+    }, {
+      "svarId" : "NEI",
+      "nesteRegelId" : null,
+      "begrunnelseType" : "PÅKREVD",
+      "triggerFakta" : null
+    } ]
+  }
+}

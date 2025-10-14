@@ -1,0 +1,74 @@
+{
+  "AVSTAND_OVER_SEKS_KM" : {
+    "erHovedregel" : true,
+    "nullstillingsinfo" : {
+      "plasseringIHierarki" : 1,
+      "hovedregel" : "AVSTAND_OVER_SEKS_KM"
+    },
+    "svaralternativer" : [ {
+      "svarId" : "JA",
+      "nesteRegelId" : "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
+      "begrunnelseType" : "UTEN",
+      "triggerFakta" : null
+    }, {
+      "svarId" : "NEI",
+      "nesteRegelId" : "UNNTAK_SEKS_KM",
+      "begrunnelseType" : "UTEN",
+      "triggerFakta" : null
+    } ]
+  },
+  "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT" : {
+    "erHovedregel" : false,
+    "nullstillingsinfo" : {
+      "plasseringIHierarki" : 3,
+      "hovedregel" : "AVSTAND_OVER_SEKS_KM"
+    },
+    "svaralternativer" : [ {
+      "svarId" : "JA",
+      "nesteRegelId" : null,
+      "begrunnelseType" : "VALGFRI",
+      "triggerFakta" : "DAGLIG_REISE_OFFENTLIG_TRANSPORT"
+    }, {
+      "svarId" : "NEI",
+      "nesteRegelId" : "KAN_BRUKER_KJØRE_SELV",
+      "begrunnelseType" : "UTEN",
+      "triggerFakta" : null
+    } ]
+  },
+  "KAN_BRUKER_KJØRE_SELV" : {
+    "erHovedregel" : false,
+    "nullstillingsinfo" : {
+      "plasseringIHierarki" : 4,
+      "hovedregel" : "AVSTAND_OVER_SEKS_KM"
+    },
+    "svaralternativer" : [ {
+      "svarId" : "JA",
+      "nesteRegelId" : null,
+      "begrunnelseType" : "VALGFRI",
+      "triggerFakta" : "DAGLIG_REISE_PRIVAT_BIL"
+    }, {
+      "svarId" : "NEI",
+      "nesteRegelId" : null,
+      "begrunnelseType" : "VALGFRI",
+      "triggerFakta" : null
+    } ]
+  },
+  "UNNTAK_SEKS_KM" : {
+    "erHovedregel" : false,
+    "nullstillingsinfo" : {
+      "plasseringIHierarki" : 2,
+      "hovedregel" : "AVSTAND_OVER_SEKS_KM"
+    },
+    "svaralternativer" : [ {
+      "svarId" : "JA",
+      "nesteRegelId" : "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
+      "begrunnelseType" : "UTEN",
+      "triggerFakta" : null
+    }, {
+      "svarId" : "NEI",
+      "nesteRegelId" : null,
+      "begrunnelseType" : "PÅKREVD",
+      "triggerFakta" : null
+    } ]
+  }
+}
