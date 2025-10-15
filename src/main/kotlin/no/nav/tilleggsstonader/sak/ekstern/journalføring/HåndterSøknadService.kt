@@ -134,11 +134,12 @@ class HåndterSøknadService(
         // TODO - fom og tom påkrevd i søknaden, skal ikke være nullable
         return ytelseService
             .hentYtelser(
-                journalpost.bruker!!.id,
-                søknad.data.aktivitet.reiseperiode!!
-                    .fom,
-                søknad.data.aktivitet.reiseperiode.tom,
-                TypeYtelsePeriode.entries.toList(),
+                ident = journalpost.bruker!!.id,
+                fom =
+                    søknad.data.aktivitet.reiseperiode!!
+                        .fom,
+                tom = søknad.data.aktivitet.reiseperiode.tom,
+                typer = TypeYtelsePeriode.entries.toList(),
             ).perioder
             .map { it.type.tilMålgruppe() }
     }
