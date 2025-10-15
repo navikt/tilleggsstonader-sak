@@ -1,0 +1,16 @@
+apiVersion: kafka.nais.io/v1
+kind: Topic
+metadata:
+  name: utbetaling.v1
+  namespace: tilleggsstonader
+  labels:
+    team: tilleggsstonader
+spec:
+  pool: nav-dev
+  acl:
+    - team: tilleggsstonader
+      application: tilleggsstonader-sak
+      access: readwrite
+    - team: helved
+      application: peisschtappern
+      access: read
