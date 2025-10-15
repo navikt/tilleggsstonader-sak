@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
+import com.fasterxml.jackson.databind.JsonNode
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
 import org.assertj.core.api.Assertions.assertThat
 import java.io.File
@@ -43,6 +44,15 @@ object FileUtil {
      * 4. set denne til false på nytt, hvis ikke feiler [FileUtilTest]
      */
     const val SKAL_SKRIVE_TIL_FIL = false
+
+    fun assertFileJsonIsEqual(
+        filnavn: String,
+        json: Any,
+    ) {
+        val jsonNode = ObjectMapperProvider.objectMapper.valueToTree<JsonNode>(json)
+        val filJsonNode = ObjectMapperProvider.objectMapper.readTree(readFile(filnavn))
+        assertThat(jsonNode).isEqualTo(filJsonNode)
+    }
 
     fun assertFileIsEqual(
         filnavn: String,

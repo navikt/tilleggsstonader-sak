@@ -17,36 +17,35 @@ object ByggRegelstrukturFraVilkårregel {
      * Se json-eksempler for hvordan regelstrukturen ser ut:
      * src/test/resources/vilkår/regelstruktur
      */
-    fun Vilkårsregel.tilRegelstruktur(): RegelstrukturDto {
+    fun Vilkårsregel.tilRegelstruktur(): Map<RegelId, RegelInfo> {
         val alleRegler = this.regler
 
-        val hierarki =
-            this.hovedregler.associate {
-                it to
-                    byggHierarki(
-                        startRegelId = it,
-                        alleRegler = alleRegler,
-                        hierarki = mutableMapOf<RegelId, Int>(),
-                    )
-            }
-
-        return hierarki
-            .map { (hovedregelId, hierarkiForHovedregel) ->
-                hierarkiForHovedregel.mapValues { (regelId, plasseringIHierarki) ->
-                    val regel = alleRegler[regelId] ?: error("Mangler steg for $regelId")
-                    RegelInfo(
-                        erHovedregel = regel.erHovedregel,
-                        nullstillingsinfo =
-                            Nullstillingsinfo(
-                                plasseringIHierarki = plasseringIHierarki,
-                                hovedregel = hovedregelId,
-                            ),
-                        svaralternativer = regel.svarMapping.tilSvaralternativ(),
-                    )
+        return this.hovedregler
+            .map { hovedregel ->
+                val hierarki = byggHierarki(hovedregel, alleRegler)
+                hierarki.mapValues { (regelId, plasseringIHierarki) ->
+                    tilRegelInfo(alleRegler[regelId]!!, plasseringIHierarki, hovedregel)
                 }
-            }.flatMap { it.entries }
+            }
+            // Bør returnere List<RegelId, Map<RegelId, RegelInfo>>? Dersom flere hovedregler som er innom samme svar, vil kun et svar og dens plassering i hierarki finnes under
+            .flatMap { it.entries }
             .associate { it.key to it.value }
     }
+
+    private fun tilRegelInfo(
+        regel: RegelSteg,
+        plasseringIHierarki: Int,
+        hovedregelId: RegelId,
+    ): RegelInfo =
+        RegelInfo(
+            erHovedregel = regel.erHovedregel,
+            nullstillingsinfo =
+                Nullstillingsinfo(
+                    plasseringIHierarki = plasseringIHierarki,
+                    hovedregel = hovedregelId,
+                ),
+            svaralternativer = regel.svarMapping.tilSvaralternativ(),
+        )
 
     /**
      * Traverserer regelTreet fra en startRegelId (hovedregelId) og videre til alle underregler den eventuelt trigger.
@@ -63,22 +62,37 @@ object ByggRegelstrukturFraVilkårregel {
      * Her skal regelen for offentlig transport få plasseringIHierarki = 3 fordi den både skal nullstilles
      * dersom avstandspm og unntak endrer svar.
      */
+
     private fun byggHierarki(
-        startRegelId: RegelId,
+        hovedregel: RegelId,
         alleRegler: Map<RegelId, RegelSteg>,
-        plasseringIHierarki: Int = 1,
-        hierarki: MutableMap<RegelId, Int> = mutableMapOf(),
     ): Map<RegelId, Int> {
-        val eksisterende = hierarki[startRegelId]
-        if (eksisterende == null || plasseringIHierarki > eksisterende) {
-            hierarki[startRegelId] = plasseringIHierarki
-            alleRegler[startRegelId]
-                ?.svarMapping
-                ?.values
-                ?.filterIsInstance<NesteRegel>()
-                ?.forEach { byggHierarki(it.regelId, alleRegler, plasseringIHierarki + 1, hierarki) }
+        val regelHierarkiListe = lagRegelHierarkiListe(hovedregel, alleRegler)
+        val filtrertHierarkiListe = mutableListOf<RegelId>()
+        regelHierarkiListe.forEach {
+            if (!filtrertHierarkiListe.contains(it)) {
+                filtrertHierarkiListe.add(it)
+            } else {
+                filtrertHierarkiListe.remove(it)
+                filtrertHierarkiListe.add(it)
+            }
         }
-        return hierarki
+
+        return filtrertHierarkiListe.mapIndexed { index, regelId -> regelId to index + 1 }.toMap()
+    }
+
+    private fun lagRegelHierarkiListe(
+        regelId: RegelId,
+        alleRegler: Map<RegelId, RegelSteg>,
+    ): List<RegelId> =
+        listOf(regelId) +
+            alleRegler[regelId].mapUtNesteRegel().map { lagRegelHierarkiListe(it.regelId, alleRegler) }.flatten()
+
+    private fun RegelSteg?.mapUtNesteRegel(): List<NesteRegel> {
+        if (this == null) return emptyList()
+        return this.svarMapping
+            .values
+            .filterIsInstance<NesteRegel>()
     }
 
     private fun Map<SvarId, SvarRegel>.tilSvaralternativ(): List<SvarAlternativ> =

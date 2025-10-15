@@ -1,8 +1,11 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping
 
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
+import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileJsonIsEqual
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregel.tilRegelstruktur
+import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
 
 class ByggRegelstrukturFraVilkårregelTest {
@@ -12,10 +15,11 @@ class ByggRegelstrukturFraVilkårregelTest {
      */
     @Test
     internal fun `sjekker at output fortsatt er det samme på json`() {
-        val vilkårsregler = Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler.map { it.value }
+        val vilkårsregler =
+            Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler.map { it.value }
 
         vilkårsregler.forEach {
-            assertFileIsEqual("vilkår/regelstruktur/${it.vilkårType}.json", it.tilRegelstruktur())
+            assertFileJsonIsEqual("vilkår/regelstruktur/${it.vilkårType}.json", it.tilRegelstruktur())
         }
     }
 }
