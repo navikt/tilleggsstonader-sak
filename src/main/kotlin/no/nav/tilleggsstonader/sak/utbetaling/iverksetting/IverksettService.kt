@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -48,28 +49,33 @@ class IverksettService(
     @Transactional
     fun iverksettBehandlingFørsteGang(behandlingId: BehandlingId) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        if (!behandling.resultat.skalIverksettes) {
-            logger.info("Iverksetter ikke behandling=$behandlingId med status=${behandling.status}")
-            return
+
+        if (skalSendeUtbetalingerPåKafka(behandling.stønadstype)) {
+            // TODO()
+        } else {
+            if (!behandling.resultat.skalIverksettes) {
+                logger.info("Iverksetter ikke behandling=$behandlingId med status=${behandling.status}")
+                return
+            }
+            markerAndelerFraForrigeBehandlingSomUaktuelle(behandling)
+
+            val tilkjentYtelse = tilkjentYtelseService.hentForBehandlingMedLås(behandlingId)
+            val andeler = andelerForFørsteIverksettingAvBehandling(tilkjentYtelse)
+
+            val totrinnskontroll = hentTotrinnskontroll(behandling)
+
+            val iverksettingId = behandlingId.id
+            val dto =
+                IverksettDtoMapper.map(
+                    behandling = behandling,
+                    andelerTilkjentYtelse = andeler,
+                    totrinnskontroll = totrinnskontroll,
+                    iverksettingId = iverksettingId,
+                    forrigeIverksetting = forrigeIverksetting(behandling, tilkjentYtelse),
+                )
+            opprettHentStatusFraIverksettingTask(behandling, iverksettingId)
+            iverksettClient.iverksett(dto)
         }
-        markerAndelerFraForrigeBehandlingSomUaktuelle(behandling)
-
-        val tilkjentYtelse = tilkjentYtelseService.hentForBehandlingMedLås(behandlingId)
-        val andeler = andelerForFørsteIverksettingAvBehandling(tilkjentYtelse)
-
-        val totrinnskontroll = hentTotrinnskontroll(behandling)
-
-        val iverksettingId = behandlingId.id
-        val dto =
-            IverksettDtoMapper.map(
-                behandling = behandling,
-                andelerTilkjentYtelse = andeler,
-                totrinnskontroll = totrinnskontroll,
-                iverksettingId = iverksettingId,
-                forrigeIverksetting = forrigeIverksetting(behandling, tilkjentYtelse),
-            )
-        opprettHentStatusFraIverksettingTask(behandling, iverksettingId)
-        iverksettClient.iverksett(dto)
     }
 
     fun hentAndelTilkjentYtelse(behandlingId: BehandlingId) =
@@ -267,3 +273,6 @@ class IverksettService(
                 ForrigeIverksettingDto(behandlingId = eksternBehandlingId.toString(), iverksettingId = it)
             }
 }
+
+fun skalSendeUtbetalingerPåKafka(stønadstype: Stønadstype) =
+    stønadstype !in setOf(Stønadstype.BARNETILSYN, Stønadstype.BOUTGIFTER, Stønadstype.LÆREMIDLER)
