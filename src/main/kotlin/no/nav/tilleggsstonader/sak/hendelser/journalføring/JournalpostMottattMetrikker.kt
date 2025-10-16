@@ -6,8 +6,10 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.journalføring.brevkoder
 import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
+import org.springframework.stereotype.Component
 
-object JournalpostMottattMetrikker {
+@Component
+class JournalpostMottattMetrikker {
     private val journalpostMottattCounters: Map<DokumentBrevkode, Counter> =
         DokumentBrevkode.entries.associateWith {
             Metrics.counter("journalpost.mottatt.brevkode", "type", it.name)

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service
 class JournalhendelseKafkaHåndtererService(
     private val journalpostService: JournalpostService,
     private val håndterSøknadService: HåndterSøknadService,
+    private val journalpostMottattMetrikker: JournalpostMottattMetrikker,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -38,7 +39,7 @@ class JournalhendelseKafkaHåndtererService(
         // Trenger ikke å logge andre journalposter av typen utgående eller notat
 
         // Teller antall mottatte journalposter per brevkode
-        JournalpostMottattMetrikker.journalpostMottatt(journalpost)
+        journalpostMottattMetrikker.journalpostMottatt(journalpost)
     }
 
     private fun Journalpost.kanBehandles() =
