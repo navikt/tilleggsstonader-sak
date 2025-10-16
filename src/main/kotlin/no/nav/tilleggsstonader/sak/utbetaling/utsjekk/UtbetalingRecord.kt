@@ -1,21 +1,22 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk
 
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
 /**
- * [uid] er en unik ID som konsumenter av Utsjekk har ansvar for å lage og holde styr
+ * [id] er en UUID som konsumenter av Utsjekk har ansvar for å lage og holde styr
  * på i egen løsning. Denne brukes til å unikt identifisere utbetalingen og kan brukes
  * når man evt. ønsker å gjøre endringer eller opphør på en utbetaling.
+ *
  */
 data class UtbetalingRecord(
     val dryrun: Boolean = false,
-    val id: UUID = UUID.randomUUID(),
     val brukFagområdeTillst: Boolean = false,
+    val id: UUID,
+    val forrigeUtbetaling: ForrigeUtbetaling?,
     val sakId: String,
-    val behandlingId: BehandlingId,
+    val behandlingId: String,
     val personident: String,
     val stønad: StønadUtbetaling,
     val saksbehandler: String,
@@ -23,6 +24,11 @@ data class UtbetalingRecord(
     val vedtakstidspunkt: LocalDateTime,
     val periodetype: PeriodetypeUtbetaling,
     val perioder: List<PerioderUtbetaling>,
+)
+
+data class ForrigeUtbetaling(
+    val id: UUID,
+    val behandlingId: String,
 )
 
 enum class StønadUtbetaling {

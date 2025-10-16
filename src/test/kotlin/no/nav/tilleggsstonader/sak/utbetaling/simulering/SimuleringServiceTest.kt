@@ -59,7 +59,7 @@ internal class SimuleringServiceTest {
         every { fagsakService.fagsakMedOppdatertPersonIdent(any()) } returns fagsak
         every { tilgangService.validerHarSaksbehandlerrolle() } just Runs
         every { tilgangService.harTilgangTilRolle(any()) } returns true
-        every { iverksettService.forrigeIverksetting(any(), any()) } returns null
+        every { iverksettService.finnForrigeIverksetting(any(), any()) } returns null
     }
 
     @Test

@@ -12,9 +12,9 @@ class UtbetalingMessageProducer(
     private val utsjekkKafkaTemplate: KafkaTemplate<String, String>,
     @Value($$"${topics.utbetaling}") private val topic: String,
 ) {
-    fun sendUtbetaling(hendelse: UtbetalingRecord) {
+    fun sendUtbetaling(utbetaling: UtbetalingRecord) {
         utsjekkKafkaTemplate
-            .send(topic, hendelse.behandlingId.toString(), objectMapper.writeValueAsString(hendelse))
+            .send(topic, utbetaling.behandlingId, objectMapper.writeValueAsString(utbetaling))
             .whenComplete { result, ex ->
                 if (ex == null) {
                     logger.info("Sente utbetaling på topic=$topic med offset=${result.recordMetadata.offset()}")

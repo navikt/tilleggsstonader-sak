@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.ForrigeIverksettingDto
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettDtoMapper
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
@@ -61,7 +62,7 @@ class SimuleringService(
 
     private fun simulerMedTilkjentYtelse(saksbehandling: Saksbehandling): SimuleringResponseDto? {
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(saksbehandling.id)
-        val forrigeIverksettingDto = iverksettService.forrigeIverksetting(saksbehandling, tilkjentYtelse)
+        val forrigeIverksetting = iverksettService.finnForrigeIverksetting(saksbehandling, tilkjentYtelse)
 
         return iverksettClient.simuler(
             SimuleringRequestDto(
@@ -70,7 +71,7 @@ class SimuleringService(
                 personident = saksbehandling.ident,
                 saksbehandlerId = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
                 utbetalinger = IverksettDtoMapper.mapUtbetalinger(tilkjentYtelse.andelerTilkjentYtelse),
-                forrigeIverksetting = forrigeIverksettingDto,
+                forrigeIverksetting = forrigeIverksetting?.let { ForrigeIverksettingDto(it.behandlingId, it.iverksettingId) },
             ),
         )
     }
