@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.kafka
 
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.libs.log.logger
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.UtbetalingRecord
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
