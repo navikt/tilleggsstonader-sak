@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
@@ -60,8 +61,8 @@ class HåndterSøknadService(
     }
 
     fun finnStønadstyperSomKanOpprettesFraJournalpost(journalpost: Journalpost): ValgbareStønadstyperForJournalpost {
-        val dokumentbrevkode = journalpost.dokumentBrevkode()
-        if (dokumentbrevkode == null) {
+        val skjematype = journalpost.dokumentBrevkode()?.tilSkjematype()
+        if (skjematype == null) {
             val valgbareStønadstyper =
                 if (unleashService.isEnabled(Toggle.KAN_SAKSBEHANDLE_DAGLIG_REISE_TSO) &&
                     unleashService.isEnabled(Toggle.KAN_SAKSBEHANDLE_DAGLIG_REISE_TSR)
@@ -76,16 +77,16 @@ class HåndterSøknadService(
             )
         }
 
-        return when (dokumentbrevkode) {
-            DokumentBrevkode.BARNETILSYN -> ValgbareStønadstyperForJournalpost(Stønadstype.BARNETILSYN)
-            DokumentBrevkode.LÆREMIDLER -> ValgbareStønadstyperForJournalpost(Stønadstype.LÆREMIDLER)
-            DokumentBrevkode.BOUTGIFTER -> ValgbareStønadstyperForJournalpost(Stønadstype.BOUTGIFTER)
-            DokumentBrevkode.DAGLIG_REISE ->
+        return when (skjematype) {
+            Skjematype.SØKNAD_BARNETILSYN -> ValgbareStønadstyperForJournalpost(Stønadstype.BARNETILSYN)
+            Skjematype.SØKNAD_LÆREMIDLER -> ValgbareStønadstyperForJournalpost(Stønadstype.LÆREMIDLER)
+            Skjematype.SØKNAD_BOUTGIFTER -> ValgbareStønadstyperForJournalpost(Stønadstype.BOUTGIFTER)
+            Skjematype.SØKNAD_DAGLIG_REISE ->
                 ValgbareStønadstyperForJournalpost(
                     finnStønadstypeForDagligReise(journalpost),
                     Stønadstype.entries.filter { it.gjelderDagligReise() },
                 )
-            DokumentBrevkode.DAGLIG_REISE_KJØRELISTE -> TODO()
+            Skjematype.DAGLIG_REISE_KJØRELISTE -> TODO()
         }
     }
 
