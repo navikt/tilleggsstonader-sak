@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -15,7 +15,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
     fun `fom og tom på andel tilkjent ytelse skal være lik fom til reisen hvis det er en ukedag`() {
         val mandag = 1 september 2025
         val beregningsresultat =
-            Beregningsresultat(
+            BeregningsresultatOffentligTransport(
                 reiser = listOf(lagBeregningsresultatForReise(mandag)),
             )
         val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId)
@@ -30,7 +30,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
     fun `flere reiser med samme fom aggregeres til én andel med summert beløp`() {
         val mandag = 1 september 2025
         val beregningsresultat =
-            Beregningsresultat(
+            BeregningsresultatOffentligTransport(
                 reiser =
                     listOf(
                         lagBeregningsresultatForReise(mandag, beløp = 100),
@@ -47,7 +47,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
         val mandag = 1 september 2025
         val tirsdag = 2 september 2025
         val beregningsresultat =
-            Beregningsresultat(
+            BeregningsresultatOffentligTransport(
                 reiser =
                     listOf(
                         lagBeregningsresultatForReise(mandag, beløp = 100),
@@ -73,7 +73,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
         val lørdag = 6 september 2025
         val søndag = 7 september 2025
         val beregningsresultat =
-            Beregningsresultat(
+            BeregningsresultatOffentligTransport(
                 reiser = listOf(lagBeregningsresultatForReise(lørdag), lagBeregningsresultatForReise(søndag)),
             )
 
@@ -103,7 +103,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                 lagVedtaksperiodeGrunnlag(fredag, målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE),
             )
         val beregningsresultat =
-            Beregningsresultat(
+            BeregningsresultatOffentligTransport(
                 reiser =
                     listOf(
                         lagBeregningsresultatForReise(
