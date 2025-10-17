@@ -19,7 +19,13 @@ object ByggVilkårFraSvar {
     fun byggDelvilkårsettFraSvarOgVilkårsregel(
         vilkårsregel: Vilkårsregel,
         svar: Map<RegelId, SvarOgBegrunnelse?>,
-    ): List<Delvilkår> = vilkårsregel.hovedregler.map { byggDelvilkårFraSvar(vilkårsregel = vilkårsregel, hovedregelId = it, svar = svar) }
+    ): List<Delvilkår> = vilkårsregel.hovedregler.map {
+        byggDelvilkårFraSvar(
+            vilkårsregel = vilkårsregel,
+            hovedregelId = it,
+            svar = svar
+        )
+    }
 
     private fun byggDelvilkårFraSvar(
         vilkårsregel: Vilkårsregel,
@@ -81,15 +87,8 @@ object ByggVilkårFraSvar {
         return svarRegel
     }
 
-    private fun finnNesteRegelId(svarRegel: SvarRegel?): RegelId? {
-        if (svarRegel is NesteRegel) return svarRegel.regelId
+    private fun finnNesteRegelId(svarRegel: SvarRegel?): RegelId? = (svarRegel as? NesteRegel)?.regelId
 
-        return null
-    }
-
-    private fun finnResultat(svarRegel: SvarRegel?): Vilkårsresultat? {
-        if (svarRegel is SluttSvarRegel) return svarRegel.resultat.vilkårsresultat
-
-        return null
-    }
+    private fun finnResultat(svarRegel: SvarRegel?): Vilkårsresultat? =
+        (svarRegel as? SluttSvarRegel)?.resultat?.vilkårsresultat
 }
