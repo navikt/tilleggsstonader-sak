@@ -7,6 +7,7 @@ import io.mockk.verify
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -31,6 +32,7 @@ class AdminOpprettBehandlingServiceTest {
     val personService = mockk<PersonService>()
     val fagsakService = mockk<FagsakService>()
     val behandlingService = mockk<BehandlingService>()
+    val opprettBehandlingService = mockk<OpprettBehandlingService>()
     val taskService = mockk<TaskService>(relaxed = true)
     val barnService = mockk<BarnService>()
 
@@ -42,6 +44,7 @@ class AdminOpprettBehandlingServiceTest {
             taskService = taskService,
             barnService = barnService,
             unleashService = mockUnleashService(),
+            opprettBehandlingService = opprettBehandlingService,
         )
 
     val ident = "13518741815"
@@ -62,7 +65,7 @@ class AdminOpprettBehandlingServiceTest {
         every { fagsakService.finnFagsak(any(), any<Stønadstype>()) } returns fagsak
         every { fagsakService.hentEllerOpprettFagsak(personIdent = ident, any<Stønadstype>()) } returns fagsak
         every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns emptyList()
-        every { behandlingService.opprettBehandling(fagsak.id, any(), any(), any(), any()) } returns behandling
+        every { opprettBehandlingService.opprettBehandling(fagsak.id, any(), any(), any(), any()) } returns behandling
         every { barnService.opprettBarn(capture(opprettedeBarnSlot)) } answers { firstArg() }
         BrukerContextUtil.mockBrukerContext()
     }
@@ -87,7 +90,7 @@ class AdminOpprettBehandlingServiceTest {
             assertThat(this.behandlingId).isEqualTo(behandling.id)
         }
         verify(exactly = 1) {
-            behandlingService.opprettBehandling(
+            opprettBehandlingService.opprettBehandling(
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET,
                 kravMottatt = LocalDate.now(),
@@ -110,7 +113,7 @@ class AdminOpprettBehandlingServiceTest {
             assertThat(this.behandlingId).isEqualTo(behandling.id)
         }
         verify(exactly = 1) {
-            behandlingService.opprettBehandling(
+            opprettBehandlingService.opprettBehandling(
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
                 kravMottatt = LocalDate.now(),
@@ -130,7 +133,7 @@ class AdminOpprettBehandlingServiceTest {
 
         assertThat(opprettedeBarnSlot.isCaptured).isFalse()
         verify(exactly = 1) {
-            behandlingService.opprettBehandling(
+            opprettBehandlingService.opprettBehandling(
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
                 kravMottatt = LocalDate.now(),

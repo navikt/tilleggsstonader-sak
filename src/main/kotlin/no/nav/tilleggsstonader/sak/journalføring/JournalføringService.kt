@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -54,6 +55,7 @@ class JournalføringService(
     private val oppgaveService: OppgaveService,
     private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
     private val klageService: KlageService,
+    private val opprettBehandlingService: OpprettBehandlingService,
 ) {
     @Transactional
     fun fullførJournalpost(
@@ -234,7 +236,7 @@ class JournalføringService(
         behandlingÅrsak: BehandlingÅrsak,
     ): Behandling {
         val behandling =
-            behandlingService.opprettBehandling(
+            opprettBehandlingService.opprettBehandling(
                 fagsakId = fagsak.id,
                 behandlingsårsak = behandlingÅrsak,
                 kravMottatt = journalpost.datoMottatt?.toLocalDate(),
