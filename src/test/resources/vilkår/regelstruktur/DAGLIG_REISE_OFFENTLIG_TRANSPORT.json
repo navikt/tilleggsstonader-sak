@@ -1,10 +1,7 @@
 {
   "AVSTAND_OVER_SEKS_KM" : {
     "erHovedregel" : true,
-    "nullstillingsinfo" : {
-      "plasseringIHierarki" : 1,
-      "hovedregel" : "AVSTAND_OVER_SEKS_KM"
-    },
+    "reglerSomMåNullstilles" : [ "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT", "KAN_BRUKER_KJØRE_SELV", "UNNTAK_SEKS_KM" ],
     "svaralternativer" : [ {
       "svarId" : "JA",
       "nesteRegelId" : "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
@@ -17,12 +14,24 @@
       "triggerFakta" : null
     } ]
   },
+  "UNNTAK_SEKS_KM" : {
+    "erHovedregel" : false,
+    "reglerSomMåNullstilles" : [ "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT", "KAN_BRUKER_KJØRE_SELV" ],
+    "svaralternativer" : [ {
+      "svarId" : "JA",
+      "nesteRegelId" : "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
+      "begrunnelseType" : "UTEN",
+      "triggerFakta" : null
+    }, {
+      "svarId" : "NEI",
+      "nesteRegelId" : null,
+      "begrunnelseType" : "PÅKREVD",
+      "triggerFakta" : null
+    } ]
+  },
   "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT" : {
     "erHovedregel" : false,
-    "nullstillingsinfo" : {
-      "plasseringIHierarki" : 3,
-      "hovedregel" : "AVSTAND_OVER_SEKS_KM"
-    },
+    "reglerSomMåNullstilles" : [ "KAN_BRUKER_KJØRE_SELV" ],
     "svaralternativer" : [ {
       "svarId" : "JA",
       "nesteRegelId" : null,
@@ -37,10 +46,7 @@
   },
   "KAN_BRUKER_KJØRE_SELV" : {
     "erHovedregel" : false,
-    "nullstillingsinfo" : {
-      "plasseringIHierarki" : 4,
-      "hovedregel" : "AVSTAND_OVER_SEKS_KM"
-    },
+    "reglerSomMåNullstilles" : [ ],
     "svaralternativer" : [ {
       "svarId" : "JA",
       "nesteRegelId" : null,
@@ -50,24 +56,6 @@
       "svarId" : "NEI",
       "nesteRegelId" : null,
       "begrunnelseType" : "VALGFRI",
-      "triggerFakta" : null
-    } ]
-  },
-  "UNNTAK_SEKS_KM" : {
-    "erHovedregel" : false,
-    "nullstillingsinfo" : {
-      "plasseringIHierarki" : 2,
-      "hovedregel" : "AVSTAND_OVER_SEKS_KM"
-    },
-    "svaralternativer" : [ {
-      "svarId" : "JA",
-      "nesteRegelId" : "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
-      "begrunnelseType" : "UTEN",
-      "triggerFakta" : null
-    }, {
-      "svarId" : "NEI",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "PÅKREVD",
       "triggerFakta" : null
     } ]
   }

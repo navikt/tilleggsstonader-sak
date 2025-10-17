@@ -6,7 +6,8 @@ typealias RegelstrukturDto = Map<RegelId, RegelInfo>
 
 data class RegelInfo(
     val erHovedregel: Boolean,
-    val nullstillingsinfo: Nullstillingsinfo,
+    // Liste med alle regler som må nullstilles dersom regelen endrer svar.
+    val reglerSomMåNullstilles: List<RegelId>,
     val svaralternativer: List<SvarAlternativ>,
 )
 

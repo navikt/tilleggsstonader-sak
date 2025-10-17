@@ -1,10 +1,7 @@
 {
   "NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET" : {
     "erHovedregel" : true,
-    "nullstillingsinfo" : {
-      "plasseringIHierarki" : 1,
-      "hovedregel" : "NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET"
-    },
+    "reglerSomMåNullstilles" : [ ],
     "svaralternativer" : [ {
       "svarId" : "JA",
       "nesteRegelId" : null,
@@ -19,10 +16,7 @@
   },
   "DOKUMENTERT_UTGIFTER_BOLIG" : {
     "erHovedregel" : true,
-    "nullstillingsinfo" : {
-      "plasseringIHierarki" : 1,
-      "hovedregel" : "DOKUMENTERT_UTGIFTER_BOLIG"
-    },
+    "reglerSomMåNullstilles" : [ ],
     "svaralternativer" : [ {
       "svarId" : "JA",
       "nesteRegelId" : null,
@@ -37,10 +31,7 @@
   },
   "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER" : {
     "erHovedregel" : true,
-    "nullstillingsinfo" : {
-      "plasseringIHierarki" : 1,
-      "hovedregel" : "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER"
-    },
+    "reglerSomMåNullstilles" : [ ],
     "svaralternativer" : [ {
       "svarId" : "JA",
       "nesteRegelId" : null,

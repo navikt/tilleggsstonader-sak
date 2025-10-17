@@ -9,6 +9,7 @@ class ByggRegelstrukturFraVilkårregelTest {
     /**
      * Sett FileUtil.SKAL_SKRIVE_TIL_FIL = true for å oppdatere filene ved endring som er ment å påvirke logikken.
      * Kan også gjøres for å lage nye filer dersom det legges til nye vilkårsregler.
+     * OBS: Ved oppdatering av filene må testen kjøres flere ganger fordi den feiler per fil som endres.
      */
     @Test
     internal fun `sjekker at output fortsatt er det samme på json`() {
