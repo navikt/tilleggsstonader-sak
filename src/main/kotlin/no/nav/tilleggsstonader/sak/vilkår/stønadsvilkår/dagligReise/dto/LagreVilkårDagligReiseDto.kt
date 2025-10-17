@@ -1,19 +1,17 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto
 
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import java.time.LocalDate
 
-data class LagreDagligReise(
-    val behandlingId: BehandlingId,
+data class LagreDagligReiseDto(
     val fom: LocalDate,
     val tom: LocalDate,
-    val svar: Map<RegelId, SvarOgBegrunnelse>,
+    val svar: Map<RegelId, SvarOgBegrunnelseDto>,
     val fakta: FaktaDagligReiseDto? = null,
 )
 
-data class SvarOgBegrunnelse(
+data class SvarOgBegrunnelseDto(
     val svarId: SvarId,
     val begrunnelse: String? = null,
 )

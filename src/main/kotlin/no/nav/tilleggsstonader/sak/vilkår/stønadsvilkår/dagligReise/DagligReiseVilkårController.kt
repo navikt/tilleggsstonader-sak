@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseDtoMapper.tilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregel.tilRegelstruktur
@@ -39,7 +39,7 @@ class DagligReiseVilkårController(
 
     @PostMapping("opprett")
     fun opprettVilkår(
-        @RequestBody lagreVilkårDto: LagreDagligReise,
+        @RequestBody lagreVilkårDto: LagreDagligReiseDto,
     ): VilkårDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(lagreVilkårDto.behandlingId)
         tilgangService.validerTilgangTilBehandling(lagreVilkårDto.behandlingId, AuditLoggerEvent.CREATE)
