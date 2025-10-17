@@ -37,15 +37,14 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
     @Test
     fun `skal kunne lagre ned et nytt vilkår for daglig reise`() {
         val nyttVilkår =
-            LagreDagligReise(
-                behandlingId = behandling.id,
+            LagreDagligReiseDto(
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 1, 31),
                 svar = svarOffentligTransport,
                 fakta = faktaOffentligTransport(),
             )
 
-        val resultat = opprettVilkårDagligReise(nyttVilkår)
+        val resultat = opprettVilkårDagligReise(nyttVilkår, behandling.id)
         assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
         assertThat(resultat.delvilkårsett).hasSize(1)
         assertThat(resultat.fakta).isNotNull()

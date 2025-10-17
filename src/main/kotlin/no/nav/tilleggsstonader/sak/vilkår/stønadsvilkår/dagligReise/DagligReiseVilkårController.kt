@@ -37,14 +37,19 @@ class DagligReiseVilkårController(
         return dagligReiseVilkårService.hentVilkårForBehandling(behandlingId).map { it.tilDto() }
     }
 
-    @PostMapping("opprett")
+    @PostMapping("{behandlingId}")
     fun opprettVilkår(
+        @PathVariable behandlingId: BehandlingId,
         @RequestBody lagreVilkårDto: LagreDagligReiseDto,
     ): VilkårDagligReiseDto {
-        tilgangService.settBehandlingsdetaljerForRequest(lagreVilkårDto.behandlingId)
-        tilgangService.validerTilgangTilBehandling(lagreVilkårDto.behandlingId, AuditLoggerEvent.CREATE)
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return dagligReiseVilkårService.opprettNyttVilkår(lagreVilkårDto.tilDomain()).tilDto()
+        return dagligReiseVilkårService.opprettNyttVilkår(
+            nyttVilkår = lagreVilkårDto.tilDomain(),
+            behandlingId = behandlingId
+        )
+            .tilDto()
     }
 }
