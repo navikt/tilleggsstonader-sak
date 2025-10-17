@@ -35,7 +35,7 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
     }
 
     @Test
-    fun `skal kunne lagre ned et nytt vilkår for daglig reise`() {
+    fun `skal kunne lagre ned et nytt vilkår for daglig reise - offentlig transport`() {
         val nyttVilkår =
             LagreDagligReiseDto(
                 fom = LocalDate.of(2025, 1, 1),
@@ -45,10 +45,33 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
             )
 
         val resultat = opprettVilkårDagligReise(nyttVilkår, behandling.id)
+
         assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
         assertThat(resultat.delvilkårsett).hasSize(1)
         assertThat(resultat.fakta).isNotNull()
         assertThat(resultat.fakta!!.type).isEqualTo(TypeDagligReise.OFFENTLIG_TRANSPORT)
+    }
+
+    @Test
+    fun `skal kunne lagre ned et vilkår uten fakta om vilkår ikke er oppfylt`() {
+        val svarAvstandIkkeOppfylt =
+            mapOf(
+                RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svarId = SvarId.NEI),
+                RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelseDto(svarId = SvarId.NEI, "Begrunnelse"),
+            )
+
+        val nyttVilkår =
+            LagreDagligReiseDto(
+                fom = LocalDate.of(2025, 1, 1),
+                tom = LocalDate.of(2025, 1, 31),
+                svar = svarAvstandIkkeOppfylt,
+                fakta = null,
+            )
+
+        val resultat = opprettVilkårDagligReise(nyttVilkår, behandling.id)
+
+        assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+        assertThat(resultat.fakta).isNull()
     }
 
     @Test

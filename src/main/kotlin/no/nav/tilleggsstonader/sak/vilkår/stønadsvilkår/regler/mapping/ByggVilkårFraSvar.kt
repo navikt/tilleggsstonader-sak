@@ -20,13 +20,14 @@ object ByggVilkårFraSvar {
         vilkårsregel: Vilkårsregel,
         svar: Map<RegelId, SvarOgBegrunnelse?>,
     ): List<Delvilkår> {
-        val delvilkår = vilkårsregel.hovedregler.map {
-            byggDelvilkårFraSvar(
-                vilkårsregel = vilkårsregel,
-                hovedregelId = it,
-                svar = svar,
-            )
-        }
+        val delvilkår =
+            vilkårsregel.hovedregler.map {
+                byggDelvilkårFraSvar(
+                    vilkårsregel = vilkårsregel,
+                    hovedregelId = it,
+                    svar = svar,
+                )
+            }
 
         validerSvarOgVurderingerLike(svar, delvilkår)
 
@@ -95,7 +96,7 @@ object ByggVilkårFraSvar {
 
     private fun validerSvarOgVurderingerLike(
         svar: Map<RegelId, SvarOgBegrunnelse?>,
-        delvilkår: List<Delvilkår>
+        delvilkår: List<Delvilkår>,
     ) {
         val brukteRegelIder = delvilkår.flatMap { it.vurderinger.map { vurdering -> vurdering.regelId } }.toSet()
         val alleBesvarteRegelIder = svar.filterValues { it != null }.keys
@@ -113,6 +114,5 @@ object ByggVilkårFraSvar {
 
     private fun finnNesteRegelId(svarRegel: SvarRegel?): RegelId? = (svarRegel as? NesteRegel)?.regelId
 
-    private fun finnResultat(svarRegel: SvarRegel?): Vilkårsresultat? =
-        (svarRegel as? SluttSvarRegel)?.resultat?.vilkårsresultat
+    private fun finnResultat(svarRegel: SvarRegel?): Vilkårsresultat? = (svarRegel as? SluttSvarRegel)?.resultat?.vilkårsresultat
 }

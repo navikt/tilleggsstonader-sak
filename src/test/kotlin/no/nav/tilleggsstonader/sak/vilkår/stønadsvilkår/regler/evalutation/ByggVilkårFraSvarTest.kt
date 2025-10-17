@@ -17,14 +17,14 @@ class ByggVilkårFraSvarTest {
         val svar =
             mapOf(
                 RegelId.AVSTAND_OVER_SEKS_KM to
-                        SvarOgBegrunnelse(
-                            svarId = SvarId.JA,
-                        ),
+                    SvarOgBegrunnelse(
+                        svarId = SvarId.JA,
+                    ),
                 RegelId.UNNTAK_SEKS_KM to null,
                 RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to
-                        SvarOgBegrunnelse(
-                            svarId = SvarId.JA,
-                        ),
+                    SvarOgBegrunnelse(
+                        svarId = SvarId.JA,
+                    ),
                 RegelId.KAN_BRUKER_KJØRE_SELV to null,
             )
 
@@ -44,14 +44,14 @@ class ByggVilkårFraSvarTest {
         val svar =
             mapOf(
                 RegelId.AVSTAND_OVER_SEKS_KM to
-                        SvarOgBegrunnelse(
-                            svarId = SvarId.NEI,
-                        ),
+                    SvarOgBegrunnelse(
+                        svarId = SvarId.NEI,
+                    ),
                 RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelse(svarId = SvarId.JA),
                 RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to
-                        SvarOgBegrunnelse(
-                            svarId = SvarId.NEI,
-                        ),
+                    SvarOgBegrunnelse(
+                        svarId = SvarId.NEI,
+                    ),
                 RegelId.KAN_BRUKER_KJØRE_SELV to SvarOgBegrunnelse(SvarId.NEI, "Begrunnelse"),
             )
 
@@ -70,9 +70,9 @@ class ByggVilkårFraSvarTest {
         val svar =
             mapOf(
                 RegelId.AVSTAND_OVER_SEKS_KM to
-                        SvarOgBegrunnelse(
-                            svarId = SvarId.JA,
-                        ),
+                    SvarOgBegrunnelse(
+                        svarId = SvarId.JA,
+                    ),
                 // Unntak skal ikke besvares dersom avstand er over 6 km
                 RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelse(svarId = SvarId.JA),
             )
