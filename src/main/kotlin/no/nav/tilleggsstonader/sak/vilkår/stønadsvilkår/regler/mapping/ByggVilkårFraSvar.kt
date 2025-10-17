@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SvarOgBegrunnelseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
@@ -18,13 +18,13 @@ import kotlin.collections.get
 object ByggVilkårFraSvar {
     fun byggDelvilkårsettFraSvarOgVilkårsregel(
         vilkårsregel: Vilkårsregel,
-        svar: Map<RegelId, SvarOgBegrunnelseDto?>,
+        svar: Map<RegelId, SvarOgBegrunnelse?>,
     ): List<Delvilkår> = vilkårsregel.hovedregler.map { byggDelvilkårFraSvar(vilkårsregel = vilkårsregel, hovedregelId = it, svar = svar) }
 
     private fun byggDelvilkårFraSvar(
         vilkårsregel: Vilkårsregel,
         hovedregelId: RegelId,
-        svar: Map<RegelId, SvarOgBegrunnelseDto?>,
+        svar: Map<RegelId, SvarOgBegrunnelse?>,
     ): Delvilkår {
         val vurderinger = mutableListOf<Vurdering>()
         var regelId: RegelId? = hovedregelId
@@ -56,7 +56,7 @@ object ByggVilkårFraSvar {
 
     private fun validerSvarOgFinnSvarregel(
         regel: RegelSteg,
-        svar: SvarOgBegrunnelseDto?,
+        svar: SvarOgBegrunnelse?,
     ): SvarRegel? {
         val svarRegel = regel.svarMapping[svar?.svarId]
 

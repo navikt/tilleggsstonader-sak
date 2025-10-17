@@ -45,6 +45,6 @@ class DagligReiseVilkårController(
         tilgangService.validerTilgangTilBehandling(lagreVilkårDto.behandlingId, AuditLoggerEvent.CREATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return dagligReiseVilkårService.opprettNyttVilkår(lagreVilkårDto).tilDto()
+        return dagligReiseVilkårService.opprettNyttVilkår(lagreVilkårDto.tilDomain()).tilDto()
     }
 }

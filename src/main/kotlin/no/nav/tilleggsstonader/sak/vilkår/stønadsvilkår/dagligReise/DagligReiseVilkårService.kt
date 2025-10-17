@@ -3,8 +3,8 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering
@@ -36,7 +36,7 @@ class DagligReiseVilkårService(
                 status = VilkårStatus.NY,
                 delvilkårsett = delvilkårsett,
                 resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
-                fakta = nyttVilkår.fakta?.mapTilFakta(),
+                fakta = nyttVilkår.fakta,
             )
 
         val lagretVilkår = vilkårRepository.insert(vilkår.mapTilVilkår())

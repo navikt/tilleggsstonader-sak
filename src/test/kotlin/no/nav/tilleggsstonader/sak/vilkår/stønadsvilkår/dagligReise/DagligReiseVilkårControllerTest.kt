@@ -9,17 +9,14 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SvarOgBegrunnelse
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.test.web.reactive.server.expectBody
 import java.time.LocalDate
 
 class DagligReiseVilkårControllerTest : IntegrationTest() {
@@ -28,8 +25,8 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
 
     val svarOffentligTransport =
         mapOf(
-            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelse(svarId = SvarId.JA),
-            RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelse(svarId = SvarId.JA),
+            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svarId = SvarId.JA),
+            RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svarId = SvarId.JA),
         )
 
     @BeforeEach
