@@ -17,9 +17,8 @@ import org.springframework.transaction.annotation.Transactional
 class DagligReiseVilkårService(
     private val vilkårRepository: VilkårRepository,
 ) {
-    fun hentVilkårForBehandling(behandlingId: BehandlingId): List<VilkårDagligReise> {
-        return vilkårRepository.findByBehandlingId(behandlingId).map { it.mapTilVilkårDagligReise() }
-    }
+    fun hentVilkårForBehandling(behandlingId: BehandlingId): List<VilkårDagligReise> =
+        vilkårRepository.findByBehandlingId(behandlingId).map { it.mapTilVilkårDagligReise() }
 
     @Transactional
     fun opprettNyttVilkår(nyttVilkår: LagreDagligReise): VilkårDagligReise {

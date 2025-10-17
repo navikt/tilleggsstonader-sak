@@ -27,7 +27,9 @@ class DagligReiseVilkårController(
     fun regler(): RegelstrukturDto = DagligReiseOffentiligTransportRegel().tilRegelstruktur()
 
     @GetMapping("{behandlingId}")
-    fun hentVilkår(@PathVariable behandlingId: BehandlingId): List<VilkårDagligReiseDto> {
+    fun hentVilkår(
+        @PathVariable behandlingId: BehandlingId,
+    ): List<VilkårDagligReiseDto> {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
