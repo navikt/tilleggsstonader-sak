@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentRegler
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentReglerDagligReise
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.opprettVilkårDagligReise
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -57,7 +57,7 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
 
     @Test
     fun `skal hente alle regler som tilhører daglig reise`() {
-        val resultat = hentRegler()
+        val resultat = hentReglerDagligReise()
 
         FileUtil.assertFileIsEqual("vilkår/regelstruktur/DAGLIG_REISE_OFFENTLIG_TRANSPORT.json", resultat)
     }

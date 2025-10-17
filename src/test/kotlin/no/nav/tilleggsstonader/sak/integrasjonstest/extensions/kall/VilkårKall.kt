@@ -19,7 +19,7 @@ fun IntegrationTest.opprettVilkårDagligReise(lagreVilkår: LagreDagligReise) =
         .returnResult()
         .responseBody!!
 
-fun IntegrationTest.hentRegler() =
+fun IntegrationTest.hentReglerDagligReise() =
     webTestClient
         .get()
         .uri("/api/vilkar/daglig-reise/regler")
