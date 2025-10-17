@@ -11,22 +11,23 @@ data class LagreDagligReiseDto(
     val tom: LocalDate,
     val svar: Map<RegelId, SvarOgBegrunnelseDto>,
     val fakta: FaktaDagligReiseDto? = null,
-){
-    fun tilDomain() = LagreDagligReise(
-        fom = fom,
-        tom = tom,
-        svar = svar.mapValues { it.value.tilDomain() },
-        fakta = fakta?.mapTilFakta(),
-    )
+) {
+    fun tilDomain() =
+        LagreDagligReise(
+            fom = fom,
+            tom = tom,
+            svar = svar.mapValues { it.value.tilDomain() },
+            fakta = fakta?.mapTilFakta(),
+        )
 }
 
 data class SvarOgBegrunnelseDto(
     val svarId: SvarId,
     val begrunnelse: String? = null,
-)
-{
-    fun tilDomain() = SvarOgBegrunnelse(
-        svarId = svarId,
-        begrunnelse = begrunnelse,
-    )
+) {
+    fun tilDomain() =
+        SvarOgBegrunnelse(
+            svarId = svarId,
+            begrunnelse = begrunnelse,
+        )
 }

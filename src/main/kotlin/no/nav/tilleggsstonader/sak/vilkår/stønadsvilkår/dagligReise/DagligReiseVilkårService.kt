@@ -21,7 +21,10 @@ class DagligReiseVilkårService(
         vilkårRepository.findByBehandlingId(behandlingId).map { it.mapTilVilkårDagligReise() }
 
     @Transactional
-    fun opprettNyttVilkår(nyttVilkår: LagreDagligReise, behandlingId: BehandlingId): VilkårDagligReise {
+    fun opprettNyttVilkår(
+        nyttVilkår: LagreDagligReise,
+        behandlingId: BehandlingId,
+    ): VilkårDagligReise {
         val delvilkårsett =
             ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
                 vilkårsregel = DagligReiseOffentiligTransportRegel(),

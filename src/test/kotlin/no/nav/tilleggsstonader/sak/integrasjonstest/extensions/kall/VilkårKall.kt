@@ -7,18 +7,20 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Vilk�
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
 import org.springframework.test.web.reactive.server.expectBody
 
-fun IntegrationTest.opprettVilkårDagligReise(lagreVilkår: LagreDagligReiseDto, behandlingId: BehandlingId) =
-    webTestClient
-        .post()
-        .uri("/api/vilkar/daglig-reise/$behandlingId")
-        .bodyValue(lagreVilkår)
-        .medOnBehalfOfToken()
-        .exchange()
-        .expectStatus()
-        .isOk
-        .expectBody<VilkårDagligReiseDto>()
-        .returnResult()
-        .responseBody!!
+fun IntegrationTest.opprettVilkårDagligReise(
+    lagreVilkår: LagreDagligReiseDto,
+    behandlingId: BehandlingId,
+) = webTestClient
+    .post()
+    .uri("/api/vilkar/daglig-reise/$behandlingId")
+    .bodyValue(lagreVilkår)
+    .medOnBehalfOfToken()
+    .exchange()
+    .expectStatus()
+    .isOk
+    .expectBody<VilkårDagligReiseDto>()
+    .returnResult()
+    .responseBody!!
 
 fun IntegrationTest.hentReglerDagligReise() =
     webTestClient
