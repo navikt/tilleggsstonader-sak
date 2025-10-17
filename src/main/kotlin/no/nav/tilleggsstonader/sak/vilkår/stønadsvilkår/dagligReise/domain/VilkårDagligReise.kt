@@ -11,7 +11,7 @@ import java.time.LocalDate
 data class VilkårDagligReise(
     val id: VilkårId = VilkårId.random(),
     val behandlingId: BehandlingId,
-    override val fom: LocalDate, // TODO: Vurder om dato skal kunne være nullable sånn som på vilkår.
+    override val fom: LocalDate,
     override val tom: LocalDate,
     val resultat: Vilkårsresultat,
     val status: VilkårStatus?,
