@@ -50,6 +50,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrap
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -318,6 +319,7 @@ fun vilkår(
     utgift: Int? = 100,
     erFremtidigUtgift: Boolean = false,
     offentligTransport: OffentligTransport? = null,
+    fakta: VilkårFakta? = null,
 ): Vilkår =
     Vilkår(
         behandlingId = behandlingId,
@@ -333,6 +335,7 @@ fun vilkår(
         erFremtidigUtgift = erFremtidigUtgift,
         gitVersjon = Applikasjonsversjon.versjon,
         offentligTransport = offentligTransport,
+        fakta = fakta,
     )
 
 fun vedtaksperiode(

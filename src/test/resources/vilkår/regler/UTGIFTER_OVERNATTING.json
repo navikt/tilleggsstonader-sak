@@ -7,10 +7,12 @@
       "svarMapping" : {
         "JA" : {
           "begrunnelseType" : "VALGFRI",
+          "triggerFakta" : null,
           "regelId" : "SLUTT_NODE"
         },
         "NEI" : {
           "begrunnelseType" : "PÅKREVD",
+          "triggerFakta" : null,
           "regelId" : "SLUTT_NODE"
         }
       }
@@ -21,10 +23,12 @@
       "svarMapping" : {
         "JA" : {
           "begrunnelseType" : "VALGFRI",
+          "triggerFakta" : null,
           "regelId" : "SLUTT_NODE"
         },
         "NEI" : {
           "begrunnelseType" : "PÅKREVD",
+          "triggerFakta" : null,
           "regelId" : "SLUTT_NODE"
         }
       }
@@ -35,10 +39,12 @@
       "svarMapping" : {
         "JA" : {
           "begrunnelseType" : "PÅKREVD",
+          "triggerFakta" : null,
           "regelId" : "SLUTT_NODE"
         },
         "NEI" : {
           "begrunnelseType" : "PÅKREVD",
+          "triggerFakta" : null,
           "regelId" : "SLUTT_NODE"
         }
       }
@@ -49,10 +55,12 @@
       "svarMapping" : {
         "JA" : {
           "begrunnelseType" : "PÅKREVD",
+          "triggerFakta" : null,
           "regelId" : "SLUTT_NODE"
         },
         "NEI" : {
           "begrunnelseType" : "VALGFRI",
+          "triggerFakta" : null,
           "regelId" : "SLUTT_NODE"
         }
       }

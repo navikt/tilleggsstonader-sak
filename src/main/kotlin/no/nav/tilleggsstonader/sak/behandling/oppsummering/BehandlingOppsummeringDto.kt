@@ -5,6 +5,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.tilTypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -63,6 +65,7 @@ data class OppsummertVilkår(
     val tom: LocalDate?,
     val resultat: Vilkårsresultat,
     val utgift: Int?,
+    val typeDagligReise: TypeDagligReise?,
 )
 
 fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
@@ -72,4 +75,10 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
         tom = this.tom,
         resultat = this.resultat,
         utgift = this.utgift,
+        typeDagligReise = finnUtTypeDagligReise(vilkår = this),
     )
+
+private fun finnUtTypeDagligReise(vilkår: Vilkår): TypeDagligReise? {
+    if (vilkår.type != VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT) return null
+    return vilkår.fakta?.type?.tilTypeDagligReise()
+}

@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
+import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -48,6 +49,8 @@ data class Vilkår(
     val opphavsvilkår: Opphavsvilkår?,
     val gitVersjon: String?,
     val slettetKommentar: String? = null,
+    @MappedCollection(idColumn = "vilkar_id")
+    val fakta: VilkårFakta? = null,
 ) {
     val delvilkårsett get() = delvilkårwrapper.delvilkårsett
 
@@ -272,16 +275,9 @@ enum class VilkårType(
     LØPENDE_UTGIFTER_TO_BOLIGER("Løpende utgifter to boliger", listOf(Stønadstype.BOUTGIFTER)),
 
     // Daglig reise
+    // TODO: Rename til DAGLIG_REISE fordi samme vilkårstype brukes på alle
     DAGLIG_REISE_OFFENTLIG_TRANSPORT(
-        "Daglig reise med offentlig transport",
-        listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
-    ),
-    DAGLIG_REISE_KJØRELISTE(
-        "Daglig reise bil og kjøreliste",
-        listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
-    ),
-    DAGLIG_REISE_TAXI(
-        "Daglig reise med taxi",
+        "Daglig reise",
         listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
     ),
     ;

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 
 enum class BegrunnelseType {
@@ -23,7 +24,7 @@ enum class Resultat(
 /**
  * Regel for svaret
  */
-interface SvarRegel {
+sealed interface SvarRegel {
     val regelId: RegelId
     val begrunnelseType: BegrunnelseType
 }
@@ -32,10 +33,11 @@ interface SvarRegel {
  * @param resultat trengs ikke for frontend, men for validering i backend
  * [regelId] er [RegelId.SLUTT_NODE] som betyr att den ikke har noen flere spørsmål for svaret
  */
-class SluttSvarRegel private constructor(
+class SluttSvarRegel(
     @JsonIgnore
     val resultat: Resultat,
     override val begrunnelseType: BegrunnelseType = BegrunnelseType.UTEN,
+    val triggerFakta: TypeVilkårFakta? = null,
 ) : SvarRegel {
     override val regelId: RegelId = RegelId.SLUTT_NODE
 
