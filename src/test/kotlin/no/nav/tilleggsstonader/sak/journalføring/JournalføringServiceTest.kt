@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -54,6 +55,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.AvsenderMottaker as Avsend
 
 class JournalføringServiceTest {
     val behandlingService = mockk<BehandlingService>()
+    val opprettBehandlingService = mockk<OpprettBehandlingService>()
     val fagsakService = mockk<FagsakService>()
     val journalpostService = mockk<JournalpostService>()
     val søknadService = mockk<SøknadService>()
@@ -77,6 +79,7 @@ class JournalføringServiceTest {
             oppgaveService,
             gjenbrukDataRevurderingService,
             klageService,
+            opprettBehandlingService,
         )
 
     val enhet = ArbeidsfordelingTestUtil.ENHET_NASJONAL_NAY.enhetNr
@@ -157,7 +160,7 @@ class JournalføringServiceTest {
     @Test
     internal fun `skal kunne journalføre og opprette behandling`() {
         every {
-            behandlingService.opprettBehandling(
+            opprettBehandlingService.opprettBehandling(
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.SØKNAD,
             )
@@ -173,7 +176,7 @@ class JournalføringServiceTest {
         )
 
         verify(exactly = 1) {
-            behandlingService.opprettBehandling(
+            opprettBehandlingService.opprettBehandling(
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.SØKNAD,
             )
@@ -241,7 +244,7 @@ class JournalføringServiceTest {
 
             journalføringService.fullførJournalpost(requestJournalfør, journalpost)
 
-            verify(exactly = 0) { behandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
+            verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
             verifyOppdaterOgFerdigstilJournalpost(1)
         }
     }
@@ -270,11 +273,11 @@ class JournalføringServiceTest {
         @Test
         fun `kan opprette revurdering for ettersending`() {
             every { behandlingService.finnesBehandlingForFagsak(fagsak.id) } returns true
-            every { behandlingService.opprettBehandling(any(), any(), any(), any(), any()) } returns
+            every { opprettBehandlingService.opprettBehandling(any(), any(), any(), any(), any()) } returns
                 behandling(fagsak = fagsak)
 
             journalføringService.fullførJournalpost(requestOpprettBehandling, journalpost)
-            verify(exactly = 1) { behandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
+            verify(exactly = 1) { opprettBehandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
             verifyOppdaterOgFerdigstilJournalpost(1)
         }
 
@@ -284,7 +287,7 @@ class JournalføringServiceTest {
 
             journalføringService.fullførJournalpost(requestJournalfør, journalpost)
 
-            verify(exactly = 0) { behandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
+            verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
             verifyOppdaterOgFerdigstilJournalpost(1)
         }
     }
@@ -319,7 +322,7 @@ class JournalføringServiceTest {
         @BeforeEach
         fun setUp() {
             every { behandlingService.finnesBehandlingForFagsak(any()) } returns true
-            every { behandlingService.opprettBehandling(any(), any(), any(), any()) } returns nyBehandling
+            every { opprettBehandlingService.opprettBehandling(any(), any(), any(), any()) } returns nyBehandling
             every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(forrigeBehandling)
             every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()
             every { barnService.finnBarnPåBehandling(nyBehandling.id) } returns eksisterendeBarn.map { it.tilBehandlingBarn() }
@@ -405,7 +408,7 @@ class JournalføringServiceTest {
         fun `skal lagre søknaden`() {
             every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()
             every {
-                behandlingService.opprettBehandling(
+                opprettBehandlingService.opprettBehandling(
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.SØKNAD,
                 )
@@ -421,7 +424,7 @@ class JournalføringServiceTest {
             )
 
             verify(exactly = 1) {
-                behandlingService.opprettBehandling(
+                opprettBehandlingService.opprettBehandling(
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.SØKNAD,
                 )

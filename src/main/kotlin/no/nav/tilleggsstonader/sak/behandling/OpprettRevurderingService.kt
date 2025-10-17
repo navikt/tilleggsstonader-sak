@@ -29,7 +29,7 @@ import java.time.LocalDateTime
 @Service
 class OpprettRevurderingService(
     private val taskService: TaskService,
-    private val behandlingService: BehandlingService,
+    private val opprettBehandlingService: OpprettBehandlingService,
     private val barnService: BarnService,
     private val unleashService: UnleashService,
     private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
@@ -53,7 +53,7 @@ class OpprettRevurderingService(
 
         val fagsakId = opprettRevurdering.fagsakId
         val behandling =
-            behandlingService.opprettBehandling(
+            opprettBehandlingService.opprettBehandling(
                 fagsakId = fagsakId,
                 behandlingsårsak = opprettRevurdering.årsak,
                 kravMottatt = opprettRevurdering.kravMottatt,
