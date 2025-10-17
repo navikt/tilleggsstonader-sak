@@ -41,6 +41,7 @@ import no.nav.tilleggsstonader.sak.util.TokenUtil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import org.junit.jupiter.api.AfterEach
@@ -155,6 +156,7 @@ abstract class IntegrationTest {
             Simuleringsresultat::class,
             TilkjentYtelse::class,
             Vilkårperiode::class,
+            VilkårFakta::class,
             Vilkår::class,
             BehandlingBarn::class,
             SøknadBehandling::class,
