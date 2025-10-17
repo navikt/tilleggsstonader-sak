@@ -1,9 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.GeneriskVilkårFakta
@@ -14,8 +11,6 @@ sealed interface FaktaDagligReise {
     val type: TypeDagligReise
 
     fun mapTilVilkårFakta(): VilkårFakta
-
-    fun tilDto(): FaktaDagligReiseDto
 
     // TODO: Validering
 }
@@ -39,14 +34,6 @@ data class FaktaOffentligTransport(
                     prisTrettidagersbillett = prisTrettidagersbillett,
                 ),
         )
-
-    override fun tilDto() =
-        FaktaDagligReiseOffentligTransportDto(
-            reisedagerPerUke = reisedagerPerUke,
-            prisEnkelbillett = prisEnkelbillett,
-            prisSyvdagersbillett = prisSyvdagersbillett,
-            prisTrettidagersbillett = prisTrettidagersbillett,
-        )
 }
 
 data class FaktaPrivatBil(
@@ -67,13 +54,5 @@ data class FaktaPrivatBil(
                     prisBompengerPerDag = prisBompengerPerDag,
                     prisFergekostandPerDag = prisFergekostandPerDag,
                 ),
-        )
-
-    override fun tilDto() =
-        FaktaDagligReisePrivatBilDto(
-            reisedagerPerUke = reisedagerPerUke,
-            reiseavstandEnVei = reiseavstandEnVei,
-            prisBompengerPerDag = prisBompengerPerDag,
-            prisFergekostandPerDag = prisFergekostandPerDag,
         )
 }
