@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.assertFinnesTaskMedType
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -133,6 +134,19 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
         }
 
+        @Test
+        internal fun `opprettBehandling av førstegangsbehandling er mulig hvis det finnes en åpen førstegangsbehandling`() {
+            every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns true
+            val fagsak = testoppsettService.lagreFagsak(fagsak())
+            testoppsettService.lagre(behandling(fagsak, BehandlingStatus.OPPRETTET))
+
+            // Sjekker at denne ikke kaster feil
+            opprettBehandlingService.opprettBehandling(
+                fagsak.id,
+                behandlingsårsak = behandlingÅrsak,
+            )
+        }
+
         // TODO: Slett når snike i køen er implementert
         @Test
         internal fun `opprettBehandling av revurdering er ikke mulig hvis det finnes en førstegangsbehandling på vent`() {
@@ -155,7 +169,27 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
         internal fun `opprettBehandling av revurdering er mulig hvis det finnes en førstegangsbehandling på vent`() {
             every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns true
             val fagsak = testoppsettService.lagreFagsak(fagsak())
-            testoppsettService.lagre(behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT))
+            val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak))
+            testoppsettService.ferdigstillBehandling(førstegangsbehandling)
+
+            testoppsettService.lagre(behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT, type = BehandlingType.REVURDERING))
+
+            // Sjekker at denne ikke kaster feil
+            opprettBehandlingService.opprettBehandling(
+                fagsak.id,
+                behandlingsårsak = behandlingÅrsak,
+            )
+        }
+
+        @Test
+        internal fun `opprettBehandling av revurdering er mulig hvis det finnes en åpen førstegangsbehandling`() {
+            every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns true
+            val fagsak = testoppsettService.lagreFagsak(fagsak())
+            val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak))
+            testoppsettService.ferdigstillBehandling(førstegangsbehandling)
+
+            testoppsettService.lagre(behandling(fagsak, BehandlingStatus.OPPRETTET, type = BehandlingType.REVURDERING))
+
             // Sjekker at denne ikke kaster feil
             opprettBehandlingService.opprettBehandling(
                 OpprettBehandling(
