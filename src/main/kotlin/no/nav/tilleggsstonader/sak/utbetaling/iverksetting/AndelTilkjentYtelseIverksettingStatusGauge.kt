@@ -39,35 +39,35 @@ class AndelTilkjentYtelseIverksettingStatusGauge(
                 ),
             )
 
-        val antallFeiledeIverksettinger =
+        val feiledeIverksettinger =
             sendteOgFeiledeAndeler
                 .filter { it.statusIverksetting == StatusIverksetting.FEILET }
-                .distinctBy { it.iverksetting?.iverksettingId } // Vil aldri være null her
-                .count()
+                .mapNotNull { it.iverksetting?.iverksettingId }
+                .distinct()
 
-        if (antallFeiledeIverksettinger > 0) {
-            logger.warn("Antall feilede iverksettinger: {}", antallFeiledeIverksettinger)
+        if (feiledeIverksettinger.isNotEmpty()) {
+            logger.warn("Feilede iverksettinger: {}", feiledeIverksettinger)
         }
 
-        val antallIverksettingerSendtForEnTimeSiden =
+        val iverksettingerSendtForEnTimeSiden =
             sendteOgFeiledeAndeler
-                .filter {
-                    it.iverksetting != null &&
-                        it.iverksetting.iverksettingTidspunkt.isBefore(LocalDateTime.now().minus(Duration.ofHours(1)))
-                }.distinctBy { it.iverksetting?.iverksettingId }
-                .count()
+                .filter { it.statusIverksetting == StatusIverksetting.SENDT }
+                .mapNotNull { it.iverksetting }
+                .filter { it.iverksettingTidspunkt.isBefore(LocalDateTime.now().minus(Duration.ofHours(1))) }
+                .map { it.iverksettingId }
+                .distinct()
 
-        if (antallIverksettingerSendtForEnTimeSiden > 0) {
+        if (iverksettingerSendtForEnTimeSiden.isNotEmpty()) {
             logger.warn(
-                "Antall iverksettinger sendt for over en time siden uten oppdatert status: {}",
-                antallIverksettingerSendtForEnTimeSiden,
+                "Iverksettinger sendt for over en time siden uten oppdatert status: {}",
+                iverksettingerSendtForEnTimeSiden,
             )
         }
 
         andelerSomHarIverksettingMedUgyldigStatusMultiGauge.register(
             listOf(
-                MultiGauge.Row.of(Tags.of("status", "FEILET"), antallFeiledeIverksettinger),
-                MultiGauge.Row.of(Tags.of("status", "IKKE_OPPDATERT_STATUS_ETTER_SENDT"), antallIverksettingerSendtForEnTimeSiden),
+                MultiGauge.Row.of(Tags.of("status", "FEILET"), feiledeIverksettinger.size),
+                MultiGauge.Row.of(Tags.of("status", "IKKE_OPPDATERT_STATUS_ETTER_SENDT"), iverksettingerSendtForEnTimeSiden.size),
             ),
             true,
         )
