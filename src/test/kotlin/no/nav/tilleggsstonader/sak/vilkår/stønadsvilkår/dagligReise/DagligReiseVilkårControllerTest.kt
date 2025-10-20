@@ -12,7 +12,10 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SvarOgBegrunnelseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.assertj.core.api.Assertions.assertThat
@@ -48,14 +51,12 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
         val resultat = opprettVilkårDagligReise(nyttVilkår, behandling.id)
 
         assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
-        assertThat(resultat.delvilkårsett).hasSize(1)
-        assertThat(resultat.fakta).isNotNull()
-        assertThat(resultat.fakta!!.type).isEqualTo(TypeDagligReise.OFFENTLIG_TRANSPORT)
+        assertThat(resultat.status).isEqualTo(VilkårStatus.NY)
+        assertLagretVilkår(nyttVilkår, resultat)
 
-        val nyTom = LocalDate.of(2025, 2, 28)
         val oppdatertVilkår =
             nyttVilkår.copy(
-                tom = nyTom,
+                tom = LocalDate.of(2025, 2, 28),
                 fakta =
                     faktaOffentligTransport(
                         reisedagerPerUke = 4,
@@ -63,10 +64,10 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
             )
 
         val resultatOppdatert = oppdaterVilkårDagligReise(oppdatertVilkår, resultat.id, behandling.id)
-        assertThat(resultatOppdatert.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
-        assertThat(resultatOppdatert.tom).isEqualTo(nyTom)
-        assertThat(resultatOppdatert.fakta?.type).isEqualTo(TypeDagligReise.OFFENTLIG_TRANSPORT)
-        assertThat((resultatOppdatert.fakta as FaktaDagligReiseOffentligTransportDto).reisedagerPerUke).isEqualTo(4)
+
+        assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
+        assertThat(resultat.status).isEqualTo(VilkårStatus.NY)
+        assertLagretVilkår(oppdatertVilkår, resultatOppdatert)
     }
 
     @Test
@@ -109,4 +110,25 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
         prisSyvdagersbillett = prisSyvdagersbillett,
         prisTrettidagersbillett = prisTrettidagersbillett,
     )
+
+    private fun assertLagretVilkår(
+        lagreVilkårRequest: LagreDagligReiseDto,
+        resultat: VilkårDagligReiseDto,
+    ) {
+        assertThat(resultat.fom).isEqualTo(lagreVilkårRequest.fom)
+        assertThat(resultat.tom).isEqualTo(lagreVilkårRequest.tom)
+        assertThat(resultat.fakta).isEqualTo(lagreVilkårRequest.fakta)
+        assertThat(resultat.delvilkårsett).hasSize(1)
+
+        assertAlleSvarHarFåttVurdering(delvilkår = resultat.delvilkårsett, svar = lagreVilkårRequest.svar)
+    }
+
+    private fun assertAlleSvarHarFåttVurdering(
+        delvilkår: List<DelvilkårDto>,
+        svar: Map<RegelId, SvarOgBegrunnelseDto>,
+    ) {
+        val brukteRegelIder = delvilkår.flatMap { it.vurderinger.map { vurdering -> vurdering.regelId } }.toSet()
+
+        assertThat(brukteRegelIder).hasSize(svar.size)
+    }
 }
