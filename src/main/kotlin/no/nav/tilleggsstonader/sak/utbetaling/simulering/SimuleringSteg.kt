@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -16,19 +17,23 @@ class SimuleringSteg(
         saksbehandling: Saksbehandling,
         data: Void?,
     ) {
-        val resultat = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
-
-        if (skalUtFøreSimulering(resultat)) {
+        if (skalUtFøreSimulering(saksbehandling)) {
             simuleringService.hentOgLagreSimuleringsresultat(saksbehandling)
         }
     }
 
-    private fun skalUtFøreSimulering(type: TypeVedtak): Boolean =
-        when (type) {
+    private fun skalUtFøreSimulering(saksbehandling: Saksbehandling): Boolean {
+        if (saksbehandling.stønadstype.gjelderDagligReise()) {
+            return false
+        }
+
+        val typeVedtak = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
+        return when (typeVedtak) {
             TypeVedtak.INNVILGELSE -> true
             TypeVedtak.AVSLAG -> false
             TypeVedtak.OPPHØR -> true
         }
+    }
 
     override fun stegType(): StegType = StegType.SIMULERING
 }
