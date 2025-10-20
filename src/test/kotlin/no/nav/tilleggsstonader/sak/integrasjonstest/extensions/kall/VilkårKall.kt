@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
@@ -13,6 +14,22 @@ fun IntegrationTest.opprettVilkårDagligReise(
 ) = webTestClient
     .post()
     .uri("/api/vilkar/daglig-reise/$behandlingId")
+    .bodyValue(lagreVilkår)
+    .medOnBehalfOfToken()
+    .exchange()
+    .expectStatus()
+    .isOk
+    .expectBody<VilkårDagligReiseDto>()
+    .returnResult()
+    .responseBody!!
+
+fun IntegrationTest.oppdaterVilkårDagligReise(
+    lagreVilkår: LagreDagligReiseDto,
+    vilkårId: VilkårId,
+    behandlingId: BehandlingId,
+) = webTestClient
+    .put()
+    .uri("/api/vilkar/daglig-reise/$behandlingId/$vilkårId")
     .bodyValue(lagreVilkår)
     .medOnBehalfOfToken()
     .exchange()

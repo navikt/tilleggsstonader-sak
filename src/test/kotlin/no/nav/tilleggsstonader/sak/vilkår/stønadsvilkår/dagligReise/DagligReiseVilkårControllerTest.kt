@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentReglerDagligReise
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.oppdaterVilkårDagligReise
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.opprettVilkårDagligReise
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -35,7 +36,7 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
     }
 
     @Test
-    fun `skal kunne lagre ned et nytt vilkår for daglig reise - offentlig transport`() {
+    fun `skal kunne lagre og endre vilkår for daglig reise - offentlig transport`() {
         val nyttVilkår =
             LagreDagligReiseDto(
                 fom = LocalDate.of(2025, 1, 1),
@@ -50,6 +51,22 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
         assertThat(resultat.delvilkårsett).hasSize(1)
         assertThat(resultat.fakta).isNotNull()
         assertThat(resultat.fakta!!.type).isEqualTo(TypeDagligReise.OFFENTLIG_TRANSPORT)
+
+        val nyTom = LocalDate.of(2025, 2, 28)
+        val oppdatertVilkår =
+            nyttVilkår.copy(
+                tom = nyTom,
+                fakta =
+                    faktaOffentligTransport(
+                        reisedagerPerUke = 4,
+                    ),
+            )
+
+        val resultatOppdatert = oppdaterVilkårDagligReise(oppdatertVilkår, resultat.id, behandling.id)
+        assertThat(resultatOppdatert.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
+        assertThat(resultatOppdatert.tom).isEqualTo(nyTom)
+        assertThat(resultatOppdatert.fakta?.type).isEqualTo(TypeDagligReise.OFFENTLIG_TRANSPORT)
+        assertThat((resultatOppdatert.fakta as FaktaDagligReiseOffentligTransportDto).reisedagerPerUke).isEqualTo(4)
     }
 
     @Test

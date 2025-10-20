@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
@@ -25,25 +27,53 @@ class DagligReiseVilkårService(
         nyttVilkår: LagreDagligReise,
         behandlingId: BehandlingId,
     ): VilkårDagligReise {
+        val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår)
+        val lagretVilkår = vilkårRepository.insert(vilkår.mapTilVilkår())
+
+        return lagretVilkår.mapTilVilkårDagligReise()
+    }
+
+    @Transactional
+    fun oppdaterVilkår(
+        nyttVilkår: LagreDagligReise,
+        behandlingId: BehandlingId,
+        vilkårId: VilkårId,
+    ): VilkårDagligReise {
+        val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårDagligReise()
+
+        val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår, eksisterendeVilkår)
+        val lagretVilkår = vilkårRepository.update(vilkår.mapTilVilkår())
+
+        return lagretVilkår.mapTilVilkårDagligReise()
+    }
+
+    private fun lagVilkårMedVurderingerOgResultat(
+        behandlingId: BehandlingId,
+        nyttVilkår: LagreDagligReise,
+        eksisterendeVilkår: VilkårDagligReise? = null,
+    ): VilkårDagligReise {
         val delvilkårsett =
             ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
                 vilkårsregel = DagligReiseOffentiligTransportRegel(),
                 svar = nyttVilkår.svar,
             )
 
-        val vilkår =
-            VilkårDagligReise(
-                behandlingId = behandlingId,
-                fom = nyttVilkår.fom,
-                tom = nyttVilkår.tom,
-                status = VilkårStatus.NY,
-                delvilkårsett = delvilkårsett,
-                resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
-                fakta = nyttVilkår.fakta,
-            )
-
-        val lagretVilkår = vilkårRepository.insert(vilkår.mapTilVilkår())
-
-        return lagretVilkår.mapTilVilkårDagligReise()
+        return VilkårDagligReise(
+            behandlingId = behandlingId,
+            id = eksisterendeVilkår?.id ?: VilkårId.random(),
+            fom = nyttVilkår.fom,
+            tom = nyttVilkår.tom,
+            status = utledStatus(eksisterendeVilkår),
+            delvilkårsett = delvilkårsett,
+            resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
+            fakta = nyttVilkår.fakta,
+        )
     }
+
+    private fun utledStatus(eksisterendeVilkår: VilkårDagligReise?): VilkårStatus? =
+        when {
+            eksisterendeVilkår == null -> VilkårStatus.NY
+            eksisterendeVilkår.status == VilkårStatus.UENDRET -> VilkårStatus.ENDRET
+            else -> eksisterendeVilkår.status
+        }
 }
