@@ -24,4 +24,6 @@ interface AndelTilkjentYtelseRepository :
     fun finnBehandlingerForIverksetting(utbetalingsdato: LocalDate): List<BehandlingId>
 
     fun findAndelTilkjentYtelsesByKildeBehandlingId(behandlingId: BehandlingId): List<AndelTilkjentYtelse>
+
+    fun findAllByStatusIverksettingIn(status: List<StatusIverksetting>): List<AndelTilkjentYtelse>
 }
