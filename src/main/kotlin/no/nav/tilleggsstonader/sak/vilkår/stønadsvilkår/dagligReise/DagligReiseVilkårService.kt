@@ -3,12 +3,15 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggVilkårFraSvar
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseOffentiligTransportRegel
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class DagligReiseVilkårService(
     private val vilkårRepository: VilkårRepository,
+    private val vilkårService: VilkårService,
 ) {
     fun hentVilkårForBehandling(behandlingId: BehandlingId): List<VilkårDagligReise> =
         vilkårRepository.findByBehandlingId(behandlingId).map { it.mapTilVilkårDagligReise() }
@@ -46,6 +50,20 @@ class DagligReiseVilkårService(
 
         return lagretVilkår.mapTilVilkårDagligReise()
     }
+
+    @Transactional
+    fun slettVilkår(
+        behandlingId: BehandlingId,
+        vilkårId: VilkårId,
+        slettetKommentar: String?,
+    ): SlettetVilkårResultat =
+        vilkårService.slettVilkår(
+            SlettVilkårRequest(
+                id = vilkårId,
+                behandlingId = behandlingId,
+                kommentar = slettetKommentar,
+            ),
+        )
 
     private fun lagVilkårMedVurderingerOgResultat(
         behandlingId: BehandlingId,

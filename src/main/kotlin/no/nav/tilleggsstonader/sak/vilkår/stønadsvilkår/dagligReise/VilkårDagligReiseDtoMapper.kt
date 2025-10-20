@@ -20,6 +20,7 @@ object VilkårDagligReiseDtoMapper {
             status = this.status,
             delvilkårsett = this.delvilkårsett.map { it.tilDto() },
             fakta = this.fakta?.tilDto(),
+            slettetKommentar = this.slettetKommentar,
         )
 
     private fun FaktaDagligReise?.tilDto(): FaktaDagligReiseDto? =
