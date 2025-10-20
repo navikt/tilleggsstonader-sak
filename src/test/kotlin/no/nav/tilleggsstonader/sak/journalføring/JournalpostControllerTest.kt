@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.klage.OpprettKlagebehandlingRequest
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -24,6 +25,8 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentJournalp
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.klage.KlageClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
 import no.nav.tilleggsstonader.sak.util.journalpostMedStrukturertSøknad
@@ -41,6 +44,7 @@ class JournalpostControllerTest(
     @Autowired val klageClient: KlageClient,
     @Autowired val journalpostClient: JournalpostClient,
     @Autowired val oppgaveClient: OppgaveClient,
+    @Autowired val ytelseClient: YtelseClient,
 ) : IntegrationTest() {
     val ident = "12345678910"
     val saksbehandler = "ole"
@@ -159,6 +163,7 @@ class JournalpostControllerTest(
         fun `hent journalpost som inneholder søknad daglig reise, kan kun opprette stønadstyper for daglig reise`() {
             val journalpost = journalpostMedStrukturertSøknad(DokumentBrevkode.DAGLIG_REISE)
             leggTilJournalpostMedSøknadIMock(journalpost, objectMapper.writeValueAsBytes(søknadDagligReise()))
+            every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
 
             val journalpostResponse = hentJournalpost(journalpost.journalpostId)
 

@@ -17,12 +17,13 @@ import org.springframework.stereotype.Service
 
 /**
  * Håndterer journalhendelser fra dokarkiv.
- * Foreløpig håndterer vi kun innkommende journalposter med brevkode for boutgifter.
+ * Alle nye tilleggsstønader-søkander prosesseres herfra
  */
 @Service
 class JournalhendelseKafkaHåndtererService(
     private val journalpostService: JournalpostService,
     private val håndterSøknadService: HåndterSøknadService,
+    private val journalpostMottattMetrikker: JournalpostMottattMetrikker,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -36,6 +37,9 @@ class JournalhendelseKafkaHåndtererService(
             logSkalBehandles(journalpost, kanBehandles = false)
         }
         // Trenger ikke å logge andre journalposter av typen utgående eller notat
+
+        // Teller antall mottatte journalposter per brevkode
+        journalpostMottattMetrikker.journalpostMottatt(journalpost)
     }
 
     private fun Journalpost.kanBehandles() =

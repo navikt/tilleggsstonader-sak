@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping(path = ["/api/ekstern/skjema-routing"])
 @ProtectedWithClaims(issuer = "azuread")
 class SkjemaRoutingController(
-    private val søknadRoutingService: SøknadRoutingService,
+    private val skjemaRoutingService: SkjemaRoutingService,
 ) {
     @PostMapping
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
@@ -25,6 +25,6 @@ class SkjemaRoutingController(
         feilHvisIkke(kallKommerFra(EksternApplikasjon.SOKNAD_API), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
-        return with(request) { SøknadRoutingResponse(søknadRoutingService.skalRoutesTilNyLøsning(ident, skjematype)) }
+        return with(request) { SøknadRoutingResponse(skjemaRoutingService.skalRoutesTilNyLøsning(ident, skjematype)) }
     }
 }

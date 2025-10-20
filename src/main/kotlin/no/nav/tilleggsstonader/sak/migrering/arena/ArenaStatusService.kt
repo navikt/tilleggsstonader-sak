@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
-import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingService
+import no.nav.tilleggsstonader.sak.migrering.routing.SkjemaRoutingService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import org.slf4j.LoggerFactory
@@ -23,7 +23,7 @@ class ArenaStatusService(
     private val personService: PersonService,
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
-    private val søknadRoutingService: SøknadRoutingService,
+    private val skjemaRoutingService: SkjemaRoutingService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -83,6 +83,6 @@ class ArenaStatusService(
         skjematype: Skjematype,
     ): Boolean =
         identer.any { ident ->
-            søknadRoutingService.harLagretRouting(ident, skjematype)
+            skjemaRoutingService.harLagretRouting(ident, skjematype)
         }
 }

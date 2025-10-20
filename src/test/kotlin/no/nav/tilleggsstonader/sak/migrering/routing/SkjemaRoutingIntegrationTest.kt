@@ -32,7 +32,7 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
-class SøknadRoutingIntegrationTest(
+class SkjemaRoutingIntegrationTest(
     @Autowired private val ytelseClient: YtelseClient,
     @Autowired private val arenaClient: ArenaClient,
     @Autowired private val pdlClient: PdlClient,
@@ -54,8 +54,8 @@ class SøknadRoutingIntegrationTest(
 
     @Nested
     inner class DagligReise {
-        val søknadRoutingDagligReise =
-            SøknadRouting(
+        val skjemaRoutingDagligReise =
+            SkjemaRouting(
                 ident = jonasIdent,
                 type = Skjematype.SØKNAD_DAGLIG_REISE,
                 detaljer = JsonWrapper("{}"),
@@ -68,7 +68,7 @@ class SøknadRoutingIntegrationTest(
 
         @Test
         fun `skal alltid svare ja hvis personen har blitt routet til ny løsning tidligere`() {
-            testoppsettService.lagreSøknadRouting(søknadRoutingDagligReise)
+            testoppsettService.lagreSøknadRouting(skjemaRoutingDagligReise)
 
             val routingSjekk = sjekkRoutingForPerson(dagligReiseRoutingRequest)
 

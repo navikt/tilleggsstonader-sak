@@ -20,7 +20,7 @@ fun lagBeregningsresultatForReise(
                 BeregningsresultatForPeriode(
                     grunnlag = beregningsgrunnlag,
                     beløp = beløp,
-                    billetdetalijer = emptyMap(),
+                    billettdetaljer = emptyMap(),
                 ),
             ),
     )

@@ -36,6 +36,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.henlagtBehandling
@@ -53,6 +54,7 @@ internal class HåndterSøknadServiceTest {
     val taskService: TaskService = mockk()
     val barnService: BarnService = mockk()
     val journalføringService: JournalføringService = mockk()
+    val ytelseService: YtelseService = mockk()
 
     val håndterSøknadService =
         HåndterSøknadService(
@@ -64,6 +66,7 @@ internal class HåndterSøknadServiceTest {
             behandlingService = behandlingService,
             søknadService = søknadService,
             unleashService = mockUnleashService(),
+            ytelseService = ytelseService,
         )
 
     val enhet = ArbeidsfordelingService.MASKINELL_JOURNALFOERENDE_ENHET
