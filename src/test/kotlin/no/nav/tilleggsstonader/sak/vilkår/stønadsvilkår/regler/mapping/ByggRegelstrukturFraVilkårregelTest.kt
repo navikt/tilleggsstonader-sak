@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping
 
-import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
+import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileJsonIsEqual
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregel.tilRegelstruktur
 import org.junit.jupiter.api.Test
@@ -16,7 +16,7 @@ class ByggRegelstrukturFraVilkårregelTest {
         val vilkårsregler = Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler.map { it.value }
 
         vilkårsregler.forEach {
-            assertFileIsEqual("vilkår/regelstruktur/${it.vilkårType}.json", it.tilRegelstruktur())
+            assertFileJsonIsEqual("vilkår/regelstruktur/${it.vilkårType}.json", it.tilRegelstruktur())
         }
     }
 }

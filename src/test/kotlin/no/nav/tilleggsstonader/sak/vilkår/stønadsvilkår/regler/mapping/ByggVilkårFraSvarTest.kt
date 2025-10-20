@@ -1,14 +1,11 @@
-package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
+package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping
 
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.SvarOgBegrunnelse
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggVilkårFraSvar
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseOffentiligTransportRegel
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
 class ByggVilkårFraSvarTest {
@@ -34,9 +31,9 @@ class ByggVilkårFraSvarTest {
                 svar = svar,
             )
 
-        assertThat(delvilkårsett).hasSize(1)
-        assertThat(delvilkårsett[0].vurderinger).hasSize(2)
-        assertThat(delvilkårsett[0].resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
+        Assertions.assertThat(delvilkårsett).hasSize(1)
+        Assertions.assertThat(delvilkårsett[0].vurderinger).hasSize(2)
+        Assertions.assertThat(delvilkårsett[0].resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
     }
 
     @Test
@@ -61,8 +58,8 @@ class ByggVilkårFraSvarTest {
                 svar = svar,
             )
 
-        assertThat(delvilkårsett).hasSize(1)
-        assertThat(delvilkårsett[0].vurderinger).hasSize(svar.size)
+        Assertions.assertThat(delvilkårsett).hasSize(1)
+        Assertions.assertThat(delvilkårsett[0].vurderinger).hasSize(svar.size)
     }
 
     @Test
@@ -77,11 +74,12 @@ class ByggVilkårFraSvarTest {
                 RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelse(svarId = SvarId.JA),
             )
 
-        assertThatThrownBy {
-            ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
-                vilkårsregel = DagligReiseOffentiligTransportRegel(),
-                svar = svar,
-            )
-        }.hasMessageContaining("Ikke alle svar kunne mappes til vurderinger")
+        Assertions
+            .assertThatThrownBy {
+                ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
+                    vilkårsregel = DagligReiseOffentiligTransportRegel(),
+                    svar = svar,
+                )
+            }.hasMessageContaining("Ikke alle svar kunne mappes til vurderinger")
     }
 }
