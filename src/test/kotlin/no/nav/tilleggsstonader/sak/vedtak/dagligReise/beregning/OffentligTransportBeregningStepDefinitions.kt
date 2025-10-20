@@ -14,8 +14,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -59,8 +59,8 @@ class OffentligTransportBeregningStepDefinitions {
     val offentligTransportBeregningService =
         OffentligTransportBeregningService()
 
-    var beregningsResultat: Beregningsresultat? = null
-    var forventetBeregningsresultat: Beregningsresultat? = null
+    var beregningsResultat: BeregningsresultatOffentligTransport? = null
+    var forventetBeregningsresultat: BeregningsresultatOffentligTransport? = null
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
     var vilkårperioder: List<Vilkårperioder> = emptyList()
     var vilkår: List<Vilkår> = emptyList()

@@ -8,8 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 import java.util.UUID
 
-// TODO: Rename til BeregningsresultatOffentligTransport i egen PR
-data class Beregningsresultat(
+data class BeregningsresultatOffentligTransport(
     val reiser: List<BeregningsresultatForReise>,
 )
 
@@ -18,12 +17,12 @@ data class BeregningsresultatForReise(
 )
 
 data class BeregningsresultatForPeriode(
-    val grunnlag: Beregningsgrunnlag,
+    val grunnlag: BeregningsgrunnlagOffentligTransport,
     val beløp: Int,
     val billettdetaljer: Map<Billettype, Int>,
 )
 
-data class Beregningsgrunnlag(
+data class BeregningsgrunnlagOffentligTransport(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val prisEnkeltbillett: Int?,

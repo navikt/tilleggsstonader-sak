@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.PeriodeMedDager
@@ -44,7 +44,7 @@ fun finnReisedagerIPeriode(
         }.values
         .sumOf { it.antallDager }
 
-fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag): BilligsteBillettRespons {
+fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: BeregningsgrunnlagOffentligTransport): BilligsteBillettRespons {
     val billigstePris =
         listOfNotNull(
             finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag),
@@ -54,13 +54,16 @@ fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: Beregningsgrunnlag):
     return billigstePris.tilRespons()
 }
 
-private fun Beregningsgrunnlag.månedsBillettMedPris() = pris30dagersbillett?.let { BillettyperMedPris(Billettype.TRETTIDAGERSBILLETT, it) }
+private fun BeregningsgrunnlagOffentligTransport.månedsBillettMedPris() =
+    pris30dagersbillett?.let {
+        BillettyperMedPris(Billettype.TRETTIDAGERSBILLETT, it)
+    }
 
 /**
  * Minimum Cost For Tickets.
  * Doc: https://docs.vultr.com/problem-set/minimum-cost-for-tickets
  */
-private fun finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag: Beregningsgrunnlag): BillettyperMedPris? {
+private fun finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag: BeregningsgrunnlagOffentligTransport): BillettyperMedPris? {
     if (grunnlag.prisEnkeltbillett == null && grunnlag.prisSyvdagersbillett == null) return null
     val reisedagerPerUke = finnReisedagerPerUke(grunnlag)
     val reisedagerListe = lagReisedagerListe(reisedagerPerUke)
@@ -119,7 +122,7 @@ enum class Billettype {
     TRETTIDAGERSBILLETT,
 }
 
-private fun finnReisedagerPerUke(grunnlag: Beregningsgrunnlag): Map<Uke, PeriodeMedDager> =
+private fun finnReisedagerPerUke(grunnlag: BeregningsgrunnlagOffentligTransport): Map<Uke, PeriodeMedDager> =
     grunnlag.splitPerUke { fom, tom ->
         val uke = Datoperiode(fom, tom)
         val dagerIPerioden = finnAntallDagerISnittetMellomUkeOgVedtaksperioder(uke, grunnlag.vedtaksperioder)
@@ -158,7 +161,7 @@ private fun tellDagerTilStartenAvUke(
 private fun finnReisekostnadForNyEnkeltbillett(
     gjeldendeDag: Int,
     reisekostnader: MutableList<BillettyperMedPris>,
-    grunnlag: Beregningsgrunnlag,
+    grunnlag: BeregningsgrunnlagOffentligTransport,
 ): BillettyperMedPris? =
     grunnlag.prisEnkeltbillett?.let {
         reisekostnader[max(0, gjeldendeDag - 1)] +
@@ -174,7 +177,7 @@ private fun finnReisekostnadForNyEnkeltbillett(
 private fun finnReisekostnadForNySyvdagersbillett(
     gjeldendeDag: Int,
     reisekostnader: MutableList<BillettyperMedPris>,
-    grunnlag: Beregningsgrunnlag,
+    grunnlag: BeregningsgrunnlagOffentligTransport,
 ): BillettyperMedPris? =
     grunnlag.prisSyvdagersbillett?.let {
         reisekostnader[max(0, gjeldendeDag - 7)] +

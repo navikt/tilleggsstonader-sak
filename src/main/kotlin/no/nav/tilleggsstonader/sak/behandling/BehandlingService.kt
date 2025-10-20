@@ -83,68 +83,6 @@ class BehandlingService(
     fun hentBehandlingsjournalposter(behandlingId: BehandlingId): List<Behandlingsjournalpost> =
         behandlingsjournalpostRepository.findAllByBehandlingId(behandlingId)
 
-    @Transactional
-    fun opprettBehandling(
-        fagsakId: FagsakId,
-        status: BehandlingStatus = BehandlingStatus.OPPRETTET,
-        stegType: StegType = StegType.INNGANGSVILKÅR,
-        behandlingsårsak: BehandlingÅrsak,
-        kravMottatt: LocalDate? = null,
-        nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
-    ): Behandling {
-        brukerfeilHvis(kravMottatt != null && kravMottatt.isAfter(LocalDate.now())) {
-            "Kan ikke sette krav mottattdato frem i tid"
-        }
-        feilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_BEHANDLING)) {
-            "Feature toggle for å opprette behandling er slått av"
-        }
-
-        val kanHaFlereBehandlingerPåSammeFagsak =
-            unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK)
-
-        val tidligereBehandlinger = behandlingRepository.findByFagsakId(fagsakId)
-        val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
-        val behandlingType =
-            when (kanHaFlereBehandlingerPåSammeFagsak) {
-                true -> utledBehandlingTypeV2(tidligereBehandlinger)
-                false -> utledBehandlingType(tidligereBehandlinger)
-            }
-
-        validerKanOppretteNyBehandling(
-            behandlingType = behandlingType,
-            tidligereBehandlinger = tidligereBehandlinger,
-            kanHaFlereBehandlingPåSammeFagsak = kanHaFlereBehandlingerPåSammeFagsak,
-        )
-
-        val behandling =
-            behandlingRepository.insert(
-                Behandling(
-                    fagsakId = fagsakId,
-                    forrigeIverksatteBehandlingId = forrigeBehandling?.id,
-                    type = behandlingType,
-                    steg = stegType,
-                    status = status,
-                    resultat = BehandlingResultat.IKKE_SATT,
-                    årsak = behandlingsårsak,
-                    kravMottatt = kravMottatt,
-                    kategori = BehandlingKategori.NASJONAL,
-                    nyeOpplysningerMetadata = nyeOpplysningerMetadata,
-                ),
-            )
-        eksternBehandlingIdRepository.insert(EksternBehandlingId(behandlingId = behandling.id))
-
-        behandlingshistorikkService.opprettHistorikkInnslag(
-            behandlingshistorikk =
-                Behandlingshistorikk(
-                    behandlingId = behandling.id,
-                    steg = stegType,
-                    gitVersjon = Applikasjonsversjon.versjon,
-                ),
-        )
-
-        return behandling
-    }
-
     fun hentBehandling(behandlingId: BehandlingId): Behandling = behandlingRepository.findByIdOrThrow(behandlingId)
 
     fun hentSaksbehandling(behandlingId: BehandlingId): Saksbehandling = behandlingRepository.finnSaksbehandling(behandlingId)

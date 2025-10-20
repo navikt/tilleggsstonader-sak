@@ -15,11 +15,11 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
@@ -88,7 +88,7 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
             beregningsresultat =
                 BeregningsresultatDagligReise(
                     offentligTransport =
-                        Beregningsresultat(
+                        BeregningsresultatOffentligTransport(
                             reiser =
                                 listOf(
                                     BeregningsresultatForReise(
@@ -96,7 +96,7 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
                                             listOf(
                                                 BeregningsresultatForPeriode(
                                                     grunnlag =
-                                                        Beregningsgrunnlag(
+                                                        BeregningsgrunnlagOffentligTransport(
                                                             fom = dummyFom,
                                                             tom = dummyTom,
                                                             prisEnkeltbillett = 44,

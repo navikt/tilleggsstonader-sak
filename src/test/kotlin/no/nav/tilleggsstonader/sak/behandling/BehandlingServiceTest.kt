@@ -84,18 +84,6 @@ internal class BehandlingServiceTest {
         clearAllMocks(answers = false)
     }
 
-    @Test
-    internal fun `skal feile hvis krav mottatt er frem i tid`() {
-        assertThrows<ApiFeil> {
-            behandlingService.opprettBehandling(
-                fagsakId = FagsakId.random(),
-                stegType = StegType.VILKÅR,
-                behandlingsårsak = BehandlingÅrsak.PAPIRSØKNAD,
-                kravMottatt = LocalDate.now().plusDays(1),
-            )
-        }
-    }
-
     @Nested
     inner class HenleggBehandling {
         @Test

@@ -8,6 +8,30 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto.KildeResultat
 import java.time.LocalDate
 
 object YtelsePerioderUtil {
+    fun tomYtelsePerioderDto(): YtelsePerioderDto =
+        YtelsePerioderDto(
+            perioder = emptyList(),
+            kildeResultat = emptyList(),
+            perioderHentetFom = LocalDate.now(),
+            perioderHentetTom = LocalDate.now(),
+        )
+
+    fun ytelsePerioderDtoAAP(): YtelsePerioderDto =
+        YtelsePerioderDto(
+            perioder = listOf(periodeAAP()),
+            kildeResultat = listOf(kildeResultatAAP()),
+            perioderHentetFom = LocalDate.now(),
+            perioderHentetTom = LocalDate.now(),
+        )
+
+    fun ytelsePerioderDtoTiltakspenger(): YtelsePerioderDto =
+        YtelsePerioderDto(
+            perioder = listOf(periodeTiltakspenger()),
+            kildeResultat = listOf(kildeResultatTiltakspenger()),
+            perioderHentetFom = LocalDate.now(),
+            perioderHentetTom = LocalDate.now(),
+        )
+
     fun ytelsePerioderDto(
         perioder: List<YtelsePeriode> = listOf(periodeAAP(), periodeEnsligForsørger()),
         kildeResultat: List<KildeResultatYtelse> = listOf(kildeResultatAAP(), kildeResultatEnsligForsørger()),
@@ -22,6 +46,9 @@ object YtelsePerioderUtil {
     fun kildeResultatAAP(resultat: ResultatKilde = ResultatKilde.OK) =
         KildeResultatYtelse(type = TypeYtelsePeriode.AAP, resultat = resultat)
 
+    fun kildeResultatTiltakspenger(resultat: ResultatKilde = ResultatKilde.OK) =
+        KildeResultatYtelse(type = TypeYtelsePeriode.TILTAKSPENGER, resultat = resultat)
+
     fun kildeResultatEnsligForsørger(resultat: ResultatKilde = ResultatKilde.OK) =
         KildeResultatYtelse(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, resultat = resultat)
 
@@ -29,6 +56,11 @@ object YtelsePerioderUtil {
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate? = LocalDate.now(),
     ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.AAP, fom = fom, tom = tom)
+
+    fun periodeTiltakspenger(
+        fom: LocalDate = LocalDate.now(),
+        tom: LocalDate? = LocalDate.now(),
+    ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.TILTAKSPENGER, fom = fom, tom = tom)
 
     fun periodeEnsligForsørger(
         fom: LocalDate = LocalDate.now(),
