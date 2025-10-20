@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.infrastruktur.kafka
+package no.nav.tilleggsstonader.sak.utbetaling.kafka
 
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.libs.log.logger
@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class UtbetalingMessageProducer(
-    private val utsjekkKafkaTemplate: KafkaTemplate<String, String>,
+    private val kafkaTemplate: KafkaTemplate<String, String>,
     @Value($$"${topics.utbetaling}") private val topic: String,
 ) {
     fun sendUtbetaling(utbetaling: UtbetalingRecord) {
-        utsjekkKafkaTemplate
+        kafkaTemplate
             .send(topic, utbetaling.behandlingId, objectMapper.writeValueAsString(utbetaling))
             .whenComplete { result, ex ->
                 if (ex == null) {
