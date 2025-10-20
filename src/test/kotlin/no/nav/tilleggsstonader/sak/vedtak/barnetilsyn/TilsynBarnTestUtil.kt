@@ -125,7 +125,8 @@ object TilsynBarnTestUtil {
 
     fun beregningsgrunnlag(
         måned: YearMonth = YearMonth.of(2024, 1),
-        vedtaksperioder: List<VedtaksperiodeGrunnlag> = vedtaksperiodeGrunnlag(måned),
+        vedtaksperioder: List<VedtaksperiodeGrunnlag> =
+            listOf(vedtaksperiodeGrunnlag(vedtaksperiodeBeregning(måned.atDay(1), måned.atEndOfMonth()))),
         utgifterTotal: Int = 5000,
         utgifter: List<UtgiftBarn> = listOf(UtgiftBarn(defaultBarn1.id, 1000)),
     ) = Beregningsgrunnlag(
@@ -136,21 +137,6 @@ object TilsynBarnTestUtil {
         utgifterTotal = utgifterTotal,
         antallBarn = 1,
     )
-
-    fun vedtaksperiodeGrunnlag(måned: YearMonth): List<VedtaksperiodeGrunnlag> =
-        listOf(
-            VedtaksperiodeGrunnlag(
-                vedtaksperiode =
-                    VedtaksperiodeBeregning(
-                        fom = måned.atDay(1),
-                        tom = måned.atEndOfMonth(),
-                        målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                        aktivitet = AktivitetType.TILTAK,
-                    ),
-                antallDager = 0,
-                aktiviteter = emptyList(),
-            ),
-        )
 
     fun innvilgelse(data: InnvilgelseTilsynBarn = defaultInnvilgelseTilsynBarn) =
         GeneriskVedtak(

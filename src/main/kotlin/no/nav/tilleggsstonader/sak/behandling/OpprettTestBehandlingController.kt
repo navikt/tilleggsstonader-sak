@@ -112,7 +112,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reis
 @Profile("!prod")
 class OpprettTestBehandlingController(
     private val tilgangService: TilgangService,
-    private val behandlingService: BehandlingService,
+    private val opprettBehandlingService: OpprettBehandlingService,
     private val fagsakService: FagsakService,
     private val personService: PersonService,
     private val barnService: BarnService,
@@ -139,7 +139,7 @@ class OpprettTestBehandlingController(
     }
 
     private fun lagBehandling(fagsak: Fagsak): Behandling =
-        behandlingService.opprettBehandling(
+        opprettBehandlingService.opprettBehandling(
             fagsakId = fagsak.id,
             behandlingsårsak = BehandlingÅrsak.SØKNAD,
         )

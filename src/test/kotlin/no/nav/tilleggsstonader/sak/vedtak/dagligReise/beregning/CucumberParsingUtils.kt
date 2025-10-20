@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OffentligTransportDto
@@ -32,7 +32,7 @@ fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
     dataTable.mapRad { rad ->
         BeregningsresultatForPeriode(
             grunnlag =
-                Beregningsgrunnlag(
+                BeregningsgrunnlagOffentligTransport(
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
                     prisEnkeltbillett = 0,

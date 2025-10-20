@@ -4,8 +4,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -44,7 +44,7 @@ class DagligReiseBeregningService(
     private fun beregnOffentligTransport(
         vilkår: Map<VilkårType, List<Vilkår>>,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): Beregningsresultat? {
+    ): BeregningsresultatOffentligTransport? {
         val vilkårOffentligTransport = vilkår[VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT] ?: return null
 
         return offentligTransportBeregningService.beregn(

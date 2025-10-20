@@ -1,0 +1,1 @@
+DELETE from skjema_routing where type in ('BARNETILSYN', 'LÆREMIDLER', 'BOUTGIFTER');

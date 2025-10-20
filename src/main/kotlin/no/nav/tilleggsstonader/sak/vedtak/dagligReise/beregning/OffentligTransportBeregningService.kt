@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -15,7 +15,7 @@ class OffentligTransportBeregningService {
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<Vilkår>,
-    ): Beregningsresultat {
+    ): BeregningsresultatOffentligTransport {
         val utgifter =
             oppfylteVilkår
                 .filter { it.offentligTransport != null }
@@ -30,7 +30,7 @@ class OffentligTransportBeregningService {
                     )
                 }
 
-        return Beregningsresultat(
+        return BeregningsresultatOffentligTransport(
             reiser =
                 utgifter.map { reise ->
                     beregnForReise(reise, vedtaksperioder)
@@ -77,7 +77,7 @@ class OffentligTransportBeregningService {
                 }
 
         val grunnlag =
-            Beregningsgrunnlag(
+            BeregningsgrunnlagOffentligTransport(
                 fom = trettidagerReisePeriode.fom,
                 tom = trettidagerReisePeriode.tom,
                 antallReisedagerPerUke = trettidagerReisePeriode.antallReisedagerPerUke,

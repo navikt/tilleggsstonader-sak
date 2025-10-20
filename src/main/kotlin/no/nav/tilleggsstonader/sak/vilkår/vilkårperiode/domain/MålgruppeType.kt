@@ -72,46 +72,36 @@ enum class MålgruppeType(
     fun kanBrukesForStønad(stønadstype: Stønadstype): Boolean =
         when (stønadstype) {
             Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER, Stønadstype.BOUTGIFTER ->
-                when (this) {
-                    AAP -> true
-                    DAGPENGER -> false
-                    NEDSATT_ARBEIDSEVNE -> true
-                    OMSTILLINGSSTØNAD -> true
-                    OVERGANGSSTØNAD -> true
-                    UFØRETRYGD -> true
-                    SYKEPENGER_100_PROSENT -> true
-                    INGEN_MÅLGRUPPE -> true
-                    TILTAKSPENGER -> false
-                    KVALIFISERINGSSTØNAD -> false
-                }
+                this in
+                    listOf(
+                        AAP,
+                        NEDSATT_ARBEIDSEVNE,
+                        OMSTILLINGSSTØNAD,
+                        OVERGANGSSTØNAD,
+                        UFØRETRYGD,
+                        SYKEPENGER_100_PROSENT,
+                        INGEN_MÅLGRUPPE,
+                    )
 
             Stønadstype.DAGLIG_REISE_TSO ->
-                when (this) {
-                    AAP -> true
-                    DAGPENGER -> false
-                    NEDSATT_ARBEIDSEVNE -> true
-                    OMSTILLINGSSTØNAD -> true
-                    OVERGANGSSTØNAD -> true
-                    UFØRETRYGD -> true
-                    SYKEPENGER_100_PROSENT -> false
-                    INGEN_MÅLGRUPPE -> true
-                    TILTAKSPENGER -> false
-                    KVALIFISERINGSSTØNAD -> false
-                }
+                this in
+                    listOf(
+                        AAP,
+                        NEDSATT_ARBEIDSEVNE,
+                        OMSTILLINGSSTØNAD,
+                        OVERGANGSSTØNAD,
+                        UFØRETRYGD,
+                        INGEN_MÅLGRUPPE,
+                    )
 
             Stønadstype.DAGLIG_REISE_TSR ->
-                when (this) {
-                    INGEN_MÅLGRUPPE -> true
-                    TILTAKSPENGER -> true
-                    KVALIFISERINGSSTØNAD -> true
-                    AAP -> false
-                    DAGPENGER -> true
-                    NEDSATT_ARBEIDSEVNE -> false
-                    OMSTILLINGSSTØNAD -> false
-                    OVERGANGSSTØNAD -> false
-                    UFØRETRYGD -> false
-                    SYKEPENGER_100_PROSENT -> false
-                }
+                this in
+                    listOf(
+                        INGEN_MÅLGRUPPE,
+                        TILTAKSPENGER,
+                        KVALIFISERINGSSTØNAD,
+                        DAGPENGER,
+                    )
         }
 }
 
