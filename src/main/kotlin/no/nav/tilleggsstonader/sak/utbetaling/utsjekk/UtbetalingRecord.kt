@@ -18,7 +18,6 @@ data class UtbetalingRecord(
     val sakId: String,
     val behandlingId: String,
     val personident: String,
-    val stønad: StønadUtbetaling,
     val saksbehandler: String,
     val beslutter: String,
     val vedtakstidspunkt: LocalDateTime,
@@ -41,6 +40,7 @@ data class PerioderUtbetaling(
     val fom: LocalDate,
     val tom: LocalDate,
     val beløp: UInt,
+    val stønad: StønadUtbetaling,
 )
 
 enum class PeriodetypeUtbetaling {

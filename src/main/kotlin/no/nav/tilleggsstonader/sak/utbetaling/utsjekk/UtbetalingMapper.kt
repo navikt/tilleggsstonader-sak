@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.ForrigeIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -25,7 +24,6 @@ object UtbetalingMapper {
             sakId = behandling.eksternFagsakId.toString(),
             behandlingId = behandling.eksternId.toString(),
             personident = behandling.ident,
-            stønad = mapTilStønadUtbetaling(andelerTilkjentYtelse),
             saksbehandler = totrinnskontroll.saksbehandler,
             beslutter = totrinnskontroll.beslutter ?: error("Mangler beslutter behandling=${behandling.id}"),
             vedtakstidspunkt = behandling.vedtakstidspunkt ?: error("Mangler vedtakstidspunkt behandling=${behandling.id}"),
@@ -41,19 +39,16 @@ object UtbetalingMapper {
                     fom = it.fom,
                     tom = it.tom,
                     beløp = it.beløp.toUInt(),
+                    stønad = mapTilStønadUtbetaling(it),
                 )
             }
 
-    private fun mapTilStønadUtbetaling(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>): StønadUtbetaling {
-        feilHvis(andelerTilkjentYtelse.distinctBy { it.type }.count() != 1) {
-            "Forventer én og bare én type andel i utbetalingen"
-        }
-        return when (val andelstype = andelerTilkjentYtelse.first().type) {
+    private fun mapTilStønadUtbetaling(andelerTilkjentYtelse: AndelTilkjentYtelse): StønadUtbetaling =
+        when (val andelstype = andelerTilkjentYtelse.type) {
             TypeAndel.DAGLIG_REISE_AAP -> StønadUtbetaling.DAGLIG_REISE_AAP
             TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER -> StønadUtbetaling.DAGLIG_REISE_ENSLIG_FORSØRGER
             TypeAndel.DAGLIG_REISE_ETTERLATTE -> StønadUtbetaling.DAGLIG_REISE_ETTERLATTE
 
             else -> error("Skal ikke sende andelstype=$andelstype på kafka")
         }
-    }
 }
