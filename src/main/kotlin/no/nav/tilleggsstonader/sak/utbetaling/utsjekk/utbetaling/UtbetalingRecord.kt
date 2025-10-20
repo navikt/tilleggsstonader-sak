@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.utbetaling.utsjekk
+package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import java.time.LocalDate
 import java.time.LocalDateTime

@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.utbetaling.utsjekk
+package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.ForrigeIverksetting

@@ -1,8 +1,7 @@
-package no.nav.tilleggsstonader.sak.utbetaling.kafka
+package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
 import no.nav.tilleggsstonader.libs.log.logger
-import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.UtbetalingRecord
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
@@ -14,7 +13,7 @@ class UtbetalingMessageProducer(
 ) {
     fun sendUtbetaling(utbetaling: UtbetalingRecord) {
         kafkaTemplate
-            .send(topic, utbetaling.behandlingId, objectMapper.writeValueAsString(utbetaling))
+            .send(topic, utbetaling.behandlingId, ObjectMapperProvider.objectMapper.writeValueAsString(utbetaling))
             .whenComplete { result, ex ->
                 if (ex == null) {
                     logger.info("Sente utbetaling på topic=$topic med offset=${result.recordMetadata.offset()}")
