@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
@@ -77,7 +77,7 @@ class OffentligTransportBeregningService {
                 }
 
         val grunnlag =
-            Beregningsgrunnlag(
+            BeregningsgrunnlagOffentligTransport(
                 fom = trettidagerReisePeriode.fom,
                 tom = trettidagerReisePeriode.tom,
                 antallReisedagerPerUke = trettidagerReisePeriode.antallReisedagerPerUke,

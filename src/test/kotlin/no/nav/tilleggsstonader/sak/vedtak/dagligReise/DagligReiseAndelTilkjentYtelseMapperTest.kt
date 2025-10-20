@@ -109,7 +109,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                         lagBeregningsresultatForReise(
                             fredag,
                             beregningsgrunnlag =
-                                lagBeregningsgrunnlag(
+                                lagBeregningsgrunnlagOffentligTransport(
                                     fom = fredag,
                                     vedtaksperioder = vedtaksperiodeEnsligForsørger,
                                 ),
@@ -117,7 +117,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                         lagBeregningsresultatForReise(
                             fredag,
                             beregningsgrunnlag =
-                                lagBeregningsgrunnlag(
+                                lagBeregningsgrunnlagOffentligTransport(
                                     fom = fredag,
                                     vedtaksperioder = vedtaksperioderNedsattArbeidsevne,
                                 ),

@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Beregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
@@ -12,7 +12,7 @@ import java.util.UUID
 fun lagBeregningsresultatForReise(
     fom: LocalDate,
     beløp: Int = 100,
-    beregningsgrunnlag: Beregningsgrunnlag = lagBeregningsgrunnlag(fom),
+    beregningsgrunnlag: BeregningsgrunnlagOffentligTransport = lagBeregningsgrunnlagOffentligTransport(fom),
 ): BeregningsresultatForReise =
     BeregningsresultatForReise(
         perioder =
@@ -37,11 +37,11 @@ fun lagVedtaksperiodeGrunnlag(
     antallReisedagerIVedtaksperioden = 5,
 )
 
-fun lagBeregningsgrunnlag(
+fun lagBeregningsgrunnlagOffentligTransport(
     fom: LocalDate,
     vedtaksperioder: List<VedtaksperiodeGrunnlag> = listOf(lagVedtaksperiodeGrunnlag(fom)),
-): Beregningsgrunnlag =
-    Beregningsgrunnlag(
+): BeregningsgrunnlagOffentligTransport =
+    BeregningsgrunnlagOffentligTransport(
         fom = fom,
         tom = fom.plusWeeks(1),
         prisEnkeltbillett = 50,
