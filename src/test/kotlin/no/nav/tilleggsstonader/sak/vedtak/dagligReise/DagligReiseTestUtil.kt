@@ -32,7 +32,7 @@ object DagligReiseTestUtil {
         listOf(
             vedtaksperiode(
                 fom = 1 januar 2024,
-                tom = 7 januar 2025,
+                tom = 7 januar 2024,
             ),
         )
     val defaultBeregningsresultat =
