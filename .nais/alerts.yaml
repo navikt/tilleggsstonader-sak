@@ -11,7 +11,6 @@ spec:
       rules:
         - alert: Feilede iverksettinger
           expr: andel_tilkjent_ytelse_iverksetting_status{status="FEILET"} > 0
-          for: 5m
           annotations:
             consequence: Vi har mottatt FEILET-status fra hel-ved ved iverksetting
             action: "Sjekk logger for å finne iverksetting-id som har feilet og kontakt hel-ved"
@@ -20,7 +19,6 @@ spec:
             severity: critical
         - alert: Iverksettinger uten status
           expr: andel_tilkjent_ytelse_iverksetting_status{status="IKKE_MOTTATT_STATUS_FRA_HELVED"} > 0
-          for: 5m
           annotations:
             consequence: Iverksettinger uten mottatt status fra hel-ved
             action: "Sjekk logger for å finne iverksetting-id ikke har mottatt status og kontakt hel-ved"
