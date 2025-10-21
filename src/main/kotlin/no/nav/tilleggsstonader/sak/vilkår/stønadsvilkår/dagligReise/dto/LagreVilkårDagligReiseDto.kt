@@ -22,12 +22,12 @@ data class LagreDagligReiseDto(
 }
 
 data class SvarOgBegrunnelseDto(
-    val svarId: SvarId,
+    val svar: SvarId,
     val begrunnelse: String? = null,
 ) {
     fun tilDomain() =
         SvarOgBegrunnelse(
-            svarId = svarId,
+            svar = svar,
             begrunnelse = begrunnelse,
         )
 }

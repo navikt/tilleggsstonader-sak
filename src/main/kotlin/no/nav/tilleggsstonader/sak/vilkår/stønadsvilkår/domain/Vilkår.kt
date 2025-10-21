@@ -49,7 +49,6 @@ data class Vilkår(
     val opphavsvilkår: Opphavsvilkår?,
     val gitVersjon: String?,
     val slettetKommentar: String? = null,
-    @MappedCollection(idColumn = "vilkar_id")
     val fakta: VilkårFakta? = null,
 ) {
     val delvilkårsett get() = delvilkårwrapper.delvilkårsett

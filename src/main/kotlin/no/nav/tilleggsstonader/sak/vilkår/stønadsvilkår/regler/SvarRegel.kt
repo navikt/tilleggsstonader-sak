@@ -37,7 +37,7 @@ class SluttSvarRegel(
     @JsonIgnore
     val resultat: Resultat,
     override val begrunnelseType: BegrunnelseType = BegrunnelseType.UTEN,
-    val triggerFakta: TypeVilkårFakta? = null,
+    val tilhørendeFaktaType: TypeVilkårFakta? = null,
 ) : SvarRegel {
     override val regelId: RegelId = RegelId.SLUTT_NODE
 

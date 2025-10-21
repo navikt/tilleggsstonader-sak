@@ -3,8 +3,6 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.GeneriskVilkårFakta
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 
 sealed interface FaktaDagligReise {
@@ -24,15 +22,11 @@ data class FaktaOffentligTransport(
     override val type = TypeDagligReise.OFFENTLIG_TRANSPORT
 
     override fun mapTilVilkårFakta() =
-        GeneriskVilkårFakta<FaktaDagligReiseOffentligTransport>(
-            type = type.tilTypeVilkårFakta(),
-            data =
-                FaktaDagligReiseOffentligTransport(
-                    reisedagerPerUke = reisedagerPerUke,
-                    prisEnkelbillett = prisEnkelbillett,
-                    prisSyvdagersbillett = prisSyvdagersbillett,
-                    prisTrettidagersbillett = prisTrettidagersbillett,
-                ),
+        FaktaDagligReiseOffentligTransport(
+            reisedagerPerUke = reisedagerPerUke,
+            prisEnkelbillett = prisEnkelbillett,
+            prisSyvdagersbillett = prisSyvdagersbillett,
+            prisTrettidagersbillett = prisTrettidagersbillett,
         )
 }
 
@@ -45,14 +39,10 @@ data class FaktaPrivatBil(
     override val type = TypeDagligReise.PRIVAT_BIL
 
     override fun mapTilVilkårFakta() =
-        GeneriskVilkårFakta<FaktaDagligReisePrivatBil>(
-            type = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL,
-            data =
-                FaktaDagligReisePrivatBil(
-                    reisedagerPerUke = reisedagerPerUke,
-                    reiseavstandEnVei = reiseavstandEnVei,
-                    prisBompengerPerDag = prisBompengerPerDag,
-                    prisFergekostandPerDag = prisFergekostandPerDag,
-                ),
+        FaktaDagligReisePrivatBil(
+            reisedagerPerUke = reisedagerPerUke,
+            reiseavstandEnVei = reiseavstandEnVei,
+            prisBompengerPerDag = prisBompengerPerDag,
+            prisFergekostandPerDag = prisFergekostandPerDag,
         )
 }

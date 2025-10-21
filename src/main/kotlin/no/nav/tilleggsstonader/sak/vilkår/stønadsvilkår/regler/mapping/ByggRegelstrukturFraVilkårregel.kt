@@ -64,7 +64,7 @@ object ByggRegelstrukturFraVilkårregel {
                     SvarAlternativ(
                         svarId = svarId,
                         begrunnelseType = svarRegel.begrunnelseType,
-                        triggerFakta = svarRegel.triggerFakta,
+                        tilhørendeFaktaType = svarRegel.tilhørendeFaktaType,
                     )
             }
         }

@@ -15,12 +15,12 @@ class ByggVilkårFraSvarTest {
             mapOf(
                 RegelId.AVSTAND_OVER_SEKS_KM to
                     SvarOgBegrunnelse(
-                        svarId = SvarId.JA,
+                        svar = SvarId.JA,
                     ),
                 RegelId.UNNTAK_SEKS_KM to null,
                 RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to
                     SvarOgBegrunnelse(
-                        svarId = SvarId.JA,
+                        svar = SvarId.JA,
                     ),
                 RegelId.KAN_BRUKER_KJØRE_SELV to null,
             )
@@ -42,12 +42,12 @@ class ByggVilkårFraSvarTest {
             mapOf(
                 RegelId.AVSTAND_OVER_SEKS_KM to
                     SvarOgBegrunnelse(
-                        svarId = SvarId.NEI,
+                        svar = SvarId.NEI,
                     ),
-                RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelse(svarId = SvarId.JA),
+                RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelse(svar = SvarId.JA),
                 RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to
                     SvarOgBegrunnelse(
-                        svarId = SvarId.NEI,
+                        svar = SvarId.NEI,
                     ),
                 RegelId.KAN_BRUKER_KJØRE_SELV to SvarOgBegrunnelse(SvarId.NEI, "Begrunnelse"),
             )
@@ -68,10 +68,10 @@ class ByggVilkårFraSvarTest {
             mapOf(
                 RegelId.AVSTAND_OVER_SEKS_KM to
                     SvarOgBegrunnelse(
-                        svarId = SvarId.JA,
+                        svar = SvarId.JA,
                     ),
                 // Unntak skal ikke besvares dersom avstand er over 6 km
-                RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelse(svarId = SvarId.JA),
+                RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelse(svar = SvarId.JA),
             )
 
         Assertions

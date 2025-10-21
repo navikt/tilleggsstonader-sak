@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakDa
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.innvilgeVedtakDagligReise
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.util.vilkårDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
@@ -28,9 +28,9 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeTestUtil.vedtaksp
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -61,7 +61,7 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
             status = BehandlingStatus.UTREDES,
         )
     val dummyOffentligTransport =
-        OffentligTransport(
+        FaktaOffentligTransport(
             reisedagerPerUke = 4,
             prisEnkelbillett = 44,
             prisSyvdagersbillett = null,
@@ -130,12 +130,11 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
         )
 
     val vilkår =
-        vilkår(
+        vilkårDagligReise(
             behandlingId = dummyBehandlingId,
-            type = VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
             fom = dummyFom,
             tom = dummyTom,
-            offentligTransport = dummyOffentligTransport,
+            fakta = dummyOffentligTransport,
         )
 
     @BeforeEach
@@ -143,7 +142,7 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
         testoppsettService.opprettBehandlingMedFagsak(dummyBehandling, stønadstype = Stønadstype.DAGLIG_REISE_TSO)
         vilkårperiodeRepository.insert(aktivitet)
         vilkårperiodeRepository.insert(målgruppe)
-        vilkårRepository.insert(vilkår)
+        vilkårRepository.insert(vilkår.mapTilVilkår())
     }
 
     @Test

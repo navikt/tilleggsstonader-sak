@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFaktaData
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 
 object VilkårDagligReiseMapper {
@@ -23,7 +23,7 @@ object VilkårDagligReiseMapper {
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett,
-            fakta = this.fakta?.data?.mapTilFaktaDagligReise(type = this.fakta.type),
+            fakta = this.fakta?.mapTilFaktaDagligReise(type = this.fakta.typeVilkårFakta),
         )
 
     fun VilkårDagligReise.mapTilVilkår() =
@@ -43,7 +43,7 @@ object VilkårDagligReiseMapper {
             gitVersjon = Applikasjonsversjon.versjon,
         )
 
-    private fun VilkårFaktaData.mapTilFaktaDagligReise(type: TypeVilkårFakta) =
+    private fun VilkårFakta.mapTilFaktaDagligReise(type: TypeVilkårFakta) =
         when (this) {
             is FaktaDagligReiseOffentligTransport -> this.mapTilFakta()
             is FaktaDagligReisePrivatBil -> this.mapTilFakta()

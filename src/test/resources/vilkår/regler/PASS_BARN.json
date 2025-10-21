@@ -7,12 +7,12 @@
       "svarMapping" : {
         "JA" : {
           "begrunnelseType" : "VALGFRI",
-          "triggerFakta" : null,
+          "tilhørendeFaktaType" : null,
           "regelId" : "SLUTT_NODE"
         },
         "NEI" : {
           "begrunnelseType" : "PÅKREVD",
-          "triggerFakta" : null,
+          "tilhørendeFaktaType" : null,
           "regelId" : "SLUTT_NODE"
         }
       }
@@ -23,12 +23,12 @@
       "svarMapping" : {
         "JA" : {
           "begrunnelseType" : "PÅKREVD",
-          "triggerFakta" : null,
+          "tilhørendeFaktaType" : null,
           "regelId" : "SLUTT_NODE"
         },
         "NEI" : {
           "begrunnelseType" : "VALGFRI",
-          "triggerFakta" : null,
+          "tilhørendeFaktaType" : null,
           "regelId" : "SLUTT_NODE"
         }
       }
@@ -43,7 +43,7 @@
         },
         "NEI" : {
           "begrunnelseType" : "VALGFRI",
-          "triggerFakta" : null,
+          "tilhørendeFaktaType" : null,
           "regelId" : "SLUTT_NODE"
         }
       }
@@ -54,17 +54,17 @@
       "svarMapping" : {
         "TRENGER_MER_TILSYN_ENN_JEVNALDRENDE" : {
           "begrunnelseType" : "VALGFRI",
-          "triggerFakta" : null,
+          "tilhørendeFaktaType" : null,
           "regelId" : "SLUTT_NODE"
         },
         "FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID" : {
           "begrunnelseType" : "VALGFRI",
-          "triggerFakta" : null,
+          "tilhørendeFaktaType" : null,
           "regelId" : "SLUTT_NODE"
         },
         "NEI" : {
           "begrunnelseType" : "PÅKREVD",
-          "triggerFakta" : null,
+          "tilhørendeFaktaType" : null,
           "regelId" : "SLUTT_NODE"
         }
       }

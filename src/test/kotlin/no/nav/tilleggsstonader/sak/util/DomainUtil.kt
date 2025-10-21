@@ -45,12 +45,13 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -319,7 +320,7 @@ fun vilkår(
     utgift: Int? = 100,
     erFremtidigUtgift: Boolean = false,
     offentligTransport: OffentligTransport? = null,
-    fakta: VilkårFakta? = null,
+//    fakta: VilkårFakta? = null,
 ): Vilkår =
     Vilkår(
         behandlingId = behandlingId,
@@ -335,6 +336,25 @@ fun vilkår(
         erFremtidigUtgift = erFremtidigUtgift,
         gitVersjon = Applikasjonsversjon.versjon,
         offentligTransport = offentligTransport,
+//        fakta = fakta,
+    )
+
+fun vilkårDagligReise(
+    behandlingId: BehandlingId = BehandlingId.random(),
+    resultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
+    status: VilkårStatus = VilkårStatus.NY,
+    delvilkår: List<Delvilkår> = emptyList(),
+    fom: LocalDate = YearMonth.now().atDay(1),
+    tom: LocalDate = YearMonth.now().atEndOfMonth(),
+    fakta: FaktaDagligReise? = null,
+): VilkårDagligReise =
+    VilkårDagligReise(
+        behandlingId = behandlingId,
+        resultat = resultat,
+        status = status,
+        delvilkårsett = delvilkår,
+        fom = fom,
+        tom = tom,
         fakta = fakta,
     )
 
