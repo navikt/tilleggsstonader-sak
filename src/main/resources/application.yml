@@ -235,3 +235,4 @@ topics:
   pdl-personhendelser: pdl.leesah-v1
   oppgavehendelser: oppgavehandtering.oppgavehendelse-v1
   utbetaling: tilleggsstonader.utbetaling.v1
+  utbetaling-status: helved.status.v1

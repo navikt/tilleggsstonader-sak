@@ -21,6 +21,8 @@ interface AndelTilkjentYtelseRepository :
         AND b.status = 'FERDIGSTILT' AND b.resultat IN ('INNVILGET', 'OPPHØRT')
         """,
     )
+    fun findByIverksettingId(iverksettingId: UUID): List<AndelTilkjentYtelse>
+
     fun finnBehandlingerForIverksetting(utbetalingsdato: LocalDate): List<BehandlingId>
 
     fun findAndelTilkjentYtelsesByKildeBehandlingId(behandlingId: BehandlingId): List<AndelTilkjentYtelse>
