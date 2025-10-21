@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.VilkårPeriodeValidering.validerIkkeOverlappendeVilkår
 import org.springframework.stereotype.Service
@@ -53,8 +54,6 @@ class VilkårSteg(
 
     private fun manglerPåkrevdUtgift(vilkår: Vilkår): Boolean =
         !vilkår.erFremtidigUtgift &&
-            harIkkeOffentligTransport(vilkår) &&
+            vilkår.type != VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT &&
             vilkår.utgift == null
-
-    private fun harIkkeOffentligTransport(vilkår: Vilkår) = vilkår.offentligTransport == null
 }

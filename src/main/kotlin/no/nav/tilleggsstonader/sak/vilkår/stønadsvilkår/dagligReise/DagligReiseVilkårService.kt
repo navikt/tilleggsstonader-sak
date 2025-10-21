@@ -5,6 +5,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -66,8 +69,23 @@ class DagligReiseVilkårService(
             status = utledStatus(eksisterendeVilkår),
             delvilkårsett = delvilkårsett,
             resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
-            fakta = nyttVilkår.fakta,
+            fakta = nyttVilkår.fakta.fjern0Verdier(),
         )
+    }
+
+    private fun FaktaDagligReise?.fjern0Verdier(): FaktaDagligReise? {
+        if (this == null) return null
+
+        when (this) {
+            is FaktaOffentligTransport -> return FaktaOffentligTransport(
+                reisedagerPerUke = this.reisedagerPerUke,
+                prisEnkelbillett = this.prisEnkelbillett?.takeIf { it > 0 },
+                prisSyvdagersbillett = this.prisSyvdagersbillett?.takeIf { it > 0 },
+                prisTrettidagersbillett = this.prisTrettidagersbillett?.takeIf { it > 0 },
+            )
+
+            is FaktaPrivatBil -> TODO()
+        }
     }
 
     private fun utledStatus(eksisterendeVilkår: VilkårDagligReise?): VilkårStatus? =
