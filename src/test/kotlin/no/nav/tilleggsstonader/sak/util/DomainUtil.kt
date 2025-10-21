@@ -464,8 +464,7 @@ fun dokumentvariant(
     filnavn = filnavn,
 )
 
-fun dokumentvariantOriginal() =
-    dokumentvariant(variantformat = Dokumentvariantformat.ORIGINAL, filnavn = "original.json")
+fun dokumentvariantOriginal() = dokumentvariant(variantformat = Dokumentvariantformat.ORIGINAL, filnavn = "original.json")
 
 fun nyeOpplysningerMetadata(
     kilde: NyeOpplysningerKilde = NyeOpplysningerKilde.ETTERSENDING,
