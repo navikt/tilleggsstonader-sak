@@ -99,6 +99,11 @@ class InterntVedtakService(
                         boutgifter = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
                     )
 
+                is InnvilgelseDagligReise ->
+                    BeregningsresultatInterntVedtakDto(
+                        dagligReise = null,
+                    )
+
                 is Innvilgelse -> error("Mangler mapping av beregningsresultat for ${data.type}")
 
                 else -> null
@@ -162,8 +167,8 @@ class InterntVedtakService(
             is InnvilgelseTilsynBarn -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is InnvilgelseLæremidler -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is InnvilgelseBoutgifter -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
+            is InnvilgelseDagligReise -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is Avslag, is Opphør -> emptyList()
-
             else -> {
                 error("Kan ikke mappe vedtaksperioder for type ${vedtak?.data?.javaClass?.simpleName}")
             }

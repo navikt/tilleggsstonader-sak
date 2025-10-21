@@ -21,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -83,8 +82,9 @@ class InterntVedtakGenereringTest {
      * Kommenter ut Disabled for å oppdatere html og pdf ved endringer i htmlify.
      * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
      * Formatter htmlfil etter generering for å unngå stor diff
+
+     @Disabled
      */
-    @Disabled
     @ParameterizedTest
     @MethodSource("stønadstyperInterntVedtak")
     fun `lager html og pdf`(type: StønadstypeInterntVedtak) {
@@ -137,7 +137,15 @@ class InterntVedtakGenereringTest {
     }
 
     private fun mockDagligReise() {
-        every { vilkårService.hentOppfylteDagligReiseVilkår(behandlingId) } returns Testdata.DagligReise.vilkårOffentligTransport
+        val testvilkår = Testdata.DagligReise.vilkårOffentligTransport
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.DagligReise.behandling
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.DagligReise.vilkårperioder
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.DagligReise.grunnlagsdata
+        every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
+        every { vilkårService.hentVilkår(behandlingId) } returns Testdata.DagligReise.vilkårOffentligTransport
+        // every { vilkårService.hentVilkår(behandlingId) } returns Testdata.DagligReise.vilkårOffentligTransport
+        every { vedtakService.hentVedtak(behandlingId) } returns Testdata.DagligReise.innvilgetVedtak
+        println("hello" + testvilkår)
     }
 
     @Test
@@ -189,8 +197,8 @@ class InterntVedtakGenereringTest {
                     Stønadstype.BARNETILSYN,
                     Stønadstype.LÆREMIDLER,
                     Stønadstype.BOUTGIFTER,
-                    -> it.håndteres()
                     Stønadstype.DAGLIG_REISE_TSO,
+                    -> it.håndteres()
                     Stønadstype.DAGLIG_REISE_TSR,
                     -> it.håndteresIkke()
                 }

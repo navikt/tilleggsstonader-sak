@@ -8,6 +8,9 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.Boutgifter.aktivitetererBoutgifter
+import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.Boutgifter.beregningsresultat
+import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.Boutgifter.vedtaksperioder
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil
@@ -25,10 +28,13 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
@@ -599,6 +605,65 @@ object Testdata {
     }
 
     object DagligReise {
+        val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+        val behandling =
+            saksbehandling(
+                behandling =
+                    behandling(
+                        id = behandlingId,
+                        vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay(),
+                        opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
+                        fagsak = Boutgifter.fagsak,
+                        resultat = BehandlingResultat.INNVILGET,
+                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    ),
+                fagsak = Boutgifter.fagsak,
+            )
+        private val aktivitetererDagligReise =
+            listOf(
+                VilkårperiodeTestUtil.aktivitet(
+                    fom = LocalDate.of(2024, 12, 10),
+                    tom = LocalDate.of(2024, 12, 15),
+                    faktaOgVurdering = faktaOgVurderingAktivitetBoutgifter(),
+                ),
+                VilkårperiodeTestUtil.aktivitet(
+                    fom = LocalDate.of(2024, 12, 10),
+                    tom = LocalDate.of(2024, 12, 15),
+                    resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
+                    begrunnelse = "ikke oppfylt",
+                    faktaOgVurdering = faktaOgVurderingAktivitetBoutgifter(type = AktivitetType.UTDANNING),
+                ),
+            )
+
+        val vilkårperioder =
+            Vilkårperioder(
+                målgrupper = målgrupper,
+                aktiviteter = aktivitetererDagligReise,
+            )
+        val grunnlagsdata =
+            lagGrunnlagsdata(personopplysninger = lagFaktaGrunnlagPersonopplysninger(barn = emptyList()))
+
+        val beregningsresultat =
+            BeregningsresultatDagligReise(
+                offentligTransport =
+                    BeregningsresultatOffentligTransport(
+                        reiser = emptyList(),
+                    ),
+            )
+        val innvilgetVedtak =
+            GeneriskVedtak(
+                behandlingId = behandlingId,
+                type = TypeVedtak.INNVILGELSE,
+                data =
+                    InnvilgelseDagligReise(
+                        vedtaksperioder = vedtaksperioder,
+                        beregningsresultat = beregningsresultat,
+                        begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = null,
+                opphørsdato = null,
+            )
         val vilkårOffentligTransport =
             listOf(
                 vilkår(

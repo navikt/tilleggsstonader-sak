@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatForMånedDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -37,6 +38,7 @@ data class BeregningsresultatInterntVedtakDto(
     val tilsynBarn: List<BeregningsresultatForMånedDto>? = null,
     val læremidler: List<BeregningsresultatDtoLæremidler>? = null,
     val boutgifter: List<BeregningsresultatDtoBoutgifter>? = null,
+    val dagligReise: List<BeregningsresultatDagligReise>? = null,
 )
 
 data class Behandlinginfo(
