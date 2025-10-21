@@ -44,52 +44,53 @@ fun lagDagligReiseInnvilgelseMedBeløp(
 
     val beregningsresultat =
         BeregningsresultatDagligReise(
-            offentligTransport = BeregningsresultatOffentligTransport(
-                reiser =
-                    listOf(
-                        BeregningsresultatForReise(
-                            perioder =
-                                listOf(
-                                    BeregningsresultatForPeriode(
-                                        grunnlag =
-                                            BeregningsgrunnlagOffentligTransport(
-                                                fom = fom,
-                                                tom = tom,
-                                                prisEnkeltbillett = 50,
-                                                prisSyvdagersbillett = 300,
-                                                pris30dagersbillett = 1000,
-                                                antallReisedagerPerUke = 5,
-                                                vedtaksperioder =
-                                                    listOf(
-                                                        no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag(
-                                                            id = randomUUID(),
-                                                            fom = fom,
-                                                            tom = tom,
-                                                            aktivitet = aktivitet.type,
-                                                            målgruppe = målgruppe,
-                                                            antallReisedagerIVedtaksperioden = 20,
+            offentligTransport =
+                BeregningsresultatOffentligTransport(
+                    reiser =
+                        listOf(
+                            BeregningsresultatForReise(
+                                perioder =
+                                    listOf(
+                                        BeregningsresultatForPeriode(
+                                            grunnlag =
+                                                BeregningsgrunnlagOffentligTransport(
+                                                    fom = fom,
+                                                    tom = tom,
+                                                    prisEnkeltbillett = 50,
+                                                    prisSyvdagersbillett = 300,
+                                                    pris30dagersbillett = 1000,
+                                                    antallReisedagerPerUke = 5,
+                                                    vedtaksperioder =
+                                                        listOf(
+                                                            no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag(
+                                                                id = randomUUID(),
+                                                                fom = fom,
+                                                                tom = tom,
+                                                                aktivitet = aktivitet.type,
+                                                                målgruppe = målgruppe,
+                                                                antallReisedagerIVedtaksperioden = 20,
+                                                            ),
                                                         ),
-                                                    ),
-                                                antallReisedager = 20,
-                                            ),
-                                        beløp = beløp,
-                                        billettdetaljer =
-                                            mapOf(
-                                                Billettype.TRETTIDAGERSBILLETT to
+                                                    antallReisedager = 20,
+                                                ),
+                                            beløp = beløp,
+                                            billettdetaljer =
+                                                mapOf(
+                                                    Billettype.TRETTIDAGERSBILLETT to
                                                         beløp,
-                                            ),
+                                                ),
+                                        ),
                                     ),
-                                ),
+                            ),
                         ),
-                    )
-            )
+                ),
         )
 
     val vedtaksdata =
         InnvilgelseDagligReise(
             vedtaksperioder = listOf(vedtaksperiode),
             beregningsresultat = beregningsresultat,
-            begrunnelse = "test"
+            begrunnelse = "test",
         )
 
     val andel =

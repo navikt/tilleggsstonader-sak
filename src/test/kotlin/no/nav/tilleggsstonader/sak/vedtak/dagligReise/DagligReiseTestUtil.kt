@@ -36,46 +36,46 @@ object DagligReiseTestUtil {
         )
     val defaultBeregningsresultat =
         BeregningsresultatDagligReise(
-            offentligTransport = BeregningsresultatOffentligTransport(
-                reiser =
-                    listOf(
-                        BeregningsresultatForReise(
-                            perioder =
-                                listOf(
-                                    BeregningsresultatForPeriode(
-                                        grunnlag =
-                                            BeregningsgrunnlagOffentligTransport(
-                                                fom = defaultVedtaksperioder.first().fom,
-                                                tom = defaultVedtaksperioder.first().tom,
-                                                prisEnkeltbillett = 50,
-                                                prisSyvdagersbillett = 300,
-                                                pris30dagersbillett = 1000,
-                                                antallReisedagerPerUke = 5,
-                                                vedtaksperioder =
-                                                    listOf(
-                                                        no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag(
-                                                            id = randomUUID(),
-                                                            fom = defaultVedtaksperioder.first().fom,
-                                                            tom = defaultVedtaksperioder.first().tom,
-                                                            aktivitet = AktivitetType.TILTAK,
-                                                            målgruppe = MålgruppeType.AAP.faktiskMålgruppe(),
-                                                            antallReisedagerIVedtaksperioden = 20,
+            offentligTransport =
+                BeregningsresultatOffentligTransport(
+                    reiser =
+                        listOf(
+                            BeregningsresultatForReise(
+                                perioder =
+                                    listOf(
+                                        BeregningsresultatForPeriode(
+                                            grunnlag =
+                                                BeregningsgrunnlagOffentligTransport(
+                                                    fom = defaultVedtaksperioder.first().fom,
+                                                    tom = defaultVedtaksperioder.first().tom,
+                                                    prisEnkeltbillett = 50,
+                                                    prisSyvdagersbillett = 300,
+                                                    pris30dagersbillett = 1000,
+                                                    antallReisedagerPerUke = 5,
+                                                    vedtaksperioder =
+                                                        listOf(
+                                                            no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag(
+                                                                id = randomUUID(),
+                                                                fom = defaultVedtaksperioder.first().fom,
+                                                                tom = defaultVedtaksperioder.first().tom,
+                                                                aktivitet = AktivitetType.TILTAK,
+                                                                målgruppe = MålgruppeType.AAP.faktiskMålgruppe(),
+                                                                antallReisedagerIVedtaksperioden = 20,
+                                                            ),
                                                         ),
-                                                    ),
-                                                antallReisedager = 20,
-                                            ),
-                                        beløp = 1000,
-                                        billettdetaljer =
-                                            mapOf(
-                                                Billettype.TRETTIDAGERSBILLETT to
+                                                    antallReisedager = 20,
+                                                ),
+                                            beløp = 1000,
+                                            billettdetaljer =
+                                                mapOf(
+                                                    Billettype.TRETTIDAGERSBILLETT to
                                                         1000,
-                                            ),
+                                                ),
+                                        ),
                                     ),
-                                ),
+                            ),
                         ),
-                    )
-            )
-
+                ),
         )
     val defaultInnvilgelseDagligReise =
         InnvilgelseDagligReise(

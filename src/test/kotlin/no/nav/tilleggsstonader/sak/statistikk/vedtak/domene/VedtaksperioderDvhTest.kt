@@ -11,9 +11,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelse as innvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse as innvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil.innvilgelse as innvilgelseDagligReise
-
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse as innvilgelseLæremidler
 
 class VedtaksperioderDvhTest {
     val fom: LocalDate = LocalDate.of(2025, 1, 1)
@@ -73,6 +72,7 @@ class VedtaksperioderDvhTest {
 
         assertThat(resultat).isEqualTo(forventetResultat)
     }
+
     @Test
     fun `fraDomene kan mappe for InnvilgelseDagligReise`() {
         val resultat =

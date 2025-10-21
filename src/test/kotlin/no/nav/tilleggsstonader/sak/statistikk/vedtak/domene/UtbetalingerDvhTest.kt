@@ -90,7 +90,8 @@ class UtbetalingerDvhTest {
                 beløp = stønadsbeløp,
             )
 
-        val innvilgelseDagligReise = GeneriskVedtak(
+        val innvilgelseDagligReise =
+            GeneriskVedtak(
                 behandlingId = defaultBehandling.id,
                 type = TypeVedtak.INNVILGELSE,
                 data = vedtaksdata,
@@ -98,7 +99,6 @@ class UtbetalingerDvhTest {
                 tidligsteEndring = null,
                 opphørsdato = null,
             )
-
 
         val resultat = UtbetalingerDvh.fraDomene(listOf(andelTilkjentYtelse), innvilgelseDagligReise)
 
@@ -118,7 +118,6 @@ class UtbetalingerDvhTest {
 
         assertThat(resultat).isEqualTo(forventetResultat)
     }
-
 
     @Test
     fun `mappes riktig for boutgifter`() {
