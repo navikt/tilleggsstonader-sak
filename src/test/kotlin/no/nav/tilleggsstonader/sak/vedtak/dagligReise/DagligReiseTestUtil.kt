@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -30,8 +31,8 @@ object DagligReiseTestUtil {
     val defaultVedtaksperioder =
         listOf(
             vedtaksperiode(
-                fom = LocalDate.of(2024, 1, 1),
-                tom = LocalDate.of(2024, 1, 7),
+                fom = 1 januar 2024,
+                tom = 7 januar 2025,
             ),
         )
     val defaultBeregningsresultat =
@@ -173,8 +174,8 @@ object DagligReiseTestUtil {
 
     fun vedtaksperiode(
         id: UUID = UUID.randomUUID(),
-        fom: LocalDate = LocalDate.of(2025, 1, 1),
-        tom: LocalDate = LocalDate.of(2025, 1, 31),
+        fom: LocalDate = 1 januar 2025,
+        tom: LocalDate = 31 januar 2025,
         målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
     ) = Vedtaksperiode(
@@ -187,8 +188,8 @@ object DagligReiseTestUtil {
 
     fun vedtaksperiodeDto(
         id: UUID = UUID.randomUUID(),
-        fom: LocalDate = LocalDate.of(2025, 1, 1),
-        tom: LocalDate = LocalDate.of(2025, 1, 31),
+        fom: LocalDate = 1 januar 2025,
+        tom: LocalDate = 31 januar 2025,
         målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
     ) = VedtaksperiodeDto(
