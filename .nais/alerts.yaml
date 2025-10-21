@@ -17,11 +17,12 @@ spec:
           labels:
             namespace: tilleggsstonader
             severity: critical
-        - alert: Iverksettinger uten status
-          expr: andel_tilkjent_ytelse_iverksetting_status{status="IKKE_MOTTATT_STATUS_FRA_HELVED"} > 0
+        - alert: Iverksettinger uten OK-status
+          expr: andel_tilkjent_ytelse_iverksetting_status{status="IKKE_MOTTATT_OK_STATUS"} > 0
           annotations:
-            consequence: Iverksettinger uten mottatt status fra hel-ved
-            action: "Sjekk logger for å finne iverksetting-id ikke har mottatt status og kontakt hel-ved"
+            consequence: Iverksettinger uten mottatt OK-status fra hel-ved
+            action: "Sjekk logger for å finne iverksetting-id ikke har mottatt OK-status og kontakt hel-ved"
+
           labels:
             namespace: tilleggsstonader
             severity: critical

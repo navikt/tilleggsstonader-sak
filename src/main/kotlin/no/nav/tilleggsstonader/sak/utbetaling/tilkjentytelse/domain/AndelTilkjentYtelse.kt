@@ -199,6 +199,8 @@ enum class StatusIverksetting {
     UAKTUELL,
     VENTER_PÅ_SATS_ENDRING,
     FEILET,
+    HOS_OPPDRAG,
+    MOTTATT,
     ;
 
     fun erOk() = this == OK || this == OK_UTEN_UTBETALING

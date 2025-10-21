@@ -5,11 +5,14 @@ import io.micrometer.core.instrument.MultiGauge
 import io.micrometer.core.instrument.Tags
 import no.nav.tilleggsstonader.sak.metrics.MetricUtil
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelseRepository
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.Scheduled
+import java.time.DayOfWeek
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
@@ -36,6 +39,8 @@ class AndelTilkjentYtelseIverksettingStatusGauge(
                 listOf(
                     StatusIverksetting.SENDT,
                     StatusIverksetting.FEILET,
+                    StatusIverksetting.HOS_OPPDRAG,
+                    StatusIverksetting.MOTTATT,
                 ),
             )
 
@@ -49,27 +54,62 @@ class AndelTilkjentYtelseIverksettingStatusGauge(
             logger.warn("Feilede iverksettinger: {}", feiledeIverksettinger)
         }
 
-        val iverksettingerSendtForEnTimeSiden =
+        val iverksettingerUtenOKStatus =
             sendteOgFeiledeAndeler
-                .filter { it.statusIverksetting == StatusIverksetting.SENDT }
-                .mapNotNull { it.iverksetting }
-                .filter { it.iverksettingTidspunkt.isBefore(LocalDateTime.now().minus(Duration.ofHours(1))) }
-                .map { it.iverksettingId }
-                .distinct()
+                .filter { it.statusIverksetting != StatusIverksetting.FEILET }
+                .map {
+                    StatusMedIverksetting(
+                        status = it.statusIverksetting,
+                        iverksetting = it.iverksetting!!, // alle som ikke har status UBEHANDLET har iverksetting
+                    )
+                }.distinct()
+                .filter { skalVarsles(it) }
+                .map { it.iverksetting }
 
-        if (iverksettingerSendtForEnTimeSiden.isNotEmpty()) {
+        if (iverksettingerUtenOKStatus.isNotEmpty()) {
             logger.warn(
-                "Iverksettinger sendt for over en time siden uten oppdatert status: {}",
-                iverksettingerSendtForEnTimeSiden,
+                "Iverksettinger uten OK-status: {}",
+                iverksettingerUtenOKStatus,
             )
         }
 
         andelerSomHarIverksettingMedUgyldigStatusMultiGauge.register(
             listOf(
                 MultiGauge.Row.of(Tags.of("status", "FEILET"), feiledeIverksettinger.size),
-                MultiGauge.Row.of(Tags.of("status", "IKKE_MOTTATT_STATUS_FRA_HELVED"), iverksettingerSendtForEnTimeSiden.size),
+                MultiGauge.Row.of(Tags.of("status", "IKKE_MOTTATT_OK_STATUS"), iverksettingerUtenOKStatus.size),
             ),
             true,
         )
     }
+
+    private fun skalVarsles(statusMedIverksetting: StatusMedIverksetting): Boolean {
+        // Ved helg vil oppdrag ikke sende status, derfor venter vi til mandag
+        return if (statusMedIverksetting.status == StatusIverksetting.HOS_OPPDRAG && oppdragErHelgestengt()) {
+            false
+        } else {
+            statusMedIverksetting.iverksetting.iverksettingTidspunkt.isBefore(LocalDateTime.now().minus(Duration.ofHours(1)))
+        }
+    }
+
+    /**
+     * Hvis oppdrag er stengt og vi har iverksatt så vil status henge på HOS_OPPDRAG til oppdrag åpner igjen.
+     * Forsøker å unngå unødvendig med varsler i helger.
+     *
+     * Oppdrag i utgangspunkt åpent 6-21 hverdager.
+     * Oppdrag vil også være stengt ved helligdager, tar ikke høyde for dette
+     *
+     */
+    private fun oppdragErHelgestengt() = erHelg() || erMandagFørKl06()
+
+    private fun erMandagFørKl06(): Boolean {
+        val now = LocalDateTime.now()
+        return now.dayOfWeek == DayOfWeek.MONDAY && now.hour < 6
+    }
+
+    private fun erHelg(): Boolean = LocalDate.now().dayOfWeek !in DayOfWeek.SATURDAY..DayOfWeek.SUNDAY
+
+    private data class StatusMedIverksetting(
+        val status: StatusIverksetting,
+        val iverksetting: Iverksetting,
+    )
 }
