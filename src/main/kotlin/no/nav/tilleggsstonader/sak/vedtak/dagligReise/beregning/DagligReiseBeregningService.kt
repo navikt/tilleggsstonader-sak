@@ -6,11 +6,12 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
 
 @Service
@@ -31,10 +32,10 @@ class DagligReiseBeregningService(
             typeVedtak = typeVedtak,
         )
 
-        val oppfylteVilkår = vilkårService.hentOppfylteDagligReiseVilkår(behandlingId)
-        validerUtgifter(oppfylteVilkår)
+        val oppfylteVilkår = vilkårService.hentOppfylteDagligReiseVilkår(behandlingId).map { it.mapTilVilkårDagligReise() }
+        validerFinnesReiser(oppfylteVilkår)
 
-        val oppfylteVilkårGruppertPåType = oppfylteVilkår.groupBy { it.type }
+        val oppfylteVilkårGruppertPåType = oppfylteVilkår.filter { it.fakta != null }.groupBy { it.fakta!!.type }
 
         return BeregningsresultatDagligReise(
             offentligTransport = beregnOffentligTransport(oppfylteVilkårGruppertPåType, vedtaksperioder),
@@ -42,10 +43,10 @@ class DagligReiseBeregningService(
     }
 
     private fun beregnOffentligTransport(
-        vilkår: Map<VilkårType, List<Vilkår>>,
+        vilkår: Map<TypeDagligReise, List<VilkårDagligReise>>,
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatOffentligTransport? {
-        val vilkårOffentligTransport = vilkår[VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT] ?: return null
+        val vilkårOffentligTransport = vilkår[TypeDagligReise.OFFENTLIG_TRANSPORT] ?: return null
 
         return offentligTransportBeregningService.beregn(
             vedtaksperioder = vedtaksperioder,
@@ -53,7 +54,7 @@ class DagligReiseBeregningService(
         )
     }
 
-    private fun validerUtgifter(vilkår: List<Vilkår>) {
+    private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {
         brukerfeilHvis(vilkår.isEmpty()) {
             "Innvilgelse er ikke et gyldig vedtaksresultat når det ikke er lagt inn perioder med reise"
         }

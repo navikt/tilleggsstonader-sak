@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
+import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileJsonIsEqual
 import no.nav.tilleggsstonader.sak.util.FileUtil.listFiles
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
@@ -18,7 +19,7 @@ internal class VilkårsregelTest {
     internal fun `sjekker at output fortsatt er det samme på json`() {
         val vilkårsregler = Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler.map { it.value }
         vilkårsregler.forEach {
-            assertFileIsEqual("vilkår/regler/${it.vilkårType}.json", it)
+            assertFileJsonIsEqual("vilkår/regler/${it.vilkårType}.json", it)
         }
     }
 

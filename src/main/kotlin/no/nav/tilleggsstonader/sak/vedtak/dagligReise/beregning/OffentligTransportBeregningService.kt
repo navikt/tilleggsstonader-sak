@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
@@ -7,28 +8,19 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatO
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
 
 @Service
 class OffentligTransportBeregningService {
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
-        oppfylteVilkår: List<Vilkår>,
+        oppfylteVilkår: List<VilkårDagligReise>,
     ): BeregningsresultatOffentligTransport {
         val utgifter =
             oppfylteVilkår
-                .filter { it.offentligTransport != null }
-                .map { vilkår ->
-                    UtgiftOffentligTransport(
-                        fom = vilkår.fom!!,
-                        tom = vilkår.tom!!,
-                        antallReisedagerPerUke = vilkår.offentligTransport?.reisedagerPerUke!!,
-                        prisEnkelbillett = vilkår.offentligTransport.prisEnkelbillett,
-                        prisSyvdagersbillett = vilkår.offentligTransport.prisSyvdagersbillett,
-                        pris30dagersbillett = vilkår.offentligTransport.prisTrettidagersbillett,
-                    )
-                }
+                .map { it.tilUtgiftOffentligTransport() }
 
         return BeregningsresultatOffentligTransport(
             reiser =
@@ -92,6 +84,21 @@ class OffentligTransportBeregningService {
             grunnlag = grunnlag,
             beløp = finnBilligsteAlternativForTrettidagersPeriode(grunnlag).billigsteBelop,
             billettdetaljer = finnBilligsteAlternativForTrettidagersPeriode(grunnlag).billettyper,
+        )
+    }
+
+    private fun VilkårDagligReise.tilUtgiftOffentligTransport(): UtgiftOffentligTransport {
+        feilHvis(this.fakta !is FaktaOffentligTransport) {
+            "Forventer kun å få inn vilkår med fakta som er av type offentlig transport ved beregning av offentlig transport"
+        }
+
+        return UtgiftOffentligTransport(
+            fom = this.fom,
+            tom = this.tom,
+            antallReisedagerPerUke = this.fakta.reisedagerPerUke,
+            prisEnkelbillett = this.fakta.prisEnkelbillett,
+            prisSyvdagersbillett = this.fakta.prisSyvdagersbillett,
+            pris30dagersbillett = this.fakta.prisTrettidagersbillett,
         )
     }
 }

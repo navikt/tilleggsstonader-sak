@@ -16,11 +16,9 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OffentligTransportDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteDelvilkårDagligReiseOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteSvarOffentligtransport
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
@@ -67,21 +65,13 @@ fun dummyBehandling(
         type = BehandlingType.FØRSTEGANGSBEHANDLING,
     )
 
-fun mapTilVilkår(
-    rad: Map<String, String>,
-    behandlingId: BehandlingId,
-): OpprettVilkårDto =
-    OpprettVilkårDto(
-        vilkårType = VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
-        barnId = null,
-        behandlingId = behandlingId,
-        delvilkårsett = oppfylteDelvilkårDagligReiseOffentligTransport().map { it.tilDto() },
+fun mapTilVilkårDagligReise(rad: Map<String, String>): LagreDagligReise =
+    LagreDagligReise(
         fom = parseDato(DomenenøkkelFelles.FOM, rad),
         tom = parseDato(DomenenøkkelFelles.TOM, rad),
-        utgift = null,
-        erFremtidigUtgift = false,
-        offentligTransport =
-            OffentligTransportDto(
+        svar = oppfylteSvarOffentligtransport,
+        fakta =
+            FaktaOffentligTransport(
                 reisedagerPerUke =
                     parseInt(
                         DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE,
@@ -89,11 +79,7 @@ fun mapTilVilkår(
                     ),
                 prisEnkelbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_ENKELTBILLETT, rad),
                 prisSyvdagersbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_SYV_DAGERS_BILLETT, rad),
-                prisTrettidagersbillett =
-                    parseValgfriInt(
-                        DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT,
-                        rad,
-                    ),
+                prisTrettidagersbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT, rad),
             ),
     )
 

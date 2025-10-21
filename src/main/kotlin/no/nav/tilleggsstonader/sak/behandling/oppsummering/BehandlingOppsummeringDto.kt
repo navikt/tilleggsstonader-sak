@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -63,6 +64,7 @@ data class OppsummertVilkår(
     val tom: LocalDate?,
     val resultat: Vilkårsresultat,
     val utgift: Int?,
+    val typeFakta: TypeVilkårFakta?,
 )
 
 fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
@@ -72,4 +74,5 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
         tom = this.tom,
         resultat = this.resultat,
         utgift = this.utgift,
+        typeFakta = this.fakta?.typeVilkårFakta,
     )
