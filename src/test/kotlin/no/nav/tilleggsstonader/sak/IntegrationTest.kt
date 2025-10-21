@@ -156,7 +156,6 @@ abstract class IntegrationTest {
             Simuleringsresultat::class,
             TilkjentYtelse::class,
             Vilkårperiode::class,
-            VilkårFakta::class,
             Vilkår::class,
             BehandlingBarn::class,
             SøknadBehandling::class,
