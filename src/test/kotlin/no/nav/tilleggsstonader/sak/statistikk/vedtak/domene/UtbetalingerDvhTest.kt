@@ -77,6 +77,50 @@ class UtbetalingerDvhTest {
     }
 
     @Test
+    fun `mappes riktig for daglig reise`() {
+        val førsteJanuar = LocalDate.of(2025, JANUARY, 1)
+        val sisteJanuar = LocalDate.of(2025, JANUARY, 31)
+
+        val stønadsbeløp = 3840
+
+        val (vedtaksdata, andelTilkjentYtelse) =
+            lagDagligReiseInnvilgelseMedBeløp(
+                fom = førsteJanuar,
+                tom = sisteJanuar,
+                beløp = stønadsbeløp,
+            )
+
+        val innvilgelseDagligReise = GeneriskVedtak(
+                behandlingId = defaultBehandling.id,
+                type = TypeVedtak.INNVILGELSE,
+                data = vedtaksdata,
+                gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = null,
+                opphørsdato = null,
+            )
+
+
+        val resultat = UtbetalingerDvh.fraDomene(listOf(andelTilkjentYtelse), innvilgelseDagligReise)
+
+        val forventetResultat =
+            UtbetalingerDvh.JsonWrapper(
+                utbetalinger =
+                    listOf(
+                        UtbetalingerDvh(
+                            fraOgMed = førsteJanuar,
+                            tilOgMed = sisteJanuar,
+                            type = AndelstypeDvh.DAGLIG_REISE_AAP,
+                            beløp = stønadsbeløp,
+                            beløpErBegrensetAvMakssats = null,
+                        ),
+                    ),
+            )
+
+        assertThat(resultat).isEqualTo(forventetResultat)
+    }
+
+
+    @Test
     fun `mappes riktig for boutgifter`() {
         val førsteJanuar = LocalDate.of(2025, JANUARY, 1)
         val makssats = 4953
