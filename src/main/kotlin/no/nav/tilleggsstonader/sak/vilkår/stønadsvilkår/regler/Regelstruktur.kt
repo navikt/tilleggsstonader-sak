@@ -24,5 +24,5 @@ data class SvarAlternativ(
     val svarId: SvarId,
     val nesteRegelId: RegelId? = null,
     val begrunnelseType: BegrunnelseType,
-    val triggerFakta: TypeVilkårFakta? = null,
+    val tilhørendeFaktaType: TypeVilkårFakta? = null,
 )

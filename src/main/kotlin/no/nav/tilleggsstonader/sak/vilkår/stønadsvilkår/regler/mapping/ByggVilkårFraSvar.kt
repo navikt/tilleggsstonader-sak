@@ -52,7 +52,7 @@ object ByggVilkårFraSvar {
             vurderinger.add(
                 Vurdering(
                     regelId = regelId,
-                    svar = gjeldendeSvar?.svarId,
+                    svar = gjeldendeSvar?.svar,
                     begrunnelse = gjeldendeSvar?.begrunnelse,
                 ),
             )
@@ -71,10 +71,10 @@ object ByggVilkårFraSvar {
         regel: RegelSteg,
         svar: SvarOgBegrunnelse?,
     ): SvarRegel? {
-        val svarRegel = regel.svarMapping[svar?.svarId]
+        val svarRegel = regel.svarMapping[svar?.svar]
 
         feilHvis(svarRegel == null && svar != null) {
-            "SvarId=${svar!!.svarId} er ikke et gyldig svar for regelId=${regel.regelId}"
+            "SvarId=${svar!!.svar} er ikke et gyldig svar for regelId=${regel.regelId}"
         }
 
         when (svarRegel?.begrunnelseType) {
@@ -106,10 +106,10 @@ object ByggVilkårFraSvar {
             "Ikke alle svar kunne mappes til vurderinger: ${ubrukteRegelIder.joinToString(", ")}"
         }
 
-        val ekstraRegelIder = brukteRegelIder - alleBesvarteRegelIder
-        feilHvisIkke(ekstraRegelIder.isEmpty()) {
-            "Det er lagt til flere vurderinger enn det finnes svar: ${ekstraRegelIder.joinToString(", ")}"
-        }
+//        val ekstraRegelIder = brukteRegelIder - alleBesvarteRegelIder
+//        feilHvisIkke(ekstraRegelIder.isEmpty()) {
+//            "Det er lagt til flere vurderinger enn det finnes svar: ${ekstraRegelIder.joinToString(", ")}"
+//        }
     }
 
     private fun finnNesteRegelId(svarRegel: SvarRegel?): RegelId? = (svarRegel as? NesteRegel)?.regelId

@@ -1,62 +1,74 @@
 {
-  "DOKUMENTERT_DELTAKELSE" : {
-    "erHovedregel" : true,
-    "reglerSomMåNullstilles" : [ ],
-    "svaralternativer" : [ {
-      "svarId" : "JA",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "VALGFRI",
-      "triggerFakta" : null
-    }, {
-      "svarId" : "NEI",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "PÅKREVD",
-      "triggerFakta" : null
-    } ]
+  "DOKUMENTERT_DELTAKELSE": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "VALGFRI",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      }
+    ]
   },
-  "DOKUMENTERT_UTGIFTER_OVERNATTING" : {
-    "erHovedregel" : true,
-    "reglerSomMåNullstilles" : [ ],
-    "svaralternativer" : [ {
-      "svarId" : "JA",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "VALGFRI",
-      "triggerFakta" : null
-    }, {
-      "svarId" : "NEI",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "PÅKREVD",
-      "triggerFakta" : null
-    } ]
+  "DOKUMENTERT_UTGIFTER_OVERNATTING": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "VALGFRI",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      }
+    ]
   },
-  "NØDVENDIGE_MERUTGIFTER" : {
-    "erHovedregel" : true,
-    "reglerSomMåNullstilles" : [ ],
-    "svaralternativer" : [ {
-      "svarId" : "JA",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "PÅKREVD",
-      "triggerFakta" : null
-    }, {
-      "svarId" : "NEI",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "PÅKREVD",
-      "triggerFakta" : null
-    } ]
+  "NØDVENDIGE_MERUTGIFTER": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      }
+    ]
   },
-  "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER" : {
-    "erHovedregel" : true,
-    "reglerSomMåNullstilles" : [ ],
-    "svaralternativer" : [ {
-      "svarId" : "JA",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "PÅKREVD",
-      "triggerFakta" : null
-    }, {
-      "svarId" : "NEI",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "VALGFRI",
-      "triggerFakta" : null
-    } ]
+  "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "VALGFRI",
+        "tilhørendeFaktaType": null
+      }
+    ]
   }
 }

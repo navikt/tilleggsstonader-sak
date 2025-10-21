@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.opprettVilk�
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SvarOgBegrunnelseDto
@@ -29,8 +28,8 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
 
     val svarOffentligTransport =
         mapOf(
-            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svarId = SvarId.JA),
-            RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svarId = SvarId.JA),
+            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
         )
 
     @BeforeEach
@@ -74,8 +73,8 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
     fun `skal kunne lagre ned et vilkår uten fakta om vilkår ikke er oppfylt`() {
         val svarAvstandIkkeOppfylt =
             mapOf(
-                RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svarId = SvarId.NEI),
-                RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelseDto(svarId = SvarId.NEI, "Begrunnelse"),
+                RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.NEI),
+                RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.NEI, "Begrunnelse"),
             )
 
         val nyttVilkår =
@@ -96,7 +95,7 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
     fun `skal hente alle regler som tilhører daglig reise`() {
         val resultat = hentReglerDagligReise()
 
-        FileUtil.assertFileIsEqual("vilkår/regelstruktur/DAGLIG_REISE_OFFENTLIG_TRANSPORT.json", resultat)
+        FileUtil.assertFileJsonIsEqual("vilkår/regelstruktur/DAGLIG_REISE_OFFENTLIG_TRANSPORT.json", resultat)
     }
 
     private fun faktaOffentligTransport(

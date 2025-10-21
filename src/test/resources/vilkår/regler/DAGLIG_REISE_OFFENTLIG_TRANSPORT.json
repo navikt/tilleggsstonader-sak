@@ -1,63 +1,63 @@
 {
-  "vilkårType" : "DAGLIG_REISE_OFFENTLIG_TRANSPORT",
-  "regler" : {
-    "AVSTAND_OVER_SEKS_KM" : {
-      "regelId" : "AVSTAND_OVER_SEKS_KM",
-      "erHovedregel" : true,
-      "svarMapping" : {
-        "JA" : {
-          "regelId" : "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
-          "begrunnelseType" : "UTEN"
+  "vilkårType": "DAGLIG_REISE_OFFENTLIG_TRANSPORT",
+  "regler": {
+    "AVSTAND_OVER_SEKS_KM": {
+      "regelId": "AVSTAND_OVER_SEKS_KM",
+      "erHovedregel": true,
+      "svarMapping": {
+        "JA": {
+          "regelId": "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
+          "begrunnelseType": "UTEN"
         },
-        "NEI" : {
-          "regelId" : "UNNTAK_SEKS_KM",
-          "begrunnelseType" : "UTEN"
+        "NEI": {
+          "regelId": "UNNTAK_SEKS_KM",
+          "begrunnelseType": "UTEN"
         }
       }
     },
-    "UNNTAK_SEKS_KM" : {
-      "regelId" : "UNNTAK_SEKS_KM",
-      "erHovedregel" : false,
-      "svarMapping" : {
-        "JA" : {
-          "regelId" : "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
-          "begrunnelseType" : "UTEN"
+    "UNNTAK_SEKS_KM": {
+      "regelId": "UNNTAK_SEKS_KM",
+      "erHovedregel": false,
+      "svarMapping": {
+        "JA": {
+          "regelId": "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
+          "begrunnelseType": "UTEN"
         },
-        "NEI" : {
-          "begrunnelseType" : "PÅKREVD",
-          "triggerFakta" : null,
-          "regelId" : "SLUTT_NODE"
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
         }
       }
     },
-    "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT" : {
-      "regelId" : "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
-      "erHovedregel" : false,
-      "svarMapping" : {
-        "JA" : {
-          "begrunnelseType" : "VALGFRI",
-          "triggerFakta" : "DAGLIG_REISE_OFFENTLIG_TRANSPORT",
-          "regelId" : "SLUTT_NODE"
+    "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT": {
+      "regelId": "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
+      "erHovedregel": false,
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "tilhørendeFaktaType": "DAGLIG_REISE_OFFENTLIG_TRANSPORT",
+          "regelId": "SLUTT_NODE"
         },
-        "NEI" : {
-          "regelId" : "KAN_BRUKER_KJØRE_SELV",
-          "begrunnelseType" : "UTEN"
+        "NEI": {
+          "regelId": "KAN_BRUKER_KJØRE_SELV",
+          "begrunnelseType": "UTEN"
         }
       }
     },
-    "KAN_BRUKER_KJØRE_SELV" : {
-      "regelId" : "KAN_BRUKER_KJØRE_SELV",
-      "erHovedregel" : false,
-      "svarMapping" : {
-        "JA" : {
-          "begrunnelseType" : "VALGFRI",
-          "triggerFakta" : "DAGLIG_REISE_PRIVAT_BIL",
-          "regelId" : "SLUTT_NODE"
+    "KAN_BRUKER_KJØRE_SELV": {
+      "regelId": "KAN_BRUKER_KJØRE_SELV",
+      "erHovedregel": false,
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "tilhørendeFaktaType": "DAGLIG_REISE_PRIVAT_BIL",
+          "regelId": "SLUTT_NODE"
         },
-        "NEI" : {
-          "begrunnelseType" : "VALGFRI",
-          "triggerFakta" : null,
-          "regelId" : "SLUTT_NODE"
+        "NEI": {
+          "begrunnelseType": "VALGFRI",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
         }
       }
     }

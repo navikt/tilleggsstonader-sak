@@ -37,7 +37,7 @@ class DagligReiseOffentiligTransportRegel :
                             SluttSvarRegel(
                                 resultat = Resultat.OPPFYLT,
                                 begrunnelseType = BegrunnelseType.VALGFRI,
-                                triggerFakta = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL,
+                                tilhørendeFaktaType = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL,
                             ),
                         SvarId.NEI to OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
                     ),
@@ -53,7 +53,7 @@ class DagligReiseOffentiligTransportRegel :
                             SluttSvarRegel(
                                 resultat = Resultat.OPPFYLT,
                                 begrunnelseType = BegrunnelseType.VALGFRI,
-                                triggerFakta = TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
+                                tilhørendeFaktaType = TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
                             ),
                         hvisNei = NesteRegel(KAN_BRUKER_KJØRE_SELV.regelId),
                     ),

@@ -12,6 +12,6 @@ data class LagreDagligReise(
 )
 
 data class SvarOgBegrunnelse(
-    val svarId: SvarId,
+    val svar: SvarId,
     val begrunnelse: String? = null,
 )

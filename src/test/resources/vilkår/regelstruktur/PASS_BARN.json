@@ -1,67 +1,82 @@
 {
-  "UTGIFTER_DOKUMENTERT" : {
-    "erHovedregel" : true,
-    "reglerSomMåNullstilles" : [ ],
-    "svaralternativer" : [ {
-      "svarId" : "JA",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "VALGFRI",
-      "triggerFakta" : null
-    }, {
-      "svarId" : "NEI",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "PÅKREVD",
-      "triggerFakta" : null
-    } ]
+  "UTGIFTER_DOKUMENTERT": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "VALGFRI",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      }
+    ]
   },
-  "ANNEN_FORELDER_MOTTAR_STØTTE" : {
-    "erHovedregel" : true,
-    "reglerSomMåNullstilles" : [ ],
-    "svaralternativer" : [ {
-      "svarId" : "JA",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "PÅKREVD",
-      "triggerFakta" : null
-    }, {
-      "svarId" : "NEI",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "VALGFRI",
-      "triggerFakta" : null
-    } ]
+  "ANNEN_FORELDER_MOTTAR_STØTTE": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "VALGFRI",
+        "tilhørendeFaktaType": null
+      }
+    ]
   },
-  "HAR_FULLFØRT_FJERDEKLASSE" : {
-    "erHovedregel" : true,
-    "reglerSomMåNullstilles" : [ "UNNTAK_ALDER" ],
-    "svaralternativer" : [ {
-      "svarId" : "JA",
-      "nesteRegelId" : "UNNTAK_ALDER",
-      "begrunnelseType" : "UTEN",
-      "triggerFakta" : null
-    }, {
-      "svarId" : "NEI",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "VALGFRI",
-      "triggerFakta" : null
-    } ]
+  "HAR_FULLFØRT_FJERDEKLASSE": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [
+      "UNNTAK_ALDER"
+    ],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": "UNNTAK_ALDER",
+        "begrunnelseType": "UTEN",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "VALGFRI",
+        "tilhørendeFaktaType": null
+      }
+    ]
   },
-  "UNNTAK_ALDER" : {
-    "erHovedregel" : false,
-    "reglerSomMåNullstilles" : [ ],
-    "svaralternativer" : [ {
-      "svarId" : "TRENGER_MER_TILSYN_ENN_JEVNALDRENDE",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "VALGFRI",
-      "triggerFakta" : null
-    }, {
-      "svarId" : "FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "VALGFRI",
-      "triggerFakta" : null
-    }, {
-      "svarId" : "NEI",
-      "nesteRegelId" : null,
-      "begrunnelseType" : "PÅKREVD",
-      "triggerFakta" : null
-    } ]
+  "UNNTAK_ALDER": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [],
+    "svaralternativer": [
+      {
+        "svarId": "TRENGER_MER_TILSYN_ENN_JEVNALDRENDE",
+        "nesteRegelId": null,
+        "begrunnelseType": "VALGFRI",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID",
+        "nesteRegelId": null,
+        "begrunnelseType": "VALGFRI",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      }
+    ]
   }
 }
