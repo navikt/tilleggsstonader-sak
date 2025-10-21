@@ -78,8 +78,8 @@ class UtbetalingerDvhTest {
 
     @Test
     fun `mappes riktig for daglig reise`() {
-        val førsteJanuar = LocalDate.of(2025, JANUARY, 1)
-        val sisteJanuar = LocalDate.of(2025, JANUARY, 31)
+        val førsteJanuar = 1 januar 2025
+        val sisteJanuar = 31 januar 2025
 
         val stønadsbeløp = 3840
 
