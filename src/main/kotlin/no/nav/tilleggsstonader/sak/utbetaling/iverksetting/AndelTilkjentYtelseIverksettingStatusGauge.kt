@@ -67,7 +67,7 @@ class AndelTilkjentYtelseIverksettingStatusGauge(
         andelerSomHarIverksettingMedUgyldigStatusMultiGauge.register(
             listOf(
                 MultiGauge.Row.of(Tags.of("status", "FEILET"), feiledeIverksettinger.size),
-                MultiGauge.Row.of(Tags.of("status", "IKKE_OPPDATERT_STATUS_ETTER_SENDT"), iverksettingerSendtForEnTimeSiden.size),
+                MultiGauge.Row.of(Tags.of("status", "IKKE_MOTTATT_STATUS_FRA_HELVED"), iverksettingerSendtForEnTimeSiden.size),
             ),
             true,
         )
