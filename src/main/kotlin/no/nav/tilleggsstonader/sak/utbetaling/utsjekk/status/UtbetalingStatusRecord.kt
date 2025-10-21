@@ -22,8 +22,8 @@ data class UtbetalingLinje(
 )
 
 enum class UtbetalingStatus {
-    OK,
-    FEILET,
-    MOTTATT,
-    HOS_OPPDRAG,
+    MOTTATT, // sendes når Helved har lest meldingen vår. Vil denne sendes så fort at vi ikke rekker å comitte til databasen?
+    FEILET, // sendes ved valideringfeil hos Helved eller hvis noe feiler mot Oppdrag
+    HOS_OPPDRAG, // sendes når oppdrag har mottatt utbetalingen. Kan ligge i denne statusen en stund hvis Oppdrag er stengt.
+    OK, // kvittert ut hos Oppdrag
 }

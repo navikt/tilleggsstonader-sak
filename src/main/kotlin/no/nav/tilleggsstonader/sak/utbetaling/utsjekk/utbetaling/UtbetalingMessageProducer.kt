@@ -11,8 +11,10 @@ class UtbetalingMessageProducer(
     private val kafkaTemplate: KafkaTemplate<String, String>,
     @Value($$"${topics.utbetaling}") private val topic: String,
 ) {
+    // Utbetalinger som skal "slås sammen" sendes på samme kafka-key
     fun sendUtbetaling(utbetaling: UtbetalingRecord) {
         kafkaTemplate
+            // Bygge nøkkel til iverksettingId? Det vi sender som nøkkel her matcher nøkkelen på status.v1
             .send(topic, utbetaling.behandlingId, ObjectMapperProvider.objectMapper.writeValueAsString(utbetaling))
             .whenComplete { result, ex ->
                 if (ex == null) {
