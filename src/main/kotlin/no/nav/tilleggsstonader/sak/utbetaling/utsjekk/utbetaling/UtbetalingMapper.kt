@@ -29,6 +29,7 @@ object UtbetalingMapper {
             vedtakstidspunkt = behandling.vedtakstidspunkt ?: error("Mangler vedtakstidspunkt behandling=${behandling.id}"),
             periodetype = PeriodetypeUtbetaling.EN_GANG,
             perioder = mapPerioder(andelerTilkjentYtelse),
+            stønad = mapTilStønadUtbetaling(andelerTilkjentYtelse.first()), // TODO - må lage record per andeltype behandlingen har
         )
 
     private fun mapPerioder(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>): List<PerioderUtbetaling> =
@@ -39,7 +40,6 @@ object UtbetalingMapper {
                     fom = it.fom,
                     tom = it.tom,
                     beløp = it.beløp.toUInt(),
-                    stønad = mapTilStønadUtbetaling(it),
                 )
             }
 

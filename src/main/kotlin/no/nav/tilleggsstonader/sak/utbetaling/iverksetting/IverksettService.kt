@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.utbetaling.id.UtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelseRepository
@@ -35,6 +36,7 @@ class IverksettService(
     private val andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository,
     private val taskService: TaskService,
     private val utbetalingMessageProducer: UtbetalingMessageProducer,
+    private val utbetalingIdService: UtbetalingIdService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -145,15 +147,22 @@ class IverksettService(
         tilkjentYtelse: TilkjentYtelse,
     ) {
         if (utbetalingSkalSendesPåKafka(behandling.stønadstype)) {
-            val record =
-                UtbetalingMapper.lagUtbetalingRecord(
-                    id = iverksettingId,
-                    andelerTilkjentYtelse = andelerTilkjentYtelse,
-                    totrinnskontroll = totrinnskontroll,
-                    behandling = behandling,
-                    forrigeUtbetaling = finnForrigeIverksetting(behandling, tilkjentYtelse),
-                )
-            utbetalingMessageProducer.sendUtbetaling(record)
+            // En utbetaling er knyttet til en type andel (klassekode hos økonomi)
+            val records =
+                andelerTilkjentYtelse
+                    .groupBy { it.type }
+                    .map { (type, andelerTilkjentYtelseGruppertPåType) ->
+                        val utbetalingId = utbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
+                        UtbetalingMapper.lagUtbetalingRecord(
+                            id = utbetalingId.id,
+                            andelerTilkjentYtelse = andelerTilkjentYtelseGruppertPåType,
+                            totrinnskontroll = totrinnskontroll,
+                            behandling = behandling,
+                            forrigeUtbetaling = finnForrigeIverksetting(behandling, tilkjentYtelse),
+                        )
+                    }
+
+            utbetalingMessageProducer.sendUtbetalinger(iverksettingId, records)
         } else {
             val dto =
                 IverksettDtoMapper.map(
