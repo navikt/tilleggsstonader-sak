@@ -1,0 +1,83 @@
+{
+  "AVSTAND_OVER_SEKS_KM": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [
+      "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
+      "KAN_BRUKER_KJØRE_SELV",
+      "UNNTAK_SEKS_KM"
+    ],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
+        "begrunnelseType": "UTEN",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": "UNNTAK_SEKS_KM",
+        "begrunnelseType": "UTEN",
+        "tilhørendeFaktaType": null
+      }
+    ]
+  },
+  "UNNTAK_SEKS_KM": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [
+      "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
+      "KAN_BRUKER_KJØRE_SELV"
+    ],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT",
+        "begrunnelseType": "UTEN",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      }
+    ]
+  },
+  "KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [
+      "KAN_BRUKER_KJØRE_SELV"
+    ],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "VALGFRI",
+        "tilhørendeFaktaType": "DAGLIG_REISE_OFFENTLIG_TRANSPORT"
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": "KAN_BRUKER_KJØRE_SELV",
+        "begrunnelseType": "UTEN",
+        "tilhørendeFaktaType": null
+      }
+    ]
+  },
+  "KAN_BRUKER_KJØRE_SELV": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "VALGFRI",
+        "tilhørendeFaktaType": "DAGLIG_REISE_PRIVAT_BIL"
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "VALGFRI",
+        "tilhørendeFaktaType": null
+      }
+    ]
+  }
+}

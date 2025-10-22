@@ -1,0 +1,118 @@
+package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping
+
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.SvarOgBegrunnelse
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.BegrunnelseType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.NesteRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelSteg
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
+import kotlin.collections.get
+
+object ByggVilkårFraSvar {
+    fun byggDelvilkårsettFraSvarOgVilkårsregel(
+        vilkårsregel: Vilkårsregel,
+        svar: Map<RegelId, SvarOgBegrunnelse?>,
+    ): List<Delvilkår> {
+        val delvilkår =
+            vilkårsregel.hovedregler.map {
+                byggDelvilkårFraSvar(
+                    vilkårsregel = vilkårsregel,
+                    hovedregelId = it,
+                    svar = svar,
+                )
+            }
+
+        validerSvarOgVurderingerLike(svar, delvilkår)
+
+        return delvilkår
+    }
+
+    private fun byggDelvilkårFraSvar(
+        vilkårsregel: Vilkårsregel,
+        hovedregelId: RegelId,
+        svar: Map<RegelId, SvarOgBegrunnelse?>,
+    ): Delvilkår {
+        val vurderinger = mutableListOf<Vurdering>()
+        var regelId: RegelId? = hovedregelId
+        var sluttResultat: Vilkårsresultat? = null
+
+        while (regelId != null) {
+            val gjeldendeSvar = svar[regelId]
+            val gjeldendeRegel = vilkårsregel.regel(regelId)
+
+            val svarRegel = validerSvarOgFinnSvarregel(regel = gjeldendeRegel, svar = gjeldendeSvar)
+
+            vurderinger.add(
+                Vurdering(
+                    regelId = regelId,
+                    svar = gjeldendeSvar?.svar,
+                    begrunnelse = gjeldendeSvar?.begrunnelse,
+                ),
+            )
+
+            regelId = finnNesteRegelId(svarRegel)
+            sluttResultat = finnResultat(svarRegel)
+        }
+
+        return Delvilkår(
+            resultat = sluttResultat ?: Vilkårsresultat.IKKE_TATT_STILLING_TIL,
+            vurderinger = vurderinger,
+        )
+    }
+
+    private fun validerSvarOgFinnSvarregel(
+        regel: RegelSteg,
+        svar: SvarOgBegrunnelse?,
+    ): SvarRegel? {
+        val svarRegel = regel.svarMapping[svar?.svar]
+
+        feilHvis(svarRegel == null && svar != null) {
+            "SvarId=${svar!!.svar} er ikke et gyldig svar for regelId=${regel.regelId}"
+        }
+
+        when (svarRegel?.begrunnelseType) {
+            BegrunnelseType.PÅKREVD ->
+                feilHvis(svar?.begrunnelse.isNullOrBlank()) {
+                    "Påkrevd begrunnelse for regelId=${regel.regelId}"
+                }
+
+            BegrunnelseType.UTEN ->
+                feilHvisIkke(svar?.begrunnelse.isNullOrBlank()) {
+                    "Begrunnelse skal ikke settes for regelId=${regel.regelId}"
+                }
+
+            else -> {}
+        }
+
+        return svarRegel
+    }
+
+    private fun validerSvarOgVurderingerLike(
+        svar: Map<RegelId, SvarOgBegrunnelse?>,
+        delvilkår: List<Delvilkår>,
+    ) {
+        val brukteRegelIder = delvilkår.flatMap { it.vurderinger.map { vurdering -> vurdering.regelId } }.toSet()
+        val alleBesvarteRegelIder = svar.filterValues { it != null }.keys
+
+        val ubrukteRegelIder = alleBesvarteRegelIder - brukteRegelIder
+        feilHvisIkke(ubrukteRegelIder.isEmpty()) {
+            "Ikke alle svar kunne mappes til vurderinger: ${ubrukteRegelIder.joinToString(", ")}"
+        }
+
+//        val ekstraRegelIder = brukteRegelIder - alleBesvarteRegelIder
+//        feilHvisIkke(ekstraRegelIder.isEmpty()) {
+//            "Det er lagt til flere vurderinger enn det finnes svar: ${ekstraRegelIder.joinToString(", ")}"
+//        }
+    }
+
+    private fun finnNesteRegelId(svarRegel: SvarRegel?): RegelId? = (svarRegel as? NesteRegel)?.regelId
+
+    private fun finnResultat(svarRegel: SvarRegel?): Vilkårsresultat? = (svarRegel as? SluttSvarRegel)?.resultat?.vilkårsresultat
+}

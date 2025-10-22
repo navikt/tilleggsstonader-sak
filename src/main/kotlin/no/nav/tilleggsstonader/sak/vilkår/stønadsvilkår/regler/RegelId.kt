@@ -29,7 +29,11 @@ enum class RegelId(
     DOKUMENTERT_DELTAKELSE("Har søker dokumentert at de har samling/eksamen/opptaksprøve/kurs på datoene for overnatting?"),
 
     // DAGLIG REISE
+    // TODO: Oppdater beskrivelser når de endelige spørsmålene er på plass
     AVSTAND_OVER_SEKS_KM("Er avstanden mellom brukers aktivitet og hjemadresse lengre enn seks km?"),
+    UNNTAK_SEKS_KM("Unntak 6km"),
+
+    // TODO: Ikke nødvendig å ha med "bruker" i id
     KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT("Kan bruker reise med offentlig transport?"),
     KAN_BRUKER_KJØRE_SELV("Kan bruker kjøre med egen bil?"),
 }
