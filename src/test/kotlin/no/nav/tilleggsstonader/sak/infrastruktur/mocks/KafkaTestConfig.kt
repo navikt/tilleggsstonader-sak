@@ -17,7 +17,14 @@ class KafkaTestConfig {
     @Primary
     fun kafkaTemplate(): KafkaTemplate<String, String> {
         val mock = mockk<KafkaTemplate<String, String>>(relaxed = true)
-        every { mock.send(any<ProducerRecord<String, String>>()) } returns CompletableFuture.completedFuture(mockk())
+        resetMock(mock)
         return mock
+    }
+
+    companion object {
+        fun resetMock(kafkaTemplate: KafkaTemplate<String, String>) {
+            io.mockk.clearMocks(kafkaTemplate)
+            every { kafkaTemplate.send(any<ProducerRecord<String, String>>()) } returns CompletableFuture.completedFuture(mockk())
+        }
     }
 }
