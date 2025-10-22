@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -9,13 +10,11 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
-import java.time.Month.JANUARY
 
 class UtbetalingerDvhTest {
     @Test
     fun `mappes riktig for tilsyn barn`() {
-        val førsteJanuar = LocalDate.of(2025, JANUARY, 1)
+        val førsteJanuar = 1 januar 2025
 
         val utgifterTotaltJanuar = 6000
         val stønadsbeløp = 3840
@@ -54,7 +53,7 @@ class UtbetalingerDvhTest {
     @Test
     fun `mappes riktig for læremidler`() {
         val innvilgelse = LæremidlerTestUtil.innvilgelse()
-        val andlelerTilkjentYtelse = listOf(andelTilkjentYtelse(fom = LocalDate.of(2024, 1, 1)))
+        val andlelerTilkjentYtelse = listOf(andelTilkjentYtelse(fom = 1 januar 2024))
 
         val resultat = UtbetalingerDvh.fraDomene(andlelerTilkjentYtelse, innvilgelse)
 
@@ -63,8 +62,8 @@ class UtbetalingerDvhTest {
                 utbetalinger =
                     listOf(
                         UtbetalingerDvh(
-                            fraOgMed = LocalDate.of(2024, 1, 1),
-                            tilOgMed = LocalDate.of(2024, 1, 1),
+                            fraOgMed = 1 januar 2024,
+                            tilOgMed = 1 januar 2024,
                             type = AndelstypeDvh.TILSYN_BARN_AAP,
                             beløp = 11554,
                             makssats = null,
@@ -77,8 +76,51 @@ class UtbetalingerDvhTest {
     }
 
     @Test
+    fun `mappes riktig for daglig reise`() {
+        val førsteJanuar = 1 januar 2025
+        val sisteJanuar = 31 januar 2025
+
+        val stønadsbeløp = 3840
+
+        val (vedtaksdata, andelTilkjentYtelse) =
+            lagDagligReiseInnvilgelseMedBeløp(
+                fom = førsteJanuar,
+                tom = sisteJanuar,
+                beløp = stønadsbeløp,
+            )
+
+        val innvilgelseDagligReise =
+            GeneriskVedtak(
+                behandlingId = defaultBehandling.id,
+                type = TypeVedtak.INNVILGELSE,
+                data = vedtaksdata,
+                gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = null,
+                opphørsdato = null,
+            )
+
+        val resultat = UtbetalingerDvh.fraDomene(listOf(andelTilkjentYtelse), innvilgelseDagligReise)
+
+        val forventetResultat =
+            UtbetalingerDvh.JsonWrapper(
+                utbetalinger =
+                    listOf(
+                        UtbetalingerDvh(
+                            fraOgMed = førsteJanuar,
+                            tilOgMed = sisteJanuar,
+                            type = AndelstypeDvh.DAGLIG_REISE_AAP,
+                            beløp = stønadsbeløp,
+                            beløpErBegrensetAvMakssats = null,
+                        ),
+                    ),
+            )
+
+        assertThat(resultat).isEqualTo(forventetResultat)
+    }
+
+    @Test
     fun `mappes riktig for boutgifter`() {
-        val førsteJanuar = LocalDate.of(2025, JANUARY, 1)
+        val førsteJanuar = 1 januar 2025
         val makssats = 4953
         val støtteJanuar = makssats
         val utgiftJanuar = 7000
