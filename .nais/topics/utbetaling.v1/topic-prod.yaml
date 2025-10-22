@@ -6,7 +6,14 @@ metadata:
   labels:
     team: tilleggsstonader
 spec:
-  pool: nav-dev
+  pool: nav-prod
+  config:
+    cleanupPolicy: compact,delete
+    minimumInSyncReplicas: 1
+    partitions: 3
+    replication: 3
+    retentionBytes: -1
+    retentionHours: 336
   acl:
     - team: tilleggsstonader
       application: tilleggsstonader-sak
