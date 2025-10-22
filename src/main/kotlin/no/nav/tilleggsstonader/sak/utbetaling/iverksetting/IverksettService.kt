@@ -14,8 +14,10 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingMapper
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingMessageProducer
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingRecord
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
@@ -75,6 +77,7 @@ class IverksettService(
             behandling = behandling,
             iverksettingId = iverksettingId,
             totrinnskontroll = totrinnskontroll,
+            erFørsteIverksettingForBehandling = true,
         )
     }
 
@@ -145,6 +148,7 @@ class IverksettService(
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         totrinnskontroll: Totrinnskontroll,
         tilkjentYtelse: TilkjentYtelse,
+        erFørsteIverksettingForBehandling: Boolean = false,
     ) {
         if (utbetalingSkalSendesPåKafka(behandling.stønadstype)) {
             // En utbetaling er knyttet til en type andel (klassekode hos økonomi)
@@ -158,11 +162,18 @@ class IverksettService(
                             andelerTilkjentYtelse = andelerTilkjentYtelseGruppertPåType,
                             totrinnskontroll = totrinnskontroll,
                             behandling = behandling,
-                            forrigeUtbetaling = finnForrigeIverksetting(behandling, tilkjentYtelse),
+                            typeAndel = type,
                         )
                     }
 
-            utbetalingMessageProducer.sendUtbetalinger(iverksettingId, records)
+            val alleRecords =
+                if (erFørsteIverksettingForBehandling) {
+                    records + lagUtbetalingRecordForAnnullering(behandling, andelerTilkjentYtelse, totrinnskontroll)
+                } else {
+                    records
+                }
+
+            utbetalingMessageProducer.sendUtbetalinger(iverksettingId, alleRecords)
         } else {
             val dto =
                 IverksettDtoMapper.map(
@@ -175,6 +186,42 @@ class IverksettService(
             opprettHentStatusFraIverksettingTask(behandling, iverksettingId)
             iverksettClient.iverksett(dto)
         }
+    }
+
+    private fun lagUtbetalingRecordForAnnullering(
+        behandling: Saksbehandling,
+        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
+        totrinnskontroll: Totrinnskontroll,
+    ): Collection<UtbetalingRecord> {
+        val typeandelerSomSkalAnnulleres = finnTypeAndelerSomSkalAnnulleres(behandling, andelerTilkjentYtelse)
+        val utbetalingIder =
+            typeandelerSomSkalAnnulleres
+                .map { utbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, it) }
+
+        return utbetalingIder.map {
+            UtbetalingMapper.lagTomUtbetalingRecordForAnnullering(
+                id = it.id,
+                behandling = behandling,
+                totrinnskontroll = totrinnskontroll,
+                typeAndel = it.typeAndel,
+            )
+        }
+    }
+
+    private fun finnTypeAndelerSomSkalAnnulleres(
+        behandling: Saksbehandling,
+        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
+    ): List<TypeAndel> {
+        if (behandling.forrigeIverksatteBehandlingId == null) {
+            return emptyList()
+        }
+        val andelerForrigeBehandling =
+            tilkjentYtelseService
+                .hentForBehandling(behandling.forrigeIverksatteBehandlingId)
+                .andelerTilkjentYtelse
+
+        val typeAndelerNåværendeBehandling = andelerTilkjentYtelse.map { it.type }
+        return andelerForrigeBehandling.filter { it.type !in typeAndelerNåværendeBehandling }.map { it.type }
     }
 
     /**

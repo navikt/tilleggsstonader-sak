@@ -14,7 +14,6 @@ data class UtbetalingRecord(
     val dryrun: Boolean = false,
     val brukFagområdeTillst: Boolean = false,
     val id: UUID,
-    val forrigeUtbetaling: ForrigeUtbetaling?,
     val sakId: String,
     val behandlingId: String,
     val personident: String,
@@ -25,11 +24,6 @@ data class UtbetalingRecord(
     // kan ikke ha flere stønader i en og samme kjede i v3 (koden som splittet opp dette er ikke i bruk - umulig å vedlikeholde)
     val stønad: StønadUtbetaling,
     val perioder: List<PerioderUtbetaling>,
-)
-
-data class ForrigeUtbetaling(
-    val id: UUID,
-    val behandlingId: String,
 )
 
 enum class StønadUtbetaling {

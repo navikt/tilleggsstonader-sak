@@ -16,11 +16,10 @@ object UtbetalingMapper {
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         totrinnskontroll: Totrinnskontroll,
         behandling: Saksbehandling,
-        forrigeUtbetaling: ForrigeIverksetting?,
+        typeAndel: TypeAndel,
     ): UtbetalingRecord =
         UtbetalingRecord(
             id = id,
-            forrigeUtbetaling = forrigeUtbetaling?.let { ForrigeUtbetaling(it.iverksettingId, it.behandlingId) },
             sakId = behandling.eksternFagsakId.toString(),
             behandlingId = behandling.eksternId.toString(),
             personident = behandling.ident,
@@ -29,7 +28,7 @@ object UtbetalingMapper {
             vedtakstidspunkt = behandling.vedtakstidspunkt ?: error("Mangler vedtakstidspunkt behandling=${behandling.id}"),
             periodetype = PeriodetypeUtbetaling.EN_GANG,
             perioder = mapPerioder(andelerTilkjentYtelse),
-            stønad = mapTilStønadUtbetaling(andelerTilkjentYtelse.first()), // TODO - må lage record per andeltype behandlingen har
+            stønad = mapTilStønadUtbetaling(typeAndel),
         )
 
     private fun mapPerioder(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>): List<PerioderUtbetaling> =
@@ -43,12 +42,30 @@ object UtbetalingMapper {
                 )
             }
 
-    private fun mapTilStønadUtbetaling(andelerTilkjentYtelse: AndelTilkjentYtelse): StønadUtbetaling =
-        when (val andelstype = andelerTilkjentYtelse.type) {
+    private fun mapTilStønadUtbetaling(typeAndel: TypeAndel): StønadUtbetaling =
+        when (typeAndel) {
             TypeAndel.DAGLIG_REISE_AAP -> StønadUtbetaling.DAGLIG_REISE_AAP
             TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER -> StønadUtbetaling.DAGLIG_REISE_ENSLIG_FORSØRGER
             TypeAndel.DAGLIG_REISE_ETTERLATTE -> StønadUtbetaling.DAGLIG_REISE_ETTERLATTE
 
-            else -> error("Skal ikke sende andelstype=$andelstype på kafka")
+            else -> error("Skal ikke sende andelstype=$typeAndel på kafka")
         }
+
+    fun lagTomUtbetalingRecordForAnnullering(
+        id: UUID,
+        behandling: Saksbehandling,
+        totrinnskontroll: Totrinnskontroll,
+        typeAndel: TypeAndel,
+    ) = UtbetalingRecord(
+        id = id,
+        sakId = behandling.eksternFagsakId.toString(),
+        behandlingId = behandling.eksternId.toString(),
+        personident = behandling.ident,
+        saksbehandler = totrinnskontroll.saksbehandler,
+        beslutter = totrinnskontroll.beslutter ?: error("Mangler beslutter behandling=${behandling.id}"),
+        vedtakstidspunkt = behandling.vedtakstidspunkt ?: error("Mangler vedtakstidspunkt behandling=${behandling.id}"),
+        periodetype = PeriodetypeUtbetaling.EN_GANG,
+        perioder = emptyList(),
+        stønad = mapTilStønadUtbetaling(typeAndel),
+    )
 }
