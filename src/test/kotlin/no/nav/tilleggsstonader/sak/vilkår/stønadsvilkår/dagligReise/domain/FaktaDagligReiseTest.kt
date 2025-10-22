@@ -50,6 +50,20 @@ class FaktaDagligReiseTest {
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke kan ikke være mer enn 7")
         }
+
+        @Test
+        fun `skal kaste feil hvis ingen billettpriser er satt`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    FaktaOffentligTransport(
+                        reisedagerPerUke = 4,
+                        prisEnkelbillett = null,
+                        prisSyvdagersbillett = null,
+                        prisTrettidagersbillett = null,
+                    )
+                }
+            assertThat(feil.message).isEqualTo("Minst en billettpris må være satt")
+        }
     }
 
     @Nested

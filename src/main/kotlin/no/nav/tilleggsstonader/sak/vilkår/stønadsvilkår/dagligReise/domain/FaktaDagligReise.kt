@@ -22,6 +22,7 @@ data class FaktaOffentligTransport(
 
     init {
         validerIngenNegativeUtgifter()
+        validerMinstEnBillettPris()
         validerReisdager()
     }
 
@@ -32,6 +33,12 @@ data class FaktaOffentligTransport(
                 (prisTrettidagersbillett != null && prisTrettidagersbillett <= 0),
         ) {
             "Billettprisen må være større enn 0"
+        }
+    }
+
+    private fun validerMinstEnBillettPris() {
+        brukerfeilHvis(prisEnkelbillett == null && prisSyvdagersbillett == null && prisTrettidagersbillett == null) {
+            "Minst en billettpris må være satt"
         }
     }
 
