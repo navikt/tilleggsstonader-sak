@@ -60,7 +60,8 @@ class IverksettService(
         markerAndelerFraForrigeBehandlingSomUaktuelle(behandling)
 
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandlingMedLås(behandlingId)
-        val andelerSomSkalIverksettesNå = andelerForFørsteIverksettingAvBehandling(tilkjentYtelse)
+        val andelerSomSkalIverksettesNå =
+            andelerForFørsteIverksettingAvBehandling(tilkjentYtelse, utbetalingSkalSendesPåKafka(behandling.stønadstype))
 
         val totrinnskontroll = hentTotrinnskontroll(behandling)
 
@@ -78,15 +79,22 @@ class IverksettService(
     fun hentAndelTilkjentYtelse(behandlingId: BehandlingId) =
         andelTilkjentYtelseRepository.findAndelTilkjentYtelsesByKildeBehandlingId(behandlingId)
 
-    private fun andelerForFørsteIverksettingAvBehandling(tilkjentYtelse: TilkjentYtelse): Collection<AndelTilkjentYtelse> {
+    private fun andelerForFørsteIverksettingAvBehandling(
+        tilkjentYtelse: TilkjentYtelse,
+        skalSendesPåKafka: Boolean,
+    ): Collection<AndelTilkjentYtelse> {
         val måned = YearMonth.now()
         val iverksettingId = tilkjentYtelse.behandlingId.id
         val andelerTilIverksetting =
             finnAndelerTilIverksetting(tilkjentYtelse, iverksettingId, utbetalingsdato = LocalDate.now())
 
-        return andelerTilIverksetting.ifEmpty {
-            val iverksetting = Iverksetting(iverksettingId, LocalDateTime.now())
-            listOf(tilkjentYtelseService.leggTilNullAndel(tilkjentYtelse, iverksetting, måned))
+        return if (!skalSendesPåKafka) {
+            andelerTilIverksetting.ifEmpty {
+                val iverksetting = Iverksetting(iverksettingId, LocalDateTime.now())
+                listOf(tilkjentYtelseService.leggTilNullAndel(tilkjentYtelse, iverksetting, måned))
+            }
+        } else {
+            andelerTilIverksetting
         }
     }
 
