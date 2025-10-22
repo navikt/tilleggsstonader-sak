@@ -13,7 +13,7 @@ import java.util.UUID
 data class UtbetalingRecord(
     val dryrun: Boolean = false,
     val brukFagområdeTillst: Boolean = false,
-    val id: UUID,
+    val id: String,
     val sakId: String,
     val behandlingId: String,
     val personident: String,

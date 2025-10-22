@@ -12,7 +12,7 @@ object UtbetalingMapper {
      * Per nå tilsvarer [id] iverksettingId, men vi må se på hva vi ønsker med denne parameteren.
      */
     fun lagUtbetalingRecord(
-        id: UUID,
+        id: String,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         totrinnskontroll: Totrinnskontroll,
         behandling: Saksbehandling,
@@ -52,7 +52,7 @@ object UtbetalingMapper {
         }
 
     fun lagTomUtbetalingRecordForAnnullering(
-        id: UUID,
+        id: String,
         behandling: Saksbehandling,
         totrinnskontroll: Totrinnskontroll,
         typeAndel: TypeAndel,

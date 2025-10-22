@@ -28,7 +28,7 @@ class UtbetalingIdServiceTest {
 
     @Test
     fun `utbetalingId finnes for gitt fagsakId og typeAndel, hentes`() {
-        val utbetalingId = UtbetalingId(UUID.randomUUID(), fagsakId, typeAndel)
+        val utbetalingId = UtbetalingId(fagsakId = fagsakId, typeAndel = typeAndel)
         every { utbetalingIdRepository.findByFagsakIdAndTypeAndel(fagsakId, typeAndel) } returns utbetalingId
 
         assertThat(utbetalingIdService.hentEllerOpprettUtbetalingId(fagsakId, typeAndel)).isEqualTo(utbetalingId)

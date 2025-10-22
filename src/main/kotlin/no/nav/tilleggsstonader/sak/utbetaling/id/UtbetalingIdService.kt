@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.utbetaling.id
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class UtbetalingIdService(
@@ -20,7 +19,6 @@ class UtbetalingIdService(
 
         return utbetalingIdRepository.insert(
             UtbetalingId(
-                id = UUID.randomUUID(),
                 fagsakId = fagsakId,
                 typeAndel = typeAndel,
             ),
