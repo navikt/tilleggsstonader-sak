@@ -1,11 +1,10 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.ForrigeIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
-import java.util.UUID
 
 object UtbetalingMapper {
     /**
@@ -34,11 +33,12 @@ object UtbetalingMapper {
     private fun mapPerioder(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>): List<PerioderUtbetaling> =
         andelerTilkjentYtelse
             .filter { it.beløp != 0 }
-            .map {
+            .groupBy { it.utbetalingsdato.toYearMonth() }
+            .map { (månedÅr, andeler) ->
                 PerioderUtbetaling(
-                    fom = it.fom,
-                    tom = it.tom,
-                    beløp = it.beløp.toUInt(),
+                    fom = månedÅr.atDay(1),
+                    tom = månedÅr.atEndOfMonth(),
+                    beløp = andeler.sumOf { it.beløp }.toUInt(),
                 )
             }
 
