@@ -4,9 +4,24 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårResultatDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
+import org.springframework.http.HttpMethod
 import org.springframework.test.web.reactive.server.expectBody
+
+fun IntegrationTest.hentVilkårDagligReise(behandlingId: BehandlingId) =
+    webTestClient
+        .get()
+        .uri("/api/vilkar/daglig-reise/$behandlingId")
+        .medOnBehalfOfToken()
+        .exchange()
+        .expectStatus()
+        .isOk
+        .expectBody<List<VilkårDagligReiseDto>>()
+        .returnResult()
+        .responseBody!!
 
 fun IntegrationTest.opprettVilkårDagligReise(
     lagreVilkår: LagreDagligReiseDto,
@@ -36,6 +51,22 @@ fun IntegrationTest.oppdaterVilkårDagligReise(
     .expectStatus()
     .isOk
     .expectBody<VilkårDagligReiseDto>()
+    .returnResult()
+    .responseBody!!
+
+fun IntegrationTest.slettVilkårDagligReise(
+    slettVilkår: SlettVilkårRequestDto,
+    vilkårId: VilkårId,
+    behandlingId: BehandlingId,
+) = webTestClient
+    .method(HttpMethod.DELETE)
+    .uri("/api/vilkar/daglig-reise/$behandlingId/$vilkårId")
+    .bodyValue(slettVilkår)
+    .medOnBehalfOfToken()
+    .exchange()
+    .expectStatus()
+    .isOk
+    .expectBody<SlettVilkårResultatDto>()
     .returnResult()
     .responseBody!!
 

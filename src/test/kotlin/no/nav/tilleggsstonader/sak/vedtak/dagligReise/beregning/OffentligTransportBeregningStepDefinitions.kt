@@ -51,6 +51,7 @@ class OffentligTransportBeregningStepDefinitions {
     val dagligReiseVilkårService =
         DagligReiseVilkårService(
             vilkårRepository = vilkårRepositoryFake,
+            vilkårService = mockk(),
         )
 
     val vedtaksperiodeValideringService =

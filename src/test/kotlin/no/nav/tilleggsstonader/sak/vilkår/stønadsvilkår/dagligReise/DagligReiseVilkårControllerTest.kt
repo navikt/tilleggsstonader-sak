@@ -2,14 +2,20 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentReglerDagligReise
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVilkårDagligReise
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.oppdaterVilkårDagligReise
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.opprettVilkårDagligReise
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.slettVilkårDagligReise
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -24,7 +30,7 @@ import java.time.LocalDate
 
 class DagligReiseVilkårControllerTest : IntegrationTest() {
     val fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO)
-    val behandling = behandling(fagsak)
+    val behandling = behandling(fagsak, steg = StegType.VILKÅR)
 
     val svarOffentligTransport =
         mapOf(
@@ -38,7 +44,7 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
     }
 
     @Test
-    fun `skal kunne lagre og endre vilkår for daglig reise - offentlig transport`() {
+    fun `skal kunne lagre, endre og slette vilkår for daglig reise - offentlig transport`() {
         val nyttVilkår =
             LagreDagligReiseDto(
                 fom = LocalDate.of(2025, 1, 1),
@@ -67,6 +73,19 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
         assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
         assertThat(resultat.status).isEqualTo(VilkårStatus.NY)
         assertLagretVilkår(oppdatertVilkår, resultatOppdatert)
+
+        val resultatSlettet =
+            slettVilkårDagligReise(
+                slettVilkår = SlettVilkårRequestDto(),
+                resultatOppdatert.id,
+                behandling.id,
+            )
+
+        assertThat(resultatSlettet.slettetPermanent).isTrue
+        assertThat(resultatSlettet.vilkår.slettetKommentar).isNull()
+
+        val hentedeVilkår = hentVilkårDagligReise(behandling.id)
+        assertThat(hentedeVilkår).isEmpty()
     }
 
     @Test

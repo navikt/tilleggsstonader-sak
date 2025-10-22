@@ -18,6 +18,7 @@ data class VilkårDagligReise(
     val status: VilkårStatus?,
     val delvilkårsett: List<Delvilkår>,
     val fakta: FaktaDagligReise?,
+    val slettetKommentar: String? = null,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
