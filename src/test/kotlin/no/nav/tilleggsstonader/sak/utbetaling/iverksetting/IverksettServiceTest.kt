@@ -2,7 +2,9 @@ package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.CapturingSlot
+import io.mockk.every
 import io.mockk.justRun
+import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.prosessering.domene.Status
@@ -23,21 +25,25 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingRecord
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollRepository
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil.totrinnskontroll
+import org.apache.kafka.clients.producer.ProducerRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.kafka.core.KafkaTemplate
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
 
 class IverksettServiceTest : IntegrationTest() {
     @Autowired
@@ -55,16 +61,21 @@ class IverksettServiceTest : IntegrationTest() {
     @Autowired
     lateinit var totrinnskontrollRepository: TotrinnskontrollRepository
 
+    @Autowired
+    lateinit var kafkaTemplate: KafkaTemplate<String, String>
+
     val forrigeMåned = YearMonth.now().minusMonths(1)
     val nåværendeMåned = YearMonth.now()
     val nesteMåned = YearMonth.now().plusMonths(1)
     val nestNesteMåned = YearMonth.now().plusMonths(2)
 
     val iverksettingDto = slot<IverksettDto>()
+    val sendteUtbetalinger = mutableListOf<ProducerRecord<String, String>>()
 
     @BeforeEach
     fun setUp() {
         justRun { iverksettClient.iverksett(capture(iverksettingDto)) }
+        every { kafkaTemplate.send(capture(sendteUtbetalinger)) } returns CompletableFuture.completedFuture(mockk())
     }
 
     private fun IverksettService.iverksett(
@@ -478,6 +489,87 @@ class IverksettServiceTest : IntegrationTest() {
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
         }
     }
+
+    @Nested
+    inner class IverksettPåKafka {
+        @Test
+        fun `iverksetter førstegangsbehandling daglig reise første gang, ingen andeler skal utbetales, sender ingenting på kafka`() {
+            val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
+            val behandling = testoppsettService.lagre(behandling(fagsak, resultat = BehandlingResultat.INNVILGET))
+            lagreTotrinnskontroll(behandling)
+
+            val andelTilkjentYtelse =
+                andelTilkjentYtelse(
+                    type = TypeAndel.DAGLIG_REISE_AAP,
+                    utbetalingsdato = LocalDate.now().plusDays(1),
+                    fom = LocalDate.now().plusDays(1),
+                    tom = LocalDate.now().plusDays(1),
+                    satstype = Satstype.ENGANGSBELØP,
+                    kildeBehandlingId = behandling.id,
+                )
+            tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, andelTilkjentYtelse))
+
+            iverksettService.iverksettBehandlingFørsteGang(behandling.id)
+
+            val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!
+            // Ingen andeler skal være iverksatt
+            assertThat(tilkjentYtelse.andelerTilkjentYtelse).noneMatch { it.iverksetting != null }
+
+            assertThat(sendteUtbetalinger).hasSize(0)
+        }
+
+        @Test
+        fun `iverksetter førstegangsbehandling daglig reise første gang, to andeler forrige måned, sender én utbetaling med én periode`() {
+            val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
+            val behandling = testoppsettService.lagre(behandling(fagsak, resultat = BehandlingResultat.INNVILGET))
+            lagreTotrinnskontroll(behandling)
+
+            val forrigeMåned = YearMonth.now().minusMonths(1)
+            val andelTilkjentYtelse1 =
+                andelTilkjentYtelse(
+                    type = TypeAndel.DAGLIG_REISE_AAP,
+                    utbetalingsdato = forrigeMåned.atDay(1),
+                    fom = forrigeMåned.atDay(1),
+                    tom = forrigeMåned.atDay(1),
+                    satstype = Satstype.ENGANGSBELØP,
+                    kildeBehandlingId = behandling.id,
+                )
+
+            val andelTilkjentYtelse2 =
+                andelTilkjentYtelse(
+                    type = TypeAndel.DAGLIG_REISE_AAP,
+                    utbetalingsdato = forrigeMåned.atDay(10),
+                    fom = forrigeMåned.atDay(10),
+                    tom = forrigeMåned.atDay(10),
+                    satstype = Satstype.ENGANGSBELØP,
+                    kildeBehandlingId = behandling.id,
+                )
+            tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, andelTilkjentYtelse1, andelTilkjentYtelse2))
+
+            iverksettService.iverksettBehandlingFørsteGang(behandling.id)
+            val iverksettingId = behandling.id.id
+
+            val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!
+            // Alle andeler skal være iverksatt
+            assertThat(tilkjentYtelse.andelerTilkjentYtelse).allMatch { it.iverksetting?.iverksettingId == iverksettingId }
+
+            assertThat(sendteUtbetalinger).hasSize(1)
+            val sendtUtbetaling = sendteUtbetalinger.single()
+            assertThat(sendtUtbetaling.key()).isEqualTo(iverksettingId.toString())
+            val utbetalingRecord = sendtUtbetaling.utbetalingRecord()
+            assertThat(utbetalingRecord.perioder).hasSize(1)
+            assertThat(utbetalingRecord.perioder.single().fom).isEqualTo(forrigeMåned.atDay(1))
+            assertThat(utbetalingRecord.perioder.single().tom).isEqualTo(forrigeMåned.atEndOfMonth())
+            assertThat(
+                utbetalingRecord.perioder
+                    .single()
+                    .beløp
+                    .toInt(),
+            ).isEqualTo(andelTilkjentYtelse1.beløp + andelTilkjentYtelse2.beløp)
+        }
+    }
+
+    private fun ProducerRecord<String, String>.utbetalingRecord() = objectMapper.readValue<UtbetalingRecord>(value())
 
     private fun CapturingSlot<IverksettDto>.assertUtbetalingerInneholder(vararg måned: YearMonth) {
         assertThat(captured.vedtak.utbetalinger.map { YearMonth.from(it.fraOgMedDato) })
