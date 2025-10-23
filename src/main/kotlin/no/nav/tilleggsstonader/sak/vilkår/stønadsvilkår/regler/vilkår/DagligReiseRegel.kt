@@ -16,7 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
 
 class DagligReiseRegel :
     Vilkårsregel(
-        vilkårType = VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
+        vilkårType = VilkårType.DAGLIG_REISE,
         regler =
             setOf(
                 AVSTAND_OVER_SEKS_KM,

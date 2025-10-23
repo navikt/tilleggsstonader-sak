@@ -29,7 +29,7 @@ object VilkårPeriodeValidering {
     ) {
         val overlappendePeriode = vilkårliste.førsteOverlappendePeriode()
         // Hopp over validering da det må være lov, dersom man f.eks først skal reise med tog så buss.
-        if (overlappendePeriode != null && vilkårType != VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT) {
+        if (overlappendePeriode != null && vilkårType != VilkårType.DAGLIG_REISE) {
             brukerfeil(
                 "Det er ikke gyldig med overlappende perioder for ${vilkårType.tilFeilmeldingTekst()}. " +
                     "Periode ${overlappendePeriode.first.formatertPeriodeNorskFormat()} " +

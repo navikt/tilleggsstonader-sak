@@ -159,7 +159,7 @@ object OppdaterVilkår {
                     it
                 }
 
-                VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> {
+                VilkårType.DAGLIG_REISE -> {
                     it
                 }
 
@@ -185,7 +185,7 @@ object OppdaterVilkår {
                     it
                 }
 
-                VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> {
+                VilkårType.DAGLIG_REISE -> {
                     it
                 }
 

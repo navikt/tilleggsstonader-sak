@@ -34,7 +34,7 @@ object VilkårDagligReiseMapper {
             tom = this.tom,
             resultat = this.resultat,
             status = this.status,
-            type = VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
+            type = VilkårType.DAGLIG_REISE,
             delvilkårwrapper = DelvilkårWrapper(this.delvilkårsett),
             fakta = this.fakta?.mapTilVilkårFakta(),
             opphavsvilkår = null, // TODO: Ta hensyn til denne i oppdatering

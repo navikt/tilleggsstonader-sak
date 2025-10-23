@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
-import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -95,7 +94,7 @@ data class Vilkår(
                 validerPåkrevdBeløpHvisOppfylt()
             }
 
-            VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> {
+            VilkårType.DAGLIG_REISE -> {
                 // Dette er kun for tester foreløpig
             }
 
@@ -274,8 +273,7 @@ enum class VilkårType(
     LØPENDE_UTGIFTER_TO_BOLIGER("Løpende utgifter to boliger", listOf(Stønadstype.BOUTGIFTER)),
 
     // Daglig reise
-    // TODO: Rename til DAGLIG_REISE fordi samme vilkårstype brukes på alle
-    DAGLIG_REISE_OFFENTLIG_TRANSPORT(
+    DAGLIG_REISE(
         "Daglig reise",
         listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
     ),

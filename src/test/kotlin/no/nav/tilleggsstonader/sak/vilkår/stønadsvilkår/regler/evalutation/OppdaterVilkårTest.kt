@@ -318,7 +318,7 @@ internal class OppdaterVilkårTest {
     inner class DagligReise {
         val opprettVilkårDto =
             OpprettVilkårDto(
-                vilkårType = VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
+                vilkårType = VilkårType.DAGLIG_REISE,
                 behandlingId = behandlingId,
                 delvilkårsett = oppfylteDelvilkårDagligReiseOffentligTransport().map { it.tilDto() },
                 fom = LocalDate.now(),
@@ -336,7 +336,7 @@ internal class OppdaterVilkårTest {
         val vilkårDagligReise =
             vilkår(
                 behandlingId = behandlingId,
-                type = VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
+                type = VilkårType.DAGLIG_REISE,
                 delvilkår = oppfylteDelvilkårDagligReiseOffentligTransport(),
             )
 
