@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
@@ -15,7 +16,7 @@ class SimuleringStegTest {
     val simuleringService = mockk<SimuleringService>()
     val vedtaksresultatService = mockk<VedtaksresultatService>()
 
-    val simuleringSteg = SimuleringSteg(simuleringService, vedtaksresultatService)
+    val simuleringSteg = SimuleringSteg(simuleringService, vedtaksresultatService, mockUnleashService())
 
     @BeforeEach
     fun setUp() {

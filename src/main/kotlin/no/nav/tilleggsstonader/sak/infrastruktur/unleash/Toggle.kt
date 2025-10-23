@@ -21,4 +21,6 @@ enum class Toggle(
     KAN_SAKSBEHANDLE_DAGLIG_REISE_TSR("sak.frontend.kan-saksbehandle.daglig-reise-tsr"),
 
     SØKNAD_ROUTING_DAGLIG_REISE("sak.soknad-routing.daglig-reise"),
+
+    SIMULER_DAGLIG_REISE("sak.simulering.daglig-reise"),
 }
