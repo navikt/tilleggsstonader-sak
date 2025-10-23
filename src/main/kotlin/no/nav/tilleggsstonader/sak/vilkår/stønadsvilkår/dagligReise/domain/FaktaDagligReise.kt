@@ -47,8 +47,8 @@ data class FaktaOffentligTransport(
             "Reisedager per uke må være 0 eller mer"
         }
 
-        brukerfeilHvis(reisedagerPerUke > 7) {
-            "Reisedager per uke kan ikke være mer enn 7"
+        brukerfeilHvis(reisedagerPerUke > 5) {
+            "Reisedager per uke kan ikke være mer enn 5"
         }
     }
 
