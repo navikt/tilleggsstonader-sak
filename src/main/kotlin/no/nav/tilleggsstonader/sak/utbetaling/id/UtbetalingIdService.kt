@@ -6,19 +6,19 @@ import org.springframework.stereotype.Service
 
 @Service
 class UtbetalingIdService(
-    private val utbetalingIdRepository: UtbetalingIdRepository,
+    private val fagsakUtbetalingIdRepository: FagsakUtbetalingIdRepository,
 ) {
     fun hentEllerOpprettUtbetalingId(
         fagsakId: FagsakId,
         typeAndel: TypeAndel,
-    ): UtbetalingId {
-        val eksisterende = utbetalingIdRepository.findByFagsakIdAndTypeAndel(fagsakId, typeAndel)
+    ): FagsakUtbetalingId {
+        val eksisterende = fagsakUtbetalingIdRepository.findByFagsakIdAndTypeAndel(fagsakId, typeAndel)
         if (eksisterende != null) {
             return eksisterende
         }
 
-        return utbetalingIdRepository.insert(
-            UtbetalingId(
+        return fagsakUtbetalingIdRepository.insert(
+            FagsakUtbetalingId(
                 fagsakId = fagsakId,
                 typeAndel = typeAndel,
             ),

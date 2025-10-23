@@ -1,9 +1,9 @@
-CREATE TABLE UTBETALING_ID
+CREATE TABLE FAGSAK_UTBETALING_ID
 (
-    ID         VARCHAR(25) NOT NULL PRIMARY KEY,
+    UTBETALING_ID         VARCHAR(25) NOT NULL PRIMARY KEY,
     FAGSAK_ID  UUID        NOT NULL REFERENCES fagsak (id),
     TYPE_ANDEL VARCHAR(50) NOT NULL
 );
 
-create unique index on UTBETALING_ID (fagsak_id, type_andel);
+create unique index on FAGSAK_UTBETALING_ID (fagsak_id, type_andel);
 

@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.utbetaling.id.UtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
@@ -29,7 +28,7 @@ class UtbetalingV3Mapper(
                 .map { (type, andelerTilkjentYtelseGruppertPåType) ->
                     val utbetalingId = utbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
                     lagUtbetalingRecord(
-                        id = utbetalingId.id,
+                        id = utbetalingId.utbetalingId,
                         erSimulering = erSimulering,
                         andelerTilkjentYtelse = andelerTilkjentYtelseGruppertPåType,
                         totrinnskontroll = totrinnskontroll,
@@ -110,7 +109,7 @@ class UtbetalingV3Mapper(
 
         return utbetalingIder.map {
             UtbetalingRecord(
-                id = it.id,
+                id = it.utbetalingId,
                 dryrun = erSimulering,
                 sakId = behandling.eksternFagsakId.toString(),
                 behandlingId = behandling.eksternId.toString(),

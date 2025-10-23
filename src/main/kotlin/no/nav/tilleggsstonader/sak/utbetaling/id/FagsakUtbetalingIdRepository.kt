@@ -8,38 +8,38 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import org.springframework.data.annotation.Id
 import org.springframework.stereotype.Repository
 import java.util.UUID
+import java.util.UUID.randomUUID
 
 @Repository
-interface UtbetalingIdRepository :
-    RepositoryInterface<UtbetalingId, UUID>,
-    InsertUpdateRepository<UtbetalingId> {
+interface FagsakUtbetalingIdRepository :
+    RepositoryInterface<FagsakUtbetalingId, UUID>,
+    InsertUpdateRepository<FagsakUtbetalingId> {
     fun findByFagsakIdAndTypeAndel(
         fagsakId: FagsakId,
         typeAndel: TypeAndel,
-    ): UtbetalingId?
+    ): FagsakUtbetalingId?
 }
 
-data class UtbetalingId(
+data class FagsakUtbetalingId(
     @Id
-    val id: String = genererUtbetalingId(),
+    val utbetalingId: String = genererUtbetalingId(),
     val fagsakId: FagsakId,
     val typeAndel: TypeAndel,
 ) {
     init {
-        feilHvis(id.length > 25) {
+        feilHvis(utbetalingId.length > 25) {
             "UtbetalingId må være kortere eller lik 25 tegn da økonomi ikke takler lengre id'er"
         }
     }
 
     companion object {
-        private val prefix = "TS"
+        private const val PREFIX = "TS"
 
         fun genererUtbetalingId(): String =
-            prefix +
-                UUID
-                    .randomUUID()
+            PREFIX +
+                randomUUID()
                     .toString()
                     .replace("-", "")
-                    .take(25 - prefix.length)
+                    .take(25 - PREFIX.length)
     }
 }
