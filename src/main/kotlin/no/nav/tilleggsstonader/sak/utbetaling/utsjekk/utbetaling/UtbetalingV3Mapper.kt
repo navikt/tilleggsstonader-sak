@@ -70,7 +70,7 @@ class UtbetalingV3Mapper(
             personident = behandling.ident,
             saksbehandler = totrinnskontroll?.saksbehandler,
             beslutter = totrinnskontroll?.beslutter,
-            vedtakstidspunkt = behandling.vedtakstidspunkt ?: error("Mangler vedtakstidspunkt behandling=${behandling.id}"),
+            vedtakstidspunkt = behandling.vedtakstidspunkt,
             periodetype = PeriodetypeUtbetaling.EN_GANG,
             perioder = mapPerioder(andelerTilkjentYtelse),
             stønad = mapTilStønadUtbetaling(typeAndel),
