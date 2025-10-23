@@ -28,7 +28,6 @@ data class BeregningsresultatForPeriodeDto(
     val prisSyvdagersbillett: Int?,
     val pris30dagersbillett: Int?,
     val antallReisedagerPerUke: Int,
-    val antallReisedager: Int,
     val beløp: Int,
     val billettdetaljer: Map<Billettype, Int>,
 ) : Periode<LocalDate>
@@ -57,7 +56,6 @@ fun BeregningsresultatForPeriode.tilDto(): BeregningsresultatForPeriodeDto =
         prisSyvdagersbillett = grunnlag.prisSyvdagersbillett,
         pris30dagersbillett = grunnlag.pris30dagersbillett,
         antallReisedagerPerUke = grunnlag.antallReisedagerPerUke,
-        antallReisedager = grunnlag.antallReisedager,
         beløp = beløp,
         billettdetaljer = billettdetaljer,
     )

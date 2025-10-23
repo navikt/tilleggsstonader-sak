@@ -589,13 +589,13 @@ object Testdata {
         private val aktivitetererBoutgifter =
             listOf(
                 VilkårperiodeTestUtil.aktivitet(
-                    fom = LocalDate.of(2024, 12, 10),
-                    tom = LocalDate.of(2024, 12, 15),
+                    fom = LocalDate.of(2024, 2, 5),
+                    tom = LocalDate.of(2024, 2, 10),
                     faktaOgVurdering = faktaOgVurderingAktivitetBoutgifter(),
                 ),
                 VilkårperiodeTestUtil.aktivitet(
-                    fom = LocalDate.of(2024, 12, 10),
-                    tom = LocalDate.of(2024, 12, 15),
+                    fom = LocalDate.of(2024, 2, 5),
+                    tom = LocalDate.of(2024, 2, 10),
                     resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
                     begrunnelse = "ikke oppfylt",
                     faktaOgVurdering = faktaOgVurderingAktivitetBoutgifter(type = AktivitetType.UTDANNING),
@@ -616,8 +616,8 @@ object Testdata {
                 behandling =
                     behandling(
                         id = behandlingId,
-                        vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay(),
-                        opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
+                        vedtakstidspunkt = LocalDate.of(2024, 2, 5).atStartOfDay(),
+                        opprettetTid = LocalDate.of(2024, 2, 10).atStartOfDay(),
                         fagsak = DagligReise.fagsak,
                         resultat = BehandlingResultat.INNVILGET,
                         type = BehandlingType.FØRSTEGANGSBEHANDLING,
@@ -627,13 +627,13 @@ object Testdata {
         private val aktivitetererDagligReise =
             listOf(
                 VilkårperiodeTestUtil.aktivitet(
-                    fom = LocalDate.of(2024, 12, 10),
-                    tom = LocalDate.of(2024, 12, 15),
+                    fom = LocalDate.of(2024, 2, 5),
+                    tom = LocalDate.of(2024, 2, 10),
                     faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTso(),
                 ),
                 VilkårperiodeTestUtil.aktivitet(
-                    fom = LocalDate.of(2024, 12, 10),
-                    tom = LocalDate.of(2024, 12, 15),
+                    fom = LocalDate.of(2024, 2, 5),
+                    tom = LocalDate.of(2024, 2, 10),
                     resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
                     begrunnelse = "ikke oppfylt",
                     faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTso(type = AktivitetType.UTDANNING),
@@ -660,47 +660,32 @@ object Testdata {
                                             BeregningsresultatForPeriode(
                                                 grunnlag =
                                                     BeregningsgrunnlagOffentligTransport(
-                                                        fom = LocalDate.of(2024, 1, 1),
-                                                        tom = LocalDate.of(2024, 1, 1),
+                                                        fom = LocalDate.of(2024, 2, 5),
+                                                        tom = LocalDate.of(2024, 2, 10),
                                                         prisEnkeltbillett = 80,
                                                         prisSyvdagersbillett = 400,
                                                         pris30dagersbillett = 1800,
                                                         antallReisedagerPerUke = 5,
                                                         vedtaksperioder = emptyList(),
-                                                        antallReisedager = 10,
+                                                        antallReisedager = 5,
                                                     ),
-                                                beløp = 3000,
-                                                billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 1),
+                                                beløp = 400,
+                                                billettdetaljer = mapOf(Billettype.SYVDAGERSBILLETT to 1),
                                             ),
                                             BeregningsresultatForPeriode(
                                                 grunnlag =
                                                     BeregningsgrunnlagOffentligTransport(
-                                                        fom = LocalDate.of(2024, 1, 1),
-                                                        tom = LocalDate.of(2024, 1, 1),
+                                                        fom = LocalDate.of(2024, 2, 5),
+                                                        tom = LocalDate.of(2024, 2, 10),
                                                         prisEnkeltbillett = 80,
                                                         prisSyvdagersbillett = 400,
                                                         pris30dagersbillett = 1800,
                                                         antallReisedagerPerUke = 5,
                                                         vedtaksperioder = emptyList(),
-                                                        antallReisedager = 10,
+                                                        antallReisedager = 5,
                                                     ),
-                                                beløp = 3000,
-                                                billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 1),
-                                            ),
-                                            BeregningsresultatForPeriode(
-                                                grunnlag =
-                                                    BeregningsgrunnlagOffentligTransport(
-                                                        fom = LocalDate.of(2024, 1, 1),
-                                                        tom = LocalDate.of(2024, 1, 1),
-                                                        prisEnkeltbillett = 80,
-                                                        prisSyvdagersbillett = 400,
-                                                        pris30dagersbillett = 1800,
-                                                        antallReisedagerPerUke = 5,
-                                                        vedtaksperioder = emptyList(),
-                                                        antallReisedager = 10,
-                                                    ),
-                                                beløp = 3000,
-                                                billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 1),
+                                                beløp = 400,
+                                                billettdetaljer = mapOf(Billettype.SYVDAGERSBILLETT to 1),
                                             ),
                                         ),
                                 ),
@@ -710,17 +695,17 @@ object Testdata {
                                             BeregningsresultatForPeriode(
                                                 grunnlag =
                                                     BeregningsgrunnlagOffentligTransport(
-                                                        fom = LocalDate.of(2024, 1, 1),
-                                                        tom = LocalDate.of(2024, 1, 1),
+                                                        fom = LocalDate.of(2025, 2, 5),
+                                                        tom = LocalDate.of(2024, 2, 10),
                                                         prisEnkeltbillett = 80,
                                                         prisSyvdagersbillett = 400,
                                                         pris30dagersbillett = 1800,
-                                                        antallReisedagerPerUke = 5,
+                                                        antallReisedagerPerUke = 2,
                                                         vedtaksperioder = emptyList(),
-                                                        antallReisedager = 10,
+                                                        antallReisedager = 2,
                                                     ),
-                                                beløp = 3000,
-                                                billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 1),
+                                                beløp = 320,
+                                                billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 4),
                                             ),
                                         ),
                                 ),
