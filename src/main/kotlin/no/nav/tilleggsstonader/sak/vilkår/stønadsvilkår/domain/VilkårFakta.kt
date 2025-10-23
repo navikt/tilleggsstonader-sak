@@ -14,8 +14,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrun
     property = "type",
 )
 @JsonSubTypes(
-    JsonSubTypes.Type(FaktaDagligReiseOffentligTransport::class, name = "DALIG_REISE_OFFENTLIG_TRANSPORT"),
-    JsonSubTypes.Type(FaktaDagligReisePrivatBil::class, name = "DALIG_REISE_PRIVAT_BIL"),
+    JsonSubTypes.Type(FaktaDagligReiseOffentligTransport::class, name = "DAGLIG_REISE_OFFENTLIG_TRANSPORT"),
+    JsonSubTypes.Type(FaktaDagligReisePrivatBil::class, name = "DAGLIG_REISE_PRIVAT_BIL"),
     failOnRepeatedNames = true,
 )
 sealed interface VilkårFakta {
