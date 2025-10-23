@@ -20,7 +20,7 @@ class UtbetalingStatusHåndterer(
         iverksettingId: String,
         melding: UtbetalingStatusRecord,
     ) {
-        if (melding.detaljer?.ytelse != "TILLEGGSSTØNADER") {
+        if (melding.detaljer?.ytelse !in fagområderTilleggsstønader) {
             return
         }
         val utbetalingsstatus = melding.status
@@ -35,6 +35,24 @@ class UtbetalingStatusHåndterer(
         }
     }
 }
+
+/*
+ Nye fagområder for tilleggsstønader.
+ Hver stønad har sitt eget fagområde hos økonomi. Et fagområde omhandler flere TypeAndel.
+ Eks TILLSTDR (ts daglig reise) omhandler TypeAndel for DAGLIG_REISE_*
+ TODO - bør vi flytte til et enum, evt høre om mulighet for å utvide status med fagsystem slik at vi slipper å forholde oss til disse?
+ */
+private val fagområderTilleggsstønader =
+    listOf(
+        "TILLSTPB",
+        "TILLSTLM",
+        "TILLSTBO",
+        "TILLSTDR",
+        "TILLSTRS",
+        "TILLSTRO",
+        "TILLSTRA",
+        "TILLSTFL",
+    )
 
 fun UtbetalingStatus.tilStatusIverksetting(): StatusIverksetting =
     when (this) {
