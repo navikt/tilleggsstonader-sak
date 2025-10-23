@@ -16,9 +16,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Sv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 
 class DagligReiseVilkårServiceTest {
@@ -51,14 +50,13 @@ class DagligReiseVilkårServiceTest {
         val behandling = saksbehandling(status = BehandlingStatus.FERDIGSTILT)
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
 
-        val feil =
-            assertThrows<Feil> {
+        assertThatExceptionOfType(Feil::class.java)
+            .isThrownBy {
                 dagligReiseVilkårService.opprettNyttVilkår(
                     nyttVilkår = nyttVilkår,
                     behandlingId = BehandlingId.random(),
                 )
-            }
-        assertThat(feil.message).isEqualTo("Kan ikke gjøre endringer på denne behandlingen fordi den er ferdigstilt.")
+            }.withMessage("Kan ikke gjøre endringer på denne behandlingen fordi den er ferdigstilt.")
     }
 
     @Test
@@ -66,15 +64,14 @@ class DagligReiseVilkårServiceTest {
         val behandling = saksbehandling(status = BehandlingStatus.FERDIGSTILT)
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
 
-        val feil =
-            assertThrows<Feil> {
+        assertThatExceptionOfType(Feil::class.java)
+            .isThrownBy {
                 dagligReiseVilkårService.oppdaterVilkår(
                     nyttVilkår = nyttVilkår,
                     behandlingId = BehandlingId.random(),
                     vilkårId = VilkårId.random(),
                 )
-            }
-        assertThat(feil.message).isEqualTo("Kan ikke gjøre endringer på denne behandlingen fordi den er ferdigstilt.")
+            }.withMessage("Kan ikke gjøre endringer på denne behandlingen fordi den er ferdigstilt.")
     }
 
     @Test
@@ -82,14 +79,13 @@ class DagligReiseVilkårServiceTest {
         val behandling = saksbehandling(steg = StegType.INNGANGSVILKÅR)
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
 
-        val feil =
-            assertThrows<Feil> {
+        assertThatExceptionOfType(Feil::class.java)
+            .isThrownBy {
                 dagligReiseVilkårService.opprettNyttVilkår(
                     nyttVilkår = nyttVilkår,
                     behandlingId = BehandlingId.random(),
                 )
-            }
-        assertThat(feil.message).isEqualTo("Kan ikke oppdatere vilkår når behandling er på steg=INNGANGSVILKÅR.")
+            }.withMessage("Kan ikke oppdatere vilkår når behandling er på steg=INNGANGSVILKÅR.")
     }
 
     @Test
@@ -97,15 +93,14 @@ class DagligReiseVilkårServiceTest {
         val behandling = saksbehandling(steg = StegType.INNGANGSVILKÅR)
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
 
-        val feil =
-            assertThrows<Feil> {
+        assertThatExceptionOfType(Feil::class.java)
+            .isThrownBy {
                 dagligReiseVilkårService.oppdaterVilkår(
                     nyttVilkår = nyttVilkår,
                     behandlingId = BehandlingId.random(),
                     vilkårId = VilkårId.random(),
                 )
-            }
-        assertThat(feil.message).isEqualTo("Kan ikke oppdatere vilkår når behandling er på steg=INNGANGSVILKÅR.")
+            }.withMessage("Kan ikke oppdatere vilkår når behandling er på steg=INNGANGSVILKÅR.")
     }
 
     fun faktaOffentligTransport(
