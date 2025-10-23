@@ -1,0 +1,83 @@
+{
+  "AVSTAND_OVER_SEKS_KM" : {
+    "erHovedregel" : true,
+    "reglerSomMåNullstilles" : [
+      "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+      "KAN_KJØRE_MED_EGEN_BIL",
+      "UNNTAK_SEKS_KM"
+    ],
+    "svaralternativer" : [
+      {
+        "svarId" : "JA",
+        "nesteRegelId" : "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+        "begrunnelseType" : "UTEN",
+        "tilhørendeFaktaType" : null
+      },
+      {
+        "svarId" : "NEI",
+        "nesteRegelId" : "UNNTAK_SEKS_KM",
+        "begrunnelseType" : "UTEN",
+        "tilhørendeFaktaType" : null
+      }
+    ]
+  },
+  "UNNTAK_SEKS_KM" : {
+    "erHovedregel" : false,
+    "reglerSomMåNullstilles" : [
+      "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+      "KAN_KJØRE_MED_EGEN_BIL"
+    ],
+    "svaralternativer" : [
+      {
+        "svarId" : "JA",
+        "nesteRegelId" : "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+        "begrunnelseType" : "UTEN",
+        "tilhørendeFaktaType" : null
+      },
+      {
+        "svarId" : "NEI",
+        "nesteRegelId" : null,
+        "begrunnelseType" : "PÅKREVD",
+        "tilhørendeFaktaType" : null
+      }
+    ]
+  },
+  "KAN_REISE_MED_OFFENTLIG_TRANSPORT" : {
+    "erHovedregel" : false,
+    "reglerSomMåNullstilles" : [
+      "KAN_KJØRE_MED_EGEN_BIL"
+    ],
+    "svaralternativer" : [
+      {
+        "svarId" : "JA",
+        "nesteRegelId" : null,
+        "begrunnelseType" : "VALGFRI",
+        "tilhørendeFaktaType" : "DAGLIG_REISE_OFFENTLIG_TRANSPORT"
+      },
+      {
+        "svarId" : "NEI",
+        "nesteRegelId" : "KAN_KJØRE_MED_EGEN_BIL",
+        "begrunnelseType" : "UTEN",
+        "tilhørendeFaktaType" : null
+      }
+    ]
+  },
+  "KAN_KJØRE_MED_EGEN_BIL" : {
+    "erHovedregel" : false,
+    "reglerSomMåNullstilles" : [],
+    "svaralternativer" : [
+      {
+        "svarId" : "JA",
+        "nesteRegelId" : null,
+        "begrunnelseType" : "VALGFRI",
+        "tilhørendeFaktaType" : "DAGLIG_REISE_PRIVAT_BIL"
+      },
+      {
+        "svarId" : "NEI",
+        "nesteRegelId" : null,
+        "begrunnelseType" : "VALGFRI",
+        "tilhørendeFaktaType" : null
+      }
+    ]
+  }
+}

@@ -112,7 +112,7 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
     fun `skal hente alle regler som tilhører daglig reise`() {
         val resultat = hentReglerDagligReise()
 
-        FileUtil.assertFileJsonIsEqual("vilkår/regelstruktur/DAGLIG_REISE_OFFENTLIG_TRANSPORT.json", resultat)
+        FileUtil.assertFileJsonIsEqual("vilkår/regelstruktur/DAGLIG_REISE.json", resultat)
     }
 
     private fun faktaOffentligTransport(
