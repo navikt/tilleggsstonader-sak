@@ -11,6 +11,7 @@ spec:
       rules:
         - alert: Feilede iverksettinger
           expr: andel_tilkjent_ytelse_iverksetting_status{status="FEILET"} > 0
+          for: 10m
           annotations:
             consequence: Vi har mottatt FEILET-status fra hel-ved ved iverksetting
             action: "Sjekk logger for å finne iverksetting-id som har feilet og kontakt hel-ved"
