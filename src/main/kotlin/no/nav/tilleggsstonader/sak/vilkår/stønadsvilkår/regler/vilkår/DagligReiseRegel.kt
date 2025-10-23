@@ -14,8 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
 
-// TODO: Rename til DagligReiseRegel fordi den er ikke spesifikk kun for offentlig transport
-class DagligReiseOffentiligTransportRegel :
+class DagligReiseRegel :
     Vilkårsregel(
         vilkårType = VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
         regler =

@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Sv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseOffentiligTransportRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegel
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -27,7 +27,7 @@ class ByggVilkårFraSvarTest {
 
         val delvilkårsett =
             ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
-                vilkårsregel = DagligReiseOffentiligTransportRegel(),
+                vilkårsregel = DagligReiseRegel(),
                 svar = svar,
             )
 
@@ -54,7 +54,7 @@ class ByggVilkårFraSvarTest {
 
         val delvilkårsett =
             ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
-                vilkårsregel = DagligReiseOffentiligTransportRegel(),
+                vilkårsregel = DagligReiseRegel(),
                 svar = svar,
             )
 
@@ -77,7 +77,7 @@ class ByggVilkårFraSvarTest {
         Assertions
             .assertThatThrownBy {
                 ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
-                    vilkårsregel = DagligReiseOffentiligTransportRegel(),
+                    vilkårsregel = DagligReiseRegel(),
                     svar = svar,
                 )
             }.hasMessageContaining("Ikke alle svar kunne mappes til vurderinger")

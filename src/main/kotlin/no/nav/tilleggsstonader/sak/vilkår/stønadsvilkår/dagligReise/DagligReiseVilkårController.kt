@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Vilk�
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.tilDagligreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregel.tilRegelstruktur
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseOffentiligTransportRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegel
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -31,7 +31,7 @@ class DagligReiseVilkårController(
     private val dagligReiseVilkårService: DagligReiseVilkårService,
 ) {
     @GetMapping("regler")
-    fun regler(): RegelstrukturDto = DagligReiseOffentiligTransportRegel().tilRegelstruktur()
+    fun regler(): RegelstrukturDto = DagligReiseRegel().tilRegelstruktur()
 
     @GetMapping("{behandlingId}")
     fun hentVilkår(

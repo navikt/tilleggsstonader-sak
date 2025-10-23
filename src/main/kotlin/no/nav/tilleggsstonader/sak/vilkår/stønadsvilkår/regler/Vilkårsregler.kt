@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseOffentiligTransportRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.LøpendeUtgifterEnBoligRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.LøpendeUtgifterToBoligerRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegel
@@ -37,8 +37,8 @@ fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
                 LøpendeUtgifterToBoligerRegel(),
             )
 
-        Stønadstype.DAGLIG_REISE_TSO -> listOf(DagligReiseOffentiligTransportRegel())
-        Stønadstype.DAGLIG_REISE_TSR -> listOf(DagligReiseOffentiligTransportRegel())
+        Stønadstype.DAGLIG_REISE_TSO -> listOf(DagligReiseRegel())
+        Stønadstype.DAGLIG_REISE_TSR -> listOf(DagligReiseRegel())
     }
 
 private val vilkårstyperPerStønad: Map<Stønadstype, Set<VilkårType>> =
