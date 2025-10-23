@@ -48,6 +48,7 @@ internal class SimuleringServiceTest {
             tilkjentYtelseService = tilkjentYtelseService,
             tilgangService = tilgangService,
             iverksettService = iverksettService,
+            utbetalingV3Mapper = utbetalingV3Mapper,
         )
 
     private val personIdent = "12345678901"
@@ -86,7 +87,7 @@ internal class SimuleringServiceTest {
         val simulerSlot = slot<SimuleringRequestDto>()
         val detaljer = SimuleringDetaljerKontrakt("", LocalDate.now(), 0, emptyList())
         every {
-            iverksettClient.simuler(capture(simulerSlot))
+            iverksettClient.simulerV2(capture(simulerSlot))
         } returns SimuleringResponseDto(emptyList(), detaljer)
 
         simuleringService.hentOgLagreSimuleringsresultat(saksbehandling)
@@ -123,7 +124,7 @@ internal class SimuleringServiceTest {
 
         val tilkjentYtelse = tilkjentYtelse(behandlingId = behandling.id)
 
-        every { iverksettClient.simuler(any()) } returns
+        every { iverksettClient.simulerV2(any()) } returns
             objectMapper.readValue(readFile("mock/iverksett/simuleringsresultat.json"))
 
         every { behandlingService.hentBehandling(any()) } returns behandling

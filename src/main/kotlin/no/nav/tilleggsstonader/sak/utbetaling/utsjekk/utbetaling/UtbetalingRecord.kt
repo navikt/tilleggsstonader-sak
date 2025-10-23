@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 
 /**
  * [id] er en UUID som konsumenter av Utsjekk har ansvar for å lage og holde styr
@@ -11,15 +10,15 @@ import java.util.UUID
  *
  */
 data class UtbetalingRecord(
-    val dryrun: Boolean = false,
-    val brukFagområdeTillst: Boolean = false,
     val id: String,
+    val dryrun: Boolean,
+    val brukFagområdeTillst: Boolean = false,
     val sakId: String,
     val behandlingId: String,
     val personident: String,
-    val saksbehandler: String,
-    val beslutter: String,
-    val vedtakstidspunkt: LocalDateTime,
+    val saksbehandler: String?, // er null i simulering
+    val beslutter: String?, // er null i simulering
+    val vedtakstidspunkt: LocalDateTime?, // er null i simulering
     val periodetype: PeriodetypeUtbetaling,
     // kan ikke ha flere stønader i en og samme kjede i v3 (koden som splittet opp dette er ikke i bruk - umulig å vedlikeholde)
     val stønad: StønadUtbetaling,

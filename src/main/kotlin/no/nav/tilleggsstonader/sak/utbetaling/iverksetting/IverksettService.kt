@@ -2,26 +2,25 @@ package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
+import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
-import no.nav.tilleggsstonader.sak.utbetaling.id.UtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingMapper
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingMessageProducer
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingRecord
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingV3Mapper
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -38,10 +37,8 @@ class IverksettService(
     private val andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository,
     private val taskService: TaskService,
     private val utbetalingMessageProducer: UtbetalingMessageProducer,
-    private val utbetalingIdService: UtbetalingIdService,
+    private val utbetalingV3Mapper: UtbetalingV3Mapper,
 ) {
-    private val logger = LoggerFactory.getLogger(javaClass)
-
     /**
      * Skal brukes når man iverksetter en behandling første gang, uansett om det er behandling 1 eller behandling 2 på en fagsak
      * Dette fordi man skal iverksette alle andeler tom forrige måned.
@@ -151,29 +148,15 @@ class IverksettService(
         erFørsteIverksettingForBehandling: Boolean = false,
     ) {
         if (utbetalingSkalSendesPåKafka(behandling.stønadstype)) {
-            // En utbetaling er knyttet til en type andel (klassekode hos økonomi)
-            val records =
-                andelerTilkjentYtelse
-                    .groupBy { it.type }
-                    .map { (type, andelerTilkjentYtelseGruppertPåType) ->
-                        val utbetalingId = utbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
-                        UtbetalingMapper.lagUtbetalingRecord(
-                            id = utbetalingId.id,
-                            andelerTilkjentYtelse = andelerTilkjentYtelseGruppertPåType,
-                            totrinnskontroll = totrinnskontroll,
-                            behandling = behandling,
-                            typeAndel = type,
-                        )
-                    }
-
-            val alleRecords =
-                if (erFørsteIverksettingForBehandling) {
-                    records + lagUtbetalingRecordForAnnullering(behandling, andelerTilkjentYtelse, totrinnskontroll)
-                } else {
-                    records
-                }
-
-            utbetalingMessageProducer.sendUtbetalinger(iverksettingId, alleRecords)
+            val recordsSomSkalPåKafka: List<UtbetalingRecord> =
+                utbetalingV3Mapper.lagUtbetalingRecords(
+                    behandling = behandling,
+                    tilkjentYtelse = tilkjentYtelse,
+                    totrinnskontroll = totrinnskontroll,
+                    erFørsteIverksettingForBehandling = erFørsteIverksettingForBehandling,
+                    erSimulering = false,
+                )
+            utbetalingMessageProducer.sendUtbetalinger(iverksettingId, recordsSomSkalPåKafka)
         } else {
             val dto =
                 IverksettDtoMapper.map(
@@ -186,42 +169,6 @@ class IverksettService(
             opprettHentStatusFraIverksettingTask(behandling, iverksettingId)
             iverksettClient.iverksett(dto)
         }
-    }
-
-    private fun lagUtbetalingRecordForAnnullering(
-        behandling: Saksbehandling,
-        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-        totrinnskontroll: Totrinnskontroll,
-    ): Collection<UtbetalingRecord> {
-        val typeandelerSomSkalAnnulleres = finnTypeAndelerSomSkalAnnulleres(behandling, andelerTilkjentYtelse)
-        val utbetalingIder =
-            typeandelerSomSkalAnnulleres
-                .map { utbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, it) }
-
-        return utbetalingIder.map {
-            UtbetalingMapper.lagTomUtbetalingRecordForAnnullering(
-                id = it.id,
-                behandling = behandling,
-                totrinnskontroll = totrinnskontroll,
-                typeAndel = it.typeAndel,
-            )
-        }
-    }
-
-    private fun finnTypeAndelerSomSkalAnnulleres(
-        behandling: Saksbehandling,
-        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-    ): List<TypeAndel> {
-        if (behandling.forrigeIverksatteBehandlingId == null) {
-            return emptyList()
-        }
-        val andelerForrigeBehandling =
-            tilkjentYtelseService
-                .hentForBehandling(behandling.forrigeIverksatteBehandlingId)
-                .andelerTilkjentYtelse
-
-        val typeAndelerNåværendeBehandling = andelerTilkjentYtelse.map { it.type }
-        return andelerForrigeBehandling.filter { it.type !in typeAndelerNåværendeBehandling }.map { it.type }
     }
 
     /**
@@ -369,5 +316,4 @@ data class ForrigeIverksetting(
     val iverksettingId: UUID,
 )
 
-fun utbetalingSkalSendesPåKafka(stønadstype: Stønadstype) =
-    stønadstype !in setOf(Stønadstype.BARNETILSYN, Stønadstype.BOUTGIFTER, Stønadstype.LÆREMIDLER)
+fun utbetalingSkalSendesPåKafka(stønadstype: Stønadstype) = stønadstype.gjelderDagligReise()

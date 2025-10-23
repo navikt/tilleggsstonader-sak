@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequestDto
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingRecord
 import no.nav.tilleggsstonader.sak.util.EnvUtil
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
@@ -62,11 +63,28 @@ class IverksettClient(
         return getForEntity<IverksettStatus>(url, uriVariables = uriVariables)
     }
 
-    fun simuler(simuleringRequest: SimuleringRequestDto): SimuleringResponseDto? {
+    fun simulerV2(simuleringRequest: SimuleringRequestDto): SimuleringResponseDto? {
         val url =
             UriComponentsBuilder
                 .fromUri(uri)
                 .pathSegment("api", "simulering", "v2")
+                .toUriString()
+
+        return try {
+            postForEntityNullable<SimuleringResponseDto>(url, simuleringRequest)
+        } catch (e: HttpClientErrorException.NotFound) {
+            brukerfeilHvis(EnvUtil.erIDev() && e.responseBodyAsString.contains("Personen finnes ikke i PDL")) {
+                "Simulering finner ikke personen i PDL. Prøv å gjenopprette personen i Dolly og prøv på nytt."
+            }
+            throw e
+        }
+    }
+
+    fun simulerV3(simuleringRequest: List<UtbetalingRecord>): SimuleringResponseDto? {
+        val url =
+            UriComponentsBuilder
+                .fromUri(uri)
+                .pathSegment("api", "simulering", "v3")
                 .toUriString()
 
         return try {

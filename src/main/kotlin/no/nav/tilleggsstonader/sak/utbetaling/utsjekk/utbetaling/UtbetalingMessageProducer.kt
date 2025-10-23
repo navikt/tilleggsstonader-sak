@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
-import no.nav.tilleggsstonader.libs.log.logger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
@@ -16,6 +15,7 @@ class UtbetalingMessageProducer(
         iverksettingId: UUID,
         utbetaling: List<UtbetalingRecord>,
     ) {
+        require(utbetaling.none { it.beslutter == null })
         val producerRecords =
             utbetaling.map { utbetalingRecord ->
                 ObjectMapperProvider.objectMapper.writeValueAsString(utbetalingRecord)
