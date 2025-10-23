@@ -3,15 +3,17 @@ package no.nav.tilleggsstonader.sak.statistikk.behandling
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
-import no.nav.tilleggsstonader.sak.infrastruktur.KafkaProducerService
+import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.header.internals.RecordHeader
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 
 @Service
 class BehandlingKafkaProducer(
-    private val kafkaProducerService: KafkaProducerService,
     @Value("\${DVH_BEHANDLING_TOPIC}") private val topic: String,
+    val kafkaTemplate: KafkaTemplate<String, String>,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
@@ -23,11 +25,11 @@ class BehandlingKafkaProducer(
         logger.info("Sending to Kafka topic: $topic")
         secureLogger.debug("Sending to Kafka topic: {}\nBehandlingstatistikk: {}", topic, behandlingDVH)
         runCatching {
-            kafkaProducerService.sendMedStønadstypeIHeader(
+            sendMedStønadstypeIHeader(
                 topic,
                 stønadstype,
                 behandlingDVH.behandlingId,
-                behandlingDVH.toJson(),
+                objectMapper.writeValueAsString(behandlingDVH),
             )
             logger.info(
                 "Behandlingstatistikk for behandling=${behandlingDVH.behandlingId} " +
@@ -41,5 +43,14 @@ class BehandlingKafkaProducer(
         }
     }
 
-    private fun Any.toJson(): String = objectMapper.writeValueAsString(this)
+    private fun sendMedStønadstypeIHeader(
+        topic: String,
+        stønadstype: Stønadstype,
+        key: String,
+        payload: String,
+    ) {
+        val record = ProducerRecord(topic, key, payload)
+        record.headers().add(RecordHeader("stønadstype", stønadstype.name.toByteArray()))
+        kafkaTemplate.send(record).get()
+    }
 }
