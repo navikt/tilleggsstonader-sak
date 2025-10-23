@@ -54,6 +54,6 @@ class VilkårSteg(
 
     private fun manglerPåkrevdUtgift(vilkår: Vilkår): Boolean =
         !vilkår.erFremtidigUtgift &&
-            vilkår.type != VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT &&
+            vilkår.type != VilkårType.DAGLIG_REISE &&
             vilkår.utgift == null
 }

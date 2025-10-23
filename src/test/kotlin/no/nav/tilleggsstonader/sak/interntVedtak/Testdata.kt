@@ -43,7 +43,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatL
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
@@ -604,13 +604,13 @@ object Testdata {
                 vilkår(
                     resultat = Vilkårsresultat.OPPFYLT,
                     behandlingId = behandlingId,
-                    type = VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
+                    type = VilkårType.DAGLIG_REISE,
                     delvilkår = oppfylteDelvilkårDagligReiseOffentligTransport(),
                     fom = LocalDate.of(2024, FEBRUARY, 1),
                     tom = LocalDate.of(2024, FEBRUARY, 2),
                     utgift = null,
-                    offentligTransport =
-                        OffentligTransport(
+                    fakta =
+                        FaktaDagligReiseOffentligTransport(
                             reisedagerPerUke = 5,
                             prisEnkelbillett = 44,
                             prisSyvdagersbillett = null,
