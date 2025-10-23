@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdat
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import org.springframework.data.annotation.Id
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
@@ -19,6 +20,7 @@ interface UtbetalingIdRepository :
 }
 
 data class UtbetalingId(
+    @Id
     val id: String = genererUtbetalingId(),
     val fagsakId: FagsakId,
     val typeAndel: TypeAndel,

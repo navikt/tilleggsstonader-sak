@@ -19,7 +19,7 @@ class UtbetalingStatusHåndterer(
             return
         }
         val utbetalingsstatus = melding.status
-        val andeler = andelTilkjentYtelseRepository.findByIverksettingId(UUID.fromString(iverksettingId))
+        val andeler = andelTilkjentYtelseRepository.findByIverksettingIverksettingId(UUID.fromString(iverksettingId))
 
         sanityCheckAndelene(andeler, iverksettingId)
 
