@@ -100,12 +100,16 @@ class InterntVedtakService(
                         boutgifter = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
                     )
 
-                is InnvilgelseDagligReise ->
+                is InnvilgelseDagligReise -> {
+                    println("✅ InnvilgelseDagligReise reached with data: ${data.beregningsresultat}")
+                    println("✅ mapped dataååååååååå: ${data.beregningsresultat.tilDto(vedtak.tidligsteEndring)}")
                     BeregningsresultatInterntVedtakDto(
-                        dagligReise = data.beregningsresultat.tilDto(vedtak.tidligsteEndring),
+                        dagligReiseTso = data.beregningsresultat.tilDto(vedtak.tidligsteEndring),
                     )
+                }
 
-                is Innvilgelse -> error("Mangler mapping av beregningsresultat for ${data.type}")
+                is Innvilgelse,
+                -> error("Mangler mapping av beregningsresultat for ${data.type}")
 
                 else -> null
             }

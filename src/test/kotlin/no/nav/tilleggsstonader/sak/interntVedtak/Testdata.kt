@@ -28,7 +28,11 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
@@ -648,7 +652,79 @@ object Testdata {
             BeregningsresultatDagligReise(
                 offentligTransport =
                     BeregningsresultatOffentligTransport(
-                        reiser = emptyList(),
+                        reiser =
+                            listOf(
+                                BeregningsresultatForReise(
+                                    perioder =
+                                        listOf(
+                                            BeregningsresultatForPeriode(
+                                                grunnlag =
+                                                    BeregningsgrunnlagOffentligTransport(
+                                                        fom = LocalDate.of(2024, 1, 1),
+                                                        tom = LocalDate.of(2024, 1, 1),
+                                                        prisEnkeltbillett = 80,
+                                                        prisSyvdagersbillett = 400,
+                                                        pris30dagersbillett = 1800,
+                                                        antallReisedagerPerUke = 5,
+                                                        vedtaksperioder = emptyList(),
+                                                        antallReisedager = 10,
+                                                    ),
+                                                beløp = 3000,
+                                                billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 1),
+                                            ),
+                                            BeregningsresultatForPeriode(
+                                                grunnlag =
+                                                    BeregningsgrunnlagOffentligTransport(
+                                                        fom = LocalDate.of(2024, 1, 1),
+                                                        tom = LocalDate.of(2024, 1, 1),
+                                                        prisEnkeltbillett = 80,
+                                                        prisSyvdagersbillett = 400,
+                                                        pris30dagersbillett = 1800,
+                                                        antallReisedagerPerUke = 5,
+                                                        vedtaksperioder = emptyList(),
+                                                        antallReisedager = 10,
+                                                    ),
+                                                beløp = 3000,
+                                                billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 1),
+                                            ),
+                                            BeregningsresultatForPeriode(
+                                                grunnlag =
+                                                    BeregningsgrunnlagOffentligTransport(
+                                                        fom = LocalDate.of(2024, 1, 1),
+                                                        tom = LocalDate.of(2024, 1, 1),
+                                                        prisEnkeltbillett = 80,
+                                                        prisSyvdagersbillett = 400,
+                                                        pris30dagersbillett = 1800,
+                                                        antallReisedagerPerUke = 5,
+                                                        vedtaksperioder = emptyList(),
+                                                        antallReisedager = 10,
+                                                    ),
+                                                beløp = 3000,
+                                                billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 1),
+                                            ),
+                                        ),
+                                ),
+                                BeregningsresultatForReise(
+                                    perioder =
+                                        listOf(
+                                            BeregningsresultatForPeriode(
+                                                grunnlag =
+                                                    BeregningsgrunnlagOffentligTransport(
+                                                        fom = LocalDate.of(2024, 1, 1),
+                                                        tom = LocalDate.of(2024, 1, 1),
+                                                        prisEnkeltbillett = 80,
+                                                        prisSyvdagersbillett = 400,
+                                                        pris30dagersbillett = 1800,
+                                                        antallReisedagerPerUke = 5,
+                                                        vedtaksperioder = emptyList(),
+                                                        antallReisedager = 10,
+                                                    ),
+                                                beløp = 3000,
+                                                billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 1),
+                                            ),
+                                        ),
+                                ),
+                            ),
                     ),
             )
         val innvilgetVedtak =

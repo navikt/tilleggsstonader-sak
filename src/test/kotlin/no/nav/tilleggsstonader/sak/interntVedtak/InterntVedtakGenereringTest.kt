@@ -137,7 +137,7 @@ class InterntVedtakGenereringTest {
     }
 
     private fun mockDagligReise() {
-        val testvilkår = Testdata.DagligReise.vilkårOffentligTransport
+        val testvilkår = Testdata.DagligReise.innvilgetVedtak
         every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.DagligReise.behandling
         every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.DagligReise.vilkårperioder
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.DagligReise.grunnlagsdata
@@ -145,7 +145,6 @@ class InterntVedtakGenereringTest {
         every { vilkårService.hentVilkår(behandlingId) } returns Testdata.DagligReise.vilkårOffentligTransport
         // every { vilkårService.hentVilkår(behandlingId) } returns Testdata.DagligReise.vilkårOffentligTransport
         every { vedtakService.hentVedtak(behandlingId) } returns Testdata.DagligReise.innvilgetVedtak
-        println("hello" + testvilkår)
     }
 
     @Test

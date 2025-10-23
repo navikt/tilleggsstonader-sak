@@ -38,7 +38,7 @@ data class BeregningsresultatInterntVedtakDto(
     val tilsynBarn: List<BeregningsresultatForMånedDto>? = null,
     val læremidler: List<BeregningsresultatDtoLæremidler>? = null,
     val boutgifter: List<BeregningsresultatDtoBoutgifter>? = null,
-    val dagligReise: BeregningsresultatDagligReiseDto? = null,
+    val dagligReiseTso: BeregningsresultatDagligReiseDto? = null,
 )
 
 data class Behandlinginfo(
