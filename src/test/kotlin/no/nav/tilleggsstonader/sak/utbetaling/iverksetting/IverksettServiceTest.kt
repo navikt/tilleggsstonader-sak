@@ -519,7 +519,7 @@ class IverksettServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `iverksetter førstegangsbehandling daglig reise første gang, to andeler forrige måned, sender en utbetaling med to andeler`() {
+        fun `iverksetter førstegangsbehandling daglig reise første gang, to andeler forrige måned, sender én utbetaling med én periode`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
             val behandling = testoppsettService.lagre(behandling(fagsak, resultat = BehandlingResultat.INNVILGET))
             lagreTotrinnskontroll(behandling)

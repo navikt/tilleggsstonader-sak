@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequ
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingV3Mapper
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -40,6 +41,7 @@ internal class SimuleringServiceTest {
     private val tilkjentYtelseService = mockk<TilkjentYtelseService>()
     private val tilgangService = mockk<TilgangService>()
     private val iverksettService = mockk<IverksettService>()
+    private val utbetalingV3Mapper = mockk<UtbetalingV3Mapper>()
 
     private val simuleringService =
         SimuleringService(

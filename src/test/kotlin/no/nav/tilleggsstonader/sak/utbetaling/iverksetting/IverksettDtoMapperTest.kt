@@ -79,7 +79,7 @@ class IverksettDtoMapperTest {
 
     @Test
     fun `skal mappe forrigeIverksetting`() {
-        val forrigeIverksetting = ForrigeIverksetting("11", UUID.randomUUID())
+        val forrigeIverksetting = ForrigeIverksettingDto("11", UUID.randomUUID())
         val dto =
             IverksettDtoMapper.map(
                 behandling = behandling,

@@ -286,11 +286,11 @@ class IverksettService(
     fun finnForrigeIverksetting(
         behandling: Saksbehandling,
         tilkjentYtelse: TilkjentYtelse,
-    ): ForrigeIverksetting? =
+    ): ForrigeIverksettingDto? =
         tilkjentYtelse.finnForrigeIverksetting(behandling.id)
             ?: forrigeIverksettingForrigeBehandling(behandling)
 
-    private fun forrigeIverksettingForrigeBehandling(behandling: Saksbehandling): ForrigeIverksetting? {
+    private fun forrigeIverksettingForrigeBehandling(behandling: Saksbehandling): ForrigeIverksettingDto? {
         val forrigeIverksatteBehandlingId = behandling.forrigeIverksatteBehandlingId
         return forrigeIverksatteBehandlingId?.let {
             tilkjentYtelseService.hentForBehandling(forrigeIverksatteBehandlingId).finnForrigeIverksetting(forrigeIverksatteBehandlingId)
@@ -300,20 +300,15 @@ class IverksettService(
     /**
      * Utleder [ForrigeIverksettingDto] ut fra andel med siste tidspunkt for iverksetting
      */
-    private fun TilkjentYtelse.finnForrigeIverksetting(behandlingId: BehandlingId): ForrigeIverksetting? =
+    private fun TilkjentYtelse.finnForrigeIverksetting(behandlingId: BehandlingId): ForrigeIverksettingDto? =
         andelerTilkjentYtelse
             .mapNotNull { it.iverksetting }
             .maxByOrNull { it.iverksettingTidspunkt }
             ?.iverksettingId
             ?.let {
                 val eksternBehandlingId = behandlingService.hentEksternBehandlingId(behandlingId).id
-                ForrigeIverksetting(behandlingId = eksternBehandlingId.toString(), iverksettingId = it)
+                ForrigeIverksettingDto(behandlingId = eksternBehandlingId.toString(), iverksettingId = it)
             }
 }
-
-data class ForrigeIverksetting(
-    val behandlingId: String,
-    val iverksettingId: UUID,
-)
 
 fun utbetalingSkalSendesPåKafka(stønadstype: Stønadstype) = stønadstype.gjelderDagligReise()
