@@ -589,13 +589,13 @@ object Testdata {
         private val aktivitetererBoutgifter =
             listOf(
                 VilkårperiodeTestUtil.aktivitet(
-                    fom = LocalDate.of(2024, 2, 5),
-                    tom = LocalDate.of(2024, 2, 10),
+                    fom = LocalDate.of(2024, 12, 10),
+                    tom = LocalDate.of(2024, 12, 15),
                     faktaOgVurdering = faktaOgVurderingAktivitetBoutgifter(),
                 ),
                 VilkårperiodeTestUtil.aktivitet(
-                    fom = LocalDate.of(2024, 2, 5),
-                    tom = LocalDate.of(2024, 2, 10),
+                    fom = LocalDate.of(2024, 12, 10),
+                    tom = LocalDate.of(2024, 12, 15),
                     resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
                     begrunnelse = "ikke oppfylt",
                     faktaOgVurdering = faktaOgVurderingAktivitetBoutgifter(type = AktivitetType.UTDANNING),

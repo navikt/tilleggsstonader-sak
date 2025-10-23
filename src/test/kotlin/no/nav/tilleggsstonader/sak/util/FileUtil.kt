@@ -43,7 +43,7 @@ object FileUtil {
      * 3. Kjører tester på nytt, 2 ganger, 1 gang for å skrive filen, en andre gång for å verifisere
      * 4. set denne til false på nytt, hvis ikke feiler [FileUtilTest]
      */
-    const val SKAL_SKRIVE_TIL_FIL = true
+    const val SKAL_SKRIVE_TIL_FIL = false
 
     fun assertFileJsonIsEqual(
         filnavn: String,

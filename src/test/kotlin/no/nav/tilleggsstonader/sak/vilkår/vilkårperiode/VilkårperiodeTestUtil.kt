@@ -16,6 +16,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeLæremidler
@@ -317,10 +319,10 @@ object VilkårperiodeTestUtil {
                 )
             AktivitetType.UTDANNING -> UtdanningBoutgifter
 
-            AktivitetType.INGEN_AKTIVITET -> IngenAktivitetTilsynBarn
+            AktivitetType.INGEN_AKTIVITET -> IngenAktivitetBoutgifter
 
             else -> {
-                throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for læremidler")
+                throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for boutgifter")
             }
         }
 
@@ -442,10 +444,10 @@ object VilkårperiodeTestUtil {
             AktivitetType.TILTAK -> TiltakDagligReiseTso(vurderinger = VurderingTiltakDagligReiseTso(lønnet = lønnet))
             AktivitetType.UTDANNING -> UtdanningDagligReiseTso
 
-            AktivitetType.INGEN_AKTIVITET -> IngenAktivitetTilsynBarn
+            AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTso
 
             else -> {
-                throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for læremidler")
+                throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for daglig reise")
             }
         }
 }
