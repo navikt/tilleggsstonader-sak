@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status
 
+import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelseRepository
@@ -11,6 +12,10 @@ import java.util.UUID
 class UtbetalingStatusHåndterer(
     private val andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository,
 ) {
+    /*
+     Iverksetting over v2/rest vil også komme inn her. Da vil key fra topic ikke være iverksettingId,
+     men en id generert av helved som vi ikke har kjennskap til
+     */
     fun behandleStatusoppdatering(
         iverksettingId: String,
         melding: UtbetalingStatusRecord,
@@ -21,9 +26,13 @@ class UtbetalingStatusHåndterer(
         val utbetalingsstatus = melding.status
         val andeler = andelTilkjentYtelseRepository.findByIverksettingIverksettingId(UUID.fromString(iverksettingId))
 
-        sanityCheckAndelene(andeler, iverksettingId)
-
-        andelTilkjentYtelseRepository.updateAll(andeler.map { it.copy(statusIverksetting = utbetalingsstatus.tilStatusIverksetting()) })
+        if (andeler.isNotEmpty()) {
+            logger.info(
+                "Mottatt utbetalingsstatus=${utbetalingsstatus.name} for iverksettingId=$iverksettingId. Oppdaterer${andeler.size} andel(er)",
+            )
+            sanityCheckStatusPåAndelerKnyttetTilIverksetting(andeler, iverksettingId)
+            andelTilkjentYtelseRepository.updateAll(andeler.map { it.copy(statusIverksetting = utbetalingsstatus.tilStatusIverksetting()) })
+        }
     }
 }
 
@@ -35,14 +44,19 @@ fun UtbetalingStatus.tilStatusIverksetting(): StatusIverksetting =
         UtbetalingStatus.HOS_OPPDRAG -> StatusIverksetting.HOS_OPPDRAG
     }
 
-private fun sanityCheckAndelene(
+// Statuser som tilsier at en andel aldri skal ha vært iverksatt
+private val uforventedeStatuser =
+    listOf(
+        StatusIverksetting.UBEHANDLET,
+        StatusIverksetting.VENTER_PÅ_SATS_ENDRING,
+        StatusIverksetting.UAKTUELL,
+    )
+
+private fun sanityCheckStatusPåAndelerKnyttetTilIverksetting(
     andeler: List<AndelTilkjentYtelse>,
     iverksettingId: String,
 ) {
-    feilHvis(andeler.any { it.statusIverksetting != StatusIverksetting.SENDT }) {
-        "Finnes andeler på iverksetting=$iverksettingId som har annen status enn ${StatusIverksetting.SENDT}"
-    }
-    feilHvis(andeler.isEmpty()) {
-        "Forventet å finne minimum en andel for iverksetting=$iverksettingId"
+    feilHvis(andeler.any { it.statusIverksetting in uforventedeStatuser }) {
+        "Det finnes andeler på iverksetting=$iverksettingId som har en uforventet status"
     }
 }
