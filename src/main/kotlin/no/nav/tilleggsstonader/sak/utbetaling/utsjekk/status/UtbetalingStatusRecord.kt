@@ -16,7 +16,7 @@ data class UtbetalingLinje(
     val behandlingId: String,
     val fom: LocalDate,
     val tom: LocalDate,
-    val vedtakssats: UInt,
+    val vedtakssats: UInt?,
     val beløp: UInt,
     val klassekode: String,
 )
