@@ -102,8 +102,8 @@ class AndelTilkjentYtelseIverksettingStatusGauge(
     private fun oppdragErHelgestengt() = erHelg() || erMandagFørKl06()
 
     private fun erMandagFørKl06(): Boolean {
-        val now = LocalDateTime.now()
-        return now.dayOfWeek == DayOfWeek.MONDAY && now.hour < 6
+        val nå = LocalDateTime.now()
+        return nå.dayOfWeek == DayOfWeek.MONDAY && nå.hour < 6
     }
 
     private fun erHelg(): Boolean = LocalDate.now().dayOfWeek !in DayOfWeek.SATURDAY..DayOfWeek.SUNDAY
