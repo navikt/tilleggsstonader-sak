@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.UUID
 
 /**
  * [id] er en UUID som konsumenter av Utsjekk har ansvar for å lage og holde styr
@@ -10,7 +11,7 @@ import java.time.LocalDateTime
  *
  */
 data class UtbetalingRecord(
-    val id: String,
+    val id: UUID,
     val dryrun: Boolean,
     val brukFagområdeTillst: Boolean = false,
     val sakId: String,

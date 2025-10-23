@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class UtbetalingV3Mapper(
@@ -54,7 +55,7 @@ class UtbetalingV3Mapper(
      * Per nå tilsvarer [id] iverksettingId, men vi må se på hva vi ønsker med denne parameteren.
      */
     private fun lagUtbetalingRecord(
-        id: String,
+        id: UUID,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         totrinnskontroll: Totrinnskontroll?,
         behandling: Saksbehandling,

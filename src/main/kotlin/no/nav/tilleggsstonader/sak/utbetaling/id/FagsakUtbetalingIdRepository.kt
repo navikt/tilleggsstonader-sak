@@ -22,24 +22,7 @@ interface FagsakUtbetalingIdRepository :
 
 data class FagsakUtbetalingId(
     @Id
-    val utbetalingId: String = genererUtbetalingId(),
+    val utbetalingId: UUID = randomUUID(),
     val fagsakId: FagsakId,
     val typeAndel: TypeAndel,
-) {
-    init {
-        feilHvis(utbetalingId.length > 25) {
-            "UtbetalingId må være kortere eller lik 25 tegn da økonomi ikke takler lengre id'er"
-        }
-    }
-
-    companion object {
-        private const val PREFIX = "TS"
-
-        fun genererUtbetalingId(): String =
-            PREFIX +
-                randomUUID()
-                    .toString()
-                    .replace("-", "")
-                    .take(25 - PREFIX.length)
-    }
-}
+)
