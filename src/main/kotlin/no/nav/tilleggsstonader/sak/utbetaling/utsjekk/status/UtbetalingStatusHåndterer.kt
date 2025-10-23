@@ -20,7 +20,7 @@ class UtbetalingStatusHåndterer(
         iverksettingId: String,
         melding: UtbetalingStatusRecord,
     ) {
-        if (melding.detaljer.ytelse != "TILLEGGSSTØNADER") {
+        if (melding.detaljer?.ytelse != "TILLEGGSSTØNADER") {
             return
         }
         val utbetalingsstatus = melding.status
