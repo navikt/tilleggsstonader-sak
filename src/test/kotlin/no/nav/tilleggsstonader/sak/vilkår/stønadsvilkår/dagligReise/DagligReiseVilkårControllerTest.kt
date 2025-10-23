@@ -11,8 +11,6 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.slettVilkår
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
@@ -35,7 +33,7 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
     val svarOffentligTransport =
         mapOf(
             RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA),
-            RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
         )
 
     @BeforeEach

@@ -18,11 +18,11 @@ class ByggVilkårFraSvarTest {
                         svar = SvarId.JA,
                     ),
                 RegelId.UNNTAK_SEKS_KM to null,
-                RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to
+                RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to
                     SvarOgBegrunnelse(
                         svar = SvarId.JA,
                     ),
-                RegelId.KAN_BRUKER_KJØRE_SELV to null,
+                RegelId.KAN_KJØRE_MED_EGEN_BIL to null,
             )
 
         val delvilkårsett =
@@ -45,11 +45,11 @@ class ByggVilkårFraSvarTest {
                         svar = SvarId.NEI,
                     ),
                 RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelse(svar = SvarId.JA),
-                RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to
+                RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to
                     SvarOgBegrunnelse(
                         svar = SvarId.NEI,
                     ),
-                RegelId.KAN_BRUKER_KJØRE_SELV to SvarOgBegrunnelse(SvarId.NEI, "Begrunnelse"),
+                RegelId.KAN_KJØRE_MED_EGEN_BIL to SvarOgBegrunnelse(SvarId.NEI, "Begrunnelse"),
             )
 
         val delvilkårsett =

@@ -21,14 +21,14 @@ class DagligReiseRegel :
             setOf(
                 AVSTAND_OVER_SEKS_KM,
                 UNNTAK_SEKS_KM,
-                KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT,
-                KAN_BRUKER_KJØRE_SELV,
+                KAN_REISE_MED_OFFENTLIG_TRANSPORT,
+                KAN_KJØRE_MED_EGEN_BIL,
             ),
     ) {
     companion object {
-        private val KAN_BRUKER_KJØRE_SELV =
+        private val KAN_KJØRE_MED_EGEN_BIL =
             RegelSteg(
-                regelId = RegelId.KAN_BRUKER_KJØRE_SELV,
+                regelId = RegelId.KAN_KJØRE_MED_EGEN_BIL,
                 erHovedregel = false,
                 svarMapping =
                     mapOf(
@@ -42,9 +42,9 @@ class DagligReiseRegel :
                     ),
             )
 
-        private val KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT =
+        private val KAN_REISE_MED_OFFENTLIG_TRANSPORT =
             RegelSteg(
-                regelId = RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT,
+                regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
                 erHovedregel = false,
                 svarMapping =
                     jaNeiSvarRegel(
@@ -54,7 +54,7 @@ class DagligReiseRegel :
                                 begrunnelseType = BegrunnelseType.VALGFRI,
                                 tilhørendeFaktaType = TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
                             ),
-                        hvisNei = NesteRegel(KAN_BRUKER_KJØRE_SELV.regelId),
+                        hvisNei = NesteRegel(KAN_KJØRE_MED_EGEN_BIL.regelId),
                     ),
             )
 
@@ -64,7 +64,7 @@ class DagligReiseRegel :
                 erHovedregel = false,
                 svarMapping =
                     jaNeiSvarRegel(
-                        hvisJa = NesteRegel(KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT.regelId),
+                        hvisJa = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId),
                         hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     ),
             )
@@ -75,7 +75,7 @@ class DagligReiseRegel :
                 erHovedregel = true,
                 svarMapping =
                     jaNeiSvarRegel(
-                        hvisJa = NesteRegel(KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT.regelId),
+                        hvisJa = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId),
                         hvisNei = NesteRegel(UNNTAK_SEKS_KM.regelId),
                     ),
             )
