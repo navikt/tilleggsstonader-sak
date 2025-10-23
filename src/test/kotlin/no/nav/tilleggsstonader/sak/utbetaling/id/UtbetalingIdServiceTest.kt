@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 
 class UtbetalingIdServiceTest {
     private val fagsakUtbetalingIdRepository = mockk<FagsakUtbetalingIdRepository>()
-    private val utbetalingIdService = UtbetalingIdService(fagsakUtbetalingIdRepository)
+    private val fagsakUtbetalingIdService = FagsakUtbetalingIdService(fagsakUtbetalingIdRepository)
 
     val fagsakId = FagsakId.random()
     val typeAndel = TypeAndel.DAGLIG_REISE_AAP
@@ -19,7 +19,7 @@ class UtbetalingIdServiceTest {
     fun `utbetalingId finnes ikke for gitt fagsakId og typeAndel, opprettes`() {
         every { fagsakUtbetalingIdRepository.findByFagsakIdAndTypeAndel(fagsakId, typeAndel) } returns null
         every { fagsakUtbetalingIdRepository.insert(any()) } answers { firstArg() }
-        val utbetalingId = utbetalingIdService.hentEllerOpprettUtbetalingId(fagsakId, typeAndel)
+        val utbetalingId = fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(fagsakId, typeAndel)
 
         verify { fagsakUtbetalingIdRepository.insert(utbetalingId) }
     }
@@ -29,7 +29,7 @@ class UtbetalingIdServiceTest {
         val fagsakUtbetalingId = FagsakUtbetalingId(fagsakId = fagsakId, typeAndel = typeAndel)
         every { fagsakUtbetalingIdRepository.findByFagsakIdAndTypeAndel(fagsakId, typeAndel) } returns fagsakUtbetalingId
 
-        assertThat(utbetalingIdService.hentEllerOpprettUtbetalingId(fagsakId, typeAndel)).isEqualTo(fagsakUtbetalingId)
+        assertThat(fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(fagsakId, typeAndel)).isEqualTo(fagsakUtbetalingId)
         verify(exactly = 0) { fagsakUtbetalingIdRepository.insert(any()) }
     }
 }

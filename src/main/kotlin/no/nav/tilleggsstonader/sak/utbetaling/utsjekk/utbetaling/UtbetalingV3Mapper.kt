@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.utbetaling.id.UtbetalingIdService
+import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -12,7 +12,7 @@ import java.util.UUID
 
 @Service
 class UtbetalingV3Mapper(
-    private val utbetalingIdService: UtbetalingIdService,
+    private val fagsakUtbetalingIdService: FagsakUtbetalingIdService,
     private val tilkjentYtelseService: TilkjentYtelseService,
 ) {
     fun lagUtbetalingRecords(
@@ -27,7 +27,7 @@ class UtbetalingV3Mapper(
             andelerTilkjentYtelse
                 .groupBy { it.type }
                 .map { (type, andelerTilkjentYtelseGruppertPåType) ->
-                    val utbetalingId = utbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
+                    val utbetalingId = fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
                     lagUtbetalingRecord(
                         id = utbetalingId.utbetalingId,
                         erSimulering = erSimulering,
@@ -106,7 +106,7 @@ class UtbetalingV3Mapper(
         val typeandelerSomSkalAnnulleres = finnTypeAndelerSomSkalAnnulleres(behandling, andelerTilkjentYtelse)
         val utbetalingIder =
             typeandelerSomSkalAnnulleres
-                .map { utbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, it) }
+                .map { fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, it) }
 
         return utbetalingIder.map {
             UtbetalingRecord(

@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import org.springframework.stereotype.Service
 
 @Service
-class UtbetalingIdService(
+class FagsakUtbetalingIdService(
     private val fagsakUtbetalingIdRepository: FagsakUtbetalingIdRepository,
 ) {
     fun hentEllerOpprettUtbetalingId(
