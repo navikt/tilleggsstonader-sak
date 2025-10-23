@@ -319,7 +319,7 @@ fun vilkår(
     tom: LocalDate? = YearMonth.now().atEndOfMonth(),
     utgift: Int? = 100,
     erFremtidigUtgift: Boolean = false,
-    fakta: VilkårFakta? = null
+    fakta: VilkårFakta? = null,
 ): Vilkår =
     Vilkår(
         behandlingId = behandlingId,

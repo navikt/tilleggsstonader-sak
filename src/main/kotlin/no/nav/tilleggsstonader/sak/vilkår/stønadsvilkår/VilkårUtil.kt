@@ -51,12 +51,12 @@ object VilkårUtil {
 
         fun kanSlåsSammen(other: VilkårHolder): Boolean =
             vilkår.type.erLøpendeOgSkalSlåsSammen() &&
-                    vilkår.type == other.vilkår.type &&
-                    vilkår.resultat == other.vilkår.resultat &&
-                    vilkår.utgift == other.vilkår.utgift &&
-                    vilkår.fakta == other.vilkår.fakta &&
-                    vilkår.barnId == other.vilkår.barnId &&
-                    overlapperEllerPåfølgesAv(other)
+                vilkår.type == other.vilkår.type &&
+                vilkår.resultat == other.vilkår.resultat &&
+                vilkår.utgift == other.vilkår.utgift &&
+                vilkår.fakta == other.vilkår.fakta &&
+                vilkår.barnId == other.vilkår.barnId &&
+                overlapperEllerPåfølgesAv(other)
 
         private fun VilkårType.erLøpendeOgSkalSlåsSammen() =
             when (this) {

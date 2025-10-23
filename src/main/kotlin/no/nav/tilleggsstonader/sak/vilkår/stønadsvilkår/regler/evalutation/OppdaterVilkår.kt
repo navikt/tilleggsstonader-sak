@@ -76,10 +76,10 @@ object OppdaterVilkår {
         }
         brukerfeilHvis(
             vilkårType in vilkårMedUtgift &&
-                    oppdatering.erFremtidigUtgift != true &&
-                    resultat == Vilkårsresultat.OPPFYLT &&
-                    oppdatering.offentligTransport == null &&
-                    oppdatering.utgift == null,
+                oppdatering.erFremtidigUtgift != true &&
+                resultat == Vilkårsresultat.OPPFYLT &&
+                oppdatering.offentligTransport == null &&
+                oppdatering.utgift == null,
         ) {
             "Mangler utgift på vilkår"
         }
@@ -96,7 +96,7 @@ object OppdaterVilkår {
             lagreVilkårDto.delvilkårsett.any { delvilkår ->
                 delvilkår.vurderinger.any { vurdering ->
                     vurdering.svar !== null ||
-                            vurdering.begrunnelse !== null
+                        vurdering.begrunnelse !== null
                 }
             },
         ) {
@@ -148,7 +148,7 @@ object OppdaterVilkår {
                 VilkårType.PASS_BARN,
                 VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
                 VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
-                    -> {
+                -> {
                     validerErFørsteDagIMåned(it)
                     it
                 }
@@ -174,7 +174,7 @@ object OppdaterVilkår {
                 VilkårType.PASS_BARN,
                 VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
                 VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
-                    -> {
+                -> {
                     validerErSisteDagIMåned(it)
                     it
                 }
@@ -213,7 +213,7 @@ object OppdaterVilkår {
         if (!vilkårsresultat.vilkår.oppfyltEllerIkkeOppfylt()) {
             val message =
                 "Mangler fullstendig vilkår for ${vilkårsresultat.vilkårType}. " +
-                        "Svar på alle spørsmål samt fyll inn evt. påkrevd begrunnelsesfelt"
+                    "Svar på alle spørsmål samt fyll inn evt. påkrevd begrunnelsesfelt"
             throw Feil(message = message, frontendFeilmelding = message)
         }
     }
