@@ -28,7 +28,7 @@ import java.time.LocalDate
 
 class DagligReiseVilkårControllerTest : IntegrationTest() {
     val fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO)
-    val behandling = behandling(fagsak, steg = StegType.VILKÅR)
+    val behandling = behandling(fagsak = fagsak, steg = StegType.VILKÅR)
 
     val svarOffentligTransport =
         mapOf(
