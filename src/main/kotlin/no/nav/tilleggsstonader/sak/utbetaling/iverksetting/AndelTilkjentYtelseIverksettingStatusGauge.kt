@@ -8,8 +8,8 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import org.slf4j.LoggerFactory
-import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Component
 import java.time.DayOfWeek
 import java.time.Duration
 import java.time.LocalDate
@@ -20,7 +20,7 @@ import java.time.LocalDateTime
  * - Vi har mottatt feilet-status fra helved/utsjekk
  * - Vi har ikke mottatt status etter iverksetting
  */
-@Configuration
+@Component
 class AndelTilkjentYtelseIverksettingStatusGauge(
     private val andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository,
 ) {
