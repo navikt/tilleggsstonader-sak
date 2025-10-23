@@ -39,7 +39,6 @@ object VilkårDagligReiseMapper {
             fakta = this.fakta?.mapTilVilkårFakta(),
             opphavsvilkår = null, // TODO: Ta hensyn til denne i oppdatering
             erFremtidigUtgift = false,
-            offentligTransport = null,
             gitVersjon = Applikasjonsversjon.versjon,
         )
 

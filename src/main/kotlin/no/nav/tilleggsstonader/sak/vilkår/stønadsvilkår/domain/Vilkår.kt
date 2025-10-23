@@ -38,8 +38,6 @@ data class Vilkår(
     val utgift: Int? = null,
     val barnId: BarnId? = null,
     val erFremtidigUtgift: Boolean,
-    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "offentlig_transport_")
-    val offentligTransport: OffentligTransport?,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     @Column("delvilkar")
@@ -107,7 +105,7 @@ data class Vilkår(
     }
 
     private fun validerPåkrevdBeløpHvisOppfylt() {
-        if (resultat == Vilkårsresultat.OPPFYLT && !erFremtidigUtgift && offentligTransport == null) {
+        if (resultat == Vilkårsresultat.OPPFYLT && !erFremtidigUtgift && type != VilkårType.DAGLIG_REISE) {
             require(utgift != null) { "Utgift er påkrevd når resultat er oppfylt" }
         }
     }
@@ -215,23 +213,6 @@ data class Vurdering(
     val svar: SvarId? = null,
     val begrunnelse: String? = null,
 )
-
-data class OffentligTransport(
-    val reisedagerPerUke: Int,
-    val prisEnkelbillett: Int?,
-    val prisSyvdagersbillett: Int?,
-    val prisTrettidagersbillett: Int?,
-) {
-    init {
-        require(reisedagerPerUke > 0) {
-            "Reisedager per uke må være større enn 0"
-        }
-
-        require(prisEnkelbillett != null || prisSyvdagersbillett != null || prisTrettidagersbillett != null) {
-            "Minst én billettpris må være satt"
-        }
-    }
-}
 
 fun List<Vurdering>.harSvar(svarId: SvarId) = this.any { it.svar == svarId }
 

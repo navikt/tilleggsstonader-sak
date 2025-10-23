@@ -49,9 +49,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Fa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -319,8 +319,7 @@ fun vilkår(
     tom: LocalDate? = YearMonth.now().atEndOfMonth(),
     utgift: Int? = 100,
     erFremtidigUtgift: Boolean = false,
-    offentligTransport: OffentligTransport? = null,
-//    fakta: VilkårFakta? = null,
+    fakta: VilkårFakta? = null
 ): Vilkår =
     Vilkår(
         behandlingId = behandlingId,
@@ -335,8 +334,7 @@ fun vilkår(
         utgift = utgift,
         erFremtidigUtgift = erFremtidigUtgift,
         gitVersjon = Applikasjonsversjon.versjon,
-        offentligTransport = offentligTransport,
-//        fakta = fakta,
+        fakta = fakta,
     )
 
 fun vilkårDagligReise(

@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -77,10 +76,10 @@ object OppdaterVilkår {
         }
         brukerfeilHvis(
             vilkårType in vilkårMedUtgift &&
-                oppdatering.erFremtidigUtgift != true &&
-                resultat == Vilkårsresultat.OPPFYLT &&
-                oppdatering.offentligTransport == null &&
-                oppdatering.utgift == null,
+                    oppdatering.erFremtidigUtgift != true &&
+                    resultat == Vilkårsresultat.OPPFYLT &&
+                    oppdatering.offentligTransport == null &&
+                    oppdatering.utgift == null,
         ) {
             "Mangler utgift på vilkår"
         }
@@ -97,7 +96,7 @@ object OppdaterVilkår {
             lagreVilkårDto.delvilkårsett.any { delvilkår ->
                 delvilkår.vurderinger.any { vurdering ->
                     vurdering.svar !== null ||
-                        vurdering.begrunnelse !== null
+                            vurdering.begrunnelse !== null
                 }
             },
         ) {
@@ -126,7 +125,6 @@ object OppdaterVilkår {
             utgift = oppdatering.utgift,
             erFremtidigUtgift = oppdatering.erFremtidigUtgift == true,
             gitVersjon = Applikasjonsversjon.versjon,
-            offentligTransport = oppdatering.offentligTransport?.mapOffentligTransport(),
         )
     }
 
@@ -150,7 +148,7 @@ object OppdaterVilkår {
                 VilkårType.PASS_BARN,
                 VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
                 VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
-                -> {
+                    -> {
                     validerErFørsteDagIMåned(it)
                     it
                 }
@@ -176,7 +174,7 @@ object OppdaterVilkår {
                 VilkårType.PASS_BARN,
                 VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
                 VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER,
-                -> {
+                    -> {
                     validerErSisteDagIMåned(it)
                     it
                 }
@@ -215,7 +213,7 @@ object OppdaterVilkår {
         if (!vilkårsresultat.vilkår.oppfyltEllerIkkeOppfylt()) {
             val message =
                 "Mangler fullstendig vilkår for ${vilkårsresultat.vilkårType}. " +
-                    "Svar på alle spørsmål samt fyll inn evt. påkrevd begrunnelsesfelt"
+                        "Svar på alle spørsmål samt fyll inn evt. påkrevd begrunnelsesfelt"
             throw Feil(message = message, frontendFeilmelding = message)
         }
     }
@@ -266,7 +264,6 @@ object OppdaterVilkår {
         metadata: HovedregelMetadata,
         behandlingId: BehandlingId,
         barnId: BarnId? = null,
-        offentligTransport: OffentligTransport? = null,
     ): Vilkår {
         val delvilkårsett = vilkårsregel.initiereDelvilkår(metadata, barnId = barnId)
         return Vilkår(
@@ -278,7 +275,6 @@ object OppdaterVilkår {
             resultat = utledResultat(vilkårsregel, delvilkårsett.map { it.tilDto() }).vilkår,
             status = VilkårStatus.NY,
             opphavsvilkår = null,
-            offentligTransport = offentligTransport,
             gitVersjon = Applikasjonsversjon.versjon,
         )
     }
@@ -291,15 +287,4 @@ object OppdaterVilkår {
                 begrunnelse = null,
             )
         }
-
-    private fun OffentligTransportDto?.mapOffentligTransport(): OffentligTransport? {
-        if (this == null) return null
-
-        return OffentligTransport(
-            reisedagerPerUke = this.reisedagerPerUke,
-            prisEnkelbillett = this.prisEnkelbillett?.takeIf { it > 0 },
-            prisSyvdagersbillett = this.prisSyvdagersbillett?.takeIf { it > 0 },
-            prisTrettidagersbillett = this.prisTrettidagersbillett?.takeIf { it > 0 },
-        )
-    }
 }

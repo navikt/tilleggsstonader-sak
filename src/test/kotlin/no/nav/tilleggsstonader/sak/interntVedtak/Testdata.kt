@@ -43,7 +43,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatL
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
@@ -467,13 +467,13 @@ object Testdata {
                                     utgifter =
                                         mapOf(
                                             TypeBoutgift.UTGIFTER_OVERNATTING to
-                                                listOf(
-                                                    lagUtgiftBeregningBoutgifter(
-                                                        fom = LocalDate.of(2024, 1, 1),
-                                                        tom = LocalDate.of(2024, 1, 31),
-                                                        utgift = 3000,
+                                                    listOf(
+                                                        lagUtgiftBeregningBoutgifter(
+                                                            fom = LocalDate.of(2024, 1, 1),
+                                                            tom = LocalDate.of(2024, 1, 31),
+                                                            utgift = 3000,
+                                                        ),
                                                     ),
-                                                ),
                                         ),
                                 ),
                             stønadsbeløp = 3000,
@@ -490,21 +490,21 @@ object Testdata {
                                     utgifter =
                                         mapOf(
                                             TypeBoutgift.UTGIFTER_OVERNATTING to
-                                                listOf(
-                                                    lagUtgiftBeregningBoutgifter(
-                                                        fom = LocalDate.of(2024, FEBRUARY, 1),
-                                                        tom = LocalDate.of(2024, FEBRUARY, 2),
-                                                        utgift = 3000,
+                                                    listOf(
+                                                        lagUtgiftBeregningBoutgifter(
+                                                            fom = LocalDate.of(2024, FEBRUARY, 1),
+                                                            tom = LocalDate.of(2024, FEBRUARY, 2),
+                                                            utgift = 3000,
+                                                        ),
                                                     ),
-                                                ),
                                             TypeBoutgift.UTGIFTER_OVERNATTING to
-                                                listOf(
-                                                    lagUtgiftBeregningBoutgifter(
-                                                        fom = LocalDate.of(2024, FEBRUARY, 26),
-                                                        tom = LocalDate.of(2024, FEBRUARY, 29),
-                                                        utgift = 4000,
+                                                    listOf(
+                                                        lagUtgiftBeregningBoutgifter(
+                                                            fom = LocalDate.of(2024, FEBRUARY, 26),
+                                                            tom = LocalDate.of(2024, FEBRUARY, 29),
+                                                            utgift = 4000,
+                                                        ),
                                                     ),
-                                                ),
                                         ),
                                 ),
                             stønadsbeløp = 4953,
@@ -609,13 +609,12 @@ object Testdata {
                     fom = LocalDate.of(2024, FEBRUARY, 1),
                     tom = LocalDate.of(2024, FEBRUARY, 2),
                     utgift = null,
-                    offentligTransport =
-                        OffentligTransport(
-                            reisedagerPerUke = 5,
-                            prisEnkelbillett = 44,
-                            prisSyvdagersbillett = null,
-                            prisTrettidagersbillett = 750,
-                        ),
+                    fakta = FaktaDagligReiseOffentligTransport(
+                        reisedagerPerUke = 5,
+                        prisEnkelbillett = 44,
+                        prisSyvdagersbillett = null,
+                        prisTrettidagersbillett = 750,
+                    ),
                 ),
             )
     }

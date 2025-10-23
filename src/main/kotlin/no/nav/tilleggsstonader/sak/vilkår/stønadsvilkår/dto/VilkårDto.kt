@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -32,7 +31,6 @@ data class VilkårDto(
     val delvilkårsett: List<DelvilkårDto> = emptyList(),
     val opphavsvilkår: OpphavsvilkårDto?,
     val slettetKommentar: String?,
-    val offentligTransport: OffentligTransport?,
 )
 
 data class OpphavsvilkårDto(
@@ -96,7 +94,6 @@ fun Vilkår.tilDto() =
                 .map { it.tilDto() },
         opphavsvilkår = this.opphavsvilkår?.let { OpphavsvilkårDto(it.behandlingId, it.vurderingstidspunkt) },
         slettetKommentar = this.slettetKommentar,
-        offentligTransport = this.offentligTransport,
     )
 
 fun DelvilkårDto.svarTilDomene() = this.vurderinger.map { it.tilDomene() }
