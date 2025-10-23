@@ -20,8 +20,8 @@ object VedtaksdataFilesUtil {
     fun Stønadstype.tilTypeVedtaksdataSuffix() =
         when (this) {
             Stønadstype.BARNETILSYN -> "TILSYN_BARN"
-            Stønadstype.DAGLIG_REISE_TSO -> "DAGLIG_REISE"
-            Stønadstype.DAGLIG_REISE_TSR -> "DAGLIG_REISE"
+            Stønadstype.DAGLIG_REISE_TSO -> "DAGLIG_REISE_TSO"
+            Stønadstype.DAGLIG_REISE_TSR -> "DAGLIG_REISE_TSO"
             else -> name
         }
 

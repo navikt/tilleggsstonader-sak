@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
@@ -101,7 +102,7 @@ class InterntVedtakService(
 
                 is InnvilgelseDagligReise ->
                     BeregningsresultatInterntVedtakDto(
-                        dagligReise = null,
+                        dagligReise = data.beregningsresultat.tilDto(vedtak.tidligsteEndring),
                     )
 
                 is Innvilgelse -> error("Mangler mapping av beregningsresultat for ${data.type}")
@@ -297,6 +298,7 @@ class InterntVedtakService(
             Stønadstype.BARNETILSYN -> {}
             Stønadstype.LÆREMIDLER -> {}
             Stønadstype.BOUTGIFTER -> {}
+            Stønadstype.DAGLIG_REISE_TSO -> {}
             else -> error("Internt vedtak håndterer ikke stønadstype=$stønadstype ennå")
         }
     }

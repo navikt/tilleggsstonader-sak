@@ -57,6 +57,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.Daglig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
@@ -613,25 +614,25 @@ object Testdata {
                         id = behandlingId,
                         vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay(),
                         opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
-                        fagsak = Boutgifter.fagsak,
+                        fagsak = DagligReise.fagsak,
                         resultat = BehandlingResultat.INNVILGET,
                         type = BehandlingType.FØRSTEGANGSBEHANDLING,
                     ),
-                fagsak = Boutgifter.fagsak,
+                fagsak = DagligReise.fagsak,
             )
         private val aktivitetererDagligReise =
             listOf(
                 VilkårperiodeTestUtil.aktivitet(
                     fom = LocalDate.of(2024, 12, 10),
                     tom = LocalDate.of(2024, 12, 15),
-                    faktaOgVurdering = faktaOgVurderingAktivitetBoutgifter(),
+                    faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTso(),
                 ),
                 VilkårperiodeTestUtil.aktivitet(
                     fom = LocalDate.of(2024, 12, 10),
                     tom = LocalDate.of(2024, 12, 15),
                     resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
                     begrunnelse = "ikke oppfylt",
-                    faktaOgVurdering = faktaOgVurderingAktivitetBoutgifter(type = AktivitetType.UTDANNING),
+                    faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTso(type = AktivitetType.UTDANNING),
                 ),
             )
 
