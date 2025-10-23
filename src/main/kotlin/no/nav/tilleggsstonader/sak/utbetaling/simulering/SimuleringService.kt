@@ -5,14 +5,17 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.ForrigeIverksettingDto
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettDtoMapper
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.utbetalingSkalSendesPåKafka
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequestDto
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingV3Mapper
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -25,6 +28,7 @@ class SimuleringService(
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val tilgangService: TilgangService,
     private val iverksettService: IverksettService,
+    private val utbetalingV3Mapper: UtbetalingV3Mapper,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -61,17 +65,29 @@ class SimuleringService(
 
     private fun simulerMedTilkjentYtelse(saksbehandling: Saksbehandling): SimuleringResponseDto? {
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(saksbehandling.id)
-        val forrigeIverksettingDto = iverksettService.forrigeIverksetting(saksbehandling, tilkjentYtelse)
+        val forrigeIverksetting = iverksettService.finnForrigeIverksetting(saksbehandling, tilkjentYtelse)
 
-        return iverksettClient.simuler(
-            SimuleringRequestDto(
-                sakId = saksbehandling.eksternFagsakId.toString(),
-                behandlingId = saksbehandling.eksternId.toString(),
-                personident = saksbehandling.ident,
-                saksbehandlerId = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
-                utbetalinger = IverksettDtoMapper.mapUtbetalinger(tilkjentYtelse.andelerTilkjentYtelse),
-                forrigeIverksetting = forrigeIverksettingDto,
-            ),
-        )
+        if (utbetalingSkalSendesPåKafka(saksbehandling.stønadstype)) {
+            return iverksettClient.simulerV3(
+                utbetalingV3Mapper.lagUtbetalingRecords(
+                    behandling = saksbehandling,
+                    andelerTilkjentYtelse = tilkjentYtelse.andelerTilkjentYtelse,
+                    totrinnskontroll = null,
+                    erSimulering = true,
+                    erFørsteIverksettingForBehandling = true,
+                ),
+            )
+        } else {
+            return iverksettClient.simulerV2(
+                SimuleringRequestDto(
+                    sakId = saksbehandling.eksternFagsakId.toString(),
+                    behandlingId = saksbehandling.eksternId.toString(),
+                    personident = saksbehandling.ident,
+                    saksbehandlerId = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+                    utbetalinger = IverksettDtoMapper.mapUtbetalinger(tilkjentYtelse.andelerTilkjentYtelse),
+                    forrigeIverksetting = forrigeIverksetting?.let { ForrigeIverksettingDto(it.behandlingId, it.iverksettingId) },
+                ),
+            )
+        }
     }
 }

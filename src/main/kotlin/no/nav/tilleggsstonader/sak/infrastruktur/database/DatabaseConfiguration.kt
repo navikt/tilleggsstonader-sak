@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringJson
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
@@ -110,6 +111,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             OppfølgingDataWriter(),
             FaktaGrunnlagDataReader(),
             FaktaGrunnlagDataWriter(),
+            VilkårFaktaDataReader(),
+            VilkårFaktaDataWriter(),
         ) + alleVedtaksstatistikkJsonConverters +
             alleValueClassConverters
 
@@ -226,4 +229,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class FaktaGrunnlagDataReader : JsonReader<FaktaGrunnlagData>(FaktaGrunnlagData::class)
 
     class FaktaGrunnlagDataWriter : JsonWriter<FaktaGrunnlagData>()
+
+    class VilkårFaktaDataReader : JsonReader<VilkårFakta>(VilkårFakta::class)
+
+    class VilkårFaktaDataWriter : JsonWriter<VilkårFakta>()
 }

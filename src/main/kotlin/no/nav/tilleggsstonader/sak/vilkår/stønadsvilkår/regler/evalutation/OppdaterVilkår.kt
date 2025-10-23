@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.OffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -126,7 +125,6 @@ object OppdaterVilkår {
             utgift = oppdatering.utgift,
             erFremtidigUtgift = oppdatering.erFremtidigUtgift == true,
             gitVersjon = Applikasjonsversjon.versjon,
-            offentligTransport = oppdatering.offentligTransport?.mapOffentligTransport(),
         )
     }
 
@@ -159,7 +157,7 @@ object OppdaterVilkår {
                     it
                 }
 
-                VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> {
+                VilkårType.DAGLIG_REISE -> {
                     it
                 }
 
@@ -185,7 +183,7 @@ object OppdaterVilkår {
                     it
                 }
 
-                VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> {
+                VilkårType.DAGLIG_REISE -> {
                     it
                 }
 
@@ -266,7 +264,6 @@ object OppdaterVilkår {
         metadata: HovedregelMetadata,
         behandlingId: BehandlingId,
         barnId: BarnId? = null,
-        offentligTransport: OffentligTransport? = null,
     ): Vilkår {
         val delvilkårsett = vilkårsregel.initiereDelvilkår(metadata, barnId = barnId)
         return Vilkår(
@@ -278,7 +275,6 @@ object OppdaterVilkår {
             resultat = utledResultat(vilkårsregel, delvilkårsett.map { it.tilDto() }).vilkår,
             status = VilkårStatus.NY,
             opphavsvilkår = null,
-            offentligTransport = offentligTransport,
             gitVersjon = Applikasjonsversjon.versjon,
         )
     }
@@ -291,15 +287,4 @@ object OppdaterVilkår {
                 begrunnelse = null,
             )
         }
-
-    private fun OffentligTransportDto?.mapOffentligTransport(): OffentligTransport? {
-        if (this == null) return null
-
-        return OffentligTransport(
-            reisedagerPerUke = this.reisedagerPerUke,
-            prisEnkelbillett = this.prisEnkelbillett?.takeIf { it > 0 },
-            prisSyvdagersbillett = this.prisSyvdagersbillett?.takeIf { it > 0 },
-            prisTrettidagersbillett = this.prisTrettidagersbillett?.takeIf { it > 0 },
-        )
-    }
 }

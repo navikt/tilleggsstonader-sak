@@ -18,4 +18,3 @@ jobs:
     with:
       cluster: "dev-gcp"
       manifest: ".nais/preprod.yaml"
-      skip-checks: ${{ github.event.inputs.skip-checks == true }}

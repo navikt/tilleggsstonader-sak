@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår
 
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
@@ -15,7 +16,7 @@ object DagligReiseRegelTestUtil {
                     svar = SvarId.JA,
                 ),
                 Vurdering(
-                    regelId = RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT,
+                    regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
                     svar = SvarId.JA,
                     begrunnelse = "En begrunnelse på delvilkåret",
                 ),
@@ -26,5 +27,18 @@ object DagligReiseRegelTestUtil {
         Delvilkår(
             resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
             vurderinger = vurderinger.toList(),
+        )
+
+    val oppfylteSvarOffentligtransport: Map<RegelId, SvarOgBegrunnelse> =
+        mapOf(
+            RegelId.AVSTAND_OVER_SEKS_KM to
+                SvarOgBegrunnelse(
+                    svar = SvarId.JA,
+                ),
+            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to
+                SvarOgBegrunnelse(
+                    svar = SvarId.JA,
+                    begrunnelse = "En begrunnelse på delvilkåret",
+                ),
         )
 }

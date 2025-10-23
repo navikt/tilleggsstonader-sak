@@ -19,7 +19,8 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatO
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
@@ -30,6 +31,7 @@ import org.assertj.core.api.Assertions.assertThat
 @Suppress("unused", "ktlint:standard:function-naming")
 class OffentligTransportBeregningStepDefinitions {
     val behandlingServiceMock = mockk<BehandlingService>()
+    val vilkårServiceMock = mockk<VilkårService>()
     val vilkårRepositoryFake = VilkårRepositoryFake()
     val vilkårperiodeRepositoryFake = VilkårperiodeRepositoryFake()
     val behandlingId = BehandlingId.random()
@@ -46,11 +48,11 @@ class OffentligTransportBeregningStepDefinitions {
             }
         }
 
-    val vilkårService =
-        VilkårService(
-            behandlingService = behandlingServiceMock,
+    val dagligReiseVilkårService =
+        DagligReiseVilkårService(
             vilkårRepository = vilkårRepositoryFake,
-            barnService = mockk(relaxed = true),
+            vilkårService = vilkårServiceMock,
+            behandlingService = behandlingServiceMock,
         )
 
     val vedtaksperiodeValideringService =
@@ -63,7 +65,7 @@ class OffentligTransportBeregningStepDefinitions {
     var forventetBeregningsresultat: BeregningsresultatOffentligTransport? = null
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
     var vilkårperioder: List<Vilkårperioder> = emptyList()
-    var vilkår: List<Vilkår> = emptyList()
+    var vilkår: List<VilkårDagligReise> = emptyList()
 
     @Gitt("følgende vedtaksperioder for daglig reise offentlig transport")
     fun `følgende vedtaksperioder`(dataTable: DataTable) {
@@ -80,8 +82,8 @@ class OffentligTransportBeregningStepDefinitions {
 
         vilkår =
             utgiftData.mapRad { rad ->
-                val nyttVilkår = mapTilVilkår(rad, behandlingId)
-                vilkårService.opprettNyttVilkår(opprettVilkårDto = nyttVilkår)
+                val nyttVilkår = mapTilVilkårDagligReise(rad)
+                dagligReiseVilkårService.opprettNyttVilkår(behandlingId = behandlingId, nyttVilkår = nyttVilkår)
             }
     }
 

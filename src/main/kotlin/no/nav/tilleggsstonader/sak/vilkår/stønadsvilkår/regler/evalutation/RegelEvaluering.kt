@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
@@ -39,6 +40,15 @@ object RegelEvaluering {
             vilkår = utledVilkårResultat(delvilkårResultat),
             delvilkår = delvilkårResultat,
         )
+    }
+
+    /**
+     * Kan kun brukes dersom resultatene per delvilkår allerede er satt.
+     */
+    fun utledVilkårResultat(delvilkårsett: List<Delvilkår>): Vilkårsresultat {
+        val delvilkårResultat = delvilkårsett.associate { delvilkår -> delvilkår.hovedregel to delvilkår.resultat }
+
+        return utledVilkårResultat(delvilkårResultat)
     }
 
     fun utledVilkårResultat(delvilkårResultat: Map<RegelId, Vilkårsresultat>): Vilkårsresultat =
