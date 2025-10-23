@@ -71,7 +71,7 @@ class SimuleringService(
             return iverksettClient.simulerV3(
                 utbetalingV3Mapper.lagUtbetalingRecords(
                     behandling = saksbehandling,
-                    tilkjentYtelse = tilkjentYtelse,
+                    andelerTilkjentYtelse = tilkjentYtelse.andelerTilkjentYtelse,
                     totrinnskontroll = null,
                     erSimulering = true,
                     erFørsteIverksettingForBehandling = true,

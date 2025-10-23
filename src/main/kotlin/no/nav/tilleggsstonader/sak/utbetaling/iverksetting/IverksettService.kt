@@ -151,7 +151,7 @@ class IverksettService(
             val recordsSomSkalPåKafka: List<UtbetalingRecord> =
                 utbetalingV3Mapper.lagUtbetalingRecords(
                     behandling = behandling,
-                    tilkjentYtelse = tilkjentYtelse,
+                    andelerTilkjentYtelse = andelerTilkjentYtelse,
                     totrinnskontroll = totrinnskontroll,
                     erFørsteIverksettingForBehandling = erFørsteIverksettingForBehandling,
                     erSimulering = false,

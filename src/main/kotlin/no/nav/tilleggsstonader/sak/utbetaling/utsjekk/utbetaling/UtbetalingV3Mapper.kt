@@ -17,14 +17,14 @@ class UtbetalingV3Mapper(
 ) {
     fun lagUtbetalingRecords(
         behandling: Saksbehandling,
-        tilkjentYtelse: TilkjentYtelse,
+        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         totrinnskontroll: Totrinnskontroll?,
         erFørsteIverksettingForBehandling: Boolean,
         erSimulering: Boolean,
     ): List<UtbetalingRecord> {
         // En utbetaling er knyttet til en type andel (klassekode hos økonomi)
         val records =
-            tilkjentYtelse.andelerTilkjentYtelse
+            andelerTilkjentYtelse
                 .groupBy { it.type }
                 .map { (type, andelerTilkjentYtelseGruppertPåType) ->
                     val utbetalingId = utbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
@@ -42,7 +42,7 @@ class UtbetalingV3Mapper(
             records +
                 lagUtbetalingRecordForAnnullering(
                     behandling = behandling,
-                    andelerTilkjentYtelse = tilkjentYtelse.andelerTilkjentYtelse,
+                    andelerTilkjentYtelse = andelerTilkjentYtelse,
                     totrinnskontroll = totrinnskontroll,
                     erSimulering = erSimulering,
                 )
