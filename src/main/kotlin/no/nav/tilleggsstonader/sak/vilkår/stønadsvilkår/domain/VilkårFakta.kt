@@ -19,7 +19,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrun
     failOnRepeatedNames = true,
 )
 sealed interface VilkårFakta {
-    val typeVilkårFakta: TypeVilkårFakta
+    val type: TypeVilkårFakta
 }
 
 data class FaktaDagligReiseOffentligTransport(
@@ -28,7 +28,7 @@ data class FaktaDagligReiseOffentligTransport(
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
 ) : VilkårFakta {
-    override val typeVilkårFakta = TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT
+    override val type = TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT
 }
 
 data class FaktaDagligReisePrivatBil(
@@ -37,7 +37,7 @@ data class FaktaDagligReisePrivatBil(
     val prisBompengerPerDag: Int?,
     val prisFergekostandPerDag: Int?,
 ) : VilkårFakta {
-    override val typeVilkårFakta = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
+    override val type = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
 }
 
 enum class TypeVilkårFakta {

@@ -23,7 +23,7 @@ object VilkårDagligReiseMapper {
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett,
-            fakta = this.fakta?.mapTilFaktaDagligReise(type = this.fakta.typeVilkårFakta),
+            fakta = this.fakta?.mapTilFaktaDagligReise(type = this.fakta.type),
         )
 
     fun VilkårDagligReise.mapTilVilkår() =
