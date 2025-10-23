@@ -23,10 +23,6 @@ class SimuleringSteg(
     }
 
     private fun skalUtFøreSimulering(saksbehandling: Saksbehandling): Boolean {
-        if (saksbehandling.stønadstype.gjelderDagligReise()) {
-            return false
-        }
-
         val typeVedtak = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
         return when (typeVedtak) {
             TypeVedtak.INNVILGELSE -> true
