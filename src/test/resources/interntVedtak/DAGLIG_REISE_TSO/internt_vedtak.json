@@ -132,7 +132,7 @@
   ],
   "vilkår": [
     {
-      "type": "DAGLIG_REISE_OFFENTLIG_TRANSPORT",
+      "type": "DAGLIG_REISE",
       "resultat": "OPPFYLT",
       "delvilkår": [
         {
