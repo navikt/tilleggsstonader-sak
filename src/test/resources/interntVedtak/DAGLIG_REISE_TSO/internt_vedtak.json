@@ -122,7 +122,7 @@
     "aktivitet" : "TILTAK"
   } ],
   "vilkår" : [ {
-    "type" : "DAGLIG_REISE",
+    "type" : "DAGLIG_REISE_OFFENTLIG_TRANSPORT",
     "resultat" : "OPPFYLT",
     "delvilkår" : [ {
       "resultat" : "IKKE_TATT_STILLING_TIL",
