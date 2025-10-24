@@ -71,6 +71,7 @@ data class FaktaOgSvarAktivitetBoutgifterDto(
 
 data class FaktaOgSvarAktivitetDagligReiseTsoDto(
     val svarLønnet: SvarJaNei? = null,
+    val svarHarUtgifter: SvarJaNei? = null,
 ) : FaktaOgSvarDto()
 
 data object FaktaOgSvarAktivitetDagligReiseTsrDto : FaktaOgSvarDto()
