@@ -4,10 +4,10 @@ import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20250922094930_4bb329c"
-val tilleggsstønaderLibsVersion = "2025.09.11-09.26.d3123ecc47ce"
+val tilleggsstønaderLibsVersion = "2025.10.14-11.02.0ba3aa7f0dc3"
 val tilleggsstønaderKontrakterVersion = "2025.10.17-12.11.c565284fc91f"
-val avroVersion = "1.12.0"
-val confluentVersion = "8.0.1"
+val avroVersion = "1.12.1"
+val confluentVersion = "8.1.0"
 val joarkHendelseVersion = "1.1.6"
 val tokenSupportVersion = "5.0.37"
 val wiremockVersion = "3.13.1"
