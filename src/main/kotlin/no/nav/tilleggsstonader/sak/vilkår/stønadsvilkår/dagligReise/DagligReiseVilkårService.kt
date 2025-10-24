@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Periode
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
