@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlClient
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.TilordnetSaksbehandlerClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
+import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 
 /**
@@ -39,6 +40,7 @@ class MockClientService(
     val registerAktivitetClient: RegisterAktivitetClient,
     val tilordnetSaksbehandlerClient: TilordnetSaksbehandlerClient,
     val ytelseClient: YtelseClient,
+    val kafkaTemplate: KafkaTemplate<String, String>,
 ) {
     fun resetAlleTilDefaults() {
         ArbeidsfordelingClientMockConfig.resetTilDefault(arbeidsfordelingClient)
@@ -56,5 +58,6 @@ class MockClientService(
         RegisterAktivitetClientMockConfig.resetTilDefault(registerAktivitetClient)
         TilordnetSaksbehandlerClientMockConfig.resetTilDefault(tilordnetSaksbehandlerClient)
         YtelseClientMockConfig.resetTilDefault(ytelseClient)
+        KafkaTestConfig.resetMock(kafkaTemplate)
     }
 }

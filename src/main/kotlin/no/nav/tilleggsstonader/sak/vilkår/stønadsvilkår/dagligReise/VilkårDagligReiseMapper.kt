@@ -23,7 +23,7 @@ object VilkårDagligReiseMapper {
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett,
-            fakta = this.fakta?.mapTilFaktaDagligReise(type = this.fakta.typeVilkårFakta),
+            fakta = this.fakta?.mapTilFaktaDagligReise(type = this.fakta.type),
         )
 
     fun VilkårDagligReise.mapTilVilkår() =
@@ -34,12 +34,11 @@ object VilkårDagligReiseMapper {
             tom = this.tom,
             resultat = this.resultat,
             status = this.status,
-            type = VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
+            type = VilkårType.DAGLIG_REISE,
             delvilkårwrapper = DelvilkårWrapper(this.delvilkårsett),
             fakta = this.fakta?.mapTilVilkårFakta(),
             opphavsvilkår = null, // TODO: Ta hensyn til denne i oppdatering
             erFremtidigUtgift = false,
-            offentligTransport = null,
             gitVersjon = Applikasjonsversjon.versjon,
         )
 

@@ -38,8 +38,6 @@ data class Vilkår(
     val utgift: Int? = null,
     val barnId: BarnId? = null,
     val erFremtidigUtgift: Boolean,
-    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "offentlig_transport_")
-    val offentligTransport: OffentligTransport?,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     @Column("delvilkar")
@@ -94,7 +92,7 @@ data class Vilkår(
                 validerPåkrevdBeløpHvisOppfylt()
             }
 
-            VilkårType.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> {
+            VilkårType.DAGLIG_REISE -> {
                 // Dette er kun for tester foreløpig
             }
 
@@ -107,7 +105,7 @@ data class Vilkår(
     }
 
     private fun validerPåkrevdBeløpHvisOppfylt() {
-        if (resultat == Vilkårsresultat.OPPFYLT && !erFremtidigUtgift && offentligTransport == null) {
+        if (resultat == Vilkårsresultat.OPPFYLT && !erFremtidigUtgift && type != VilkårType.DAGLIG_REISE) {
             require(utgift != null) { "Utgift er påkrevd når resultat er oppfylt" }
         }
     }
@@ -216,23 +214,6 @@ data class Vurdering(
     val begrunnelse: String? = null,
 )
 
-data class OffentligTransport(
-    val reisedagerPerUke: Int,
-    val prisEnkelbillett: Int?,
-    val prisSyvdagersbillett: Int?,
-    val prisTrettidagersbillett: Int?,
-) {
-    init {
-        require(reisedagerPerUke > 0) {
-            "Reisedager per uke må være større enn 0"
-        }
-
-        require(prisEnkelbillett != null || prisSyvdagersbillett != null || prisTrettidagersbillett != null) {
-            "Minst én billettpris må være satt"
-        }
-    }
-}
-
 fun List<Vurdering>.harSvar(svarId: SvarId) = this.any { it.svar == svarId }
 
 enum class Vilkårsresultat(
@@ -273,8 +254,7 @@ enum class VilkårType(
     LØPENDE_UTGIFTER_TO_BOLIGER("Løpende utgifter to boliger", listOf(Stønadstype.BOUTGIFTER)),
 
     // Daglig reise
-    // TODO: Rename til DAGLIG_REISE fordi samme vilkårstype brukes på alle
-    DAGLIG_REISE_OFFENTLIG_TRANSPORT(
+    DAGLIG_REISE(
         "Daglig reise",
         listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
     ),

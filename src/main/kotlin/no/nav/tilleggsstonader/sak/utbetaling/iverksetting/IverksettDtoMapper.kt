@@ -40,7 +40,7 @@ object IverksettDtoMapper {
                     ?: error("Mangler vedtakstidspunkt behandling=${behandling.id}"),
             saksbehandlerId = totrinnskontroll.saksbehandler,
             beslutterId = totrinnskontroll.beslutter ?: error("Mangler beslutter"),
-            utbetalinger = mapUtbetalinger(andelerTilkjentYtelse),
+            utbetalinger = mapUtbetalinger(andelerTilkjentYtelse).sortedBy { it.fraOgMedDato },
         )
 
     fun mapUtbetalinger(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>) =
@@ -82,9 +82,10 @@ object IverksettDtoMapper {
             TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER -> StønadstypeIverksetting.BOUTGIFTER_ENSLIG_FORSØRGER
             TypeAndel.BOUTGIFTER_ETTERLATTE -> StønadstypeIverksetting.BOUTGIFTER_ETTERLATTE
 
-            TypeAndel.DAGLIG_REISE_AAP -> StønadstypeIverksetting.DAGLIG_REISE_AAP
-            TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER -> StønadstypeIverksetting.DAGLIG_REISE_ENSLIG_FORSØRGER
-            TypeAndel.DAGLIG_REISE_ETTERLATTE -> StønadstypeIverksetting.DAGLIG_REISE_ETTERLATTE
+            TypeAndel.DAGLIG_REISE_AAP,
+            TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER,
+            TypeAndel.DAGLIG_REISE_ETTERLATTE,
+            -> error("Andeler for daglig reise skal sendes på Kafka")
 
             TypeAndel.UGYLDIG -> error("Ugyldig type andel. Skal ikke iverksettes")
         }

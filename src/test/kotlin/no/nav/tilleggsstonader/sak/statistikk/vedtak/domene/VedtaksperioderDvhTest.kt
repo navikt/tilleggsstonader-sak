@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelse as innvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil.innvilgelse as innvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse as innvilgelseLæremidler
 
 class VedtaksperioderDvhTest {
@@ -65,6 +66,30 @@ class VedtaksperioderDvhTest {
                             aktivitet = AktivitetTypeDvh.TILTAK,
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.NEDSATT_ARBEIDSEVNE,
                             studienivå = StudienivåDvh.HØYERE_UTDANNING,
+                        ),
+                    ),
+            )
+
+        assertThat(resultat).isEqualTo(forventetResultat)
+    }
+
+    @Test
+    fun `fraDomene kan mappe for InnvilgelseDagligReise`() {
+        val resultat =
+            VedtaksperioderDvh.fraDomene(
+                vedtak = innvilgelseDagligReise(),
+                barn = emptyList(),
+            )
+
+        val forventetResultat =
+            VedtaksperioderDvh.JsonWrapper(
+                vedtaksperioder =
+                    listOf(
+                        VedtaksperioderDvh(
+                            fom = LocalDate.of(2024, 1, 1),
+                            tom = LocalDate.of(2024, 1, 7),
+                            aktivitet = AktivitetTypeDvh.TILTAK,
+                            lovverketsMålgruppe = LovverketsMålgruppeDvh.NEDSATT_ARBEIDSEVNE,
                         ),
                     ),
             )
