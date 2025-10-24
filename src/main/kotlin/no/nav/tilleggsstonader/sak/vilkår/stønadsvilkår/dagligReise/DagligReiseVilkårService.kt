@@ -99,13 +99,11 @@ class DagligReiseVilkårService(
             status = utledStatus(eksisterendeVilkår),
             delvilkårsett = delvilkårsett,
             resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
-            fakta = nyttVilkår.fakta.fjern0Verdier(Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom)),
+            fakta = nyttVilkår.fakta?.fjern0Verdier(Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom)),
         )
     }
 
-    private fun FaktaDagligReise?.fjern0Verdier(periode: Datoperiode): FaktaDagligReise? {
-        if (this == null) return null
-
+    private fun FaktaDagligReise.fjern0Verdier(periode: Datoperiode): FaktaDagligReise {
         when (this) {
             is FaktaOffentligTransport -> return FaktaOffentligTransport(
                 reisedagerPerUke = this.reisedagerPerUke,
