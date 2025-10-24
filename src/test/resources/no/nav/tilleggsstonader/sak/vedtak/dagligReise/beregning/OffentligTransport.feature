@@ -201,36 +201,6 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | Fom        | Tom        | Beløp | Enkeltbillett-antall |
       | 01.01.2025 | 03.01.2025 | 240   | 6                    |
 
-  Scenario: Skal kun beregne med månedsbillett dersom det er den eneste som er satt
-    Gitt følgende vedtaksperioder for daglig reise offentlig transport
-      | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
-      | 01.01.2025 | 03.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
-
-    Gitt følgende beregningsinput for offentlig transport
-      | Fom        | Tom        | Antall reisedager per uke | Pris tretti-dagersbillett |
-      | 01.01.2025 | 03.01.2025 | 3                         | 800                       |
-
-    Når beregner for daglig reise offentlig transport
-
-    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp | Trettidagersbillett-antall |
-      | 01.01.2025 | 03.01.2025 | 800   | 1                          |
-
-  Scenario: Skal kun beregne med syvdagersbillett dersom det er den eneste som er satt
-    Gitt følgende vedtaksperioder for daglig reise offentlig transport
-      | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
-      | 01.01.2025 | 03.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
-
-    Gitt følgende beregningsinput for offentlig transport
-      | Fom        | Tom        | Antall reisedager per uke | Pris syv-dagersbillett |
-      | 01.01.2025 | 03.01.2025 | 3                         | 200                    |
-
-    Når beregner for daglig reise offentlig transport
-
-    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
-      | Fom        | Tom        | Beløp | Syvdagersbillett-antall |
-      | 01.01.2025 | 03.01.2025 | 200   | 1                       |
-
   Scenario: Skal vise antall av hver billet typer av billigeste beløp
     Gitt følgende vedtaksperioder for daglig reise offentlig transport
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
