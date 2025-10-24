@@ -40,7 +40,7 @@ object IverksettDtoMapper {
                     ?: error("Mangler vedtakstidspunkt behandling=${behandling.id}"),
             saksbehandlerId = totrinnskontroll.saksbehandler,
             beslutterId = totrinnskontroll.beslutter ?: error("Mangler beslutter"),
-            utbetalinger = mapUtbetalinger(andelerTilkjentYtelse),
+            utbetalinger = mapUtbetalinger(andelerTilkjentYtelse).sortedBy { it.fraOgMedDato },
         )
 
     fun mapUtbetalinger(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>) =

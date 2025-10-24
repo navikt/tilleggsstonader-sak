@@ -1,0 +1,1 @@
+CREATE INDEX ON andel_tilkjent_ytelse(status_iverksetting);

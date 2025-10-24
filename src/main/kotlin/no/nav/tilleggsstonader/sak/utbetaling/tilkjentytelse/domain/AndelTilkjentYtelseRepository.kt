@@ -26,4 +26,6 @@ interface AndelTilkjentYtelseRepository :
     fun findByIverksettingIverksettingId(iverksettingId: UUID): List<AndelTilkjentYtelse>
 
     fun findAndelTilkjentYtelsesByKildeBehandlingId(behandlingId: BehandlingId): List<AndelTilkjentYtelse>
+
+    fun findAllByStatusIverksettingIn(status: List<StatusIverksetting>): List<AndelTilkjentYtelse>
 }
