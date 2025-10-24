@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -87,11 +88,11 @@ class DagligReiseVilkårService(
             status = utledStatus(eksisterendeVilkår),
             delvilkårsett = delvilkårsett,
             resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
-            fakta = nyttVilkår.fakta.fjern0Verdier(),
+            fakta = nyttVilkår.fakta.fjern0Verdier(Periode(fom = nyttVilkår.fom, tom = nyttVilkår.tom)),
         )
     }
 
-    private fun FaktaDagligReise?.fjern0Verdier(): FaktaDagligReise? {
+    private fun FaktaDagligReise?.fjern0Verdier(periode: Periode): FaktaDagligReise? {
         if (this == null) return null
 
         when (this) {
@@ -100,6 +101,7 @@ class DagligReiseVilkårService(
                 prisEnkelbillett = this.prisEnkelbillett?.takeIf { it > 0 },
                 prisSyvdagersbillett = this.prisSyvdagersbillett?.takeIf { it > 0 },
                 prisTrettidagersbillett = this.prisTrettidagersbillett?.takeIf { it > 0 },
+                periode = periode,
             )
 
             is FaktaPrivatBil -> TODO()

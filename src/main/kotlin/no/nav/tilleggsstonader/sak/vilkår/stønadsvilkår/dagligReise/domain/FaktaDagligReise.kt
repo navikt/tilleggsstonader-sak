@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
 
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Periode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.antallDagerIPeriodeInklusiv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
@@ -17,6 +19,7 @@ data class FaktaOffentligTransport(
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
+    val periode: Periode? = null,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.OFFENTLIG_TRANSPORT
 
@@ -24,6 +27,7 @@ data class FaktaOffentligTransport(
         validerIngenNegativeUtgifter()
         validerMinstEnBillettPris()
         validerReisdager()
+        validerBillettpriser()
     }
 
     private fun validerIngenNegativeUtgifter() {
@@ -49,6 +53,37 @@ data class FaktaOffentligTransport(
 
         brukerfeilHvis(reisedagerPerUke > 7) {
             "Reisedager per uke kan ikke være mer enn 7"
+        }
+    }
+
+    private fun validerBillettpriser() {
+        if (periode == null) {
+            return
+        }
+
+        val dager = antallDagerIPeriodeInklusiv(periode.fom, periode.tom)
+        val manglerEnkelbillett = prisEnkelbillett == null || prisEnkelbillett <= 0
+        val manglerTrettidagersbillett = prisTrettidagersbillett == null || prisTrettidagersbillett <= 0
+        val eksaktTrettidagersperiode = dager % 30 == 0
+        val mindreEnnTrettiDager = dager < 30
+        val overTrettiDager = dager > 30
+        val reiserOfte = reisedagerPerUke >= 3
+        val reiserSjeldent = reisedagerPerUke < 3
+
+        brukerfeilHvis(mindreEnnTrettiDager && reiserSjeldent && manglerEnkelbillett) {
+            "Du er nødt til å fylle ut pris for enkeltbillett"
+        }
+
+        brukerfeilHvis(overTrettiDager && reiserOfte && manglerTrettidagersbillett) {
+            "Du er nødt til å fylle ut pris for 30-dagersbillett"
+        }
+
+        brukerfeilHvis(eksaktTrettidagersperiode && manglerTrettidagersbillett) {
+            "Fyll ut pris for 30-dagersbillett"
+        }
+
+        brukerfeilHvis(!eksaktTrettidagersperiode && reiserOfte && manglerEnkelbillett) {
+            "Fyll ut pris for enkeltbillett"
         }
     }
 
