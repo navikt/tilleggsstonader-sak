@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
 
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.antallDagerIPeriodeInklusiv
@@ -19,7 +19,7 @@ data class FaktaOffentligTransport(
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
-    val periode: Periode? = null,
+    val periode: Datoperiode? = null,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.OFFENTLIG_TRANSPORT
 
@@ -62,8 +62,8 @@ data class FaktaOffentligTransport(
         }
 
         val dager = antallDagerIPeriodeInklusiv(periode.fom, periode.tom)
-        val manglerEnkelbillett = prisEnkelbillett == null || prisEnkelbillett <= 0
-        val manglerTrettidagersbillett = prisTrettidagersbillett == null || prisTrettidagersbillett <= 0
+        val manglerEnkelbillett = prisEnkelbillett == null
+        val manglerTrettidagersbillett = prisTrettidagersbillett == null
         val eksaktTrettidagersperiode = dager % 30 == 0
         val mindreEnnTrettiDager = dager < 30
         val overTrettiDager = dager > 30

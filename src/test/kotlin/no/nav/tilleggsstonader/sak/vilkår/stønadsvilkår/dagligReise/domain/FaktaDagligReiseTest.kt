@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
 
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -76,7 +76,7 @@ class FaktaDagligReiseTest {
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = null,
                         prisTrettidagersbillett = null,
-                        periode = Periode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(31)),
+                        periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(31)),
                     )
                 }
             assertThat(feil.message).isEqualTo("Du er nødt til å fylle ut pris for 30-dagersbillett")
@@ -91,7 +91,7 @@ class FaktaDagligReiseTest {
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = null,
                         prisTrettidagersbillett = null,
-                        periode = Periode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(29)),
+                        periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(29)),
                     )
                 }
             assertThat(feil.message).isEqualTo("Fyll ut pris for 30-dagersbillett")
@@ -106,7 +106,7 @@ class FaktaDagligReiseTest {
                         prisEnkelbillett = null,
                         prisSyvdagersbillett = null,
                         prisTrettidagersbillett = 750,
-                        periode = Periode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(20)),
+                        periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(20)),
                     )
                 }
             assertThat(feil.message).isEqualTo("Du er nødt til å fylle ut pris for enkeltbillett")
@@ -121,7 +121,7 @@ class FaktaDagligReiseTest {
                         prisEnkelbillett = null,
                         prisSyvdagersbillett = null,
                         prisTrettidagersbillett = 750,
-                        periode = Periode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(31)),
+                        periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(31)),
                     )
                 }
             assertThat(feil.message).isEqualTo("Fyll ut pris for enkeltbillett")

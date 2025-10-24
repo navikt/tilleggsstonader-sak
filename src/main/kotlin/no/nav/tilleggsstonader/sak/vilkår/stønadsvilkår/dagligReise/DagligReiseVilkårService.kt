@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -99,11 +99,11 @@ class DagligReiseVilkårService(
             status = utledStatus(eksisterendeVilkår),
             delvilkårsett = delvilkårsett,
             resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
-            fakta = nyttVilkår.fakta.fjern0Verdier(Periode(fom = nyttVilkår.fom, tom = nyttVilkår.tom)),
+            fakta = nyttVilkår.fakta.fjern0Verdier(Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom)),
         )
     }
 
-    private fun FaktaDagligReise?.fjern0Verdier(periode: Periode): FaktaDagligReise? {
+    private fun FaktaDagligReise?.fjern0Verdier(periode: Datoperiode): FaktaDagligReise? {
         if (this == null) return null
 
         when (this) {
