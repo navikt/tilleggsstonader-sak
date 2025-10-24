@@ -84,6 +84,7 @@ class InterntVedtakGenereringTest {
      * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
      * Formatter htmlfil etter generering for å unngå stor diff
      */
+
     @Disabled
     @ParameterizedTest
     @MethodSource("stønadstyperInterntVedtak")
@@ -137,7 +138,12 @@ class InterntVedtakGenereringTest {
     }
 
     private fun mockDagligReise() {
-        every { vilkårService.hentOppfylteDagligReiseVilkår(behandlingId) } returns Testdata.DagligReise.vilkårOffentligTransport
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.DagligReise.behandling
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.DagligReise.vilkårperioder
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.DagligReise.grunnlagsdata
+        every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
+        every { vilkårService.hentVilkår(behandlingId) } returns Testdata.DagligReise.vilkårOffentligTransport
+        every { vedtakService.hentVedtak(behandlingId) } returns Testdata.DagligReise.innvilgetVedtak
     }
 
     @Test
@@ -189,8 +195,8 @@ class InterntVedtakGenereringTest {
                     Stønadstype.BARNETILSYN,
                     Stønadstype.LÆREMIDLER,
                     Stønadstype.BOUTGIFTER,
-                    -> it.håndteres()
                     Stønadstype.DAGLIG_REISE_TSO,
+                    -> it.håndteres()
                     Stønadstype.DAGLIG_REISE_TSR,
                     -> it.håndteresIkke()
                 }

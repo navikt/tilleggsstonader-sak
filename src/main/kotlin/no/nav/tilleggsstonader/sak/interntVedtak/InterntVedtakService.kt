@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
@@ -99,7 +100,13 @@ class InterntVedtakService(
                         boutgifter = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
                     )
 
-                is Innvilgelse -> error("Mangler mapping av beregningsresultat for ${data.type}")
+                is InnvilgelseDagligReise ->
+                    BeregningsresultatInterntVedtakDto(
+                        dagligReiseTso = data.beregningsresultat.tilDto(vedtak.tidligsteEndring),
+                    )
+
+                is Innvilgelse,
+                -> error("Mangler mapping av beregningsresultat for ${data.type}")
 
                 else -> null
             }
@@ -162,8 +169,8 @@ class InterntVedtakService(
             is InnvilgelseTilsynBarn -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is InnvilgelseLæremidler -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is InnvilgelseBoutgifter -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
+            is InnvilgelseDagligReise -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is Avslag, is Opphør -> emptyList()
-
             else -> {
                 error("Kan ikke mappe vedtaksperioder for type ${vedtak?.data?.javaClass?.simpleName}")
             }
@@ -292,6 +299,7 @@ class InterntVedtakService(
             Stønadstype.BARNETILSYN -> {}
             Stønadstype.LÆREMIDLER -> {}
             Stønadstype.BOUTGIFTER -> {}
+            Stønadstype.DAGLIG_REISE_TSO -> {}
             else -> error("Internt vedtak håndterer ikke stønadstype=$stønadstype ennå")
         }
     }
