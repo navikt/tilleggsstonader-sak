@@ -267,7 +267,11 @@ private fun mapAktiviteterDagligReiseTso(
     when (aktivitetType) {
         AktivitetType.TILTAK -> {
             TiltakDagligReiseTso(
-                vurderinger = VurderingTiltakDagligReiseTso(lønnet = VurderingLønnet(faktaOgSvar.svarLønnet)),
+                vurderinger =
+                    VurderingTiltakDagligReiseTso(
+                        lønnet = VurderingLønnet(faktaOgSvar.svarLønnet),
+                        harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
+                    ),
             )
         }
 

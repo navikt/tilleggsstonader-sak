@@ -16,7 +16,7 @@ object DagligReiseRegelTestUtil {
                     svar = SvarId.JA,
                 ),
                 Vurdering(
-                    regelId = RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT,
+                    regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
                     svar = SvarId.JA,
                     begrunnelse = "En begrunnelse på delvilkåret",
                 ),
@@ -35,7 +35,7 @@ object DagligReiseRegelTestUtil {
                 SvarOgBegrunnelse(
                     svar = SvarId.JA,
                 ),
-            RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to
+            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to
                 SvarOgBegrunnelse(
                     svar = SvarId.JA,
                     begrunnelse = "En begrunnelse på delvilkåret",

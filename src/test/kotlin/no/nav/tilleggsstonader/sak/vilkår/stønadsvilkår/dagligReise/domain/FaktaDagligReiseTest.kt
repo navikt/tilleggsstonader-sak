@@ -40,17 +40,17 @@ class FaktaDagligReiseTest {
         }
 
         @Test
-        fun `skal kaste feil hvis reisedager er større enn 7`() {
+        fun `skal kaste feil hvis reisedager er større enn 5`() {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
-                        reisedagerPerUke = 8,
+                        reisedagerPerUke = 6,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = 200,
                         prisTrettidagersbillett = 780,
                     )
                 }
-            assertThat(feil.message).isEqualTo("Reisedager per uke kan ikke være mer enn 7")
+            assertThat(feil.message).isEqualTo("Reisedager per uke kan ikke være mer enn 5")
         }
 
         @Test

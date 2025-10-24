@@ -74,5 +74,5 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
         tom = this.tom,
         resultat = this.resultat,
         utgift = this.utgift,
-        typeFakta = this.fakta?.typeVilkårFakta,
+        typeFakta = this.fakta?.type,
     )

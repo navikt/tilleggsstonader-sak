@@ -122,6 +122,7 @@ data class AktivitetBoutgifterFaktaOgVurderingerDto(
 
 data class AktivitetDagligReiseTsoFaktaOgVurderingerDto(
     val lønnet: VurderingDto? = null,
+    val harUtgifter: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
 data object AktivitetDagligReiseTsrFaktaOgVurderingerDto : FaktaOgVurderingerDto()
@@ -190,6 +191,7 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                 is FaktaOgVurderingDagligReiseTso ->
                     AktivitetDagligReiseTsoFaktaOgVurderingerDto(
                         lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
+                        harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
                     )
                 is FaktaOgVurderingDagligReiseTsr ->
                     AktivitetDagligReiseTsrFaktaOgVurderingerDto

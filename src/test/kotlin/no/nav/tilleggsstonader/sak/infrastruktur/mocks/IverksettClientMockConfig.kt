@@ -27,8 +27,8 @@ class IverksettClientMockConfig {
             clearMocks(iverksettClient)
             justRun { iverksettClient.iverksett(any()) }
             every { iverksettClient.hentStatus(any(), any(), any()) } returns IverksettStatus.OK
-            every { iverksettClient.simuler(any()) } returns simuleringsresultat
-            every { iverksettClient.simuler(match { it.personident == "identIngenEndring" }) } returns null
+            every { iverksettClient.simulerV2(any()) } returns simuleringsresultat
+            every { iverksettClient.simulerV2(match { it.personident == "identIngenEndring" }) } returns null
         }
 
         private val simuleringsresultat =

@@ -80,7 +80,9 @@ data object IngenAktivitetDagligReiseTso : AktivitetDagligReiseTso {
 
 data class VurderingTiltakDagligReiseTso(
     override val lønnet: VurderingLønnet,
-) : LønnetVurdering
+    override val harUtgifter: VurderingHarUtgifter,
+) : HarUtgifterVurdering,
+    LønnetVurdering
 
 sealed interface TypeFaktaOgVurderingDagligReiseTso : TypeFaktaOgVurdering
 

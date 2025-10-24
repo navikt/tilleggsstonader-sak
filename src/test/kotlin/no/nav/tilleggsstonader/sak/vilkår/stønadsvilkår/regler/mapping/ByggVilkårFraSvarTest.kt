@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Sv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseOffentiligTransportRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegel
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -18,16 +18,16 @@ class ByggVilkårFraSvarTest {
                         svar = SvarId.JA,
                     ),
                 RegelId.UNNTAK_SEKS_KM to null,
-                RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to
+                RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to
                     SvarOgBegrunnelse(
                         svar = SvarId.JA,
                     ),
-                RegelId.KAN_BRUKER_KJØRE_SELV to null,
+                RegelId.KAN_KJØRE_MED_EGEN_BIL to null,
             )
 
         val delvilkårsett =
             ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
-                vilkårsregel = DagligReiseOffentiligTransportRegel(),
+                vilkårsregel = DagligReiseRegel(),
                 svar = svar,
             )
 
@@ -45,16 +45,16 @@ class ByggVilkårFraSvarTest {
                         svar = SvarId.NEI,
                     ),
                 RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelse(svar = SvarId.JA),
-                RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to
+                RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to
                     SvarOgBegrunnelse(
                         svar = SvarId.NEI,
                     ),
-                RegelId.KAN_BRUKER_KJØRE_SELV to SvarOgBegrunnelse(SvarId.NEI, "Begrunnelse"),
+                RegelId.KAN_KJØRE_MED_EGEN_BIL to SvarOgBegrunnelse(SvarId.NEI, "Begrunnelse"),
             )
 
         val delvilkårsett =
             ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
-                vilkårsregel = DagligReiseOffentiligTransportRegel(),
+                vilkårsregel = DagligReiseRegel(),
                 svar = svar,
             )
 
@@ -77,7 +77,7 @@ class ByggVilkårFraSvarTest {
         Assertions
             .assertThatThrownBy {
                 ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
-                    vilkårsregel = DagligReiseOffentiligTransportRegel(),
+                    vilkårsregel = DagligReiseRegel(),
                     svar = svar,
                 )
             }.hasMessageContaining("Ikke alle svar kunne mappes til vurderinger")

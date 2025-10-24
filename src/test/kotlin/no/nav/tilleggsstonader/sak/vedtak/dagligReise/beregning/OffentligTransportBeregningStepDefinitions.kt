@@ -21,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringSer
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
@@ -32,6 +31,7 @@ import org.assertj.core.api.Assertions.assertThat
 @Suppress("unused", "ktlint:standard:function-naming")
 class OffentligTransportBeregningStepDefinitions {
     val behandlingServiceMock = mockk<BehandlingService>()
+    val vilkårServiceMock = mockk<VilkårService>()
     val vilkårRepositoryFake = VilkårRepositoryFake()
     val vilkårperiodeRepositoryFake = VilkårperiodeRepositoryFake()
     val behandlingId = BehandlingId.random()
@@ -51,7 +51,8 @@ class OffentligTransportBeregningStepDefinitions {
     val dagligReiseVilkårService =
         DagligReiseVilkårService(
             vilkårRepository = vilkårRepositoryFake,
-            vilkårService = mockk(),
+            vilkårService = vilkårServiceMock,
+            behandlingService = behandlingServiceMock,
         )
 
     val vedtaksperiodeValideringService =

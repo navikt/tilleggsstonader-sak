@@ -11,8 +11,6 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.slettVilkår
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
@@ -30,12 +28,12 @@ import java.time.LocalDate
 
 class DagligReiseVilkårControllerTest : IntegrationTest() {
     val fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO)
-    val behandling = behandling(fagsak, steg = StegType.VILKÅR)
+    val behandling = behandling(fagsak = fagsak, steg = StegType.VILKÅR)
 
     val svarOffentligTransport =
         mapOf(
             RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA),
-            RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
         )
 
     @BeforeEach
@@ -114,7 +112,7 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
     fun `skal hente alle regler som tilhører daglig reise`() {
         val resultat = hentReglerDagligReise()
 
-        FileUtil.assertFileJsonIsEqual("vilkår/regelstruktur/DAGLIG_REISE_OFFENTLIG_TRANSPORT.json", resultat)
+        FileUtil.assertFileJsonIsEqual("vilkår/regelstruktur/DAGLIG_REISE.json", resultat)
     }
 
     private fun faktaOffentligTransport(

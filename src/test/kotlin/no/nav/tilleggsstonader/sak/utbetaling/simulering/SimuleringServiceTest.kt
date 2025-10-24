@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequ
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingV3Mapper
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -40,6 +41,7 @@ internal class SimuleringServiceTest {
     private val tilkjentYtelseService = mockk<TilkjentYtelseService>()
     private val tilgangService = mockk<TilgangService>()
     private val iverksettService = mockk<IverksettService>()
+    private val utbetalingV3Mapper = mockk<UtbetalingV3Mapper>()
 
     private val simuleringService =
         SimuleringService(
@@ -48,6 +50,7 @@ internal class SimuleringServiceTest {
             tilkjentYtelseService = tilkjentYtelseService,
             tilgangService = tilgangService,
             iverksettService = iverksettService,
+            utbetalingV3Mapper = utbetalingV3Mapper,
         )
 
     private val personIdent = "12345678901"
@@ -59,7 +62,7 @@ internal class SimuleringServiceTest {
         every { fagsakService.fagsakMedOppdatertPersonIdent(any()) } returns fagsak
         every { tilgangService.validerHarSaksbehandlerrolle() } just Runs
         every { tilgangService.harTilgangTilRolle(any()) } returns true
-        every { iverksettService.forrigeIverksetting(any(), any()) } returns null
+        every { iverksettService.finnForrigeIverksetting(any(), any()) } returns null
     }
 
     @Test
@@ -86,7 +89,7 @@ internal class SimuleringServiceTest {
         val simulerSlot = slot<SimuleringRequestDto>()
         val detaljer = SimuleringDetaljerKontrakt("", LocalDate.now(), 0, emptyList())
         every {
-            iverksettClient.simuler(capture(simulerSlot))
+            iverksettClient.simulerV2(capture(simulerSlot))
         } returns SimuleringResponseDto(emptyList(), detaljer)
 
         simuleringService.hentOgLagreSimuleringsresultat(saksbehandling)
@@ -123,7 +126,7 @@ internal class SimuleringServiceTest {
 
         val tilkjentYtelse = tilkjentYtelse(behandlingId = behandling.id)
 
-        every { iverksettClient.simuler(any()) } returns
+        every { iverksettClient.simulerV2(any()) } returns
             objectMapper.readValue(readFile("mock/iverksett/simuleringsresultat.json"))
 
         every { behandlingService.hentBehandling(any()) } returns behandling
