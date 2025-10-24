@@ -96,6 +96,10 @@
       "lønnet" : {
         "svar" : "NEI",
         "resultat" : "OPPFYLT"
+      },
+      "harUtgifter" : {
+        "svar" : "JA",
+        "resultat" : "OPPFYLT"
       }
     },
     "kilde" : "MANUELL",
@@ -108,7 +112,8 @@
     "tom" : "2024-02-10",
     "faktaOgVurderinger" : {
       "@type" : "AktivitetDagligReiseTsoFaktaOgVurderingerDto",
-      "lønnet" : null
+      "lønnet" : null,
+      "harUtgifter" : null
     },
     "kilde" : "MANUELL",
     "resultat" : "IKKE_OPPFYLT",
