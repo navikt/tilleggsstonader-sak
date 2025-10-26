@@ -124,6 +124,7 @@
       "aktivitet" : "TILTAK",
       "delAvTidligereUtbetaling" : false
     } ],
-    "boutgifter" : null
+    "boutgifter" : null,
+    "dagligReiseTso" : null
   }
 }
