@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -20,6 +21,7 @@ class UtbetalingV3Mapper(
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         totrinnskontroll: Totrinnskontroll?,
         erFørsteIverksettingForBehandling: Boolean,
+        vedtakstidspunkt: LocalDateTime,
         erSimulering: Boolean,
     ): List<UtbetalingRecord> {
         // En utbetaling er knyttet til en type andel (klassekode hos økonomi)
@@ -35,6 +37,7 @@ class UtbetalingV3Mapper(
                         totrinnskontroll = totrinnskontroll,
                         behandling = behandling,
                         typeAndel = type,
+                        vedtakstidspunkt = vedtakstidspunkt,
                     )
                 }
 
@@ -45,6 +48,7 @@ class UtbetalingV3Mapper(
                     andelerTilkjentYtelse = andelerTilkjentYtelse,
                     totrinnskontroll = totrinnskontroll,
                     erSimulering = erSimulering,
+                    vedtakstidspunkt = vedtakstidspunkt,
                 )
         } else {
             records
@@ -60,6 +64,7 @@ class UtbetalingV3Mapper(
         totrinnskontroll: Totrinnskontroll?,
         behandling: Saksbehandling,
         typeAndel: TypeAndel,
+        vedtakstidspunkt: LocalDateTime,
         erSimulering: Boolean,
     ): UtbetalingRecord =
         UtbetalingRecord(
@@ -70,7 +75,7 @@ class UtbetalingV3Mapper(
             personident = behandling.ident,
             saksbehandler = totrinnskontroll?.saksbehandler,
             beslutter = totrinnskontroll?.beslutter,
-            vedtakstidspunkt = behandling.vedtakstidspunkt,
+            vedtakstidspunkt = vedtakstidspunkt,
             periodetype = PeriodetypeUtbetaling.EN_GANG,
             perioder = mapPerioder(andelerTilkjentYtelse),
             stønad = mapTilStønadUtbetaling(typeAndel),
@@ -101,6 +106,7 @@ class UtbetalingV3Mapper(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         totrinnskontroll: Totrinnskontroll?,
+        vedtakstidspunkt: LocalDateTime,
         erSimulering: Boolean,
     ): Collection<UtbetalingRecord> {
         val typeandelerSomSkalAnnulleres = finnTypeAndelerSomSkalAnnulleres(behandling, andelerTilkjentYtelse)
@@ -117,7 +123,7 @@ class UtbetalingV3Mapper(
                 personident = behandling.ident,
                 saksbehandler = totrinnskontroll?.saksbehandler,
                 beslutter = totrinnskontroll?.beslutter,
-                vedtakstidspunkt = behandling.vedtakstidspunkt,
+                vedtakstidspunkt = vedtakstidspunkt,
                 periodetype = PeriodetypeUtbetaling.EN_GANG,
                 perioder = emptyList(),
                 stønad = mapTilStønadUtbetaling(typeAndel = it.typeAndel),

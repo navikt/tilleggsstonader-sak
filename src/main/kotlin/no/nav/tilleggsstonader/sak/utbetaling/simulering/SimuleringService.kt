@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class SimuleringService(
@@ -74,6 +75,7 @@ class SimuleringService(
                     andelerTilkjentYtelse = tilkjentYtelse.andelerTilkjentYtelse,
                     totrinnskontroll = null,
                     erSimulering = true,
+                    vedtakstidspunkt = LocalDateTime.now(),
                     erFørsteIverksettingForBehandling = true,
                 ),
             )
