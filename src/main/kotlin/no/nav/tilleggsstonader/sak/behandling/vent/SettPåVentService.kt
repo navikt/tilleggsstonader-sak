@@ -28,7 +28,7 @@ class SettPåVentService(
 ) {
     fun hentStatusSettPåVent(behandlingId: BehandlingId): StatusPåVentDto {
         val settPåVent = finnAktivSattPåVent(behandlingId)
-        val oppgave = oppgaveService.hentOppgave(settPåVent.oppgaveId)
+        val oppgave = oppgaveService.hentAktivBehandleSakOppgave(behandlingId)
 
         val endret = utledEndretInformasjon(settPåVent)
 
@@ -57,12 +57,11 @@ class SettPåVentService(
         opprettHistorikkInnslag(behandling, årsaker = dto.årsaker, kommentar = dto.kommentar)
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT)
 
-        val oppgave = hentOppgave(behandlingId)
+        val oppgave = oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId)
 
         val settPåVent =
             SettPåVent(
                 behandlingId = behandlingId,
-                oppgaveId = oppgave.gsakOppgaveId,
                 årsaker = dto.årsaker,
                 kommentar = dto.kommentar,
             )
@@ -120,7 +119,11 @@ class SettPåVentService(
         val oppdatertSettPåVent =
             settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker, kommentar = dto.kommentar))
 
-        val oppgaveResponse = oppdaterOppgave(oppdatertSettPåVent, dto)
+        val oppgaveResponse =
+            oppdaterOppgave(
+                oppgaveId = oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId).gsakOppgaveId,
+                dto = dto,
+            )
 
         val endret = utledEndretInformasjon(oppdatertSettPåVent)
 
@@ -137,12 +140,12 @@ class SettPåVentService(
     }
 
     private fun oppdaterOppgave(
-        settPåVent: SettPåVent,
+        oppgaveId: Long,
         dto: OppdaterSettPåVentDto,
     ): SettPåVentResponse {
         val oppdatertOppgave =
             OppdaterPåVentRequest(
-                oppgaveId = settPåVent.oppgaveId,
+                oppgaveId = oppgaveId,
                 oppgaveVersjon = dto.oppgaveVersjon,
                 kommentar = dto.kommentar,
                 frist = dto.frist,
@@ -170,10 +173,6 @@ class SettPåVentService(
         dto: OppdaterSettPåVentDto,
     ) = !settPåVent.årsaker.containsAll(dto.årsaker) ||
         settPåVent.årsaker.size != dto.årsaker.size
-
-    private fun hentOppgave(behandlingId: BehandlingId): OppgaveDomain =
-        oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId)
-            ?: error("Finner ikke behandleSakOppgave for behandling=$behandlingId")
 
     private fun finnAktivSattPåVent(behandlingId: BehandlingId) =
         settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)

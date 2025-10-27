@@ -1,0 +1,1 @@
+ALTER TABLE sett_pa_vent DROP COLUMN oppgave_id;

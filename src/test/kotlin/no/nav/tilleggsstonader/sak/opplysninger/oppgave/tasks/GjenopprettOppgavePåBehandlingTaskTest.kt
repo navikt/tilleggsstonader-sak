@@ -26,7 +26,6 @@ class GjenopprettOppgavePåBehandlingTaskTest {
     private val behandlingService: BehandlingService = mockk()
     private val oppgaveService: OppgaveService = mockk()
     private val oppgaveRepository: OppgaveRepository = mockk()
-    private val settPåVentRepository: SettPåVentRepository = mockk()
     private lateinit var taskStep: GjenopprettOppgavePåBehandlingTask
 
     @BeforeEach
@@ -36,12 +35,11 @@ class GjenopprettOppgavePåBehandlingTaskTest {
                 behandligService = behandlingService,
                 oppgaveService = oppgaveService,
                 oppgaveRepository = oppgaveRepository,
-                settPåVentRepository = settPåVentRepository,
             )
     }
 
     @Test
-    fun `skal ignorere tidligere oppgave og opprette ny når siste er feilregistrert og oppdatere settpåvent med oppgaveid`() {
+    fun `skal ignorere tidligere oppgave og opprette ny når siste er feilregistrert`() {
         val behandling = behandling(status = BehandlingStatus.FATTER_VEDTAK)
 
         val sisteOppgave =
@@ -50,20 +48,8 @@ class GjenopprettOppgavePåBehandlingTaskTest {
                 status = Oppgavestatus.FEILREGISTRERT,
             )
 
-        val settPåVent =
-            SettPåVent(
-                id = UUID.randomUUID(),
-                behandlingId = behandling.id,
-                oppgaveId = 0L,
-                årsaker = ÅrsakSettPåVent.entries.toList(),
-                kommentar = "",
-                aktiv = true,
-            )
-
         every { behandlingService.hentBehandling(behandling.id) } returns behandling
         every { oppgaveService.finnSisteOppgaveDomainForBehandling(behandling.id) } returns sisteOppgave
-        every { settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandling.id) } returns settPåVent
-        every { settPåVentRepository.update(any()) } answers { firstArg() }
 
         val opprettOppgaveSlot = slot<OpprettOppgave>()
         every { oppgaveService.opprettOppgave(behandling.id, capture(opprettOppgaveSlot)) } returns 1L
@@ -74,7 +60,6 @@ class GjenopprettOppgavePåBehandlingTaskTest {
 
         verify(exactly = 0) { oppgaveRepository.update(any()) }
         verify(exactly = 1) { oppgaveService.opprettOppgave(behandling.id, any()) }
-        verify(exactly = 1) { settPåVentRepository.update(settPåVent.copy(oppgaveId = 1L)) }
 
         val ny = opprettOppgaveSlot.captured
         assertThat(ny.beskrivelse).contains("feilregistrert")
@@ -97,7 +82,6 @@ class GjenopprettOppgavePåBehandlingTaskTest {
         val opprettOppgaveSlot = slot<OpprettOppgave>()
         every { oppgaveService.opprettOppgave(behandling.id, capture(opprettOppgaveSlot)) } returns 1L
         every { oppgaveRepository.update(any()) } returns sisteOppgave.copy(status = Oppgavestatus.IGNORERT)
-        every { settPåVentRepository.findByBehandlingIdAndAktivIsTrue(any()) } returns null
 
         val task: Task = GjenopprettOppgavePåBehandlingTask.opprettTask(behandling.id)
 

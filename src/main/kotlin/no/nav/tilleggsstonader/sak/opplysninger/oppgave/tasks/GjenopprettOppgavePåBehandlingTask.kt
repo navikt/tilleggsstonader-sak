@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
@@ -32,7 +31,6 @@ class GjenopprettOppgavePåBehandlingTask(
     private val behandligService: BehandlingService,
     private val oppgaveService: OppgaveService,
     private val oppgaveRepository: OppgaveRepository,
-    private val settPåVentRepository: SettPåVentRepository,
 ) : AsyncTaskStep {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -55,15 +53,7 @@ class GjenopprettOppgavePåBehandlingTask(
             settOppgaveTilIgnorert(sisteOppgavePåBehandling)
         }
 
-        val opprettetOppgaveId = opprettNyOppgave(behandling, beskrivelseNyOppgave)
-
-        // Om behandling er på vent så må vi oppdatere oppgaveId på settPåVent slik at saksbehandler får tatt behandlingen av vent
-        settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandling.id)?.let {
-            logger.info(
-                "Endrer oppgaveid på settPåVent for behandling ${behandling.id} til $opprettetOppgaveId fordi oppgaven gjenopprettes",
-            )
-            settPåVentRepository.update(it.copy(oppgaveId = opprettetOppgaveId))
-        }
+        opprettNyOppgave(behandling, beskrivelseNyOppgave)
     }
 
     private fun settOppgaveTilIgnorert(oppgaveDomain: OppgaveDomain) {
@@ -74,7 +64,7 @@ class GjenopprettOppgavePåBehandlingTask(
     private fun opprettNyOppgave(
         behandling: Behandling,
         beskrivelse: String,
-    ): Long =
+    ) {
         oppgaveService.opprettOppgave(
             behandling.id,
             OpprettOppgave(
@@ -84,6 +74,7 @@ class GjenopprettOppgavePåBehandlingTask(
                 fristFerdigstillelse = LocalDate.now(),
             ),
         )
+    }
 
     private fun finnOppgavetype(behandling: Behandling) =
         when (behandling.status) {
