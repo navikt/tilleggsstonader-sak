@@ -66,7 +66,7 @@ data class OffentligTransport(
 enum class BillettType {
     ENKELTBILLETT,
     SYVDAGERSBILLETT,
-    MÅNEDSKORT,
+    TRETTIDAGERSBILLETT,
 }
 
 data class PrivatTransport(

@@ -47,7 +47,7 @@
     "harBehovForTransportUavhengigAvReisensLengde" : null,
     "kanReiseMedOffentligTransport" : "JA",
     "offentligTransport" : {
-      "billettTyperValgt" : [ "ENKELTBILLETT", "MÅNEDSKORT" ],
+      "billettTyperValgt" : [ "ENKELTBILLETT", "TRETTIDAGERSBILLETT" ],
       "enkeltbillettPris" : 44,
       "syvdagersbillettPris" : null,
       "månedskortPris" : 788

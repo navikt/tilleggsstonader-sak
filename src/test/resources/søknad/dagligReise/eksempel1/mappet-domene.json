@@ -66,7 +66,7 @@
     "harBehovForTransportUavhengigAvReisensLengde" : "JA",
     "kanReiseMedOffentligTransport" : "KOMBINERT_BIL_OFFENTLIG_TRANSPORT",
     "offentligTransport" : {
-      "billettTyperValgt" : [ "ENKELTBILLETT", "SYVDAGERSBILLETT", "MÅNEDSKORT" ],
+      "billettTyperValgt" : [ "ENKELTBILLETT", "SYVDAGERSBILLETT", "TRETTIDAGERSBILLETT" ],
       "enkeltbillettPris" : 100,
       "syvdagersbillettPris" : 100,
       "månedskortPris" : 100

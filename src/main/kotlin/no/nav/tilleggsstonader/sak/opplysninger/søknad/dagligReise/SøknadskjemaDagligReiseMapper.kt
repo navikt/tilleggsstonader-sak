@@ -250,7 +250,7 @@ class SøknadskjemaDagligReiseMapper(
                     when (it.key) {
                         HvaSlagsTypeBillettMaDuKjopeType.enkeltbillett -> BillettType.ENKELTBILLETT
                         HvaSlagsTypeBillettMaDuKjopeType.ukeskort -> BillettType.SYVDAGERSBILLETT
-                        HvaSlagsTypeBillettMaDuKjopeType.manedskort -> BillettType.MÅNEDSKORT
+                        HvaSlagsTypeBillettMaDuKjopeType.manedskort -> BillettType.TRETTIDAGERSBILLETT
                     }
                 } ?: emptyList()
 
