@@ -54,6 +54,7 @@
         "mottarGrunnstønad" : null,
         "reisedistanseEgenBil" : 100,
         "destinasjonEgenBil" : [ "TOGSTASJON" ],
+        "parkering" : "JA",
         "bompenger" : 43,
         "ferge" : 0,
         "piggdekkavgift" : 22

@@ -78,6 +78,7 @@
         "mottarGrunnstønad" : "JA",
         "reisedistanseEgenBil" : 100,
         "destinasjonEgenBil" : [ "TOGSTASJON", "BUSSSTOPP", "FERGE_BAT_KAI" ],
+        "parkering" : "JA",
         "bompenger" : 100,
         "ferge" : 100,
         "piggdekkavgift" : 100

@@ -95,6 +95,7 @@ data class UtgifterBil(
     val mottarGrunnstønad: JaNei?,
     val reisedistanseEgenBil: Int,
     val destinasjonEgenBil: List<DestinasjonEgenBil>?,
+    val parkering: JaNei,
     val bompenger: Int?,
     val ferge: Int?,
     val piggdekkavgift: Int?,

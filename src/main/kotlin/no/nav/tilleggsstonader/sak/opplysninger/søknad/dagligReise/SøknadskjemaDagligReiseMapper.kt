@@ -302,6 +302,7 @@ class SøknadskjemaDagligReiseMapper(
         return if (skalKjøreBil) {
             UtgifterBil(
                 destinasjonEgenBil = mapDestinasjonEgenBil(reise.hvorSkalDuKjoreMedEgenBil),
+                parkering = mapJaNei(reise.parkering ?: error("'Parkering' er påkrevd når bruker skal kjøre egen bil")),
                 mottarGrunnstønad = reise.mottarDuGrunnstonadFraNav?.let(::mapJaNei),
                 reisedistanseEgenBil =
                     reise.hvorLangErReiseveienDinMedBil
