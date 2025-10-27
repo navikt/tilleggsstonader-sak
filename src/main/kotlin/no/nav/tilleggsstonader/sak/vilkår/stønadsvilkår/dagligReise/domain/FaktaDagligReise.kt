@@ -66,24 +66,32 @@ data class FaktaOffentligTransport(
         val manglerTrettidagersbillett = prisTrettidagersbillett == null
         val eksaktTrettidagersperiode = dager % 30 == 0
         val mindreEnnTrettiDager = dager < 30
-        val overTrettiDager = dager > 30
+        val overTrettiDager = dager >= 30
         val reiserOfte = reisedagerPerUke >= 3
         val reiserSjeldent = reisedagerPerUke < 3
+        // Vi regner om perioden til uker og ganger med antall reisedager for å få summen av reisedagene i perioden
+        val faktiskeReisedager = dager / 7 * reisedagerPerUke
+        // Vi bruker 9 reisedager som grense for når månedskort anbefales, da det vil være rimeligere enn enkeltbilletter
+        val grenseHvorMånedskortLønnerSeg = 9
 
-        brukerfeilHvis(mindreEnnTrettiDager && reiserSjeldent && manglerEnkelbillett) {
-            "Du er nødt til å fylle ut pris for enkeltbillett"
+        brukerfeilHvis((reiserSjeldent || faktiskeReisedager < grenseHvorMånedskortLønnerSeg) && manglerEnkelbillett) {
+            "Pris for enkeltbillett må fylles ut når det reises sjeldent eller over en kort periode"
+        }
+
+        brukerfeilHvis(faktiskeReisedager >= grenseHvorMånedskortLønnerSeg && mindreEnnTrettiDager && manglerTrettidagersbillett) {
+            "Pris for 30-dagersbillett må fylles ut da det lønner seg med 30-dagersbillett for denne perioden"
         }
 
         brukerfeilHvis(overTrettiDager && reiserOfte && manglerTrettidagersbillett) {
-            "Du er nødt til å fylle ut pris for 30-dagersbillett"
+            "Pris for 30-dagersbillett må fylles ut når det reises regelmessig over lengre tid"
         }
 
-        brukerfeilHvis(eksaktTrettidagersperiode && manglerTrettidagersbillett) {
-            "Fyll ut pris for 30-dagersbillett"
+        brukerfeilHvis(eksaktTrettidagersperiode && reiserOfte && manglerTrettidagersbillett) {
+            "Pris for 30-dagersbillett må fylles ut da reisen går opp i eksakte trettidagersperioder"
         }
 
-        brukerfeilHvis(!eksaktTrettidagersperiode && reiserOfte && manglerEnkelbillett) {
-            "Fyll ut pris for enkeltbillett"
+        brukerfeilHvis(!eksaktTrettidagersperiode && overTrettiDager && manglerEnkelbillett) {
+            "Pris for enkeltbillett må fylles ut siden reisen varer lenger enn 30 dager uten å være en eksakt 30-dagersperiode"
         }
     }
 
