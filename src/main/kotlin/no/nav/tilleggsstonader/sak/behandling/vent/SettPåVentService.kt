@@ -172,7 +172,7 @@ class SettPåVentService(
         settPåVent.årsaker.size != dto.årsaker.size
 
     private fun hentOppgave(behandlingId: BehandlingId): OppgaveDomain =
-        oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(behandlingId)
+        oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId)
             ?: error("Finner ikke behandleSakOppgave for behandling=$behandlingId")
 
     private fun finnAktivSattPåVent(behandlingId: BehandlingId) =

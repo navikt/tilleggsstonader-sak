@@ -41,7 +41,7 @@ class GjenopprettOppgavePåBehandlingTask(
         val behandling = behandligService.hentBehandling(BehandlingId.fromString(task.payload))
         feilHvis(behandling.status.erFerdigbehandlet()) { "Behandling er ferdig behandlet" }
 
-        val sisteOppgavePåBehandling = oppgaveService.finnSisteOppgaveForBehandling(behandling.id)
+        val sisteOppgavePåBehandling = oppgaveService.finnSisteOppgaveDomainForBehandling(behandling.id)
 
         val beskrivelseNyOppgave =
             when (sisteOppgavePåBehandling?.status == Oppgavestatus.FEILREGISTRERT) {

@@ -109,7 +109,7 @@ class BeslutteVedtakSteg(
 
     private fun ferdigstillOppgave(saksbehandling: Saksbehandling): Long? {
         val oppgavetype = Oppgavetype.GodkjenneVedtak
-        return oppgaveService.hentOppgaveSomIkkeErFerdigstilt(saksbehandling.id, oppgavetype)?.let {
+        return oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(saksbehandling.id, oppgavetype)?.let {
             taskService.save(
                 FerdigstillOppgaveTask.opprettTask(
                     behandlingId = saksbehandling.id,

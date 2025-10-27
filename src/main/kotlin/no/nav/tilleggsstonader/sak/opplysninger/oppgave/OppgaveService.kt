@@ -249,12 +249,12 @@ class OppgaveService(
         versjon: Int,
     ): Oppgave = oppgaveClient.fordelOppgave(gsakOppgaveId, null, versjon = versjon)
 
-    fun hentOppgaveSomIkkeErFerdigstilt(
+    fun hentOppgaveDomainSomIkkeErFerdigstilt(
         behandlingId: BehandlingId,
         oppgavetype: Oppgavetype,
     ): OppgaveDomain? = oppgaveRepository.findByBehandlingIdAndTypeAndStatus(behandlingId, oppgavetype, Oppgavestatus.ÅPEN)
 
-    fun hentBehandleSakOppgaveSomIkkeErFerdigstilt(behandlingId: BehandlingId): OppgaveDomain? =
+    fun hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId: BehandlingId): OppgaveDomain? =
         oppgaveRepository.findByBehandlingIdAndStatusAndTypeIn(
             behandlingId = behandlingId,
             status = Oppgavestatus.ÅPEN,
@@ -306,7 +306,7 @@ class OppgaveService(
         oppgaveClient.ferdigstillOppgave(gsakOppgaveId)
     }
 
-    fun finnSisteOppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
+    fun finnSisteOppgaveDomainForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
         oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandlingId)
 
     fun finnMappe(
