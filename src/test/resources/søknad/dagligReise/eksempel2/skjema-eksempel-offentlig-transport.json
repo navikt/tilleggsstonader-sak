@@ -19,24 +19,6 @@
     "reiseFraAnnetEnnFolkeregistrertAdr": "nei"
   },
   "aktiviteter": {
-    "aktiviteterOgMaalgruppe": {
-      "aktivitet": {
-        "aktivitetId": "134120740",
-        "maalgruppe": {
-          "maalgruppetype": "NEDSARBEVN",
-          "gyldighetsperiode": {
-            "fom": "2025-03-01",
-            "tom": "2025-10-06"
-          },
-          "maalgruppenavn": "Person med nedsatt arbeidsevne pga. sykdom"
-        },
-        "periode": {
-          "fom": "2025-03-11",
-          "tom": "2025-09-30"
-        },
-        "text": "Arbeidstrening: 11. mars 2025 - 30. september 2025"
-      }
-    },
     "arbeidsrettetAktivitet": "tiltakArbeidsrettetUtredning",
     "faktiskeUtgifter": {
       "garDuPaVideregaendeEllerGrunnskole": "videregaendeSkole",

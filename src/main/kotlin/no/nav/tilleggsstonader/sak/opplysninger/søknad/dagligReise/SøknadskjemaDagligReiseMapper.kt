@@ -156,13 +156,16 @@ class SøknadskjemaDagligReiseMapper(
         } ?: emptyList()
 
     private fun mapAktivitet(aktiviteter: Aktiviteter): AktivitetDagligReiseAvsnitt {
-        val aktivitet = aktiviteter.aktiviteterOgMaalgruppe.aktivitet
-        // Fyll ut setter aktivitetId til "ingenAktivitet" og vi har ellers mapping til ANNET som brukes i vår søknad
-        val id = if (aktivitet.aktivitetId == "ingenAktivitet") "ANNET" else aktivitet.aktivitetId
+        val aktivitetListe =
+            aktiviteter.aktiviteterOgMaalgruppe?.aktivitet?.let {
+                // Fyll ut setter aktivitetId til "ingenAktivitet" og vi har ellers mapping til ANNET som brukes i vår søknad
+                val id = if (it.aktivitetId == "ingenAktivitet") "ANNET" else it.aktivitetId
+                listOf(ValgtAktivitet(id = id, label = it.text))
+            }
 
         val aktivitetAvsnitt =
             AktivitetAvsnitt(
-                aktiviteter = listOf(ValgtAktivitet(id = id, label = aktivitet.text)),
+                aktiviteter = aktivitetListe,
                 annenAktivitet = mapAnnenAktivitet(aktiviteter.arbeidsrettetAktivitet),
                 lønnetAktivitet = null,
             )

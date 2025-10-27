@@ -16,10 +16,7 @@
   },
   "aktivitet" : {
     "aktivitet" : {
-      "aktiviteter" : [ {
-        "id" : "134120740",
-        "label" : "Arbeidstrening: 11. mars 2025 - 30. september 2025"
-      } ],
+      "aktiviteter" : null,
       "annenAktivitet" : "TILTAK",
       "lønnetAktivitet" : null
     },
