@@ -451,10 +451,15 @@ class OpprettTestBehandlingController(
                 harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde = JaNeiTypeDagligReise.nei,
                 hvorLangErReiseveienDin = 8,
                 kanDuReiseMedOffentligTransport = KanDuReiseMedOffentligTransportType.ja,
-                hvaSlagsTypeBillettMaDuKjope = mapOf(HvaSlagsTypeBillettMaDuKjopeType.enkeltbillett to true),
-                enkeltbilett = 1,
-                syvdagersbilett = 0,
-                manedskort = 0,
+                hvaSlagsTypeBillettMaDuKjope =
+                    mapOf(
+                        HvaSlagsTypeBillettMaDuKjopeType.enkeltbillett to true,
+                        HvaSlagsTypeBillettMaDuKjopeType.ukeskort to true,
+                        HvaSlagsTypeBillettMaDuKjopeType.manedskort to true,
+                    ),
+                enkeltbilett = 44,
+                syvdagersbilett = 280,
+                manedskort = 740,
                 hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport = null,
                 kanKjoreMedEgenBil = null,
                 mottarDuGrunnstonadFraNav = null,
@@ -483,7 +488,7 @@ class OpprettTestBehandlingController(
                                 ),
                             arbeidOgOpphold = arbeidOgOppholdDagligReise(),
                             aktiviteter = aktiviteter,
-                            reise = listOf(reise),
+                            reise = listOf(reise, reise),
                         ),
                     ),
                 dokumentasjon = emptyList(),
@@ -500,8 +505,10 @@ class OpprettTestBehandlingController(
             when (fagsak.stønadstype) {
                 Stønadstype.DAGLIG_REISE_TSO ->
                     "Søknad om Daglig reise tso" to "DAGLIG_REISE_TSO"
+
                 Stønadstype.DAGLIG_REISE_TSR ->
                     "Søknad om Daglig reise tsr" to "DAGLIG_REISE_TSR"
+
                 else -> error("Ugyldig stønadstype for daglig reise: ${fagsak.stønadstype}")
             }
 
