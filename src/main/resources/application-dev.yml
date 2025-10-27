@@ -15,7 +15,3 @@ DVH_BEHANDLING_TOPIC: tilleggsstonader.aapen-tilleggsstonader-dvh-behandling-tes
 clients:
   kodeverk:
     uri: https://kodeverk-api.nav.no
-
-tilleggsstonader:
-  http-client:
-    read-timeout: PT2M
