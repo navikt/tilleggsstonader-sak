@@ -6,7 +6,8 @@
       "postnummer" : null,
       "poststed" : "JESSHEIM",
       "landkode" : "Land1"
-    }
+    },
+    "fødselsdatoPersonUtenFødselsnummer" : null
   },
   "hovedytelse" : {
     "hovedytelse" : [ "AAP" ],

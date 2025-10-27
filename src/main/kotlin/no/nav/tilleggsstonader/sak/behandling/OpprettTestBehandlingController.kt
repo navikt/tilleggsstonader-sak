@@ -50,10 +50,13 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Skjem
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeUtgifterType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterFlereSteder
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterNyBolig
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransportType
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DekkesUtgiftenAvAndre
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaSlagsTypeBillettMaDuKjopeType
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.KanDuReiseMedOffentligTransportType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.PeriodeAktivitet
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.SkjemaDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.TypeUtdanning
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Valgfelt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOpphold
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
@@ -63,6 +66,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNor
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.HarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.UtdanningAvsnitt
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -92,7 +96,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Akti
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktiviteterOgMålgruppe as AktiviteterOgMålgruppeDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArsakOppholdUtenforNorgeType as ArsakOppholdUtenforNorgeTypeDagligReise
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData as DagligReiseFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DineOpplysninger as DineOpplysningerDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HarPengestotteAnnetLandType as HarPengestotteAnnetLandTypeDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType as HovedytelseTypeDagligReise
@@ -103,8 +106,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.NavA
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge as OppholdUtenforNorgeDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Periode as PeriodeDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reise as ReiseDagligReise
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ReiseAdresse as ReiseAdresseDagligReise
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reiseperiode as ReiseperiodeDagligReise
 
 @RestController
 @RequestMapping(path = ["/api/test/opprett-behandling"])
@@ -399,6 +400,7 @@ class OpprettTestBehandlingController(
                 etternavn = "Etternavn",
                 identitet =
                     IdentitetDagligReise(identitetsnummer = "11111122222"),
+                fodselsdato2 = "2025-01-01",
                 adresse =
                     NavAdresseDagligReise(
                         gyldigFraOgMed = LocalDate.of(2025, 1, 1),
@@ -428,32 +430,43 @@ class OpprettTestBehandlingController(
                             ),
                     ),
                 arbeidsrettetAktivitet = null,
-                mottarLonnGjennomTiltak = JaNeiTypeDagligReise.ja,
-                reiseTilAktivitetsstedHelePerioden = JaNeiTypeDagligReise.ja,
-                reiseperiode =
-                    ReiseperiodeDagligReise(
-                        LocalDate.of(2025, 6, 20),
-                        LocalDate.of(2025, 5, 20),
+                faktiskeUtgifter =
+                    DekkesUtgiftenAvAndre(
+                        garDuPaVideregaendeEllerGrunnskole = TypeUtdanning.annetTiltak,
+                        erDuLaerling = null,
+                        arbeidsgiverDekkerUtgift = null,
+                        bekreftelsemottarIkkeSkoleskyss = null,
+                        lonnGjennomTiltak = null,
                     ),
             )
         val reise =
             ReiseDagligReise(
-                reiseAdresse =
-                    ReiseAdresseDagligReise(gateadresse = "Nisseveien 3", postnr = "0011", poststed = "OSLO"),
+                gateadresse = "Nisseveien 3",
+                postnr = "0011",
+                poststed = "OSLO",
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
                 hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet = Valgfelt("dager", "5"),
                 harDu6KmReisevei = JaNeiTypeDagligReise.ja,
-                hvorLangErReiseveienDin = 8,
                 harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde = JaNeiTypeDagligReise.nei,
-                kanDuReiseMedOffentligTransport = JaNeiTypeDagligReise.ja,
+                hvorLangErReiseveienDin = 8,
+                kanDuReiseMedOffentligTransport = KanDuReiseMedOffentligTransportType.ja,
                 hvaSlagsTypeBillettMaDuKjope = mapOf(HvaSlagsTypeBillettMaDuKjopeType.enkeltbillett to true),
                 enkeltbilett = 1,
                 syvdagersbilett = 0,
                 manedskort = 0,
-                hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport =
-                    mapOf(HvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransportType.annet to false),
-                kanDuKjoreMedEgenBil = JaNeiTypeDagligReise.nei,
-                utgifterBil = null,
-                drosje = null,
+                hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport = null,
+                kanKjoreMedEgenBil = null,
+                mottarDuGrunnstonadFraNav = null,
+                hvorforIkkeBil = null,
+                reiseMedTaxi = null,
+                ttKort = null,
+                hvorSkalDuKjoreMedEgenBil = null,
+                hvorLangErReiseveienDinMedBil = null,
+                parkering = null,
+                bompenger = null,
+                ferge = null,
+                piggdekkavgift = null,
             )
 
         val skjemaDagligReise =

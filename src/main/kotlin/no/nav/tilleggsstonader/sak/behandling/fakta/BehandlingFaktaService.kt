@@ -149,14 +149,13 @@ class BehandlingFaktaService(
     private fun mapAktivitetForDagligReise(aktivitet: AktivitetDagligReiseAvsnitt?) =
         FaktaAktivtetDagligReise(
             aktivitet = mapAktivitet(aktivitet?.aktivitet),
-            reiseTilAktivitetsstedHelePerioden = aktivitet?.reiseTilAktivitetsstedHelePerioden,
-            reiseperiode = aktivitet?.reiseperiode,
         )
 
     private fun mapReise(reiser: List<ReiseDagligReise>?): List<FaktaReise>? =
         reiser?.map { reise ->
             FaktaReise(
-                reiseAdresse = reise.reiseAdresse,
+                reiseAdresse = reise.adresse,
+                periode = reise.periode,
                 dagerPerUke = reise.dagerPerUke,
                 harMerEnn6KmReisevei = reise.harMerEnn6KmReisevei,
                 lengdeReisevei = reise.lengdeReisevei,

@@ -1,4 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling.fakta
+
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Personopplysninger
 import org.assertj.core.api.Assertions.assertThat
@@ -18,11 +19,13 @@ class BehandlingFaktaUtilsTest {
                         poststed = "Oslo",
                         landkode = "no",
                     ),
+                fødselsdatoPersonUtenFødselsnummer = "2025-01-01",
             )
 
         val mappetPersonopplysninger = mapPersonopplysninger(personopplysninger)
 
         assertThat(mappetPersonopplysninger.søknadsgrunnlag!!.adresse).isEqualTo("Rundgata, 1234, Oslo")
+        assertThat(mappetPersonopplysninger.søknadsgrunnlag.fødselsdatPersonUtenPersonnummer).isEqualTo("2025-01-01")
     }
 
     @Test
@@ -37,10 +40,12 @@ class BehandlingFaktaUtilsTest {
                         poststed = null,
                         landkode = null,
                     ),
+                fødselsdatoPersonUtenFødselsnummer = null,
             )
 
         val mappetPersonopplysninger = mapPersonopplysninger(personopplysninger)
 
         assertThat(mappetPersonopplysninger.søknadsgrunnlag!!.adresse).isNull()
+        assertThat(mappetPersonopplysninger.søknadsgrunnlag.fødselsdatPersonUtenPersonnummer).isNull()
     }
 }

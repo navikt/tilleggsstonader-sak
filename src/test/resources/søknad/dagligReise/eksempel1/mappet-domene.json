@@ -6,12 +6,8 @@
       "postnummer" : "2069",
       "poststed" : "JESSHEIM",
       "landkode" : "Land1"
-    }
-  },
-  "annenAdresseDetSkalReisesFra" : {
-    "gateadresse" : "Osloveien 1",
-    "postnummer" : "0482",
-    "poststed" : "Oslo"
+    },
+    "fødselsdatoPersonUtenFødselsnummer" : "2025-01-01"
   },
   "hovedytelse" : {
     "hovedytelse" : [ "AAP", "OVERGANGSSTØNAD", "GJENLEVENDEPENSJON", "UFØRETRYGD", "TILTAKSPENGER", "DAGPENGER", "SYKEPENGER", "KVALIFISERINGSSTØNAD", "INGEN_PENGESTØTTE", "INGEN_PASSENDE_ALTERNATIVER" ],
@@ -44,28 +40,31 @@
         "label" : "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
       } ],
       "annenAktivitet" : "TILTAK",
-      "lønnetAktivitet" : "JA"
+      "lønnetAktivitet" : null
     },
-    "reiseTilAktivitetsstedHelePerioden" : "JA",
-    "reiseperiode" : {
-      "fom" : "2025-01-01",
-      "tom" : "2025-01-01"
+    "dekkesUtgiftenAvAndre" : {
+      "typeUtdanning" : "VIDEREGÅENDE",
+      "lærling" : "JA",
+      "arbeidsgiverDekkerUtgift" : "JA",
+      "mottarIkkeSkoleskyss" : true,
+      "lønnetAktivitet" : "JA"
     }
   },
   "reiser" : [ {
-    "reiseAdresse" : {
+    "adresse" : {
       "gateadresse" : "EksempelSvar",
       "postnummer" : "EksempelSvar",
       "poststed" : "EksempelSvar"
     },
-    "dagerPerUke" : {
-      "id" : "3",
-      "label" : "3"
+    "periode" : {
+      "fom" : "2025-01-01",
+      "tom" : "2025-01-01"
     },
+    "dagerPerUke" : "3",
     "harMerEnn6KmReisevei" : "JA",
     "lengdeReisevei" : 100,
     "harBehovForTransportUavhengigAvReisensLengde" : "JA",
-    "kanReiseMedOffentligTransport" : "JA",
+    "kanReiseMedOffentligTransport" : "KOMBINERT_BIL_OFFENTLIG_TRANSPORT",
     "offentligTransport" : {
       "billettTyperValgt" : [ "ENKELTBILLETT", "SYVDAGERSBILLETT", "MÅNEDSKORT" ],
       "enkeltbillettPris" : 100,
@@ -76,15 +75,14 @@
       "årsakIkkeOffentligTransport" : [ "HELSEMESSIGE_ÅRSAKER", "DÅRLIG_TRANSPORTTILBUD", "LEVERING_HENTING_BARNEHAGE_SKOLE", "ANNET" ],
       "kanKjøreMedEgenBil" : "JA",
       "utgifterBil" : {
-        "merEnn6kmReisevei" : "JA",
+        "mottarGrunnstønad" : "JA",
+        "reisedistanseEgenBil" : 100,
+        "destinasjonEgenBil" : [ "TOGSTASJON", "BUSSSTOPP", "FERGE_BAT_KAI" ],
         "bompenger" : 100,
         "ferge" : 100,
         "piggdekkavgift" : 100
       },
-      "utgifterTaxi" : {
-        "årsakIkkeKjøreBil" : [ "HELSEMESSIGE_ÅRSAKER", "DÅRLIG_TRANSPORTTILBUD", "ANNET" ],
-        "ønskerSøkeOmTaxi" : "JA"
-      }
+      "taxi" : null
     }
   } ],
   "dokumentasjon" : [ ]

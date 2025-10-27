@@ -66,17 +66,14 @@
         "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": false,
         "annet": false
       },
-      "kanKjoreMedEgenBil": "ja",
-      "hvorSkalDuKjoreMedEgenBil": {
-        "togstasjon": true,
-        "busstopp": false,
-        "fergeBatkai": false
+      "kanKjoreMedEgenBil": "nei",
+      "hvorforIkkeBil" : {
+        "helsemessigeArsaker" : true,
+        "harIkkeBilEllerForerkort" : false,
+        "annet" : false
       },
-      "hvorLangErReiseveienDinMedBil": 100,
-      "parkering": "ja",
-      "bompenger": 43,
-      "ferge": 0,
-      "piggdekkavgift": 22
+      "reiseMedTaxi" : "ja",
+      "ttKort" : "ja"
     }
   ]
 }

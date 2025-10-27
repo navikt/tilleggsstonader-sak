@@ -13,10 +13,10 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.KanDuReiseMedOffentligTransport
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.OffentligTransport
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.PrivatTransport
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reiseperiode
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ValgtAktivitetDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Utgifter
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -88,6 +88,7 @@ data class FaktaPersonopplysninger(
 
 data class FaktaPersonopplysningerSøknadsgrunnlag(
     val adresse: String?,
+    val fødselsdatPersonUtenPersonnummer: String?,
 )
 
 data class SøknadsgrunnlagHovedytelse(
@@ -132,8 +133,6 @@ data class FaktaAktivtet(
 
 data class FaktaAktivtetDagligReise(
     val aktivitet: FaktaAktivtet,
-    val reiseTilAktivitetsstedHelePerioden: JaNei?,
-    val reiseperiode: Reiseperiode?,
 )
 
 data class SøknadsgrunnlagAktivitet(
@@ -152,11 +151,12 @@ data class FaktaBarn(
 
 data class FaktaReise(
     val reiseAdresse: no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse?,
-    val dagerPerUke: ValgtAktivitetDagligReise,
+    val periode: Reiseperiode,
+    val dagerPerUke: String,
     val harMerEnn6KmReisevei: JaNei,
     val lengdeReisevei: Int?,
     val harBehovForTransportUavhengigAvReisensLengde: JaNei?,
-    val kanReiseMedOffentligTransport: JaNei,
+    val kanReiseMedOffentligTransport: KanDuReiseMedOffentligTransport,
     val offentligTransport: OffentligTransport?,
     val privatTransport: PrivatTransport?,
 )

@@ -34,7 +34,7 @@ class DagligReiseVilkårServiceTest {
     val svarOffentligTransport =
         mapOf(
             RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelse(svar = SvarId.JA),
-            RegelId.KAN_BRUKER_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelse(svar = SvarId.JA),
+            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelse(svar = SvarId.JA),
         )
 
     val nyttVilkår =
