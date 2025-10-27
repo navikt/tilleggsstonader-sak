@@ -50,7 +50,7 @@ class AngreSendTilBeslutterServiceTest {
             oppgave(behandlingId = behandling.id)
         every { oppgaveService.hentOppgave(oppgave.gsakOppgaveId) } returns
             Oppgave(id = 123, versjon = 0, tilordnetRessurs = null)
-        every { oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandling.id) } returns null
+        every { oppgaveService.finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandling.id) } returns null
     }
 
     @AfterEach
@@ -150,7 +150,7 @@ class AngreSendTilBeslutterServiceTest {
         @Test
         fun `skal kaste feil hvis behandle sak oppgaven ikke er ferdigstilt`() {
             every {
-                oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandling.id)
+                oppgaveService.finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandling.id)
             } returns oppgave(behandling.id)
 
             assertThat(

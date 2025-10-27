@@ -104,7 +104,7 @@ class SendTilBeslutterStegTest {
         every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev
 
         every { vedtaksbrevRepository.existsById(any()) } returns true
-        every { oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(any()) } returns oppgave(behandling.id)
+        every { oppgaveService.finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(any()) } returns oppgave(behandling.id)
         every { oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(any(), any()) } returns null
         every { oppgaveService.hentOppgave(any()) } returns Oppgave(id = 123, versjon = 0)
 
@@ -142,7 +142,7 @@ class SendTilBeslutterStegTest {
 
     @Test
     internal fun `Skal kaste feil hvis oppgave med type BehandleUnderkjentVedtak eller BehandleSak ikke finnes`() {
-        every { oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(any()) } returns null
+        every { oppgaveService.finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(any()) } returns null
 
         val feil = catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(behandling) }
         assertThat(feil.feil)
@@ -154,7 +154,7 @@ class SendTilBeslutterStegTest {
         val oppgaveId = 10099L
         val oppgaveDomain = oppgave(behandling.id, gsakOppgaveId = oppgaveId)
         val oppgave = Oppgave(id = oppgaveId, versjon = 0, tilordnetRessurs = "annenSaksbehandler")
-        every { oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(any()) } returns oppgaveDomain
+        every { oppgaveService.finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(any()) } returns oppgaveDomain
         every { oppgaveService.hentOppgave(oppgaveDomain.gsakOppgaveId) } returns oppgave
 
         val feil = catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(behandling) }

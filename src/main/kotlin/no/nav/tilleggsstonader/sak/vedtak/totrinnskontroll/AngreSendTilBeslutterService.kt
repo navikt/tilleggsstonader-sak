@@ -108,7 +108,7 @@ class AngreSendTilBeslutterService(
     }
 
     private fun validerOppgave(saksbehandling: Saksbehandling) {
-        brukerfeilHvis(oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(saksbehandling.id) != null) {
+        brukerfeilHvis(oppgaveService.finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(saksbehandling.id) != null) {
             "Systemet har ikke rukket å ferdigstille forrige behandle sak oppgave. Prøv igjen om litt."
         }
 

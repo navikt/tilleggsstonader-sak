@@ -254,7 +254,14 @@ class OppgaveService(
         oppgavetype: Oppgavetype,
     ): OppgaveDomain? = oppgaveRepository.findByBehandlingIdAndTypeAndStatus(behandlingId, oppgavetype, Oppgavestatus.ÅPEN)
 
-    fun hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId: BehandlingId): OppgaveDomain? =
+    fun hentAktivBehandleSakOppgave(behandlingId: BehandlingId): Oppgave =
+        hentOppgave(hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId).gsakOppgaveId)
+
+    fun hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId: BehandlingId): OppgaveDomain =
+        finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId)
+            ?: error("Finner ikke aktiv BehandleSak oppgave for behandling $behandlingId")
+
+    fun finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId: BehandlingId): OppgaveDomain? =
         oppgaveRepository.findByBehandlingIdAndStatusAndTypeIn(
             behandlingId = behandlingId,
             status = Oppgavestatus.ÅPEN,
