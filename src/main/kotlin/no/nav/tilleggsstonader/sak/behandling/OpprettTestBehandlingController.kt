@@ -488,7 +488,7 @@ class OpprettTestBehandlingController(
                                 ),
                             arbeidOgOpphold = arbeidOgOppholdDagligReise(),
                             aktiviteter = aktiviteter,
-                            reise = listOf(reise, reise),
+                            reise = listOf(reise),
                         ),
                     ),
                 dokumentasjon = emptyList(),
