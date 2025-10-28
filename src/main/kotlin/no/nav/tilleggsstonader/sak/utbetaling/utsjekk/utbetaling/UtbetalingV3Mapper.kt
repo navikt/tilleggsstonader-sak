@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -9,6 +10,7 @@ import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import java.time.Month
 import java.util.UUID
 
 @Service
@@ -27,8 +29,11 @@ class UtbetalingV3Mapper(
         // En utbetaling er knyttet til en type andel (klassekode hos økonomi)
         val records =
             andelerTilkjentYtelse
-                .groupBy { it.type }
+                .groupBy { it.type } // TODO: Grupper på år også, ettersom engangsutbetalinger ikke kan krysse år
                 .map { (type, andelerTilkjentYtelseGruppertPåType) ->
+                    val andelerKrysserÅrsskiftet = andelerTilkjentYtelse.distinctBy { it.utbetalingsdato.toYearMonth() }.size > 1
+                    brukerfeilHvis(andelerKrysserÅrsskiftet) { "Alle andeler i én og samme utbetaling må være innenfor samme år." }
+
                     val utbetalingId = fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
                     lagUtbetalingRecord(
                         id = utbetalingId.utbetalingId,
@@ -86,11 +91,13 @@ class UtbetalingV3Mapper(
             .filter { it.beløp != 0 }
             .groupBy { it.utbetalingsdato.toYearMonth() }
             .map { (månedÅr, andeler) ->
-                PerioderUtbetaling(
-                    fom = månedÅr.atDay(1),
-                    tom = månedÅr.atEndOfMonth(),
-                    beløp = andeler.sumOf { it.beløp }.toUInt(),
-                )
+                månedÅr.run {
+                    PerioderUtbetaling(
+                        fom = atDay(1),
+                        tom = if (month == Month.DECEMBER) atDay(30) else atEndOfMonth(),
+                        beløp = andeler.sumOf { it.beløp }.toUInt(),
+                    )
+                }
             }
 
     private fun mapTilStønadUtbetaling(typeAndel: TypeAndel): StønadUtbetaling =
