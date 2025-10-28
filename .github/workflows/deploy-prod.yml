@@ -4,6 +4,15 @@ on:
   push:
     branches:
       - 'main'
+    paths:
+      - 'src/**'
+      - '.github/workflows/deploy-prod.yml'
+      - '.nais/prod.yaml'
+      - '.nais/preprod.yaml'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'Dockerfile'
+      - '.dockerignore'
 
 jobs:
   build_and_deploy:

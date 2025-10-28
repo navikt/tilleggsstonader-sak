@@ -96,7 +96,7 @@ class BehandlingsstatistikkService(
         behandlingId: BehandlingId,
         oppgaveId: Long?,
     ): Oppgave? {
-        val gsakOppgaveId = oppgaveId ?: oppgaveService.finnSisteOppgaveForBehandling(behandlingId)?.gsakOppgaveId
+        val gsakOppgaveId = oppgaveId ?: oppgaveService.finnSisteOppgaveDomainForBehandling(behandlingId)?.gsakOppgaveId
 
         return gsakOppgaveId?.let { oppgaveService.hentOppgave(it) }
     }

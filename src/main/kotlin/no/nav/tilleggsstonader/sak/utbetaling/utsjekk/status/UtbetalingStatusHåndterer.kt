@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status
 
 import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.utbetaling.UtbetalingFagområde
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
@@ -12,6 +13,13 @@ import java.util.UUID
 class UtbetalingStatusHåndterer(
     private val andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository,
 ) {
+    // I første omgang vil vi kun plukke opp status for nye fagområder, da disse har gått over kafka
+    // Ved migrering av gamle stønader til nye fagområder må vi også lytte på disse her
+    private val nyeFagområderTilleggsstønader =
+        UtbetalingFagområde.entries
+            .filter { it.erNyeFagområder() }
+            .map { it.kode }
+
     /*
      Iverksetting over v2/rest vil også komme inn her. Da vil key fra topic ikke være iverksettingId,
      men en id generert av helved som vi ikke har kjennskap til
@@ -20,7 +28,7 @@ class UtbetalingStatusHåndterer(
         iverksettingId: String,
         melding: UtbetalingStatusRecord,
     ) {
-        if (melding.detaljer.ytelse != "TILLEGGSSTØNADER") {
+        if (melding.detaljer?.ytelse !in nyeFagområderTilleggsstønader) {
             return
         }
         val utbetalingsstatus = melding.status

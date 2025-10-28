@@ -1,0 +1,29 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: tilleggsstonader-sak-alerts
+  namespace: tilleggsstonader
+  labels:
+    team: tilleggsstonader
+spec:
+  groups:
+    - name: alerts
+      rules:
+        - alert: Feilede iverksettinger
+          expr: max(andel_tilkjent_ytelse_iverksetting_status{status="FEILET"}) > 0
+          for: 10m
+          annotations:
+            consequence: Vi har mottatt FEILET-status fra hel-ved ved iverksetting
+            action: "Sjekk logger for å finne iverksetting-id som har feilet og kontakt hel-ved"
+          labels:
+            namespace: tilleggsstonader
+            severity: critical
+        - alert: Iverksettinger uten OK-status
+          expr: max(andel_tilkjent_ytelse_iverksetting_status{status="IKKE_MOTTATT_OK_STATUS"}) > 0
+          annotations:
+            consequence: Iverksettinger uten mottatt OK-status fra hel-ved
+            action: "Sjekk logger for å finne iverksetting-id ikke har mottatt OK-status og kontakt hel-ved"
+
+          labels:
+            namespace: tilleggsstonader
+            severity: critical

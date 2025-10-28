@@ -154,6 +154,7 @@ class IverksettService(
                     andelerTilkjentYtelse = andelerTilkjentYtelse,
                     totrinnskontroll = totrinnskontroll,
                     erFørsteIverksettingForBehandling = erFørsteIverksettingForBehandling,
+                    vedtakstidspunkt = behandling.vedtakstidspunkt!!,
                     erSimulering = false,
                 )
             utbetalingMessageProducer.sendUtbetalinger(iverksettingId, recordsSomSkalPåKafka)

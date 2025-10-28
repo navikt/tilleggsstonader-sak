@@ -241,6 +241,7 @@
       "delAvTidligereUtbetaling" : false,
       "skalFåDekketFaktiskeUtgifter" : false,
       "inneholderUtgifterOvernatting" : true
-    } ]
+    } ],
+    "dagligReiseTso" : null
   }
 }

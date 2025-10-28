@@ -93,14 +93,14 @@ class SendTilBeslutterSteg(
     }
 
     private fun validerOppgaver(saksbehandling: Saksbehandling) {
-        val behandleSakOppgave = oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(saksbehandling.id)
+        val behandleSakOppgave = oppgaveService.finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(saksbehandling.id)
         brukerfeilHvis(behandleSakOppgave == null) {
             "Oppgaven for behandlingen er ikke tilgjengelig. Prøv igjen om litt."
         }
         validerAtOppgaveIkkeErPlukketAvAnnenSaksbehandler(behandleSakOppgave)
 
         brukerfeilHvis(
-            oppgaveService.hentOppgaveSomIkkeErFerdigstilt(
+            oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(
                 saksbehandling.id,
                 Oppgavetype.GodkjenneVedtak,
             ) != null,

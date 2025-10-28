@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.antallDagerIPeriodeInklusiv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
@@ -17,6 +19,7 @@ data class FaktaOffentligTransport(
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
+    val periode: Datoperiode? = null,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.OFFENTLIG_TRANSPORT
 
@@ -24,6 +27,7 @@ data class FaktaOffentligTransport(
         validerIngenNegativeUtgifter()
         validerMinstEnBillettPris()
         validerReisdager()
+        validerBillettpriser()
     }
 
     private fun validerIngenNegativeUtgifter() {
@@ -49,6 +53,45 @@ data class FaktaOffentligTransport(
 
         brukerfeilHvis(reisedagerPerUke > 5) {
             "Reisedager per uke kan ikke være mer enn 5"
+        }
+    }
+
+    private fun validerBillettpriser() {
+        if (periode == null) {
+            return
+        }
+
+        val dager = antallDagerIPeriodeInklusiv(periode.fom, periode.tom)
+        val manglerEnkelbillett = prisEnkelbillett == null
+        val manglerTrettidagersbillett = prisTrettidagersbillett == null
+        val eksaktTrettidagersperiode = dager % 30 == 0
+        val mindreEnnTrettiDager = dager < 30
+        val overTrettiDager = dager >= 30
+        val reiserOfte = reisedagerPerUke >= 3
+        val reiserSjeldent = reisedagerPerUke < 3
+        // Vi regner om perioden til uker og ganger med antall reisedager for å få summen av reisedagene i perioden
+        val faktiskeReisedager = dager / 7 * reisedagerPerUke
+        // Vi bruker 9 reisedager som grense for når månedskort anbefales, da det vil være rimeligere enn enkeltbilletter
+        val grenseHvorMånedskortLønnerSeg = 9
+
+        brukerfeilHvis((reiserSjeldent || faktiskeReisedager < grenseHvorMånedskortLønnerSeg) && manglerEnkelbillett) {
+            "Pris for enkeltbillett må fylles ut når det reises sjeldent eller over en kort periode"
+        }
+
+        brukerfeilHvis(faktiskeReisedager >= grenseHvorMånedskortLønnerSeg && mindreEnnTrettiDager && manglerTrettidagersbillett) {
+            "Pris for 30-dagersbillett må fylles ut da det lønner seg med 30-dagersbillett for denne perioden"
+        }
+
+        brukerfeilHvis(overTrettiDager && reiserOfte && manglerTrettidagersbillett) {
+            "Pris for 30-dagersbillett må fylles ut når det reises regelmessig over lengre tid"
+        }
+
+        brukerfeilHvis(eksaktTrettidagersperiode && reiserOfte && manglerTrettidagersbillett) {
+            "Pris for 30-dagersbillett må fylles ut da reisen går opp i eksakte trettidagersperioder"
+        }
+
+        brukerfeilHvis(!eksaktTrettidagersperiode && overTrettiDager && manglerEnkelbillett) {
+            "Pris for enkeltbillett må fylles ut siden reisen varer lenger enn 30 dager uten å være en eksakt 30-dagersperiode"
         }
     }
 

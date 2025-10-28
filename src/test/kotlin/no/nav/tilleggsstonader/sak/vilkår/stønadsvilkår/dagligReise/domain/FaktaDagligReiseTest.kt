@@ -1,10 +1,12 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.time.LocalDate
 
 class FaktaDagligReiseTest {
     @Nested
@@ -63,6 +65,117 @@ class FaktaDagligReiseTest {
                     )
                 }
             assertThat(feil.message).isEqualTo("Minst en billettpris må være satt")
+        }
+
+        @Test
+        fun `skal kaste feil dersom perioden er mindre enn 30-dager, reisedager mindre enn tre og man mangler enkeltbillett`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    FaktaOffentligTransport(
+                        reisedagerPerUke = 1,
+                        prisEnkelbillett = null,
+                        prisSyvdagersbillett = null,
+                        prisTrettidagersbillett = 750,
+                        periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(20)),
+                    )
+                }
+            assertThat(feil.message).isEqualTo("Pris for enkeltbillett må fylles ut når det reises sjeldent eller over en kort periode")
+        }
+
+        @Test
+        fun `skal kaste feil dersom perioden er mindre enn 30-dager og man mangler enkeltbillett`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    FaktaOffentligTransport(
+                        reisedagerPerUke = 3,
+                        prisEnkelbillett = null,
+                        prisSyvdagersbillett = null,
+                        prisTrettidagersbillett = 750,
+                        periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(12)),
+                    )
+                }
+            assertThat(feil.message).isEqualTo("Pris for enkeltbillett må fylles ut når det reises sjeldent eller over en kort periode")
+        }
+
+        @Test
+        fun `skal kaste feil dersom perioden er mindre enn 30 dager, reisedager mer enn tre og man mangler 30-dagersbillett`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    FaktaOffentligTransport(
+                        reisedagerPerUke = 3,
+                        prisEnkelbillett = 44,
+                        prisSyvdagersbillett = null,
+                        prisTrettidagersbillett = null,
+                        periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(28)),
+                    )
+                }
+            assertThat(
+                feil.message,
+            ).isEqualTo("Pris for 30-dagersbillett må fylles ut da det lønner seg med 30-dagersbillett for denne perioden")
+        }
+
+        @Test
+        fun `skal kaste feil dersom perioden er over 30-dager, antall reisedager er mer eller lik tre og man mangler 30-dagersbillett`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    FaktaOffentligTransport(
+                        reisedagerPerUke = 3,
+                        prisEnkelbillett = 44,
+                        prisSyvdagersbillett = null,
+                        prisTrettidagersbillett = null,
+                        periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(31)),
+                    )
+                }
+            assertThat(feil.message).isEqualTo("Pris for 30-dagersbillett må fylles ut når det reises regelmessig over lengre tid")
+        }
+
+        @Test
+        fun `skal kaste feil dersom perioden er 30-dager og man mangler trettidagersbillett`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    FaktaOffentligTransport(
+                        reisedagerPerUke = 4,
+                        prisEnkelbillett = 44,
+                        prisSyvdagersbillett = null,
+                        prisTrettidagersbillett = null,
+                        periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(29)),
+                    )
+                }
+            assertThat(feil.message).isEqualTo("Pris for 30-dagersbillett må fylles ut når det reises regelmessig over lengre tid")
+        }
+
+        @Test
+        fun `skal kaste feil hvis perioden går opp i hele 30-dagersperioder og man ikke har 30-dagersbillett`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    FaktaOffentligTransport(
+                        reisedagerPerUke = 3,
+                        prisEnkelbillett = 44,
+                        prisSyvdagersbillett = null,
+                        prisTrettidagersbillett = null,
+                        periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(47)),
+                    )
+                }
+            assertThat(
+                feil.message,
+            ).isEqualTo("Pris for 30-dagersbillett må fylles ut når det reises regelmessig over lengre tid")
+        }
+
+        @Test
+        fun `skal kaste feil hvis perioden ikke går opp i hele 30-dagersperioder`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    FaktaOffentligTransport(
+                        reisedagerPerUke = 3,
+                        prisEnkelbillett = null,
+                        prisSyvdagersbillett = null,
+                        prisTrettidagersbillett = 750,
+                        periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(47)),
+                    )
+                }
+            assertThat(
+                feil.message,
+            ).isEqualTo("Pris for enkeltbillett må fylles ut siden reisen varer lenger enn 30 dager uten å være en eksakt 30-dagersperiode")
         }
     }
 

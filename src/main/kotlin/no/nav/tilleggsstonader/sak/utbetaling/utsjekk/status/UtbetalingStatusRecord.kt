@@ -4,7 +4,8 @@ import java.time.LocalDate
 
 data class UtbetalingStatusRecord(
     val status: UtbetalingStatus,
-    val detaljer: UtbetalingStatusDetaljer,
+    val detaljer: UtbetalingStatusDetaljer?,
+    val error: UtbetalingError?,
 )
 
 data class UtbetalingStatusDetaljer(
@@ -27,3 +28,9 @@ enum class UtbetalingStatus {
     HOS_OPPDRAG, // sendes når oppdrag har mottatt utbetalingen. Kan ligge i denne statusen en stund hvis Oppdrag er stengt.
     OK, // kvittert ut hos Oppdrag
 }
+
+data class UtbetalingError(
+    val statusCode: Int,
+    val msg: String,
+    val doc: String,
+)

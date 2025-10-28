@@ -19,7 +19,7 @@ data class UtbetalingRecord(
     val personident: String,
     val saksbehandler: String?, // er null i simulering
     val beslutter: String?, // er null i simulering
-    val vedtakstidspunkt: LocalDateTime?, // er null i simulering
+    val vedtakstidspunkt: LocalDateTime, // er null i simulering
     val periodetype: PeriodetypeUtbetaling,
     // kan ikke ha flere stønader i en og samme kjede i v3 (koden som splittet opp dette er ikke i bruk - umulig å vedlikeholde)
     val stønad: StønadUtbetaling,

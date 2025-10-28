@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Fagområde
+import no.nav.tilleggsstonader.sak.utbetaling.UtbetalingFagområde
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.OppsummeringForPeriode
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Periode
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringDetaljer
@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.Fagområde as FagområdeKontrakt
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.OppsummeringForPeriode as OppsummeringForPeriodeKontrakt
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.Periode as PeriodeKontrakt
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.Postering as PosteringKontrakt
@@ -64,7 +63,7 @@ class SimuleringKontraktTilDomeneMapperTest {
     private fun assertPosteringer(periode: Periode) {
         assertThat(periode.posteringer).hasSize(1)
         val postering = periode.posteringer[0]
-        assertThat(postering.fagområde).isEqualTo(Fagområde.TILLEGGSSTØNADER)
+        assertThat(postering.fagområde).isEqualTo(UtbetalingFagområde.TILLEGGSSTØNADER)
         assertThat(postering.sakId).isEqualTo("1234")
         assertThat(postering.beløp).isEqualTo(1000)
     }
@@ -86,7 +85,7 @@ class SimuleringKontraktTilDomeneMapperTest {
                 posteringer =
                     listOf(
                         PosteringKontrakt(
-                            fagområde = FagområdeKontrakt.TILLEGGSSTØNADER,
+                            fagområde = UtbetalingFagområde.TILLEGGSSTØNADER.name,
                             sakId = "1234",
                             fom = posteringFom,
                             tom = posteringTom,
