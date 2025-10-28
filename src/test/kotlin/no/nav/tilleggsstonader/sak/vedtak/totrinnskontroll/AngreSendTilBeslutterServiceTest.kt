@@ -46,11 +46,11 @@ class AngreSendTilBeslutterServiceTest {
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         every { totrinnskontrollService.hentSaksbehandlerSomSendteTilBeslutter(behandling.id) } returns saksbehandler1
         every { totrinnskontrollService.hentBeslutter(behandling.id) } returns null
-        every { oppgaveService.hentOppgaveSomIkkeErFerdigstilt(behandling.id, Oppgavetype.GodkjenneVedtak) } returns
+        every { oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(behandling.id, Oppgavetype.GodkjenneVedtak) } returns
             oppgave(behandlingId = behandling.id)
         every { oppgaveService.hentOppgave(oppgave.gsakOppgaveId) } returns
             Oppgave(id = 123, versjon = 0, tilordnetRessurs = null)
-        every { oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(behandling.id) } returns null
+        every { oppgaveService.finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandling.id) } returns null
     }
 
     @AfterEach
@@ -137,7 +137,7 @@ class AngreSendTilBeslutterServiceTest {
         @Test
         fun `skal kaste feil hvis godkjenne vedtak oppgaven`() {
             every {
-                oppgaveService.hentOppgaveSomIkkeErFerdigstilt(behandling.id, Oppgavetype.GodkjenneVedtak)
+                oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(behandling.id, Oppgavetype.GodkjenneVedtak)
             } returns null
 
             assertThat(
@@ -150,7 +150,7 @@ class AngreSendTilBeslutterServiceTest {
         @Test
         fun `skal kaste feil hvis behandle sak oppgaven ikke er ferdigstilt`() {
             every {
-                oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(behandling.id)
+                oppgaveService.finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandling.id)
             } returns oppgave(behandling.id)
 
             assertThat(

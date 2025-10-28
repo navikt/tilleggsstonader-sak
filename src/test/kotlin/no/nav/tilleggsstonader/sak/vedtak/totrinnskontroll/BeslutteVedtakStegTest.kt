@@ -99,7 +99,7 @@ class BeslutteVedtakStegTest {
         every { fagsakService.hentAktivIdent(any()) } returns fagsak.hentAktivIdent()
         every { fagsakService.fagsakMedOppdatertPersonIdent(any()) } returns fagsak
         every { taskService.save(capture(taskSlot)) } returns Task("", "", Properties())
-        every { oppgaveService.hentOppgaveSomIkkeErFerdigstilt(any(), any()) } returns oppgave
+        every { oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(any(), any()) } returns oppgave
         // every { iverksettingDtoMapper.tilDto(any(), any()) } returns mockk()
         // every { iverksett.iverksett(any(), any()) } just Runs
         // every { iverksett.iverksettUtenBrev(any()) } just Runs
