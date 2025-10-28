@@ -137,7 +137,6 @@ data class HovedytelseAvsnitt(
 
 data class Personopplysninger(
     val adresse: Adresse?,
-    val fødselsdatoPersonUtenFødselsnummer: String?,
 )
 
 data class Adresse(

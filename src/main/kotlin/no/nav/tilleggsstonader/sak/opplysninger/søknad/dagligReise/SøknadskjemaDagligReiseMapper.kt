@@ -104,7 +104,6 @@ class SøknadskjemaDagligReiseMapper(
                         landkode = it.land?.value?.let { land -> kodeverkService.hentLandkodeIso2(land) },
                     )
                 },
-            fødselsdatoPersonUtenFødselsnummer = opplysninger.fodselsdato2,
         )
 
     private fun mapHovedytelse(skjemaDagligReise: SkjemaDagligReiseKontrakt) =

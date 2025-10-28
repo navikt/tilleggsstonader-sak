@@ -103,7 +103,6 @@ class SøknadskjemaBoutgifterMapper(
                         landkode = it.land?.value?.let { land -> kodeverkService.hentLandkodeIso2(land) },
                     )
                 },
-            fødselsdatoPersonUtenFødselsnummer = null,
         )
 
     private fun mapHovedytelse(skjemaBoutgifter: SkjemaBoutgifterKontrakt) =

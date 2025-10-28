@@ -11,7 +11,6 @@ fun mapPersonopplysninger(personopplysninger: Personopplysninger?): FaktaPersono
                         listOfNotNull(adresse.adresse, adresse.postnummer, adresse.poststed)
                             .takeIf { it.isNotEmpty() }
                             ?.joinToString(", "),
-                    fødselsdatoForPersonUtenFødselsnummer = personopplysninger.fødselsdatoPersonUtenFødselsnummer,
                 )
             },
     )

@@ -6,8 +6,7 @@
       "postnummer" : "2069",
       "poststed" : "JESSHEIM",
       "landkode" : "Land1"
-    },
-    "fødselsdatoPersonUtenFødselsnummer" : null
+    }
   },
   "hovedytelse" : {
     "hovedytelse" : [ "AAP" ],
