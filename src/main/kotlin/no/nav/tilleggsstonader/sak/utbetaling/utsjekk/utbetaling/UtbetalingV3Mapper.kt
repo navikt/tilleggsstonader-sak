@@ -11,9 +11,6 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
-/**
- * Per nå tilsvarer [id] iverksettingId, men vi må se på hva vi ønsker med denne parameteren.
- */
 @Service
 class UtbetalingV3Mapper(
     private val fagsakUtbetalingIdService: FagsakUtbetalingIdService,
