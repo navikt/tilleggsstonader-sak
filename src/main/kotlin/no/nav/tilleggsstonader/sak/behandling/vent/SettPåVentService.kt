@@ -56,8 +56,6 @@ class SettPåVentService(
         opprettHistorikkInnslag(behandling, årsaker = request.årsaker, kommentar = request.kommentar)
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT)
 
-        val oppgave = oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId)
-
         val settPåVent =
             SettPåVent(
                 behandlingId = behandlingId,
@@ -66,7 +64,9 @@ class SettPåVentService(
             )
         settPåVentRepository.insert(settPåVent)
 
-        val oppdatertOppgave = settOppgavePåVent(oppgave, request)
+        if (request.oppdaterOppgave) {
+            settOppgavePåVent(behandlingId, request)
+        }
 
         taskService.save(BehandlingsstatistikkTask.opprettVenterTask(behandlingId))
         val endret = utledEndretInformasjon(settPåVent)
@@ -83,10 +83,11 @@ class SettPåVentService(
     }
 
     private fun settOppgavePåVent(
-        oppgave: OppgaveDomain,
+        behandlingId: BehandlingId,
         request: SettBehandlingPåVentRequest,
-    ): SettPåVentResponse =
-        oppgaveService.settPåVent(
+    ): SettPåVentResponse {
+        val oppgave = oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId)
+        return oppgaveService.settPåVent(
             SettPåVentRequest(
                 oppgaveId = oppgave.gsakOppgaveId,
                 kommentar = request.kommentar,
@@ -94,6 +95,7 @@ class SettPåVentService(
                 beholdOppgave = request.beholdOppgave,
             ),
         )
+    }
 
     @Transactional
     fun oppdaterSettPåVent(

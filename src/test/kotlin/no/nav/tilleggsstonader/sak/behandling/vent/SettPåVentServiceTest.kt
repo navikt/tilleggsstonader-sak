@@ -128,6 +128,17 @@ class SettPåVentServiceTest : IntegrationTest() {
         }
 
         @Test
+        fun `skal sette behandling på vent uten å oppdatere oppgave`() {
+            testWithBrukerContext(dummySaksbehandler) {
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVentRequest.copy(oppdaterOppgave = false))
+
+                with(oppgaveService.hentOppgave(oppgaveId!!)) {
+                    assertThat(tilordnetRessurs).isEqualTo(dummySaksbehandler)
+                }
+            }
+        }
+
+        @Test
         fun `skal feile hvis man ikke er eier av oppgaven`() {
             testWithBrukerContext {
                 assertThatThrownBy {

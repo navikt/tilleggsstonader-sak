@@ -351,7 +351,10 @@ class OppgaveService(
             mappeRespons.mapper
         }
 
-    fun settPåVent(settPåVent: SettPåVentRequest): SettPåVentResponse = oppgaveClient.settPåVent(settPåVent)
+    fun settPåVent(settPåVent: SettPåVentRequest): SettPåVentResponse {
+        logger.info("Setter oppgave ${settPåVent.oppgaveId} på vent")
+        return oppgaveClient.settPåVent(settPåVent)
+    }
 
     fun oppdaterPåVent(oppdaterPåVent: OppdaterPåVentRequest): SettPåVentResponse = oppgaveClient.oppdaterPåVent(oppdaterPåVent)
 

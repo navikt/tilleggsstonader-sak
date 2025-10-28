@@ -15,6 +15,7 @@ data class SettPåVentDto(
             frist = frist,
             kommentar = kommentar,
             beholdOppgave = beholdOppgave,
+            oppdaterOppgave = true,
         )
 }
 
