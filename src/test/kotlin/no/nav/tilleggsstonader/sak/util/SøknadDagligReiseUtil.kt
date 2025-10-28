@@ -5,23 +5,22 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Akti
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Aktiviteter
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktiviteterOgMålgruppe
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArbeidOgOpphold
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArbeidsrettetAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DekkesUtgiftenAvAndre
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DineOpplysninger
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Drosje
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HarPengestotteAnnetLandType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaErViktigsteGrunnerTilAtDuIkkeKanKjoreBilType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaSlagsTypeBillettMaDuKjopeType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Identitet
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.JaNeiType
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.KanDuReiseMedOffentligTransportType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Landvelger
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.NavAdresse
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reise
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ReiseAdresse
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reiseperiode
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.SkjemaDagligReise
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.TypeUtdanning
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Valgfelt
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import java.time.LocalDate
 
 object SøknadDagligReiseUtil {
@@ -61,6 +60,7 @@ object SøknadDagligReiseUtil {
                 Identitet(
                     identitetsnummer = "11111122222",
                 ),
+            fodselsdato2 = "2025-01-01",
             adresse =
                 NavAdresse(
                     gyldigFraOgMed = LocalDate.of(2025, 1, 1),
@@ -74,7 +74,7 @@ object SøknadDagligReiseUtil {
                             value = "NO",
                         ),
                 ),
-            reiseFraAnnetEnnFolkeregistrertAdr = JaNeiType.nei,
+            reiseFraFolkeregistrertAdr = JaNeiType.nei,
             adresseJegSkalReiseFra = null,
         )
 
@@ -90,24 +90,24 @@ object SøknadDagligReiseUtil {
                             maalgruppe = null,
                         ),
                 ),
-            arbeidsrettetAktivitet = ArbeidsrettetAktivitetType.tiltakArbeidsrettetUtredning,
-            mottarLonnGjennomTiltak = JaNeiType.nei,
-            reiseTilAktivitetsstedHelePerioden = JaNeiType.ja,
-            reiseperiode =
-                Reiseperiode(
-                    fom = LocalDate.of(2025, 1, 1),
-                    tom = LocalDate.of(2025, 12, 31),
+            arbeidsrettetAktivitet = null,
+            faktiskeUtgifter =
+                DekkesUtgiftenAvAndre(
+                    garDuPaVideregaendeEllerGrunnskole = TypeUtdanning.annetTiltak,
+                    erDuLaerling = null,
+                    arbeidsgiverDekkerUtgift = null,
+                    bekreftelsemottarIkkeSkoleskyss = null,
+                    lonnGjennomTiltak = null,
                 ),
         )
 
     private fun reise(): Reise =
         Reise(
-            reiseAdresse =
-                ReiseAdresse(
-                    gateadresse = "Eksempelveien 1",
-                    postnr = "0123",
-                    poststed = "OSLO",
-                ),
+            gateadresse = "Eksempelveien 1",
+            postnr = "0123",
+            poststed = "OSLO",
+            fom = 1 januar 2025,
+            tom = 31 januar 2025,
             hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet =
                 Valgfelt(
                     label = "5",
@@ -116,24 +116,25 @@ object SøknadDagligReiseUtil {
             harDu6KmReisevei = JaNeiType.ja,
             hvorLangErReiseveienDin = 15,
             harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde = JaNeiType.nei,
-            kanDuReiseMedOffentligTransport = JaNeiType.ja,
+            kanDuReiseMedOffentligTransport = KanDuReiseMedOffentligTransportType.ja,
             hvaSlagsTypeBillettMaDuKjope =
                 mapOf(
                     HvaSlagsTypeBillettMaDuKjopeType.manedskort to true,
                 ),
-            enkeltbilett = null,
-            syvdagersbilett = null,
+            enkeltbillett = null,
+            syvdagersbillett = null,
             manedskort = 800,
-            kanDuKjoreMedEgenBil = JaNeiType.nei,
-            utgifterBil = null,
-            drosje =
-                Drosje(
-                    hvaErViktigsteGrunnerTilAtDuIkkeKanKjoreBil =
-                        mapOf(
-                            HvaErViktigsteGrunnerTilAtDuIkkeKanKjoreBilType.helsemessigeArsaker to true,
-                        ),
-                    onskerDuASokeOmFaDekketUtgifterTilReiseMedTaxi = JaNeiType.nei,
-                ),
+            kanKjoreMedEgenBil = JaNeiType.nei,
             hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport = null,
+            mottarDuGrunnstonadFraNav = null,
+            hvorforIkkeBil = null,
+            reiseMedTaxi = null,
+            ttKort = null,
+            hvorSkalDuKjoreMedEgenBil = null,
+            hvorLangErReiseveienDinMedBil = null,
+            parkering = null,
+            bompenger = null,
+            ferge = null,
+            piggdekkavgift = null,
         )
 }

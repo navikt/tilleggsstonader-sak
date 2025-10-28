@@ -5,6 +5,7 @@
     "identitet": {
       "identitetsnummer": "1111111111"
     },
+    "fodselsdato2": "2025-01-01",
     "adresse": {
       "gyldigFraOgMed": "2004-10-29",
       "adresse": "En vei 2",
@@ -16,9 +17,9 @@
         "value": "NO"
       }
     },
-    "reiseFraAnnetEnnFolkeregistrertAdr": "ja",
+    "reiseFraFolkeregistrertAdr": "nei",
     "adresseJegSkalReiseFra": {
-      "gateadresse": "Osloveien 1",
+      "gateadresse": "Annen gate 2",
       "postnr": "0482",
       "poststed": "Oslo"
     }
@@ -110,57 +111,62 @@
       }
     },
     "arbeidsrettetAktivitet": "tiltakArbeidsrettetUtredning",
-    "mottarLonnGjennomTiltak": "ja",
-    "reiseTilAktivitetsstedHelePerioden": "ja",
-    "reiseperiode": {
-      "fom": "2025-01-01",
-      "tom": "2025-01-01"
+    "faktiskeUtgifter": {
+      "garDuPaVideregaendeEllerGrunnskole": "videregaendeSkole",
+      "erDuLaerling": "ja",
+      "arbeidsgiverDekkerUtgift": "ja",
+      "bekreftelsemottarIkkeSkoleskyss": "true",
+      "lonnGjennomTiltak": "ja"
     }
   },
   "reise": [
     {
-      "reiseAdresse": {
-        "gateadresse": "EksempelSvar",
-        "postnr": "EksempelSvar",
-        "poststed": "EksempelSvar"
-      },
+      "gateadresse": "EksempelSvar",
+      "postnr": "EksempelSvar",
+      "poststed": "EksempelSvar",
+      "fom": "2025-01-01",
+      "tom": "2025-01-01",
       "hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet": {
         "label": "3",
         "value": "3"
       },
       "harDu6KmReisevei": "ja",
-      "hvorLangErReiseveienDin": 100,
       "harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde": "ja",
-      "kanDuReiseMedOffentligTransport": "ja",
-      "hvaSlagsTypeBillettMaDuKjope": {
-        "enkeltbillett": true,
-        "ukeskort": true,
-        "manedskort": true
-      },
-      "enkeltbilett": 100,
-      "syvdagersbilett": 100,
-      "manedskort": 100,
+      "hvorLangErReiseveienDin": 100,
+      "kanDuReiseMedOffentligTransport": "kombinertTogBil",
       "hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport": {
         "helsemessigeArsaker": true,
         "darligTransporttilbud": true,
         "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": true,
         "annet": true
       },
-      "kanDuKjoreMedEgenBil": "ja",
-      "utgifterBil": {
-        "harDu6KmReisevei": "ja",
-        "bompenger": 100,
-        "ferge": 100,
-        "piggdekkavgift": 100
+      "kanKjoreMedEgenBil": "ja",
+      "mottarDuGrunnstonadFraNav": "ja",
+      "hvorforIkkeBil": {
+        "helsemessigeArsaker": true,
+        "harIkkeBilEllerForerkort": true,
+        "annet": true
       },
-      "drosje": {
-        "hvaErViktigsteGrunnerTilAtDuIkkeKanKjoreBil": {
-          "helsemessigeArsaker": true,
-          "darligTransporttilbud": true,
-          "annet": true
-        },
-        "onskerDuASokeOmFaDekketUtgifterTilReiseMedTaxi": "ja"
-      }
+      "reiseMedTaxi": "ja",
+      "ttKort": "ja",
+      "hvaSlagsTypeBillettMaDuKjope": {
+        "enkeltbillett": true,
+        "ukeskort": true,
+        "manedskort": true
+      },
+      "enkeltbillett": 100,
+      "syvdagersbillett": 100,
+      "manedskort": 100,
+      "hvorSkalDuKjoreMedEgenBil": {
+        "togstasjon": true,
+        "busstopp": true,
+        "fergeBatkai": true
+      },
+      "hvorLangErReiseveienDinMedBil": 100,
+      "parkering": "ja",
+      "bompenger": 100,
+      "ferge": 100,
+      "piggdekkavgift": 100
     }
   ]
 }

@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
@@ -35,7 +34,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilMålgruppe
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 
 @Service
 class HåndterSøknadService(
@@ -132,14 +130,11 @@ class HåndterSøknadService(
             "Forventer at bruker skal være satt på journalpost"
         }
 
-        // TODO - fom og tom påkrevd i søknaden, skal ikke være nullable
         return ytelseService
             .hentYtelser(
                 ident = journalpost.bruker!!.id,
-                fom =
-                    søknad.data.aktivitet.reiseperiode!!
-                        .fom,
-                tom = søknad.data.aktivitet.reiseperiode.tom,
+                fom = søknad.data.reiser.minOf { it.periode.fom },
+                tom = søknad.data.reiser.maxOf { it.periode.tom },
                 typer = TypeYtelsePeriode.entries.toList(),
             ).perioder
             .map { it.type.tilMålgruppe() }

@@ -16,41 +16,25 @@
         "value": "NO"
       }
     },
-    "reiseFraAnnetEnnFolkeregistrertAdr": "nei"
+    "reiseFraFolkeregistrertAdr": "ja"
   },
   "aktiviteter": {
-    "aktiviteterOgMaalgruppe": {
-      "aktivitet": {
-        "aktivitetId": "134120740",
-        "maalgruppe": {
-          "maalgruppetype": "NEDSARBEVN",
-          "gyldighetsperiode": {
-            "fom": "2025-03-01",
-            "tom": "2025-10-06"
-          },
-          "maalgruppenavn": "Person med nedsatt arbeidsevne pga. sykdom"
-        },
-        "periode": {
-          "fom": "2025-03-11",
-          "tom": "2025-09-30"
-        },
-        "text": "Arbeidstrening: 11. mars 2025 - 30. september 2025"
-      }
-    },
-    "mottarLonnGjennomTiltak": "nei",
-    "reiseTilAktivitetsstedHelePerioden": "nei",
-    "reiseperiode": {
-      "fom": "2025-04-01",
-      "tom": "2025-09-30"
+    "arbeidsrettetAktivitet": "tiltakArbeidsrettetUtredning",
+    "faktiskeUtgifter": {
+      "garDuPaVideregaendeEllerGrunnskole": "videregaendeSkole",
+      "erDuLaerling": "ja",
+      "arbeidsgiverDekkerUtgift": "ja",
+      "bekreftelsemottarIkkeSkoleskyss": "true",
+      "lonnGjennomTiltak": "ja"
     }
   },
   "reise": [
     {
-      "reiseAdresse": {
-        "gateadresse": "Oslogate 42",
-        "postnr": "0482",
-        "poststed": "Olso"
-      },
+      "gateadresse" : "Oslogate 42",
+      "postnr" : "0482",
+      "poststed" : "Olso",
+      "fom": "2025-01-01",
+      "tom": "2025-01-01",
       "kanDuReiseMedOffentligTransport": "ja",
       "hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet": {
         "label": "4",
@@ -63,16 +47,17 @@
         "ukeskort": false,
         "manedskort": true
       },
-      "enkeltbilett": 44,
+      "enkeltbillett": 44,
       "manedskort": 788
     },
     {
-      "reiseAdresse": {
-        "gateadresse": "Drammensveien 42",
-        "postnr": "0482",
-        "poststed": "Oslo"
-      },
+      "gateadresse": "Drammensveien 42",
+      "postnr": "0482",
+      "poststed": "Oslo",
+      "fom": "2025-01-01",
+      "tom": "2025-01-01",
       "harDu6KmReisevei": "nei",
+      "hvorLangErReiseveienDin": 1,
       "harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde": "nei",
       "kanDuReiseMedOffentligTransport": "ja",
       "hvaSlagsTypeBillettMaDuKjope": {
@@ -84,7 +69,7 @@
         "label": "1",
         "value": "1"
       },
-      "syvdagersbilett": 233
+      "syvdagersbillett": 233
     }
   ],
   "hovedytelse": {
