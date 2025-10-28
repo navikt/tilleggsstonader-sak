@@ -48,8 +48,8 @@ class SettPåVentServiceTest : IntegrationTest() {
     val behandling = behandling(fagsak = fagsak)
     var oppgaveId: Long? = null
 
-    val settPåVentDto =
-        SettPåVentDto(
+    val settBehandlingPåVentRequest =
+        SettBehandlingPåVentRequest(
             årsaker = listOf(ÅrsakSettPåVent.ANNET),
             frist = LocalDate.now().plusDays(3),
             kommentar = "ny beskrivelse",
@@ -81,20 +81,20 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal sette behandling på vent`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVentRequest)
 
                 assertThat(testoppsettService.hentBehandling(behandling.id).status)
                     .isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
 
                 with(settPåVentService.hentStatusSettPåVent(behandling.id)) {
-                    assertThat(årsaker).isEqualTo(settPåVentDto.årsaker)
-                    assertThat(frist).isEqualTo(settPåVentDto.frist)
+                    assertThat(årsaker).isEqualTo(settBehandlingPåVentRequest.årsaker)
+                    assertThat(frist).isEqualTo(settBehandlingPåVentRequest.frist)
                     assertThat(kommentar).contains("ny beskrivelse")
                 }
 
                 with(oppgaveService.hentOppgave(oppgaveId!!)) {
                     assertThat(beskrivelse).contains("ny beskrivelse")
-                    assertThat(fristFerdigstillelse).isEqualTo(settPåVentDto.frist)
+                    assertThat(fristFerdigstillelse).isEqualTo(settBehandlingPåVentRequest.frist)
                     assertThat(tilordnetRessurs).isNull()
                     assertThat(mappeId?.getOrNull()).isEqualTo(MAPPE_ID_PÅ_VENT)
                 }
@@ -119,7 +119,7 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal sette behandling på vent og fortsette beholde oppgaven`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto.copy(beholdOppgave = true))
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVentRequest.copy(beholdOppgave = true))
 
                 with(oppgaveService.hentOppgave(oppgaveId!!)) {
                     assertThat(tilordnetRessurs).isEqualTo(dummySaksbehandler)
@@ -131,7 +131,7 @@ class SettPåVentServiceTest : IntegrationTest() {
         fun `skal feile hvis man ikke er eier av oppgaven`() {
             testWithBrukerContext {
                 assertThatThrownBy {
-                    settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                    settPåVentService.settPåVent(behandling.id, settBehandlingPåVentRequest)
                 }.hasMessageContaining("Kan ikke sette behandling på vent når man ikke er eier av oppgaven.")
             }
         }
@@ -139,10 +139,10 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal feile hvis man prøver å sette behandling på vent når den allerede er på vent`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVentRequest)
             }
             assertThatThrownBy {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVentRequest)
             }.hasMessageContaining("Kan ikke gjøre endringer på denne behandlingen fordi den er satt på vent.")
         }
     }
@@ -152,7 +152,7 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne oppdatere settPåVent`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVentRequest)
                 plukkOppgaven()
                 settPåVentService.oppdaterSettPåVent(behandling.id, oppdaterSettPåVentDto.copy(oppgaveVersjon = 3))
 
@@ -177,7 +177,7 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal sette behandling på vent og fortsette beholde oppgaven`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVentRequest)
                 plukkOppgaven()
                 val dto = oppdaterSettPåVentDto.copy(oppgaveVersjon = 3, beholdOppgave = true)
                 settPåVentService.oppdaterSettPåVent(behandling.id, dto)
@@ -191,7 +191,7 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal feile hvis man ikke er eier av oppgaven`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVentRequest)
             }
             testWithBrukerContext {
                 assertThatThrownBy {
@@ -209,7 +209,7 @@ class SettPåVentServiceTest : IntegrationTest() {
             val taAvVentDto = TaAvVentDto(skalTilordnesRessurs = false, kommentar = "tatt av")
 
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVentRequest)
                 plukkOppgaven()
                 taAvVentService.taAvVent(behandling.id, taAvVentDto)
             }
@@ -238,7 +238,7 @@ class SettPåVentServiceTest : IntegrationTest() {
             val taAvVentDto = TaAvVentDto(skalTilordnesRessurs = false, kommentar = "tatt av")
 
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto.copy(beholdOppgave = true))
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVentRequest.copy(beholdOppgave = true))
                 taAvVentService.taAvVent(behandling.id, taAvVentDto)
             }
 

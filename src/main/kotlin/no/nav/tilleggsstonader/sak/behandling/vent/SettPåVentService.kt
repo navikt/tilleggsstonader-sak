@@ -47,14 +47,14 @@ class SettPåVentService(
     @Transactional
     fun settPåVent(
         behandlingId: BehandlingId,
-        dto: SettPåVentDto,
+        request: SettBehandlingPåVentRequest,
     ): StatusPåVentDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
         behandling.status.validerKanBehandlingRedigeres()
 
         behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId, behandling.status, behandling.steg)
 
-        opprettHistorikkInnslag(behandling, årsaker = dto.årsaker, kommentar = dto.kommentar)
+        opprettHistorikkInnslag(behandling, årsaker = request.årsaker, kommentar = request.kommentar)
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT)
 
         val oppgave = oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId)
@@ -62,38 +62,38 @@ class SettPåVentService(
         val settPåVent =
             SettPåVent(
                 behandlingId = behandlingId,
-                årsaker = dto.årsaker,
-                kommentar = dto.kommentar,
+                årsaker = request.årsaker,
+                kommentar = request.kommentar,
             )
         settPåVentRepository.insert(settPåVent)
 
-        val oppdatertOppgave = settOppgavePåVent(oppgave, dto)
+        val oppdatertOppgave = settOppgavePåVent(oppgave, request)
 
         taskService.save(BehandlingsstatistikkTask.opprettVenterTask(behandlingId))
         val endret = utledEndretInformasjon(settPåVent)
 
         return StatusPåVentDto(
-            årsaker = dto.årsaker,
-            kommentar = dto.kommentar,
+            årsaker = request.årsaker,
+            kommentar = request.kommentar,
             datoSattPåVent = settPåVent.sporbar.opprettetTid.toLocalDate(),
             opprettetAv = settPåVent.sporbar.opprettetAv,
             endretAv = endret?.endretAv,
             endretTid = endret?.endretTid,
-            frist = dto.frist,
+            frist = request.frist,
             oppgaveVersjon = oppdatertOppgave.oppgaveVersjon,
         )
     }
 
     private fun settOppgavePåVent(
         oppgave: OppgaveDomain,
-        dto: SettPåVentDto,
+        request: SettBehandlingPåVentRequest,
     ): SettPåVentResponse =
         oppgaveService.settPåVent(
             SettPåVentRequest(
                 oppgaveId = oppgave.gsakOppgaveId,
-                kommentar = dto.kommentar,
-                frist = dto.frist,
-                beholdOppgave = dto.beholdOppgave,
+                kommentar = request.kommentar,
+                frist = request.frist,
+                beholdOppgave = request.beholdOppgave,
             ),
         )
 

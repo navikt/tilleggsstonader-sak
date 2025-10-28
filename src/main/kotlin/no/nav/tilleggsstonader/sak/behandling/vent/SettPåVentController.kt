@@ -38,7 +38,7 @@ class SettPåVentController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
-        return settPåVentService.settPåVent(behandlingId, dto)
+        return settPåVentService.settPåVent(behandlingId, dto.tilDomene())
     }
 
     @PutMapping("{behandlingId}")
