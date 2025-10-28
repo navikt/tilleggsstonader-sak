@@ -155,7 +155,8 @@
     "fom" : "2024-02-01",
     "tom" : "2024-02-29",
     "utgift" : 100,
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "fakta" : null
   }, {
     "type" : "PASS_BARN",
     "resultat" : "OPPFYLT",
@@ -185,7 +186,8 @@
     "fom" : "2024-02-01",
     "tom" : "2024-02-29",
     "utgift" : 200,
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "fakta" : null
   }, {
     "type" : "PASS_BARN",
     "resultat" : "SLETTET",
@@ -215,7 +217,8 @@
     "fom" : "2024-02-01",
     "tom" : "2024-02-29",
     "utgift" : 200,
-    "slettetKommentar" : "slettet dette vilkår"
+    "slettetKommentar" : "slettet dette vilkår",
+    "fakta" : null
   } ],
   "vedtak" : {
     "innvilgelseBegrunnelse" : "Sånn her vil en begrunnelse se ut",

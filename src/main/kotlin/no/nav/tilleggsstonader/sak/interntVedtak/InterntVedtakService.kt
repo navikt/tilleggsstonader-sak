@@ -38,6 +38,8 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgVurderingDto
@@ -202,6 +204,7 @@ class InterntVedtakService(
                     tom = vilkår.tom,
                     utgift = vilkår.utgift,
                     slettetKommentar = vilkår.slettetKommentar,
+                    fakta = mapVilkårFakta(vilkår.fakta),
                 )
             }.sortedWith(compareBy<VilkårInternt> { it.type }.thenBy { it.fødselsdatoBarn }.thenBy { it.fom })
 
@@ -303,4 +306,27 @@ class InterntVedtakService(
             else -> error("Internt vedtak håndterer ikke stønadstype=$stønadstype ennå")
         }
     }
+
+    private fun mapVilkårFakta(fakta: no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta?): VilkårFaktaInternt? =
+        when (fakta) {
+            is FaktaDagligReiseOffentligTransport ->
+                VilkårFaktaOffentligTransport(
+                    type = fakta.type,
+                    reisedagerPerUke = fakta.reisedagerPerUke,
+                    prisEnkelbillett = fakta.prisEnkelbillett,
+                    prisSyvdagersbillett = fakta.prisSyvdagersbillett,
+                    prisTrettidagersbillett = fakta.prisTrettidagersbillett,
+                )
+
+            is FaktaDagligReisePrivatBil ->
+                VilkårFaktaPrivatBil(
+                    type = fakta.type,
+                    reisedagerPerUke = fakta.reisedagerPerUke,
+                    reiseavstandEnVei = fakta.reiseavstandEnVei,
+                    prisBompengerPerDag = fakta.prisBompengerPerDag,
+                    prisFergekostandPerDag = fakta.prisFergekostandPerDag,
+                )
+
+            null -> null
+        }
 }

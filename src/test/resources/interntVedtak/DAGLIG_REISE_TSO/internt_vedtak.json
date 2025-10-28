@@ -145,7 +145,14 @@
     "fom" : "2024-02-01",
     "tom" : "2024-02-02",
     "utgift" : null,
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "fakta" : {
+      "type" : "DAGLIG_REISE_OFFENTLIG_TRANSPORT",
+      "reisedagerPerUke" : 5,
+      "prisEnkelbillett" : 44,
+      "prisSyvdagersbillett" : null,
+      "prisTrettidagersbillett" : 750
+    }
   } ],
   "vedtak" : {
     "innvilgelseBegrunnelse" : "Sånn her vil en begrunnelse se ut i det interne vedtaket",
