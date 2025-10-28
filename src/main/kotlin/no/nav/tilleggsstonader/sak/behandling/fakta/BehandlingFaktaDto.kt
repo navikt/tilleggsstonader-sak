@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.KanDuReiseMedOffentligTransport
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.OffentligTransport
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.PrivatTransport
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reiseperiode
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Utgifter
 import java.time.LocalDate
@@ -150,8 +151,8 @@ data class FaktaBarn(
 
 data class FaktaReise(
     val skalReiseFraFolkeregistrertAdresse: JaNei,
-    val adresseDetSkalReisesFra: no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse?,
-    val reiseAdresse: no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse?,
+    val adresseDetSkalReisesFra: ReiseAdresse?,
+    val reiseAdresse: ReiseAdresse?,
     val periode: Reiseperiode,
     val dagerPerUke: String,
     val harMerEnn6KmReisevei: JaNei,
