@@ -40,7 +40,6 @@ class SettPåVentService(
             endretAv = endret?.endretAv,
             endretTid = endret?.endretTid,
             frist = oppgave.fristFerdigstillelse,
-            oppgaveVersjon = oppgave.versjonEllerFeil(),
         )
     }
 
@@ -80,7 +79,6 @@ class SettPåVentService(
             endretAv = endret?.endretAv,
             endretTid = endret?.endretTid,
             frist = request.frist,
-            oppgaveVersjon = oppdatertOppgave.oppgaveVersjon,
         )
     }
 
@@ -135,7 +133,6 @@ class SettPåVentService(
             endretAv = endret?.endretAv,
             endretTid = endret?.endretTid,
             frist = dto.frist,
-            oppgaveVersjon = oppgaveResponse.oppgaveVersjon,
         )
     }
 
