@@ -4,6 +4,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingRequest
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -52,9 +53,11 @@ class AdminOpprettBehandlingService(
             if (medBrev) BehandlingÅrsak.MANUELT_OPPRETTET else BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV
         val behandling =
             opprettBehandlingService.opprettBehandling(
-                fagsakId = fagsak.id,
-                behandlingsårsak = behandlingsårsak,
-                kravMottatt = kravMottatt,
+                OpprettBehandlingRequest(
+                    fagsakId = fagsak.id,
+                    behandlingsårsak = behandlingsårsak,
+                    kravMottatt = kravMottatt,
+                ),
             )
 
         if (valgteBarn.isNotEmpty()) {

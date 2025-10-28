@@ -54,10 +54,12 @@ class OpprettRevurderingService(
         val fagsakId = opprettRevurdering.fagsakId
         val behandling =
             opprettBehandlingService.opprettBehandling(
-                fagsakId = fagsakId,
-                behandlingsårsak = opprettRevurdering.årsak,
-                kravMottatt = opprettRevurdering.kravMottatt,
-                nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
+                OpprettBehandlingRequest(
+                    fagsakId = fagsakId,
+                    behandlingsårsak = opprettRevurdering.årsak,
+                    kravMottatt = opprettRevurdering.kravMottatt,
+                    nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
+                ),
             )
 
         val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)

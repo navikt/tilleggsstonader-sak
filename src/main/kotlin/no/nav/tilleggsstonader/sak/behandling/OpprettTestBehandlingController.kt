@@ -142,8 +142,10 @@ class OpprettTestBehandlingController(
 
     private fun lagBehandling(fagsak: Fagsak): Behandling =
         opprettBehandlingService.opprettBehandling(
-            fagsakId = fagsak.id,
-            behandlingsårsak = BehandlingÅrsak.SØKNAD,
+            OpprettBehandlingRequest(
+                fagsakId = fagsak.id,
+                behandlingsårsak = BehandlingÅrsak.SØKNAD,
+            ),
         )
 
     private fun opprettSøknad(

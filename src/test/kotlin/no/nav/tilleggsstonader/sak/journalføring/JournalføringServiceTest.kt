@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingRequest
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -161,8 +162,10 @@ class JournalføringServiceTest {
     internal fun `skal kunne journalføre og opprette behandling`() {
         every {
             opprettBehandlingService.opprettBehandling(
-                fagsakId = fagsak.id,
-                behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                OpprettBehandlingRequest(
+                    fagsakId = fagsak.id,
+                    behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                ),
             )
         } returns behandling(fagsak = fagsak)
 
@@ -177,8 +180,10 @@ class JournalføringServiceTest {
 
         verify(exactly = 1) {
             opprettBehandlingService.opprettBehandling(
-                fagsakId = fagsak.id,
-                behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                OpprettBehandlingRequest(
+                    fagsakId = fagsak.id,
+                    behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                ),
             )
         }
         verifyOppdaterOgFerdigstilJournalpost(1)
@@ -244,7 +249,7 @@ class JournalføringServiceTest {
 
             journalføringService.fullførJournalpost(requestJournalfør, journalpost)
 
-            verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
+            verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any()) }
             verifyOppdaterOgFerdigstilJournalpost(1)
         }
     }
@@ -273,11 +278,11 @@ class JournalføringServiceTest {
         @Test
         fun `kan opprette revurdering for ettersending`() {
             every { behandlingService.finnesBehandlingForFagsak(fagsak.id) } returns true
-            every { opprettBehandlingService.opprettBehandling(any(), any(), any(), any(), any()) } returns
+            every { opprettBehandlingService.opprettBehandling(any()) } returns
                 behandling(fagsak = fagsak)
 
             journalføringService.fullførJournalpost(requestOpprettBehandling, journalpost)
-            verify(exactly = 1) { opprettBehandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
+            verify(exactly = 1) { opprettBehandlingService.opprettBehandling(any()) }
             verifyOppdaterOgFerdigstilJournalpost(1)
         }
 
@@ -287,7 +292,7 @@ class JournalføringServiceTest {
 
             journalføringService.fullførJournalpost(requestJournalfør, journalpost)
 
-            verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
+            verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any()) }
             verifyOppdaterOgFerdigstilJournalpost(1)
         }
     }
@@ -322,7 +327,7 @@ class JournalføringServiceTest {
         @BeforeEach
         fun setUp() {
             every { behandlingService.finnesBehandlingForFagsak(any()) } returns true
-            every { opprettBehandlingService.opprettBehandling(any(), any(), any(), any()) } returns nyBehandling
+            every { opprettBehandlingService.opprettBehandling(any()) } returns nyBehandling
             every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(forrigeBehandling)
             every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()
             every { barnService.finnBarnPåBehandling(nyBehandling.id) } returns eksisterendeBarn.map { it.tilBehandlingBarn() }
@@ -409,8 +414,10 @@ class JournalføringServiceTest {
             every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()
             every {
                 opprettBehandlingService.opprettBehandling(
-                    fagsakId = fagsak.id,
-                    behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                    OpprettBehandlingRequest(
+                        fagsakId = fagsak.id,
+                        behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                    ),
                 )
             } returns behandling(fagsak = fagsak)
 
@@ -425,8 +432,10 @@ class JournalføringServiceTest {
 
             verify(exactly = 1) {
                 opprettBehandlingService.opprettBehandling(
-                    fagsakId = fagsak.id,
-                    behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                    OpprettBehandlingRequest(
+                        fagsakId = fagsak.id,
+                        behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                    ),
                 )
             }
             verifyOppdaterOgFerdigstilJournalpost(1)

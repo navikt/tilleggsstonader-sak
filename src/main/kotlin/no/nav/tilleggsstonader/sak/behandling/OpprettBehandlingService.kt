@@ -9,8 +9,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.OPPRETTET
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.SATT_PÅ_VENT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
@@ -37,15 +35,8 @@ class OpprettBehandlingService(
     private val settPåVentService: SettPåVentService,
 ) {
     @Transactional
-    fun opprettBehandling(
-        fagsakId: FagsakId,
-        status: BehandlingStatus = BehandlingStatus.OPPRETTET,
-        stegType: StegType = StegType.INNGANGSVILKÅR,
-        behandlingsårsak: BehandlingÅrsak,
-        kravMottatt: LocalDate? = null,
-        nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
-    ): Behandling {
-        brukerfeilHvis(kravMottatt != null && kravMottatt.isAfter(LocalDate.now())) {
+    fun opprettBehandling(request: OpprettBehandlingRequest): Behandling {
+        brukerfeilHvis(request.kravMottatt != null && request.kravMottatt.isAfter(LocalDate.now())) {
             "Kan ikke sette krav mottattdato frem i tid"
         }
         feilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_BEHANDLING)) {
@@ -55,8 +46,8 @@ class OpprettBehandlingService(
         val kanHaFlereBehandlingerPåSammeFagsak =
             unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK)
 
-        val tidligereBehandlinger = behandlingRepository.findByFagsakId(fagsakId)
-        val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
+        val tidligereBehandlinger = behandlingRepository.findByFagsakId(request.fagsakId)
+        val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
         val behandlingType =
             when (kanHaFlereBehandlingerPåSammeFagsak) {
                 true -> utledBehandlingTypeV2(tidligereBehandlinger)
@@ -72,16 +63,16 @@ class OpprettBehandlingService(
         val behandling =
             behandlingRepository.insert(
                 Behandling(
-                    fagsakId = fagsakId,
+                    fagsakId = request.fagsakId,
                     forrigeIverksatteBehandlingId = forrigeBehandling?.id,
                     type = behandlingType,
-                    steg = stegType,
-                    status = status,
+                    steg = request.stegType,
+                    status = request.status,
                     resultat = BehandlingResultat.IKKE_SATT,
-                    årsak = behandlingsårsak,
-                    kravMottatt = kravMottatt,
+                    årsak = request.behandlingsårsak,
+                    kravMottatt = request.kravMottatt,
                     kategori = BehandlingKategori.NASJONAL,
-                    nyeOpplysningerMetadata = nyeOpplysningerMetadata,
+                    nyeOpplysningerMetadata = request.nyeOpplysningerMetadata,
                 ),
             )
         eksternBehandlingIdRepository.insert(EksternBehandlingId(behandlingId = behandling.id))
@@ -90,7 +81,7 @@ class OpprettBehandlingService(
             behandlingshistorikk =
                 Behandlingshistorikk(
                     behandlingId = behandling.id,
-                    steg = stegType,
+                    steg = request.stegType,
                     gitVersjon = Applikasjonsversjon.versjon,
                 ),
         )
@@ -98,3 +89,12 @@ class OpprettBehandlingService(
         return behandling
     }
 }
+
+data class OpprettBehandlingRequest(
+    val fagsakId: FagsakId,
+    val status: BehandlingStatus = BehandlingStatus.OPPRETTET,
+    val stegType: StegType = StegType.INNGANGSVILKÅR,
+    val behandlingsårsak: BehandlingÅrsak,
+    val kravMottatt: LocalDate? = null,
+    val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
+)

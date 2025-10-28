@@ -32,10 +32,12 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
         assertThatExceptionOfType(ApiFeil::class.java)
             .isThrownBy {
                 opprettBehandlingService.opprettBehandling(
-                    fagsakId = fagsak.id,
-                    stegType = StegType.VILKÅR,
-                    behandlingsårsak = BehandlingÅrsak.PAPIRSØKNAD,
-                    kravMottatt = LocalDate.now().plusDays(1),
+                    OpprettBehandlingRequest(
+                        fagsakId = fagsak.id,
+                        stegType = StegType.VILKÅR,
+                        behandlingsårsak = BehandlingÅrsak.PAPIRSØKNAD,
+                        kravMottatt = LocalDate.now().plusDays(1),
+                    ),
                 )
             }.withMessage("Kan ikke sette krav mottattdato frem i tid")
     }
@@ -54,8 +56,10 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
         assertThatExceptionOfType(ApiFeil::class.java)
             .isThrownBy {
                 opprettBehandlingService.opprettBehandling(
-                    fagsak.id,
-                    behandlingsårsak = behandlingÅrsak,
+                    OpprettBehandlingRequest(
+                        fagsak.id,
+                        behandlingsårsak = behandlingÅrsak,
+                    ),
                 )
             }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
     }
@@ -73,8 +77,10 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
         assertThatExceptionOfType(ApiFeil::class.java)
             .isThrownBy {
                 opprettBehandlingService.opprettBehandling(
-                    fagsak.id,
-                    behandlingsårsak = behandlingÅrsak,
+                    OpprettBehandlingRequest(
+                        fagsak.id,
+                        behandlingsårsak = behandlingÅrsak,
+                    ),
                 )
             }.withMessage("Det finnes en behandling på fagsaken som hverken er ferdigstilt eller satt på vent")
     }
@@ -90,8 +96,10 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             assertThatExceptionOfType(ApiFeil::class.java)
                 .isThrownBy {
                     opprettBehandlingService.opprettBehandling(
-                        fagsak.id,
-                        behandlingsårsak = behandlingÅrsak,
+                        OpprettBehandlingRequest(
+                            fagsak.id,
+                            behandlingsårsak = behandlingÅrsak,
+                        ),
                     )
                 }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
         }
@@ -104,8 +112,10 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
 
             // Sjekker at denne ikke kaster feil
             opprettBehandlingService.opprettBehandling(
-                fagsak.id,
-                behandlingsårsak = behandlingÅrsak,
+                OpprettBehandlingRequest(
+                    fagsak.id,
+                    behandlingsårsak = behandlingÅrsak,
+                ),
             )
         }
 
@@ -118,8 +128,10 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             assertThatExceptionOfType(ApiFeil::class.java)
                 .isThrownBy {
                     opprettBehandlingService.opprettBehandling(
-                        fagsak.id,
-                        behandlingsårsak = behandlingÅrsak,
+                        OpprettBehandlingRequest(
+                            fagsak.id,
+                            behandlingsårsak = behandlingÅrsak,
+                        ),
                     )
                 }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
         }
@@ -131,8 +143,10 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT))
             // Sjekker at denne ikke kaster feil
             opprettBehandlingService.opprettBehandling(
-                fagsak.id,
-                behandlingsårsak = behandlingÅrsak,
+                OpprettBehandlingRequest(
+                    fagsak.id,
+                    behandlingsårsak = behandlingÅrsak,
+                ),
             )
         }
     }
@@ -149,8 +163,10 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
         assertThatExceptionOfType(ApiFeil::class.java)
             .isThrownBy {
                 opprettBehandlingService.opprettBehandling(
-                    fagsak.id,
-                    behandlingsårsak = behandlingÅrsak,
+                    OpprettBehandlingRequest(
+                        fagsak.id,
+                        behandlingsårsak = behandlingÅrsak,
+                    ),
                 )
             }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
     }
@@ -165,8 +181,10 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
         )
         // Sjekker at denne ikke kaster feil
         opprettBehandlingService.opprettBehandling(
-            fagsak.id,
-            behandlingsårsak = behandlingÅrsak,
+            OpprettBehandlingRequest(
+                fagsak.id,
+                behandlingsårsak = behandlingÅrsak,
+            ),
         )
     }
 }

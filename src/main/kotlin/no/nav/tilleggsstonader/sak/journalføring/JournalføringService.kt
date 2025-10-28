@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingRequest
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -237,9 +238,11 @@ class JournalføringService(
     ): Behandling {
         val behandling =
             opprettBehandlingService.opprettBehandling(
-                fagsakId = fagsak.id,
-                behandlingsårsak = behandlingÅrsak,
-                kravMottatt = journalpost.datoMottatt?.toLocalDate(),
+                OpprettBehandlingRequest(
+                    fagsakId = fagsak.id,
+                    behandlingsårsak = behandlingÅrsak,
+                    kravMottatt = journalpost.datoMottatt?.toLocalDate(),
+                ),
             )
 
         behandlingService.leggTilBehandlingsjournalpost(journalpost.journalpostId, Journalposttype.I, behandling.id)

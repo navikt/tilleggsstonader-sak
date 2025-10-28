@@ -7,6 +7,7 @@ import io.mockk.verify
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingRequest
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -65,7 +66,7 @@ class AdminOpprettBehandlingServiceTest {
         every { fagsakService.finnFagsak(any(), any<Stønadstype>()) } returns fagsak
         every { fagsakService.hentEllerOpprettFagsak(personIdent = ident, any<Stønadstype>()) } returns fagsak
         every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns emptyList()
-        every { opprettBehandlingService.opprettBehandling(fagsak.id, any(), any(), any(), any()) } returns behandling
+        every { opprettBehandlingService.opprettBehandling(any()) } returns behandling
         every { barnService.opprettBarn(capture(opprettedeBarnSlot)) } answers { firstArg() }
         BrukerContextUtil.mockBrukerContext()
     }
@@ -91,9 +92,11 @@ class AdminOpprettBehandlingServiceTest {
         }
         verify(exactly = 1) {
             opprettBehandlingService.opprettBehandling(
-                fagsakId = fagsak.id,
-                behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET,
-                kravMottatt = LocalDate.now(),
+                OpprettBehandlingRequest(
+                    fagsakId = fagsak.id,
+                    behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET,
+                    kravMottatt = LocalDate.now(),
+                ),
             )
         }
     }
@@ -114,9 +117,11 @@ class AdminOpprettBehandlingServiceTest {
         }
         verify(exactly = 1) {
             opprettBehandlingService.opprettBehandling(
-                fagsakId = fagsak.id,
-                behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
-                kravMottatt = LocalDate.now(),
+                OpprettBehandlingRequest(
+                    fagsakId = fagsak.id,
+                    behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
+                    kravMottatt = LocalDate.now(),
+                ),
             )
         }
     }
@@ -134,9 +139,11 @@ class AdminOpprettBehandlingServiceTest {
         assertThat(opprettedeBarnSlot.isCaptured).isFalse()
         verify(exactly = 1) {
             opprettBehandlingService.opprettBehandling(
-                fagsakId = fagsak.id,
-                behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
-                kravMottatt = LocalDate.now(),
+                OpprettBehandlingRequest(
+                    fagsakId = fagsak.id,
+                    behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
+                    kravMottatt = LocalDate.now(),
+                ),
             )
         }
     }
