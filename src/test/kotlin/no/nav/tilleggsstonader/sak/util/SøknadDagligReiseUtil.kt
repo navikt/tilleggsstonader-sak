@@ -74,7 +74,7 @@ object SøknadDagligReiseUtil {
                             value = "NO",
                         ),
                 ),
-            reiseFraAnnetEnnFolkeregistrertAdr = JaNeiType.nei,
+            reiseFraFolkeregistrertAdr = JaNeiType.nei,
             adresseJegSkalReiseFra = null,
         )
 

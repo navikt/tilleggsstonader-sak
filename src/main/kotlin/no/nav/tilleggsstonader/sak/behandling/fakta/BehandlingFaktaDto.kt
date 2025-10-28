@@ -151,6 +151,8 @@ data class FaktaBarn(
 )
 
 data class FaktaReise(
+    val skalReiseFraFolkeregistrertAdresse: JaNei,
+    val adresseDetSkalReisesFra: no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse?,
     val reiseAdresse: no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse?,
     val periode: Reiseperiode,
     val dagerPerUke: String,

@@ -39,6 +39,8 @@ data class Reiseperiode(
 )
 
 data class Reise(
+    val skalReiseFraFolkeregistrertAdresse: JaNei,
+    val adresseDetSkalReisesFra: ReiseAdresse?,
     val adresse: ReiseAdresse,
     val periode: Reiseperiode,
     val dagerPerUke: String,
@@ -51,9 +53,9 @@ data class Reise(
 )
 
 data class ReiseAdresse(
-    val gateadresse: String,
-    val postnummer: String,
-    val poststed: String,
+    val gateadresse: String?,
+    val postnummer: String?,
+    val poststed: String?,
 )
 
 data class OffentligTransport(

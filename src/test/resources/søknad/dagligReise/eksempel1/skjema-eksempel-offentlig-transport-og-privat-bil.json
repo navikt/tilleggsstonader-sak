@@ -17,11 +17,11 @@
         "value": "NO"
       }
     },
-    "reiseFraAnnetEnnFolkeregistrertAdr": "ja",
+    "reiseFraFolkeregistrertAdr": "nei",
     "adresseJegSkalReiseFra": {
-      "gateadresse": "EksempelSvar",
-      "postnr": "EksempelSvar",
-      "poststed": "EksempelSvar"
+      "gateadresse": "Annen gate 2",
+      "postnr": "0482",
+      "poststed": "Oslo"
     }
   },
   "hovedytelse": {

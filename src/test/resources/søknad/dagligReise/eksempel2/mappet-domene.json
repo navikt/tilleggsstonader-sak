@@ -29,6 +29,12 @@
     }
   },
   "reiser" : [ {
+    "skalReiseFraFolkeregistrertAdresse" : "JA",
+    "adresseDetSkalReisesFra" : {
+      "gateadresse" : "Hestehagen 2",
+      "postnummer" : "2069",
+      "poststed" : "JESSHEIM"
+    },
     "adresse" : {
       "gateadresse" : "Oslogate 42",
       "postnummer" : "0482",
@@ -51,6 +57,12 @@
     },
     "privatTransport" : null
   }, {
+    "skalReiseFraFolkeregistrertAdresse" : "JA",
+    "adresseDetSkalReisesFra" : {
+      "gateadresse" : "Hestehagen 2",
+      "postnummer" : "2069",
+      "poststed" : "JESSHEIM"
+    },
     "adresse" : {
       "gateadresse" : "Drammensveien 42",
       "postnummer" : "0482",

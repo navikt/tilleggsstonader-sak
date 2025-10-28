@@ -50,6 +50,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Skjem
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeUtgifterType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterFlereSteder
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterNyBolig
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AdresseJegSkalReiseFra
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DekkesUtgiftenAvAndre
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaSlagsTypeBillettMaDuKjopeType
@@ -414,8 +415,13 @@ class OpprettTestBehandlingController(
                                 label = "NO",
                             ),
                     ),
-                reiseFraAnnetEnnFolkeregistrertAdr = JaNeiTypeDagligReise.nei,
-                adresseJegSkalReiseFra = null,
+                reiseFraFolkeregistrertAdr = JaNeiTypeDagligReise.nei,
+                adresseJegSkalReiseFra =
+                    AdresseJegSkalReiseFra(
+                        gateadresse = "Annen vei 3",
+                        postnr = "0482",
+                        poststed = "Oslo",
+                    ),
             )
         val aktiviteter =
             AktiviteterDagligReise(

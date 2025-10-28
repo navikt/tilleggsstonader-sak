@@ -88,7 +88,7 @@ class SøknadskjemaDagligReiseMapper(
             personopplysninger = mapPersonopplysninger(skjemaDagligReise.dineOpplysninger),
             hovedytelse = mapHovedytelse(skjemaDagligReise),
             aktivitet = mapAktivitet(skjemaDagligReise.aktiviteter),
-            reiser = mapReiser(skjemaDagligReise.reise),
+            reiser = mapReiser(skjemaDagligReise.reise, skjemaDagligReise.dineOpplysninger),
             dokumentasjon = dokumentasjon,
         )
 
@@ -204,11 +204,36 @@ class SøknadskjemaDagligReiseMapper(
             ArbeidsrettetAktivitetType.jegErArbeidssoker -> AnnenAktivitetType.ARBEIDSSØKER
         }
 
-    private fun mapReiser(reiser: List<ReiseKontrakt>): List<Reise> =
-        reiser.map { reise ->
+    private fun mapReiser(
+        reiser: List<ReiseKontrakt>,
+        dineOpplysninger: DineOpplysninger,
+    ): List<Reise> {
+        val skalReiseFraFolkeregistrertAdresse = mapJaNei(dineOpplysninger.reiseFraFolkeregistrertAdr)
+        val adresseDetSkalReisesFra =
+            if (skalReiseFraFolkeregistrertAdresse === JaNei.JA) {
+                dineOpplysninger.adresse?.let {
+                    ReiseAdresse(
+                        gateadresse = it.adresse,
+                        postnummer = it.postnummer,
+                        poststed = it.bySted,
+                    )
+                }
+            } else {
+                dineOpplysninger.adresseJegSkalReiseFra?.let {
+                    ReiseAdresse(
+                        gateadresse = it.gateadresse,
+                        postnummer = it.postnr,
+                        poststed = it.poststed,
+                    )
+                }
+            }
+
+        return reiser.map { reise ->
             val kanReiseMedOffentligTransport = mapKanReiseMedOffentligTransport(reise.kanDuReiseMedOffentligTransport)
 
             Reise(
+                skalReiseFraFolkeregistrertAdresse = skalReiseFraFolkeregistrertAdresse,
+                adresseDetSkalReisesFra = adresseDetSkalReisesFra,
                 adresse =
                     ReiseAdresse(
                         gateadresse = reise.gateadresse,
@@ -235,6 +260,7 @@ class SøknadskjemaDagligReiseMapper(
                 privatTransport = mapPrivatTransport(reise),
             )
         }
+    }
 
     private fun mapKanReiseMedOffentligTransport(
         kanDuReiseMedOffentligTransport: KanDuReiseMedOffentligTransportType,

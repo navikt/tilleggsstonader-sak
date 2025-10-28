@@ -51,6 +51,12 @@
     }
   },
   "reiser" : [ {
+    "skalReiseFraFolkeregistrertAdresse" : "NEI",
+    "adresseDetSkalReisesFra" : {
+      "gateadresse" : "Annen gate 2",
+      "postnummer" : "0482",
+      "poststed" : "Oslo"
+    },
     "adresse" : {
       "gateadresse" : "EksempelSvar",
       "postnummer" : "EksempelSvar",

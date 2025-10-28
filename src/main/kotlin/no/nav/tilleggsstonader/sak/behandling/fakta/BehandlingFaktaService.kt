@@ -154,6 +154,8 @@ class BehandlingFaktaService(
     private fun mapReise(reiser: List<ReiseDagligReise>?): List<FaktaReise>? =
         reiser?.map { reise ->
             FaktaReise(
+                skalReiseFraFolkeregistrertAdresse = reise.skalReiseFraFolkeregistrertAdresse,
+                adresseDetSkalReisesFra = reise.adresseDetSkalReisesFra,
                 reiseAdresse = reise.adresse,
                 periode = reise.periode,
                 dagerPerUke = reise.dagerPerUke,
