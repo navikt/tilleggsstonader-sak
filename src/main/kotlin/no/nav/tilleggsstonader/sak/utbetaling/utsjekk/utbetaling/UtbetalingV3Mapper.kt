@@ -31,7 +31,7 @@ class UtbetalingV3Mapper(
             andelerTilkjentYtelse
                 .groupBy { it.type } // TODO: Grupper på år også, ettersom engangsutbetalinger ikke kan krysse år
                 .map { (type, andelerTilkjentYtelseGruppertPåType) ->
-                    val andelerKrysserÅrsskiftet = andelerTilkjentYtelse.distinctBy { it.utbetalingsdato.toYearMonth() }.size > 1
+                    val andelerKrysserÅrsskiftet = andelerTilkjentYtelse.distinctBy { it.utbetalingsdato.year }.size > 1
                     brukerfeilHvis(andelerKrysserÅrsskiftet) { "Alle andeler i én og samme utbetaling må være innenfor samme år." }
 
                     val utbetalingId = fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
