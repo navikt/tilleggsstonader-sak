@@ -311,11 +311,7 @@ class SøknadskjemaDagligReiseMapper(
         ) {
             PrivatTransport(
                 årsakIkkeOffentligTransport = årsakIkkeOffentligTransport,
-                kanKjøreMedEgenBil =
-                    mapJaNei(
-                        reise.kanKjoreMedEgenBil
-                            ?: error("'Kan kjøre egen bil' er påkrevd om bruker skal bruke privat transport"),
-                    ),
+                kanKjøreMedEgenBil = reise.kanKjoreMedEgenBil?.let(::mapJaNei),
                 utgifterBil = mapUtgifterBil(reise),
                 taxi = mapTaxi(reise),
             )

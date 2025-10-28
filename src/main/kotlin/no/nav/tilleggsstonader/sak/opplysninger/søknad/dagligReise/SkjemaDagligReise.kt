@@ -73,7 +73,7 @@ enum class BillettType {
 
 data class PrivatTransport(
     val årsakIkkeOffentligTransport: List<ÅrsakIkkeOffentligTransport>,
-    val kanKjøreMedEgenBil: JaNei,
+    val kanKjøreMedEgenBil: JaNei?,
     val utgifterBil: UtgifterBil?,
     val taxi: Taxi?,
 )
