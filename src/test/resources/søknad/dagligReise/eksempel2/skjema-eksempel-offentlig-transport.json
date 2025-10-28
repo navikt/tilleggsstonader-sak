@@ -47,7 +47,7 @@
         "ukeskort": false,
         "manedskort": true
       },
-      "enkeltbilett": 44,
+      "enkeltbillett": 44,
       "manedskort": 788
     },
     {
@@ -69,7 +69,7 @@
         "label": "1",
         "value": "1"
       },
-      "syvdagersbilett": 233
+      "syvdagersbillett": 233
     }
   ],
   "hovedytelse": {

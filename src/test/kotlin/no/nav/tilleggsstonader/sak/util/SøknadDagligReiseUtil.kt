@@ -121,8 +121,8 @@ object SøknadDagligReiseUtil {
                 mapOf(
                     HvaSlagsTypeBillettMaDuKjopeType.manedskort to true,
                 ),
-            enkeltbilett = null,
-            syvdagersbilett = null,
+            enkeltbillett = null,
+            syvdagersbillett = null,
             manedskort = 800,
             kanKjoreMedEgenBil = JaNeiType.nei,
             hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport = null,

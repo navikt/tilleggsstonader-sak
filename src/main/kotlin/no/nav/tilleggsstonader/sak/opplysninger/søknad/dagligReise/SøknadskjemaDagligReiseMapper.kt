@@ -284,8 +284,8 @@ class SøknadskjemaDagligReiseMapper(
 
         return OffentligTransport(
             billettTyperValgt = billettTyper,
-            enkeltbillettPris = reise.enkeltbilett,
-            syvdagersbillettPris = reise.syvdagersbilett,
+            enkeltbillettPris = reise.enkeltbillett,
+            syvdagersbillettPris = reise.syvdagersbillett,
             månedskortPris = reise.manedskort,
         )
     }
