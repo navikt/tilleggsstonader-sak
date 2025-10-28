@@ -50,5 +50,9 @@ enum class Oppgavestatus {
     ÅPEN,
     FEILREGISTRERT,
     FERDIGSTILT,
-    IGNORERT, // Brukes i tilfeller hvor vi skal se bort fra oppgaven, selv om den fortsatt er åpen-status i oppgave
+
+    /**
+     * Brukes i tilfeller hvor vi skal se bort fra oppgaven, selv om den fortsatt er åpen-status i oppgave
+     */
+    IGNORERT,
 }

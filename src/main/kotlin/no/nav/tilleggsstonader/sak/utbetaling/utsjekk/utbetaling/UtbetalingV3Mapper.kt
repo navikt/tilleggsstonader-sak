@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -54,6 +55,9 @@ class UtbetalingV3Mapper(
         andeler: Collection<AndelTilkjentYtelse>,
     ): UtbetalingGrunnlagDto {
         val utbetalingId = fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
+        val andelerKrysserÅrsskiftet = andeler.distinctBy { it.utbetalingsdato.year }.size > 1
+        brukerfeilHvis(andelerKrysserÅrsskiftet) { "Alle andeler i én og samme utbetaling må være innenfor samme år." }
+
         return UtbetalingGrunnlagDto(
             id = utbetalingId.utbetalingId,
             sakId = behandling.eksternFagsakId.toString(),
