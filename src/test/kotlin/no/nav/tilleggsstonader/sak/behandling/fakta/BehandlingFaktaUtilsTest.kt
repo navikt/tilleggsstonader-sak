@@ -25,7 +25,7 @@ class BehandlingFaktaUtilsTest {
         val mappetPersonopplysninger = mapPersonopplysninger(personopplysninger)
 
         assertThat(mappetPersonopplysninger.søknadsgrunnlag!!.adresse).isEqualTo("Rundgata, 1234, Oslo")
-        assertThat(mappetPersonopplysninger.søknadsgrunnlag.fødselsdatoForPersonUtenPersonnummer).isEqualTo("2025-01-01")
+        assertThat(mappetPersonopplysninger.søknadsgrunnlag.fødselsdatoForPersonUtenFødselsnummer).isEqualTo("2025-01-01")
     }
 
     @Test
@@ -46,6 +46,6 @@ class BehandlingFaktaUtilsTest {
         val mappetPersonopplysninger = mapPersonopplysninger(personopplysninger)
 
         assertThat(mappetPersonopplysninger.søknadsgrunnlag!!.adresse).isNull()
-        assertThat(mappetPersonopplysninger.søknadsgrunnlag.fødselsdatoForPersonUtenPersonnummer).isNull()
+        assertThat(mappetPersonopplysninger.søknadsgrunnlag.fødselsdatoForPersonUtenFødselsnummer).isNull()
     }
 }

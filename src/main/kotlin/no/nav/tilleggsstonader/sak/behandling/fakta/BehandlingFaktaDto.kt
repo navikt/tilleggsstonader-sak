@@ -88,8 +88,8 @@ data class FaktaPersonopplysninger(
 
 data class FaktaPersonopplysningerSøknadsgrunnlag(
     val adresse: String?,
-    // For personer uten personnummer eller d-nummer spørr vi om fødselsdato for å kunne vurdere vikår knyttet til alder
-    val fødselsdatoForPersonUtenPersonnummer: String?,
+    // For personer uten fødselsnummer eller d-nummer spørr vi om fødselsdato for å kunne vurdere vikår knyttet til alder
+    val fødselsdatoForPersonUtenFødselsnummer: String?,
 )
 
 data class SøknadsgrunnlagHovedytelse(
