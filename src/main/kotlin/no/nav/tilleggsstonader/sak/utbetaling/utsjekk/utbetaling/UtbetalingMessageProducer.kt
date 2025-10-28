@@ -14,9 +14,8 @@ class UtbetalingMessageProducer(
 ) {
     fun sendUtbetalinger(
         iverksettingId: UUID,
-        utbetaling: List<UtbetalingRecord>,
+        utbetaling: Collection<IverksettingDto>,
     ) {
-        require(utbetaling.none { it.beslutter == null })
         val producerRecords =
             utbetaling.map { utbetalingRecord ->
                 ProducerRecord(

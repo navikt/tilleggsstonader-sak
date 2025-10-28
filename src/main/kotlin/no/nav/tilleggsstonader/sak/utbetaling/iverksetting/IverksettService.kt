@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingMessageProducer
-import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingRecord
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingV3Mapper
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
@@ -136,6 +135,7 @@ class IverksettService(
             andelerTilkjentYtelse = andelerTilkjentYtelse,
             totrinnskontroll = totrinnskontroll,
             tilkjentYtelse = tilkjentYtelse,
+            erFørsteIverksettingForBehandling = false,
         )
     }
 
@@ -145,19 +145,18 @@ class IverksettService(
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         totrinnskontroll: Totrinnskontroll,
         tilkjentYtelse: TilkjentYtelse,
-        erFørsteIverksettingForBehandling: Boolean = false,
+        erFørsteIverksettingForBehandling: Boolean,
     ) {
         if (utbetalingSkalSendesPåKafka(behandling.stønadstype)) {
-            val recordsSomSkalPåKafka: List<UtbetalingRecord> =
-                utbetalingV3Mapper.lagUtbetalingRecords(
+            val utbetalinger =
+                utbetalingV3Mapper.lagIverksettingRecord(
                     behandling = behandling,
                     andelerTilkjentYtelse = andelerTilkjentYtelse,
                     totrinnskontroll = totrinnskontroll,
                     erFørsteIverksettingForBehandling = erFørsteIverksettingForBehandling,
                     vedtakstidspunkt = behandling.vedtakstidspunkt!!,
-                    erSimulering = false,
                 )
-            utbetalingMessageProducer.sendUtbetalinger(iverksettingId, recordsSomSkalPåKafka)
+            utbetalingMessageProducer.sendUtbetalinger(iverksettingId, utbetalinger)
         } else {
             val dto =
                 IverksettDtoMapper.map(

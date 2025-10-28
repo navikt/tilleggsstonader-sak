@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 @Service
 class SimuleringService(
@@ -68,19 +67,10 @@ class SimuleringService(
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(saksbehandling.id)
         val forrigeIverksetting = iverksettService.finnForrigeIverksetting(saksbehandling, tilkjentYtelse)
 
-        if (utbetalingSkalSendesPåKafka(saksbehandling.stønadstype)) {
-            return iverksettClient.simulerV3(
-                utbetalingV3Mapper.lagUtbetalingRecords(
-                    behandling = saksbehandling,
-                    andelerTilkjentYtelse = tilkjentYtelse.andelerTilkjentYtelse,
-                    totrinnskontroll = null,
-                    erSimulering = true,
-                    vedtakstidspunkt = LocalDateTime.now(),
-                    erFørsteIverksettingForBehandling = true,
-                ),
-            )
+        return if (utbetalingSkalSendesPåKafka(saksbehandling.stønadstype)) {
+            iverksettClient.simulerV3(utbetalingV3Mapper.lagSimuleringDto(saksbehandling, tilkjentYtelse.andelerTilkjentYtelse))
         } else {
-            return iverksettClient.simulerV2(
+            iverksettClient.simulerV2(
                 SimuleringRequestDto(
                     sakId = saksbehandling.eksternFagsakId.toString(),
                     behandlingId = saksbehandling.eksternId.toString(),
