@@ -2,11 +2,15 @@ package no.nav.tilleggsstonader.sak.behandling.admin
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkObject
 import io.mockk.slot
+import io.mockk.unmockkObject
 import io.mockk.verify
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingRequest
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -14,6 +18,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -56,6 +61,15 @@ class AdminOpprettBehandlingServiceTest {
     val fagsak = fagsak()
     val behandling = behandling()
 
+    val saksbehandler = "mrsaksbehandler"
+
+    val forventetOppgaveMetadata =
+        OpprettBehandlingOppgaveMetadata(
+            tilordneSaksbehandler = saksbehandler,
+            beskrivelse = "Manuelt opprettet sak fra journalpost. Skal saksbehandles i ny løsning.",
+            prioritet = OppgavePrioritet.NORM,
+        )
+
     @BeforeEach
     fun setUp() {
         every { personService.hentFolkeregisterIdenter(ident) } returns
@@ -69,11 +83,15 @@ class AdminOpprettBehandlingServiceTest {
         every { opprettBehandlingService.opprettBehandling(any()) } returns behandling
         every { barnService.opprettBarn(capture(opprettedeBarnSlot)) } answers { firstArg() }
         BrukerContextUtil.mockBrukerContext()
+
+        mockkObject(SikkerhetContext)
+        every { SikkerhetContext.hentSaksbehandler() } returns saksbehandler
     }
 
     @AfterEach
     fun tearDown() {
         BrukerContextUtil.clearBrukerContext()
+        unmockkObject(SikkerhetContext)
     }
 
     @Test
@@ -96,6 +114,7 @@ class AdminOpprettBehandlingServiceTest {
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET,
                     kravMottatt = LocalDate.now(),
+                    oppgaveMetadata = forventetOppgaveMetadata,
                 ),
             )
         }
@@ -121,6 +140,7 @@ class AdminOpprettBehandlingServiceTest {
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
                     kravMottatt = LocalDate.now(),
+                    oppgaveMetadata = forventetOppgaveMetadata,
                 ),
             )
         }
@@ -143,6 +163,7 @@ class AdminOpprettBehandlingServiceTest {
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
                     kravMottatt = LocalDate.now(),
+                    oppgaveMetadata = forventetOppgaveMetadata,
                 ),
             )
         }

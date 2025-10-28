@@ -2,8 +2,10 @@ package no.nav.tilleggsstonader.sak.behandling.admin
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingRequest
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -57,6 +59,12 @@ class AdminOpprettBehandlingService(
                     fagsakId = fagsak.id,
                     behandlingsårsak = behandlingsårsak,
                     kravMottatt = kravMottatt,
+                    oppgaveMetadata =
+                        OpprettBehandlingOppgaveMetadata(
+                            tilordneSaksbehandler = SikkerhetContext.hentSaksbehandler(),
+                            beskrivelse = "Manuelt opprettet sak fra journalpost. Skal saksbehandles i ny løsning.",
+                            prioritet = OppgavePrioritet.NORM,
+                        ),
                 ),
             )
 
@@ -64,8 +72,6 @@ class AdminOpprettBehandlingService(
             val behandlingBarn = valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) }
             barnService.opprettBarn(behandlingBarn)
         }
-
-        opprettBehandleSakOppgave(behandling)
 
         return behandling.id
     }
@@ -115,18 +121,6 @@ class AdminOpprettBehandlingService(
                     )
                 },
         )
-    }
-
-    private fun opprettBehandleSakOppgave(behandling: Behandling) {
-        val task =
-            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
-                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                    behandlingId = behandling.id,
-                    saksbehandler = SikkerhetContext.hentSaksbehandler(),
-                    beskrivelse = "Manuelt opprettet sak fra journalpost. Skal saksbehandles i ny løsning.",
-                ),
-            )
-        taskService.save(task)
     }
 
     private fun validerAtBarnFinnesPåPerson(

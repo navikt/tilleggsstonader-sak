@@ -1,14 +1,18 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import io.mockk.every
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.assertFinnesTaskMedType
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
@@ -25,6 +29,13 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
 
     private val behandlingÅrsak = BehandlingÅrsak.SØKNAD
 
+    private val opprettBehandlingOppgaveMetadata =
+        OpprettBehandlingOppgaveMetadata(
+            tilordneSaksbehandler = "nissemann",
+            beskrivelse = "Ny oppgave",
+            prioritet = OppgavePrioritet.NORM,
+        )
+
     @Test
     internal fun `skal feile hvis krav mottatt er frem i tid`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
@@ -37,6 +48,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                         stegType = StegType.VILKÅR,
                         behandlingsårsak = BehandlingÅrsak.PAPIRSØKNAD,
                         kravMottatt = LocalDate.now().plusDays(1),
+                        oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                     ),
                 )
             }.withMessage("Kan ikke sette krav mottattdato frem i tid")
@@ -59,6 +71,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                     OpprettBehandlingRequest(
                         fagsak.id,
                         behandlingsårsak = behandlingÅrsak,
+                        oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                     ),
                 )
             }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
@@ -80,6 +93,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                     OpprettBehandlingRequest(
                         fagsak.id,
                         behandlingsårsak = behandlingÅrsak,
+                        oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                     ),
                 )
             }.withMessage("Det finnes en behandling på fagsaken som hverken er ferdigstilt eller satt på vent")
@@ -99,6 +113,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                         OpprettBehandlingRequest(
                             fagsak.id,
                             behandlingsårsak = behandlingÅrsak,
+                            oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                         ),
                     )
                 }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
@@ -115,8 +130,11 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                 OpprettBehandlingRequest(
                     fagsak.id,
                     behandlingsårsak = behandlingÅrsak,
+                    oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                 ),
             )
+
+            assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
         }
 
         // TODO: Slett når snike i køen er implementert
@@ -131,6 +149,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                         OpprettBehandlingRequest(
                             fagsak.id,
                             behandlingsårsak = behandlingÅrsak,
+                            oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                         ),
                     )
                 }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
@@ -146,8 +165,11 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                 OpprettBehandlingRequest(
                     fagsak.id,
                     behandlingsårsak = behandlingÅrsak,
+                    oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                 ),
             )
+
+            assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
         }
     }
 
@@ -166,6 +188,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                     OpprettBehandlingRequest(
                         fagsak.id,
                         behandlingsårsak = behandlingÅrsak,
+                        oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                     ),
                 )
             }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
@@ -184,7 +207,28 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             OpprettBehandlingRequest(
                 fagsak.id,
                 behandlingsårsak = behandlingÅrsak,
+                oppgaveMetadata = opprettBehandlingOppgaveMetadata,
             ),
         )
+
+        assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
+    }
+
+    @Test
+    internal fun `opprettBehandling med opprettOppgave=false skal ikke opprette oppgave`() {
+        every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns true
+        val fagsak = testoppsettService.lagreFagsak(fagsak())
+
+        // Sjekker at denne ikke kaster feil
+        opprettBehandlingService.opprettBehandling(
+            OpprettBehandlingRequest(
+                fagsak.id,
+                behandlingsårsak = behandlingÅrsak,
+                skalOppretteOppgave = false,
+                oppgaveMetadata = null,
+            ),
+        )
+
+        assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE, antall = 0)
     }
 }

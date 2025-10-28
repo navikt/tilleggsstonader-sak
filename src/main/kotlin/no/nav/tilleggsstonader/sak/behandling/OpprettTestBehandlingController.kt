@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.søknad.DatoFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
@@ -72,7 +73,6 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -135,7 +135,6 @@ class OpprettTestBehandlingController(
         val fagsak: Fagsak = lagFagsak(testBehandlingRequest)
         val behandling = lagBehandling(fagsak)
         opprettSøknad(fagsak, behandling)
-        opprettOppgave(behandling)
 
         return behandling.id
     }
@@ -145,6 +144,12 @@ class OpprettTestBehandlingController(
             OpprettBehandlingRequest(
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                oppgaveMetadata =
+                    OpprettBehandlingOppgaveMetadata(
+                        tilordneSaksbehandler = SikkerhetContext.hentSaksbehandler(),
+                        beskrivelse = "Testbehandling (ikke lagd med en ekte søknad)",
+                        prioritet = OppgavePrioritet.NORM,
+                    ),
             ),
         )
 
@@ -650,18 +655,6 @@ class OpprettTestBehandlingController(
                 )
             }
         barnService.opprettBarn(behandlingBarn)
-    }
-
-    private fun opprettOppgave(behandling: Behandling) {
-        taskService.save(
-            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
-                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                    behandlingId = behandling.id,
-                    saksbehandler = SikkerhetContext.hentSaksbehandler(),
-                    beskrivelse = "Testbehandling (ikke lagd med en ekte søknad)",
-                ),
-            ),
-        )
     }
 
     private fun lagFagsak(testBehandlingRequest: TestBehandlingRequest) =

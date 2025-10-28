@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingTypeV2
@@ -17,14 +19,17 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 class OpprettBehandlingService(
@@ -33,6 +38,7 @@ class OpprettBehandlingService(
     private val behandlingshistorikkService: BehandlingshistorikkService,
     private val unleashService: UnleashService,
     private val settPåVentService: SettPåVentService,
+    private val taskService: TaskService,
 ) {
     @Transactional
     fun opprettBehandling(request: OpprettBehandlingRequest): Behandling {
@@ -86,6 +92,21 @@ class OpprettBehandlingService(
                 ),
         )
 
+        if (request.skalOppretteOppgave && request.oppgaveMetadata != null) {
+            taskService.save(
+                OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                    OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                        behandlingId = behandling.id,
+                        saksbehandler = request.oppgaveMetadata.tilordneSaksbehandler,
+                        beskrivelse = request.oppgaveMetadata.beskrivelse,
+                        // TODO - brukes for å opprette BehandlingsstatistikkTask.opprettMottattTask - kan vi heller opprette tasken her?
+                        hendelseTidspunkt = behandling.kravMottatt?.atStartOfDay() ?: LocalDateTime.now(),
+                        prioritet = request.oppgaveMetadata.prioritet,
+                    ),
+                ),
+            )
+        }
+
         return behandling
     }
 }
@@ -97,4 +118,21 @@ data class OpprettBehandlingRequest(
     val behandlingsårsak: BehandlingÅrsak,
     val kravMottatt: LocalDate? = null,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
+    val skalOppretteOppgave: Boolean = true,
+    val oppgaveMetadata: OpprettBehandlingOppgaveMetadata?,
+) {
+    init {
+        feilHvis(skalOppretteOppgave && oppgaveMetadata == null) {
+            "Kan ikke opprette oppgave uten oppgaveMetadata"
+        }
+        feilHvis(!skalOppretteOppgave && oppgaveMetadata != null) {
+            "oppgaveMetadata må være null når man ikke skal opprette oppgave"
+        }
+    }
+}
+
+data class OpprettBehandlingOppgaveMetadata(
+    val tilordneSaksbehandler: String?,
+    val beskrivelse: String?,
+    val prioritet: OppgavePrioritet,
 )

@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -51,16 +52,7 @@ class OpprettRevurderingService(
             }
         }
 
-        val fagsakId = opprettRevurdering.fagsakId
-        val behandling =
-            opprettBehandlingService.opprettBehandling(
-                OpprettBehandlingRequest(
-                    fagsakId = fagsakId,
-                    behandlingsårsak = opprettRevurdering.årsak,
-                    kravMottatt = opprettRevurdering.kravMottatt,
-                    nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
-                ),
-            )
+        val behandling = opprettBehandlingService.opprettBehandling(lagOpprettBehandlingRequest(opprettRevurdering))
 
         val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
 
@@ -69,21 +61,33 @@ class OpprettRevurderingService(
         behandlingIdForGjenbruk?.let { gjenbrukDataRevurderingService.gjenbrukData(behandling, it) }
         barnService.opprettBarn(opprettRevurdering.valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) })
 
-        if (opprettRevurdering.skalOppretteOppgave) {
-            taskService.save(
-                OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
-                    OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                        behandlingId = behandling.id,
-                        saksbehandler = SikkerhetContext.hentSaksbehandler(),
-                        beskrivelse = "Skal behandles i TS-Sak",
-                        hendelseTidspunkt = behandling.kravMottatt?.atStartOfDay() ?: LocalDateTime.now(),
-                    ),
-                ),
-            )
-        }
-
         return behandling.id
     }
+
+    private fun lagOpprettBehandlingRequest(opprettRevurdering: OpprettRevurdering): OpprettBehandlingRequest =
+        if (opprettRevurdering.skalOppretteOppgave) {
+            OpprettBehandlingRequest(
+                fagsakId = opprettRevurdering.fagsakId,
+                behandlingsårsak = opprettRevurdering.årsak,
+                kravMottatt = opprettRevurdering.kravMottatt,
+                nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
+                oppgaveMetadata =
+                    OpprettBehandlingOppgaveMetadata(
+                        tilordneSaksbehandler = SikkerhetContext.hentSaksbehandler(),
+                        beskrivelse = "Skal behandles i TS-Sak",
+                        prioritet = OppgavePrioritet.NORM,
+                    ),
+            )
+        } else {
+            OpprettBehandlingRequest(
+                fagsakId = opprettRevurdering.fagsakId,
+                behandlingsårsak = opprettRevurdering.årsak,
+                kravMottatt = opprettRevurdering.kravMottatt,
+                nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
+                skalOppretteOppgave = false,
+                oppgaveMetadata = null,
+            )
+        }
 
     private fun validerValgteBarn(
         request: OpprettRevurdering,
