@@ -130,7 +130,6 @@ class HåndterSøknadService(
             "Forventer at bruker skal være satt på journalpost"
         }
 
-        // TODO - fom og tom påkrevd i søknaden, skal ikke være nullable
         return ytelseService
             .hentYtelser(
                 ident = journalpost.bruker!!.id,
