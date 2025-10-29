@@ -25,7 +25,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingRecord
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingDto
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -557,11 +557,19 @@ class IverksettServiceTest : IntegrationTest() {
             val sendtUtbetaling = sendteUtbetalinger.single()
             assertThat(sendtUtbetaling.key()).isEqualTo(iverksettingId.toString())
             val utbetalingRecord = sendtUtbetaling.utbetalingRecord()
-            assertThat(utbetalingRecord.perioder).hasSize(1)
-            assertThat(utbetalingRecord.perioder.single().fom).isEqualTo(forrigeMåned.atDay(1))
-            assertThat(utbetalingRecord.perioder.single().tom).isEqualTo(forrigeMåned.atEndOfMonth())
+            assertThat(utbetalingRecord.utbetalingsgrunnlag.perioder).hasSize(1)
             assertThat(
-                utbetalingRecord.perioder
+                utbetalingRecord.utbetalingsgrunnlag.perioder
+                    .single()
+                    .fom,
+            ).isEqualTo(forrigeMåned.atDay(1))
+            assertThat(
+                utbetalingRecord.utbetalingsgrunnlag.perioder
+                    .single()
+                    .tom,
+            ).isEqualTo(forrigeMåned.atEndOfMonth())
+            assertThat(
+                utbetalingRecord.utbetalingsgrunnlag.perioder
                     .single()
                     .beløp
                     .toInt(),
@@ -569,7 +577,7 @@ class IverksettServiceTest : IntegrationTest() {
         }
     }
 
-    private fun ProducerRecord<String, String>.utbetalingRecord() = objectMapper.readValue<UtbetalingRecord>(value())
+    private fun ProducerRecord<String, String>.utbetalingRecord() = objectMapper.readValue<IverksettingDto>(value())
 
     private fun CapturingSlot<IverksettDto>.assertUtbetalingerInneholder(vararg måned: YearMonth) {
         assertThat(captured.vedtak.utbetalinger.map { YearMonth.from(it.fraOgMedDato) })

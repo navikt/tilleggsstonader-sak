@@ -10,94 +10,105 @@ import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import java.time.Month
-import java.util.UUID
 
 @Service
 class UtbetalingV3Mapper(
     private val fagsakUtbetalingIdService: FagsakUtbetalingIdService,
     private val tilkjentYtelseService: TilkjentYtelseService,
 ) {
-    fun lagUtbetalingRecords(
+    fun lagSimuleringDtoer(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-        totrinnskontroll: Totrinnskontroll?,
+    ): Collection<SimuleringDto> =
+        lagUtbetalinger(
+            behandling = behandling,
+            andeler = andelerTilkjentYtelse,
+            erFørsteIverksetting = true,
+        ) { utbetalingsgrunnlag -> SimuleringDto(utbetalingsgrunnlag) }
+
+    fun lagIverksettingDtoer(
+        behandling: Saksbehandling,
+        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         erFørsteIverksettingForBehandling: Boolean,
-        vedtakstidspunkt: LocalDateTime,
-        erSimulering: Boolean,
-    ): List<UtbetalingRecord> {
-        // En utbetaling er knyttet til en type andel (klassekode hos økonomi)
-        val records =
-            andelerTilkjentYtelse
-                .groupBy { it.type } // TODO: Grupper på år også, ettersom engangsutbetalinger ikke kan krysse år
-                .map { (type, andelerTilkjentYtelseGruppertPåType) ->
-                    val andelerKrysserÅrsskiftet = andelerTilkjentYtelse.distinctBy { it.utbetalingsdato.year }.size > 1
-                    brukerfeilHvis(andelerKrysserÅrsskiftet) { "Alle andeler i én og samme utbetaling må være innenfor samme år." }
-
-                    val utbetalingId = fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
-                    lagUtbetalingRecord(
-                        id = utbetalingId.utbetalingId,
-                        erSimulering = erSimulering,
-                        andelerTilkjentYtelse = andelerTilkjentYtelseGruppertPåType,
-                        totrinnskontroll = totrinnskontroll,
-                        behandling = behandling,
-                        typeAndel = type,
-                        vedtakstidspunkt = vedtakstidspunkt,
-                    )
-                }
-
-        return if (erFørsteIverksettingForBehandling) {
-            records +
-                lagUtbetalingRecordForAnnullering(
-                    behandling = behandling,
-                    andelerTilkjentYtelse = andelerTilkjentYtelse,
-                    totrinnskontroll = totrinnskontroll,
-                    erSimulering = erSimulering,
-                    vedtakstidspunkt = vedtakstidspunkt,
-                )
-        } else {
-            records
-        }
-    }
-
-    /**
-     * Per nå tilsvarer [id] iverksettingId, men vi må se på hva vi ønsker med denne parameteren.
-     */
-    private fun lagUtbetalingRecord(
-        id: UUID,
-        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         totrinnskontroll: Totrinnskontroll?,
-        behandling: Saksbehandling,
-        typeAndel: TypeAndel,
         vedtakstidspunkt: LocalDateTime,
-        erSimulering: Boolean,
-    ): UtbetalingRecord =
-        UtbetalingRecord(
-            id = id,
-            dryrun = erSimulering,
+    ): Collection<IverksettingDto> =
+        lagUtbetalinger(
+            behandling = behandling,
+            andeler = andelerTilkjentYtelse,
+            erFørsteIverksetting = erFørsteIverksettingForBehandling,
+        ) { utbetalingsgrunnlag ->
+            IverksettingDto(
+                utbetalingsgrunnlag = utbetalingsgrunnlag,
+                saksbehandler = totrinnskontroll?.saksbehandler ?: error("Saksbehandler mangler"),
+                beslutter = totrinnskontroll.beslutter ?: error("Beslutter mangler"),
+                vedtakstidspunkt = vedtakstidspunkt,
+            )
+        }
+
+    private fun lagUtbetalingGrunnlag(
+        behandling: Saksbehandling,
+        type: TypeAndel,
+        andeler: Collection<AndelTilkjentYtelse>,
+    ): UtbetalingGrunnlagDto {
+        val utbetalingId = fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
+        val andelerKrysserÅrsskiftet = andeler.distinctBy { it.utbetalingsdato.year }.size > 1
+        brukerfeilHvis(andelerKrysserÅrsskiftet) { "Alle andeler i én og samme utbetaling må være innenfor samme år." }
+
+        return UtbetalingGrunnlagDto(
+            id = utbetalingId.utbetalingId,
             sakId = behandling.eksternFagsakId.toString(),
             behandlingId = behandling.eksternId.toString(),
             personident = behandling.ident,
-            saksbehandler = totrinnskontroll?.saksbehandler,
-            beslutter = totrinnskontroll?.beslutter,
-            vedtakstidspunkt = vedtakstidspunkt,
             periodetype = PeriodetypeUtbetaling.EN_GANG,
-            perioder = mapPerioder(andelerTilkjentYtelse),
-            stønad = mapTilStønadUtbetaling(typeAndel),
+            stønad = mapTilStønadUtbetaling(typeAndel = type),
+            perioder = mapPerioder(andelerTilkjentYtelse = andeler),
         )
+    }
+
+    private fun <T : UtbetalingDto> lagUtbetalinger(
+        behandling: Saksbehandling,
+        andeler: Collection<AndelTilkjentYtelse>,
+        erFørsteIverksetting: Boolean,
+        utbetalingDtoFactory: (UtbetalingGrunnlagDto) -> T,
+    ): Collection<T> =
+        andeler
+            .groupBy { it.type }
+            .map { (type, andelerAvType) -> utbetalingDtoFactory(lagUtbetalingGrunnlag(behandling, type, andelerAvType)) }
+            .let { utbetalinger ->
+                if (erFørsteIverksetting) {
+                    utbetalinger + lagUtbetalingDtoForAnnulering(behandling, andeler, utbetalingDtoFactory)
+                } else {
+                    utbetalinger
+                }
+            }
+
+    private fun <T : UtbetalingDto> lagUtbetalingDtoForAnnulering(
+        behandling: Saksbehandling,
+        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
+        utbetalingDtoFactory: (UtbetalingGrunnlagDto) -> T,
+    ): Collection<T> =
+        finnTypeAndelerSomSkalAnnulleres(behandling, andelerTilkjentYtelse)
+            .map { typeAndel ->
+                val grunnlag =
+                    lagUtbetalingGrunnlag(
+                        behandling = behandling,
+                        type = typeAndel,
+                        andeler = emptyList(), // periodene skal annuleres 💥
+                    )
+                utbetalingDtoFactory(grunnlag)
+            }
 
     private fun mapPerioder(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>): List<PerioderUtbetaling> =
         andelerTilkjentYtelse
             .filter { it.beløp != 0 }
             .groupBy { it.utbetalingsdato.toYearMonth() }
             .map { (månedÅr, andeler) ->
-                månedÅr.run {
-                    PerioderUtbetaling(
-                        fom = atDay(1),
-                        tom = if (month == Month.DECEMBER) atDay(30) else atEndOfMonth(),
-                        beløp = andeler.sumOf { it.beløp }.toUInt(),
-                    )
-                }
+                PerioderUtbetaling(
+                    fom = månedÅr.atDay(1),
+                    tom = månedÅr.atEndOfMonth(),
+                    beløp = andeler.sumOf { it.beløp }.toUInt(),
+                )
             }
 
     private fun mapTilStønadUtbetaling(typeAndel: TypeAndel): StønadUtbetaling =
@@ -108,35 +119,6 @@ class UtbetalingV3Mapper(
 
             else -> error("Skal ikke sende andelstype=$typeAndel på kafka")
         }
-
-    private fun lagUtbetalingRecordForAnnullering(
-        behandling: Saksbehandling,
-        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-        totrinnskontroll: Totrinnskontroll?,
-        vedtakstidspunkt: LocalDateTime,
-        erSimulering: Boolean,
-    ): Collection<UtbetalingRecord> {
-        val typeandelerSomSkalAnnulleres = finnTypeAndelerSomSkalAnnulleres(behandling, andelerTilkjentYtelse)
-        val utbetalingIder =
-            typeandelerSomSkalAnnulleres
-                .map { fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, it) }
-
-        return utbetalingIder.map {
-            UtbetalingRecord(
-                id = it.utbetalingId,
-                dryrun = erSimulering,
-                sakId = behandling.eksternFagsakId.toString(),
-                behandlingId = behandling.eksternId.toString(),
-                personident = behandling.ident,
-                saksbehandler = totrinnskontroll?.saksbehandler,
-                beslutter = totrinnskontroll?.beslutter,
-                vedtakstidspunkt = vedtakstidspunkt,
-                periodetype = PeriodetypeUtbetaling.EN_GANG,
-                perioder = emptyList(),
-                stønad = mapTilStønadUtbetaling(typeAndel = it.typeAndel),
-            )
-        }
-    }
 
     private fun finnTypeAndelerSomSkalAnnulleres(
         behandling: Saksbehandling,
