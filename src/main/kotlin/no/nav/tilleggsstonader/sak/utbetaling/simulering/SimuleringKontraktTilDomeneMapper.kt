@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Fagområde
+import no.nav.tilleggsstonader.sak.utbetaling.UtbetalingFagområde
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.OppsummeringForPeriode
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Periode
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Postering
@@ -38,7 +38,7 @@ object SimuleringKontraktTilDomeneMapper {
     private fun mapPosteringer(it: PeriodeKontrakt) =
         it.posteringer.map {
             Postering(
-                fagområde = Fagområde.valueOf(it.fagområde.name),
+                fagområde = UtbetalingFagområde.fraKode(it.fagområde),
                 sakId = it.sakId,
                 fom = it.fom,
                 tom = it.tom,

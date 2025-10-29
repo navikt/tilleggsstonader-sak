@@ -43,7 +43,6 @@ class SettPåVentRepositoryTest : IntegrationTest() {
     ) = SettPåVent(
         behandlingId = behandling.id,
         årsaker = listOf(ÅrsakSettPåVent.ANNET),
-        oppgaveId = 1,
         aktiv = aktiv,
         kommentar = "kommentar",
     )

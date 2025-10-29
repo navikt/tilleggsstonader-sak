@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequestDto
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
-import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingRecord
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.SimuleringDto
 import no.nav.tilleggsstonader.sak.util.EnvUtil
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
@@ -80,7 +80,7 @@ class IverksettClient(
         }
     }
 
-    fun simulerV3(simuleringRequest: List<UtbetalingRecord>): SimuleringResponseDto? {
+    fun simulerV3(simuleringRequest: Collection<SimuleringDto>): SimuleringResponseDto? {
         val url =
             UriComponentsBuilder
                 .fromUri(uri)

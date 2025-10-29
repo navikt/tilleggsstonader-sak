@@ -25,8 +25,8 @@ class SøknadskjemaDagligReiseMapperTest {
         )
 
     @Test
-    fun `skal kunne mappe skjema-eksempel fra fyllUtSendInn som inneholder alle felter`() {
-        val skjema = mapSkjemadata("søknad/dagligReise/eksempel1/skjema-eksempel-alle-felter.json")
+    fun `skal kunne mappe skjema-eksempel fra fyllUtSendInn offentlig transport og privat bil`() {
+        val skjema = mapSkjemadata("søknad/dagligReise/eksempel1/skjema-eksempel-offentlig-transport-og-privat-bil.json")
         val mappetSkjema = mapper.mapSkjema(skjema, emptyList())
 
         val mappetJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
@@ -49,6 +49,15 @@ class SøknadskjemaDagligReiseMapperTest {
 
         val mappetJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
         assertFileIsEqual("søknad/dagligReise/eksempel3/mappet-domene.json", mappetJson)
+    }
+
+    @Test
+    fun `skal kunne mappe skjema-eksempel fra fyllUtSendInn med taxi`() {
+        val skjema = mapSkjemadata("søknad/dagligReise/eksempel4/skjema-eksempel-taxi.json")
+        val mappetSkjema = mapper.mapSkjema(skjema, emptyList())
+
+        val mappetJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
+        assertFileIsEqual("søknad/dagligReise/eksempel4/mappet-domene.json", mappetJson)
     }
 
     private fun mapSkjemadata(skjemaJsonFil: String): SøknadsskjemaDagligReiseFyllUtSendInn {

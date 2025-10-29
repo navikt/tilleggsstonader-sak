@@ -121,9 +121,10 @@ class TaAvVentService(
         skalTilordnesRessurs: Boolean,
         frist: LocalDate,
     ) {
+        val oppgaveId = oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(settPåVent.behandlingId).gsakOppgaveId
         val taAvVent =
             TaAvVentRequest(
-                oppgaveId = settPåVent.oppgaveId,
+                oppgaveId = oppgaveId,
                 beholdOppgave = skalTilordnesRessurs,
                 kommentar = settPåVent.taAvVentKommentar,
                 frist = frist,

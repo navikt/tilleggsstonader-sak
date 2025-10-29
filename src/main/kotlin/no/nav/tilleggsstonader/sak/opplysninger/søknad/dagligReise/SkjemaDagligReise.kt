@@ -8,7 +8,6 @@ import java.time.LocalDate
 
 data class SkjemaDagligReise(
     val personopplysninger: Personopplysninger,
-    val annenAdresseDetSkalReisesFra: ReiseAdresse?,
     val hovedytelse: HovedytelseAvsnitt,
     val aktivitet: AktivitetDagligReiseAvsnitt,
     val reiser: List<Reise>,
@@ -17,9 +16,22 @@ data class SkjemaDagligReise(
 
 data class AktivitetDagligReiseAvsnitt(
     val aktivitet: AktivitetAvsnitt,
-    val reiseTilAktivitetsstedHelePerioden: JaNei?,
-    val reiseperiode: Reiseperiode?,
+    val dekkesUtgiftenAvAndre: DekkesUtgiftenAvAndre,
 )
+
+data class DekkesUtgiftenAvAndre(
+    val typeUtdanning: TypeUtdanning,
+    val lærling: JaNei?,
+    val arbeidsgiverDekkerUtgift: JaNei?,
+    val mottarIkkeSkoleskyss: Boolean?,
+    val lønnetAktivitet: JaNei?,
+)
+
+enum class TypeUtdanning {
+    VIDEREGÅENDE,
+    OPPLÆRING_FOR_VOKSNE,
+    ANNET_TILTAK,
+}
 
 data class Reiseperiode(
     val fom: LocalDate,
@@ -27,25 +39,23 @@ data class Reiseperiode(
 )
 
 data class Reise(
-    val reiseAdresse: ReiseAdresse,
-    val dagerPerUke: ValgtAktivitetDagligReise,
+    val skalReiseFraFolkeregistrertAdresse: JaNei,
+    val adresseDetSkalReisesFra: ReiseAdresse?,
+    val adresse: ReiseAdresse,
+    val periode: Reiseperiode,
+    val dagerPerUke: String,
     val harMerEnn6KmReisevei: JaNei,
-    val lengdeReisevei: Int?,
+    val lengdeReisevei: Int,
     val harBehovForTransportUavhengigAvReisensLengde: JaNei?,
-    val kanReiseMedOffentligTransport: JaNei,
+    val kanReiseMedOffentligTransport: KanDuReiseMedOffentligTransport,
     val offentligTransport: OffentligTransport?,
     val privatTransport: PrivatTransport?,
 )
 
 data class ReiseAdresse(
-    val gateadresse: String,
-    val postnummer: String,
-    val poststed: String,
-)
-
-data class ValgtAktivitetDagligReise(
-    val id: String,
-    val label: String,
+    val gateadresse: String?,
+    val postnummer: String?,
+    val poststed: String?,
 )
 
 data class OffentligTransport(
@@ -58,15 +68,23 @@ data class OffentligTransport(
 enum class BillettType {
     ENKELTBILLETT,
     SYVDAGERSBILLETT,
-    MÅNEDSKORT,
+    TRETTIDAGERSBILLETT,
 }
 
 data class PrivatTransport(
     val årsakIkkeOffentligTransport: List<ÅrsakIkkeOffentligTransport>,
     val kanKjøreMedEgenBil: JaNei?,
     val utgifterBil: UtgifterBil?,
-    val utgifterTaxi: UtgifterTaxi?,
+    val taxi: Taxi?,
 )
+
+enum class KanDuReiseMedOffentligTransport {
+    JA,
+    NEI,
+    KOMBINERT_BIL_OFFENTLIG_TRANSPORT, ;
+
+    fun kanReiseMedOffentligTransport(): Boolean = this == JA || this == KOMBINERT_BIL_OFFENTLIG_TRANSPORT
+}
 
 enum class ÅrsakIkkeOffentligTransport {
     HELSEMESSIGE_ÅRSAKER,
@@ -76,20 +94,24 @@ enum class ÅrsakIkkeOffentligTransport {
 }
 
 data class UtgifterBil(
-    val merEnn6kmReisevei: JaNei?,
+    val mottarGrunnstønad: JaNei?,
+    val reisedistanseEgenBil: Int,
+    val destinasjonEgenBil: List<DestinasjonEgenBil>?,
+    val parkering: JaNei,
     val bompenger: Int?,
     val ferge: Int?,
     val piggdekkavgift: Int?,
 )
 
-data class UtgifterTaxi(
+data class Taxi(
     val årsakIkkeKjøreBil: List<ÅrsakIkkeKjøreBil>,
     val ønskerSøkeOmTaxi: JaNei,
+    val ttkort: JaNei?,
 )
 
 enum class ÅrsakIkkeKjøreBil {
     HELSEMESSIGE_ÅRSAKER,
-    DÅRLIG_TRANSPORTTILBUD,
+    HAR_IKKE_BIL_FØRERKORT,
     ANNET,
 }
 
@@ -97,3 +119,9 @@ data class DokumentasjonDagligReise(
     val tittel: String,
     val dokumentInfoId: String,
 )
+
+enum class DestinasjonEgenBil {
+    TOGSTASJON,
+    BUSSSTOPP,
+    FERGE_BAT_KAI,
+}

@@ -30,7 +30,7 @@ data class Periode(
 )
 
 data class Postering(
-    val fagområde: Fagområde,
+    val fagområde: String,
     val sakId: String,
     val fom: LocalDate,
     val tom: LocalDate,
@@ -38,11 +38,3 @@ data class Postering(
     val type: PosteringType,
     val klassekode: String,
 )
-
-enum class Fagområde(
-    val kode: String,
-) {
-    TILLEGGSSTØNADER("TILLST"),
-    TILLEGGSSTØNADER_ARENA("TSTARENA"),
-    TILLEGGSSTØNADER_ARENA_MANUELL_POSTERING("MTSTAREN"),
-}

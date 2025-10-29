@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.simulering.domain
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.utbetaling.UtbetalingFagområde
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.PosteringType
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
@@ -50,7 +51,7 @@ data class Periode(
 )
 
 data class Postering(
-    val fagområde: Fagområde,
+    val fagområde: UtbetalingFagområde,
     val sakId: String,
     val fom: LocalDate,
     val tom: LocalDate,
@@ -58,13 +59,3 @@ data class Postering(
     val type: PosteringType,
     val klassekode: String,
 )
-
-enum class Fagområde(
-    val kode: String,
-) {
-    TILLEGGSSTØNADER("TILLST"),
-    TILLEGGSSTØNADER_ARENA("TSTARENA"),
-    TILLEGGSSTØNADER_ARENA_MANUELL_POSTERING("MTSTAREN"),
-
-    TILLEGGSTØNADER_DAGLIG_REISE("TILLSTDR"),
-}

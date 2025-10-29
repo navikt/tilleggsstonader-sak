@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -16,7 +17,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingMessageProducer
-import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingRecord
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingV3Mapper
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
@@ -40,15 +40,12 @@ class IverksettService(
     private val utbetalingV3Mapper: UtbetalingV3Mapper,
 ) {
     /**
-     * Skal brukes når man iverksetter en behandling første gang, uansett om det er behandling 1 eller behandling 2 på en fagsak
-     * Dette fordi man skal iverksette alle andeler tom forrige måned.
-     * Dvs denne skal brukes fra [no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.BeslutteVedtakSteg]
+     * Iverksetter andeler til og med dagens dato. Utbetalinger frem i tid blir plukket opp av en daglig jobb.
      *
+     * Notat om synkron iverksetting (aka v2 av utsjekk):
      * Ved første iverksetting av en behandling er det krav på at det gjøres med jwt, dvs med saksbehandler-token
-     * Neste iverksettinger kan gjøres med client_credentials.
-     *
-     * Dersom det ikke finnes utbetalinger som skal iverksettes for forrige måned, så legges det til en nullandel
-     * for å kunne sjekke status på iverksetting og for å kunne opphøre andeler fra forrige behandling.
+     * Neste iverksettinger kan gjøres med client_credentials. Dersom det ikke finnes utbetalinger som skal iverksettes for forrige måned,
+     * så legges det til en nullandel for å kunne sjekke status på iverksetting og for å kunne opphøre andeler fra forrige behandling.
      */
     @Transactional
     fun iverksettBehandlingFørsteGang(behandlingId: BehandlingId) {
@@ -67,7 +64,6 @@ class IverksettService(
         val totrinnskontroll = hentTotrinnskontroll(behandling)
 
         val iverksettingId = behandlingId.id
-        // Iverksetter andeler til og med dagens dato med en gang. Utbetalinger frem i tid blir plukket opp av en daglig jobb.
         sendAndelerTilUtsjekk(
             tilkjentYtelse = tilkjentYtelse,
             andelerTilkjentYtelse = andelerSomSkalIverksettesNå,
@@ -101,13 +97,13 @@ class IverksettService(
     }
 
     /**
-     * Hvis kallet feiler er det viktig at den samme iverksettingId brukes for å kunne ignorere conflict
-     * Vid første iverksetting som gjøres burde man bruke behandlingId for å iverksette
-     * for å enkelt kunne gjenbruke samme id vid neste iverksetting
+     * Kalles på av daglig jobb som plukker opp alle andeler som har utbetalingsdato <= dagens dato.
      *
-     * @param [måned] Når man iverksetter en behandling første gangen så skal [måned] settes til forrige måned
-     * fordi man skal iverksette tidligere måneder direkte.
-     * Når man iverksetter samme behandling neste gang skal man bruke inneværende måned for å iverksette aktuell måned
+     * Notat om synkron iverksetting (aka v2 av utsjekk):
+     * Hvis kallet feiler er det viktig at den samme iverksettingId brukes for å kunne ignorere conflict
+     * Ved første iverksetting som gjøres brukes behandlingId for å iverksette
+     * for å enkelt kunne gjenbruke samme id vid neste iverksetting.
+     *
      */
     @Transactional
     fun iverksett(
@@ -136,6 +132,7 @@ class IverksettService(
             andelerTilkjentYtelse = andelerTilkjentYtelse,
             totrinnskontroll = totrinnskontroll,
             tilkjentYtelse = tilkjentYtelse,
+            erFørsteIverksettingForBehandling = false,
         )
     }
 
@@ -145,19 +142,18 @@ class IverksettService(
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         totrinnskontroll: Totrinnskontroll,
         tilkjentYtelse: TilkjentYtelse,
-        erFørsteIverksettingForBehandling: Boolean = false,
+        erFørsteIverksettingForBehandling: Boolean,
     ) {
         if (utbetalingSkalSendesPåKafka(behandling.stønadstype)) {
-            val recordsSomSkalPåKafka: List<UtbetalingRecord> =
-                utbetalingV3Mapper.lagUtbetalingRecords(
+            val utbetalingRecords =
+                utbetalingV3Mapper.lagIverksettingDtoer(
                     behandling = behandling,
                     andelerTilkjentYtelse = andelerTilkjentYtelse,
                     totrinnskontroll = totrinnskontroll,
                     erFørsteIverksettingForBehandling = erFørsteIverksettingForBehandling,
-                    vedtakstidspunkt = behandling.vedtakstidspunkt!!,
-                    erSimulering = false,
+                    vedtakstidspunkt = behandling.vedtakstidspunkt ?: feil("Vedtakstidspunkt er påkrevd"),
                 )
-            utbetalingMessageProducer.sendUtbetalinger(iverksettingId, recordsSomSkalPåKafka)
+            utbetalingMessageProducer.sendUtbetalinger(iverksettingId, utbetalingRecords)
         } else {
             val dto =
                 IverksettDtoMapper.map(

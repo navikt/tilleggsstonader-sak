@@ -14,7 +14,6 @@ data class SettPåVent(
     @Id
     val id: UUID = UUID.randomUUID(),
     val behandlingId: BehandlingId,
-    val oppgaveId: Long,
     @Column("arsaker")
     val årsaker: List<ÅrsakSettPåVent>,
     val kommentar: String?,
