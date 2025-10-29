@@ -8,14 +8,14 @@ import java.util.UUID
 sealed interface UtbetalingDto
 
 data class SimuleringDto(
-    @JsonUnwrapped val grunnlag: UtbetalingGrunnlagDto,
+    @JsonUnwrapped val utbetalingsgrunnlag: UtbetalingGrunnlagDto,
 ) : UtbetalingDto {
     val dryrun: Boolean = true
     val vedtakstidspunkt: LocalDateTime = LocalDateTime.now()
 }
 
 class IverksettingDto(
-    @JsonUnwrapped val grunnlag: UtbetalingGrunnlagDto,
+    @JsonUnwrapped val utbetalingsgrunnlag: UtbetalingGrunnlagDto,
     val saksbehandler: String,
     val beslutter: String,
     val vedtakstidspunkt: LocalDateTime,

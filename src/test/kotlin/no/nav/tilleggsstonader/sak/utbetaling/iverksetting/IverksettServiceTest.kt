@@ -557,19 +557,19 @@ class IverksettServiceTest : IntegrationTest() {
             val sendtUtbetaling = sendteUtbetalinger.single()
             assertThat(sendtUtbetaling.key()).isEqualTo(iverksettingId.toString())
             val utbetalingRecord = sendtUtbetaling.utbetalingRecord()
-            assertThat(utbetalingRecord.grunnlag.perioder).hasSize(1)
+            assertThat(utbetalingRecord.utbetalingsgrunnlag.perioder).hasSize(1)
             assertThat(
-                utbetalingRecord.grunnlag.perioder
+                utbetalingRecord.utbetalingsgrunnlag.perioder
                     .single()
                     .fom,
             ).isEqualTo(forrigeMåned.atDay(1))
             assertThat(
-                utbetalingRecord.grunnlag.perioder
+                utbetalingRecord.utbetalingsgrunnlag.perioder
                     .single()
                     .tom,
             ).isEqualTo(forrigeMåned.atEndOfMonth())
             assertThat(
-                utbetalingRecord.grunnlag.perioder
+                utbetalingRecord.utbetalingsgrunnlag.perioder
                     .single()
                     .beløp
                     .toInt(),

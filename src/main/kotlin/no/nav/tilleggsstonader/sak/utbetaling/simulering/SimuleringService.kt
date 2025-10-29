@@ -68,7 +68,7 @@ class SimuleringService(
         val forrigeIverksetting = iverksettService.finnForrigeIverksetting(saksbehandling, tilkjentYtelse)
 
         return if (utbetalingSkalSendesPåKafka(saksbehandling.stønadstype)) {
-            iverksettClient.simulerV3(utbetalingV3Mapper.lagSimuleringDto(saksbehandling, tilkjentYtelse.andelerTilkjentYtelse))
+            iverksettClient.simulerV3(utbetalingV3Mapper.lagSimuleringDtoer(saksbehandling, tilkjentYtelse.andelerTilkjentYtelse))
         } else {
             iverksettClient.simulerV2(
                 SimuleringRequestDto(

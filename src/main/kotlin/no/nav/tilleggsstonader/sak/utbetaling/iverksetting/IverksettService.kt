@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -144,15 +145,15 @@ class IverksettService(
         erFørsteIverksettingForBehandling: Boolean,
     ) {
         if (utbetalingSkalSendesPåKafka(behandling.stønadstype)) {
-            val utbetalinger =
-                utbetalingV3Mapper.lagIverksettingRecord(
+            val utbetalingRecords =
+                utbetalingV3Mapper.lagIverksettingDtoer(
                     behandling = behandling,
                     andelerTilkjentYtelse = andelerTilkjentYtelse,
                     totrinnskontroll = totrinnskontroll,
                     erFørsteIverksettingForBehandling = erFørsteIverksettingForBehandling,
-                    vedtakstidspunkt = behandling.vedtakstidspunkt!!,
+                    vedtakstidspunkt = behandling.vedtakstidspunkt ?: feil("Vedtakstidspunkt er påkrevd"),
                 )
-            utbetalingMessageProducer.sendUtbetalinger(iverksettingId, utbetalinger)
+            utbetalingMessageProducer.sendUtbetalinger(iverksettingId, utbetalingRecords)
         } else {
             val dto =
                 IverksettDtoMapper.map(

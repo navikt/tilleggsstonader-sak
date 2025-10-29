@@ -16,7 +16,7 @@ class UtbetalingV3Mapper(
     private val fagsakUtbetalingIdService: FagsakUtbetalingIdService,
     private val tilkjentYtelseService: TilkjentYtelseService,
 ) {
-    fun lagSimuleringDto(
+    fun lagSimuleringDtoer(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
     ): Collection<SimuleringDto> =
@@ -24,9 +24,9 @@ class UtbetalingV3Mapper(
             behandling = behandling,
             andeler = andelerTilkjentYtelse,
             erFørsteIverksetting = true,
-        ) { grunnlag -> SimuleringDto(grunnlag = grunnlag) }
+        ) { utbetalingsgrunnlag -> SimuleringDto(utbetalingsgrunnlag) }
 
-    fun lagIverksettingRecord(
+    fun lagIverksettingDtoer(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         erFørsteIverksettingForBehandling: Boolean,
@@ -37,9 +37,9 @@ class UtbetalingV3Mapper(
             behandling = behandling,
             andeler = andelerTilkjentYtelse,
             erFørsteIverksetting = erFørsteIverksettingForBehandling,
-        ) { grunnlag ->
+        ) { utbetalingsgrunnlag ->
             IverksettingDto(
-                grunnlag = grunnlag,
+                utbetalingsgrunnlag = utbetalingsgrunnlag,
                 saksbehandler = totrinnskontroll?.saksbehandler ?: error("Saksbehandler mangler"),
                 beslutter = totrinnskontroll.beslutter ?: error("Beslutter mangler"),
                 vedtakstidspunkt = vedtakstidspunkt,
