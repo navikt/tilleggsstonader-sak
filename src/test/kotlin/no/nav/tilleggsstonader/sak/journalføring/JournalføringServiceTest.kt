@@ -22,8 +22,8 @@ import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingOppgaveMetadata
-import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingRequest
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -160,7 +160,7 @@ class JournalføringServiceTest {
     internal fun `skal kunne journalføre og opprette behandling`() {
         every {
             opprettBehandlingService.opprettBehandling(
-                OpprettBehandlingRequest(
+                OpprettBehandling(
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.SØKNAD,
                     oppgaveMetadata =
@@ -184,7 +184,7 @@ class JournalføringServiceTest {
 
         verify(exactly = 1) {
             opprettBehandlingService.opprettBehandling(
-                OpprettBehandlingRequest(
+                OpprettBehandling(
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.SØKNAD,
                     oppgaveMetadata =
@@ -422,7 +422,7 @@ class JournalføringServiceTest {
             every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()
             every {
                 opprettBehandlingService.opprettBehandling(
-                    OpprettBehandlingRequest(
+                    OpprettBehandling(
                         fagsakId = fagsak.id,
                         behandlingsårsak = BehandlingÅrsak.SØKNAD,
                         oppgaveMetadata =
@@ -446,7 +446,7 @@ class JournalføringServiceTest {
 
             verify(exactly = 1) {
                 opprettBehandlingService.opprettBehandling(
-                    OpprettBehandlingRequest(
+                    OpprettBehandling(
                         fagsakId = fagsak.id,
                         behandlingsårsak = BehandlingÅrsak.SØKNAD,
                         oppgaveMetadata =

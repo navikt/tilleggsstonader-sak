@@ -22,7 +22,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -41,7 +40,7 @@ class OpprettBehandlingService(
     private val taskService: TaskService,
 ) {
     @Transactional
-    fun opprettBehandling(request: OpprettBehandlingRequest): Behandling {
+    fun opprettBehandling(request: OpprettBehandling): Behandling {
         brukerfeilHvis(request.kravMottatt != null && request.kravMottatt.isAfter(LocalDate.now())) {
             "Kan ikke sette krav mottattdato frem i tid"
         }
@@ -111,7 +110,7 @@ class OpprettBehandlingService(
     }
 }
 
-data class OpprettBehandlingRequest(
+data class OpprettBehandling(
     val fagsakId: FagsakId,
     val status: BehandlingStatus = BehandlingStatus.OPPRETTET,
     val stegType: StegType = StegType.INNGANGSVILKÅR,

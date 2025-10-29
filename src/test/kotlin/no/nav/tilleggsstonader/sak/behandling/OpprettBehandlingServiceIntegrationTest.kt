@@ -8,18 +8,14 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
-import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.assertFinnesTaskMedType
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
@@ -43,7 +39,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
         assertThatExceptionOfType(ApiFeil::class.java)
             .isThrownBy {
                 opprettBehandlingService.opprettBehandling(
-                    OpprettBehandlingRequest(
+                    OpprettBehandling(
                         fagsakId = fagsak.id,
                         stegType = StegType.VILKÅR,
                         behandlingsårsak = BehandlingÅrsak.PAPIRSØKNAD,
@@ -68,7 +64,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
         assertThatExceptionOfType(ApiFeil::class.java)
             .isThrownBy {
                 opprettBehandlingService.opprettBehandling(
-                    OpprettBehandlingRequest(
+                    OpprettBehandling(
                         fagsak.id,
                         behandlingsårsak = behandlingÅrsak,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
@@ -90,7 +86,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
         assertThatExceptionOfType(ApiFeil::class.java)
             .isThrownBy {
                 opprettBehandlingService.opprettBehandling(
-                    OpprettBehandlingRequest(
+                    OpprettBehandling(
                         fagsak.id,
                         behandlingsårsak = behandlingÅrsak,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
@@ -110,7 +106,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             assertThatExceptionOfType(ApiFeil::class.java)
                 .isThrownBy {
                     opprettBehandlingService.opprettBehandling(
-                        OpprettBehandlingRequest(
+                        OpprettBehandling(
                             fagsak.id,
                             behandlingsårsak = behandlingÅrsak,
                             oppgaveMetadata = opprettBehandlingOppgaveMetadata,
@@ -127,7 +123,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
 
             // Sjekker at denne ikke kaster feil
             opprettBehandlingService.opprettBehandling(
-                OpprettBehandlingRequest(
+                OpprettBehandling(
                     fagsak.id,
                     behandlingsårsak = behandlingÅrsak,
                     oppgaveMetadata = opprettBehandlingOppgaveMetadata,
@@ -146,7 +142,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             assertThatExceptionOfType(ApiFeil::class.java)
                 .isThrownBy {
                     opprettBehandlingService.opprettBehandling(
-                        OpprettBehandlingRequest(
+                        OpprettBehandling(
                             fagsak.id,
                             behandlingsårsak = behandlingÅrsak,
                             oppgaveMetadata = opprettBehandlingOppgaveMetadata,
@@ -162,7 +158,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT))
             // Sjekker at denne ikke kaster feil
             opprettBehandlingService.opprettBehandling(
-                OpprettBehandlingRequest(
+                OpprettBehandling(
                     fagsak.id,
                     behandlingsårsak = behandlingÅrsak,
                     oppgaveMetadata = opprettBehandlingOppgaveMetadata,
@@ -185,7 +181,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
         assertThatExceptionOfType(ApiFeil::class.java)
             .isThrownBy {
                 opprettBehandlingService.opprettBehandling(
-                    OpprettBehandlingRequest(
+                    OpprettBehandling(
                         fagsak.id,
                         behandlingsårsak = behandlingÅrsak,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
@@ -204,7 +200,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
         )
         // Sjekker at denne ikke kaster feil
         opprettBehandlingService.opprettBehandling(
-            OpprettBehandlingRequest(
+            OpprettBehandling(
                 fagsak.id,
                 behandlingsårsak = behandlingÅrsak,
                 oppgaveMetadata = opprettBehandlingOppgaveMetadata,
@@ -221,7 +217,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
 
         // Sjekker at denne ikke kaster feil
         opprettBehandlingService.opprettBehandling(
-            OpprettBehandlingRequest(
+            OpprettBehandling(
                 fagsak.id,
                 behandlingsårsak = behandlingÅrsak,
                 oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,

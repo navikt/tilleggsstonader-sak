@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.behandling.dto.BarnTilRevurderingDto
-import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -25,7 +24,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 @Service
 class OpprettRevurderingService(
@@ -64,9 +62,9 @@ class OpprettRevurderingService(
         return behandling.id
     }
 
-    private fun lagOpprettBehandlingRequest(opprettRevurdering: OpprettRevurdering): OpprettBehandlingRequest =
+    private fun lagOpprettBehandlingRequest(opprettRevurdering: OpprettRevurdering): OpprettBehandling =
         if (opprettRevurdering.skalOppretteOppgave) {
-            OpprettBehandlingRequest(
+            OpprettBehandling(
                 fagsakId = opprettRevurdering.fagsakId,
                 behandlingsårsak = opprettRevurdering.årsak,
                 kravMottatt = opprettRevurdering.kravMottatt,
@@ -79,7 +77,7 @@ class OpprettRevurderingService(
                     ),
             )
         } else {
-            OpprettBehandlingRequest(
+            OpprettBehandling(
                 fagsakId = opprettRevurdering.fagsakId,
                 behandlingsårsak = opprettRevurdering.årsak,
                 kravMottatt = opprettRevurdering.kravMottatt,

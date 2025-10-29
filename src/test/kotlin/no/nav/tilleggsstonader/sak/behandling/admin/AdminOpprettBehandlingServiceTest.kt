@@ -10,8 +10,8 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingOppgaveMetadata
-import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingRequest
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -110,7 +110,7 @@ class AdminOpprettBehandlingServiceTest {
         }
         verify(exactly = 1) {
             opprettBehandlingService.opprettBehandling(
-                OpprettBehandlingRequest(
+                OpprettBehandling(
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET,
                     kravMottatt = LocalDate.now(),
@@ -136,7 +136,7 @@ class AdminOpprettBehandlingServiceTest {
         }
         verify(exactly = 1) {
             opprettBehandlingService.opprettBehandling(
-                OpprettBehandlingRequest(
+                OpprettBehandling(
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
                     kravMottatt = LocalDate.now(),
@@ -159,7 +159,7 @@ class AdminOpprettBehandlingServiceTest {
         assertThat(opprettedeBarnSlot.isCaptured).isFalse()
         verify(exactly = 1) {
             opprettBehandlingService.opprettBehandling(
-                OpprettBehandlingRequest(
+                OpprettBehandling(
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
                     kravMottatt = LocalDate.now(),
