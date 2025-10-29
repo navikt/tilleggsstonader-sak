@@ -9,9 +9,9 @@ sealed interface UtbetalingDto
 
 data class SimuleringDto(
     @JsonUnwrapped val utbetalingsgrunnlag: UtbetalingGrunnlagDto,
+    val vedtakstidspunkt: LocalDateTime = LocalDateTime.now(),
 ) : UtbetalingDto {
     val dryrun: Boolean = true
-    val vedtakstidspunkt: LocalDateTime = LocalDateTime.now()
 }
 
 class IverksettingDto(
