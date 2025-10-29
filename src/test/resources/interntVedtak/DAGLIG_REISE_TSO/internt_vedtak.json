@@ -132,11 +132,11 @@
     "delvilkår" : [ {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Er avstanden mellom brukers aktivitet og hjemadresse lengre enn seks km?",
+        "regel" : "Er reiseavstanden over 6km?",
         "svar" : "Ja",
         "begrunnelse" : null
       }, {
-        "regel" : "Kan bruker reise med offentlig transport?",
+        "regel" : "Kan søker benytte seg av offentlig transport?",
         "svar" : "Ja",
         "begrunnelse" : "En begrunnelse på delvilkåret"
       } ]

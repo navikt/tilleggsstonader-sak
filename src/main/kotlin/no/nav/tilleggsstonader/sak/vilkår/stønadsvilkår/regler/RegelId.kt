@@ -29,9 +29,10 @@ enum class RegelId(
     DOKUMENTERT_DELTAKELSE("Har søker dokumentert at de har samling/eksamen/opptaksprøve/kurs på datoene for overnatting?"),
 
     // DAGLIG REISE
-    // TODO: Oppdater beskrivelser når de endelige spørsmålene er på plass
-    AVSTAND_OVER_SEKS_KM("Er avstanden mellom brukers aktivitet og hjemadresse lengre enn seks km?"),
-    UNNTAK_SEKS_KM("Unntak 6km"),
-    KAN_REISE_MED_OFFENTLIG_TRANSPORT("Kan bruker reise med offentlig transport?"),
-    KAN_KJØRE_MED_EGEN_BIL("Kan bruker kjøre med egen bil?"),
+    AVSTAND_OVER_SEKS_KM("Er reiseavstanden over 6km?"),
+    UNNTAK_SEKS_KM(
+        "Har søker dokumentert funksjonsnedsettelse, midlertidig skade eller sykdom som gjør at søker har et særskilt behov for transport?",
+    ),
+    KAN_REISE_MED_OFFENTLIG_TRANSPORT("Kan søker benytte seg av offentlig transport?"),
+    KAN_KJØRE_MED_EGEN_BIL("Kan søker benytte privat bil?"),
 }
