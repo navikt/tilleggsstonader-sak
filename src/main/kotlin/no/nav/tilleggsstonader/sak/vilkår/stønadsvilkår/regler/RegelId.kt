@@ -30,7 +30,9 @@ enum class RegelId(
 
     // DAGLIG REISE
     AVSTAND_OVER_SEKS_KM("Er reiseavstanden over 6km?"),
-    UNNTAK_SEKS_KM("Har søker dokumentert funksjonsnedsettelse, midlertidig skade eller sykdom som gjør at søker har et særskilt behov for transport?"),
+    UNNTAK_SEKS_KM(
+        "Har søker dokumentert funksjonsnedsettelse, midlertidig skade eller sykdom som gjør at søker har et særskilt behov for transport?",
+    ),
     KAN_REISE_MED_OFFENTLIG_TRANSPORT("Kan søker benytte seg av offentlig transport?"),
     KAN_KJØRE_MED_EGEN_BIL("Kan søker benytte privat bil?"),
 }
