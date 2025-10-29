@@ -145,7 +145,7 @@ class OpprettTestBehandlingController(
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.SØKNAD,
                 oppgaveMetadata =
-                    OpprettBehandlingOppgaveMetadata(
+                    OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                         tilordneSaksbehandler = SikkerhetContext.hentSaksbehandler(),
                         beskrivelse = "Testbehandling (ikke lagd med en ekte søknad)",
                         prioritet = OppgavePrioritet.NORM,

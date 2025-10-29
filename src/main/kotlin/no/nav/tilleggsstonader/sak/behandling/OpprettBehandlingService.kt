@@ -92,7 +92,7 @@ class OpprettBehandlingService(
                 ),
         )
 
-        if (request.skalOppretteOppgave && request.oppgaveMetadata != null) {
+        if (request.oppgaveMetadata is OpprettBehandlingOppgaveMetadata.OppgaveMetadata) {
             taskService.save(
                 OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
                     OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
@@ -118,21 +118,15 @@ data class OpprettBehandlingRequest(
     val behandlingsårsak: BehandlingÅrsak,
     val kravMottatt: LocalDate? = null,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
-    val skalOppretteOppgave: Boolean = true,
-    val oppgaveMetadata: OpprettBehandlingOppgaveMetadata?,
-) {
-    init {
-        feilHvis(skalOppretteOppgave && oppgaveMetadata == null) {
-            "Kan ikke opprette oppgave uten oppgaveMetadata"
-        }
-        feilHvis(!skalOppretteOppgave && oppgaveMetadata != null) {
-            "oppgaveMetadata må være null når man ikke skal opprette oppgave"
-        }
-    }
-}
-
-data class OpprettBehandlingOppgaveMetadata(
-    val tilordneSaksbehandler: String?,
-    val beskrivelse: String?,
-    val prioritet: OppgavePrioritet,
+    val oppgaveMetadata: OpprettBehandlingOppgaveMetadata,
 )
+
+sealed interface OpprettBehandlingOppgaveMetadata {
+    data class OppgaveMetadata(
+        val tilordneSaksbehandler: String?,
+        val beskrivelse: String?,
+        val prioritet: OppgavePrioritet,
+    ) : OpprettBehandlingOppgaveMetadata
+
+    data object UtenOppgave : OpprettBehandlingOppgaveMetadata
+}

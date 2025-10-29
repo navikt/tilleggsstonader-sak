@@ -30,7 +30,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
     private val behandlingÅrsak = BehandlingÅrsak.SØKNAD
 
     private val opprettBehandlingOppgaveMetadata =
-        OpprettBehandlingOppgaveMetadata(
+        OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
             tilordneSaksbehandler = "nissemann",
             beskrivelse = "Ny oppgave",
             prioritet = OppgavePrioritet.NORM,
@@ -215,7 +215,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
     }
 
     @Test
-    internal fun `opprettBehandling med opprettOppgave=false skal ikke opprette oppgave`() {
+    internal fun `opprettBehandling med oppgaveMetadata=UtenOppgave skal ikke opprette oppgave`() {
         every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns true
         val fagsak = testoppsettService.lagreFagsak(fagsak())
 
@@ -224,8 +224,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             OpprettBehandlingRequest(
                 fagsak.id,
                 behandlingsårsak = behandlingÅrsak,
-                skalOppretteOppgave = false,
-                oppgaveMetadata = null,
+                oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
             ),
         )
 

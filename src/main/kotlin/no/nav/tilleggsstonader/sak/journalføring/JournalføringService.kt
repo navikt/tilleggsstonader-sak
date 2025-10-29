@@ -237,7 +237,7 @@ class JournalføringService(
                     behandlingsårsak = behandlingÅrsak,
                     kravMottatt = journalpost.datoMottatt?.toLocalDate(),
                     oppgaveMetadata =
-                        OpprettBehandlingOppgaveMetadata(
+                        OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                             tilordneSaksbehandler = null, // Behandle sak oppgaven skal være ufordelt
                             beskrivelse = oppgaveBeskrivelse,
                             prioritet = OppgavePrioritet.NORM,

@@ -60,7 +60,7 @@ class AdminOpprettBehandlingService(
                     behandlingsårsak = behandlingsårsak,
                     kravMottatt = kravMottatt,
                     oppgaveMetadata =
-                        OpprettBehandlingOppgaveMetadata(
+                        OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                             tilordneSaksbehandler = SikkerhetContext.hentSaksbehandler(),
                             beskrivelse = "Manuelt opprettet sak fra journalpost. Skal saksbehandles i ny løsning.",
                             prioritet = OppgavePrioritet.NORM,

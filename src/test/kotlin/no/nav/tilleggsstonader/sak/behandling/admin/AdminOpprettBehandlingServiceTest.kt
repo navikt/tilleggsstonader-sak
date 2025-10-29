@@ -64,7 +64,7 @@ class AdminOpprettBehandlingServiceTest {
     val saksbehandler = "mrsaksbehandler"
 
     val forventetOppgaveMetadata =
-        OpprettBehandlingOppgaveMetadata(
+        OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
             tilordneSaksbehandler = saksbehandler,
             beskrivelse = "Manuelt opprettet sak fra journalpost. Skal saksbehandles i ny løsning.",
             prioritet = OppgavePrioritet.NORM,

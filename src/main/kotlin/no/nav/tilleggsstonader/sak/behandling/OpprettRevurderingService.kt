@@ -72,7 +72,7 @@ class OpprettRevurderingService(
                 kravMottatt = opprettRevurdering.kravMottatt,
                 nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
                 oppgaveMetadata =
-                    OpprettBehandlingOppgaveMetadata(
+                    OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                         tilordneSaksbehandler = SikkerhetContext.hentSaksbehandler(),
                         beskrivelse = "Skal behandles i TS-Sak",
                         prioritet = OppgavePrioritet.NORM,
@@ -84,8 +84,7 @@ class OpprettRevurderingService(
                 behandlingsårsak = opprettRevurdering.årsak,
                 kravMottatt = opprettRevurdering.kravMottatt,
                 nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
-                skalOppretteOppgave = false,
-                oppgaveMetadata = null,
+                oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
             )
         }
 

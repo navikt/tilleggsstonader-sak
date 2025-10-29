@@ -5,7 +5,6 @@ import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
@@ -32,7 +31,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -166,7 +164,7 @@ class JournalføringServiceTest {
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.SØKNAD,
                     oppgaveMetadata =
-                        OpprettBehandlingOppgaveMetadata(
+                        OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                             tilordneSaksbehandler = null,
                             beskrivelse = oppgaveBeskrivelse,
                             prioritet = OppgavePrioritet.NORM,
@@ -190,7 +188,7 @@ class JournalføringServiceTest {
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.SØKNAD,
                     oppgaveMetadata =
-                        OpprettBehandlingOppgaveMetadata(
+                        OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                             tilordneSaksbehandler = null,
                             beskrivelse = oppgaveBeskrivelse,
                             prioritet = OppgavePrioritet.NORM,
@@ -428,7 +426,7 @@ class JournalføringServiceTest {
                         fagsakId = fagsak.id,
                         behandlingsårsak = BehandlingÅrsak.SØKNAD,
                         oppgaveMetadata =
-                            OpprettBehandlingOppgaveMetadata(
+                            OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                                 tilordneSaksbehandler = null,
                                 beskrivelse = oppgaveBeskrivelse,
                                 prioritet = OppgavePrioritet.NORM,
@@ -452,7 +450,7 @@ class JournalføringServiceTest {
                         fagsakId = fagsak.id,
                         behandlingsårsak = BehandlingÅrsak.SØKNAD,
                         oppgaveMetadata =
-                            OpprettBehandlingOppgaveMetadata(
+                            OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                                 tilordneSaksbehandler = null,
                                 beskrivelse = oppgaveBeskrivelse,
                                 prioritet = OppgavePrioritet.NORM,
