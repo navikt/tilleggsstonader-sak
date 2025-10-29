@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
@@ -60,9 +61,9 @@ class UtbetalingV3Mapper(
             sakId = behandling.eksternFagsakId.toString(),
             behandlingId = behandling.eksternId.toString(),
             personident = behandling.ident,
-            periodetype = PeriodetypeUtbetaling.EN_GANG,
-            stønad = mapTilStønadUtbetaling(typeAndel = type),
-            perioder = mapPerioder(andelerTilkjentYtelse = andeler),
+            periodetype = PeriodetypeUtbetaling.UKEDAG,
+            stønad = mapTilStønadUtbetaling(type),
+            perioder = grupperPåMånedOgMapTilPerioder(andeler),
         )
     }
 
@@ -99,14 +100,15 @@ class UtbetalingV3Mapper(
                 utbetalingDtoFactory(grunnlag)
             }
 
-    private fun mapPerioder(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>): List<PerioderUtbetaling> =
+    private fun grupperPåMånedOgMapTilPerioder(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>): List<PerioderUtbetaling> =
         andelerTilkjentYtelse
             .filter { it.beløp != 0 }
             .groupBy { it.utbetalingsdato.toYearMonth() }
             .map { (månedÅr, andeler) ->
+                val førsteUkedagIMåneden = månedÅr.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag()
                 PerioderUtbetaling(
-                    fom = månedÅr.atDay(1),
-                    tom = månedÅr.atEndOfMonth(),
+                    fom = førsteUkedagIMåneden,
+                    tom = førsteUkedagIMåneden,
                     beløp = andeler.sumOf { it.beløp }.toUInt(),
                 )
             }

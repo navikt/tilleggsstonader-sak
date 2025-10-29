@@ -567,7 +567,7 @@ class IverksettServiceTest : IntegrationTest() {
                 utbetalingRecord.utbetalingsgrunnlag.perioder
                     .single()
                     .tom,
-            ).isEqualTo(forrigeMåned.atEndOfMonth())
+            ).isEqualTo(forrigeMåned.atDay(1))
             assertThat(
                 utbetalingRecord.utbetalingsgrunnlag.perioder
                     .single()
