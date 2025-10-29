@@ -77,9 +77,9 @@ class UtbetalingV3Mapper(
             .map { (type, andelerAvType) -> utbetalingDtoFactory(lagUtbetalingGrunnlag(behandling, type, andelerAvType)) }
             .let { utbetalinger ->
                 if (erFørsteIverksetting) {
-                    utbetalinger
-                } else {
                     utbetalinger + lagUtbetalingDtoForAnnulering(behandling, andeler, utbetalingDtoFactory)
+                } else {
+                    utbetalinger
                 }
             }
 
