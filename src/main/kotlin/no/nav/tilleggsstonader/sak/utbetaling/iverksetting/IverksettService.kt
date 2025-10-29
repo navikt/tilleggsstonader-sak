@@ -39,15 +39,12 @@ class IverksettService(
     private val utbetalingV3Mapper: UtbetalingV3Mapper,
 ) {
     /**
-     * Skal brukes når man iverksetter en behandling første gang, uansett om det er behandling 1 eller behandling 2 på en fagsak
-     * Dette fordi man skal iverksette alle andeler tom forrige måned.
-     * Dvs denne skal brukes fra [no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.BeslutteVedtakSteg]
+     * Iverksetter andeler til og med dagens dato. Utbetalinger frem i tid blir plukket opp av en daglig jobb.
      *
+     * Notat om synkron iverksetting (aka v2 av utsjekk):
      * Ved første iverksetting av en behandling er det krav på at det gjøres med jwt, dvs med saksbehandler-token
-     * Neste iverksettinger kan gjøres med client_credentials.
-     *
-     * Dersom det ikke finnes utbetalinger som skal iverksettes for forrige måned, så legges det til en nullandel
-     * for å kunne sjekke status på iverksetting og for å kunne opphøre andeler fra forrige behandling.
+     * Neste iverksettinger kan gjøres med client_credentials. Dersom det ikke finnes utbetalinger som skal iverksettes for forrige måned,
+     * så legges det til en nullandel for å kunne sjekke status på iverksetting og for å kunne opphøre andeler fra forrige behandling.
      */
     @Transactional
     fun iverksettBehandlingFørsteGang(behandlingId: BehandlingId) {
@@ -66,7 +63,6 @@ class IverksettService(
         val totrinnskontroll = hentTotrinnskontroll(behandling)
 
         val iverksettingId = behandlingId.id
-        // Iverksetter andeler til og med dagens dato med en gang. Utbetalinger frem i tid blir plukket opp av en daglig jobb.
         sendAndelerTilUtsjekk(
             tilkjentYtelse = tilkjentYtelse,
             andelerTilkjentYtelse = andelerSomSkalIverksettesNå,
@@ -100,13 +96,13 @@ class IverksettService(
     }
 
     /**
-     * Hvis kallet feiler er det viktig at den samme iverksettingId brukes for å kunne ignorere conflict
-     * Vid første iverksetting som gjøres burde man bruke behandlingId for å iverksette
-     * for å enkelt kunne gjenbruke samme id vid neste iverksetting
+     * Kalles på av daglig jobb som plukker opp alle andeler som har utbetalingsdato <= dagens dato.
      *
-     * @param [måned] Når man iverksetter en behandling første gangen så skal [måned] settes til forrige måned
-     * fordi man skal iverksette tidligere måneder direkte.
-     * Når man iverksetter samme behandling neste gang skal man bruke inneværende måned for å iverksette aktuell måned
+     * Notat om synkron iverksetting (aka v2 av utsjekk):
+     * Hvis kallet feiler er det viktig at den samme iverksettingId brukes for å kunne ignorere conflict
+     * Ved første iverksetting som gjøres brukes behandlingId for å iverksette
+     * for å enkelt kunne gjenbruke samme id vid neste iverksetting.
+     *
      */
     @Transactional
     fun iverksett(
