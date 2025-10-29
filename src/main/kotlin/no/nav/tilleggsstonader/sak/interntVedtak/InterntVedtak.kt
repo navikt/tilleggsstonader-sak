@@ -121,20 +121,22 @@ sealed interface VilkårFaktaInternt {
 }
 
 data class VilkårFaktaOffentligTransport(
-    override val type: TypeVilkårFakta,
     val reisedagerPerUke: Int,
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
-) : VilkårFaktaInternt
+) : VilkårFaktaInternt {
+    override val type = TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT
+}
 
 data class VilkårFaktaPrivatBil(
-    override val type: TypeVilkårFakta,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: Int,
     val prisBompengerPerDag: Int?,
     val prisFergekostandPerDag: Int?,
-) : VilkårFaktaInternt
+) : VilkårFaktaInternt {
+    override val type = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
+}
 
 data class VurderingInternt(
     val regel: String,

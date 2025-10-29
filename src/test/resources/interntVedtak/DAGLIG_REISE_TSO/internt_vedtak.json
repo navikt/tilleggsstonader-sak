@@ -147,11 +147,11 @@
     "utgift" : null,
     "slettetKommentar" : null,
     "fakta" : {
-      "type" : "DAGLIG_REISE_OFFENTLIG_TRANSPORT",
       "reisedagerPerUke" : 5,
       "prisEnkelbillett" : 44,
       "prisSyvdagersbillett" : null,
-      "prisTrettidagersbillett" : 750
+      "prisTrettidagersbillett" : 750,
+      "type" : "DAGLIG_REISE_OFFENTLIG_TRANSPORT"
     }
   } ],
   "vedtak" : {

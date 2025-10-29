@@ -311,7 +311,6 @@ class InterntVedtakService(
         when (fakta) {
             is FaktaDagligReiseOffentligTransport ->
                 VilkårFaktaOffentligTransport(
-                    type = fakta.type,
                     reisedagerPerUke = fakta.reisedagerPerUke,
                     prisEnkelbillett = fakta.prisEnkelbillett,
                     prisSyvdagersbillett = fakta.prisSyvdagersbillett,
@@ -320,7 +319,6 @@ class InterntVedtakService(
 
             is FaktaDagligReisePrivatBil ->
                 VilkårFaktaPrivatBil(
-                    type = fakta.type,
                     reisedagerPerUke = fakta.reisedagerPerUke,
                     reiseavstandEnVei = fakta.reiseavstandEnVei,
                     prisBompengerPerDag = fakta.prisBompengerPerDag,
