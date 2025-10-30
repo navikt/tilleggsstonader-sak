@@ -6,11 +6,13 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.assertFinnesTaskMedType
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -23,6 +25,9 @@ import java.time.LocalDate
 class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
     @Autowired
     private lateinit var opprettBehandlingService: OpprettBehandlingService
+
+    @Autowired
+    private lateinit var settPåVentService: SettPåVentService
 
     private val behandlingÅrsak = BehandlingÅrsak.SØKNAD
 
@@ -74,28 +79,6 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
     }
 
-    @Test
-    internal fun `skal ikke være mulig å opprette en revurdering om forrige behandling ikke er ferdigstilt eller på vent`() {
-        every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns true
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
-        testoppsettService.lagre(
-            behandling(
-                fagsak = fagsak,
-                status = BehandlingStatus.UTREDES,
-            ),
-        )
-        assertThatExceptionOfType(ApiFeil::class.java)
-            .isThrownBy {
-                opprettBehandlingService.opprettBehandling(
-                    OpprettBehandling(
-                        fagsak.id,
-                        behandlingsårsak = behandlingÅrsak,
-                        oppgaveMetadata = opprettBehandlingOppgaveMetadata,
-                    ),
-                )
-            }.withMessage("Det finnes en behandling på fagsaken som hverken er ferdigstilt eller satt på vent")
-    }
-
     @Nested
     inner class BehandlingPåVent {
         // TODO: Slett når snike i køen er implementert
@@ -111,6 +94,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                             fagsak.id,
                             behandlingsårsak = behandlingÅrsak,
                             oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                            tillatFlereÅpneBehandlinger = true,
                         ),
                     )
                 }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
@@ -128,6 +112,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                     fagsak.id,
                     behandlingsårsak = behandlingÅrsak,
                     oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                    tillatFlereÅpneBehandlinger = true,
                 ),
             )
 
@@ -141,10 +126,20 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.OPPRETTET))
 
             // Sjekker at denne ikke kaster feil
-            opprettBehandlingService.opprettBehandling(
-                fagsak.id,
-                behandlingsårsak = behandlingÅrsak,
-            )
+            val nyBehandling =
+                opprettBehandlingService.opprettBehandling(
+                    OpprettBehandling(
+                        fagsak.id,
+                        behandlingsårsak = behandlingÅrsak,
+                        oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                        tillatFlereÅpneBehandlinger = true,
+                    ),
+                )
+
+            // For å opprette oppgave slik at ikke settPåVentService-kall feiler
+            kjørTasksKlareForProsessering()
+            assertThat(nyBehandling.status).isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
+            assertThat(settPåVentService.hentStatusSettPåVent(nyBehandling.id)).isNotNull
         }
 
         // TODO: Slett når snike i køen er implementert
@@ -160,6 +155,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                             fagsak.id,
                             behandlingsårsak = behandlingÅrsak,
                             oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                            tillatFlereÅpneBehandlinger = true,
                         ),
                     )
                 }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
@@ -176,8 +172,12 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
 
             // Sjekker at denne ikke kaster feil
             opprettBehandlingService.opprettBehandling(
-                fagsak.id,
-                behandlingsårsak = behandlingÅrsak,
+                OpprettBehandling(
+                    fagsak.id,
+                    behandlingsårsak = behandlingÅrsak,
+                    oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                    tillatFlereÅpneBehandlinger = true,
+                ),
             )
         }
 
@@ -191,15 +191,21 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.OPPRETTET, type = BehandlingType.REVURDERING))
 
             // Sjekker at denne ikke kaster feil
-            opprettBehandlingService.opprettBehandling(
-                OpprettBehandling(
-                    fagsak.id,
-                    behandlingsårsak = behandlingÅrsak,
-                    oppgaveMetadata = opprettBehandlingOppgaveMetadata,
-                ),
-            )
+            val nyBehandling =
+                opprettBehandlingService.opprettBehandling(
+                    OpprettBehandling(
+                        fagsak.id,
+                        behandlingsårsak = behandlingÅrsak,
+                        oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                        tillatFlereÅpneBehandlinger = true,
+                    ),
+                )
 
+            // For å opprette oppgave slik at ikke settPåVentService-kall feiler
             assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
+            kjørTasksKlareForProsessering()
+            assertThat(nyBehandling.status).isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
+            assertThat(settPåVentService.hentStatusSettPåVent(nyBehandling.id)).isNotNull
         }
     }
 
@@ -219,6 +225,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                         fagsak.id,
                         behandlingsårsak = behandlingÅrsak,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                        tillatFlereÅpneBehandlinger = true,
                     ),
                 )
             }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
@@ -238,6 +245,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                 fagsak.id,
                 behandlingsårsak = behandlingÅrsak,
                 oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                tillatFlereÅpneBehandlinger = true,
             ),
         )
 
@@ -255,6 +263,7 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                 fagsak.id,
                 behandlingsårsak = behandlingÅrsak,
                 oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
+                tillatFlereÅpneBehandlinger = true,
             ),
         )
 

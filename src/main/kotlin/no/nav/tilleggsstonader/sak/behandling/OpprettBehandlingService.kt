@@ -17,7 +17,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdReposito
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
+import no.nav.tilleggsstonader.sak.behandling.vent.SettBehandlingPåVentRequest
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentService
+import no.nav.tilleggsstonader.sak.behandling.vent.ÅrsakSettPåVent
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -62,8 +64,10 @@ class OpprettBehandlingService(
         validerKanOppretteNyBehandling(
             behandlingType = behandlingType,
             tidligereBehandlinger = tidligereBehandlinger,
-            kanHaFlereBehandlingPåSammeFagsak = kanHaFlereBehandlingerPåSammeFagsak,
+            kanHaFlereBehandlingPåSammeFagsak = kanHaFlereBehandlingerPåSammeFagsak && request.tillatFlereÅpneBehandlinger,
         )
+
+        val behandlingStatus = utledBehandlingStatus(tidligereBehandlinger)
 
         val behandling =
             behandlingRepository.insert(
@@ -72,7 +76,7 @@ class OpprettBehandlingService(
                     forrigeIverksatteBehandlingId = forrigeBehandling?.id,
                     type = behandlingType,
                     steg = request.stegType,
-                    status = request.status,
+                    status = behandlingStatus,
                     resultat = BehandlingResultat.IKKE_SATT,
                     årsak = request.behandlingsårsak,
                     kravMottatt = request.kravMottatt,
@@ -91,6 +95,19 @@ class OpprettBehandlingService(
                 ),
         )
 
+        if (behandlingStatus == BehandlingStatus.SATT_PÅ_VENT) {
+            settPåVentService.settPåVent(
+                behandling.id,
+                SettBehandlingPåVentRequest(
+                    årsaker = listOf(ÅrsakSettPåVent.ANNET),
+                    frist = LocalDate.now().plusWeeks(1),
+                    kommentar = "Behandling satt på vent grunnet det finnes en aktiv behandling på saken",
+                    oppdaterOppgave = false,
+                    beholdOppgave = false,
+                ),
+            )
+        }
+
         if (request.oppgaveMetadata is OpprettBehandlingOppgaveMetadata.OppgaveMetadata) {
             taskService.save(
                 OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
@@ -108,6 +125,13 @@ class OpprettBehandlingService(
 
         return behandling
     }
+
+    private fun utledBehandlingStatus(tidligereBehandlinger: List<Behandling>): BehandlingStatus =
+        if (tidligereBehandlinger.any { it.erAktiv() }) {
+            BehandlingStatus.SATT_PÅ_VENT
+        } else {
+            BehandlingStatus.OPPRETTET
+        }
 }
 
 data class OpprettBehandling(
@@ -117,6 +141,7 @@ data class OpprettBehandling(
     val behandlingsårsak: BehandlingÅrsak,
     val kravMottatt: LocalDate? = null,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
+    val tillatFlereÅpneBehandlinger: Boolean = false,
     val oppgaveMetadata: OpprettBehandlingOppgaveMetadata,
 )
 

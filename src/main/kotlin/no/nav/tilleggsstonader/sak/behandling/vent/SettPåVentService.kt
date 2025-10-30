@@ -27,7 +27,9 @@ class SettPåVentService(
     private val settPåVentRepository: SettPåVentRepository,
 ) {
     fun hentStatusSettPåVent(behandlingId: BehandlingId): StatusPåVentDto {
-        val settPåVent = finnAktivSattPåVent(behandlingId)
+        val settPåVent =
+            finnAktivSattPåVent(behandlingId)
+                ?: error("Finner ikke settPåVent for behandling=$behandlingId")
         val oppgave = oppgaveService.hentAktivBehandleSakOppgave(behandlingId)
 
         val endret = utledEndretInformasjon(settPåVent)
@@ -49,7 +51,14 @@ class SettPåVentService(
         request: SettBehandlingPåVentRequest,
     ): StatusPåVentDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
-        behandling.status.validerKanBehandlingRedigeres()
+
+        if (behandling.status != BehandlingStatus.SATT_PÅ_VENT) {
+            behandling.status.validerKanBehandlingRedigeres()
+        }
+
+        feilHvis(finnAktivSattPåVent(behandlingId) != null) {
+            "Kan ikke gjøre endringer på denne behandlingen fordi den er satt på vent."
+        }
 
         behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId, behandling.status, behandling.steg)
 
@@ -106,7 +115,9 @@ class SettPåVentService(
         feilHvis(behandling.status != BehandlingStatus.SATT_PÅ_VENT) {
             "Status på behandlingen må være ${BehandlingStatus.SATT_PÅ_VENT} for å kunne oppdatere"
         }
-        val settPåVent = finnAktivSattPåVent(behandlingId)
+        val settPåVent =
+            finnAktivSattPåVent(behandlingId)
+                ?: error("Finner ikke settPåVent for behandling=$behandlingId")
 
         if (harEndretÅrsaker(settPåVent, dto) || harEndretKommentar(settPåVent, dto)) {
             opprettHistorikkInnslag(
@@ -119,11 +130,10 @@ class SettPåVentService(
         val oppdatertSettPåVent =
             settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker, kommentar = dto.kommentar))
 
-        val oppgaveResponse =
-            oppdaterOppgave(
-                oppgaveId = oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId).gsakOppgaveId,
-                dto = dto,
-            )
+        oppdaterOppgave(
+            oppgaveId = oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId).gsakOppgaveId,
+            dto = dto,
+        )
 
         val endret = utledEndretInformasjon(oppdatertSettPåVent)
 
@@ -173,9 +183,7 @@ class SettPåVentService(
     ) = !settPåVent.årsaker.containsAll(dto.årsaker) ||
         settPåVent.årsaker.size != dto.årsaker.size
 
-    private fun finnAktivSattPåVent(behandlingId: BehandlingId) =
-        settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
-            ?: error("Finner ikke settPåVent for behandling=$behandlingId")
+    private fun finnAktivSattPåVent(behandlingId: BehandlingId) = settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
 
     private fun opprettHistorikkInnslag(
         behandling: Behandling,

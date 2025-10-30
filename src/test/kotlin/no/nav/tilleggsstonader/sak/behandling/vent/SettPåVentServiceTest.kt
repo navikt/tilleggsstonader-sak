@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistor
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientMockConfig.Companion.MAPPE_ID_PÅ_VENT
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
@@ -17,6 +18,7 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -152,9 +154,10 @@ class SettPåVentServiceTest : IntegrationTest() {
             testWithBrukerContext(dummySaksbehandler) {
                 settPåVentService.settPåVent(behandling.id, settBehandlingPåVentRequest)
             }
-            assertThatThrownBy {
-                settPåVentService.settPåVent(behandling.id, settBehandlingPåVentRequest)
-            }.hasMessageContaining("Kan ikke gjøre endringer på denne behandlingen fordi den er satt på vent.")
+            assertThatExceptionOfType(Feil::class.java)
+                .isThrownBy {
+                    settPåVentService.settPåVent(behandling.id, settBehandlingPåVentRequest)
+                }.withMessage("Kan ikke gjøre endringer på denne behandlingen fordi den er satt på vent.")
         }
     }
 

@@ -163,6 +163,7 @@ class JournalføringServiceTest {
                 OpprettBehandling(
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                    tillatFlereÅpneBehandlinger = true,
                     oppgaveMetadata =
                         OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                             tilordneSaksbehandler = null,
@@ -187,6 +188,7 @@ class JournalføringServiceTest {
                 OpprettBehandling(
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                    tillatFlereÅpneBehandlinger = true,
                     oppgaveMetadata =
                         OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                             tilordneSaksbehandler = null,
@@ -425,6 +427,7 @@ class JournalføringServiceTest {
                     OpprettBehandling(
                         fagsakId = fagsak.id,
                         behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                        tillatFlereÅpneBehandlinger = true,
                         oppgaveMetadata =
                             OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                                 tilordneSaksbehandler = null,
@@ -449,6 +452,7 @@ class JournalføringServiceTest {
                     OpprettBehandling(
                         fagsakId = fagsak.id,
                         behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                        tillatFlereÅpneBehandlinger = true,
                         oppgaveMetadata =
                             OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                                 tilordneSaksbehandler = null,
