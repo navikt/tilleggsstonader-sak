@@ -123,9 +123,9 @@ spec:
 
   envFrom:
     - secret: tilleggsstonader-sak-unleash-api-token
+    - secret: google-maps-api-key
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: dev
     - name: TZ
       value: Europe/Oslo
-
