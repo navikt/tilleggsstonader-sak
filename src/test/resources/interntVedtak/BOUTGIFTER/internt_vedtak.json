@@ -157,7 +157,8 @@
     "fom" : "2024-02-01",
     "tom" : "2024-02-02",
     "utgift" : 3000,
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "fakta" : null
   }, {
     "type" : "UTGIFTER_OVERNATTING",
     "resultat" : "OPPFYLT",
@@ -194,7 +195,8 @@
     "fom" : "2024-02-26",
     "tom" : "2024-02-29",
     "utgift" : 4000,
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "fakta" : null
   } ],
   "vedtak" : {
     "innvilgelseBegrunnelse" : "Sånn her vil en begrunnelse se ut i det interne vedtaket",

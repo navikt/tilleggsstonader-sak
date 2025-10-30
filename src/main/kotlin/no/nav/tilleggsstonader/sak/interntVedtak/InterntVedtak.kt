@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatForM
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -107,12 +108,35 @@ data class VilkårInternt(
     val tom: LocalDate?,
     val utgift: Int?,
     val slettetKommentar: String?,
+    val fakta: VilkårFaktaInternt?,
 )
 
 data class DelvilkårInternt(
     val resultat: Vilkårsresultat,
     val vurderinger: List<VurderingInternt>,
 )
+
+sealed interface VilkårFaktaInternt {
+    val type: TypeVilkårFakta
+}
+
+data class VilkårFaktaOffentligTransport(
+    val reisedagerPerUke: Int,
+    val prisEnkelbillett: Int?,
+    val prisSyvdagersbillett: Int?,
+    val prisTrettidagersbillett: Int?,
+) : VilkårFaktaInternt {
+    override val type = TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT
+}
+
+data class VilkårFaktaPrivatBil(
+    val reisedagerPerUke: Int,
+    val reiseavstandEnVei: Int,
+    val prisBompengerPerDag: Int?,
+    val prisFergekostandPerDag: Int?,
+) : VilkårFaktaInternt {
+    override val type = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
+}
 
 data class VurderingInternt(
     val regel: String,
