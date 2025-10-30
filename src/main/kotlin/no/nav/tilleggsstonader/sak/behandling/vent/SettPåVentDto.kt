@@ -14,8 +14,7 @@ data class SettPåVentDto(
             årsaker = årsaker,
             frist = frist,
             kommentar = kommentar,
-            beholdOppgave = beholdOppgave,
-            oppdaterOppgave = true,
+            oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave(beholdOppgave = beholdOppgave),
         )
 }
 

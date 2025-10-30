@@ -8,8 +8,7 @@ data class SettBehandlingPåVent(
     val årsaker: List<ÅrsakSettPåVent>,
     val frist: LocalDate,
     val kommentar: String?,
-    val oppdaterOppgave: Boolean = true,
-    val beholdOppgave: Boolean = false,
+    val oppgaveMetadata: SettBehandlingPåVentOppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave(),
 ) {
     init {
         brukerfeilHvis(årsaker.any { it == ÅrsakSettPåVent.ANNET } && kommentar.isNullOrBlank()) {
@@ -18,8 +17,13 @@ data class SettBehandlingPåVent(
         brukerfeilHvis((kommentar?.length ?: 0) > 1000) {
             "Kommentar kan maks være 1000 tegn"
         }
-        feilHvis(!oppdaterOppgave && beholdOppgave) {
-            "Kan ikke beholde oppgave når oppdaterOppgave er $oppdaterOppgave"
-        }
     }
+}
+
+sealed interface SettBehandlingPåVentOppgaveMetadata {
+    data object IkkeOppdaterOppgave : SettBehandlingPåVentOppgaveMetadata
+
+    data class OppdaterOppgave(
+        val beholdOppgave: Boolean = false,
+    ) : SettBehandlingPåVentOppgaveMetadata
 }

@@ -121,10 +121,16 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal sette behandling på vent og fortsette beholde oppgaven`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settBehandlingPåVent.copy(beholdOppgave = true))
+                settPåVentService.settPåVent(
+                    behandling.id,
+                    settBehandlingPåVent.copy(
+                        oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave(beholdOppgave = true),
+                    ),
+                )
 
                 with(oppgaveService.hentOppgave(oppgaveId!!)) {
                     assertThat(tilordnetRessurs).isEqualTo(dummySaksbehandler)
+                    assertThat(versjon).isEqualTo(2)
                 }
             }
         }
@@ -132,10 +138,16 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal sette behandling på vent uten å oppdatere oppgave`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settBehandlingPåVent.copy(oppdaterOppgave = false))
+                settPåVentService.settPåVent(
+                    behandling.id,
+                    settBehandlingPåVent.copy(
+                        oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.IkkeOppdaterOppgave,
+                    ),
+                )
 
                 with(oppgaveService.hentOppgave(oppgaveId!!)) {
                     assertThat(tilordnetRessurs).isEqualTo(dummySaksbehandler)
+                    assertThat(versjon).isEqualTo(1)
                 }
             }
         }
@@ -252,7 +264,12 @@ class SettPåVentServiceTest : IntegrationTest() {
             val taAvVentDto = TaAvVentDto(skalTilordnesRessurs = false, kommentar = "tatt av")
 
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settBehandlingPåVent.copy(beholdOppgave = true))
+                settPåVentService.settPåVent(
+                    behandling.id,
+                    settBehandlingPåVent.copy(
+                        oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave(beholdOppgave = true),
+                    ),
+                )
                 taAvVentService.taAvVent(behandling.id, taAvVentDto)
             }
 

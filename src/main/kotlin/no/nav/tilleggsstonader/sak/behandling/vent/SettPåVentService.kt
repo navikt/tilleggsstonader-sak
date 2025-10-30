@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
+import no.nav.tilleggsstonader.sak.behandling.vent.SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -72,8 +73,8 @@ class SettPåVentService(
             )
         settPåVentRepository.insert(settPåVent)
 
-        if (request.oppdaterOppgave) {
-            settOppgavePåVent(behandlingId, request)
+        if (request.oppgaveMetadata is OppdaterOppgave) {
+            settOppgavePåVent(behandlingId, request, request.oppgaveMetadata)
         }
 
         taskService.save(BehandlingsstatistikkTask.opprettVenterTask(behandlingId))
@@ -93,6 +94,7 @@ class SettPåVentService(
     private fun settOppgavePåVent(
         behandlingId: BehandlingId,
         request: SettBehandlingPåVent,
+        oppdaterOppgave: OppdaterOppgave,
     ): SettPåVentResponse {
         val oppgave = oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId)
         return oppgaveService.settPåVent(
@@ -100,7 +102,7 @@ class SettPåVentService(
                 oppgaveId = oppgave.gsakOppgaveId,
                 kommentar = request.kommentar,
                 frist = request.frist,
-                beholdOppgave = request.beholdOppgave,
+                beholdOppgave = oppdaterOppgave.beholdOppgave,
             ),
         )
     }

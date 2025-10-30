@@ -71,7 +71,12 @@ class TaAvVentServiceTest : IntegrationTest() {
                 OpprettOppgave(Oppgavetype.BehandleSak, tilordnetNavIdent = dummySaksbehandler),
             )
         testWithBrukerContext(dummySaksbehandler) {
-            settPåVentService.settPåVent(behandling.id, settBehandlingPåVent.copy(beholdOppgave = true))
+            settPåVentService.settPåVent(
+                behandling.id,
+                settBehandlingPåVent.copy(
+                    oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave(beholdOppgave = true),
+                ),
+            )
         }
     }
 
@@ -181,7 +186,12 @@ class TaAvVentServiceTest : IntegrationTest() {
             // Lagre informasjon på behandlingen som skal nullstilles
             taAvVentService.taAvVent(behandling.id)
             vilkårperiodeService.opprettVilkårperiode(dummyVilkårperiodeMålgruppe(behandlingId = behandling.id))
-            settPåVentService.settPåVent(behandling.id, settBehandlingPåVent.copy(beholdOppgave = true))
+            settPåVentService.settPåVent(
+                behandling.id,
+                settBehandlingPåVent.copy(
+                    oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave(beholdOppgave = true),
+                ),
+            )
 
             // Lag ny behandling som "sniker i køen" og blir iverksatt
             val behandlingSomSniker =
