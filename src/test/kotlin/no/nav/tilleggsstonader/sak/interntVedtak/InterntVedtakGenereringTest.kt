@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
-import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.behandlingId
+import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTestdata.behandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.FileUtil
@@ -58,8 +58,8 @@ class InterntVedtakGenereringTest {
 
     @BeforeEach
     fun setUp() {
-        every { totrinnskontrollService.hentTotrinnskontroll(behandlingId) } returns Testdata.totrinnskontroll
-        every { søknadService.hentSøknadMetadata(behandlingId) } returns Testdata.søknadMetadata
+        every { totrinnskontrollService.hentTotrinnskontroll(behandlingId) } returns InterntVedtakTestdata.totrinnskontroll
+        every { søknadService.hentSøknadMetadata(behandlingId) } returns InterntVedtakTestdata.søknadMetadata
     }
 
     @ParameterizedTest
@@ -111,39 +111,39 @@ class InterntVedtakGenereringTest {
     }
 
     private fun mockTilsynBarn() {
-        every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.TilsynBarn.behandling
-        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.TilsynBarn.vilkårperioder
-        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.TilsynBarn.grunnlagsdata
-        every { barnService.finnBarnPåBehandling(behandlingId) } returns Testdata.TilsynBarn.behandlingBarn
-        every { vilkårService.hentVilkår(behandlingId) } returns Testdata.TilsynBarn.vilkår
-        every { vedtakService.hentVedtak(behandlingId) } returns Testdata.TilsynBarn.vedtak
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.behandling
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.vilkårperioder
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.grunnlagsdata
+        every { barnService.finnBarnPåBehandling(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.behandlingBarn
+        every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.vilkår
+        every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.vedtak
     }
 
     private fun mockLæremidler() {
-        every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.Læremidler.behandling
-        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.Læremidler.vilkårperioder
-        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.Læremidler.grunnlagsdata
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.Læremidler.behandling
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.Læremidler.vilkårperioder
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.Læremidler.grunnlagsdata
         every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
         every { vilkårService.hentVilkår(behandlingId) } returns emptyList()
-        every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.innvilgetVedtak
+        every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.Læremidler.innvilgetVedtak
     }
 
     private fun mockBoutgifter() {
-        every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.Boutgifter.behandling
-        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.Boutgifter.vilkårperioder
-        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.Boutgifter.grunnlagsdata
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.Boutgifter.behandling
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.Boutgifter.vilkårperioder
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.Boutgifter.grunnlagsdata
         every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
-        every { vilkårService.hentVilkår(behandlingId) } returns Testdata.Boutgifter.vilkår
-        every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Boutgifter.innvilgetVedtak
+        every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.Boutgifter.vilkår
+        every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.Boutgifter.innvilgetVedtak
     }
 
     private fun mockDagligReise() {
-        every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.DagligReise.behandling
-        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.DagligReise.vilkårperioder
-        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.DagligReise.grunnlagsdata
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.DagligReise.behandling
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårperioder
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.DagligReise.grunnlagsdata
         every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
-        every { vilkårService.hentVilkår(behandlingId) } returns Testdata.DagligReise.vilkårOffentligTransport
-        every { vedtakService.hentVedtak(behandlingId) } returns Testdata.DagligReise.innvilgetVedtak
+        every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårOffentligTransport
+        every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.DagligReise.innvilgetVedtak
     }
 
     @Test

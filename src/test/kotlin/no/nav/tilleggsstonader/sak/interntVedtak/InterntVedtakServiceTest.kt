@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.behandlingId
+import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTestdata.behandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -57,20 +57,20 @@ class InterntVedtakServiceTest {
 
     @BeforeEach
     fun setUp() {
-        every { totrinnskontrollService.hentTotrinnskontroll(behandlingId) } returns Testdata.totrinnskontroll
-        every { søknadService.hentSøknadMetadata(behandlingId) } returns Testdata.søknadMetadata
+        every { totrinnskontrollService.hentTotrinnskontroll(behandlingId) } returns InterntVedtakTestdata.totrinnskontroll
+        every { søknadService.hentSøknadMetadata(behandlingId) } returns InterntVedtakTestdata.søknadMetadata
     }
 
     @Nested
     inner class TilsynBarn {
         @BeforeEach
         fun setUp() {
-            every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.TilsynBarn.behandling
-            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.TilsynBarn.vilkårperioder
-            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.TilsynBarn.grunnlagsdata
-            every { barnService.finnBarnPåBehandling(behandlingId) } returns Testdata.TilsynBarn.behandlingBarn
-            every { vilkårService.hentVilkår(behandlingId) } returns Testdata.TilsynBarn.vilkår
-            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.TilsynBarn.vedtak
+            every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.behandling
+            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.vilkårperioder
+            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.grunnlagsdata
+            every { barnService.finnBarnPåBehandling(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.behandlingBarn
+            every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.vilkår
+            every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.vedtak
         }
 
         @Test
@@ -78,13 +78,13 @@ class InterntVedtakServiceTest {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
             with(interntVedtak.behandling) {
-                assertThat(behandlingId).isEqualTo(Testdata.behandlingId)
+                assertThat(behandlingId).isEqualTo(InterntVedtakTestdata.behandlingId)
                 assertThat(eksternFagsakId).isEqualTo(1673L)
                 assertThat(stønadstype).isEqualTo(Stønadstype.BARNETILSYN)
-                assertThat(årsak).isEqualTo(Testdata.TilsynBarn.behandling.årsak)
-                assertThat(ident).isEqualTo(Testdata.TilsynBarn.behandling.ident)
-                assertThat(opprettetTidspunkt).isEqualTo(Testdata.TilsynBarn.behandling.opprettetTid)
-                assertThat(resultat).isEqualTo(Testdata.TilsynBarn.behandling.resultat)
+                assertThat(årsak).isEqualTo(InterntVedtakTestdata.TilsynBarn.behandling.årsak)
+                assertThat(ident).isEqualTo(InterntVedtakTestdata.TilsynBarn.behandling.ident)
+                assertThat(opprettetTidspunkt).isEqualTo(InterntVedtakTestdata.TilsynBarn.behandling.opprettetTid)
+                assertThat(resultat).isEqualTo(InterntVedtakTestdata.TilsynBarn.behandling.resultat)
                 assertThat(vedtakstidspunkt).isEqualTo(vedtakstidspunkt)
                 assertThat(saksbehandler).isEqualTo("saksbehandler")
                 assertThat(beslutter).isEqualTo("saksbeh2")
@@ -95,7 +95,7 @@ class InterntVedtakServiceTest {
         fun `søknadsfelter skal bli riktig mappet`() {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
-            assertThat(interntVedtak.søknad!!.mottattTidspunkt).isEqualTo(Testdata.søknadMetadata.mottattTidspunkt)
+            assertThat(interntVedtak.søknad!!.mottattTidspunkt).isEqualTo(InterntVedtakTestdata.søknadMetadata.mottattTidspunkt)
         }
 
         @Test
@@ -104,7 +104,7 @@ class InterntVedtakServiceTest {
             assertThat(interntVedtak.målgrupper).hasSize(3)
 
             val målgruppe =
-                Testdata.TilsynBarn.vilkårperioder.målgrupper
+                InterntVedtakTestdata.TilsynBarn.vilkårperioder.målgrupper
                     .single { it.type == MålgruppeType.AAP }
 
             with(interntVedtak.målgrupper.single { it.type == MålgruppeType.AAP }) {
@@ -127,7 +127,7 @@ class InterntVedtakServiceTest {
             assertThat(interntVedtak.aktiviteter).hasSize(2)
 
             val aktivitet =
-                Testdata.TilsynBarn.vilkårperioder.aktiviteter
+                InterntVedtakTestdata.TilsynBarn.vilkårperioder.aktiviteter
                     .single { it.resultat != ResultatVilkårperiode.SLETTET }
 
             with(interntVedtak.aktiviteter.single { it.resultat != ResultatVilkårperiode.SLETTET }) {
@@ -143,7 +143,7 @@ class InterntVedtakServiceTest {
                 }
             }
             val aktivitetSlettet =
-                Testdata.TilsynBarn.vilkårperioder.aktiviteter
+                InterntVedtakTestdata.TilsynBarn.vilkårperioder.aktiviteter
                     .single { it.resultat == ResultatVilkårperiode.SLETTET }
             with(interntVedtak.aktiviteter.single { it.resultat == ResultatVilkårperiode.SLETTET }) {
                 assertThat(resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
@@ -156,7 +156,7 @@ class InterntVedtakServiceTest {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
             val forventet =
-                Testdata.TilsynBarn.vedtak.data.beregningsresultat.perioder
+                InterntVedtakTestdata.TilsynBarn.vedtak.data.beregningsresultat.perioder
                     .single()
 
             with(interntVedtak.beregningsresultat!!.tilsynBarn!!.single()) {
@@ -186,12 +186,12 @@ class InterntVedtakServiceTest {
     inner class Læremidler {
         @BeforeEach
         fun setUp() {
-            every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.Læremidler.behandling
-            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.Læremidler.vilkårperioder
-            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.Læremidler.grunnlagsdata
+            every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.Læremidler.behandling
+            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.Læremidler.vilkårperioder
+            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.Læremidler.grunnlagsdata
             every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
             every { vilkårService.hentVilkår(behandlingId) } returns emptyList()
-            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.innvilgetVedtak
+            every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.Læremidler.innvilgetVedtak
         }
 
         @Test
@@ -227,12 +227,12 @@ class InterntVedtakServiceTest {
 
         @Test
         fun `beregningsfelter skal bli riktig mappet`() {
-            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.innvilgetVedtak
+            every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.Læremidler.innvilgetVedtak
 
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
             val forventet =
-                Testdata.Læremidler.beregningsresultat
+                InterntVedtakTestdata.Læremidler.beregningsresultat
                     .tilDto(null)
                     .perioder
                     .single()
@@ -249,9 +249,9 @@ class InterntVedtakServiceTest {
 
         @Test
         fun `Vedtak avslag skal mappes riktig`() {
-            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.avslåttVedtak
+            every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.Læremidler.avslåttVedtak
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
-            val dummyAvslåttVedtak = Testdata.Læremidler.avslåttVedtak.data
+            val dummyAvslåttVedtak = InterntVedtakTestdata.Læremidler.avslåttVedtak.data
 
             assertThat(interntVedtak.vedtak!!).isEqualTo(
                 VedtakAvslagInternt(
@@ -279,12 +279,12 @@ class InterntVedtakServiceTest {
     inner class Boutgifter {
         @BeforeEach
         fun setUp() {
-            every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.Boutgifter.behandling
-            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.Boutgifter.vilkårperioder
-            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns Testdata.Boutgifter.grunnlagsdata
+            every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.Boutgifter.behandling
+            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.Boutgifter.vilkårperioder
+            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.Boutgifter.grunnlagsdata
             every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
-            every { vilkårService.hentVilkår(behandlingId) } returns Testdata.Boutgifter.vilkår
-            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Boutgifter.innvilgetVedtak
+            every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.Boutgifter.vilkår
+            every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.Boutgifter.innvilgetVedtak
         }
 
         @Test
@@ -292,13 +292,13 @@ class InterntVedtakServiceTest {
             val interntVedtak = service.lagInterntVedtak(behandlingId)
 
             with(interntVedtak.behandling) {
-                assertThat(behandlingId).isEqualTo(Testdata.behandlingId)
+                assertThat(behandlingId).isEqualTo(InterntVedtakTestdata.behandlingId)
                 assertThat(eksternFagsakId).isEqualTo(1673L)
                 assertThat(stønadstype).isEqualTo(Stønadstype.BOUTGIFTER)
-                assertThat(årsak).isEqualTo(Testdata.Boutgifter.behandling.årsak)
-                assertThat(ident).isEqualTo(Testdata.Boutgifter.behandling.ident)
-                assertThat(opprettetTidspunkt).isEqualTo(Testdata.Boutgifter.behandling.opprettetTid)
-                assertThat(resultat).isEqualTo(Testdata.Boutgifter.behandling.resultat)
+                assertThat(årsak).isEqualTo(InterntVedtakTestdata.Boutgifter.behandling.årsak)
+                assertThat(ident).isEqualTo(InterntVedtakTestdata.Boutgifter.behandling.ident)
+                assertThat(opprettetTidspunkt).isEqualTo(InterntVedtakTestdata.Boutgifter.behandling.opprettetTid)
+                assertThat(resultat).isEqualTo(InterntVedtakTestdata.Boutgifter.behandling.resultat)
                 assertThat(vedtakstidspunkt).isEqualTo(vedtakstidspunkt)
                 assertThat(saksbehandler).isEqualTo("saksbehandler")
                 assertThat(beslutter).isEqualTo("saksbeh2")
@@ -309,7 +309,7 @@ class InterntVedtakServiceTest {
         fun `søknadsfelter skal bli riktig mappet`() {
             val interntVedtak = service.lagInterntVedtak(behandlingId)
 
-            assertThat(interntVedtak.søknad!!.mottattTidspunkt).isEqualTo(Testdata.søknadMetadata.mottattTidspunkt)
+            assertThat(interntVedtak.søknad!!.mottattTidspunkt).isEqualTo(InterntVedtakTestdata.søknadMetadata.mottattTidspunkt)
         }
 
         @Test
@@ -318,7 +318,7 @@ class InterntVedtakServiceTest {
             assertThat(interntVedtak.målgrupper).hasSize(3)
 
             val målgruppe =
-                Testdata.Boutgifter.vilkårperioder.målgrupper
+                InterntVedtakTestdata.Boutgifter.vilkårperioder.målgrupper
                     .single { it.type == MålgruppeType.AAP }
 
             with(interntVedtak.målgrupper.single { it.type == MålgruppeType.AAP }) {
@@ -341,7 +341,7 @@ class InterntVedtakServiceTest {
             assertThat(interntVedtak.aktiviteter).hasSize(2)
 
             val oppfyltAktivitet =
-                Testdata.Boutgifter.vilkårperioder.aktiviteter
+                InterntVedtakTestdata.Boutgifter.vilkårperioder.aktiviteter
                     .single { it.resultat == ResultatVilkårperiode.OPPFYLT }
 
             with(interntVedtak.aktiviteter.single { it.resultat == ResultatVilkårperiode.OPPFYLT }) {
@@ -358,7 +358,7 @@ class InterntVedtakServiceTest {
             }
 
             val ikkeOppfyltAktivitet =
-                Testdata.Boutgifter.vilkårperioder.aktiviteter
+                InterntVedtakTestdata.Boutgifter.vilkårperioder.aktiviteter
                     .single { it.resultat == ResultatVilkårperiode.IKKE_OPPFYLT }
             with(interntVedtak.aktiviteter.single { it.resultat == ResultatVilkårperiode.IKKE_OPPFYLT }) {
                 assertThat(type).isEqualTo(AktivitetType.UTDANNING)
@@ -380,7 +380,7 @@ class InterntVedtakServiceTest {
             assertThat(interntVedtak.beregningsresultat!!.boutgifter!!.size).isEqualTo(2)
 
             val forventet =
-                Testdata.Boutgifter.innvilgetVedtak.data.beregningsresultat.perioder
+                InterntVedtakTestdata.Boutgifter.innvilgetVedtak.data.beregningsresultat.perioder
                     .first()
 
             with(interntVedtak.beregningsresultat.boutgifter.first()) {
@@ -406,7 +406,7 @@ class InterntVedtakServiceTest {
 
         @Test
         fun `Vedtak avslag skal mappes riktig`() {
-            val dummyAvslåttVedtak = Testdata.Boutgifter.avslåttVedtak
+            val dummyAvslåttVedtak = InterntVedtakTestdata.Boutgifter.avslåttVedtak
             every { vedtakService.hentVedtak(behandlingId) } returns dummyAvslåttVedtak
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
@@ -420,7 +420,7 @@ class InterntVedtakServiceTest {
 
         @Test
         fun `Opphør skal mappes riktig`() {
-            val dummyOpphørtVedtak = Testdata.Boutgifter.opphørtVedtak
+            val dummyOpphørtVedtak = InterntVedtakTestdata.Boutgifter.opphørtVedtak
             every { vedtakService.hentVedtak(behandlingId) } returns dummyOpphørtVedtak
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 

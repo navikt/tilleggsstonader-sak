@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.behandlingId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -49,6 +48,8 @@ object TilsynBarnTestUtil {
 
     val defaultBehandling = behandling()
     val defaultVedtaksperiodeId = UUID.randomUUID()
+
+    val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")
 
     val defaultBarn1 = BehandlingBarn(behandlingId = behandlingId, ident = "1")
     val defaultBarn2 = BehandlingBarn(behandlingId = behandlingId, ident = "2")

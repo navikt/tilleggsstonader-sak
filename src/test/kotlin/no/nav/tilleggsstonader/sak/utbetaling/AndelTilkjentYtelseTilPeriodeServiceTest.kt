@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.utbetaling
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.interntVedtak.Testdata
+import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTestdata
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.nullAndel
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
@@ -23,7 +23,7 @@ class AndelTilkjentYtelseTilPeriodeServiceTest {
         val behandlingId = BehandlingId.random()
         every { tilkjentYtelseService.hentForBehandling(behandlingId) } returns
             tilkjentYtelse(behandlingId = behandlingId, andeler = arrayOf(nullAndel()))
-        every { vedtakservice.hentVedtak(behandlingId) } returns Testdata.Boutgifter.innvilgetVedtak
+        every { vedtakservice.hentVedtak(behandlingId) } returns InterntVedtakTestdata.Boutgifter.innvilgetVedtak
 
         val response = andelTilkjentYtelseTilPeriodeService.mapAndelerTilVedtaksperiodeForBehandling(behandlingId)
         assertThat(response).hasSize(1)
@@ -35,7 +35,7 @@ class AndelTilkjentYtelseTilPeriodeServiceTest {
 
     @Test
     fun `mapAndelerTilVedtaksperiodeForBehandling, andeler mappes`() {
-        val vedtak = Testdata.Boutgifter.innvilgetVedtak
+        val vedtak = InterntVedtakTestdata.Boutgifter.innvilgetVedtak
 
         val behandlingId = BehandlingId.random()
         every { tilkjentYtelseService.hentForBehandling(behandlingId) } returns
