@@ -94,7 +94,7 @@
     },
     "aktiviteter": {
       "aktiviteterOgMaalgruppe": {
-        "134124111": false,
+        "134124111": true,
         "134125430": true,
         "annet": false
       },
