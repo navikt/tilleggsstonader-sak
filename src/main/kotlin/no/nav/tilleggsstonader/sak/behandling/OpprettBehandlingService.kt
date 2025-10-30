@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingTypeV2
@@ -9,8 +11,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.OPPRETTET
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.SATT_PÅ_VENT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -27,6 +28,7 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 class OpprettBehandlingService(
@@ -35,17 +37,11 @@ class OpprettBehandlingService(
     private val behandlingshistorikkService: BehandlingshistorikkService,
     private val unleashService: UnleashService,
     private val settPåVentService: SettPåVentService,
+    private val taskService: TaskService,
 ) {
     @Transactional
-    fun opprettBehandling(
-        fagsakId: FagsakId,
-        status: BehandlingStatus = BehandlingStatus.OPPRETTET,
-        stegType: StegType = StegType.INNGANGSVILKÅR,
-        behandlingsårsak: BehandlingÅrsak,
-        kravMottatt: LocalDate? = null,
-        nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
-    ): Behandling {
-        brukerfeilHvis(kravMottatt != null && kravMottatt.isAfter(LocalDate.now())) {
+    fun opprettBehandling(request: OpprettBehandling): Behandling {
+        brukerfeilHvis(request.kravMottatt != null && request.kravMottatt.isAfter(LocalDate.now())) {
             "Kan ikke sette krav mottattdato frem i tid"
         }
         feilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_BEHANDLING)) {
@@ -55,8 +51,8 @@ class OpprettBehandlingService(
         val kanHaFlereBehandlingerPåSammeFagsak =
             unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK)
 
-        val tidligereBehandlinger = behandlingRepository.findByFagsakId(fagsakId)
-        val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
+        val tidligereBehandlinger = behandlingRepository.findByFagsakId(request.fagsakId)
+        val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
         val behandlingType =
             when (kanHaFlereBehandlingerPåSammeFagsak) {
                 true -> utledBehandlingTypeV2(tidligereBehandlinger)
@@ -72,16 +68,16 @@ class OpprettBehandlingService(
         val behandling =
             behandlingRepository.insert(
                 Behandling(
-                    fagsakId = fagsakId,
+                    fagsakId = request.fagsakId,
                     forrigeIverksatteBehandlingId = forrigeBehandling?.id,
                     type = behandlingType,
-                    steg = stegType,
-                    status = status,
+                    steg = request.stegType,
+                    status = request.status,
                     resultat = BehandlingResultat.IKKE_SATT,
-                    årsak = behandlingsårsak,
-                    kravMottatt = kravMottatt,
+                    årsak = request.behandlingsårsak,
+                    kravMottatt = request.kravMottatt,
                     kategori = BehandlingKategori.NASJONAL,
-                    nyeOpplysningerMetadata = nyeOpplysningerMetadata,
+                    nyeOpplysningerMetadata = request.nyeOpplysningerMetadata,
                 ),
             )
         eksternBehandlingIdRepository.insert(EksternBehandlingId(behandlingId = behandling.id))
@@ -90,11 +86,46 @@ class OpprettBehandlingService(
             behandlingshistorikk =
                 Behandlingshistorikk(
                     behandlingId = behandling.id,
-                    steg = stegType,
+                    steg = request.stegType,
                     gitVersjon = Applikasjonsversjon.versjon,
                 ),
         )
 
+        if (request.oppgaveMetadata is OpprettBehandlingOppgaveMetadata.OppgaveMetadata) {
+            taskService.save(
+                OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                    OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                        behandlingId = behandling.id,
+                        saksbehandler = request.oppgaveMetadata.tilordneSaksbehandler,
+                        beskrivelse = request.oppgaveMetadata.beskrivelse,
+                        // TODO - brukes for å opprette BehandlingsstatistikkTask.opprettMottattTask - bør heller opprette tasken her
+                        hendelseTidspunkt = behandling.kravMottatt?.atStartOfDay() ?: LocalDateTime.now(),
+                        prioritet = request.oppgaveMetadata.prioritet,
+                    ),
+                ),
+            )
+        }
+
         return behandling
     }
+}
+
+data class OpprettBehandling(
+    val fagsakId: FagsakId,
+    val status: BehandlingStatus = BehandlingStatus.OPPRETTET,
+    val stegType: StegType = StegType.INNGANGSVILKÅR,
+    val behandlingsårsak: BehandlingÅrsak,
+    val kravMottatt: LocalDate? = null,
+    val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
+    val oppgaveMetadata: OpprettBehandlingOppgaveMetadata,
+)
+
+sealed interface OpprettBehandlingOppgaveMetadata {
+    data class OppgaveMetadata(
+        val tilordneSaksbehandler: String?,
+        val beskrivelse: String?,
+        val prioritet: OppgavePrioritet,
+    ) : OpprettBehandlingOppgaveMetadata
+
+    data object UtenOppgave : OpprettBehandlingOppgaveMetadata
 }

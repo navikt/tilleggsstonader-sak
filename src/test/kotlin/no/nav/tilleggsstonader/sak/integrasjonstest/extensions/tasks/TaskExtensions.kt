@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
+import org.assertj.core.api.Assertions.assertThat
 import org.springframework.data.domain.Pageable
 
 fun IntegrationTest.kjørTasksKlareForProsesseringTilIngenTasksIgjen() {
@@ -46,3 +47,10 @@ private fun taskMsg(it: Task): String =
 
         else -> it.payload
     }
+
+fun IntegrationTest.assertFinnesTaskMedType(
+    type: String,
+    antall: Int = 1,
+) {
+    assertThat(taskService.finnAlleTasksKlareForProsessering(Pageable.unpaged()).filter { it.type == type }).hasSize(antall)
+}

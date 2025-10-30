@@ -9,15 +9,17 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandling
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Journalposttype
-import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -125,6 +127,7 @@ class JournalføringService(
                 fagsak = fagsak,
                 journalpost = journalpostMedOppdatertTema,
                 behandlingÅrsak = behandlingÅrsak,
+                oppgaveBeskrivelse = oppgaveBeskrivelse,
             )
 
         val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
@@ -144,16 +147,6 @@ class JournalføringService(
             dokumentTitler = dokumentTitler,
             logiskVedlegg = logiskVedlegg,
             avsenderMottaker = avsenderMottaker,
-        )
-
-        taskService.save(
-            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
-                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                    behandlingId = behandling.id,
-                    saksbehandler = null, // Behandle sak oppgaven skal være ufordelt
-                    beskrivelse = oppgaveBeskrivelse,
-                ),
-            ),
         )
     }
 
@@ -234,12 +227,21 @@ class JournalføringService(
         fagsak: Fagsak,
         journalpost: Journalpost,
         behandlingÅrsak: BehandlingÅrsak,
+        oppgaveBeskrivelse: String?,
     ): Behandling {
         val behandling =
             opprettBehandlingService.opprettBehandling(
-                fagsakId = fagsak.id,
-                behandlingsårsak = behandlingÅrsak,
-                kravMottatt = journalpost.datoMottatt?.toLocalDate(),
+                OpprettBehandling(
+                    fagsakId = fagsak.id,
+                    behandlingsårsak = behandlingÅrsak,
+                    kravMottatt = journalpost.datoMottatt?.toLocalDate(),
+                    oppgaveMetadata =
+                        OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
+                            tilordneSaksbehandler = null, // Behandle sak oppgaven skal være ufordelt
+                            beskrivelse = oppgaveBeskrivelse,
+                            prioritet = OppgavePrioritet.NORM,
+                        ),
+                ),
             )
 
         behandlingService.leggTilBehandlingsjournalpost(journalpost.journalpostId, Journalposttype.I, behandling.id)

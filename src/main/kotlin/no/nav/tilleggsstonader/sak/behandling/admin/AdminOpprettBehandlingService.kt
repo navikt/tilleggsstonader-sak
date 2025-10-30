@@ -2,14 +2,15 @@ package no.nav.tilleggsstonader.sak.behandling.admin
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandling
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
@@ -52,17 +53,23 @@ class AdminOpprettBehandlingService(
             if (medBrev) BehandlingÅrsak.MANUELT_OPPRETTET else BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV
         val behandling =
             opprettBehandlingService.opprettBehandling(
-                fagsakId = fagsak.id,
-                behandlingsårsak = behandlingsårsak,
-                kravMottatt = kravMottatt,
+                OpprettBehandling(
+                    fagsakId = fagsak.id,
+                    behandlingsårsak = behandlingsårsak,
+                    kravMottatt = kravMottatt,
+                    oppgaveMetadata =
+                        OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
+                            tilordneSaksbehandler = SikkerhetContext.hentSaksbehandler(),
+                            beskrivelse = "Manuelt opprettet sak fra journalpost. Skal saksbehandles i ny løsning.",
+                            prioritet = OppgavePrioritet.NORM,
+                        ),
+                ),
             )
 
         if (valgteBarn.isNotEmpty()) {
             val behandlingBarn = valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) }
             barnService.opprettBarn(behandlingBarn)
         }
-
-        opprettBehandleSakOppgave(behandling)
 
         return behandling.id
     }
@@ -112,18 +119,6 @@ class AdminOpprettBehandlingService(
                     )
                 },
         )
-    }
-
-    private fun opprettBehandleSakOppgave(behandling: Behandling) {
-        val task =
-            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
-                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                    behandlingId = behandling.id,
-                    saksbehandler = SikkerhetContext.hentSaksbehandler(),
-                    beskrivelse = "Manuelt opprettet sak fra journalpost. Skal saksbehandles i ny løsning.",
-                ),
-            )
-        taskService.save(task)
     }
 
     private fun validerAtBarnFinnesPåPerson(

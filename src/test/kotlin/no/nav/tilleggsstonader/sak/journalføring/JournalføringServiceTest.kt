@@ -5,7 +5,6 @@ import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
@@ -18,10 +17,13 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandling
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -29,7 +31,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -104,8 +105,8 @@ class JournalføringServiceTest {
             journalforendeEnhet = "123",
             avsenderMottaker = avsenderMottaker,
         )
+    val oppgaveBeskrivelse = "Beskrivelse"
 
-    val taskSlot = slot<Task>()
     val nyAvsenderSlot = slot<AvsenderMottaker?>()
 
     @BeforeEach
@@ -116,7 +117,6 @@ class JournalføringServiceTest {
         justRun { behandlingService.leggTilBehandlingsjournalpost(any(), any(), any()) }
         every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
 
-        every { taskService.save(capture(taskSlot)) } returns mockk()
         every { personService.hentFolkeregisterIdenter(personIdent) } returns
             PdlIdenter(listOf(PdlIdent(personIdent, false, "FOLKEREGISTERIDENT")))
         justRun { oppgaveService.ferdigstillOppgave(any()) }
@@ -140,7 +140,6 @@ class JournalføringServiceTest {
 
     @AfterEach
     fun tearDown() {
-        taskSlot.clear()
         nyAvsenderSlot.clear()
     }
 
@@ -161,29 +160,43 @@ class JournalføringServiceTest {
     internal fun `skal kunne journalføre og opprette behandling`() {
         every {
             opprettBehandlingService.opprettBehandling(
-                fagsakId = fagsak.id,
-                behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                OpprettBehandling(
+                    fagsakId = fagsak.id,
+                    behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                    oppgaveMetadata =
+                        OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
+                            tilordneSaksbehandler = null,
+                            beskrivelse = oppgaveBeskrivelse,
+                            prioritet = OppgavePrioritet.NORM,
+                        ),
+                ),
             )
         } returns behandling(fagsak = fagsak)
 
         journalføringService.journalførTilNyBehandling(
-            journalpost,
-            personIdent,
-            Stønadstype.BARNETILSYN,
-            BehandlingÅrsak.SØKNAD,
-            "beskrivelse",
-            enhet,
+            journalpost = journalpost,
+            personIdent = personIdent,
+            stønadstype = Stønadstype.BARNETILSYN,
+            behandlingÅrsak = BehandlingÅrsak.SØKNAD,
+            oppgaveBeskrivelse = oppgaveBeskrivelse,
+            journalførendeEnhet = enhet,
         )
 
         verify(exactly = 1) {
             opprettBehandlingService.opprettBehandling(
-                fagsakId = fagsak.id,
-                behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                OpprettBehandling(
+                    fagsakId = fagsak.id,
+                    behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                    oppgaveMetadata =
+                        OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
+                            tilordneSaksbehandler = null,
+                            beskrivelse = oppgaveBeskrivelse,
+                            prioritet = OppgavePrioritet.NORM,
+                        ),
+                ),
             )
         }
         verifyOppdaterOgFerdigstilJournalpost(1)
-
-        assertThat(taskSlot.captured.type).isEqualTo(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
     }
 
     @Test
@@ -244,7 +257,7 @@ class JournalføringServiceTest {
 
             journalføringService.fullførJournalpost(requestJournalfør, journalpost)
 
-            verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
+            verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any()) }
             verifyOppdaterOgFerdigstilJournalpost(1)
         }
     }
@@ -273,11 +286,11 @@ class JournalføringServiceTest {
         @Test
         fun `kan opprette revurdering for ettersending`() {
             every { behandlingService.finnesBehandlingForFagsak(fagsak.id) } returns true
-            every { opprettBehandlingService.opprettBehandling(any(), any(), any(), any(), any()) } returns
+            every { opprettBehandlingService.opprettBehandling(any()) } returns
                 behandling(fagsak = fagsak)
 
             journalføringService.fullførJournalpost(requestOpprettBehandling, journalpost)
-            verify(exactly = 1) { opprettBehandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
+            verify(exactly = 1) { opprettBehandlingService.opprettBehandling(any()) }
             verifyOppdaterOgFerdigstilJournalpost(1)
         }
 
@@ -287,7 +300,7 @@ class JournalføringServiceTest {
 
             journalføringService.fullførJournalpost(requestJournalfør, journalpost)
 
-            verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
+            verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any()) }
             verifyOppdaterOgFerdigstilJournalpost(1)
         }
     }
@@ -322,7 +335,7 @@ class JournalføringServiceTest {
         @BeforeEach
         fun setUp() {
             every { behandlingService.finnesBehandlingForFagsak(any()) } returns true
-            every { opprettBehandlingService.opprettBehandling(any(), any(), any(), any()) } returns nyBehandling
+            every { opprettBehandlingService.opprettBehandling(any()) } returns nyBehandling
             every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(forrigeBehandling)
             every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()
             every { barnService.finnBarnPåBehandling(nyBehandling.id) } returns eksisterendeBarn.map { it.tilBehandlingBarn() }
@@ -409,8 +422,16 @@ class JournalføringServiceTest {
             every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()
             every {
                 opprettBehandlingService.opprettBehandling(
-                    fagsakId = fagsak.id,
-                    behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                    OpprettBehandling(
+                        fagsakId = fagsak.id,
+                        behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                        oppgaveMetadata =
+                            OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
+                                tilordneSaksbehandler = null,
+                                beskrivelse = oppgaveBeskrivelse,
+                                prioritet = OppgavePrioritet.NORM,
+                            ),
+                    ),
                 )
             } returns behandling(fagsak = fagsak)
 
@@ -419,20 +440,26 @@ class JournalføringServiceTest {
                 personIdent,
                 Stønadstype.BOUTGIFTER,
                 BehandlingÅrsak.SØKNAD,
-                "beskrivelse",
+                oppgaveBeskrivelse,
                 enhet,
             )
 
             verify(exactly = 1) {
                 opprettBehandlingService.opprettBehandling(
-                    fagsakId = fagsak.id,
-                    behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                    OpprettBehandling(
+                        fagsakId = fagsak.id,
+                        behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                        oppgaveMetadata =
+                            OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
+                                tilordneSaksbehandler = null,
+                                beskrivelse = oppgaveBeskrivelse,
+                                prioritet = OppgavePrioritet.NORM,
+                            ),
+                    ),
                 )
             }
             verifyOppdaterOgFerdigstilJournalpost(1)
             verify(exactly = 1) { søknadService.lagreSøknad(any(), any(), any()) }
-
-            assertThat(taskSlot.captured.type).isEqualTo(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
         }
     }
 
