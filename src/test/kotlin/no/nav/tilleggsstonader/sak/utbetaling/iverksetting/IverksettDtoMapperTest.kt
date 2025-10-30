@@ -8,25 +8,19 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil.totrinnskontroll
+import no.nav.tilleggsstonader.sak.util.totrinnskontroll
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.UUID
 
 class IverksettDtoMapperTest {
-    val iverksettingId = UUID.randomUUID()
+    val iverksettingId: UUID = UUID.randomUUID()
     val fagsak = fagsak(identer = setOf(PersonIdent("ident1")), eksternId = EksternFagsakId(200, FagsakId.random()))
     val behandling = saksbehandling(fagsak = fagsak, behandling = behandling(vedtakstidspunkt = LocalDateTime.now()))
     val iverksetting = Iverksetting(iverksettingId, LocalDateTime.now())
     val andel = andelTilkjentYtelse(kildeBehandlingId = behandling.id, beløp = 100, iverksetting = iverksetting)
-    val totrinnskontroll =
-        totrinnskontroll(
-            status = TotrinnInternStatus.GODKJENT,
-            saksbehandler = "saksbehandler",
-            beslutter = "beslutter",
-        )
+    val totrinnskontroll = totrinnskontroll(behandling.id)
 
     @Test
     fun `skal mappe felter riktig`() {

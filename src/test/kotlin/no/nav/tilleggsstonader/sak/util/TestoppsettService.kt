@@ -191,16 +191,6 @@ class TestoppsettService(
 
     fun lagreTotrinnskontroll(totrinnskontroll: Totrinnskontroll): Totrinnskontroll = totrinnskontrollRepository.insert(totrinnskontroll)
 
-    private fun lagreTotrinnskontroll(behandling: Behandling) {
-        totrinnskontrollRepository.insert(
-            totrinnskontroll(
-                status = TotrinnInternStatus.GODKJENT,
-                behandlingId = behandling.id,
-                beslutter = "beslutter",
-            ),
-        )
-    }
-
     private fun hentEllerOpprettPerson(fagsak: Fagsak): FagsakPerson =
         fagsakPersonRepository.findByIdOrNull(fagsak.fagsakPersonId)
             ?: hentPersonFraIdenter(fagsak)
