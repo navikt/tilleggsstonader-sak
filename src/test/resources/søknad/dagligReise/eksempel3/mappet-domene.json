@@ -14,21 +14,19 @@
     "arbeidOgOpphold" : null
   },
   "aktivitet" : {
-    "aktivitet" : {
-      "aktiviteter" : [ {
-        "id" : "ANNET",
-        "label" : "Ingen relevant aktivitet registrert på meg"
-      } ],
-      "annenAktivitet" : "TILTAK",
-      "lønnetAktivitet" : null
-    },
+    "aktiviteter" : [ {
+      "id" : "annet",
+      "label" : "Annet",
+      "type" : null
+    } ],
     "dekkesUtgiftenAvAndre" : {
       "typeUtdanning" : "VIDEREGÅENDE",
       "lærling" : "JA",
       "arbeidsgiverDekkerUtgift" : "JA",
       "mottarIkkeSkoleskyss" : true,
       "lønnetAktivitet" : "JA"
-    }
+    },
+    "annenAktivitet" : "TILTAK"
   },
   "reiser" : [ {
     "skalReiseFraFolkeregistrertAdresse" : "JA",

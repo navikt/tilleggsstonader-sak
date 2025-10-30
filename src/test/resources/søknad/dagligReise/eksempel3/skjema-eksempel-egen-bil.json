@@ -32,10 +32,9 @@
   },
   "aktiviteter": {
     "aktiviteterOgMaalgruppe": {
-      "aktivitet": {
-        "aktivitetId": "ingenAktivitet",
-        "text": "Ingen relevant aktivitet registrert på meg"
-      }
+      "134124111": false,
+      "134125430": false,
+      "annet": true
     },
     "arbeidsrettetAktivitet": "tiltakArbeidsrettetUtredning",
     "faktiskeUtgifter": {
@@ -78,5 +77,29 @@
       "ferge": 0,
       "piggdekkavgift": 22
     }
-  ]
+  ],
+  "metadata": {
+    "dataFetcher": {
+      "aktiviteter": {
+        "aktiviteterOgMaalgruppe": {
+          "data": [
+            {
+              "value": "134125430",
+              "label": "Høyere utdanning: 10. september 2025 - 30. juni 2026",
+              "type": "TILTAK"
+            },
+            {
+              "value": "134124111",
+              "label": "Arbeidstrening: 16. juni 2025 - 31. juli 2025",
+              "type": "TILTAK"
+            },
+            {
+              "label": "Annet",
+              "value": "annet"
+            }
+          ]
+        }
+      }
+    }
+  }
 }

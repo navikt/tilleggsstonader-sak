@@ -33,21 +33,19 @@
     }
   },
   "aktivitet" : {
-    "aktivitet" : {
-      "aktiviteter" : [ {
-        "id" : "123",
-        "label" : "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
-      } ],
-      "annenAktivitet" : "TILTAK",
-      "lønnetAktivitet" : null
-    },
+    "aktiviteter" : [ {
+      "id" : "134125430",
+      "label" : "Høyere utdanning: 10. september 2025 - 30. juni 2026",
+      "type" : "TILTAK"
+    } ],
     "dekkesUtgiftenAvAndre" : {
       "typeUtdanning" : "VIDEREGÅENDE",
       "lærling" : "JA",
       "arbeidsgiverDekkerUtgift" : "JA",
       "mottarIkkeSkoleskyss" : true,
       "lønnetAktivitet" : "JA"
-    }
+    },
+    "annenAktivitet" : "TILTAK"
   },
   "reiser" : [ {
     "skalReiseFraFolkeregistrertAdresse" : "NEI",

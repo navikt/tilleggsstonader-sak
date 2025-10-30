@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Personopplysninger
 import java.time.LocalDate
@@ -15,8 +15,15 @@ data class SkjemaDagligReise(
 )
 
 data class AktivitetDagligReiseAvsnitt(
-    val aktivitet: AktivitetAvsnitt,
+    val aktiviteter: List<AktivitetDagligReise>?,
     val dekkesUtgiftenAvAndre: DekkesUtgiftenAvAndre,
+    val annenAktivitet: AnnenAktivitetType?,
+)
+
+data class AktivitetDagligReise(
+    val id: String,
+    val label: String,
+    val type: String?,
 )
 
 data class DekkesUtgiftenAvAndre(
