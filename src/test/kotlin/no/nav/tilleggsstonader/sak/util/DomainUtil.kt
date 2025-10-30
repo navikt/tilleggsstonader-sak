@@ -45,6 +45,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
@@ -472,4 +476,20 @@ fun nyeOpplysningerMetadata(
     kilde = kilde,
     endringer = endringer,
     beskrivelse = beskrivelse,
+)
+
+fun totrinnskontroll(
+    behandlingId: BehandlingId,
+    status: TotrinnInternStatus = TotrinnInternStatus.GODKJENT,
+    saksbehandler: String = "saksbehandler",
+    årsakerUnderkjent: List<ÅrsakUnderkjent> = emptyList(),
+    beslutter: String? = "beslutter",
+    begrunnelse: String? = null,
+) = Totrinnskontroll(
+    behandlingId = behandlingId,
+    saksbehandler = saksbehandler,
+    status = status,
+    årsakerUnderkjent = Årsaker(årsakerUnderkjent),
+    beslutter = beslutter,
+    begrunnelse = begrunnelse,
 )

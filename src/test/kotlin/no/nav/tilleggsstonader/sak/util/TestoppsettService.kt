@@ -34,6 +34,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.tilBehandlingResult
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollRepository
 import org.springframework.context.annotation.Profile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -51,6 +53,7 @@ class TestoppsettService(
     private val faktaGrunnlagService: FaktaGrunnlagService,
     private val vedtakRepository: VedtakRepository,
     private val skjemaRoutingRepository: SkjemaRoutingRepository,
+    private val totrinnskontrollRepository: TotrinnskontrollRepository,
 ) {
     fun hentFagsak(fagsakId: FagsakId) = fagsakService.hentFagsak(fagsakId)
 
@@ -185,6 +188,18 @@ class TestoppsettService(
         ident: String,
         type: Skjematype,
     ) = skjemaRoutingRepository.findByIdentAndType(ident, type)
+
+    fun lagreTotrinnskontroll(totrinnskontroll: Totrinnskontroll): Totrinnskontroll = totrinnskontrollRepository.insert(totrinnskontroll)
+
+    private fun lagreTotrinnskontroll(behandling: Behandling) {
+        totrinnskontrollRepository.insert(
+            totrinnskontroll(
+                status = TotrinnInternStatus.GODKJENT,
+                behandlingId = behandling.id,
+                beslutter = "beslutter",
+            ),
+        )
+    }
 
     private fun hentEllerOpprettPerson(fagsak: Fagsak): FagsakPerson =
         fagsakPersonRepository.findByIdOrNull(fagsak.fagsakPersonId)

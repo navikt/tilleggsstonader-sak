@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -33,7 +33,7 @@ class TotrinnskontrollRepositoryTest : IntegrationTest() {
                 ),
             )
         val totrinnskontrollFraDb = totrinnskontrollRepository.findByIdOrThrow(totrinnskontroll.id)
-        assertThat(totrinnskontrollFraDb).isEqualTo(totrinnskontroll)
+        Assertions.assertThat(totrinnskontrollFraDb).isEqualTo(totrinnskontroll)
     }
 
     @Nested
@@ -49,7 +49,8 @@ class TotrinnskontrollRepositoryTest : IntegrationTest() {
                         sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(1)),
                     ),
                 )
-            assertThat(totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandling.id))
+            Assertions
+                .assertThat(totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandling.id))
                 .isEqualTo(totrinnskontrollFirst)
 
             val totrinnskontrollSecond =
@@ -61,7 +62,8 @@ class TotrinnskontrollRepositoryTest : IntegrationTest() {
                         sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
                     ),
                 )
-            assertThat(totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandling.id))
+            Assertions
+                .assertThat(totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandling.id))
                 .isEqualTo(totrinnskontrollSecond)
         }
     }
@@ -78,7 +80,7 @@ class TotrinnskontrollRepositoryTest : IntegrationTest() {
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(1)),
                 ),
             )
-            assertThat(finnSisteSomIkkeErAngret()).isNull()
+            Assertions.assertThat(finnSisteSomIkkeErAngret()).isNull()
 
             val totrinnskontrollSecond =
                 lagreOgOppdaterEndretTidTilOpprettetTid(
@@ -89,7 +91,7 @@ class TotrinnskontrollRepositoryTest : IntegrationTest() {
                         sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
                     ),
                 )
-            assertThat(finnSisteSomIkkeErAngret()).isEqualTo(totrinnskontrollSecond)
+            Assertions.assertThat(finnSisteSomIkkeErAngret()).isEqualTo(totrinnskontrollSecond)
         }
 
         private fun finnSisteSomIkkeErAngret() =

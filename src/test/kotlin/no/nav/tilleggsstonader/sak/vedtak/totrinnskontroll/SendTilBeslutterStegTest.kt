@@ -32,10 +32,10 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.oppgave
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.util.totrinnskontroll
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil.totrinnskontroll
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -135,7 +135,8 @@ class SendTilBeslutterStegTest {
 
     @Test
     internal fun `Skal avslutte oppgave BehandleUnderkjentVedtak hvis den finnes`() {
-        every { totrinnskontrollService.hentTotrinnskontroll(any()) } returns totrinnskontroll(status = TotrinnInternStatus.UNDERKJENT)
+        every { totrinnskontrollService.hentTotrinnskontroll(any()) } returns
+            totrinnskontroll(behandling.id, status = TotrinnInternStatus.UNDERKJENT)
 
         utførOgVerifiserKall(Oppgavetype.BehandleUnderkjentVedtak)
     }
