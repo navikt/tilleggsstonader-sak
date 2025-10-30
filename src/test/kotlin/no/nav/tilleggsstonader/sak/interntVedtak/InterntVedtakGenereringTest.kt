@@ -21,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -85,7 +84,6 @@ class InterntVedtakGenereringTest {
      * Formatter htmlfil etter generering for å unngå stor diff
      */
 
-    @Disabled
     @ParameterizedTest
     @MethodSource("stønadstyperInterntVedtak")
     fun `lager html og pdf`(type: StønadstypeInterntVedtak) {
@@ -106,7 +104,6 @@ class InterntVedtakGenereringTest {
             Stønadstype.BOUTGIFTER -> mockBoutgifter()
             Stønadstype.DAGLIG_REISE_TSO -> mockDagligReise()
             Stønadstype.DAGLIG_REISE_TSR -> mockDagligReise()
-            else -> error("Har ikke mapping for ${type.stønadstype}")
         }
     }
 
@@ -207,8 +204,8 @@ class InterntVedtakGenereringTest {
             val håndteresAvInterntVedtak: Boolean,
         )
 
-        private fun Stønadstype.håndteres() = StønadstypeInterntVedtak(this, true)
+        private fun Stønadstype.håndteres() = StønadstypeInterntVedtak(stønadstype = this, håndteresAvInterntVedtak = true)
 
-        private fun Stønadstype.håndteresIkke() = StønadstypeInterntVedtak(this, false)
+        private fun Stønadstype.håndteresIkke() = StønadstypeInterntVedtak(stønadstype = this, håndteresAvInterntVedtak = false)
     }
 }
