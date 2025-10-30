@@ -17,9 +17,6 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
-import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
-import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
-import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingsjournalpostRepository
@@ -30,6 +27,7 @@ import no.nav.tilleggsstonader.sak.hendelser.HendelseRepository
 import no.nav.tilleggsstonader.sak.hendelser.TypeHendelse
 import no.nav.tilleggsstonader.sak.hendelser.journalføring.JournalhendelseKafkaListener
 import no.nav.tilleggsstonader.sak.hendelser.journalføring.JournalpostHendelseType
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.Oppgavelager
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
@@ -49,10 +47,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.support.Acknowledgment
-import java.time.LocalDate
 import java.util.UUID
 
 class MottaSøknadTest : IntegrationTest() {
+    @Autowired
+    private lateinit var oppgavelager: Oppgavelager
+
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
 
@@ -129,6 +129,38 @@ class MottaSøknadTest : IntegrationTest() {
         kjørTasksKlareForProsessering()
 
         validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.LÆREMIDLER, journalpostId.toString())
+    }
+
+    @Test
+    fun `mottar to læremidler-søknad på samme bruker fra kafka, journalføres og oppretter sak og en jfr-oppgave`() {
+        val hendelse1 = journalfoeringHendelseRecord(journalpostId = 67)
+        val hendelse2 = journalfoeringHendelseRecord(journalpostId = 6767)
+
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key1", hendelse1),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key2", hendelse2),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+
+        assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse1.hendelsesId)).isNotNull
+        assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse2.hendelsesId)).isNotNull
+
+        mockJournalpost(brevkode = DokumentBrevkode.LÆREMIDLER, søknad = søknadskjemaLæremidler(), journalpostId = hendelse1.journalpostId)
+        mockJournalpost(brevkode = DokumentBrevkode.LÆREMIDLER, søknad = søknadskjemaLæremidler(), journalpostId = hendelse2.journalpostId)
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.LÆREMIDLER, hendelse1.journalpostId.toString())
+
+        // Verifiserer at det har blitt opprettet jfr-oppgave for den andre søknaden
+        assertThat(
+            oppgavelager.alleOppgaver().filter {
+                it.journalpostId?.toLong() == hendelse2.journalpostId &&
+                    it.oppgavetype == "JFR"
+            },
+        ).hasSize(1)
     }
 
     @Test
@@ -231,6 +263,7 @@ class MottaSøknadTest : IntegrationTest() {
         brevkode: DokumentBrevkode,
         søknad: Any?,
         journalpostKanal: String = "NAV_NO",
+        journalpostId: Long = this.journalpostId,
     ): Journalpost {
         val dokumentvariantformat = if (søknad != null) Dokumentvariantformat.ORIGINAL else Dokumentvariantformat.ARKIV
         val søknaddookumentInfo =
