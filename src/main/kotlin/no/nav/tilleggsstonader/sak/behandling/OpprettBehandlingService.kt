@@ -17,7 +17,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdReposito
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
-import no.nav.tilleggsstonader.sak.behandling.vent.SettBehandlingPåVentRequest
+import no.nav.tilleggsstonader.sak.behandling.vent.SettBehandlingPåVent
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentService
 import no.nav.tilleggsstonader.sak.behandling.vent.ÅrsakSettPåVent
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -98,7 +98,7 @@ class OpprettBehandlingService(
         if (behandlingStatus == BehandlingStatus.SATT_PÅ_VENT) {
             settPåVentService.settPåVent(
                 behandling.id,
-                SettBehandlingPåVentRequest(
+                SettBehandlingPåVent(
                     årsaker = listOf(ÅrsakSettPåVent.ANNET),
                     frist = LocalDate.now().plusWeeks(1),
                     kommentar = "Behandling satt på vent grunnet det finnes en aktiv behandling på saken",

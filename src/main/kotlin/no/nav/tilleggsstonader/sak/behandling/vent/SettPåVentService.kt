@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.springframework.stereotype.Service
@@ -48,7 +47,7 @@ class SettPåVentService(
     @Transactional
     fun settPåVent(
         behandlingId: BehandlingId,
-        request: SettBehandlingPåVentRequest,
+        request: SettBehandlingPåVent,
     ): StatusPåVentDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
 
@@ -93,7 +92,7 @@ class SettPåVentService(
 
     private fun settOppgavePåVent(
         behandlingId: BehandlingId,
-        request: SettBehandlingPåVentRequest,
+        request: SettBehandlingPåVent,
     ): SettPåVentResponse {
         val oppgave = oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId)
         return oppgaveService.settPåVent(

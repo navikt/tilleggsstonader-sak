@@ -10,7 +10,7 @@ data class SettPåVentDto(
     val beholdOppgave: Boolean = false,
 ) {
     fun tilDomene() =
-        SettBehandlingPåVentRequest(
+        SettBehandlingPåVent(
             årsaker = årsaker,
             frist = frist,
             kommentar = kommentar,
