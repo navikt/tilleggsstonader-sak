@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapperFailOnUnknownProperties
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.SkjemaDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.kodeverk.KodeverkService
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
@@ -62,7 +61,7 @@ class SøknadskjemaDagligReiseMapperTest {
 
     private fun mapSkjemadata(skjemaJsonFil: String): SøknadsskjemaDagligReiseFyllUtSendInn {
         val json = FileUtil.readFile(skjemaJsonFil)
-        val dagligReise = objectMapperFailOnUnknownProperties.readValue<SkjemaDagligReise>(json)
-        return SøknadsskjemaDagligReiseFyllUtSendInn("nb-NO", DagligReiseFyllUtSendInnData(dagligReise))
+        val dagligReise = objectMapperFailOnUnknownProperties.readValue<DagligReiseFyllUtSendInnData>(json)
+        return SøknadsskjemaDagligReiseFyllUtSendInn("nb-NO", dagligReise)
     }
 }

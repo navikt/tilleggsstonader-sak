@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Aktiviteter
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArbeidsrettetAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArsakOppholdUtenforNorgeType
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DineOpplysninger
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HarPengestotteAnnetLandType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
@@ -75,19 +76,19 @@ class SøknadskjemaDagligReiseMapper(
         dagligReise: SøknadsskjemaDagligReiseFyllUtSendInn,
         dokumentasjon: List<DokumentasjonDagligReise>,
     ): SkjemaDagligReise {
-        val skjemaDagligReise = dagligReise.data.data
-        return mapSkjema(skjemaDagligReise, dokumentasjon)
+        val søknadsdataDagligReise = dagligReise.data
+        return mapSkjema(søknadsdataDagligReise, dokumentasjon)
     }
 
     private fun mapSkjema(
-        skjemaDagligReise: SkjemaDagligReiseKontrakt,
+        søknadsdataDagligReise: DagligReiseFyllUtSendInnData,
         dokumentasjon: List<DokumentasjonDagligReise>,
     ): SkjemaDagligReise =
         SkjemaDagligReise(
-            personopplysninger = mapPersonopplysninger(skjemaDagligReise.dineOpplysninger),
-            hovedytelse = mapHovedytelse(skjemaDagligReise),
-            aktivitet = mapAktivitet(skjemaDagligReise.aktiviteter, skjemaDagligReise.metadata),
-            reiser = mapReiser(skjemaDagligReise.reise, skjemaDagligReise.dineOpplysninger),
+            personopplysninger = mapPersonopplysninger(søknadsdataDagligReise.data.dineOpplysninger),
+            hovedytelse = mapHovedytelse(søknadsdataDagligReise.data),
+            aktivitet = mapAktivitet(søknadsdataDagligReise.data.aktiviteter, søknadsdataDagligReise.metadata),
+            reiser = mapReiser(søknadsdataDagligReise.data.reise, søknadsdataDagligReise.data.dineOpplysninger),
             dokumentasjon = dokumentasjon,
         )
 

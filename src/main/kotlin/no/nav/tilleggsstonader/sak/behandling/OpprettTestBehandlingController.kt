@@ -526,8 +526,8 @@ class OpprettTestBehandlingController(
                             arbeidOgOpphold = arbeidOgOppholdDagligReise(),
                             aktiviteter = aktiviteter,
                             reise = listOf(reise),
-                            metadata = metadataDagligReise,
                         ),
+                        metadata = metadataDagligReise,
                     ),
                 dokumentasjon = emptyList(),
             )

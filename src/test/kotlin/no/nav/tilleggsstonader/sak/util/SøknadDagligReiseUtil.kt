@@ -45,11 +45,10 @@ object SøknadDagligReiseUtil {
                         harOppholdUtenforNorgeSiste12mnd = JaNeiType.nei,
                         oppholdUtenforNorgeSiste12mnd = null,
                     ),
-                metadata = metadata(),
             )
         return SøknadsskjemaDagligReiseFyllUtSendInn(
             language = "nb-NO",
-            data = DagligReiseFyllUtSendInnData(skjemaDagligReise),
+            data = DagligReiseFyllUtSendInnData(skjemaDagligReise, metadata()),
             dokumentasjon = emptyList(),
         )
     }
