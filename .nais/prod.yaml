@@ -131,3 +131,5 @@ spec:
       value: prod
     - name: TZ
       value: Europe/Oslo
+    - name: JDK_JAVA_OPTIONS
+      value: -XX:MaxRAMPercentage=75
