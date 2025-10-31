@@ -24,7 +24,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.klage.KlageService
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalPlasseresIKlarMappe
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalHåndteresAvTSSak
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.FinnOppgaveresultatMedMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppdatertOppgaveHendelse
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMedMetadata
@@ -178,7 +178,7 @@ class OppgaveService(
             "Må ha behandlingId når man oppretter oppgave for behandle sak"
         }
         val enhetsnummer = arbeidsfordelingService.hentNavEnhetId(personIdent, stønadstype, oppgave.oppgavetype)
-        val mappeId = if (oppgave.skalOpprettesIMappe) utledMappeId(personIdent, oppgave, enhetsnummer) else null
+        val mappeId = oppgave.opprettIMappe?.let { oppgaveMappe -> utledMappeId(personIdent, oppgave, enhetsnummer, oppgaveMappe) }
         val opprettetOppgaveId = opprettOppgaveUtenÅLagreIRepository(personIdent, stønadstype, oppgave, enhetsnummer, mappeId)
         val oppgave =
             OppgaveDomain(
@@ -234,14 +234,15 @@ class OppgaveService(
         ident: String,
         oppgave: OpprettOppgave,
         enhetsnummer: String?,
+        oppgaveMappe: OppgaveMappe,
     ): Long? {
-        if (!skalPlasseresIKlarMappe(oppgave.oppgavetype)) {
+        if (!skalHåndteresAvTSSak(oppgave.oppgavetype)) {
             return null
         }
         if (enhetsnummer == null) {
             error("Mangler enhetsnummer for oppgave for ident=$ident oppgavetype=${oppgave.oppgavetype}")
         }
-        return finnMappe(enhetsnummer, OppgaveMappe.KLAR).id
+        return finnMappe(enhetsnummer, oppgaveMappe).id
     }
 
     fun tilbakestillFordelingPåOppgave(
@@ -351,7 +352,10 @@ class OppgaveService(
             mappeRespons.mapper
         }
 
-    fun settPåVent(settPåVent: SettPåVentRequest): SettPåVentResponse = oppgaveClient.settPåVent(settPåVent)
+    fun settPåVent(settPåVent: SettPåVentRequest): SettPåVentResponse {
+        logger.info("Setter oppgave ${settPåVent.oppgaveId} på vent")
+        return oppgaveClient.settPåVent(settPåVent)
+    }
 
     fun oppdaterPåVent(oppdaterPåVent: OppdaterPåVentRequest): SettPåVentResponse = oppgaveClient.oppdaterPåVent(oppdaterPåVent)
 

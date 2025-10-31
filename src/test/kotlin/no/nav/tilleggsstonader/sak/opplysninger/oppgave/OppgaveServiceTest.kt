@@ -91,7 +91,7 @@ internal class OppgaveServiceTest {
             )
         mockkObject(OppgaveUtil)
         every { OppgaveUtil.utledBehandlesAvApplikasjon(any<Oppgavetype>()) } answers { callOriginal() }
-        every { OppgaveUtil.skalPlasseresIKlarMappe(any<Oppgavetype>()) } answers { callOriginal() }
+        every { OppgaveUtil.skalHåndteresAvTSSak(any<Oppgavetype>()) } answers { callOriginal() }
     }
 
     @AfterEach
@@ -144,7 +144,7 @@ internal class OppgaveServiceTest {
     @Nested
     inner class OpprettOppgaveIMappe {
         @Test
-        fun `Skal opprette behandle-sak-oppgave i Klar-mappe`() {
+        fun `Skal opprette behandle-sak-oppgave i Klar-mappe når ikke annet er spesifisert`() {
             val slot = slot<OpprettOppgaveRequest>()
             mockOpprettOppgave(slot)
 
@@ -154,11 +154,24 @@ internal class OppgaveServiceTest {
         }
 
         @Test
+        fun `Skal opprette behandle-sak-oppgave i På vent-mappe når spesifisert`() {
+            val slot = slot<OpprettOppgaveRequest>()
+            mockOpprettOppgave(slot)
+
+            oppgaveService.opprettOppgave(
+                BEHANDLING_ID,
+                OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak, opprettIMappe = OppgaveMappe.PÅ_VENT),
+            )
+
+            assertThat(slot.captured.mappeId).isEqualTo(OppgaveClientMockConfig.MAPPE_ID_PÅ_VENT)
+        }
+
+        @Test
         fun `Skal opprette vurder henvendelse-oppgave uten mappe`() {
             val slot = slot<OpprettOppgaveRequest>()
             mockOpprettOppgave(slot)
             every { OppgaveUtil.utledBehandlesAvApplikasjon(Oppgavetype.VurderHenvendelse) } returns ""
-            every { OppgaveUtil.skalPlasseresIKlarMappe(Oppgavetype.VurderHenvendelse) } returns false
+            every { OppgaveUtil.skalHåndteresAvTSSak(Oppgavetype.VurderHenvendelse) } returns false
 
             oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.VurderHenvendelse))
 
@@ -166,11 +179,11 @@ internal class OppgaveServiceTest {
         }
 
         @Test
-        fun `Skal ikke opprette i mappe når skalOpprettesIMappe er false`() {
+        fun `Skal ikke opprette i mappe når opprettIMappe er null`() {
             val slot = slot<OpprettOppgaveRequest>()
             mockOpprettOppgave(slot)
 
-            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak, skalOpprettesIMappe = false))
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak, opprettIMappe = null))
 
             assertThat(slot.captured.mappeId).isNull()
         }

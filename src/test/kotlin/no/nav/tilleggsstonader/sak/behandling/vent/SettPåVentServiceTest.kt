@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistor
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientMockConfig.Companion.MAPPE_ID_PÅ_VENT
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
@@ -17,6 +18,7 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -48,8 +50,8 @@ class SettPåVentServiceTest : IntegrationTest() {
     val behandling = behandling(fagsak = fagsak)
     var oppgaveId: Long? = null
 
-    val settPåVentDto =
-        SettPåVentDto(
+    val settBehandlingPåVent =
+        SettBehandlingPåVent(
             årsaker = listOf(ÅrsakSettPåVent.ANNET),
             frist = LocalDate.now().plusDays(3),
             kommentar = "ny beskrivelse",
@@ -81,20 +83,20 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal sette behandling på vent`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVent)
 
                 assertThat(testoppsettService.hentBehandling(behandling.id).status)
                     .isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
 
                 with(settPåVentService.hentStatusSettPåVent(behandling.id)) {
-                    assertThat(årsaker).isEqualTo(settPåVentDto.årsaker)
-                    assertThat(frist).isEqualTo(settPåVentDto.frist)
+                    assertThat(årsaker).isEqualTo(settBehandlingPåVent.årsaker)
+                    assertThat(frist).isEqualTo(settBehandlingPåVent.frist)
                     assertThat(kommentar).contains("ny beskrivelse")
                 }
 
                 with(oppgaveService.hentOppgave(oppgaveId!!)) {
                     assertThat(beskrivelse).contains("ny beskrivelse")
-                    assertThat(fristFerdigstillelse).isEqualTo(settPåVentDto.frist)
+                    assertThat(fristFerdigstillelse).isEqualTo(settBehandlingPåVent.frist)
                     assertThat(tilordnetRessurs).isNull()
                     assertThat(mappeId?.getOrNull()).isEqualTo(MAPPE_ID_PÅ_VENT)
                 }
@@ -119,10 +121,33 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal sette behandling på vent og fortsette beholde oppgaven`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto.copy(beholdOppgave = true))
+                settPåVentService.settPåVent(
+                    behandling.id,
+                    settBehandlingPåVent.copy(
+                        oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave(beholdOppgave = true),
+                    ),
+                )
 
                 with(oppgaveService.hentOppgave(oppgaveId!!)) {
                     assertThat(tilordnetRessurs).isEqualTo(dummySaksbehandler)
+                    assertThat(versjon).isEqualTo(2)
+                }
+            }
+        }
+
+        @Test
+        fun `skal sette behandling på vent uten å oppdatere oppgave`() {
+            testWithBrukerContext(dummySaksbehandler) {
+                settPåVentService.settPåVent(
+                    behandling.id,
+                    settBehandlingPåVent.copy(
+                        oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.IkkeOppdaterOppgave,
+                    ),
+                )
+
+                with(oppgaveService.hentOppgave(oppgaveId!!)) {
+                    assertThat(tilordnetRessurs).isEqualTo(dummySaksbehandler)
+                    assertThat(versjon).isEqualTo(1)
                 }
             }
         }
@@ -131,7 +156,7 @@ class SettPåVentServiceTest : IntegrationTest() {
         fun `skal feile hvis man ikke er eier av oppgaven`() {
             testWithBrukerContext {
                 assertThatThrownBy {
-                    settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                    settPåVentService.settPåVent(behandling.id, settBehandlingPåVent)
                 }.hasMessageContaining("Kan ikke sette behandling på vent når man ikke er eier av oppgaven.")
             }
         }
@@ -139,11 +164,12 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal feile hvis man prøver å sette behandling på vent når den allerede er på vent`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVent)
             }
-            assertThatThrownBy {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto)
-            }.hasMessageContaining("Kan ikke gjøre endringer på denne behandlingen fordi den er satt på vent.")
+            assertThatExceptionOfType(Feil::class.java)
+                .isThrownBy {
+                    settPåVentService.settPåVent(behandling.id, settBehandlingPåVent)
+                }.withMessage("Kan ikke gjøre endringer på denne behandlingen fordi den er satt på vent.")
         }
     }
 
@@ -152,7 +178,7 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne oppdatere settPåVent`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVent)
                 plukkOppgaven()
                 settPåVentService.oppdaterSettPåVent(behandling.id, oppdaterSettPåVentDto.copy(oppgaveVersjon = 3))
 
@@ -177,7 +203,7 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal sette behandling på vent og fortsette beholde oppgaven`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVent)
                 plukkOppgaven()
                 val dto = oppdaterSettPåVentDto.copy(oppgaveVersjon = 3, beholdOppgave = true)
                 settPåVentService.oppdaterSettPåVent(behandling.id, dto)
@@ -191,7 +217,7 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal feile hvis man ikke er eier av oppgaven`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVent)
             }
             testWithBrukerContext {
                 assertThatThrownBy {
@@ -209,7 +235,7 @@ class SettPåVentServiceTest : IntegrationTest() {
             val taAvVentDto = TaAvVentDto(skalTilordnesRessurs = false, kommentar = "tatt av")
 
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.settPåVent(behandling.id, settBehandlingPåVent)
                 plukkOppgaven()
                 taAvVentService.taAvVent(behandling.id, taAvVentDto)
             }
@@ -238,7 +264,12 @@ class SettPåVentServiceTest : IntegrationTest() {
             val taAvVentDto = TaAvVentDto(skalTilordnesRessurs = false, kommentar = "tatt av")
 
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.settPåVent(behandling.id, settPåVentDto.copy(beholdOppgave = true))
+                settPåVentService.settPåVent(
+                    behandling.id,
+                    settBehandlingPåVent.copy(
+                        oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave(beholdOppgave = true),
+                    ),
+                )
                 taAvVentService.taAvVent(behandling.id, taAvVentDto)
             }
 

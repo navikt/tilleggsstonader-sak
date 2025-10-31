@@ -54,7 +54,7 @@ class BehandlingController(
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val tilordnetSaksbehandler = tilordnetSaksbehandlerService.finnTilordnetSaksbehandler(behandlingId).tilDto()
 
-        if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
+        if (saksbehandling.status == BehandlingStatus.OPPRETTET || saksbehandling.status == BehandlingStatus.SATT_PÅ_VENT) {
             brukerfeilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
                 "Behandlingen er ikke påbegynt. En saksbehandler må påbegynne behandlingen før du kan gå inn."
             }

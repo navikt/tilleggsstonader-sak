@@ -200,14 +200,13 @@ class HåndterSøknadService(
                         journalpost.førsteDokumentMedBrevkode()?.tittel
                             ?: "Ny søknad eller ettersendelse for ${stønadstype.visningsnavn}",
                     journalpostId = journalpost.journalpostId,
-                    skalOpprettesIMappe = false,
+                    opprettIMappe = null,
                 )
             } else {
                 OpprettOppgave(
                     oppgavetype = Oppgavetype.Journalføring,
                     beskrivelse = lagOppgavebeskrivelseForJournalføringsoppgave(journalpost),
                     journalpostId = journalpost.journalpostId,
-                    skalOpprettesIMappe = true,
                 )
             }
 

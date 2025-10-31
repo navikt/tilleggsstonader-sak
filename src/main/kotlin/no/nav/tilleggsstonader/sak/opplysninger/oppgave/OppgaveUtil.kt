@@ -30,7 +30,7 @@ object OppgaveUtil {
             else -> error("Håndterer ikke behandlesAvApplikasjon for $oppgavetype")
         }
 
-    fun skalPlasseresIKlarMappe(oppgavetype: Oppgavetype) =
+    fun skalHåndteresAvTSSak(oppgavetype: Oppgavetype) =
         when (oppgavetype) {
             Oppgavetype.Journalføring,
             Oppgavetype.BehandleSak,

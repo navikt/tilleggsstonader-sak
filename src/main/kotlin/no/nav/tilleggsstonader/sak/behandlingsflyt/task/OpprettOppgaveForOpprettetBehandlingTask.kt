@@ -6,10 +6,13 @@ import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.OPPRETTET
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.SATT_PÅ_VENT
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -60,7 +63,7 @@ class OpprettOppgaveForOpprettetBehandlingTask(
         task: Task,
     ): Long? {
         val behandling = behandlingService.hentSaksbehandling(data.behandlingId)
-        if (behandling.status == BehandlingStatus.OPPRETTET || behandling.status == BehandlingStatus.UTREDES) {
+        if (behandling.status in listOf(OPPRETTET, UTREDES, SATT_PÅ_VENT)) {
             val tilordnetNavIdent =
                 if (data.saksbehandler == SikkerhetContext.SYSTEM_FORKORTELSE) null else data.saksbehandler
             val oppgaveId =
@@ -77,6 +80,7 @@ class OpprettOppgaveForOpprettetBehandlingTask(
                                     kravMottatt = behandling.kravMottatt,
                                     behandlingOpprettet = behandling.opprettetTid,
                                 ),
+                            opprettIMappe = if (behandling.status == SATT_PÅ_VENT) OppgaveMappe.PÅ_VENT else OppgaveMappe.KLAR,
                         ),
                 )
             task.metadata.setProperty("oppgaveId", oppgaveId.toString())

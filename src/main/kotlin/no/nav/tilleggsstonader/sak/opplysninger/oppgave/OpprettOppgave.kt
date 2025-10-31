@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.tilBehandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.tilTema
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
@@ -21,7 +22,7 @@ data class OpprettOppgave(
     val prioritet: OppgavePrioritet = OppgavePrioritet.NORM,
     val fristFerdigstillelse: LocalDate? = null,
     val journalpostId: String? = null,
-    val skalOpprettesIMappe: Boolean = true,
+    val opprettIMappe: OppgaveMappe? = OppgaveMappe.KLAR,
 )
 
 fun tilOpprettOppgaveRequest(

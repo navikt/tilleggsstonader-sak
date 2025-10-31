@@ -26,9 +26,7 @@ object OpprettBehandlingUtil {
                 .filter { it.resultat != BehandlingResultat.HENLAGT }
                 .sisteFerdigstilteBehandling()
 
-        if (kanHaFlereBehandlingPåSammeFagsak) {
-            validerTidligereBehandlingerErFerdigstilteEllerPåVent(tidligereBehandlinger)
-        } else {
+        if (!kanHaFlereBehandlingPåSammeFagsak) {
             validerTidligereBehandlingerErFerdigstilte(tidligereBehandlinger)
         }
 
@@ -45,12 +43,6 @@ object OpprettBehandlingUtil {
         }
         feilHvis(tidligereBehandlinger.any { it.type == FØRSTEGANGSBEHANDLING && it.status == BehandlingStatus.SATT_PÅ_VENT }) {
             "Kan ikke opprette ny behandling når det finnes en førstegangsbehandling på vent"
-        }
-    }
-
-    private fun validerTidligereBehandlingerErFerdigstilteEllerPåVent(tidligereBehandlinger: List<Behandling>) {
-        brukerfeilHvis(tidligereBehandlinger.any { it.erAktiv() }) {
-            "Det finnes en behandling på fagsaken som hverken er ferdigstilt eller satt på vent"
         }
     }
 
