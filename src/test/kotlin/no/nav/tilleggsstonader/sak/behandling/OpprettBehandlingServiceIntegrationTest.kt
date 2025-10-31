@@ -106,16 +106,17 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             val fagsak = testoppsettService.lagreFagsak(fagsak())
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT))
 
-            // Sjekker at denne ikke kaster feil
-            opprettBehandlingService.opprettBehandling(
-                OpprettBehandling(
-                    fagsak.id,
-                    behandlingsårsak = behandlingÅrsak,
-                    oppgaveMetadata = opprettBehandlingOppgaveMetadata,
-                    tillatFlereÅpneBehandlinger = true,
-                ),
-            )
+            val nyBehandling =
+                opprettBehandlingService.opprettBehandling(
+                    OpprettBehandling(
+                        fagsak.id,
+                        behandlingsårsak = behandlingÅrsak,
+                        oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                        tillatFlereÅpneBehandlinger = true,
+                    ),
+                )
 
+            assertThat(nyBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
             assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
         }
 
@@ -170,15 +171,17 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
 
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT, type = BehandlingType.REVURDERING))
 
-            // Sjekker at denne ikke kaster feil
-            opprettBehandlingService.opprettBehandling(
-                OpprettBehandling(
-                    fagsak.id,
-                    behandlingsårsak = behandlingÅrsak,
-                    oppgaveMetadata = opprettBehandlingOppgaveMetadata,
-                    tillatFlereÅpneBehandlinger = true,
-                ),
-            )
+            val nyBehandling =
+                opprettBehandlingService.opprettBehandling(
+                    OpprettBehandling(
+                        fagsak.id,
+                        behandlingsårsak = behandlingÅrsak,
+                        oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                        tillatFlereÅpneBehandlinger = true,
+                    ),
+                )
+
+            assertThat(nyBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
         }
 
         @Test
@@ -190,7 +193,6 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
 
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.OPPRETTET, type = BehandlingType.REVURDERING))
 
-            // Sjekker at denne ikke kaster feil
             val nyBehandling =
                 opprettBehandlingService.opprettBehandling(
                     OpprettBehandling(
@@ -239,16 +241,18 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
         testoppsettService.lagre(
             behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT, type = BehandlingType.REVURDERING),
         )
-        // Sjekker at denne ikke kaster feil
-        opprettBehandlingService.opprettBehandling(
-            OpprettBehandling(
-                fagsak.id,
-                behandlingsårsak = behandlingÅrsak,
-                oppgaveMetadata = opprettBehandlingOppgaveMetadata,
-                tillatFlereÅpneBehandlinger = true,
-            ),
-        )
 
+        val nyBehandling =
+            opprettBehandlingService.opprettBehandling(
+                OpprettBehandling(
+                    fagsak.id,
+                    behandlingsårsak = behandlingÅrsak,
+                    oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                    tillatFlereÅpneBehandlinger = true,
+                ),
+            )
+
+        assertThat(nyBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
         assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
     }
 
@@ -257,7 +261,6 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
         every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns true
         val fagsak = testoppsettService.lagreFagsak(fagsak())
 
-        // Sjekker at denne ikke kaster feil
         opprettBehandlingService.opprettBehandling(
             OpprettBehandling(
                 fagsak.id,
