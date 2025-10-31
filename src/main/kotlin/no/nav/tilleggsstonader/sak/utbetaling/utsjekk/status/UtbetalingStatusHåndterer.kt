@@ -31,14 +31,22 @@ class UtbetalingStatusHåndterer(
         if (melding.detaljer?.ytelse !in nyeFagområderTilleggsstønader) {
             return
         }
+
         val utbetalingsstatus = melding.status
+
+        if (utbetalingsstatus == UtbetalingStatus.FEILET) {
+            logger.error("Utbetaling feilet med ${melding.error} for iverksettingId=$iverksettingId.")
+        }
+
         val andeler = andelTilkjentYtelseRepository.findByIverksettingIverksettingId(UUID.fromString(iverksettingId))
 
         if (andeler.isNotEmpty()) {
             logger.info(
                 "Mottatt utbetalingsstatus=${utbetalingsstatus.name} for iverksettingId=$iverksettingId. Oppdaterer${andeler.size} andel(er)",
             )
-            sanityCheckStatusPåAndelerKnyttetTilIverksetting(andeler, iverksettingId)
+            feilHvis(andelerHarUforventetStatus(andeler)) {
+                "Det finnes andeler på iverksetting=$iverksettingId som har en uforventet status"
+            }
             andelTilkjentYtelseRepository.updateAll(andeler.map { it.copy(statusIverksetting = utbetalingsstatus.tilStatusIverksetting()) })
         }
     }
@@ -52,19 +60,14 @@ fun UtbetalingStatus.tilStatusIverksetting(): StatusIverksetting =
         UtbetalingStatus.HOS_OPPDRAG -> StatusIverksetting.HOS_OPPDRAG
     }
 
-// Statuser som tilsier at en andel aldri skal ha vært iverksatt
-private val uforventedeStatuser =
-    listOf(
-        StatusIverksetting.UBEHANDLET,
-        StatusIverksetting.VENTER_PÅ_SATS_ENDRING,
-        StatusIverksetting.UAKTUELL,
-    )
+private fun andelerHarUforventetStatus(andeler: List<AndelTilkjentYtelse>): Boolean {
+    // Statuser som tilsier at en andel aldri skal ha vært iverksatt
+    val uforventedeStatuser =
+        listOf(
+            StatusIverksetting.UBEHANDLET,
+            StatusIverksetting.VENTER_PÅ_SATS_ENDRING,
+            StatusIverksetting.UAKTUELL,
+        )
 
-private fun sanityCheckStatusPåAndelerKnyttetTilIverksetting(
-    andeler: List<AndelTilkjentYtelse>,
-    iverksettingId: String,
-) {
-    feilHvis(andeler.any { it.statusIverksetting in uforventedeStatuser }) {
-        "Det finnes andeler på iverksetting=$iverksettingId som har en uforventet status"
-    }
+    return andeler.any { it.statusIverksetting in uforventedeStatuser }
 }
