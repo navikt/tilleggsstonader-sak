@@ -102,7 +102,7 @@ class OpprettBehandlingService(
                 SettBehandlingPåVent(
                     årsaker = listOf(ÅrsakSettPåVent.ANNET),
                     frist = LocalDate.now().plusWeeks(1),
-                    kommentar = "Behandling satt på vent grunnet det finnes en aktiv behandling på saken",
+                    kommentar = "Behandlingen er automatisk satt på vent grunnet det finnes en aktiv behandling på saken",
                     oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.IkkeOppdaterOppgave,
                 ),
             )
