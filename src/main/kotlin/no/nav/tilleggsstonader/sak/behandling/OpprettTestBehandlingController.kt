@@ -52,11 +52,15 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeU
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterFlereSteder
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterNyBolig
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AdresseJegSkalReiseFra
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktivitetMetadata
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktiviteterMetadata
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktiviteterOgMålgruppeMetadata
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DataFetcher
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DekkesUtgiftenAvAndre
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaSlagsTypeBillettMaDuKjopeType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.KanDuReiseMedOffentligTransportType
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.PeriodeAktivitet
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.MetadataDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.SkjemaDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.TypeUtdanning
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Valgfelt
@@ -92,9 +96,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdBoutgifter
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.OppholdUtenforNorge as OppholdUtenforNorgeBoutgifter
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Aktivitet as AktivitetDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Aktiviteter as AktiviteterDagligReise
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktiviteterOgMålgruppe as AktiviteterOgMålgruppeDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArsakOppholdUtenforNorgeType as ArsakOppholdUtenforNorgeTypeDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DineOpplysninger as DineOpplysningerDagligReise
@@ -432,16 +434,7 @@ class OpprettTestBehandlingController(
             )
         val aktiviteter =
             AktiviteterDagligReise(
-                aktiviteterOgMaalgruppe =
-                    AktiviteterOgMålgruppeDagligReise(
-                        aktivitet =
-                            AktivitetDagligReise(
-                                aktivitetId = "ingenAktivitet",
-                                text = "AAP",
-                                periode = PeriodeAktivitet(LocalDate.of(2025, 5, 20), LocalDate.of(2025, 7, 20)),
-                                maalgruppe = null,
-                            ),
-                    ),
+                aktiviteterOgMaalgruppe = mapOf("134124111" to false, "134125430" to true, "annet" to false),
                 arbeidsrettetAktivitet = null,
                 faktiskeUtgifter =
                     DekkesUtgiftenAvAndre(
@@ -487,6 +480,37 @@ class OpprettTestBehandlingController(
                 piggdekkavgift = null,
             )
 
+        val metadataDagligReise =
+            MetadataDagligReise(
+                dataFetcher =
+                    DataFetcher(
+                        aktiviteter =
+                            AktiviteterMetadata(
+                                aktiviteterOgMaalgruppe =
+                                    AktiviteterOgMålgruppeMetadata(
+                                        data =
+                                            listOf(
+                                                AktivitetMetadata(
+                                                    value = "134125430",
+                                                    label = "Høyere utdanning: 10. september 2025 - 30. juni 2026",
+                                                    type = "TILTAK",
+                                                ),
+                                                AktivitetMetadata(
+                                                    value = "134124111",
+                                                    label = "Arbeidstrening: 16. juni 2025 - 31. juli 2025",
+                                                    type = "TILTAK",
+                                                ),
+                                                AktivitetMetadata(
+                                                    value = "annet",
+                                                    label = "Annet",
+                                                    type = null,
+                                                ),
+                                            ),
+                                    ),
+                            ),
+                    ),
+            )
+
         val skjemaDagligReise =
             SøknadsskjemaDagligReiseFyllUtSendInn(
                 language = "nb-NO",
@@ -503,6 +527,7 @@ class OpprettTestBehandlingController(
                             aktiviteter = aktiviteter,
                             reise = listOf(reise),
                         ),
+                        metadata = metadataDagligReise,
                     ),
                 dokumentasjon = emptyList(),
             )

@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Aktiviteter
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArbeidsrettetAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArsakOppholdUtenforNorgeType
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DineOpplysninger
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HarPengestotteAnnetLandType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
@@ -23,17 +24,16 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Hvor
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvorforIkkeBilType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.JaNeiType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.KanDuReiseMedOffentligTransportType
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.MetadataDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.opplysninger.kodeverk.KodeverkService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.OppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Personopplysninger
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import no.nav.tilleggsstonader.sak.vedlegg.BrevkodeVedlegg
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -76,19 +76,19 @@ class SøknadskjemaDagligReiseMapper(
         dagligReise: SøknadsskjemaDagligReiseFyllUtSendInn,
         dokumentasjon: List<DokumentasjonDagligReise>,
     ): SkjemaDagligReise {
-        val skjemaDagligReise = dagligReise.data.data
-        return mapSkjema(skjemaDagligReise, dokumentasjon)
+        val søknadsdataDagligReise = dagligReise.data
+        return mapSkjema(søknadsdataDagligReise, dokumentasjon)
     }
 
     private fun mapSkjema(
-        skjemaDagligReise: SkjemaDagligReiseKontrakt,
+        søknadsdataDagligReise: DagligReiseFyllUtSendInnData,
         dokumentasjon: List<DokumentasjonDagligReise>,
     ): SkjemaDagligReise =
         SkjemaDagligReise(
-            personopplysninger = mapPersonopplysninger(skjemaDagligReise.dineOpplysninger),
-            hovedytelse = mapHovedytelse(skjemaDagligReise),
-            aktivitet = mapAktivitet(skjemaDagligReise.aktiviteter),
-            reiser = mapReiser(skjemaDagligReise.reise, skjemaDagligReise.dineOpplysninger),
+            personopplysninger = mapPersonopplysninger(søknadsdataDagligReise.data.dineOpplysninger),
+            hovedytelse = mapHovedytelse(søknadsdataDagligReise.data),
+            aktivitet = mapAktivitet(søknadsdataDagligReise.data.aktiviteter, søknadsdataDagligReise.metadata),
+            reiser = mapReiser(søknadsdataDagligReise.data.reise, søknadsdataDagligReise.data.dineOpplysninger),
             dokumentasjon = dokumentasjon,
         )
 
@@ -154,20 +154,24 @@ class SøknadskjemaDagligReiseMapper(
             )
         } ?: emptyList()
 
-    private fun mapAktivitet(aktiviteter: Aktiviteter): AktivitetDagligReiseAvsnitt {
-        val aktivitetListe =
-            aktiviteter.aktiviteterOgMaalgruppe?.aktivitet?.let {
-                // Fyll ut setter aktivitetId til "ingenAktivitet" og vi har ellers mapping til ANNET som brukes i vår søknad
-                val id = if (it.aktivitetId == "ingenAktivitet") "ANNET" else it.aktivitetId
-                listOf(ValgtAktivitet(id = id, label = it.text))
-            }
+    private fun mapAktivitet(
+        aktiviteter: Aktiviteter,
+        metadata: MetadataDagligReise,
+    ): AktivitetDagligReiseAvsnitt {
+        val valgteAktiviteter = aktiviteter.aktiviteterOgMaalgruppe?.filterValues { it }?.keys
 
-        val aktivitetAvsnitt =
-            AktivitetAvsnitt(
-                aktiviteter = aktivitetListe,
-                annenAktivitet = mapAnnenAktivitet(aktiviteter.arbeidsrettetAktivitet),
-                lønnetAktivitet = null,
-            )
+        val aktiviteterDagligReise =
+            valgteAktiviteter?.let {
+                metadata.dataFetcher.aktiviteter.aktiviteterOgMaalgruppe.data
+                    .filter { valgteAktiviteter.contains(it.value) }
+                    .map {
+                        AktivitetDagligReise(
+                            id = it.value,
+                            label = it.label,
+                            type = it.type,
+                        )
+                    }
+            }
 
         val dekkesUtgiftenAvAndre =
             DekkesUtgiftenAvAndre(
@@ -182,7 +186,8 @@ class SøknadskjemaDagligReiseMapper(
             )
 
         return AktivitetDagligReiseAvsnitt(
-            aktivitet = aktivitetAvsnitt,
+            aktiviteter = aktiviteterDagligReise,
+            annenAktivitet = mapAnnenAktivitet(aktiviteter.arbeidsrettetAktivitet),
             dekkesUtgiftenAvAndre = dekkesUtgiftenAvAndre,
         )
     }

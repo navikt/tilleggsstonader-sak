@@ -1,11 +1,13 @@
 package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Aktivitet
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktivitetMetadata
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Aktiviteter
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktiviteterOgMålgruppe
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktiviteterMetadata
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktiviteterOgMålgruppeMetadata
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArbeidOgOpphold
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DataFetcher
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DekkesUtgiftenAvAndre
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DineOpplysninger
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HarPengestotteAnnetLandType
@@ -15,6 +17,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Iden
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.JaNeiType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.KanDuReiseMedOffentligTransportType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Landvelger
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.MetadataDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.NavAdresse
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.SkjemaDagligReise
@@ -45,7 +48,7 @@ object SøknadDagligReiseUtil {
             )
         return SøknadsskjemaDagligReiseFyllUtSendInn(
             language = "nb-NO",
-            data = DagligReiseFyllUtSendInnData(skjemaDagligReise),
+            data = DagligReiseFyllUtSendInnData(skjemaDagligReise, metadata()),
             dokumentasjon = emptyList(),
         )
     }
@@ -81,14 +84,10 @@ object SøknadDagligReiseUtil {
     private fun aktiviteter(): Aktiviteter =
         Aktiviteter(
             aktiviteterOgMaalgruppe =
-                AktiviteterOgMålgruppe(
-                    aktivitet =
-                        Aktivitet(
-                            aktivitetId = "ingenAktivitet",
-                            text = "",
-                            periode = null,
-                            maalgruppe = null,
-                        ),
+                mapOf(
+                    "134125430" to true,
+                    "134124111" to false,
+                    "annet" to false,
                 ),
             arbeidsrettetAktivitet = null,
             faktiskeUtgifter =
@@ -136,5 +135,36 @@ object SøknadDagligReiseUtil {
             bompenger = null,
             ferge = null,
             piggdekkavgift = null,
+        )
+
+    private fun metadata(): MetadataDagligReise =
+        MetadataDagligReise(
+            dataFetcher =
+                DataFetcher(
+                    aktiviteter =
+                        AktiviteterMetadata(
+                            aktiviteterOgMaalgruppe =
+                                AktiviteterOgMålgruppeMetadata(
+                                    data =
+                                        listOf(
+                                            AktivitetMetadata(
+                                                value = "134125430",
+                                                label = "Høyere utdanning: 10. september 2025 - 30. juni 2026",
+                                                type = "TILTAK",
+                                            ),
+                                            AktivitetMetadata(
+                                                value = "134125430",
+                                                label = "Høyere utdanning: 10. september 2025 - 30. juni 2026",
+                                                type = "TILTAK",
+                                            ),
+                                            AktivitetMetadata(
+                                                value = "134125430",
+                                                label = "Høyere utdanning: 10. september 2025 - 30. juni 2026",
+                                                type = "TILTAK",
+                                            ),
+                                        ),
+                                ),
+                        ),
+                ),
         )
 }

@@ -148,7 +148,19 @@ class BehandlingFaktaService(
 
     private fun mapAktivitetForDagligReise(aktivitet: AktivitetDagligReiseAvsnitt?) =
         FaktaAktivtetDagligReise(
-            aktivitet = mapAktivitet(aktivitet?.aktivitet),
+            aktivitet =
+                FaktaAktivtet(
+                    søknadsgrunnlag =
+                        aktivitet?.let {
+                            SøknadsgrunnlagAktivitet(
+                                aktiviteter =
+                                    it.aktiviteter
+                                        ?.map { it.label },
+                                annenAktivitet = it.annenAktivitet,
+                                lønnetAktivitet = null,
+                            )
+                        },
+                ),
         )
 
     private fun mapReise(reiser: List<ReiseDagligReise>?): List<FaktaReise>? =

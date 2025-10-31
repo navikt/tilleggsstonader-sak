@@ -1,82 +1,107 @@
 {
-  "dineOpplysninger": {
-    "fornavn": "FORNUFTIG",
-    "etternavn": "SØNNAVIND",
-    "identitet": {
-      "identitetsnummer": "29500474120"
+  "data": {
+    "dineOpplysninger": {
+      "fornavn": "FORNUFTIG",
+      "etternavn": "SØNNAVIND",
+      "identitet": {
+        "identitetsnummer": "29500474120"
+      },
+      "adresse": {
+        "gyldigFraOgMed": "2004-10-29",
+        "adresse": "Hestehagen 2",
+        "postnummer": "2069",
+        "bySted": "JESSHEIM",
+        "landkode": "NOR",
+        "land": {
+          "label": "Norge",
+          "value": "NO"
+        }
+      },
+      "reiseFraFolkeregistrertAdr": "ja"
     },
-    "adresse": {
-      "gyldigFraOgMed": "2004-10-29",
-      "adresse": "Hestehagen 2",
-      "postnummer": "2069",
-      "bySted": "JESSHEIM",
-      "landkode": "NOR",
-      "land": {
-        "label": "Norge",
-        "value": "NO"
+    "hovedytelse": {
+      "arbeidsavklaringspenger": false,
+      "overgangsstonad": true,
+      "gjenlevendepensjon": false,
+      "uforetrygd": false,
+      "tiltakspenger": false,
+      "dagpenger": false,
+      "sykepenger": false,
+      "kvalifiseringsstonad": false,
+      "mottarIngenPengestotte": false,
+      "ingenAvAlternativenePasserForMeg": false
+    },
+    "aktiviteter": {
+      "aktiviteterOgMaalgruppe": {
+        "134124111": false,
+        "134125430": false,
+        "annet": true
+      },
+      "arbeidsrettetAktivitet": "tiltakArbeidsrettetUtredning",
+      "faktiskeUtgifter": {
+        "garDuPaVideregaendeEllerGrunnskole": "videregaendeSkole",
+        "erDuLaerling": "ja",
+        "arbeidsgiverDekkerUtgift": "ja",
+        "bekreftelsemottarIkkeSkoleskyss": "true",
+        "lonnGjennomTiltak": "ja"
       }
     },
-    "reiseFraFolkeregistrertAdr": "ja"
-  },
-  "hovedytelse": {
-    "arbeidsavklaringspenger": false,
-    "overgangsstonad": true,
-    "gjenlevendepensjon": false,
-    "uforetrygd": false,
-    "tiltakspenger": false,
-    "dagpenger": false,
-    "sykepenger": false,
-    "kvalifiseringsstonad": false,
-    "mottarIngenPengestotte": false,
-    "ingenAvAlternativenePasserForMeg": false
-  },
-  "aktiviteter": {
-    "aktiviteterOgMaalgruppe": {
-      "aktivitet": {
-        "aktivitetId": "ingenAktivitet",
-        "text": "Ingen relevant aktivitet registrert på meg"
+    "reise": [
+      {
+        "gateadresse": "Osloveien 42",
+        "postnr": "0482",
+        "poststed": "Oslo",
+        "fom": "2025-01-01",
+        "tom": "2025-01-01",
+        "kanDuReiseMedOffentligTransport": "nei",
+        "harDu6KmReisevei": "ja",
+        "hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet": {
+          "label": "4",
+          "value": "4"
+        },
+        "hvorLangErReiseveienDin": 14,
+        "hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport": {
+          "helsemessigeArsaker": false,
+          "darligTransporttilbud": true,
+          "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": false,
+          "annet": false
+        },
+        "kanKjoreMedEgenBil": "ja",
+        "hvorSkalDuKjoreMedEgenBil": {
+          "togstasjon": true,
+          "busstopp": false,
+          "fergeBatkai": false
+        },
+        "hvorLangErReiseveienDinMedBil": 100,
+        "parkering": "ja",
+        "bompenger": 43,
+        "ferge": 0,
+        "piggdekkavgift": 22
       }
-    },
-    "arbeidsrettetAktivitet": "tiltakArbeidsrettetUtredning",
-    "faktiskeUtgifter": {
-      "garDuPaVideregaendeEllerGrunnskole": "videregaendeSkole",
-      "erDuLaerling": "ja",
-      "arbeidsgiverDekkerUtgift": "ja",
-      "bekreftelsemottarIkkeSkoleskyss": "true",
-      "lonnGjennomTiltak": "ja"
-    }
+    ]
   },
-  "reise": [
-    {
-      "gateadresse": "Osloveien 42",
-      "postnr": "0482",
-      "poststed": "Oslo",
-      "fom": "2025-01-01",
-      "tom": "2025-01-01",
-      "kanDuReiseMedOffentligTransport": "nei",
-      "harDu6KmReisevei": "ja",
-      "hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet": {
-        "label": "4",
-        "value": "4"
-      },
-      "hvorLangErReiseveienDin": 14,
-      "hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport": {
-        "helsemessigeArsaker": false,
-        "darligTransporttilbud": true,
-        "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": false,
-        "annet": false
-      },
-      "kanKjoreMedEgenBil": "ja",
-      "hvorSkalDuKjoreMedEgenBil": {
-        "togstasjon": true,
-        "busstopp": false,
-        "fergeBatkai": false
-      },
-      "hvorLangErReiseveienDinMedBil": 100,
-      "parkering": "ja",
-      "bompenger": 43,
-      "ferge": 0,
-      "piggdekkavgift": 22
+  "metadata": {
+    "dataFetcher": {
+      "aktiviteter": {
+        "aktiviteterOgMaalgruppe": {
+          "data": [
+            {
+              "value": "134125430",
+              "label": "Høyere utdanning: 10. september 2025 - 30. juni 2026",
+              "type": "TILTAK"
+            },
+            {
+              "value": "134124111",
+              "label": "Arbeidstrening: 16. juni 2025 - 31. juli 2025",
+              "type": "TILTAK"
+            },
+            {
+              "label": "Annet",
+              "value": "annet"
+            }
+          ]
+        }
+      }
     }
-  ]
+  }
 }
