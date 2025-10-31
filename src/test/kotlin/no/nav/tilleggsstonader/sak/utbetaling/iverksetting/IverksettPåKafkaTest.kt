@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingDto
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingLoggRepository
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.totrinnskontroll
@@ -30,6 +31,7 @@ class IverksettPåKafkaTest(
     @Autowired private val iverksettService: IverksettService,
     @Autowired private val kafkaTemplate: KafkaTemplate<String, String>,
     @Autowired private val tilkjentYtelseRepository: TilkjentYtelseRepository,
+    @Autowired private val iverksettingLoggRepository: IverksettingLoggRepository,
 ) : IntegrationTest() {
     val sendteUtbetalinger = mutableListOf<ProducerRecord<String, String>>()
 
@@ -110,6 +112,10 @@ class IverksettPåKafkaTest(
             assertThat(perioder.single().tom).isEqualTo(forrigeMåned.atDay(1))
             assertThat(perioder.single().beløp.toInt()).isEqualTo(andelTilkjentYtelse1.beløp + andelTilkjentYtelse2.beløp)
         }
+
+        val loggedeIverksettinger = iverksettingLoggRepository.findAll().single()
+        assertThat(loggedeIverksettinger.iverksettingId).isEqualTo(iverksettingId)
+        assertThat(loggedeIverksettinger.utbetalingJson.json).isEqualTo(sendtUtbetaling.value())
     }
 
     private fun ProducerRecord<String, String>.utbetalingRecord() = objectMapper.readValue<IverksettingDto>(value())

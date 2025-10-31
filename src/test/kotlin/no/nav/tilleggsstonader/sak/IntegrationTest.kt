@@ -36,6 +36,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingId
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingLogg
 import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
 import no.nav.tilleggsstonader.sak.util.TestoppsettService
 import no.nav.tilleggsstonader.sak.util.TokenUtil
@@ -177,6 +178,7 @@ abstract class IntegrationTest {
             FagsakDomain::class,
             PersonIdent::class,
             FagsakPerson::class,
+            IverksettingLogg::class,
         ).forEach { jdbcAggregateOperations.deleteAll(it.java) }
     }
 
