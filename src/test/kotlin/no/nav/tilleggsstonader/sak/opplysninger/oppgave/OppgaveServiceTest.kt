@@ -91,7 +91,7 @@ internal class OppgaveServiceTest {
             )
         mockkObject(OppgaveUtil)
         every { OppgaveUtil.utledBehandlesAvApplikasjon(any<Oppgavetype>()) } answers { callOriginal() }
-        every { OppgaveUtil.skalPlasseresIKlarMappe(any<Oppgavetype>()) } answers { callOriginal() }
+        every { OppgaveUtil.skalHåndteresAvTSSak(any<Oppgavetype>()) } answers { callOriginal() }
     }
 
     @AfterEach
@@ -171,7 +171,7 @@ internal class OppgaveServiceTest {
             val slot = slot<OpprettOppgaveRequest>()
             mockOpprettOppgave(slot)
             every { OppgaveUtil.utledBehandlesAvApplikasjon(Oppgavetype.VurderHenvendelse) } returns ""
-            every { OppgaveUtil.skalPlasseresIKlarMappe(Oppgavetype.VurderHenvendelse) } returns false
+            every { OppgaveUtil.skalHåndteresAvTSSak(Oppgavetype.VurderHenvendelse) } returns false
 
             oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.VurderHenvendelse))
 

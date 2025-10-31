@@ -24,7 +24,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.klage.KlageService
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalPlasseresIKlarMappe
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalHåndteresAvTSSak
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.FinnOppgaveresultatMedMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppdatertOppgaveHendelse
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.OppgaveMedMetadata
@@ -236,7 +236,7 @@ class OppgaveService(
         enhetsnummer: String?,
         oppgaveMappe: OppgaveMappe,
     ): Long? {
-        if (!skalPlasseresIKlarMappe(oppgave.oppgavetype)) {
+        if (!skalHåndteresAvTSSak(oppgave.oppgavetype)) {
             return null
         }
         if (enhetsnummer == null) {
