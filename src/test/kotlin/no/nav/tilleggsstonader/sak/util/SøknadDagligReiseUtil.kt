@@ -8,8 +8,9 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Akti
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArbeidOgOpphold
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DataFetcher
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DekkesUtgiftenAvAndre
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DineOpplysninger
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.FaktiskeUtgifter
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.GarDuPaVideregaendeEllerGrunnskoleType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HarPengestotteAnnetLandType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaSlagsTypeBillettMaDuKjopeType
@@ -21,7 +22,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Meta
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.NavAdresse
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.SkjemaDagligReise
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.TypeUtdanning
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Valgfelt
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import java.time.LocalDate
@@ -63,7 +63,6 @@ object SøknadDagligReiseUtil {
                 Identitet(
                     identitetsnummer = "11111122222",
                 ),
-            fodselsdato2 = "2025-01-01",
             adresse =
                 NavAdresse(
                     gyldigFraOgMed = LocalDate.of(2025, 1, 1),
@@ -91,11 +90,12 @@ object SøknadDagligReiseUtil {
                 ),
             arbeidsrettetAktivitet = null,
             faktiskeUtgifter =
-                DekkesUtgiftenAvAndre(
-                    garDuPaVideregaendeEllerGrunnskole = TypeUtdanning.annetTiltak,
+                FaktiskeUtgifter(
+                    garDuPaVideregaendeEllerGrunnskole = GarDuPaVideregaendeEllerGrunnskoleType.annetTiltak,
                     erDuLaerling = null,
                     arbeidsgiverDekkerUtgift = null,
-                    bekreftelsemottarIkkeSkoleskyss = null,
+                    under25 = null,
+                    betalerForReisenTilSkolenSelv = null,
                     lonnGjennomTiltak = null,
                 ),
         )

@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Arbe
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArsakOppholdUtenforNorgeType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DineOpplysninger
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.GarDuPaVideregaendeEllerGrunnskoleType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HarPengestotteAnnetLandType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransportType.annet
@@ -41,7 +42,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Arbe
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge as OppholdUtenforNorgeKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reise as ReiseKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.SkjemaDagligReise as SkjemaDagligReiseKontrakt
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.TypeUtdanning as TypeUtdanningKontrakter
 
 @Service
 class SøknadskjemaDagligReiseMapper(
@@ -181,7 +181,8 @@ class SøknadskjemaDagligReiseMapper(
                     ),
                 lærling = aktiviteter.faktiskeUtgifter.erDuLaerling?.let(::mapJaNei),
                 arbeidsgiverDekkerUtgift = aktiviteter.faktiskeUtgifter.arbeidsgiverDekkerUtgift?.let(::mapJaNei),
-                mottarIkkeSkoleskyss = aktiviteter.faktiskeUtgifter.bekreftelsemottarIkkeSkoleskyss,
+                erUnder25år = aktiviteter.faktiskeUtgifter.under25?.let(::mapJaNei),
+                betalerForReisenTilSkolenSelv = aktiviteter.faktiskeUtgifter.betalerForReisenTilSkolenSelv?.let(::mapJaNei),
                 lønnetAktivitet = aktiviteter.faktiskeUtgifter.lonnGjennomTiltak?.let(::mapJaNei),
             )
 
@@ -192,11 +193,11 @@ class SøknadskjemaDagligReiseMapper(
         )
     }
 
-    private fun mapTypeUtdanning(vidregåendeEllerGrunnskole: TypeUtdanningKontrakter): TypeUtdanning =
+    private fun mapTypeUtdanning(vidregåendeEllerGrunnskole: GarDuPaVideregaendeEllerGrunnskoleType): TypeUtdanning =
         when (vidregåendeEllerGrunnskole) {
-            TypeUtdanningKontrakter.videregaendeSkole -> TypeUtdanning.VIDEREGÅENDE
-            TypeUtdanningKontrakter.opplaeringForVoksne -> TypeUtdanning.OPPLÆRING_FOR_VOKSNE
-            TypeUtdanningKontrakter.annetTiltak -> TypeUtdanning.ANNET_TILTAK
+            GarDuPaVideregaendeEllerGrunnskoleType.videregaendeSkole -> TypeUtdanning.VIDEREGÅENDE
+            GarDuPaVideregaendeEllerGrunnskoleType.opplaeringForVoksne -> TypeUtdanning.OPPLÆRING_FOR_VOKSNE
+            GarDuPaVideregaendeEllerGrunnskoleType.annetTiltak -> TypeUtdanning.ANNET_TILTAK
         }
 
     private fun mapAnnenAktivitet(verdi: ArbeidsrettetAktivitetType?): AnnenAktivitetType? =

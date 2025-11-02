@@ -57,12 +57,12 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Akti
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktiviteterOgMålgruppeMetadata
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DataFetcher
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DekkesUtgiftenAvAndre
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.FaktiskeUtgifter
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.GarDuPaVideregaendeEllerGrunnskoleType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaSlagsTypeBillettMaDuKjopeType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.KanDuReiseMedOffentligTransportType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.MetadataDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.SkjemaDagligReise
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.TypeUtdanning
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Valgfelt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOpphold
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
@@ -410,7 +410,6 @@ class OpprettTestBehandlingController(
                 etternavn = "Etternavn",
                 identitet =
                     IdentitetDagligReise(identitetsnummer = "11111122222"),
-                fodselsdato2 = "2025-01-01",
                 adresse =
                     NavAdresseDagligReise(
                         gyldigFraOgMed = LocalDate.of(2025, 1, 1),
@@ -437,12 +436,13 @@ class OpprettTestBehandlingController(
                 aktiviteterOgMaalgruppe = mapOf("134124111" to false, "134125430" to true, "annet" to false),
                 arbeidsrettetAktivitet = null,
                 faktiskeUtgifter =
-                    DekkesUtgiftenAvAndre(
-                        garDuPaVideregaendeEllerGrunnskole = TypeUtdanning.annetTiltak,
-                        erDuLaerling = null,
-                        arbeidsgiverDekkerUtgift = null,
-                        bekreftelsemottarIkkeSkoleskyss = null,
-                        lonnGjennomTiltak = null,
+                    FaktiskeUtgifter(
+                        garDuPaVideregaendeEllerGrunnskole = GarDuPaVideregaendeEllerGrunnskoleType.annetTiltak,
+                        erDuLaerling = JaNeiTypeDagligReise.ja,
+                        arbeidsgiverDekkerUtgift = JaNeiTypeDagligReise.ja,
+                        under25 = JaNeiTypeDagligReise.nei,
+                        betalerForReisenTilSkolenSelv = JaNeiTypeDagligReise.ja,
+                        lonnGjennomTiltak = JaNeiTypeDagligReise.ja,
                     ),
             )
         val reise =

@@ -43,6 +43,7 @@ import java.time.LocalDate
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.FasteUtgifter as FasteUtgifterKontraktor
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterFlereSteder as UtgifterFlereStederKontraktor
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterNyBolig as UtgifterNyBoligKontrakt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.DekkesUtgiftenAvAndre as DekkesUtgiftenAvAndreKontrakt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reise as ReiseDagligReise
 
 /**
@@ -142,6 +143,7 @@ class BehandlingFaktaService(
                                 ?.map { it.label },
                         annenAktivitet = it.annenAktivitet,
                         lønnetAktivitet = it.lønnetAktivitet,
+                        dekkesUtgiftenAvAndre = null,
                     )
                 },
         )
@@ -158,9 +160,20 @@ class BehandlingFaktaService(
                                         ?.map { it.label },
                                 annenAktivitet = it.annenAktivitet,
                                 lønnetAktivitet = null,
+                                dekkesUtgiftenAvAndre = mapDekkesUtgiftenAvAndre(it.dekkesUtgiftenAvAndre),
                             )
                         },
                 ),
+        )
+
+    private fun mapDekkesUtgiftenAvAndre(dekkesUtgiftenAvAndre: DekkesUtgiftenAvAndreKontrakt): DekkesUtgiftenAvAndre =
+        DekkesUtgiftenAvAndre(
+            typeUtdanning = dekkesUtgiftenAvAndre.typeUtdanning,
+            lærling = dekkesUtgiftenAvAndre.lærling,
+            arbeidsgiverDekkerUtgift = dekkesUtgiftenAvAndre.arbeidsgiverDekkerUtgift,
+            erUnder25år = dekkesUtgiftenAvAndre.erUnder25år,
+            betalerForReisenTilSkolenSelv = dekkesUtgiftenAvAndre.betalerForReisenTilSkolenSelv,
+            lønnetAktivitet = dekkesUtgiftenAvAndre.lønnetAktivitet,
         )
 
     private fun mapReise(reiser: List<ReiseDagligReise>?): List<FaktaReise>? =
