@@ -42,6 +42,7 @@ class SettPåVentService(
             endretAv = endret?.endretAv,
             endretTid = endret?.endretTid,
             frist = oppgave.fristFerdigstillelse,
+            oppgaveVersjon = oppgave.versjonEllerFeil(),
         )
     }
 
@@ -73,9 +74,12 @@ class SettPåVentService(
             )
         settPåVentRepository.insert(settPåVent)
 
-        if (request.oppgaveMetadata is OppdaterOppgave) {
-            settOppgavePåVent(behandlingId, request, request.oppgaveMetadata)
-        }
+        val oppdatertOppgave =
+            if (request.oppgaveMetadata is OppdaterOppgave) {
+                settOppgavePåVent(behandlingId, request, request.oppgaveMetadata)
+            } else {
+                null
+            }
 
         taskService.save(BehandlingsstatistikkTask.opprettVenterTask(behandlingId))
         val endret = utledEndretInformasjon(settPåVent)
@@ -88,6 +92,7 @@ class SettPåVentService(
             endretAv = endret?.endretAv,
             endretTid = endret?.endretTid,
             frist = request.frist,
+            oppgaveVersjon = oppdatertOppgave?.oppgaveVersjon,
         )
     }
 
@@ -131,10 +136,11 @@ class SettPåVentService(
         val oppdatertSettPåVent =
             settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker, kommentar = dto.kommentar))
 
-        oppdaterOppgave(
-            oppgaveId = oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId).gsakOppgaveId,
-            dto = dto,
-        )
+        val oppgaveResponse =
+            oppdaterOppgave(
+                oppgaveId = oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId).gsakOppgaveId,
+                dto = dto,
+            )
 
         val endret = utledEndretInformasjon(oppdatertSettPåVent)
 
@@ -146,6 +152,7 @@ class SettPåVentService(
             endretAv = endret?.endretAv,
             endretTid = endret?.endretTid,
             frist = dto.frist,
+            oppgaveVersjon = oppgaveResponse.oppgaveVersjon,
         )
     }
 

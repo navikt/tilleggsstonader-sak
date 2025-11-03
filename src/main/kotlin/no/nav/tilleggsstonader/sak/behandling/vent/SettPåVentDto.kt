@@ -34,6 +34,7 @@ data class StatusPåVentDto(
     val endretAv: String?,
     val endretTid: LocalDateTime?,
     val frist: LocalDate?,
+    val oppgaveVersjon: Int?,
 )
 
 data class TaAvVentDto(
