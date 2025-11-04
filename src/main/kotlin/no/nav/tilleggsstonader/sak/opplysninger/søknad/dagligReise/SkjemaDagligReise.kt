@@ -30,7 +30,8 @@ data class DekkesUtgiftenAvAndre(
     val typeUtdanning: TypeUtdanning,
     val lærling: JaNei?,
     val arbeidsgiverDekkerUtgift: JaNei?,
-    val mottarIkkeSkoleskyss: Boolean?,
+    val erUnder25år: JaNei?,
+    val betalerForReisenTilSkolenSelv: JaNei?,
     val lønnetAktivitet: JaNei?,
 )
 

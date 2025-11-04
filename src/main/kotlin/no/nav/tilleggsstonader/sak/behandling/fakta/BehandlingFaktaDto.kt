@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.OffentligTra
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.PrivatTransport
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reiseperiode
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.TypeUtdanning
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Utgifter
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -138,6 +139,16 @@ data class FaktaAktivtetDagligReise(
 data class SøknadsgrunnlagAktivitet(
     val aktiviteter: List<String>?,
     val annenAktivitet: AnnenAktivitetType?,
+    val lønnetAktivitet: JaNei?,
+    val dekkesUtgiftenAvAndre: DekkesUtgiftenAvAndre?,
+)
+
+data class DekkesUtgiftenAvAndre(
+    val typeUtdanning: TypeUtdanning,
+    val lærling: JaNei?,
+    val arbeidsgiverDekkerUtgift: JaNei?,
+    val erUnder25år: JaNei?,
+    val betalerForReisenTilSkolenSelv: JaNei?,
     val lønnetAktivitet: JaNei?,
 )
 

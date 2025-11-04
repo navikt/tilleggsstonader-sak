@@ -6,7 +6,6 @@
       "identitet": {
         "identitetsnummer": "1111111111"
       },
-      "fodselsdato2": "2025-01-01",
       "adresse": {
         "gyldigFraOgMed": "2004-10-29",
         "adresse": "En vei 2",
@@ -103,7 +102,8 @@
         "garDuPaVideregaendeEllerGrunnskole": "videregaendeSkole",
         "erDuLaerling": "ja",
         "arbeidsgiverDekkerUtgift": "ja",
-        "bekreftelsemottarIkkeSkoleskyss": "true",
+        "under25": "ja",
+        "betalerForReisenTilSkolenSelv": "ja",
         "lonnGjennomTiltak": "ja"
       }
     },

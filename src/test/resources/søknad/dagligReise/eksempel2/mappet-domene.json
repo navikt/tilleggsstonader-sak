@@ -19,7 +19,8 @@
       "typeUtdanning" : "VIDEREGÅENDE",
       "lærling" : "JA",
       "arbeidsgiverDekkerUtgift" : "JA",
-      "mottarIkkeSkoleskyss" : true,
+      "erUnder25år" : "JA",
+      "betalerForReisenTilSkolenSelv" : "JA",
       "lønnetAktivitet" : "JA"
     },
     "annenAktivitet" : "TILTAK"

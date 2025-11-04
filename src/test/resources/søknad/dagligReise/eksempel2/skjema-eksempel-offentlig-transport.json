@@ -25,7 +25,8 @@
         "garDuPaVideregaendeEllerGrunnskole": "videregaendeSkole",
         "erDuLaerling": "ja",
         "arbeidsgiverDekkerUtgift": "ja",
-        "bekreftelsemottarIkkeSkoleskyss": "true",
+        "under25": "ja",
+        "betalerForReisenTilSkolenSelv": "ja",
         "lonnGjennomTiltak": "ja"
       }
     },

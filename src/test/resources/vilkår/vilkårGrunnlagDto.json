@@ -43,7 +43,8 @@
     "søknadsgrunnlag" : {
       "aktiviteter" : [ ],
       "annenAktivitet" : "TILTAK",
-      "lønnetAktivitet" : "NEI"
+      "lønnetAktivitet" : "NEI",
+      "dekkesUtgiftenAvAndre" : null
     }
   },
   "barn" : [ {
