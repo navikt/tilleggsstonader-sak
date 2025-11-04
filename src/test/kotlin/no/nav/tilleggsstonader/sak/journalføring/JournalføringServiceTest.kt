@@ -119,7 +119,7 @@ class JournalføringServiceTest {
 
         every { personService.hentFolkeregisterIdenter(personIdent) } returns
             PdlIdenter(listOf(PdlIdent(personIdent, false, "FOLKEREGISTERIDENT")))
-        justRun { oppgaveService.ferdigstillOppgave(any()) }
+        justRun { oppgaveService.ferdigstillOppgave(any(), any()) }
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
         every { journalpostService.hentIdentFraJournalpost(any()) } returns personIdent
         justRun {

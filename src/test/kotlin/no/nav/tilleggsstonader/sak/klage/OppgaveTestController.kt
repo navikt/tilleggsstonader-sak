@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.klage
 
 import no.nav.security.token.support.core.api.Unprotected
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveResponse
@@ -38,7 +39,7 @@ class OppgaveTestController(
     fun ferdigstillOppgave(
         @PathVariable oppgaveId: Long,
     ): OppgaveResponse {
-        oppgaveClient.ferdigstillOppgave(oppgaveId)
+        oppgaveClient.ferdigstillOppgave(oppgaveId, Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr)
         return OppgaveResponse(oppgaveId)
     }
 

@@ -10,6 +10,7 @@ import io.mockk.slot
 import io.mockk.unmockkObject
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
@@ -217,7 +218,7 @@ internal class OppgaveServiceTest {
         } returns lagTestOppgave()
         every { oppgaveRepository.update(any()) } returns lagTestOppgave()
         val slot = slot<Long>()
-        every { oppgaveClient.ferdigstillOppgave(capture(slot)) } just runs
+        every { oppgaveClient.ferdigstillOppgave(capture(slot), any()) } just runs
 
         oppgaveService.ferdigstillBehandleOppgave(BEHANDLING_ID, Oppgavetype.BehandleSak)
         assertThat(slot.captured).isEqualTo(GSAK_OPPGAVE_ID)
@@ -244,7 +245,11 @@ internal class OppgaveServiceTest {
         every {
             oppgaveRepository.findByBehandlingIdAndTypeAndStatus(any(), any(), any())
         } returns null
-        oppgaveService.ferdigstillOppgaveOgsåHvisFeilregistrert(BEHANDLING_ID, Oppgavetype.BehandleSak)
+        oppgaveService.ferdigstillOppgaveOgsåHvisFeilregistrert(
+            BEHANDLING_ID,
+            Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+            Oppgavetype.BehandleSak,
+        )
     }
 
     @Test
@@ -254,9 +259,13 @@ internal class OppgaveServiceTest {
         } returns lagTestOppgave()
         every { oppgaveRepository.update(any()) } returns lagTestOppgave()
         val slot = slot<Long>()
-        every { oppgaveClient.ferdigstillOppgave(capture(slot)) } just runs
+        every { oppgaveClient.ferdigstillOppgave(capture(slot), any()) } just runs
 
-        oppgaveService.ferdigstillOppgaveOgsåHvisFeilregistrert(BEHANDLING_ID, Oppgavetype.BehandleSak)
+        oppgaveService.ferdigstillOppgaveOgsåHvisFeilregistrert(
+            BEHANDLING_ID,
+            Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+            Oppgavetype.BehandleSak,
+        )
         assertThat(slot.captured).isEqualTo(GSAK_OPPGAVE_ID)
     }
 
@@ -266,14 +275,18 @@ internal class OppgaveServiceTest {
             oppgaveRepository.findByBehandlingIdAndTypeAndStatus(any(), any(), any())
         } returns lagTestOppgave()
 
-        every { oppgaveClient.ferdigstillOppgave(any()) } throws Exception("Oppgaven er allerede ferdigstilt")
+        every { oppgaveClient.ferdigstillOppgave(any(), any()) } throws Exception("Oppgaven er allerede ferdigstilt")
         every { oppgaveClient.finnOppgaveMedId(any()) } returns lagEksternTestOppgave().copy(status = StatusEnum.FEILREGISTRERT)
 
         val slot = slot<OppgaveDomain>()
 
         every { oppgaveRepository.update(capture(slot)) } answers { firstArg() }
 
-        oppgaveService.ferdigstillOppgaveOgsåHvisFeilregistrert(BEHANDLING_ID, Oppgavetype.BehandleSak)
+        oppgaveService.ferdigstillOppgaveOgsåHvisFeilregistrert(
+            BEHANDLING_ID,
+            Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+            Oppgavetype.BehandleSak,
+        )
 
         assertThat(slot.captured.status).isEqualTo(Oppgavestatus.FEILREGISTRERT)
     }
@@ -287,7 +300,7 @@ internal class OppgaveServiceTest {
         every { oppgaveRepository.findByGsakOppgaveId(GSAK_OPPGAVE_ID) } returns testOppgave
 
         every {
-            oppgaveClient.fordelOppgave(capture(oppgaveSlot), capture(saksbehandlerSlot), any())
+            oppgaveClient.fordelOppgave(capture(oppgaveSlot), capture(saksbehandlerSlot), any(), any())
         } answers {
             lagEksternTestOppgave().copy(
                 tilordnetRessurs = secondArg(),
@@ -310,17 +323,6 @@ internal class OppgaveServiceTest {
                 },
             )
         }
-    }
-
-    @Test
-    fun `Tilbakestill oppgave skal nullstille tildeling på oppgave`() {
-        val oppgaveSlot = slot<Long>()
-        every { oppgaveClient.fordelOppgave(capture(oppgaveSlot), any(), any()) } returns mockk()
-
-        oppgaveService.tilbakestillFordelingPåOppgave(GSAK_OPPGAVE_ID, 1)
-
-        assertThat(GSAK_OPPGAVE_ID).isEqualTo(oppgaveSlot.captured)
-        verify(exactly = 1) { oppgaveClient.fordelOppgave(any(), null, 1) }
     }
 
     @Test

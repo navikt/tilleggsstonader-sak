@@ -76,6 +76,7 @@ class OppgaveClient(
         oppgaveId: Long,
         saksbehandler: String?,
         versjon: Int,
+        endretAvEnhetsnr: String?,
     ): Oppgave {
         val uriBuilder =
             UriComponentsBuilder
@@ -83,8 +84,8 @@ class OppgaveClient(
                 .pathSegment("{id}", "fordel")
         val uriVariables = oppgaveIdUriVariables(oppgaveId).toMutableMap()
 
-        val listOf = listOf("saksbehandler" to saksbehandler, "versjon" to versjon.toString())
-        listOf.forEach { (key, value) ->
+        val queryParams = listOf("saksbehandler" to saksbehandler, "versjon" to versjon.toString(), "endretAvEnhetsnr" to endretAvEnhetsnr)
+        queryParams.forEach { (key, value) ->
             if (value != null) {
                 uriBuilder.queryParam(key, "{$key}")
                 uriVariables[key] = value
@@ -111,14 +112,25 @@ class OppgaveClient(
         }
     }
 
-    fun ferdigstillOppgave(oppgaveId: Long) {
-        val uri =
+    fun ferdigstillOppgave(
+        oppgaveId: Long,
+        endretAvEnhetsnr: String?,
+    ) {
+        val uriBuilder =
             UriComponentsBuilder
                 .fromUri(oppgaveUri)
                 .pathSegment("{id}", "ferdigstill")
-                .encode()
-                .toUriString()
-        patchForEntity<OppgaveResponse>(uri, "", uriVariables = oppgaveIdUriVariables(oppgaveId))
+        val uriVariables = oppgaveIdUriVariables(oppgaveId).toMutableMap()
+
+        val queryParams = listOf("endretAvEnhetsnr" to endretAvEnhetsnr)
+        queryParams.forEach { (key, value) ->
+            if (value != null) {
+                uriBuilder.queryParam(key, "{$key}")
+                uriVariables[key] = value
+            }
+        }
+
+        patchForEntity<OppgaveResponse>(uriBuilder.encode().toUriString(), "", uriVariables = oppgaveIdUriVariables(oppgaveId))
     }
 
     fun oppdaterOppgave(oppgave: Oppgave): OppdatertOppgaveResponse {
