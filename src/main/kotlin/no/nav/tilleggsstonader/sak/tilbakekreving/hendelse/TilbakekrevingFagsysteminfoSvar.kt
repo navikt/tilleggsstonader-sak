@@ -1,21 +1,7 @@
-package no.nav.tilleggsstonader.sak.tilbakekreving
+package no.nav.tilleggsstonader.sak.tilbakekreving.hendelse
 
 import java.time.LocalDate
 import java.time.LocalDateTime
-
-sealed interface TilbakrekrevingHendelse {
-    val hendelsestype: String
-    val versjon: Int
-}
-
-data class TilbakekrevingFagsysteminfoBehov(
-    override val versjon: Int,
-    val eksternFagsakId: String,
-    val kravgrunnlagReferanse: String?, // behandlingid
-    val hendelseOpprettet: LocalDateTime,
-) : TilbakrekrevingHendelse {
-    override val hendelsestype: String = "fagsysteminfo_behov"
-}
 
 data class TilbakekrevingFagsysteminfoSvar(
     val eksternFagsakId: String,
@@ -23,7 +9,7 @@ data class TilbakekrevingFagsysteminfoSvar(
     val mottaker: TilbakekrevingMottaker,
     val revurdering: TilbakekrevingFagsysteminfoSvarRevurdering,
     val utvidPerioder: List<UtvidetPeriode>,
-) : TilbakrekrevingHendelse {
+) : TilbakekrevingHendelse {
     override val hendelsestype: String = "fagsysteminfo_svar"
     override val versjon: Int = 1
 }

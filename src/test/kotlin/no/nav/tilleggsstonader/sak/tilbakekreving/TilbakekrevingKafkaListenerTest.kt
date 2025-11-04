@@ -13,6 +13,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.hendelser.ConsumerRecordUtil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingFagsysteminfoBehov
+import no.nav.tilleggsstonader.sak.tilbakekreving.håndter.FagsysteminfoBehovHåndterer
 import no.nav.tilleggsstonader.sak.utbetaling.AndelMedVedtaksperioder
 import no.nav.tilleggsstonader.sak.utbetaling.AndelTilkjentYtelseTilPeriodeService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
@@ -39,14 +41,19 @@ class TilbakekrevingKafkaListenerTest {
     val vedtakService = mockk<VedtakService>()
     val fagsakService = mockk<FagsakService>()
 
-    val tilbakekrevingKafkaListener =
-        TilbakekrevingKafkaListener(
+    val håndterer =
+        FagsysteminfoBehovHåndterer(
             behandlingService = behandlingService,
             eksternBehandlingIdRepository = eksternBehandlingIdRepository,
             kafkaTemplate = kafkaTemplate,
             andelTilkjentYtelseTilPeriodeService = andelTilkjentYtelseTilPeriodeService,
             vedtakService = vedtakService,
             fagsakService = fagsakService,
+        )
+
+    val tilbakekrevingKafkaListener =
+        TilbakekrevingKafkaListener(
+            tilbakekrevingHendelseHåndterere = listOf(håndterer),
         )
 
     val ack = mockk<Acknowledgment>()
