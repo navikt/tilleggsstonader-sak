@@ -135,7 +135,7 @@ class JournalføringServiceTest {
         }
         every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
 
-        every { gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(any<Behandling>()) } returns null
+        every { gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(any<FagsakId>()) } returns null
     }
 
     @AfterEach
@@ -350,7 +350,7 @@ class JournalføringServiceTest {
 
         @Test
         fun `skal gjennbruke data fra tidligere behandling`() {
-            every { gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(any<Behandling>()) } returns
+            every { gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(any<FagsakId>()) } returns
                 forrigeBehandling.id
 
             journalføringService.journalførTilNyBehandling(

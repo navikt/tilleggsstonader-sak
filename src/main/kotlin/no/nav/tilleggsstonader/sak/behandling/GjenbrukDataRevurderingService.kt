@@ -49,10 +49,6 @@ class GjenbrukDataRevurderingService(
         )
     }
 
-    fun finnBehandlingIdForGjenbruk(behandling: Behandling): BehandlingId? =
-        behandling.forrigeIverksatteBehandlingId
-            ?: behandlingService.finnSisteBehandlingSomHarVedtakPåFagsaken(behandling.fagsakId)?.id
-
     fun finnBehandlingIdForGjenbruk(fagsakId: FagsakId): BehandlingId? =
         behandlingService.finnSisteIverksatteBehandling(fagsakId)?.id
             ?: behandlingService.finnSisteBehandlingSomHarVedtakPåFagsaken(fagsakId)?.id

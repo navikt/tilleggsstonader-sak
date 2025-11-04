@@ -216,6 +216,54 @@ class TaAvVentServiceTest : IntegrationTest() {
         }
     }
 
+    @Test
+    fun `oppdaterer sisteIverksatteBehandling om det finnes flere iverksatte behandlinger og behandlinger på vent`() {
+        testWithBrukerContext(dummySaksbehandler) {
+            // oppretter en eksisterende iverksatt behandling, behandling har denne som forrigeIverksatte
+            val førsteIverksatteBehandling =
+                behandling(
+                    fagsak = fagsak,
+                    status = BehandlingStatus.UTREDES,
+                    resultat = BehandlingResultat.INNVILGET,
+                    vedtakstidspunkt = LocalDateTime.now().minusDays(2),
+                    forrigeIverksatteBehandlingId = null,
+                )
+            testoppsettService.lagre(førsteIverksatteBehandling)
+            vilkårperiodeService.opprettVilkårperiode(dummyVilkårperiodeAktivitet(behandlingId = førsteIverksatteBehandling.id))
+            testoppsettService.ferdigstillBehandling(førsteIverksatteBehandling)
+
+            val behandlingPåVent =
+                testoppsettService
+                    .hentBehandling(
+                        behandling.id,
+                    ).copy(forrigeIverksatteBehandlingId = førsteIverksatteBehandling.id)
+            testoppsettService.oppdater(behandlingPåVent)
+
+            // Iverksetter ny behandling mens første på vent
+            val andreIverksatteBehandling =
+                behandling(
+                    fagsak = fagsak,
+                    status = BehandlingStatus.UTREDES,
+                    resultat = BehandlingResultat.INNVILGET,
+                    vedtakstidspunkt = LocalDateTime.now().minusDays(1),
+                    forrigeIverksatteBehandlingId = førsteIverksatteBehandling.id,
+                )
+            testoppsettService.lagre(andreIverksatteBehandling)
+            vilkårperiodeService.opprettVilkårperiode(dummyVilkårperiodeAktivitet(behandlingId = andreIverksatteBehandling.id))
+            vilkårperiodeService.opprettVilkårperiode(dummyVilkårperiodeAktivitet(behandlingId = andreIverksatteBehandling.id))
+            testoppsettService.ferdigstillBehandling(andreIverksatteBehandling)
+
+            // Ta av behandlingen på vent og sjekk at den blir nullstilt og får ny forrigeIverksatteBehandlingId
+            taAvVentService.taAvVent(behandlingPåVent.id)
+
+            val nullstilteVilkår = vilkårperiodeService.hentVilkårperioder(behandling.id)
+            val nullstiltBehandling = testoppsettService.hentBehandling(behandling.id)
+            assertThat(nullstiltBehandling.forrigeIverksatteBehandlingId).isEqualTo(andreIverksatteBehandling.id)
+            assertThat(nullstilteVilkår.målgrupper).isEmpty()
+            assertThat(nullstilteVilkår.aktiviteter).hasSize(2)
+        }
+    }
+
     /**
      * Utility method for creating a dummy test barn (child)
      */

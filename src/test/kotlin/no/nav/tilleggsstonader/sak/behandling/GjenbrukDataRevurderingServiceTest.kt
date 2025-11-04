@@ -57,28 +57,6 @@ class GjenbrukDataRevurderingServiceTest {
     }
 
     @Nested
-    inner class FinnBehandlingIdForGjenbrukFraBehandling {
-        @Test
-        fun `skal bruke forrige behandlingId hvis den finnes på behandling som man sender inn`() {
-            val behandling = behandling(forrigeIverksatteBehandlingId = BehandlingId.random())
-
-            assertThat(service.finnBehandlingIdForGjenbruk(behandling)).isEqualTo(behandling.forrigeIverksatteBehandlingId)
-
-            verify(exactly = 0) { behandlingService.hentBehandlinger(any<FagsakId>()) }
-        }
-
-        @Test
-        fun `skal bruke siste avslåtte behandling hvis forrigeIverksatteBehandlingId på behandling er null`() {
-            val behandling = behandling()
-            every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(avslåttBehandling)
-
-            assertThat(service.finnBehandlingIdForGjenbruk(behandling)).isEqualTo(avslåttBehandling.id)
-
-            verify(exactly = 1) { behandlingService.hentBehandlinger(any<FagsakId>()) }
-        }
-    }
-
-    @Nested
     inner class FinnBehandlingIdForGjenbrukFraFagsakId {
         @Test
         fun `skal finne siste iverksatte behandling hvis den finnes`() {

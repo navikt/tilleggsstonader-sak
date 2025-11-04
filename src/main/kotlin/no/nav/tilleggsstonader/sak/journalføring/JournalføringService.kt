@@ -130,7 +130,7 @@ class JournalføringService(
                 oppgaveBeskrivelse = oppgaveBeskrivelse,
             )
 
-        val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
+        val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling.fagsakId)
 
         if (behandlingIdForGjenbruk != null) {
             gjenbrukDataRevurderingService.gjenbrukData(behandling, behandlingIdForGjenbruk)

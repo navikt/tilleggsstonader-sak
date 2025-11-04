@@ -52,7 +52,7 @@ class OpprettRevurderingService(
 
         val behandling = opprettBehandlingService.opprettBehandling(lagOpprettBehandlingRequest(opprettRevurdering))
 
-        val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
+        val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling.fagsakId)
 
         validerValgteBarn(opprettRevurdering, behandlingIdForGjenbruk)
 

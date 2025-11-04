@@ -81,7 +81,7 @@ class NullstillBehandlingService(
 
     private fun gjenbrukData(behandling: Behandling) {
         val behandlingIdForGjenbruk =
-            gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
+            gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling.fagsakId)
                 ?: error("Fant ingen behandling å gjenbruke data fra")
         kopierManglendeBarnFraForrigeBehandling(behandlingIdForGjenbruk, behandling)
         val barnMap = gjenbrukDataRevurderingService.finnNyttIdForBarn(behandling.id, behandlingIdForGjenbruk)
