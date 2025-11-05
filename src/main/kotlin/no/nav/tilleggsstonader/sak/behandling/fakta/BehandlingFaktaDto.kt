@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.KanDuReiseMedOffentligTransport
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.OffentligTransport
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.PrivatTransport
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse
@@ -144,7 +143,7 @@ data class SøknadsgrunnlagAktivitet(
 )
 
 data class DekkesUtgiftenAvAndre(
-    val typeUtdanning: TypeUtdanning,
+    val typeUtdanning: TypeUtdanning?,
     val lærling: JaNei?,
     val arbeidsgiverDekkerUtgift: JaNei?,
     val erUnder25år: JaNei?,
@@ -169,7 +168,7 @@ data class FaktaReise(
     val harMerEnn6KmReisevei: JaNei,
     val lengdeReisevei: Int?,
     val harBehovForTransportUavhengigAvReisensLengde: JaNei?,
-    val kanReiseMedOffentligTransport: KanDuReiseMedOffentligTransport,
+    val kanReiseMedOffentligTransport: JaNei,
     val offentligTransport: OffentligTransport?,
     val privatTransport: PrivatTransport?,
 )

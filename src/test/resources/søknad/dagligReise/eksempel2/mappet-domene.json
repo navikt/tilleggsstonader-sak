@@ -9,12 +9,16 @@
     }
   },
   "hovedytelse" : {
-    "hovedytelse" : [ "AAP" ],
+    "hovedytelse" : [ "OVERGANGSSTØNAD" ],
     "harNedsattArbeidsevne" : null,
     "arbeidOgOpphold" : null
   },
   "aktivitet" : {
-    "aktiviteter" : null,
+    "aktiviteter" : [ {
+      "id" : "annet",
+      "label" : "Annet",
+      "type" : null
+    } ],
     "dekkesUtgiftenAvAndre" : {
       "typeUtdanning" : "VIDEREGÅENDE",
       "lærling" : "JA",
@@ -33,35 +37,7 @@
       "poststed" : "JESSHEIM"
     },
     "adresse" : {
-      "gateadresse" : "Oslogate 42",
-      "postnummer" : "0482",
-      "poststed" : "Olso"
-    },
-    "periode" : {
-      "fom" : "2025-01-01",
-      "tom" : "2025-01-01"
-    },
-    "dagerPerUke" : "4",
-    "harMerEnn6KmReisevei" : "JA",
-    "lengdeReisevei" : 18,
-    "harBehovForTransportUavhengigAvReisensLengde" : null,
-    "kanReiseMedOffentligTransport" : "JA",
-    "offentligTransport" : {
-      "billettTyperValgt" : [ "ENKELTBILLETT", "TRETTIDAGERSBILLETT" ],
-      "enkeltbillettPris" : 44,
-      "syvdagersbillettPris" : null,
-      "månedskortPris" : 788
-    },
-    "privatTransport" : null
-  }, {
-    "skalReiseFraFolkeregistrertAdresse" : "JA",
-    "adresseDetSkalReisesFra" : {
-      "gateadresse" : "Hestehagen 2",
-      "postnummer" : "2069",
-      "poststed" : "JESSHEIM"
-    },
-    "adresse" : {
-      "gateadresse" : "Drammensveien 42",
+      "gateadresse" : "Osloveien 42",
       "postnummer" : "0482",
       "poststed" : "Oslo"
     },
@@ -69,18 +45,24 @@
       "fom" : "2025-01-01",
       "tom" : "2025-01-01"
     },
-    "dagerPerUke" : "1",
-    "harMerEnn6KmReisevei" : "NEI",
-    "lengdeReisevei" : 1,
-    "harBehovForTransportUavhengigAvReisensLengde" : "NEI",
-    "kanReiseMedOffentligTransport" : "JA",
-    "offentligTransport" : {
-      "billettTyperValgt" : [ "SYVDAGERSBILLETT" ],
-      "enkeltbillettPris" : null,
-      "syvdagersbillettPris" : 233,
-      "månedskortPris" : null
-    },
-    "privatTransport" : null
+    "dagerPerUke" : "4",
+    "harMerEnn6KmReisevei" : "JA",
+    "lengdeReisevei" : 14,
+    "harBehovForTransportUavhengigAvReisensLengde" : null,
+    "kanReiseMedOffentligTransport" : "NEI",
+    "offentligTransport" : null,
+    "privatTransport" : {
+      "årsakIkkeOffentligTransport" : [ "DÅRLIG_TRANSPORTTILBUD" ],
+      "kanKjøreMedEgenBil" : "JA",
+      "utgifterBil" : {
+        "mottarGrunnstønad" : null,
+        "parkering" : "JA",
+        "bompenger" : 43,
+        "ferge" : 0,
+        "piggdekkavgift" : 22
+      },
+      "taxi" : null
+    }
   } ],
   "dokumentasjon" : [ ]
 }

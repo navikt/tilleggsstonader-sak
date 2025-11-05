@@ -60,7 +60,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Data
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.FaktiskeUtgifter
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.GarDuPaVideregaendeEllerGrunnskoleType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaSlagsTypeBillettMaDuKjopeType
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.KanDuReiseMedOffentligTransportType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.MetadataDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.SkjemaDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Valgfelt
@@ -456,7 +455,7 @@ class OpprettTestBehandlingController(
                 harDu6KmReisevei = JaNeiTypeDagligReise.ja,
                 harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde = JaNeiTypeDagligReise.nei,
                 hvorLangErReiseveienDin = 8,
-                kanDuReiseMedOffentligTransport = KanDuReiseMedOffentligTransportType.ja,
+                kanDuReiseMedOffentligTransport = JaNeiTypeDagligReise.ja,
                 hvaSlagsTypeBillettMaDuKjope =
                     mapOf(
                         HvaSlagsTypeBillettMaDuKjopeType.enkeltbillett to true,
@@ -472,8 +471,6 @@ class OpprettTestBehandlingController(
                 hvorforIkkeBil = null,
                 reiseMedTaxi = null,
                 ttKort = null,
-                hvorSkalDuKjoreMedEgenBil = null,
-                hvorLangErReiseveienDinMedBil = null,
                 parkering = null,
                 bompenger = null,
                 ferge = null,

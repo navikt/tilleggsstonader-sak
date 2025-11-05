@@ -64,8 +64,7 @@
         "hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport": {
           "helsemessigeArsaker": false,
           "darligTransporttilbud": true,
-          "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": false,
-          "annet": false
+          "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": false
         },
         "kanKjoreMedEgenBil": "nei",
         "hvorforIkkeBil": {

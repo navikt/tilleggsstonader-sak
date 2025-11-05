@@ -2,14 +2,14 @@
   "personopplysninger" : {
     "adresse" : {
       "gyldigFraOgMed" : "2004-10-29",
-      "adresse" : "En vei 2",
+      "adresse" : "Hestehagen 2",
       "postnummer" : "2069",
       "poststed" : "JESSHEIM",
       "landkode" : "Land1"
     }
   },
   "hovedytelse" : {
-    "hovedytelse" : [ "AAP", "OVERGANGSSTØNAD", "GJENLEVENDEPENSJON", "UFØRETRYGD", "TILTAKSPENGER", "DAGPENGER", "SYKEPENGER", "KVALIFISERINGSSTØNAD", "INGEN_PENGESTØTTE", "INGEN_PASSENDE_ALTERNATIVER" ],
+    "hovedytelse" : [ "AAP" ],
     "harNedsattArbeidsevne" : null,
     "arbeidOgOpphold" : {
       "jobberIAnnetLand" : "JA",
@@ -60,39 +60,54 @@
       "poststed" : "Oslo"
     },
     "adresse" : {
-      "gateadresse" : "EksempelSvar",
-      "postnummer" : "EksempelSvar",
-      "poststed" : "EksempelSvar"
+      "gateadresse" : "Oslogate 42",
+      "postnummer" : "0482",
+      "poststed" : "Olso"
     },
     "periode" : {
       "fom" : "2025-01-01",
       "tom" : "2025-01-01"
     },
-    "dagerPerUke" : "3",
+    "dagerPerUke" : "4",
     "harMerEnn6KmReisevei" : "JA",
-    "lengdeReisevei" : 100,
-    "harBehovForTransportUavhengigAvReisensLengde" : "JA",
-    "kanReiseMedOffentligTransport" : "KOMBINERT_BIL_OFFENTLIG_TRANSPORT",
+    "lengdeReisevei" : 18,
+    "harBehovForTransportUavhengigAvReisensLengde" : null,
+    "kanReiseMedOffentligTransport" : "JA",
     "offentligTransport" : {
-      "billettTyperValgt" : [ "ENKELTBILLETT", "SYVDAGERSBILLETT", "TRETTIDAGERSBILLETT" ],
-      "enkeltbillettPris" : 100,
-      "syvdagersbillettPris" : 100,
-      "månedskortPris" : 100
+      "billettTyperValgt" : [ "ENKELTBILLETT", "TRETTIDAGERSBILLETT" ],
+      "enkeltbillettPris" : 44,
+      "syvdagersbillettPris" : null,
+      "månedskortPris" : 788
     },
-    "privatTransport" : {
-      "årsakIkkeOffentligTransport" : [ "HELSEMESSIGE_ÅRSAKER", "DÅRLIG_TRANSPORTTILBUD", "LEVERING_HENTING_BARNEHAGE_SKOLE", "ANNET" ],
-      "kanKjøreMedEgenBil" : "JA",
-      "utgifterBil" : {
-        "mottarGrunnstønad" : "JA",
-        "reisedistanseEgenBil" : 100,
-        "destinasjonEgenBil" : [ "TOGSTASJON", "BUSSSTOPP", "FERGE_BAT_KAI" ],
-        "parkering" : "JA",
-        "bompenger" : 100,
-        "ferge" : 100,
-        "piggdekkavgift" : 100
-      },
-      "taxi" : null
-    }
+    "privatTransport" : null
+  }, {
+    "skalReiseFraFolkeregistrertAdresse" : "NEI",
+    "adresseDetSkalReisesFra" : {
+      "gateadresse" : "Annen gate 2",
+      "postnummer" : "0482",
+      "poststed" : "Oslo"
+    },
+    "adresse" : {
+      "gateadresse" : "Drammensveien 42",
+      "postnummer" : "0482",
+      "poststed" : "Oslo"
+    },
+    "periode" : {
+      "fom" : "2025-01-01",
+      "tom" : "2025-01-01"
+    },
+    "dagerPerUke" : "1",
+    "harMerEnn6KmReisevei" : "NEI",
+    "lengdeReisevei" : 1,
+    "harBehovForTransportUavhengigAvReisensLengde" : "NEI",
+    "kanReiseMedOffentligTransport" : "JA",
+    "offentligTransport" : {
+      "billettTyperValgt" : [ "SYVDAGERSBILLETT" ],
+      "enkeltbillettPris" : null,
+      "syvdagersbillettPris" : 233,
+      "månedskortPris" : null
+    },
+    "privatTransport" : null
   } ],
   "dokumentasjon" : [ ]
 }

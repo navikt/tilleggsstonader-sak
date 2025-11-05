@@ -64,16 +64,9 @@
         "hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport": {
           "helsemessigeArsaker": false,
           "darligTransporttilbud": true,
-          "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": false,
-          "annet": false
+          "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": false
         },
         "kanKjoreMedEgenBil": "ja",
-        "hvorSkalDuKjoreMedEgenBil": {
-          "togstasjon": true,
-          "busstopp": false,
-          "fergeBatkai": false
-        },
-        "hvorLangErReiseveienDinMedBil": 100,
         "parkering": "ja",
         "bompenger": 43,
         "ferge": 0,

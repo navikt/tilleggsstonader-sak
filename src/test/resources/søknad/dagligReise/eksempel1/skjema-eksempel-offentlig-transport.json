@@ -1,14 +1,14 @@
 {
   "data": {
     "dineOpplysninger": {
-      "fornavn": "Fornavn",
-      "etternavn": "Etternavn",
+      "fornavn": "FORNUFTIG",
+      "etternavn": "SØNNAVIND",
       "identitet": {
-        "identitetsnummer": "1111111111"
+        "identitetsnummer": "29500474120"
       },
       "adresse": {
         "gyldigFraOgMed": "2004-10-29",
-        "adresse": "En vei 2",
+        "adresse": "Hestehagen 2",
         "postnummer": "2069",
         "bySted": "JESSHEIM",
         "landkode": "NOR",
@@ -23,18 +23,6 @@
         "postnr": "0482",
         "poststed": "Oslo"
       }
-    },
-    "hovedytelse": {
-      "arbeidsavklaringspenger": true,
-      "overgangsstonad": true,
-      "gjenlevendepensjon": true,
-      "uforetrygd": true,
-      "tiltakspenger": true,
-      "dagpenger": true,
-      "sykepenger": true,
-      "kvalifiseringsstonad": true,
-      "mottarIngenPengestotte": true,
-      "ingenAvAlternativenePasserForMeg": true
     },
     "arbeidOgOpphold": {
       "jobberIAnnetLand": "ja",
@@ -109,54 +97,60 @@
     },
     "reise": [
       {
-        "gateadresse": "EksempelSvar",
-        "postnr": "EksempelSvar",
-        "poststed": "EksempelSvar",
+        "gateadresse": "Oslogate 42",
+        "postnr": "0482",
+        "poststed": "Olso",
         "fom": "2025-01-01",
         "tom": "2025-01-01",
+        "kanDuReiseMedOffentligTransport": "ja",
         "hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet": {
-          "label": "3",
-          "value": "3"
+          "label": "4",
+          "value": "4"
         },
         "harDu6KmReisevei": "ja",
-        "harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde": "ja",
-        "hvorLangErReiseveienDin": 100,
-        "kanDuReiseMedOffentligTransport": "kombinertTogBil",
-        "hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport": {
-          "helsemessigeArsaker": true,
-          "darligTransporttilbud": true,
-          "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": true,
-          "annet": true
-        },
-        "kanKjoreMedEgenBil": "ja",
-        "mottarDuGrunnstonadFraNav": "ja",
-        "hvorforIkkeBil": {
-          "helsemessigeArsaker": true,
-          "harIkkeBilEllerForerkort": true,
-          "annet": true
-        },
-        "reiseMedTaxi": "ja",
-        "ttKort": "ja",
+        "hvorLangErReiseveienDin": 18,
         "hvaSlagsTypeBillettMaDuKjope": {
           "enkeltbillett": true,
-          "ukeskort": true,
+          "ukeskort": false,
           "manedskort": true
         },
-        "enkeltbillett": 100,
-        "syvdagersbillett": 100,
-        "manedskort": 100,
-        "hvorSkalDuKjoreMedEgenBil": {
-          "togstasjon": true,
-          "busstopp": true,
-          "fergeBatkai": true
+        "enkeltbillett": 44,
+        "manedskort": 788
+      },
+      {
+        "gateadresse": "Drammensveien 42",
+        "postnr": "0482",
+        "poststed": "Oslo",
+        "fom": "2025-01-01",
+        "tom": "2025-01-01",
+        "harDu6KmReisevei": "nei",
+        "hvorLangErReiseveienDin": 1,
+        "harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde": "nei",
+        "kanDuReiseMedOffentligTransport": "ja",
+        "hvaSlagsTypeBillettMaDuKjope": {
+          "enkeltbillett": false,
+          "ukeskort": true,
+          "manedskort": false
         },
-        "hvorLangErReiseveienDinMedBil": 100,
-        "parkering": "ja",
-        "bompenger": 100,
-        "ferge": 100,
-        "piggdekkavgift": 100
+        "hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet": {
+          "label": "1",
+          "value": "1"
+        },
+        "syvdagersbillett": 233
       }
-    ]
+    ],
+    "hovedytelse": {
+      "arbeidsavklaringspenger": true,
+      "overgangsstonad": false,
+      "gjenlevendepensjon": false,
+      "uforetrygd": false,
+      "tiltakspenger": false,
+      "dagpenger": false,
+      "sykepenger": false,
+      "kvalifiseringsstonad": false,
+      "mottarIngenPengestotte": false,
+      "ingenAvAlternativenePasserForMeg": false
+    }
   },
   "metadata": {
     "dataFetcher": {
