@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
@@ -10,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandling.vent.SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -25,6 +27,7 @@ class SettPåVentService(
     private val oppgaveService: OppgaveService,
     private val taskService: TaskService,
     private val settPåVentRepository: SettPåVentRepository,
+    private val fagsakservice: FagsakService,
 ) {
     fun hentStatusSettPåVent(behandlingId: BehandlingId): StatusPåVentDto {
         val settPåVent =
@@ -108,6 +111,7 @@ class SettPåVentService(
                 kommentar = request.kommentar,
                 frist = request.frist,
                 beholdOppgave = oppdaterOppgave.beholdOppgave,
+                endretAvEnhetsnr = hentBehandlendeEnhetForBehandlingId(behandlingId),
             ),
         )
     }
@@ -140,6 +144,7 @@ class SettPåVentService(
             oppdaterOppgave(
                 oppgaveId = oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(behandlingId).gsakOppgaveId,
                 dto = dto,
+                endretAvEnhetsnr = hentBehandlendeEnhetForBehandlingId(behandlingId),
             )
 
         val endret = utledEndretInformasjon(oppdatertSettPåVent)
@@ -159,6 +164,7 @@ class SettPåVentService(
     private fun oppdaterOppgave(
         oppgaveId: Long,
         dto: OppdaterSettPåVentDto,
+        endretAvEnhetsnr: String,
     ): SettPåVentResponse {
         val oppdatertOppgave =
             OppdaterPåVentRequest(
@@ -167,6 +173,7 @@ class SettPåVentService(
                 kommentar = dto.kommentar,
                 frist = dto.frist,
                 beholdOppgave = dto.beholdOppgave,
+                endretAvEnhetsnr = endretAvEnhetsnr,
             )
         return oppgaveService.oppdaterPåVent(oppdatertOppgave)
     }
@@ -211,4 +218,11 @@ class SettPåVentService(
             metadata = metadata,
         )
     }
+
+    private fun hentBehandlendeEnhetForBehandlingId(behandlingId: BehandlingId) =
+        fagsakservice
+            .hentFagsakForBehandling(behandlingId)
+            .stønadstype
+            .behandlendeEnhet()
+            .enhetsnr
 }
