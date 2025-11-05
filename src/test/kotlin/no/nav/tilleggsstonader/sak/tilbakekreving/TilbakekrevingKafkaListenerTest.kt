@@ -51,9 +51,11 @@ class TilbakekrevingKafkaListenerTest {
             fagsakService = fagsakService,
         )
 
+    val tilbakekrevingHendelseDelegate = TilbakekrevingHendelseDelegate(listOf(håndterer))
+
     val tilbakekrevingKafkaListener =
         TilbakekrevingKafkaListener(
-            tilbakekrevingHendelseHåndterere = listOf(håndterer),
+            tilbakekrevingHendelseDelegate = tilbakekrevingHendelseDelegate,
         )
 
     val ack = mockk<Acknowledgment>()
