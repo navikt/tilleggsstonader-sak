@@ -12,7 +12,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.klage.OpprettKlagebehandlingRequest
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
-import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -105,7 +104,7 @@ class JournalpostControllerTest(
                     request = BulkOppdaterLogiskVedleggRequest(listOf("ny tittel")),
                 )
             }
-            verify(exactly = 1) { oppgaveClient.ferdigstillOppgave("123".toLong()) }
+            verify(exactly = 1) { oppgaveClient.ferdigstillOppgave("123".toLong(), any()) }
         }
 
         @Test
@@ -153,7 +152,7 @@ class JournalpostControllerTest(
                     request = BulkOppdaterLogiskVedleggRequest(listOf("ny tittel")),
                 )
             }
-            verify(exactly = 1) { oppgaveClient.ferdigstillOppgave("123".toLong()) }
+            verify(exactly = 1) { oppgaveClient.ferdigstillOppgave("123".toLong(), any()) }
         }
     }
 

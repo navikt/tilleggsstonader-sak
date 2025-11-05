@@ -134,6 +134,7 @@ class OppgaveService(
     ): OppgaveMedMetadata {
         val finnOppgave =
             oppgaveRepository.findByGsakOppgaveId(gsakOppgaveId)
+        val oppgave = hentOppgave(gsakOppgaveId)
 
         finnOppgave?.let { it ->
             oppgaveRepository.update(it.copy(tilordnetSaksbehandler = saksbehandler))
@@ -144,6 +145,7 @@ class OppgaveService(
                 oppgaveId = gsakOppgaveId,
                 saksbehandler = saksbehandler,
                 versjon = versjon,
+                endretAvEnhetsnr = oppgave.tildeltEnhetsnr, // Går ut fra at samme enhet som oppgaven er tildelt til gjør oppdatering
             )
 
         return medMetadata(oppdatertOppgave)
@@ -245,11 +247,6 @@ class OppgaveService(
         return finnMappe(enhetsnummer, oppgaveMappe).id
     }
 
-    fun tilbakestillFordelingPåOppgave(
-        gsakOppgaveId: Long,
-        versjon: Int,
-    ): Oppgave = oppgaveClient.fordelOppgave(gsakOppgaveId, null, versjon = versjon)
-
     fun hentOppgaveDomainSomIkkeErFerdigstilt(
         behandlingId: BehandlingId,
         oppgavetype: Oppgavetype,
@@ -281,8 +278,11 @@ class OppgaveService(
         ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave)
     }
 
-    private fun ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave: OppgaveDomain) {
-        ferdigstillOppgave(oppgave.gsakOppgaveId)
+    private fun ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(
+        oppgave: OppgaveDomain,
+        endretAvEnhetsnr: String? = null,
+    ) {
+        ferdigstillOppgave(oppgave.gsakOppgaveId, endretAvEnhetsnr)
 
         oppgaveRepository.update(oppgave.copy(status = Oppgavestatus.FERDIGSTILT))
     }
@@ -292,12 +292,13 @@ class OppgaveService(
      */
     fun ferdigstillOppgaveOgsåHvisFeilregistrert(
         behandlingId: BehandlingId,
+        endretAvEnhetsnr: String?,
         oppgavetype: Oppgavetype,
     ) {
         val oppgave = oppgaveRepository.findByBehandlingIdAndTypeAndStatus(behandlingId, oppgavetype, Oppgavestatus.ÅPEN)
         oppgave?.let {
             try {
-                ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave)
+                ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave, endretAvEnhetsnr)
             } catch (e: Exception) {
                 val oppgaveStatus = hentOppgave(oppgave.gsakOppgaveId).status
                 if (oppgaveStatus == StatusEnum.FEILREGISTRERT) {
@@ -310,8 +311,11 @@ class OppgaveService(
         }
     }
 
-    fun ferdigstillOppgave(gsakOppgaveId: Long) {
-        oppgaveClient.ferdigstillOppgave(gsakOppgaveId)
+    fun ferdigstillOppgave(
+        gsakOppgaveId: Long,
+        endretAvEnhetsnr: String? = null,
+    ) {
+        oppgaveClient.ferdigstillOppgave(gsakOppgaveId, endretAvEnhetsnr)
     }
 
     fun finnSisteOppgaveDomainForBehandling(behandlingId: BehandlingId): OppgaveDomain? =

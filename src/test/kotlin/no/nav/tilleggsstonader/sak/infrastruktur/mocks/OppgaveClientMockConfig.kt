@@ -103,7 +103,7 @@ class OppgaveClientMockConfig {
                 oppgave.id
             }
 
-            every { oppgaveClient.ferdigstillOppgave(any()) } answers {
+            every { oppgaveClient.ferdigstillOppgave(any(), any()) } answers {
                 val oppgave = oppgavelager.hentOppgave(firstArg())
                 if (oppgave.status == StatusEnum.FERDIGSTILT) {
                     error("Allerede ferdigstilt")
@@ -206,7 +206,7 @@ class OppgaveClientMockConfig {
             oppgaveClient: OppgaveClient,
             oppgavelager: Oppgavelager,
         ) {
-            every { oppgaveClient.fordelOppgave(any(), any(), any()) } answers {
+            every { oppgaveClient.fordelOppgave(any(), any(), any(), any()) } answers {
                 val oppgaveId = firstArg<Long>()
                 val oppgave = oppgavelager.hentOppgave(oppgaveId)
                 val versjon = oppgave.versjon

@@ -4,6 +4,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.felles.tilTema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
@@ -86,14 +87,20 @@ class JournalføringService(
             journalførUtenNyBehandling(journalføringRequest, journalpost)
         }
 
-        ferdigstillJournalføringsoppgave(journalføringRequest.oppgaveId)
+        ferdigstillJournalføringsoppgave(journalføringRequest.oppgaveId, stønadstype = journalføringRequest.stønadstype)
 
         return journalpost.journalpostId
     }
 
-    private fun ferdigstillJournalføringsoppgave(oppgaveId: String) {
+    private fun ferdigstillJournalføringsoppgave(
+        oppgaveId: String,
+        stønadstype: Stønadstype,
+    ) {
         try {
-            oppgaveService.ferdigstillOppgave(oppgaveId.toLong())
+            oppgaveService.ferdigstillOppgave(
+                gsakOppgaveId = oppgaveId.toLong(),
+                endretAvEnhetsnr = stønadstype.behandlendeEnhet().enhetsnr,
+            )
         } catch (e: Exception) {
             logger.warn("Kunne ikke ferdigstille journalføringsoppgave=$oppgaveId. Oppretter task for ferdigstillelse")
             opprettFerdigstillJournalføringsoppgaveTask(oppgaveId)
