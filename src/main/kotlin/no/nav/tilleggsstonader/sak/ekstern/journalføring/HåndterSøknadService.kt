@@ -50,12 +50,29 @@ class HåndterSøknadService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun håndterSøknad(journalpost: Journalpost) {
+    fun håndterSøknad(journalpost: Journalpost): Behandling? {
         val personIdent = journalpostService.hentIdentFraJournalpost(journalpost)
         val stønadstype =
             finnStønadstyperSomKanOpprettesFraJournalpost(journalpost).defaultStønadstype
                 ?: error("Fant ikke dokument brevkode for journalpost")
-        håndterSøknad(personIdent = personIdent, stønadstype = stønadstype, journalpost = journalpost)
+
+        if (kanAutomatiskJournalføre(personIdent, stønadstype, journalpost)) {
+            return journalføringService.journalførTilNyBehandling(
+                journalpost = journalpost,
+                personIdent = personIdent,
+                stønadstype = stønadstype,
+                behandlingÅrsak = BehandlingÅrsak.SØKNAD,
+                oppgaveBeskrivelse = "Automatisk journalført søknad. Skal saksbehandles i ny løsning.",
+                journalførendeEnhet = MASKINELL_JOURNALFOERENDE_ENHET,
+            )
+        } else {
+            håndterSøknadSomIkkeKanAutomatiskJournalføres(
+                personIdent = personIdent,
+                stønadstype = stønadstype,
+                journalpost = journalpost,
+            )
+            return null
+        }
     }
 
     fun finnStønadstyperSomKanOpprettesFraJournalpost(journalpost: Journalpost): ValgbareStønadstyperForJournalpost {
@@ -138,29 +155,6 @@ class HåndterSøknadService(
                 typer = TypeYtelsePeriode.entries.toList(),
             ).perioder
             .map { it.type.tilMålgruppe() }
-    }
-
-    private fun håndterSøknad(
-        personIdent: String,
-        stønadstype: Stønadstype,
-        journalpost: Journalpost,
-    ) {
-        if (kanAutomatiskJournalføre(personIdent, stønadstype, journalpost)) {
-            journalføringService.journalførTilNyBehandling(
-                journalpost = journalpost,
-                personIdent = personIdent,
-                stønadstype = stønadstype,
-                behandlingÅrsak = BehandlingÅrsak.SØKNAD,
-                oppgaveBeskrivelse = "Automatisk journalført søknad. Skal saksbehandles i ny løsning.",
-                journalførendeEnhet = MASKINELL_JOURNALFOERENDE_ENHET,
-            )
-        } else {
-            håndterSøknadSomIkkeKanAutomatiskJournalføres(
-                personIdent = personIdent,
-                stønadstype = stønadstype,
-                journalpost = journalpost,
-            )
-        }
     }
 
     fun kanAutomatiskJournalføre(

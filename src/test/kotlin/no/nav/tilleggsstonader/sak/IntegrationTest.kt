@@ -48,7 +48,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.Vilkårperiod
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
@@ -119,8 +118,6 @@ abstract class IntegrationTest {
     @Autowired
     lateinit var taskWorker: TaskWorker
 
-    val logger = LoggerFactory.getLogger(javaClass)
-
     @Autowired
     lateinit var webTestClient: WebTestClient
 
@@ -190,8 +187,6 @@ abstract class IntegrationTest {
         }
     }
 
-    protected fun localhost(path: String): String = "$LOCALHOST$port/$path"
-
     protected fun onBehalfOfToken(
         role: String = rolleConfig.beslutterRolle,
         saksbehandler: String = "julenissen",
@@ -201,10 +196,6 @@ abstract class IntegrationTest {
         clientId: String,
         accessAsApplication: Boolean,
     ): String = TokenUtil.clientToken(mockOAuth2Server, clientId, accessAsApplication)
-
-    companion object {
-        private const val LOCALHOST = "http://localhost:"
-    }
 
     fun <T : Any> medBrukercontext(
         bruker: String = testBrukerkontekst.defaultBruker,

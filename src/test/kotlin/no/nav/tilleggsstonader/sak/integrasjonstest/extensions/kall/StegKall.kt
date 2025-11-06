@@ -19,3 +19,17 @@ fun IntegrationTest.resetSteg(
         .expectBody()
         .isEmpty
 }
+
+fun IntegrationTest.ferdigstillStegKall(
+    behandlingId: BehandlingId,
+    dto: StegController.FerdigstillStegRequest,
+) {
+    webTestClient
+        .post()
+        .uri("api/steg/behandling/$behandlingId/ferdigstill")
+        .bodyValue(dto)
+        .medOnBehalfOfToken()
+        .exchange()
+        .expectStatus()
+        .isOk
+}
