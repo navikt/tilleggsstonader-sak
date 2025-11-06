@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Arbe
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArsakOppholdUtenforNorgeType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DineOpplysninger
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.FaktiskeUtgifter
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.GarDuPaVideregaendeEllerGrunnskoleType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HarPengestotteAnnetLandType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
@@ -170,23 +171,28 @@ class SøknadskjemaDagligReiseMapper(
                     }
             }
 
-        val dekkesUtgiftenAvAndre =
-            DekkesUtgiftenAvAndre(
-                typeUtdanning =
-                    mapTypeUtdanning(
-                        aktiviteter.faktiskeUtgifter.garDuPaVideregaendeEllerGrunnskole,
-                    ),
-                lærling = aktiviteter.faktiskeUtgifter.erDuLaerling?.let(::mapJaNei),
-                arbeidsgiverDekkerUtgift = aktiviteter.faktiskeUtgifter.arbeidsgiverDekkerUtgift?.let(::mapJaNei),
-                erUnder25år = aktiviteter.faktiskeUtgifter.under25?.let(::mapJaNei),
-                betalerForReisenTilSkolenSelv = aktiviteter.faktiskeUtgifter.betalerForReisenTilSkolenSelv?.let(::mapJaNei),
-                lønnetAktivitet = aktiviteter.faktiskeUtgifter.lonnGjennomTiltak?.let(::mapJaNei),
-            )
-
         return AktivitetDagligReiseAvsnitt(
             aktiviteter = aktiviteterDagligReise,
             annenAktivitet = mapAnnenAktivitet(aktiviteter.arbeidsrettetAktivitet),
-            dekkesUtgiftenAvAndre = dekkesUtgiftenAvAndre,
+            dekkesUtgiftenAvAndre = mapDekkesUtgiftenAvAndre(aktiviteter.faktiskeUtgifter),
+        )
+    }
+
+    private fun mapDekkesUtgiftenAvAndre(faktiskeUtgifter: FaktiskeUtgifter?): DekkesUtgiftenAvAndre? {
+        if (faktiskeUtgifter == null) {
+            return null
+        }
+
+        return DekkesUtgiftenAvAndre(
+            typeUtdanning =
+                mapTypeUtdanning(
+                    faktiskeUtgifter.garDuPaVideregaendeEllerGrunnskole,
+                ),
+            lærling = faktiskeUtgifter.erDuLaerling?.let(::mapJaNei),
+            arbeidsgiverDekkerUtgift = faktiskeUtgifter.arbeidsgiverDekkerUtgift?.let(::mapJaNei),
+            erUnder25år = faktiskeUtgifter.under25?.let(::mapJaNei),
+            betalerForReisenTilSkolenSelv = faktiskeUtgifter.betalerForReisenTilSkolenSelv?.let(::mapJaNei),
+            lønnetAktivitet = faktiskeUtgifter.lonnGjennomTiltak?.let(::mapJaNei),
         )
     }
 

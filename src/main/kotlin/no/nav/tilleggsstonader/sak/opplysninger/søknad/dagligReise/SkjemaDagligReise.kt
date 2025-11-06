@@ -16,7 +16,7 @@ data class SkjemaDagligReise(
 
 data class AktivitetDagligReiseAvsnitt(
     val aktiviteter: List<AktivitetDagligReise>?,
-    val dekkesUtgiftenAvAndre: DekkesUtgiftenAvAndre,
+    val dekkesUtgiftenAvAndre: DekkesUtgiftenAvAndre?,
     val annenAktivitet: AnnenAktivitetType?,
 )
 
