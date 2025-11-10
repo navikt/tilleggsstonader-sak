@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.gjenopprettOppgaveKall
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.GjenopprettOppgavePåBehandlingTask
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -13,7 +12,8 @@ class GjenopprettOppgaveControllerTest : IntegrationTest() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak()
 
         medBrukercontext(rolle = rolleConfig.utvikler) {
-            gjenopprettOppgaveKall(behandling.id)
+            kall.gjenopprettOppgave
+                .gjenopprettResponse(behandling.id)
                 .expectStatus()
                 .isNoContent
         }
@@ -23,7 +23,8 @@ class GjenopprettOppgaveControllerTest : IntegrationTest() {
 
     @Test
     fun `gjenopprett feilregistrert på behandling, har ikke utviklerrolle, får 403`() {
-        gjenopprettOppgaveKall(BehandlingId.random())
+        kall.gjenopprettOppgave
+            .gjenopprettResponse(BehandlingId.random())
             .expectStatus()
             .isForbidden
     }

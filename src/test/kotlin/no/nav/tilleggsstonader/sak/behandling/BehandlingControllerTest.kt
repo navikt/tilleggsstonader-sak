@@ -16,10 +16,6 @@ import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.henleggBehandling
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentBehandling
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentBehandlingKall
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentBehandlingMedEksternId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -40,7 +36,8 @@ internal class BehandlingControllerTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("ikkeTilgang"))))
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        hentBehandlingKall(behandling.id)
+        kall.behandling
+            .hentBehandlingResponse(behandling.id)
             .expectStatus()
             .isForbidden
     }
@@ -51,7 +48,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
         val behandling = testoppsettService.lagre(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
         val henlagtBegrunnelse = "Registert feil"
 
-        henleggBehandling(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
+        kall.behandling.henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
 
         val oppdatert = behandlingRepository.findByIdOrThrow(behandling.id)
         assertThat(oppdatert.resultat).isEqualTo(BehandlingResultat.HENLAGT)
@@ -68,11 +65,11 @@ internal class BehandlingControllerTest : IntegrationTest() {
                 EksternBehandlingId(fagsak.eksternId.id, BehandlingId(behandling.id.id)),
             )
 
-        val respons = hentBehandlingMedEksternId(eskternBehandlingId.id)
+        val behandlingId = kall.behandling.ekstern(eskternBehandlingId.id)
 
         val oppdatert = eksternBehandlingIdRepository.findByIdOrThrow(eskternBehandlingId.id)
         assertThat(oppdatert.id).isEqualTo(eskternBehandlingId.id)
-        assertThat(oppdatert.behandlingId.id).isEqualTo(respons.id)
+        assertThat(oppdatert.behandlingId.id).isEqualTo(behandlingId.id)
     }
 
     @Test
@@ -81,7 +78,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
         val behandling = testoppsettService.lagre(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
         val henlagtBegrunnelse = "Registert feil"
 
-        henleggBehandling(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
+        kall.behandling.henleggResponse(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
 
         val oppdatert = behandlingRepository.findByIdOrThrow(behandling.id)
 
@@ -105,7 +102,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
                         ),
                 ),
             )
-        val hentetBehandling = hentBehandling(behandling.id)
+        val hentetBehandling = kall.behandling.hentBehandling(behandling.id)
 
         assertThat(hentetBehandling.nyeOpplysningerMetadata?.kilde).isEqualTo(NyeOpplysningerKilde.ETTERSENDING)
         assertThat(hentetBehandling.nyeOpplysningerMetadata?.endringer).containsExactly(NyeOpplysningerEndring.MÅLGRUPPE)
@@ -124,7 +121,8 @@ internal class BehandlingControllerTest : IntegrationTest() {
         @Test
         fun `behandlingStatus=OPPRETTET og veileder skal ikke hentes då det opprettes grunnlag`() {
             medBrukercontext(rolle = rolleConfig.veilederRolle) {
-                hentBehandlingKall(behandling.id)
+                kall.behandling
+                    .hentBehandlingResponse(behandling.id)
                     .expectStatus()
                     .isBadRequest
                     .expectBody()
@@ -140,13 +138,13 @@ internal class BehandlingControllerTest : IntegrationTest() {
             testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.UTREDES))
 
             medBrukercontext(rolle = rolleConfig.veilederRolle) {
-                hentBehandling(behandling.id)
+                kall.behandling.hentBehandling(behandling.id)
             }
         }
 
         @Test
         fun `behandlingStatus=OPPRETTET skal kunne opprette grunnlag hvis bruker er saksbehandler`() {
-            hentBehandling(behandling.id)
+            kall.behandling.hentBehandling(behandling.id)
         }
     }
 }

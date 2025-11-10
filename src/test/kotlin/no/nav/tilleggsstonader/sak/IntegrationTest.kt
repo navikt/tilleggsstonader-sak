@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.hendelser.Hendelse
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.MockClientService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
+import no.nav.tilleggsstonader.sak.integrasjonstest.Kall
 import no.nav.tilleggsstonader.sak.migrering.routing.SkjemaRouting
 import no.nav.tilleggsstonader.sak.oppfølging.Oppfølging
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlag
@@ -122,6 +123,8 @@ abstract class IntegrationTest {
     lateinit var webTestClient: WebTestClient
 
     private lateinit var testBrukerkontekst: TestBrukerKontekst
+
+    val kall = Kall(this)
 
     @BeforeEach
     fun setup() {

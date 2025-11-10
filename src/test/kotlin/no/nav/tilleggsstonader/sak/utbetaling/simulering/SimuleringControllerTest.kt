@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.simulerForBehandling
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -40,7 +39,7 @@ internal class SimuleringControllerTest : IntegrationTest() {
 
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
 
-        val respons = simulerForBehandling(behandling.id)
+        val respons = kall.simulering.simulering(behandling.id)
 
         assertThat(respons.perioder).hasSize(15)
         val simuleringsresultat = simuleringsresultatRepository.findByIdOrThrow(behandling.id)
@@ -59,7 +58,7 @@ internal class SimuleringControllerTest : IntegrationTest() {
 
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
 
-        val response = simulerForBehandling(behandling.id)
+        val response = kall.simulering.simulering(behandling.id)
         assertThat(response.oppsummering).isNull()
         assertThat(response.ingenEndringIUtbetaling).isTrue()
 

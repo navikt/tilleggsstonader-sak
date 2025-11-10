@@ -3,31 +3,35 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalpostResponse
-import org.springframework.test.web.reactive.server.expectBody
 
-fun IntegrationTest.fullførJournalpost(
-    journalpostId: String,
-    request: JournalføringRequest,
-) = webTestClient
-    .post()
-    .uri("/api/journalpost/$journalpostId/fullfor")
-    .bodyValue(request)
-    .medOnBehalfOfToken()
-    .exchange()
-    .expectStatus()
-    .isOk
-    .expectBody<String>()
-    .returnResult()
-    .responseBody!!
+class JournalpostKall(
+    private val test: IntegrationTest,
+) {
+    fun fullfor(
+        journalpostId: String,
+        request: JournalføringRequest,
+    ): String = fullforResponse(journalpostId, request).expectOkWithBody()
 
-fun IntegrationTest.hentJournalpost(journalpostId: String) =
-    webTestClient
-        .get()
-        .uri("/api/journalpost/$journalpostId")
-        .medOnBehalfOfToken()
-        .exchange()
-        .expectStatus()
-        .isOk
-        .expectBody<JournalpostResponse>()
-        .returnResult()
-        .responseBody!!
+    fun fullforResponse(
+        journalpostId: String,
+        request: JournalføringRequest,
+    ) = with(test) {
+        webTestClient
+            .post()
+            .uri("/api/journalpost/$journalpostId/fullfor")
+            .bodyValue(request)
+            .medOnBehalfOfToken()
+            .exchange()
+    }
+
+    fun journalpost(journalpostId: String): JournalpostResponse = journalpostResponse(journalpostId).expectOkWithBody()
+
+    fun journalpostResponse(journalpostId: String) =
+        with(test) {
+            webTestClient
+                .get()
+                .uri("/api/journalpost/$journalpostId")
+                .medOnBehalfOfToken()
+                .exchange()
+        }
+}

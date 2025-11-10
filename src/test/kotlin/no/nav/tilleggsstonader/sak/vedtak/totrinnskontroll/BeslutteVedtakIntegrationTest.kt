@@ -10,18 +10,10 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.brevKall
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.ferdigstillStegKall
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentBehandlingKall
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.innvilgeVedtakDagligReise
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.kall
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.opprettVilkårDagligReise
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.opprettVilkårperiode
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeTestUtil
@@ -43,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired
 
 class BeslutteVedtakIntegrationTest(
     @Autowired private val håndterSøknadService: HåndterSøknadService,
-    @Autowired private val behandlingService: BehandlingService,
 ) : IntegrationTest() {
     @Test
     fun `skal kunne opprette en behandling fra journalpost og fullføre den steg for steg`() {
@@ -62,12 +53,12 @@ class BeslutteVedtakIntegrationTest(
         val behandling = håndterSøknadService.håndterSøknad(journalpost)!!
 
         // Henter behandling, fordi det gjør at det opprettes grunnlagsdata(!) hvis ikke det eksisterer fra før
-        hentBehandlingKall(behandling.id)
+        kall.behandling.hentBehandling(behandling.id)
 
         // Oppretter oppgave
         kjørTasksKlareForProsessering()
 
-        opprettVilkårperiode(
+        kall.vilkårperiode.opprett(
             lagreVilkårperiode =
                 LagreVilkårperiode(
                     type = MålgruppeType.AAP,
@@ -78,7 +69,7 @@ class BeslutteVedtakIntegrationTest(
                 ),
         )
 
-        opprettVilkårperiode(
+        kall.vilkårperiode.opprett(
             lagreVilkårperiode =
                 LagreVilkårperiode(
                     type = AktivitetType.TILTAK,
@@ -94,7 +85,7 @@ class BeslutteVedtakIntegrationTest(
         )
 
         // INNGANGSVILKÅR -> VILKÅR
-        ferdigstillStegKall(
+        kall.steg.ferdigstill(
             behandling.id,
             StegController.FerdigstillStegRequest(
                 steg = StegType.INNGANGSVILKÅR,
@@ -114,10 +105,10 @@ class BeslutteVedtakIntegrationTest(
                 svar = svarOffentligTransport,
                 fakta = faktaOffentligTransport(),
             )
-        opprettVilkårDagligReise(reise, behandling.id)
+        kall.vilkår.opprettDagligReise(reise, behandling.id)
 
         // VILKÅR -> BEREGNE_YTELSE
-        ferdigstillStegKall(
+        kall.steg.ferdigstill(
             behandling.id,
             StegController.FerdigstillStegRequest(
                 steg = StegType.VILKÅR,
@@ -125,16 +116,16 @@ class BeslutteVedtakIntegrationTest(
         )
 
         // BEREGNE_YTELSE -> SIMULERING
-        innvilgeVedtakDagligReise(
+        kall.vedtak.dagligReise.lagreInnvilgelseResponse(
             behandlingId = behandling.id,
-            innvilgeVedtakDagligReiseRequest =
+            innvilgelseDto =
                 InnvilgelseDagligReiseRequest(
                     vedtaksperioder = listOf(VedtaksperiodeTestUtil.vedtaksperiode().tilDto()),
                 ),
         )
 
         // SIMULERING -> SEND_TIL_BESLUTTER
-        ferdigstillStegKall(
+        kall.steg.ferdigstill(
             behandling.id,
             StegController.FerdigstillStegRequest(
                 steg = StegType.SIMULERING,
@@ -142,7 +133,7 @@ class BeslutteVedtakIntegrationTest(
         )
 
         val minimaltBrev = "\"SAKSBEHANDLER_SIGNATUR - BREVDATO_PLACEHOLDER - BESLUTTER_SIGNATUR\""
-        brevKall(behandling.id, GenererPdfRequest(minimaltBrev))
+        kall.brev.brev(behandling.id, GenererPdfRequest(minimaltBrev))
         // SEND_TIL_BESLUTTER -> BESLUTTE_VEDTAK
         kall.totrinnskontroll.sendTilBeslutter(behandling.id)
 

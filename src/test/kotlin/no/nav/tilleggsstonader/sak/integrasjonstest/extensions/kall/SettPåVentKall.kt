@@ -5,36 +5,35 @@ import no.nav.tilleggsstonader.sak.behandling.vent.KanTaAvVentDto
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentDto
 import no.nav.tilleggsstonader.sak.behandling.vent.StatusPåVentDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import org.springframework.test.web.reactive.server.expectBody
 
-fun IntegrationTest.settPåVentKall(
-    behandlingId: BehandlingId,
-    settPåVentDto: SettPåVentDto,
-) = webTestClient
-    .post()
-    .uri("/api/sett-pa-vent/$behandlingId")
-    .bodyValue(settPåVentDto)
-    .medOnBehalfOfToken()
-    .exchange()
+class SettPåVentKall(
+    private val test: IntegrationTest,
+) {
+    fun settPaVent(
+        behandlingId: BehandlingId,
+        settPåVentDto: SettPåVentDto,
+    ): StatusPåVentDto = settPaVentResponse(behandlingId, settPåVentDto).expectOkWithBody()
 
-fun IntegrationTest.settPåVent(
-    behandlingId: BehandlingId,
-    settPåVentDto: SettPåVentDto,
-) = settPåVentKall(behandlingId, settPåVentDto)
-    .expectStatus()
-    .isOk
-    .expectBody<StatusPåVentDto>()
-    .returnResult()
-    .responseBody!!
+    fun settPaVentResponse(
+        behandlingId: BehandlingId,
+        settPåVentDto: SettPåVentDto,
+    ) = with(test) {
+        webTestClient
+            .post()
+            .uri("/api/sett-pa-vent/$behandlingId")
+            .bodyValue(settPåVentDto)
+            .medOnBehalfOfToken()
+            .exchange()
+    }
 
-fun IntegrationTest.hentKanTaAvVent(behandlingId: BehandlingId) =
-    webTestClient
-        .get()
-        .uri("/api/sett-pa-vent/$behandlingId/kan-ta-av-vent")
-        .medOnBehalfOfToken()
-        .exchange()
-        .expectStatus()
-        .isOk
-        .expectBody<KanTaAvVentDto>()
-        .returnResult()
-        .responseBody!!
+    fun kanTaAvVent(behandlingId: BehandlingId): KanTaAvVentDto = kanTaAvVentResponse(behandlingId).expectOkWithBody()
+
+    fun kanTaAvVentResponse(behandlingId: BehandlingId) =
+        with(test) {
+            webTestClient
+                .get()
+                .uri("/api/sett-pa-vent/$behandlingId/kan-ta-av-vent")
+                .medOnBehalfOfToken()
+                .exchange()
+        }
+}

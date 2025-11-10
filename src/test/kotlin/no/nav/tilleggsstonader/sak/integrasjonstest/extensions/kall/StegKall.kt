@@ -4,32 +4,40 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 
-fun IntegrationTest.resetSteg(
-    behandlingId: BehandlingId,
-    resetStegRequest: StegController.ResetStegRequest,
+class StegKall(
+    private val test: IntegrationTest,
 ) {
-    webTestClient
-        .post()
-        .uri("/api/steg/behandling/$behandlingId/reset")
-        .bodyValue(resetStegRequest)
-        .medOnBehalfOfToken()
-        .exchange()
-        .expectStatus()
-        .isOk
-        .expectBody()
-        .isEmpty
-}
+    fun reset(
+        behandlingId: BehandlingId,
+        resetStegRequest: StegController.ResetStegRequest,
+    ) = resetResponse(behandlingId, resetStegRequest).expectOkEmpty()
 
-fun IntegrationTest.ferdigstillStegKall(
-    behandlingId: BehandlingId,
-    dto: StegController.FerdigstillStegRequest,
-) {
-    webTestClient
-        .post()
-        .uri("api/steg/behandling/$behandlingId/ferdigstill")
-        .bodyValue(dto)
-        .medOnBehalfOfToken()
-        .exchange()
-        .expectStatus()
-        .isOk
+    fun resetResponse(
+        behandlingId: BehandlingId,
+        resetStegRequest: StegController.ResetStegRequest,
+    ) = with(test) {
+        webTestClient
+            .post()
+            .uri("/api/steg/behandling/$behandlingId/reset")
+            .bodyValue(resetStegRequest)
+            .medOnBehalfOfToken()
+            .exchange()
+    }
+
+    fun ferdigstill(
+        behandlingId: BehandlingId,
+        dto: StegController.FerdigstillStegRequest,
+    ) = ferdigstillResponse(behandlingId, dto).expectOkEmpty()
+
+    fun ferdigstillResponse(
+        behandlingId: BehandlingId,
+        dto: StegController.FerdigstillStegRequest,
+    ) = with(test) {
+        webTestClient
+            .post()
+            .uri("api/steg/behandling/$behandlingId/ferdigstill")
+            .bodyValue(dto)
+            .medOnBehalfOfToken()
+            .exchange()
+    }
 }

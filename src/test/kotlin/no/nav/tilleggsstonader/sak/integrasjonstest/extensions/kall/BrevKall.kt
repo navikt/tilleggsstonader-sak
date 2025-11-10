@@ -4,16 +4,23 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 
-fun IntegrationTest.brevKall(
-    behandlingId: BehandlingId,
-    dto: GenererPdfRequest,
+class BrevKall(
+    private val test: IntegrationTest,
 ) {
-    webTestClient
-        .post()
-        .uri("api/brev/$behandlingId")
-        .bodyValue(dto)
-        .medOnBehalfOfToken()
-        .exchange()
-        .expectStatus()
-        .isOk
+    fun brev(
+        behandlingId: BehandlingId,
+        dto: GenererPdfRequest,
+    ) = brevResponse(behandlingId, dto).expectOkWithBody<ByteArray>()
+
+    fun brevResponse(
+        behandlingId: BehandlingId,
+        dto: GenererPdfRequest,
+    ) = with(test) {
+        webTestClient
+            .post()
+            .uri("api/brev/$behandlingId")
+            .bodyValue(dto)
+            .medOnBehalfOfToken()
+            .exchange()
+    }
 }

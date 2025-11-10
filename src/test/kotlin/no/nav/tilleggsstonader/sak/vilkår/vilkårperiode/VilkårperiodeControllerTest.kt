@@ -2,11 +2,6 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVilkårperioder
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.oppdaterGrunnlagKall
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.oppdaterVikårperiode
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.opprettVilkårperiode
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.slettVilkårperiodeKall
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingerMålgruppeDto
@@ -23,7 +18,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
     fun `skal kunne lagre og hente vilkarperioder for AAP`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-        opprettVilkårperiode(
+        kall.vilkårperiode.opprett(
             LagreVilkårperiode(
                 type = MålgruppeType.AAP,
                 fom = LocalDate.now(),
@@ -33,7 +28,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
             ),
         )
 
-        val hentedeVilkårperioder = hentVilkårperioder(behandling)
+        val hentedeVilkårperioder = kall.vilkårperiode.hentForBehandling(behandling).vilkårperioder
 
         assertThat(hentedeVilkårperioder.målgrupper).hasSize(1)
         assertThat(hentedeVilkårperioder.aktiviteter).isEmpty()
@@ -55,16 +50,16 @@ class VilkårperiodeControllerTest : IntegrationTest() {
                 behandlingId = behandling.id,
             )
 
-        val response = opprettVilkårperiode(originalLagreRequest)
+        val response = kall.vilkårperiode.opprett(originalLagreRequest)
 
         val nyTom = LocalDate.now()
 
-        oppdaterVikårperiode(
+        kall.vilkårperiode.oppdater(
             lagreVilkårperiode = originalLagreRequest.copy(behandlingId = behandling.id, tom = nyTom),
             vilkårperiodeId = response.periode!!.id,
         )
 
-        val lagredeVilkårperioder = hentVilkårperioder(behandling)
+        val lagredeVilkårperioder = kall.vilkårperiode.hentForBehandling(behandling).vilkårperioder
 
         assertThat(lagredeVilkårperioder.målgrupper.single().tom).isEqualTo(nyTom)
     }
@@ -78,7 +73,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
             }
 
         val response =
-            opprettVilkårperiode(
+            kall.vilkårperiode.opprett(
                 LagreVilkårperiode(
                     type = MålgruppeType.AAP,
                     fom = LocalDate.now(),
@@ -88,10 +83,11 @@ class VilkårperiodeControllerTest : IntegrationTest() {
                 ),
             )
 
-        slettVilkårperiodeKall(
-            vilkårperiodeId = response.periode!!.id,
-            SlettVikårperiode(behandlingForAnnenFagsak.id, "test"),
-        ).expectStatus()
+        kall.vilkårperiode
+            .slettResponse(
+                vilkårperiodeId = response.periode!!.id,
+                SlettVikårperiode(behandlingForAnnenFagsak.id, "test"),
+            ).expectStatus()
             .is5xxServerError
             .expectBody()
             .jsonPath("$.detail")
@@ -107,7 +103,8 @@ class VilkårperiodeControllerTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             medBrukercontext(rolle = rolleConfig.veilederRolle) {
-                oppdaterGrunnlagKall(behandling.id)
+                kall.vilkårperiode
+                    .oppdaterGrunnlagResponse(behandling.id)
                     .expectStatus()
                     .isForbidden
                     .expectBody()

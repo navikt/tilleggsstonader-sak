@@ -7,8 +7,6 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.kjørSatsjusteringForStønadstype
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.kjørSatsjusteringForStønadstypeKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
@@ -68,7 +66,7 @@ class SatsjusteringLæremidlerTest : IntegrationTest() {
 
         val behandlingerForSatsjustering =
             medBrukercontext(rolle = rolleConfig.utvikler) {
-                kjørSatsjusteringForStønadstype(Stønadstype.LÆREMIDLER)
+                kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
             }
 
         kjørTasksKlareForProsessering()
@@ -99,7 +97,7 @@ class SatsjusteringLæremidlerTest : IntegrationTest() {
 
         val behandlingerTilSatsjustering =
             medBrukercontext(rolle = rolleConfig.utvikler) {
-                kjørSatsjusteringForStønadstype(Stønadstype.LÆREMIDLER)
+                kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
             }
 
         assertThat(behandlingerTilSatsjustering).isEmpty()
@@ -108,7 +106,8 @@ class SatsjusteringLæremidlerTest : IntegrationTest() {
     @Test
     fun `kaller satsjustering-endepunkt uten utvikler-rolle, kaster feil`() {
         medBrukercontext(rolle = rolleConfig.beslutterRolle) {
-            kjørSatsjusteringForStønadstypeKall(Stønadstype.LÆREMIDLER)
+            kall.satsjustering
+                .satsjusteringResponse(Stønadstype.LÆREMIDLER)
                 .expectStatus()
                 .isForbidden
         }

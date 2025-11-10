@@ -11,32 +11,34 @@ class TotrinnskontrollKall(
     fun sendTilBeslutter(
         behandlingId: BehandlingId,
         dto: SendTilBeslutterRequest = SendTilBeslutterRequest(),
-    ) {
-        with(test) {
-            webTestClient
-                .post()
-                .uri("/api/totrinnskontroll/$behandlingId/send-til-beslutter")
-                .bodyValue(dto)
-                .medOnBehalfOfToken()
-                .exchange()
-                .expectStatus()
-                .isOk
-        }
+    ) = sendTilBeslutterResponse(behandlingId, dto).expectOkEmpty()
+
+    fun sendTilBeslutterResponse(
+        behandlingId: BehandlingId,
+        dto: SendTilBeslutterRequest = SendTilBeslutterRequest(),
+    ) = with(test) {
+        webTestClient
+            .post()
+            .uri("/api/totrinnskontroll/$behandlingId/send-til-beslutter")
+            .bodyValue(dto)
+            .medOnBehalfOfToken()
+            .exchange()
     }
 
     fun beslutteVedtak(
         behandlingId: BehandlingId,
         beslutteVedtakDto: BeslutteVedtakDto,
-    ) {
-        with(test) {
-            webTestClient
-                .post()
-                .uri("/api/totrinnskontroll/$behandlingId/beslutte-vedtak")
-                .bodyValue(beslutteVedtakDto)
-                .medOnBehalfOfToken()
-                .exchange()
-                .expectStatus()
-                .isOk
-        }
+    ) = beslutteVedtakResponse(behandlingId, beslutteVedtakDto).expectOkEmpty()
+
+    fun beslutteVedtakResponse(
+        behandlingId: BehandlingId,
+        beslutteVedtakDto: BeslutteVedtakDto,
+    ) = with(test) {
+        webTestClient
+            .post()
+            .uri("/api/totrinnskontroll/$behandlingId/beslutte-vedtak")
+            .bodyValue(beslutteVedtakDto)
+            .medOnBehalfOfToken()
+            .exchange()
     }
 }

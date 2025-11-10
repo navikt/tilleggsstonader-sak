@@ -7,65 +7,66 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import org.springframework.test.web.reactive.server.expectBody
 
-fun IntegrationTest.hentBehandlingKall(behandlingId: BehandlingId) =
-    webTestClient
-        .get()
-        .uri("/api/behandling/$behandlingId")
-        .medOnBehalfOfToken()
-        .exchange()
-
-fun IntegrationTest.hentBehandling(behandlingId: BehandlingId) =
-    hentBehandlingKall(behandlingId)
-        .expectStatus()
-        .isOk
-        .expectBody<BehandlingDto>()
-        .returnResult()
-        .responseBody!!
-
-fun IntegrationTest.hentBehandlingMedEksternId(behandlingIdEksternId: Long) =
-    webTestClient
-        .get()
-        .uri("/api/behandling/ekstern/$behandlingIdEksternId")
-        .medOnBehalfOfToken()
-        .exchange()
-        .expectStatus()
-        .isOk
-        .expectBody<BehandlingId>()
-        .returnResult()
-        .responseBody!!
-
-fun IntegrationTest.henleggBehandlingKall(
-    behandlingId: BehandlingId,
-    henlagtDto: HenlagtDto,
-) = webTestClient
-    .post()
-    .uri("/api/behandling/$behandlingId/henlegg")
-    .bodyValue(henlagtDto)
-    .medOnBehalfOfToken()
-    .exchange()
-
-fun IntegrationTest.henleggBehandling(
-    behandlingId: BehandlingId,
-    henlagtDto: HenlagtDto,
+class BehandlingKall(
+    private val test: IntegrationTest,
 ) {
-    henleggBehandlingKall(behandlingId, henlagtDto)
+    fun hentBehandling(behandlingId: BehandlingId): BehandlingDto = hentBehandlingResponse(behandlingId).expectOkWithBody<BehandlingDto>()
+
+    fun hentBehandlingResponse(behandlingId: BehandlingId) =
+        with(test) {
+            webTestClient
+                .get()
+                .uri("/api/behandling/$behandlingId")
+                .medOnBehalfOfToken()
+                .exchange()
+        }
+
+    fun ekstern(behandlingIdEksternId: Long) = eksternResponse(behandlingIdEksternId).expectOkWithBody<BehandlingId>()
+
+    fun eksternResponse(behandlingIdEksternId: Long) =
+        with(test) {
+            webTestClient
+                .get()
+                .uri("/api/behandling/ekstern/$behandlingIdEksternId")
+                .medOnBehalfOfToken()
+                .exchange()
+        }
+
+    fun henlegg(
+        behandlingId: BehandlingId,
+        henlagtDto: HenlagtDto,
+    ) = henleggResponse(behandlingId, henlagtDto)
         .expectStatus()
-        .isNoContent
+        .isNoContent()
         .expectBody()
-        .isEmpty
+        .isEmpty()
+
+    fun henleggResponse(
+        behandlingId: BehandlingId,
+        henlagtDto: HenlagtDto,
+    ) = with(test) {
+        webTestClient
+            .post()
+            .uri("/api/behandling/$behandlingId/henlegg")
+            .bodyValue(henlagtDto)
+            .medOnBehalfOfToken()
+            .exchange()
+    }
+
+    fun behandlingshistorikkResponse(behandlingId: BehandlingId) =
+        with(test) {
+            webTestClient
+                .get()
+                .uri("/api/behandlingshistorikk/$behandlingId")
+                .medOnBehalfOfToken()
+                .exchange()
+        }
+
+    fun behandlingshistorikk(behandlingId: BehandlingId): List<BehandlingshistorikkDto> =
+        behandlingshistorikkResponse(behandlingId)
+            .expectStatus()
+            .isOk
+            .expectBody<List<BehandlingshistorikkDto>>()
+            .returnResult()
+            .responseBody!!
 }
-
-fun IntegrationTest.hentBehandlingshistorikkKall(behandlingId: BehandlingId) =
-    webTestClient
-        .get()
-        .uri("/api/behandlingshistorikk/$behandlingId")
-        .medOnBehalfOfToken()
-        .exchange()
-
-fun IntegrationTest.hentBehandlingshistorikk(behandlingId: BehandlingId) =
-    hentBehandlingshistorikkKall(behandlingId)
-        .expectStatus()
-        .isOk
-        .expectBody<List<BehandlingshistorikkDto>>()
-        .returnResult()
-        .responseBody!!

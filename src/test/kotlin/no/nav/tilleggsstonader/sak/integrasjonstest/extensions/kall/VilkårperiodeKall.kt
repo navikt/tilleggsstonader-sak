@@ -8,73 +8,76 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
 import org.springframework.http.HttpMethod
-import org.springframework.test.web.reactive.server.expectBody
 import java.util.UUID
 
-fun IntegrationTest.hentVilkårperioder(behandling: Behandling) =
-    webTestClient
-        .get()
-        .uri("/api/vilkarperiode/behandling/${behandling.id}")
-        .medOnBehalfOfToken()
-        .exchange()
-        .expectStatus()
-        .isOk
-        .expectBody<VilkårperioderResponse>()
-        .returnResult()
-        .responseBody!!
-        .vilkårperioder
+class VilkårperiodeKall(
+    private val test: IntegrationTest,
+) {
+    fun hentForBehandling(behandling: Behandling): VilkårperioderResponse = hentForBehandlingResponse(behandling).expectOkWithBody()
 
-fun IntegrationTest.opprettVilkårperiode(lagreVilkårperiode: LagreVilkårperiode) =
-    webTestClient
-        .post()
-        .uri("/api/vilkarperiode/v2")
-        .bodyValue(lagreVilkårperiode)
-        .medOnBehalfOfToken()
-        .exchange()
-        .expectStatus()
-        .isOk
-        .expectBody<LagreVilkårperiodeResponse>()
-        .returnResult()
-        .responseBody!!
+    fun hentForBehandlingResponse(behandling: Behandling) =
+        with(test) {
+            webTestClient
+                .get()
+                .uri("/api/vilkarperiode/behandling/${behandling.id}")
+                .medOnBehalfOfToken()
+                .exchange()
+        }
 
-fun IntegrationTest.oppdaterVikårperiode(
-    lagreVilkårperiode: LagreVilkårperiode,
-    vilkårperiodeId: UUID,
-) = webTestClient
-    .post()
-    .uri("/api/vilkarperiode/v2/$vilkårperiodeId")
-    .bodyValue(lagreVilkårperiode)
-    .medOnBehalfOfToken()
-    .exchange()
-    .expectStatus()
-    .isOk
-    .expectBody<LagreVilkårperiodeResponse>()
-    .returnResult()
-    .responseBody!!
+    fun opprett(lagreVilkårperiode: LagreVilkårperiode): LagreVilkårperiodeResponse = opprettResponse(lagreVilkårperiode).expectOkWithBody()
 
-fun IntegrationTest.slettVilkårperiodeKall(
-    vilkårperiodeId: UUID,
-    slettVikårperiode: SlettVikårperiode,
-) = webTestClient
-    .method(HttpMethod.DELETE) // Delete's ikke spesifisert skal ha body, så er en "hack"
-    .uri("/api/vilkarperiode/$vilkårperiodeId")
-    .bodyValue(slettVikårperiode)
-    .medOnBehalfOfToken()
-    .exchange()
+    fun opprettResponse(lagreVilkårperiode: LagreVilkårperiode) =
+        with(test) {
+            webTestClient
+                .post()
+                .uri("/api/vilkarperiode/v2")
+                .bodyValue(lagreVilkårperiode)
+                .medOnBehalfOfToken()
+                .exchange()
+        }
 
-fun IntegrationTest.slettVilkårperiode(
-    vilkårperiodeId: UUID,
-    slettVikårperiode: SlettVikårperiode,
-) = slettVilkårperiodeKall(vilkårperiodeId, slettVikårperiode)
-    .expectStatus()
-    .isOk
-    .expectBody<LagreVilkårperiodeResponse>()
-    .returnResult()
-    .responseBody!!
+    fun oppdater(
+        lagreVilkårperiode: LagreVilkårperiode,
+        vilkårperiodeId: UUID,
+    ): LagreVilkårperiodeResponse = oppdaterResponse(lagreVilkårperiode, vilkårperiodeId).expectOkWithBody()
 
-fun IntegrationTest.oppdaterGrunnlagKall(behandlingId: BehandlingId) =
-    webTestClient
-        .post()
-        .uri("/api/vilkarperiode/behandling/$behandlingId/oppdater-grunnlag")
-        .medOnBehalfOfToken()
-        .exchange()
+    fun oppdaterResponse(
+        lagreVilkårperiode: LagreVilkårperiode,
+        vilkårperiodeId: UUID,
+    ) = with(test) {
+        webTestClient
+            .post()
+            .uri("/api/vilkarperiode/v2/$vilkårperiodeId")
+            .bodyValue(lagreVilkårperiode)
+            .medOnBehalfOfToken()
+            .exchange()
+    }
+
+    fun slett(
+        vilkårperiodeId: UUID,
+        slettVikårperiode: SlettVikårperiode,
+    ): LagreVilkårperiodeResponse = slettResponse(vilkårperiodeId, slettVikårperiode).expectOkWithBody()
+
+    fun slettResponse(
+        vilkårperiodeId: UUID,
+        slettVikårperiode: SlettVikårperiode,
+    ) = with(test) {
+        webTestClient
+            .method(HttpMethod.DELETE) // Delete's ikke spesifisert skal ha body, så er en "hack"
+            .uri("/api/vilkarperiode/$vilkårperiodeId")
+            .bodyValue(slettVikårperiode)
+            .medOnBehalfOfToken()
+            .exchange()
+    }
+
+    fun oppdaterGrunnlag(behandlingId: BehandlingId) = oppdaterGrunnlagResponse(behandlingId).expectOkEmpty()
+
+    fun oppdaterGrunnlagResponse(behandlingId: BehandlingId) =
+        with(test) {
+            webTestClient
+                .post()
+                .uri("/api/vilkarperiode/behandling/$behandlingId/oppdater-grunnlag")
+                .medOnBehalfOfToken()
+                .exchange()
+        }
+}

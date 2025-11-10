@@ -4,8 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.avslåVedtakLæremidler
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakLæremidler
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -33,9 +31,9 @@ class LæremidlerVedtakControllerTest : IntegrationTest() {
                 begrunnelse = "begrunnelse",
             )
 
-        avslåVedtakLæremidler(behandling.id, vedtak)
+        kall.vedtak.læremidler.lagreAvslagResponse(behandling.id, vedtak)
 
-        val lagretDto = hentVedtakLæremidler<AvslagLæremidlerDto>(behandling.id)
+        val lagretDto = kall.vedtak.læremidler.hentVedtak<AvslagLæremidlerDto>(behandling.id)
 
         assertThat(lagretDto.årsakerAvslag).isEqualTo(vedtak.årsakerAvslag)
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)

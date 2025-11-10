@@ -6,10 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.avslåVedtakDagligReise
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakDagligReise
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakDagligReiseKall
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.innvilgeVedtakDagligReise
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkEmpty
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vilkårDagligReise
@@ -147,22 +144,20 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
 
     @Test
     fun `hent vedtak skal returnere tom body når det ikke finnes noen lagrede vedtak`() {
-        hentVedtakDagligReiseKall(dummyBehandlingId)
-            .expectStatus()
-            .isOk
-            .expectBody()
-            .isEmpty
+        kall.vedtak.dagligReise
+            .hentVedtakResponse(dummyBehandlingId)
+            .expectOkEmpty()
     }
 
     @Test
     fun `hent ut lagrede vedtak av type innvilgelse`() {
         val vedtakRequest = InnvilgelseDagligReiseRequest(listOf(vedtaksperiode.tilDto()))
 
-        innvilgeVedtakDagligReise(
+        kall.vedtak.dagligReise.lagreInnvilgelseResponse(
             dummyBehandling.id,
             vedtakRequest,
         )
-        val response = hentVedtakDagligReise<InnvilgelseDagligReiseResponse>(dummyBehandlingId)
+        val response = kall.vedtak.dagligReise.hentVedtak<InnvilgelseDagligReiseResponse>(dummyBehandlingId)
 
         assertThat(response).isEqualTo(dummyInnvilgelse)
     }
@@ -177,9 +172,9 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
                     begrunnelse = "begrunnelse",
                 )
 
-            avslåVedtakDagligReise(dummyBehandling.id, avslag)
+            kall.vedtak.dagligReise.lagreAvslagResponse(dummyBehandling.id, avslag)
 
-            val lagretDto = hentVedtakDagligReise<AvslagDagligReiseDto>(dummyBehandling.id)
+            val lagretDto = kall.vedtak.dagligReise.hentVedtak<AvslagDagligReiseDto>(dummyBehandling.id)
 
             assertThat(lagretDto.årsakerAvslag).isEqualTo(avslag.årsakerAvslag)
             assertThat(lagretDto.begrunnelse).isEqualTo(avslag.begrunnelse)
