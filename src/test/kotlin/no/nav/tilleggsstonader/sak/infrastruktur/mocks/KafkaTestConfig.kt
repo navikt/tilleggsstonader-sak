@@ -22,9 +22,18 @@ class KafkaTestConfig {
     }
 
     companion object {
+        private val sendteMeldinger = mutableListOf<ProducerRecord<String, String>>()
+
         fun resetMock(kafkaTemplate: KafkaTemplate<String, String>) {
             io.mockk.clearMocks(kafkaTemplate)
-            every { kafkaTemplate.send(any<ProducerRecord<String, String>>()) } returns CompletableFuture.completedFuture(mockk())
+            sendteMeldinger.clear()
+            every { kafkaTemplate.send(any<ProducerRecord<String, String>>()) } answers {
+                val record = firstArg<ProducerRecord<String, String>>()
+                sendteMeldinger.add(record)
+                CompletableFuture.completedFuture(mockk())
+            }
         }
+
+        fun sendteMeldinger() = sendteMeldinger.toList()
     }
 }

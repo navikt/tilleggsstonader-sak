@@ -13,20 +13,22 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.util.journalpost
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 
 val defaultIdent = "12345678910"
 val defaultJournalpostId = "1"
@@ -43,6 +45,9 @@ val minimaltBrev = """SAKSBEHANDLER_SIGNATUR - BREVDATO_PLACEHOLDER - BESLUTTER_
 fun IntegrationTest.gjennomførInnvilgelseDagligReise(
     fraJournalpost: Journalpost = defaultJournalpost,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
+    medAktivitet: (BehandlingId) -> LagreVilkårperiode = ::lagreVilkårperiodeAktivitet,
+    medMålgruppe: (BehandlingId) -> LagreVilkårperiode = ::lagreVilkårperiodeMålgruppe,
+    medVilkår: List<LagreDagligReiseDto> = listOf(lagreDagligReiseDto()),
 ): BehandlingId {
     val behandling = håndterSøknadService.håndterSøknad(fraJournalpost)!!
 
@@ -56,8 +61,8 @@ fun IntegrationTest.gjennomførInnvilgelseDagligReise(
     }
 
     // Gjennomfører steg: Inngangsvilkår
-    kall.vilkårperiode.opprett(lagreVilkårperiodeMålgruppe(behandling.id))
-    kall.vilkårperiode.opprett(lagreVilkårperiodeAktivitet(behandling.id))
+    kall.vilkårperiode.opprett(medAktivitet(behandling.id))
+    kall.vilkårperiode.opprett(medMålgruppe(behandling.id))
 
     kall.steg.ferdigstill(
         behandling.id,
@@ -71,7 +76,9 @@ fun IntegrationTest.gjennomførInnvilgelseDagligReise(
     }
 
     // Gjennomfører steg: Vilkår
-    kall.vilkår.opprettDagligReise(lagreDagligReiseDto(), behandling.id)
+    medVilkår.forEach {
+        kall.vilkår.opprettDagligReise(it, behandling.id)
+    }
 
     kall.steg.ferdigstill(
         behandling.id,
@@ -85,11 +92,16 @@ fun IntegrationTest.gjennomførInnvilgelseDagligReise(
     }
 
     // Gjennomfører steg: Beregn ytelse
-    kall.vedtak.dagligReise.lagreInnvilgelseResponse(
+    val foreslåtteVedtaksperioder: List<LagretVedtaksperiodeDto> =
+        kall.vedtak
+            .foreslåVedtaksperioder(behandling.id)
+            .expectOkWithBody()
+
+    kall.vedtak.dagligReise.lagreInnvilgelse(
         behandlingId = behandling.id,
         innvilgelseDto =
             InnvilgelseDagligReiseRequest(
-                vedtaksperioder = listOf(vedtaksperiode().tilDto()),
+                vedtaksperioder = foreslåtteVedtaksperioder.map { it.tilVedtaksperiodeDto() },
             ),
     )
 
@@ -175,7 +187,7 @@ fun IntegrationTest.gjennomførAvslagDagligReise(
     }
 
     // Gjennomfører steg: Beregn ytelse
-    kall.vedtak.dagligReise.lagreAvslagResponse(
+    kall.vedtak.dagligReise.lagreAvslag(
         behandlingId = behandling.id,
         avslagDto =
             AvslagDagligReiseDto(
