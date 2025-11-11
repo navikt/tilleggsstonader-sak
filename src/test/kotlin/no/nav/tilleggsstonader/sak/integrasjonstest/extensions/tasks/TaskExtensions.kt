@@ -16,6 +16,8 @@ fun IntegrationTest.kjørTasksKlareForProsesseringTilIngenTasksIgjen() {
     } while (taskService.finnAlleTasksKlareForProsessering(Pageable.unpaged()).isNotEmpty())
 }
 
+fun IntegrationTest.finnAlleTaskerMedType(type: String) = taskService.finnAlleTaskerMedType(type)
+
 fun IntegrationTest.kjørTasksKlareForProsessering() {
     logger.info("Kjører tasks klare for prosessering")
     taskService

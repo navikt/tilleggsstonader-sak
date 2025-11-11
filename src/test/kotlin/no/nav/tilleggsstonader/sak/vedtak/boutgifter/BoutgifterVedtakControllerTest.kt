@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkEmpty
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
@@ -68,7 +69,7 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
     @Test
     fun `hent vedtak skal returnere tom body når det ikke finnes noen lagrede vedtak`() {
         kall.vedtak.boutgifter
-            .hentVedtakResponse(dummyBehandling.id)
+            .hentVedtak(dummyBehandling.id)
             .expectOkEmpty()
     }
 
@@ -82,9 +83,12 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
                     begrunnelse = "begrunnelse",
                 )
 
-            kall.vedtak.boutgifter.lagreAvslagResponse(dummyBehandling.id, avslag)
+            kall.vedtak.boutgifter.lagreAvslag(dummyBehandling.id, avslag)
 
-            val lagretDto = kall.vedtak.boutgifter.hentVedtak<AvslagBoutgifterDto>(dummyBehandling.id)
+            val lagretDto =
+                kall.vedtak.boutgifter
+                    .hentVedtak(dummyBehandling.id)
+                    .expectOkWithBody<AvslagBoutgifterDto>()
 
             assertThat(lagretDto.årsakerAvslag).isEqualTo(avslag.årsakerAvslag)
             assertThat(lagretDto.begrunnelse).isEqualTo(avslag.begrunnelse)
@@ -97,7 +101,7 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
         @Test
         fun `skal lagre og hente opphør`() {
             val opphørsdato = dummyFom.plusDays(4)
-            kall.vedtak.boutgifter.lagreInnvilgelseResponse(
+            kall.vedtak.boutgifter.lagreInnvilgelse(
                 dummyBehandling.id,
                 InnvilgelseBoutgifterRequest(listOf(vedtaksperiode.tilDto())),
             )
@@ -141,9 +145,12 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
                     opphørsdato = opphørsdato,
                 )
 
-            kall.vedtak.boutgifter.lagreOpphørResponse(revurdering.id, opphørVedtak)
+            kall.vedtak.boutgifter.lagreOpphør(revurdering.id, opphørVedtak)
 
-            val lagretDto = kall.vedtak.boutgifter.hentVedtak<OpphørBoutgifterResponse>(revurdering.id)
+            val lagretDto =
+                kall.vedtak.boutgifter
+                    .hentVedtak(revurdering.id)
+                    .expectOkWithBody<OpphørBoutgifterResponse>()
 
             assertThat((lagretDto).årsakerOpphør).isEqualTo(opphørVedtak.årsakerOpphør)
             assertThat(lagretDto.begrunnelse).isEqualTo(opphørVedtak.begrunnelse)

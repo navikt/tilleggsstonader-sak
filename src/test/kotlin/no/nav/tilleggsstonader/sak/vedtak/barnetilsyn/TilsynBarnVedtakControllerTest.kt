@@ -84,7 +84,7 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
     fun `skal returnere empty body når det ikke finnes noe lagret`() {
         kall.vedtak
             .tilsynBarn
-            .hentVedtakResponse(behandling.id)
+            .hentVedtak(behandling.id)
             .expectStatus()
             .isOk
             .expectBody()
@@ -94,11 +94,11 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
     @Test
     fun `Skal lagre og hente innvilgelse med vedtaksperioder og begrunnelse`() {
         val vedtak = innvilgelseDto(listOf(vedtaksperiodeDto), "Jo du skjønner det, at...")
-        kall.vedtak.tilsynBarn.lagreInnvilgelseResponse(behandling.id, vedtak)
+        kall.vedtak.tilsynBarn.lagreInnvilgelse(behandling.id, vedtak)
 
         val lagretDto =
             kall.vedtak.tilsynBarn
-                .hentVedtakResponse(behandling.id)
+                .hentVedtak(behandling.id)
                 .expectOkWithBody<InnvilgelseTilsynBarnResponse>()
 
         assertThat(lagretDto.vedtaksperioder?.map { it.tilVedtaksperiodeDto() }).isEqualTo(vedtak.vedtaksperioder)
@@ -114,11 +114,11 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
                 begrunnelse = "begrunnelse",
             )
 
-        kall.vedtak.tilsynBarn.lagreAvslagResponse(behandling.id, vedtak)
+        kall.vedtak.tilsynBarn.lagreAvslag(behandling.id, vedtak)
 
         val lagretDto =
             kall.vedtak.tilsynBarn
-                .hentVedtakResponse(behandling.id)
+                .hentVedtak(behandling.id)
                 .expectOkWithBody<AvslagTilsynBarnDto>()
 
         assertThat((lagretDto).årsakerAvslag).isEqualTo(vedtak.årsakerAvslag)
@@ -128,7 +128,7 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
 
     @Test
     fun `skal lagre og hente opphør med vedtaksperioder`() {
-        kall.vedtak.tilsynBarn.lagreInnvilgelseResponse(
+        kall.vedtak.tilsynBarn.lagreInnvilgelse(
             behandlingId = behandling.id,
             innvilgelseDto =
                 InnvilgelseTilsynBarnRequest(
@@ -173,11 +173,11 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
                 opphørsdato = opphørsdato,
             )
 
-        kall.vedtak.tilsynBarn.lagreOpphørResponse(behandlingLagreOpphør.id, vedtak)
+        kall.vedtak.tilsynBarn.lagreOpphør(behandlingLagreOpphør.id, vedtak)
 
         val lagretDto =
             kall.vedtak.tilsynBarn
-                .hentVedtakResponse(behandlingLagreOpphør.id)
+                .hentVedtak(behandlingLagreOpphør.id)
                 .expectOkWithBody<OpphørTilsynBarnResponse>()
 
         assertThat(lagretDto.årsakerOpphør).isEqualTo(vedtak.årsakerOpphør)

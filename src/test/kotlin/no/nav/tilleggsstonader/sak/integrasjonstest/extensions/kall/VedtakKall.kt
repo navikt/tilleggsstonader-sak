@@ -3,22 +3,30 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 
 class VedtakKall(
-    test: IntegrationTest,
+    val test: IntegrationTest,
 ) {
     val tilsynBarn = VedtakStønadKall(test, "tilsyn-barn")
     val læremidler = VedtakStønadKall(test, "laremidler")
     val boutgifter = VedtakStønadKall(test, "boutgifter")
     val dagligReise = VedtakStønadKall(test, "daglig-reise")
+
+    fun foreslåVedtaksperioder(behandlingId: BehandlingId) =
+        with(test) {
+            webTestClient
+                .get()
+                .uri("/api/vedtak/$behandlingId/foresla")
+                .medOnBehalfOfToken()
+                .exchange()
+        }
 }
 
 class VedtakStønadKall(
     val test: IntegrationTest,
     val stønadPath: String,
 ) {
-    fun lagreVedtakResponse(
+    fun lagreVedtak(
         behandlingId: BehandlingId,
         resultatPath: String,
         vedtakDto: VedtakRequest,
@@ -31,22 +39,22 @@ class VedtakStønadKall(
             .exchange()
     }
 
-    fun lagreOpphørResponse(
+    fun lagreOpphør(
         behandlingId: BehandlingId,
         opphørDto: VedtakRequest,
-    ) = lagreVedtakResponse(behandlingId, "opphor", opphørDto)
+    ) = lagreVedtak(behandlingId, "opphor", opphørDto)
 
-    fun lagreAvslagResponse(
+    fun lagreAvslag(
         behandlingId: BehandlingId,
         avslagDto: VedtakRequest,
-    ) = lagreVedtakResponse(behandlingId, "avslag", avslagDto)
+    ) = lagreVedtak(behandlingId, "avslag", avslagDto)
 
-    fun lagreInnvilgelseResponse(
+    fun lagreInnvilgelse(
         behandlingId: BehandlingId,
         innvilgelseDto: VedtakRequest,
-    ) = lagreVedtakResponse(behandlingId, "innvilgelse", innvilgelseDto)
+    ) = lagreVedtak(behandlingId, "innvilgelse", innvilgelseDto)
 
-    fun hentVedtakResponse(behandlingId: BehandlingId) =
+    fun hentVedtak(behandlingId: BehandlingId) =
         with(test) {
             webTestClient
                 .get()
@@ -54,8 +62,4 @@ class VedtakStønadKall(
                 .medOnBehalfOfToken()
                 .exchange()
         }
-
-    inline fun <reified T : VedtakResponse> hentVedtak(behandlingId: BehandlingId) =
-        hentVedtakResponse(behandlingId)
-            .expectOkWithBody<T>()
 }

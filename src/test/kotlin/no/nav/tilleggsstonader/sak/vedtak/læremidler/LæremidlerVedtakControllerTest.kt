@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -31,9 +32,12 @@ class LæremidlerVedtakControllerTest : IntegrationTest() {
                 begrunnelse = "begrunnelse",
             )
 
-        kall.vedtak.læremidler.lagreAvslagResponse(behandling.id, vedtak)
+        kall.vedtak.læremidler.lagreAvslag(behandling.id, vedtak)
 
-        val lagretDto = kall.vedtak.læremidler.hentVedtak<AvslagLæremidlerDto>(behandling.id)
+        val lagretDto =
+            kall.vedtak.læremidler
+                .hentVedtak(behandling.id)
+                .expectOkWithBody<AvslagLæremidlerDto>()
 
         assertThat(lagretDto.årsakerAvslag).isEqualTo(vedtak.årsakerAvslag)
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
