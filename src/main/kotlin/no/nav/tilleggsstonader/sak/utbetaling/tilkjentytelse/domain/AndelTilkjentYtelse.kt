@@ -84,12 +84,11 @@ data class AndelTilkjentYtelse(
             TypeAndel.BOUTGIFTER_AAP,
             TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER,
             TypeAndel.BOUTGIFTER_ETTERLATTE,
-            -> satstype skalVære Satstype.DAG
 
             TypeAndel.DAGLIG_REISE_AAP,
             TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER,
             TypeAndel.DAGLIG_REISE_ETTERLATTE,
-            -> satstype skalVære Satstype.ENGANGSBELØP
+            -> satstype skalVære Satstype.DAG
 
             TypeAndel.UGYLDIG -> {}
         }

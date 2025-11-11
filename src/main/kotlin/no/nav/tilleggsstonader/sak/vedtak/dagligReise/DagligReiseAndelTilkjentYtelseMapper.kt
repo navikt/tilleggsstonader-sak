@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import java.time.LocalDate
 
@@ -21,7 +22,7 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(behandlingId:
 
             lagAndelForDagligReise(
                 behandlingId = behandlingId,
-                fomUkedag = fom,
+                fomUkedag = fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 beløp = reiseperioder.sumOf { it.beløp },
                 målgruppe = målgrupper.first(),
             )
