@@ -69,9 +69,10 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
     }
 
     @Test
-    fun `to reiser som starter på ulike helgedager, skal begge fredagen på de respektive helgedagene`() {
+    fun `to reiser som starter på ulike helgedager, skal begge utbetales mandagen etter`() {
         val lørdag = 6 september 2025
         val søndag = 7 september 2025
+        val mandag = 8 september 2025
         val beregningsresultat =
             BeregningsresultatOffentligTransport(
                 reiser = listOf(lagBeregningsresultatForReise(lørdag), lagBeregningsresultatForReise(søndag)),
@@ -84,13 +85,13 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
             assertThat(fom).isEqualTo(lørdag)
             assertThat(tom).isEqualTo(lørdag)
             assertThat(beløp).isEqualTo(100)
-            assertThat(utbetalingsdato).isEqualTo(lørdag)
+            assertThat(utbetalingsdato).isEqualTo(mandag)
         }
         with(andeler.last()) {
             assertThat(fom).isEqualTo(søndag)
             assertThat(tom).isEqualTo(søndag)
             assertThat(beløp).isEqualTo(100)
-            assertThat(utbetalingsdato).isEqualTo(søndag)
+            assertThat(utbetalingsdato).isEqualTo(mandag)
         }
     }
 
