@@ -27,7 +27,7 @@ class StegKall(
     fun ferdigstill(
         behandlingId: BehandlingId,
         dto: StegController.FerdigstillStegRequest,
-    ) = ferdigstillResponse(behandlingId, dto).expectOkEmpty()
+    ) = ferdigstillResponse(behandlingId, dto).expectOkWithBody<BehandlingId>()
 
     fun ferdigstillResponse(
         behandlingId: BehandlingId,

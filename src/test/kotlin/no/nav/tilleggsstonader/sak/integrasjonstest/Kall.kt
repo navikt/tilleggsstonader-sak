@@ -18,7 +18,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårperiodeKall
 
 class Kall(
-    private val test: IntegrationTest,
+    test: IntegrationTest,
 ) {
     val arena = ArenaKall(test)
     val behandling = BehandlingKall(test)

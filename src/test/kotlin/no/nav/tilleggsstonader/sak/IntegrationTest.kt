@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.brev.frittstående.FrittståendeBrev
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretBrev
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretFrittståendeBrev
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.Vedtaksbrev
+import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
@@ -118,6 +119,9 @@ abstract class IntegrationTest {
 
     @Autowired
     lateinit var taskWorker: TaskWorker
+
+    @Autowired
+    lateinit var håndterSøknadService: HåndterSøknadService
 
     @Autowired
     lateinit var webTestClient: WebTestClient

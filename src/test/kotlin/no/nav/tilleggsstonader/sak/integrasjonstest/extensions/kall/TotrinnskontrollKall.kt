@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.StatusTotrinnskontrollDto
 
 class TotrinnskontrollKall(
     private val test: IntegrationTest,
@@ -11,7 +12,7 @@ class TotrinnskontrollKall(
     fun sendTilBeslutter(
         behandlingId: BehandlingId,
         dto: SendTilBeslutterRequest = SendTilBeslutterRequest(),
-    ) = sendTilBeslutterResponse(behandlingId, dto).expectOkEmpty()
+    ): StatusTotrinnskontrollDto = sendTilBeslutterResponse(behandlingId, dto).expectOkWithBody()
 
     fun sendTilBeslutterResponse(
         behandlingId: BehandlingId,
@@ -28,7 +29,7 @@ class TotrinnskontrollKall(
     fun beslutteVedtak(
         behandlingId: BehandlingId,
         beslutteVedtakDto: BeslutteVedtakDto,
-    ) = beslutteVedtakResponse(behandlingId, beslutteVedtakDto).expectOkEmpty()
+    ): StatusTotrinnskontrollDto = beslutteVedtakResponse(behandlingId, beslutteVedtakDto).expectOkWithBody()
 
     fun beslutteVedtakResponse(
         behandlingId: BehandlingId,
