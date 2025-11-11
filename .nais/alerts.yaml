@@ -18,12 +18,32 @@ spec:
           labels:
             namespace: tilleggsstonader
             severity: critical
+
         - alert: Iverksettinger uten OK-status
           expr: max(andel_tilkjent_ytelse_iverksetting_status{status="IKKE_MOTTATT_OK_STATUS"}) > 0
           annotations:
             consequence: Iverksettinger uten mottatt OK-status fra hel-ved
             action: "Sjekk logger for å finne iverksetting-id ikke har mottatt OK-status og kontakt hel-ved"
+          labels:
+            namespace: tilleggsstonader
+            severity: critical
 
+        - alert: Feil i TS-sak
+          expr: sum(increase(logback_events_total{app=~"tilleggsstonader-.*",level=~"error"}[5m])) > 0
+          for: 2m
+          annotations:
+            consequence: Det har skjedd en feil i TS-sak
+            action: "Sjekk logger for å finne feilen https://logs.adeo.no/s/nav-logs-legacy/app/r/s/zjo6X"
+          labelste:
+            namespace: tilleggsstonader
+            severity: critical
+
+        - alert: Feilet task i Tilleggsstønader
+          expr: sum(increase(prosessering_tasks_feilet{team="tilleggsstonader"}[5m])) > 0
+          for: 2m
+          annotations:
+            consequence: En eller flere prosesseringstasks har feilet
+            action: "Sjekk prosessering: https://tilleggsstonader-prosessering.intern.nav.no/"
           labels:
             namespace: tilleggsstonader
             severity: critical
