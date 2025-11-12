@@ -34,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
@@ -615,11 +616,11 @@ object InterntVedtakTestdata {
                         id = behandlingId,
                         vedtakstidspunkt = LocalDate.of(2024, 2, 5).atStartOfDay(),
                         opprettetTid = LocalDate.of(2024, 2, 10).atStartOfDay(),
-                        fagsak = DagligReise.fagsak,
+                        fagsak = fagsak,
                         resultat = BehandlingResultat.INNVILGET,
                         type = BehandlingType.FØRSTEGANGSBEHANDLING,
                     ),
-                fagsak = DagligReise.fagsak,
+                fagsak = fagsak,
             )
         private val aktivitetererDagligReise =
             listOf(
@@ -721,8 +722,21 @@ object InterntVedtakTestdata {
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
-                opphørsdato = null,
             )
+
+        val avslåttVedtak =
+            GeneriskVedtak(
+                behandlingId = behandlingId,
+                data =
+                    AvslagDagligReise(
+                        årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON),
+                        begrunnelse = "Årsaken til avslaget",
+                    ),
+                type = TypeVedtak.AVSLAG,
+                gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = null,
+            )
+
         val vilkårOffentligTransport =
             listOf(
                 vilkår(

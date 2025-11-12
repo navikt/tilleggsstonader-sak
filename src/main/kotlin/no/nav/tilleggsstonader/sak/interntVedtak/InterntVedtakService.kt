@@ -288,7 +288,11 @@ class InterntVedtakService(
     private fun mapVedtakDagligReise(vedtak: VedtakDagligReise) =
         when (vedtak) {
             is InnvilgelseDagligReise -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
-            is AvslagDagligReise -> TODO()
+            is AvslagDagligReise ->
+                VedtakAvslagInternt(
+                    årsakerAvslag = vedtak.årsaker,
+                    avslagBegrunnelse = vedtak.begrunnelse,
+                )
             is OpphørDagligReise -> TODO()
         }
 
