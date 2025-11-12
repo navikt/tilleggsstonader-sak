@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
+import org.assertj.core.api.Assertions.assertThat
+import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
 
@@ -16,9 +18,13 @@ fun WebTestClient.ResponseSpec.expectOkEmpty() =
         .expectBody()
         .isEmpty
 
-fun WebTestClient.ResponseSpec.expectBadRequestWithDetail(detail: String) =
-    expectStatus()
-        .isBadRequest
-        .expectBody()
-        .jsonPath("$.detail")
-        .isEqualTo(detail)
+fun WebTestClient.ResponseSpec.expectProblemDetail(
+    forventetStatus: HttpStatus,
+    forventetDetail: String,
+) = expectStatus()
+    .isEqualTo(forventetStatus)
+    .expectBody()
+    .jsonPath("$.detail")
+    .value<String> {
+        assertThat(it).contains(forventetDetail)
+    }

@@ -66,7 +66,7 @@ fun IntegrationTest.gjennomførBehandlingsløp(
     val behandlingId = håndterSøknadService.håndterSøknad(fraJournalpost)!!.id
 
     // Oppretter grunnlagsdata
-    val behandling = kall.behandling.hentBehandling(behandlingId)
+    val behandling = kall.behandling.hent(behandlingId)
 
     // Oppretter oppgave
     kjørTasksKlareForProsessering()
@@ -169,18 +169,17 @@ fun IntegrationTest.gjennomførHenleggelse(fraJournalpost: Journalpost = default
     val behandlingId = håndterSøknadService.håndterSøknad(fraJournalpost)!!.id
 
     // Oppretter grunnlagsdata
-    kall.behandling.hentBehandling(behandlingId)
+    kall.behandling.hent(behandlingId)
 
     // Oppretter oppgave
     kjørTasksKlareForProsessering()
 
     kall.behandling.henlegg(
-        behandlingId = behandlingId,
-        henlagtDto =
-            HenlagtDto(
-                årsak = HenlagtÅrsak.FEILREGISTRERT,
-                begrunnelse = "begrunnelse for henleggelse",
-            ),
+        behandlingId,
+        HenlagtDto(
+            årsak = HenlagtÅrsak.FEILREGISTRERT,
+            begrunnelse = "begrunnelse for henleggelse",
+        ),
     )
     kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 

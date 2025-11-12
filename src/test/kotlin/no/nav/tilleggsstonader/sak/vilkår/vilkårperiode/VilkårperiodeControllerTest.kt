@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingerMålgruppeDto
@@ -11,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpStatus
 import java.time.LocalDate
 
 class VilkårperiodeControllerTest : IntegrationTest() {
@@ -83,17 +85,11 @@ class VilkårperiodeControllerTest : IntegrationTest() {
                 ),
             )
 
-        kall.vilkårperiode
-            .slettResponse(
+        kall.vilkårperiode.apiRespons
+            .slett(
                 vilkårperiodeId = response.periode!!.id,
                 SlettVikårperiode(behandlingForAnnenFagsak.id, "test"),
-            ).expectStatus()
-            .is5xxServerError
-            .expectBody()
-            .jsonPath("$.detail")
-            .value<String> {
-                assertThat(it).startsWith("BehandlingId er ikke lik")
-            }
+            ).expectProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "BehandlingId er ikke lik")
     }
 
     @Nested
@@ -101,17 +97,10 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         @Test
         fun `må ha saksbehandlerrolle for å kunne oppdatere grunnlag`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-
             medBrukercontext(rolle = rolleConfig.veilederRolle) {
-                kall.vilkårperiode
-                    .oppdaterGrunnlagResponse(behandling.id)
-                    .expectStatus()
-                    .isForbidden
-                    .expectBody()
-                    .jsonPath("$.detail")
-                    .value<String> {
-                        assertThat(it).startsWith("Mangler nødvendig saksbehandlerrolle for å utføre handlingen")
-                    }
+                kall.vilkårperiode.apiRespons
+                    .oppdaterGrunnlag(behandling.id)
+                    .expectProblemDetail(HttpStatus.FORBIDDEN, "Mangler nødvendig saksbehandlerrolle for å utføre handlingen")
             }
         }
     }

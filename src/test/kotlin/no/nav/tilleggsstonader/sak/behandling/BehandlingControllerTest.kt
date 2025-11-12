@@ -16,13 +16,16 @@ import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 
 internal class BehandlingControllerTest : IntegrationTest() {
     @Autowired
@@ -36,10 +39,9 @@ internal class BehandlingControllerTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("ikkeTilgang"))))
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        kall.behandling
-            .hentBehandlingResponse(behandling.id)
-            .expectStatus()
-            .isForbidden
+        assertThatThrownBy {
+            kall.behandling.hent(behandling.id)
+        }.hasMessage("Status expected:<200 OK> but was:<403 FORBIDDEN>")
     }
 
     @Test
@@ -78,7 +80,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
         val behandling = testoppsettService.lagre(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
         val henlagtBegrunnelse = "Registert feil"
 
-        kall.behandling.henleggResponse(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
+        kall.behandling.henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
 
         val oppdatert = behandlingRepository.findByIdOrThrow(behandling.id)
 
@@ -102,7 +104,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
                         ),
                 ),
             )
-        val hentetBehandling = kall.behandling.hentBehandling(behandling.id)
+        val hentetBehandling = kall.behandling.hent(behandling.id)
 
         assertThat(hentetBehandling.nyeOpplysningerMetadata?.kilde).isEqualTo(NyeOpplysningerKilde.ETTERSENDING)
         assertThat(hentetBehandling.nyeOpplysningerMetadata?.endringer).containsExactly(NyeOpplysningerEndring.MÅLGRUPPE)
@@ -122,29 +124,25 @@ internal class BehandlingControllerTest : IntegrationTest() {
         fun `behandlingStatus=OPPRETTET og veileder skal ikke hentes då det opprettes grunnlag`() {
             medBrukercontext(rolle = rolleConfig.veilederRolle) {
                 kall.behandling
-                    .hentBehandlingResponse(behandling.id)
+                    .apiRespons
+                    .hent(behandling.id)
                     .expectStatus()
                     .isBadRequest
-                    .expectBody()
-                    .jsonPath("$.detail")
-                    .value<String> {
-                        assertThat(it).contains("Behandlingen er ikke påbegynt")
-                    }
+                    .expectProblemDetail(HttpStatus.BAD_REQUEST, "Behandlingen er ikke påbegynt")
             }
         }
 
         @Test
         fun `behandlingStatus=UTREDES og veilder skal kunne hente behandlingen hvis statusen er annet enn UTREDES`() {
             testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.UTREDES))
-
             medBrukercontext(rolle = rolleConfig.veilederRolle) {
-                kall.behandling.hentBehandling(behandling.id)
+                kall.behandling.apiRespons.hent(behandling.id)
             }
         }
 
         @Test
         fun `behandlingStatus=OPPRETTET skal kunne opprette grunnlag hvis bruker er saksbehandler`() {
-            kall.behandling.hentBehandling(behandling.id)
+            kall.behandling.apiRespons.hent(behandling.id)
         }
     }
 }

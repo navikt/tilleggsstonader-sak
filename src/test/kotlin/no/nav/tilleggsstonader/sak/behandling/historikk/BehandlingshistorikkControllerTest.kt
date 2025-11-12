@@ -33,8 +33,8 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("ikkeTilgang"))))
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        kall.behandling
-            .hentBehandlingResponse(behandling.id)
+        kall.behandling.apiRespons
+            .hent(behandling.id)
             .expectStatus()
             .isForbidden
     }
@@ -48,7 +48,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
         leggInnHistorikk(behandling, "2", LocalDateTime.now().minusDays(1), StegType.INNGANGSVILKÅR)
         leggInnHistorikk(behandling, "3", LocalDateTime.now().plusDays(1), StegType.INNGANGSVILKÅR)
 
-        val respons = kall.behandling.behandlingshistorikk(behandling.id)
+        val respons = kall.behandling.historikk(behandling.id)
         assertThat(respons.map { it.endretAvNavn }).containsExactly("2")
     }
 
@@ -78,7 +78,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
                 vedtakstidspunkt = SporbarUtils.now(),
             ),
         )
-        val respons = kall.behandling.behandlingshistorikk(behandling.id)
+        val respons = kall.behandling.historikk(behandling.id)
         assertThat(respons.map { it.endretAvNavn }).containsExactly("7", "5", "4", "1")
     }
 
@@ -108,7 +108,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
                 vedtakstidspunkt = SporbarUtils.now(),
             ),
         )
-        val respons = kall.behandling.behandlingshistorikk(behandling.id)
+        val respons = kall.behandling.historikk(behandling.id)
         assertThat(respons.map { it.endretAvNavn }).containsExactly("7", "5", "4", "1")
     }
 
@@ -141,7 +141,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
             stegUtfall = StegUtfall.BESLUTTE_VEDTAK_GODKJENT,
         )
 
-        val respons = kall.behandling.behandlingshistorikk(behandling.id)
+        val respons = kall.behandling.historikk(behandling.id)
         assertThat(respons.map { it.endretAvNavn }).containsExactly("7", "6", "5", "4", "1")
     }
 
@@ -161,7 +161,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
             ),
         )
 
-        val respons = kall.behandling.behandlingshistorikk(behandling.id)
+        val respons = kall.behandling.historikk(behandling.id)
         assertThat(respons.first().metadata).isEqualTo(jsonMap)
     }
 

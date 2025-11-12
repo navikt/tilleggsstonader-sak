@@ -1,43 +1,38 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 
 class StegKall(
-    private val test: IntegrationTest,
+    private val testklient: Testklient,
 ) {
     fun reset(
         behandlingId: BehandlingId,
         resetStegRequest: StegController.ResetStegRequest,
-    ) = resetResponse(behandlingId, resetStegRequest).expectOkEmpty()
-
-    fun resetResponse(
-        behandlingId: BehandlingId,
-        resetStegRequest: StegController.ResetStegRequest,
-    ) = with(test) {
-        webTestClient
-            .post()
-            .uri("/api/steg/behandling/$behandlingId/reset")
-            .bodyValue(resetStegRequest)
-            .medOnBehalfOfToken()
-            .exchange()
+    ) {
+        apiRespons
+            .reset(behandlingId, resetStegRequest)
+            .expectOkEmpty()
     }
 
     fun ferdigstill(
         behandlingId: BehandlingId,
         dto: StegController.FerdigstillStegRequest,
-    ) = ferdigstillResponse(behandlingId, dto).expectOkWithBody<BehandlingId>()
+    ): BehandlingId = apiRespons.ferdigstill(behandlingId, dto).expectOkWithBody()
 
-    fun ferdigstillResponse(
-        behandlingId: BehandlingId,
-        dto: StegController.FerdigstillStegRequest,
-    ) = with(test) {
-        webTestClient
-            .post()
-            .uri("api/steg/behandling/$behandlingId/ferdigstill")
-            .bodyValue(dto)
-            .medOnBehalfOfToken()
-            .exchange()
+    // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
+    val apiRespons = StegApi()
+
+    inner class StegApi {
+        fun reset(
+            behandlingId: BehandlingId,
+            resetStegRequest: StegController.ResetStegRequest,
+        ) = testklient.post("/api/steg/behandling/$behandlingId/reset", resetStegRequest)
+
+        fun ferdigstill(
+            behandlingId: BehandlingId,
+            dto: StegController.FerdigstillStegRequest,
+        ) = testklient.post("/api/steg/behandling/$behandlingId/ferdigstill", dto)
     }
 }

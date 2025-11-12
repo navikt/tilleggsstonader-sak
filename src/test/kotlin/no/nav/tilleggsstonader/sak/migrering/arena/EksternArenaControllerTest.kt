@@ -2,8 +2,10 @@ package no.nav.tilleggsstonader.sak.migrering.arena
 
 import no.nav.tilleggsstonader.kontrakter.arena.vedtak.Rettighet
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpStatus
 
 class EksternArenaControllerTest : IntegrationTest() {
     @Test
@@ -14,12 +16,8 @@ class EksternArenaControllerTest : IntegrationTest() {
 
     @Test
     fun `skal kaste feil hvis man sender inn rettighet som ikke er mappet`() {
-        kall.arena
-            .statusResponse(ArenaFinnesPersonRequest("ident", Rettighet.REISE.kodeArena))
-            .expectStatus()
-            .is5xxServerError
-            .expectBody()
-            .jsonPath("$.detail")
-            .isEqualTo("Har ikke lagt inn mapping av stønadstype for REISE")
+        kall.arena.apiRespons
+            .status(ArenaFinnesPersonRequest("ident", Rettighet.REISE.kodeArena))
+            .expectProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Har ikke lagt inn mapping av stønadstype for REISE")
     }
 }

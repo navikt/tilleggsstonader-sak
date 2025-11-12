@@ -12,10 +12,7 @@ class GjenopprettOppgaveControllerTest : IntegrationTest() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak()
 
         medBrukercontext(rolle = rolleConfig.utvikler) {
-            kall.gjenopprettOppgave
-                .gjenopprettResponse(behandling.id)
-                .expectStatus()
-                .isNoContent
+            kall.gjenopprettOppgave.gjenopprett(behandling.id)
         }
 
         assertThat(taskService.findAll().filter { it.type == GjenopprettOppgavePåBehandlingTask.TYPE }).hasSize(1)
@@ -23,8 +20,8 @@ class GjenopprettOppgaveControllerTest : IntegrationTest() {
 
     @Test
     fun `gjenopprett feilregistrert på behandling, har ikke utviklerrolle, får 403`() {
-        kall.gjenopprettOppgave
-            .gjenopprettResponse(BehandlingId.random())
+        kall.gjenopprettOppgave.apiRespons
+            .gjenopprett(BehandlingId.random())
             .expectStatus()
             .isForbidden
     }

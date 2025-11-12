@@ -5,13 +5,14 @@ import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusHarSakerDto
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectBadRequestWithDetail
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 
 internal class SøkControllerTest : IntegrationTest() {
     @Autowired
@@ -39,30 +40,31 @@ internal class SøkControllerTest : IntegrationTest() {
     internal fun `person uten fagsak og ikke finnes i arena skal svare med BAD_REQUEST`() {
         every { arenaClient.harSaker(any()) } returns ArenaStatusHarSakerDto(false)
 
-        kall.person
-            .sokResponse("01010166666")
-            .expectBadRequestWithDetail("Personen har ikke fagsak eller sak i arena")
+        kall.person.apiRespons
+            .sok("01010166666")
+            .expectProblemDetail(HttpStatus.BAD_REQUEST, "Personen har ikke fagsak eller sak i arena")
     }
 
     @Test
     internal fun `Skal feile hvis personIdenten ikke finnes i pdl`() {
-        kall.person
-            .sokResponse("19117313797")
-            .expectBadRequestWithDetail("Finner ingen personer for valgt personident")
+        kall.person.apiRespons
+            .sok("19117313797")
+            .expectProblemDetail(HttpStatus.BAD_REQUEST, "Finner ingen personer for valgt personident")
     }
 
     @Test
     internal fun `Skal feile hvis personIdenten har feil lengde`() {
         kall.person
-            .sokResponse("010101999990")
-            .expectBadRequestWithDetail("Ugyldig personident. Det må være 11 sifre")
+            .apiRespons
+            .sok("010101999990")
+            .expectProblemDetail(HttpStatus.BAD_REQUEST, "Ugyldig personident. Det må være 11 sifre")
     }
 
     @Test
     internal fun `Skal feile hvis personIdenten inneholder noe annet enn tall`() {
-        kall.person
-            .sokResponse("010et1ord02")
-            .expectBadRequestWithDetail("Ugyldig personident. Det kan kun inneholde tall")
+        kall.person.apiRespons
+            .sok("010et1ord02")
+            .expectProblemDetail(HttpStatus.BAD_REQUEST, "Ugyldig personident. Det kan kun inneholde tall")
     }
 
     @Nested
@@ -80,9 +82,9 @@ internal class SøkControllerTest : IntegrationTest() {
 
         @Test
         internal fun `skal kaste feil hvis fagsaken ikke eksisterer`() {
-            kall.person
-                .fagsakEksternResponse(100L)
-                .expectBadRequestWithDetail("Finner ikke fagsak for eksternFagsakId=100")
+            kall.person.apiRespons
+                .fagsakEkstern(100L)
+                .expectProblemDetail(HttpStatus.BAD_REQUEST, "Finner ikke fagsak for eksternFagsakId=100")
         }
     }
 }

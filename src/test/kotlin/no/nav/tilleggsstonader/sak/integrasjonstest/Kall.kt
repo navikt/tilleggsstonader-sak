@@ -19,22 +19,24 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårperiodeKall
 
 class Kall(
-    test: IntegrationTest,
+    kontekst: IntegrationTest,
 ) {
-    val arena = ArenaKall(test)
-    val behandling = BehandlingKall(test)
-    val brev = BrevKall(test)
-    val gjenopprettOppgave = GjenopprettOppgaveKall(test)
-    val journalpost = JournalpostKall(test)
-    val person = PersonKall(test)
-    val satsjustering = SatsjusteringKall(test)
-    val settPaVent = SettPåVentKall(test)
-    val simulering = SimuleringKall(test)
-    val steg = StegKall(test)
-    val søknadRouting = SøknadRoutingKall(test)
-    val totrinnskontroll = TotrinnskontrollKall(test)
-    val vedtak = VedtakKall(test)
-    val vilkår = VilkårKall(test)
-    val vilkårDagligReise = VilkårDagligReiseKall(test)
-    val vilkårperiode = VilkårperiodeKall(test)
+    val testklient = Testklient(kontekst)
+
+    val arena = ArenaKall(testklient)
+    val behandling = BehandlingKall(testklient)
+    val brev = BrevKall(testklient)
+    val gjenopprettOppgave = GjenopprettOppgaveKall(testklient)
+    val journalpost = JournalpostKall(testklient)
+    val person = PersonKall(testklient)
+    val satsjustering = SatsjusteringKall(testklient)
+    val settPaVent = SettPåVentKall(testklient)
+    val simulering = SimuleringKall(testklient)
+    val steg = StegKall(testklient)
+    val søknadRouting = SøknadRoutingKall(testklient)
+    val totrinnskontroll = TotrinnskontrollKall(testklient)
+    val vedtak = VedtakKall(testklient)
+    val vilkår = VilkårKall(testklient)
+    val vilkårDagligReise = VilkårDagligReiseKall(testklient)
+    val vilkårperiode = VilkårperiodeKall(testklient)
 }

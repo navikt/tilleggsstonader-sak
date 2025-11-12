@@ -1,20 +1,24 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 
 // Må kalles med utvikler-rettighet
 class GjenopprettOppgaveKall(
-    private val test: IntegrationTest,
+    private val testklient: Testklient,
 ) {
-    fun gjenopprett(behandlingId: BehandlingId) = gjenopprettResponse(behandlingId).expectOkEmpty()
+    fun gjenopprett(behandlingId: BehandlingId) =
+        apiRespons
+            .gjenopprett(behandlingId)
+            .expectStatus()
+            .isNoContent
+            .expectBody()
+            .isEmpty()
 
-    fun gjenopprettResponse(behandlingId: BehandlingId) =
-        with(test) {
-            webTestClient
-                .post()
-                .uri("/api/forvaltning/oppgave/gjenopprett/$behandlingId")
-                .medOnBehalfOfToken()
-                .exchange()
-        }
+    // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
+    val apiRespons = GjenopprettOppgaveApi()
+
+    inner class GjenopprettOppgaveApi {
+        fun gjenopprett(behandlingId: BehandlingId) = testklient.post("/api/forvaltning/oppgave/gjenopprett/$behandlingId", Unit)
+    }
 }

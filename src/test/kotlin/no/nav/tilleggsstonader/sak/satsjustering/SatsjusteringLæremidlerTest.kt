@@ -106,8 +106,8 @@ class SatsjusteringLæremidlerTest : IntegrationTest() {
     @Test
     fun `kaller satsjustering-endepunkt uten utvikler-rolle, kaster feil`() {
         medBrukercontext(rolle = rolleConfig.beslutterRolle) {
-            kall.satsjustering
-                .satsjusteringResponse(Stønadstype.LÆREMIDLER)
+            kall.satsjustering.apiRespons
+                .satsjustering(Stønadstype.LÆREMIDLER)
                 .expectStatus()
                 .isForbidden
         }
