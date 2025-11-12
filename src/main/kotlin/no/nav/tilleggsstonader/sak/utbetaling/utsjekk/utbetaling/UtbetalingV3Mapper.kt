@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
@@ -57,11 +59,27 @@ class UtbetalingV3Mapper(
             sakId = behandling.eksternFagsakId.toString(),
             behandlingId = behandling.eksternId.toString(),
             personident = behandling.ident,
-            periodetype = PeriodetypeUtbetaling.UKEDAG,
+            periodetype = mapPeriodetypeFraAndeler(andeler),
             stønad = mapTilStønadUtbetaling(type),
             perioder = grupperPåMånedOgMapTilPerioder(andeler),
         )
     }
+
+    fun mapPeriodetypeFraAndeler(andeler: Collection<AndelTilkjentYtelse>): PeriodetypeUtbetaling {
+        val satstyper = andeler.distinctBy { it.satstype }
+        feilHvis(satstyper.size != 1) {
+            "Håndterer ikke andeler med flere ulike satstyper samtidig"
+        }
+        return satstyper.single().satstype.tilPeriodetypeUtbetaling()
+    }
+
+    fun Satstype.tilPeriodetypeUtbetaling() =
+        when (this) {
+            Satstype.DAG -> PeriodetypeUtbetaling.UKEDAG
+            Satstype.MÅNED -> PeriodetypeUtbetaling.MND
+            Satstype.ENGANGSBELØP -> PeriodetypeUtbetaling.EN_GANG
+            Satstype.UGYLDIG -> error("Andeler med satstype UGYLDIG skal ikke iverksettes")
+        }
 
     private fun <T : UtbetalingDto> lagUtbetalinger(
         behandling: Saksbehandling,

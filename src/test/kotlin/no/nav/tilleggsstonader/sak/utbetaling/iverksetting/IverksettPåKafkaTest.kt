@@ -52,7 +52,7 @@ class IverksettPåKafkaTest(
                 utbetalingsdato = LocalDate.now().plusDays(1),
                 fom = LocalDate.now().plusDays(1),
                 tom = LocalDate.now().plusDays(1),
-                satstype = Satstype.ENGANGSBELØP,
+                satstype = Satstype.DAG,
                 kildeBehandlingId = behandling.id,
             )
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, andelTilkjentYtelse))
@@ -79,7 +79,7 @@ class IverksettPåKafkaTest(
                 utbetalingsdato = forrigeMåned.atDay(1),
                 fom = forrigeMåned.atDay(1),
                 tom = forrigeMåned.atDay(1),
-                satstype = Satstype.ENGANGSBELØP,
+                satstype = Satstype.DAG,
                 kildeBehandlingId = behandling.id,
             )
 
@@ -89,7 +89,7 @@ class IverksettPåKafkaTest(
                 utbetalingsdato = forrigeMåned.atDay(10),
                 fom = forrigeMåned.atDay(10),
                 tom = forrigeMåned.atDay(10),
-                satstype = Satstype.ENGANGSBELØP,
+                satstype = Satstype.DAG,
                 kildeBehandlingId = behandling.id,
             )
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, andelTilkjentYtelse1, andelTilkjentYtelse2))

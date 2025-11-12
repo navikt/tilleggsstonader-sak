@@ -99,7 +99,7 @@ fun lagDagligReiseInnvilgelseMedBeløp(
             tom = tom,
             beløp = beløp,
             id = randomUUID(),
-            satstype = Satstype.ENGANGSBELØP,
+            satstype = Satstype.DAG,
             utbetalingsdato = fom,
             type = TypeAndel.DAGLIG_REISE_AAP,
             kildeBehandlingId = BehandlingId.random(),
