@@ -85,7 +85,7 @@ class UtbetalingerDvhTest {
         val (vedtaksdata, andelTilkjentYtelse) =
             lagDagligReiseInnvilgelseMedBeløp(
                 fom = førsteJanuar,
-                tom = sisteJanuar,
+                tom = førsteJanuar,
                 beløp = stønadsbeløp,
             )
 
@@ -107,7 +107,7 @@ class UtbetalingerDvhTest {
                     listOf(
                         UtbetalingerDvh(
                             fraOgMed = førsteJanuar,
-                            tilOgMed = sisteJanuar,
+                            tilOgMed = førsteJanuar,
                             type = AndelstypeDvh.DAGLIG_REISE_AAP,
                             beløp = stønadsbeløp,
                             beløpErBegrensetAvMakssats = null,

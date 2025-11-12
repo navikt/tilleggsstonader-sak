@@ -38,7 +38,7 @@ private fun lagAndelForDagligReise(
         beløp = beløp,
         fom = fomUkedag,
         tom = fomUkedag,
-        satstype = Satstype.ENGANGSBELØP,
+        satstype = Satstype.DAG,
         type = målgruppe.tilTypeAndel(Stønadstype.DAGLIG_REISE_TSO),
         kildeBehandlingId = behandlingId,
         utbetalingsdato = fomUkedag,

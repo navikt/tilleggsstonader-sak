@@ -82,14 +82,14 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
 
         assertThat(andeler).hasSize(2)
         with(andeler.first()) {
-            assertThat(fom).isEqualTo(lørdag)
-            assertThat(tom).isEqualTo(lørdag)
+            assertThat(fom).isEqualTo(mandag)
+            assertThat(tom).isEqualTo(mandag)
             assertThat(beløp).isEqualTo(100)
             assertThat(utbetalingsdato).isEqualTo(mandag)
         }
         with(andeler.last()) {
-            assertThat(fom).isEqualTo(søndag)
-            assertThat(tom).isEqualTo(søndag)
+            assertThat(fom).isEqualTo(mandag)
+            assertThat(tom).isEqualTo(mandag)
             assertThat(beløp).isEqualTo(100)
             assertThat(utbetalingsdato).isEqualTo(mandag)
         }
