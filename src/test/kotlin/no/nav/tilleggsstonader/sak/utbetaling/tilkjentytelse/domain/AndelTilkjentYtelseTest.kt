@@ -164,15 +164,15 @@ class AndelTilkjentYtelseTest {
     @Nested
     inner class DagligReiseAndel {
         @Test
-        fun `skal kaste feil hvis satstype ikke er enkeltbeløp`() {
+        fun `skal kaste feil hvis satstype ikke er DAG`() {
             assertThatThrownBy {
                 andelTilkjentYtelse(
                     type = TypeAndel.DAGLIG_REISE_AAP,
-                    satstype = Satstype.DAG,
+                    satstype = Satstype.ENGANGSBELØP,
                     fom = måned.atDay(1),
                     tom = måned.atDay(1),
                 )
-            }.hasMessageContaining("Forventet satstype=ENGANGSBELØP for type=DAGLIG_REISE_AAP, men fikk DAG")
+            }.hasMessageContaining("Forventet satstype=DAG for type=DAGLIG_REISE_AAP, men fikk ENGANGSBELØP")
         }
     }
 }
