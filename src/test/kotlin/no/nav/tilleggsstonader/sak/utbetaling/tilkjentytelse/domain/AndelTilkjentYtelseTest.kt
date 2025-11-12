@@ -164,7 +164,7 @@ class AndelTilkjentYtelseTest {
     @Nested
     inner class DagligReiseAndel {
         @Test
-        fun `skal kaste feil hvis satstype ikke er ukedag`() {
+        fun `skal kaste feil hvis satstype ikke er DAG`() {
             assertThatThrownBy {
                 andelTilkjentYtelse(
                     type = TypeAndel.DAGLIG_REISE_AAP,
