@@ -32,11 +32,11 @@ class LæremidlerVedtakControllerTest : IntegrationTest() {
                 begrunnelse = "begrunnelse",
             )
 
-        kall.vedtak.læremidler.lagreAvslag(behandling.id, vedtak)
+        kall.vedtak.lagreAvslag(Stønadstype.LÆREMIDLER, behandling.id, vedtak)
 
         val lagretDto =
-            kall.vedtak.læremidler
-                .hentVedtak(behandling.id)
+            kall.vedtak
+                .hentVedtak(Stønadstype.LÆREMIDLER, behandling.id)
                 .expectOkWithBody<AvslagLæremidlerDto>()
 
         assertThat(lagretDto.årsakerAvslag).isEqualTo(vedtak.årsakerAvslag)

@@ -145,8 +145,8 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
 
     @Test
     fun `hent vedtak skal returnere tom body når det ikke finnes noen lagrede vedtak`() {
-        kall.vedtak.dagligReise
-            .hentVedtak(dummyBehandlingId)
+        kall.vedtak
+            .hentVedtak(Stønadstype.DAGLIG_REISE_TSO, dummyBehandlingId)
             .expectOkEmpty()
     }
 
@@ -154,13 +154,14 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
     fun `hent ut lagrede vedtak av type innvilgelse`() {
         val vedtakRequest = InnvilgelseDagligReiseRequest(listOf(vedtaksperiode.tilDto()))
 
-        kall.vedtak.dagligReise.lagreInnvilgelse(
+        kall.vedtak.lagreInnvilgelse(
+            Stønadstype.DAGLIG_REISE_TSO,
             dummyBehandling.id,
             vedtakRequest,
         )
         val response =
-            kall.vedtak.dagligReise
-                .hentVedtak(dummyBehandlingId)
+            kall.vedtak
+                .hentVedtak(Stønadstype.DAGLIG_REISE_TSO, dummyBehandlingId)
                 .expectOkWithBody<InnvilgelseDagligReiseResponse>()
 
         assertThat(response).isEqualTo(dummyInnvilgelse)
@@ -176,11 +177,11 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
                     begrunnelse = "begrunnelse",
                 )
 
-            kall.vedtak.dagligReise.lagreAvslag(dummyBehandling.id, avslag)
+            kall.vedtak.lagreAvslag(Stønadstype.DAGLIG_REISE_TSO, dummyBehandling.id, avslag)
 
             val lagretDto =
-                kall.vedtak.dagligReise
-                    .hentVedtak(dummyBehandling.id)
+                kall.vedtak
+                    .hentVedtak(Stønadstype.DAGLIG_REISE_TSO, dummyBehandling.id)
                     .expectOkWithBody<AvslagDagligReiseDto>()
 
             assertThat(lagretDto.årsakerAvslag).isEqualTo(avslag.årsakerAvslag)

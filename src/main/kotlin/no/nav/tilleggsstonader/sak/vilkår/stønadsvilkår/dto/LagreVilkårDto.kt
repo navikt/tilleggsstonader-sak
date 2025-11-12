@@ -37,7 +37,8 @@ data class OpprettVilkårDto(
     override val utgift: Int?,
     override val erFremtidigUtgift: Boolean?,
     override val offentligTransport: OffentligTransportDto?,
-) : LagreVilkårDto
+) : LagreVilkårDto,
+    LagreVilkår
 
 data class OffentligTransportDto(
     val reisedagerPerUke: Int,

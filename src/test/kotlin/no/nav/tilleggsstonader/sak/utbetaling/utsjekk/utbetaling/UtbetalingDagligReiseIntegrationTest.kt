@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.finnPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførInnvilgelseDagligReise
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
@@ -23,7 +23,7 @@ class UtbetalingDagligReiseIntegrationTest : IntegrationTest() {
     fun `utbetalingsdato i fremtiden - ingen andeler skal bli utbetalt`() {
         val reiseFramITid = lagreDagligReiseDto(fom = LocalDate.now().plusDays(1), tom = LocalDate.now().plusWeeks(1))
 
-        gjennomførInnvilgelseDagligReise(
+        gjennomførBehandlingsløp(
             medAktivitet = langtvarendeAktivitet,
             medMålgruppe = langtvarendeMålgruppe,
             medVilkår = listOf(reiseFramITid),
@@ -43,7 +43,7 @@ class UtbetalingDagligReiseIntegrationTest : IntegrationTest() {
             )
 
         val behandlingId =
-            gjennomførInnvilgelseDagligReise(
+            gjennomførBehandlingsløp(
                 medAktivitet = langtvarendeAktivitet,
                 medMålgruppe = langtvarendeMålgruppe,
                 medVilkår = reiser,
@@ -71,7 +71,7 @@ class UtbetalingDagligReiseIntegrationTest : IntegrationTest() {
                 lagreDagligReiseDto(fom = nå.plusWeeks(1), tom = nå.plusWeeks(2)),
             )
 
-        gjennomførInnvilgelseDagligReise(
+        gjennomførBehandlingsløp(
             medAktivitet = langtvarendeAktivitet,
             medMålgruppe = langtvarendeMålgruppe,
             medVilkår = reiser,

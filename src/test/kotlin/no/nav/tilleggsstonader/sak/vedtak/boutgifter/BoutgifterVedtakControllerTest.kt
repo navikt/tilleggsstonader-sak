@@ -68,8 +68,8 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
 
     @Test
     fun `hent vedtak skal returnere tom body når det ikke finnes noen lagrede vedtak`() {
-        kall.vedtak.boutgifter
-            .hentVedtak(dummyBehandling.id)
+        kall.vedtak
+            .hentVedtak(Stønadstype.BOUTGIFTER, dummyBehandling.id)
             .expectOkEmpty()
     }
 
@@ -83,11 +83,11 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
                     begrunnelse = "begrunnelse",
                 )
 
-            kall.vedtak.boutgifter.lagreAvslag(dummyBehandling.id, avslag)
+            kall.vedtak.lagreAvslag(Stønadstype.BOUTGIFTER, dummyBehandling.id, avslag)
 
             val lagretDto =
-                kall.vedtak.boutgifter
-                    .hentVedtak(dummyBehandling.id)
+                kall.vedtak
+                    .hentVedtak(Stønadstype.BOUTGIFTER, dummyBehandling.id)
                     .expectOkWithBody<AvslagBoutgifterDto>()
 
             assertThat(lagretDto.årsakerAvslag).isEqualTo(avslag.årsakerAvslag)
@@ -101,7 +101,8 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
         @Test
         fun `skal lagre og hente opphør`() {
             val opphørsdato = dummyFom.plusDays(4)
-            kall.vedtak.boutgifter.lagreInnvilgelse(
+            kall.vedtak.lagreInnvilgelse(
+                Stønadstype.BOUTGIFTER,
                 dummyBehandling.id,
                 InnvilgelseBoutgifterRequest(listOf(vedtaksperiode.tilDto())),
             )
@@ -145,11 +146,11 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
                     opphørsdato = opphørsdato,
                 )
 
-            kall.vedtak.boutgifter.lagreOpphør(revurdering.id, opphørVedtak)
+            kall.vedtak.lagreOpphør(Stønadstype.BOUTGIFTER, revurdering.id, opphørVedtak)
 
             val lagretDto =
-                kall.vedtak.boutgifter
-                    .hentVedtak(revurdering.id)
+                kall.vedtak
+                    .hentVedtak(Stønadstype.BOUTGIFTER, revurdering.id)
                     .expectOkWithBody<OpphørBoutgifterResponse>()
 
             assertThat((lagretDto).årsakerOpphør).isEqualTo(opphørVedtak.årsakerOpphør)

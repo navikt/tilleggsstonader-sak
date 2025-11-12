@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.StegKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.SøknadRoutingKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.TotrinnskontrollKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VedtakKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårDagligReiseKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårperiodeKall
 
@@ -34,5 +35,6 @@ class Kall(
     val totrinnskontroll = TotrinnskontrollKall(test)
     val vedtak = VedtakKall(test)
     val vilkår = VilkårKall(test)
+    val vilkårDagligReise = VilkårDagligReiseKall(test)
     val vilkårperiode = VilkårperiodeKall(test)
 }

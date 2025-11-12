@@ -8,8 +8,8 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.defaultJournalpost
 import no.nav.tilleggsstonader.sak.integrasjonstest.defaultJournalpostId
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.finnAlleTaskerMedType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførHenleggelse
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførInnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -40,8 +40,7 @@ class HåndterSøknadIntegrationTest : IntegrationTest() {
 
     @Test
     internal fun `oppretter behandling hvis alle eksisterende behandlinger er ferdigstilt`() {
-        gjennomførInnvilgelseDagligReise()
-        // gjennomførAvslagDagligReise() TODO: Kommenter ut når avslag er implementert
+        gjennomførBehandlingsløp()
 
         val nyBehandling = håndterSøknadService.håndterSøknad(defaultJournalpost)
         assertThat(nyBehandling).isNotNull()

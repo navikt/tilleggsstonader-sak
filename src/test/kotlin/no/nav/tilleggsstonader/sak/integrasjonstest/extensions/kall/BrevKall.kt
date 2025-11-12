@@ -7,12 +7,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 class BrevKall(
     private val test: IntegrationTest,
 ) {
-    fun brev(
-        behandlingId: BehandlingId,
-        dto: GenererPdfRequest,
-    ) = brevResponse(behandlingId, dto).expectOkWithBody<ByteArray>()
-
-    fun brevResponse(
+    fun genererPdf(
         behandlingId: BehandlingId,
         dto: GenererPdfRequest,
     ) = with(test) {
@@ -22,5 +17,6 @@ class BrevKall(
             .bodyValue(dto)
             .medOnBehalfOfToken()
             .exchange()
+            .expectOkWithBody<ByteArray>()
     }
 }
