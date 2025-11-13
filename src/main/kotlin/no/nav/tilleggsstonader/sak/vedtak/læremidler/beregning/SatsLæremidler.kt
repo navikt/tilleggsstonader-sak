@@ -83,6 +83,6 @@ class SatsLæremidlerService(
 
     fun finnSatsForPeriode(periode: Periode<LocalDate>): SatsLæremidler =
         satsLæremidlerProvider.satser.find {
-            it.inneholder(periode)
+            it.inneholder(periode.fom)
         } ?: error("Finner ikke satser for $periode")
 }
