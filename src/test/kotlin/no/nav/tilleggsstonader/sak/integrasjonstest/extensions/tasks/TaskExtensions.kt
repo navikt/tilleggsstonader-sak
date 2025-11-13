@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
@@ -14,6 +15,8 @@ fun IntegrationTest.kjørTasksKlareForProsesseringTilIngenTasksIgjen() {
         kjørTasksKlareForProsessering()
     } while (taskService.finnAlleTasksKlareForProsessering(Pageable.unpaged()).isNotEmpty())
 }
+
+fun IntegrationTest.finnAlleTaskerMedType(type: String) = taskService.finnAlleTaskerMedType(type)
 
 fun IntegrationTest.kjørTasksKlareForProsessering() {
     logger.info("Kjører tasks klare for prosessering")

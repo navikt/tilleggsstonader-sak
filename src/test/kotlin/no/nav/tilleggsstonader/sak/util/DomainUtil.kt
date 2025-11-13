@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
@@ -51,6 +52,10 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
@@ -59,7 +64,15 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -410,25 +423,29 @@ fun vedtaksbrev(
     beslutterIdent = beslutterIdent,
 )
 
-fun journalpostMedStrukturertSøknad(dokumentBrevkode: DokumentBrevkode) =
-    journalpost(
-        journalpostId = Random.nextLong(10000L, 10000000L).toString(),
-        journalposttype = Journalposttype.I,
-        journalstatus = Journalstatus.UNDER_ARBEID,
-        tema = Tema.TSO.name,
-        dokumenter = listOf(dokumentInfoMedOriginalVariant(dokumentBrevkode)),
-        bruker = Bruker("12345678910", BrukerIdType.FNR),
-        kanal = "NAV_NO",
-    )
+fun journalpostMedStrukturertSøknad(
+    dokumentBrevkode: DokumentBrevkode,
+    søkerIdent: String = "12345678910",
+    tema: Tema = Tema.TSO,
+    journalpostId: String = Random.nextLong(10000L, 10000000L).toString(),
+) = journalpost(
+    journalpostId = journalpostId,
+    journalposttype = Journalposttype.I,
+    journalstatus = Journalstatus.UNDER_ARBEID,
+    tema = tema.name,
+    dokumenter = listOf(dokumentInfoMedOriginalVariant(dokumentBrevkode)),
+    bruker = Bruker(søkerIdent, BrukerIdType.FNR),
+    kanal = "NAV_NO",
+)
 
 fun journalpost(
     journalpostId: String = UUID.randomUUID().toString(),
-    journalposttype: Journalposttype = Journalposttype.U,
+    journalposttype: Journalposttype = Journalposttype.I,
     journalstatus: Journalstatus = Journalstatus.FERDIGSTILT,
     tema: String = Tema.TSO.toString(),
     dokumenter: List<DokumentInfo>? = null,
     bruker: Bruker? = null,
-    kanal: String? = null,
+    kanal: String? = "NAV_NO",
 ) = Journalpost(
     journalpostId = journalpostId,
     journalposttype = journalposttype,
@@ -492,4 +509,81 @@ fun totrinnskontroll(
     årsakerUnderkjent = Årsaker(årsakerUnderkjent),
     beslutter = beslutter,
     begrunnelse = begrunnelse,
+)
+
+fun faktaOffentligTransport(
+    reisedagerPerUke: Int = 5,
+    prisEnkelbillett: Int? = 40,
+    prisSyvdagersbillett: Int? = null,
+    prisTrettidagersbillett: Int? = 800,
+) = FaktaDagligReiseOffentligTransportDto(
+    reisedagerPerUke = reisedagerPerUke,
+    prisEnkelbillett = prisEnkelbillett,
+    prisSyvdagersbillett = prisSyvdagersbillett,
+    prisTrettidagersbillett = prisTrettidagersbillett,
+)
+
+fun lagreVilkårperiodeMålgruppe(
+    behandlingId: BehandlingId,
+    målgruppeType: MålgruppeType = MålgruppeType.AAP,
+    fom: LocalDate = 1 januar 2025,
+    tom: LocalDate = 31 januar 2025,
+    faktaOgSvar: FaktaOgSvarDto = VilkårperiodeTestUtil.faktaOgVurderingerMålgruppeDto(),
+    begrunnelse: String = "begrunnelse",
+) = LagreVilkårperiode(
+    type = målgruppeType,
+    fom = fom,
+    tom = tom,
+    faktaOgSvar = faktaOgSvar,
+    behandlingId = behandlingId,
+    begrunnelse = begrunnelse,
+)
+
+fun lagreVilkårperiodeAktivitet(
+    behandlingId: BehandlingId,
+    aktivitetType: AktivitetType = AktivitetType.TILTAK,
+    fom: LocalDate = 1 januar 2025,
+    tom: LocalDate = 31 januar 2025,
+    faktaOgSvar: FaktaOgSvarDto =
+        FaktaOgSvarAktivitetDagligReiseTsoDto(
+            svarLønnet = SvarJaNei.NEI,
+            svarHarUtgifter = SvarJaNei.JA,
+        ),
+    begrunnelse: String = "begrunnelse",
+) = LagreVilkårperiode(
+    type = aktivitetType,
+    fom = fom,
+    tom = tom,
+    faktaOgSvar = faktaOgSvar,
+    behandlingId = behandlingId,
+    begrunnelse = begrunnelse,
+)
+
+fun lagreDagligReiseDto(
+    fom: LocalDate = 1 januar 2025,
+    tom: LocalDate = 31 januar 2025,
+    svar: Map<RegelId, SvarOgBegrunnelseDto> =
+        mapOf(
+            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
+        ),
+    fakta: FaktaDagligReiseDto = faktaOffentligTransport(),
+) = LagreDagligReiseDto(
+    fom = fom,
+    tom = tom,
+    svar = svar,
+    fakta = fakta,
+)
+
+fun vedtaksperiode(
+    fom: LocalDate = 1 januar 2025,
+    tom: LocalDate = 31 januar 2025,
+    målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+    aktivitet: AktivitetType = AktivitetType.TILTAK,
+) = Vedtaksperiode(
+    id = UUID.randomUUID(),
+    fom = fom,
+    tom = tom,
+    målgruppe = målgruppe,
+    aktivitet = aktivitet,
 )

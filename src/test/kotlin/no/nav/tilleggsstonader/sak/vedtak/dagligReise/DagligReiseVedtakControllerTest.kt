@@ -6,12 +6,11 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.avslåVedtakDagligReise
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakDagligReise
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakDagligReiseKall
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.innvilgeVedtakDagligReise
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkEmpty
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkårDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
@@ -24,7 +23,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunn
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
@@ -147,22 +145,24 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
 
     @Test
     fun `hent vedtak skal returnere tom body når det ikke finnes noen lagrede vedtak`() {
-        hentVedtakDagligReiseKall(dummyBehandlingId)
-            .expectStatus()
-            .isOk
-            .expectBody()
-            .isEmpty
+        kall.vedtak
+            .hentVedtak(Stønadstype.DAGLIG_REISE_TSO, dummyBehandlingId)
+            .expectOkEmpty()
     }
 
     @Test
     fun `hent ut lagrede vedtak av type innvilgelse`() {
         val vedtakRequest = InnvilgelseDagligReiseRequest(listOf(vedtaksperiode.tilDto()))
 
-        innvilgeVedtakDagligReise(
+        kall.vedtak.lagreInnvilgelse(
+            Stønadstype.DAGLIG_REISE_TSO,
             dummyBehandling.id,
             vedtakRequest,
         )
-        val response = hentVedtakDagligReise<InnvilgelseDagligReiseResponse>(dummyBehandlingId)
+        val response =
+            kall.vedtak
+                .hentVedtak(Stønadstype.DAGLIG_REISE_TSO, dummyBehandlingId)
+                .expectOkWithBody<InnvilgelseDagligReiseResponse>()
 
         assertThat(response).isEqualTo(dummyInnvilgelse)
     }
@@ -177,9 +177,12 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
                     begrunnelse = "begrunnelse",
                 )
 
-            avslåVedtakDagligReise(dummyBehandling.id, avslag)
+            kall.vedtak.lagreAvslag(Stønadstype.DAGLIG_REISE_TSO, dummyBehandling.id, avslag)
 
-            val lagretDto = hentVedtakDagligReise<AvslagDagligReiseDto>(dummyBehandling.id)
+            val lagretDto =
+                kall.vedtak
+                    .hentVedtak(Stønadstype.DAGLIG_REISE_TSO, dummyBehandling.id)
+                    .expectOkWithBody<AvslagDagligReiseDto>()
 
             assertThat(lagretDto.årsakerAvslag).isEqualTo(avslag.årsakerAvslag)
             assertThat(lagretDto.begrunnelse).isEqualTo(avslag.begrunnelse)

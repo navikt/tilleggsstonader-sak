@@ -122,7 +122,7 @@ class JournalføringService(
         dokumentTitler: Map<String, String>? = null,
         logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
         avsenderMottaker: AvsenderMottaker? = null,
-    ) {
+    ): Behandling {
         val journalpostMedOppdatertTema = journalpost.copy(tema = stønadstype.tilTema().toString())
 
         val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
@@ -155,6 +155,8 @@ class JournalføringService(
             logiskVedlegg = logiskVedlegg,
             avsenderMottaker = avsenderMottaker,
         )
+
+        return behandling
     }
 
     private fun journalførTilNyKlage(

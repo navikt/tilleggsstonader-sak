@@ -1,83 +1,40 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårResultatDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
-import org.springframework.http.HttpMethod
-import org.springframework.test.web.reactive.server.expectBody
+import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårResponse
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 
-fun IntegrationTest.hentVilkårDagligReise(behandlingId: BehandlingId) =
-    webTestClient
-        .get()
-        .uri("/api/vilkar/daglig-reise/$behandlingId")
-        .medOnBehalfOfToken()
-        .exchange()
-        .expectStatus()
-        .isOk
-        .expectBody<List<VilkårDagligReiseDto>>()
-        .returnResult()
-        .responseBody!!
+class VilkårKall(
+    private val testklient: Testklient,
+) {
+    fun hentVilkår(behandlingId: BehandlingId): VilkårsvurderingDto = apiRespons.hentVilkår(behandlingId).expectOkWithBody()
 
-fun IntegrationTest.opprettVilkårDagligReise(
-    lagreVilkår: LagreDagligReiseDto,
-    behandlingId: BehandlingId,
-) = webTestClient
-    .post()
-    .uri("/api/vilkar/daglig-reise/$behandlingId")
-    .bodyValue(lagreVilkår)
-    .medOnBehalfOfToken()
-    .exchange()
-    .expectStatus()
-    .isOk
-    .expectBody<VilkårDagligReiseDto>()
-    .returnResult()
-    .responseBody!!
+    fun opprettVilkår(dto: OpprettVilkårDto): VilkårDto = apiRespons.opprettVilkår(dto).expectOkWithBody()
 
-fun IntegrationTest.oppdaterVilkårDagligReise(
-    lagreVilkår: LagreDagligReiseDto,
-    vilkårId: VilkårId,
-    behandlingId: BehandlingId,
-) = webTestClient
-    .put()
-    .uri("/api/vilkar/daglig-reise/$behandlingId/$vilkårId")
-    .bodyValue(lagreVilkår)
-    .medOnBehalfOfToken()
-    .exchange()
-    .expectStatus()
-    .isOk
-    .expectBody<VilkårDagligReiseDto>()
-    .returnResult()
-    .responseBody!!
+    fun oppdaterVilkår(dto: SvarPåVilkårDto): VilkårDto = apiRespons.oppdaterVilkår(dto).expectOkWithBody()
 
-fun IntegrationTest.slettVilkårDagligReise(
-    slettVilkår: SlettVilkårRequestDto,
-    vilkårId: VilkårId,
-    behandlingId: BehandlingId,
-) = webTestClient
-    .method(HttpMethod.DELETE)
-    .uri("/api/vilkar/daglig-reise/$behandlingId/$vilkårId")
-    .bodyValue(slettVilkår)
-    .medOnBehalfOfToken()
-    .exchange()
-    .expectStatus()
-    .isOk
-    .expectBody<SlettVilkårResultatDto>()
-    .returnResult()
-    .responseBody!!
+    fun slettVilkår(dto: SlettVilkårRequest): SlettVilkårResponse = apiRespons.slettVilkår(dto).expectOkWithBody()
 
-fun IntegrationTest.hentReglerDagligReise() =
-    webTestClient
-        .get()
-        .uri("/api/vilkar/daglig-reise/regler")
-        .medOnBehalfOfToken()
-        .exchange()
-        .expectStatus()
-        .isOk
-        .expectBody<RegelstrukturDto>()
-        .returnResult()
-        .responseBody!!
+    fun regler(): Vilkårsregler = apiRespons.regler().expectOkWithBody()
+
+    // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
+    val apiRespons = VilkårApi()
+
+    inner class VilkårApi {
+        fun hentVilkår(behandlingId: BehandlingId) = testklient.get("/api/vilkar/$behandlingId")
+
+        fun opprettVilkår(dto: OpprettVilkårDto) = testklient.post("/api/vilkar/opprett", dto)
+
+        fun oppdaterVilkår(dto: SvarPåVilkårDto) = testklient.post("/api/vilkar", dto)
+
+        fun slettVilkår(dto: SlettVilkårRequest) = testklient.delete("/api/vilkar", dto)
+
+        fun regler() = testklient.get("/api/regler")
+    }
+}

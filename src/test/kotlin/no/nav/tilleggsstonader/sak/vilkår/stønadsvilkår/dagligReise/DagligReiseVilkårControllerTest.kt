@@ -3,11 +3,6 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentReglerDagligReise
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVilkårDagligReise
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.oppdaterVilkårDagligReise
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.opprettVilkårDagligReise
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.slettVilkårDagligReise
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -51,7 +46,7 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
                 fakta = faktaOffentligTransport(),
             )
 
-        val resultat = opprettVilkårDagligReise(nyttVilkår, behandling.id)
+        val resultat = kall.vilkårDagligReise.opprettVilkår(behandling.id, nyttVilkår)
 
         assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
         assertThat(resultat.status).isEqualTo(VilkårStatus.NY)
@@ -66,23 +61,23 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
                     ),
             )
 
-        val resultatOppdatert = oppdaterVilkårDagligReise(oppdatertVilkår, resultat.id, behandling.id)
+        val resultatOppdatert = kall.vilkårDagligReise.oppdaterVilkår(oppdatertVilkår, resultat.id, behandling.id)
 
         assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
         assertThat(resultat.status).isEqualTo(VilkårStatus.NY)
         assertLagretVilkår(oppdatertVilkår, resultatOppdatert)
 
         val resultatSlettet =
-            slettVilkårDagligReise(
-                slettVilkår = SlettVilkårRequestDto(),
-                resultatOppdatert.id,
+            kall.vilkårDagligReise.slettVilkår(
                 behandling.id,
+                vilkårId = resultatOppdatert.id,
+                dto = SlettVilkårRequestDto(),
             )
 
         assertThat(resultatSlettet.slettetPermanent).isTrue
         assertThat(resultatSlettet.vilkår.slettetKommentar).isNull()
 
-        val hentedeVilkår = hentVilkårDagligReise(behandling.id)
+        val hentedeVilkår = kall.vilkårDagligReise.hentVilkår(behandling.id)
         assertThat(hentedeVilkår).isEmpty()
     }
 
@@ -102,7 +97,7 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
                 fakta = null,
             )
 
-        val resultat = opprettVilkårDagligReise(nyttVilkår, behandling.id)
+        val resultat = kall.vilkårDagligReise.opprettVilkår(behandling.id, nyttVilkår)
 
         assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
         assertThat(resultat.fakta).isNull()
@@ -110,7 +105,7 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
 
     @Test
     fun `skal hente alle regler som tilhører daglig reise`() {
-        val resultat = hentReglerDagligReise()
+        val resultat = kall.vilkårDagligReise.regler()
 
         FileUtil.assertFileJsonIsEqual("vilkår/regelstruktur/DAGLIG_REISE.json", resultat)
     }

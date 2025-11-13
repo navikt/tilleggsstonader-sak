@@ -5,11 +5,8 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.avslåVedtakBoutgifter
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakBoutgifter
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentVedtakBoutgifterKall
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.innvilgeVedtakBoutgifter
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.opphørVedtakBoutgifter
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkEmpty
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
@@ -71,11 +68,9 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
 
     @Test
     fun `hent vedtak skal returnere tom body når det ikke finnes noen lagrede vedtak`() {
-        hentVedtakBoutgifterKall(dummyBehandling.id)
-            .expectStatus()
-            .isOk
-            .expectBody()
-            .isEmpty
+        kall.vedtak
+            .hentVedtak(Stønadstype.BOUTGIFTER, dummyBehandling.id)
+            .expectOkEmpty()
     }
 
     @Nested
@@ -88,9 +83,12 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
                     begrunnelse = "begrunnelse",
                 )
 
-            avslåVedtakBoutgifter(dummyBehandling.id, avslag)
+            kall.vedtak.lagreAvslag(Stønadstype.BOUTGIFTER, dummyBehandling.id, avslag)
 
-            val lagretDto = hentVedtakBoutgifter<AvslagBoutgifterDto>(dummyBehandling.id)
+            val lagretDto =
+                kall.vedtak
+                    .hentVedtak(Stønadstype.BOUTGIFTER, dummyBehandling.id)
+                    .expectOkWithBody<AvslagBoutgifterDto>()
 
             assertThat(lagretDto.årsakerAvslag).isEqualTo(avslag.årsakerAvslag)
             assertThat(lagretDto.begrunnelse).isEqualTo(avslag.begrunnelse)
@@ -103,7 +101,8 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
         @Test
         fun `skal lagre og hente opphør`() {
             val opphørsdato = dummyFom.plusDays(4)
-            innvilgeVedtakBoutgifter(
+            kall.vedtak.lagreInnvilgelse(
+                Stønadstype.BOUTGIFTER,
                 dummyBehandling.id,
                 InnvilgelseBoutgifterRequest(listOf(vedtaksperiode.tilDto())),
             )
@@ -147,9 +146,12 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
                     opphørsdato = opphørsdato,
                 )
 
-            opphørVedtakBoutgifter(revurdering.id, opphørVedtak)
+            kall.vedtak.lagreOpphør(Stønadstype.BOUTGIFTER, revurdering.id, opphørVedtak)
 
-            val lagretDto = hentVedtakBoutgifter<OpphørBoutgifterResponse>(revurdering.id)
+            val lagretDto =
+                kall.vedtak
+                    .hentVedtak(Stønadstype.BOUTGIFTER, revurdering.id)
+                    .expectOkWithBody<OpphørBoutgifterResponse>()
 
             assertThat((lagretDto).årsakerOpphør).isEqualTo(opphørVedtak.årsakerOpphør)
             assertThat(lagretDto.begrunnelse).isEqualTo(opphørVedtak.begrunnelse)
