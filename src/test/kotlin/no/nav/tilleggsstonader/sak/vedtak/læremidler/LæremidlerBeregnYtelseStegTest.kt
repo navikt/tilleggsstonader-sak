@@ -1,6 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.april
+import no.nav.tilleggsstonader.libs.utils.dato.august
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
@@ -159,10 +162,10 @@ class LæremidlerBeregnYtelseStegTest : IntegrationTest() {
     // Ved ny sats må man oppdatere datoer her
     @Test
     fun `skal splitte andeler i 2, en for høsten og en for våren som ikke har bekreftet sats ennå`() {
-        val fom = LocalDate.of(2025, 8, 15)
-        val tom = LocalDate.of(2026, 4, 30)
-        val datoUtbetalingDel1 = LocalDate.of(2025, 8, 15)
-        val datoUtbetalingDel2 = LocalDate.of(2026, 1, 1)
+        val fom = 15 august 2025
+        val tom = 20 april 2026
+        val datoUtbetalingDel1 = 15 august 2025
+        val datoUtbetalingDel2 = 15 januar 2026
 
         lagreMålgruppeOgAktivitet(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)

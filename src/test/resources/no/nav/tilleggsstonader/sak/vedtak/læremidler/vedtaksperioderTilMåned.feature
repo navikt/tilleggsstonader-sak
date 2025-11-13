@@ -30,15 +30,15 @@ Egenskap: Splitt vedtaksperioder til utbetalingsperioder
   Scenario: En vedtaksperiode som treffer nytt år
     Gitt følgende vedtaksperioder for læremidler
       | Fom        | Tom        |
-      | 15.11.2024 | 14.01.2025 |
+      | 15.11.2024 | 19.01.2025 |
 
     Når splitter vedtaksperioder for læremidler
 
     Så forvent følgende utbetalingsperioder
       | Fom        | Tom        | Utbetalingsdato |
       | 15.11.2024 | 14.12.2024 | 15.11.2024      |
-      | 15.12.2024 | 31.12.2024 | 15.11.2024      |
-      | 01.01.2025 | 31.01.2025 | 01.01.2025      |
+      | 15.12.2024 | 14.01.2025 | 15.11.2024      |
+      | 15.01.2025 | 14.02.2025 | 15.01.2025      |
 
   Scenario: Flere vedtaksperioder
     Gitt følgende vedtaksperioder for læremidler
@@ -55,8 +55,29 @@ Egenskap: Splitt vedtaksperioder til utbetalingsperioder
       | 17.05.2024 | 16.06.2024 | 17.04.2024      |
       | 18.08.2024 | 17.09.2024 | 19.08.2024      |
       | 18.09.2024 | 17.10.2024 | 19.08.2024      |
-      | 13.12.2024 | 31.12.2024 | 13.12.2024      |
-      | 01.01.2025 | 31.01.2025 | 01.01.2025      |
+      | 13.12.2024 | 12.01.2025 | 13.12.2024      |
+      | 13.01.2025 | 12.02.2025 | 13.01.2025      |
+
+  Scenario: Flere vedtaksperioder krysser flere år
+    Gitt følgende vedtaksperioder for læremidler
+      | Fom        | Tom        |
+      | 13.11.2024 | 05.03.2025 |
+      | 10.11.2025 | 02.03.2026 |
+
+
+    Når splitter vedtaksperioder for læremidler
+
+    Så forvent følgende utbetalingsperioder
+      | Fom        | Tom        | Utbetalingsdato |
+      | 13.11.2024 | 12.12.2024 | 13.11.2024      |
+      | 13.12.2024 | 12.01.2025 | 13.11.2024      |
+      | 13.01.2025 | 12.02.2025 | 13.01.2025      |
+      | 13.02.2025 | 12.03.2025 | 13.01.2025      |
+
+      | 10.11.2025 | 09.12.2025 | 10.11.2025      |
+      | 10.12.2025 | 09.01.2026 | 10.11.2025      |
+      | 10.01.2026 | 09.02.2026 | 10.01.2026      |
+      | 10.02.2026 | 09.03.2026 | 10.01.2026      |
 
   Scenario: Treffer rundt månedsskifte februar-mars - håndter spesialtilfelle
     Gitt følgende vedtaksperioder for læremidler
