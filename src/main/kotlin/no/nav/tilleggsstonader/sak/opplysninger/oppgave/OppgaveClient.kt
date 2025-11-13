@@ -51,6 +51,10 @@ class OppgaveClient(
             .oppgaveId
     }
 
+    fun opprettTilbakekrevingsoppgave(): Long {
+        TODO("Ikke implementert, må finne ut hvor vi skal opprette tilbakekrevingsoppgaver til")
+    }
+
     fun finnOppgaveMedId(oppgaveId: Long): Oppgave {
         val uri =
             UriComponentsBuilder

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mai
 import no.nav.tilleggsstonader.sak.IntegrationTest
@@ -14,8 +15,13 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.hendelser.ConsumerRecordUtil
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.Oppgavelager
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
+import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingBehandlingEndret
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingFagsysteminfoBehov
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingFagsysteminfoSvar
+import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingInfo
+import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingPeriode
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeDto
@@ -37,6 +43,12 @@ import java.util.UUID
 import kotlin.random.Random
 
 class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
+    @Autowired
+    private lateinit var oppgaveClient: OppgaveClient
+
+    @Autowired
+    private lateinit var oppgavelager: Oppgavelager
+
     @Autowired
     lateinit var vilkårsperiodeRepository: VilkårperiodeRepository
 
@@ -165,6 +177,42 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
             val tilbakekrevingFagsysteminfoSvar = objectMapper.readValue<TilbakekrevingFagsysteminfoSvar>(publisertHendelse.value())
             assertThat(tilbakekrevingFagsysteminfoSvar.utvidPerioder).isNotEmpty
             println(tilbakekrevingFagsysteminfoSvar)
+        }
+    }
+
+    @Nested
+    inner class BehandlingEndret {
+        @Test
+        fun `mottar hendelsestype behandling_endret med status TIL_BEHANDLING, behandling har vedtak, publiserer andeler på topic`() {
+            val key = UUID.randomUUID().toString()
+            val payload =
+                TilbakekrevingBehandlingEndret(
+                    eksternFagsakId = behandling.eksternFagsakId.toString(),
+                    hendelseOpprettet = LocalDateTime.now(),
+                    eksternBehandlingId = behandling.eksternId.toString(),
+                    tilbakekreving =
+                        TilbakekrevingInfo(
+                            behandlingId = UUID.randomUUID().toString(),
+                            sakOpprettet = LocalDateTime.now(),
+                            varselSendt = null,
+                            behandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_TIL_BEHANDLING,
+                            totaltFeilutbetaltBeløp = 10000,
+                            saksbehandlingURL = "http://localhost",
+                            fullstendigPeriode =
+                                TilbakekrevingPeriode(
+                                    fom = 1 januar 2025,
+                                    tom = 31 mai 2025,
+                                ),
+                        ),
+                    versjon = 1,
+                )
+
+            publiserTilbakekrevinghendelse(key, payload)
+
+            verify(exactly = 0) { kafkaTemplate.send(capture(publiserteHendelser)) }
+
+            // TODO - utfylle test når klart hvordan vi skal opprette tilbakekrevingsoppgave
+            verify { oppgaveClient.opprettTilbakekrevingsoppgave() }
         }
     }
 

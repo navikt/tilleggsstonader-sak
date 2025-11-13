@@ -170,6 +170,8 @@ class OppgaveService(
         )
     }
 
+    fun opprettTilbakekrevingsoppgave() = oppgaveClient.opprettTilbakekrevingsoppgave()
+
     fun opprettOppgave(
         personIdent: String,
         stønadstype: Stønadstype,
