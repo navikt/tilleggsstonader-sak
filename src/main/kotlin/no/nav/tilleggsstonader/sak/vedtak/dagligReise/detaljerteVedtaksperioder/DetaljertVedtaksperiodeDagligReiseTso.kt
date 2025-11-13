@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
+import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.DetaljertVedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
@@ -25,14 +25,14 @@ data class DetaljertVedtaksperiodeDagligReiseTso(
 
     override fun merge(other: DetaljertVedtaksperiodeDagligReiseTso): DetaljertVedtaksperiodeDagligReiseTso = this.copy(tom = other.tom)
 
-    fun erLikOgPåfølgesAv(other: DetaljertVedtaksperiodeDagligReiseTso): Boolean {
+    fun erLikOgOverlapperEllerPåfølgesAv(other: DetaljertVedtaksperiodeDagligReiseTso): Boolean {
         val erLik =
             this.aktivitet == other.aktivitet &&
                 this.målgruppe == other.målgruppe &&
                 this.typeDagligReise == other.typeDagligReise
-        return erLik && this.påfølgesAv(other)
+        return erLik && this.overlapperEllerPåfølgesAv(other)
     }
 }
 
 fun List<DetaljertVedtaksperiodeDagligReiseTso>.sorterOgMergeSammenhengende() =
-    this.sorted().mergeSammenhengende { p1, p2 -> p1.erLikOgPåfølgesAv(p2) }
+    this.sorted().mergeSammenhengende { p1, p2 -> p1.erLikOgOverlapperEllerPåfølgesAv(p2) }

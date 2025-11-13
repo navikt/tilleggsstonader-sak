@@ -81,6 +81,35 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         assertThat(resultat).isEqualTo(forventetResultat)
     }
 
+    @Test
+    fun `skal slå sammen like perioder når det er flere enn 1 reise`() {
+        val vedtak =
+            innvilgelse(
+                toReiser(
+                    førsteJanuar,
+                    sisteJanuar,
+                ),
+            )
+
+        val resultat = vedtak.data.finnDetaljerteVedtaksperioderTso()
+        val forventetResultat =
+            listOf(
+                detaljertVedtaksperiodeDagligReiseTso(førsteJanuar, sisteJanuar),
+            )
+        assertThat(resultat).isEqualTo(forventetResultat)
+    }
+
+    private fun toReiser(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) = InnvilgelseDagligReise(
+        vedtaksperioder =
+            listOf(
+                vedtaksperiode(fom = fom, tom = tom),
+            ),
+        beregningsresultat = lagBeregningsresultatMedToReiser(fom, tom),
+    )
+
     private fun detaljertVedtaksperiodeDagligReiseTso(
         fom: LocalDate,
         tom: LocalDate,
@@ -116,10 +145,34 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 vedtaksperiode(fom = fom1, tom = tom1),
                 vedtaksperiode(fom = fom2, tom = tom2),
             ),
-        beregningsresultat = lagBeregningsresultat(fom1, tom1, fom2, tom2),
+        beregningsresultat = lagBeregningsresultatMedToPerioder(fom1, tom1, fom2, tom2),
     )
 
-    private fun lagBeregningsresultat(
+    private fun lagBeregningsresultatMedToReiser(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) = BeregningsresultatDagligReise(
+        offentligTransport =
+            BeregningsresultatOffentligTransport(
+                reiser =
+                    listOf(
+                        BeregningsresultatForReise(
+                            perioder =
+                                listOf(
+                                    beregningsresultatForPeriode(fom, tom),
+                                ),
+                        ),
+                        BeregningsresultatForReise(
+                            perioder =
+                                listOf(
+                                    beregningsresultatForPeriode(fom, tom),
+                                ),
+                        ),
+                    ),
+            ),
+    )
+
+    private fun lagBeregningsresultatMedToPerioder(
         fom1: LocalDate,
         tom1: LocalDate,
         fom2: LocalDate,
