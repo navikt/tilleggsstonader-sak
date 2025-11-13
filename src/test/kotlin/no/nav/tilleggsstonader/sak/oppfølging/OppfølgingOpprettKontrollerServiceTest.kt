@@ -22,10 +22,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.period
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe

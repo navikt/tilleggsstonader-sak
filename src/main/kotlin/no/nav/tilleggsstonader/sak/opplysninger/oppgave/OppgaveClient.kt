@@ -130,7 +130,7 @@ class OppgaveClient(
             }
         }
 
-        patchForEntity<OppgaveResponse>(uriBuilder.encode().toUriString(), "", uriVariables = oppgaveIdUriVariables(oppgaveId))
+        patchForEntity<OppgaveResponse>(uriBuilder.encode().toUriString(), "", uriVariables = uriVariables)
     }
 
     fun oppdaterOppgave(oppgave: Oppgave): OppdatertOppgaveResponse {

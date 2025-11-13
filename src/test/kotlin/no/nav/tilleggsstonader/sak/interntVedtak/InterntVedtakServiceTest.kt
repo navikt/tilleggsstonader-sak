@@ -262,6 +262,20 @@ class InterntVedtakServiceTest {
         }
 
         @Test
+        fun `Vedtak avslag skal mappes riktig for daglig reise`() {
+            every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.DagligReise.avslåttVedtak
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            val dummyAvslåttVedtak = InterntVedtakTestdata.DagligReise.avslåttVedtak.data
+
+            assertThat(interntVedtak.vedtak!!).isEqualTo(
+                VedtakAvslagInternt(
+                    årsakerAvslag = dummyAvslåttVedtak.årsaker,
+                    avslagBegrunnelse = dummyAvslåttVedtak.begrunnelse,
+                ),
+            )
+        }
+
+        @Test
         fun `vedtaksperiodefelter skal bli riktig mappet`() {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 

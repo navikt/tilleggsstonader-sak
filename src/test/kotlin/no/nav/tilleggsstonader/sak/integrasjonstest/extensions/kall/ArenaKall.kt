@@ -1,23 +1,27 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
+import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.migrering.arena.ArenaFinnesPersonRequest
 import no.nav.tilleggsstonader.sak.migrering.arena.ArenaFinnesPersonResponse
-import org.springframework.test.web.reactive.server.expectBody
 
-fun IntegrationTest.hentStatusFraArenaKall(arenaFinnesPersonRequest: ArenaFinnesPersonRequest) =
-    webTestClient
-        .post()
-        .uri("/api/ekstern/arena/status")
-        .bodyValue(arenaFinnesPersonRequest)
-        .medClientCredentials(EksternApplikasjon.ARENA.namespaceAppNavn, true)
-        .exchange()
+class ArenaKall(
+    private val testklient: Testklient,
+) {
+    fun status(dto: ArenaFinnesPersonRequest) = apiRespons.status(dto).expectOkWithBody<ArenaFinnesPersonResponse>()
 
-fun IntegrationTest.hentStatusFraArena(arenaFinnesPersonRequest: ArenaFinnesPersonRequest) =
-    hentStatusFraArenaKall(arenaFinnesPersonRequest)
-        .expectStatus()
-        .isOk
-        .expectBody<ArenaFinnesPersonResponse>()
-        .returnResult()
-        .responseBody!!
+    // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
+    val apiRespons = ArenaApi()
+
+    inner class ArenaApi {
+        fun status(dto: ArenaFinnesPersonRequest) =
+            with(testklient.testkontekst) {
+                webTestClient
+                    .post()
+                    .uri("/api/ekstern/arena/status")
+                    .bodyValue(dto)
+                    .medClientCredentials(EksternApplikasjon.ARENA.namespaceAppNavn, true)
+                    .exchange()
+            }
+    }
+}

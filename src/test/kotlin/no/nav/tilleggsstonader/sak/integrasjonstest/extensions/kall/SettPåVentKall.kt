@@ -1,40 +1,30 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.vent.KanTaAvVentDto
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentDto
 import no.nav.tilleggsstonader.sak.behandling.vent.StatusPåVentDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import org.springframework.test.web.reactive.server.expectBody
+import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 
-fun IntegrationTest.settPåVentKall(
-    behandlingId: BehandlingId,
-    settPåVentDto: SettPåVentDto,
-) = webTestClient
-    .post()
-    .uri("/api/sett-pa-vent/$behandlingId")
-    .bodyValue(settPåVentDto)
-    .medOnBehalfOfToken()
-    .exchange()
+class SettPåVentKall(
+    private val testklient: Testklient,
+) {
+    fun settPaVent(
+        behandlingId: BehandlingId,
+        settPåVentDto: SettPåVentDto,
+    ): StatusPåVentDto = apiRespons.settPaVent(behandlingId, settPåVentDto).expectOkWithBody()
 
-fun IntegrationTest.settPåVent(
-    behandlingId: BehandlingId,
-    settPåVentDto: SettPåVentDto,
-) = settPåVentKall(behandlingId, settPåVentDto)
-    .expectStatus()
-    .isOk
-    .expectBody<StatusPåVentDto>()
-    .returnResult()
-    .responseBody!!
+    fun kanTaAvVent(behandlingId: BehandlingId): KanTaAvVentDto = apiRespons.kanTaAvVent(behandlingId).expectOkWithBody()
 
-fun IntegrationTest.hentKanTaAvVent(behandlingId: BehandlingId) =
-    webTestClient
-        .get()
-        .uri("/api/sett-pa-vent/$behandlingId/kan-ta-av-vent")
-        .medOnBehalfOfToken()
-        .exchange()
-        .expectStatus()
-        .isOk
-        .expectBody<KanTaAvVentDto>()
-        .returnResult()
-        .responseBody!!
+    // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
+    val apiRespons = SettPåVentApi()
+
+    inner class SettPåVentApi {
+        fun settPaVent(
+            behandlingId: BehandlingId,
+            settPåVentDto: SettPåVentDto,
+        ) = testklient.post("/api/sett-pa-vent/$behandlingId", settPåVentDto)
+
+        fun kanTaAvVent(behandlingId: BehandlingId) = testklient.get("/api/sett-pa-vent/$behandlingId/kan-ta-av-vent")
+    }
+}

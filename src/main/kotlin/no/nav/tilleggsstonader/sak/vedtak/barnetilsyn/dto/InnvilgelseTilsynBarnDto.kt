@@ -13,5 +13,5 @@ data class InnvilgelseTilsynBarnResponse(
 
 data class InnvilgelseTilsynBarnRequest(
     val vedtaksperioder: List<VedtaksperiodeDto>,
-    val begrunnelse: String?,
+    val begrunnelse: String? = null,
 ) : VedtakTilsynBarnRequest

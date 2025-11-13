@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
+import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.NullstillBehandlingService
@@ -9,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandling.vent.KanTaAvVent.Ja.PåkrevdHandling
 import no.nav.tilleggsstonader.sak.behandling.vent.KanTaAvVent.Nei.Årsak
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
@@ -25,6 +27,7 @@ class TaAvVentService(
     private val behandlingshistorikkService: BehandlingshistorikkService,
     private val settPåVentRepository: SettPåVentRepository,
     private val oppgaveService: OppgaveService,
+    private val fagsakService: FagsakService,
 ) {
     @Transactional
     fun taAvVent(
@@ -56,6 +59,7 @@ class TaAvVentService(
         val påVentMetadata =
             finnAktivSattPåVent(behandlingId).copy(aktiv = false, taAvVentKommentar = taAvVentDto?.kommentar)
         settPåVentRepository.update(påVentMetadata)
+        val fagsak = fagsakService.hentFagsak(behandling.fagsakId)
 
         taOppgaveAvVent(
             settPåVent = påVentMetadata,
@@ -65,6 +69,7 @@ class TaAvVentService(
                     kravMottatt = behandling.kravMottatt,
                     behandlingOpprettet = behandling.sporbar.opprettetTid,
                 ),
+            endretAvEnhetsnr = fagsak.stønadstype.behandlendeEnhet().enhetsnr,
         )
     }
 
@@ -120,6 +125,7 @@ class TaAvVentService(
         settPåVent: SettPåVent,
         skalTilordnesRessurs: Boolean,
         frist: LocalDate,
+        endretAvEnhetsnr: String?,
     ) {
         val oppgaveId = oppgaveService.hentBehandleSakOppgaveDomainSomIkkeErFerdigstilt(settPåVent.behandlingId).gsakOppgaveId
         val taAvVent =
@@ -128,6 +134,7 @@ class TaAvVentService(
                 beholdOppgave = skalTilordnesRessurs,
                 kommentar = settPåVent.taAvVentKommentar,
                 frist = frist,
+                endretAvEnhetsnr = endretAvEnhetsnr,
             )
         oppgaveService.taAvVent(taAvVent)
     }

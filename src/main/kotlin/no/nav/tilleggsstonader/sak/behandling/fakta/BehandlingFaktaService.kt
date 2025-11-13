@@ -166,8 +166,12 @@ class BehandlingFaktaService(
                 ),
         )
 
-    private fun mapDekkesUtgiftenAvAndre(dekkesUtgiftenAvAndre: DekkesUtgiftenAvAndreKontrakt): DekkesUtgiftenAvAndre =
-        DekkesUtgiftenAvAndre(
+    private fun mapDekkesUtgiftenAvAndre(dekkesUtgiftenAvAndre: DekkesUtgiftenAvAndreKontrakt?): DekkesUtgiftenAvAndre? {
+        if (dekkesUtgiftenAvAndre === null) {
+            return null
+        }
+
+        return DekkesUtgiftenAvAndre(
             typeUtdanning = dekkesUtgiftenAvAndre.typeUtdanning,
             lærling = dekkesUtgiftenAvAndre.lærling,
             arbeidsgiverDekkerUtgift = dekkesUtgiftenAvAndre.arbeidsgiverDekkerUtgift,
@@ -175,6 +179,7 @@ class BehandlingFaktaService(
             betalerForReisenTilSkolenSelv = dekkesUtgiftenAvAndre.betalerForReisenTilSkolenSelv,
             lønnetAktivitet = dekkesUtgiftenAvAndre.lønnetAktivitet,
         )
+    }
 
     private fun mapReise(reiser: List<ReiseDagligReise>?): List<FaktaReise>? =
         reiser?.map { reise ->

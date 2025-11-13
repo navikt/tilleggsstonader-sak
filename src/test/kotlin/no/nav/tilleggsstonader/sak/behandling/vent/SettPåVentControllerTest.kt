@@ -5,8 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentKanTaAvVent
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.settPåVent
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -49,7 +47,7 @@ class SettPåVentControllerTest : IntegrationTest() {
         @BeforeEach
         fun setUp() {
             medBrukercontext(bruker = dummySaksbehandler) {
-                settPåVent(behandling.id, settPåVentDto)
+                kall.settPaVent.settPaVent(behandling.id, settPåVentDto)
             }
         }
 
@@ -57,7 +55,7 @@ class SettPåVentControllerTest : IntegrationTest() {
         fun `retunerer OK når behandlingen kan tas av vent`() {
             val res =
                 medBrukercontext(bruker = dummySaksbehandler) {
-                    hentKanTaAvVent(behandling.id)
+                    kall.settPaVent.kanTaAvVent(behandling.id)
                 }
             assertThat(res).isEqualTo(KanTaAvVentDto(resultat = KanTaAvVentStatus.OK))
         }
@@ -73,7 +71,7 @@ class SettPåVentControllerTest : IntegrationTest() {
                 )
             testoppsettService.lagre(behandlingSomSniker)
 
-            val res = medBrukercontext(bruker = dummySaksbehandler) { hentKanTaAvVent(behandling.id) }
+            val res = medBrukercontext(bruker = dummySaksbehandler) { kall.settPaVent.kanTaAvVent(behandling.id) }
             assertThat(res).isEqualTo(KanTaAvVentDto(resultat = KanTaAvVentStatus.MÅ_NULLSTILLE_BEHANDLING))
         }
 
@@ -83,7 +81,7 @@ class SettPåVentControllerTest : IntegrationTest() {
                 behandling(fagsak = fagsak, status = BehandlingStatus.UTREDES)
             testoppsettService.lagre(aktivBehandling)
 
-            val res = hentKanTaAvVent(behandling.id)
+            val res = kall.settPaVent.kanTaAvVent(behandling.id)
             assertThat(res).isEqualTo(KanTaAvVentDto(resultat = KanTaAvVentStatus.ANNEN_AKTIV_BEHANDLING_PÅ_FAGSAKEN))
         }
     }

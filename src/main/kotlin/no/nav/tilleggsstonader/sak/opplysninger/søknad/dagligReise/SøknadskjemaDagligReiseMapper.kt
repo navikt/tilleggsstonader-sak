@@ -13,18 +13,16 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Arbe
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArsakOppholdUtenforNorgeType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DineOpplysninger
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.FaktiskeUtgifter
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.GarDuPaVideregaendeEllerGrunnskoleType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HarPengestotteAnnetLandType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransportType.annet
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransportType.darligTransporttilbud
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransportType.helsemessigeArsaker
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransportType.leveringHentingIBarnehageEllerSkolefritidsordningSfoAks
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaSlagsTypeBillettMaDuKjopeType
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvorSkalDuKjoreMedEgenBilType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvorforIkkeBilType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.JaNeiType
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.KanDuReiseMedOffentligTransportType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.MetadataDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
@@ -173,28 +171,34 @@ class SøknadskjemaDagligReiseMapper(
                     }
             }
 
-        val dekkesUtgiftenAvAndre =
-            DekkesUtgiftenAvAndre(
-                typeUtdanning =
-                    mapTypeUtdanning(
-                        aktiviteter.faktiskeUtgifter.garDuPaVideregaendeEllerGrunnskole,
-                    ),
-                lærling = aktiviteter.faktiskeUtgifter.erDuLaerling?.let(::mapJaNei),
-                arbeidsgiverDekkerUtgift = aktiviteter.faktiskeUtgifter.arbeidsgiverDekkerUtgift?.let(::mapJaNei),
-                erUnder25år = aktiviteter.faktiskeUtgifter.under25?.let(::mapJaNei),
-                betalerForReisenTilSkolenSelv = aktiviteter.faktiskeUtgifter.betalerForReisenTilSkolenSelv?.let(::mapJaNei),
-                lønnetAktivitet = aktiviteter.faktiskeUtgifter.lonnGjennomTiltak?.let(::mapJaNei),
-            )
-
         return AktivitetDagligReiseAvsnitt(
             aktiviteter = aktiviteterDagligReise,
             annenAktivitet = mapAnnenAktivitet(aktiviteter.arbeidsrettetAktivitet),
-            dekkesUtgiftenAvAndre = dekkesUtgiftenAvAndre,
+            dekkesUtgiftenAvAndre = mapDekkesUtgiftenAvAndre(aktiviteter.faktiskeUtgifter),
         )
     }
 
-    private fun mapTypeUtdanning(vidregåendeEllerGrunnskole: GarDuPaVideregaendeEllerGrunnskoleType): TypeUtdanning =
-        when (vidregåendeEllerGrunnskole) {
+    private fun mapDekkesUtgiftenAvAndre(faktiskeUtgifter: FaktiskeUtgifter?): DekkesUtgiftenAvAndre? {
+        if (faktiskeUtgifter == null) {
+            return null
+        }
+
+        return DekkesUtgiftenAvAndre(
+            typeUtdanning =
+                mapTypeUtdanning(
+                    faktiskeUtgifter.garDuPaVideregaendeEllerGrunnskole,
+                ),
+            lærling = faktiskeUtgifter.erDuLaerling?.let(::mapJaNei),
+            arbeidsgiverDekkerUtgift = faktiskeUtgifter.arbeidsgiverDekkerUtgift?.let(::mapJaNei),
+            erUnder25år = faktiskeUtgifter.under25?.let(::mapJaNei),
+            betalerForReisenTilSkolenSelv = faktiskeUtgifter.betalerForReisenTilSkolenSelv?.let(::mapJaNei),
+            lønnetAktivitet = faktiskeUtgifter.lonnGjennomTiltak?.let(::mapJaNei),
+        )
+    }
+
+    private fun mapTypeUtdanning(videregåendeEllerGrunnskole: GarDuPaVideregaendeEllerGrunnskoleType?): TypeUtdanning? =
+        when (videregåendeEllerGrunnskole) {
+            null -> null
             GarDuPaVideregaendeEllerGrunnskoleType.videregaendeSkole -> TypeUtdanning.VIDEREGÅENDE
             GarDuPaVideregaendeEllerGrunnskoleType.opplaeringForVoksne -> TypeUtdanning.OPPLÆRING_FOR_VOKSNE
             GarDuPaVideregaendeEllerGrunnskoleType.annetTiltak -> TypeUtdanning.ANNET_TILTAK
@@ -234,7 +238,7 @@ class SøknadskjemaDagligReiseMapper(
             }
 
         return reiser.map { reise ->
-            val kanReiseMedOffentligTransport = mapKanReiseMedOffentligTransport(reise.kanDuReiseMedOffentligTransport)
+            val kanReiseMedOffentligTransport = mapJaNei(reise.kanDuReiseMedOffentligTransport)
 
             Reise(
                 skalReiseFraFolkeregistrertAdresse = skalReiseFraFolkeregistrertAdresse,
@@ -254,29 +258,16 @@ class SøknadskjemaDagligReiseMapper(
                         ::mapJaNei,
                     ),
                 kanReiseMedOffentligTransport = kanReiseMedOffentligTransport,
-                offentligTransport =
-                    if (kanReiseMedOffentligTransport.kanReiseMedOffentligTransport()) {
-                        mapOffentligTransport(
-                            reise,
-                        )
-                    } else {
-                        null
-                    },
+                offentligTransport = mapOffentligTransport(reise),
                 privatTransport = mapPrivatTransport(reise),
             )
         }
     }
 
-    private fun mapKanReiseMedOffentligTransport(
-        kanDuReiseMedOffentligTransport: KanDuReiseMedOffentligTransportType,
-    ): KanDuReiseMedOffentligTransport =
-        when (kanDuReiseMedOffentligTransport) {
-            KanDuReiseMedOffentligTransportType.ja -> KanDuReiseMedOffentligTransport.JA
-            KanDuReiseMedOffentligTransportType.nei -> KanDuReiseMedOffentligTransport.NEI
-            KanDuReiseMedOffentligTransportType.kombinertTogBil -> KanDuReiseMedOffentligTransport.KOMBINERT_BIL_OFFENTLIG_TRANSPORT
+    private fun mapOffentligTransport(reise: ReiseKontrakt): OffentligTransport? {
+        if (reise.kanDuReiseMedOffentligTransport === JaNeiType.nei) {
+            return null
         }
-
-    private fun mapOffentligTransport(reise: ReiseKontrakt): OffentligTransport {
         val billettTyper =
             reise.hvaSlagsTypeBillettMaDuKjope
                 ?.filter { it.value }
@@ -297,6 +288,10 @@ class SøknadskjemaDagligReiseMapper(
     }
 
     private fun mapPrivatTransport(reise: ReiseKontrakt): PrivatTransport? {
+        if (reise.kanDuReiseMedOffentligTransport === JaNeiType.ja) {
+            return null
+        }
+
         val årsakIkkeOffentligTransport =
             reise.hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport
                 ?.filter { it.value }
@@ -306,49 +301,34 @@ class SøknadskjemaDagligReiseMapper(
                         darligTransporttilbud -> ÅrsakIkkeOffentligTransport.DÅRLIG_TRANSPORTTILBUD
                         leveringHentingIBarnehageEllerSkolefritidsordningSfoAks,
                         -> ÅrsakIkkeOffentligTransport.LEVERING_HENTING_BARNEHAGE_SKOLE
-
-                        annet -> ÅrsakIkkeOffentligTransport.ANNET
                     }
                 } ?: emptyList()
 
-        return if (reise.kanDuReiseMedOffentligTransport === KanDuReiseMedOffentligTransportType.kombinertTogBil ||
-            reise.kanDuReiseMedOffentligTransport == KanDuReiseMedOffentligTransportType.nei
-        ) {
-            PrivatTransport(
-                årsakIkkeOffentligTransport = årsakIkkeOffentligTransport,
-                kanKjøreMedEgenBil = reise.kanKjoreMedEgenBil?.let(::mapJaNei),
-                utgifterBil = mapUtgifterBil(reise),
-                taxi = mapTaxi(reise),
-            )
-        } else {
-            null
-        }
+        return PrivatTransport(
+            årsakIkkeOffentligTransport = årsakIkkeOffentligTransport,
+            kanKjøreMedEgenBil = reise.kanKjoreMedEgenBil?.let(::mapJaNei),
+            utgifterBil = mapUtgifterBil(reise),
+            taxi = mapTaxi(reise),
+        )
     }
 
     private fun mapUtgifterBil(reise: ReiseKontrakt): UtgifterBil? {
-        val skalKjøreBil =
-            reise.kanKjoreMedEgenBil == JaNeiType.ja ||
-                reise.kanDuReiseMedOffentligTransport == KanDuReiseMedOffentligTransportType.kombinertTogBil
-        return if (skalKjøreBil) {
-            UtgifterBil(
-                destinasjonEgenBil = mapDestinasjonEgenBil(reise.hvorSkalDuKjoreMedEgenBil),
-                parkering = mapJaNei(reise.parkering ?: error("'Parkering' er påkrevd når bruker skal kjøre egen bil")),
-                mottarGrunnstønad = reise.mottarDuGrunnstonadFraNav?.let(::mapJaNei),
-                reisedistanseEgenBil =
-                    reise.hvorLangErReiseveienDinMedBil
-                        ?: error("'Reisedistanse med egen bil' er påkrevd når bruker skal kjøre egen bil"),
-                bompenger = reise.bompenger,
-                ferge = reise.ferge,
-                piggdekkavgift = reise.piggdekkavgift,
-            )
-        } else {
-            null
+        if (reise.kanKjoreMedEgenBil == JaNeiType.nei) {
+            return null
         }
+
+        return UtgifterBil(
+            parkering = mapJaNei(reise.parkering ?: error("'Parkering' er påkrevd når bruker skal kjøre egen bil")),
+            mottarGrunnstønad = reise.mottarDuGrunnstonadFraNav?.let(::mapJaNei),
+            bompenger = reise.bompenger,
+            ferge = reise.ferge,
+            piggdekkavgift = reise.piggdekkavgift,
+        )
     }
 
     private fun mapTaxi(reise: ReiseKontrakt): Taxi? {
         val skalTaTaxi =
-            reise.kanDuReiseMedOffentligTransport == KanDuReiseMedOffentligTransportType.nei && reise.kanKjoreMedEgenBil == JaNeiType.nei
+            reise.kanDuReiseMedOffentligTransport == JaNeiType.nei && reise.kanKjoreMedEgenBil == JaNeiType.nei
         return if (skalTaTaxi) {
             Taxi(
                 årsakIkkeKjøreBil =
@@ -365,15 +345,6 @@ class SøknadskjemaDagligReiseMapper(
             null
         }
     }
-
-    private fun mapDestinasjonEgenBil(hvorSkalDuKjoreMedEgenBil: Map<HvorSkalDuKjoreMedEgenBilType, Boolean>?): List<DestinasjonEgenBil>? =
-        hvorSkalDuKjoreMedEgenBil?.filter { it.value }?.map {
-            when (it.key) {
-                HvorSkalDuKjoreMedEgenBilType.togstasjon -> DestinasjonEgenBil.TOGSTASJON
-                HvorSkalDuKjoreMedEgenBilType.busstopp -> DestinasjonEgenBil.BUSSSTOPP
-                HvorSkalDuKjoreMedEgenBilType.fergeBatkai -> DestinasjonEgenBil.FERGE_BAT_KAI
-            }
-        }
 
     private fun mapÅrsakerIkkeEgenBil(hvorforIkkeBil: Map<HvorforIkkeBilType, Boolean>?): List<ÅrsakIkkeKjøreBil>? =
         hvorforIkkeBil?.filter { svar -> svar.value }?.map { svar ->

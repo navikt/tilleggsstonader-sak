@@ -48,7 +48,6 @@ class DistribuerVedtaksbrevTaskTest {
         DistribuerVedtaksbrevService(
             journalpostClient = journalpostClient,
             brevmottakerVedtaksbrevRepository = brevmottakerVedtaksbrevRepository,
-            personService = personService,
             transactionHandler = TransactionHandler(),
         )
 

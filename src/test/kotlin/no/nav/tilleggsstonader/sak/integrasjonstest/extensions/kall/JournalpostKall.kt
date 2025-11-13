@@ -1,33 +1,28 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalpostResponse
-import org.springframework.test.web.reactive.server.expectBody
 
-fun IntegrationTest.fullførJournalpost(
-    journalpostId: String,
-    request: JournalføringRequest,
-) = webTestClient
-    .post()
-    .uri("/api/journalpost/$journalpostId/fullfor")
-    .bodyValue(request)
-    .medOnBehalfOfToken()
-    .exchange()
-    .expectStatus()
-    .isOk
-    .expectBody<String>()
-    .returnResult()
-    .responseBody!!
+class JournalpostKall(
+    private val testklient: Testklient,
+) {
+    fun fullfor(
+        journalpostId: String,
+        request: JournalføringRequest,
+    ): String = apiRespons.fullfor(journalpostId, request).expectOkWithBody()
 
-fun IntegrationTest.hentJournalpost(journalpostId: String) =
-    webTestClient
-        .get()
-        .uri("/api/journalpost/$journalpostId")
-        .medOnBehalfOfToken()
-        .exchange()
-        .expectStatus()
-        .isOk
-        .expectBody<JournalpostResponse>()
-        .returnResult()
-        .responseBody!!
+    fun journalpost(journalpostId: String): JournalpostResponse = apiRespons.journalpost(journalpostId).expectOkWithBody()
+
+    // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
+    val apiRespons = JournalpostApi()
+
+    inner class JournalpostApi {
+        fun fullfor(
+            journalpostId: String,
+            request: JournalføringRequest,
+        ) = testklient.post("/api/journalpost/$journalpostId/fullfor", request)
+
+        fun journalpost(journalpostId: String) = testklient.get("/api/journalpost/$journalpostId")
+    }
+}

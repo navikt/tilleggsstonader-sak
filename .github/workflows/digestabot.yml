@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      id-token: write
     steps:
       - uses: navikt/digestabot@3233d68167c867ef8227c5dfde7a30f2a0e10af0
         with:

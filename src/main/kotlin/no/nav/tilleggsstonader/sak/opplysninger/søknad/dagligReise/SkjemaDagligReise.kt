@@ -16,7 +16,7 @@ data class SkjemaDagligReise(
 
 data class AktivitetDagligReiseAvsnitt(
     val aktiviteter: List<AktivitetDagligReise>?,
-    val dekkesUtgiftenAvAndre: DekkesUtgiftenAvAndre,
+    val dekkesUtgiftenAvAndre: DekkesUtgiftenAvAndre?,
     val annenAktivitet: AnnenAktivitetType?,
 )
 
@@ -27,7 +27,7 @@ data class AktivitetDagligReise(
 )
 
 data class DekkesUtgiftenAvAndre(
-    val typeUtdanning: TypeUtdanning,
+    val typeUtdanning: TypeUtdanning?,
     val lærling: JaNei?,
     val arbeidsgiverDekkerUtgift: JaNei?,
     val erUnder25år: JaNei?,
@@ -55,7 +55,7 @@ data class Reise(
     val harMerEnn6KmReisevei: JaNei,
     val lengdeReisevei: Int,
     val harBehovForTransportUavhengigAvReisensLengde: JaNei?,
-    val kanReiseMedOffentligTransport: KanDuReiseMedOffentligTransport,
+    val kanReiseMedOffentligTransport: JaNei,
     val offentligTransport: OffentligTransport?,
     val privatTransport: PrivatTransport?,
 )
@@ -86,14 +86,6 @@ data class PrivatTransport(
     val taxi: Taxi?,
 )
 
-enum class KanDuReiseMedOffentligTransport {
-    JA,
-    NEI,
-    KOMBINERT_BIL_OFFENTLIG_TRANSPORT, ;
-
-    fun kanReiseMedOffentligTransport(): Boolean = this == JA || this == KOMBINERT_BIL_OFFENTLIG_TRANSPORT
-}
-
 enum class ÅrsakIkkeOffentligTransport {
     HELSEMESSIGE_ÅRSAKER,
     DÅRLIG_TRANSPORTTILBUD,
@@ -103,8 +95,6 @@ enum class ÅrsakIkkeOffentligTransport {
 
 data class UtgifterBil(
     val mottarGrunnstønad: JaNei?,
-    val reisedistanseEgenBil: Int,
-    val destinasjonEgenBil: List<DestinasjonEgenBil>?,
     val parkering: JaNei,
     val bompenger: Int?,
     val ferge: Int?,
@@ -127,9 +117,3 @@ data class DokumentasjonDagligReise(
     val tittel: String,
     val dokumentInfoId: String,
 )
-
-enum class DestinasjonEgenBil {
-    TOGSTASJON,
-    BUSSSTOPP,
-    FERGE_BAT_KAI,
-}

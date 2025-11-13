@@ -1,18 +1,18 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.dto.SimuleringDto
-import org.springframework.test.web.reactive.server.expectBody
 
-fun IntegrationTest.simulerForBehandling(behandlingId: BehandlingId) =
-    webTestClient
-        .get()
-        .uri("/api/simulering/$behandlingId")
-        .medOnBehalfOfToken()
-        .exchange()
-        .expectStatus()
-        .isOk
-        .expectBody<SimuleringDto>()
-        .returnResult()
-        .responseBody!!
+class SimuleringKall(
+    private val testklient: Testklient,
+) {
+    fun simulering(behandlingId: BehandlingId): SimuleringDto = apiRespons.simulering(behandlingId).expectOkWithBody()
+
+    // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
+    val apiRespons = SimuleringApi()
+
+    inner class SimuleringApi {
+        fun simulering(behandlingId: BehandlingId) = testklient.get("/api/simulering/$behandlingId")
+    }
+}

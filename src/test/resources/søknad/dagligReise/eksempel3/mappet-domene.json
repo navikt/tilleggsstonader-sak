@@ -53,17 +53,13 @@
     "offentligTransport" : null,
     "privatTransport" : {
       "årsakIkkeOffentligTransport" : [ "DÅRLIG_TRANSPORTTILBUD" ],
-      "kanKjøreMedEgenBil" : "JA",
-      "utgifterBil" : {
-        "mottarGrunnstønad" : null,
-        "reisedistanseEgenBil" : 100,
-        "destinasjonEgenBil" : [ "TOGSTASJON" ],
-        "parkering" : "JA",
-        "bompenger" : 43,
-        "ferge" : 0,
-        "piggdekkavgift" : 22
-      },
-      "taxi" : null
+      "kanKjøreMedEgenBil" : "NEI",
+      "utgifterBil" : null,
+      "taxi" : {
+        "årsakIkkeKjøreBil" : [ "HELSEMESSIGE_ÅRSAKER" ],
+        "ønskerSøkeOmTaxi" : "JA",
+        "ttkort" : "JA"
+      }
     }
   } ],
   "dokumentasjon" : [ ]

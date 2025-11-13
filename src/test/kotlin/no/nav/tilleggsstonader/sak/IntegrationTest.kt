@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.brev.frittstående.FrittståendeBrev
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretBrev
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretFrittståendeBrev
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.Vedtaksbrev
+import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
@@ -27,6 +28,7 @@ import no.nav.tilleggsstonader.sak.hendelser.Hendelse
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.MockClientService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
+import no.nav.tilleggsstonader.sak.integrasjonstest.Kall
 import no.nav.tilleggsstonader.sak.migrering.routing.SkjemaRouting
 import no.nav.tilleggsstonader.sak.oppfølging.Oppfølging
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlag
@@ -48,7 +50,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.Vilkårperiod
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
@@ -119,12 +120,15 @@ abstract class IntegrationTest {
     @Autowired
     lateinit var taskWorker: TaskWorker
 
-    val logger = LoggerFactory.getLogger(javaClass)
+    @Autowired
+    lateinit var håndterSøknadService: HåndterSøknadService
 
     @Autowired
     lateinit var webTestClient: WebTestClient
 
     private lateinit var testBrukerkontekst: TestBrukerKontekst
+
+    val kall = Kall(this)
 
     @BeforeEach
     fun setup() {
@@ -190,8 +194,6 @@ abstract class IntegrationTest {
         }
     }
 
-    protected fun localhost(path: String): String = "$LOCALHOST$port/$path"
-
     protected fun onBehalfOfToken(
         role: String = rolleConfig.beslutterRolle,
         saksbehandler: String = "julenissen",
@@ -201,10 +203,6 @@ abstract class IntegrationTest {
         clientId: String,
         accessAsApplication: Boolean,
     ): String = TokenUtil.clientToken(mockOAuth2Server, clientId, accessAsApplication)
-
-    companion object {
-        private const val LOCALHOST = "http://localhost:"
-    }
 
     fun <T : Any> medBrukercontext(
         bruker: String = testBrukerkontekst.defaultBruker,

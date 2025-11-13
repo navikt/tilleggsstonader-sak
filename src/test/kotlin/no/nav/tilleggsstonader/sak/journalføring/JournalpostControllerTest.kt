@@ -19,8 +19,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.JournalpostClientMockConfig.Companion.journalposter
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.fullførJournalpost
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.hentJournalpost
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.klage.KlageClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
@@ -35,7 +33,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import kotlin.collections.set
 
 class JournalpostControllerTest(
     @Autowired val fagsakService: FagsakService,
@@ -60,16 +57,17 @@ class JournalpostControllerTest(
         fun `fullfør journalpost - skal ferdigstille journalpost, og opprette behandling og oppgave`() {
             val journalpostId =
                 medBrukercontext(bruker = saksbehandler) {
-                    fullførJournalpost(
-                        "1",
-                        JournalføringRequest(
-                            stønadstype = Stønadstype.BARNETILSYN,
-                            aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
-                            årsak = JournalføringRequest.Journalføringsårsak.DIGITAL_SØKNAD,
-                            oppgaveId = "123",
-                            journalførendeEnhet = enhet,
-                            logiskeVedlegg = mapOf("1" to listOf(LogiskVedlegg("1", "ny tittel"))),
-                        ),
+                    kall.journalpost.fullfor(
+                        journalpostId = "1",
+                        request =
+                            JournalføringRequest(
+                                stønadstype = Stønadstype.BARNETILSYN,
+                                aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
+                                årsak = JournalføringRequest.Journalføringsårsak.DIGITAL_SØKNAD,
+                                oppgaveId = "123",
+                                journalførendeEnhet = enhet,
+                                logiskeVedlegg = mapOf("1" to listOf(LogiskVedlegg("1", "ny tittel"))),
+                            ),
                     )
                 }
 
@@ -111,16 +109,17 @@ class JournalpostControllerTest(
         fun `fullfør journalpost - skal ferdigstille journalpost, og opprette klage`() {
             val journalpostId =
                 medBrukercontext(bruker = saksbehandler) {
-                    fullførJournalpost(
-                        "1",
-                        JournalføringRequest(
-                            stønadstype = Stønadstype.BARNETILSYN,
-                            aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
-                            årsak = JournalføringRequest.Journalføringsårsak.KLAGE,
-                            oppgaveId = "123",
-                            journalførendeEnhet = enhet,
-                            logiskeVedlegg = mapOf("1" to listOf(LogiskVedlegg("1", "ny tittel"))),
-                        ),
+                    kall.journalpost.fullfor(
+                        journalpostId = "1",
+                        request =
+                            JournalføringRequest(
+                                stønadstype = Stønadstype.BARNETILSYN,
+                                aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
+                                årsak = JournalføringRequest.Journalføringsårsak.KLAGE,
+                                oppgaveId = "123",
+                                journalførendeEnhet = enhet,
+                                logiskeVedlegg = mapOf("1" to listOf(LogiskVedlegg("1", "ny tittel"))),
+                            ),
                     )
                 }
 
@@ -164,7 +163,7 @@ class JournalpostControllerTest(
             leggTilJournalpostMedSøknadIMock(journalpost, objectMapper.writeValueAsBytes(søknadDagligReise()))
             every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
 
-            val journalpostResponse = hentJournalpost(journalpost.journalpostId)
+            val journalpostResponse = kall.journalpost.journalpost(journalpost.journalpostId)
 
             assertThat(journalpostResponse.defaultStønadstype).isEqualTo(Stønadstype.DAGLIG_REISE_TSO)
 
@@ -179,7 +178,7 @@ class JournalpostControllerTest(
             val journalpost = journalpostMedStrukturertSøknad(DokumentBrevkode.BOUTGIFTER)
             leggTilJournalpostMedSøknadIMock(journalpost, objectMapper.writeValueAsBytes(søknadBoutgifter()))
 
-            val journalpostResponse = hentJournalpost(journalpost.journalpostId)
+            val journalpostResponse = kall.journalpost.journalpost(journalpost.journalpostId)
 
             assertThat(journalpostResponse.valgbareStønadstyper).containsExactly(
                 Stønadstype.BOUTGIFTER,

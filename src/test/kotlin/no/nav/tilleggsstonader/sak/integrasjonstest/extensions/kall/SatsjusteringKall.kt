@@ -1,20 +1,19 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import org.springframework.test.web.reactive.server.expectBody
+import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 
 // Må kjøres med utvikler-rolle
-fun IntegrationTest.kjørSatsjusteringForStønadstypeKall(stønadstype: Stønadstype) =
-    webTestClient
-        .post()
-        .uri("/api/forvaltning/satsjustering/$stønadstype")
-        .medOnBehalfOfToken()
-        .exchange()
+class SatsjusteringKall(
+    private val testklient: Testklient,
+) {
+    fun satsjustering(stønadstype: Stønadstype): List<BehandlingId> = apiRespons.satsjustering(stønadstype).expectOkWithBody()
 
-fun IntegrationTest.kjørSatsjusteringForStønadstype(stønadstype: Stønadstype) =
-    kjørSatsjusteringForStønadstypeKall(stønadstype)
-        .expectBody<List<BehandlingId>>()
-        .returnResult()
-        .responseBody!!
+    // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
+    val apiRespons = SatsjusteringApi()
+
+    inner class SatsjusteringApi {
+        fun satsjustering(stønadstype: Stønadstype) = testklient.post("/api/forvaltning/satsjustering/$stønadstype", Unit)
+    }
+}

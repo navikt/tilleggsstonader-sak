@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Hove
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaSlagsTypeBillettMaDuKjopeType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Identitet
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.JaNeiType
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.KanDuReiseMedOffentligTransportType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Landvelger
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.MetadataDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.NavAdresse
@@ -115,7 +114,7 @@ object SøknadDagligReiseUtil {
             harDu6KmReisevei = JaNeiType.ja,
             hvorLangErReiseveienDin = 15,
             harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde = JaNeiType.nei,
-            kanDuReiseMedOffentligTransport = KanDuReiseMedOffentligTransportType.ja,
+            kanDuReiseMedOffentligTransport = JaNeiType.ja,
             hvaSlagsTypeBillettMaDuKjope =
                 mapOf(
                     HvaSlagsTypeBillettMaDuKjopeType.manedskort to true,
@@ -129,8 +128,6 @@ object SøknadDagligReiseUtil {
             hvorforIkkeBil = null,
             reiseMedTaxi = null,
             ttKort = null,
-            hvorSkalDuKjoreMedEgenBil = null,
-            hvorLangErReiseveienDinMedBil = null,
             parkering = null,
             bompenger = null,
             ferge = null,
