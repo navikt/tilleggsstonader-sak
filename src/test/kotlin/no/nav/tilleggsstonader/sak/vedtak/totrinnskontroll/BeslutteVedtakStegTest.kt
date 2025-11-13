@@ -83,6 +83,7 @@ class BeslutteVedtakStegTest {
         OppgaveDomain(
             id = UUID.randomUUID(),
             behandlingId = behandlingId,
+            tilbakekrevingBehandlingId = null,
             gsakOppgaveId = 123L,
             type = Oppgavetype.BehandleSak,
             status = Oppgavestatus.ÅPEN,

@@ -176,6 +176,7 @@ class OppgaveService(
         personIdent: String,
         stønadstype: Stønadstype,
         behandlingId: BehandlingId?,
+        tilbakekrevingBehandlingId: String? = null,
         oppgave: OpprettOppgave,
     ): Long {
         feilHvis(oppgave.oppgavetype == Oppgavetype.BehandleSak && behandlingId == null) {
@@ -188,6 +189,7 @@ class OppgaveService(
             OppgaveDomain(
                 gsakOppgaveId = opprettetOppgaveId,
                 behandlingId = behandlingId,
+                tilbakekrevingBehandlingId = tilbakekrevingBehandlingId,
                 type = oppgave.oppgavetype,
                 tilordnetSaksbehandler = oppgave.tilordnetNavIdent,
                 status = Oppgavestatus.ÅPEN,
@@ -322,6 +324,8 @@ class OppgaveService(
 
     fun finnSisteOppgaveDomainForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
         oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandlingId)
+
+    fun finnAlleOppgaveDomainForBehandling(behandlingId: BehandlingId) = oppgaveRepository.findByBehandlingId(behandlingId)
 
     fun finnMappe(
         enhet: String,

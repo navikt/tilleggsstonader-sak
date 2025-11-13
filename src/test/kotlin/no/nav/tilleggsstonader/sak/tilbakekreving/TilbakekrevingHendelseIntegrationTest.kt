@@ -15,8 +15,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.hendelser.ConsumerRecordUtil
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientMockConfig.Companion.MAPPE_ID_TILBAKEKREVING
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.Oppgavelager
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingBehandlingEndret
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingFagsysteminfoBehov
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingFagsysteminfoSvar
@@ -33,19 +33,20 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatNoException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.core.KafkaTemplate
 import java.time.LocalDateTime
 import java.util.UUID
+import kotlin.jvm.optionals.getOrNull
 import kotlin.random.Random
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
-    @Autowired
-    private lateinit var oppgaveClient: OppgaveClient
-
     @Autowired
     private lateinit var oppgavelager: Oppgavelager
 
@@ -183,7 +184,7 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
     @Nested
     inner class BehandlingEndret {
         @Test
-        fun `mottar hendelsestype behandling_endret med status TIL_BEHANDLING, behandling har vedtak, publiserer andeler på topic`() {
+        fun `mottar to hendelsestype behandling_endret med status TIL_BEHANDLING, oppretter oppgave kun på første hendelse`() {
             val key = UUID.randomUUID().toString()
             val payload =
                 TilbakekrevingBehandlingEndret(
@@ -211,8 +212,15 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
 
             verify(exactly = 0) { kafkaTemplate.send(capture(publiserteHendelser)) }
 
-            // TODO - utfylle test når klart hvordan vi skal opprette tilbakekrevingsoppgave
-            verify { oppgaveClient.opprettTilbakekrevingsoppgave() }
+            val opprettetOppgave = oppgavelager.alleOppgaver().single { it.mappeId?.getOrNull() == MAPPE_ID_TILBAKEKREVING }
+            assertThat(opprettetOppgave.oppgavetype).isEqualTo(Oppgavetype.BehandleSak.value)
+            assertThat(opprettetOppgave.beskrivelse).contains(payload.tilbakekreving.saksbehandlingURL)
+
+            // Verifiser at vi ikke oppretter flere oppgaver ved mottak av samme hendelse
+            publiserTilbakekrevinghendelse(key, payload)
+            assertThatNoException().isThrownBy {
+                oppgavelager.alleOppgaver().single { it.mappeId?.getOrNull() == MAPPE_ID_TILBAKEKREVING }
+            }
         }
     }
 

@@ -12,6 +12,8 @@ import java.util.UUID
 interface OppgaveRepository :
     RepositoryInterface<OppgaveDomain, UUID>,
     InsertUpdateRepository<OppgaveDomain> {
+    fun findByBehandlingId(behandlingId: BehandlingId): List<OppgaveDomain>
+
     fun findByBehandlingIdAndTypeAndStatus(
         behandlingId: BehandlingId,
         oppgavetype: Oppgavetype,
