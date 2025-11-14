@@ -40,7 +40,7 @@ class DetaljertVedtaksperiodeDagligReiseTsoTest {
                 vedtaksperiodeJan,
                 vedtaksperiodeFeb,
             )
-        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengendeEllerOverlappende()
         assertThat(resultat).isEqualTo(
             listOf(
                 vedtaksperiodeJan.copy(tom = vedtaksperiodeFeb.tom),
@@ -59,7 +59,7 @@ class DetaljertVedtaksperiodeDagligReiseTsoTest {
                     tom = LocalDate.of(2024, 3, 31),
                 ),
             )
-        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengendeEllerOverlappende()
         assertThat(resultat).isEqualTo(
             listOf(
                 vedtaksperiodeJan.copy(tom = LocalDate.of(2024, 3, 31)),
@@ -74,7 +74,7 @@ class DetaljertVedtaksperiodeDagligReiseTsoTest {
                 vedtaksperiodeFeb,
                 vedtaksperiodeJan,
             )
-        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengendeEllerOverlappende()
         assertThat(resultat).isEqualTo(
             listOf(
                 vedtaksperiodeJan.copy(tom = vedtaksperiodeFeb.tom),
@@ -92,7 +92,7 @@ class DetaljertVedtaksperiodeDagligReiseTsoTest {
                     målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
                 ),
             )
-        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengendeEllerOverlappende()
         assertThat(resultat).isEqualTo(vedtaksperioder)
     }
 
@@ -105,7 +105,7 @@ class DetaljertVedtaksperiodeDagligReiseTsoTest {
                     typeDagligReise = TypeDagligReise.PRIVAT_BIL,
                 ),
             )
-        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengendeEllerOverlappende()
         assertThat(resultat).isEqualTo(vedtaksperioder)
     }
 
@@ -118,7 +118,7 @@ class DetaljertVedtaksperiodeDagligReiseTsoTest {
                     fom = LocalDate.of(2024, 2, 2),
                 ),
             )
-        val resultat = vedtaksperioder.sorterOgMergeSammenhengende()
+        val resultat = vedtaksperioder.sorterOgMergeSammenhengendeEllerOverlappende()
         assertThat(resultat).isEqualTo(vedtaksperioder)
     }
 }

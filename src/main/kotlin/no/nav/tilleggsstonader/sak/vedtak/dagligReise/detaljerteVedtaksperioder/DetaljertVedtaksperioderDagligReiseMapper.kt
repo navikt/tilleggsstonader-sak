@@ -22,7 +22,7 @@ object DetaljertVedtaksperioderDagligReiseMapper {
                     )
                 }
             }
-        return vedaksperioderFraBeregningsresultat?.sorterOgMergeSammenhengende()
+        return vedaksperioderFraBeregningsresultat?.sorterOgMergeSammenhengendeEllerOverlappende()
             ?: error("Fant ikke vedtsksperioder for offentlig transport.")
     }
 }

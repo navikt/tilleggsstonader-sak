@@ -34,5 +34,5 @@ data class DetaljertVedtaksperiodeDagligReiseTso(
     }
 }
 
-fun List<DetaljertVedtaksperiodeDagligReiseTso>.sorterOgMergeSammenhengende() =
+fun List<DetaljertVedtaksperiodeDagligReiseTso>.sorterOgMergeSammenhengendeEllerOverlappende() =
     this.sorted().mergeSammenhengende { p1, p2 -> p1.erLikOgOverlapperEllerPåfølgesAv(p2) }
