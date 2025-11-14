@@ -56,13 +56,14 @@ fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
 fun dummyBehandling(
     behandlingId: BehandlingId,
     steg: StegType = StegType.BEREGNE_YTELSE,
+    forrigeIverksatteBehandlingId: BehandlingId? = null,
 ): Saksbehandling =
     saksbehandling(
         id = behandlingId,
         steg = steg,
         fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO),
         forrigeIverksatteBehandlingId = null,
-        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+        type = if (forrigeIverksatteBehandlingId != null) BehandlingType.REVURDERING else BehandlingType.FØRSTEGANGSBEHANDLING,
     )
 
 fun mapTilVilkårDagligReise(rad: Map<String, String>): LagreDagligReise =

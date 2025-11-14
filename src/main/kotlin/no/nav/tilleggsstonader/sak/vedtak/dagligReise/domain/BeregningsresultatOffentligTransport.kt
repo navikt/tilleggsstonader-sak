@@ -23,8 +23,6 @@ data class BeregningsresultatForPeriode(
     val delAvTidligereUtbetaling: Boolean = false,
 ) {
     fun markerSomDelAvTidligereUtbetaling() = this.copy(delAvTidligereUtbetaling = true)
-
-    fun avkortPeriode(dato: LocalDate) = this.grunnlag.copy(fom = dato)
 }
 
 data class BeregningsgrunnlagOffentligTransport(

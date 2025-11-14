@@ -67,7 +67,8 @@ class DagligReiseBeregningService(
                 nyttBeregningsresultat =
                     beregnOffentligTransport(
                         vilkår = oppfylteVilkårGruppertPåType,
-                        vedtaksperioder = vedtaksperioder.filter { it.fom >= tidligsteEndring.plusDays(1) },
+                        vedtaksperioder =
+                            vedtaksperioder.filter { it.fom >= tidligsteEndring },
                     )?.reiser
                         ?.flatMap { it.perioder }
                         ?: emptyList(),

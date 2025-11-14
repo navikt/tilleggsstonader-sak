@@ -8,7 +8,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
       | 01.01.2025 | 01.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
-    Gitt følgende beregningsinput for offentlig transport
+    Gitt følgende beregningsinput for offentlig transport behandling=1
       | Fom        | Tom        | Pris tretti-dagersbillett | Antall reisedager per uke |
       | 01.01.2025 | 30.01.2025 | 778                       | 3                         |
 
@@ -23,7 +23,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
       | 01.01.2025 | 01.04.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
-    Gitt følgende beregningsinput for offentlig transport
+    Gitt følgende beregningsinput for offentlig transport behandling=1
       | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
       | 01.01.2025 | 30.01.2025 | 44                 | 778                       | 3                         |
 
@@ -38,7 +38,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
       | 01.01.2025 | 30.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
-    Gitt følgende beregningsinput for offentlig transport
+    Gitt følgende beregningsinput for offentlig transport behandling=1
       | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
       | 01.01.2025 | 31.01.2025 | 44                 | 778                       | 1                         |
 
@@ -53,7 +53,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
       | 01.01.2025 | 08.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
-    Gitt følgende beregningsinput for offentlig transport
+    Gitt følgende beregningsinput for offentlig transport behandling=1
       | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
       | 01.01.2025 | 08.03.2025 | 44                 | 778                       | 3                         |
 
@@ -72,7 +72,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
       | 01.03.2025 | 30.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
-    Gitt følgende beregningsinput for offentlig transport
+    Gitt følgende beregningsinput for offentlig transport behandling=1
       | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
       | 15.02.2025 | 15.04.2025 | 44                 | 778                       | 1                         |
 
@@ -88,7 +88,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | 01.01.2025 | 30.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
       | 01.02.2025 | 12.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
-    Gitt følgende beregningsinput for offentlig transport
+    Gitt følgende beregningsinput for offentlig transport behandling=1
       | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
       | 01.01.2025 | 30.04.2025 | 44                 | 778                       | 5                         |
 
@@ -106,7 +106,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | 01.01.2025 | 30.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
       | 01.04.2025 | 30.04.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
-    Gitt følgende beregningsinput for offentlig transport
+    Gitt følgende beregningsinput for offentlig transport behandling=1
       | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
       | 01.01.2025 | 31.05.2025 | 44                 | 778                       | 5                         |
 
@@ -126,7 +126,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | 01.01.2025 | 30.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
       | 01.04.2025 | 30.04.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
-    Gitt følgende beregningsinput for offentlig transport
+    Gitt følgende beregningsinput for offentlig transport behandling=1
       | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
       | 01.01.2025 | 31.05.2025 | 44                 | 778                       | 5                         |
       | 01.01.2025 | 31.05.2025 | 287                | 3369                      | 5                         |
@@ -154,7 +154,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | 01.01.2025 | 03.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
       | 10.02.2025 | 21.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
-    Gitt følgende beregningsinput for offentlig transport
+    Gitt følgende beregningsinput for offentlig transport behandling=1
       | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
       | 01.01.2025 | 31.05.2025 | 44                 | 778                       | 5                         |
 
@@ -173,7 +173,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | 01.01.2025 | 03.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
       | 18.02.2025 | 21.03.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
-    Gitt følgende beregningsinput for offentlig transport
+    Gitt følgende beregningsinput for offentlig transport behandling=1
       | Fom        | Tom        | Pris enkeltbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
       | 01.01.2025 | 31.05.2025 | 44                 | 778                       | 3                         |
 
@@ -191,7 +191,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
       | 01.01.2025 | 03.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
-    Gitt følgende beregningsinput for offentlig transport
+    Gitt følgende beregningsinput for offentlig transport behandling=1
       | Fom        | Tom        | Antall reisedager per uke | Pris enkeltbillett |
       | 01.01.2025 | 03.01.2025 | 3                         | 40                 |
 
@@ -206,7 +206,7 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
       | 01.01.2025 | 01.02.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
-    Gitt følgende beregningsinput for offentlig transport
+    Gitt følgende beregningsinput for offentlig transport behandling=1
       | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
       | 01.01.2025 | 30.01.2025 | 80                 | 400                    | 1800                      | 3                         |
 
@@ -215,7 +215,3 @@ Egenskap: Beregning av offentlig transport for daglig reise
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp | Enkeltbillett-antall | Syvdagersbillett-antall |
       | 01.01.2025 | 30.01.2025 | 1760  | 2                    | 4                       |
-
-
-
-
