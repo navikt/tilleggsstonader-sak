@@ -13,6 +13,7 @@ data class OppgaveDomain(
     @Id
     val id: UUID = UUID.randomUUID(),
     val behandlingId: BehandlingId?,
+    val tilbakekrevingBehandlingId: String?,
     val gsakOppgaveId: Long,
     val type: Oppgavetype,
     val status: Oppgavestatus,

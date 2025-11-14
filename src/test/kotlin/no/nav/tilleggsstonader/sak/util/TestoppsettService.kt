@@ -32,13 +32,17 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtakB
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.opphør
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.tilBehandlingResult
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollRepository
 import org.springframework.context.annotation.Profile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Profile("integrasjonstest")
@@ -131,6 +135,21 @@ class TestoppsettService(
                 behandlingId = behandling.id,
                 beregningsresultat = beregningsresultat,
                 vedtaksperioder = vedtaksperioder,
+            )
+        vedtakRepository.insert(vedtak)
+        return vedtak
+    }
+
+    fun lagOpphørVedtak(
+        behandling: Behandling,
+        vedtaksperioder: List<Vedtaksperiode> = emptyList(),
+        opphørsdato: LocalDate = LocalDate.now(),
+    ): GeneriskVedtak<OpphørLæremidler> {
+        val vedtak =
+            opphør(
+                behandlingId = behandling.id,
+                vedtaksperioder = vedtaksperioder,
+                opphørsdato = opphørsdato,
             )
         vedtakRepository.insert(vedtak)
         return vedtak

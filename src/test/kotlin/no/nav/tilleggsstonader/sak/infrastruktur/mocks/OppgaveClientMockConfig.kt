@@ -50,6 +50,7 @@ class OppgaveClientMockConfig {
     companion object {
         const val MAPPE_ID_PÅ_VENT = 10L
         const val MAPPE_ID_KLAR = 20L
+        const val MAPPE_ID_TILBAKEKREVING = 30L
 
         fun resetTilDefault(
             oppgaveClient: OppgaveClient,
@@ -95,6 +96,7 @@ class OppgaveClientMockConfig {
                 listOf(
                     MappeDto(MAPPE_ID_PÅ_VENT, OppgaveMappe.PÅ_VENT.navn.first(), "4462"),
                     MappeDto(MAPPE_ID_KLAR, OppgaveMappe.KLAR.navn.first(), "4462"),
+                    MappeDto(MAPPE_ID_TILBAKEKREVING, OppgaveMappe.TILBAKEKREVING.navn.first(), "4462"),
                 )
             every { oppgaveClient.finnMapper(any(), any()) } returns FinnMappeResponseDto(mapper.size, mapper)
 

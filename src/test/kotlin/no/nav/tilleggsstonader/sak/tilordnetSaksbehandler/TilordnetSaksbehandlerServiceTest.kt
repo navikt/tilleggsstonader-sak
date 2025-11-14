@@ -51,6 +51,7 @@ internal class TilordnetSaksbehandlerServiceTest {
             OppgaveDomain(
                 id = UUID.randomUUID(),
                 behandlingId = behandlingId,
+                tilbakekrevingBehandlingId = null,
                 gsakOppgaveId = 1L,
                 type = Oppgavetype.BehandleSak,
                 status = Oppgavestatus.ÅPEN,
@@ -124,6 +125,7 @@ internal class TilordnetSaksbehandlerServiceTest {
             OppgaveDomain(
                 id = UUID.randomUUID(),
                 behandlingId = behandlingId,
+                tilbakekrevingBehandlingId = null,
                 gsakOppgaveId = 1L,
                 type = Oppgavetype.BehandleSak,
                 status = Oppgavestatus.ÅPEN,
@@ -188,6 +190,7 @@ internal class TilordnetSaksbehandlerServiceTest {
             OppgaveDomain(
                 id = UUID.randomUUID(),
                 behandlingId = behandlingId,
+                tilbakekrevingBehandlingId = null,
                 gsakOppgaveId = 1L,
                 type = Oppgavetype.BehandleSak,
                 status = Oppgavestatus.ÅPEN,

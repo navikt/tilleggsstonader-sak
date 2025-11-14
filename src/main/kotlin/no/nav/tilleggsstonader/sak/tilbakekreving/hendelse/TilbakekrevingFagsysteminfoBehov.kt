@@ -7,6 +7,6 @@ data class TilbakekrevingFagsysteminfoBehov(
     val eksternFagsakId: String,
     val kravgrunnlagReferanse: String?, // behandlingid
     val hendelseOpprettet: LocalDateTime,
-) : TilbakekrevingHendelse {
+) : TilbakekrevinghendelseRecord {
     override val hendelsestype: String = "fagsysteminfo_behov"
 }

@@ -122,6 +122,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
         oppgaveRepository.insert(
             OppgaveDomain(
                 behandlingId = behandling.id,
+                tilbakekrevingBehandlingId = null,
                 type = Oppgavetype.InnhentDokumentasjon,
                 gsakOppgaveId = 1,
                 tilordnetSaksbehandler = null,
@@ -133,6 +134,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
         oppgaveRepository.insert(
             OppgaveDomain(
                 behandlingId = behandling.id,
+                tilbakekrevingBehandlingId = null,
                 type = Oppgavetype.BehandleSak,
                 gsakOppgaveId = 1,
                 tilordnetSaksbehandler = null,
@@ -178,6 +180,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
             oppgaveRepository.insert(
                 OppgaveDomain(
                     behandlingId = null,
+                    tilbakekrevingBehandlingId = null,
                     type = Oppgavetype.Journalføring,
                     gsakOppgaveId = 1,
                     tilordnetSaksbehandler = null,
@@ -241,6 +244,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
             oppgaveRepository.insert(
                 OppgaveDomain(
                     behandlingId = behandling1.id,
+                    tilbakekrevingBehandlingId = null,
                     type = Oppgavetype.BehandleSak,
                     gsakOppgaveId = 1,
                     tilordnetSaksbehandler = null,
@@ -252,6 +256,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
             oppgaveRepository.insert(
                 OppgaveDomain(
                     behandlingId = behandling2.id,
+                    tilbakekrevingBehandlingId = null,
                     type = Oppgavetype.BehandleSak,
                     gsakOppgaveId = 2,
                     tilordnetSaksbehandler = null,

@@ -98,6 +98,7 @@ fun oppgave(
 ): OppgaveDomain =
     OppgaveDomain(
         behandlingId = behandlingId,
+        tilbakekrevingBehandlingId = null,
         gsakOppgaveId = gsakOppgaveId,
         type = type,
         status = status,
