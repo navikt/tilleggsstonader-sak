@@ -454,7 +454,7 @@ class OpprettTestBehandlingController(
                 hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet = Valgfelt("dager", "5"),
                 harDu6KmReisevei = JaNeiTypeDagligReise.ja,
                 harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde = JaNeiTypeDagligReise.nei,
-                hvorLangErReiseveienDin = 8,
+                hvorLangErReiseveienDin = 8.0,
                 kanDuReiseMedOffentligTransport = JaNeiTypeDagligReise.ja,
                 hvaSlagsTypeBillettMaDuKjope =
                     mapOf(

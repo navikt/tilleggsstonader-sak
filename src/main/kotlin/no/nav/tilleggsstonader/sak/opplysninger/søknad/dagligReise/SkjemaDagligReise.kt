@@ -53,7 +53,7 @@ data class Reise(
     val periode: Reiseperiode,
     val dagerPerUke: String,
     val harMerEnn6KmReisevei: JaNei,
-    val lengdeReisevei: Int,
+    val lengdeReisevei: Double,
     val harBehovForTransportUavhengigAvReisensLengde: JaNei?,
     val kanReiseMedOffentligTransport: JaNei,
     val offentligTransport: OffentligTransport?,
