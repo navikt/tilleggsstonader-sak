@@ -9,7 +9,7 @@ data class TilbakekrevingFagsysteminfoSvar(
     val mottaker: TilbakekrevingMottaker,
     val revurdering: TilbakekrevingFagsysteminfoSvarRevurdering,
     val utvidPerioder: List<UtvidetPeriode>,
-) : TilbakekrevingHendelse {
+) : TilbakekrevinghendelseRecord {
     override val hendelsestype: String = "fagsysteminfo_svar"
     override val versjon: Int = 1
 }

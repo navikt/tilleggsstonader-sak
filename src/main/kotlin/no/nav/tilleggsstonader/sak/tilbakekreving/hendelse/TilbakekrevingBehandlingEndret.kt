@@ -9,7 +9,7 @@ data class TilbakekrevingBehandlingEndret(
     val hendelseOpprettet: LocalDateTime,
     val eksternBehandlingId: String,
     val tilbakekreving: TilbakekrevingInfo,
-) : TilbakekrevingHendelse {
+) : TilbakekrevinghendelseRecord {
     override val hendelsestype = "behandling_endret"
 
     fun harStatusOpprettet() = tilbakekreving.behandlingsstatus == STATUS_OPPRETTET

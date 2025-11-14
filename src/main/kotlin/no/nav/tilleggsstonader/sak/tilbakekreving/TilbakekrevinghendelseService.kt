@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.tilbakekreving
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.tilbakekreving.domene.Tilbakekrevinghendelse
+import no.nav.tilleggsstonader.sak.tilbakekreving.domene.TilbakekrevingHendelse
 import no.nav.tilleggsstonader.sak.tilbakekreving.domene.Tilbakekrevingsstatus
 import org.springframework.stereotype.Service
 
@@ -14,13 +14,13 @@ class TilbakekrevinghendelseService(
         tilbakekrevingsstatus: Tilbakekrevingsstatus,
     ) {
         tilbakekrevinghendelseRepository.insert(
-            Tilbakekrevinghendelse(
+            TilbakekrevingHendelse(
                 behandlingId = behandlingId,
                 hendelse = tilbakekrevingsstatus,
             ),
         )
     }
 
-    fun hentHendelserForBehandling(behandlingId: BehandlingId): List<Tilbakekrevinghendelse> =
+    fun hentHendelserForBehandling(behandlingId: BehandlingId): List<TilbakekrevingHendelse> =
         tilbakekrevinghendelseRepository.findAllByBehandlingId(behandlingId)
 }
