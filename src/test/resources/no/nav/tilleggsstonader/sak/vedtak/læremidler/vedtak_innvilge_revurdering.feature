@@ -219,13 +219,13 @@ Egenskap: Innvilgelse av læremidler - revurdering
 
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato | Del av tidligere utbetaling |
-      | 20.12.2024 | 31.12.2024 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 20.12.2024      | Ja                          |
-      | 01.01.2025 | 31.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | NEDSATT_ARBEIDSEVNE | 01.01.2025      | Ja                          |
+      | 20.12.2024 | 19.01.2025 | 438   | VIDEREGÅENDE | 100           | 438  | NEDSATT_ARBEIDSEVNE | 20.12.2024      | Ja                          |
+      | 20.01.2025 | 31.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | NEDSATT_ARBEIDSEVNE | 20.01.2025      | Ja                          |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
       | 20.12.2024 | 438   | LÆREMIDLER_AAP | 20.12.2024      |
-      | 01.01.2025 | 226   | LÆREMIDLER_AAP | 01.01.2025      |
+      | 20.01.2025 | 226   | LÆREMIDLER_AAP | 20.01.2025      |
 
   Scenario: Avkorter og setter ny vedtaksperiode
   Beholder utbetalingsdato for de vedtaksperioder som allerede er vurder fra tidligere
