@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.integrasjonstest.defaultJournalpost
-import no.nav.tilleggsstonader.sak.integrasjonstest.defaultJournalpostId
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.finnAlleTaskerMedType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
@@ -25,7 +24,8 @@ class HåndterSøknadIntegrationTest : IntegrationTest() {
     @Test
     fun `skal opprette journalføringsoppgave hvis det allerede finnes aktiv behandling`() {
         // Første journalføring vil føre til at det opprettes behandling
-        håndterSøknadService.håndterSøknad(defaultJournalpost)
+        val journalpostId = "1"
+        håndterSøknadService.håndterSøknad(defaultJournalpost.copy(journalpostId = journalpostId))
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
         // Andre journalføring skal føre til journalføringsoppgave
@@ -34,7 +34,7 @@ class HåndterSøknadIntegrationTest : IntegrationTest() {
         val oppgaveTask = finnAlleTaskerMedType(OpprettOppgaveTask.TYPE).single()
         val payload = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(oppgaveTask.payload)
 
-        assertThat(payload.oppgave.journalpostId).isEqualTo(defaultJournalpostId)
+        assertThat(payload.oppgave.journalpostId).isEqualTo(journalpostId)
         assertThat(payload.oppgave.oppgavetype).isEqualTo(Oppgavetype.Journalføring)
     }
 

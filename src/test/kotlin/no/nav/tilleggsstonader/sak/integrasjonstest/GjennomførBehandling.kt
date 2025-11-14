@@ -33,18 +33,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 
-val defaultIdent = "12345678910"
-val defaultJournalpostId = "1"
-val defaultJournalpost =
-    journalpost(
-        journalpostId = defaultJournalpostId,
-        journalstatus = Journalstatus.MOTTATT,
-        dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
-        bruker = Bruker(defaultIdent, BrukerIdType.FNR),
-    )
-
-val minimaltBrev = """SAKSBEHANDLER_SIGNATUR - BREVDATO_PLACEHOLDER - BESLUTTER_SIGNATUR"""
-
 /**
  * Gjennomfører en behandling fra journalpost og helt til et gitt steg.
  *
@@ -143,7 +131,7 @@ fun IntegrationTest.gjennomførBehandlingsløp(
     }
 
     // Gjennomfører steg: Send til beslutter
-    kall.brev.genererPdf(behandlingId, GenererPdfRequest(minimaltBrev))
+    kall.brev.genererPdf(behandlingId, GenererPdfRequest(MINIMALT_BREV))
     kall.totrinnskontroll.sendTilBeslutter(behandlingId)
 
     if (tilSteg == StegType.BESLUTTE_VEDTAK) {
@@ -197,3 +185,13 @@ private fun mapInnvilgelseRequest(
         Stønadstype.DAGLIG_REISE_TSO -> InnvilgelseDagligReiseRequest(vedtaksperioder)
         Stønadstype.DAGLIG_REISE_TSR -> InnvilgelseDagligReiseRequest(vedtaksperioder)
     }
+
+val defaultJournalpost =
+    journalpost(
+        journalpostId = "1",
+        journalstatus = Journalstatus.MOTTATT,
+        dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
+        bruker = Bruker("12345678910", BrukerIdType.FNR),
+    )
+
+private const val MINIMALT_BREV = """SAKSBEHANDLER_SIGNATUR - BREVDATO_PLACEHOLDER - BESLUTTER_SIGNATUR"""
