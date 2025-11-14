@@ -29,7 +29,7 @@ data class TilbakekrevingInfo(
     val sakOpprettet: LocalDateTime,
     val varselSendt: LocalDateTime?,
     val behandlingsstatus: String,
-    val totaltFeilutbetaltBeløp: Int,
+    val totaltFeilutbetaltBeløp: String,
     val saksbehandlingURL: String,
     val fullstendigPeriode: TilbakekrevingPeriode,
 )

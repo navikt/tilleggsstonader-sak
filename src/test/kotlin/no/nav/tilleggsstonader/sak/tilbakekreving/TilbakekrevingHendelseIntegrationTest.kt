@@ -197,7 +197,7 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
                             sakOpprettet = LocalDateTime.now(),
                             varselSendt = null,
                             behandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_TIL_BEHANDLING,
-                            totaltFeilutbetaltBeløp = 10000,
+                            totaltFeilutbetaltBeløp = "10000",
                             saksbehandlingURL = "http://localhost",
                             fullstendigPeriode =
                                 TilbakekrevingPeriode(
