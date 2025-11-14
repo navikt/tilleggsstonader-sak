@@ -7,10 +7,13 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
+import no.nav.tilleggsstonader.sak.tilbakekreving.TilbakekrevinghendelseService
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingBehandlingEndret
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -21,6 +24,7 @@ class BehandlingEndretHåndterer(
     private val oppgaveService: OppgaveService,
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
+    private val tilbakekrevinghendelseService: TilbakekrevinghendelseService,
 ) : TilbakekrevingHendelseHåndterer {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -30,18 +34,7 @@ class BehandlingEndretHåndterer(
         hendelseKey: String,
         payload: JsonNode,
     ) {
-        val behandlingEndretHendelse = objectMapper.treeToValue<TilbakekrevingBehandlingEndret>(payload)
-        if (behandlingEndretHendelse.harStatusTilBehandling()) {
-            håndterHendelseTilBehandling(behandlingEndretHendelse)
-        } else {
-            logger.info(
-                "Ignorerer hendelse ${behandlingEndretHendelse.hendelsestype} for tilbakekrevingsbehandling " +
-                    "${behandlingEndretHendelse.tilbakekreving.behandlingId} med status ${behandlingEndretHendelse.tilbakekreving.behandlingsstatus}",
-            )
-        }
-    }
-
-    private fun håndterHendelseTilBehandling(behandlingEndret: TilbakekrevingBehandlingEndret) {
+        val behandlingEndret = objectMapper.treeToValue<TilbakekrevingBehandlingEndret>(payload)
         val fagsak = fagsakService.hentFagsakPåEksternId(behandlingEndret.eksternFagsakId.toLong())
         val behandling = behandlingService.hentBehandlingPåEksternId(behandlingEndret.eksternBehandlingId.toLong())
 
@@ -49,6 +42,23 @@ class BehandlingEndretHåndterer(
             error("Fagsak har id ${fagsak.id} men behandling ${behandling.id} har fagsakId ${behandling.fagsakId}")
         }
 
+        if (behandlingEndret.harStatusTilBehandling()) {
+            håndterHendelseTilBehandling(behandlingEndret, fagsak, behandling)
+        } else {
+            logger.info(
+                "Ignorerer hendelse ${behandlingEndret.hendelsestype} for tilbakekrevingsbehandling " +
+                    "${behandlingEndret.tilbakekreving.behandlingId} med status ${behandlingEndret.tilbakekreving.behandlingsstatus}",
+            )
+        }
+
+        tilbakekrevinghendelseService.persisterHendelse(behandling.id, behandlingEndret.tilDomene())
+    }
+
+    private fun håndterHendelseTilBehandling(
+        behandlingEndret: TilbakekrevingBehandlingEndret,
+        fagsak: Fagsak,
+        behandling: Behandling,
+    ) {
         if (finnesOppgaveForTilbakekreving(behandling.id)) {
             logger.info(
                 "Oppgave for tilbakekrevingsbehandling ${behandlingEndret.tilbakekreving.behandlingId} finnes allerede, oppretter ikke ny oppgave",
@@ -65,7 +75,9 @@ class BehandlingEndretHåndterer(
                 oppgave =
                     OpprettOppgave(
                         oppgavetype = Oppgavetype.BehandleSak,
-                        beskrivelse = "Tilbakekrevingssak behandles i nytt tilbakekrevingssystem ${behandlingEndret.tilbakekreving.saksbehandlingURL}",
+                        beskrivelse =
+                            "Tilbakekrevingssak behandles i nytt tilbakekrevingssystem " +
+                                behandlingEndret.tilbakekreving.saksbehandlingURL,
                         prioritet = OppgavePrioritet.NORM,
                         fristFerdigstillelse = LocalDate.now().plusWeeks(2),
                         journalpostId = null,

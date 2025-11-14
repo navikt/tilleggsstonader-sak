@@ -48,6 +48,9 @@ import kotlin.random.Random
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
     @Autowired
+    private lateinit var tilbakekrevinghendelseService: TilbakekrevinghendelseService
+
+    @Autowired
     private lateinit var oppgavelager: Oppgavelager
 
     @Autowired
@@ -215,6 +218,7 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
             val opprettetOppgave = oppgavelager.alleOppgaver().single { it.mappeId?.getOrNull() == MAPPE_ID_TILBAKEKREVING }
             assertThat(opprettetOppgave.oppgavetype).isEqualTo(Oppgavetype.BehandleSak.value)
             assertThat(opprettetOppgave.beskrivelse).contains(payload.tilbakekreving.saksbehandlingURL)
+            assertThat(tilbakekrevinghendelseService.hentHendelserForBehandling(behandling.id)).hasSize(1)
 
             // Verifiser at vi ikke oppretter flere oppgaver ved mottak av samme hendelse
             publiserTilbakekrevinghendelse(key, payload)

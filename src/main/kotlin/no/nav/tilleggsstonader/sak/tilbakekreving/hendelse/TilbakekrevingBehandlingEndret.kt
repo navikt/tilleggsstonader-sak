@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.tilbakekreving.hendelse
 
+import no.nav.tilleggsstonader.sak.tilbakekreving.domene.Tilbakekrevingsstatus
 import java.time.LocalDateTime
 
 data class TilbakekrevingBehandlingEndret(
@@ -17,6 +18,18 @@ data class TilbakekrevingBehandlingEndret(
 
     fun harStatusAvsluttet() = tilbakekreving.behandlingsstatus == STATUS_AVSLUTTET
 
+    fun tilDomene() =
+        Tilbakekrevingsstatus(
+            hendelseOpprettet = hendelseOpprettet,
+            sakOpprettet = tilbakekreving.sakOpprettet,
+            varselSendtTidspunkt = tilbakekreving.varselSendt,
+            behandlingstatus = tilbakekreving.behandlingsstatus,
+            totaltFeilutbetaltBeløp = tilbakekreving.totaltFeilutbetaltBeløp.toLong(),
+            tilbakekrevingFom = tilbakekreving.fullstendigPeriode.fom,
+            tilbakekrevingTom = tilbakekreving.fullstendigPeriode.tom,
+            tilbakekrevingBehandlingId = tilbakekreving.behandlingId,
+        )
+
     companion object {
         const val STATUS_OPPRETTET = "OPPRETTET"
         const val STATUS_TIL_BEHANDLING = "TIL_BEHANDLING"
@@ -25,7 +38,7 @@ data class TilbakekrevingBehandlingEndret(
 }
 
 data class TilbakekrevingInfo(
-    val behandlingId: String?, // Ikke påkrevd før tilbakekreving har skrudd på krav om integrasjon (fagsysteminfo_behov-hendelse)
+    val behandlingId: String,
     val sakOpprettet: LocalDateTime,
     val varselSendt: LocalDateTime?,
     val behandlingsstatus: String,
