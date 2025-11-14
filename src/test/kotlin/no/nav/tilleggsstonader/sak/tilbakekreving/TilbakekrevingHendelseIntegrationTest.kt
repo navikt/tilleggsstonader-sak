@@ -37,7 +37,6 @@ import org.assertj.core.api.Assertions.assertThatNoException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.core.KafkaTemplate
 import java.time.LocalDateTime
@@ -45,7 +44,6 @@ import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 import kotlin.random.Random
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
     @Autowired
     private lateinit var tilbakekrevinghendelseService: TilbakekrevinghendelseService
