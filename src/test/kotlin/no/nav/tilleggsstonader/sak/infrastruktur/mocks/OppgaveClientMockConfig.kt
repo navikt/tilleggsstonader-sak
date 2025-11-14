@@ -202,8 +202,6 @@ class OppgaveClientMockConfig {
                 )
                 SettPåVentResponse(oppgaveId = request.oppgaveId, oppgaveVersjon = versjon)
             }
-
-            every { oppgaveClient.opprettTilbakekrevingsoppgave() } returns 123L
         }
 
         private fun mockFordeling(
