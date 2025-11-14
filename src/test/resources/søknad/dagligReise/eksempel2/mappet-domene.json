@@ -47,7 +47,7 @@
     },
     "dagerPerUke" : "4",
     "harMerEnn6KmReisevei" : "JA",
-    "lengdeReisevei" : 14,
+    "lengdeReisevei" : 14.0,
     "harBehovForTransportUavhengigAvReisensLengde" : null,
     "kanReiseMedOffentligTransport" : "NEI",
     "offentligTransport" : null,
