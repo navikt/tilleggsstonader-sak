@@ -11,16 +11,12 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatD
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
@@ -38,45 +34,7 @@ object DagligReiseTestUtil {
     val defaultBeregningsresultat =
         BeregningsresultatDagligReise(
             offentligTransport =
-                BeregningsresultatOffentligTransport(
-                    reiser =
-                        listOf(
-                            BeregningsresultatForReise(
-                                perioder =
-                                    listOf(
-                                        BeregningsresultatForPeriode(
-                                            grunnlag =
-                                                BeregningsgrunnlagOffentligTransport(
-                                                    fom = defaultVedtaksperioder.first().fom,
-                                                    tom = defaultVedtaksperioder.first().tom,
-                                                    prisEnkeltbillett = 50,
-                                                    prisSyvdagersbillett = 300,
-                                                    pris30dagersbillett = 1000,
-                                                    antallReisedagerPerUke = 5,
-                                                    vedtaksperioder =
-                                                        listOf(
-                                                            no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag(
-                                                                id = randomUUID(),
-                                                                fom = defaultVedtaksperioder.first().fom,
-                                                                tom = defaultVedtaksperioder.first().tom,
-                                                                aktivitet = AktivitetType.TILTAK,
-                                                                målgruppe = MålgruppeType.AAP.faktiskMålgruppe(),
-                                                                antallReisedagerIVedtaksperioden = 20,
-                                                            ),
-                                                        ),
-                                                    antallReisedager = 20,
-                                                ),
-                                            beløp = 1000,
-                                            billettdetaljer =
-                                                mapOf(
-                                                    Billettype.TRETTIDAGERSBILLETT to
-                                                        1000,
-                                                ),
-                                        ),
-                                    ),
-                            ),
-                        ),
-                ),
+                beregningsresultatOffentligTransport(),
         )
     val defaultInnvilgelseDagligReise =
         InnvilgelseDagligReise(
@@ -119,7 +77,7 @@ object DagligReiseTestUtil {
         behandlingId = behandlingId,
         type = TypeVedtak.AVSLAG,
         data =
-            AvslagLæremidler(
+            AvslagDagligReise(
                 årsaker = årsaker,
                 begrunnelse = begrunnelse,
             ),
@@ -128,54 +86,10 @@ object DagligReiseTestUtil {
         opphørsdato = null,
     )
 
-    fun beregningsresultatForMåned(
-        fom: LocalDate,
-        tom: LocalDate,
-        utbetalingsdato: LocalDate = fom,
-        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-        aktivitet: AktivitetType = AktivitetType.TILTAK,
-    ): BeregningsresultatForMåned =
-        BeregningsresultatForMåned(
-            beløp = 875,
-            grunnlag =
-                Beregningsgrunnlag(
-                    fom = fom,
-                    tom = tom,
-                    utbetalingsdato = utbetalingsdato,
-                    studienivå = Studienivå.HØYERE_UTDANNING,
-                    studieprosent = 100,
-                    sats = 875,
-                    satsBekreftet = true,
-                    målgruppe = målgruppe,
-                    aktivitet = aktivitet,
-                ),
-        )
-
-    fun beregningsresultatForPeriodeDto(
-        fom: LocalDate,
-        tom: LocalDate,
-        antallMåneder: Int = 1,
-        stønadsbeløpForPeriode: Int = 875,
-        utbetalingsdato: LocalDate = fom,
-    ): BeregningsresultatForPeriodeDto =
-        BeregningsresultatForPeriodeDto(
-            fom = fom,
-            tom = tom,
-            antallMåneder = antallMåneder,
-            studienivå = Studienivå.HØYERE_UTDANNING,
-            studieprosent = 100,
-            stønadsbeløpPerMåned = 875,
-            stønadsbeløpForPeriode = stønadsbeløpForPeriode,
-            utbetalingsdato = utbetalingsdato,
-            målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-            aktivitet = AktivitetType.TILTAK,
-            delAvTidligereUtbetaling = false,
-        )
-
     fun vedtaksperiode(
-        id: UUID = UUID.randomUUID(),
-        fom: LocalDate = 1 januar 2025,
-        tom: LocalDate = 31 januar 2025,
+        id: UUID = randomUUID(),
+        fom: LocalDate = 1 januar 2024,
+        tom: LocalDate = 31 januar 2024,
         målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
     ) = Vedtaksperiode(
@@ -185,18 +99,80 @@ object DagligReiseTestUtil {
         målgruppe = målgruppe,
         aktivitet = aktivitet,
     )
-
-    fun vedtaksperiodeDto(
-        id: UUID = UUID.randomUUID(),
-        fom: LocalDate = 1 januar 2025,
-        tom: LocalDate = 31 januar 2025,
-        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-        aktivitet: AktivitetType = AktivitetType.TILTAK,
-    ) = VedtaksperiodeDto(
-        id = id,
-        fom = fom,
-        tom = tom,
-        målgruppeType = målgruppe,
-        aktivitetType = aktivitet,
-    )
 }
+
+private fun beregningsresultatOffentligTransport(
+    fom: LocalDate = 1 januar 2024,
+    tom: LocalDate = 31 januar 2024,
+    reiser: List<BeregningsresultatForReise> =
+        listOf(
+            beregningsresultatForReise(fom = fom, tom = tom),
+        ),
+) = BeregningsresultatOffentligTransport(
+    reiser = reiser,
+)
+
+private fun beregningsresultatForReise(
+    fom: LocalDate = 1 januar 2024,
+    tom: LocalDate = 31 januar 2024,
+    perioder: List<BeregningsresultatForPeriode> =
+        listOf(
+            beregningsresultatForPeriode(fom = fom, tom = tom),
+        ),
+) = BeregningsresultatForReise(
+    perioder = perioder,
+)
+
+private fun beregningsresultatForPeriode(
+    fom: LocalDate = 1 januar 2024,
+    tom: LocalDate = 31 januar 2024,
+    grunnlag: BeregningsgrunnlagOffentligTransport = beregningsgrunnlagOffentligTransport(fom = fom, tom = tom),
+    beløp: Int = 1000,
+    billettdetaljer: Map<Billettype, Int> =
+        mapOf(
+            Billettype.TRETTIDAGERSBILLETT to 1000,
+        ),
+) = BeregningsresultatForPeriode(
+    grunnlag = grunnlag,
+    beløp = beløp,
+    billettdetaljer = billettdetaljer,
+)
+
+private fun beregningsgrunnlagOffentligTransport(
+    fom: LocalDate = 1 januar 2024,
+    tom: LocalDate = 31 januar 2024,
+    prisEnkeltbillett: Int = 50,
+    prisSyvdagersbillett: Int = 300,
+    pris30dagersbillett: Int = 1000,
+    antallReisedagerPerUke: Int = 5,
+    vedtaksperioder: List<VedtaksperiodeGrunnlag> =
+        listOf(
+            vedtaksperiodeGrunnlag(fom = fom, tom = tom),
+        ),
+    antallReisedager: Int = 20,
+) = BeregningsgrunnlagOffentligTransport(
+    fom = fom,
+    tom = tom,
+    prisEnkeltbillett = prisEnkeltbillett,
+    prisSyvdagersbillett = prisSyvdagersbillett,
+    pris30dagersbillett = pris30dagersbillett,
+    antallReisedagerPerUke = antallReisedagerPerUke,
+    vedtaksperioder = vedtaksperioder,
+    antallReisedager = antallReisedager,
+)
+
+private fun vedtaksperiodeGrunnlag(
+    id: UUID = randomUUID(),
+    fom: LocalDate = 1 januar 2025,
+    tom: LocalDate = 31 januar 2025,
+    aktivitet: AktivitetType = AktivitetType.TILTAK,
+    målgruppe: FaktiskMålgruppe = MålgruppeType.AAP.faktiskMålgruppe(),
+    antallReisedagerIVedtaksperioden: Int = 20,
+) = VedtaksperiodeGrunnlag(
+    id = id,
+    fom = fom,
+    tom = tom,
+    aktivitet = aktivitet,
+    målgruppe = målgruppe,
+    antallReisedagerIVedtaksperioden = antallReisedagerIVedtaksperioden,
+)
