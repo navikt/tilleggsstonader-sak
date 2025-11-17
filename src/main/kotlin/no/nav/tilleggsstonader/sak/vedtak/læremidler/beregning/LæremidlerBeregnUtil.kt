@@ -78,7 +78,7 @@ object LæremidlerBeregnUtil {
         var utbetalingsDato = this.fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
         return this.splitPerLøpendeMåneder { fom, tom ->
             if (utbetalingsDato.year != fom.year) {
-                utbetalingsDato = fom
+                utbetalingsDato = fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
             }
             LøpendeMåned(
                 fom = fom,

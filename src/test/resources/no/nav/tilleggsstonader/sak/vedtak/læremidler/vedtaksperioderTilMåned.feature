@@ -76,8 +76,19 @@ Egenskap: Splitt vedtaksperioder til utbetalingsperioder
 
       | 10.11.2025 | 09.12.2025 | 10.11.2025      |
       | 10.12.2025 | 09.01.2026 | 10.11.2025      |
-      | 10.01.2026 | 09.02.2026 | 10.01.2026      |
-      | 10.02.2026 | 09.03.2026 | 10.01.2026      |
+      | 10.01.2026 | 09.02.2026 | 12.01.2026      |
+      | 10.02.2026 | 09.03.2026 | 12.01.2026      |
+
+  Scenario: Vedtaksperiode starter lørdag 31. desember. Flytter da utbetalingsdato til nytt år
+    Gitt følgende vedtaksperioder for læremidler
+      | Fom        | Tom        |
+      | 31.12.2022 | 15.01.2023 |
+
+    Når splitter vedtaksperioder for læremidler
+
+    Så forvent følgende utbetalingsperioder
+      | Fom        | Tom        | Utbetalingsdato |
+      | 31.12.2022 | 30.01.2023 | 02.01.2023      |
 
   Scenario: Treffer rundt månedsskifte februar-mars - håndter spesialtilfelle
     Gitt følgende vedtaksperioder for læremidler
