@@ -91,7 +91,8 @@ class BehandlingEndretHåndterer(
     }
 
     private fun finnesOppgaveForTilbakekreving(behandlingId: BehandlingId): Boolean =
-        oppgaveService.finnAlleOppgaveDomainForBehandling(behandlingId).any {
-            it.tilbakekrevingBehandlingId != null
-        }
+        oppgaveService
+            .finnAlleOppgaveDomainForBehandling(behandlingId)
+            .filter { it.erÅpen() }
+            .any { it.tilbakekrevingBehandlingId != null }
 }
