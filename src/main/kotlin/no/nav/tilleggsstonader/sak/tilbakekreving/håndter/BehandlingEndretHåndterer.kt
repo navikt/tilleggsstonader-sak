@@ -43,7 +43,7 @@ class BehandlingEndretHåndterer(
         }
 
         if (behandlingEndret.harStatusTilBehandling()) {
-            håndterHendelseTilBehandling(behandlingEndret, fagsak, behandling)
+            opprettOppgaveForTilbakekrevingBehandling(behandlingEndret, fagsak, behandling)
         } else {
             logger.info(
                 "Ignorerer hendelse ${behandlingEndret.hendelsestype} for tilbakekrevingsbehandling " +
@@ -57,16 +57,12 @@ class BehandlingEndretHåndterer(
         }
     }
 
-    private fun håndterHendelseTilBehandling(
+    private fun opprettOppgaveForTilbakekrevingBehandling(
         behandlingEndret: TilbakekrevingBehandlingEndret,
         fagsak: Fagsak,
         behandling: Behandling,
     ) {
-        if (finnesOppgaveForTilbakekreving(behandling.id)) {
-            logger.info(
-                "Oppgave for tilbakekrevingsbehandling ${behandlingEndret.tilbakekreving.behandlingId} finnes allerede, oppretter ikke ny oppgave",
-            )
-        } else {
+        if (!finnesOppgaveForTilbakekreving(behandling.id)) {
             logger.info(
                 "Oppretter oppgave for tilbakekrevingsbehandling ${behandlingEndret.tilbakekreving.behandlingId} som er satt til TIL_BEHANDLING",
             )
@@ -86,6 +82,10 @@ class BehandlingEndretHåndterer(
                         journalpostId = null,
                         opprettIMappe = OppgaveMappe.TILBAKEKREVING,
                     ),
+            )
+        } else {
+            logger.info(
+                "Oppgave for tilbakekrevingsbehandling ${behandlingEndret.tilbakekreving.behandlingId} finnes allerede, oppretter ikke ny oppgave",
             )
         }
     }
