@@ -76,15 +76,16 @@ object LæremidlerBeregnUtil {
         }
 
         var utbetalingsDato = this.fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
-        return this.splitPerLøpendeMåneder { fom, tom ->
-            if (utbetalingsDato.year != fom.year) {
-                utbetalingsDato = fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
+        return this.splitPerLøpendeMåneder { løpendeMånedFom, løpendeMånedTom ->
+            // Ønsker å lage en ny utbetalingsdato i januar dersom vedtaksperioden strekker seg over nyttår
+            if (utbetalingsDato.year != løpendeMånedFom.year) {
+                utbetalingsDato = løpendeMånedFom.datoEllerNesteMandagHvisLørdagEllerSøndag()
             }
             LøpendeMåned(
-                fom = fom,
-                tom = minOf(fom.sisteDagenILøpendeMåned(), this.tom.sisteDagIÅret()),
+                fom = løpendeMånedFom,
+                tom = minOf(løpendeMånedFom.sisteDagenILøpendeMåned(), this.tom.sisteDagIÅret()),
                 utbetalingsdato = utbetalingsDato,
-            ).medVedtaksperiode(VedtaksperiodeInnenforLøpendeMåned(fom = fom, tom = tom))
+            ).medVedtaksperiode(VedtaksperiodeInnenforLøpendeMåned(fom = løpendeMånedFom, tom = løpendeMånedTom))
         }
     }
 }
