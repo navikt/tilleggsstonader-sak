@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.tilbakekreving.TilbakekrevinghendelseService
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingBehandlingEndret
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Service
@@ -33,6 +34,7 @@ class BehandlingEndretHåndterer(
 
     override fun håndtererHendelsetype(): String = "behandling_endret"
 
+    @Transactional
     override fun håndter(
         hendelseKey: String,
         payload: JsonNode,
