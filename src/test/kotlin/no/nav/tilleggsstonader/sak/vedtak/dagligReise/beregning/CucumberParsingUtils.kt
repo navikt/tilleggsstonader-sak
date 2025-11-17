@@ -12,10 +12,12 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteSvarOffentligtransport
@@ -25,6 +27,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import java.util.UUID.randomUUID
 
 fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
     dataTable.mapRad { rad ->
@@ -39,6 +42,43 @@ fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
                     antallReisedagerPerUke = 0,
                     antallReisedager = 0,
                     vedtaksperioder = emptyList(),
+                ),
+            beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
+            billettdetaljer =
+                mapOf(
+                    Billettype.ENKELTBILLETT to
+                        (parseValgfriInt(DomenenøkkelFelles.ENKELTBILLETT_ANTALL, rad) ?: 0),
+                    Billettype.SYVDAGERSBILLETT to
+                        (parseValgfriInt(DomenenøkkelFelles.SYVDAGERSBILLETT_ANTALL, rad) ?: 0),
+                    Billettype.TRETTIDAGERSBILLETT to
+                        (parseValgfriInt(DomenenøkkelFelles.TRETTIDAGERSBILLETT_ANTALL, rad) ?: 0),
+                ).filterValues { it > 0 },
+        )
+    }
+
+fun mapBeregningsresultatForPeriodeRevurdering(dataTable: DataTable) =
+    dataTable.mapRad { rad ->
+        BeregningsresultatForPeriode(
+            grunnlag =
+                BeregningsgrunnlagOffentligTransport(
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    prisEnkeltbillett = 0,
+                    prisSyvdagersbillett = 0,
+                    pris30dagersbillett = 0,
+                    antallReisedagerPerUke = 0,
+                    antallReisedager = 0,
+                    vedtaksperioder =
+                        listOf(
+                            VedtaksperiodeGrunnlag(
+                                id = randomUUID(),
+                                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                                tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                                aktivitet = AktivitetType.TILTAK,
+                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                                antallReisedagerIVedtaksperioden = 0,
+                            ),
+                        ),
                 ),
             beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
             billettdetaljer =
@@ -80,7 +120,11 @@ fun mapTilVilkårDagligReise(rad: Map<String, String>): LagreDagligReise =
                     ),
                 prisEnkelbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_ENKELTBILLETT, rad),
                 prisSyvdagersbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_SYV_DAGERS_BILLETT, rad),
-                prisTrettidagersbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT, rad),
+                prisTrettidagersbillett =
+                    parseValgfriInt(
+                        DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT,
+                        rad,
+                    ),
             ),
     )
 
