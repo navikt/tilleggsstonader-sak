@@ -6,11 +6,13 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.tilbakekreving.TilbakekrevinghendelseService
@@ -25,6 +27,7 @@ class BehandlingEndretHåndterer(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
     private val tilbakekrevinghendelseService: TilbakekrevinghendelseService,
+    private val unleashService: UnleashService,
 ) : TilbakekrevingHendelseHåndterer {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -62,6 +65,11 @@ class BehandlingEndretHåndterer(
         fagsak: Fagsak,
         behandling: Behandling,
     ) {
+        if (!unleashService.isEnabled(Toggle.OPPRETT_OPPGAVE_TILBAKEKREVING)) {
+            logger.info("Oppretter ikke oppgave for tilbakekreving da toggle ${Toggle.OPPRETT_OPPGAVE_TILBAKEKREVING} er av")
+            return
+        }
+
         if (!finnesOppgaveForTilbakekreving(behandling.id)) {
             logger.info(
                 "Oppretter oppgave for tilbakekrevingsbehandling ${behandlingEndret.tilbakekreving.behandlingId} som er satt til TIL_BEHANDLING",
