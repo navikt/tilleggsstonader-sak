@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.tilbakekreving.TilbakekrevinghendelseService
+import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TILBAKEKREVING_TYPE_BEHANDLING_ENDRET
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingBehandlingEndret
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -32,7 +33,7 @@ class BehandlingEndretHåndterer(
 ) : TilbakekrevingHendelseHåndterer {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
-    override fun håndtererHendelsetype(): String = "behandling_endret"
+    override fun håndtererHendelsetype(): String = TILBAKEKREVING_TYPE_BEHANDLING_ENDRET
 
     @Transactional
     override fun håndter(
@@ -43,7 +44,7 @@ class BehandlingEndretHåndterer(
 
         if (gjelderTestsak(behandlingEndret)) {
             logger.debug(
-                "Mottatt hendelse fagsysteminfo_behov med ugyldig eksternFagsakId=${behandlingEndret.eksternFagsakId}, ignorerer melding",
+                "Mottatt hendelse $TILBAKEKREVING_TYPE_BEHANDLING_ENDRET med ugyldig eksternFagsakId=${behandlingEndret.eksternFagsakId}, ignorerer melding",
             )
         } else {
             behandleBehandlingEndretHendelse(behandlingEndret)

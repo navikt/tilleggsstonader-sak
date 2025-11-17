@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.tilbakekreving.hendelse
 import no.nav.tilleggsstonader.sak.tilbakekreving.domene.Tilbakekrevingsstatus
 import java.time.LocalDateTime
 
+const val TILBAKEKREVING_TYPE_BEHANDLING_ENDRET = "behandling_endret"
+
 data class TilbakekrevingBehandlingEndret(
     override val versjon: Int,
     override val eksternFagsakId: String,
@@ -10,7 +12,7 @@ data class TilbakekrevingBehandlingEndret(
     val eksternBehandlingId: String,
     val tilbakekreving: TilbakekrevingInfo,
 ) : TilbakekrevinghendelseRecord {
-    override val hendelsestype = "behandling_endret"
+    override val hendelsestype = TILBAKEKREVING_TYPE_BEHANDLING_ENDRET
 
     fun harStatusOpprettet() = tilbakekreving.behandlingsstatus == STATUS_OPPRETTET
 

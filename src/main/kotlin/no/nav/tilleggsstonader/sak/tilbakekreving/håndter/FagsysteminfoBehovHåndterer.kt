@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tilbakekreving.TILBAKEKREVING_TOPIC
+import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TILBAKEKREVING_TYPE_FAGSYSTEMINFO_BEHOV
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingFagsysteminfoBehov
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingFagsysteminfoSvar
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingFagsysteminfoSvarRevurdering
@@ -41,7 +42,7 @@ class FagsysteminfoBehovHåndterer(
 ) : TilbakekrevingHendelseHåndterer {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    override fun håndtererHendelsetype(): String = "fagsysteminfo_behov"
+    override fun håndtererHendelsetype(): String = TILBAKEKREVING_TYPE_FAGSYSTEMINFO_BEHOV
 
     override fun håndter(
         hendelseKey: String,
@@ -52,7 +53,7 @@ class FagsysteminfoBehovHåndterer(
         // Team tilbake bruker også kafka-topic til intern testing i dev, filtrerer vekk meldinger ikke ment for oss
         if (gjelderTestsak(fagsystemBehovMelding)) {
             logger.debug(
-                "Mottatt hendelse fagsysteminfo_behov med ugyldig eksternFagsakId=${fagsystemBehovMelding.eksternFagsakId}, ignorerer melding",
+                "Mottatt hendelse $TILBAKEKREVING_TYPE_FAGSYSTEMINFO_BEHOV med ugyldig eksternFagsakId=${fagsystemBehovMelding.eksternFagsakId}, ignorerer melding",
             )
         } else if (fagsakService.hentFagsakPåEksternIdHvisEksisterer(fagsystemBehovMelding.eksternFagsakId.toLong()) == null) {
             logger.warn("Finner ikke faksak med eksternId ${fagsystemBehovMelding.eksternFagsakId}")
