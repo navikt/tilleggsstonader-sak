@@ -185,7 +185,7 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
     @Nested
     inner class BehandlingEndret {
         @Test
-        fun `mottar to hendelsestype behandling_endret med status TIL_BEHANDLING, oppretter oppgave kun på første hendelse`() {
+        fun `mottar to hendelsestype behandling_endret med status TIL_BEHANDLING, oppretter oppgave og db-innslag kun på første hendelse`() {
             val key = UUID.randomUUID().toString()
             val payload =
                 TilbakekrevingBehandlingEndret(
@@ -216,13 +216,13 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
             val opprettetOppgave = oppgavelager.alleOppgaver().single { it.mappeId?.getOrNull() == MAPPE_ID_TILBAKEKREVING }
             assertThat(opprettetOppgave.oppgavetype).isEqualTo(Oppgavetype.BehandleSak.value)
             assertThat(opprettetOppgave.beskrivelse).contains(payload.tilbakekreving.saksbehandlingURL)
-            assertThat(tilbakekrevinghendelseService.hentHendelserForBehandling(behandling.id)).hasSize(1)
 
             // Verifiser at vi ikke oppretter flere oppgaver ved mottak av samme hendelse
             publiserTilbakekrevinghendelse(key, payload)
             assertThatNoException().isThrownBy {
                 oppgavelager.alleOppgaver().single { it.mappeId?.getOrNull() == MAPPE_ID_TILBAKEKREVING }
             }
+            assertThat(tilbakekrevinghendelseService.hentHendelserForBehandling(behandling.id)).hasSize(1)
         }
     }
 

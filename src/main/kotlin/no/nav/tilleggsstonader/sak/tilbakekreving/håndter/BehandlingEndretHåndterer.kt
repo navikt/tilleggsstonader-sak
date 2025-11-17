@@ -51,7 +51,10 @@ class BehandlingEndretHåndterer(
             )
         }
 
-        tilbakekrevinghendelseService.persisterHendelse(behandling.id, behandlingEndret.tilDomene())
+        val tilbakekrevingStatus = behandlingEndret.tilDomene()
+        if (!tilbakekrevinghendelseService.harMottattHendelseMedStatus(behandling.id, tilbakekrevingStatus.behandlingstatus)) {
+            tilbakekrevinghendelseService.persisterHendelse(behandling.id, behandlingEndret.tilDomene())
+        }
     }
 
     private fun håndterHendelseTilBehandling(

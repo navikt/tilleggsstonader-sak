@@ -23,4 +23,13 @@ class TilbakekrevinghendelseService(
 
     fun hentHendelserForBehandling(behandlingId: BehandlingId): List<TilbakekrevingHendelse> =
         tilbakekrevinghendelseRepository.findAllByBehandlingId(behandlingId)
+
+    fun harMottattHendelseMedStatus(
+        behandlingId: BehandlingId,
+        behandlingstatus: String,
+    ): Boolean =
+        hentHendelserForBehandling(behandlingId)
+            .map { it.hendelse }
+            .filterIsInstance<Tilbakekrevingsstatus>()
+            .any { it.behandlingstatus == behandlingstatus }
 }
