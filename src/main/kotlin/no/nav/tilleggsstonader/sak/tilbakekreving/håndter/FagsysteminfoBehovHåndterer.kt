@@ -50,7 +50,7 @@ class FagsysteminfoBehovHåndterer(
         val fagsystemBehovMelding = objectMapper.treeToValue<TilbakekrevingFagsysteminfoBehov>(payload)
 
         // Team tilbake bruker også kafka-topic til intern testing i dev, filtrerer vekk meldinger ikke ment for oss
-        if (!fagsystemBehovMelding.eksternFagsakId.all { it.isDigit() }) {
+        if (gjelderTestsak(fagsystemBehovMelding)) {
             logger.debug(
                 "Mottatt hendelse fagsysteminfo_behov med ugyldig eksternFagsakId=${fagsystemBehovMelding.eksternFagsakId}, ignorerer melding",
             )

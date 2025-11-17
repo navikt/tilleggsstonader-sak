@@ -40,6 +40,17 @@ class BehandlingEndretHåndterer(
         payload: JsonNode,
     ) {
         val behandlingEndret = objectMapper.treeToValue<TilbakekrevingBehandlingEndret>(payload)
+
+        if (gjelderTestsak(behandlingEndret)) {
+            logger.debug(
+                "Mottatt hendelse fagsysteminfo_behov med ugyldig eksternFagsakId=${behandlingEndret.eksternFagsakId}, ignorerer melding",
+            )
+        } else {
+            behandleBehandlingEndretHendelse(behandlingEndret)
+        }
+    }
+
+    private fun behandleBehandlingEndretHendelse(behandlingEndret: TilbakekrevingBehandlingEndret) {
         val fagsak = fagsakService.hentFagsakPåEksternId(behandlingEndret.eksternFagsakId.toLong())
         val behandling = behandlingService.hentBehandlingPåEksternId(behandlingEndret.eksternBehandlingId.toLong())
 

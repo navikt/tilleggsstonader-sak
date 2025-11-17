@@ -185,6 +185,35 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
     @Nested
     inner class BehandlingEndret {
         @Test
+        fun `mottar hendelsestype fagsysteminfo_behov med ukjent fagsystemId, gjør ingenting`() {
+            val tilbakekrevingBehandlingEndret =
+                TilbakekrevingBehandlingEndret(
+                    eksternFagsakId = UUID.randomUUID().toString(),
+                    hendelseOpprettet = LocalDateTime.now(),
+                    eksternBehandlingId = UUID.randomUUID().toString(),
+                    tilbakekreving =
+                        TilbakekrevingInfo(
+                            behandlingId = UUID.randomUUID().toString(),
+                            sakOpprettet = LocalDateTime.now(),
+                            varselSendt = null,
+                            behandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_TIL_BEHANDLING,
+                            totaltFeilutbetaltBeløp = "10000",
+                            saksbehandlingURL = "http://localhost",
+                            fullstendigPeriode =
+                                TilbakekrevingPeriode(
+                                    fom = 1 januar 2025,
+                                    tom = 31 mai 2025,
+                                ),
+                        ),
+                    versjon = 1,
+                )
+
+            publiserTilbakekrevinghendelse(UUID.randomUUID().toString(), tilbakekrevingBehandlingEndret)
+
+            verify(exactly = 0) { kafkaTemplate.send(any<ProducerRecord<String, String>>()) }
+        }
+
+        @Test
         fun `mottar to hendelsestype behandling_endret med status TIL_BEHANDLING, oppretter oppgave og db-innslag kun på første hendelse`() {
             val key = UUID.randomUUID().toString()
             val payload =

@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 data class TilbakekrevingBehandlingEndret(
     override val versjon: Int,
-    val eksternFagsakId: String,
+    override val eksternFagsakId: String,
     val hendelseOpprettet: LocalDateTime,
     val eksternBehandlingId: String,
     val tilbakekreving: TilbakekrevingInfo,

@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class TilbakekrevingFagsysteminfoSvar(
-    val eksternFagsakId: String,
+    override val eksternFagsakId: String,
     val hendelseOpprettet: LocalDateTime,
     val mottaker: TilbakekrevingMottaker,
     val revurdering: TilbakekrevingFagsysteminfoSvarRevurdering,
