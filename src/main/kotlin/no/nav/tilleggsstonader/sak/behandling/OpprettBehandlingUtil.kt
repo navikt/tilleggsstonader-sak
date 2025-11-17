@@ -36,13 +36,9 @@ object OpprettBehandlingUtil {
         }
     }
 
-    // TODO: Slett når snike i køen er implementert
     private fun validerTidligereBehandlingerErFerdigstilte(tidligereBehandlinger: List<Behandling>) {
-        if (tidligereBehandlinger.any { it.status != BehandlingStatus.FERDIGSTILT }) {
-            throw ApiFeil("Det finnes en behandling på fagsaken som ikke er ferdigstilt", HttpStatus.BAD_REQUEST)
-        }
-        feilHvis(tidligereBehandlinger.any { it.type == FØRSTEGANGSBEHANDLING && it.status == BehandlingStatus.SATT_PÅ_VENT }) {
-            "Kan ikke opprette ny behandling når det finnes en førstegangsbehandling på vent"
+        feilHvis(tidligereBehandlinger.any { it.status != BehandlingStatus.FERDIGSTILT }) {
+            "Det finnes en behandling på fagsaken som ikke er ferdigstilt"
         }
     }
 

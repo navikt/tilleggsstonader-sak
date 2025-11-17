@@ -7,14 +7,12 @@ import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.unmockkObject
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingTypeV2
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak.FEILREGISTRERT
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak.TRUKKET_TILBAKE
@@ -42,7 +40,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.springframework.http.HttpStatus
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -221,24 +218,6 @@ internal class BehandlingServiceTest {
 
     @Nested
     inner class UtledNesteBehandlingstype {
-        // TODO: Slett når snike i køen er implementert
-        @Test
-        internal fun `skal returnere revurdering hvis det finnes en førstegangsbehandling`() {
-            val fagsak = fagsak()
-            every {
-                behandlingRepository.findByFagsakId(fagsak.id)
-            } returns
-                listOf(
-                    behandling(
-                        fagsak,
-                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                        resultat = BehandlingResultat.INNVILGET,
-                    ),
-                )
-
-            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
-        }
-
         @Test
         internal fun `skal returnere revurdering hvis det finnes en ferdigstillt førstegangsbehandling som ikke er henlagt`() {
             val fagsak = fagsak()
@@ -264,7 +243,7 @@ internal class BehandlingServiceTest {
                 behandlingRepository.findByFagsakId(fagsak.id)
             } returns emptyList()
 
-            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+            assertThat(behandlingService.utledNesteBehandlingstypeV2(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
 
         @Test
@@ -274,26 +253,7 @@ internal class BehandlingServiceTest {
                 behandlingRepository.findByFagsakId(fagsak.id)
             } returns listOf(henlagtBehandling(fagsak))
 
-            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
-        }
-
-        // TODO: Slett når snike i køen er implementert
-        @Test
-        internal fun `skal returnere revurdering hvis det finnes en førstegangsbehandling som ikke er ferdigstilt`() {
-            val fagsak = fagsak()
-            every {
-                behandlingRepository.findByFagsakId(fagsak.id)
-            } returns
-                listOf(
-                    behandling(
-                        fagsak,
-                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                        status = BehandlingStatus.UTREDES,
-                        resultat = BehandlingResultat.IKKE_SATT,
-                    ),
-                )
-
-            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
+            assertThat(behandlingService.utledNesteBehandlingstypeV2(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
 
         @Test
@@ -319,10 +279,4 @@ internal class BehandlingServiceTest {
 fun BehandlingService.utledNesteBehandlingstypeV2(fagsakId: FagsakId): BehandlingType {
     val behandlinger = hentBehandlinger(fagsakId)
     return utledBehandlingTypeV2(behandlinger)
-}
-
-// TODO: Slett når snike i køen er implementert
-fun BehandlingService.utledNesteBehandlingstype(fagsakId: FagsakId): BehandlingType {
-    val behandlinger = hentBehandlinger(fagsakId)
-    return utledBehandlingType(behandlinger)
 }

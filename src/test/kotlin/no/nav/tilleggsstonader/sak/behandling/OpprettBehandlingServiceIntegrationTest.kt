@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling
 
-import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -10,7 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.assertFinnesTaskMedType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -56,10 +55,8 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             }.withMessage("Kan ikke sette krav mottattdato frem i tid")
     }
 
-    // TODO: Slett når snike i køen er implementert
     @Test
-    internal fun `skal ikke være mulig å opprette en revurdering om forrige behandling ikke er ferdigstilt`() {
-        every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns false
+    internal fun `kaster feil om forrige behandling ikke er ferdigstilt når tillatFlereÅpneBehandlinger=false`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         testoppsettService.lagre(
             behandling(
@@ -67,13 +64,14 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
                 status = BehandlingStatus.UTREDES,
             ),
         )
-        assertThatExceptionOfType(ApiFeil::class.java)
+        assertThatExceptionOfType(Feil::class.java)
             .isThrownBy {
                 opprettBehandlingService.opprettBehandling(
                     OpprettBehandling(
                         fagsak.id,
                         behandlingsårsak = behandlingÅrsak,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                        tillatFlereÅpneBehandlinger = false,
                     ),
                 )
             }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
@@ -81,28 +79,8 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
 
     @Nested
     inner class BehandlingPåVent {
-        // TODO: Slett når snike i køen er implementert
-        @Test
-        internal fun `opprettBehandling av førstegangsbehandling er ikke mulig hvis det finnes en førstegangsbehandling på vent`() {
-            every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns false
-            val fagsak = testoppsettService.lagreFagsak(fagsak())
-            testoppsettService.lagre(behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT))
-            assertThatExceptionOfType(ApiFeil::class.java)
-                .isThrownBy {
-                    opprettBehandlingService.opprettBehandling(
-                        OpprettBehandling(
-                            fagsak.id,
-                            behandlingsårsak = behandlingÅrsak,
-                            oppgaveMetadata = opprettBehandlingOppgaveMetadata,
-                            tillatFlereÅpneBehandlinger = true,
-                        ),
-                    )
-                }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
-        }
-
         @Test
         internal fun `opprettBehandling av førstegangsbehandling er mulig hvis det finnes en førstegangsbehandling på vent`() {
-            every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns true
             val fagsak = testoppsettService.lagreFagsak(fagsak())
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT))
 
@@ -122,7 +100,6 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
 
         @Test
         internal fun `opprettBehandling av førstegangsbehandling er mulig hvis det finnes en åpen førstegangsbehandling`() {
-            every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns true
             val fagsak = testoppsettService.lagreFagsak(fagsak())
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.OPPRETTET))
 
@@ -143,28 +120,8 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
             assertThat(settPåVentService.hentStatusSettPåVent(nyBehandling.id)).isNotNull
         }
 
-        // TODO: Slett når snike i køen er implementert
-        @Test
-        internal fun `opprettBehandling av revurdering er ikke mulig hvis det finnes en førstegangsbehandling på vent`() {
-            every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns false
-            val fagsak = testoppsettService.lagreFagsak(fagsak())
-            testoppsettService.lagre(behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT))
-            assertThatExceptionOfType(ApiFeil::class.java)
-                .isThrownBy {
-                    opprettBehandlingService.opprettBehandling(
-                        OpprettBehandling(
-                            fagsak.id,
-                            behandlingsårsak = behandlingÅrsak,
-                            oppgaveMetadata = opprettBehandlingOppgaveMetadata,
-                            tillatFlereÅpneBehandlinger = true,
-                        ),
-                    )
-                }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
-        }
-
         @Test
         internal fun `opprettBehandling av revurdering er mulig hvis det finnes en førstegangsbehandling på vent`() {
-            every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns true
             val fagsak = testoppsettService.lagreFagsak(fagsak())
             val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak))
             testoppsettService.ferdigstillBehandling(førstegangsbehandling)
@@ -186,7 +143,6 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
 
         @Test
         internal fun `opprettBehandling av revurdering er mulig hvis det finnes en åpen førstegangsbehandling`() {
-            every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns true
             val fagsak = testoppsettService.lagreFagsak(fagsak())
             val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak))
             testoppsettService.ferdigstillBehandling(førstegangsbehandling)
@@ -211,31 +167,8 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
         }
     }
 
-    // TODO: Slett når snike i køen er implementert
-    @Test
-    internal fun `opprettBehandling er ikke mulig hvis det finnes en revurdering på vent`() {
-        every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns false
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
-        testoppsettService.lagre(behandling(fagsak, BehandlingStatus.FERDIGSTILT))
-        testoppsettService.lagre(
-            behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT, type = BehandlingType.REVURDERING),
-        )
-        assertThatExceptionOfType(ApiFeil::class.java)
-            .isThrownBy {
-                opprettBehandlingService.opprettBehandling(
-                    OpprettBehandling(
-                        fagsak.id,
-                        behandlingsårsak = behandlingÅrsak,
-                        oppgaveMetadata = opprettBehandlingOppgaveMetadata,
-                        tillatFlereÅpneBehandlinger = true,
-                    ),
-                )
-            }.withMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
-    }
-
     @Test
     internal fun `opprettBehandling er mulig hvis det finnes en revurdering på vent`() {
-        every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns true
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         testoppsettService.lagre(behandling(fagsak, BehandlingStatus.FERDIGSTILT))
         testoppsettService.lagre(
@@ -258,7 +191,6 @@ class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
 
     @Test
     internal fun `opprettBehandling med oppgaveMetadata=UtenOppgave skal ikke opprette oppgave`() {
-        every { unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK) } returns true
         val fagsak = testoppsettService.lagreFagsak(fagsak())
 
         opprettBehandlingService.opprettBehandling(
