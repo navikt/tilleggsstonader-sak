@@ -31,9 +31,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
@@ -184,6 +182,7 @@ class OffentligTransportBeregningRevurderingStepDefinitions {
                 steg = StegType.BEREGNE_YTELSE,
             )
         val vedtaksperioder = mapVedtaksperioder(dataTable).map { it.tilDto() }
+
         steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseDagligReiseRequest(vedtaksperioder))
     }
 
@@ -231,22 +230,11 @@ class OffentligTransportBeregningRevurderingStepDefinitions {
     ) {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
 
-        val vedtaksperioder = mapVedtaksperioder(dataTable)
-
-        val faktiskeBeregningsperioder =
-            beregningService
-                .beregn(
-                    behandlingId,
-                    typeVedtak = TypeVedtak.INNVILGELSE,
-                    vedtaksperioder = vedtaksperioder,
-                    behandling = dummyBehandling(behandlingId),
-                ).offentligTransport
-                ?.reiser
-                ?.flatMap { it.perioder }!!
+        val forventedeBeregningsperioder = mapBeregningsresultatForPeriode(dataTable)
 
         val vedtak = hentVedtak(behandlingId).beregningsresultat
 
-        val forventedeBeregningsperioder =
+        val faktiskeBeregningsperioder =
             BeregningsresultatForReise(
                 perioder = vedtak.offentligTransport?.reiser?.flatMap { it.perioder }!!,
             ).perioder

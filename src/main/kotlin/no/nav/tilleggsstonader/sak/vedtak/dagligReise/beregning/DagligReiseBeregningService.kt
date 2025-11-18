@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -16,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligRe
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.brukPerioderFraOgMedTidligsteEndring
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
@@ -68,7 +70,7 @@ class DagligReiseBeregningService(
                     beregnOffentligTransport(
                         vilkår = oppfylteVilkårGruppertPåType,
                         vedtaksperioder =
-                            vedtaksperioder.filter { it.fom >= tidligsteEndring },
+                            vedtaksperioder.brukPerioderFraOgMedTidligsteEndring(tidligsteEndring),
                     )?.reiser
                         ?.flatMap { it.perioder }
                         ?: emptyList(),
@@ -112,6 +114,9 @@ class DagligReiseBeregningService(
         forrigeBeregningsresultat: BeregningsresultatOffentligTransport,
     ): BeregningsresultatDagligReise {
         // Kast en feil dersom dagens dato er det samme som tidligstEndring?
+        if (LocalDate.now() == tidligsteEndring) {
+            error("tidligste endring kan ikke være det samme som dagens dato, det kan bli krøll")
+        }
 
         val perioderFraForrigeVedtakSomSkalBeholdes =
             forrigeBeregningsresultat
