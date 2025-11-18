@@ -1,5 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
+import no.nav.tilleggsstonader.libs.utils.dato.desember
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningTestUtil.vedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.splittTilLøpendeMåneder
@@ -17,25 +20,31 @@ class LæremidlerBeregnUtilTest {
         val vedtaksperioder =
             listOf(
                 vedtaksperiodeBeregning(
-                    fom = LocalDate.of(2024, 12, 5),
-                    tom = LocalDate.of(2025, 1, 4),
+                    fom = 5 desember 2024,
+                    tom = 15 januar 2025,
                 ),
             )
         val perioder = vedtaksperioder.splittTilLøpendeMåneder()
         assertThat(perioder).hasSize(2)
 
         with(perioder[0]) {
-            assertThat(fom).isEqualTo(LocalDate.of(2024, 12, 5))
-            assertThat(tom).isEqualTo(LocalDate.of(2024, 12, 31))
+            assertThat(fom).isEqualTo(5 desember 2024)
+            assertThat(tom).isEqualTo(4 januar 2025)
             assertThat(this.vedtaksperioder).containsExactly(
-                VedtaksperiodeInnenforLøpendeMåned(LocalDate.of(2024, 12, 5), LocalDate.of(2024, 12, 31)),
+                VedtaksperiodeInnenforLøpendeMåned(
+                    fom = 5 desember 2024,
+                    tom = 4 januar 2025,
+                ),
             )
         }
         with(perioder[1]) {
-            assertThat(fom).isEqualTo(LocalDate.of(2025, 1, 1))
-            assertThat(tom).isEqualTo(LocalDate.of(2025, 1, 31))
+            assertThat(fom).isEqualTo(5 januar 2025)
+            assertThat(tom).isEqualTo(4 februar 2025)
             assertThat(this.vedtaksperioder).containsExactly(
-                VedtaksperiodeInnenforLøpendeMåned(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 4)),
+                VedtaksperiodeInnenforLøpendeMåned(
+                    fom = 5 januar 2025,
+                    tom = 15 januar 2025,
+                ),
             )
         }
     }
