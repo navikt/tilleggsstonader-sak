@@ -39,6 +39,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.core.KafkaTemplate
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
@@ -196,7 +197,7 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
                             sakOpprettet = LocalDateTime.now(),
                             varselSendt = null,
                             behandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_TIL_BEHANDLING,
-                            totaltFeilutbetaltBeløp = "10000",
+                            totaltFeilutbetaltBeløp = BigDecimal("10000"),
                             saksbehandlingURL = "http://localhost",
                             fullstendigPeriode =
                                 TilbakekrevingPeriode(
@@ -226,7 +227,7 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
                             sakOpprettet = LocalDateTime.now(),
                             varselSendt = null,
                             behandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_TIL_BEHANDLING,
-                            totaltFeilutbetaltBeløp = "10000",
+                            totaltFeilutbetaltBeløp = BigDecimal("10000"),
                             saksbehandlingURL = "http://localhost",
                             fullstendigPeriode =
                                 TilbakekrevingPeriode(

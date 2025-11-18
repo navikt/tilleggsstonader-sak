@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.tilbakekreving.hendelse
 
 import no.nav.tilleggsstonader.sak.tilbakekreving.domene.Tilbakekrevingsstatus
+import java.math.BigDecimal
 import java.time.LocalDateTime
 
 const val TILBAKEKREVING_TYPE_BEHANDLING_ENDRET = "behandling_endret"
@@ -26,7 +27,7 @@ data class TilbakekrevingBehandlingEndret(
             sakOpprettet = tilbakekreving.sakOpprettet,
             varselSendtTidspunkt = tilbakekreving.varselSendt,
             behandlingstatus = tilbakekreving.behandlingsstatus,
-            totaltFeilutbetaltBeløp = tilbakekreving.totaltFeilutbetaltBeløp.toLong(),
+            totaltFeilutbetaltBeløp = tilbakekreving.totaltFeilutbetaltBeløp,
             tilbakekrevingFom = tilbakekreving.fullstendigPeriode.fom,
             tilbakekrevingTom = tilbakekreving.fullstendigPeriode.tom,
             tilbakekrevingBehandlingId = tilbakekreving.behandlingId,
@@ -44,7 +45,7 @@ data class TilbakekrevingInfo(
     val sakOpprettet: LocalDateTime,
     val varselSendt: LocalDateTime?,
     val behandlingsstatus: String,
-    val totaltFeilutbetaltBeløp: String,
+    val totaltFeilutbetaltBeløp: BigDecimal,
     val saksbehandlingURL: String,
     val fullstendigPeriode: TilbakekrevingPeriode,
 )
