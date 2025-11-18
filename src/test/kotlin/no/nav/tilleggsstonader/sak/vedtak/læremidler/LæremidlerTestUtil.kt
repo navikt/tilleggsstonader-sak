@@ -96,6 +96,7 @@ object LæremidlerTestUtil {
         beregningsresultat: BeregningsresultatLæremidler = defaultBeregningsresultat,
         årsaker: List<ÅrsakOpphør> = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
         begrunnelse: String = "En begrunnelse",
+        opphørsdato: LocalDate = LocalDate.now(),
     ) = GeneriskVedtak(
         behandlingId = behandlingId,
         type = TypeVedtak.OPPHØR,
@@ -108,7 +109,7 @@ object LæremidlerTestUtil {
             ),
         gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
-        opphørsdato = LocalDate.now(),
+        opphørsdato = opphørsdato,
     )
 
     fun beregningsresultatForMåned(

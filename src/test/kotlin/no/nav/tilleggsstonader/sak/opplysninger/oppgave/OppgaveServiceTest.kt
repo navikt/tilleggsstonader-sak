@@ -484,6 +484,7 @@ internal class OppgaveServiceTest {
     private fun lagTestOppgave(): OppgaveDomain =
         OppgaveDomain(
             behandlingId = BEHANDLING_ID,
+            tilbakekrevingBehandlingId = null,
             type = Oppgavetype.BehandleSak,
             gsakOppgaveId = GSAK_OPPGAVE_ID,
             tilordnetSaksbehandler = null,

@@ -3,14 +3,16 @@ package no.nav.tilleggsstonader.sak.tilbakekreving.hendelse
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+const val TILBAKEKREVING_TYPE_FAGSYSTEMINFO_SVAR = "fagsysteminfo_svar"
+
 data class TilbakekrevingFagsysteminfoSvar(
-    val eksternFagsakId: String,
+    override val eksternFagsakId: String,
     val hendelseOpprettet: LocalDateTime,
     val mottaker: TilbakekrevingMottaker,
     val revurdering: TilbakekrevingFagsysteminfoSvarRevurdering,
     val utvidPerioder: List<UtvidetPeriode>,
-) : TilbakekrevingHendelse {
-    override val hendelsestype: String = "fagsysteminfo_svar"
+) : TilbakekrevinghendelseRecord {
+    override val hendelsestype: String = TILBAKEKREVING_TYPE_FAGSYSTEMINFO_SVAR
     override val versjon: Int = 1
 }
 

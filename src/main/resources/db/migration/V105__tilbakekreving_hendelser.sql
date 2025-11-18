@@ -1,0 +1,10 @@
+CREATE TABLE TILBAKEKREVING_HENDELSE
+(
+    id BIGSERIAL NOT NULL PRIMARY KEY,
+    behandling_id UUID         NOT NULL REFERENCES behandling (id),
+    hendelse jsonb NOT NULL
+);
+
+CREATE INDEX idx_tilbakekreving_hendelse_behandling_id ON TILBAKEKREVING_HENDELSE (behandling_id);
+
+ALTER TABLE oppgave ADD COLUMN TILBAKEKREVING_BEHANDLING_ID VARCHAR;

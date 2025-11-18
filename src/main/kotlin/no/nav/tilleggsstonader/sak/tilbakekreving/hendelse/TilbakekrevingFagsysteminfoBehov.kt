@@ -2,11 +2,13 @@ package no.nav.tilleggsstonader.sak.tilbakekreving.hendelse
 
 import java.time.LocalDateTime
 
+const val TILBAKEKREVING_TYPE_FAGSYSTEMINFO_BEHOV = "fagsysteminfo_behov"
+
 data class TilbakekrevingFagsysteminfoBehov(
     override val versjon: Int,
-    val eksternFagsakId: String,
+    override val eksternFagsakId: String,
     val kravgrunnlagReferanse: String?, // behandlingid
     val hendelseOpprettet: LocalDateTime,
-) : TilbakekrevingHendelse {
-    override val hendelsestype: String = "fagsysteminfo_behov"
+) : TilbakekrevinghendelseRecord {
+    override val hendelsestype: String = TILBAKEKREVING_TYPE_FAGSYSTEMINFO_BEHOV
 }
