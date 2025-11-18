@@ -19,7 +19,6 @@ import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
-import no.nav.tilleggsstonader.sak.cucumber.verifiserAtListerErLike
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYtelseRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
@@ -32,6 +31,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
@@ -163,6 +163,8 @@ class OffentligTransportBeregningRevurderingStepDefinitions {
                 steg = StegType.VILKÅR,
             )
 
+        // oppdatere kopien istedenfor å lage nyttvilkår
+
         utgifterData.mapRad { rad ->
             val nyttVilkår = mapTilVilkårDagligReise(rad)
             dagligReiseVilkårService.opprettNyttVilkår(behandlingId = behandlingId, nyttVilkår = nyttVilkår)
@@ -241,19 +243,23 @@ class OffentligTransportBeregningRevurderingStepDefinitions {
                 ).offentligTransport
                 ?.reiser
                 ?.flatMap { it.perioder }!!
-                .map { it.utenVedtaksperiodeId() }
 
         val vedtak = hentVedtak(behandlingId).beregningsresultat
 
         val forventedeBeregningsperioder =
             BeregningsresultatForReise(
                 perioder = vedtak.offentligTransport?.reiser?.flatMap { it.perioder }!!,
-            ).perioder.map { it.utenVedtaksperiodeId() }
+            ).perioder
 
-        verifiserAtListerErLike(
-            faktisk = faktiskeBeregningsperioder,
-            forventet = forventedeBeregningsperioder,
-        )
+        assertThat(faktiskeBeregningsperioder.size).isEqualTo(forventedeBeregningsperioder.size)
+
+        forventedeBeregningsperioder.forEachIndexed { index, periode ->
+            assertThat(faktiskeBeregningsperioder[index].grunnlag.fom).isEqualTo(periode.grunnlag.fom)
+            assertThat(faktiskeBeregningsperioder[index].grunnlag.tom).isEqualTo(periode.grunnlag.tom)
+            assertThat(faktiskeBeregningsperioder[index].beløp).isEqualTo(periode.beløp)
+            assertThat(faktiskeBeregningsperioder[index].billettdetaljer)
+                .isEqualTo(periode.billettdetaljer)
+        }
     }
 
     @Så("kan vi forvente følgende daglig reise vedtaksperioder for behandling={}")
