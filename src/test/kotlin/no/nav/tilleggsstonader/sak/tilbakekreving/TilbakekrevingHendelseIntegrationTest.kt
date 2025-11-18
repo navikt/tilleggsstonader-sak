@@ -213,7 +213,7 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
         }
 
         @Test
-        fun `mottar to hendelsestype behandling_endret med status TIL_BEHANDLING, oppretter oppgave og db-innslag kun på første hendelse`() {
+        fun `mottar to hendelsestype behandling_endret med status TIL_BEHANDLING, oppretter kun en oppgave og db-innslag`() {
             val key = UUID.randomUUID().toString()
             val payload =
                 TilbakekrevingBehandlingEndret(
