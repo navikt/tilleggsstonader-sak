@@ -3,27 +3,21 @@ package no.nav.tilleggsstonader.sak.tilbakekreving
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
-import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.hendelser.ConsumerRecordUtil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingFagsysteminfoBehov
 import no.nav.tilleggsstonader.sak.tilbakekreving.håndter.FagsysteminfoBehovHåndterer
-import no.nav.tilleggsstonader.sak.utbetaling.AndelMedVedtaksperioder
 import no.nav.tilleggsstonader.sak.utbetaling.AndelTilkjentYtelseTilPeriodeService
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.opphør
-import org.apache.kafka.clients.producer.ProducerRecord
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -40,15 +34,17 @@ class TilbakekrevingKafkaListenerTest {
     val andelTilkjentYtelseTilPeriodeService = mockk<AndelTilkjentYtelseTilPeriodeService>()
     val vedtakService = mockk<VedtakService>()
     val fagsakService = mockk<FagsakService>()
+    val oppgaveService = mockk<OppgaveService>()
 
     val håndterer =
         FagsysteminfoBehovHåndterer(
-            behandlingService = behandlingService,
-            eksternBehandlingIdRepository = eksternBehandlingIdRepository,
-            kafkaTemplate = kafkaTemplate,
-            andelTilkjentYtelseTilPeriodeService = andelTilkjentYtelseTilPeriodeService,
-            vedtakService = vedtakService,
             fagsakService = fagsakService,
+            eksternBehandlingIdRepository = eksternBehandlingIdRepository,
+            behandlingService = behandlingService,
+            vedtakService = vedtakService,
+            andelTilkjentYtelseTilPeriodeService = andelTilkjentYtelseTilPeriodeService,
+            kafkaTemplate = kafkaTemplate,
+            oppgaveService = oppgaveService,
         )
 
     val tilbakekrevingHendelseDelegate = TilbakekrevingHendelseDelegate(listOf(håndterer))
