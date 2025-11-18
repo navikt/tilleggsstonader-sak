@@ -112,7 +112,7 @@ object SøknadDagligReiseUtil {
                     value = "5",
                 ),
             harDu6KmReisevei = JaNeiType.ja,
-            hvorLangErReiseveienDin = 15,
+            hvorLangErReiseveienDin = 15.0,
             harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde = JaNeiType.nei,
             kanDuReiseMedOffentligTransport = JaNeiType.ja,
             hvaSlagsTypeBillettMaDuKjope =

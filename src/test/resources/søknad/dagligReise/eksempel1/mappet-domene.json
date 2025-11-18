@@ -70,7 +70,7 @@
     },
     "dagerPerUke" : "4",
     "harMerEnn6KmReisevei" : "JA",
-    "lengdeReisevei" : 18,
+    "lengdeReisevei" : 18.5,
     "harBehovForTransportUavhengigAvReisensLengde" : null,
     "kanReiseMedOffentligTransport" : "JA",
     "offentligTransport" : {
@@ -98,7 +98,7 @@
     },
     "dagerPerUke" : "1",
     "harMerEnn6KmReisevei" : "NEI",
-    "lengdeReisevei" : 1,
+    "lengdeReisevei" : 1.0,
     "harBehovForTransportUavhengigAvReisensLengde" : "NEI",
     "kanReiseMedOffentligTransport" : "JA",
     "offentligTransport" : {
