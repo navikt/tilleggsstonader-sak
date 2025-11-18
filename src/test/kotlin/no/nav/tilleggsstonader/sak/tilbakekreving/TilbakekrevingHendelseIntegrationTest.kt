@@ -178,7 +178,6 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
             assertThat(publisertHendelse.key()).isEqualTo(key)
             val tilbakekrevingFagsysteminfoSvar = objectMapper.readValue<TilbakekrevingFagsysteminfoSvar>(publisertHendelse.value())
             assertThat(tilbakekrevingFagsysteminfoSvar.utvidPerioder).isNotEmpty
-            println(tilbakekrevingFagsysteminfoSvar)
         }
     }
 

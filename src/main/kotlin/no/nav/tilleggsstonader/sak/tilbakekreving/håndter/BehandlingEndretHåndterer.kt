@@ -70,7 +70,7 @@ class BehandlingEndretHåndterer(
 
         val tilbakekrevingStatus = behandlingEndret.tilDomene()
         if (!tilbakekrevinghendelseService.harMottattHendelseMedStatus(behandling.id, tilbakekrevingStatus.behandlingstatus)) {
-            tilbakekrevinghendelseService.persisterHendelse(behandling.id, behandlingEndret.tilDomene())
+            tilbakekrevinghendelseService.persisterHendelse(behandling.id, tilbakekrevingStatus)
         }
     }
 
