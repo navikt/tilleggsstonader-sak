@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mai
@@ -249,7 +250,10 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
             // Verifiser at vi ikke oppretter flere oppgaver ved mottak av samme hendelse
             publiserTilbakekrevinghendelse(key, payload)
             assertThatNoException().isThrownBy {
-                oppgavelager.alleOppgaver().single { it.mappeId?.getOrNull() == MAPPE_ID_TILBAKEKREVING }
+                oppgavelager.alleOppgaver().single {
+                    it.mappeId?.getOrNull() == MAPPE_ID_TILBAKEKREVING &&
+                        it.behandlingstype == Behandlingstype.Tilbakekreving.value
+                }
             }
             assertThat(tilbakekrevinghendelseService.hentHendelserForBehandling(behandling.id)).hasSize(1)
         }

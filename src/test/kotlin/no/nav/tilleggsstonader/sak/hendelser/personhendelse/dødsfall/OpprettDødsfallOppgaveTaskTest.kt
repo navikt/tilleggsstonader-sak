@@ -35,11 +35,11 @@ class OpprettDødsfallOppgaveTaskTest {
             }
 
         every { personService.hentPersonUtenBarn(personident) } returns mockk { every { søker } returns person }
-        every { oppgaveService.opprettOppgave(any(), any(), any(), any(), any()) } returns 1L
+        every { oppgaveService.opprettOppgave(any(), any(), any(), any(), any(), any()) } returns 1L
 
         opprettDødsfallOppgaveTask.doTask(task)
 
-        verify { oppgaveService.opprettOppgave(personident, Stønadstype.LÆREMIDLER, null, any(), any()) }
+        verify { oppgaveService.opprettOppgave(personident, Stønadstype.LÆREMIDLER, null, any(), any(), any()) }
     }
 
     @Test
@@ -63,6 +63,6 @@ class OpprettDødsfallOppgaveTaskTest {
 
         opprettDødsfallOppgaveTask.doTask(task)
 
-        verify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any(), any(), any()) }
+        verify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any(), any(), any(), any()) }
     }
 }

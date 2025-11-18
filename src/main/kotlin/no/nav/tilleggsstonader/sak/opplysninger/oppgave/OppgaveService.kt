@@ -175,6 +175,7 @@ class OppgaveService(
         stønadstype: Stønadstype,
         behandlingId: BehandlingId?,
         tilbakekrevingBehandlingId: String? = null,
+        behandlingstype: Behandlingstype? = null,
         oppgave: OpprettOppgave,
     ): Long {
         feilHvis(oppgave.oppgavetype == Oppgavetype.BehandleSak && behandlingId == null) {
@@ -182,7 +183,8 @@ class OppgaveService(
         }
         val enhetsnummer = arbeidsfordelingService.hentNavEnhetId(personIdent, stønadstype, oppgave.oppgavetype)
         val mappeId = oppgave.opprettIMappe?.let { oppgaveMappe -> utledMappeId(personIdent, oppgave, enhetsnummer, oppgaveMappe) }
-        val opprettetOppgaveId = opprettOppgaveUtenÅLagreIRepository(personIdent, stønadstype, oppgave, enhetsnummer, mappeId)
+        val opprettetOppgaveId =
+            opprettOppgaveUtenÅLagreIRepository(personIdent, stønadstype, oppgave, enhetsnummer, mappeId, behandlingstype)
         val oppgave =
             OppgaveDomain(
                 gsakOppgaveId = opprettetOppgaveId,
@@ -209,6 +211,7 @@ class OppgaveService(
         oppgave: OpprettOppgave,
         enhetsnummer: String?,
         mappeId: Long? = null,
+        behandlingstype: Behandlingstype? = null,
     ): Long {
         val opprettOppgave =
             tilOpprettOppgaveRequest(
@@ -217,6 +220,7 @@ class OppgaveService(
                 stønadstype,
                 enhetsnummer = enhetsnummer,
                 mappeId = mappeId,
+                behandlingstype = behandlingstype,
             )
 
         try {

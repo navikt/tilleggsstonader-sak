@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.tilbakekreving.håndter
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.treeToValue
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -93,6 +94,7 @@ class BehandlingEndretHåndterer(
                 stønadstype = fagsak.stønadstype,
                 behandlingId = behandling.id,
                 tilbakekrevingBehandlingId = behandlingEndret.tilbakekreving.behandlingId,
+                behandlingstype = Behandlingstype.Tilbakekreving,
                 oppgave =
                     OpprettOppgave(
                         oppgavetype = Oppgavetype.BehandleSak,

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.tilBehandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.tilTema
+import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
@@ -31,6 +32,7 @@ fun tilOpprettOppgaveRequest(
     stønadstype: Stønadstype,
     enhetsnummer: String? = null,
     mappeId: Long?,
+    behandlingstype: Behandlingstype? = null,
 ): OpprettOppgaveRequest =
     OpprettOppgaveRequest(
         ident = OppgaveIdentV2(ident = personIdent, gruppe = IdentGruppe.FOLKEREGISTERIDENT),
@@ -40,6 +42,7 @@ fun tilOpprettOppgaveRequest(
         fristFerdigstillelse = oppgave.fristFerdigstillelse ?: lagFristForOppgave(LocalDateTime.now()),
         beskrivelse = lagOppgaveTekst(oppgave.beskrivelse),
         enhetsnummer = enhetsnummer,
+        behandlingstype = behandlingstype?.value,
         behandlingstema = stønadstype.tilBehandlingstema().value,
         tilordnetRessurs = oppgave.tilordnetNavIdent,
         mappeId = mappeId,
