@@ -36,6 +36,7 @@ import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseBeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
@@ -52,6 +53,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeU
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
+import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -205,7 +207,7 @@ class OffentligTransportBeregningRevurderingStepDefinitions {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val tidligsteEndring = parseDato(tidligsteEndringStr)
         val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto() }
-        vedtakRepositoryFake.insertAll(vedtaksperioder.map { Ve })
+
         every {
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(
                 behandlingId,
@@ -229,27 +231,29 @@ class OffentligTransportBeregningRevurderingStepDefinitions {
 
         val vedtaksperioder = mapVedtaksperioder(dataTable)
 
-        val test =
-            beregningService.beregn(
-                behandlingId,
-                typeVedtak = TypeVedtak.INNVILGELSE,
-                vedtaksperioder = vedtaksperioder,
-                behandling = dummyBehandling(behandlingId),
-            )
+        val faktiskeBeregningsperioder =
+            beregningService
+                .beregn(
+                    behandlingId,
+                    typeVedtak = TypeVedtak.INNVILGELSE,
+                    vedtaksperioder = vedtaksperioder,
+                    behandling = dummyBehandling(behandlingId),
+                ).offentligTransport
+                ?.reiser
+                ?.flatMap { it.perioder }!!
+                .map { it.utenVedtaksperiodeId() }
 
         val vedtak = hentVedtak(behandlingId).beregningsresultat
 
         val forventedeBeregningsperioder =
             BeregningsresultatForReise(
                 perioder = vedtak.offentligTransport?.reiser?.flatMap { it.perioder }!!,
-            ).perioder
+            ).perioder.map { it.utenVedtaksperiodeId() }
 
-        test.offentligTransport?.reiser?.map { reise ->
-            verifiserAtListerErLike(
-                faktisk = reise.perioder,
-                forventet = forventedeBeregningsperioder,
-            )
-        }
+        verifiserAtListerErLike(
+            faktisk = faktiskeBeregningsperioder,
+            forventet = forventedeBeregningsperioder,
+        )
     }
 
     @Så("kan vi forvente følgende daglig reise vedtaksperioder for behandling={}")
@@ -264,7 +268,14 @@ class OffentligTransportBeregningRevurderingStepDefinitions {
 
         val forventedeVedtaksperioder = mapVedtaksperioder(dataTable)
 
-        verifiserAtListerErLike(vedtaksperioder, forventedeVedtaksperioder)
+        assertThat(vedtaksperioder.size).isEqualTo(forventedeVedtaksperioder.size)
+
+        forventedeVedtaksperioder.forEachIndexed { index, periode ->
+            assertThat(vedtaksperioder[index].fom).isEqualTo(periode.fom)
+            assertThat(vedtaksperioder[index].tom).isEqualTo(periode.tom)
+            assertThat(vedtaksperioder[index].målgruppe).isEqualTo(periode.målgruppe)
+            assertThat(vedtaksperioder[index].aktivitet).isEqualTo(periode.aktivitet)
+        }
     }
 
     fun mapTilVilkårDagligReise(rad: Map<String, String>): LagreDagligReise =
@@ -308,6 +319,17 @@ class OffentligTransportBeregningRevurderingStepDefinitions {
             type = if (forrigeIverksatteBehandlingId != null) BehandlingType.REVURDERING else BehandlingType.FØRSTEGANGSBEHANDLING,
         )
     }
+
+    private fun BeregningsresultatForPeriode.utenVedtaksperiodeId(): BeregningsresultatForPeriode =
+        this.copy(
+            grunnlag =
+                this.grunnlag.copy(
+                    vedtaksperioder =
+                        this.grunnlag.vedtaksperioder.map {
+                            it.copy(id = UUID(0, 0))
+                        },
+                ),
+        )
 
     private fun forrigeIverksatteBehandlingId(behandlingId: BehandlingId): BehandlingId? {
         val behandlingIdInt = behandlingIdTilTestId(behandlingId)

@@ -29,13 +29,13 @@ Egenskap: Innvilgelse av daglig reise - revurdering
     Når vi kopierer perioder fra forrige daglig reise behandling for behandling=2
 
     Og vi legger inn følgende daglig reise endringer for behandling=2
-      | Fom        | Tom        | Beløp | Trettidagersbillett-antall |
-      | 31.01.2025 | 01.03.2025 | 778   | 1                          |
+      | Fom        | Tom        | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 31.01.2025 | 01.03.2025 | 778                       | 3                         |
 
     Og vi innvilger daglig reise behandling=2 med tidligsteEndring=2025-01-30 med følgende vedtaksperioder
       | Fom        | Tom        |
       | 01.01.2025 | 30.01.2025 |
-      | 31.02.2025 | 01.03.2025 |
+      | 31.01.2025 | 01.03.2025 |
 
 
     Så kan vi forvente følgende daglig reise beregningsresultat for behandling=2
