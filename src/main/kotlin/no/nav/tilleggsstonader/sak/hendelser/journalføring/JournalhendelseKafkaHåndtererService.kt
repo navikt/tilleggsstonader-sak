@@ -60,7 +60,8 @@ class JournalhendelseKafkaHåndtererService(
                 "status=${journalpost.journalstatus} " +
                 "type=${journalpost.journalposttype} " +
                 "kanal=${journalpost.kanal} " +
-                "brevkode=${journalpost.brevkoder()}",
+                "brevkode=${journalpost.brevkoder()} " +
+                "relevanteDatoer=${journalpost.relevanteDatoer}",
         )
     }
 }
