@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
-import no.nav.security.token.support.core.api.Unprotected
+import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -10,8 +10,7 @@ import java.time.ZoneOffset
 
 @RestController
 @RequestMapping(path = ["/api/kjoreavstand"])
-// @ProtectedWithClaims(issuer = "azuread")
-@Unprotected
+@ProtectedWithClaims(issuer = "azuread")
 class GooglemapsController(
     private val googleRoutesClient: GoogleRoutesClient,
 ) {
