@@ -30,6 +30,8 @@ class YtelseService(
                 TypeYtelsePeriode.ENSLIG_FORSØRGER,
                 TypeYtelsePeriode.OMSTILLINGSSTØNAD,
                 TypeYtelsePeriode.TILTAKSPENGER,
+                TypeYtelsePeriode.TILTAKSPENGER_TPSAK,
+                TypeYtelsePeriode.TILTAKSPENGER_ARENA,
             )
 
         return ytelseClient
