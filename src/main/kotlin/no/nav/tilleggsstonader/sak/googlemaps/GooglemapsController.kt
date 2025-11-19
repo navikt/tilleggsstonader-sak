@@ -37,21 +37,3 @@ class GooglemapsController(
         ),
     )
 }
-
-data class KalkulerKjoreavstandDto(
-    val fraAdresse: String,
-    val tilAdresse: String,
-)
-
-data class FinnReiseAvstandDto(
-    val fraAdresse: ManuellAdresse,
-    val tilAdresse: ManuellAdresse,
-)
-
-data class ManuellAdresse(
-    val gate: String,
-    val postnummer: String,
-    val poststed: String,
-) {
-    fun tilSøkeString() = "$gate, $postnummer, $poststed"
-}
