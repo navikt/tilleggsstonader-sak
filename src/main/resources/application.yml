@@ -198,6 +198,10 @@ no.nav.security.jwt:
 
 DVH_BEHANDLING_TOPIC: tilleggsstonader.aapen-tilleggsstonader-dvh-behandling
 
+google:
+  api-key: ${GOOGLE_MAPS_API_KEY}
+  uri: https://routes.googleapis.com/directions/v2:computeRoutes
+
 clients:
   integrasjoner:
     uri: http://tilleggsstonader-integrasjoner

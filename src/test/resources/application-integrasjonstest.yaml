@@ -16,3 +16,6 @@ no.nav.security.jwt:
 
 unleash:
   enabled: false
+
+google:
+  api-key: mock-key
