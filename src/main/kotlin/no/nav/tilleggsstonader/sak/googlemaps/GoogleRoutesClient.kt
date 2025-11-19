@@ -18,7 +18,7 @@ class GoogleRoutesClient(
     private val restClient = builder.baseUrl(baseUrl.toString()).build()
     private val uri = UriComponentsBuilder.fromUri(baseUrl).encode().toUriString()
 
-    fun hentRuter(request: RuteRequest): RuteDto =
+    fun hentRuter(request: RuteRequest): RuteDto? =
         restClient
             .post()
             .uri(uri)
@@ -30,5 +30,5 @@ class GoogleRoutesClient(
                 }
             }.bodyWithType(request)
             .retrieve()
-            .body<RuteDto>()!!
+            .body<RuteDto>()
 }
