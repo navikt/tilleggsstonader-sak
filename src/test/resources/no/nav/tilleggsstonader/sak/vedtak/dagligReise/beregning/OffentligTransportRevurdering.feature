@@ -31,7 +31,7 @@ Egenskap: Innvilgelse av daglig reise - revurdering
 
     Når vi kopierer perioder fra forrige daglig reise behandling for behandling=2
 
-    Når vi innvilger daglig reise behandling=2 med tidligsteEndring=2026-01-16 med følgende vedtaksperioder
+    Når vi innvilger daglig reise behandling=2 med tidligsteEndring=2026-01-13 med følgende vedtaksperioder
       | Fom        | Tom        |
       | 01.10.2025 | 15.01.2026 |
       | 16.01.2026 | 28.02.2026 |
@@ -41,8 +41,8 @@ Egenskap: Innvilgelse av daglig reise - revurdering
       | 01.10.2025 | 30.10.2025 | 800   | 1                          | 0                    |
       | 31.10.2025 | 29.11.2025 | 800   | 1                          | 0                    |
       | 30.11.2025 | 29.12.2025 | 800   | 1                          | 0                    |
-      | 30.12.2025 | 29.01.2026 | 800   | 1                          | 0                    |
-      | 30.01.2026 | 28.02.2026 | 800   | 1                          | 0                    |
+      | 30.12.2025 | 28.01.2026 | 800   | 1                          | 0                    |
+      | 29.01.2026 | 27.02.2026 | 800   | 1                          | 0                    |
 
   Scenario: Legger til lengre periode i en revurdering som en vedtaksperiode
 
@@ -63,7 +63,7 @@ Egenskap: Innvilgelse av daglig reise - revurdering
 
     Når vi kopierer perioder fra forrige daglig reise behandling for behandling=2
 
-    Når vi innvilger daglig reise behandling=2 med tidligsteEndring=2026-01-16 med følgende vedtaksperioder
+    Når vi innvilger daglig reise behandling=2 med tidligsteEndring=2025-12-30 med følgende vedtaksperioder
       | Fom        | Tom        |
       | 01.10.2025 | 28.02.2026 |
 
@@ -72,6 +72,6 @@ Egenskap: Innvilgelse av daglig reise - revurdering
       | 01.10.2025 | 30.10.2025 | 800   | 1                          | 0                    |
       | 31.10.2025 | 29.11.2025 | 800   | 1                          | 0                    |
       | 30.11.2025 | 29.12.2025 | 800   | 1                          | 0                    |
-      | 30.12.2025 | 29.01.2026 | 800   | 1                          | 0                    |
-      | 30.01.2026 | 28.02.2026 | 800   | 1                          | 0                    |
+      | 30.12.2025 | 28.01.2026 | 800   | 1                          | 0                    |
+      | 29.01.2026 | 27.02.2026 | 800   | 1                          | 0                    |
 

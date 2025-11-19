@@ -100,15 +100,16 @@ class OffentligTransportBeregningRevurderingStepDefinitions {
     val simuleringServiceMock = mockk<SimuleringService>(relaxed = true)
 
     val offentligtransportService =
-        OffentligTransportBeregningService()
+        OffentligTransportBeregningService(
+            vedtakRepository = vedtakRepositoryFake,
+            utledTidligsteEndringService = utledTidligsteEndringService,
+        )
 
     val beregningService =
         DagligReiseBeregningService(
             vilkårService = vilkårService,
             offentligTransportBeregningService = offentligtransportService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
-            vedtakRepository = vedtakRepositoryFake,
-            utledTidligsteEndringService = utledTidligsteEndringService,
         )
     val opphørValideringService =
         OpphørValideringService(
