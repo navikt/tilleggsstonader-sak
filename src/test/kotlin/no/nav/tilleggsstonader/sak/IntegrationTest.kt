@@ -84,6 +84,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
     "mock-pdl",
     "mock-register-aktivitet",
     "mock-ytelse-client",
+    "mock-google-routes",
 )
 @EnableMockOAuth2Server
 @AutoConfigureWebTestClient
