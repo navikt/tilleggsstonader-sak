@@ -32,6 +32,7 @@ object VilkårDagligReiseDtoMapper {
 
     private fun FaktaOffentligTransport.tilDto() =
         FaktaDagligReiseOffentligTransportDto(
+            reiseId = this.reiseId,
             reisedagerPerUke = reisedagerPerUke,
             prisEnkelbillett = prisEnkelbillett,
             prisSyvdagersbillett = prisSyvdagersbillett,

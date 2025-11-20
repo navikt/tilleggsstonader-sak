@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import java.util.UUID
 
 fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
     dataTable.mapRad { rad ->
@@ -72,6 +73,7 @@ fun mapTilVilkårDagligReise(rad: Map<String, String>): LagreDagligReise =
         svar = oppfylteSvarOffentligtransport,
         fakta =
             FaktaOffentligTransport(
+                reiseId = UUID.randomUUID(),
                 reisedagerPerUke =
                     parseInt(
                         DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE,
@@ -79,7 +81,11 @@ fun mapTilVilkårDagligReise(rad: Map<String, String>): LagreDagligReise =
                     ),
                 prisEnkelbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_ENKELTBILLETT, rad),
                 prisSyvdagersbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_SYV_DAGERS_BILLETT, rad),
-                prisTrettidagersbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT, rad),
+                prisTrettidagersbillett =
+                    parseValgfriInt(
+                        DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT,
+                        rad,
+                    ),
             ),
     )
 

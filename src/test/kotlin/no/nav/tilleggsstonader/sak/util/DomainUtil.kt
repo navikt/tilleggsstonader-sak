@@ -513,11 +513,13 @@ fun totrinnskontroll(
 )
 
 fun faktaOffentligTransport(
+    reiseId: UUID = UUID.randomUUID(),
     reisedagerPerUke: Int = 5,
     prisEnkelbillett: Int? = 40,
     prisSyvdagersbillett: Int? = null,
     prisTrettidagersbillett: Int? = 800,
 ) = FaktaDagligReiseOffentligTransportDto(
+    reiseId = reiseId,
     reisedagerPerUke = reisedagerPerUke,
     prisEnkelbillett = prisEnkelbillett,
     prisSyvdagersbillett = prisSyvdagersbillett,

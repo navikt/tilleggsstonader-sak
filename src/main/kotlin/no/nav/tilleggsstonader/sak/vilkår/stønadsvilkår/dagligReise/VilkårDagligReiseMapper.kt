@@ -51,6 +51,7 @@ object VilkårDagligReiseMapper {
 
     private fun FaktaDagligReiseOffentligTransport.mapTilFakta() =
         FaktaOffentligTransport(
+            reiseId = this.reiseId,
             reisedagerPerUke = this.reisedagerPerUke,
             prisEnkelbillett = this.prisEnkelbillett,
             prisSyvdagersbillett = this.prisSyvdagersbillett,

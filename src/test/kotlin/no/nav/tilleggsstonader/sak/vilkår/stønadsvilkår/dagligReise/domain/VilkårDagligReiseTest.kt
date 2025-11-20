@@ -9,6 +9,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
+import java.util.UUID
 
 class VilkårDagligReiseTest {
     @Test
@@ -54,6 +55,7 @@ class VilkårDagligReiseTest {
     fun `skal kaste feil hvis fakta ikke er null når resulat er ikke oppfylt`() {
         val faktaOffentligTransport =
             FaktaOffentligTransport(
+                reiseId = UUID.randomUUID(),
                 reisedagerPerUke = 4,
                 prisEnkelbillett = 44,
                 prisSyvdagersbillett = 200,

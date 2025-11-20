@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.ant
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
+import java.util.UUID
 
 sealed interface FaktaDagligReise {
     val type: TypeDagligReise
@@ -15,6 +16,7 @@ sealed interface FaktaDagligReise {
 }
 
 data class FaktaOffentligTransport(
+    val reiseId: UUID = UUID.randomUUID(),
     val reisedagerPerUke: Int,
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
@@ -97,6 +99,7 @@ data class FaktaOffentligTransport(
 
     override fun mapTilVilkårFakta() =
         FaktaDagligReiseOffentligTransport(
+            reiseId = reiseId,
             reisedagerPerUke = reisedagerPerUke,
             prisEnkelbillett = prisEnkelbillett,
             prisSyvdagersbillett = prisSyvdagersbillett,

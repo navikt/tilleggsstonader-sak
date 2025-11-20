@@ -106,6 +106,7 @@ class DagligReiseVilkårService(
     private fun FaktaDagligReise.fjern0Verdier(periode: Datoperiode): FaktaDagligReise {
         when (this) {
             is FaktaOffentligTransport -> return FaktaOffentligTransport(
+                reiseId = this.reiseId,
                 reisedagerPerUke = this.reisedagerPerUke,
                 prisEnkelbillett = this.prisEnkelbillett?.takeIf { it > 0 },
                 prisSyvdagersbillett = this.prisSyvdagersbillett?.takeIf { it > 0 },

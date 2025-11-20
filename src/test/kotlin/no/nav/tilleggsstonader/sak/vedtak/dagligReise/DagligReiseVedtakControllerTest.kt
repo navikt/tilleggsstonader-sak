@@ -39,6 +39,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.util.UUID
 
 class DagligReiseVedtakControllerTest : IntegrationTest() {
     @Autowired
@@ -60,6 +61,7 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
         )
     val dummyOffentligTransport =
         FaktaOffentligTransport(
+            reiseId = UUID.randomUUID(),
             reisedagerPerUke = 4,
             prisEnkelbillett = 44,
             prisSyvdagersbillett = null,

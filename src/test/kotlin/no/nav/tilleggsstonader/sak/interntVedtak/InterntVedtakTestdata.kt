@@ -749,6 +749,7 @@ object InterntVedtakTestdata {
                     utgift = null,
                     fakta =
                         FaktaDagligReiseOffentligTransport(
+                            reiseId = UUID.randomUUID(),
                             reisedagerPerUke = 5,
                             prisEnkelbillett = 44,
                             prisSyvdagersbillett = null,

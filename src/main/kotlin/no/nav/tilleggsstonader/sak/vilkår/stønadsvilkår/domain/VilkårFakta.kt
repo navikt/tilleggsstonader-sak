@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagData
+import java.util.UUID
 
 /**
  * [FaktaGrunnlagDataJson] definierer alle suklasser av [FaktaGrunnlagData]
@@ -23,6 +24,7 @@ sealed interface VilkårFakta {
 }
 
 data class FaktaDagligReiseOffentligTransport(
+    val reiseId: UUID,
     val reisedagerPerUke: Int,
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
