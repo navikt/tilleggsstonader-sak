@@ -37,3 +37,33 @@ class GooglemapsController(
         ),
     )
 }
+
+@RestController
+@RequestMapping(path = ["/api/kjoreavstand-v2"])
+@ProtectedWithClaims(issuer = "azuread")
+class GooglemapsControllerV2(
+    private val googleRoutesClient: GoogleRoutesClient,
+) {
+    @PostMapping()
+    fun hentKjoreavstand(
+        @RequestBody finnReiseAvstandDto: FinnReiseAvstandDto,
+    ) = googleRoutesClient.hentRuterV2(
+        RuteRequest(
+            origin = Address(finnReiseAvstandDto.fraAdresse.tilSøkeString()),
+            destination = Address(finnReiseAvstandDto.tilAdresse.tilSøkeString()),
+            travelMode = "TRANSIT",
+            departureTime = OffsetDateTime.now(ZoneOffset.UTC).toString(),
+            transitPreferences =
+                TransitPreferences(
+                    allowedTravelModes =
+                        listOf(
+                            TransitOption.TRAIN.value,
+                            TransitOption.SUBWAY.value,
+                            TransitOption.BUS.value,
+                            TransitOption.LIGHT_RAIL.value,
+                            TransitOption.RAIL.value,
+                        ),
+                ),
+        ),
+    )
+}
