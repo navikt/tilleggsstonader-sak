@@ -96,9 +96,6 @@ abstract class IntegrationTest {
     private lateinit var mockOAuth2Server: MockOAuth2Server
 
     @Autowired
-    private lateinit var jdbcAggregateOperations: JdbcAggregateOperations
-
-    @Autowired
     protected lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
@@ -143,50 +140,9 @@ abstract class IntegrationTest {
 
     @AfterEach
     fun tearDown() {
-        resetDatabase()
         clearCaches()
         mockClientService.resetAlleTilDefaults()
         resetMock(unleashService)
-    }
-
-    private fun resetDatabase() {
-        listOf(
-            FagsakUtbetalingId::class,
-            Hendelse::class,
-            TaskLogg::class,
-            Task::class,
-            SkjemaRouting::class,
-            BrevmottakerFrittståendeBrev::class,
-            FrittståendeBrev::class,
-            Oppfølging::class,
-            FaktaGrunnlag::class,
-            Vedtak::class,
-            Simuleringsresultat::class,
-            TilkjentYtelse::class,
-            Vilkårperiode::class,
-            Vilkår::class,
-            BehandlingBarn::class,
-            SøknadBehandling::class,
-            SøknadBarnetilsyn::class,
-            SettPåVent::class,
-            OppgaveDomain::class,
-            Totrinnskontroll::class,
-            Vedtaksbrev::class,
-            BrevmottakerVedtaksbrev::class,
-            MellomlagretFrittståendeBrev::class,
-            MellomlagretBrev::class,
-            VilkårperioderGrunnlagDomain::class,
-            Behandlingshistorikk::class,
-            Behandlingsjournalpost::class,
-            EksternBehandlingId::class,
-            TilbakekrevingHendelse::class,
-            Behandling::class,
-            EksternFagsakId::class,
-            FagsakDomain::class,
-            PersonIdent::class,
-            FagsakPerson::class,
-            IverksettingLogg::class,
-        ).forEach { jdbcAggregateOperations.deleteAll(it.java) }
     }
 
     private fun clearCaches() {

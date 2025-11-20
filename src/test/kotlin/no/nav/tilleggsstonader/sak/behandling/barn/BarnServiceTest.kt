@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.barn
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 
-class BarnServiceTest : IntegrationTest() {
+class BarnServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var barnService: BarnService
 

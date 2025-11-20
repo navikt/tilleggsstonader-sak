@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.historikk
 
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 
-internal class BehandlingshistorikkServiceTest : IntegrationTest() {
+internal class BehandlingshistorikkServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var behandlingshistorikkService: BehandlingshistorikkService
 

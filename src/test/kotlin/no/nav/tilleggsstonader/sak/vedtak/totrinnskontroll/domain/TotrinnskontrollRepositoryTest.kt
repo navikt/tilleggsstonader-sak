@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class TotrinnskontrollRepositoryTest : IntegrationTest() {
+class TotrinnskontrollRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var totrinnskontrollRepository: TotrinnskontrollRepository
 

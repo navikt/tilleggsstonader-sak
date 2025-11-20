@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status
 
 import no.nav.tilleggsstonader.libs.utils.dato.januar
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 class UtbetalingStatusHåndtererIntegrationTest(
     @Autowired private val tilkjentYtelseRepository: TilkjentYtelseRepository,
     @Autowired private val utbetalingStatusHåndterer: UtbetalingStatusHåndterer,
-) : IntegrationTest() {
+) : CleanDatabaseIntegrationTest() {
     @ParameterizedTest(name = "status {0} fra Helved oppdaterer andeler med IverksettingStatus {0}")
     @CsvSource(
         "MOTTATT, MOTTATT",

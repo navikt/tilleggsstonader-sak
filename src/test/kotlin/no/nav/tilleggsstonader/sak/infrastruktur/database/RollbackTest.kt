@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database
 
 import no.nav.familie.prosessering.domene.Task
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -17,7 +17,7 @@ import kotlin.reflect.full.findAnnotation
  * @EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
  * Hvis ikke rulles kun unchecked exceptions tilbake.
  */
-class RollbackTest : IntegrationTest() {
+class RollbackTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var transactionHandler: TransactionHandler
 

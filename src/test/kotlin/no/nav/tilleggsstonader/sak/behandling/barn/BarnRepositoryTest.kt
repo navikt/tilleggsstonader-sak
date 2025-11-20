@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.barn
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
 
-class BarnRepositoryTest : IntegrationTest() {
+class BarnRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var barnRepository: BarnRepository
 

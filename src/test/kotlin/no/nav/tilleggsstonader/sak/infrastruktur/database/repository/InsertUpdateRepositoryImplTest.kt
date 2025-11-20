@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database.repository
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonRepository
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
 
-class InsertUpdateRepositoryImplTest : IntegrationTest() {
+class InsertUpdateRepositoryImplTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var fagsakPersonRepository: FagsakPersonRepository
 

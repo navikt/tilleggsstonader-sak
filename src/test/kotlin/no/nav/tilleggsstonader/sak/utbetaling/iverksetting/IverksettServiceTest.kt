@@ -8,7 +8,7 @@ import io.mockk.verify
 import no.nav.familie.prosessering.domene.Status
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -39,7 +39,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
 
-class IverksettServiceTest : IntegrationTest() {
+class IverksettServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var iverksettService: IverksettService
 

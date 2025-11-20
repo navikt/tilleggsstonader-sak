@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mai
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -35,9 +36,11 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeR
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatNoException
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.core.KafkaTemplate
 import java.math.BigDecimal
@@ -46,6 +49,7 @@ import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 import kotlin.random.Random
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
     @Autowired
     private lateinit var tilbakekrevinghendelseService: TilbakekrevinghendelseService
@@ -77,7 +81,7 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
 
     val publiserteHendelser = mutableListOf<ProducerRecord<String, String>>()
 
-    @BeforeEach
+    @BeforeAll
     fun setUp() {
         val forrigeBehandling =
             testoppsettService.opprettBehandlingMedFagsak(

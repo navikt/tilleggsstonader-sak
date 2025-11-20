@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import org.assertj.core.api.Assertions.assertThat
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
-class AdvisoryLockServiceTest : IntegrationTest() {
+class AdvisoryLockServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var advisoryLockService: AdvisoryLockService
 
