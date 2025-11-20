@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 /**
@@ -22,7 +23,7 @@ data class MakssatsBoutgifter(
 
 private val MAX = LocalDate.of(2099, 12, 31)
 
-private val bekreftedeSatser =
+val bekreftedeSatser =
     listOf(
         MakssatsBoutgifter(
             fom = LocalDate.of(2025, 1, 1),
@@ -66,6 +67,29 @@ private val satser: List<MakssatsBoutgifter> =
             )
         },
     ) + bekreftedeSatser
+
+// TODO can den over bare wrappes med en provider?
+@Component
+class SatsBoutgifterProvider {
+    val satser: List<MakssatsBoutgifter>
+        get() =
+            listOf(
+                bekreftedeSatser.first().let {
+                    it.copy(
+                        fom = it.tom.plusDays(1),
+                        tom = MAX,
+                        bekreftet = false,
+                    )
+                },
+            ) + bekreftedeSatser
+}
+
+@Component
+class SatsBoutgifterService(
+    private val satsBoutgifterProvider: SatsBoutgifterProvider,
+) {
+    fun alleSatser() = satsBoutgifterProvider.satser
+}
 
 fun finnMakssats(dato: LocalDate): MakssatsBoutgifter =
     satser.find { makssats ->

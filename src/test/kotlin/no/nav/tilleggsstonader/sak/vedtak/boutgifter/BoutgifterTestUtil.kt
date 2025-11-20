@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -74,6 +75,20 @@ object BoutgifterTestUtil {
         tom = tom,
         målgruppe = målgruppe,
         aktivitet = aktivitet,
+    )
+
+    fun vedtaksperiodeDto(
+        id: UUID = UUID.randomUUID(),
+        fom: LocalDate = LocalDate.of(2025, 1, 1),
+        tom: LocalDate = LocalDate.of(2025, 1, 31),
+        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+        aktivitet: AktivitetType = AktivitetType.TILTAK,
+    ) = VedtaksperiodeDto(
+        id = id,
+        fom = fom,
+        tom = tom,
+        målgruppeType = målgruppe,
+        aktivitetType = aktivitet,
     )
 
     fun beregningsresultat(
