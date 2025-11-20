@@ -126,7 +126,7 @@ fun IntegrationTest.gjennomførHenleggelse(fraJournalpost: Journalpost = default
 }
 
 private fun IntegrationTest.gjennomførBeslutteVedtakSteg(behandlingId: BehandlingId) {
-    medBrukercontext(bruker = "nissemor", rolle = rolleConfig.beslutterRolle) {
+    medBrukercontext(bruker = "nissemor", roller = listOf(rolleConfig.beslutterRolle)) {
         kall.totrinnskontroll.beslutteVedtak(behandlingId, BeslutteVedtakDto(godkjent = true))
     }
     kjørTasksKlareForProsessering()

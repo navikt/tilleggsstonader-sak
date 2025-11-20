@@ -40,7 +40,7 @@ object TokenUtil {
      */
     fun onBehalfOfToken(
         mockOAuth2Server: MockOAuth2Server,
-        role: String,
+        roles: List<String>,
         saksbehandler: String,
     ): String {
         val clientId = UUID.randomUUID().toString()
@@ -52,7 +52,7 @@ object TokenUtil {
                 "azp" to clientId,
                 "name" to saksbehandler,
                 "NAVident" to saksbehandler,
-                "groups" to listOf(role),
+                "groups" to roles,
             )
 
         return mockOAuth2Server
