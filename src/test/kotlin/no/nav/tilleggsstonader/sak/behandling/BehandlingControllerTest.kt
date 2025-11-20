@@ -122,7 +122,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
 
         @Test
         fun `behandlingStatus=OPPRETTET og veileder skal ikke hentes då det opprettes grunnlag`() {
-            medBrukercontext(rolle = rolleConfig.veilederRolle) {
+            medBrukercontext(roller = listOf(rolleConfig.veilederRolle)) {
                 kall.behandling
                     .apiRespons
                     .hent(behandling.id)
@@ -135,7 +135,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
         @Test
         fun `behandlingStatus=UTREDES og veilder skal kunne hente behandlingen hvis statusen er annet enn UTREDES`() {
             testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.UTREDES))
-            medBrukercontext(rolle = rolleConfig.veilederRolle) {
+            medBrukercontext(roller = listOf(rolleConfig.veilederRolle)) {
                 kall.behandling.hent(behandling.id)
             }
         }

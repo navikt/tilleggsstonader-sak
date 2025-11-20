@@ -97,7 +97,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         @Test
         fun `må ha saksbehandlerrolle for å kunne oppdatere grunnlag`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            medBrukercontext(rolle = rolleConfig.veilederRolle) {
+            medBrukercontext(roller = listOf(rolleConfig.veilederRolle)) {
                 kall.vilkårperiode.apiRespons
                     .oppdaterGrunnlag(behandling.id)
                     .expectProblemDetail(HttpStatus.FORBIDDEN, "Mangler nødvendig saksbehandlerrolle for å utføre handlingen")
