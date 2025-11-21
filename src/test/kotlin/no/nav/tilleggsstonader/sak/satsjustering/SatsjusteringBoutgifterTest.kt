@@ -70,7 +70,7 @@ class SatsjusteringBoutgifterTest : IntegrationTest() {
         mockSatser()
 
         val behandlingerForSatsjustering =
-            medBrukercontext(rolle = rolleConfig.utvikler) {
+            medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
                 kall.satsjustering.satsjustering(Stønadstype.BOUTGIFTER)
             }
 
@@ -94,7 +94,7 @@ class SatsjusteringBoutgifterTest : IntegrationTest() {
         testoppsettService.ferdigstillBehandling(behandling)
 
         val behandlingerTilSatsjustering =
-            medBrukercontext(rolle = rolleConfig.utvikler) {
+            medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
                 kall.satsjustering.satsjustering(Stønadstype.BOUTGIFTER)
             }
 
@@ -103,7 +103,7 @@ class SatsjusteringBoutgifterTest : IntegrationTest() {
 
     @Test
     fun `kaller satsjustering-endepunkt uten utvikler-rolle, kaster feil`() {
-        medBrukercontext(rolle = rolleConfig.beslutterRolle) {
+        medBrukercontext(roller = listOf(rolleConfig.beslutterRolle)) {
             kall.satsjustering.apiRespons
                 .satsjustering(Stønadstype.BOUTGIFTER)
                 .expectStatus()
