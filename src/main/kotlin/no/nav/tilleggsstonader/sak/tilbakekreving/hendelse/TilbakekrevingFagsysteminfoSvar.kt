@@ -11,6 +11,7 @@ data class TilbakekrevingFagsysteminfoSvar(
     val mottaker: TilbakekrevingMottaker,
     val revurdering: TilbakekrevingFagsysteminfoSvarRevurdering,
     val utvidPerioder: List<UtvidetPeriode>,
+    val behandlendeEnhet: String?,
 ) : TilbakekrevinghendelseRecord {
     override val hendelsestype: String = TILBAKEKREVING_TYPE_FAGSYSTEMINFO_SVAR
     override val versjon: Int = 1
