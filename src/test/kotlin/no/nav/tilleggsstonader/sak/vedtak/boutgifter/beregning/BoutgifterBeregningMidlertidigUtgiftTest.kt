@@ -40,12 +40,18 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
             vilkårperiodeService = vilkårperiodeService,
         )
 
+    val satsBoutgifterService =
+        SatsBoutgifterService(
+            satsBoutgifterProvider = SatsBoutgifterProvider(),
+        )
+
     val boutgifterBeregningService =
         BoutgifterBeregningService(
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepository,
             unleashService = unleashService,
+            satsBoutgifterService = satsBoutgifterService,
         )
 
     val utgiftMidlertidigOvernatting: BoutgifterPerUtgiftstype =

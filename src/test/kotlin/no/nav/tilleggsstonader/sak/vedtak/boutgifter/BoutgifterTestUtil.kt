@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.default
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.finnMakssats
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.satser
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -15,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -76,6 +78,20 @@ object BoutgifterTestUtil {
         aktivitet = aktivitet,
     )
 
+    fun vedtaksperiodeDto(
+        id: UUID = UUID.randomUUID(),
+        fom: LocalDate = LocalDate.of(2025, 1, 1),
+        tom: LocalDate = LocalDate.of(2025, 1, 31),
+        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+        aktivitet: AktivitetType = AktivitetType.TILTAK,
+    ) = VedtaksperiodeDto(
+        id = id,
+        fom = fom,
+        tom = tom,
+        målgruppeType = målgruppe,
+        aktivitetType = aktivitet,
+    )
+
     fun beregningsresultat(
         fom: LocalDate = LocalDate.of(2025, JANUARY, 1),
         tom: LocalDate = fom,
@@ -124,7 +140,7 @@ object BoutgifterTestUtil {
                 fom = fom,
                 tom = tom,
                 utgifter = utgifter,
-                makssats = finnMakssats(fom).beløp,
+                makssats = satser.finnMakssats(fom).beløp,
                 makssatsBekreftet = true,
                 målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 aktivitet = AktivitetType.TILTAK,
