@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.søknadBarnetilsyn
@@ -9,7 +9,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class SøknadMetadataRepositoryTest : IntegrationTest() {
+class SøknadMetadataRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var søknadBehandlingRepository: SøknadBehandlingRepository
 

@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.oppsummering
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.util.UUID
 
-class BehandlingOppsummeringServiceTest : IntegrationTest() {
+class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var behandlingOppsummeringService: BehandlingOppsummeringService
 

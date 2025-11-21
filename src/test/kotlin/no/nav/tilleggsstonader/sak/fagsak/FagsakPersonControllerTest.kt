@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.fagsak
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 
-internal class FagsakPersonControllerTest : IntegrationTest() {
+internal class FagsakPersonControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var fagsakPersonController: FagsakPersonController
 

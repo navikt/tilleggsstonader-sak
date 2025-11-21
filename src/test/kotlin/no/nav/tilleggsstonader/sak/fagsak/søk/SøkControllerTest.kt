@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.fagsak.søk
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusHarSakerDto
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
-internal class SøkControllerTest : IntegrationTest() {
+internal class SøkControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var arenaClient: ArenaClient
 

@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.fagsak.domain
 
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Endret
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.assertj.core.api.Assertions.assertThat
@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import java.time.LocalDateTime
 
-internal class FagsakPersonRepositoryTest : IntegrationTest() {
+internal class FagsakPersonRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var fagsakPersonRepository: FagsakPersonRepository
 

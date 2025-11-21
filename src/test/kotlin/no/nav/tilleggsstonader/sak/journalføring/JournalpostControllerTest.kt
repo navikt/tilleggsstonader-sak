@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.klage.OpprettKlagebehandlingRequest
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -41,7 +41,7 @@ class JournalpostControllerTest(
     @Autowired val journalpostClient: JournalpostClient,
     @Autowired val oppgaveClient: OppgaveClient,
     @Autowired val ytelseClient: YtelseClient,
-) : IntegrationTest() {
+) : CleanDatabaseIntegrationTest() {
     val ident = "12345678910"
     val saksbehandler = "ole"
     val enhet = "enhet"

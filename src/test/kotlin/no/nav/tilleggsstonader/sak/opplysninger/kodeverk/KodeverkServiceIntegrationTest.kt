@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.opplysninger.kodeverk
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class KodeverkServiceIntegrationTest : IntegrationTest() {
+class KodeverkServiceIntegrationTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var kodeverkService: KodeverkService
 

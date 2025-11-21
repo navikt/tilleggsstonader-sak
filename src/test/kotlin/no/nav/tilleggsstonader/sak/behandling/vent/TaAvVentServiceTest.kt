@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -30,7 +30,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Optional
 
-class TaAvVentServiceTest : IntegrationTest() {
+class TaAvVentServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var settPåVentService: SettPåVentService
 

@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.EnumUtil.enumName
@@ -23,7 +23,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 
-class VedtakRepositoryJsonTest : IntegrationTest() {
+class VedtakRepositoryJsonTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var repository: VedtakRepository
 

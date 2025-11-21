@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.AVSLÅTT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.IKKE_SATT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.INNVILGET
@@ -36,7 +36,7 @@ import org.springframework.data.relational.core.conversion.DbActionExecutionExce
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class BehandlingRepositoryTest : IntegrationTest() {
+class BehandlingRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
 
@@ -74,35 +74,41 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class FinnSaksbehandling {
-        val fagsak =
-            testoppsettService
-                .lagreFagsak(
-                    fagsak(
-                        setOf(
-                            PersonIdent(ident = "1"),
-                            PersonIdent(
-                                ident = "2",
-                                sporbar = Sporbar(endret = Endret(endretTid = LocalDateTime.now().plusDays(2))),
+        lateinit var fagsak: Fagsak
+        lateinit var behandling: Behandling
+
+        @BeforeEach
+        fun opprettBehandling() {
+            fagsak =
+                testoppsettService
+                    .lagreFagsak(
+                        fagsak(
+                            setOf(
+                                PersonIdent(ident = "1"),
+                                PersonIdent(
+                                    ident = "2",
+                                    sporbar = Sporbar(endret = Endret(endretTid = LocalDateTime.now().plusDays(2))),
+                                ),
+                                PersonIdent(ident = "3"),
                             ),
-                            PersonIdent(ident = "3"),
                         ),
+                    )
+            behandling =
+                testoppsettService.lagre(
+                    behandling(
+                        fagsak,
+                        status = OPPRETTET,
+                        resultat = INNVILGET,
+                        type = BehandlingType.REVURDERING,
+                        årsak = BehandlingÅrsak.SØKNAD,
+                        henlagtÅrsak = HenlagtÅrsak.FEILREGISTRERT,
+                        henlagtBegrunnelse = "Registrert feil",
+                        vedtakstidspunkt = SporbarUtils.now(),
+                        kravMottatt = LocalDate.now(),
+                        nyeOpplysningerMetadata = nyeOpplysningerMetadata(),
                     ),
                 )
-        val behandling =
-            testoppsettService.lagre(
-                behandling(
-                    fagsak,
-                    status = OPPRETTET,
-                    resultat = INNVILGET,
-                    type = BehandlingType.REVURDERING,
-                    årsak = BehandlingÅrsak.SØKNAD,
-                    henlagtÅrsak = HenlagtÅrsak.FEILREGISTRERT,
-                    henlagtBegrunnelse = "Registrert feil",
-                    vedtakstidspunkt = SporbarUtils.now(),
-                    kravMottatt = LocalDate.now(),
-                    nyeOpplysningerMetadata = nyeOpplysningerMetadata(),
-                ),
-            )
+        }
 
         @Test
         fun `finnSaksbehandling returnerer korrekt konstruert saksbehandling`() {

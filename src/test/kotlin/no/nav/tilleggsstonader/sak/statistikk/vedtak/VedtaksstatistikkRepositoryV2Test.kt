@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDvh
@@ -25,7 +25,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
 
-class VedtaksstatistikkRepositoryV2Test : IntegrationTest() {
+class VedtaksstatistikkRepositoryV2Test : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var vedtakstatistikkRepository: VedtaksstatistikkRepositoryV2
 

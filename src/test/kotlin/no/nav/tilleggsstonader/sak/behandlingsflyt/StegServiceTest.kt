@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -41,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.util.UUID
 
-class StegServiceTest : IntegrationTest() {
+class StegServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var stegService: StegService
 

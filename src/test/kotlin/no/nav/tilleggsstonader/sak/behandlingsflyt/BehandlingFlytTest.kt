@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.log.IdUtils
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.OpprettTestBehandlingController
 import no.nav.tilleggsstonader.sak.behandling.TestBehandlingRequest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -55,7 +55,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.util.UUID
 
-class BehandlingFlytTest : IntegrationTest() {
+class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var barnService: BarnService
 

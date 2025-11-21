@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -22,7 +22,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.collections.mapOf
 
-class TestControllerTest : IntegrationTest() {
+class TestControllerTest : CleanDatabaseIntegrationTest() {
     val json = """{"tekst":"abc","dato":"2023-01-01","tidspunkt":"2023-01-01T12:00:03"}"""
 
     @Test

@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import io.mockk.every
 import no.nav.familie.prosessering.error.TaskExceptionUtenStackTrace
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -24,7 +24,7 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 
-class IverksettStatusServiceTest : IntegrationTest() {
+class IverksettStatusServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var iverksettClient: IverksettClient
 

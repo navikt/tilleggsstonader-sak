@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.brev.vedtaksbrev
 
 import no.nav.familie.prosessering.domene.Task
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
@@ -13,7 +13,7 @@ import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class DistribuerVedtaksbrevTaskIntegrationTest : IntegrationTest() {
+class DistribuerVedtaksbrevTaskIntegrationTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var brevmottakerVedtaksbrevRepository: BrevmottakerVedtaksbrevRepository
 

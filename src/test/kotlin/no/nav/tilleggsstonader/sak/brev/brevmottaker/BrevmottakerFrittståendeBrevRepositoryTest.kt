@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerFrittståendeBrev
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerRolle
@@ -20,7 +20,7 @@ import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.repository.findByIdOrNull
 import java.time.temporal.ChronoUnit
 
-class BrevmottakerFrittståendeBrevRepositoryTest : IntegrationTest() {
+class BrevmottakerFrittståendeBrevRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var repository: BrevmottakerFrittståendeBrevRepository
 

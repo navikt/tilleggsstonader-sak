@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.integrasjonstest.defaultJournalpost
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.finnAlleTaskerMedType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class HåndterSøknadIntegrationTest : IntegrationTest() {
+class HåndterSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
     @Test
     internal fun `skal kunne automatisk journalføre hvis det ikke finnes eksisterende sak på person`() {
         val opprettetBehandling = håndterSøknadService.håndterSøknad(defaultJournalpost)

@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GeneriskFaktaGrunnlagTestUtil
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.TypeFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -10,7 +10,7 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
 
-class FaktaGrunnlagRepositoryTest : IntegrationTest() {
+class FaktaGrunnlagRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var faktaGrunnlagRepository: FaktaGrunnlagRepository
 

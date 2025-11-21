@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.finnPåTopic
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
 
-class UtbetalingDagligReiseIntegrationTest : IntegrationTest() {
+class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
     val utbetalingTopic = "tilleggsstonader.utbetaling.v1"
 
     @Test

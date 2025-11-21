@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.arena.SakStatus
 import no.nav.tilleggsstonader.kontrakter.felles.IdentSkjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
@@ -35,7 +35,7 @@ class SkjemaRoutingIntegrationTest(
     @Autowired private val ytelseClient: YtelseClient,
     @Autowired private val arenaClient: ArenaClient,
     @Autowired private val pdlClient: PdlClient,
-) : IntegrationTest() {
+) : CleanDatabaseIntegrationTest() {
     val jonasIdent = "12345678910"
     val ernaIdent = "10987654321"
 

@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -59,7 +59,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
 
-class TilsynBarnBeregnYtelseStegIntegrationTest : IntegrationTest() {
+class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var steg: TilsynBarnBeregnYtelseSteg
 

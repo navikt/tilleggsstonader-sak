@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.historikk
 
 import no.nav.security.mock.oauth2.http.objectMapper
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 
-internal class BehandlingshistorikkControllerTest : IntegrationTest() {
+internal class BehandlingshistorikkControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
 

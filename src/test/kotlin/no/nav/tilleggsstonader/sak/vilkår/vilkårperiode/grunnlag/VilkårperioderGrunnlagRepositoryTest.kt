@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 import no.nav.tilleggsstonader.kontrakter.aktivitet.Kilde
 import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagTestUtil.periodeGrunnlagAktivitet
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-internal class VilkårperioderGrunnlagRepositoryTest : IntegrationTest() {
+internal class VilkårperioderGrunnlagRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository
 
