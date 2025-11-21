@@ -3,7 +3,9 @@ package no.nav.tilleggsstonader.sak.satsjustering
 import io.mockk.clearMocks
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.libs.utils.dato.august
+import no.nav.tilleggsstonader.libs.utils.dato.juni
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -33,7 +35,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
-class SatsjusteringBoutgifterTest : IntegrationTest() {
+class SatsjusteringBoutgifterTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var faktaGrunnlagService: FaktaGrunnlagService
 
@@ -55,8 +57,8 @@ class SatsjusteringBoutgifterTest : IntegrationTest() {
     lateinit var boutgifterBeregnYtelseSteg: BoutgifterBeregnYtelseSteg
 
     val sisteBekreftedeSatsÅr = bekreftedeSatser.maxOf { it.fom.year }
-    val fom = LocalDate.of(sisteBekreftedeSatsÅr, 8, 1)
-    val tom = LocalDate.of(sisteBekreftedeSatsÅr + 1, 6, 30)
+    val fom = 1.august(sisteBekreftedeSatsÅr)
+    val tom = 30.juni(sisteBekreftedeSatsÅr + 1)
 
     @AfterEach
     fun resetMock() {
@@ -70,7 +72,7 @@ class SatsjusteringBoutgifterTest : IntegrationTest() {
         mockSatser()
 
         val behandlingerForSatsjustering =
-            medBrukercontext(rolle = rolleConfig.utvikler) {
+            medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
                 kall.satsjustering.satsjustering(Stønadstype.BOUTGIFTER)
             }
 
@@ -94,7 +96,7 @@ class SatsjusteringBoutgifterTest : IntegrationTest() {
         testoppsettService.ferdigstillBehandling(behandling)
 
         val behandlingerTilSatsjustering =
-            medBrukercontext(rolle = rolleConfig.utvikler) {
+            medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
                 kall.satsjustering.satsjustering(Stønadstype.BOUTGIFTER)
             }
 
@@ -103,7 +105,7 @@ class SatsjusteringBoutgifterTest : IntegrationTest() {
 
     @Test
     fun `kaller satsjustering-endepunkt uten utvikler-rolle, kaster feil`() {
-        medBrukercontext(rolle = rolleConfig.beslutterRolle) {
+        medBrukercontext(roller = listOf(rolleConfig.beslutterRolle)) {
             kall.satsjustering.apiRespons
                 .satsjustering(Stønadstype.BOUTGIFTER)
                 .expectStatus()
