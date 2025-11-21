@@ -57,7 +57,7 @@ val bekreftedeSatser =
         ),
     )
 
-private val satser: List<MakssatsBoutgifter> =
+val satser: List<MakssatsBoutgifter> =
     listOf(
         bekreftedeSatser.max().let {
             it.copy(
@@ -68,30 +68,22 @@ private val satser: List<MakssatsBoutgifter> =
         },
     ) + bekreftedeSatser
 
-// TODO can den over bare wrappes med en provider?
 @Component
 class SatsBoutgifterProvider {
-    val satser: List<MakssatsBoutgifter>
-        get() =
-            listOf(
-                bekreftedeSatser.first().let {
-                    it.copy(
-                        fom = it.tom.plusDays(1),
-                        tom = MAX,
-                        bekreftet = false,
-                    )
-                },
-            ) + bekreftedeSatser
+    val alleSatser: List<MakssatsBoutgifter>
+        get() = satser
 }
 
 @Component
 class SatsBoutgifterService(
     private val satsBoutgifterProvider: SatsBoutgifterProvider,
 ) {
-    fun alleSatser() = satsBoutgifterProvider.satser
+    fun alleSatser() = satsBoutgifterProvider.alleSatser
+
+    fun finnMakssats(dato: LocalDate): MakssatsBoutgifter = satsBoutgifterProvider.alleSatser.finnMakssats(dato)
 }
 
-fun finnMakssats(dato: LocalDate): MakssatsBoutgifter =
-    satser.find { makssats ->
+fun List<MakssatsBoutgifter>.finnMakssats(dato: LocalDate): MakssatsBoutgifter =
+    find { makssats ->
         dato >= makssats.fom && dato <= makssats.tom
     } ?: error("Finner ikke makssats for $dato")

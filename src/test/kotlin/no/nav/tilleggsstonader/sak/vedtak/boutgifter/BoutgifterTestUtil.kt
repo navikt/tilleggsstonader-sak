@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.default
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.finnMakssats
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.satser
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -139,7 +140,7 @@ object BoutgifterTestUtil {
                 fom = fom,
                 tom = tom,
                 utgifter = utgifter,
-                makssats = finnMakssats(fom).beløp,
+                makssats = satser.finnMakssats(fom).beløp,
                 makssatsBekreftet = true,
                 målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 aktivitet = AktivitetType.TILTAK,

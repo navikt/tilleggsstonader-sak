@@ -38,6 +38,7 @@ class BoutgifterBeregningService(
     private val boutgifterUtgiftService: BoutgifterUtgiftService,
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val vedtakRepository: VedtakRepository,
+    private val satsBoutgifterService: SatsBoutgifterService,
     private val unleashService: UnleashService,
 ) {
     /**
@@ -115,7 +116,7 @@ class BoutgifterBeregningService(
             .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
             .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(utgifter)
             .validerIngenLøpendeOgMidlertidigUtgiftISammeUtbetalingsperiode(utgifter)
-            .map { lagBeregningsgrunnlag(periode = it, utgifter = utgifter) }
+            .map { lagBeregningsgrunnlag(periode = it, utgifter = utgifter, makssats = satsBoutgifterService.finnMakssats(it.fom)) }
             .validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter()
             .map {
                 BeregningsresultatForLøpendeMåned(

@@ -106,7 +106,7 @@ class SatsjusteringBoutgifterTest : IntegrationTest() {
     fun `kaller satsjustering-endepunkt uten utvikler-rolle, kaster feil`() {
         medBrukercontext(rolle = rolleConfig.beslutterRolle) {
             kall.satsjustering.apiRespons
-                .satsjustering(Stønadstype.LÆREMIDLER)
+                .satsjustering(Stønadstype.BOUTGIFTER)
                 .expectStatus()
                 .isForbidden
         }
@@ -114,7 +114,7 @@ class SatsjusteringBoutgifterTest : IntegrationTest() {
 
     private fun mockSatser() {
         val nyMakssats = 10_000
-        val ubekreftetSats = satsBoutgifterProvider.satser.first { !it.bekreftet }
+        val ubekreftetSats = satsBoutgifterProvider.alleSatser.first { !it.bekreftet }
         val nyBekreftetSats =
             ubekreftetSats.copy(
                 tom =
@@ -132,7 +132,7 @@ class SatsjusteringBoutgifterTest : IntegrationTest() {
             )
 
         every {
-            satsBoutgifterProvider.satser
+            satsBoutgifterProvider.alleSatser
         } returns bekreftedeSatser + nyBekreftetSats + nyUbekreftetSats
     }
 
