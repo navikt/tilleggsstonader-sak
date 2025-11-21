@@ -15,7 +15,7 @@ data class Leg(
 )
 
 data class Step(
-    val travelMode: String,
+    val travelMode: Reisetype,
     val startLocation: Location,
     val endLocation: Location,
     val transitDetails: TransitDetails?,
@@ -55,5 +55,35 @@ data class TransitLine(
 )
 
 data class Vehicle(
-    val type: String,
+    val type: LinjeType,
 )
+
+enum class LinjeType {
+    BUS,
+    CABLE_CAR,
+    COMMUTER_TRAIN,
+    FERRY,
+    FUNICULAR,
+    GONDOLA_LIFT,
+    HEAVY_RAIL,
+    HIGH_SPEED_TRAIN,
+    INTERCITY_BUS,
+    LONG_DISTANCE_TRAIN,
+    METRO_RAIL,
+    MONORAIL,
+    OTHER,
+    RAIL,
+    SHARE_TAXI,
+    SUBWAY,
+    TRAM,
+    TROLLEYBUS,
+}
+
+enum class Reisetype {
+    TRAVEL_MODE_UNSPECIFIED,
+    DRIVE,
+    BICYCLE,
+    WALK,
+    TWO_WHEELER,
+    TRANSIT,
+}

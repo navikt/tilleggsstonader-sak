@@ -1,4 +1,6 @@
 import no.nav.tilleggsstonader.sak.googlemaps.Leg
+import no.nav.tilleggsstonader.sak.googlemaps.LinjeType
+import no.nav.tilleggsstonader.sak.googlemaps.Reisetype
 import no.nav.tilleggsstonader.sak.googlemaps.Route
 import no.nav.tilleggsstonader.sak.googlemaps.RuteResponse
 import no.nav.tilleggsstonader.sak.googlemaps.Step
@@ -16,7 +18,7 @@ data class RuteDto(
 
 data class StrekningDto(
     val varighetSekunder: Double,
-    val framkomstmiddel: String, // TODO enum
+    val reisetype: Reisetype,
     val kollektivDetaljer: KollektivDetaljerDto?,
 )
 
@@ -24,7 +26,7 @@ data class KollektivDetaljerDto(
     val startHoldeplass: String,
     val sluttHoldeplass: String,
     val linjeNavn: String,
-    val linjeType: String, // TODO enum
+    val linjeType: LinjeType,
 )
 
 fun RuteResponse.tilDto(): ReisedataDto =
@@ -44,7 +46,7 @@ private fun List<Leg>.tilDto(): List<StrekningDto> {
     return steps.map {
         StrekningDto(
             varighetSekunder = it.staticDuration.tilDouble(),
-            framkomstmiddel = it.travelMode,
+            reisetype = it.travelMode,
             kollektivDetaljer = it.transitDetails?.tilDto(),
         )
     }
