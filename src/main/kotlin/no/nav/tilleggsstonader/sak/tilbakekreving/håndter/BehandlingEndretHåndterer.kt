@@ -43,7 +43,12 @@ class BehandlingEndretHåndterer(
     ) {
         val behandlingEndret = objectMapper.treeToValue<TilbakekrevingBehandlingEndret>(payload)
 
-        if (gjelderTestsak(behandlingEndret)) {
+        if (behandlingEndret.eksternBehandlingId == null) {
+            logger.warn(
+                "Tilbakekrevingshendlse ${behandlingEndret.hendelsestype} for sak ${behandlingEndret.eksternFagsakId} " +
+                    "mangler eksternBehandlingId, ignorerer melding da vi forventer behandlingId er satt i en senere hendelse",
+            )
+        } else if (gjelderTestsak(behandlingEndret)) {
             logger.debug(
                 "Mottatt hendelse $TILBAKEKREVING_TYPE_BEHANDLING_ENDRET med ugyldig eksternFagsakId=${behandlingEndret.eksternFagsakId}, ignorerer melding",
             )
@@ -54,7 +59,7 @@ class BehandlingEndretHåndterer(
 
     private fun behandleBehandlingEndretHendelse(behandlingEndret: TilbakekrevingBehandlingEndret) {
         val fagsak = fagsakService.hentFagsakPåEksternId(behandlingEndret.eksternFagsakId.toLong())
-        val behandling = behandlingService.hentBehandlingPåEksternId(behandlingEndret.eksternBehandlingId.toLong())
+        val behandling = behandlingService.hentBehandlingPåEksternId(behandlingEndret.eksternBehandlingId!!.toLong())
 
         if (fagsak.id != behandling.fagsakId) {
             error("Fagsak har id ${fagsak.id} men behandling ${behandling.id} har fagsakId ${behandling.fagsakId}")
