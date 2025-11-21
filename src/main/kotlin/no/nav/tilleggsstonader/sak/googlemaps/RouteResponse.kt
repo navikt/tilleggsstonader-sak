@@ -5,6 +5,7 @@ data class RuteResponse(
 )
 
 data class Route(
+    val routeLabels: List<RouteLabel>,
     val distanceMeters: Int,
     val staticDuration: String,
     val legs: List<Leg>,
@@ -86,4 +87,12 @@ enum class Reisetype {
     WALK,
     TWO_WHEELER,
     TRANSIT,
+}
+
+enum class RouteLabel {
+    ROUTE_LABEL_UNSPECIFIED,
+    DEFAULT_ROUTE,
+    DEFAULT_ROUTE_ALTERNATE,
+    FUEL_EFFICIENT,
+    SHORTER_DISTANCE,
 }

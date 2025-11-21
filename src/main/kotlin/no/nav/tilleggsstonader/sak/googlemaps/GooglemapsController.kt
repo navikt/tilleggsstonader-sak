@@ -27,7 +27,8 @@ class GooglemapsController(
                 departureTime = null,
                 transitPreferences = null,
             ),
-        )?.tilDto()
+        )?.finnDefaultRute()
+        ?.tilDto()
 
     @PostMapping("/kollektiv-detaljer")
     fun hentKollektivDetalher(
@@ -51,5 +52,6 @@ class GooglemapsController(
                             ),
                     ),
             ),
-        )?.tilDto()
+        )?.finnDefaultRute()
+        ?.tilDto()
 }

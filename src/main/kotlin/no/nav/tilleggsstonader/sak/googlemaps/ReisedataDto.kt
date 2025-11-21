@@ -2,13 +2,8 @@ import no.nav.tilleggsstonader.sak.googlemaps.Leg
 import no.nav.tilleggsstonader.sak.googlemaps.LinjeType
 import no.nav.tilleggsstonader.sak.googlemaps.Reisetype
 import no.nav.tilleggsstonader.sak.googlemaps.Route
-import no.nav.tilleggsstonader.sak.googlemaps.RuteResponse
 import no.nav.tilleggsstonader.sak.googlemaps.Step
 import no.nav.tilleggsstonader.sak.googlemaps.TransitDetails
-
-data class ReisedataDto(
-    val ruter: List<RuteDto>,
-)
 
 data class RuteDto(
     val avstandMeter: Int,
@@ -29,12 +24,7 @@ data class KollektivDetaljerDto(
     val linjeType: LinjeType,
 )
 
-fun RuteResponse.tilDto(): ReisedataDto =
-    ReisedataDto(
-        ruter = routes.map { it.tilDto() },
-    )
-
-private fun Route.tilDto(): RuteDto =
+fun Route.tilDto(): RuteDto =
     RuteDto(
         avstandMeter = distanceMeters,
         varighetSekunder = staticDuration.tilDouble(),
