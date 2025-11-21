@@ -46,7 +46,6 @@ object BoutgifterBeregnUtil {
         utgifter: BoutgifterPerUtgiftstype,
         makssats: MakssatsBoutgifter,
     ): Beregningsgrunnlag {
-        val makssats = makssats
 
         val utgifterIPerioden =
             utgifter.mapValues { (_, utgifter) ->
