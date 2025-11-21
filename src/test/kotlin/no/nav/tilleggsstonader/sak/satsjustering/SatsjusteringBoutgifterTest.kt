@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.satsjustering
 import io.mockk.clearMocks
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.august
+import no.nav.tilleggsstonader.libs.utils.dato.juni
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -55,8 +57,8 @@ class SatsjusteringBoutgifterTest : IntegrationTest() {
     lateinit var boutgifterBeregnYtelseSteg: BoutgifterBeregnYtelseSteg
 
     val sisteBekreftedeSatsÅr = bekreftedeSatser.maxOf { it.fom.year }
-    val fom = LocalDate.of(sisteBekreftedeSatsÅr, 8, 1)
-    val tom = LocalDate.of(sisteBekreftedeSatsÅr + 1, 6, 30)
+    val fom = 1.august(sisteBekreftedeSatsÅr)
+    val tom = 30.juni(sisteBekreftedeSatsÅr + 1)
 
     @AfterEach
     fun resetMock() {

@@ -52,11 +52,24 @@ class BoutgifterBeregnYtelseSteg(
     ) {
         logger.info("Lagrer vedtak for satsjustering for behandling=${saksbehandling.id}, satsjusteringFra=$satsjusteringFra")
 
-        beregnOgLagreInnvilgelseSatsjustering(
-            saksbehandling = saksbehandling,
-            vedtak = vedtak as InnvilgelseBoutgifterRequest,
-            satsjusteringFra = satsjusteringFra,
+        val innvilgelse = vedtak as InnvilgelseBoutgifterRequest
+        val vedtaksperioder = innvilgelse.vedtaksperioder.tilDomene().sorted()
+        val tidligsteEndring = satsjusteringFra
+        val beregningsresultat =
+            beregningService.beregn(
+                vedtaksperioder = vedtaksperioder,
+                behandling = saksbehandling,
+                typeVedtak = TypeVedtak.INNVILGELSE,
+                tidligsteEndring = tidligsteEndring,
+            )
+        lagreInnvilgetVedtak(
+            behandling = saksbehandling,
+            beregningsresultat = beregningsresultat,
+            vedtaksperioder = vedtaksperioder,
+            begrunnelse = innvilgelse.begrunnelse,
+            tidligsteEndring = tidligsteEndring,
         )
+        lagreTilkjentYtelse(saksbehandling.id, beregningsresultat)
     }
 
     override fun lagreVedtak(
@@ -80,31 +93,6 @@ class BoutgifterBeregnYtelseSteg(
                 saksbehandling.id,
                 vedtaksperioder,
             )
-        val beregningsresultat =
-            beregningService.beregn(
-                vedtaksperioder = vedtaksperioder,
-                behandling = saksbehandling,
-                typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = tidligsteEndring,
-            )
-        lagreInnvilgetVedtak(
-            behandling = saksbehandling,
-            beregningsresultat = beregningsresultat,
-            vedtaksperioder = vedtaksperioder,
-            begrunnelse = vedtak.begrunnelse,
-            tidligsteEndring = tidligsteEndring,
-        )
-        lagreTilkjentYtelse(saksbehandling.id, beregningsresultat)
-    }
-
-    private fun beregnOgLagreInnvilgelseSatsjustering(
-        saksbehandling: Saksbehandling,
-        vedtak: InnvilgelseBoutgifterRequest,
-        satsjusteringFra: LocalDate,
-    ) {
-        val vedtaksperioder = vedtak.vedtaksperioder.tilDomene().sorted()
-        val tidligsteEndring = satsjusteringFra
-
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
