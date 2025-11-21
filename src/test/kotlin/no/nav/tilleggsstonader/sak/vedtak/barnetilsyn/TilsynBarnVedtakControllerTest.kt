@@ -9,6 +9,8 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vilkår
@@ -75,6 +77,7 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
     @BeforeEach
     fun setUp() {
         testoppsettService.opprettBehandlingMedFagsak(behandling)
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
         barnRepository.insert(barn)
         vilkårperiodeRepository.insert(aktivitet)
         vilkårperiodeRepository.insert(målgruppe)
@@ -181,6 +184,7 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
                 opphørsdato = opphørsdato,
             )
 
+        opprettOgTilordneOppgaveForBehandling(behandlingLagreOpphør.id)
         kall.vedtak.lagreOpphør(Stønadstype.BARNETILSYN, behandlingLagreOpphør.id, vedtak)
 
         val lagretDto =

@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingerMålgruppeDto
@@ -19,6 +21,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
     @Test
     fun `skal kunne lagre og hente vilkarperioder for AAP`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
 
         kall.vilkårperiode.opprett(
             LagreVilkårperiode(
@@ -42,6 +45,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
     @Test
     fun `skal kunne oppdatere eksisterende aktivitet`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
 
         val originalLagreRequest =
             LagreVilkårperiode(
@@ -69,6 +73,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
     @Test
     fun `skal feile hvis man ikke sender inn lik behandlingId som det er på vilkårperioden`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
         val behandlingForAnnenFagsak =
             testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1")))).let {
                 testoppsettService.lagre(behandling(it))
@@ -85,6 +90,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
                 ),
             )
 
+        opprettOgTilordneOppgaveForBehandling(behandlingForAnnenFagsak.id)
         kall.vilkårperiode.apiRespons
             .slett(
                 vilkårperiodeId = response.periode!!.id,
@@ -98,6 +104,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         fun `må ha saksbehandlerrolle for å kunne oppdatere grunnlag`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             medBrukercontext(roller = listOf(rolleConfig.veilederRolle)) {
+                opprettOgTilordneOppgaveForBehandling(behandling.id)
                 kall.vilkårperiode.apiRespons
                     .oppdaterGrunnlag(behandling.id)
                     .expectProblemDetail(HttpStatus.FORBIDDEN, "Mangler nødvendig saksbehandlerrolle for å utføre handlingen")

@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkEmpty
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
@@ -61,6 +62,7 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
     @BeforeEach
     fun setUp() {
         testoppsettService.opprettBehandlingMedFagsak(dummyBehandling, stønadstype = Stønadstype.BOUTGIFTER)
+        opprettOgTilordneOppgaveForBehandling(dummyBehandling.id)
         vilkårperiodeRepository.insert(aktivitet)
         vilkårperiodeRepository.insert(målgruppe)
         vilkårRepository.insert(vilkår)
@@ -113,6 +115,7 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
                     forrigeBehandling = dummyBehandling,
                     fagsak = dummyFagsak,
                 )
+            opprettOgTilordneOppgaveForBehandling(revurdering.id)
 
             vilkårRepository.insert(
                 vilkår.copy(

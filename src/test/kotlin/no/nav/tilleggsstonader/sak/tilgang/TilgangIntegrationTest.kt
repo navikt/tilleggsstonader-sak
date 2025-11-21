@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
@@ -45,7 +46,8 @@ class TilgangIntegrationTest : IntegrationTest() {
     }
 
     @Test
-    fun `kan opprette vilkårsperioder på behandling med rolle saksbehandler og beslutter`() {
+    fun `kan opprette vilkårsperioder på behandling med rolle saksbehandler og beslutter når tilordnet oppgave`() {
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
         listOf(rolleConfig.beslutterRolle, rolleConfig.saksbehandlerRolle).forEach {
             medBrukercontext(roller = listOf(it)) {
                 kall.vilkårperiode.opprett(

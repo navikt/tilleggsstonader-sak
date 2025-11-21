@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -22,6 +23,7 @@ class LæremidlerVedtakControllerTest : IntegrationTest() {
     fun setUp() {
         testoppsettService.lagreFagsak(fagsak)
         testoppsettService.lagre(behandling, opprettGrunnlagsdata = false)
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
     }
 
     @Test
