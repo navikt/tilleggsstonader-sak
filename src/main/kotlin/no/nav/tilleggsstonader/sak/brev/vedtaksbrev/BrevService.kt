@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
@@ -48,7 +49,12 @@ class BrevService(
     }
 
     fun hentBeslutterbrevEllerRekonstruerSaksbehandlerBrev(behandlingId: BehandlingId): ByteArray {
-        val vedtaksbrev = vedtaksbrevRepository.findByIdOrThrow(behandlingId)
+        val vedtaksbrev = vedtaksbrevRepository.findByBehandlingId(behandlingId)
+
+        brukerfeilHvis(vedtaksbrev == null) {
+            "Finner ikke vedtaksbrev for behandlingId=$behandlingId. Det er nok fordi et brev ikke har blitt laget enda."
+        }
+
         return when (vedtaksbrev.beslutterPdf) {
             null -> familieDokumentClient.genererPdf(vedtaksbrev.saksbehandlerHtml)
             else -> vedtaksbrev.beslutterPdf.bytes
