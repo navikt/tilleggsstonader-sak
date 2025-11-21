@@ -50,6 +50,7 @@ internal class TilgangServiceTest {
             fagsakPersonService = fagsakPersonService,
             rolleConfig = rolleConfig,
             cacheManager = cacheManager,
+            fiveSecCacheManager = cacheManager,
             auditLogger = mockk(relaxed = true),
             mockk(),
             mockk(),

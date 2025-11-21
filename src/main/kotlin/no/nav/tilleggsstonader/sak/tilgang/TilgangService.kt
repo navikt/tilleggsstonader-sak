@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.FORTROLIG
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.STRENGT_FORTROLIG
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
 
@@ -37,6 +38,7 @@ class TilgangService(
     private val fagsakPersonService: FagsakPersonService,
     private val rolleConfig: RolleConfig,
     private val cacheManager: CacheManager,
+    @Qualifier("5secCache") fiveSecCacheManager: CacheManager,
     private val auditLogger: AuditLogger,
     private val behandlingLogService: BehandlingLogService,
     private val oppgaveService: OppgaveService,
