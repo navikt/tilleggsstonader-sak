@@ -54,7 +54,6 @@ class SatsjusteringBoutgifterTest : IntegrationTest() {
     @Autowired
     lateinit var boutgifterBeregnYtelseSteg: BoutgifterBeregnYtelseSteg
 
-    // TODO hent fra MakssatsBoutgifter
     val sisteBekreftedeSatsÅr = bekreftedeSatser.maxOf { it.fom.year }
     val fom = LocalDate.of(sisteBekreftedeSatsÅr, 8, 1)
     val tom = LocalDate.of(sisteBekreftedeSatsÅr + 1, 6, 30)
