@@ -28,6 +28,16 @@ data class OppgaveDomain(
     fun erÅpen() = status == Oppgavestatus.ÅPEN
 
     fun erIgnorert() = status == Oppgavestatus.IGNORERT
+
+    fun erBehandlingsoppgave() =
+        type in
+            listOf(
+                Oppgavetype.BehandleSak,
+                Oppgavetype.BehandleUnderkjentVedtak,
+                Oppgavetype.GodkjenneVedtak,
+            )
+
+    fun erTilbakekrevingsoppgave() = tilbakekrevingBehandlingId != null
 }
 
 /**

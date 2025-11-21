@@ -49,4 +49,6 @@ data class Saksbehandling(
     val erSatsendring get() = årsak == BehandlingÅrsak.SATSENDRING
 
     val harStatusOpprettet get() = status == BehandlingStatus.OPPRETTET
+
+    fun erFerdigstilt(): Boolean = status == BehandlingStatus.FERDIGSTILT
 }

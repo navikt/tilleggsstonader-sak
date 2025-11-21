@@ -335,6 +335,11 @@ class OppgaveService(
 
     fun finnAlleOppgaveDomainForBehandling(behandlingId: BehandlingId) = oppgaveRepository.findByBehandlingId(behandlingId)
 
+    fun hentSaksbehandlerTilordnetBehandlingsoppgaveForBehandling(behandlingId: BehandlingId) =
+        finnAlleOppgaveDomainForBehandling(behandlingId)
+            .singleOrNull { it.erÅpen() && !it.erTilbakekrevingsoppgave() && it.erBehandlingsoppgave() }
+            ?.tilordnetSaksbehandler
+
     fun finnMappe(
         enhet: String,
         oppgaveMappe: OppgaveMappe,
