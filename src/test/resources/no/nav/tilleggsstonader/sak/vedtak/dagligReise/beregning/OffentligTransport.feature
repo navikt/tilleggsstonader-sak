@@ -215,7 +215,3 @@ Egenskap: Beregning av offentlig transport for daglig reise
     Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
       | Fom        | Tom        | Beløp | Enkeltbillett-antall | Syvdagersbillett-antall |
       | 01.01.2025 | 30.01.2025 | 1760  | 2                    | 4                       |
-
-
-
-

@@ -32,25 +32,28 @@ class DagligReiseBeregningService(
             typeVedtak = typeVedtak,
         )
 
-        val oppfylteVilkår = vilkårService.hentOppfylteDagligReiseVilkår(behandlingId).map { it.mapTilVilkårDagligReise() }
+        val oppfylteVilkår =
+            vilkårService.hentOppfylteDagligReiseVilkår(behandlingId).map { it.mapTilVilkårDagligReise() }
         validerFinnesReiser(oppfylteVilkår)
 
         val oppfylteVilkårGruppertPåType = oppfylteVilkår.filter { it.fakta != null }.groupBy { it.fakta!!.type }
 
         return BeregningsresultatDagligReise(
-            offentligTransport = beregnOffentligTransport(oppfylteVilkårGruppertPåType, vedtaksperioder),
+            offentligTransport = beregnOffentligTransport(oppfylteVilkårGruppertPåType, vedtaksperioder, behandling),
         )
     }
 
     private fun beregnOffentligTransport(
         vilkår: Map<TypeDagligReise, List<VilkårDagligReise>>,
         vedtaksperioder: List<Vedtaksperiode>,
+        behandling: Saksbehandling,
     ): BeregningsresultatOffentligTransport? {
         val vilkårOffentligTransport = vilkår[TypeDagligReise.OFFENTLIG_TRANSPORT] ?: return null
 
         return offentligTransportBeregningService.beregn(
             vedtaksperioder = vedtaksperioder,
             oppfylteVilkår = vilkårOffentligTransport,
+            behandling = behandling,
         )
     }
 

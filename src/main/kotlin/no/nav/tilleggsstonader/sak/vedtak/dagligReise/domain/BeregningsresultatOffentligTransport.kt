@@ -20,7 +20,10 @@ data class BeregningsresultatForPeriode(
     val grunnlag: BeregningsgrunnlagOffentligTransport,
     val beløp: Int,
     val billettdetaljer: Map<Billettype, Int>,
-)
+    val delAvTidligereUtbetaling: Boolean = false,
+) {
+    fun markerSomDelAvTidligereUtbetaling() = this.copy(delAvTidligereUtbetaling = true)
+}
 
 data class BeregningsgrunnlagOffentligTransport(
     override val fom: LocalDate,
