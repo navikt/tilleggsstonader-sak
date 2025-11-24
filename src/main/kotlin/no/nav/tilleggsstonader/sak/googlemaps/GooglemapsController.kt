@@ -14,6 +14,7 @@ import java.time.ZoneOffset
 @ProtectedWithClaims(issuer = "azuread")
 class GooglemapsController(
     private val googleRoutesClient: GoogleRoutesClient,
+    private val staticMapClient: GoogleStaticMapClient,
 ) {
     @PostMapping("/kjoreavstand")
     fun hentKjoreavstand(
@@ -54,4 +55,9 @@ class GooglemapsController(
             ),
         )?.finnDefaultRute()
         ?.tilDto()
+
+    @PostMapping("/statisk-kart")
+    fun hentStatiskKart(
+        @RequestBody statiskKartRequest: StatiskKartRequest,
+    ): ByteArray? = staticMapClient.hentStaticMap(statiskKartRequest.polyline)
 }

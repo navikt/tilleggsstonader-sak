@@ -1,11 +1,13 @@
 import no.nav.tilleggsstonader.sak.googlemaps.Leg
 import no.nav.tilleggsstonader.sak.googlemaps.LinjeType
+import no.nav.tilleggsstonader.sak.googlemaps.Polyline
 import no.nav.tilleggsstonader.sak.googlemaps.Reisetype
 import no.nav.tilleggsstonader.sak.googlemaps.Route
 import no.nav.tilleggsstonader.sak.googlemaps.Step
 import no.nav.tilleggsstonader.sak.googlemaps.TransitDetails
 
 data class RuteDto(
+    val polyline: Polyline,
     val avstandMeter: Int,
     val varighetSekunder: Double,
     val strekninger: List<StrekningDto>,
@@ -26,6 +28,7 @@ data class KollektivDetaljerDto(
 
 fun Route.tilDto(): RuteDto =
     RuteDto(
+        polyline = polyline,
         avstandMeter = distanceMeters,
         varighetSekunder = staticDuration.tilDouble(),
         strekninger = legs.tilDto(),

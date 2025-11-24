@@ -6,6 +6,7 @@ data class RuteResponse(
 
 data class Route(
     val routeLabels: List<RouteLabel>,
+    val polyline: Polyline,
     val distanceMeters: Int,
     val staticDuration: String,
     val legs: List<Leg>,
@@ -57,6 +58,11 @@ data class TransitLine(
 
 data class Vehicle(
     val type: LinjeType,
+)
+
+data class Polyline(
+    val encodedPolyline: String,
+    val geoJsonLinestring: Any?,
 )
 
 enum class LinjeType {
