@@ -127,7 +127,6 @@ class TilgangIntegrationTest : IntegrationTest() {
                     ).expectStatus()
                     .isForbidden
                     .expectBody()
-                    .also { println(it) }
                     .jsonPath("$.detail")
                     .value<String> { feilmelding ->
                         assertThat(feilmelding).isEqualTo("Du mangler tilgang til denne saksbehandlingsløsningen")

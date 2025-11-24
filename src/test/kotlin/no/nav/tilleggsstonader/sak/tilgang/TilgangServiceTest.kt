@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ManglerTilgang
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
@@ -54,6 +55,7 @@ internal class TilgangServiceTest {
             auditLogger = mockk(relaxed = true),
             behandlingLogService = mockk(),
             oppgaveService = mockk(),
+            unleashService = mockUnleashService(),
         )
     private val mocketPersonIdent = "12345"
 
