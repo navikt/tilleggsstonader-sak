@@ -337,7 +337,7 @@ class OppgaveService(
 
     fun hentSaksbehandlerTilordnetBehandlingsoppgaveForBehandling(behandlingId: BehandlingId) =
         finnAlleOppgaveDomainForBehandling(behandlingId)
-            .singleOrNull { it.erÅpen() && !it.erTilbakekrevingsoppgave() && it.erBehandlingsoppgave() }
+            .singleOrNull { it.erÅpen() && it.erBehandlingsoppgave() }
             ?.tilordnetSaksbehandler
 
     fun finnMappe(

@@ -29,7 +29,12 @@ data class OppgaveDomain(
 
     fun erIgnorert() = status == Oppgavestatus.IGNORERT
 
-    fun erBehandlingsoppgave() =
+    /**
+     * En behandlingsoppgave er en oppgave som gjelder behandling av en behandling i ts-sak
+     */
+    fun erBehandlingsoppgave() = erBehandleSakOppgave() && !erTilbakekrevingsoppgave()
+
+    private fun erBehandleSakOppgave() =
         type in
             listOf(
                 Oppgavetype.BehandleSak,

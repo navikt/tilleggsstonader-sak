@@ -30,7 +30,7 @@ fun IntegrationTest.tilordneÅpenBehandlingOppgaveForBehandling(
     val oppgaveDomain =
         oppgaveRepository
             .findByBehandlingId(behandlingId)
-            .single { it.erÅpen() && it.erBehandlingsoppgave() && !it.erTilbakekrevingsoppgave() }
+            .single { it.erÅpen() && it.erBehandlingsoppgave() }
             .also { oppgaveRepository.update(it.copy(tilordnetSaksbehandler = tilordneTilSaksbehandler)) }
 
     val oppgave = mockClientService.oppgaveClient.finnOppgaveMedId(oppgaveDomain.gsakOppgaveId)
