@@ -55,7 +55,6 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
     override fun tearDown() {
         super.tearDown()
         BrukerContextUtil.clearBrukerContext()
-        PdlClientMockConfig.opprettPdlSøker()
     }
 
     @Nested
