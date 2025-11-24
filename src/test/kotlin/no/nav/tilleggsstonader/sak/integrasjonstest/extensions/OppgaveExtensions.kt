@@ -27,8 +27,12 @@ fun IntegrationTest.tilordneÅpenBehandlingOppgaveForBehandling(
     behandlingId: BehandlingId,
     tilordneTilSaksbehandler: String? = testBrukerkontekst.bruker,
 ) {
-    oppgaveRepository
-        .findByBehandlingId(behandlingId)
-        .single { it.erÅpen() && it.erBehandlingsoppgave() && !it.erTilbakekrevingsoppgave() }
-        .also { oppgaveRepository.update(it.copy(tilordnetSaksbehandler = tilordneTilSaksbehandler)) }
+    val oppgaveDomain =
+        oppgaveRepository
+            .findByBehandlingId(behandlingId)
+            .single { it.erÅpen() && it.erBehandlingsoppgave() && !it.erTilbakekrevingsoppgave() }
+            .also { oppgaveRepository.update(it.copy(tilordnetSaksbehandler = tilordneTilSaksbehandler)) }
+
+    val oppgave = mockClientService.oppgaveClient.finnOppgaveMedId(oppgaveDomain.gsakOppgaveId)
+    mockClientService.oppgaveClient.fordelOppgave(oppgave.id, tilordneTilSaksbehandler, oppgave.versjon, null)
 }

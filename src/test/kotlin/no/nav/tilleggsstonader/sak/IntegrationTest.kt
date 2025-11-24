@@ -115,7 +115,7 @@ abstract class IntegrationTest {
     private lateinit var cacheManagers: List<CacheManager>
 
     @Autowired
-    protected lateinit var mockClientService: MockClientService
+    lateinit var mockClientService: MockClientService
 
     @Autowired
     lateinit var taskService: TaskService
