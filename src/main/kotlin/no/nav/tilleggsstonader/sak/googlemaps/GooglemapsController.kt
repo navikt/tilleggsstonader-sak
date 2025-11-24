@@ -27,6 +27,7 @@ class GooglemapsController(
                 travelMode = "DRIVE",
                 departureTime = null,
                 transitPreferences = null,
+                polylineQuality = "OVERVIEW",
             ),
         )?.finnDefaultRute()
         ?.tilDto()
@@ -52,6 +53,7 @@ class GooglemapsController(
                                 TransitOption.RAIL.value,
                             ),
                     ),
+                polylineQuality = "OVERVIEW",
             ),
         )?.finnDefaultRute()
         ?.tilDto()
