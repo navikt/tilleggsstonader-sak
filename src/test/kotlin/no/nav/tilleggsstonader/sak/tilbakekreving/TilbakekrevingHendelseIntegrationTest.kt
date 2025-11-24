@@ -180,13 +180,14 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
             assertThat(publisertHendelse.key()).isEqualTo(key)
             val tilbakekrevingFagsysteminfoSvar = objectMapper.readValue<TilbakekrevingFagsysteminfoSvar>(publisertHendelse.value())
             assertThat(tilbakekrevingFagsysteminfoSvar.utvidPerioder).isNotEmpty
+            assertThat(tilbakekrevingFagsysteminfoSvar.behandlendeEnhet).isNotNull
         }
     }
 
     @Nested
     inner class BehandlingEndret {
         @Test
-        fun `mottar hendelsestype fagsysteminfo_behov med ukjent fagsystemId, gjør ingenting`() {
+        fun `mottar hendelsestype behandling_endret med ukjent fagsystemId, gjør ingenting`() {
             val tilbakekrevingBehandlingEndret =
                 TilbakekrevingBehandlingEndret(
                     eksternFagsakId = UUID.randomUUID().toString(),
@@ -209,9 +210,38 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
                     versjon = 1,
                 )
 
-            publiserTilbakekrevinghendelse(UUID.randomUUID().toString(), tilbakekrevingBehandlingEndret)
+            assertThatNoException().isThrownBy {
+                publiserTilbakekrevinghendelse(UUID.randomUUID().toString(), tilbakekrevingBehandlingEndret)
+            }
+        }
 
-            verify(exactly = 0) { kafkaTemplate.send(any<ProducerRecord<String, String>>()) }
+        @Test
+        fun `mottar hendelsestype behandling_endret uten eksternBehandlingId, gjør ingenting`() {
+            val tilbakekrevingBehandlingEndret =
+                TilbakekrevingBehandlingEndret(
+                    eksternFagsakId = fagsak.eksternId.toString(),
+                    hendelseOpprettet = LocalDateTime.now(),
+                    eksternBehandlingId = null,
+                    tilbakekreving =
+                        TilbakekrevingInfo(
+                            behandlingId = UUID.randomUUID().toString(),
+                            sakOpprettet = LocalDateTime.now(),
+                            varselSendt = null,
+                            behandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_TIL_BEHANDLING,
+                            totaltFeilutbetaltBeløp = BigDecimal("10000"),
+                            saksbehandlingURL = "http://localhost",
+                            fullstendigPeriode =
+                                TilbakekrevingPeriode(
+                                    fom = 1 januar 2025,
+                                    tom = 31 mai 2025,
+                                ),
+                        ),
+                    versjon = 1,
+                )
+
+            assertThatNoException().isThrownBy {
+                publiserTilbakekrevinghendelse(UUID.randomUUID().toString(), tilbakekrevingBehandlingEndret)
+            }
         }
 
         @Test

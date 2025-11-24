@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
+import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -24,26 +25,12 @@ import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
-
-val defaultIdent = "12345678910"
-val defaultJournalpostId = "1"
-val defaultJournalpost =
-    journalpost(
-        journalpostId = defaultJournalpostId,
-        journalstatus = Journalstatus.MOTTATT,
-        dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
-        bruker = Bruker(defaultIdent, BrukerIdType.FNR),
-    )
-
-val minimaltBrev = """SAKSBEHANDLER_SIGNATUR - BREVDATO_PLACEHOLDER - BESLUTTER_SIGNATUR"""
 
 /**
  * Gjennomfører en behandling fra journalpost og helt til et gitt steg.
@@ -75,85 +62,37 @@ fun IntegrationTest.gjennomførBehandlingsløp(
         return behandlingId
     }
 
-    // Gjennomfører steg: Inngangsvilkår
-    kall.vilkårperiode.opprett(medAktivitet(behandlingId))
-    kall.vilkårperiode.opprett(medMålgruppe(behandlingId))
-
-    kall.steg.ferdigstill(
-        behandlingId,
-        StegController.FerdigstillStegRequest(
-            steg = StegType.INNGANGSVILKÅR,
-        ),
-    )
+    gjennomførIngangsvilkårSteg(medAktivitet, medMålgruppe, behandlingId)
 
     if (tilSteg == StegType.VILKÅR) {
         return behandlingId
     }
 
-    // Gjennomfører steg: Vilkår
-    medVilkår.forEach {
-        if (behandling.stønadstype.gjelderDagligReise()) {
-            kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreDagligReiseDto)
-        } else {
-            kall.vilkår.opprettVilkår(it as OpprettVilkårDto)
-        }
-    }
-
-    kall.steg.ferdigstill(
-        behandlingId,
-        StegController.FerdigstillStegRequest(
-            steg = StegType.VILKÅR,
-        ),
-    )
+    gjennomførVilkårSteg(medVilkår, behandling)
 
     if (tilSteg == StegType.BEREGNE_YTELSE) {
         return behandlingId
     }
 
-    // Gjennomfører steg: Beregn ytelse
-    val foreslåtteVedtaksperioder = kall.vedtak.foreslåVedtaksperioder(behandlingId)
-
-    kall.vedtak.lagreInnvilgelse(
-        stønadstype = behandling.stønadstype,
-        behandlingId = behandlingId,
-        innvilgelseDto =
-            mapInnvilgelseRequest(
-                behandling.stønadstype,
-                vedtaksperioder =
-                    foreslåtteVedtaksperioder.map {
-                        it.tilVedtaksperiodeDto()
-                    },
-            ),
-    )
+    gjennomførBeregningSteg(behandling)
 
     if (tilSteg == StegType.SIMULERING) {
         return behandlingId
     }
 
-    // Gjennomfører steg: Simulering
-    kall.steg.ferdigstill(
-        behandlingId,
-        StegController.FerdigstillStegRequest(
-            steg = StegType.SIMULERING,
-        ),
-    )
+    gjennomførSimuleringSteg(behandlingId)
 
     if (tilSteg == StegType.SEND_TIL_BESLUTTER) {
         return behandlingId
     }
 
-    // Gjennomfører steg: Send til beslutter
-    kall.brev.genererPdf(behandlingId, GenererPdfRequest(minimaltBrev))
-    kall.totrinnskontroll.sendTilBeslutter(behandlingId)
+    gjennomførSendTilBeslutterSteg(behandlingId)
 
     if (tilSteg == StegType.BESLUTTE_VEDTAK) {
         return behandlingId
     }
 
-    // Gjennomfører steg: Beslutte vedtak
-    medBrukercontext(bruker = "nissemor", rolle = rolleConfig.beslutterRolle) {
-        kall.totrinnskontroll.beslutteVedtak(behandlingId, BeslutteVedtakDto(godkjent = true))
-    }
+    gjennomførBeslutteVedtakSteg(behandlingId)
 
     if (tilSteg in setOf(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV, StegType.FERDIGSTILLE_BEHANDLING)) {
         return behandlingId
@@ -186,14 +125,95 @@ fun IntegrationTest.gjennomførHenleggelse(fraJournalpost: Journalpost = default
     return behandlingId
 }
 
-private fun mapInnvilgelseRequest(
-    stønadstype: Stønadstype,
-    vedtaksperioder: List<VedtaksperiodeDto>,
-): VedtakRequest =
-    when (stønadstype) {
-        Stønadstype.BARNETILSYN -> InnvilgelseTilsynBarnRequest(vedtaksperioder)
-        Stønadstype.LÆREMIDLER -> InnvilgelseLæremidlerRequest(vedtaksperioder)
-        Stønadstype.BOUTGIFTER -> InnvilgelseBoutgifterRequest(vedtaksperioder)
-        Stønadstype.DAGLIG_REISE_TSO -> InnvilgelseDagligReiseRequest(vedtaksperioder)
-        Stønadstype.DAGLIG_REISE_TSR -> InnvilgelseDagligReiseRequest(vedtaksperioder)
+private fun IntegrationTest.gjennomførBeslutteVedtakSteg(behandlingId: BehandlingId) {
+    medBrukercontext(bruker = "nissemor", roller = listOf(rolleConfig.beslutterRolle)) {
+        kall.totrinnskontroll.beslutteVedtak(behandlingId, BeslutteVedtakDto(godkjent = true))
     }
+    kjørTasksKlareForProsessering()
+}
+
+private fun IntegrationTest.gjennomførSendTilBeslutterSteg(behandlingId: BehandlingId) {
+    kall.brev.genererPdf(behandlingId, GenererPdfRequest(MINIMALT_BREV))
+    kall.totrinnskontroll.sendTilBeslutter(behandlingId)
+    kjørTasksKlareForProsessering()
+}
+
+private fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId) {
+    kall.steg.ferdigstill(
+        behandlingId,
+        StegController.FerdigstillStegRequest(
+            steg = StegType.SIMULERING,
+        ),
+    )
+    kjørTasksKlareForProsessering()
+}
+
+private fun IntegrationTest.gjennomførBeregningSteg(behandling: BehandlingDto) {
+    val foreslåtteVedtaksperioder = kall.vedtak.foreslåVedtaksperioder(behandling.id)
+
+    val vedtaksperioder =
+        foreslåtteVedtaksperioder.map {
+            it.tilVedtaksperiodeDto()
+        }
+    kall.vedtak.lagreInnvilgelse(
+        stønadstype = behandling.stønadstype,
+        behandlingId = behandling.id,
+        innvilgelseDto =
+            when (behandling.stønadstype) {
+                Stønadstype.BARNETILSYN -> InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioder)
+                Stønadstype.LÆREMIDLER -> InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder)
+                Stønadstype.BOUTGIFTER -> InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder)
+                Stønadstype.DAGLIG_REISE_TSO -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
+                Stønadstype.DAGLIG_REISE_TSR -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
+            },
+    )
+    kjørTasksKlareForProsessering()
+}
+
+private fun IntegrationTest.gjennomførIngangsvilkårSteg(
+    medAktivitet: (BehandlingId) -> LagreVilkårperiode,
+    medMålgruppe: (BehandlingId) -> LagreVilkårperiode,
+    behandlingId: BehandlingId,
+) {
+    kall.vilkårperiode.opprett(medAktivitet(behandlingId))
+    kall.vilkårperiode.opprett(medMålgruppe(behandlingId))
+
+    kall.steg.ferdigstill(
+        behandlingId,
+        StegController.FerdigstillStegRequest(
+            steg = StegType.INNGANGSVILKÅR,
+        ),
+    )
+    kjørTasksKlareForProsessering()
+}
+
+private fun IntegrationTest.gjennomførVilkårSteg(
+    medVilkår: List<LagreVilkår>,
+    behandling: BehandlingDto,
+) {
+    medVilkår.forEach {
+        if (behandling.stønadstype.gjelderDagligReise()) {
+            kall.vilkårDagligReise.opprettVilkår(behandling.id, it as LagreDagligReiseDto)
+        } else {
+            kall.vilkår.opprettVilkår(it as OpprettVilkårDto)
+        }
+    }
+
+    kall.steg.ferdigstill(
+        behandling.id,
+        StegController.FerdigstillStegRequest(
+            steg = StegType.VILKÅR,
+        ),
+    )
+    kjørTasksKlareForProsessering()
+}
+
+val defaultJournalpost =
+    journalpost(
+        journalpostId = "1",
+        journalstatus = Journalstatus.MOTTATT,
+        dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
+        bruker = Bruker("12345678910", BrukerIdType.FNR),
+    )
+
+private const val MINIMALT_BREV = """SAKSBEHANDLER_SIGNATUR - BREVDATO_PLACEHOLDER - BESLUTTER_SIGNATUR"""

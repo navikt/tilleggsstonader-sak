@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.client.exchange
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.collections.mapOf
@@ -191,7 +190,7 @@ class TestControllerTest : IntegrationTest() {
         @Test
         fun `autorisert token, men mangler saksbehandler-relatert rolle`() {
             listOf(rolleConfig.kode6, rolleConfig.kode7, rolleConfig.egenAnsatt).forEach {
-                medBrukercontext(rolle = it) {
+                medBrukercontext(roller = listOf(it)) {
                     webTestClient
                         .get()
                         .uri("/api/test/azuread")
@@ -206,7 +205,7 @@ class TestControllerTest : IntegrationTest() {
         @Test
         fun `autorisert token med saksbehandler-relatert rolle kan gjøre kall`() {
             listOf(rolleConfig.saksbehandlerRolle, rolleConfig.beslutterRolle, rolleConfig.veilederRolle).forEach {
-                medBrukercontext(rolle = it) {
+                medBrukercontext(roller = listOf(it)) {
                     webTestClient
                         .get()
                         .uri("/api/test/azuread")

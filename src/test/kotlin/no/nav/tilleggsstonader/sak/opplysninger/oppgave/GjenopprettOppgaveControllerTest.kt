@@ -11,7 +11,7 @@ class GjenopprettOppgaveControllerTest : IntegrationTest() {
     fun `gjenopprett feilregistrert på behandling, har utviklerrolle`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak()
 
-        medBrukercontext(rolle = rolleConfig.utvikler) {
+        medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
             kall.gjenopprettOppgave.gjenopprett(behandling.id)
         }
 

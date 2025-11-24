@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.treeToValue
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
@@ -12,6 +13,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.tilbakekreving.TILBAKEKREVING_TOPIC
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TILBAKEKREVING_TYPE_FAGSYSTEMINFO_BEHOV
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingFagsysteminfoBehov
@@ -39,6 +41,7 @@ class FagsysteminfoBehovHåndterer(
     private val vedtakService: VedtakService,
     private val andelTilkjentYtelseTilPeriodeService: AndelTilkjentYtelseTilPeriodeService,
     private val kafkaTemplate: KafkaTemplate<String, String>,
+    private val oppgaveService: OppgaveService,
 ) : TilbakekrevingHendelseHåndterer {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -90,6 +93,7 @@ class FagsysteminfoBehovHåndterer(
                 mottaker = TilbakekrevingMottaker(ident = behandling.ident),
                 revurdering = mapRevurderinginformsjon(saksbehandling = behandling, eksternBehandlingId = referanse),
                 utvidPerioder = mapUtvidedePerioder(behandling.forrigeIverksatteBehandlingId),
+                behandlendeEnhet = finnBehandlendeEnhet(behandling),
             )
 
         // Sender med samme key på kafka, slik at tilbake får meldinger i rekkefølge
@@ -102,6 +106,10 @@ class FagsysteminfoBehovHåndterer(
                 ),
             ).get()
     }
+
+    private fun finnBehandlendeEnhet(behandling: Saksbehandling): String? =
+        oppgaveService.finnSisteBehandlingsoppgaveForBehandling(behandling.id)?.tildeltEnhetsnummer
+            ?: behandling.stønadstype.behandlendeEnhet().enhetsnr
 
     private fun mapRevurderinginformsjon(
         saksbehandling: Saksbehandling,
