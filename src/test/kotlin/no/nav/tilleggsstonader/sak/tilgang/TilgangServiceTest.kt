@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlSøker
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.fagsakpersoner
+import no.nav.tilleggsstonader.sak.util.oppgave
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -50,10 +51,9 @@ internal class TilgangServiceTest {
             fagsakPersonService = fagsakPersonService,
             rolleConfig = rolleConfig,
             cacheManager = cacheManager,
-            fiveSecCacheManager = cacheManager,
             auditLogger = mockk(relaxed = true),
-            mockk(),
-            mockk(),
+            behandlingLogService = mockk(),
+            oppgaveService = mockk(),
         )
     private val mocketPersonIdent = "12345"
 

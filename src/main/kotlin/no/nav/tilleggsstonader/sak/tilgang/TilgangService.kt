@@ -38,7 +38,6 @@ class TilgangService(
     private val fagsakPersonService: FagsakPersonService,
     private val rolleConfig: RolleConfig,
     private val cacheManager: CacheManager,
-    @Qualifier("5secCache") fiveSecCacheManager: CacheManager,
     private val auditLogger: AuditLogger,
     private val behandlingLogService: BehandlingLogService,
     private val oppgaveService: OppgaveService,
