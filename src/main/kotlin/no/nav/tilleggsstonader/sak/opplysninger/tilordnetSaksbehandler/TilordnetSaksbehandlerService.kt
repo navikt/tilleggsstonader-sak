@@ -1,42 +1,26 @@
 package no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Saksbehandler
-import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.domain.TilordnetSaksbehandler
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.domain.TilordnetSaksbehandlerPåOppgave
 import org.springframework.stereotype.Service
 
 @Service
 class TilordnetSaksbehandlerService(
-    private val oppgaveRepository: OppgaveRepository,
+    private val oppgaveService: OppgaveService,
     private val behandlingRepository: BehandlingRepository,
     private val tilordnetSaksbehandlerClient: TilordnetSaksbehandlerClient,
 ) {
     fun finnTilordnetSaksbehandler(behandlingId: BehandlingId): TilordnetSaksbehandler {
-        val oppgave = hentOppgaveMedTypeSomIkkeErFerdigstilt(behandlingId)
+        val oppgave = oppgaveService.hentÅpenBehandlingsoppgave(behandlingId)
         return utledTilordnetSaksbehandlerForOppgave(behandlingId, oppgave)
-    }
-
-    private fun hentOppgaveMedTypeSomIkkeErFerdigstilt(behandlingId: BehandlingId): OppgaveDomain? {
-        val oppgavetyper =
-            setOf(
-                Oppgavetype.BehandleSak,
-                Oppgavetype.BehandleUnderkjentVedtak,
-                Oppgavetype.GodkjenneVedtak,
-            )
-        return oppgaveRepository.findByBehandlingIdAndStatusAndTypeIn(
-            behandlingId = behandlingId,
-            status = Oppgavestatus.ÅPEN,
-            oppgavetype = oppgavetyper,
-        )
     }
 
     private fun utledTilordnetSaksbehandlerForOppgave(

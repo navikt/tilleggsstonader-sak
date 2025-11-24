@@ -327,7 +327,7 @@ class OppgaveService(
     fun finnSisteOppgaveDomainForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
         oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandlingId)
 
-    fun finnSisteBehandlingsoppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
+    fun finnSisteBehandleSakOppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
         oppgaveRepository
             .findByBehandlingId(behandlingId)
             .filter { it.type in setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak) }
@@ -335,10 +335,9 @@ class OppgaveService(
 
     fun finnAlleOppgaveDomainForBehandling(behandlingId: BehandlingId) = oppgaveRepository.findByBehandlingId(behandlingId)
 
-    fun hentSaksbehandlerTilordnetBehandlingsoppgaveForBehandling(behandlingId: BehandlingId) =
+    fun hentÅpenBehandlingsoppgave(behandlingId: BehandlingId): OppgaveDomain? =
         finnAlleOppgaveDomainForBehandling(behandlingId)
             .singleOrNull { it.erÅpen() && it.erBehandlingsoppgave() }
-            ?.tilordnetSaksbehandler
 
     fun finnMappe(
         enhet: String,

@@ -120,7 +120,7 @@ class TilgangService(
         }
 
         val tilordnetSaksbehandler =
-            oppgaveService.hentSaksbehandlerTilordnetBehandlingsoppgaveForBehandling(behandling.id)
+            oppgaveService.hentÅpenBehandlingsoppgave(behandling.id)?.tilordnetSaksbehandler
 
         val skalValidereTilordnetSaksbehandler = unleashService.isEnabled(Toggle.TILGANGSSTYRE_PÅ_TILORDNET_OPPGAVE)
 

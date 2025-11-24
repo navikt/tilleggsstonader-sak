@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.TilordnetSaksbehandlerClient
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.TilordnetSaksbehandlerService
@@ -25,19 +26,19 @@ import org.junit.jupiter.api.Test
 import java.util.UUID
 
 internal class TilordnetSaksbehandlerServiceTest {
-    private val oppgaveRepository = mockk<OppgaveRepository>()
+    private val oppgaveService = mockk<OppgaveService>()
     private val behandlingRepository = mockk<BehandlingRepository>()
     private val saksbehandlerClient = mockk<TilordnetSaksbehandlerClient>()
     private lateinit var service: TilordnetSaksbehandlerService
 
-    private val behandlingId = BehandlingId(UUID.randomUUID())
+    private val behandlingId = BehandlingId.random()
     private val saksbehandlerInfo = Saksbehandler(UUID.randomUUID(), "Z123456", "Test", "Testesen", "TSO")
 
     @BeforeEach
     fun setUp() {
         service =
             TilordnetSaksbehandlerService(
-                oppgaveRepository,
+                oppgaveService,
                 behandlingRepository,
                 saksbehandlerClient,
             )
@@ -61,9 +62,7 @@ internal class TilordnetSaksbehandlerServiceTest {
             )
 
         every { behandlingRepository.findByIdOrThrow(behandlingId) } returns behandling
-        every {
-            oppgaveRepository.findByBehandlingIdAndStatusAndTypeIn(any(), any(), any())
-        } returns oppgave
+        every { oppgaveService.hentÅpenBehandlingsoppgave(behandlingId) } returns oppgave
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
 
         testWithBrukerContext(saksbehandlerInfo.navIdent) {
@@ -81,9 +80,7 @@ internal class TilordnetSaksbehandlerServiceTest {
             iverksattFørstegangsbehandling.copy(steg = StegType.INNGANGSVILKÅR, status = BehandlingStatus.UTREDES)
 
         every { behandlingRepository.findByIdOrThrow(behandlingId) } returns behandling
-        every {
-            oppgaveRepository.findByBehandlingIdAndStatusAndTypeIn(any(), any(), any())
-        } returns null
+        every { oppgaveService.hentÅpenBehandlingsoppgave(behandlingId) } returns null
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
 
         testWithBrukerContext(saksbehandlerInfo.navIdent) {
@@ -103,9 +100,7 @@ internal class TilordnetSaksbehandlerServiceTest {
             iverksattFørstegangsbehandling.copy(steg = StegType.SEND_TIL_BESLUTTER, status = BehandlingStatus.UTREDES)
 
         every { behandlingRepository.findByIdOrThrow(behandlingId) } returns behandling
-        every {
-            oppgaveRepository.findByBehandlingIdAndStatusAndTypeIn(any(), any(), any())
-        } returns null
+        every { oppgaveService.hentÅpenBehandlingsoppgave(behandlingId) } returns null
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
 
         testWithBrukerContext(saksbehandlerInfo.navIdent) {
@@ -135,9 +130,7 @@ internal class TilordnetSaksbehandlerServiceTest {
             )
 
         every { behandlingRepository.findByIdOrThrow(behandlingId) } returns behandling
-        every {
-            oppgaveRepository.findByBehandlingIdAndStatusAndTypeIn(any(), any(), any())
-        } returns oppgave
+        every { oppgaveService.hentÅpenBehandlingsoppgave(behandlingId) } returns oppgave
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
 
         testWithBrukerContext(saksbehandlerInfo.navIdent) {
@@ -159,13 +152,7 @@ internal class TilordnetSaksbehandlerServiceTest {
 
         every { behandlingRepository.findByIdOrThrow(behandlingId) } returns ferdigstiltBehandling
 
-        every {
-            oppgaveRepository.findByBehandlingIdAndStatusAndTypeIn(
-                any(),
-                any(),
-                any(),
-            )
-        } returns null
+        every { oppgaveService.hentÅpenBehandlingsoppgave(behandlingId) } returns null
 
         val resultat = service.finnTilordnetSaksbehandler(behandlingId).tilDto()
 
@@ -205,7 +192,7 @@ internal class TilordnetSaksbehandlerServiceTest {
         every { saksbehandlerClient.hentSaksbehandlerInfo(saksbehandlerInfo.navIdent) } returns saksbehandlerInfo
 
         every { behandlingRepository.findByIdOrThrow(behandlingId) } returns behandling
-        every { oppgaveRepository.findByBehandlingIdAndStatusAndTypeIn(any(), any(), any()) } returns oppgave
+        every { oppgaveService.hentÅpenBehandlingsoppgave(behandlingId) } returns oppgave
 
         testWithBrukerContext(innloggetSaksbehandlerSomIkkeEierBehandling.navIdent) {
             val resultat = service.finnTilordnetSaksbehandler(behandlingId)
