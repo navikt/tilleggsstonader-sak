@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
@@ -26,6 +27,10 @@ class TilgangIntegrationTest : IntegrationTest() {
                 behandling(status = BehandlingStatus.UTREDES),
                 stønadstype = Stønadstype.BARNETILSYN,
             )
+        opprettOgTilordneOppgaveForBehandling(
+            behandlingId = behandling.id,
+            tilordneTilSaksbehandler = null,
+        )
     }
 
     @Nested
@@ -54,8 +59,9 @@ class TilgangIntegrationTest : IntegrationTest() {
     inner class Skrivetilgang {
         @Test
         fun `kan opprette vilkårsperioder på behandling med rolle saksbehandler og beslutter når tilordnet oppgave`() {
-            opprettOgTilordneOppgaveForBehandling(behandling.id)
             listOf(rolleConfig.beslutterRolle, rolleConfig.saksbehandlerRolle).forEach {
+                tilordneÅpenBehandlingOppgaveForBehandling(behandling.id)
+
                 medBrukercontext(roller = listOf(it)) {
                     kall.vilkårperiode.opprett(
                         lagreVilkårperiodeAktivitet(
@@ -69,8 +75,9 @@ class TilgangIntegrationTest : IntegrationTest() {
 
         @Test
         fun `kan ikke opprette vilkårsperioder på behandling med rolle veileder`() {
-            opprettOgTilordneOppgaveForBehandling(behandling.id)
             medBrukercontext(roller = listOf(rolleConfig.veilederRolle)) {
+                tilordneÅpenBehandlingOppgaveForBehandling(behandling.id)
+
                 kall.vilkårperiode.apiRespons
                     .opprett(
                         lagreVilkårperiodeAktivitet(
@@ -90,6 +97,8 @@ class TilgangIntegrationTest : IntegrationTest() {
         @Test
         fun `kan ikke opprette vilkårsperioder på behandling uten å ha tilordnet oppgave`() {
             medBrukercontext(roller = listOf(rolleConfig.saksbehandlerRolle)) {
+                tilordneÅpenBehandlingOppgaveForBehandling(behandling.id, null)
+
                 kall.vilkårperiode.apiRespons
                     .opprett(
                         lagreVilkårperiodeAktivitet(

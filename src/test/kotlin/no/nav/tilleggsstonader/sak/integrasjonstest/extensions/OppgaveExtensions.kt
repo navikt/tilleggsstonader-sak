@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksK
  */
 fun IntegrationTest.opprettOgTilordneOppgaveForBehandling(
     behandlingId: BehandlingId,
-    tilordneTilSaksbehandler: String = testBrukerkontekst.bruker,
+    tilordneTilSaksbehandler: String? = testBrukerkontekst.bruker,
 ) {
     OpprettOppgaveForOpprettetBehandlingTask
         .opprettTask(
@@ -25,7 +25,7 @@ fun IntegrationTest.opprettOgTilordneOppgaveForBehandling(
 
 fun IntegrationTest.tilordneÅpenBehandlingOppgaveForBehandling(
     behandlingId: BehandlingId,
-    tilordneTilSaksbehandler: String = testBrukerkontekst.bruker,
+    tilordneTilSaksbehandler: String? = testBrukerkontekst.bruker,
 ) {
     oppgaveRepository
         .findByBehandlingId(behandlingId)
