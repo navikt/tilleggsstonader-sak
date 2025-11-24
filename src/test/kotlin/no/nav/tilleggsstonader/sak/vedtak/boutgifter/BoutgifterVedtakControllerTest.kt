@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.util.UUID
 
-class BoutgifterVedtakControllerTest : IntegrationTest() {
+class BoutgifterVedtakControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var vilkårperiodeRepository: VilkårperiodeRepository
 

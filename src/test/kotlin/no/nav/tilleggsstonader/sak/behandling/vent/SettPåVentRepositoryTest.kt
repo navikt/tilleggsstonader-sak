@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.util.behandling
 import org.assertj.core.api.Assertions.assertThat
@@ -8,7 +8,7 @@ import org.assertj.core.api.Assertions.catchException
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class SettPåVentRepositoryTest : IntegrationTest() {
+class SettPåVentRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var repository: SettPåVentRepository
 

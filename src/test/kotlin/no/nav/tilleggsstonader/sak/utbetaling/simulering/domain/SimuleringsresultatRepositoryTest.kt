@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering.domain
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import org.assertj.core.api.Assertions.assertThat
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
-class SimuleringsresultatRepositoryTest : IntegrationTest() {
+class SimuleringsresultatRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var repository: SimuleringsresultatRepository
 

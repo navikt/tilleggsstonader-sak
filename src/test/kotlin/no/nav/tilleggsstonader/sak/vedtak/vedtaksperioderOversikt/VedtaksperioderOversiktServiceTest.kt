@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
-class VedtaksperioderOversiktServiceTest : IntegrationTest() {
+class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var vedtaksperioderOversiktService: VedtaksperioderOversiktService
 
