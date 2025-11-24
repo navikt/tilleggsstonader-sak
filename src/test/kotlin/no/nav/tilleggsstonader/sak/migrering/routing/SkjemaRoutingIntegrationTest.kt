@@ -10,11 +10,13 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig.Companion.lagPersonKort
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockGetVariant
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaStatusDtoUtil
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlClient
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
@@ -104,6 +106,30 @@ class SkjemaRoutingIntegrationTest(
         }
 
         @Test
+        fun `skal route til gammel løsning hvis person har AAP men fortrolig adresse`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
+            mockAapVedtak(erAktivt = true)
+            mockPersonMedAdressebeskyttelse(AdressebeskyttelseGradering.FORTROLIG)
+
+            val routingSjekk = kall.søknadRouting.skjemaRouting(dagligReiseRoutingRequest)
+
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingHarBlittLagret()).isFalse()
+        }
+
+        @Test
+        fun `skal route til gammel løsning hvis person har AAP men strengt fortrolig adresse`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
+            mockAapVedtak(erAktivt = true)
+            mockPersonMedAdressebeskyttelse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
+
+            val routingSjekk = kall.søknadRouting.skjemaRouting(dagligReiseRoutingRequest)
+
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingHarBlittLagret()).isFalse()
+        }
+
+        @Test
         fun `skal svare nei hvis feature toggle sier at ingen skal slippe gjennom`() {
             mockMaksAntallSomKanRoutesPåDagligReise(0)
 
@@ -181,6 +207,17 @@ class SkjemaRoutingIntegrationTest(
                     perioder = if (erAktivt) listOf(pågåendePeriode) else emptyList(),
                     kildeResultat = listOf(kildeResultatAAP()),
                 )
+        }
+
+        private fun mockPersonMedAdressebeskyttelse(adressebeskyttelseGradering: AdressebeskyttelseGradering) {
+            every { pdlClient.hentPersonKortBolk(any()) } answers {
+                firstArg<List<String>>().associateWith {
+                    lagPersonKort(
+                        fornavn = it,
+                        adressebeskyttelseGradering = adressebeskyttelseGradering,
+                    )
+                }
+            }
         }
 
         private fun mockHentIdenterFraPdl() {
