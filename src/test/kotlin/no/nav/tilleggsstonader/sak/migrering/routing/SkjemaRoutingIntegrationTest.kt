@@ -47,7 +47,7 @@ class SkjemaRoutingIntegrationTest(
         names = ["SØKNAD_BARNETILSYN", "SØKNAD_LÆREMIDLER", "SØKNAD_BOUTGIFTER"],
     )
     fun `visse stønadstyper skal alltid routes til ny løsning`(skjematype: Skjematype) {
-        val routingSjekk = kall.søknadRouting.skjemaRouting(IdentSkjematype(jonasIdent, skjematype))
+        val routingSjekk = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
 
         assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
         assertThat(routingHarBlittLagret(skjematype)).isFalse()
@@ -71,7 +71,7 @@ class SkjemaRoutingIntegrationTest(
         fun `skal alltid svare ja hvis personen har blitt routet til ny løsning tidligere`() {
             testoppsettService.lagreSøknadRouting(skjemaRoutingDagligReise)
 
-            val routingSjekk = kall.søknadRouting.skjemaRouting(dagligReiseRoutingRequest)
+            val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
             assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
         }
@@ -88,7 +88,7 @@ class SkjemaRoutingIntegrationTest(
             testoppsettService.lagreFagsak(dagligReiseFagsak)
             testoppsettService.lagre(behandling = dagligReiseBehandling, opprettGrunnlagsdata = false)
 
-            val routingSjekk = kall.søknadRouting.skjemaRouting(dagligReiseRoutingRequest)
+            val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
             assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
             assertThat(routingHarBlittLagret()).isTrue()
@@ -99,7 +99,7 @@ class SkjemaRoutingIntegrationTest(
             mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockDagligReiseVedtakIArena(erAktivt = true)
 
-            val routingSjekk = kall.søknadRouting.skjemaRouting(dagligReiseRoutingRequest)
+            val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
             assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
             assertThat(routingHarBlittLagret()).isFalse()
@@ -111,7 +111,7 @@ class SkjemaRoutingIntegrationTest(
             mockAapVedtak(erAktivt = true)
             mockPersonMedAdressebeskyttelse(AdressebeskyttelseGradering.FORTROLIG)
 
-            val routingSjekk = kall.søknadRouting.skjemaRouting(dagligReiseRoutingRequest)
+            val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
             assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
             assertThat(routingHarBlittLagret()).isFalse()
@@ -123,7 +123,7 @@ class SkjemaRoutingIntegrationTest(
             mockAapVedtak(erAktivt = true)
             mockPersonMedAdressebeskyttelse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
 
-            val routingSjekk = kall.søknadRouting.skjemaRouting(dagligReiseRoutingRequest)
+            val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
             assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
             assertThat(routingHarBlittLagret()).isFalse()
@@ -133,7 +133,7 @@ class SkjemaRoutingIntegrationTest(
         fun `skal svare nei hvis feature toggle sier at ingen skal slippe gjennom`() {
             mockMaksAntallSomKanRoutesPåDagligReise(0)
 
-            val routingSjekk = kall.søknadRouting.skjemaRouting(dagligReiseRoutingRequest)
+            val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
             assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
             assertThat(routingHarBlittLagret()).isFalse()
@@ -145,7 +145,7 @@ class SkjemaRoutingIntegrationTest(
             mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = true)
 
-            val routingSjekk = kall.søknadRouting.skjemaRouting(dagligReiseRoutingRequest)
+            val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
             assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
             assertThat(routingHarBlittLagret()).isTrue()
         }
@@ -156,7 +156,7 @@ class SkjemaRoutingIntegrationTest(
             mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = false)
 
-            val routingSjekk = kall.søknadRouting.skjemaRouting(dagligReiseRoutingRequest)
+            val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
             assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
             assertThat(routingHarBlittLagret()).isFalse()
         }
@@ -167,8 +167,8 @@ class SkjemaRoutingIntegrationTest(
             mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = true)
 
-            val routingSjekkFørsteRouting = kall.søknadRouting.skjemaRouting(IdentSkjematype(jonasIdent, Skjematype.SØKNAD_DAGLIG_REISE))
-            val routingSjekkAndreRouting = kall.søknadRouting.skjemaRouting(IdentSkjematype(ernaIdent, Skjematype.SØKNAD_DAGLIG_REISE))
+            val routingSjekkFørsteRouting = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, Skjematype.SØKNAD_DAGLIG_REISE))
+            val routingSjekkAndreRouting = kall.skjemaRouting.sjekk(IdentSkjematype(ernaIdent, Skjematype.SØKNAD_DAGLIG_REISE))
 
             assertThat(routingSjekkFørsteRouting.skalBehandlesINyLøsning).isTrue()
             assertThat(routingHarBlittLagret(ident = jonasIdent)).isTrue()
