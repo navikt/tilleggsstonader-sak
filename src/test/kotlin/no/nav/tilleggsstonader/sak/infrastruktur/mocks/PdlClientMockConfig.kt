@@ -103,17 +103,19 @@ class PdlClientMockConfig {
                 )
         }
 
-        fun lagPersonKort(it: String) =
-            PdlPersonKort(
-                listOf(
-                    Adressebeskyttelse(
-                        gradering = AdressebeskyttelseGradering.UGRADERT,
-                        metadata = metadataGjeldende,
-                    ),
+        fun lagPersonKort(
+            fornavn: String,
+            adressebeskyttelseGradering: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT,
+        ) = PdlPersonKort(
+            listOf(
+                Adressebeskyttelse(
+                    gradering = adressebeskyttelseGradering,
+                    metadata = metadataGjeldende,
                 ),
-                listOf(lagNavn(fornavn = it)),
-                emptyList(),
-            )
+            ),
+            listOf(lagNavn(fornavn = fornavn)),
+            emptyList(),
+        )
 
         val folkeregisteridentifikatorSøker =
             Folkeregisteridentifikator(
@@ -122,12 +124,12 @@ class PdlClientMockConfig {
                 metadataGjeldende,
             )
 
-        fun opprettPdlSøker() =
+        fun opprettPdlSøker(adressebeskyttelseGradering: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT) =
             pdlSøker(
                 adressebeskyttelse =
                     listOf(
                         Adressebeskyttelse(
-                            gradering = AdressebeskyttelseGradering.UGRADERT,
+                            gradering = adressebeskyttelseGradering,
                             metadata = metadataGjeldende,
                         ),
                     ),
