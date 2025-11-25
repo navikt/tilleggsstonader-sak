@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.domain.DetaljertVedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 
@@ -10,4 +11,5 @@ class DetaljertVedtaksperiodeDagligReiseTsr(
     override val tom: LocalDate,
     val aktivitet: AktivitetType,
     val målgruppe: FaktiskMålgruppe,
-) : Periode<LocalDate>
+) : Periode<LocalDate>,
+    DetaljertVedtaksperiode

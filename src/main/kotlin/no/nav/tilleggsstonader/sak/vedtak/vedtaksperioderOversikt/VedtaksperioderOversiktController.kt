@@ -29,7 +29,7 @@ class VedtaksperioderOversiktController(
     @GetMapping("/detaljerte-vedtaksperioder/{behandlingId}")
     fun hentDetaljerteVedtaksperioderForBehandling(
         @PathVariable behandlingId: BehandlingId,
-    ): List<DetaljertVedtaksperiode> {
+    ): VedtaksperiodeOversiktForBehandling<out DetaljertVedtaksperiode> {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return vedtakOversiktService.hentDetaljerteVedtaksperioderForBehandling(behandlingId)
     }

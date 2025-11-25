@@ -35,9 +35,9 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
 
         val res = vedtaksperioderOversiktService.hentVedtaksperioderOversikt(fagsakPersonId = fagsakPerson.id)
 
-        assertThat(res.tilsynBarn).isNotEmpty()
-        assertThat(res.læremidler).isNotEmpty()
-        assertThat(res.boutgifter).isNotEmpty()
+        assertThat(res.tilsynBarn?.detaljerteVedtaksperioder).isNotEmpty()
+        assertThat(res.læremidler?.detaljerteVedtaksperioder).isNotEmpty()
+        assertThat(res.boutgifter?.detaljerteVedtaksperioder).isNotEmpty()
     }
 
     private fun opprettBehandlingOgVedtakTilsynBarn(fagsakPerson: FagsakPerson) {
