@@ -24,7 +24,7 @@ class GoogleStaticMapClient(
             "&markers=color:red|${statiskKartRequest.sluttLokasjon.lat},${statiskKartRequest.sluttLokasjon.lng}"
 
         val uriString =
-            "https://maps.googleapis.com/maps/api/staticmap?size=900x500$path$startMarkør$sluttMarkør&key=$apiKey"
+            "$baseUrl?size=900x500$path$startMarkør$sluttMarkør&key=$apiKey"
 
         val uri =
             UriComponentsBuilder
