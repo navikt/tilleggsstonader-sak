@@ -14,13 +14,22 @@ class GoogleStaticMapClient(
 ) {
     private val restClient = builder.baseUrl(baseUrl.toString()).build()
 
-    fun hentStaticMap(polyline: String): ByteArray? {
-        val uriString = "https://maps.googleapis.com/maps/api/staticmap?size=600x300&path=enc:$polyline&key=$apiKey"
+    fun hentStaticMap(statiskKartRequest: StatiskKartRequest): ByteArray? {
+        // URL-er kan maks være 2048 tegn. En lang polyline kan derfor gjøre kart-requesten ugyldig.
+        // Viser ikke polylinen hvis den blir for lang.
+        val path = if (statiskKartRequest.polyline.length < 1900) "&path=enc:${statiskKartRequest.polyline}" else ""
+        val startMarkør =
+            "&markers=color:green|${statiskKartRequest.startLokasjon.lat},${statiskKartRequest.startLokasjon.lng}"
+        val sluttMarkør =
+            "&markers=color:red|${statiskKartRequest.sluttLokasjon.lat},${statiskKartRequest.sluttLokasjon.lng}"
+
+        val uriString =
+            "https://maps.googleapis.com/maps/api/staticmap?size=900x500$path$startMarkør$sluttMarkør&key=$apiKey"
 
         val uri =
             UriComponentsBuilder
                 .fromUriString(uriString)
-                .build(false) // Kan ikke encode pga av polyline fra GoogleMaps som ikke kan endre noen karakterer
+                .build(false) // Kan ikke encode pga av polyline fra GoogleMaps som ikke klarer å tolke encoded karakterer
                 .toUri()
 
         return restClient

@@ -61,5 +61,5 @@ class GooglemapsController(
     @PostMapping("/statisk-kart")
     fun hentStatiskKart(
         @RequestBody statiskKartRequest: StatiskKartRequest,
-    ): ByteArray? = staticMapClient.hentStaticMap(statiskKartRequest.polyline)
+    ): ByteArray? = staticMapClient.hentStaticMap(statiskKartRequest)
 }
