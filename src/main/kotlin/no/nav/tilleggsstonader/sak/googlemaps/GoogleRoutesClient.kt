@@ -10,8 +10,7 @@ import java.net.URI
 
 @Service
 class GoogleRoutesClient(
-    @Value("\${google.uri}")
-    private val baseUrl: URI,
+    @Value("\${google.routes.uri}") private val baseUrl: URI,
     @Value("\${google.api-key}") private val apiKey: String,
     builder: RestClient.Builder,
 ) {

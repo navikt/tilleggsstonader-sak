@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
 import org.springframework.web.util.UriComponentsBuilder
@@ -7,15 +8,10 @@ import java.net.URI
 
 @Service
 class GoogleStaticMapClient(
+    @Value("\${google.static-map.uri}") private val baseUrl: URI,
+    @Value("\${google.api-key}") private val apiKey: String,
     builder: RestClient.Builder,
 ) {
-    private val apiKey = "nøkkel" // TODO fjern
-
-    private val baseUrl =
-        URI(
-            "https://maps.googleapis.com/maps/api/staticmap",
-        )
-
     private val restClient = builder.baseUrl(baseUrl.toString()).build()
 
     fun hentStaticMap(polyline: String): ByteArray? {
