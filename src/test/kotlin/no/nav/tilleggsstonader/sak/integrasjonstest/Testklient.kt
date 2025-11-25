@@ -8,7 +8,7 @@ class Testklient(
 ) {
     fun get(uri: String) =
         with(testkontekst) {
-            webTestClient
+            restTestClient
                 .get()
                 .uri(uri)
                 .medOnBehalfOfToken()
@@ -19,10 +19,10 @@ class Testklient(
         uri: String,
         body: Any? = null,
     ) = with(testkontekst) {
-        webTestClient
+        restTestClient
             .post()
             .uri(uri)
-            .let { if (body != null) it.bodyValue(body) else it }
+            .let { if (body != null) it.body(body) else it }
             .medOnBehalfOfToken()
             .exchange()
     }
@@ -31,10 +31,10 @@ class Testklient(
         uri: String,
         body: Any,
     ) = with(testkontekst) {
-        webTestClient
+        restTestClient
             .put()
             .uri(uri)
-            .bodyValue(body)
+            .body(body)
             .medOnBehalfOfToken()
             .exchange()
     }
@@ -43,10 +43,10 @@ class Testklient(
         uri: String,
         body: Any,
     ) = with(testkontekst) {
-        webTestClient
+        restTestClient
             .method(HttpMethod.DELETE)
             .uri(uri)
-            .bodyValue(body)
+            .body(body)
             .medOnBehalfOfToken()
             .exchange()
     }

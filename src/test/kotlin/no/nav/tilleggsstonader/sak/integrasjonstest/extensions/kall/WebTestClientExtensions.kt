@@ -2,23 +2,23 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.http.HttpStatus
-import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.reactive.server.expectBody
+import org.springframework.test.web.servlet.client.RestTestClient
+import org.springframework.test.web.servlet.client.expectBody
 
-inline fun <reified T : Any> WebTestClient.ResponseSpec.expectOkWithBody(): T =
+inline fun <reified T : Any> RestTestClient.ResponseSpec.expectOkWithBody(): T =
     expectStatus()
         .isOk
         .expectBody<T>()
         .returnResult()
         .responseBody!!
 
-fun WebTestClient.ResponseSpec.expectOkEmpty() =
+fun RestTestClient.ResponseSpec.expectOkEmpty() =
     expectStatus()
         .isOk
         .expectBody()
         .isEmpty
 
-fun WebTestClient.ResponseSpec.expectProblemDetail(
+fun RestTestClient.ResponseSpec.expectProblemDetail(
     forventetStatus: HttpStatus,
     forventetDetail: String,
 ) = expectStatus()

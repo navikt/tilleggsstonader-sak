@@ -16,10 +16,10 @@ import java.util.UUID
  */
 object IdConverters {
     @WritingConverter
-    abstract class ValueClassWriter<T>(
+    abstract class ValueClassWriter<T : Any>(
         val convert: (T) -> UUID,
     ) : Converter<T, UUID> {
-        override fun convert(valueClass: T & Any): UUID = this.convert.invoke(valueClass)
+        override fun convert(valueClass: T): UUID = this.convert.invoke(valueClass)
     }
 
     @ReadingConverter

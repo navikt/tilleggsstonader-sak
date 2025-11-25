@@ -24,7 +24,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import org.postgresql.util.PGobject
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer
+import org.springframework.boot.flyway.autoconfigure.FlywayConfigurationCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.convert.converter.Converter
@@ -120,8 +120,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             alleValueClassConverters
 
     @WritingConverter
-    abstract class JsonWriter<T> : Converter<T, PGobject> {
-        override fun convert(source: T & Any): PGobject =
+    abstract class JsonWriter<T : Any> : Converter<T, PGobject> {
+        override fun convert(source: T): PGobject =
             PGobject().apply {
                 type = "json"
                 value = objectMapper.writeValueAsString(source)
@@ -136,7 +136,7 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     }
 
     @ReadingConverter
-    class PGobjectTilJsonWrapperConverter : Converter<PGobject, JsonWrapper?> {
+    class PGobjectTilJsonWrapperConverter : Converter<PGobject, JsonWrapper> {
         override fun convert(pGobject: PGobject): JsonWrapper? = pGobject.value?.let { JsonWrapper(it) }
     }
 

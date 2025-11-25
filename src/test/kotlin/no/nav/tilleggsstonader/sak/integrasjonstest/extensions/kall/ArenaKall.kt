@@ -16,10 +16,10 @@ class ArenaKall(
     inner class ArenaApi {
         fun status(dto: ArenaFinnesPersonRequest) =
             with(testklient.testkontekst) {
-                webTestClient
+                restTestClient
                     .post()
                     .uri("/api/ekstern/arena/status")
-                    .bodyValue(dto)
+                    .body(dto)
                     .medClientCredentials(EksternApplikasjon.ARENA.namespaceAppNavn, true)
                     .exchange()
             }
