@@ -51,7 +51,7 @@ class SkjemaRoutingService(
         skjematype: Skjematype,
         kontekst: RoutingStrategi.SendEnkelteBrukereTilNyLøsning,
     ): Boolean {
-        if (harFortroligEllerStrengtFortroligAdresse(ident)) {
+        if (kontekst.kreverUgradertAdresse && harFortroligEllerStrengtFortroligAdresse(ident)) {
             return false
         }
         if (harLagretRouting(ident, skjematype)) {
