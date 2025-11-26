@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
+import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDato
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
@@ -145,28 +146,44 @@ class OffentligTransportBeregningService(
             error("tidligste endring kan ikke være det samme som dagens dato, det kan bli krøll")
         }
 
-        val beregnFraTidligsteEndring =
-            forrigeBeregningsresultat
-                .flatMap { it.perioder }
-                .sortedBy { it.grunnlag.fom }
-                .firstOrNull { periode ->
-                    tidligsteEndring in periode.grunnlag.fom..periode.grunnlag.tom
-                }?.grunnlag
-                ?.fom
-                ?: tidligsteEndring
+        val ikkeUtbetaltVedtaksPerioder =
+            forrigeBeregningsresultat.map { it.perioder.filter { it.grunnlag.fom > dagensDato() } }.flatten()
+        if (ikkeUtbetaltVedtaksPerioder.isEmpty()) {
+            val beregnFraTidligsteEndring = tidligsteEndring
+            val reberegneUtgifter =
+                UtgiftOffentligTransport(
+                    fom = beregnFraTidligsteEndring,
+                    tom = nyttBeregningsresultat.perioder.maxOf { it.grunnlag.tom },
+                    antallReisedagerPerUke = nyttBeregningsresultat.perioder[0].grunnlag.antallReisedagerPerUke,
+                    prisEnkelbillett = nyttBeregningsresultat.perioder[0].grunnlag.prisEnkeltbillett,
+                    prisSyvdagersbillett = nyttBeregningsresultat.perioder[0].grunnlag.prisSyvdagersbillett,
+                    pris30dagersbillett = nyttBeregningsresultat.perioder[0].grunnlag.pris30dagersbillett,
+                )
+            val reberegnedePerioder = reberegneUtgifter.delTil30Dagersperioder()
 
-        val perioderFraForrigeVedtakSomSkalBeholdes =
-            forrigeBeregningsresultat
-                .flatMap { it.perioder }
-                .filter { it.grunnlag.tom < beregnFraTidligsteEndring }
+            return BeregningsresultatForReise(
+                perioder =
+                    reberegnedePerioder.map { reberegnedePeriode ->
+                        beregnForTrettiDagersPeriode(reberegnedePeriode, emptyList())
+                    },
+            )
+        } else {
+            val beregnFraTidligsteEndring = ikkeUtbetaltVedtaksPerioder.minOf { it.grunnlag.fom }
+            val reberegneUtgifter =
+                UtgiftOffentligTransport(
+                    fom = beregnFraTidligsteEndring,
+                    tom = nyttBeregningsresultat.perioder.maxOf { it.grunnlag.tom },
+                    antallReisedagerPerUke = nyttBeregningsresultat.perioder[0].grunnlag.antallReisedagerPerUke,
+                    prisEnkelbillett = nyttBeregningsresultat.perioder[0].grunnlag.prisEnkeltbillett,
+                    prisSyvdagersbillett = nyttBeregningsresultat.perioder[0].grunnlag.prisSyvdagersbillett,
+                    pris30dagersbillett = nyttBeregningsresultat.perioder[0].grunnlag.pris30dagersbillett,
+                )
+            val reberegnedePerioder = reberegneUtgifter.delTil30Dagersperioder()
 
-        val reberegnedePerioder =
-            nyttBeregningsresultat.perioder
-                .filter { it.grunnlag.tom >= beregnFraTidligsteEndring }
-
-        return BeregningsresultatForReise(
-            perioder = perioderFraForrigeVedtakSomSkalBeholdes + reberegnedePerioder,
-        )
+            return BeregningsresultatForReise(
+                perioder = nyttBeregningsresultat.perioder,
+            )
+        }
     }
 
     private fun hentVedtak(behandlingId: BehandlingId) =
