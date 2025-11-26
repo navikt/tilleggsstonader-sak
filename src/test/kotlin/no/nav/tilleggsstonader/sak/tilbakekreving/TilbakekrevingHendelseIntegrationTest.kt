@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mai
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -35,9 +36,11 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeR
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatNoException
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.core.KafkaTemplate
 import java.math.BigDecimal
@@ -46,6 +49,7 @@ import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 import kotlin.random.Random
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
     @Autowired
     private lateinit var tilbakekrevinghendelseService: TilbakekrevinghendelseService
@@ -77,7 +81,7 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
 
     val publiserteHendelser = mutableListOf<ProducerRecord<String, String>>()
 
-    @BeforeEach
+    @BeforeAll
     fun setUp() {
         val forrigeBehandling =
             testoppsettService.opprettBehandlingMedFagsak(
@@ -180,13 +184,14 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
             assertThat(publisertHendelse.key()).isEqualTo(key)
             val tilbakekrevingFagsysteminfoSvar = objectMapper.readValue<TilbakekrevingFagsysteminfoSvar>(publisertHendelse.value())
             assertThat(tilbakekrevingFagsysteminfoSvar.utvidPerioder).isNotEmpty
+            assertThat(tilbakekrevingFagsysteminfoSvar.behandlendeEnhet).isNotNull
         }
     }
 
     @Nested
     inner class BehandlingEndret {
         @Test
-        fun `mottar hendelsestype fagsysteminfo_behov med ukjent fagsystemId, gjør ingenting`() {
+        fun `mottar hendelsestype behandling_endret med ukjent fagsystemId, gjør ingenting`() {
             val tilbakekrevingBehandlingEndret =
                 TilbakekrevingBehandlingEndret(
                     eksternFagsakId = UUID.randomUUID().toString(),
@@ -209,9 +214,38 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
                     versjon = 1,
                 )
 
-            publiserTilbakekrevinghendelse(UUID.randomUUID().toString(), tilbakekrevingBehandlingEndret)
+            assertThatNoException().isThrownBy {
+                publiserTilbakekrevinghendelse(UUID.randomUUID().toString(), tilbakekrevingBehandlingEndret)
+            }
+        }
 
-            verify(exactly = 0) { kafkaTemplate.send(any<ProducerRecord<String, String>>()) }
+        @Test
+        fun `mottar hendelsestype behandling_endret uten eksternBehandlingId, gjør ingenting`() {
+            val tilbakekrevingBehandlingEndret =
+                TilbakekrevingBehandlingEndret(
+                    eksternFagsakId = fagsak.eksternId.toString(),
+                    hendelseOpprettet = LocalDateTime.now(),
+                    eksternBehandlingId = null,
+                    tilbakekreving =
+                        TilbakekrevingInfo(
+                            behandlingId = UUID.randomUUID().toString(),
+                            sakOpprettet = LocalDateTime.now(),
+                            varselSendt = null,
+                            behandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_TIL_BEHANDLING,
+                            totaltFeilutbetaltBeløp = BigDecimal("10000"),
+                            saksbehandlingURL = "http://localhost",
+                            fullstendigPeriode =
+                                TilbakekrevingPeriode(
+                                    fom = 1 januar 2025,
+                                    tom = 31 mai 2025,
+                                ),
+                        ),
+                    versjon = 1,
+                )
+
+            assertThatNoException().isThrownBy {
+                publiserTilbakekrevinghendelse(UUID.randomUUID().toString(), tilbakekrevingBehandlingEndret)
+            }
         }
 
         @Test

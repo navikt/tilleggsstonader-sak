@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -18,7 +18,7 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
+class AndelTilkjentYtelseRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 

@@ -456,6 +456,19 @@ internal class OppgaveServiceTest {
             .endsWith("$endring\n\n$nåværendeBeskrivelse")
     }
 
+    @Test
+    fun `finnSisteBehandlingsoppgaveForBehandling returnerer siste BehandleSak oppgave`() {
+        val behandleSakOppgave = lagTestOppgave().copy(type = Oppgavetype.BehandleSak)
+        every { oppgaveRepository.findByBehandlingId(any()) } returns
+            listOf(
+                behandleSakOppgave,
+                lagTestOppgave().copy(type = Oppgavetype.GodkjenneVedtak),
+            )
+
+        assertThat(oppgaveService.finnSisteBehandlingsoppgaveForBehandling(BEHANDLING_ID))
+            .isEqualTo(behandleSakOppgave)
+    }
+
     private fun mockOpprettOppgave(slot: CapturingSlot<OpprettOppgaveRequest>) {
         every { fagsakService.hentFagsakForBehandling(BEHANDLING_ID) } returns lagTestFagsak()
 

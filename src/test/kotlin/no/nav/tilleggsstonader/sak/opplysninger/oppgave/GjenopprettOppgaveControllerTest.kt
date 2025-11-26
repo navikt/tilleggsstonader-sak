@@ -1,17 +1,17 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.GjenopprettOppgavePåBehandlingTask
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class GjenopprettOppgaveControllerTest : IntegrationTest() {
+class GjenopprettOppgaveControllerTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `gjenopprett feilregistrert på behandling, har utviklerrolle`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak()
 
-        medBrukercontext(rolle = rolleConfig.utvikler) {
+        medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
             kall.gjenopprettOppgave.gjenopprett(behandling.id)
         }
 

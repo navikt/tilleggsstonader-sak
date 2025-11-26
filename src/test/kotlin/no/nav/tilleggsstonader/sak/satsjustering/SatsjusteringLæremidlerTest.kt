@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.satsjustering
 import io.mockk.clearMocks
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
-class SatsjusteringLæremidlerTest : IntegrationTest() {
+class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var faktaGrunnlagService: FaktaGrunnlagService
 
@@ -65,7 +65,7 @@ class SatsjusteringLæremidlerTest : IntegrationTest() {
         mockSatser()
 
         val behandlingerForSatsjustering =
-            medBrukercontext(rolle = rolleConfig.utvikler) {
+            medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
                 kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
             }
 
@@ -96,7 +96,7 @@ class SatsjusteringLæremidlerTest : IntegrationTest() {
         testoppsettService.ferdigstillBehandling(behandling)
 
         val behandlingerTilSatsjustering =
-            medBrukercontext(rolle = rolleConfig.utvikler) {
+            medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
                 kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
             }
 
@@ -105,7 +105,7 @@ class SatsjusteringLæremidlerTest : IntegrationTest() {
 
     @Test
     fun `kaller satsjustering-endepunkt uten utvikler-rolle, kaster feil`() {
-        medBrukercontext(rolle = rolleConfig.beslutterRolle) {
+        medBrukercontext(roller = listOf(rolleConfig.beslutterRolle)) {
             kall.satsjustering.apiRespons
                 .satsjustering(Stønadstype.LÆREMIDLER)
                 .expectStatus()

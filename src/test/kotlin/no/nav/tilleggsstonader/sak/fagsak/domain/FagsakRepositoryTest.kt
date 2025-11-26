@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.fagsak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -28,7 +28,7 @@ import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class FagsakRepositoryTest : IntegrationTest() {
+class FagsakRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 

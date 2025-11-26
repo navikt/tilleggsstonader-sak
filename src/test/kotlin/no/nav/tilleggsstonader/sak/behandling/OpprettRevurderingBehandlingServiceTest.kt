@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
-class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
+class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var service: OpprettRevurderingService
 
@@ -55,7 +55,6 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
     override fun tearDown() {
         super.tearDown()
         BrukerContextUtil.clearBrukerContext()
-        PdlClientMockConfig.opprettPdlSøker()
     }
 
     @Nested

@@ -96,9 +96,6 @@ abstract class IntegrationTest {
     private lateinit var mockOAuth2Server: MockOAuth2Server
 
     @Autowired
-    private lateinit var jdbcAggregateOperations: JdbcAggregateOperations
-
-    @Autowired
     protected lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
@@ -137,56 +134,15 @@ abstract class IntegrationTest {
         testBrukerkontekst =
             TestBrukerKontekst(
                 defaultBruker = "julenissen",
-                defaultRolle = rolleConfig.beslutterRolle,
+                defaultRoller = listOf(rolleConfig.beslutterRolle),
             )
     }
 
     @AfterEach
     fun tearDown() {
-        resetDatabase()
         clearCaches()
         mockClientService.resetAlleTilDefaults()
         resetMock(unleashService)
-    }
-
-    private fun resetDatabase() {
-        listOf(
-            FagsakUtbetalingId::class,
-            Hendelse::class,
-            TaskLogg::class,
-            Task::class,
-            SkjemaRouting::class,
-            BrevmottakerFrittståendeBrev::class,
-            FrittståendeBrev::class,
-            Oppfølging::class,
-            FaktaGrunnlag::class,
-            Vedtak::class,
-            Simuleringsresultat::class,
-            TilkjentYtelse::class,
-            Vilkårperiode::class,
-            Vilkår::class,
-            BehandlingBarn::class,
-            SøknadBehandling::class,
-            SøknadBarnetilsyn::class,
-            SettPåVent::class,
-            OppgaveDomain::class,
-            Totrinnskontroll::class,
-            Vedtaksbrev::class,
-            BrevmottakerVedtaksbrev::class,
-            MellomlagretFrittståendeBrev::class,
-            MellomlagretBrev::class,
-            VilkårperioderGrunnlagDomain::class,
-            Behandlingshistorikk::class,
-            Behandlingsjournalpost::class,
-            EksternBehandlingId::class,
-            TilbakekrevingHendelse::class,
-            Behandling::class,
-            EksternFagsakId::class,
-            FagsakDomain::class,
-            PersonIdent::class,
-            FagsakPerson::class,
-            IverksettingLogg::class,
-        ).forEach { jdbcAggregateOperations.deleteAll(it.java) }
     }
 
     private fun clearCaches() {
@@ -198,9 +154,9 @@ abstract class IntegrationTest {
     }
 
     protected fun onBehalfOfToken(
-        role: String = rolleConfig.beslutterRolle,
+        roller: List<String> = listOf(rolleConfig.beslutterRolle),
         saksbehandler: String = "julenissen",
-    ): String = TokenUtil.onBehalfOfToken(mockOAuth2Server, role, saksbehandler)
+    ): String = TokenUtil.onBehalfOfToken(mockOAuth2Server, roller, saksbehandler)
 
     protected fun clientCredential(
         clientId: String,
@@ -209,18 +165,18 @@ abstract class IntegrationTest {
 
     fun <T : Any> medBrukercontext(
         bruker: String = testBrukerkontekst.defaultBruker,
-        rolle: String = testBrukerkontekst.rolle,
+        roller: List<String> = testBrukerkontekst.roller,
         fn: () -> T,
     ): T {
         testBrukerkontekst.bruker = bruker
-        testBrukerkontekst.rolle = rolle
+        testBrukerkontekst.roller = roller
 
         return fn().also { testBrukerkontekst.reset() }
     }
 
     fun WebTestClient.RequestHeadersSpec<*>.medOnBehalfOfToken() =
         this.headers {
-            it.setBearerAuth(onBehalfOfToken(testBrukerkontekst.rolle, testBrukerkontekst.bruker))
+            it.setBearerAuth(onBehalfOfToken(testBrukerkontekst.roller, testBrukerkontekst.bruker))
         }
 
     fun WebTestClient.RequestHeadersSpec<*>.medClientCredentials(
@@ -232,14 +188,14 @@ abstract class IntegrationTest {
 
     private data class TestBrukerKontekst(
         val defaultBruker: String,
-        val defaultRolle: String,
+        val defaultRoller: List<String>,
     ) {
         var bruker: String = defaultBruker
-        var rolle: String = defaultRolle
+        var roller: List<String> = defaultRoller
 
         fun reset() {
             bruker = defaultBruker
-            rolle = defaultRolle
+            roller = defaultRoller
         }
     }
 }

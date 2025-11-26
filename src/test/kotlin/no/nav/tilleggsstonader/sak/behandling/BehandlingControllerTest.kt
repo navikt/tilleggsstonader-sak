@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
-internal class BehandlingControllerTest : IntegrationTest() {
+internal class BehandlingControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var behandlingRepository: BehandlingRepository
 
@@ -122,7 +122,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
 
         @Test
         fun `behandlingStatus=OPPRETTET og veileder skal ikke hentes då det opprettes grunnlag`() {
-            medBrukercontext(rolle = rolleConfig.veilederRolle) {
+            medBrukercontext(roller = listOf(rolleConfig.veilederRolle)) {
                 kall.behandling
                     .apiRespons
                     .hent(behandling.id)
@@ -135,7 +135,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
         @Test
         fun `behandlingStatus=UTREDES og veilder skal kunne hente behandlingen hvis statusen er annet enn UTREDES`() {
             testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.UTREDES))
-            medBrukercontext(rolle = rolleConfig.veilederRolle) {
+            medBrukercontext(roller = listOf(rolleConfig.veilederRolle)) {
                 kall.behandling.hent(behandling.id)
             }
         }

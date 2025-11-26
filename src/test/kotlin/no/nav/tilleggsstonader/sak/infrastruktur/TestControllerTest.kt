@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -18,12 +18,11 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.client.exchange
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.collections.mapOf
 
-class TestControllerTest : IntegrationTest() {
+class TestControllerTest : CleanDatabaseIntegrationTest() {
     val json = """{"tekst":"abc","dato":"2023-01-01","tidspunkt":"2023-01-01T12:00:03"}"""
 
     @Test
@@ -191,7 +190,7 @@ class TestControllerTest : IntegrationTest() {
         @Test
         fun `autorisert token, men mangler saksbehandler-relatert rolle`() {
             listOf(rolleConfig.kode6, rolleConfig.kode7, rolleConfig.egenAnsatt).forEach {
-                medBrukercontext(rolle = it) {
+                medBrukercontext(roller = listOf(it)) {
                     webTestClient
                         .get()
                         .uri("/api/test/azuread")
@@ -206,7 +205,7 @@ class TestControllerTest : IntegrationTest() {
         @Test
         fun `autorisert token med saksbehandler-relatert rolle kan gjøre kall`() {
             listOf(rolleConfig.saksbehandlerRolle, rolleConfig.beslutterRolle, rolleConfig.veilederRolle).forEach {
-                medBrukercontext(rolle = it) {
+                medBrukercontext(roller = listOf(it)) {
                     webTestClient
                         .get()
                         .uri("/api/test/azuread")

@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import java.time.LocalDate
 
-class VilkårperiodeControllerTest : IntegrationTest() {
+class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `skal kunne lagre og hente vilkarperioder for AAP`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
@@ -97,7 +97,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         @Test
         fun `må ha saksbehandlerrolle for å kunne oppdatere grunnlag`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            medBrukercontext(rolle = rolleConfig.veilederRolle) {
+            medBrukercontext(roller = listOf(rolleConfig.veilederRolle)) {
                 kall.vilkårperiode.apiRespons
                     .oppdaterGrunnlag(behandling.id)
                     .expectProblemDetail(HttpStatus.FORBIDDEN, "Mangler nødvendig saksbehandlerrolle for å utføre handlingen")

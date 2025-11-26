@@ -1,13 +1,13 @@
 package no.nav.tilleggsstonader.sak.hendelser
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
 
-class HendelseRepositoryTest : IntegrationTest() {
+class HendelseRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var hendelseRepository: HendelseRepository
 

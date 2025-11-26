@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import kotlin.jvm.optionals.getOrNull
 
-class SettPåVentServiceTest : IntegrationTest() {
+class SettPåVentServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var settPåVentService: SettPåVentService
 

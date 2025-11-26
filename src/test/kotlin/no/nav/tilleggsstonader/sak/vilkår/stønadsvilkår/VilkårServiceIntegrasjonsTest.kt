@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -38,7 +38,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
 
-internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
+internal class VilkårServiceIntegrasjonsTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var vilkårRepository: VilkårRepository
 

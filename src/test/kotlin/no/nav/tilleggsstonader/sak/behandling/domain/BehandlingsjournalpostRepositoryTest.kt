@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.domain
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -9,7 +9,7 @@ import org.assertj.core.util.Throwables.getRootCause
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-internal class BehandlingsjournalpostRepositoryTest : IntegrationTest() {
+internal class BehandlingsjournalpostRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
 
