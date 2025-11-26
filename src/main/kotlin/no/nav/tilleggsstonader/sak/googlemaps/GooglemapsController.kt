@@ -19,7 +19,7 @@ class GooglemapsController(
 ) {
     @PostMapping("/kjoreavstand")
     fun hentKjoreavstand(
-        @RequestBody finnReiseAvstandDto: FinnReiseAvstandDto,
+        @RequestBody finnReiseAvstandDto: FinnReiseavstandDto,
     ) = googleRoutesClient
         .hentRuter(
             RuteRequest(
@@ -35,7 +35,7 @@ class GooglemapsController(
 
     @PostMapping("/kollektiv-detaljer")
     fun hentKollektivDetalher(
-        @RequestBody finnReiseAvstandDto: FinnReiseAvstandDto,
+        @RequestBody finnReiseAvstandDto: FinnReiseavstandDto,
     ) = googleRoutesClient
         .hentRuter(
             RuteRequest(
