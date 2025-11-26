@@ -10,8 +10,10 @@ import java.net.URI
 class GoogleStaticMapClient(
     @Value("\${google.static-map.uri}") private val baseUrl: URI,
     @Value("\${google.api-key}") private val apiKey: String,
-    builder: RestClient.Builder,
 ) {
+    // Initialiserer en egen builder for å unngå Prometheus-metrikker for hvert kall mot staticmap.
+    // URL-en mot staticmap kan ikke parametriseres, så det ville ellers blitt en ny metrikk for hvert kall.
+    val builder = RestClient.builder()
     private val restClient = builder.baseUrl(baseUrl.toString()).build()
 
     fun hentStaticMap(statiskKartRequest: StatiskKartRequest): ByteArray? {
