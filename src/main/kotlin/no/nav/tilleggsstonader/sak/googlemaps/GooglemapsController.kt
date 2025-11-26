@@ -22,8 +22,8 @@ class GooglemapsController(
     ) = googleRoutesClient
         .hentRuter(
             RuteRequest(
-                origin = Address(finnReiseAvstandDto.fraAdresse.tilSøkeString()),
-                destination = Address(finnReiseAvstandDto.tilAdresse.tilSøkeString()),
+                origin = Address(finnReiseAvstandDto.fraAdresse),
+                destination = Address(finnReiseAvstandDto.tilAdresse),
                 travelMode = "DRIVE",
                 departureTime = null,
                 transitPreferences = null,
@@ -37,8 +37,8 @@ class GooglemapsController(
     ) = googleRoutesClient
         .hentRuter(
             RuteRequest(
-                origin = Address(finnReiseAvstandDto.fraAdresse.tilSøkeString()),
-                destination = Address(finnReiseAvstandDto.tilAdresse.tilSøkeString()),
+                origin = Address(finnReiseAvstandDto.fraAdresse),
+                destination = Address(finnReiseAvstandDto.tilAdresse),
                 travelMode = "TRANSIT",
                 departureTime = OffsetDateTime.now(ZoneOffset.UTC).toString(),
                 transitPreferences =

@@ -1,14 +1,6 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
 data class FinnReiseAvstandDto(
-    val fraAdresse: Adresse,
-    val tilAdresse: Adresse,
+    val fraAdresse: String,
+    val tilAdresse: String,
 )
-
-data class Adresse(
-    val gate: String,
-    val postnummer: String,
-    val poststed: String,
-) {
-    fun tilSøkeString() = "$gate, $postnummer, $poststed"
-}
