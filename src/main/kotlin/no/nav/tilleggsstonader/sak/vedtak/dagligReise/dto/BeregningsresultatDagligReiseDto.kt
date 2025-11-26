@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import java.time.LocalDate
+import java.util.UUID
 
 data class BeregningsresultatDagligReiseDto(
     val offentligTransport: BeregningsresultatOffentligTransportDto?,
@@ -22,6 +23,7 @@ data class BeregningsresultatForReiseDto(
 )
 
 data class BeregningsresultatForPeriodeDto(
+    val reiseId: UUID,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val prisEnkeltbillett: Int?,
@@ -50,6 +52,7 @@ fun BeregningsresultatForReise.tilDto(): BeregningsresultatForReiseDto =
 
 fun BeregningsresultatForPeriode.tilDto(): BeregningsresultatForPeriodeDto =
     BeregningsresultatForPeriodeDto(
+        reiseId = reiseId,
         fom = grunnlag.fom,
         tom = grunnlag.tom,
         prisEnkeltbillett = grunnlag.prisEnkeltbillett,

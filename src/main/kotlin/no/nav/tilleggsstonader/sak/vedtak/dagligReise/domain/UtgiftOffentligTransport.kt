@@ -3,8 +3,10 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.util.inneholderUkedag
 import java.time.LocalDate
+import java.util.UUID
 
 data class UtgiftOffentligTransport(
+    val reiseId: UUID,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val antallReisedagerPerUke: Int,
@@ -15,6 +17,7 @@ data class UtgiftOffentligTransport(
     fun delTil30Dagersperioder(): List<UtgiftOffentligTransport> =
         this.splitPer30DagersPerioder { fom, tom ->
             UtgiftOffentligTransport(
+                reiseId = reiseId,
                 fom = fom,
                 tom = tom,
                 antallReisedagerPerUke = antallReisedagerPerUke,

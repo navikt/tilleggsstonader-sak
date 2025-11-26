@@ -608,7 +608,8 @@ object InterntVedtakTestdata {
     }
 
     object DagligReise {
-        val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+        val fagsak =
+            fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
         val behandling =
             saksbehandling(
                 behandling =
@@ -656,6 +657,7 @@ object InterntVedtakTestdata {
                                     perioder =
                                         listOf(
                                             BeregningsresultatForPeriode(
+                                                reiseId = UUID.randomUUID(),
                                                 grunnlag =
                                                     BeregningsgrunnlagOffentligTransport(
                                                         fom = LocalDate.of(2024, 2, 5),
@@ -671,6 +673,7 @@ object InterntVedtakTestdata {
                                                 billettdetaljer = mapOf(Billettype.SYVDAGERSBILLETT to 1),
                                             ),
                                             BeregningsresultatForPeriode(
+                                                reiseId = UUID.randomUUID(),
                                                 grunnlag =
                                                     BeregningsgrunnlagOffentligTransport(
                                                         fom = LocalDate.of(2024, 2, 5),
@@ -691,6 +694,7 @@ object InterntVedtakTestdata {
                                     perioder =
                                         listOf(
                                             BeregningsresultatForPeriode(
+                                                reiseId = UUID.randomUUID(),
                                                 grunnlag =
                                                     BeregningsgrunnlagOffentligTransport(
                                                         fom = LocalDate.of(2025, 2, 5),

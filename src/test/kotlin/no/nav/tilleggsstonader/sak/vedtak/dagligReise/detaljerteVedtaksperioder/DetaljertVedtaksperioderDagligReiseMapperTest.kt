@@ -242,6 +242,7 @@ private fun beregningsresultatForPeriode(
     tom: LocalDate,
 ): BeregningsresultatForPeriode =
     BeregningsresultatForPeriode(
+        reiseId = randomUUID(),
         grunnlag =
             BeregningsgrunnlagOffentligTransport(
                 fom = fom,

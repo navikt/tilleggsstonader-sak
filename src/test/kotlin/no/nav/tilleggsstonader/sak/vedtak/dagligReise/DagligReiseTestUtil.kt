@@ -133,6 +133,7 @@ private fun beregningsresultatForPeriode(
             Billettype.TRETTIDAGERSBILLETT to 1000,
         ),
 ) = BeregningsresultatForPeriode(
+    reiseId = randomUUID(),
     grunnlag = grunnlag,
     beløp = beløp,
     billettdetaljer = billettdetaljer,

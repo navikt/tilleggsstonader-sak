@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
+import java.util.UUID
 import java.util.UUID.randomUUID
 
 fun lagDagligReiseInnvilgelseMedBeløp(
@@ -52,6 +53,7 @@ fun lagDagligReiseInnvilgelseMedBeløp(
                                 perioder =
                                     listOf(
                                         BeregningsresultatForPeriode(
+                                            reiseId = randomUUID(),
                                             grunnlag =
                                                 BeregningsgrunnlagOffentligTransport(
                                                     fom = fom,

@@ -95,6 +95,7 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
                                         perioder =
                                             listOf(
                                                 BeregningsresultatForPeriode(
+                                                    reiseId = UUID.randomUUID(),
                                                     grunnlag =
                                                         BeregningsgrunnlagOffentligTransport(
                                                             fom = dummyFom,

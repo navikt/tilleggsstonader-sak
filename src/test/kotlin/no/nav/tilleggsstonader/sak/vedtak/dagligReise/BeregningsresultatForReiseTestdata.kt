@@ -18,6 +18,7 @@ fun lagBeregningsresultatForReise(
         perioder =
             listOf(
                 BeregningsresultatForPeriode(
+                    reiseId = UUID.randomUUID(),
                     grunnlag = beregningsgrunnlag,
                     beløp = beløp,
                     billettdetaljer = emptyMap(),

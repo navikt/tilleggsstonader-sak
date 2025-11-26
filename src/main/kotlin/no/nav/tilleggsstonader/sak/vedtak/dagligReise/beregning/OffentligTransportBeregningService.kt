@@ -81,6 +81,7 @@ class OffentligTransportBeregningService {
             )
 
         return BeregningsresultatForPeriode(
+            reiseId = trettidagerReisePeriode.reiseId,
             grunnlag = grunnlag,
             beløp = finnBilligsteAlternativForTrettidagersPeriode(grunnlag).billigsteBelop,
             billettdetaljer = finnBilligsteAlternativForTrettidagersPeriode(grunnlag).billettyper,
@@ -93,6 +94,7 @@ class OffentligTransportBeregningService {
         }
 
         return UtgiftOffentligTransport(
+            reiseId = this.fakta.reiseId,
             fom = this.fom,
             tom = this.tom,
             antallReisedagerPerUke = this.fakta.reisedagerPerUke,

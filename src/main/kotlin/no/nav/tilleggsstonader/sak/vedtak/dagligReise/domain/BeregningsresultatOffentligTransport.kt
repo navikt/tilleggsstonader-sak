@@ -17,6 +17,7 @@ data class BeregningsresultatForReise(
 )
 
 data class BeregningsresultatForPeriode(
+    val reiseId: UUID,
     val grunnlag: BeregningsgrunnlagOffentligTransport,
     val beløp: Int,
     val billettdetaljer: Map<Billettype, Int>,

@@ -30,6 +30,7 @@ import java.util.UUID
 fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
     dataTable.mapRad { rad ->
         BeregningsresultatForPeriode(
+            reiseId = UUID.randomUUID(),
             grunnlag =
                 BeregningsgrunnlagOffentligTransport(
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
