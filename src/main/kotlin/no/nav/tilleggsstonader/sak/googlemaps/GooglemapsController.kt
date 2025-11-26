@@ -28,8 +28,9 @@ class GooglemapsController(
                 departureTime = null,
                 transitPreferences = null,
                 polylineQuality = "OVERVIEW",
+                computeAlternativeRoutes = true,
             ),
-        )?.finnDefaultRute()
+        )?.finnKortesteRute()
         ?.tilDto()
 
     @PostMapping("/kollektiv-detaljer")
@@ -54,6 +55,7 @@ class GooglemapsController(
                             ),
                     ),
                 polylineQuality = "OVERVIEW",
+                computeAlternativeRoutes = false,
             ),
         )?.finnDefaultRute()
         ?.tilDto()
