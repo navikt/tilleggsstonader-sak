@@ -50,7 +50,7 @@ class BehandlingController(
         @PathVariable behandlingId: BehandlingId,
     ): BehandlingDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val tilordnetSaksbehandler = tilordnetSaksbehandlerService.finnTilordnetSaksbehandler(behandlingId).tilDto()
 
@@ -114,7 +114,7 @@ class BehandlingController(
         @RequestBody henlagt: HenlagtDto,
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         henleggService.henleggBehandling(behandlingId, henlagt)
     }
@@ -124,7 +124,7 @@ class BehandlingController(
         @PathVariable eksternBehandlingId: Long,
     ): BehandlingId {
         val saksbehandling = behandlingService.hentSaksbehandling(eksternBehandlingId)
-        tilgangService.validerTilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(saksbehandling.id)
         return saksbehandling.id
     }
 
@@ -134,7 +134,7 @@ class BehandlingController(
         @PathVariable behandlingId: BehandlingId,
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         nullstillBehandlingService.nullstillBehandling(behandlingService.hentBehandling(behandlingId))
     }

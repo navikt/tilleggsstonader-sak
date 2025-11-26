@@ -25,7 +25,7 @@ class BrevMellomlagerController(
         @RequestBody mellomlagretBrev: MellomlagreBrevDto,
     ): BehandlingId {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
         return mellomlagringBrevService.mellomlagreBrev(
@@ -40,7 +40,7 @@ class BrevMellomlagerController(
         @PathVariable behandlingId: BehandlingId,
     ): MellomlagreBrevDto? {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
         return mellomlagringBrevService.hentMellomlagretBrev(
             behandlingId,

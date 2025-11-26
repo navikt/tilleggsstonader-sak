@@ -24,7 +24,6 @@ import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlSøker
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.fagsakpersoner
-import no.nav.tilleggsstonader.sak.util.oppgave
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -103,10 +102,7 @@ internal class TilgangServiceTest {
 
             val feil =
                 catchThrowableOfType<ManglerTilgang> {
-                    tilgangService.validerTilgangTilBehandling(
-                        behandling.id,
-                        AuditLoggerEvent.ACCESS,
-                    )
+                    tilgangService.validerLesetilgangTilBehandling(behandling.id)
                 }
 
             assertThat(feil.frontendFeilmelding).contains(tilgangsfeilNavAnsatt.begrunnelse)
@@ -120,7 +116,7 @@ internal class TilgangServiceTest {
             } returns Tilgang(true)
 
             assertDoesNotThrow {
-                tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
+                tilgangService.validerLesetilgangTilBehandling(behandling.id)
             }
         }
 
@@ -161,8 +157,8 @@ internal class TilgangServiceTest {
 
             mockBrukerContext("A")
 
-            tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
-            tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
+            tilgangService.validerLesetilgangTilBehandling(behandling.id)
+            tilgangService.validerLesetilgangTilBehandling(behandling.id)
 
             verify(exactly = 1) { behandlingService.hentSaksbehandling(behandling.id) }
             verify(exactly = 2) { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) }
@@ -173,9 +169,9 @@ internal class TilgangServiceTest {
             every { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) } returns Tilgang(true)
 
             mockBrukerContext("A")
-            tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
+            tilgangService.validerLesetilgangTilBehandling(behandling.id)
             mockBrukerContext("B")
-            tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
+            tilgangService.validerLesetilgangTilBehandling(behandling.id)
 
             verify(exactly = 1) { behandlingService.hentSaksbehandling(behandling.id) }
             verify(exactly = 2) { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) }

@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.SluttdatoForVedtakDto
@@ -28,7 +27,7 @@ class VedtakController(
         @PathVariable behandlingId: BehandlingId,
     ): SluttdatoForVedtakDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
         return SluttdatoForVedtakDto(
             sluttdato = vedtakService.hentVedtak(behandlingId)?.vedtaksperioderHvisFinnes()?.maxOfOrNull { it.tom },
@@ -40,7 +39,7 @@ class VedtakController(
         @PathVariable behandlingId: BehandlingId,
     ): List<LagretVedtaksperiodeDto> {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
         tilgangService.validerHarSaksbehandlerrolle()
 
         val behandling = behandlingService.hentBehandling(behandlingId)

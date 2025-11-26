@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ManglerTilgang
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.logging.BehandlingLogService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
@@ -24,7 +25,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.FORTROLIG
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.STRENGT_FORTROLIG
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
 
@@ -77,36 +77,55 @@ class TilgangService(
         kastFeilHvisIkkeTilgang(tilgang, "person", personIdent)
     }
 
-    /**
-     * Cachear henting av saksehandling då vi kun skal bruke ident og fagsakPersonId
-     */
-    fun validerTilgangTilBehandling(
+    fun validerSkrivetilgangTilBehandling(
         behandlingId: BehandlingId,
         event: AuditLoggerEvent,
     ) {
-        val saksbehandling =
-            cacheManager.getValue("tilgangService_behandling", behandlingId) {
-                behandlingService.hentSaksbehandling(behandlingId)
-            }
-        val tilgang =
-            if (event == AuditLoggerEvent.ACCESS) {
-                tilgangskontrollService.sjekkTilgangTilStønadstype(
-                    personIdent = saksbehandling.ident,
-                    stønadstype = saksbehandling.stønadstype,
-                    jwtToken = SikkerhetContext.hentToken(),
-                )
-            } else {
-                hentTilgangTilRedigerBehandling(
-                    behandling = saksbehandling,
-                    personIdent = saksbehandling.ident,
-                    stønadstype = saksbehandling.stønadstype,
-                    jwtToken = SikkerhetContext.hentToken(),
-                )
-            }
+        feilHvis(event == AuditLoggerEvent.ACCESS) {
+            "AuditLoggerEvent.ACCESS er ikke gyldig for skrivetilgangskontroll"
+        }
 
-        val key = CustomKeyValue("behandling", behandlingId.id)
+        val saksbehandling = hentCachedBehandling(behandlingId)
+
+        val tilgang =
+            hentTilgangTilRedigerBehandling(
+                behandling = saksbehandling,
+                personIdent = saksbehandling.ident,
+                stønadstype = saksbehandling.stønadstype,
+                jwtToken = SikkerhetContext.hentToken(),
+            )
+
+        validerTilgangTilBehandling(saksbehandling, event, tilgang)
+    }
+
+    private fun hentCachedBehandling(behandlingId: BehandlingId): Saksbehandling =
+        cacheManager.getValue("tilgangService_behandling", behandlingId) {
+            behandlingService.hentSaksbehandling(behandlingId)
+        }
+
+    /**
+     * Cachear henting av saksehandling då vi kun skal bruke ident og fagsakPersonId
+     */
+    fun validerLesetilgangTilBehandling(behandlingId: BehandlingId) {
+        val saksbehandling = hentCachedBehandling(behandlingId)
+        val tilgang =
+            tilgangskontrollService.sjekkTilgangTilStønadstype(
+                personIdent = saksbehandling.ident,
+                stønadstype = saksbehandling.stønadstype,
+                jwtToken = SikkerhetContext.hentToken(),
+            )
+
+        validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.ACCESS, tilgang)
+    }
+
+    private fun validerTilgangTilBehandling(
+        saksbehandling: Saksbehandling,
+        event: AuditLoggerEvent,
+        tilgang: Tilgang,
+    ) {
+        val key = CustomKeyValue("behandling", saksbehandling.id.id)
         auditLogger.log(Sporingsdata(event, saksbehandling.ident, tilgang, custom1 = key))
-        kastFeilHvisIkkeTilgang(tilgang, "behandling", behandlingId.id.toString())
+        kastFeilHvisIkkeTilgang(tilgang, "behandling", saksbehandling.id.toString())
     }
 
     private fun hentTilgangTilRedigerBehandling(

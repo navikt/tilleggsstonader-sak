@@ -36,7 +36,6 @@ class BoutgifterVedtakController(
     private val beregningService: BoutgifterBeregningService,
     private val tilgangService: TilgangService,
     private val vedtakService: VedtakService,
-    private val vedtakOversiktService: VedtaksperioderOversiktService,
     private val behandlingService: BehandlingService,
     private val stegService: StegService,
     private val steg: BoutgifterBeregnYtelseSteg,
@@ -78,7 +77,7 @@ class BoutgifterVedtakController(
         vedtak: VedtakBoutgifterRequest,
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         stegService.håndterSteg(behandlingId, steg, vedtak)
     }
 
@@ -108,7 +107,7 @@ class BoutgifterVedtakController(
         @PathVariable behandlingId: BehandlingId,
     ): VedtakResponse? {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
         val behandling = behandlingService.hentBehandling(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
         return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)

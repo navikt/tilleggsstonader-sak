@@ -24,7 +24,7 @@ class SimuleringController(
         @PathVariable behandlingId: BehandlingId,
     ): SimuleringDto? {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
 
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 

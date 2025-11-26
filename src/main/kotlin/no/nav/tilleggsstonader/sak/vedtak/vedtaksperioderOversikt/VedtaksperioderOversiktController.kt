@@ -30,7 +30,7 @@ class VedtaksperioderOversiktController(
     fun hentDetaljerteVedtaksperioderForBehandling(
         @PathVariable behandlingId: BehandlingId,
     ): List<DetaljertVedtaksperiode> {
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
         return vedtakOversiktService.hentDetaljerteVedtaksperioderForBehandling(behandlingId)
     }
 }

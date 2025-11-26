@@ -39,7 +39,6 @@ class TilsynBarnVedtakController(
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
-    private val vedtakOversiktService: VedtaksperioderOversiktService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -71,7 +70,7 @@ class TilsynBarnVedtakController(
         vedtak: VedtakTilsynBarnRequest,
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         vedtakService.håndterSteg(behandlingId, vedtak)
     }
 
@@ -103,7 +102,7 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: BehandlingId,
     ): VedtakResponse? {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
         return vedtakDtoMapper.toDto(vedtak, saksbehandling.forrigeIverksatteBehandlingId)

@@ -38,7 +38,7 @@ class DagligReiseVilkårController(
         @PathVariable behandlingId: BehandlingId,
     ): List<VilkårDagligReiseDto> {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
         return dagligReiseVilkårService.hentVilkårForBehandling(behandlingId).map { it.tilDto() }
     }
@@ -49,7 +49,7 @@ class DagligReiseVilkårController(
         @RequestBody lagreVilkårDto: LagreDagligReiseDto,
     ): VilkårDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
         return dagligReiseVilkårService
@@ -66,7 +66,7 @@ class DagligReiseVilkårController(
         @RequestBody lagreVilkårDto: LagreDagligReiseDto,
     ): VilkårDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
         return dagligReiseVilkårService
@@ -84,7 +84,7 @@ class DagligReiseVilkårController(
         @RequestBody slettVilkårRequestDto: SlettVilkårRequestDto,
     ): SlettVilkårResultatDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.DELETE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.DELETE)
         tilgangService.validerHarSaksbehandlerrolle()
 
         return dagligReiseVilkårService

@@ -31,7 +31,7 @@ class TotrinnskontrollController(
         @PathVariable behandlingId: BehandlingId,
     ): StatusTotrinnskontrollDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
         return totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId)
     }
 
@@ -41,7 +41,7 @@ class TotrinnskontrollController(
         @RequestBody request: SendTilBeslutterRequest,
     ): StatusTotrinnskontrollDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
         stegService.håndterSteg(behandlingId, sendTilBeslutterSteg, request)
         return totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId)
     }
@@ -52,7 +52,7 @@ class TotrinnskontrollController(
         @RequestBody request: BeslutteVedtakDto,
     ): StatusTotrinnskontrollDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         stegService.håndterSteg(behandlingId, beslutteVedtakSteg, request)
         return totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId)
     }
@@ -62,7 +62,7 @@ class TotrinnskontrollController(
         @PathVariable behandlingId: BehandlingId,
     ): StatusTotrinnskontrollDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
         angreSendTilBeslutterService.angreSendTilBeslutter(behandlingId)
