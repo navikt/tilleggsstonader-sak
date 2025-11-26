@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 /**
@@ -22,7 +23,7 @@ data class MakssatsBoutgifter(
 
 private val MAX = LocalDate.of(2099, 12, 31)
 
-private val bekreftedeSatser =
+val bekreftedeSatser =
     listOf(
         MakssatsBoutgifter(
             fom = LocalDate.of(2025, 1, 1),
@@ -56,7 +57,7 @@ private val bekreftedeSatser =
         ),
     )
 
-private val satser: List<MakssatsBoutgifter> =
+val satser: List<MakssatsBoutgifter> =
     listOf(
         bekreftedeSatser.max().let {
             it.copy(
@@ -67,7 +68,22 @@ private val satser: List<MakssatsBoutgifter> =
         },
     ) + bekreftedeSatser
 
-fun finnMakssats(dato: LocalDate): MakssatsBoutgifter =
-    satser.find { makssats ->
+@Component
+class SatsBoutgifterProvider {
+    val alleSatser: List<MakssatsBoutgifter>
+        get() = satser
+}
+
+@Component
+class SatsBoutgifterService(
+    private val satsBoutgifterProvider: SatsBoutgifterProvider,
+) {
+    fun alleSatser() = satsBoutgifterProvider.alleSatser
+
+    fun finnMakssats(dato: LocalDate): MakssatsBoutgifter = satsBoutgifterProvider.alleSatser.finnMakssats(dato)
+}
+
+fun List<MakssatsBoutgifter>.finnMakssats(dato: LocalDate): MakssatsBoutgifter =
+    find { makssats ->
         dato >= makssats.fom && dato <= makssats.tom
     } ?: error("Finner ikke makssats for $dato")
