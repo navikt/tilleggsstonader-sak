@@ -62,7 +62,6 @@ data class Vehicle(
 
 data class Polyline(
     val encodedPolyline: String,
-    val geoJsonLinestring: Any?,
 )
 
 enum class LinjeType {
