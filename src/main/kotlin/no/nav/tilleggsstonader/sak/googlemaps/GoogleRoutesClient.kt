@@ -1,7 +1,10 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 import org.springframework.web.client.bodyWithType
@@ -18,16 +21,25 @@ class GoogleRoutesClient(
     private val uri = UriComponentsBuilder.fromUri(baseUrl).encode().toUriString()
 
     fun hentRuter(request: RuteRequest): RuteResponse? =
-        restClient
-            .post()
-            .uri(uri)
-            .headers { headers ->
-                headers.apply {
-                    add("X-Goog-Api-Key", apiKey)
-                    add("X-Goog-FieldMask", "*")
-                    add("Content-Type", "application/json")
-                }
-            }.bodyWithType(request)
-            .retrieve()
-            .body<RuteResponse>()
+        try {
+            restClient
+                .post()
+                .uri(uri)
+                .headers { headers ->
+                    headers.apply {
+                        add("X-Goog-Api-Key", apiKey)
+                        add("X-Goog-FieldMask", "*")
+                        add("Content-Type", "application/json")
+                    }
+                }.bodyWithType(request)
+                .retrieve()
+                .body<RuteResponse>()
+        } catch (e: HttpClientErrorException.NotFound) {
+            if (e.message?.contains("Address not found") == true) {
+                logger.warn(e.message)
+                brukerfeil("Kunne ikke finne adressen")
+            } else {
+                throw e
+            }
+        }
 }

@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
 data class RuteResponse(
-    val routes: List<Route>,
+    val routes: List<Route>?,
 )
 
 data class Route(
