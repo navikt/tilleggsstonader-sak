@@ -5,17 +5,16 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingResponse
 
-class SøknadRoutingKall(
+class SkjemaRoutingKall(
     private val testklient: Testklient,
 ) {
-    fun skjemaRouting(identSkjematype: IdentSkjematype): SøknadRoutingResponse =
-        apiRespons.skjemaRouting(identSkjematype).expectOkWithBody()
+    fun sjekk(identSkjematype: IdentSkjematype): SøknadRoutingResponse = apiRespons.sjekk(identSkjematype).expectOkWithBody()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = SøknadRoutingApi()
 
     inner class SøknadRoutingApi {
-        fun skjemaRouting(identSkjematype: IdentSkjematype) =
+        fun sjekk(identSkjematype: IdentSkjematype) =
             with(testklient.testkontekst) {
                 webTestClient
                     .post()

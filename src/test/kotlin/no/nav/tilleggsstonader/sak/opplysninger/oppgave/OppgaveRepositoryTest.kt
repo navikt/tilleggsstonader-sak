@@ -22,9 +22,6 @@ import java.time.LocalDateTime
 
 internal class OppgaveRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
-    private lateinit var oppgaveRepository: OppgaveRepository
-
-    @Autowired
     private lateinit var totrinnskontrollRepository: TotrinnskontrollRepository
 
     @Test

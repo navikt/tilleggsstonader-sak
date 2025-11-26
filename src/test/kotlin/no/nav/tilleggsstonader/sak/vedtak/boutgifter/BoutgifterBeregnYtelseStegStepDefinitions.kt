@@ -37,6 +37,8 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilge
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterUtgiftService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.ForenkletAndel
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.SatsBoutgifterProvider
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.SatsBoutgifterService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.mapAktiviteter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.mapAndeler
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.mapBeregningsresultat
@@ -108,12 +110,17 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         )
     val simuleringServiceMock = mockk<SimuleringService>(relaxed = true)
 
+    val satsBoutgifterService =
+        SatsBoutgifterService(
+            satsBoutgifterProvider = SatsBoutgifterProvider(),
+        )
     val beregningService =
         BoutgifterBeregningService(
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepositoryFake,
             unleashService = unleashService,
+            satsBoutgifterService = satsBoutgifterService,
         )
     val opphørValideringService =
         OpphørValideringService(

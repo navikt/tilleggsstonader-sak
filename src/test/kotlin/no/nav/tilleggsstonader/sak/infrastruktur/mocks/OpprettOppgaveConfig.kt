@@ -69,7 +69,7 @@ class OpprettOppgaveConfig(
                 OpprettOppgaveRequest(
                     ident = OppgaveIdentV2(ident = behandling.ident, gruppe = IdentGruppe.FOLKEREGISTERIDENT),
                     tema = behandling.stønadstype.tilTema(),
-                    tilordnetRessurs = mapTilordnetRessurs(oppgavetype, behandling),
+                    tilordnetRessurs = oppgave.tilordnetSaksbehandler,
                     oppgavetype = oppgavetype,
                     behandlingstema = behandling.stønadstype.tilBehandlingstema().value,
                     behandlingstype = Behandlingstype.NASJONAL.value,
@@ -84,11 +84,6 @@ class OpprettOppgaveConfig(
     }
 
     private fun mapEnhet() = "4462" // Tilleggsstønad INN, som er Nasjonal kø for NAY tilleggsstønader
-
-    private fun mapTilordnetRessurs(
-        oppgavetype: Oppgavetype,
-        behandling: Saksbehandling,
-    ) = if (oppgavetype == Oppgavetype.BehandleSak) behandling.opprettetAv else null
 
     private fun mapBeskrivelse(oppgavetype: Oppgavetype): String =
         when (oppgavetype) {

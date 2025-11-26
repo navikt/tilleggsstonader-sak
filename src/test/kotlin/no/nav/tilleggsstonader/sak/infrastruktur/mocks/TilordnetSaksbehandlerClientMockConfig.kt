@@ -4,6 +4,7 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Saksbehandler
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.TilordnetSaksbehandlerClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -26,14 +27,15 @@ class TilordnetSaksbehandlerClientMockConfig {
             val faktiskClient = runCatching { AopTestUtils.getTargetObject<TilordnetSaksbehandlerClient>(client) }.getOrElse { client }
 
             clearMocks(faktiskClient)
-            every { faktiskClient.hentSaksbehandlerInfo(any()) } returns
+            every { faktiskClient.hentSaksbehandlerInfo(any()) } answers {
                 Saksbehandler(
-                    navIdent = "Z993543",
+                    navIdent = if (SikkerhetContext.erSaksbehandler()) SikkerhetContext.hentSaksbehandler() else "Z999999",
                     azureId = UUID.randomUUID(),
                     fornavn = "Test",
                     etternavn = "Testesen",
                     enhet = "TSO",
                 )
+            }
         }
     }
 }

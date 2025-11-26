@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.finnMakssats
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.satser
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperioderBoutgifterMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -63,7 +64,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
             assertThat(resJan.tom).isEqualTo(sisteJan)
             assertThat(resJan.erLøpendeUtgift).isFalse
             assertThat(resJan.utgifterTilOvernatting).hasSize(3)
-            assertThat(resJan.stønadsbeløpMnd).isEqualTo(finnMakssats(førsteJan).beløp)
+            assertThat(resJan.stønadsbeløpMnd).isEqualTo(satser.finnMakssats(førsteJan).beløp)
 
             val forventetUtgiftRes =
                 listOf(
@@ -146,7 +147,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
             assertThat(resJan.tom).isEqualTo(sisteJan)
             assertThat(resJan.erLøpendeUtgift).isFalse
             assertThat(resJan.totalUtgiftMåned).isEqualTo(8000)
-            assertThat(resJan.stønadsbeløpMnd).isEqualTo(finnMakssats(førsteJan).beløp)
+            assertThat(resJan.stønadsbeløpMnd).isEqualTo(satser.finnMakssats(førsteJan).beløp)
 
             assertThat(resFeb.fom).isEqualTo(førsteFeb)
             assertThat(resFeb.tom).isEqualTo(sisteFeb)

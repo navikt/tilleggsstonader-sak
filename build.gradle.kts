@@ -144,12 +144,14 @@ tasks {
         if (System.getenv("GITHUB_ACTIONS") == "true") {
             return System.getenv("GITHUB_SHA")
         }
-        val byteOut = ByteArrayOutputStream()
-        project.exec {
-            commandLine = "git rev-parse --verify HEAD".split("\\s".toRegex())
-            standardOutput = byteOut
-        }
-        return String(byteOut.toByteArray()).trim()
+        val execResult =
+            providers.exec {
+                commandLine = "git rev-parse --verify HEAD".split("\\s".toRegex())
+                workingDir = project.projectDir
+            }
+        return execResult.standardOutput.asText
+            .get()
+            .trim()
     }
 
     val projectProps by registering(WriteProperties::class) {

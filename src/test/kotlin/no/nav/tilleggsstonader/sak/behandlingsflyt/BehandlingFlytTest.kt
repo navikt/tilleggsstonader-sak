@@ -21,8 +21,10 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksb
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.BrevController
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringStegService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
@@ -58,9 +60,6 @@ import java.util.UUID
 class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var barnService: BarnService
-
-    @Autowired
-    lateinit var oppgaveRepository: OppgaveRepository
 
     @Autowired
     lateinit var opprettTestBehandlingController: OpprettTestBehandlingController
@@ -114,6 +113,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
         }
 
         somBeslutter {
+            tilordneÅpenBehandlingOppgaveForBehandling(behandlingId, SikkerhetContext.hentSaksbehandler())
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.KAN_FATTE_VEDTAK)
             godkjennTotrinnskontroll(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
@@ -150,6 +150,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
             }
 
         somBeslutter {
+            tilordneÅpenBehandlingOppgaveForBehandling(behandlingId, SikkerhetContext.hentSaksbehandler())
             underkjennTotrinnskontroll(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT)
         }
@@ -162,6 +163,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
         }
 
         somBeslutter {
+            tilordneÅpenBehandlingOppgaveForBehandling(behandlingId, SikkerhetContext.hentSaksbehandler())
             godkjennTotrinnskontroll(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
         }
@@ -180,6 +182,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
         assertSisteOpprettedeOppgave(behandlingId, Oppgavetype.GodkjenneVedtak)
 
         somSaksbehandler {
+            tilordneÅpenBehandlingOppgaveForBehandling(behandlingId, SikkerhetContext.hentSaksbehandler())
             angreSendTilBeslutter(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
         }
@@ -195,6 +198,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
         assertSisteOpprettedeOppgave(behandlingId, Oppgavetype.GodkjenneVedtak)
 
         somBeslutter {
+            tilordneÅpenBehandlingOppgaveForBehandling(behandlingId, SikkerhetContext.hentSaksbehandler())
             godkjennTotrinnskontroll(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
         }
@@ -219,6 +223,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
         assertSisteOpprettedeOppgave(behandlingId, Oppgavetype.GodkjenneVedtak)
 
         somBeslutter {
+            tilordneÅpenBehandlingOppgaveForBehandling(behandlingId, SikkerhetContext.hentSaksbehandler())
             godkjennTotrinnskontroll(behandlingId)
         }
         kjørTasksKlareForProsessering()

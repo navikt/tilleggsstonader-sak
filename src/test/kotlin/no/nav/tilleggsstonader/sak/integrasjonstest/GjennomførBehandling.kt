@@ -16,8 +16,10 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.journalpost
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
@@ -57,6 +59,8 @@ fun IntegrationTest.gjennomførBehandlingsløp(
 
     // Oppretter oppgave
     kjørTasksKlareForProsessering()
+
+    tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
 
     if (tilSteg == StegType.INNGANGSVILKÅR) {
         return behandlingId
@@ -113,6 +117,8 @@ fun IntegrationTest.gjennomførHenleggelse(fraJournalpost: Journalpost = default
     // Oppretter oppgave
     kjørTasksKlareForProsessering()
 
+    tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
+
     kall.behandling.henlegg(
         behandlingId,
         HenlagtDto(
@@ -127,6 +133,7 @@ fun IntegrationTest.gjennomførHenleggelse(fraJournalpost: Journalpost = default
 
 private fun IntegrationTest.gjennomførBeslutteVedtakSteg(behandlingId: BehandlingId) {
     medBrukercontext(bruker = "nissemor", roller = listOf(rolleConfig.beslutterRolle)) {
+        tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
         kall.totrinnskontroll.beslutteVedtak(behandlingId, BeslutteVedtakDto(godkjent = true))
     }
     kjørTasksKlareForProsessering()

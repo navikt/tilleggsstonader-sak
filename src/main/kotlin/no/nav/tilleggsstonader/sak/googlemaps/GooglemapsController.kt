@@ -15,6 +15,7 @@ import java.time.ZoneOffset
 class GooglemapsController(
     private val googleRoutesClient: GoogleRoutesClient,
     private val googleAutocompleteClient: GoogleAutocompleteClient,
+    private val staticMapClient: GoogleStaticMapClient,
 ) {
     @PostMapping("/kjoreavstand")
     fun hentKjoreavstand(
@@ -27,6 +28,7 @@ class GooglemapsController(
                 travelMode = "DRIVE",
                 departureTime = null,
                 transitPreferences = null,
+                polylineQuality = "OVERVIEW",
             ),
         )?.finnDefaultRute()
         ?.tilDto()
@@ -52,9 +54,15 @@ class GooglemapsController(
                                 TransitOption.RAIL.value,
                             ),
                     ),
+                polylineQuality = "OVERVIEW",
             ),
         )?.finnDefaultRute()
         ?.tilDto()
+
+    @PostMapping("/statisk-kart")
+    fun hentStatiskKart(
+        @RequestBody statiskKartRequest: StatiskKartRequest,
+    ): ByteArray? = staticMapClient.hentStaticMap(statiskKartRequest)
 
     @PostMapping("/autocomplete")
     fun hentForslag(

@@ -22,9 +22,6 @@ import kotlin.random.Random
 
 class OppgavehendelseHåndtererTest : CleanDatabaseIntegrationTest() {
     @Autowired
-    private lateinit var oppgaveRepository: OppgaveRepository
-
-    @Autowired
     private lateinit var oppgavehendelseHåndterer: OppgavehendelseHåndterer
 
     lateinit var behandling: Behandling

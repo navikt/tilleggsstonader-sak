@@ -50,7 +50,26 @@ class BoutgifterBeregnYtelseSteg(
         vedtak: VedtakBoutgifterRequest,
         satsjusteringFra: LocalDate,
     ) {
-        TODO("Not yet implemented")
+        logger.info("Lagrer vedtak for satsjustering for behandling=${saksbehandling.id}, satsjusteringFra=$satsjusteringFra")
+
+        val innvilgelse = vedtak as InnvilgelseBoutgifterRequest
+        val vedtaksperioder = innvilgelse.vedtaksperioder.tilDomene().sorted()
+        val tidligsteEndring = satsjusteringFra
+        val beregningsresultat =
+            beregningService.beregn(
+                vedtaksperioder = vedtaksperioder,
+                behandling = saksbehandling,
+                typeVedtak = TypeVedtak.INNVILGELSE,
+                tidligsteEndring = tidligsteEndring,
+            )
+        lagreInnvilgetVedtak(
+            behandling = saksbehandling,
+            beregningsresultat = beregningsresultat,
+            vedtaksperioder = vedtaksperioder,
+            begrunnelse = innvilgelse.begrunnelse,
+            tidligsteEndring = tidligsteEndring,
+        )
+        lagreTilkjentYtelse(saksbehandling.id, beregningsresultat)
     }
 
     override fun lagreVedtak(
