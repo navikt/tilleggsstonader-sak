@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.fagsak
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-internal class FagsakServiceTest : IntegrationTest() {
+internal class FagsakServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var behandlingService: BehandlingService
 

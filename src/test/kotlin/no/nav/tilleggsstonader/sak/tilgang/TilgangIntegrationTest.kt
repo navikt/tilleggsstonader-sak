@@ -9,18 +9,20 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBeha
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
+import org.junit.jupiter.api.BeforeAll
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
 /**
  * Tilgangstester mot endepunkt
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TilgangIntegrationTest : IntegrationTest() {
     lateinit var behandling: Behandling
 
-    @BeforeEach
+    @BeforeAll
     fun setUp() {
         behandling =
             testoppsettService.opprettBehandlingMedFagsak(

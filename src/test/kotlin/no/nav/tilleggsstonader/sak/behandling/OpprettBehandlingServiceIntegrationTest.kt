@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
-class OpprettBehandlingServiceIntegrationTest : IntegrationTest() {
+class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var opprettBehandlingService: OpprettBehandlingService
 

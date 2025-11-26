@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.tilBehandlingstema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
@@ -20,7 +20,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.random.Random
 
-class OppgavehendelseHåndtererTest : IntegrationTest() {
+class OppgavehendelseHåndtererTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var oppgavehendelseHåndterer: OppgavehendelseHåndterer
 

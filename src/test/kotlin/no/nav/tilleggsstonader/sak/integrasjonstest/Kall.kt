@@ -10,8 +10,8 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.PersonKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.SatsjusteringKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.SettPåVentKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.SimuleringKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.SkjemaRoutingKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.StegKall
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.SøknadRoutingKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.TotrinnskontrollKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VedtakKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårDagligReiseKall
@@ -33,7 +33,7 @@ class Kall(
     val settPaVent = SettPåVentKall(testklient)
     val simulering = SimuleringKall(testklient)
     val steg = StegKall(testklient)
-    val søknadRouting = SøknadRoutingKall(testklient)
+    val skjemaRouting = SkjemaRoutingKall(testklient)
     val totrinnskontroll = TotrinnskontrollKall(testklient)
     val vedtak = VedtakKall(testklient)
     val vilkår = VilkårKall(testklient)

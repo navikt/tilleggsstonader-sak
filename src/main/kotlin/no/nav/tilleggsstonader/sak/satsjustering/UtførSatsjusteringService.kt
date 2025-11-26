@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.satsjustering
 
 import no.nav.familie.prosessering.error.RekjørSenereException
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.OpprettRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -17,6 +18,8 @@ import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterBeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
@@ -30,7 +33,8 @@ class UtførSatsjusteringService(
     private val behandlingService: BehandlingService,
     private val revurderingBehandlingService: OpprettRevurderingService,
     private val vedtakservice: VedtakService,
-    private val beregnYtelseSteg: LæremidlerBeregnYtelseSteg,
+    private val beregnYtelseStegLæremidler: LæremidlerBeregnYtelseSteg,
+    private val beregnYtelseStegBoutgifter: BoutgifterBeregnYtelseSteg,
     private val ferdigstillBehandlingSteg: FerdigstillBehandlingSteg,
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val iverksettService: IverksettService,
@@ -74,11 +78,23 @@ class UtførSatsjusteringService(
         val vedtaksperioder =
             vedtakservice.hentVedtaksperioder(behandlingId = forrigeIverksatteBehandlingId).tilDto()
 
-        beregnYtelseSteg.lagreVedtakForSatsjustering(
-            saksbehandling = revurdering,
-            vedtak = InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder),
-            satsjusteringFra = finnDatoForSatsjustering(revurdering),
-        )
+        when (revurdering.stønadstype) {
+            Stønadstype.LÆREMIDLER ->
+                beregnYtelseStegLæremidler.lagreVedtakForSatsjustering(
+                    saksbehandling = revurdering,
+                    vedtak = InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder),
+                    satsjusteringFra = finnDatoForSatsjustering(revurdering),
+                )
+
+            Stønadstype.BOUTGIFTER ->
+                beregnYtelseStegBoutgifter.lagreVedtakForSatsjustering(
+                    saksbehandling = revurdering,
+                    vedtak = InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder),
+                    satsjusteringFra = finnDatoForSatsjustering(revurdering),
+                )
+
+            else -> error("Stønadstype ${revurdering.stønadstype} støttes ikke for satsjustering.")
+        }
 
         // Kaller disse direkte for å hoppe over totrinnskontroll
         behandlingService.oppdaterStatusPåBehandling(revurdering.id, BehandlingStatus.FATTER_VEDTAK)

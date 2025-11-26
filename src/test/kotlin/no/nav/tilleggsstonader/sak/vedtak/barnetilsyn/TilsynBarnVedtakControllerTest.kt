@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.util.UUID
 
-class TilsynBarnVedtakControllerTest : IntegrationTest() {
+class TilsynBarnVedtakControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var barnRepository: BarnRepository
 

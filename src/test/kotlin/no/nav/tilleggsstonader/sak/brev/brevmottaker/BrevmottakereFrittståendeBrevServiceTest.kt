@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.brev.brevmottaker
 import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerPersonDto
 import no.nav.tilleggsstonader.kontrakter.brevmottaker.MottakerRolle
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerFrittståendeBrev
 import no.nav.tilleggsstonader.sak.brev.frittstående.FrittståendeBrev
@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
 
-class BrevmottakereFrittståendeBrevServiceTest : IntegrationTest() {
+class BrevmottakereFrittståendeBrevServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var service: BrevmottakereFrittståendeBrevService
 

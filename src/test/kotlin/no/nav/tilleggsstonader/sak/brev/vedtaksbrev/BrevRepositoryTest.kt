@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.brev.vedtaksbrev
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import java.time.temporal.ChronoUnit
 
-internal class BrevRepositoryTest : IntegrationTest() {
+internal class BrevRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var vedtaksbrevRepository: VedtaksbrevRepository
 

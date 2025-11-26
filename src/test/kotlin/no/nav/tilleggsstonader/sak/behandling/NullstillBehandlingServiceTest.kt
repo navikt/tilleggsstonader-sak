@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 
-class NullstillBehandlingServiceTest : IntegrationTest() {
+class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var nullstillBehandlingService: NullstillBehandlingService
 

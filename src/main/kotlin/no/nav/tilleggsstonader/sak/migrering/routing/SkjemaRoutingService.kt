@@ -13,6 +13,8 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.UnleashUtil.getVariantWithNameOrDefault
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import org.springframework.stereotype.Service
 
@@ -24,6 +26,7 @@ class SkjemaRoutingService(
     private val behandlingService: BehandlingService,
     private val unleashService: UnleashService,
     private val ytelseService: YtelseService,
+    private val personService: PersonService,
 ) {
     fun harLagretRouting(
         ident: String,
@@ -48,6 +51,9 @@ class SkjemaRoutingService(
         skjematype: Skjematype,
         kontekst: RoutingStrategi.SendEnkelteBrukereTilNyLøsning,
     ): Boolean {
+        if (kontekst.kreverUgradertAdresse && harFortroligEllerStrengtFortroligAdresse(ident)) {
+            return false
+        }
         if (harLagretRouting(ident, skjematype)) {
             logger.info("routing - skjematype=$skjematype harLagretRouting=true")
             return true
@@ -69,6 +75,12 @@ class SkjemaRoutingService(
 
         return false
     }
+
+    private fun harFortroligEllerStrengtFortroligAdresse(ident: String): Boolean =
+        personService.hentAdressebeskyttelse(ident).søker.adressebeskyttelse.let { adressebeskyttelse ->
+            adressebeskyttelse == AdressebeskyttelseGradering.FORTROLIG ||
+                adressebeskyttelse == AdressebeskyttelseGradering.STRENGT_FORTROLIG
+        }
 
     private fun maksAntallErNådd(
         skjematype: Skjematype,

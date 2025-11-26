@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.satsjustering
 import io.mockk.clearMocks
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.august
+import no.nav.tilleggsstonader.libs.utils.dato.juni
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -14,14 +16,17 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.toYearMonth
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerBeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.SatsLæremidlerProvider
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.bekreftedeSatser
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
+import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterBeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.SatsBoutgifterProvider
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.bekreftedeSatser
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppeLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -30,9 +35,11 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
-class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
+class SatsjusteringBoutgifterTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var faktaGrunnlagService: FaktaGrunnlagService
+
+    @Autowired private lateinit var vilkårRepository: VilkårRepository
 
     @Autowired
     private lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
@@ -41,21 +48,21 @@ class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
     private lateinit var behandlingRepository: BehandlingRepository
 
     @Autowired
+    lateinit var satsBoutgifterProvider: SatsBoutgifterProvider
+
+    @Autowired
     lateinit var vilkårsperiodeRepository: VilkårperiodeRepository
 
     @Autowired
-    lateinit var satsLæremidlerProvider: SatsLæremidlerProvider
-
-    @Autowired
-    lateinit var læremidlerBeregnYtelseSteg: LæremidlerBeregnYtelseSteg
+    lateinit var boutgifterBeregnYtelseSteg: BoutgifterBeregnYtelseSteg
 
     val sisteBekreftedeSatsÅr = bekreftedeSatser.maxOf { it.fom.year }
-    val fom = LocalDate.of(sisteBekreftedeSatsÅr, 8, 1)
-    val tom = LocalDate.of(sisteBekreftedeSatsÅr + 1, 6, 30)
+    val fom = 1.august(sisteBekreftedeSatsÅr)
+    val tom = 30.juni(sisteBekreftedeSatsÅr + 1)
 
     @AfterEach
     fun resetMock() {
-        clearMocks(satsLæremidlerProvider)
+        clearMocks(satsBoutgifterProvider)
     }
 
     @Test
@@ -66,38 +73,31 @@ class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
 
         val behandlingerForSatsjustering =
             medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
-                kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
+                kall.satsjustering.satsjustering(Stønadstype.BOUTGIFTER)
             }
 
         kjørTasksKlareForProsessering()
 
         assertThat(behandlingerForSatsjustering).containsExactly(behandling.id)
 
-        val sistIverksatteBehandling = behandlingRepository.finnSisteIverksatteBehandling(behandling.fagsakId)!!
-        assertThat(behandling.id).isNotEqualTo(sistIverksatteBehandling.id)
-        assertThat(sistIverksatteBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
+        val satsjusteringBehandling = behandlingRepository.finnSisteIverksatteBehandling(behandling.fagsakId)!!
+        assertThat(behandling.id).isNotEqualTo(satsjusteringBehandling.id)
+        assertThat(satsjusteringBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
 
-        val tilkjentYtelseRevurdering = tilkjentYtelseRepository.findByBehandlingId(sistIverksatteBehandling.id)!!
-
-        validerHarKopiertOverFaktagrunnlagFraForrigeBehandling(sistIverksatteBehandling)
-        validerHarIngenAndelserSomVenterPåSatsEndring(sistIverksatteBehandling.id)
-        assertThat(tilkjentYtelseRevurdering.andelerTilkjentYtelse)
-            .noneMatch {
-                it.statusIverksetting ==
-                    StatusIverksetting.VENTER_PÅ_SATS_ENDRING
-            }
+        validerHarKopiertOverFaktagrunnlagFraForrigeBehandling(satsjusteringBehandling)
+        validerHarIngenAndelserSomVenterPåSatsEndring(satsjusteringBehandling.id)
     }
 
     @Test
     fun `kaller satsjustering-endepunkt, finnes behandling uten andeler til satsjustering, ingen behandlinger blir behandlet`() {
-        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), stønadstype = Stønadstype.LÆREMIDLER)
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), stønadstype = Stønadstype.BOUTGIFTER)
         lagreVilkårOgVedtak(behandling, fom = fom, tom = fom.toYearMonth().withMonth(12).atEndOfMonth())
         validerHarIngenAndelserSomVenterPåSatsEndring(behandling.id)
         testoppsettService.ferdigstillBehandling(behandling)
 
         val behandlingerTilSatsjustering =
             medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
-                kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
+                kall.satsjustering.satsjustering(Stønadstype.BOUTGIFTER)
             }
 
         assertThat(behandlingerTilSatsjustering).isEmpty()
@@ -107,7 +107,7 @@ class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
     fun `kaller satsjustering-endepunkt uten utvikler-rolle, kaster feil`() {
         medBrukercontext(roller = listOf(rolleConfig.beslutterRolle)) {
             kall.satsjustering.apiRespons
-                .satsjustering(Stønadstype.LÆREMIDLER)
+                .satsjustering(Stønadstype.BOUTGIFTER)
                 .expectStatus()
                 .isForbidden
         }
@@ -115,7 +115,7 @@ class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
 
     private fun mockSatser() {
         val nyMakssats = 10_000
-        val ubekreftetSats = satsLæremidlerProvider.satser.first { !it.bekreftet }
+        val ubekreftetSats = satsBoutgifterProvider.alleSatser.first { !it.bekreftet }
         val nyBekreftetSats =
             ubekreftetSats.copy(
                 tom =
@@ -124,27 +124,21 @@ class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
                         .withMonth(12)
                         .atEndOfMonth(),
                 bekreftet = true,
-                beløp =
-                    ubekreftetSats.beløp
-                        .map { it.key to nyMakssats }
-                        .toMap(),
+                beløp = nyMakssats,
             )
         val nyUbekreftetSats =
             ubekreftetSats.copy(
                 fom = ubekreftetSats.fom.plusYears(1),
-                beløp =
-                    ubekreftetSats.beløp
-                        .map { it.key to nyMakssats }
-                        .toMap(),
+                beløp = nyMakssats,
             )
 
         every {
-            satsLæremidlerProvider.satser
+            satsBoutgifterProvider.alleSatser
         } returns bekreftedeSatser + nyBekreftetSats + nyUbekreftetSats
     }
 
     private fun opprettBehandlingMedAndelerTilSatsjustering(): Behandling {
-        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), stønadstype = Stønadstype.LÆREMIDLER)
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), stønadstype = Stønadstype.BOUTGIFTER)
 
         lagreVilkårOgVedtak(behandling, fom, tom)
 
@@ -161,14 +155,26 @@ class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
     ) {
         vilkårsperiodeRepository.insertAll(
             listOf(
-                målgruppe(behandlingId = behandling.id, fom = fom, tom = tom, faktaOgVurdering = faktaOgVurderingMålgruppeLæremidler()),
-                aktivitet(behandlingId = behandling.id, fom = fom, tom = tom, faktaOgVurdering = faktaOgVurderingAktivitetLæremidler()),
+                målgruppe(behandlingId = behandling.id, fom = fom, tom = tom, faktaOgVurdering = faktaOgVurderingMålgruppe()),
+                aktivitet(behandlingId = behandling.id, fom = fom, tom = tom, faktaOgVurdering = faktaOgVurderingAktivitetBoutgifter()),
             ),
         )
 
-        læremidlerBeregnYtelseSteg.utførSteg(
+        vilkårRepository.insertAll(
+            listOf(
+                vilkår(
+                    behandlingId = behandling.id,
+                    type = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+                    fom = fom,
+                    tom = tom,
+                    utgift = 4000,
+                ),
+            ),
+        )
+
+        boutgifterBeregnYtelseSteg.utførSteg(
             saksbehandling = behandlingRepository.finnSaksbehandling(behandling.id),
-            InnvilgelseLæremidlerRequest(
+            InnvilgelseBoutgifterRequest(
                 vedtaksperioder = listOf(vedtaksperiodeDto(fom = fom, tom = tom)),
             ),
         )
@@ -190,7 +196,7 @@ class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
                     it.statusIverksetting ==
                         StatusIverksetting.VENTER_PÅ_SATS_ENDRING
                 },
-        ).hasSize(1)
+        ).hasSize(6)
     }
 
     private fun validerHarIngenAndelserSomVenterPåSatsEndring(behandlingId: BehandlingId) {

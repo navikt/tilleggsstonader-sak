@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.brev.frittstående
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerFrittståendeBrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerFrittståendeBrev
@@ -19,7 +19,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-internal class FrittståendeBrevServiceTest : IntegrationTest() {
+internal class FrittståendeBrevServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var frittståendeBrevService: FrittståendeBrevService
 

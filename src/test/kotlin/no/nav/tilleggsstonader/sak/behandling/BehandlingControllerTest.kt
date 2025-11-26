@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
-internal class BehandlingControllerTest : IntegrationTest() {
+internal class BehandlingControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var behandlingRepository: BehandlingRepository
 

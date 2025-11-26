@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
@@ -48,7 +48,7 @@ import java.time.LocalDate
 import java.time.LocalDate.now
 import java.time.LocalDateTime
 
-class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
+class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var behandlingRepository: BehandlingRepository
 

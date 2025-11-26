@@ -44,9 +44,8 @@ object BoutgifterBeregnUtil {
     fun lagBeregningsgrunnlag(
         periode: UtbetalingPeriode,
         utgifter: BoutgifterPerUtgiftstype,
+        makssats: MakssatsBoutgifter,
     ): Beregningsgrunnlag {
-        val makssats = finnMakssats(periode.fom)
-
         val utgifterIPerioden =
             utgifter.mapValues { (_, utgifter) ->
                 utgifter.filter {
