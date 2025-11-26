@@ -1,14 +1,19 @@
 import no.nav.tilleggsstonader.sak.googlemaps.Leg
 import no.nav.tilleggsstonader.sak.googlemaps.LinjeType
+import no.nav.tilleggsstonader.sak.googlemaps.Location
+import no.nav.tilleggsstonader.sak.googlemaps.Polyline
 import no.nav.tilleggsstonader.sak.googlemaps.Reisetype
 import no.nav.tilleggsstonader.sak.googlemaps.Route
 import no.nav.tilleggsstonader.sak.googlemaps.Step
 import no.nav.tilleggsstonader.sak.googlemaps.TransitDetails
 
 data class RuteDto(
+    val polyline: Polyline,
     val avstandMeter: Int,
     val varighetSekunder: Double,
     val strekninger: List<StrekningDto>,
+    val startLokasjon: Lokasjon,
+    val sluttLokasjon: Lokasjon,
 )
 
 data class StrekningDto(
@@ -24,11 +29,31 @@ data class KollektivDetaljerDto(
     val linjeType: LinjeType,
 )
 
+data class Lokasjon(
+    val lat: Double,
+    val lng: Double,
+)
+
 fun Route.tilDto(): RuteDto =
     RuteDto(
+        polyline = polyline,
         avstandMeter = distanceMeters,
         varighetSekunder = staticDuration.tilDouble(),
         strekninger = legs.tilDto(),
+        startLokasjon =
+            legs
+                .first()
+                .steps
+                .first()
+                .startLocation
+                .tilLokasjon(),
+        sluttLokasjon =
+            legs
+                .last()
+                .steps
+                .last()
+                .endLocation
+                .tilLokasjon(),
     )
 
 private fun List<Leg>.tilDto(): List<StrekningDto> {
@@ -71,6 +96,12 @@ private fun List<Step>.mergeSammenhengende(): List<Step> =
         }
         acc
     }
+
+private fun Location.tilLokasjon(): Lokasjon =
+    Lokasjon(
+        lat = this.latLng.latitude,
+        lng = this.latLng.longitude,
+    )
 
 private fun String.tilDouble(): Double = this.removeSuffix("s").toDouble()
 
