@@ -1,8 +1,11 @@
 package no.nav.tilleggsstonader.sak.tilgang
 
+import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.spring.cache.getValue
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
@@ -15,10 +18,13 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.hentGrupperFraToken
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.FORTROLIG
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.STRENGT_FORTROLIG
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
 
@@ -36,6 +42,8 @@ class TilgangService(
     private val cacheManager: CacheManager,
     private val auditLogger: AuditLogger,
     private val behandlingLogService: BehandlingLogService,
+    private val oppgaveService: OppgaveService,
+    private val unleashService: UnleashService,
 ) {
     fun settBehandlingsdetaljerForRequest(behandlingId: BehandlingId) {
         behandlingLogService.settBehandlingsdetaljerForRequest(behandlingId)
@@ -81,14 +89,50 @@ class TilgangService(
                 behandlingService.hentSaksbehandling(behandlingId)
             }
         val tilgang =
-            tilgangskontrollService.sjekkTilgangTilStønadstype(
-                personIdent = saksbehandling.ident,
-                stønadstype = saksbehandling.stønadstype,
-                jwtToken = SikkerhetContext.hentToken(),
-            )
+            if (event == AuditLoggerEvent.ACCESS) {
+                tilgangskontrollService.sjekkTilgangTilStønadstype(
+                    personIdent = saksbehandling.ident,
+                    stønadstype = saksbehandling.stønadstype,
+                    jwtToken = SikkerhetContext.hentToken(),
+                )
+            } else {
+                hentTilgangTilRedigerBehandling(
+                    behandling = saksbehandling,
+                    personIdent = saksbehandling.ident,
+                    stønadstype = saksbehandling.stønadstype,
+                    jwtToken = SikkerhetContext.hentToken(),
+                )
+            }
+
         val key = CustomKeyValue("behandling", behandlingId.id)
         auditLogger.log(Sporingsdata(event, saksbehandling.ident, tilgang, custom1 = key))
         kastFeilHvisIkkeTilgang(tilgang, "behandling", behandlingId.id.toString())
+    }
+
+    private fun hentTilgangTilRedigerBehandling(
+        behandling: Saksbehandling,
+        personIdent: String,
+        stønadstype: Stønadstype,
+        jwtToken: JwtToken,
+    ): Tilgang {
+        if (behandling.erFerdigstilt()) {
+            return Tilgang(harTilgang = false, begrunnelse = "Behandling er ferdigstilt")
+        }
+
+        val tilordnetSaksbehandler =
+            oppgaveService.hentÅpenBehandlingsoppgave(behandling.id)?.tilordnetSaksbehandler
+
+        val skalValidereTilordnetSaksbehandler = unleashService.isEnabled(Toggle.TILGANGSSTYRE_PÅ_TILORDNET_OPPGAVE)
+
+        return if (skalValidereTilordnetSaksbehandler && tilordnetSaksbehandler != SikkerhetContext.hentSaksbehandler()) {
+            Tilgang(harTilgang = false, begrunnelse = "Behandling er tilordnet en annen saksbehandler")
+        } else {
+            tilgangskontrollService.sjekkTilgangTilStønadstype(
+                personIdent = personIdent,
+                stønadstype = stønadstype,
+                jwtToken = jwtToken,
+            )
+        }
     }
 
     /**

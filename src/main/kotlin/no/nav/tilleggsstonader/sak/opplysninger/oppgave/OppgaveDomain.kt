@@ -28,6 +28,21 @@ data class OppgaveDomain(
     fun erÅpen() = status == Oppgavestatus.ÅPEN
 
     fun erIgnorert() = status == Oppgavestatus.IGNORERT
+
+    /**
+     * En behandlingsoppgave er en oppgave som gjelder behandling av en behandling i ts-sak
+     */
+    fun erBehandlingsoppgave() = erBehandleSakOppgave() && !erTilbakekrevingsoppgave()
+
+    private fun erBehandleSakOppgave() =
+        type in
+            listOf(
+                Oppgavetype.BehandleSak,
+                Oppgavetype.BehandleUnderkjentVedtak,
+                Oppgavetype.GodkjenneVedtak,
+            )
+
+    fun erTilbakekrevingsoppgave() = tilbakekrevingBehandlingId != null
 }
 
 /**

@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.migrering.routing.SkjemaRouting
 import no.nav.tilleggsstonader.sak.oppfølging.Oppfølging
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.tilbakekreving.domene.TilbakekrevingHendelse
@@ -111,7 +112,7 @@ abstract class IntegrationTest {
     private lateinit var cacheManagers: List<CacheManager>
 
     @Autowired
-    protected lateinit var mockClientService: MockClientService
+    lateinit var mockClientService: MockClientService
 
     @Autowired
     lateinit var taskService: TaskService
@@ -125,7 +126,10 @@ abstract class IntegrationTest {
     @Autowired
     lateinit var webTestClient: WebTestClient
 
-    private lateinit var testBrukerkontekst: TestBrukerKontekst
+    @Autowired
+    lateinit var oppgaveRepository: OppgaveRepository
+
+    lateinit var testBrukerkontekst: TestBrukerKontekst
 
     val kall = Kall(this)
 
@@ -186,7 +190,7 @@ abstract class IntegrationTest {
         it.setBearerAuth(clientCredential(clientId, accessAsApplication))
     }
 
-    private data class TestBrukerKontekst(
+    data class TestBrukerKontekst(
         val defaultBruker: String,
         val defaultRoller: List<String>,
     ) {
