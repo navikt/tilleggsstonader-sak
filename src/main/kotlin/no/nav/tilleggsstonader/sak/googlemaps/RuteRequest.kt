@@ -4,8 +4,8 @@ data class RuteRequest(
     val origin: Address,
     val destination: Address,
     val travelMode: String,
-    val departureTime: String,
-    val transitPreferences: TransitPreferences,
+    val departureTime: String?,
+    val transitPreferences: TransitPreferences?,
 )
 
 data class Address(

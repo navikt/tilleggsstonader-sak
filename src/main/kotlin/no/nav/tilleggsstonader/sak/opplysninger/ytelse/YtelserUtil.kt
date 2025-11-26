@@ -23,7 +23,8 @@ object YtelserUtil {
                     TypeYtelsePeriode.AAP,
                     TypeYtelsePeriode.ENSLIG_FORSØRGER,
                     TypeYtelsePeriode.OMSTILLINGSSTØNAD,
-                    TypeYtelsePeriode.TILTAKSPENGER,
+                    TypeYtelsePeriode.TILTAKSPENGER_TPSAK,
+                    TypeYtelsePeriode.TILTAKSPENGER_ARENA,
                     TypeYtelsePeriode.DAGPENGER,
                 )
         }

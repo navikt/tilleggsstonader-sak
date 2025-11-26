@@ -137,7 +137,7 @@ abstract class IntegrationTest {
         testBrukerkontekst =
             TestBrukerKontekst(
                 defaultBruker = "julenissen",
-                defaultRolle = rolleConfig.beslutterRolle,
+                defaultRoller = listOf(rolleConfig.beslutterRolle),
             )
     }
 
@@ -198,9 +198,9 @@ abstract class IntegrationTest {
     }
 
     protected fun onBehalfOfToken(
-        role: String = rolleConfig.beslutterRolle,
+        roller: List<String> = listOf(rolleConfig.beslutterRolle),
         saksbehandler: String = "julenissen",
-    ): String = TokenUtil.onBehalfOfToken(mockOAuth2Server, role, saksbehandler)
+    ): String = TokenUtil.onBehalfOfToken(mockOAuth2Server, roller, saksbehandler)
 
     protected fun clientCredential(
         clientId: String,
@@ -209,18 +209,18 @@ abstract class IntegrationTest {
 
     fun <T : Any> medBrukercontext(
         bruker: String = testBrukerkontekst.defaultBruker,
-        rolle: String = testBrukerkontekst.rolle,
+        roller: List<String> = testBrukerkontekst.roller,
         fn: () -> T,
     ): T {
         testBrukerkontekst.bruker = bruker
-        testBrukerkontekst.rolle = rolle
+        testBrukerkontekst.roller = roller
 
         return fn().also { testBrukerkontekst.reset() }
     }
 
     fun WebTestClient.RequestHeadersSpec<*>.medOnBehalfOfToken() =
         this.headers {
-            it.setBearerAuth(onBehalfOfToken(testBrukerkontekst.rolle, testBrukerkontekst.bruker))
+            it.setBearerAuth(onBehalfOfToken(testBrukerkontekst.roller, testBrukerkontekst.bruker))
         }
 
     fun WebTestClient.RequestHeadersSpec<*>.medClientCredentials(
@@ -232,14 +232,14 @@ abstract class IntegrationTest {
 
     private data class TestBrukerKontekst(
         val defaultBruker: String,
-        val defaultRolle: String,
+        val defaultRoller: List<String>,
     ) {
         var bruker: String = defaultBruker
-        var rolle: String = defaultRolle
+        var roller: List<String> = defaultRoller
 
         fun reset() {
             bruker = defaultBruker
-            rolle = defaultRolle
+            roller = defaultRoller
         }
     }
 }

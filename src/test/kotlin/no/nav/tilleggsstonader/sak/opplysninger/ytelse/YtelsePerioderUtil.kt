@@ -24,10 +24,10 @@ object YtelsePerioderUtil {
             perioderHentetTom = LocalDate.now(),
         )
 
-    fun ytelsePerioderDtoTiltakspenger(): YtelsePerioderDto =
+    fun ytelsePerioderDtoTiltakspengerTpsak(): YtelsePerioderDto =
         YtelsePerioderDto(
-            perioder = listOf(periodeTiltakspenger()),
-            kildeResultat = listOf(kildeResultatTiltakspenger()),
+            perioder = listOf(periodeTiltakspengerTpsak()),
+            kildeResultat = listOf(kildeResultatTiltakspengerTpsak()),
             perioderHentetFom = LocalDate.now(),
             perioderHentetTom = LocalDate.now(),
         )
@@ -46,8 +46,8 @@ object YtelsePerioderUtil {
     fun kildeResultatAAP(resultat: ResultatKilde = ResultatKilde.OK) =
         KildeResultatYtelse(type = TypeYtelsePeriode.AAP, resultat = resultat)
 
-    fun kildeResultatTiltakspenger(resultat: ResultatKilde = ResultatKilde.OK) =
-        KildeResultatYtelse(type = TypeYtelsePeriode.TILTAKSPENGER, resultat = resultat)
+    fun kildeResultatTiltakspengerTpsak(resultat: ResultatKilde = ResultatKilde.OK) =
+        KildeResultatYtelse(type = TypeYtelsePeriode.TILTAKSPENGER_TPSAK, resultat = resultat)
 
     fun kildeResultatEnsligForsørger(resultat: ResultatKilde = ResultatKilde.OK) =
         KildeResultatYtelse(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, resultat = resultat)
@@ -57,10 +57,10 @@ object YtelsePerioderUtil {
         tom: LocalDate? = LocalDate.now(),
     ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.AAP, fom = fom, tom = tom)
 
-    fun periodeTiltakspenger(
+    fun periodeTiltakspengerTpsak(
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate? = LocalDate.now(),
-    ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.TILTAKSPENGER, fom = fom, tom = tom)
+    ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.TILTAKSPENGER_TPSAK, fom = fom, tom = tom)
 
     fun periodeEnsligForsørger(
         fom: LocalDate = LocalDate.now(),

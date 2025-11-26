@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProble
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -39,9 +38,10 @@ internal class BehandlingControllerTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("ikkeTilgang"))))
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        assertThatThrownBy {
-            kall.behandling.hent(behandling.id)
-        }.hasMessage("Status expected:<200 OK> but was:<403 FORBIDDEN>")
+        kall.behandling.apiRespons
+            .hent(behandling.id)
+            .expectStatus()
+            .isForbidden()
     }
 
     @Test
@@ -122,7 +122,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
 
         @Test
         fun `behandlingStatus=OPPRETTET og veileder skal ikke hentes då det opprettes grunnlag`() {
-            medBrukercontext(rolle = rolleConfig.veilederRolle) {
+            medBrukercontext(roller = listOf(rolleConfig.veilederRolle)) {
                 kall.behandling
                     .apiRespons
                     .hent(behandling.id)
@@ -135,14 +135,14 @@ internal class BehandlingControllerTest : IntegrationTest() {
         @Test
         fun `behandlingStatus=UTREDES og veilder skal kunne hente behandlingen hvis statusen er annet enn UTREDES`() {
             testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.UTREDES))
-            medBrukercontext(rolle = rolleConfig.veilederRolle) {
-                kall.behandling.apiRespons.hent(behandling.id)
+            medBrukercontext(roller = listOf(rolleConfig.veilederRolle)) {
+                kall.behandling.hent(behandling.id)
             }
         }
 
         @Test
         fun `behandlingStatus=OPPRETTET skal kunne opprette grunnlag hvis bruker er saksbehandler`() {
-            kall.behandling.apiRespons.hent(behandling.id)
+            kall.behandling.hent(behandling.id)
         }
     }
 }
