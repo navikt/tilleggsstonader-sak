@@ -11,9 +11,9 @@ import java.net.URI
 @Service
 class GoogleAutocompleteClient(
     @Value("\${google.api-key}") private val apiKey: String,
+    @Value("\${google.autocomplete.uri}") private val baseUrl: URI,
     builder: RestClient.Builder,
 ) {
-    private val baseUrl = URI("https://places.googleapis.com/v1/places:autocomplete")
     private val restClient = builder.baseUrl(baseUrl.toString()).build()
     private val uri = UriComponentsBuilder.fromUri(baseUrl).encode().toUriString()
 
