@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.tilgang
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
@@ -9,20 +9,18 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBeha
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
-import org.junit.jupiter.api.BeforeAll
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 
 /**
  * Tilgangstester mot endepunkt
  */
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TilgangIntegrationTest : IntegrationTest() {
+class TilgangIntegrationTest : CleanDatabaseIntegrationTest() {
     lateinit var behandling: Behandling
 
-    @BeforeAll
+    @BeforeEach
     fun setUp() {
         behandling =
             testoppsettService.opprettBehandlingMedFagsak(
