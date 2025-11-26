@@ -14,6 +14,7 @@ import java.time.ZoneOffset
 @ProtectedWithClaims(issuer = "azuread")
 class GooglemapsController(
     private val googleRoutesClient: GoogleRoutesClient,
+    private val googleAutocompleteClient: GoogleAutocompleteClient,
 ) {
     @PostMapping("/kjoreavstand")
     fun hentKjoreavstand(
@@ -54,4 +55,17 @@ class GooglemapsController(
             ),
         )?.finnDefaultRute()
         ?.tilDto()
+
+    @PostMapping("/autocomplete")
+    fun hentForslag(
+        @RequestBody hentForslagDto: HentForslagDto,
+    ) = googleAutocompleteClient
+        .hentForslag(
+            AutocompleteRequest(
+                input = hentForslagDto.input,
+                includedRegionCodes = listOf("no"),
+                languageCode = "no",
+                regionCode = "no",
+            ),
+        )?.tilDto()
 }
