@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -11,11 +12,12 @@ import java.time.LocalDateTime
 object OppgaveUtil {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    val ENHET_NR_NAY = "4462" // Tilleggsstønad INN
-    val ENHET_NR_EGEN_ANSATT = "4483" // NAV Arbeid og ytelser Egne ansatte
-    val ENHET_NR_STRENGT_FORTROLIG = "2103" // NAV Vikafossen
-
-    val GYLDIGE_ENHETER_TILLEGGSTØNADER = setOf(ENHET_NR_NAY, ENHET_NR_EGEN_ANSATT, ENHET_NR_STRENGT_FORTROLIG)
+    val GYLDIGE_ENHETER_TILLEGGSTØNADER =
+        setOf(
+            Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+            Enhet.NAV_ARBEID_OG_YTELSER_EGNE_ANSATTE.enhetsnr,
+            Enhet.VIKAFOSSEN.enhetsnr,
+        )
 
     fun utledBehandlesAvApplikasjon(oppgavetype: Oppgavetype) =
         when (oppgavetype) {
@@ -53,9 +55,18 @@ object OppgaveUtil {
         oppgavetype: Oppgavetype,
     ): Boolean {
         return when (oppgavetype) {
-            Oppgavetype.BehandleSak -> saksbehandling.status.behandlingErLåstForVidereRedigering()
-            Oppgavetype.GodkjenneVedtak -> saksbehandling.status != BehandlingStatus.FATTER_VEDTAK
-            Oppgavetype.BehandleUnderkjentVedtak -> saksbehandling.status.behandlingErLåstForVidereRedigering()
+            Oppgavetype.BehandleSak -> {
+                saksbehandling.status.behandlingErLåstForVidereRedigering()
+            }
+
+            Oppgavetype.GodkjenneVedtak -> {
+                saksbehandling.status != BehandlingStatus.FATTER_VEDTAK
+            }
+
+            Oppgavetype.BehandleUnderkjentVedtak -> {
+                saksbehandling.status.behandlingErLåstForVidereRedigering()
+            }
+
             else -> {
                 logger.warn("Har ikke håndtering av $oppgavetype for behandling=${saksbehandling.id}")
                 return false
