@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
 data class AutocompleteResponse(
-    val suggestions: List<Suggestion>,
+    val suggestions: List<Suggestion>?,
 )
 
 data class Suggestion(

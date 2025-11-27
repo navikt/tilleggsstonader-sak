@@ -74,6 +74,7 @@ class GooglemapsController(
                 includedRegionCodes = listOf("no"),
                 languageCode = "no",
                 regionCode = "no",
+                includedPrimaryTypes = listOf("street_address", "geocode", "premise", "route", "subpremise"),
             ),
         )?.tilDto()
 }
