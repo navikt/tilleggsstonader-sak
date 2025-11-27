@@ -14,16 +14,17 @@ import java.time.ZoneOffset
 @ProtectedWithClaims(issuer = "azuread")
 class GooglemapsController(
     private val googleRoutesClient: GoogleRoutesClient,
+    private val googleAutocompleteClient: GoogleAutocompleteClient,
     private val staticMapClient: GoogleStaticMapClient,
 ) {
     @PostMapping("/kjoreavstand")
     fun hentKjoreavstand(
-        @RequestBody finnReiseAvstandDto: FinnReiseAvstandDto,
+        @RequestBody finnReiseAvstandDto: FinnReiseavstandDto,
     ) = googleRoutesClient
         .hentRuter(
             RuteRequest(
-                origin = Address(finnReiseAvstandDto.fraAdresse.tilSøkeString()),
-                destination = Address(finnReiseAvstandDto.tilAdresse.tilSøkeString()),
+                origin = Address(finnReiseAvstandDto.fraAdresse),
+                destination = Address(finnReiseAvstandDto.tilAdresse),
                 travelMode = "DRIVE",
                 departureTime = null,
                 transitPreferences = null,
@@ -35,12 +36,12 @@ class GooglemapsController(
 
     @PostMapping("/kollektiv-detaljer")
     fun hentKollektivDetalher(
-        @RequestBody finnReiseAvstandDto: FinnReiseAvstandDto,
+        @RequestBody finnReiseAvstandDto: FinnReiseavstandDto,
     ) = googleRoutesClient
         .hentRuter(
             RuteRequest(
-                origin = Address(finnReiseAvstandDto.fraAdresse.tilSøkeString()),
-                destination = Address(finnReiseAvstandDto.tilAdresse.tilSøkeString()),
+                origin = Address(finnReiseAvstandDto.fraAdresse),
+                destination = Address(finnReiseAvstandDto.tilAdresse),
                 travelMode = "TRANSIT",
                 departureTime = OffsetDateTime.now(ZoneOffset.UTC).toString(),
                 transitPreferences =
@@ -64,4 +65,18 @@ class GooglemapsController(
     fun hentStatiskKart(
         @RequestBody statiskKartRequest: StatiskKartRequest,
     ): ByteArray? = staticMapClient.hentStaticMap(statiskKartRequest)
+
+    @PostMapping("/autocomplete")
+    fun hentForslag(
+        @RequestBody hentForslagDto: HentForslagDto,
+    ) = googleAutocompleteClient
+        .hentForslag(
+            AutocompleteRequest(
+                input = hentForslagDto.input,
+                includedRegionCodes = listOf("no"),
+                languageCode = "no",
+                regionCode = "no",
+                includedPrimaryTypes = listOf("street_address", "geocode", "premise", "route", "subpremise"),
+            ),
+        )?.tilDto()
 }
