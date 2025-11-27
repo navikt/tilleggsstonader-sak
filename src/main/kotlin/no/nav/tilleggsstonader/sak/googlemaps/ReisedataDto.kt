@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.googlemaps.Polyline
 import no.nav.tilleggsstonader.sak.googlemaps.Reisetype
 import no.nav.tilleggsstonader.sak.googlemaps.Route
 import no.nav.tilleggsstonader.sak.googlemaps.Step
+import no.nav.tilleggsstonader.sak.googlemaps.TransitAgency
 import no.nav.tilleggsstonader.sak.googlemaps.TransitDetails
 
 data class RuteDto(
@@ -27,6 +28,12 @@ data class KollektivDetaljerDto(
     val sluttHoldeplass: String,
     val linjeNavn: String,
     val linjeType: LinjeType,
+    val operatør: List<Operatør>,
+)
+
+data class Operatør(
+    val navn: String,
+    val url: String,
 )
 
 data class Lokasjon(
@@ -73,6 +80,13 @@ private fun TransitDetails.tilDto(): KollektivDetaljerDto =
         sluttHoldeplass = stopDetails.arrivalStop.name,
         linjeNavn = transitLine.name,
         linjeType = transitLine.vehicle.type,
+        operatør = transitLine.agencies.map { it.tilDto() },
+    )
+
+private fun TransitAgency.tilDto(): Operatør =
+    Operatør(
+        navn = this.name,
+        url = this.uri,
     )
 
 private fun List<Step>.mergeSammenhengende(): List<Step> =

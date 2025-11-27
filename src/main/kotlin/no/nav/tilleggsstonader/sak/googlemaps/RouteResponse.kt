@@ -54,6 +54,12 @@ data class TransitLine(
     val shortName: String?,
     val name: String,
     val vehicle: Vehicle,
+    val agencies: List<TransitAgency>,
+)
+
+data class TransitAgency(
+    val name: String,
+    val uri: String,
 )
 
 data class Vehicle(
