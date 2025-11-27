@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import tilDto
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
+import java.time.LocalDate
+import java.time.ZoneId
 
 @RestController
 @RequestMapping(path = ["/api/kart"])
@@ -43,7 +43,13 @@ class GooglemapsController(
                 origin = Address(finnReiseAvstandDto.fraAdresse),
                 destination = Address(finnReiseAvstandDto.tilAdresse),
                 travelMode = "TRANSIT",
-                departureTime = OffsetDateTime.now(ZoneOffset.UTC).toString(),
+                departureTime =
+                    LocalDate
+                        .now()
+                        .atTime(8, 0)
+                        .atZone(ZoneId.of("Europe/Oslo"))
+                        .toInstant()
+                        .toString(),
                 transitPreferences =
                     TransitPreferences(
                         allowedTravelModes =
