@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import tilDto
 import java.time.LocalDate
 import java.time.ZoneId
 
@@ -32,7 +31,7 @@ class GooglemapsController(
                 computeAlternativeRoutes = true,
             ),
         )?.finnKortesteRute()
-        ?.tilDto()
+        ?.tilReisedataDto()
 
     @PostMapping("/kollektiv-detaljer")
     fun hentKollektivDetalher(
@@ -65,7 +64,7 @@ class GooglemapsController(
                 computeAlternativeRoutes = false,
             ),
         )?.finnDefaultRute()
-        ?.tilDto()
+        ?.tilReisedataDto()
 
     @PostMapping("/statisk-kart")
     fun hentStatiskKart(

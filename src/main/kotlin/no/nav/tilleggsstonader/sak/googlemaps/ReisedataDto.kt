@@ -1,12 +1,8 @@
-import no.nav.tilleggsstonader.sak.googlemaps.Leg
-import no.nav.tilleggsstonader.sak.googlemaps.LinjeType
-import no.nav.tilleggsstonader.sak.googlemaps.Location
-import no.nav.tilleggsstonader.sak.googlemaps.Polyline
-import no.nav.tilleggsstonader.sak.googlemaps.Reisetype
-import no.nav.tilleggsstonader.sak.googlemaps.Route
-import no.nav.tilleggsstonader.sak.googlemaps.Step
-import no.nav.tilleggsstonader.sak.googlemaps.TransitAgency
-import no.nav.tilleggsstonader.sak.googlemaps.TransitDetails
+package no.nav.tilleggsstonader.sak.googlemaps
+
+data class ReisedataDto(
+    val reiserute: RuteDto?,
+)
 
 data class RuteDto(
     val polyline: Polyline,
@@ -41,7 +37,12 @@ data class Lokasjon(
     val lng: Double,
 )
 
-fun Route.tilDto(): RuteDto =
+fun Route?.tilReisedataDto(): ReisedataDto =
+    ReisedataDto(
+        reiserute = this?.tilDto(),
+    )
+
+private fun Route.tilDto(): RuteDto =
     RuteDto(
         polyline = polyline,
         avstandMeter = distanceMeters,
