@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
@@ -355,7 +356,7 @@ class OppgaveService(
             aktuelleMapper.single()
         }
 
-    fun finnMapper(enheter: List<String>): List<MappeDto> = enheter.flatMap { finnMapper(it) }
+    fun finnMapper(enheter: List<Enhet>): List<MappeDto> = enheter.flatMap { finnMapper(it.enhetsnr) }
 
     private fun finnMapper(enhet: String): List<MappeDto> =
         cacheManager.getValue("oppgave-mappe", enhet) {

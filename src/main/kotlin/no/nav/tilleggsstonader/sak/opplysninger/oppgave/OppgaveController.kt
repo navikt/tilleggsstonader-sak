@@ -1,13 +1,11 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_EGEN_ANSATT
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_STRENGT_FORTROLIG
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
@@ -58,12 +56,16 @@ class OppgaveController(
 
     @GetMapping("/mapper")
     fun hentMapper(): List<MappeDto> {
-        val enheter = mutableListOf(ENHET_NR_NAY)
+        val enheter =
+            mutableListOf(
+                Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD,
+                Enhet.NAV_TILTAK_OSLO,
+            )
         if (tilgangService.harEgenAnsattRolle()) {
-            enheter += ENHET_NR_EGEN_ANSATT
+            enheter += Enhet.NAV_ARBEID_OG_YTELSER_EGNE_ANSATTE
         }
         if (tilgangService.harStrengtFortroligRolle()) {
-            enheter += ENHET_NR_STRENGT_FORTROLIG
+            enheter += Enhet.VIKAFOSSEN
         }
         return oppgaveService.finnMapper(enheter = enheter)
     }
