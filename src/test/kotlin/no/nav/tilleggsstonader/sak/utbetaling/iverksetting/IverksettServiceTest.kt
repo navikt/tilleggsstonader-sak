@@ -307,6 +307,41 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
         }
 
         @Test
+        fun `skal markere andeler fra forrige behandling med status VENTER_PÅ_SATSENDRING som UAKTUELL`() {
+            oppdaterAndelerTilOk(behandling)
+            val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!
+            val treMndFrem = YearMonth.now().plusMonths(3)
+
+            // Legger til andel med status VENTER_PÅ_SATSENDRING
+            tilkjentYtelseRepository.update(
+                tilkjentYtelse.copy(
+                    andelerTilkjentYtelse =
+                        tilkjentYtelse.andelerTilkjentYtelse.plus(
+                            lagAndel(behandling, treMndFrem, statusIverksetting = StatusIverksetting.VENTER_PÅ_SATS_ENDRING),
+                        ),
+                ),
+            )
+
+            testoppsettService.lagre(behandling2)
+            tilkjentYtelseRepository.insert(
+                tilkjentYtelse(
+                    behandling2.id,
+                    lagAndel(behandling2, forrigeMåned, beløp = 100),
+                ),
+            )
+            testoppsettService.lagreTotrinnskontroll(totrinnskontroll(behandling2.id))
+            iverksettService.iverksettBehandlingFørsteGang(behandling2.id)
+
+            val andeler = hentAndeler(behandling)
+
+            andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
+            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
+            andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
+            andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
+            andeler.forMåned(treMndFrem).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
+        }
+
+        @Test
         fun `skal feile hvis en andel fra forrige behandling er sendt til iverksetting med ikke kvittert OK`() {
             testoppsettService.lagre(behandling2)
 
