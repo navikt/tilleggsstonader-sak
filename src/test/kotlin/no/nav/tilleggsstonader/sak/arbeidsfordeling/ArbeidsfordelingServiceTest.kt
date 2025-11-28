@@ -4,13 +4,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsatt
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_STRENGT_FORTROLIG
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonMedRelasjoner
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPersonUtenRelasjoner
@@ -54,9 +53,9 @@ class ArbeidsfordelingServiceTest {
             val diskresjonskodeStrengtFortrolig = AdressebeskyttelseGradering.STRENGT_FORTROLIG.tilDiskresjonskode()
             val kriterie = firstArg<ArbeidsfordelingKriterie>()
             if (kriterie.diskresjonskode == diskresjonskodeStrengtFortrolig) {
-                listOf(Arbeidsfordelingsenhet(ENHET_NR_STRENGT_FORTROLIG, "vikafossen"))
+                listOf(Arbeidsfordelingsenhet(Enhet.VIKAFOSSEN.enhetsnr, "vikafossen"))
             } else {
-                listOf(Arbeidsfordelingsenhet(ENHET_NR_NAY, "nay"))
+                listOf(Arbeidsfordelingsenhet(Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr, "nay"))
             }
         }
         val geografiskTilknytning =
@@ -147,8 +146,8 @@ class ArbeidsfordelingServiceTest {
             val arbeidsfordelingTilsynBarn = service.hentNavEnhet(søkerIdent, Stønadstype.BARNETILSYN)
             val arbeidsfordelingLæremidler = service.hentNavEnhet(søkerIdent, Stønadstype.LÆREMIDLER)
 
-            assertThat(arbeidsfordelingTilsynBarn?.enhetNr).isEqualTo(ENHET_NR_STRENGT_FORTROLIG)
-            assertThat(arbeidsfordelingLæremidler?.enhetNr).isEqualTo(ENHET_NR_NAY)
+            assertThat(arbeidsfordelingTilsynBarn?.enhetNr).isEqualTo(Enhet.VIKAFOSSEN.enhetsnr)
+            assertThat(arbeidsfordelingLæremidler?.enhetNr).isEqualTo(Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr)
 
             verify(exactly = 2) { arbeidsfordelingClient.finnArbeidsfordelingsenhet(any()) }
         }
