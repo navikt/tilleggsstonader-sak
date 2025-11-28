@@ -10,13 +10,12 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
-import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
+import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
@@ -72,13 +71,76 @@ fun IntegrationTest.gjennomførBehandlingsløp(
         return behandlingId
     }
 
-    gjennomførVilkårSteg(medVilkår, behandling)
+    gjennomførVilkårSteg(medVilkår, behandling.id, behandling.stønadstype)
 
     if (tilSteg == StegType.BEREGNE_YTELSE) {
         return behandlingId
     }
 
-    gjennomførBeregningSteg(behandling)
+    gjennomførBeregningSteg(behandling.id, behandling.stønadstype)
+
+    if (tilSteg == StegType.SIMULERING) {
+        return behandlingId
+    }
+
+    gjennomførSimuleringSteg(behandlingId)
+
+    if (tilSteg == StegType.SEND_TIL_BESLUTTER) {
+        return behandlingId
+    }
+
+    gjennomførSendTilBeslutterSteg(behandlingId)
+
+    if (tilSteg == StegType.BESLUTTE_VEDTAK) {
+        return behandlingId
+    }
+
+    gjennomførBeslutteVedtakSteg(behandlingId)
+
+    if (tilSteg in setOf(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV, StegType.FERDIGSTILLE_BEHANDLING)) {
+        return behandlingId
+    }
+
+    // Ferdigstiller behandling
+    kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+    return behandlingId
+}
+
+fun IntegrationTest.gjennomførRevurderingsløp(
+    opprettBehandlingDto: OpprettBehandlingDto,
+    tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
+    medVilkår: List<LagreVilkår> = emptyList(),
+): BehandlingId {
+    val behandlingId = kall.behandling.opprettRevurdering(opprettBehandlingDto)
+
+    // Oppretter grunnlagsdata
+    kall.behandling.hent(behandlingId)
+
+    // Oppretter oppgave
+    kjørTasksKlareForProsessering()
+
+    tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
+
+    if (tilSteg == StegType.INNGANGSVILKÅR) {
+        return behandlingId
+    }
+
+    gjennomførIngangsvilkårStegRevurdering(behandlingId)
+
+    if (tilSteg == StegType.VILKÅR) {
+        return behandlingId
+    }
+
+    val behandling = kall.behandling.hent(behandlingId)
+
+    gjennomførVilkårSteg(medVilkår, behandling.id, behandling.stønadstype)
+
+    if (tilSteg == StegType.BEREGNE_YTELSE) {
+        return behandlingId
+    }
+
+    gjennomførBeregningSteg(behandling.id, behandling.stønadstype)
 
     if (tilSteg == StegType.SIMULERING) {
         return behandlingId
@@ -155,18 +217,21 @@ private fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId
     kjørTasksKlareForProsessering()
 }
 
-private fun IntegrationTest.gjennomførBeregningSteg(behandling: BehandlingDto) {
-    val foreslåtteVedtaksperioder = kall.vedtak.foreslåVedtaksperioder(behandling.id)
+fun IntegrationTest.gjennomførBeregningSteg(
+    behandlingId: BehandlingId,
+    stønadstype: Stønadstype,
+) {
+    val foreslåtteVedtaksperioder = kall.vedtak.foreslåVedtaksperioder(behandlingId)
 
     val vedtaksperioder =
         foreslåtteVedtaksperioder.map {
             it.tilVedtaksperiodeDto()
         }
     kall.vedtak.lagreInnvilgelse(
-        stønadstype = behandling.stønadstype,
-        behandlingId = behandling.id,
+        stønadstype = stønadstype,
+        behandlingId = behandlingId,
         innvilgelseDto =
-            when (behandling.stønadstype) {
+            when (stønadstype) {
                 Stønadstype.BARNETILSYN -> InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioder)
                 Stønadstype.LÆREMIDLER -> InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder)
                 Stønadstype.BOUTGIFTER -> InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder)
@@ -194,20 +259,31 @@ private fun IntegrationTest.gjennomførIngangsvilkårSteg(
     kjørTasksKlareForProsessering()
 }
 
-private fun IntegrationTest.gjennomførVilkårSteg(
+private fun IntegrationTest.gjennomførIngangsvilkårStegRevurdering(behandlingId: BehandlingId) {
+    kall.steg.ferdigstill(
+        behandlingId,
+        StegController.FerdigstillStegRequest(
+            steg = StegType.INNGANGSVILKÅR,
+        ),
+    )
+    kjørTasksKlareForProsessering()
+}
+
+fun IntegrationTest.gjennomførVilkårSteg(
     medVilkår: List<LagreVilkår>,
-    behandling: BehandlingDto,
+    behandlingId: BehandlingId,
+    stønadstype: Stønadstype,
 ) {
     medVilkår.forEach {
-        if (behandling.stønadstype.gjelderDagligReise()) {
-            kall.vilkårDagligReise.opprettVilkår(behandling.id, it as LagreDagligReiseDto)
+        if (stønadstype.gjelderDagligReise()) {
+            kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreDagligReiseDto)
         } else {
             kall.vilkår.opprettVilkår(it as OpprettVilkårDto)
         }
     }
 
     kall.steg.ferdigstill(
-        behandling.id,
+        behandlingId,
         StegController.FerdigstillStegRequest(
             steg = StegType.VILKÅR,
         ),
