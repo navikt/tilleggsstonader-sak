@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.utbetaling.simulering
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.dto.SimuleringDto
 import org.springframework.web.bind.annotation.GetMapping
@@ -24,7 +23,7 @@ class SimuleringController(
         @PathVariable behandlingId: BehandlingId,
     ): SimuleringDto? {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
