@@ -41,7 +41,7 @@ class BrevController(
         @PathVariable behandlingId: BehandlingId,
     ): ByteArray {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
         return Base64.getEncoder().encode(brevService.hentBeslutterbrevEllerRekonstruerSaksbehandlerBrev(behandlingId))
     }
