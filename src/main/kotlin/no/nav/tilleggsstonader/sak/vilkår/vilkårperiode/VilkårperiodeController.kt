@@ -32,7 +32,7 @@ class VilkårperiodeController(
         @PathVariable behandlingId: BehandlingId,
     ): VilkårperioderResponse {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
         return vilkårperiodeService.hentVilkårperioderResponse(behandlingId)
     }
@@ -43,7 +43,7 @@ class VilkårperiodeController(
         @RequestBody oppdaterGrunnlag: OppdaterGrunnlagDto?,
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
         vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandlingId, oppdaterGrunnlag?.hentFom)
@@ -54,7 +54,7 @@ class VilkårperiodeController(
         @RequestBody vilkårperiode: LagreVilkårperiode,
     ): LagreVilkårperiodeResponse {
         tilgangService.settBehandlingsdetaljerForRequest(vilkårperiode.behandlingId)
-        tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.opprettVilkårperiode(vilkårperiode)
@@ -67,7 +67,7 @@ class VilkårperiodeController(
         @RequestBody vilkårperiode: LagreVilkårperiode,
     ): LagreVilkårperiodeResponse {
         tilgangService.settBehandlingsdetaljerForRequest(vilkårperiode.behandlingId)
-        tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.oppdaterVilkårperiode(id, vilkårperiode)
@@ -80,7 +80,7 @@ class VilkårperiodeController(
         @RequestBody slettVikårperiode: SlettVikårperiode,
     ): LagreVilkårperiodeResponse {
         tilgangService.settBehandlingsdetaljerForRequest(slettVikårperiode.behandlingId)
-        tilgangService.validerTilgangTilBehandling(slettVikårperiode.behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(slettVikårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.slettVilkårperiode(id, slettVikårperiode)

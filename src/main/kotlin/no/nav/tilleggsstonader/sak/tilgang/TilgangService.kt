@@ -1,8 +1,11 @@
 package no.nav.tilleggsstonader.sak.tilgang
 
+import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.spring.cache.getValue
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
@@ -10,11 +13,14 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ManglerTilgang
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.logging.BehandlingLogService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.hentGrupperFraToken
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.FORTROLIG
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.STRENGT_FORTROLIG
@@ -36,6 +42,8 @@ class TilgangService(
     private val cacheManager: CacheManager,
     private val auditLogger: AuditLogger,
     private val behandlingLogService: BehandlingLogService,
+    private val oppgaveService: OppgaveService,
+    private val unleashService: UnleashService,
 ) {
     fun settBehandlingsdetaljerForRequest(behandlingId: BehandlingId) {
         behandlingLogService.settBehandlingsdetaljerForRequest(behandlingId)
@@ -69,26 +77,89 @@ class TilgangService(
         kastFeilHvisIkkeTilgang(tilgang, "person", personIdent)
     }
 
-    /**
-     * Cachear henting av saksehandling då vi kun skal bruke ident og fagsakPersonId
-     */
-    fun validerTilgangTilBehandling(
+    fun validerSkrivetilgangTilBehandling(
         behandlingId: BehandlingId,
         event: AuditLoggerEvent,
     ) {
-        val saksbehandling =
-            cacheManager.getValue("tilgangService_behandling", behandlingId) {
-                behandlingService.hentSaksbehandling(behandlingId)
-            }
+        feilHvis(event == AuditLoggerEvent.ACCESS) {
+            "AuditLoggerEvent.ACCESS er ikke gyldig for skrivetilgangskontroll"
+        }
+
+        val saksbehandling = hentCachedBehandling(behandlingId)
+
+        val tilgang =
+            hentTilgangTilRedigerBehandling(
+                behandling = saksbehandling,
+                personIdent = saksbehandling.ident,
+                stønadstype = saksbehandling.stønadstype,
+                jwtToken = SikkerhetContext.hentToken(),
+            )
+
+        validerTilgangTilBehandling(saksbehandling, event, tilgang)
+    }
+
+    fun harSkrivetilgangTilBehandling(saksbehandling: Saksbehandling): Boolean =
+        hentTilgangTilRedigerBehandling(
+            behandling = saksbehandling,
+            personIdent = saksbehandling.ident,
+            stønadstype = saksbehandling.stønadstype,
+            jwtToken = SikkerhetContext.hentToken(),
+        ).harTilgang
+
+    private fun hentCachedBehandling(behandlingId: BehandlingId): Saksbehandling =
+        cacheManager.getValue("tilgangService_behandling", behandlingId) {
+            behandlingService.hentSaksbehandling(behandlingId)
+        }
+
+    /**
+     * Cachear henting av saksehandling då vi kun skal bruke ident og fagsakPersonId
+     */
+    fun validerLesetilgangTilBehandling(behandlingId: BehandlingId) {
+        val saksbehandling = hentCachedBehandling(behandlingId)
         val tilgang =
             tilgangskontrollService.sjekkTilgangTilStønadstype(
                 personIdent = saksbehandling.ident,
                 stønadstype = saksbehandling.stønadstype,
                 jwtToken = SikkerhetContext.hentToken(),
             )
-        val key = CustomKeyValue("behandling", behandlingId.id)
+
+        validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.ACCESS, tilgang)
+    }
+
+    private fun validerTilgangTilBehandling(
+        saksbehandling: Saksbehandling,
+        event: AuditLoggerEvent,
+        tilgang: Tilgang,
+    ) {
+        val key = CustomKeyValue("behandling", saksbehandling.id.id)
         auditLogger.log(Sporingsdata(event, saksbehandling.ident, tilgang, custom1 = key))
-        kastFeilHvisIkkeTilgang(tilgang, "behandling", behandlingId.id.toString())
+        kastFeilHvisIkkeTilgang(tilgang, "behandling", saksbehandling.id.toString())
+    }
+
+    private fun hentTilgangTilRedigerBehandling(
+        behandling: Saksbehandling,
+        personIdent: String,
+        stønadstype: Stønadstype,
+        jwtToken: JwtToken,
+    ): Tilgang {
+        if (behandling.erFerdigstilt()) {
+            return Tilgang(harTilgang = false, begrunnelse = "Behandling er ferdigstilt")
+        }
+
+        val tilordnetSaksbehandler =
+            oppgaveService.hentÅpenBehandlingsoppgave(behandling.id)?.tilordnetSaksbehandler
+
+        val skalValidereTilordnetSaksbehandler = unleashService.isEnabled(Toggle.TILGANGSSTYRE_PÅ_TILORDNET_OPPGAVE)
+
+        return if (skalValidereTilordnetSaksbehandler && tilordnetSaksbehandler != SikkerhetContext.hentSaksbehandler()) {
+            Tilgang(harTilgang = false, begrunnelse = "Behandling er tilordnet en annen saksbehandler")
+        } else {
+            tilgangskontrollService.sjekkTilgangTilStønadstype(
+                personIdent = personIdent,
+                stønadstype = stønadstype,
+                jwtToken = jwtToken,
+            )
+        }
     }
 
     /**

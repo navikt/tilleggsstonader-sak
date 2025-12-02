@@ -1,11 +1,10 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20250922094930_4bb329c"
 val tilleggsstønaderLibsVersion = "2025.09.11-09.26.d3123ecc47ce"
-val tilleggsstønaderKontrakterVersion = "2025.11.20-16.01.4a0045ebcd19"
+val tilleggsstønaderKontrakterVersion = "2025.11.27-22.38.29b9e7f1339a"
 val avroVersion = "1.12.0"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.6"
@@ -144,12 +143,14 @@ tasks {
         if (System.getenv("GITHUB_ACTIONS") == "true") {
             return System.getenv("GITHUB_SHA")
         }
-        val byteOut = ByteArrayOutputStream()
-        project.exec {
-            commandLine = "git rev-parse --verify HEAD".split("\\s".toRegex())
-            standardOutput = byteOut
-        }
-        return String(byteOut.toByteArray()).trim()
+        val execResult =
+            providers.exec {
+                commandLine = "git rev-parse --verify HEAD".split("\\s".toRegex())
+                workingDir = project.projectDir
+            }
+        return execResult.standardOutput.asText
+            .get()
+            .trim()
     }
 
     val projectProps by registering(WriteProperties::class) {

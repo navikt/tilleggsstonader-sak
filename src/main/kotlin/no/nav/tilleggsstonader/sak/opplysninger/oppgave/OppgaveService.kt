@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
@@ -327,13 +328,17 @@ class OppgaveService(
     fun finnSisteOppgaveDomainForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
         oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandlingId)
 
-    fun finnSisteBehandlingsoppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
+    fun finnSisteBehandleSakOppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
         oppgaveRepository
             .findByBehandlingId(behandlingId)
             .filter { it.type in setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak) }
             .maxByOrNull { it.sporbar.opprettetTid }
 
     fun finnAlleOppgaveDomainForBehandling(behandlingId: BehandlingId) = oppgaveRepository.findByBehandlingId(behandlingId)
+
+    fun hentÅpenBehandlingsoppgave(behandlingId: BehandlingId): OppgaveDomain? =
+        finnAlleOppgaveDomainForBehandling(behandlingId)
+            .singleOrNull { it.erÅpen() && it.erBehandlingsoppgave() }
 
     fun finnMappe(
         enhet: String,
@@ -351,7 +356,7 @@ class OppgaveService(
             aktuelleMapper.single()
         }
 
-    fun finnMapper(enheter: List<String>): List<MappeDto> = enheter.flatMap { finnMapper(it) }
+    fun finnMapper(enheter: List<Enhet>): List<MappeDto> = enheter.flatMap { finnMapper(it.enhetsnr) }
 
     private fun finnMapper(enhet: String): List<MappeDto> =
         cacheManager.getValue("oppgave-mappe", enhet) {

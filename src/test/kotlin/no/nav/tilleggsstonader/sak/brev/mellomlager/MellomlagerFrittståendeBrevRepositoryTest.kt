@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.brev.mellomlager
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.temporal.ChronoUnit
 
-internal class MellomlagerFrittståendeBrevRepositoryTest : IntegrationTest() {
+internal class MellomlagerFrittståendeBrevRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var repository: MellomlagerFrittståendeBrevRepository
 

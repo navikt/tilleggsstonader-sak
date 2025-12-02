@@ -200,7 +200,12 @@ DVH_BEHANDLING_TOPIC: tilleggsstonader.aapen-tilleggsstonader-dvh-behandling
 
 google:
   api-key: ${GOOGLE_MAPS_API_KEY}
-  uri: https://routes.googleapis.com/directions/v2:computeRoutes
+  routes:
+    uri: https://routes.googleapis.com/directions/v2:computeRoutes
+  static-map:
+    uri: https://maps.googleapis.com/maps/api/staticmap
+  autocomplete:
+    uri: https://places.googleapis.com/v1/places:autocomplete
 
 clients:
   integrasjoner:

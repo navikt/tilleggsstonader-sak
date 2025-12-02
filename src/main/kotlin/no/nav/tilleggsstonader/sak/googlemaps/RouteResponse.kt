@@ -1,11 +1,12 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
 data class RuteResponse(
-    val routes: List<Route>,
+    val routes: List<Route>?,
 )
 
 data class Route(
     val routeLabels: List<RouteLabel>,
+    val polyline: Polyline,
     val distanceMeters: Int,
     val staticDuration: String,
     val legs: List<Leg>,
@@ -53,10 +54,20 @@ data class TransitLine(
     val shortName: String?,
     val name: String,
     val vehicle: Vehicle,
+    val agencies: List<TransitAgency>,
+)
+
+data class TransitAgency(
+    val name: String,
+    val uri: String,
 )
 
 data class Vehicle(
     val type: LinjeType,
+)
+
+data class Polyline(
+    val encodedPolyline: String,
 )
 
 enum class LinjeType {

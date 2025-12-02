@@ -36,37 +36,10 @@ data class BehandlingDto(
     val henlagtÅrsak: HenlagtÅrsak?,
     val henlagtBegrunnelse: String?,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata?,
-    val tilordnetSaksbehandler: TilordnetSaksbehandlerDto?,
+    val tilordnetSaksbehandler: TilordnetSaksbehandlerDto,
 )
 
-fun Behandling.tilDto(
-    stønadstype: Stønadstype,
-    fagsakPersonId: FagsakPersonId,
-    tilordnetSaksbehandler: TilordnetSaksbehandlerDto?,
-): BehandlingDto =
-    BehandlingDto(
-        id = this.id,
-        forrigeIverksatteBehandlingId = this.forrigeIverksatteBehandlingId,
-        fagsakId = this.fagsakId,
-        fagsakPersonId = fagsakPersonId,
-        steg = this.steg,
-        kategori = this.kategori,
-        type = this.type,
-        status = this.status,
-        sistEndret = this.sporbar.endret.endretTid,
-        resultat = this.resultat,
-        opprettet = this.sporbar.opprettetTid,
-        opprettetAv = this.sporbar.opprettetAv,
-        behandlingsårsak = this.årsak,
-        henlagtÅrsak = this.henlagtÅrsak,
-        henlagtBegrunnelse = this.henlagtBegrunnelse,
-        stønadstype = stønadstype,
-        vedtaksdato = this.vedtakstidspunkt,
-        nyeOpplysningerMetadata = this.nyeOpplysningerMetadata,
-        tilordnetSaksbehandler = tilordnetSaksbehandler,
-    )
-
-fun Saksbehandling.tilDto(tilordnetSaksbehandler: TilordnetSaksbehandlerDto?): BehandlingDto =
+fun Saksbehandling.tilDto(tilordnetSaksbehandler: TilordnetSaksbehandlerDto): BehandlingDto =
     BehandlingDto(
         id = this.id,
         forrigeIverksatteBehandlingId = this.forrigeIverksatteBehandlingId,

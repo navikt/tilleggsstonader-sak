@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -20,7 +21,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-internal class SimuleringControllerTest : IntegrationTest() {
+internal class SimuleringControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 
@@ -35,6 +36,7 @@ internal class SimuleringControllerTest : IntegrationTest() {
         val personIdent = "12345678901"
         val fagsak = opprettFagsak(personIdent)
         val behandling = opprettBehandling(fagsak)
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
         opprettVedtak(behandling.id)
 
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
@@ -54,6 +56,7 @@ internal class SimuleringControllerTest : IntegrationTest() {
         val personIdent = "identIngenEndring"
         val fagsak = opprettFagsak(personIdent)
         val behandling = opprettBehandling(fagsak)
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
         opprettVedtak(behandling.id)
 
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))

@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -26,7 +27,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
-internal class BehandlingControllerTest : IntegrationTest() {
+internal class BehandlingControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var behandlingRepository: BehandlingRepository
 
@@ -48,6 +49,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
     internal fun `Skal henlegge behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("12345678901"))))
         val behandling = testoppsettService.lagre(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
         val henlagtBegrunnelse = "Registert feil"
 
         kall.behandling.henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
@@ -78,6 +80,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
     internal fun `Skal henlegge FØRSTEGANGSBEHANDLING`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("12345678901"))))
         val behandling = testoppsettService.lagre(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
         val henlagtBegrunnelse = "Registert feil"
 
         kall.behandling.henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))

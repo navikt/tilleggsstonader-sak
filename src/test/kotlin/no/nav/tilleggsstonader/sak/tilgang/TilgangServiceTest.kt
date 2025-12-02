@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ManglerTilgang
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
@@ -51,7 +52,9 @@ internal class TilgangServiceTest {
             rolleConfig = rolleConfig,
             cacheManager = cacheManager,
             auditLogger = mockk(relaxed = true),
-            mockk(),
+            behandlingLogService = mockk(),
+            oppgaveService = mockk(),
+            unleashService = mockUnleashService(),
         )
     private val mocketPersonIdent = "12345"
 
@@ -99,10 +102,7 @@ internal class TilgangServiceTest {
 
             val feil =
                 catchThrowableOfType<ManglerTilgang> {
-                    tilgangService.validerTilgangTilBehandling(
-                        behandling.id,
-                        AuditLoggerEvent.ACCESS,
-                    )
+                    tilgangService.validerLesetilgangTilBehandling(behandling.id)
                 }
 
             assertThat(feil.frontendFeilmelding).contains(tilgangsfeilNavAnsatt.begrunnelse)
@@ -116,7 +116,7 @@ internal class TilgangServiceTest {
             } returns Tilgang(true)
 
             assertDoesNotThrow {
-                tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
+                tilgangService.validerLesetilgangTilBehandling(behandling.id)
             }
         }
 
@@ -157,8 +157,8 @@ internal class TilgangServiceTest {
 
             mockBrukerContext("A")
 
-            tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
-            tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
+            tilgangService.validerLesetilgangTilBehandling(behandling.id)
+            tilgangService.validerLesetilgangTilBehandling(behandling.id)
 
             verify(exactly = 1) { behandlingService.hentSaksbehandling(behandling.id) }
             verify(exactly = 2) { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) }
@@ -169,9 +169,9 @@ internal class TilgangServiceTest {
             every { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) } returns Tilgang(true)
 
             mockBrukerContext("A")
-            tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
+            tilgangService.validerLesetilgangTilBehandling(behandling.id)
             mockBrukerContext("B")
-            tilgangService.validerTilgangTilBehandling(behandling.id, AuditLoggerEvent.ACCESS)
+            tilgangService.validerLesetilgangTilBehandling(behandling.id)
 
             verify(exactly = 1) { behandlingService.hentSaksbehandling(behandling.id) }
             verify(exactly = 2) { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) }

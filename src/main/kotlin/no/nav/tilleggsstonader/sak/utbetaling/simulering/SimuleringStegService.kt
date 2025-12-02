@@ -19,7 +19,8 @@ class SimuleringStegService(
     @Transactional
     fun hentEllerOpprettSimuleringsresultat(saksbehandling: Saksbehandling): SimuleringDto? {
         if (saksbehandling.status.behandlingErLåstForVidereRedigering() ||
-            !tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)
+            !tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER) ||
+            !tilgangService.harSkrivetilgangTilBehandling(saksbehandling)
         ) {
             return simuleringService.hentLagretSimulering(saksbehandling.id)?.tilDto()
         } else {

@@ -108,7 +108,7 @@ class FagsysteminfoBehovHåndterer(
     }
 
     private fun finnBehandlendeEnhet(behandling: Saksbehandling): String? =
-        oppgaveService.finnSisteBehandlingsoppgaveForBehandling(behandling.id)?.tildeltEnhetsnummer
+        oppgaveService.finnSisteBehandleSakOppgaveForBehandling(behandling.id)?.tildeltEnhetsnummer
             ?: behandling.stønadstype.behandlendeEnhet().enhetsnr
 
     private fun mapRevurderinginformsjon(

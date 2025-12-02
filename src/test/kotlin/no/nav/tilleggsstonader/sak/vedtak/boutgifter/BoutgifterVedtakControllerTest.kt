@@ -1,12 +1,13 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkEmpty
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
@@ -34,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.util.UUID
 
-class BoutgifterVedtakControllerTest : IntegrationTest() {
+class BoutgifterVedtakControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var vilkårperiodeRepository: VilkårperiodeRepository
 
@@ -61,6 +62,7 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
     @BeforeEach
     fun setUp() {
         testoppsettService.opprettBehandlingMedFagsak(dummyBehandling, stønadstype = Stønadstype.BOUTGIFTER)
+        opprettOgTilordneOppgaveForBehandling(dummyBehandling.id)
         vilkårperiodeRepository.insert(aktivitet)
         vilkårperiodeRepository.insert(målgruppe)
         vilkårRepository.insert(vilkår)
@@ -113,6 +115,7 @@ class BoutgifterVedtakControllerTest : IntegrationTest() {
                     forrigeBehandling = dummyBehandling,
                     fagsak = dummyFagsak,
                 )
+            opprettOgTilordneOppgaveForBehandling(revurdering.id)
 
             vilkårRepository.insert(
                 vilkår.copy(

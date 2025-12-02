@@ -1,10 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -14,7 +15,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class LæremidlerVedtakControllerTest : IntegrationTest() {
+class LæremidlerVedtakControllerTest : CleanDatabaseIntegrationTest() {
     val fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER)
     val behandling = behandling(fagsak = fagsak, steg = StegType.BEREGNE_YTELSE, status = BehandlingStatus.UTREDES)
 
@@ -22,6 +23,7 @@ class LæremidlerVedtakControllerTest : IntegrationTest() {
     fun setUp() {
         testoppsettService.lagreFagsak(fagsak)
         testoppsettService.lagre(behandling, opprettGrunnlagsdata = false)
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
     }
 
     @Test

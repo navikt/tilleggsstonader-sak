@@ -42,7 +42,6 @@ class LæremidlerVedtakController(
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
-    private val vedtakOversiktService: VedtaksperioderOversiktService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -78,7 +77,7 @@ class LæremidlerVedtakController(
         vedtak: VedtakLæremidlerRequest,
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         stegService.håndterSteg(behandlingId, steg, vedtak)
     }
 
@@ -107,7 +106,7 @@ class LæremidlerVedtakController(
         @PathVariable behandlingId: BehandlingId,
     ): VedtakResponse? {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
         val behandling = behandlingService.hentBehandling(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
         return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)

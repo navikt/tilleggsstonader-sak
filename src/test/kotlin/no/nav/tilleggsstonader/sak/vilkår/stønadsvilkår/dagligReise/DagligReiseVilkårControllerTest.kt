@@ -1,8 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -21,7 +22,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class DagligReiseVilkårControllerTest : IntegrationTest() {
+class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
     val fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO)
     val behandling = behandling(fagsak = fagsak, steg = StegType.VILKÅR)
 
@@ -34,6 +35,7 @@ class DagligReiseVilkårControllerTest : IntegrationTest() {
     @BeforeEach
     fun setUp() {
         testoppsettService.opprettBehandlingMedFagsak(behandling)
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
     }
 
     @Test

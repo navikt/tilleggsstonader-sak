@@ -1,14 +1,16 @@
-import no.nav.tilleggsstonader.sak.googlemaps.Leg
-import no.nav.tilleggsstonader.sak.googlemaps.LinjeType
-import no.nav.tilleggsstonader.sak.googlemaps.Reisetype
-import no.nav.tilleggsstonader.sak.googlemaps.Route
-import no.nav.tilleggsstonader.sak.googlemaps.Step
-import no.nav.tilleggsstonader.sak.googlemaps.TransitDetails
+package no.nav.tilleggsstonader.sak.googlemaps
+
+data class ReisedataDto(
+    val reiserute: RuteDto?,
+)
 
 data class RuteDto(
+    val polyline: Polyline,
     val avstandMeter: Int,
     val varighetSekunder: Double,
     val strekninger: List<StrekningDto>,
+    val startLokasjon: Lokasjon,
+    val sluttLokasjon: Lokasjon,
 )
 
 data class StrekningDto(
@@ -22,13 +24,44 @@ data class KollektivDetaljerDto(
     val sluttHoldeplass: String,
     val linjeNavn: String,
     val linjeType: LinjeType,
+    val operatør: List<Operatør>,
 )
 
-fun Route.tilDto(): RuteDto =
+data class Operatør(
+    val navn: String,
+    val url: String,
+)
+
+data class Lokasjon(
+    val lat: Double,
+    val lng: Double,
+)
+
+fun Route?.tilReisedataDto(): ReisedataDto =
+    ReisedataDto(
+        reiserute = this?.tilDto(),
+    )
+
+private fun Route.tilDto(): RuteDto =
     RuteDto(
+        polyline = polyline,
         avstandMeter = distanceMeters,
         varighetSekunder = staticDuration.tilDouble(),
         strekninger = legs.tilDto(),
+        startLokasjon =
+            legs
+                .first()
+                .steps
+                .first()
+                .startLocation
+                .tilLokasjon(),
+        sluttLokasjon =
+            legs
+                .last()
+                .steps
+                .last()
+                .endLocation
+                .tilLokasjon(),
     )
 
 private fun List<Leg>.tilDto(): List<StrekningDto> {
@@ -48,6 +81,13 @@ private fun TransitDetails.tilDto(): KollektivDetaljerDto =
         sluttHoldeplass = stopDetails.arrivalStop.name,
         linjeNavn = transitLine.name,
         linjeType = transitLine.vehicle.type,
+        operatør = transitLine.agencies.map { it.tilDto() },
+    )
+
+private fun TransitAgency.tilDto(): Operatør =
+    Operatør(
+        navn = this.name,
+        url = this.uri,
     )
 
 private fun List<Step>.mergeSammenhengende(): List<Step> =
@@ -71,6 +111,12 @@ private fun List<Step>.mergeSammenhengende(): List<Step> =
         }
         acc
     }
+
+private fun Location.tilLokasjon(): Lokasjon =
+    Lokasjon(
+        lat = this.latLng.latitude,
+        lng = this.latLng.longitude,
+    )
 
 private fun String.tilDouble(): Double = this.removeSuffix("s").toDouble()
 

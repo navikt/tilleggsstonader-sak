@@ -4,7 +4,6 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -25,7 +24,7 @@ class BehandlingshistorikkController(
     ): List<BehandlingshistorikkDto> {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        tilgangService.validerTilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(saksbehandling.id)
         val behandlingHistorikk = behandlingshistorikkService.finnHendelseshistorikk(saksbehandling)
         return behandlingHistorikk
     }

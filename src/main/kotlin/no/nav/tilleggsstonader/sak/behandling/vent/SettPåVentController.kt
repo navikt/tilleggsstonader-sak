@@ -26,7 +26,7 @@ class SettPåVentController(
         @PathVariable behandlingId: BehandlingId,
     ): StatusPåVentDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
         return settPåVentService.hentStatusSettPåVent(behandlingId)
     }
 
@@ -36,7 +36,7 @@ class SettPåVentController(
         @RequestBody dto: SettPåVentDto,
     ): StatusPåVentDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return settPåVentService.settPåVent(behandlingId, dto.tilDomene())
     }
@@ -47,7 +47,7 @@ class SettPåVentController(
         @RequestBody dto: OppdaterSettPåVentDto,
     ): StatusPåVentDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return settPåVentService.oppdaterSettPåVent(behandlingId, dto)
     }
@@ -58,7 +58,7 @@ class SettPåVentController(
         @RequestBody taAvVentDto: TaAvVentDto,
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         taAvVentService.taAvVent(behandlingId, taAvVentDto)
     }
@@ -68,7 +68,7 @@ class SettPåVentController(
         @PathVariable behandlingId: BehandlingId,
     ): KanTaAvVentDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
         tilgangService.validerHarSaksbehandlerrolle()
         return taAvVentService.kanTaAvVent(behandlingId)
     }

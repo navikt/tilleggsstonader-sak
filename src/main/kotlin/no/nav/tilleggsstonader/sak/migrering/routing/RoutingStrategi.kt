@@ -11,6 +11,7 @@ sealed interface RoutingStrategi {
         val featureToggleMaksAntall: ToggleId,
         val kreverAtSøkerErUtenAktivtVedtakIArena: Boolean,
         val kreverAktivtAapVedtak: Boolean,
+        val kreverUgradertAdresse: Boolean,
     ) : RoutingStrategi
 }
 
@@ -24,6 +25,7 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
                 featureToggleMaksAntall = Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
                 kreverAtSøkerErUtenAktivtVedtakIArena = true,
                 kreverAktivtAapVedtak = true,
+                kreverUgradertAdresse = true,
             )
         Skjematype.DAGLIG_REISE_KJØRELISTE -> TODO()
     }

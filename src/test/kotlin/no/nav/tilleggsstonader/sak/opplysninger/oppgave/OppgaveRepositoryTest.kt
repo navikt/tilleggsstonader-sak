@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -20,10 +20,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 
-internal class OppgaveRepositoryTest : IntegrationTest() {
-    @Autowired
-    private lateinit var oppgaveRepository: OppgaveRepository
-
+internal class OppgaveRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var totrinnskontrollRepository: TotrinnskontrollRepository
 

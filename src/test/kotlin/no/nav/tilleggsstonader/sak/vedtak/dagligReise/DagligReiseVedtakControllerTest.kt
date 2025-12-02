@@ -1,13 +1,14 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkEmpty
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
@@ -41,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.util.UUID
 
-class DagligReiseVedtakControllerTest : IntegrationTest() {
+class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var vilkårperiodeRepository: VilkårperiodeRepository
 
@@ -141,6 +142,7 @@ class DagligReiseVedtakControllerTest : IntegrationTest() {
     @BeforeEach
     fun setUp() {
         testoppsettService.opprettBehandlingMedFagsak(dummyBehandling, stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+        opprettOgTilordneOppgaveForBehandling(dummyBehandling.id)
         vilkårperiodeRepository.insert(aktivitet)
         vilkårperiodeRepository.insert(målgruppe)
         vilkårRepository.insert(vilkår.mapTilVilkår())

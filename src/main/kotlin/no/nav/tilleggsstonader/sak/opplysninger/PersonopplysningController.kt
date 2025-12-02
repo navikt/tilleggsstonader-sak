@@ -23,7 +23,7 @@ class PersonopplysningController(
         @PathVariable behandlingId: BehandlingId,
     ): PersonopplysningerDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
         return personopplysningerService.hentPersonopplysninger(behandlingId)
     }
 
