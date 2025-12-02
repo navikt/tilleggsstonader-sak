@@ -16,15 +16,11 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførVilkårSteg
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 
-class OffentligTransportBeregningRevurderingTest(
-    @Autowired private val vedtakRepository: VedtakRepository,
-) : CleanDatabaseIntegrationTest() {
+class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest() {
     @Test
     fun forlengelseAvReiserSkalKasteFeil() {
         val reiser =

@@ -64,8 +64,7 @@ class OffentligTransportBeregningStepDefinitions {
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(vilkårperiodeService = vilkårperiodeServiceMock)
 
-    val offentligTransportBeregningService =
-        OffentligTransportBeregningService(vedtakRepositoryFake, utledTidligsteEndringService)
+    val offentligTransportBeregningService = OffentligTransportBeregningService()
 
     var beregningsResultat: BeregningsresultatOffentligTransport? = null
     var forventetBeregningsresultat: BeregningsresultatOffentligTransport? = null
@@ -99,11 +98,6 @@ class OffentligTransportBeregningStepDefinitions {
             offentligTransportBeregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkår = vilkår,
-                behandling =
-                    dummyBehandling(
-                        behandlingId = behandlingId,
-                        steg = StegType.VILKÅR,
-                    ),
             )
     }
 
