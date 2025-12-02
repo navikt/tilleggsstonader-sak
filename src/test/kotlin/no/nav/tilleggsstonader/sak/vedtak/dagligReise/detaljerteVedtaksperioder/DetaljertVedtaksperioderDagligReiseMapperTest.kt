@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -157,12 +158,14 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 reiser =
                     listOf(
                         BeregningsresultatForReise(
+                            reiseId = ReiseId.random(),
                             perioder =
                                 listOf(
                                     beregningsresultatForPeriode(fom, tom),
                                 ),
                         ),
                         BeregningsresultatForReise(
+                            reiseId = ReiseId.random(),
                             perioder =
                                 listOf(
                                     beregningsresultatForPeriode(fom, tom),
@@ -183,6 +186,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 reiser =
                     listOf(
                         BeregningsresultatForReise(
+                            reiseId = ReiseId.random(),
                             perioder =
                                 listOf(
                                     beregningsresultatForPeriode(fom1, tom1),
@@ -207,6 +211,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                     reiser =
                         listOf(
                             BeregningsresultatForReise(
+                                reiseId = ReiseId.random(),
                                 perioder =
                                     listOf(
                                         beregningsresultatForPeriode(førsteJanuar, sisteJanuar),
@@ -242,7 +247,6 @@ private fun beregningsresultatForPeriode(
     tom: LocalDate,
 ): BeregningsresultatForPeriode =
     BeregningsresultatForPeriode(
-        reiseId = randomUUID(),
         grunnlag =
             BeregningsgrunnlagOffentligTransport(
                 fom = fom,

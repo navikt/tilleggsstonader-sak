@@ -43,6 +43,7 @@ class OffentligTransportBeregningService {
         val trettidagerReisePerioder = justertReiseperiode.delTil30Dagersperioder()
 
         return BeregningsresultatForReise(
+            reiseId = reise.reiseId,
             perioder =
                 trettidagerReisePerioder.map { trettidagerReiseperiode ->
                     beregnForTrettiDagersPeriode(trettidagerReiseperiode, justerteVedtaksperioder)
@@ -81,7 +82,6 @@ class OffentligTransportBeregningService {
             )
 
         return BeregningsresultatForPeriode(
-            reiseId = trettidagerReisePeriode.reiseId,
             grunnlag = grunnlag,
             beløp = finnBilligsteAlternativForTrettidagersPeriode(grunnlag).billigsteBelop,
             billettdetaljer = finnBilligsteAlternativForTrettidagersPeriode(grunnlag).billettyper,

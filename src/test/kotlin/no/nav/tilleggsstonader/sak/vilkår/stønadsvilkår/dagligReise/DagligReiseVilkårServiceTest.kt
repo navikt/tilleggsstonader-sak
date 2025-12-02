@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -19,7 +20,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.UUID
 
 class DagligReiseVilkårServiceTest {
     val vilkårRepository = mockk<VilkårRepository>()
@@ -110,7 +110,7 @@ class DagligReiseVilkårServiceTest {
         prisSyvdagersbillett: Int? = null,
         prisTrettidagersbillett: Int? = 800,
     ) = FaktaOffentligTransport(
-        reiseId = UUID.randomUUID(),
+        reiseId = ReiseId.random(),
         reisedagerPerUke = reisedagerPerUke,
         prisEnkelbillett = prisEnkelbillett,
         prisSyvdagersbillett = prisSyvdagersbillett,

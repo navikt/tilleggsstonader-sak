@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
@@ -40,7 +41,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import java.util.UUID
 
 class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -62,7 +62,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
         )
     val dummyOffentligTransport =
         FaktaOffentligTransport(
-            reiseId = UUID.randomUUID(),
+            reiseId = ReiseId.random(),
             reisedagerPerUke = 4,
             prisEnkelbillett = 44,
             prisSyvdagersbillett = null,
@@ -93,10 +93,10 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                             reiser =
                                 listOf(
                                     BeregningsresultatForReise(
+                                        reiseId = ReiseId.random(),
                                         perioder =
                                             listOf(
                                                 BeregningsresultatForPeriode(
-                                                    reiseId = UUID.randomUUID(),
                                                     grunnlag =
                                                         BeregningsgrunnlagOffentligTransport(
                                                             fom = dummyFom,

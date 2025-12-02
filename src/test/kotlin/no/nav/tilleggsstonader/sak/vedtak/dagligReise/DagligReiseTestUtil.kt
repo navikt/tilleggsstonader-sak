@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
@@ -120,6 +121,7 @@ private fun beregningsresultatForReise(
             beregningsresultatForPeriode(fom = fom, tom = tom),
         ),
 ) = BeregningsresultatForReise(
+    reiseId = ReiseId.random(),
     perioder = perioder,
 )
 
@@ -133,7 +135,6 @@ private fun beregningsresultatForPeriode(
             Billettype.TRETTIDAGERSBILLETT to 1000,
         ),
 ) = BeregningsresultatForPeriode(
-    reiseId = randomUUID(),
     grunnlag = grunnlag,
     beløp = beløp,
     billettdetaljer = billettdetaljer,

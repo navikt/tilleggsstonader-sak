@@ -6,8 +6,8 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatD
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.time.LocalDate
-import java.util.UUID
 
 data class BeregningsresultatDagligReiseDto(
     val offentligTransport: BeregningsresultatOffentligTransportDto?,
@@ -19,7 +19,7 @@ data class BeregningsresultatOffentligTransportDto(
 )
 
 data class BeregningsresultatForReiseDto(
-    val reiseId: UUID,
+    val reiseId: ReiseId,
     val perioder: List<BeregningsresultatForPeriodeDto>,
 )
 

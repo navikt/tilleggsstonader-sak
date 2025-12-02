@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordne
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
@@ -113,11 +114,13 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     private fun faktaOffentligTransport(
+        reiseId: ReiseId = ReiseId.random(),
         reisedagerPerUke: Int = 5,
         prisEnkelbillett: Int? = 40,
         prisSyvdagersbillett: Int? = null,
         prisTrettidagersbillett: Int? = 800,
     ) = FaktaDagligReiseOffentligTransportDto(
+        reiseId = reiseId,
         reisedagerPerUke = reisedagerPerUke,
         prisEnkelbillett = prisEnkelbillett,
         prisSyvdagersbillett = prisSyvdagersbillett,

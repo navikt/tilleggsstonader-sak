@@ -2,11 +2,11 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.util.inneholderUkedag
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.time.LocalDate
-import java.util.UUID
 
 data class UtgiftOffentligTransport(
-    val reiseId: UUID,
+    val reiseId: ReiseId,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val antallReisedagerPerUke: Int,

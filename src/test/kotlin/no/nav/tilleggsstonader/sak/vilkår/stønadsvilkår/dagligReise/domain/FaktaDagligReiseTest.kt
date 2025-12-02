@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
-import java.util.UUID
 
 class FaktaDagligReiseTest {
     @Nested
@@ -17,7 +16,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
-                        reiseId = UUID.randomUUID(),
                         reisedagerPerUke = 4,
                         prisEnkelbillett = -44,
                         prisSyvdagersbillett = 200,
@@ -32,7 +30,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
-                        reiseId = UUID.randomUUID(),
                         reisedagerPerUke = -4,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = 200,
@@ -47,7 +44,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
-                        reiseId = UUID.randomUUID(),
                         reisedagerPerUke = 6,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = 200,
@@ -62,7 +58,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
-                        reiseId = UUID.randomUUID(),
                         reisedagerPerUke = 4,
                         prisEnkelbillett = null,
                         prisSyvdagersbillett = null,
@@ -77,7 +72,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
-                        reiseId = UUID.randomUUID(),
                         reisedagerPerUke = 1,
                         prisEnkelbillett = null,
                         prisSyvdagersbillett = null,
@@ -93,7 +87,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
-                        reiseId = UUID.randomUUID(),
                         reisedagerPerUke = 3,
                         prisEnkelbillett = null,
                         prisSyvdagersbillett = null,
@@ -109,7 +102,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
-                        reiseId = UUID.randomUUID(),
                         reisedagerPerUke = 3,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = null,
@@ -127,7 +119,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
-                        reiseId = UUID.randomUUID(),
                         reisedagerPerUke = 3,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = null,
@@ -143,7 +134,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
-                        reiseId = UUID.randomUUID(),
                         reisedagerPerUke = 4,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = null,
@@ -159,7 +149,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
-                        reiseId = UUID.randomUUID(),
                         reisedagerPerUke = 3,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = null,
@@ -177,7 +166,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
-                        reiseId = UUID.randomUUID(),
                         reisedagerPerUke = 3,
                         prisEnkelbillett = null,
                         prisSyvdagersbillett = null,

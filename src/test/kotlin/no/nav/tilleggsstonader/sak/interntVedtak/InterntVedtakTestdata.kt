@@ -51,6 +51,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -608,8 +609,7 @@ object InterntVedtakTestdata {
     }
 
     object DagligReise {
-        val fagsak =
-            fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+        val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
         val behandling =
             saksbehandling(
                 behandling =
@@ -654,10 +654,10 @@ object InterntVedtakTestdata {
                         reiser =
                             listOf(
                                 BeregningsresultatForReise(
+                                    reiseId = ReiseId.random(),
                                     perioder =
                                         listOf(
                                             BeregningsresultatForPeriode(
-                                                reiseId = UUID.randomUUID(),
                                                 grunnlag =
                                                     BeregningsgrunnlagOffentligTransport(
                                                         fom = LocalDate.of(2024, 2, 5),
@@ -673,7 +673,6 @@ object InterntVedtakTestdata {
                                                 billettdetaljer = mapOf(Billettype.SYVDAGERSBILLETT to 1),
                                             ),
                                             BeregningsresultatForPeriode(
-                                                reiseId = UUID.randomUUID(),
                                                 grunnlag =
                                                     BeregningsgrunnlagOffentligTransport(
                                                         fom = LocalDate.of(2024, 2, 5),
@@ -691,10 +690,10 @@ object InterntVedtakTestdata {
                                         ),
                                 ),
                                 BeregningsresultatForReise(
+                                    reiseId = ReiseId.random(),
                                     perioder =
                                         listOf(
                                             BeregningsresultatForPeriode(
-                                                reiseId = UUID.randomUUID(),
                                                 grunnlag =
                                                     BeregningsgrunnlagOffentligTransport(
                                                         fom = LocalDate.of(2025, 2, 5),
@@ -753,7 +752,7 @@ object InterntVedtakTestdata {
                     utgift = null,
                     fakta =
                         FaktaDagligReiseOffentligTransport(
-                            reiseId = UUID.randomUUID(),
+                            reiseId = ReiseId.random(),
                             reisedagerPerUke = 5,
                             prisEnkelbillett = 44,
                             prisSyvdagersbillett = null,

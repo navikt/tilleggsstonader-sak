@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagO
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 import java.util.UUID
@@ -15,10 +16,10 @@ fun lagBeregningsresultatForReise(
     beregningsgrunnlag: BeregningsgrunnlagOffentligTransport = lagBeregningsgrunnlagOffentligTransport(fom),
 ): BeregningsresultatForReise =
     BeregningsresultatForReise(
+        reiseId = ReiseId.random(),
         perioder =
             listOf(
                 BeregningsresultatForPeriode(
-                    reiseId = UUID.randomUUID(),
                     grunnlag = beregningsgrunnlag,
                     beløp = beløp,
                     billettdetaljer = emptyMap(),
