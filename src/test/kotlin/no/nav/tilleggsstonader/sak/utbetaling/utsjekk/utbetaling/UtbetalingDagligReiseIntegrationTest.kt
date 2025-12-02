@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøn
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -84,10 +85,16 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 .single()
                 .verdiEllerFeil<IverksettingDto>()
 
-        val førsteUkedagDenneMåneden = YearMonth.now().atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag()
+        val førsteUkedagIFørsteMåned =
+            reiser
+                .first()
+                .fom
+                .toYearMonth()
+                .atDay(1)
+                .datoEllerNesteMandagHvisLørdagEllerSøndag()
 
         with(utbetaling.utbetalingsgrunnlag.perioder.single()) {
-            assertThat(fom).isEqualTo(tom).isEqualTo(førsteUkedagDenneMåneden)
+            assertThat(fom).isEqualTo(tom).isEqualTo(førsteUkedagIFørsteMåned)
         }
     }
 
