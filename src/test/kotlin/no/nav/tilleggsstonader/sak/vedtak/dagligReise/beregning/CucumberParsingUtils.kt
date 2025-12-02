@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagO
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteSvarOffentligtransport
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
@@ -72,6 +73,7 @@ fun mapTilVilkårDagligReise(rad: Map<String, String>): LagreDagligReise =
         svar = oppfylteSvarOffentligtransport,
         fakta =
             FaktaOffentligTransport(
+                reiseId = ReiseId.random(),
                 reisedagerPerUke =
                     parseInt(
                         DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE,
