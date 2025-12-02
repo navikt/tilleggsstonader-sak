@@ -19,22 +19,8 @@ class OffentligTransportBeregningValidering {
         brukerfeilHvis(tidligsteEndring == null) {
             "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
         }
-        // TO-DO denne må byttes ut til LocalDate.now()
-        val idag = LocalDate.now()
+        val dagensDato = LocalDate.now()
         val perioderSomSkalBeregnes = beregnignsresultat.reiser.flatMap { it.perioder }
-
-        // Sjekk om førstegangsbehandlingen hadde en periode som dekker dagens dato
-        val førstegangsbehandlingHarDagensDatoiPeriode =
-            harPeriodeMedDato(
-                forrigeVedtak.beregningsresultat.offentligTransport?.reiser ?: emptyList(),
-                idag,
-            )
-
-        // Sjekk om revurderingen har en periode som dekker dagens dato
-        val revurderingHarDagensDatoIPeriode =
-            perioderSomSkalBeregnes.any { periode ->
-                idag in periode.grunnlag.fom..periode.grunnlag.tom
-            }
 
         // Finn perioden som gjelder i dag i førstegangsbehandlingen
         val dagensPeriodeIFørstegangs =
@@ -43,11 +29,11 @@ class OffentligTransportBeregningValidering {
                     ?.reiser
                     ?.flatMap { it.perioder }
                     ?: emptyList(),
-                idag,
+                dagensDato,
             )
 
         // Finn perioden som gjelder i dag i revurderingen
-        val dagensPeriodeIRevurdering = finnPeriodeMedDato(perioderSomSkalBeregnes, idag)
+        val dagensPeriodeIRevurdering = finnPeriodeMedDato(perioderSomSkalBeregnes, dagensDato)
 
         // Sjekk om periode-typen endrer seg fra enkeltbilletter → månedskort
         val endrerFraEnkeltbilletterTilMånedskort =
@@ -56,8 +42,8 @@ class OffentligTransportBeregningValidering {
                 dagensPeriodeIRevurdering,
             )
 
-        if (førstegangsbehandlingHarDagensDatoiPeriode &&
-            revurderingHarDagensDatoIPeriode &&
+        if (dagensPeriodeIFørstegangs != null &&
+            dagensPeriodeIRevurdering != null &&
             endrerFraEnkeltbilletterTilMånedskort
         ) {
             brukerfeil(
@@ -71,15 +57,10 @@ class OffentligTransportBeregningValidering {
         }
     }
 
-    private fun harPeriodeMedDato(
-        reiser: List<BeregningsresultatForReise>,
-        dato: LocalDate,
-    ): Boolean = reiser.any { reise -> reise.perioder.any { periode -> dato in periode.grunnlag.fom..periode.grunnlag.tom } }
-
     private fun finnPeriodeMedDato(
         perioder: List<BeregningsresultatForPeriode>,
         dato: LocalDate,
-    ): BeregningsresultatForPeriode? = perioder.firstOrNull { periode -> dato in periode.grunnlag.fom..periode.grunnlag.tom }
+    ): BeregningsresultatForPeriode? = perioder.firstOrNull { periode -> periode.grunnlag.inneholder(dato) }
 
     private fun endrerFraEnkeltbilletterTilMånedskort(
         førstegangs: BeregningsresultatForPeriode?,
