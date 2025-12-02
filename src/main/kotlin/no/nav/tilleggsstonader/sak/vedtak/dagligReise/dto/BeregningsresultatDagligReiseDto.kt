@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatD
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.time.LocalDate
 
 data class BeregningsresultatDagligReiseDto(
@@ -18,6 +19,7 @@ data class BeregningsresultatOffentligTransportDto(
 )
 
 data class BeregningsresultatForReiseDto(
+    val reiseId: ReiseId,
     val perioder: List<BeregningsresultatForPeriodeDto>,
 )
 
@@ -45,6 +47,7 @@ fun BeregningsresultatOffentligTransport.tilDto(): BeregningsresultatOffentligTr
 
 fun BeregningsresultatForReise.tilDto(): BeregningsresultatForReiseDto =
     BeregningsresultatForReiseDto(
+        reiseId = reiseId,
         perioder = perioder.map { it.tilDto() },
     )
 

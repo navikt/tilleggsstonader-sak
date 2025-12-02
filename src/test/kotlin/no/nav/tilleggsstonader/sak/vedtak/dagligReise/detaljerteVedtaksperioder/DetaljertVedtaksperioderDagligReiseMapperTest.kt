@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperioderDagligReiseMapper.finnDetaljerteVedtaksperioderTso
@@ -157,12 +158,14 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 reiser =
                     listOf(
                         BeregningsresultatForReise(
+                            reiseId = dummyReiseId,
                             perioder =
                                 listOf(
                                     beregningsresultatForPeriode(fom, tom),
                                 ),
                         ),
                         BeregningsresultatForReise(
+                            reiseId = dummyReiseId,
                             perioder =
                                 listOf(
                                     beregningsresultatForPeriode(fom, tom),
@@ -183,6 +186,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 reiser =
                     listOf(
                         BeregningsresultatForReise(
+                            reiseId = dummyReiseId,
                             perioder =
                                 listOf(
                                     beregningsresultatForPeriode(fom1, tom1),
@@ -207,6 +211,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                     reiser =
                         listOf(
                             BeregningsresultatForReise(
+                                reiseId = dummyReiseId,
                                 perioder =
                                     listOf(
                                         beregningsresultatForPeriode(førsteJanuar, sisteJanuar),

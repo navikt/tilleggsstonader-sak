@@ -43,6 +43,7 @@ class OffentligTransportBeregningService {
         val trettidagerReisePerioder = justertReiseperiode.delTil30Dagersperioder()
 
         return BeregningsresultatForReise(
+            reiseId = reise.reiseId,
             perioder =
                 trettidagerReisePerioder.map { trettidagerReiseperiode ->
                     beregnForTrettiDagersPeriode(trettidagerReiseperiode, justerteVedtaksperioder)
@@ -93,6 +94,7 @@ class OffentligTransportBeregningService {
         }
 
         return UtgiftOffentligTransport(
+            reiseId = this.fakta.reiseId,
             fom = this.fom,
             tom = this.tom,
             antallReisedagerPerUke = this.fakta.reisedagerPerUke,
