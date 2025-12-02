@@ -20,7 +20,7 @@ class OffentligTransportBeregningValidering {
             "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
         }
         // TO-DO denne må byttes ut til LocalDate.now()
-        val idag = LocalDate.of(2025, 2, 10)
+        val idag = LocalDate.now()
         val perioderSomSkalBeregnes = beregnignsresultat.reiser.flatMap { it.perioder }
 
         // Sjekk om førstegangsbehandlingen hadde en periode som dekker dagens dato

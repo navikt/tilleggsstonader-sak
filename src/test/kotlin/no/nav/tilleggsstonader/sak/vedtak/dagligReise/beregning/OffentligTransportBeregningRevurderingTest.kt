@@ -1,9 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.utils.dato.februar
-import no.nav.tilleggsstonader.libs.utils.dato.januar
-import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
@@ -19,14 +16,17 @@ import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest() {
     @Test
     fun forlengelseAvReiserSkalKasteFeil() {
+        val dagensDato = LocalDate.now()
+
         val reiser =
             lagreDagligReiseDto(
-                fom = 1 januar 2025,
-                tom = 16 februar 2025,
+                fom = dagensDato.minusDays(46),
+                tom = dagensDato.plusDays(7),
                 fakta =
                     FaktaDagligReiseOffentligTransportDto(
                         reisedagerPerUke = 2,
@@ -55,7 +55,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
                     OpprettBehandlingDto(
                         fagsakId = førstegangsbehandling.fagsakId,
                         årsak = BehandlingÅrsak.SØKNAD,
-                        kravMottatt = 17 februar 2025,
+                        kravMottatt = dagensDato,
                         nyeOpplysningerMetadata = null,
                     ),
             )
@@ -69,8 +69,8 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
         kall.vilkårDagligReise.oppdaterVilkår(
             lagreVilkår =
                 lagreDagligReiseDto(
-                    fom = 1 januar 2025,
-                    tom = 30 mars 2025,
+                    fom = dagensDato.minusDays(46),
+                    tom = dagensDato.plusDays(42),
                 ),
             vilkårId = vilkårId,
             behandlingId = revurderingId,
@@ -98,7 +98,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
 }
 
 private fun lagreAktivitet(behandlingId: BehandlingId): LagreVilkårperiode =
-    lagreVilkårperiodeAktivitet(behandlingId, fom = 1 januar 2025, tom = 30 mars 2025)
+    lagreVilkårperiodeAktivitet(behandlingId, fom = LocalDate.now().minusDays(46), tom = LocalDate.now().plusDays(42))
 
 private fun lagreMålgruppe(behandlingId: BehandlingId): LagreVilkårperiode =
-    lagreVilkårperiodeMålgruppe(behandlingId, fom = 1 januar 2025, tom = 30 mars 2025)
+    lagreVilkårperiodeMålgruppe(behandlingId, fom = LocalDate.now().minusDays(46), tom = LocalDate.now().plusDays(42))
