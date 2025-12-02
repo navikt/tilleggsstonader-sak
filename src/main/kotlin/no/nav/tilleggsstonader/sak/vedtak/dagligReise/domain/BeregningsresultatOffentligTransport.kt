@@ -13,11 +13,11 @@ data class BeregningsresultatOffentligTransport(
 )
 
 data class BeregningsresultatForReise(
+    val reiseId: UUID,
     val perioder: List<BeregningsresultatForPeriode>,
 )
 
 data class BeregningsresultatForPeriode(
-    val reiseId: UUID,
     val grunnlag: BeregningsgrunnlagOffentligTransport,
     val beløp: Int,
     val billettdetaljer: Map<Billettype, Int>,

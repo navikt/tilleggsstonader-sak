@@ -19,11 +19,11 @@ data class BeregningsresultatOffentligTransportDto(
 )
 
 data class BeregningsresultatForReiseDto(
+    val reiseId: UUID,
     val perioder: List<BeregningsresultatForPeriodeDto>,
 )
 
 data class BeregningsresultatForPeriodeDto(
-    val reiseId: UUID,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val prisEnkeltbillett: Int?,
@@ -47,12 +47,12 @@ fun BeregningsresultatOffentligTransport.tilDto(): BeregningsresultatOffentligTr
 
 fun BeregningsresultatForReise.tilDto(): BeregningsresultatForReiseDto =
     BeregningsresultatForReiseDto(
+        reiseId = reiseId,
         perioder = perioder.map { it.tilDto() },
     )
 
 fun BeregningsresultatForPeriode.tilDto(): BeregningsresultatForPeriodeDto =
     BeregningsresultatForPeriodeDto(
-        reiseId = reiseId,
         fom = grunnlag.fom,
         tom = grunnlag.tom,
         prisEnkeltbillett = grunnlag.prisEnkeltbillett,
