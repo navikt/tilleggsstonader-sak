@@ -99,7 +99,7 @@ class OppgaveClient(
                 uriVariables = uriVariables,
             )
         } catch (e: ProblemDetailException) {
-            if (e.detail.detail?.contains("navIdent har ikke tilgang til enheten") == true) {
+            if (e.detail.detail?.contains("har ikke tilgang til") == true) {
                 throw ApiFeil("Bruker har ikke tilgang til enhet", HttpStatus.BAD_REQUEST)
             } else if (e.detail.detail?.contains("allerede er ferdigstilt") == true) {
                 throw ApiFeil(
