@@ -34,13 +34,13 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `to andeler forrige måned, sender da én utbetaling med én periode`() {
+    fun `to andeler forrige måned, sender da én utbetaling med to perioder`() {
         val forrigeMåned = YearMonth.now().minusMonths(1)
-        val førsteIMåneden = forrigeMåned.atDay(1)
+
         val reiser =
             listOf(
-                lagreDagligReiseDto(fom = førsteIMåneden, tom = førsteIMåneden),
-                lagreDagligReiseDto(fom = forrigeMåned.atDay(10), tom = forrigeMåned.atDay(10)),
+                lagreDagligReiseDto(fom = forrigeMåned.atDay(1), tom = forrigeMåned.atDay(7)),
+                lagreDagligReiseDto(fom = forrigeMåned.atDay(10), tom = forrigeMåned.atDay(17)),
             )
 
         val behandlingId =
@@ -53,19 +53,23 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         val utbetalinger = KafkaTestConfig.sendteMeldinger().finnPåTopic(utbetalingTopic)
         val utbetaling = utbetalinger.single().verdiEllerFeil<IverksettingDto>()
 
-        val forventetDatoForUtbetalingsperiode = førsteIMåneden.datoEllerNesteMandagHvisLørdagEllerSøndag()
-
         with(utbetaling.utbetalingsgrunnlag) {
             assertThat(periodetype).isEqualTo(PeriodetypeUtbetaling.UKEDAG)
             assertThat(behandlingId).isEqualTo(behandlingId)
-            with(perioder.single()) {
-                assertThat(fom).isEqualTo(tom).isEqualTo(forventetDatoForUtbetalingsperiode)
+            assertThat(perioder).hasSize(2)
+
+            with(perioder.first()) {
+                assertThat(fom).isEqualTo(tom).isEqualTo(reiser.first().fom.datoEllerNesteMandagHvisLørdagEllerSøndag())
+            }
+
+            with(perioder.last()) {
+                assertThat(fom).isEqualTo(tom).isEqualTo(reiser.last().fom.datoEllerNesteMandagHvisLørdagEllerSøndag())
             }
         }
     }
 
     @Test
-    fun `hvis vi har én andel nå og én andel fra i tid, skal vi bare iverksette den første andelen`() {
+    fun `hvis vi har én andel nå og én andel fram i tid, skal vi bare iverksette den første andelen`() {
         val reiser =
             listOf(
                 lagreDagligReiseDto(fom = nå.minusDays(5), tom = nå),
@@ -85,16 +89,14 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 .single()
                 .verdiEllerFeil<IverksettingDto>()
 
-        val førsteUkedagIFørsteMåned =
+        val forventetUtbetalingsdato =
             reiser
                 .first()
                 .fom
-                .toYearMonth()
-                .atDay(1)
                 .datoEllerNesteMandagHvisLørdagEllerSøndag()
 
         with(utbetaling.utbetalingsgrunnlag.perioder.single()) {
-            assertThat(fom).isEqualTo(tom).isEqualTo(førsteUkedagIFørsteMåned)
+            assertThat(fom).isEqualTo(tom).isEqualTo(forventetUtbetalingsdato)
         }
     }
 
