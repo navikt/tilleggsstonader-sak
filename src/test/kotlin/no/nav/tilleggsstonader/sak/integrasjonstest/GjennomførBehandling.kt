@@ -32,6 +32,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Lagre
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import org.springframework.test.web.reactive.server.WebTestClient
 
 /**
  * Gjennomfører en behandling fra journalpost og helt til et gitt steg.
@@ -221,25 +222,33 @@ fun IntegrationTest.gjennomførBeregningSteg(
     behandlingId: BehandlingId,
     stønadstype: Stønadstype,
 ) {
+    gjennomførBeregningStegKall(behandlingId, stønadstype).expectStatus().isOk
+    kjørTasksKlareForProsessering()
+}
+
+fun IntegrationTest.gjennomførBeregningStegKall(
+    behandlingId: BehandlingId,
+    stønadstype: Stønadstype,
+): WebTestClient.ResponseSpec {
     val foreslåtteVedtaksperioder = kall.vedtak.foreslåVedtaksperioder(behandlingId)
 
     val vedtaksperioder =
         foreslåtteVedtaksperioder.map {
             it.tilVedtaksperiodeDto()
         }
-    kall.vedtak.lagreInnvilgelse(
-        stønadstype = stønadstype,
-        behandlingId = behandlingId,
-        innvilgelseDto =
-            when (stønadstype) {
-                Stønadstype.BARNETILSYN -> InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioder)
-                Stønadstype.LÆREMIDLER -> InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder)
-                Stønadstype.BOUTGIFTER -> InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder)
-                Stønadstype.DAGLIG_REISE_TSO -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
-                Stønadstype.DAGLIG_REISE_TSR -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
-            },
-    )
-    kjørTasksKlareForProsessering()
+    return kall.vedtak.apiRespons
+        .lagreInnvilgelse(
+            stønadstype = stønadstype,
+            behandlingId = behandlingId,
+            innvilgelseDto =
+                when (stønadstype) {
+                    Stønadstype.BARNETILSYN -> InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioder)
+                    Stønadstype.LÆREMIDLER -> InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder)
+                    Stønadstype.BOUTGIFTER -> InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder)
+                    Stønadstype.DAGLIG_REISE_TSO -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
+                    Stønadstype.DAGLIG_REISE_TSR -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
+                },
+        )
 }
 
 private fun IntegrationTest.gjennomførIngangsvilkårSteg(
