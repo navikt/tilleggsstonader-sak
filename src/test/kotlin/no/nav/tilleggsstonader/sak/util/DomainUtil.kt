@@ -513,8 +513,10 @@ fun totrinnskontroll(
     begrunnelse = begrunnelse,
 )
 
+val dummyReiseId = ReiseId.fromString("02c86eca-36e5-451b-a22d-8501a0f7b8dd")
+
 fun faktaOffentligTransport(
-    reiseId: ReiseId = ReiseId.random(),
+    reiseId: ReiseId = dummyReiseId,
     reisedagerPerUke: Int = 5,
     prisEnkelbillett: Int? = 40,
     prisSyvdagersbillett: Int? = null,

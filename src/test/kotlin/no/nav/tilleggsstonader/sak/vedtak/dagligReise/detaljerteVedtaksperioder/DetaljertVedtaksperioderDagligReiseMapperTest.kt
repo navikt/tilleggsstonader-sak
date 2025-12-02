@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperioderDagligReiseMapper.finnDetaljerteVedtaksperioderTso
@@ -19,7 +20,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -158,14 +158,14 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 reiser =
                     listOf(
                         BeregningsresultatForReise(
-                            reiseId = ReiseId.random(),
+                            reiseId = dummyReiseId,
                             perioder =
                                 listOf(
                                     beregningsresultatForPeriode(fom, tom),
                                 ),
                         ),
                         BeregningsresultatForReise(
-                            reiseId = ReiseId.random(),
+                            reiseId = dummyReiseId,
                             perioder =
                                 listOf(
                                     beregningsresultatForPeriode(fom, tom),
@@ -186,7 +186,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 reiser =
                     listOf(
                         BeregningsresultatForReise(
-                            reiseId = ReiseId.random(),
+                            reiseId = dummyReiseId,
                             perioder =
                                 listOf(
                                     beregningsresultatForPeriode(fom1, tom1),
@@ -211,7 +211,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                     reiser =
                         listOf(
                             BeregningsresultatForReise(
-                                reiseId = ReiseId.random(),
+                                reiseId = dummyReiseId,
                                 perioder =
                                     listOf(
                                         beregningsresultatForPeriode(førsteJanuar, sisteJanuar),

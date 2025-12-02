@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
@@ -114,7 +115,7 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     private fun faktaOffentligTransport(
-        reiseId: ReiseId = ReiseId.random(),
+        reiseId: ReiseId = dummyReiseId,
         reisedagerPerUke: Int = 5,
         prisEnkelbillett: Int? = 40,
         prisSyvdagersbillett: Int? = null,

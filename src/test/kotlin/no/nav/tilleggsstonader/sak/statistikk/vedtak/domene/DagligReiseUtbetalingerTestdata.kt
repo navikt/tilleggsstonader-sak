@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
@@ -13,7 +14,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
@@ -50,7 +50,7 @@ fun lagDagligReiseInnvilgelseMedBeløp(
                     reiser =
                         listOf(
                             BeregningsresultatForReise(
-                                reiseId = ReiseId.random(),
+                                reiseId = dummyReiseId,
                                 perioder =
                                     listOf(
                                         BeregningsresultatForPeriode(

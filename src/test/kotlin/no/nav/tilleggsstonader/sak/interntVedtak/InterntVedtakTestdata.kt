@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFaktaGrunnlagPerson
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.totrinnskontroll
@@ -51,7 +52,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -654,7 +654,7 @@ object InterntVedtakTestdata {
                         reiser =
                             listOf(
                                 BeregningsresultatForReise(
-                                    reiseId = ReiseId.random(),
+                                    reiseId = dummyReiseId,
                                     perioder =
                                         listOf(
                                             BeregningsresultatForPeriode(
@@ -690,7 +690,7 @@ object InterntVedtakTestdata {
                                         ),
                                 ),
                                 BeregningsresultatForReise(
-                                    reiseId = ReiseId.random(),
+                                    reiseId = dummyReiseId,
                                     perioder =
                                         listOf(
                                             BeregningsresultatForPeriode(
@@ -752,7 +752,7 @@ object InterntVedtakTestdata {
                     utgift = null,
                     fakta =
                         FaktaDagligReiseOffentligTransport(
-                            reiseId = ReiseId.random(),
+                            reiseId = dummyReiseId,
                             reisedagerPerUke = 5,
                             prisEnkelbillett = 44,
                             prisSyvdagersbillett = null,

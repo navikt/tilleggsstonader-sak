@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 import java.util.UUID
@@ -16,7 +16,7 @@ fun lagBeregningsresultatForReise(
     beregningsgrunnlag: BeregningsgrunnlagOffentligTransport = lagBeregningsgrunnlagOffentligTransport(fom),
 ): BeregningsresultatForReise =
     BeregningsresultatForReise(
-        reiseId = ReiseId.random(),
+        reiseId = dummyReiseId,
         perioder =
             listOf(
                 BeregningsresultatForPeriode(

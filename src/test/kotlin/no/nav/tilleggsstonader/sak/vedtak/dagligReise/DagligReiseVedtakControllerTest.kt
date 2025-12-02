@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkEmpt
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkårDagligReise
@@ -29,7 +30,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
@@ -62,7 +62,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
         )
     val dummyOffentligTransport =
         FaktaOffentligTransport(
-            reiseId = ReiseId.random(),
+            reiseId = dummyReiseId,
             reisedagerPerUke = 4,
             prisEnkelbillett = 44,
             prisSyvdagersbillett = null,
@@ -93,7 +93,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                             reiser =
                                 listOf(
                                     BeregningsresultatForReise(
-                                        reiseId = ReiseId.random(),
+                                        reiseId = dummyReiseId,
                                         perioder =
                                             listOf(
                                                 BeregningsresultatForPeriode(
