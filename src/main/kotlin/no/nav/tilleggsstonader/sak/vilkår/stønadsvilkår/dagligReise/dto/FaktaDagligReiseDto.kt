@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(
@@ -19,6 +20,7 @@ sealed interface FaktaDagligReiseDto {
 }
 
 data class FaktaDagligReiseOffentligTransportDto(
+    val reiseId: ReiseId?, // TODO: Fjern nullbarhet
     val reisedagerPerUke: Int,
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
@@ -28,6 +30,7 @@ data class FaktaDagligReiseOffentligTransportDto(
 
     override fun mapTilFakta() =
         FaktaOffentligTransport(
+            reiseId = reiseId,
             reisedagerPerUke = reisedagerPerUke,
             prisEnkelbillett = prisEnkelbillett,
             prisTrettidagersbillett = prisTrettidagersbillett,

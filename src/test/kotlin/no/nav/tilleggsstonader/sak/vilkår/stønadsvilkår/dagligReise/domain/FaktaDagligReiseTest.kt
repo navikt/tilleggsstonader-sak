@@ -16,6 +16,7 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = 4,
                         prisEnkelbillett = -44,
                         prisSyvdagersbillett = 200,
@@ -30,6 +31,7 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = -4,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = 200,
@@ -44,6 +46,7 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = 6,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = 200,
@@ -58,6 +61,7 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = 4,
                         prisEnkelbillett = null,
                         prisSyvdagersbillett = null,
@@ -72,6 +76,7 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = 1,
                         prisEnkelbillett = null,
                         prisSyvdagersbillett = null,
@@ -87,6 +92,7 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = 3,
                         prisEnkelbillett = null,
                         prisSyvdagersbillett = null,
@@ -102,6 +108,7 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = 3,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = null,
@@ -119,6 +126,7 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = 3,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = null,
@@ -134,6 +142,7 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = 4,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = null,
@@ -149,6 +158,7 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = 3,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = null,
@@ -166,6 +176,7 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaOffentligTransport(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = 3,
                         prisEnkelbillett = null,
                         prisSyvdagersbillett = null,

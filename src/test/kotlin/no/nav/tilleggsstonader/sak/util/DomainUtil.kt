@@ -51,6 +51,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
@@ -512,12 +513,16 @@ fun totrinnskontroll(
     begrunnelse = begrunnelse,
 )
 
+val dummyReiseId = ReiseId.fromString("02c86eca-36e5-451b-a22d-8501a0f7b8dd")
+
 fun faktaOffentligTransport(
+    reiseId: ReiseId = dummyReiseId,
     reisedagerPerUke: Int = 5,
     prisEnkelbillett: Int? = 40,
     prisSyvdagersbillett: Int? = null,
     prisTrettidagersbillett: Int? = 800,
 ) = FaktaDagligReiseOffentligTransportDto(
+    reiseId = reiseId,
     reisedagerPerUke = reisedagerPerUke,
     prisEnkelbillett = prisEnkelbillett,
     prisSyvdagersbillett = prisSyvdagersbillett,

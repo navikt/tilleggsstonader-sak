@@ -39,14 +39,17 @@ class GjenopprettOppgavePåBehandlingTask(
         val behandling = behandligService.hentBehandling(BehandlingId.fromString(task.payload))
         feilHvis(behandling.status.erFerdigbehandlet()) { "Behandling er ferdig behandlet" }
 
-        val sisteOppgavePåBehandling = oppgaveService.finnSisteOppgaveDomainForBehandling(behandling.id)
+        val sisteOppgavePåBehandling = oppgaveService.finnSisteBehandlingsoppgaveForBehandling(behandling.id)
 
         val beskrivelseNyOppgave =
             when (sisteOppgavePåBehandling?.status == Oppgavestatus.FEILREGISTRERT) {
-                true ->
+                true -> {
                     "Opprinnelig oppgave er feilregistrert. For å kunne utføre behandling har det blitt opprettet en ny oppgave."
-                false ->
+                }
+
+                false -> {
                     "Opprinnelig oppgave har blitt flyttet eller endret. For å kunne utføre behandling har det blitt opprettet en ny oppgave."
+                }
             }
 
         if (sisteOppgavePåBehandling?.status == Oppgavestatus.ÅPEN) {

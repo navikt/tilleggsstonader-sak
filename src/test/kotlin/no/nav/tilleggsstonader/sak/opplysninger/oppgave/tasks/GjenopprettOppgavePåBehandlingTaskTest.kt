@@ -49,7 +49,7 @@ class GjenopprettOppgavePåBehandlingTaskTest {
             )
 
         every { behandlingService.hentBehandling(behandling.id) } returns behandling
-        every { oppgaveService.finnSisteOppgaveDomainForBehandling(behandling.id) } returns sisteOppgave
+        every { oppgaveService.finnSisteBehandlingsoppgaveForBehandling(behandling.id) } returns sisteOppgave
 
         val opprettOppgaveSlot = slot<OpprettOppgave>()
         every { oppgaveService.opprettOppgave(behandling.id, capture(opprettOppgaveSlot)) } returns 1L
@@ -77,7 +77,7 @@ class GjenopprettOppgavePåBehandlingTaskTest {
             )
 
         every { behandlingService.hentBehandling(behandling.id) } returns behandling
-        every { oppgaveService.finnSisteOppgaveDomainForBehandling(behandling.id) } returns sisteOppgave
+        every { oppgaveService.finnSisteBehandlingsoppgaveForBehandling(behandling.id) } returns sisteOppgave
 
         val opprettOppgaveSlot = slot<OpprettOppgave>()
         every { oppgaveService.opprettOppgave(behandling.id, capture(opprettOppgaveSlot)) } returns 1L

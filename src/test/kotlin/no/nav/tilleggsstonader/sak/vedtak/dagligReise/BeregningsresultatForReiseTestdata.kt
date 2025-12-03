@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
@@ -15,6 +16,7 @@ fun lagBeregningsresultatForReise(
     beregningsgrunnlag: BeregningsgrunnlagOffentligTransport = lagBeregningsgrunnlagOffentligTransport(fom),
 ): BeregningsresultatForReise =
     BeregningsresultatForReise(
+        reiseId = dummyReiseId,
         perioder =
             listOf(
                 BeregningsresultatForPeriode(

@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
@@ -109,6 +110,7 @@ class DagligReiseVilkårServiceTest {
         prisSyvdagersbillett: Int? = null,
         prisTrettidagersbillett: Int? = 800,
     ) = FaktaOffentligTransport(
+        reiseId = dummyReiseId,
         reisedagerPerUke = reisedagerPerUke,
         prisEnkelbillett = prisEnkelbillett,
         prisSyvdagersbillett = prisSyvdagersbillett,

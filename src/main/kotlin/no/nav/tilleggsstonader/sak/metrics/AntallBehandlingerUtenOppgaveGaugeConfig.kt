@@ -3,8 +3,8 @@ package no.nav.tilleggsstonader.sak.metrics
 import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.Metrics
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.GYLDIGE_ENHETER_TILLEGGSTØNADER
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
 import java.time.Duration
@@ -27,7 +27,11 @@ class AntallBehandlingerUtenOppgaveGaugeConfig(
                 if (sistHentet.isBefore(Instant.now().minus(Duration.ofMinutes(30)))) {
                     val behandlingerUtenOppgave =
                         it.finnÅpneBehandlingerUtenOppgaveMedStatusOgTildeltEnhetsnummer(
-                            status = Oppgavestatus.ÅPEN,
+                            behandlingsstatuserHvorOppgaveIkkeSkalFinnes =
+                                listOf(
+                                    BehandlingStatus.IVERKSETTER_VEDTAK,
+                                    BehandlingStatus.FERDIGSTILT,
+                                ),
                             gyldigeEnheterForOppgave = GYLDIGE_ENHETER_TILLEGGSTØNADER,
                         )
                     if (behandlingerUtenOppgave.isNotEmpty()) {

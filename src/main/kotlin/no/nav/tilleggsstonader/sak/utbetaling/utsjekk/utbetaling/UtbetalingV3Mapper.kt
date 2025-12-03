@@ -117,12 +117,11 @@ class UtbetalingV3Mapper(
     private fun grupperPåMånedOgMapTilPerioder(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>): List<PerioderUtbetaling> =
         andelerTilkjentYtelse
             .filter { it.beløp != 0 }
-            .groupBy { it.utbetalingsdato.toYearMonth() }
-            .map { (månedÅr, andeler) ->
-                val førsteUkedagIMåneden = månedÅr.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag()
+            .groupBy { it.utbetalingsdato }
+            .map { (utbetalingsdato, andeler) ->
                 PerioderUtbetaling(
-                    fom = førsteUkedagIMåneden,
-                    tom = førsteUkedagIMåneden,
+                    fom = utbetalingsdato,
+                    tom = utbetalingsdato,
                     beløp = andeler.sumOf { it.beløp }.toUInt(),
                 )
             }
@@ -132,7 +131,6 @@ class UtbetalingV3Mapper(
             TypeAndel.DAGLIG_REISE_AAP -> StønadUtbetaling.DAGLIG_REISE_AAP
             TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER -> StønadUtbetaling.DAGLIG_REISE_ENSLIG_FORSØRGER
             TypeAndel.DAGLIG_REISE_ETTERLATTE -> StønadUtbetaling.DAGLIG_REISE_ETTERLATTE
-
             else -> error("Skal ikke sende andelstype=$typeAndel på kafka")
         }
 

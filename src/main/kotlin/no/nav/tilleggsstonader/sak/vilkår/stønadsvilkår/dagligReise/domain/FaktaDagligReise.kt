@@ -15,6 +15,7 @@ sealed interface FaktaDagligReise {
 }
 
 data class FaktaOffentligTransport(
+    val reiseId: ReiseId? = ReiseId.random(), // TODO: Fjern nullbarhet
     val reisedagerPerUke: Int,
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
@@ -97,6 +98,7 @@ data class FaktaOffentligTransport(
 
     override fun mapTilVilkårFakta() =
         FaktaDagligReiseOffentligTransport(
+            reiseId = reiseId,
             reisedagerPerUke = reisedagerPerUke,
             prisEnkelbillett = prisEnkelbillett,
             prisSyvdagersbillett = prisSyvdagersbillett,

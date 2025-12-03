@@ -192,8 +192,10 @@ class IverksettService(
 
         val uaktuelleAndeler =
             andelerTilkjentYtelse
-                .filter { it.statusIverksetting == StatusIverksetting.UBEHANDLET }
-                .map { it.copy(statusIverksetting = StatusIverksetting.UAKTUELL) }
+                .filter {
+                    it.statusIverksetting == StatusIverksetting.UBEHANDLET ||
+                        it.statusIverksetting == StatusIverksetting.VENTER_PÅ_SATS_ENDRING
+                }.map { it.copy(statusIverksetting = StatusIverksetting.UAKTUELL) }
 
         andelTilkjentYtelseRepository.updateAll(uaktuelleAndeler)
     }

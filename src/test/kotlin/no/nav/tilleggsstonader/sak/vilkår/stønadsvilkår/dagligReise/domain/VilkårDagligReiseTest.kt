@@ -54,6 +54,7 @@ class VilkårDagligReiseTest {
     fun `skal kaste feil hvis fakta ikke er null når resulat er ikke oppfylt`() {
         val faktaOffentligTransport =
             FaktaOffentligTransport(
+                reiseId = ReiseId.random(),
                 reisedagerPerUke = 4,
                 prisEnkelbillett = 44,
                 prisSyvdagersbillett = 200,

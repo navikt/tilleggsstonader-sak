@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkEmpt
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkårDagligReise
@@ -61,6 +62,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
         )
     val dummyOffentligTransport =
         FaktaOffentligTransport(
+            reiseId = dummyReiseId,
             reisedagerPerUke = 4,
             prisEnkelbillett = 44,
             prisSyvdagersbillett = null,
@@ -91,6 +93,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                             reiser =
                                 listOf(
                                     BeregningsresultatForReise(
+                                        reiseId = dummyReiseId,
                                         perioder =
                                             listOf(
                                                 BeregningsresultatForPeriode(

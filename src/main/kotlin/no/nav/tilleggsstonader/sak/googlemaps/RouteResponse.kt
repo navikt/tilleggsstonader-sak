@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
 data class RuteResponse(
-    val routes: List<Route>,
+    val routes: List<Route>?,
 )
 
 data class Route(
@@ -54,6 +54,12 @@ data class TransitLine(
     val shortName: String?,
     val name: String,
     val vehicle: Vehicle,
+    val agencies: List<TransitAgency>,
+)
+
+data class TransitAgency(
+    val name: String,
+    val uri: String,
 )
 
 data class Vehicle(

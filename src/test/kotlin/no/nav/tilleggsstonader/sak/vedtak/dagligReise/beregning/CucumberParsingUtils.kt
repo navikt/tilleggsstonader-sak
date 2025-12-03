@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
@@ -72,6 +73,7 @@ fun mapTilVilkårDagligReise(rad: Map<String, String>): LagreDagligReise =
         svar = oppfylteSvarOffentligtransport,
         fakta =
             FaktaOffentligTransport(
+                reiseId = dummyReiseId,
                 reisedagerPerUke =
                     parseInt(
                         DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE,
@@ -79,7 +81,11 @@ fun mapTilVilkårDagligReise(rad: Map<String, String>): LagreDagligReise =
                     ),
                 prisEnkelbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_ENKELTBILLETT, rad),
                 prisSyvdagersbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_SYV_DAGERS_BILLETT, rad),
-                prisTrettidagersbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT, rad),
+                prisTrettidagersbillett =
+                    parseValgfriInt(
+                        DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT,
+                        rad,
+                    ),
             ),
     )
 

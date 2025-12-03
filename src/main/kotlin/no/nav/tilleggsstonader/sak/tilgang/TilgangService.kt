@@ -98,6 +98,14 @@ class TilgangService(
         validerTilgangTilBehandling(saksbehandling, event, tilgang)
     }
 
+    fun harSkrivetilgangTilBehandling(saksbehandling: Saksbehandling): Boolean =
+        hentTilgangTilRedigerBehandling(
+            behandling = saksbehandling,
+            personIdent = saksbehandling.ident,
+            stønadstype = saksbehandling.stønadstype,
+            jwtToken = SikkerhetContext.hentToken(),
+        ).harTilgang
+
     private fun hentCachedBehandling(behandlingId: BehandlingId): Saksbehandling =
         cacheManager.getValue("tilgangService_behandling", behandlingId) {
             behandlingService.hentSaksbehandling(behandlingId)

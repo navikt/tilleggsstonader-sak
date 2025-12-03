@@ -22,8 +22,6 @@ enum class Toggle(
 
     SØKNAD_ROUTING_DAGLIG_REISE("sak.soknad-routing.daglig-reise"),
 
-    SIMULER_DAGLIG_REISE("sak.simulering.daglig-reise"),
-
     OPPRETT_OPPGAVE_TILBAKEKREVING("sak.opprett-oppgave-tilbakekreving"),
 
     TILGANGSSTYRE_PÅ_TILORDNET_OPPGAVE("sak.tilgangsstyring-tildelt-oppgave"),

@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
 
@@ -212,13 +211,17 @@ interface BehandlingRepository :
 
     @Query(
         """
-            select id from behandling
-            where status != 'FERDIGSTILT'
-            and id not in (select behandling_id from oppgave where status = :status and tildelt_enhetsnummer in (:gyldigeEnheterForOppgave));
+            with siste_oppgave_per_behandling as (
+                select *, row_number() over (partition by behandling_id order by opprettet_tid desc) as rn from oppgave
+                )
+            select b.id from behandling b join siste_oppgave_per_behandling o on b.id = o.behandling_id
+            where b.status not in (:behandlingsstatuserHvorOppgaveIkkeSkalFinnes)
+              and o.rn = 1
+              and (o.status = 'FERDIGSTILT' or o.tildelt_enhetsnummer not in (:gyldigeEnheterForOppgave))            
         """,
     )
     fun finnÅpneBehandlingerUtenOppgaveMedStatusOgTildeltEnhetsnummer(
-        status: Oppgavestatus,
+        behandlingsstatuserHvorOppgaveIkkeSkalFinnes: Collection<BehandlingStatus>,
         gyldigeEnheterForOppgave: Collection<String>,
     ): List<BehandlingId>
 }
