@@ -72,10 +72,7 @@ class TilordnetSaksbehandlerService(
     ): TilordnetSaksbehandlerPåOppgave {
         if (oppgave == null) {
             val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
-            if (behandling.steg == StegType.INNGANGSVILKÅR ||
-                behandling.steg == StegType.VILKÅR ||
-                behandling.steg == StegType.BEREGNE_YTELSE
-            ) {
+            if (behandling.steg == StegType.INNGANGSVILKÅR) {
                 return TilordnetSaksbehandlerPåOppgave.OPPGAVE_FINNES_IKKE_SANNSYNLIGVIS_INNLOGGET_SAKSBEHANDLER
             }
             return TilordnetSaksbehandlerPåOppgave.OPPGAVE_FINNES_IKKE
