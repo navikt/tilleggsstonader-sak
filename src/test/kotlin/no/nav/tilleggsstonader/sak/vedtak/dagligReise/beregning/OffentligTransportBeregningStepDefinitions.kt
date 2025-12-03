@@ -14,8 +14,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
-import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport

@@ -108,11 +108,7 @@ fun IntegrationTest.gjennomførBehandlingsløp(
     return behandlingId
 }
 
-fun IntegrationTest.gjennomførRevurderingsløp(
-    opprettBehandlingDto: OpprettBehandlingDto,
-    tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
-    medVilkår: List<LagreVilkår> = emptyList(),
-): BehandlingId {
+fun IntegrationTest.opprettRevurdering(opprettBehandlingDto: OpprettBehandlingDto): BehandlingId {
     val behandlingId = kall.behandling.opprettRevurdering(opprettBehandlingDto)
 
     // Oppretter grunnlagsdata
@@ -122,51 +118,6 @@ fun IntegrationTest.gjennomførRevurderingsløp(
     kjørTasksKlareForProsessering()
 
     tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
-
-    if (tilSteg == StegType.INNGANGSVILKÅR) {
-        return behandlingId
-    }
-
-    gjennomførIngangsvilkårStegRevurdering(behandlingId)
-
-    if (tilSteg == StegType.VILKÅR) {
-        return behandlingId
-    }
-
-    val behandling = kall.behandling.hent(behandlingId)
-
-    gjennomførVilkårSteg(medVilkår, behandling.id, behandling.stønadstype)
-
-    if (tilSteg == StegType.BEREGNE_YTELSE) {
-        return behandlingId
-    }
-
-    gjennomførBeregningSteg(behandling.id, behandling.stønadstype)
-
-    if (tilSteg == StegType.SIMULERING) {
-        return behandlingId
-    }
-
-    gjennomførSimuleringSteg(behandlingId)
-
-    if (tilSteg == StegType.SEND_TIL_BESLUTTER) {
-        return behandlingId
-    }
-
-    gjennomførSendTilBeslutterSteg(behandlingId)
-
-    if (tilSteg == StegType.BESLUTTE_VEDTAK) {
-        return behandlingId
-    }
-
-    gjennomførBeslutteVedtakSteg(behandlingId)
-
-    if (tilSteg in setOf(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV, StegType.FERDIGSTILLE_BEHANDLING)) {
-        return behandlingId
-    }
-
-    // Ferdigstiller behandling
-    kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
     return behandlingId
 }
@@ -251,24 +202,14 @@ fun IntegrationTest.gjennomførBeregningStegKall(
         )
 }
 
-private fun IntegrationTest.gjennomførIngangsvilkårSteg(
-    medAktivitet: (BehandlingId) -> LagreVilkårperiode,
-    medMålgruppe: (BehandlingId) -> LagreVilkårperiode,
+fun IntegrationTest.gjennomførIngangsvilkårSteg(
+    medAktivitet: ((BehandlingId) -> LagreVilkårperiode)? = null,
+    medMålgruppe: ((BehandlingId) -> LagreVilkårperiode)? = null,
     behandlingId: BehandlingId,
 ) {
-    kall.vilkårperiode.opprett(medAktivitet(behandlingId))
-    kall.vilkårperiode.opprett(medMålgruppe(behandlingId))
+    medAktivitet?.invoke(behandlingId)?.let { kall.vilkårperiode.opprett(it) }
+    medMålgruppe?.invoke(behandlingId)?.let { kall.vilkårperiode.opprett(it) }
 
-    kall.steg.ferdigstill(
-        behandlingId,
-        StegController.FerdigstillStegRequest(
-            steg = StegType.INNGANGSVILKÅR,
-        ),
-    )
-    kjørTasksKlareForProsessering()
-}
-
-private fun IntegrationTest.gjennomførIngangsvilkårStegRevurdering(behandlingId: BehandlingId) {
     kall.steg.ferdigstill(
         behandlingId,
         StegController.FerdigstillStegRequest(

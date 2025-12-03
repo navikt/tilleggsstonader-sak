@@ -29,11 +29,9 @@ class UtbetalingStatusHåndtererIntegrationTest(
         statusFraHelved: UtbetalingStatus,
         forventetStatus: StatusIverksetting,
     ) {
-        // Arrange: Gjennomfør behandling til iverksetting er ferdig
+        // Gjennomfør behandling til iverksetting er ferdig
         val behandlingId =
             gjennomførBehandlingsløp(
-                medAktivitet = ::lagreVilkårperiodeAktivitet,
-                medMålgruppe = ::lagreVilkårperiodeMålgruppe,
                 medVilkår = listOf(lagreDagligReiseDto()),
                 tilSteg = StegType.BEHANDLING_FERDIGSTILT,
             )

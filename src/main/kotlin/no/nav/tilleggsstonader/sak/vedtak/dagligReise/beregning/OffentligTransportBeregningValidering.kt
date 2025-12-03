@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
@@ -15,7 +14,7 @@ class OffentligTransportBeregningValidering {
         beregnignsresultat: BeregningsresultatOffentligTransport,
         tidligsteEndring: LocalDate?,
         forrigeVedtak: InnvilgelseEllerOpphørDagligReise,
-    ): BeregningsresultatForReise {
+    ) {
         brukerfeilHvis(tidligsteEndring == null) {
             "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
         }
@@ -49,10 +48,6 @@ class OffentligTransportBeregningValidering {
             brukerfeil(
                 "Kan ikke endre fra enkeltbilletter til månedskort i en periode som allerede er aktiv. " +
                     "Legg inn månedskortet som en egen reise.",
-            )
-        } else {
-            return BeregningsresultatForReise(
-                perioder = perioderSomSkalBeregnes,
             )
         }
     }

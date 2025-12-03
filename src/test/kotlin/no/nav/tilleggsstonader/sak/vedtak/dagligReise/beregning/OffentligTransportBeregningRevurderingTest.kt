@@ -4,12 +4,14 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningStegKall
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførRevurderingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførIngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførVilkårSteg
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
@@ -20,7 +22,7 @@ import java.time.LocalDate
 
 class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest() {
     @Test
-    fun forlengelseAvReiserSkalKasteFeil() {
+    fun `forlengelse av reise der perioden allerede har blitt utbetalt skal validere feil`() {
         val dagensDato = LocalDate.now()
 
         val reiser =
@@ -29,6 +31,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
                 tom = dagensDato.plusDays(7),
                 fakta =
                     FaktaDagligReiseOffentligTransportDto(
+                        reiseId = dummyReiseId,
                         reisedagerPerUke = 2,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = null,
@@ -40,17 +43,13 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
             gjennomførBehandlingsløp(
                 medAktivitet = ::lagreAktivitet,
                 medMålgruppe = ::lagreMålgruppe,
-                medVilkår =
-                    listOf(
-                        reiser,
-                    ),
+                medVilkår = listOf(reiser),
             )
 
         val førstegangsbehandling = kall.behandling.hent(førstegangsbehandlingId)
 
         val revurderingId =
-            gjennomførRevurderingsløp(
-                tilSteg = StegType.VILKÅR,
+            opprettRevurdering(
                 opprettBehandlingDto =
                     OpprettBehandlingDto(
                         fagsakId = førstegangsbehandling.fagsakId,
@@ -59,12 +58,10 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
                         nyeOpplysningerMetadata = null,
                     ),
             )
+        gjennomførIngangsvilkårSteg(behandlingId = revurderingId)
 
-        val vilkårId =
-            kall.vilkårDagligReise
-                .hentVilkår(revurderingId)
-                .first()
-                .id
+        kjørTasksKlareForProsessering()
+        val vilkårId = kall.vilkårDagligReise.hentVilkår(revurderingId).first().id
 
         kall.vilkårDagligReise.oppdaterVilkår(
             lagreVilkår =
