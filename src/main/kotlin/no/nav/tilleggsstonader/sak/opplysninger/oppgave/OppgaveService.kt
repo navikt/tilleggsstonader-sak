@@ -338,7 +338,8 @@ class OppgaveService(
 
     fun hentÅpenBehandlingsoppgave(behandlingId: BehandlingId): OppgaveDomain? =
         finnAlleOppgaveDomainForBehandling(behandlingId)
-            .singleOrNull { it.erÅpen() && it.erBehandlingsoppgave() }
+            .filter { it.erÅpen() && it.erBehandlingsoppgave() }
+            .maxByOrNull { it.sporbar.opprettetTid }
 
     fun finnMappe(
         enhet: String,
