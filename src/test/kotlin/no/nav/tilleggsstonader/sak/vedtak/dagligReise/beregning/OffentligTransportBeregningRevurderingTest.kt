@@ -92,8 +92,11 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
             .jsonPath(
                 "$.detail",
             ).isEqualTo(
-                "Kan ikke endre fra enkeltbilletter til månedskort i en periode som allerede er aktiv. " +
-                    "Legg inn månedskortet som en egen reise.",
+                """
+                I den revurderte beregningen vil en allerede utbetalt periode med enkeltbilletter bli endret 
+                til en periode med månedskort, som kan være til ugunst for søker. For å hindre dette kan du legge 
+                inn en ny reise i stedet for å forlenge den eksisterende.
+                """.trimIndent(),
             )
     }
 }

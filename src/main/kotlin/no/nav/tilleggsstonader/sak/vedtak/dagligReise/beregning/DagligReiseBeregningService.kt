@@ -57,7 +57,7 @@ class DagligReiseBeregningService(
     ): BeregningsresultatOffentligTransport? {
         val vilkårOffentligTransport = vilkår[TypeDagligReise.OFFENTLIG_TRANSPORT] ?: return null
 
-        val forrigeVedtak = hentForrigeVedtak(behandling)
+        val forrigeIverksatteVedtak = hentForrigeVedtak(behandling)
 
         val beregnignsresultat =
             offentligTransportBeregningService.beregn(
@@ -65,7 +65,7 @@ class DagligReiseBeregningService(
                 oppfylteVilkår = vilkårOffentligTransport,
             )
 
-        if (forrigeVedtak != null) {
+        if (forrigeIverksatteVedtak != null) {
             val tidligsteEndring =
                 utledTidligsteEndringService.utledTidligsteEndringForBeregning(
                     behandlingId = behandling.id,
@@ -73,9 +73,9 @@ class DagligReiseBeregningService(
                 )
 
             validerRevurdering(
-                beregnignsresultat = beregnignsresultat,
+                beregningsresultat = beregnignsresultat,
                 tidligsteEndring = tidligsteEndring,
-                forrigeVedtak = forrigeVedtak,
+                forrigeIverksatteVedtak = forrigeIverksatteVedtak,
             )
         }
         return beregnignsresultat

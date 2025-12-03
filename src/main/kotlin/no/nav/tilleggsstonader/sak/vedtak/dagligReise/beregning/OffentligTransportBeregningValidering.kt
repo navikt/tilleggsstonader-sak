@@ -7,42 +7,56 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatO
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import java.time.LocalDate
 
+/**
+ * Validerer at en revurdering av offentlig transport ikke endrer en periode som inneholder dagens dato (er tidligere utbetalt) som enkeltbilletter
+ * til månedskort, da dette kan være til ugunst for søker. Valideringen resulterer i en brukerfeil som veileder saksbehandler må legge inn en ny reise i stedet for å
+ * forlenge en eksisterende periode.
+ *
+ * For hver reise i det nye beregningsresultatet:
+ *  - Sjekker vi om det finnes en tilsvarende reise i forrige beregningsresultat (basert på reiseId).
+ *  - Hvis ja, sjekker om det finnes en periode for dagens dato i både revurderingen og førstegangsbehandlingen.
+ *  - Dersom endringen på perioden endrer billetttype fra enkeltbilletter til månedskort, kastes en veiledende brukerfeil.
+ */
 fun validerRevurdering(
-    beregnignsresultat: BeregningsresultatOffentligTransport,
+    beregningsresultat: BeregningsresultatOffentligTransport,
     tidligsteEndring: LocalDate?,
-    forrigeVedtak: InnvilgelseEllerOpphørDagligReise,
+    forrigeIverksatteVedtak: InnvilgelseEllerOpphørDagligReise,
 ) {
     brukerfeilHvis(tidligsteEndring == null) {
         "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
     }
     val dagensDato = LocalDate.now()
-    val perioderSomSkalBeregnes = beregnignsresultat.reiser.flatMap { it.perioder }
 
-    // Finn perioden som gjelder i dag i førstegangsbehandlingen
-    val dagensPeriodeIFørstegangs =
-        forrigeVedtak.beregningsresultat.offentligTransport
-            ?.reiser
-            ?.flatMap { it.perioder }
-            ?.firstOrNull { periode -> periode.grunnlag.inneholder(dagensDato) }
+    val nyttBeregningsresultat = beregningsresultat.reiser
+    val forrigeBeregningsresultat = forrigeIverksatteVedtak.beregningsresultat.offentligTransport?.reiser ?: return
 
-    // Finn perioden som gjelder i dag i revurderingen
-    val dagensPeriodeIRevurdering = finnPeriodeMedDato(perioderSomSkalBeregnes, dagensDato)
+    for (reise in nyttBeregningsresultat) {
+        val overlappendeReise = forrigeBeregningsresultat.filter { it.reiseId == reise.reiseId }
+        if (overlappendeReise.isEmpty()) continue
+        // Hvis vi kommer hit, vet vi at reisen har blitt endret på i revurderingen
 
-    // Sjekk om periode-typen endrer seg fra enkeltbilletter → månedskort
-    val endrerFraEnkeltbilletterTilMånedskort =
-        endrerFraEnkeltbilletterTilMånedskort(
-            dagensPeriodeIFørstegangs,
-            dagensPeriodeIRevurdering,
-        )
+        // Sjekker om det finnes en periode som inneholder dagens dato i revurderingen
+        val dagensPeriodeIRevurdering = finnPeriodeMedDato(reise.perioder, dagensDato)
 
-    if (dagensPeriodeIFørstegangs != null &&
-        dagensPeriodeIRevurdering != null &&
-        endrerFraEnkeltbilletterTilMånedskort
-    ) {
-        brukerfeil(
-            "Kan ikke endre fra enkeltbilletter til månedskort i en periode som allerede er aktiv. " +
-                "Legg inn månedskortet som en egen reise.",
-        )
+        // Sjekker om det finnes en periode som inneholder dagens dato i førstegangsbehandlingen
+        val dagensPeriodeIFørstegangs = finnPeriodeMedDato(overlappendeReise.flatMap { it.perioder }, dagensDato)
+
+        // Sjekk om perioden som inneholder dagens dato sin billetttype endrer seg fra enkeltbilletter til månedskort
+        val endrerFraEnkeltbilletterTilMånedskort =
+            endrerFraEnkeltbilletterTilMånedskort(
+                dagensPeriodeIFørstegangs,
+                dagensPeriodeIRevurdering,
+            )
+
+        if (endrerFraEnkeltbilletterTilMånedskort) {
+            brukerfeil(
+                """
+                I den revurderte beregningen vil en allerede utbetalt periode med enkeltbilletter bli endret 
+                til en periode med månedskort, som kan være til ugunst for søker. For å hindre dette kan du legge 
+                inn en ny reise i stedet for å forlenge den eksisterende.
+                """.trimIndent(),
+            )
+        }
     }
 }
 
