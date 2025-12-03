@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Re
 import java.time.LocalDate
 
 data class UtgiftOffentligTransport(
-    val reiseId: ReiseId,
+    val reiseId: ReiseId?, // TODO: Fjern nullbarhet
     override val fom: LocalDate,
     override val tom: LocalDate,
     val antallReisedagerPerUke: Int,

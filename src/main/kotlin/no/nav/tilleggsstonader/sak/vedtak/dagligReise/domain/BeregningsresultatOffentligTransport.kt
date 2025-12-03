@@ -14,7 +14,7 @@ data class BeregningsresultatOffentligTransport(
 )
 
 data class BeregningsresultatForReise(
-    val reiseId: ReiseId,
+    val reiseId: ReiseId?, // TODO: Fjern nullbarhet
     val perioder: List<BeregningsresultatForPeriode>,
 )
 
