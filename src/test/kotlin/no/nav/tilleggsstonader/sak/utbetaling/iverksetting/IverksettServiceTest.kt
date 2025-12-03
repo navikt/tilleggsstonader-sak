@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.core.KafkaTemplate
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
@@ -152,12 +153,16 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             val andeler = hentAndeler(behandling)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
-            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
+            if (!erHelgOgFørsteEllerAndreDagIMåned()) {
+                andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
+                iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
+            } else {
+                andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
+                iverksettingDto.assertUtbetalingerInneholder(forrigeMåned)
+            }
+
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
             andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
-
-            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
-
             assertThat(iverksettingDto.captured.forrigeIverksetting).isNull()
         }
 
@@ -170,7 +175,12 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             val andeler = hentAndeler(behandling)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
-            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
+            if (!erHelgOgFørsteEllerAndreDagIMåned()) {
+                andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
+            } else {
+                andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
+            }
+
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
             andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
 
@@ -192,11 +202,16 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             val andeler = hentAndeler(behandling2)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
-            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
             andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
 
-            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
+            if (!erHelgOgFørsteEllerAndreDagIMåned()) {
+                andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
+                iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
+            } else {
+                andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
+                iverksettingDto.assertUtbetalingerInneholder(forrigeMåned)
+            }
 
             assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId)
                 .isEqualTo(hentEksternBehandlingId(behandling))
@@ -218,11 +233,16 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             val andeler = hentAndeler(behandling2)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
-            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
             andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
 
-            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
+            if (!erHelgOgFørsteEllerAndreDagIMåned()) {
+                andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
+                iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
+            } else {
+                andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
+                iverksettingDto.assertUtbetalingerInneholder(forrigeMåned)
+            }
 
             assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId)
                 .isEqualTo(hentEksternBehandlingId(behandling))
@@ -246,9 +266,14 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             val andeler = hentAndeler(behandling2)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling2.id)
-            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling2.id)
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
             andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
+
+            if (!erHelgOgFørsteEllerAndreDagIMåned()) {
+                andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling2.id)
+            } else {
+                andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
+            }
 
             iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned, nesteMåned)
 
@@ -301,9 +326,14 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             val andeler = hentAndeler(behandling)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
-            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
             andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
+
+            if (!erHelgOgFørsteEllerAndreDagIMåned()) {
+                andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
+            } else {
+                andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
+            }
         }
 
         @Test
@@ -335,10 +365,15 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             val andeler = hentAndeler(behandling)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
-            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
             andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
             andeler.forMåned(treMndFrem).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
+
+            if (!erHelgOgFørsteEllerAndreDagIMåned()) {
+                andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
+            } else {
+                andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
+            }
         }
 
         @Test
@@ -593,5 +628,13 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
     private fun CapturingSlot<IverksettDto>.assertUtbetalingerInneholder(vararg måned: YearMonth) {
         assertThat(captured.vedtak.utbetalinger.map { YearMonth.from(it.fraOgMedDato) })
             .containsExactly(*måned)
+    }
+
+    private fun erHelgOgFørsteEllerAndreDagIMåned(): Boolean {
+        val dagensDato = LocalDate.now()
+        val dagIMåned = dagensDato.dayOfMonth
+        val dagIUken = dagensDato.dayOfWeek
+        return (dagIMåned == 1 || dagIMåned == 2) &&
+            (dagIUken == DayOfWeek.SATURDAY || dagIUken == DayOfWeek.SUNDAY)
     }
 }
