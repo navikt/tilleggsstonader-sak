@@ -479,7 +479,7 @@ internal class OppgaveServiceTest {
         every { oppgaveRepository.findByBehandlingId(any()) } returns
             listOf(
                 behandleSakOppgave,
-                lagTestOppgave().copy(type = Oppgavetype.GodkjenneVedtak),
+                lagTestOppgave().copy(type = Oppgavetype.VurderHenvendelse),
             )
 
         assertThat(oppgaveService.finnSisteBehandlingsoppgaveForBehandling(BEHANDLING_ID))
