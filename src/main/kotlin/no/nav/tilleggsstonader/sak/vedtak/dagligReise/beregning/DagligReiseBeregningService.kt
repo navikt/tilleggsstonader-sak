@@ -25,7 +25,6 @@ class DagligReiseBeregningService(
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val offentligTransportBeregningService: OffentligTransportBeregningService,
     private val vedtakRepository: VedtakRepository,
-    private val offentligTransportBeregningValidering: OffentligTransportBeregningValidering,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
     fun beregn(
@@ -73,7 +72,7 @@ class DagligReiseBeregningService(
                     vedtaksperioder = vedtaksperioder,
                 )
 
-            offentligTransportBeregningValidering.validerRevurdering(
+            validerRevurdering(
                 beregnignsresultat = beregnignsresultat,
                 tidligsteEndring = tidligsteEndring,
                 forrigeVedtak = forrigeVedtak,
