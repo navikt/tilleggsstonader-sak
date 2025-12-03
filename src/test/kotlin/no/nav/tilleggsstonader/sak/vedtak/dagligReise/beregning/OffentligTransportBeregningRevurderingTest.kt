@@ -61,7 +61,11 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
         gjennomførIngangsvilkårSteg(behandlingId = revurderingId)
 
         kjørTasksKlareForProsessering()
-        val vilkårId = kall.vilkårDagligReise.hentVilkår(revurderingId).first().id
+        val vilkårId =
+            kall.vilkårDagligReise
+                .hentVilkår(revurderingId)
+                .first()
+                .id
 
         kall.vilkårDagligReise.oppdaterVilkår(
             lagreVilkår =
