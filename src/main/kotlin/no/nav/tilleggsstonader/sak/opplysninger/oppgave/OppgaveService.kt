@@ -325,16 +325,12 @@ class OppgaveService(
         oppgaveClient.ferdigstillOppgave(gsakOppgaveId, endretAvEnhetsnr)
     }
 
-    fun finnSisteOppgaveDomainForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
-        oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandlingId)
-
-    fun finnSisteBehandleSakOppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
-        oppgaveRepository
-            .findByBehandlingId(behandlingId)
-            .filter { it.type in setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak) }
-            .maxByOrNull { it.sporbar.opprettetTid }
-
     fun finnAlleOppgaveDomainForBehandling(behandlingId: BehandlingId) = oppgaveRepository.findByBehandlingId(behandlingId)
+
+    fun finnSisteBehandlingsoppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
+        finnAlleOppgaveDomainForBehandling(behandlingId)
+            .filter { it.erBehandlingsoppgave() }
+            .maxByOrNull { it.sporbar.opprettetTid }
 
     fun hentÅpenBehandlingsoppgave(behandlingId: BehandlingId): OppgaveDomain? =
         finnAlleOppgaveDomainForBehandling(behandlingId)

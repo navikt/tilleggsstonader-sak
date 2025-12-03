@@ -482,7 +482,7 @@ internal class OppgaveServiceTest {
                 lagTestOppgave().copy(type = Oppgavetype.GodkjenneVedtak),
             )
 
-        assertThat(oppgaveService.finnSisteBehandleSakOppgaveForBehandling(BEHANDLING_ID))
+        assertThat(oppgaveService.finnSisteBehandlingsoppgaveForBehandling(BEHANDLING_ID))
             .isEqualTo(behandleSakOppgave)
     }
 

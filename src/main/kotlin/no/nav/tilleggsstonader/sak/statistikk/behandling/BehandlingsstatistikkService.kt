@@ -96,7 +96,7 @@ class BehandlingsstatistikkService(
         behandlingId: BehandlingId,
         oppgaveId: Long?,
     ): Oppgave? {
-        val gsakOppgaveId = oppgaveId ?: oppgaveService.finnSisteOppgaveDomainForBehandling(behandlingId)?.gsakOppgaveId
+        val gsakOppgaveId = oppgaveId ?: oppgaveService.finnSisteBehandlingsoppgaveForBehandling(behandlingId)?.gsakOppgaveId
 
         return gsakOppgaveId?.let { oppgaveService.hentOppgave(it) }
     }
@@ -107,20 +107,25 @@ class BehandlingsstatistikkService(
         totrinnskontroll: Totrinnskontroll?,
     ): String =
         when (hendelse) {
-            Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER, Hendelse.ANGRET_SENDT_TIL_BESLUTTER, Hendelse.UNDERKJENT_BESLUTTER ->
+            Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER, Hendelse.ANGRET_SENDT_TIL_BESLUTTER, Hendelse.UNDERKJENT_BESLUTTER -> {
                 gjeldendeSaksbehandler ?: error("Mangler saksbehandler for hendelse=$hendelse")
+            }
 
-            Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG ->
+            Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG -> {
                 totrinnskontroll?.saksbehandler ?: gjeldendeSaksbehandler
                     ?: error("Mangler totrinnskontroll for hendelse=$hendelse")
+            }
         }
 
     private fun finnHenvendelsestidspunkt(saksbehandling: Saksbehandling): LocalDateTime =
         when (saksbehandling.type) {
-            BehandlingType.FØRSTEGANGSBEHANDLING ->
+            BehandlingType.FØRSTEGANGSBEHANDLING -> {
                 søknadService.hentSøknadMetadata(saksbehandling.id)?.mottattTidspunkt ?: saksbehandling.opprettetTid
+            }
 
-            BehandlingType.REVURDERING -> saksbehandling.opprettetTid
+            BehandlingType.REVURDERING -> {
+                saksbehandling.opprettetTid
+            }
         }
 
     private fun evaluerAdresseBeskyttelseStrengtFortrolig(personIdent: String): Boolean {
@@ -228,7 +233,6 @@ class BehandlingsstatistikkService(
             when (behandling.resultat) {
                 BehandlingResultat.HENLAGT -> behandling.henlagtÅrsak?.name
                 BehandlingResultat.AVSLÅTT -> "UKJENT"
-
                 else -> null
             }
     }

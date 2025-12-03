@@ -123,5 +123,5 @@ class BehandlingEndretHåndterer(
         oppgaveService
             .finnAlleOppgaveDomainForBehandling(behandlingId)
             .filter { it.erÅpen() }
-            .any { it.tilbakekrevingBehandlingId != null }
+            .any { it.erTilbakekrevingsoppgave() }
 }

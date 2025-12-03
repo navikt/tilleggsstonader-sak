@@ -108,7 +108,7 @@ class FagsysteminfoBehovHåndterer(
     }
 
     private fun finnBehandlendeEnhet(behandling: Saksbehandling): String? =
-        oppgaveService.finnSisteBehandleSakOppgaveForBehandling(behandling.id)?.tildeltEnhetsnummer
+        oppgaveService.finnSisteBehandlingsoppgaveForBehandling(behandling.id)?.tildeltEnhetsnummer
             ?: behandling.stønadstype.behandlendeEnhet().enhetsnr
 
     private fun mapRevurderinginformsjon(
@@ -128,11 +128,14 @@ class FagsysteminfoBehovHåndterer(
     private fun mapÅrsak(saksbehandling: Saksbehandling): TilbakekrevingRevurderingÅrsak =
         when (saksbehandling.årsak) {
             BehandlingÅrsak.KLAGE -> TilbakekrevingRevurderingÅrsak.KLAGE
+
             BehandlingÅrsak.NYE_OPPLYSNINGER -> TilbakekrevingRevurderingÅrsak.NYE_OPPLYSNINGER
+
             BehandlingÅrsak.KORRIGERING_UTEN_BREV,
             BehandlingÅrsak.MANUELT_OPPRETTET,
             BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
             -> TilbakekrevingRevurderingÅrsak.KORRIGERING
+
             BehandlingÅrsak.SØKNAD,
             BehandlingÅrsak.PAPIRSØKNAD,
             BehandlingÅrsak.SATSENDRING,
