@@ -1,13 +1,12 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostResponse
 import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
@@ -22,6 +21,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
+import tools.jackson.module.kotlin.readValue
 import java.net.URI
 
 @Component
@@ -194,7 +194,7 @@ class JournalpostClient(
     private fun håndterConflictArkiverDokument(e: HttpClientErrorException.Conflict) {
         val response: ArkiverDokumentResponse =
             try {
-                objectMapper.readValue<ArkiverDokumentResponse>(e.responseBodyAsString)
+                jsonMapper.readValue<ArkiverDokumentResponse>(e.responseBodyAsString)
             } catch (ex: Exception) {
                 secureLogger.warn("Klarte ikke å parsea body=${e.responseBodyAsString}", ex)
                 // kaster opprinnelig exception

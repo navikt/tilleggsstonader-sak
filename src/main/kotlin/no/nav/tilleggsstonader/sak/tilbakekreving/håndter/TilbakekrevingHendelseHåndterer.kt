@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.tilbakekreving.håndter
 
-import com.fasterxml.jackson.databind.JsonNode
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevinghendelseRecord
+import tools.jackson.databind.JsonNode
 
 sealed interface TilbakekrevingHendelseHåndterer {
     fun håndtererHendelsetype(): String

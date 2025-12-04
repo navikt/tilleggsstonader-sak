@@ -2,9 +2,9 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonDeserializer
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.ValueDeserializer
 
 /**
  * [VedtaksdataJson] definierer alle suklasser av [Vedtaksdata]
@@ -38,7 +38,7 @@ sealed interface VedtaksdataJson
  * For å kunne deserialisere disse trenger jackson litt hjelp.
  * Den finner riktig enum ut fra hvilken
  */
-class TypeVedtaksdataDeserializer : JsonDeserializer<TypeVedtaksdata>() {
+class TypeVedtaksdataDeserializer : ValueDeserializer<TypeVedtaksdata>() {
     override fun deserialize(
         p: JsonParser,
         ctxt: DeserializationContext,

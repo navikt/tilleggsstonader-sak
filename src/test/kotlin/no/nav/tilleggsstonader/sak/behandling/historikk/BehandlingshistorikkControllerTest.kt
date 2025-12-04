@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.historikk
 
-import no.nav.security.mock.oauth2.http.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -151,7 +151,7 @@ internal class BehandlingshistorikkControllerTest : CleanDatabaseIntegrationTest
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
         val jsonMap = mapOf("key" to "value")
-        val metadata = JsonWrapper(objectMapper.writeValueAsString(jsonMap))
+        val metadata = JsonWrapper(jsonMapper.writeValueAsString(jsonMap))
         behandlingshistorikkRepository.insert(
             Behandlingshistorikk(
                 behandlingId = behandling.id,

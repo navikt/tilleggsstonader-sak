@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
-import com.fasterxml.jackson.module.kotlin.convertValue
-import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -19,6 +17,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
+import tools.jackson.module.kotlin.convertValue
+import tools.jackson.module.kotlin.readValue
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -41,12 +41,12 @@ class VedtakRepositoryJsonTest : CleanDatabaseIntegrationTest() {
 
         opprettVedtak(fil.typeVedtaksdata().typeVedtak, json)
         val vedtak = repository.findByIdOrThrow(behandling.id)
-        val jsonFraObj = objectMapper.convertValue<Map<String, Any>>(vedtak.data).toSortedMap()
-        val jsonFraFil = objectMapper.readValue<Map<String, Any>>(json).toSortedMap()
+        val jsonFraObj = jsonMapper.convertValue<Map<String, Any>>(vedtak.data).toSortedMap()
+        val jsonFraFil = jsonMapper.readValue<Map<String, Any>>(json).toSortedMap()
 
         assertThat(vedtak.data).isInstanceOf(forventetType(fil.typeVedtaksdata()))
-        assertThat(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonFraObj))
-            .isEqualTo(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonFraFil))
+        assertThat(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonFraObj))
+            .isEqualTo(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonFraFil))
     }
 
     @Disabled

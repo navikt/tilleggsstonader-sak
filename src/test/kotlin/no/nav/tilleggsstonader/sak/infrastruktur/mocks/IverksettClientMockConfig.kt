@@ -1,11 +1,10 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettStatus
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
@@ -14,6 +13,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
+import tools.jackson.module.kotlin.readValue
 
 @Configuration
 @Profile("mock-iverksett")
@@ -33,7 +33,7 @@ class IverksettClientMockConfig {
         }
 
         private val simuleringsresultat =
-            objectMapper.readValue<SimuleringResponseDto>(
+            jsonMapper.readValue<SimuleringResponseDto>(
                 readFile("mock/iverksett/simuleringsresultat.json"),
             )
     }

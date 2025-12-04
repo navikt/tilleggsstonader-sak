@@ -2,9 +2,8 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.dto.KodeverkDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
@@ -39,6 +38,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.VilkårperiodeTypeDeserializer
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDto
+import tools.jackson.databind.annotation.JsonDeserialize
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -139,9 +139,9 @@ data object AktivitetDagligReiseTsrFaktaOgVurderingerDto : FaktaOgVurderingerDto
 
 fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
     when (this) {
-        is MålgruppeFaktaOgVurdering ->
+        is MålgruppeFaktaOgVurdering -> {
             when (this) {
-                is FaktaOgVurderingLæremidler ->
+                is FaktaOgVurderingLæremidler -> {
                     MålgruppeLæremidlerFaktaOgVurderingerDto(
                         medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
                         utgifterDekketAvAnnetRegelverk =
@@ -153,8 +153,9 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                                 ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
                                 ?.tilDto(),
                     )
+                }
 
-                else ->
+                else -> {
                     MålgruppeFaktaOgVurderingerDto(
                         medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
                         utgifterDekketAvAnnetRegelverk =
@@ -172,17 +173,20 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                                 ?.takeIf { it.svar != SvarJaNei.GAMMEL_MANGLER_DATA }
                                 ?.tilDto(),
                     )
+                }
             }
+        }
 
         is AktivitetFaktaOgVurdering -> {
             when (this) {
-                is FaktaOgVurderingTilsynBarn ->
+                is FaktaOgVurderingTilsynBarn -> {
                     AktivitetBarnetilsynFaktaOgVurderingerDto(
                         aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
                         lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
                     )
+                }
 
-                is FaktaOgVurderingLæremidler ->
+                is FaktaOgVurderingLæremidler -> {
                     AktivitetLæremidlerFaktaOgVurderingerDto(
                         prosent = fakta.takeIfFakta<FaktaProsent>()?.prosent,
                         studienivå = fakta.takeIfFakta<FaktaStudienivå>()?.studienivå,
@@ -193,18 +197,24 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                                 ?.harRettTilUtstyrsstipend
                                 ?.tilDto(),
                     )
+                }
 
-                is FaktaOgVurderingBoutgifter ->
+                is FaktaOgVurderingBoutgifter -> {
                     AktivitetBoutgifterFaktaOgVurderingerDto(
                         lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
                     )
-                is FaktaOgVurderingDagligReiseTso ->
+                }
+
+                is FaktaOgVurderingDagligReiseTso -> {
                     AktivitetDagligReiseTsoFaktaOgVurderingerDto(
                         lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
                         harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
                     )
-                is FaktaOgVurderingDagligReiseTsr ->
+                }
+
+                is FaktaOgVurderingDagligReiseTsr -> {
                     AktivitetDagligReiseTsrFaktaOgVurderingerDto
+                }
             }
         }
     }

@@ -1,8 +1,7 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
-import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapperFailOnUnknownProperties
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapperFailOnUnknownProperties
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
@@ -11,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDateTime
 
 object SøknadsskjemaUtil {
@@ -20,8 +20,8 @@ object SøknadsskjemaUtil {
         mottattTidspunkt: LocalDateTime,
     ): InnsendtSkjema<out Skjemadata> =
         when (stønadstype) {
-            Stønadstype.BARNETILSYN -> objectMapper.readValue<InnsendtSkjema<SøknadsskjemaBarnetilsyn>>(data)
-            Stønadstype.LÆREMIDLER -> objectMapper.readValue<InnsendtSkjema<SøknadsskjemaLæremidler>>(data)
+            Stønadstype.BARNETILSYN -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaBarnetilsyn>>(data)
+            Stønadstype.LÆREMIDLER -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaLæremidler>>(data)
             Stønadstype.BOUTGIFTER -> håndterBoutgifter(data, mottattTidspunkt)
             Stønadstype.DAGLIG_REISE_TSO -> håndterDagligReise(data, mottattTidspunkt)
             Stønadstype.DAGLIG_REISE_TSR -> håndterDagligReise(data, mottattTidspunkt)
@@ -31,7 +31,7 @@ object SøknadsskjemaUtil {
         data: ByteArray,
         mottattTidspunkt: LocalDateTime,
     ): InnsendtSkjema<SøknadsskjemaBoutgifterFyllUtSendInn> {
-        val skjema = objectMapperFailOnUnknownProperties.readValue<SøknadsskjemaBoutgifterFyllUtSendInn>(data)
+        val skjema = jsonMapperFailOnUnknownProperties.readValue<SøknadsskjemaBoutgifterFyllUtSendInn>(data)
         return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
             mottattTidspunkt = mottattTidspunkt,
@@ -44,7 +44,7 @@ object SøknadsskjemaUtil {
         data: ByteArray,
         mottattTidspunkt: LocalDateTime,
     ): InnsendtSkjema<SøknadsskjemaDagligReiseFyllUtSendInn> {
-        val skjema = objectMapperFailOnUnknownProperties.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(data)
+        val skjema = jsonMapperFailOnUnknownProperties.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(data)
         return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
             mottattTidspunkt = mottattTidspunkt,

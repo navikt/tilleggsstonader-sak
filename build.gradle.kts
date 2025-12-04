@@ -3,12 +3,12 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20250922094930_4bb329c"
-val tilleggsstønaderLibsVersion = "2025.09.11-09.26.d3123ecc47ce"
-val tilleggsstønaderKontrakterVersion = "2025.11.27-22.38.29b9e7f1339a"
+val tilleggsstønaderLibsVersion = "1"
+val tilleggsstønaderKontrakterVersion = "1"
 val avroVersion = "1.12.0"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.6"
-val tokenSupportVersion = "5.0.37"
+val tokenSupportVersion = "6.0.0"
 val wiremockVersion = "3.13.1"
 val mockkVersion = "1.14.6"
 val testcontainerVersion = "1.21.3"
@@ -58,8 +58,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
+    implementation("org.springframework.boot:spring-boot-starter-jackson")
+    implementation("tools.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     implementation("org.postgresql:postgresql")

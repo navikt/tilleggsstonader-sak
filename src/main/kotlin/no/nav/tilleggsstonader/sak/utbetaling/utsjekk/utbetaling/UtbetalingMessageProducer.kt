@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.springframework.beans.factory.annotation.Value
@@ -20,7 +20,7 @@ class UtbetalingMessageProducer(
     ) {
         val producerRecords =
             utbetaling.map { utbetalingRecord ->
-                val utbetalingJson = objectMapper.writeValueAsString(utbetalingRecord)
+                val utbetalingJson = jsonMapper.writeValueAsString(utbetalingRecord)
                 iverksettingLoggRepository.insert(
                     IverksettingLogg(
                         iverksettingId = iverksettingId,

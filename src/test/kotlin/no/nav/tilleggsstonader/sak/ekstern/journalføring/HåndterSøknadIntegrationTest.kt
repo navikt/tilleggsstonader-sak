@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
-import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.integrasjonstest.defaultJournalpost
@@ -12,6 +11,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførHenleggelse
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import tools.jackson.module.kotlin.readValue
 
 class HåndterSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
     @Test
@@ -32,7 +32,7 @@ class HåndterSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
         håndterSøknadService.håndterSøknad(defaultJournalpost)
 
         val oppgaveTask = finnAlleTaskerMedType(OpprettOppgaveTask.TYPE).single()
-        val payload = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(oppgaveTask.payload)
+        val payload = jsonMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(oppgaveTask.payload)
 
         assertThat(payload.oppgave.journalpostId).isEqualTo(journalpostId)
         assertThat(payload.oppgave.oppgavetype).isEqualTo(Oppgavetype.Journalføring)

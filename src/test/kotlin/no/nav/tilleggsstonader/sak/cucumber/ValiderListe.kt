@@ -17,11 +17,11 @@ fun <T> verifiserAtListerErLike(
     faktisk.forEachIndexed { index, verdi ->
         val forventetVerdi = forventet[index]
         val actualPretty =
-            ObjectMapperProvider.objectMapper
+            ObjectMapperProvider.jsonMapper
                 .writerWithDefaultPrettyPrinter()
                 .writeValueAsString(verdi)
         val expectedPretty =
-            ObjectMapperProvider.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(forventetVerdi)
+            ObjectMapperProvider.jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(forventetVerdi)
         try {
             Assertions.assertThat(actualPretty).isEqualTo(expectedPretty)
         } catch (e: Throwable) {

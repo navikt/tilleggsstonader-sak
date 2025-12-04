@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
-import com.fasterxml.jackson.module.kotlin.convertValue
-import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -19,6 +17,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
+import tools.jackson.module.kotlin.convertValue
+import tools.jackson.module.kotlin.readValue
 import java.io.File
 import java.time.LocalDate
 import java.util.UUID
@@ -42,8 +42,8 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
 
         opprettVilkårperiode(id, fil.typeVilkårperiode(), json)
         val vilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
-        val jsonFraObj = objectMapper.convertValue<Map<String, Any>>(vilkårperiode.faktaOgVurdering).toSortedMap()
-        val jsonFraFil = objectMapper.readValue<Map<String, Any>>(json).toSortedMap()
+        val jsonFraObj = jsonMapper.convertValue<Map<String, Any>>(vilkårperiode.faktaOgVurdering).toSortedMap()
+        val jsonFraFil = jsonMapper.readValue<Map<String, Any>>(json).toSortedMap()
 
         assertThat(vilkårperiode.faktaOgVurdering).isInstanceOf(forventetType(fil.typeFaktaOgVurdering()))
         assertThat(jsonFraFil).isEqualTo(jsonFraObj)
@@ -240,6 +240,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                     MålgruppeDagligReiseTsoType.INGEN_MÅLGRUPPE_DAGLIG_REISE_TSO -> IngenMålgruppeDagligReiseTso::class
                 }
             }
+
             is AktivitetDagligReiseTsoType -> {
                 when (type) {
                     AktivitetDagligReiseTsoType.TILTAK_DAGLIG_REISE_TSO -> TiltakDagligReiseTso::class
@@ -259,6 +260,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                     MålgruppeDagligReiseTsrType.INGEN_MÅLGRUPPE_DAGLIG_REISE_TSR -> IngenMålgruppeDagligReiseTsr::class
                 }
             }
+
             is AktivitetDagligReiseTsrType -> {
                 when (type) {
                     AktivitetDagligReiseTsrType.TILTAK_DAGLIG_REISE_TSR -> TiltakDagligReiseTsr::class

@@ -1,12 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -42,6 +41,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
+import tools.jackson.module.kotlin.readValue
 import java.util.Properties
 
 class SendTilBeslutterStegTest {
@@ -205,13 +205,13 @@ class SendTilBeslutterStegTest {
 
         with(taskSlot[1]) {
             assertThat(type).isEqualTo(OpprettOppgaveTask.TYPE)
-            val taskData = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(payload)
+            val taskData = jsonMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(payload)
             assertThat(taskData.oppgave.oppgavetype).isEqualTo(Oppgavetype.GodkjenneVedtak)
         }
 
         with(taskSlot[0]) {
             assertThat(type).isEqualTo(FerdigstillOppgaveTask.TYPE)
-            assertThat(objectMapper.readValue<FerdigstillOppgaveTask.FerdigstillOppgaveTaskData>(payload).oppgavetype)
+            assertThat(jsonMapper.readValue<FerdigstillOppgaveTask.FerdigstillOppgaveTaskData>(payload).oppgavetype)
                 .isEqualTo(ferdigstillOppgaveType)
         }
     }

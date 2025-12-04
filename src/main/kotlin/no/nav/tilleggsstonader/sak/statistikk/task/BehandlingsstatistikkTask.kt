@@ -1,16 +1,16 @@
 package no.nav.tilleggsstonader.sak.statistikk.task
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.statistikk.behandling.BehandlingsstatistikkService
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import org.springframework.stereotype.Service
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDateTime
 import java.util.Properties
 
@@ -24,7 +24,7 @@ class BehandlingsstatistikkTask(
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
         val (behandlingId, hendelse, hendelseTidspunkt, gjeldendeSaksbehandler, oppgaveId, behandlingMetode) =
-            objectMapper.readValue<BehandlingsstatistikkTaskPayload>(task.payload)
+            jsonMapper.readValue<BehandlingsstatistikkTaskPayload>(task.payload)
 
         behandlingsstatistikkService.sendBehandlingstatistikk(
             behandlingId,
@@ -109,7 +109,7 @@ class BehandlingsstatistikkTask(
             Task(
                 type = TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         BehandlingsstatistikkTaskPayload(
                             behandlingId,
                             hendelse,

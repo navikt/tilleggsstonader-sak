@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.historikk
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
@@ -65,7 +65,7 @@ class BehandlingshistorikkService(
                 utfall = utfall,
                 metadata =
                     metadata?.let {
-                        JsonWrapper(objectMapper.writeValueAsString(it))
+                        JsonWrapper(jsonMapper.writeValueAsString(it))
                     },
                 gitVersjon = Applikasjonsversjon.versjon,
             ),
@@ -98,7 +98,7 @@ class BehandlingshistorikkService(
                         else -> metadataMap
                     }
 
-                    JsonWrapper(objectMapper.writeValueAsString(metadataMap))
+                    JsonWrapper(jsonMapper.writeValueAsString(metadataMap))
                 },
         )
 }

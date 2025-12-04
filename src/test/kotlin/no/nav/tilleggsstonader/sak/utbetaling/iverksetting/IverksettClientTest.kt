@@ -8,7 +8,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import no.nav.security.mock.oauth2.http.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettDtoUtil.iverksettDto
 import org.assertj.core.api.Assertions.assertThat
@@ -51,7 +51,7 @@ class IverksettClientTest {
         val eksternFagsakId = 10L
         val eksternBehandlingId = 11L
         val iverksettingId = UUID.randomUUID()
-        val json = objectMapper.writeValueAsString("OK")
+        val json = jsonMapper.writeValueAsString("OK")
         wiremockServerItem.stubFor(
             get(WireMock.urlEqualTo("/api/iverksetting/$eksternFagsakId/$eksternBehandlingId/$iverksettingId/status"))
                 .willReturn(okJson(json)),

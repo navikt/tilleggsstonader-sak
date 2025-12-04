@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import org.assertj.core.api.Assertions.assertThat
@@ -42,7 +42,7 @@ class UtbetalingDtoTest {
                 beslutter = "Z654321",
             )
 
-        val faktiskJson = objectMapper.writeValueAsString(iverksettingDto)
+        val faktiskJson = jsonMapper.writeValueAsString(iverksettingDto)
 
         val forventetJson =
             """
@@ -73,8 +73,8 @@ class UtbetalingDtoTest {
             }
             """.trimIndent()
 
-        val faktisk = objectMapper.readTree(faktiskJson)
-        val forventet = objectMapper.readTree(forventetJson)
+        val faktisk = jsonMapper.readTree(faktiskJson)
+        val forventet = jsonMapper.readTree(forventetJson)
 
         assertThat(faktisk).isEqualTo(forventet)
     }
@@ -88,7 +88,7 @@ class UtbetalingDtoTest {
                 utbetalingsgrunnlag = testUtbetalingsgrunnlag,
             ).copy(vedtakstidspunkt = vedtakstidspunkt)
 
-        val faktiskJson = objectMapper.writeValueAsString(simuleringDto)
+        val faktiskJson = jsonMapper.writeValueAsString(simuleringDto)
 
         val forventetJson =
             """
@@ -117,8 +117,8 @@ class UtbetalingDtoTest {
             }
             """.trimIndent()
 
-        val faktisk = objectMapper.readTree(faktiskJson)
-        val forventet = objectMapper.readTree(forventetJson)
+        val faktisk = jsonMapper.readTree(faktiskJson)
+        val forventet = jsonMapper.readTree(forventetJson)
 
         assertThat(faktisk).isEqualTo(forventet)
     }

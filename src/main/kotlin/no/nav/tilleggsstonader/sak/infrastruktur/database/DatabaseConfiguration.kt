@@ -1,9 +1,8 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.PropertiesWrapperTilStringConverter
 import no.nav.familie.prosessering.StringTilPropertiesWrapperConverter
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.IdConverters.alleValueClassConverters
 import no.nav.tilleggsstonader.sak.oppfølging.OppfølgingData
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagData
@@ -41,6 +40,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.transaction.annotation.RollbackOn
+import tools.jackson.module.kotlin.readValue
 import java.util.Optional
 import javax.sql.DataSource
 import kotlin.reflect.KClass
@@ -124,7 +124,7 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
         override fun convert(source: T): PGobject =
             PGobject().apply {
                 type = "json"
-                value = objectMapper.writeValueAsString(source)
+                value = jsonMapper.writeValueAsString(source)
             }
     }
 
@@ -132,7 +132,7 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     abstract class JsonReader<T : Any>(
         val clazz: KClass<T>,
     ) : Converter<PGobject, T> {
-        override fun convert(pGobject: PGobject): T? = pGobject.value?.let { objectMapper.readValue(it, clazz.java) }
+        override fun convert(pGobject: PGobject): T? = pGobject.value?.let { jsonMapper.readValue(it, clazz.java) }
     }
 
     @ReadingConverter
@@ -162,7 +162,7 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     @ReadingConverter
     class PGobjectTilDelvilkårConverter : Converter<PGobject, DelvilkårWrapper> {
         override fun convert(pGobject: PGobject): DelvilkårWrapper =
-            DelvilkårWrapper(pGobject.value?.let { objectMapper.readValue(it) } ?: emptyList())
+            DelvilkårWrapper(pGobject.value?.let { jsonMapper.readValue(it) } ?: emptyList())
     }
 
     @WritingConverter
@@ -170,7 +170,7 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
         override fun convert(data: DelvilkårWrapper): PGobject =
             PGobject().apply {
                 type = "json"
-                value = objectMapper.writeValueAsString(data.delvilkårsett)
+                value = jsonMapper.writeValueAsString(data.delvilkårsett)
             }
     }
 

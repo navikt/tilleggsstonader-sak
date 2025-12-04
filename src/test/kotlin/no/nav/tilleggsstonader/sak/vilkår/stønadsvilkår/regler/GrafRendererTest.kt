@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 
 @Disabled
 internal class GrafRendererTest {
-    private val objectMapper = ObjectMapperProvider.objectMapper.writerWithDefaultPrettyPrinter()
+    private val jsonMapper = ObjectMapperProvider.jsonMapper.writerWithDefaultPrettyPrinter()
 
     @Test
     internal fun `print alle vilkår`() {
@@ -20,7 +20,7 @@ internal class GrafRendererTest {
                 )
             }
         println(
-            objectMapper.writeValueAsString(
+            jsonMapper.writeValueAsString(
                 mapOf(
                     "name" to "vilkår",
                     "children" to vilkårsregler.toList(),

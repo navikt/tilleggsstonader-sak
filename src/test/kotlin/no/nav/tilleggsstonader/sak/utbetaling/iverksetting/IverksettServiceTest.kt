@@ -1,12 +1,11 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.CapturingSlot
 import io.mockk.justRun
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.prosessering.domene.Status
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -35,6 +34,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.core.KafkaTemplate
+import tools.jackson.module.kotlin.readValue
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -113,7 +113,7 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
     ) {
         val task = taskService.finnTasksMedStatus(Status.entries, HentStatusFraIverksettingTask.TYPE).single()
         val eksternBehandlingId = testoppsettService.hentSaksbehandling(behandling.id).eksternId
-        assertThat(objectMapper.readValue<Map<String, Any>>(task.payload)).isEqualTo(
+        assertThat(jsonMapper.readValue<Map<String, Any>>(task.payload)).isEqualTo(
             mapOf(
                 "eksternFagsakId" to fagsak.eksternId.id.toInt(),
                 "behandlingId" to behandling.id.toString(),

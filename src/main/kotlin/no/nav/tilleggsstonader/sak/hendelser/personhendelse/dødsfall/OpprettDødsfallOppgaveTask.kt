@@ -1,10 +1,9 @@
 package no.nav.tilleggsstonader.sak.hendelser.personhendelse.dødsfall
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -14,6 +13,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisteridentifikat
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import tools.jackson.module.kotlin.readValue
 
 @Service
 @TaskStepBeskrivelse(
@@ -27,7 +27,7 @@ class OpprettDødsfallOppgaveTask(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun doTask(task: Task) {
-        val data = objectMapper.readValue<DødsfallOppgaveTaskData>(task.payload)
+        val data = jsonMapper.readValue<DødsfallOppgaveTaskData>(task.payload)
         val dødsfallHendelse = data.dødsfallHendelse
 
         val person = personService.hentPersonUtenBarn(dødsfallHendelse.personidenter.first())
@@ -73,7 +73,7 @@ class OpprettDødsfallOppgaveTask(
         fun opprettTask(dødsfallOppgaveTaskData: DødsfallOppgaveTaskData) =
             Task(
                 type = TYPE,
-                payload = objectMapper.writeValueAsString(dødsfallOppgaveTaskData),
+                payload = jsonMapper.writeValueAsString(dødsfallOppgaveTaskData),
             )
 
         fun opprettTask(
@@ -83,7 +83,7 @@ class OpprettDødsfallOppgaveTask(
             Task(
                 type = TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         DødsfallOppgaveTaskData(
                             dødsfallHendelse = dødsfallHendelse,
                             stønadstype = stønadstype,

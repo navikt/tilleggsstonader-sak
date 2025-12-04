@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.servlet.client.RestTestClient
 
 /**
  * Gjennomfører en behandling fra journalpost og helt til et gitt steg.
@@ -172,7 +173,7 @@ private fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId
 fun IntegrationTest.gjennomførBeregningSteg(
     behandlingId: BehandlingId,
     stønadstype: Stønadstype,
-): WebTestClient.ResponseSpec {
+): RestTestClient.ResponseSpec {
     val foreslåtteVedtaksperioder = kall.vedtak.foreslåVedtaksperioder(behandlingId)
 
     val vedtaksperioder =

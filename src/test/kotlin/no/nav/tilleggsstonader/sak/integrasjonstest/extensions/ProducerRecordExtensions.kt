@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions
 
-import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import org.apache.kafka.clients.producer.ProducerRecord
+import tools.jackson.module.kotlin.readValue
 
 fun List<ProducerRecord<String, String>>.finnPåTopic(topic: String): List<ProducerRecord<String, String>> = filter { it.topic() == topic }
 
@@ -18,4 +18,4 @@ fun List<ProducerRecord<String, String>>.forventAntallMeldingerPåTopic(
     }
 }
 
-inline fun <reified T> ProducerRecord<String, String>.verdiEllerFeil(): T = objectMapper.readValue<T>(this.value())
+inline fun <reified T> ProducerRecord<String, String>.verdiEllerFeil(): T = jsonMapper.readValue<T>(this.value())

@@ -1,18 +1,18 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.PropertiesWrapper
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.util.IdUtils
 import no.nav.familie.prosessering.util.MDCConstants
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import org.springframework.stereotype.Service
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
 import java.util.Properties
 import java.util.UUID
@@ -30,7 +30,7 @@ class DagligIverksettBehandlingTask(
     private val iverksettService: IverksettService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val taskData = objectMapper.readValue<TaskData>(task.payload)
+        val taskData = jsonMapper.readValue<TaskData>(task.payload)
         val iverksettingId = task.metadata.getProperty("iverksettingId") ?: error("Mangler iverksettingId")
 
         validerErSisteBehandling(taskData.behandlingId)
@@ -70,7 +70,7 @@ class DagligIverksettBehandlingTask(
                     setProperty(MDCConstants.MDC_CALL_ID, IdUtils.generateId())
                 }
 
-            val payload = objectMapper.writeValueAsString(TaskData(behandlingId, utbetalingsdato))
+            val payload = jsonMapper.writeValueAsString(TaskData(behandlingId, utbetalingsdato))
 
             return Task(TYPE, payload).copy(metadataWrapper = PropertiesWrapper(properties))
         }

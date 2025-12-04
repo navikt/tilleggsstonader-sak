@@ -1,11 +1,10 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt.task
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -21,6 +20,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.fristBehandleSakOppgave
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDateTime
 import java.util.Properties
 
@@ -46,7 +46,7 @@ class OpprettOppgaveForOpprettetBehandlingTask(
     )
 
     override fun doTask(task: Task) {
-        val data = objectMapper.readValue<OpprettOppgaveTaskData>(task.payload)
+        val data = jsonMapper.readValue<OpprettOppgaveTaskData>(task.payload)
         val oppgaveId = opprettOppgave(data, task)
 
         taskService.save(
@@ -95,7 +95,7 @@ class OpprettOppgaveForOpprettetBehandlingTask(
         fun opprettTask(data: OpprettOppgaveTaskData): Task =
             Task(
                 type = TYPE,
-                payload = objectMapper.writeValueAsString(data),
+                payload = jsonMapper.writeValueAsString(data),
                 properties =
                     Properties().apply {
                         if (data.saksbehandler != null) {

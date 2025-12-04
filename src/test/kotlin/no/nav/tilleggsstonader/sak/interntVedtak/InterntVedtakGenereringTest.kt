@@ -31,6 +31,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.converter.StringHttpMessageConverter
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import java.net.URI
 
@@ -173,7 +174,7 @@ class InterntVedtakGenereringTest {
         restTemplate.messageConverters =
             listOf(
                 StringHttpMessageConverter(),
-                MappingJackson2HttpMessageConverter(ObjectMapperProvider.objectMapper),
+                JacksonJsonHttpMessageConverter(ObjectMapperProvider.jsonMapper),
             )
         return HtmlifyClient(URI.create("http://localhost:8001"), restTemplate)
     }

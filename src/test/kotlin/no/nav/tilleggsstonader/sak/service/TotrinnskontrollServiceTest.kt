@@ -1,13 +1,12 @@
 package no.nav.tilleggsstonader.sak.service
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
@@ -39,6 +38,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
+import tools.jackson.module.kotlin.readValue
 
 internal class TotrinnskontrollServiceTest {
     private val behandlingshistorikkService = mockk<BehandlingshistorikkService>(relaxed = true)
@@ -345,7 +345,7 @@ internal class TotrinnskontrollServiceTest {
             verify(exactly = 1) { taskService.save(any()) }
             assertThat(taskSlot.captured.type).isEqualTo("behandlingsstatistikkTask")
 
-            val payload = objectMapper.readValue<BehandlingsstatistikkTask.BehandlingsstatistikkTaskPayload>(taskSlot.captured.payload)
+            val payload = jsonMapper.readValue<BehandlingsstatistikkTask.BehandlingsstatistikkTaskPayload>(taskSlot.captured.payload)
             assertThat(payload.hendelse).isEqualTo(hendelse)
         }
     }

@@ -1,12 +1,12 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import org.springframework.stereotype.Service
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDateTime
 import java.util.Properties
 import java.util.UUID
@@ -23,7 +23,7 @@ class HentStatusFraIverksettingTask(
     private val iverksettStatusService: IverksettStatusService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val taskData = objectMapper.readValue<TaskData>(task.payload)
+        val taskData = jsonMapper.readValue<TaskData>(task.payload)
         iverksettStatusService.hentStatusOgOppdaterAndeler(
             eksternFagsakId = taskData.eksternFagsakId,
             behandlingId = taskData.behandlingId,
@@ -48,7 +48,7 @@ class HentStatusFraIverksettingTask(
                 )
             return Task(
                 type = TYPE,
-                payload = objectMapper.writeValueAsString(taskData),
+                payload = jsonMapper.writeValueAsString(taskData),
                 properties =
                     Properties().apply {
                         setProperty("eksternFagsakId", eksternFagsakId.toString())

@@ -1,14 +1,14 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import org.springframework.stereotype.Service
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDateTime
 import java.util.Properties
 
@@ -21,7 +21,7 @@ class VedtaksstatistikkTask(
     private val vedtaksstatistikkService: VedtaksstatistikkService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val (behandlingId, fagsakId) = objectMapper.readValue<VedtaksstatistikkTaskPayload>(task.payload)
+        val (behandlingId, fagsakId) = jsonMapper.readValue<VedtaksstatistikkTaskPayload>(task.payload)
 
         vedtaksstatistikkService.lagreVedtaksstatistikkV2(
             behandlingId,
@@ -39,7 +39,7 @@ class VedtaksstatistikkTask(
             Task(
                 type = TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         VedtaksstatistikkTaskPayload(
                             behandlingId = behandlingId,
                             fagsakId = fagsakId,

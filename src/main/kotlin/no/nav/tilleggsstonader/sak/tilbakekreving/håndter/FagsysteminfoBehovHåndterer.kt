@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.tilbakekreving.håndter
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.treeToValue
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -30,6 +28,8 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
+import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.treeToValue
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -51,7 +51,7 @@ class FagsysteminfoBehovHåndterer(
         hendelseKey: String,
         payload: JsonNode,
     ) {
-        val fagsystemBehovMelding = objectMapper.treeToValue<TilbakekrevingFagsysteminfoBehov>(payload)
+        val fagsystemBehovMelding = jsonMapper.treeToValue<TilbakekrevingFagsysteminfoBehov>(payload)
 
         // Team tilbake bruker også kafka-topic til intern testing i dev, filtrerer vekk meldinger ikke ment for oss
         if (gjelderTestsak(fagsystemBehovMelding)) {
@@ -102,7 +102,7 @@ class FagsysteminfoBehovHåndterer(
                 ProducerRecord(
                     TILBAKEKREVING_TOPIC,
                     kafkaKey,
-                    objectMapper.writeValueAsString(svarTilbakekrevingKravgrunnlagOppslagRecord),
+                    jsonMapper.writeValueAsString(svarTilbakekrevingKravgrunnlagOppslagRecord),
                 ),
             ).get()
     }

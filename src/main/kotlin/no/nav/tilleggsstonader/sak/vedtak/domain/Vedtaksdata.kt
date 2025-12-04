@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import tools.jackson.databind.annotation.JsonDeserialize
 
 /**
  * Sealed class for å kunne ha egne objekter for hver type innvilgelse/opphør og avslag per stønadstype,

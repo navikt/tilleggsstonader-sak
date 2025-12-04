@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.hendelser
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
@@ -46,7 +46,7 @@ data class Hendelse(
         this(
             type = type,
             id = id,
-            metadata = metadata?.let { JsonWrapper(objectMapper.writeValueAsString(it)) },
+            metadata = metadata?.let { JsonWrapper(jsonMapper.writeValueAsString(it)) },
         )
 }
 

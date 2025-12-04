@@ -5,7 +5,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
@@ -292,7 +292,7 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
                     Dokumentvariantformat.ORIGINAL,
                 )
             } returns
-                objectMapper.writeValueAsBytes(søknad)
+                jsonMapper.writeValueAsBytes(søknad)
         }
 
         return journalpost

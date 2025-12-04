@@ -1,15 +1,15 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import org.springframework.stereotype.Service
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDateTime
 import java.util.Properties
 
@@ -32,7 +32,7 @@ class FerdigstillOppgaveTask(
     )
 
     override fun doTask(task: Task) {
-        val data = objectMapper.readValue<FerdigstillOppgaveTaskData>(task.payload)
+        val data = jsonMapper.readValue<FerdigstillOppgaveTaskData>(task.payload)
         oppgaveService.ferdigstillBehandleOppgave(
             behandlingId = data.behandlingId,
             oppgavetype = data.oppgavetype,
@@ -47,7 +47,7 @@ class FerdigstillOppgaveTask(
         ): Task =
             Task(
                 type = TYPE,
-                payload = objectMapper.writeValueAsString(FerdigstillOppgaveTaskData(behandlingId, oppgavetype)),
+                payload = jsonMapper.writeValueAsString(FerdigstillOppgaveTaskData(behandlingId, oppgavetype)),
                 properties =
                     Properties().apply {
                         setProperty("saksbehandler", SikkerhetContext.hentSaksbehandlerEllerSystembruker())

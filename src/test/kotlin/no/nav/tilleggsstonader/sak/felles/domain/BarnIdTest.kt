@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.felles.domain
 
-import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import tools.jackson.module.kotlin.readValue
 
 class BarnIdTest {
     val id = "96673a99-1d90-4f22-abdf-faee57062432"
@@ -16,10 +16,10 @@ class BarnIdTest {
     @Test
     fun `skal håndteres riktig i fra og til json`() {
         val foo = Foo(BarnId.fromString(id))
-        val json = objectMapper.writeValueAsString(foo)
+        val json = jsonMapper.writeValueAsString(foo)
 
         assertThat(json).isEqualTo("""{"id":"96673a99-1d90-4f22-abdf-faee57062432"}""")
-        assertThat(objectMapper.readValue<Foo>(json)).isEqualTo(foo)
+        assertThat(jsonMapper.readValue<Foo>(json)).isEqualTo(foo)
     }
 
     /**
@@ -29,10 +29,10 @@ class BarnIdTest {
     @Test
     fun `skal kunne deserialisere som nøkkel i json`() {
         val foo = mapOf(BarnId.fromString(id) to "id")
-        val json = objectMapper.writeValueAsString(foo)
+        val json = jsonMapper.writeValueAsString(foo)
 
         assertThat(json).isEqualTo("""{"96673a99-1d90-4f22-abdf-faee57062432":"id"}""")
-        assertThat(objectMapper.readValue<Map<BarnId, String>>(json)).isEqualTo(foo)
+        assertThat(jsonMapper.readValue<Map<BarnId, String>>(json)).isEqualTo(foo)
     }
 
     private data class Foo(

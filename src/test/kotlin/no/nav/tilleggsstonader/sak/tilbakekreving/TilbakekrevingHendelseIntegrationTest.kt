@@ -1,8 +1,7 @@
 package no.nav.tilleggsstonader.sak.tilbakekreving
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.verify
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -43,6 +42,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.core.KafkaTemplate
+import tools.jackson.module.kotlin.readValue
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
@@ -182,7 +182,7 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
             assertThat(publiserteHendelser).hasSize(1)
             val publisertHendelse = publiserteHendelser.single()
             assertThat(publisertHendelse.key()).isEqualTo(key)
-            val tilbakekrevingFagsysteminfoSvar = objectMapper.readValue<TilbakekrevingFagsysteminfoSvar>(publisertHendelse.value())
+            val tilbakekrevingFagsysteminfoSvar = jsonMapper.readValue<TilbakekrevingFagsysteminfoSvar>(publisertHendelse.value())
             assertThat(tilbakekrevingFagsysteminfoSvar.utvidPerioder).isNotEmpty
             assertThat(tilbakekrevingFagsysteminfoSvar.behandlendeEnhet).isNotNull
         }
@@ -298,7 +298,7 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
         payload: Any,
     ) {
         tilbakekrevingHendelseDelegate.håndter(
-            ConsumerRecordUtil.lagConsumerRecord(key, objectMapper.writeValueAsString(payload)),
+            ConsumerRecordUtil.lagConsumerRecord(key, jsonMapper.writeValueAsString(payload)),
         )
     }
 }

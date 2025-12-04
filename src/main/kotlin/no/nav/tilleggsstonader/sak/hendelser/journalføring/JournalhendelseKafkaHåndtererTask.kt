@@ -1,13 +1,13 @@
 package no.nav.tilleggsstonader.sak.hendelser.journalføring
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import tools.jackson.module.kotlin.readValue
 
 @Service
 @TaskStepBeskrivelse(
@@ -23,7 +23,7 @@ class JournalhendelseKafkaHåndtererTask(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun doTask(task: Task) {
-        val hendelse = objectMapper.readValue<JournalhendelseTaskData>(task.payload)
+        val hendelse = jsonMapper.readValue<JournalhendelseTaskData>(task.payload)
         journalhendelseKafkaHåndtererService.behandleJournalhendelse(journalpostId = hendelse.journalpostId)
     }
 
@@ -43,7 +43,7 @@ class JournalhendelseKafkaHåndtererTask(
                 )
             return Task(
                 type = TYPE,
-                payload = objectMapper.writeValueAsString(taskData),
+                payload = jsonMapper.writeValueAsString(taskData),
             )
         }
     }

@@ -1,12 +1,11 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.slot
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -30,6 +29,7 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDetaljer as SimuleringDetaljerKontrakt
 
@@ -127,7 +127,7 @@ internal class SimuleringServiceTest {
         val tilkjentYtelse = tilkjentYtelse(behandlingId = behandling.id)
 
         every { iverksettClient.simulerV2(any()) } returns
-            objectMapper.readValue(readFile("mock/iverksett/simuleringsresultat.json"))
+            jsonMapper.readValue(readFile("mock/iverksett/simuleringsresultat.json"))
 
         every { behandlingService.hentBehandling(any()) } returns behandling
         every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
