@@ -66,7 +66,7 @@ fun IntegrationTest.gjennomførBehandlingsløp(
         return behandlingId
     }
 
-    gjennomførIngangsvilkårSteg(medAktivitet, medMålgruppe, behandlingId)
+    gjennomførInngangsvilkårSteg(medAktivitet, medMålgruppe, behandlingId)
 
     if (tilSteg == StegType.VILKÅR) {
         return behandlingId
@@ -202,7 +202,7 @@ fun IntegrationTest.gjennomførBeregningStegKall(
         )
 }
 
-fun IntegrationTest.gjennomførIngangsvilkårSteg(
+fun IntegrationTest.gjennomførInngangsvilkårSteg(
     medAktivitet: ((BehandlingId) -> LagreVilkårperiode)? = null,
     medMålgruppe: ((BehandlingId) -> LagreVilkårperiode)? = null,
     behandlingId: BehandlingId,

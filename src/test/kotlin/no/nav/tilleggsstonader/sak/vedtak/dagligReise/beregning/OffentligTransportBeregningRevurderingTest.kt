@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningStegKall
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførIngangsvilkårSteg
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførInngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførVilkårSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
@@ -58,7 +58,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
                         nyeOpplysningerMetadata = null,
                     ),
             )
-        gjennomførIngangsvilkårSteg(behandlingId = revurderingId)
+        gjennomførInngangsvilkårSteg(behandlingId = revurderingId)
 
         kjørTasksKlareForProsessering()
         val vilkårId =

@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
@@ -31,15 +30,16 @@ fun validerRevurdering(
     val forrigeBeregningsresultat = forrigeIverksatteVedtak.beregningsresultat.offentligTransport?.reiser ?: return
 
     for (reise in nyttBeregningsresultat) {
-        val overlappendeReise = forrigeBeregningsresultat.filter { it.reiseId == reise.reiseId }
-        if (overlappendeReise.isEmpty()) continue
+        val reiseIForrigeBeregningsresultat = forrigeBeregningsresultat.filter { it.reiseId == reise.reiseId }
+        if (reiseIForrigeBeregningsresultat.isEmpty()) continue
         // Hvis vi kommer hit, vet vi at reisen har blitt endret på i revurderingen
 
         // Sjekker om det finnes en periode som inneholder dagens dato i revurderingen
         val dagensPeriodeIRevurdering = finnPeriodeMedDato(reise.perioder, dagensDato)
 
         // Sjekker om det finnes en periode som inneholder dagens dato i førstegangsbehandlingen
-        val dagensPeriodeIFørstegangs = finnPeriodeMedDato(overlappendeReise.flatMap { it.perioder }, dagensDato)
+        val dagensPeriodeIFørstegangs =
+            finnPeriodeMedDato(reiseIForrigeBeregningsresultat.flatMap { it.perioder }, dagensDato)
 
         // Sjekk om perioden som inneholder dagens dato sin billetttype endrer seg fra enkeltbilletter til månedskort
         val endrerFraEnkeltbilletterTilMånedskort =
@@ -48,14 +48,12 @@ fun validerRevurdering(
                 dagensPeriodeIRevurdering,
             )
 
-        if (endrerFraEnkeltbilletterTilMånedskort) {
-            brukerfeil(
-                """
-                I den revurderte beregningen vil en allerede utbetalt periode med enkeltbilletter bli endret 
-                til en periode med månedskort, som kan være til ugunst for søker. For å hindre dette kan du legge 
-                inn en ny reise i stedet for å forlenge den eksisterende.
-                """.trimIndent(),
-            )
+        brukerfeilHvis(endrerFraEnkeltbilletterTilMånedskort) {
+            """
+            I den revurderte beregningen vil en allerede utbetalt periode med enkeltbilletter bli endret 
+            til en periode med månedskort, som kan være til ugunst for søker. For å hindre dette kan du legge 
+            inn en ny reise i stedet for å forlenge den eksisterende.
+            """.trimIndent()
         }
     }
 }
