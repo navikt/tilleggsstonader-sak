@@ -57,13 +57,13 @@ class DagligReiseBeregningService(
     ): BeregningsresultatOffentligTransport? {
         val vilkårOffentligTransport = vilkår[TypeDagligReise.OFFENTLIG_TRANSPORT] ?: return null
 
-        val forrigeIverksatteVedtak = hentForrigeVedtak(behandling)
-
         val beregnignsresultat =
             offentligTransportBeregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkår = vilkårOffentligTransport,
             )
+
+        val forrigeIverksatteVedtak = hentForrigeVedtak(behandling)
 
         if (forrigeIverksatteVedtak != null) {
             val tidligsteEndring =
