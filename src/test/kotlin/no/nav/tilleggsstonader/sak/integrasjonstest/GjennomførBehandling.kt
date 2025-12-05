@@ -10,13 +10,12 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
-import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
+import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
@@ -33,6 +32,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Lagre
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import org.springframework.test.web.reactive.server.WebTestClient
 
 /**
  * Gjennomfører en behandling fra journalpost og helt til et gitt steg.
@@ -66,19 +66,19 @@ fun IntegrationTest.gjennomførBehandlingsløp(
         return behandlingId
     }
 
-    gjennomførIngangsvilkårSteg(medAktivitet, medMålgruppe, behandlingId)
+    gjennomførInngangsvilkårSteg(medAktivitet, medMålgruppe, behandlingId)
 
     if (tilSteg == StegType.VILKÅR) {
         return behandlingId
     }
 
-    gjennomførVilkårSteg(medVilkår, behandling)
+    gjennomførVilkårSteg(medVilkår, behandling.id, behandling.stønadstype)
 
     if (tilSteg == StegType.BEREGNE_YTELSE) {
         return behandlingId
     }
 
-    gjennomførBeregningSteg(behandling)
+    gjennomførBeregningSteg(behandling.id, behandling.stønadstype)
 
     if (tilSteg == StegType.SIMULERING) {
         return behandlingId
@@ -104,6 +104,20 @@ fun IntegrationTest.gjennomførBehandlingsløp(
 
     // Ferdigstiller behandling
     kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+    return behandlingId
+}
+
+fun IntegrationTest.opprettRevurdering(opprettBehandlingDto: OpprettBehandlingDto): BehandlingId {
+    val behandlingId = kall.behandling.opprettRevurdering(opprettBehandlingDto)
+
+    // Oppretter grunnlagsdata
+    kall.behandling.hent(behandlingId)
+
+    // Oppretter oppgave
+    kjørTasksKlareForProsessering()
+
+    tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
 
     return behandlingId
 }
@@ -155,35 +169,46 @@ private fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId
     kjørTasksKlareForProsessering()
 }
 
-private fun IntegrationTest.gjennomførBeregningSteg(behandling: BehandlingDto) {
-    val foreslåtteVedtaksperioder = kall.vedtak.foreslåVedtaksperioder(behandling.id)
+fun IntegrationTest.gjennomførBeregningSteg(
+    behandlingId: BehandlingId,
+    stønadstype: Stønadstype,
+) {
+    gjennomførBeregningStegKall(behandlingId, stønadstype).expectStatus().isOk
+    kjørTasksKlareForProsessering()
+}
+
+fun IntegrationTest.gjennomførBeregningStegKall(
+    behandlingId: BehandlingId,
+    stønadstype: Stønadstype,
+): WebTestClient.ResponseSpec {
+    val foreslåtteVedtaksperioder = kall.vedtak.foreslåVedtaksperioder(behandlingId)
 
     val vedtaksperioder =
         foreslåtteVedtaksperioder.map {
             it.tilVedtaksperiodeDto()
         }
-    kall.vedtak.lagreInnvilgelse(
-        stønadstype = behandling.stønadstype,
-        behandlingId = behandling.id,
-        innvilgelseDto =
-            when (behandling.stønadstype) {
-                Stønadstype.BARNETILSYN -> InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioder)
-                Stønadstype.LÆREMIDLER -> InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder)
-                Stønadstype.BOUTGIFTER -> InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder)
-                Stønadstype.DAGLIG_REISE_TSO -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
-                Stønadstype.DAGLIG_REISE_TSR -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
-            },
-    )
-    kjørTasksKlareForProsessering()
+    return kall.vedtak.apiRespons
+        .lagreInnvilgelse(
+            stønadstype = stønadstype,
+            behandlingId = behandlingId,
+            innvilgelseDto =
+                when (stønadstype) {
+                    Stønadstype.BARNETILSYN -> InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioder)
+                    Stønadstype.LÆREMIDLER -> InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder)
+                    Stønadstype.BOUTGIFTER -> InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder)
+                    Stønadstype.DAGLIG_REISE_TSO -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
+                    Stønadstype.DAGLIG_REISE_TSR -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
+                },
+        )
 }
 
-private fun IntegrationTest.gjennomførIngangsvilkårSteg(
-    medAktivitet: (BehandlingId) -> LagreVilkårperiode,
-    medMålgruppe: (BehandlingId) -> LagreVilkårperiode,
+fun IntegrationTest.gjennomførInngangsvilkårSteg(
+    medAktivitet: ((BehandlingId) -> LagreVilkårperiode)? = null,
+    medMålgruppe: ((BehandlingId) -> LagreVilkårperiode)? = null,
     behandlingId: BehandlingId,
 ) {
-    kall.vilkårperiode.opprett(medAktivitet(behandlingId))
-    kall.vilkårperiode.opprett(medMålgruppe(behandlingId))
+    medAktivitet?.invoke(behandlingId)?.let { kall.vilkårperiode.opprett(it) }
+    medMålgruppe?.invoke(behandlingId)?.let { kall.vilkårperiode.opprett(it) }
 
     kall.steg.ferdigstill(
         behandlingId,
@@ -194,20 +219,21 @@ private fun IntegrationTest.gjennomførIngangsvilkårSteg(
     kjørTasksKlareForProsessering()
 }
 
-private fun IntegrationTest.gjennomførVilkårSteg(
+fun IntegrationTest.gjennomførVilkårSteg(
     medVilkår: List<LagreVilkår>,
-    behandling: BehandlingDto,
+    behandlingId: BehandlingId,
+    stønadstype: Stønadstype,
 ) {
     medVilkår.forEach {
-        if (behandling.stønadstype.gjelderDagligReise()) {
-            kall.vilkårDagligReise.opprettVilkår(behandling.id, it as LagreDagligReiseDto)
+        if (stønadstype.gjelderDagligReise()) {
+            kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreDagligReiseDto)
         } else {
             kall.vilkår.opprettVilkår(it as OpprettVilkårDto)
         }
     }
 
     kall.steg.ferdigstill(
-        behandling.id,
+        behandlingId,
         StegController.FerdigstillStegRequest(
             steg = StegType.VILKÅR,
         ),

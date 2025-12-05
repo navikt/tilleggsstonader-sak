@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
+import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.BehandlingshistorikkDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
@@ -25,6 +26,9 @@ class BehandlingKall(
 
     fun historikk(behandlingId: BehandlingId): List<BehandlingshistorikkDto> = apiRespons.historikk(behandlingId).expectOkWithBody()
 
+    fun opprettRevurdering(opprettBehandlingDto: OpprettBehandlingDto) =
+        apiRespons.opprettRevurdering(opprettBehandlingDto).expectOkWithBody<BehandlingId>()
+
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = BehandlingApi()
 
@@ -39,5 +43,7 @@ class BehandlingKall(
         ) = testklient.post("/api/behandling/$behandlingId/henlegg", request)
 
         fun historikk(behandlingId: BehandlingId) = testklient.get("/api/behandlingshistorikk/$behandlingId")
+
+        fun opprettRevurdering(opprettBehandlingDto: OpprettBehandlingDto) = testklient.post("/api/behandling", opprettBehandlingDto)
     }
 }

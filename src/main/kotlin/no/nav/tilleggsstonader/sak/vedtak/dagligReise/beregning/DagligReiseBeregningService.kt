@@ -2,11 +2,16 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -19,6 +24,8 @@ class DagligReiseBeregningService(
     private val vilkårService: VilkårService,
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val offentligTransportBeregningService: OffentligTransportBeregningService,
+    private val vedtakRepository: VedtakRepository,
+    private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
     fun beregn(
         behandlingId: BehandlingId,
@@ -32,26 +39,46 @@ class DagligReiseBeregningService(
             typeVedtak = typeVedtak,
         )
 
-        val oppfylteVilkår = vilkårService.hentOppfylteDagligReiseVilkår(behandlingId).map { it.mapTilVilkårDagligReise() }
+        val oppfylteVilkår =
+            vilkårService.hentOppfylteDagligReiseVilkår(behandlingId).map { it.mapTilVilkårDagligReise() }
         validerFinnesReiser(oppfylteVilkår)
 
         val oppfylteVilkårGruppertPåType = oppfylteVilkår.filter { it.fakta != null }.groupBy { it.fakta!!.type }
 
         return BeregningsresultatDagligReise(
-            offentligTransport = beregnOffentligTransport(oppfylteVilkårGruppertPåType, vedtaksperioder),
+            offentligTransport = beregnOffentligTransport(oppfylteVilkårGruppertPåType, vedtaksperioder, behandling),
         )
     }
 
     private fun beregnOffentligTransport(
         vilkår: Map<TypeDagligReise, List<VilkårDagligReise>>,
         vedtaksperioder: List<Vedtaksperiode>,
+        behandling: Saksbehandling,
     ): BeregningsresultatOffentligTransport? {
         val vilkårOffentligTransport = vilkår[TypeDagligReise.OFFENTLIG_TRANSPORT] ?: return null
 
-        return offentligTransportBeregningService.beregn(
-            vedtaksperioder = vedtaksperioder,
-            oppfylteVilkår = vilkårOffentligTransport,
-        )
+        val beregnignsresultat =
+            offentligTransportBeregningService.beregn(
+                vedtaksperioder = vedtaksperioder,
+                oppfylteVilkår = vilkårOffentligTransport,
+            )
+
+        val forrigeIverksatteVedtak = hentForrigeVedtak(behandling)
+
+        if (forrigeIverksatteVedtak != null) {
+            val tidligsteEndring =
+                utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                    behandlingId = behandling.id,
+                    vedtaksperioder = vedtaksperioder,
+                )
+
+            validerRevurdering(
+                beregningsresultat = beregnignsresultat,
+                tidligsteEndring = tidligsteEndring,
+                forrigeIverksatteVedtak = forrigeIverksatteVedtak,
+            )
+        }
+        return beregnignsresultat
     }
 
     private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {
@@ -59,4 +86,12 @@ class DagligReiseBeregningService(
             "Innvilgelse er ikke et gyldig vedtaksresultat når det ikke er lagt inn perioder med reise"
         }
     }
+
+    private fun hentVedtak(behandlingId: BehandlingId) =
+        vedtakRepository
+            .findByIdOrThrow(behandlingId)
+            .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
+
+    private fun hentForrigeVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørDagligReise? =
+        behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
 }

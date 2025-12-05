@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -12,7 +11,8 @@ import java.util.UUID
 class VilkårperiodeKall(
     private val testklient: Testklient,
 ) {
-    fun hentForBehandling(behandling: Behandling): VilkårperioderResponse = apiRespons.hentForBehandling(behandling).expectOkWithBody()
+    fun hentForBehandling(behandlingId: BehandlingId): VilkårperioderResponse =
+        apiRespons.hentForBehandling(behandlingId).expectOkWithBody()
 
     fun opprett(lagreVilkårperiode: LagreVilkårperiode): LagreVilkårperiodeResponse =
         apiRespons.opprett(lagreVilkårperiode).expectOkWithBody()
@@ -37,7 +37,7 @@ class VilkårperiodeKall(
     val apiRespons = VilkårperiodeApi()
 
     inner class VilkårperiodeApi {
-        fun hentForBehandling(behandling: Behandling) = testklient.get("/api/vilkarperiode/behandling/${behandling.id}")
+        fun hentForBehandling(behandlingId: BehandlingId) = testklient.get("/api/vilkarperiode/behandling/$behandlingId")
 
         fun opprett(lagreVilkårperiode: LagreVilkårperiode) = testklient.post("/api/vilkarperiode/v2", lagreVilkårperiode)
 

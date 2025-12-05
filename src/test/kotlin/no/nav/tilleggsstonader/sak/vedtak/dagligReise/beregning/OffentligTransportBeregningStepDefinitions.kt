@@ -11,8 +11,10 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
@@ -34,9 +36,13 @@ class OffentligTransportBeregningStepDefinitions {
     val behandlingServiceMock = mockk<BehandlingService>()
     val vilkårServiceMock = mockk<VilkårService>()
     val vilkårRepositoryFake = VilkårRepositoryFake()
+    val vedtakRepositoryFake = VedtakRepositoryFake()
     val vilkårperiodeRepositoryFake = VilkårperiodeRepositoryFake()
     val behandlingId = BehandlingId.random()
-
+    val utledTidligsteEndringService =
+        mockk<UtledTidligsteEndringService> {
+            every { utledTidligsteEndringForBeregning(any(), any()) } returns null
+        }
     val vilkårperiodeServiceMock =
         mockk<VilkårperiodeService>().apply {
             every { hentVilkårperioder(any()) } answers {
@@ -59,8 +65,7 @@ class OffentligTransportBeregningStepDefinitions {
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(vilkårperiodeService = vilkårperiodeServiceMock)
 
-    val offentligTransportBeregningService =
-        OffentligTransportBeregningService()
+    val offentligTransportBeregningService = OffentligTransportBeregningService()
 
     var beregningsResultat: BeregningsresultatOffentligTransport? = null
     var forventetBeregningsresultat: BeregningsresultatOffentligTransport? = null

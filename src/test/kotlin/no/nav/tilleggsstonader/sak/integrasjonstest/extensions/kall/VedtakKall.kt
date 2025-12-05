@@ -67,6 +67,12 @@ class VedtakKall(
             typeVedtakPath: String,
             vedtakDto: VedtakRequest,
         ) = testklient.post("/api/vedtak/${stønadstype.tilPath()}/$behandlingId/$typeVedtakPath", vedtakDto)
+
+        fun lagreInnvilgelse(
+            stønadstype: Stønadstype,
+            behandlingId: BehandlingId,
+            innvilgelseDto: VedtakRequest,
+        ) = lagreVedtak(stønadstype, behandlingId, "innvilgelse", innvilgelseDto)
     }
 }
 

@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingerMålgruppeDto
@@ -33,7 +32,7 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
             ),
         )
 
-        val hentedeVilkårperioder = kall.vilkårperiode.hentForBehandling(behandling).vilkårperioder
+        val hentedeVilkårperioder = kall.vilkårperiode.hentForBehandling(behandling.id).vilkårperioder
 
         assertThat(hentedeVilkårperioder.målgrupper).hasSize(1)
         assertThat(hentedeVilkårperioder.aktiviteter).isEmpty()
@@ -65,7 +64,7 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
             vilkårperiodeId = response.periode!!.id,
         )
 
-        val lagredeVilkårperioder = kall.vilkårperiode.hentForBehandling(behandling).vilkårperioder
+        val lagredeVilkårperioder = kall.vilkårperiode.hentForBehandling(behandling.id).vilkårperioder
 
         assertThat(lagredeVilkårperioder.målgrupper.single().tom).isEqualTo(nyTom)
     }
@@ -107,7 +106,10 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
                 opprettOgTilordneOppgaveForBehandling(behandling.id)
                 kall.vilkårperiode.apiRespons
                     .oppdaterGrunnlag(behandling.id)
-                    .expectProblemDetail(HttpStatus.FORBIDDEN, "Mangler nødvendig saksbehandlerrolle for å utføre handlingen")
+                    .expectProblemDetail(
+                        HttpStatus.FORBIDDEN,
+                        "Mangler nødvendig saksbehandlerrolle for å utføre handlingen",
+                    )
             }
         }
     }
