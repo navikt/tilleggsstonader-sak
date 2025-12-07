@@ -62,7 +62,7 @@ class TotrinnskontrollController(
         @PathVariable behandlingId: BehandlingId,
     ): StatusTotrinnskontrollDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE, validerTilordnetOppgave = false)
         tilgangService.validerHarSaksbehandlerrolle()
 
         angreSendTilBeslutterService.angreSendTilBeslutter(behandlingId)
