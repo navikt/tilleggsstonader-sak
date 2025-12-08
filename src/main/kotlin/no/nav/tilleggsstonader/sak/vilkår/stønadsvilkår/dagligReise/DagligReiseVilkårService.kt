@@ -33,7 +33,10 @@ class DagligReiseVilkårService(
     private val vilkårService: VilkårService,
 ) {
     fun hentVilkårForBehandling(behandlingId: BehandlingId): List<VilkårDagligReise> =
-        vilkårRepository.findByBehandlingId(behandlingId).map { it.mapTilVilkårDagligReise() }
+        vilkårRepository
+            .findByBehandlingId(behandlingId)
+            .map { it.mapTilVilkårDagligReise() }
+            .sortedBy { it.fom }
 
     @Transactional
     fun opprettNyttVilkår(
