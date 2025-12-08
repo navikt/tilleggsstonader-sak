@@ -80,6 +80,7 @@ class TilgangService(
     fun validerSkrivetilgangTilBehandling(
         behandlingId: BehandlingId,
         event: AuditLoggerEvent,
+        validerTilordnetOppgave: Boolean = true,
     ) {
         feilHvis(event == AuditLoggerEvent.ACCESS) {
             "AuditLoggerEvent.ACCESS er ikke gyldig for skrivetilgangskontroll"
@@ -92,6 +93,7 @@ class TilgangService(
                 behandling = saksbehandling,
                 personIdent = saksbehandling.ident,
                 stønadstype = saksbehandling.stønadstype,
+                validerTilordnetOppgave = validerTilordnetOppgave,
                 jwtToken = SikkerhetContext.hentToken(),
             )
 
@@ -103,6 +105,7 @@ class TilgangService(
             behandling = saksbehandling,
             personIdent = saksbehandling.ident,
             stønadstype = saksbehandling.stønadstype,
+            validerTilordnetOppgave = true,
             jwtToken = SikkerhetContext.hentToken(),
         ).harTilgang
 
@@ -140,6 +143,7 @@ class TilgangService(
         behandling: Saksbehandling,
         personIdent: String,
         stønadstype: Stønadstype,
+        validerTilordnetOppgave: Boolean,
         jwtToken: JwtToken,
     ): Tilgang {
         if (behandling.erFerdigstilt()) {
@@ -151,7 +155,10 @@ class TilgangService(
 
         val skalValidereTilordnetSaksbehandler = unleashService.isEnabled(Toggle.TILGANGSSTYRE_PÅ_TILORDNET_OPPGAVE)
 
-        return if (skalValidereTilordnetSaksbehandler && tilordnetSaksbehandler != SikkerhetContext.hentSaksbehandler()) {
+        return if (validerTilordnetOppgave &&
+            skalValidereTilordnetSaksbehandler &&
+            tilordnetSaksbehandler != SikkerhetContext.hentSaksbehandler()
+        ) {
             Tilgang(harTilgang = false, begrunnelse = "Behandling er tilordnet en annen saksbehandler")
         } else {
             tilgangskontrollService.sjekkTilgangTilStønadstype(

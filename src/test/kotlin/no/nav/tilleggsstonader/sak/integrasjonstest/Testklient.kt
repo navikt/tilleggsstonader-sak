@@ -17,12 +17,12 @@ class Testklient(
 
     fun post(
         uri: String,
-        body: Any,
+        body: Any? = null,
     ) = with(testkontekst) {
         webTestClient
             .post()
             .uri(uri)
-            .bodyValue(body)
+            .let { if (body != null) it.bodyValue(body) else it }
             .medOnBehalfOfToken()
             .exchange()
     }

@@ -19,6 +19,9 @@ class TotrinnskontrollKall(
         beslutteVedtakDto: BeslutteVedtakDto,
     ): StatusTotrinnskontrollDto = apiRespons.beslutteVedtak(behandlingId, beslutteVedtakDto).expectOkWithBody()
 
+    fun angreSendTilBeslutter(behandlingId: BehandlingId): StatusTotrinnskontrollDto =
+        apiRespons.angreSendTilBeslutter(behandlingId).expectOkWithBody()
+
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = TotrinnskontrollApi()
 
@@ -32,5 +35,8 @@ class TotrinnskontrollKall(
             behandlingId: BehandlingId,
             beslutteVedtakDto: BeslutteVedtakDto,
         ) = testklient.post("/api/totrinnskontroll/$behandlingId/beslutte-vedtak", beslutteVedtakDto)
+
+        fun angreSendTilBeslutter(behandlingId: BehandlingId) =
+            testklient.post("/api/totrinnskontroll/$behandlingId/angre-send-til-beslutter")
     }
 }
