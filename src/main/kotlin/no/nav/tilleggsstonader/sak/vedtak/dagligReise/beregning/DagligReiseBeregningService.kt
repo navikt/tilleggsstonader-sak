@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -41,7 +43,8 @@ class DagligReiseBeregningService(
 
         val oppfylteVilkår =
             vilkårService.hentOppfylteDagligReiseVilkår(behandlingId).map { it.mapTilVilkårDagligReise() }
-        validerFinnesReiser(oppfylteVilkår)
+
+        validerReiser(oppfylteVilkår, vedtaksperioder)
 
         val oppfylteVilkårGruppertPåType = oppfylteVilkår.filter { it.fakta != null }.groupBy { it.fakta!!.type }
 
@@ -79,12 +82,6 @@ class DagligReiseBeregningService(
             )
         }
         return beregnignsresultat
-    }
-
-    private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {
-        brukerfeilHvis(vilkår.isEmpty()) {
-            "Innvilgelse er ikke et gyldig vedtaksresultat når det ikke er lagt inn perioder med reise"
-        }
     }
 
     private fun hentVedtak(behandlingId: BehandlingId) =
