@@ -8,10 +8,15 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Fa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type",
+    visible = true,
+)
 @JsonSubTypes(
-    JsonSubTypes.Type(FaktaDagligReiseOffentligTransportDto::class, name = "FAKTA_DAGLIG_REISE_OFFENTLIG_TRANSPORT"),
-    JsonSubTypes.Type(FaktaDagligReisePrivatBilDto::class, name = "FAKTA_DAGLIG_REISE_PRIVAT_BIL"),
+    JsonSubTypes.Type(FaktaDagligReiseOffentligTransportDto::class, name = "OFFENTLIG_TRANSPORT"),
+    JsonSubTypes.Type(FaktaDagligReisePrivatBilDto::class, name = "PRIVAT_BIL"),
 )
 sealed interface FaktaDagligReiseDto {
     val type: TypeDagligReise
