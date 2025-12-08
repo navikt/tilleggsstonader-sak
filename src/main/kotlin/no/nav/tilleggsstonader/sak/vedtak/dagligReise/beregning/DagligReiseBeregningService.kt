@@ -47,7 +47,7 @@ class DagligReiseBeregningService(
 
         return BeregningsresultatDagligReise(
             offentligTransport = beregnOffentligTransport(oppfylteVilkårGruppertPåType, vedtaksperioder, behandling),
-        )
+        ).sorterReiser()
     }
 
     private fun beregnOffentligTransport(
