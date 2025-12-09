@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
@@ -18,6 +19,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Re
     JsonSubTypes.Type(FaktaDagligReisePrivatBilDto::class, name = "PRIVAT_BIL"),
 )
 sealed interface FaktaDagligReiseDto {
+    val type: TypeDagligReise
+
     fun mapTilFakta(): FaktaDagligReise
 }
 
@@ -28,6 +31,8 @@ data class FaktaDagligReiseOffentligTransportDto(
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
 ) : FaktaDagligReiseDto {
+    override val type = TypeDagligReise.OFFENTLIG_TRANSPORT
+
     override fun mapTilFakta() =
         FaktaOffentligTransport(
             reiseId = reiseId,
@@ -44,6 +49,8 @@ data class FaktaDagligReisePrivatBilDto(
     val prisBompengerPerDag: Int?,
     val prisFergekostandPerDag: Int?,
 ) : FaktaDagligReiseDto {
+    override val type = TypeDagligReise.PRIVAT_BIL
+
     override fun mapTilFakta() =
         FaktaPrivatBil(
             reisedagerPerUke = reisedagerPerUke,
