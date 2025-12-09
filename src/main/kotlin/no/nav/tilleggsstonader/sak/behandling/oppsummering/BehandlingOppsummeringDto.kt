@@ -5,6 +5,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -74,5 +76,10 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
         tom = this.tom,
         resultat = this.resultat,
         utgift = this.utgift,
-        typeFakta = this.fakta?.type,
+        typeFakta =
+            when (this.fakta) {
+                is FaktaDagligReiseOffentligTransport -> TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT
+                is FaktaDagligReisePrivatBil -> TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
+                null -> null
+            },
     )
