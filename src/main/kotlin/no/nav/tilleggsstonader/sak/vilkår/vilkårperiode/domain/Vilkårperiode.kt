@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -12,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
@@ -47,6 +49,7 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
     @Column("forrige_vilkarperiode_id")
     val forrigeVilkårperiodeId: UUID? = null,
     val type: VilkårperiodeType,
+    val typeAktivitet: TypeAktivitet? = null,
     override val fom: LocalDate,
     override val tom: LocalDate,
     override val faktaOgVurdering: T,
@@ -69,6 +72,10 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         validerSlettefelter()
 
         validerBegrunnelse()
+
+        feilHvis(faktaOgVurdering is FaktaOgVurderingDagligReiseTsr && type == AktivitetType.TILTAK && typeAktivitet == null) {
+            "Mangler data: typeAktivitet må være satt for aktivitet TILTAK"
+        }
 
         feilHvis(faktaOgVurdering.type.vilkårperiodeType != type) {
             "Ugyldig kombinasjon - type($type) må være lik faktaOgVurdering($faktaOgVurdering)"
