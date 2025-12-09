@@ -23,7 +23,7 @@ object VilkårDagligReiseMapper {
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett,
-            fakta = this.fakta?.mapTilFaktaDagligReise(type = this.fakta.type),
+            fakta = this.fakta?.mapTilFaktaDagligReise(),
         )
 
     fun VilkårDagligReise.mapTilVilkår() =
@@ -42,11 +42,10 @@ object VilkårDagligReiseMapper {
             gitVersjon = Applikasjonsversjon.versjon,
         )
 
-    private fun VilkårFakta.mapTilFaktaDagligReise(type: TypeVilkårFakta) =
+    private fun VilkårFakta.mapTilFaktaDagligReise() =
         when (this) {
             is FaktaDagligReiseOffentligTransport -> this.mapTilFakta()
             is FaktaDagligReisePrivatBil -> this.mapTilFakta()
-            else -> error("Fakta av type=$type finnes ikke for vilkår på daglig reise")
         }
 
     private fun FaktaDagligReiseOffentligTransport.mapTilFakta() =

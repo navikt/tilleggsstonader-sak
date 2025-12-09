@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagData
@@ -20,9 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Re
     JsonSubTypes.Type(FaktaDagligReisePrivatBil::class, name = "DAGLIG_REISE_PRIVAT_BIL"),
     failOnRepeatedNames = true,
 )
-sealed interface VilkårFakta {
-    val type: TypeVilkårFakta
-}
+sealed interface VilkårFakta
 
 data class FaktaDagligReiseOffentligTransport(
     val reiseId: ReiseId? = ReiseId.random(), // TODO: Fjern nullbarhet
@@ -30,19 +27,14 @@ data class FaktaDagligReiseOffentligTransport(
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
-) : VilkårFakta {
-    @JsonIgnore
-    override val type = TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT
-}
+) : VilkårFakta
 
 data class FaktaDagligReisePrivatBil(
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: Int,
     val prisBompengerPerDag: Int?,
     val prisFergekostandPerDag: Int?,
-) : VilkårFakta {
-    override val type = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
-}
+) : VilkårFakta
 
 enum class TypeVilkårFakta {
     DAGLIG_REISE_OFFENTLIG_TRANSPORT,
