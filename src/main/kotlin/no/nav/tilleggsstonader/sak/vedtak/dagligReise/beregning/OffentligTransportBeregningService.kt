@@ -27,7 +27,7 @@ class OffentligTransportBeregningService {
                 utgifter.map { reise ->
                     beregnForReise(reise, vedtaksperioder)
                 },
-        )
+        ).sorterReiser()
     }
 
     private fun beregnForReise(

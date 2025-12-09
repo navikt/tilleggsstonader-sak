@@ -11,7 +11,16 @@ import java.util.UUID
 
 data class BeregningsresultatOffentligTransport(
     val reiser: List<BeregningsresultatForReise>,
-)
+) {
+    fun sorterReiser(): BeregningsresultatOffentligTransport =
+        BeregningsresultatOffentligTransport(
+            reiser
+                .sortedBy { reise -> reise.perioder.minOf { it.grunnlag.fom } }
+                .map { reise ->
+                    reise.copy(perioder = reise.perioder.sortedBy { it.grunnlag.fom })
+                },
+        )
+}
 
 data class BeregningsresultatForReise(
     val reiseId: ReiseId?, // TODO: Fjern nullbarhet
