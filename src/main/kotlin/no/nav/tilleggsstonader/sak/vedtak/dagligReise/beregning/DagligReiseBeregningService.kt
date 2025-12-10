@@ -50,8 +50,10 @@ class DagligReiseBeregningService(
         oppfylteVilkårDagligReise: List<VilkårDagligReise>,
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
-    ): BeregningsresultatOffentligTransport {
+    ): BeregningsresultatOffentligTransport? {
         val oppfylteVilkårOffentligTransport = oppfylteVilkårDagligReise.filter { it.fakta is FaktaOffentligTransport }
+
+        if (oppfylteVilkårOffentligTransport.isEmpty()) return null
 
         return offentligTransportBeregningService
             .beregn(
