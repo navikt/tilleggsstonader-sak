@@ -2,8 +2,8 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import java.time.LocalDate
 
 /**
@@ -17,20 +17,15 @@ import java.time.LocalDate
  *  - Dersom endringen på perioden endrer billetttype fra enkeltbilletter til månedskort, kastes en veiledende brukerfeil.
  */
 fun validerRevurdering(
-    beregningsresultat: BeregningsresultatOffentligTransport,
-    tidligsteEndring: LocalDate?,
-    forrigeIverksatteVedtak: InnvilgelseEllerOpphørDagligReise,
+    nyttBeregningsresultat: BeregningsresultatOffentligTransport,
+    reiserForrigeBehandling: List<BeregningsresultatForReise>?,
 ) {
-    brukerfeilHvis(tidligsteEndring == null) {
-        "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
-    }
     val dagensDato = LocalDate.now()
 
-    val nyttBeregningsresultat = beregningsresultat.reiser
-    val forrigeBeregningsresultat = forrigeIverksatteVedtak.beregningsresultat.offentligTransport?.reiser ?: return
+    if (reiserForrigeBehandling.isNullOrEmpty()) return
 
-    for (reise in nyttBeregningsresultat) {
-        val reiseIForrigeBeregningsresultat = forrigeBeregningsresultat.filter { it.reiseId == reise.reiseId }
+    for (reise in nyttBeregningsresultat.reiser) {
+        val reiseIForrigeBeregningsresultat = reiserForrigeBehandling.filter { it.reiseId == reise.reiseId }
         if (reiseIForrigeBeregningsresultat.isEmpty()) continue
         // Hvis vi kommer hit, vet vi at reisen har blitt endret på i revurderingen
 
