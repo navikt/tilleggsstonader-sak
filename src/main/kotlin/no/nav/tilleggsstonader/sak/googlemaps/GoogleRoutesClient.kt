@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
@@ -23,8 +24,9 @@ class GoogleRoutesClient(
     private val restClient = builder.baseUrl(baseUrl.toString()).build()
     private val uri = UriComponentsBuilder.fromUri(baseUrl).encode().toUriString()
 
-    fun hentRuter(request: RuteRequest): RuteResponse? =
-        restClient
+    fun hentRuter(request: RuteRequest): RuteResponse? {
+        secureLogger.info("Reise fra ${request.origin} til ${request.destination}")
+        return restClient
             .post()
             .uri(uri)
             .headers { headers ->
@@ -37,6 +39,7 @@ class GoogleRoutesClient(
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError, clientErrorHandler)
             .body<RuteResponse>()
+    }
 
     private val clientErrorHandler: (HttpRequest, ClientHttpResponse) -> Unit = { _, response ->
         val body = String(response.body.readAllBytes())
