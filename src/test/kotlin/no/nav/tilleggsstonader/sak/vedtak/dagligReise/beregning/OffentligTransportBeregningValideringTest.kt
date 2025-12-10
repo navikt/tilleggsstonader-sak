@@ -24,7 +24,7 @@ class OffentligTransportBeregningValideringTest {
             vedtaksperiode(fom = førsteFebruar, tom = sisteFebruar),
         )
 
-    val forventetFeilmelding =
+    val forventetFeilmeldingIkkeVilkårForAlleVedtaksperioder =
         "Kan ikke innvilge for valgte perioder fordi det ikke finnes vilkår for reise for alle vedtaksperioder."
 
     @Nested
@@ -64,11 +64,11 @@ class OffentligTransportBeregningValideringTest {
 
             assertThatExceptionOfType(ApiFeil::class.java)
                 .isThrownBy { validerReiser(vilkår, vedtaksperiodeJanFeb) }
-                .withMessage(forventetFeilmelding)
+                .withMessage(forventetFeilmeldingIkkeVilkårForAlleVedtaksperioder)
 
             assertThatExceptionOfType(ApiFeil::class.java)
                 .isThrownBy { validerReiser(vilkår, vedtaksperioderJanFebMedSplitt) }
-                .withMessage(forventetFeilmelding)
+                .withMessage(forventetFeilmeldingIkkeVilkårForAlleVedtaksperioder)
         }
 
         @Test
@@ -83,7 +83,7 @@ class OffentligTransportBeregningValideringTest {
 
             assertThatExceptionOfType(ApiFeil::class.java)
                 .isThrownBy { validerReiser(vilkår, vedtaksperioder) }
-                .withMessage(forventetFeilmelding)
+                .withMessage(forventetFeilmeldingIkkeVilkårForAlleVedtaksperioder)
         }
     }
 }
