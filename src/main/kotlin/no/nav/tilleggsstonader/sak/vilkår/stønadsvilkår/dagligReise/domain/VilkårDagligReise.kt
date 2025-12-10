@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
@@ -19,12 +20,16 @@ data class VilkårDagligReise(
     val delvilkårsett: List<Delvilkår>,
     val fakta: FaktaDagligReise?,
     val slettetKommentar: String? = null,
-) : Periode<LocalDate> {
+) : Periode<LocalDate>,
+    Mergeable<LocalDate, VilkårDagligReise> {
     init {
         validatePeriode()
         validerFaktaErNullNårResultatIkkeOppfylt()
         validerFaktaErForventetType()
     }
+
+    override fun merge(other: VilkårDagligReise): VilkårDagligReise =
+        this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
 
     private fun validerFaktaErNullNårResultatIkkeOppfylt() {
         feilHvis(resultat == Vilkårsresultat.IKKE_OPPFYLT && fakta != null) {
