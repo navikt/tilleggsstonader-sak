@@ -23,8 +23,7 @@ class DagligReiseBeregningRevurderingService(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
         nyttBeregningsresultat: BeregningsresultatOffentligTransport,
-
-        ): BeregningsresultatOffentligTransport {
+    ): BeregningsresultatOffentligTransport {
         val forrigeIverksatte =
             hentForrigeVedtak(behandling)?.beregningsresultat?.offentligTransport ?: return nyttBeregningsresultat
 
@@ -50,25 +49,25 @@ class DagligReiseBeregningRevurderingService(
     /**
      * Beholder de periodene fra forrige iverksatte behandling som har fom-dato som ligger mer enn 30 dager unna tidligste endring-datoen.
      *
-     * Dette gjøres for ikke å reberegne mer enn vi trenger å gjøre, men vi er samtidig nødt til å reberegne perioder som er f.eks. 29 dager
-     * unna tidligste endring-datoen, ettersom denne perioden kan revurderes til å skulle være være en 30-dagersperiode i stedet for.
+     * Dette gjøres for ikke å reberegne mer enn vi trenger å gjøre, men vi er samtidig nødt til å reberegne perioder som er f.eks. 25 dager
+     * unna tidligste endring-datoen, ettersom det kan skje at denne perioden etter revurderingen skulle vært en 30-dagersperiode i stedet.
      */
     private fun slåSammenNyttOgGammeltBeregningsresultat(
         nyBeregningForReise: BeregningsresultatForReise,
         forrigeBeregning: BeregningsresultatOffentligTransport,
         tidligsteEndring: LocalDate,
     ): BeregningsresultatForReise {
-        val ANTALL_DAGER_I_REISEPERIODE = 30L
         val perioderSomSkalReberegnes =
-            nyBeregningForReise.perioder.filter { it.grunnlag.fom.plusDays(ANTALL_DAGER_I_REISEPERIODE) > tidligsteEndring }
-        val beholdFraForrigeVedtak = forrigeBeregning.reiser
-            .singleOrNull { it.reiseId == nyBeregningForReise.reiseId }
-            ?.perioder
-            ?.filter { it.grunnlag.fom.plusDays(ANTALL_DAGER_I_REISEPERIODE) <= tidligsteEndring }
-            ?: emptyList()
+            nyBeregningForReise.perioder.filter { it.grunnlag.fom.plusDays(30L) > tidligsteEndring }
+        val beholdFraForrigeVedtak =
+            forrigeBeregning.reiser
+                .singleOrNull { it.reiseId == nyBeregningForReise.reiseId }
+                ?.perioder
+                ?.filter { it.grunnlag.fom.plusDays(30L) <= tidligsteEndring }
+                ?: emptyList()
 
         return nyBeregningForReise.copy(
-            perioder = (beholdFraForrigeVedtak + perioderSomSkalReberegnes).sortedBy { it.grunnlag.fom }
+            perioder = (beholdFraForrigeVedtak + perioderSomSkalReberegnes).sortedBy { it.grunnlag.fom },
         )
     }
 

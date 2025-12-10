@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -20,7 +18,7 @@ class DagligReiseBeregningService(
     private val vilkårService: VilkårService,
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val offentligTransportBeregningService: OffentligTransportBeregningService,
-    private val dagligReiseBeregningRevurderingService: DagligReiseBeregningRevurderingService
+    private val dagligReiseBeregningRevurderingService: DagligReiseBeregningRevurderingService,
 ) {
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -36,11 +34,12 @@ class DagligReiseBeregningService(
         val oppfylteVilkårDagligReise = vilkårService.hentOppfylteDagligReiseVilkår(behandling.id).map { it.mapTilVilkårDagligReise() }
         validerFinnesReiser(oppfylteVilkårDagligReise)
 
-        val beregningsresultatOffentligTransport = beregnOffentligTransport(
-            oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
-            vedtaksperioder = vedtaksperioder,
-            behandling = behandling,
-        )
+        val beregningsresultatOffentligTransport =
+            beregnOffentligTransport(
+                oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
+                vedtaksperioder = vedtaksperioder,
+                behandling = behandling,
+            )
 
         return BeregningsresultatDagligReise(
             offentligTransport = beregningsresultatOffentligTransport,
@@ -54,16 +53,17 @@ class DagligReiseBeregningService(
     ): BeregningsresultatOffentligTransport {
         val oppfylteVilkårOffentligTransport = oppfylteVilkårDagligReise.filter { it.fakta is FaktaOffentligTransport }
 
-        return offentligTransportBeregningService.beregn(
-            vedtaksperioder = vedtaksperioder,
-            oppfylteVilkår = oppfylteVilkårOffentligTransport,
-        ).let {
-            dagligReiseBeregningRevurderingService.flettMedForrigeVedtakHvisRevurdering(
-                behandling = behandling,
+        return offentligTransportBeregningService
+            .beregn(
                 vedtaksperioder = vedtaksperioder,
-                nyttBeregningsresultat = it,
-            )
-        }
+                oppfylteVilkår = oppfylteVilkårOffentligTransport,
+            ).let {
+                dagligReiseBeregningRevurderingService.flettMedForrigeVedtakHvisRevurdering(
+                    behandling = behandling,
+                    vedtaksperioder = vedtaksperioder,
+                    nyttBeregningsresultat = it,
+                )
+            }
     }
 
     private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {

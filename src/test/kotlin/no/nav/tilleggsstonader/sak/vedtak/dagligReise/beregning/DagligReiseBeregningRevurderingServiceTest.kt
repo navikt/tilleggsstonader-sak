@@ -34,9 +34,7 @@ class DagligReiseBeregningRevurderingServiceTest : CleanDatabaseIntegrationTest(
             gjennomførBehandlingsløp(
                 medAktivitet = ::lagreAktivitet,
                 medMålgruppe = ::lagreMålgruppe,
-                medVilkår = listOf(
-                    lagreDagligReiseDto(fom = reiseFom, tom = reiseOpprinneligTom)
-                ),
+                medVilkår = listOf(lagreDagligReiseDto(fom = reiseFom, tom = reiseOpprinneligTom)),
             )
 
         val førstegangsbehandling = kall.behandling.hent(førstegangsbehandlingId)
@@ -70,8 +68,9 @@ class DagligReiseBeregningRevurderingServiceTest : CleanDatabaseIntegrationTest(
                     revurderingId,
                 ).expectOkWithBody<InnvilgelseDagligReiseResponse>()
                 .beregningsresultat.offentligTransport!!
-                .reiser.single().perioder
-
+                .reiser
+                .single()
+                .perioder
 
         assertThat(revurdertePerioder.size).isEqualTo(3)
         assertThat(revurdertePerioder[0].grunnlag.fom).isEqualTo(1 januar 2025)
@@ -82,16 +81,16 @@ class DagligReiseBeregningRevurderingServiceTest : CleanDatabaseIntegrationTest(
         assertThat(revurdertePerioder[2].beløp).isEqualTo(800)
     }
 
-    private fun opprettRevurderingDagligReise(førstegangsbehandling: BehandlingDto): BehandlingId = opprettRevurdering(
-        opprettBehandlingDto =
-            OpprettBehandlingDto(
-                fagsakId = førstegangsbehandling.fagsakId,
-                årsak = BehandlingÅrsak.SØKNAD,
-                kravMottatt = 15 februar 2025,
-                nyeOpplysningerMetadata = null,
-            ),
-    )
-
+    private fun opprettRevurderingDagligReise(førstegangsbehandling: BehandlingDto): BehandlingId =
+        opprettRevurdering(
+            opprettBehandlingDto =
+                OpprettBehandlingDto(
+                    fagsakId = førstegangsbehandling.fagsakId,
+                    årsak = BehandlingÅrsak.SØKNAD,
+                    kravMottatt = 15 februar 2025,
+                    nyeOpplysningerMetadata = null,
+                ),
+        )
 
     private fun lagreAktivitet(behandlingId: BehandlingId): LagreVilkårperiode =
         lagreVilkårperiodeAktivitet(behandlingId, fom = 1 januar 2025, tom = 30 mars 2025)
