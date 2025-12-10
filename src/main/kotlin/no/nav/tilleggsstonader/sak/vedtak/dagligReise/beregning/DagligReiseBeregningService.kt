@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak

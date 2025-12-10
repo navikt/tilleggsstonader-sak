@@ -21,7 +21,7 @@ data class Step(
     val startLocation: Location,
     val endLocation: Location,
     val transitDetails: TransitDetails?,
-    val distanceMeters: Int,
+    val distanceMeters: Int?,
     val staticDuration: String,
 )
 

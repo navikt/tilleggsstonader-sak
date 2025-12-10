@@ -102,7 +102,7 @@ private fun List<Step>.mergeSammenhengende(): List<Step> =
             acc.add(
                 last.copy(
                     endLocation = entry.endLocation,
-                    distanceMeters = last.distanceMeters + entry.distanceMeters,
+                    distanceMeters = listOfNotNull(last.distanceMeters, entry.distanceMeters).sum(),
                     staticDuration = summerSekunderStrings(last.staticDuration, entry.staticDuration),
                 ),
             )

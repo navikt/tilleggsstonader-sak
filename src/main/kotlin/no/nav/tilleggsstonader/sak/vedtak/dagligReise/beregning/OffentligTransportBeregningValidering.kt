@@ -1,9 +1,15 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import java.time.LocalDate
 
 /**
@@ -66,3 +72,30 @@ private fun endrerFraEnkeltbilletterTilMånedskort(
         revurdering != null &&
         førstegangs.beløp < (revurdering.grunnlag.pris30dagersbillett ?: Int.MAX_VALUE) &&
         revurdering.beløp == revurdering.grunnlag.pris30dagersbillett
+
+fun validerReiser(
+    vilkår: List<VilkårDagligReise>,
+    vedtaksperioder: List<Vedtaksperiode>,
+) {
+    brukerfeilHvis(vilkår.isEmpty()) {
+        "Innvilgelse er ikke et gyldig vedtaksresultat når det ikke er lagt inn perioder med reise"
+    }
+
+    brukerfeilHvisIkke(finnesReiseHeleVedtaksperioden(vilkår, vedtaksperioder)) {
+        "Kan ikke innvilge for valgte perioder fordi det ikke finnes vilkår for reise for alle vedtaksperioder."
+    }
+}
+
+private fun finnesReiseHeleVedtaksperioden(
+    vilkår: List<VilkårDagligReise>,
+    vedtaksperioder: List<Vedtaksperiode>,
+): Boolean {
+    val sammenslåtteReiser =
+        vilkår
+            .sorted()
+            .mergeSammenhengende { p1, p2 -> p1.overlapperEllerPåfølgesAv(p2) }
+
+    return vedtaksperioder.all { vedtaksperiode ->
+        sammenslåtteReiser.any { it.inneholder(vedtaksperiode) }
+    }
+}

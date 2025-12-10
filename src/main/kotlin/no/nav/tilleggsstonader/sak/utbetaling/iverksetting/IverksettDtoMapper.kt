@@ -85,6 +85,23 @@ object IverksettDtoMapper {
             TypeAndel.DAGLIG_REISE_AAP,
             TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER,
             TypeAndel.DAGLIG_REISE_ETTERLATTE,
+            TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSFORBEREDENDE,
+            TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSRETTET_REHAB,
+            TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSTRENING,
+            TypeAndel.DAGLIG_REISE_TILTAK_AVKLARING,
+            TypeAndel.DAGLIG_REISE_TILTAK_DIGITAL_JOBBKLUBB,
+            TypeAndel.DAGLIG_REISE_TILTAK_ENKELTPLASS_AMO,
+            TypeAndel.DAGLIG_REISE_TILTAK_ENKELTPLASS_FAG_YRKE_HOYERE_UTD,
+            TypeAndel.DAGLIG_REISE_TILTAK_FORSØK_OPPLÆRINGSTILTAK_LENGER_VARIGHET,
+            TypeAndel.DAGLIG_REISE_TILTAK_GRUPPE_AMO,
+            TypeAndel.DAGLIG_REISE_TILTAK_GRUPPE_FAG_YRKE_HOYERE_UTD,
+            TypeAndel.DAGLIG_REISE_TILTAK_HØYERE_UTDANNING,
+            TypeAndel.DAGLIG_REISE_TILTAK_INDIVIDUELL_JOBBSTØTTE,
+            TypeAndel.DAGLIG_REISE_TILTAK_INDIVIDUELL_JOBBSTØTTE_UNG,
+            TypeAndel.DAGLIG_REISE_TILTAK_JOBBKLUBB,
+            TypeAndel.DAGLIG_REISE_TILTAK_OPPFØLGING,
+            TypeAndel.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_NAV,
+            TypeAndel.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING,
             -> error("Andeler for daglig reise skal sendes på Kafka")
 
             TypeAndel.UGYLDIG -> error("Ugyldig type andel. Skal ikke iverksettes")
