@@ -127,7 +127,6 @@ class HåndterSøknadService(
                 ?: søknad.data.hovedytelse.hovedytelse
                     .map { it.tilMålgruppeType() }
 
-        println(målgrupper)
         // Sender til TSR hvis flere målgrupper eller TSR sine målgrupper
         return if (målgrupper.size > 1 ||
             målgrupper
