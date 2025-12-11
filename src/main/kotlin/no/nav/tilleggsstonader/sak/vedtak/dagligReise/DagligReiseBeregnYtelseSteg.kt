@@ -68,7 +68,6 @@ class DagligReiseBeregnYtelseSteg(
             )
         val beregningsresultat =
             beregningService.beregn(
-                behandlingId = saksbehandling.id,
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,

@@ -81,7 +81,6 @@ class DagligReiseVedtakController(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         return beregningService
             .beregn(
-                behandlingId = behandlingId,
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                 behandling = behandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
