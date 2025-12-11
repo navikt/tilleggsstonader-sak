@@ -1,15 +1,18 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class DagligReiseAndelTilkjentYtelseMapperTest {
-    val behandlingId = BehandlingId.random()
+    val saksbehandling = saksbehandling(fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
 
     @Test
     fun `fom og tom på andel tilkjent ytelse skal være lik fom til reisen hvis det er en ukedag`() {
@@ -18,7 +21,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
             BeregningsresultatOffentligTransport(
                 reiser = listOf(lagBeregningsresultatForReise(mandag)),
             )
-        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId)
+        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
         with(andeler.single()) {
             assertThat(fom).isEqualTo(mandag)
             assertThat(tom).isEqualTo(mandag)
@@ -37,7 +40,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                         lagBeregningsresultatForReise(mandag, beløp = 200),
                     ),
             )
-        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId)
+        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
         assertThat(andeler).hasSize(1)
         assertThat(andeler.single().beløp).isEqualTo(300)
     }
@@ -54,7 +57,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                         lagBeregningsresultatForReise(tirsdag, beløp = 200),
                     ),
             )
-        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId)
+        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
         assertThat(andeler).hasSize(2)
         with(andeler.first()) {
             assertThat(fom).isEqualTo(mandag)
@@ -78,7 +81,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                 reiser = listOf(lagBeregningsresultatForReise(lørdag), lagBeregningsresultatForReise(søndag)),
             )
 
-        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId)
+        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
 
         assertThat(andeler).hasSize(2)
         with(andeler.first()) {
@@ -126,7 +129,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                     ),
             )
 
-        val message = assertThrows<IllegalArgumentException> { beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId) }.message
+        val message = assertThrows<IllegalArgumentException> { beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling) }.message
         assertThat(message).isEqualTo("Støtter foreløpig ikke ulike målgrupper på samme utbetalingsdato")
     }
 }

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
@@ -50,6 +51,7 @@ data class VedtaksperiodeGrunnlag(
     val tom: LocalDate,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
+    val typeAktivitet: TypeAktivitet?,
     val antallReisedagerIVedtaksperioden: Int,
 ) {
     constructor(vedtaksperiode: Vedtaksperiode, antallReisedager: Int) : this(
@@ -58,6 +60,7 @@ data class VedtaksperiodeGrunnlag(
         tom = vedtaksperiode.tom,
         målgruppe = vedtaksperiode.målgruppe,
         aktivitet = vedtaksperiode.aktivitet,
+        typeAktivitet = vedtaksperiode.typeAktivitet,
         antallReisedagerIVedtaksperioden = antallReisedager,
     )
 }

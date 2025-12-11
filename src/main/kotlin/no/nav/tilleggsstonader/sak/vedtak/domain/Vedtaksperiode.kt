@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
@@ -19,12 +21,14 @@ interface PeriodeMedId : Periode<LocalDate> {
     ): PeriodeMedId
 }
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class Vedtaksperiode(
     override val id: UUID,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
+    val typeAktivitet: TypeAktivitet? = null,
 ) : Periode<LocalDate>,
     KopierPeriode<Vedtaksperiode>,
     PeriodeMedId,
