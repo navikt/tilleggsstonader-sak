@@ -3,8 +3,10 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.dto.KodeverkDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -45,6 +47,7 @@ data class VilkårperiodeDto(
     val id: UUID,
     @JsonDeserialize(using = VilkårperiodeTypeDeserializer::class)
     val type: VilkårperiodeType,
+    val typeAktivitet: KodeverkDto?,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val resultat: ResultatVilkårperiode,
@@ -66,6 +69,7 @@ fun Vilkårperiode.tilDto() =
     VilkårperiodeDto(
         id = this.id,
         type = this.type,
+        typeAktivitet = this.typeAktivitet?.tilKodeverkDto(),
         fom = this.fom,
         tom = this.tom,
         resultat = this.resultat,
@@ -77,6 +81,12 @@ fun Vilkårperiode.tilDto() =
         status = this.status,
         kildeId = this.kildeId,
         faktaOgVurderinger = this.faktaOgVurdering.tilFaktaOgVurderingDto(),
+    )
+
+fun TypeAktivitet.tilKodeverkDto(): KodeverkDto =
+    KodeverkDto(
+        kode = this.name,
+        beskrivelse = this.beskrivelse,
     )
 
 fun Vurdering.tilDto() = VurderingDto(svar = svar, resultat = resultat)

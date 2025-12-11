@@ -12,7 +12,7 @@ object ArenaKontraktUtil {
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate? = LocalDate.now().plusMonths(1),
         type: String = "TYPE",
-        typeNavn: String = "Type navn",
+        typeNavn: String = "Gruppe AMO",
         status: StatusAktivitet? = StatusAktivitet.AKTUELL,
         statusArena: String? = "AKTUL",
         antallDagerPerUke: Int? = 5,

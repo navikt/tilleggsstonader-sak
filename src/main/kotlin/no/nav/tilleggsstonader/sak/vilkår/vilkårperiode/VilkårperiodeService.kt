@@ -101,6 +101,7 @@ class VilkårperiodeService(
                 status = Vilkårstatus.NY,
                 kildeId = vilkårperiode.kildeId,
                 type = vilkårperiode.type,
+                typeAktivitet = vilkårperiode.typeAktivitet,
                 faktaOgVurdering = faktaOgVurdering,
                 fom = vilkårperiode.fom,
                 tom = vilkårperiode.tom,

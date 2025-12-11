@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
@@ -29,6 +30,7 @@ import java.time.LocalDate
 data class LagreVilkårperiode(
     val behandlingId: BehandlingId,
     val type: VilkårperiodeType,
+    val typeAktivitet: TypeAktivitet? = null,
     val fom: LocalDate,
     val tom: LocalDate,
     val begrunnelse: String? = null,

@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
@@ -7,7 +9,9 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordne
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingerMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import org.assertj.core.api.Assertions.assertThat
@@ -95,6 +99,55 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
                 vilkårperiodeId = response.periode!!.id,
                 SlettVikårperiode(behandlingForAnnenFagsak.id, "test"),
             ).expectProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "BehandlingId er ikke lik")
+    }
+
+    @Test
+    fun `skal kunne lagre aktivitet med type aktivitet når stønadstype daglig reise tsr`() {
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(
+                behandling(),
+                stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+            )
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
+
+        val originalLagreRequest =
+            LagreVilkårperiode(
+                type = AktivitetType.TILTAK,
+                typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
+                faktaOgSvar = FaktaOgSvarAktivitetDagligReiseTsrDto,
+                behandlingId = behandling.id,
+            )
+
+        kall.vilkårperiode.opprett(originalLagreRequest)
+    }
+
+    @Test
+    fun `skal kaste feil hvis aktivitet er tiltak og ingen type aktivitet`() {
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(
+                behandling(),
+                stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+            )
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
+
+        val originalLagreRequest =
+            LagreVilkårperiode(
+                type = AktivitetType.TILTAK,
+                typeAktivitet = null,
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
+                faktaOgSvar = FaktaOgSvarAktivitetDagligReiseTsrDto,
+                behandlingId = behandling.id,
+            )
+
+        kall.vilkårperiode.apiRespons
+            .opprett(originalLagreRequest)
+            .expectProblemDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Mangler data: typeAktivitet må være satt for aktivitet TILTAK",
+            )
     }
 
     @Nested
