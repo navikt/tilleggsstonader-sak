@@ -80,6 +80,25 @@ class ArbeidsfordelingService(
         stønadstype: Stønadstype,
     ): String = hentNavEnhet(personIdent, stønadstype)?.enhetNr ?: MASKINELL_JOURNALFOERENDE_ENHET
 
+    fun hentBrukersNavKontor(
+        personIdent: String,
+        stønadstype: Stønadstype,
+    ): String {
+        val adressebeskyttelseForPerson = hentAdressebeskyttelse(personIdent, stønadstype)
+        // TODO - OK med default til Oslo her og?
+        val geografiskTilknytning =
+            utledGeografiskTilknytningKode(personService.hentGeografiskTilknytning(personIdent))
+                ?: error("Klarer ikke utlede geografisk tilknytning")
+        val diskresjonskode = høyesteGraderingen(adressebeskyttelseForPerson).tilDiskresjonskode()
+
+        return arbeidsfordelingClient
+            .finnNavKontorForGeografiskOmråde(
+                geografiskTilknytning,
+                diskresjonskode,
+                erEgenAnsatt(adressebeskyttelseForPerson),
+            )?.enhetNr ?: error("Finner ikke NAV kontor for geografiskOmraade=$geografiskTilknytning, diskresjonskode=$diskresjonskode")
+    }
+
     private fun lagArbeidsfordelingKritierieForPerson(
         personIdent: String,
         stønadstype: Stønadstype,
