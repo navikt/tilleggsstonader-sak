@@ -37,4 +37,5 @@ fun appLocal(): SpringApplicationBuilder =
             // "mock-familie-dokument",
             "mock-ytelse-client",
             "mock-klage",
+            "simuler-utbetalingstatus",
         )
