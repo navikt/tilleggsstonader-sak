@@ -20,7 +20,7 @@ class DagligReiseBeregningService(
     private val vilkårService: VilkårService,
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val offentligTransportBeregningService: OffentligTransportBeregningService,
-    private val dagligReiseBeregningRevurderingService: DagligReiseBeregningRevurderingService,
+    private val offentligTransportBeregningRevurderingService: OffentligTransportBeregningRevurderingService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
 ) {
     fun beregn(
@@ -44,16 +44,13 @@ class DagligReiseBeregningService(
                 null
             }
 
-        val beregningsresultatOffentligTransport =
-            beregnOffentligTransport(
+        return BeregningsresultatDagligReise(
+            offentligTransport = beregnOffentligTransport(
                 oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
                 vedtaksperioder = vedtaksperioder,
                 behandling = behandling,
                 brukersNavKontor = brukersNavKontor,
-            )
-
-        return BeregningsresultatDagligReise(
-            offentligTransport = beregningsresultatOffentligTransport,
+            ),
         )
     }
 
@@ -67,23 +64,22 @@ class DagligReiseBeregningService(
 
         if (oppfylteVilkårOffentligTransport.isEmpty()) return null
 
-        return offentligTransportBeregningService
-            .beregn(
-                vedtaksperioder = vedtaksperioder,
-                oppfylteVilkår = oppfylteVilkårOffentligTransport,
-                brukersNavKontor = brukersNavKontor,
-            ).let {
-                dagligReiseBeregningRevurderingService.flettMedForrigeVedtakHvisRevurdering(
-                    behandling = behandling,
-                    vedtaksperioder = vedtaksperioder,
-                    nyttBeregningsresultat = it,
-                )
-            }
-    }
+        val nyttBeregningsresultat = offentligTransportBeregningService.beregn(
+            vedtaksperioder = vedtaksperioder,
+            oppfylteVilkår = oppfylteVilkårOffentligTransport,
+        brukersNavKontor = brukersNavKontor,)
 
-    private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {
-        brukerfeilHvis(vilkår.isEmpty()) {
-            "Innvilgelse er ikke et gyldig vedtaksresultat når det ikke er lagt inn perioder med reise"
-        }
+        return offentligTransportBeregningRevurderingService.flettMedForrigeVedtakHvisRevurdering(
+            nyttBeregningsresultat = nyttBeregningsresultat,
+            vedtaksperioder = vedtaksperioder,
+            behandling = behandling,
+        )
     }
 }
+
+private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {
+    brukerfeilHvis(vilkår.isEmpty()) {
+        "Innvilgelse er ikke et gyldig vedtaksresultat når det ikke er lagt inn perioder med reise"
+    }
+}
+

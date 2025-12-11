@@ -15,14 +15,14 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class DagligReiseBeregningRevurderingService(
+class OffentligTransportBeregningRevurderingService(
     private val vedtakRepository: VedtakRepository,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
     fun flettMedForrigeVedtakHvisRevurdering(
-        behandling: Saksbehandling,
-        vedtaksperioder: List<Vedtaksperiode>,
         nyttBeregningsresultat: BeregningsresultatOffentligTransport,
+        vedtaksperioder: List<Vedtaksperiode>,
+        behandling: Saksbehandling,
     ): BeregningsresultatOffentligTransport {
         val forrigeIverksatte =
             hentForrigeVedtak(behandling)?.beregningsresultat?.offentligTransport ?: return nyttBeregningsresultat
