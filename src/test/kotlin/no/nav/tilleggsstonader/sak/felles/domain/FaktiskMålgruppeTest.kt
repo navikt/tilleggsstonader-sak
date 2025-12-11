@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.felles.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatException
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
@@ -38,6 +39,7 @@ class FaktiskMålgruppeTest {
                 FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 FaktiskMålgruppe.ENSLIG_FORSØRGER,
                 FaktiskMålgruppe.GJENLEVENDE,
+                FaktiskMålgruppe.TILTAK,
             )
     }
 
@@ -112,6 +114,41 @@ class FaktiskMålgruppeTest {
                 assertThat(
                     FaktiskMålgruppe.GJENLEVENDE.tilTypeAndel(Stønadstype.BOUTGIFTER),
                 ).isEqualTo(TypeAndel.BOUTGIFTER_ETTERLATTE)
+            }
+        }
+
+        @Nested
+        inner class `for daglig reise tso` {
+            @Test
+            fun `fra NEDSATT_ARBEIDSEVNE`() {
+                assertThat(FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE.tilTypeAndel(Stønadstype.DAGLIG_REISE_TSO)).isEqualTo(
+                    TypeAndel.DAGLIG_REISE_AAP,
+                )
+            }
+
+            @Test
+            fun `fra ENSLIG_FORSØRGER`() {
+                assertThat(
+                    FaktiskMålgruppe.ENSLIG_FORSØRGER.tilTypeAndel(Stønadstype.DAGLIG_REISE_TSO),
+                ).isEqualTo(TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER)
+            }
+
+            @Test
+            fun `fra GJENLEVENDE`() {
+                assertThat(
+                    FaktiskMålgruppe.GJENLEVENDE.tilTypeAndel(Stønadstype.DAGLIG_REISE_TSO),
+                ).isEqualTo(TypeAndel.DAGLIG_REISE_ETTERLATTE)
+            }
+        }
+
+        @Nested
+        inner class `for daglig reise tsr` {
+            @Test
+            fun `kan ikke mappe`() {
+                assertThatException()
+                    .isThrownBy {
+                        FaktiskMålgruppe.GJENLEVENDE.tilTypeAndel(Stønadstype.DAGLIG_REISE_TSR)
+                    }.withMessage("Kan ikke utlede Typeandel for Daglig reise TSR fra FaktiskMålgruppe")
             }
         }
     }

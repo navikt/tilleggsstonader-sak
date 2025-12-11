@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
@@ -548,6 +549,7 @@ fun lagreVilkårperiodeMålgruppe(
 fun lagreVilkårperiodeAktivitet(
     behandlingId: BehandlingId,
     aktivitetType: AktivitetType = AktivitetType.TILTAK,
+    typeAktivitet: TypeAktivitet? = null,
     fom: LocalDate = 1 januar 2025,
     tom: LocalDate = 31 januar 2025,
     faktaOgSvar: FaktaOgSvarDto =
@@ -558,6 +560,7 @@ fun lagreVilkårperiodeAktivitet(
     begrunnelse: String = "begrunnelse",
 ) = LagreVilkårperiode(
     type = aktivitetType,
+    typeAktivitet = typeAktivitet,
     fom = fom,
     tom = tom,
     faktaOgSvar = faktaOgSvar,

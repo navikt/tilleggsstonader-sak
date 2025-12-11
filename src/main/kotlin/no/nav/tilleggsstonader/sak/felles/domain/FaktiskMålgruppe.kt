@@ -23,6 +23,10 @@ enum class FaktiskMålgruppe(
         prioritet = 4,
         gyldigeAktiviter = setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING),
     ),
+    TILTAK(
+        prioritet = 5,
+        gyldigeAktiviter = setOf(AktivitetType.TILTAK),
+    ),
     ;
 
     fun prioritet() = prioritet ?: error("Målgruppe=${this.name} har ikke prioritet")
@@ -62,6 +66,6 @@ enum class FaktiskMålgruppe(
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
                 }
             }
-            Stønadstype.DAGLIG_REISE_TSR -> TODO("Daglig reise TSR er ikke implementert enda")
+            Stønadstype.DAGLIG_REISE_TSR -> error("Kan ikke utlede Typeandel for Daglig reise TSR fra FaktiskMålgruppe")
         }
 }

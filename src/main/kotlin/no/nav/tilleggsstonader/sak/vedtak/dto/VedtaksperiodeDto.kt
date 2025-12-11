@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dto
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -15,6 +16,7 @@ interface VedtaksperiodeDtoInterface : Periode<LocalDate> {
     override val tom: LocalDate
     val målgruppeType: FaktiskMålgruppe
     val aktivitetType: AktivitetType
+    val typeAktivitet: TypeAktivitet?
 }
 
 data class LagretVedtaksperiodeDto(
@@ -23,6 +25,7 @@ data class LagretVedtaksperiodeDto(
     override val tom: LocalDate,
     override val målgruppeType: FaktiskMålgruppe,
     override val aktivitetType: AktivitetType,
+    override val typeAktivitet: TypeAktivitet? = null,
     val vedtaksperiodeFraForrigeVedtak: VedtaksperiodeDto?,
 ) : VedtaksperiodeDtoInterface,
     KopierPeriode<LagretVedtaksperiodeDto> {
@@ -38,6 +41,7 @@ data class LagretVedtaksperiodeDto(
             tom = tom,
             målgruppeType = målgruppeType,
             aktivitetType = aktivitetType,
+            typeAktivitet = typeAktivitet,
         )
 }
 
@@ -47,6 +51,7 @@ data class VedtaksperiodeDto(
     override val tom: LocalDate,
     override val målgruppeType: FaktiskMålgruppe,
     override val aktivitetType: AktivitetType,
+    override val typeAktivitet: TypeAktivitet? = null,
 ) : VedtaksperiodeDtoInterface {
     fun tilDomene() =
         Vedtaksperiode(
@@ -55,6 +60,7 @@ data class VedtaksperiodeDto(
             tom = tom,
             målgruppe = målgruppeType,
             aktivitet = aktivitetType,
+            typeAktivitet = typeAktivitet,
         )
 }
 
@@ -70,6 +76,7 @@ fun Vedtaksperiode.tilLagretVedtaksperiodeDto(forrigeVedtaksperiode: Vedtaksperi
         tom = tom,
         målgruppeType = målgruppe,
         aktivitetType = aktivitet,
+        typeAktivitet = typeAktivitet,
         vedtaksperiodeFraForrigeVedtak = forrigeVedtaksperiode?.tilDto(),
     )
 
@@ -82,6 +89,7 @@ fun Vedtaksperiode.tilDto() =
         tom = tom,
         målgruppeType = målgruppe,
         aktivitetType = aktivitet,
+        typeAktivitet = typeAktivitet,
     )
 
 fun List<VedtaksperiodeDto>.tilDomene() = map { it.tilDomene() }.sorted()

@@ -4,6 +4,7 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.TestIdTilUUIDHolder.testIdTilUUID
@@ -174,6 +175,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
             aktivitet(
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                typeAktivitet = parseValgfriEnum<TypeAktivitet>(DomenenøkkelFelles.TYPE_AKTIVITET, rad),
                 faktaOgVurdering =
                     faktaOgVurderingAktivitetTilsynBarn(
                         type = parseValgfriEnum<AktivitetType>(DomenenøkkelForeslåVedtaksperioder.TYPE, rad)!!,
@@ -222,6 +224,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
                 tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
                 målgruppe = parseEnum(DomenenøkkelForeslåVedtaksperioder.MÅLGRUPPE, rad),
                 aktivitet = parseEnum(DomenenøkkelForeslåVedtaksperioder.AKTIVITET, rad),
+                typeAktivitet = parseValgfriEnum<TypeAktivitet>(DomenenøkkelFelles.TYPE_AKTIVITET, rad),
             )
         }
 }

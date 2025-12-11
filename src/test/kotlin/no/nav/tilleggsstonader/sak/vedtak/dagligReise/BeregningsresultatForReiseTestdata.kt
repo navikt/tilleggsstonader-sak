@@ -36,6 +36,7 @@ fun lagVedtaksperiodeGrunnlag(
     tom = fom,
     målgruppe = målgruppe,
     aktivitet = AktivitetType.TILTAK,
+    typeAktivitet = null,
     antallReisedagerIVedtaksperioden = 5,
 )
 

@@ -41,7 +41,7 @@ enum class MålgruppeType(
     ),
     TILTAKSPENGER(
         gyldigeAktiviter = setOf(AktivitetType.TILTAK),
-        faktiskMålgruppe = null,
+        faktiskMålgruppe = FaktiskMålgruppe.TILTAK,
     ),
     INGEN_MÅLGRUPPE(
         gyldigeAktiviter = emptySet(),

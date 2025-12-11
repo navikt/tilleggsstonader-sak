@@ -87,7 +87,7 @@ class DagligReiseBeregnYtelseSteg(
 
         tilkjentYtelseService.lagreTilkjentYtelse(
             behandlingId = saksbehandling.id,
-            andeler = beregningsresultat.offentligTransport.mapTilAndelTilkjentYtelse(saksbehandling.id),
+            andeler = beregningsresultat.offentligTransport.mapTilAndelTilkjentYtelse(saksbehandling),
         )
     }
 

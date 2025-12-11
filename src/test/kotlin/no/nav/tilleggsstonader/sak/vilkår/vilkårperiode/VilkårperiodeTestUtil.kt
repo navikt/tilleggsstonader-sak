@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
@@ -228,6 +229,7 @@ object VilkårperiodeTestUtil {
         slettetKommentar: String? = null,
         status: Vilkårstatus = Vilkårstatus.NY,
         kildeId: String? = null,
+        typeAktivitet: TypeAktivitet? = null,
     ) = GeneriskVilkårperiode(
         behandlingId = behandlingId,
         resultat = resultat,
@@ -236,6 +238,7 @@ object VilkårperiodeTestUtil {
         fom = fom,
         tom = tom,
         type = faktaOgVurdering.type.vilkårperiodeType,
+        typeAktivitet = typeAktivitet,
         begrunnelse = begrunnelse,
         faktaOgVurdering = faktaOgVurdering,
         kildeId = kildeId,
