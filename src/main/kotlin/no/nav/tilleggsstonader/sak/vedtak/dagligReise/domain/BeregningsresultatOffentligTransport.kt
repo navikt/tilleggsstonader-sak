@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -45,6 +46,8 @@ data class BeregningsgrunnlagOffentligTransport(
     val antallReisedager: Int,
 ) : Periode<LocalDate>
 
+// Legger på Include.NON_NULL for å unngå at vi serialiserer "typeAktivitet": null" i JSON for TSO som er i produksjon
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class VedtaksperiodeGrunnlag(
     val id: UUID,
     val fom: LocalDate,
