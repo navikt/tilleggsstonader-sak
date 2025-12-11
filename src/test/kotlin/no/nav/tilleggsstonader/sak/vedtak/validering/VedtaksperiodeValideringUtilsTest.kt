@@ -365,6 +365,22 @@ class VedtaksperiodeValideringUtilsTest {
             }
 
             @Test
+            fun `kaster feil hvis det ikke finnes alle utgifter i hele vedtaksperioden`() {
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerUtgiftHeleVedtaksperioden(
+                            vedtaksperioder =
+                                listOf(
+                                    vedtaksperiode.copy(tom = LocalDate.of(2025, 2, 28)),
+                                    vedtaksperiode.copy(tom = LocalDate.of(2025, 1, 31)),
+                                ),
+                            utgifter = utgifter,
+                        )
+                    }
+                assertThat(feil.feil).contains("Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden")
+            }
+
+            @Test
             fun `kaster ikke feil når det utgifter hele vedtaksperioden fordelt i flere perioder`() {
                 val utgifter: Map<BarnId, List<UtgiftBeregning>> =
                     mapOf(
