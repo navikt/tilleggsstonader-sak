@@ -18,9 +18,14 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandlin
         .groupBy { it.grunnlag.fom }
         .map { (fom, reiseperioder) ->
             val målgrupper = reiseperioder.flatMap { it.grunnlag.vedtaksperioder }.map { it.målgruppe }
+            val typeAktivitet = reiseperioder.flatMap { it.grunnlag.vedtaksperioder }.map { it.typeAktivitet }
 
             require(målgrupper.distinct().size == 1) {
                 "Støtter foreløpig ikke ulike målgrupper på samme utbetalingsdato"
+            }
+
+            require(typeAktivitet.distinct().size == 1) {
+                "Støtter foreløpig ikke ulike typer aktiviteter på samme utbetalingsdato"
             }
 
             lagAndelForDagligReise(
@@ -28,6 +33,7 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandlin
                 fomUkedag = fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 beløp = reiseperioder.sumOf { it.beløp },
                 målgruppe = målgrupper.first(),
+                typeAktivitet = typeAktivitet.first()!!, // TODO ikke !!
             )
         }
 
@@ -36,12 +42,13 @@ private fun lagAndelForDagligReise(
     fomUkedag: LocalDate,
     beløp: Int,
     målgruppe: FaktiskMålgruppe,
+    typeAktivitet: TypeAktivitet,
 ): AndelTilkjentYtelse {
     val typeAndel =
         if (saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSO) {
             målgruppe.tilTypeAndel(saksbehandling.stønadstype)
         } else if (saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-            TODO("finnTypeAndelFraTypeAktivitet(typeAktivitet)")
+            finnTypeAndelFraTypeAktivitet(typeAktivitet)
         } else {
             error("Uforventet stønadstype ${saksbehandling.stønadstype}")
         }
