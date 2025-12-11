@@ -41,7 +41,7 @@ private fun lagAndelForDagligReise(
         if (saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSO) {
             målgruppe.tilTypeAndel(saksbehandling.stønadstype)
         } else if (saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-            finnTypeAndelFraTypeAktivitet(typeAktivitet)
+            TODO("finnTypeAndelFraTypeAktivitet(typeAktivitet)")
         } else {
             error("Uforventet stønadstype ${saksbehandling.stønadstype}")
         }

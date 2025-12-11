@@ -113,6 +113,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                                                                         tom = dummyTom,
                                                                         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                                                                         aktivitet = AktivitetType.TILTAK,
+                                                                        typeAktivitet = null,
                                                                         antallReisedagerIVedtaksperioden = 19,
                                                                     ),
                                                                 ),
