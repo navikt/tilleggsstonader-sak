@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
@@ -51,6 +52,19 @@ class OpphørValideringService(
                     ) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter opphørsdato" }
                 }
         }
+    }
+
+    fun validerIngenUtbetalingEtterOpphørsdatoDagligReise(
+        beregningsresultatDagligReise: BeregningsresultatDagligReise,
+        opphørsdato: LocalDate,
+    ) {
+        val alleReiseperiode =
+            beregningsresultatDagligReise.offentligTransport?.reiser?.flatMap { reise ->
+                reise.perioder
+            }
+
+        alleReiseperiode?.forEach { periode -> }
+        TODO()
     }
 
     fun validerVedtaksperioderAvkortetVedOpphør(
