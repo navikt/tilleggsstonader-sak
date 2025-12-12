@@ -21,6 +21,7 @@ class ArbeidsfordelingClientMockConfig {
         fun resetTilDefault(client: ArbeidsfordelingClient) {
             clearMocks(client)
             every { client.finnArbeidsfordelingsenhet(any()) } returns listOf(Arbeidsfordelingsenhet("4462", "NAY Nasjonal"))
+            every { client.finnNavKontorForGeografiskOmråde(any(), any(), any()) } returns Arbeidsfordelingsenhet("4462", "NAY Nasjonal")
         }
     }
 }

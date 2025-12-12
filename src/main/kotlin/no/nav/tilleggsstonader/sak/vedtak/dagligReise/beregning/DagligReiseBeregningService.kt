@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -19,6 +21,7 @@ class DagligReiseBeregningService(
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val offentligTransportBeregningService: OffentligTransportBeregningService,
     private val dagligReiseBeregningRevurderingService: DagligReiseBeregningRevurderingService,
+    private val arbeidsfordelingService: ArbeidsfordelingService,
 ) {
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -34,11 +37,19 @@ class DagligReiseBeregningService(
         val oppfylteVilkårDagligReise = vilkårService.hentOppfylteDagligReiseVilkår(behandling.id).map { it.mapTilVilkårDagligReise() }
         validerFinnesReiser(oppfylteVilkårDagligReise)
 
+        val brukersNavKontor =
+            if (behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
+                arbeidsfordelingService.hentBrukersNavKontor(behandling.ident, behandling.stønadstype)
+            } else {
+                null
+            }
+
         val beregningsresultatOffentligTransport =
             beregnOffentligTransport(
                 oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
                 vedtaksperioder = vedtaksperioder,
                 behandling = behandling,
+                brukersNavKontor = brukersNavKontor,
             )
 
         return BeregningsresultatDagligReise(
@@ -50,6 +61,7 @@ class DagligReiseBeregningService(
         oppfylteVilkårDagligReise: List<VilkårDagligReise>,
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
+        brukersNavKontor: String?,
     ): BeregningsresultatOffentligTransport? {
         val oppfylteVilkårOffentligTransport = oppfylteVilkårDagligReise.filter { it.fakta is FaktaOffentligTransport }
 
@@ -59,6 +71,7 @@ class DagligReiseBeregningService(
             .beregn(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkår = oppfylteVilkårOffentligTransport,
+                brukersNavKontor = brukersNavKontor,
             ).let {
                 dagligReiseBeregningRevurderingService.flettMedForrigeVedtakHvisRevurdering(
                     behandling = behandling,

@@ -17,6 +17,7 @@ class OffentligTransportBeregningService {
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<VilkårDagligReise>,
+        brukersNavKontor: String?,
     ): BeregningsresultatOffentligTransport {
         val utgifter =
             oppfylteVilkår
@@ -25,7 +26,7 @@ class OffentligTransportBeregningService {
         return BeregningsresultatOffentligTransport(
             reiser =
                 utgifter.map { reise ->
-                    beregnForReise(reise, vedtaksperioder)
+                    beregnForReise(reise, vedtaksperioder, brukersNavKontor)
                 },
         ).sorterReiser()
     }
@@ -33,6 +34,7 @@ class OffentligTransportBeregningService {
     private fun beregnForReise(
         reise: UtgiftOffentligTransport,
         vedtaksperioder: List<Vedtaksperiode>,
+        brukersNavKontor: String?,
     ): BeregningsresultatForReise {
         val (justerteVedtaksperioder, justertReiseperiode) =
             finnSnittMellomReiseOgVedtaksperioder(
@@ -46,7 +48,7 @@ class OffentligTransportBeregningService {
             reiseId = reise.reiseId,
             perioder =
                 trettidagerReisePerioder.map { trettidagerReiseperiode ->
-                    beregnForTrettiDagersPeriode(trettidagerReiseperiode, justerteVedtaksperioder)
+                    beregnForTrettiDagersPeriode(trettidagerReiseperiode, justerteVedtaksperioder, brukersNavKontor)
                 },
         )
     }
@@ -54,6 +56,7 @@ class OffentligTransportBeregningService {
     private fun beregnForTrettiDagersPeriode(
         trettidagerReisePeriode: UtgiftOffentligTransport,
         vedtaksperioder: List<Vedtaksperiode>,
+        brukersNavKontor: String?,
     ): BeregningsresultatForPeriode {
         val vedtaksperiodeGrunnlag =
             finnSnittMellomReiseOgVedtaksperioder(trettidagerReisePeriode, vedtaksperioder)
@@ -79,6 +82,7 @@ class OffentligTransportBeregningService {
                 pris30dagersbillett = trettidagerReisePeriode.pris30dagersbillett,
                 antallReisedager = vedtaksperiodeGrunnlag.sumOf { it.antallReisedagerIVedtaksperioden },
                 vedtaksperioder = vedtaksperiodeGrunnlag,
+                brukersNavKontor = brukersNavKontor,
             )
 
         return BeregningsresultatForPeriode(

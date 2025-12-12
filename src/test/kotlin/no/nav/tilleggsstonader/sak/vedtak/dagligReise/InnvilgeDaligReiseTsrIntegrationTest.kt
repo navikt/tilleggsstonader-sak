@@ -82,5 +82,7 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
 
         assertThat(andeler).allMatch { it.type == TypeAndel.DAGLIG_REISE_TILTAK_ENKELTPLASS_AMO }
         assertThat(andeler).allMatch { it.brukersNavKontor != null }
+
+        // TODO - også validere internt vedtak
     }
 }

@@ -44,6 +44,8 @@ data class BeregningsgrunnlagOffentligTransport(
     val antallReisedagerPerUke: Int,
     val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
     val antallReisedager: Int,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val brukersNavKontor: String?,
 ) : Periode<LocalDate>
 
 // Legger på Include.NON_NULL for å unngå at vi serialiserer "typeAktivitet": null" i JSON for TSO som er i produksjon
