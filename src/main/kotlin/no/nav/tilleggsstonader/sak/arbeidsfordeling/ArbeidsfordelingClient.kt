@@ -29,7 +29,7 @@ class ArbeidsfordelingClient(
         geografiskOmraade: String?,
         diskresjonskode: String?,
         erEgenAnsatt: Boolean,
-    ): Arbeidsfordelingsenhet? {
+    ): NavKontor? {
         val uri =
             UriComponentsBuilder
                 .fromUri(arbeidsfordelingUri)
@@ -39,18 +39,15 @@ class ArbeidsfordelingClient(
                 .build()
                 .toUriString()
 
-        val enheter: List<Arbeidsfordelingsenhet> =
-            getForEntity(
-                uri = uri,
-                uriVariables =
-                    mapOf(
-                        "geografiskOmraade" to geografiskOmraade,
-                        "disk" to (diskresjonskode ?: "ANY"),
-                        "skjermet" to erEgenAnsatt,
-                    ),
-            )
-
-        return enheter.firstOrNull()
+        return getForEntity<NavKontor>(
+            uri = uri,
+            uriVariables =
+                mapOf(
+                    "geografiskOmraade" to geografiskOmraade,
+                    "disk" to (diskresjonskode ?: "ANY"),
+                    "skjermet" to erEgenAnsatt,
+                ),
+        )
     }
 
     private val arbeidsfordelingUri =

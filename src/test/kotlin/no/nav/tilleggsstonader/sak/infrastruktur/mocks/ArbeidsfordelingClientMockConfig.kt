@@ -5,6 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingClient
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.Arbeidsfordelingsenhet
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.NavKontor
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -21,7 +22,7 @@ class ArbeidsfordelingClientMockConfig {
         fun resetTilDefault(client: ArbeidsfordelingClient) {
             clearMocks(client)
             every { client.finnArbeidsfordelingsenhet(any()) } returns listOf(Arbeidsfordelingsenhet("4462", "NAY Nasjonal"))
-            every { client.finnNavKontorForGeografiskOmråde(any(), any(), any()) } returns Arbeidsfordelingsenhet("4462", "NAY Nasjonal")
+            every { client.finnNavKontorForGeografiskOmråde(any(), any(), any()) } returns NavKontor("1014") // Nav Midt-Agder
         }
     }
 }
