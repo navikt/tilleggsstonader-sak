@@ -32,8 +32,8 @@ class ArbeidsfordelingClient(
     ): NavKontor? {
         val uri =
             UriComponentsBuilder
-                .fromUri(arbeidsfordelingUri)
-                .pathSegment("enhet/navkontor/{geografiskOmraade}")
+                .fromUri(enhetUri)
+                .pathSegment("navkontor/{geografiskOmraade}")
                 .queryParam("disk", "{disk}")
                 .queryParam("skjermet", "{skjermet}")
                 .build()
@@ -54,6 +54,13 @@ class ArbeidsfordelingClient(
         UriComponentsBuilder
             .fromUri(uri)
             .pathSegment("api/v1/arbeidsfordeling")
+            .build()
+            .toUri()
+
+    private val enhetUri =
+        UriComponentsBuilder
+            .fromUri(uri)
+            .pathSegment("api/v1/enhet")
             .build()
             .toUri()
 }
