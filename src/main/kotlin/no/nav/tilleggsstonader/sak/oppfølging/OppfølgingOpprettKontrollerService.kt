@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetServi
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
@@ -154,8 +155,12 @@ class OppfølgingOpprettKontrollerService(
 
             Stønadstype.BOUTGIFTER ->
                 hentVedtak<InnvilgelseEllerOpphørBoutgifter>(behandling).vedtaksperioder
-            Stønadstype.DAGLIG_REISE_TSO -> TODO()
-            Stønadstype.DAGLIG_REISE_TSR -> TODO()
+
+            Stønadstype.DAGLIG_REISE_TSO ->
+                hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling).vedtaksperioder
+
+            Stønadstype.DAGLIG_REISE_TSR ->
+                hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling).vedtaksperioder
         }
 
     private inline fun <reified T : Vedtaksdata> hentVedtak(behandling: Behandling) =
