@@ -45,12 +45,13 @@ class DagligReiseBeregningService(
             }
 
         return BeregningsresultatDagligReise(
-            offentligTransport = beregnOffentligTransport(
-                oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
-                vedtaksperioder = vedtaksperioder,
-                behandling = behandling,
-                brukersNavKontor = brukersNavKontor,
-            ),
+            offentligTransport =
+                beregnOffentligTransport(
+                    oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
+                    vedtaksperioder = vedtaksperioder,
+                    behandling = behandling,
+                    brukersNavKontor = brukersNavKontor,
+                ),
         )
     }
 
@@ -64,16 +65,19 @@ class DagligReiseBeregningService(
 
         if (oppfylteVilkårOffentligTransport.isEmpty()) return null
 
-        val nyttBeregningsresultat = offentligTransportBeregningService.beregn(
-            vedtaksperioder = vedtaksperioder,
-            oppfylteVilkår = oppfylteVilkårOffentligTransport,
-        brukersNavKontor = brukersNavKontor,)
+        val nyttBeregningsresultat =
+            offentligTransportBeregningService.beregn(
+                vedtaksperioder = vedtaksperioder,
+                oppfylteVilkår = oppfylteVilkårOffentligTransport,
+                brukersNavKontor = brukersNavKontor,
+            )
 
-        return offentligTransportBeregningRevurderingService.flettMedForrigeVedtakHvisRevurdering(
-            nyttBeregningsresultat = nyttBeregningsresultat,
-            vedtaksperioder = vedtaksperioder,
-            behandling = behandling,
-        )
+        return offentligTransportBeregningRevurderingService
+            .flettMedForrigeVedtakHvisRevurdering(
+                nyttBeregningsresultat = nyttBeregningsresultat,
+                vedtaksperioder = vedtaksperioder,
+                behandling = behandling,
+            ).sorterReiserOgPerioder()
     }
 }
 
@@ -82,4 +86,3 @@ private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {
         "Innvilgelse er ikke et gyldig vedtaksresultat når det ikke er lagt inn perioder med reise"
     }
 }
-

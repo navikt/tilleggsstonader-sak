@@ -57,15 +57,16 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
         }
     }
 
-    private fun hentBeregningsresultat(revurderingId: BehandlingId): List<BeregningsresultatForPeriode> = kall.vedtak
-        .hentVedtak(
-            Stønadstype.DAGLIG_REISE_TSO,
-            revurderingId,
-        ).expectOkWithBody<InnvilgelseDagligReiseResponse>()
-        .beregningsresultat.offentligTransport!!
-        .reiser
-        .single()
-        .perioder
+    private fun hentBeregningsresultat(revurderingId: BehandlingId): List<BeregningsresultatForPeriode> =
+        kall.vedtak
+            .hentVedtak(
+                Stønadstype.DAGLIG_REISE_TSO,
+                revurderingId,
+            ).expectOkWithBody<InnvilgelseDagligReiseResponse>()
+            .beregningsresultat.offentligTransport!!
+            .reiser
+            .single()
+            .perioder
 
     private fun gjennomførEnFørstegangsbehandling(
         reiseFom: LocalDate,

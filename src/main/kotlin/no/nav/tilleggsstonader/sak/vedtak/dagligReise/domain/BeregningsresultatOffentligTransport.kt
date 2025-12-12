@@ -14,7 +14,7 @@ import java.util.UUID
 data class BeregningsresultatOffentligTransport(
     val reiser: List<BeregningsresultatForReise>,
 ) {
-    fun sorterReiser(): BeregningsresultatOffentligTransport =
+    fun sorterReiserOgPerioder(): BeregningsresultatOffentligTransport =
         BeregningsresultatOffentligTransport(
             reiser
                 .sortedBy { reise -> reise.perioder.minOf { it.grunnlag.fom } }
