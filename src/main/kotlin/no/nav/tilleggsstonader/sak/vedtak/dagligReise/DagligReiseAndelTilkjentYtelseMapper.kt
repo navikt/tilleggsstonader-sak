@@ -30,7 +30,7 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandlin
                 }
             }
 
-            // Grupperer på brukersNavKontor for å ta høyde for at
+            // Grupperer på brukersNavKontor for å ta høyde for at de kan ha ulike kontorer
             reiseperioder
                 .groupBy { it.grunnlag.brukersNavKontor }
                 .map { (brukersNavKontor, reiseperioderMedSammeBrukersNavKontor) ->
