@@ -40,6 +40,7 @@ fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
                     antallReisedagerPerUke = 0,
                     antallReisedager = 0,
                     vedtaksperioder = emptyList(),
+                    brukersNavKontor = null,
                 ),
             beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
             billettdetaljer =

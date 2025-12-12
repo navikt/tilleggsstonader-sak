@@ -39,9 +39,6 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
     lateinit var ytelseClient: YtelseClient
 
     @Autowired
-    lateinit var vedtakService: VedtakService
-
-    @Autowired
     lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 
     @Test
@@ -81,12 +78,11 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
             )
 
         // valider har fått korrekte andeler
-        val vedtak = vedtakService.hentVedtak<InnvilgelseDagligReise>(behandlingId)
-
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandlingId)!!.andelerTilkjentYtelse
 
         assertThat(andeler).allMatch { it.type == TypeAndel.DAGLIG_REISE_TILTAK_ENKELTPLASS_AMO }
+        assertThat(andeler).allMatch { it.brukersNavKontor != null }
 
-        // TODO - valider brukers navkontor
+        // TODO - også validere internt vedtak
     }
 }

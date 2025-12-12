@@ -3,12 +3,12 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import java.time.LocalDate
 
@@ -16,7 +16,7 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandlin
     reiser
         .flatMap { it.perioder }
         .groupBy { it.grunnlag.fom }
-        .map { (fom, reiseperioder) ->
+        .flatMap { (fom, reiseperioder) ->
             val målgrupper = reiseperioder.flatMap { it.grunnlag.vedtaksperioder }.map { it.målgruppe }
             val typeAktivitet = reiseperioder.flatMap { it.grunnlag.vedtaksperioder }.map { it.typeAktivitet }
 
@@ -30,13 +30,19 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandlin
                 }
             }
 
-            lagAndelForDagligReise(
-                saksbehandling = saksbehandling,
-                fomUkedag = fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
-                beløp = reiseperioder.sumOf { it.beløp },
-                målgruppe = målgrupper.first(),
-                typeAktivitet = typeAktivitet.firstOrNull(),
-            )
+            // Grupperer på brukersNavKontor for å ta høyde for at de kan ha ulike kontorer
+            reiseperioder
+                .groupBy { it.grunnlag.brukersNavKontor }
+                .map { (brukersNavKontor, reiseperioderMedSammeBrukersNavKontor) ->
+                    lagAndelForDagligReise(
+                        saksbehandling = saksbehandling,
+                        fomUkedag = fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                        beløp = reiseperioderMedSammeBrukersNavKontor.sumOf { it.beløp },
+                        målgruppe = målgrupper.first(),
+                        typeAktivitet = typeAktivitet.firstOrNull(),
+                        brukersNavKontor = brukersNavKontor,
+                    )
+                }
         }
 
 private fun lagAndelForDagligReise(
@@ -45,16 +51,23 @@ private fun lagAndelForDagligReise(
     beløp: Int,
     målgruppe: FaktiskMålgruppe,
     typeAktivitet: TypeAktivitet?,
+    brukersNavKontor: String?,
 ): AndelTilkjentYtelse {
     val typeAndel =
-        if (saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSO) {
-            målgruppe.tilTypeAndel(saksbehandling.stønadstype)
-        } else if (saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-            // Validert i funksjon over at den ikke er null for TSR
-            finnTypeAndelFraTypeAktivitet(typeAktivitet!!)
-        } else {
-            error("Uforventet stønadstype ${saksbehandling.stønadstype}")
+        when (saksbehandling.stønadstype) {
+            Stønadstype.DAGLIG_REISE_TSO -> {
+                målgruppe.tilTypeAndel(saksbehandling.stønadstype)
+            }
+            Stønadstype.DAGLIG_REISE_TSR -> {
+                // Validert i funksjon over at den ikke er null for TSR
+                finnTypeAndelFraTypeAktivitet(typeAktivitet!!)
+            }
+            else -> {
+                error("Uforventet stønadstype ${saksbehandling.stønadstype}")
+            }
         }
+
+    validerBrukersNavKontorForStønadstype(brukersNavKontor, saksbehandling.stønadstype)
 
     return AndelTilkjentYtelse(
         beløp = beløp,
@@ -64,7 +77,28 @@ private fun lagAndelForDagligReise(
         type = typeAndel,
         kildeBehandlingId = saksbehandling.id,
         utbetalingsdato = fomUkedag,
+        brukersNavKontor = brukersNavKontor,
     )
+}
+
+private fun validerBrukersNavKontorForStønadstype(
+    brukersNavKontor: String?,
+    stønadstype: Stønadstype,
+) {
+    when (stønadstype) {
+        Stønadstype.DAGLIG_REISE_TSR -> {
+            require(!brukersNavKontor.isNullOrBlank()) {
+                "Brukers NAV-kontor må være satt for stønadstype $stønadstype"
+            }
+        }
+        Stønadstype.DAGLIG_REISE_TSO -> {
+            require(brukersNavKontor == null) {
+                "Brukers NAV-kontor skal ikke være satt for stønadstype $stønadstype"
+            }
+        }
+
+        else -> {}
+    }
 }
 
 fun finnTypeAndelFraTypeAktivitet(typeAktivitet: TypeAktivitet): TypeAndel =

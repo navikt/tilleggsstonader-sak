@@ -50,6 +50,7 @@ data class AndelTilkjentYtelse(
     @LastModifiedDate
     val endretTid: LocalDateTime = SporbarUtils.now(),
     val utbetalingsdato: LocalDate,
+    val brukersNavKontor: String? = null,
 ) : Periode<LocalDate> {
     init {
         feilHvis(YearMonth.from(fom) != YearMonth.from(tom)) {

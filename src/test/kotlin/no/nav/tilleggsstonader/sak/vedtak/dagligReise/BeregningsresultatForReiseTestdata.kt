@@ -53,4 +53,5 @@ fun lagBeregningsgrunnlagOffentligTransport(
         antallReisedagerPerUke = 5,
         vedtaksperioder = vedtaksperioder,
         antallReisedager = 20,
+        brukersNavKontor = null,
     )

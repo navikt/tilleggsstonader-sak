@@ -75,6 +75,7 @@ fun lagDagligReiseInnvilgelseMedBeløp(
                                                             ),
                                                         ),
                                                     antallReisedager = 20,
+                                                    brukersNavKontor = null,
                                                 ),
                                             beløp = beløp,
                                             billettdetaljer =

@@ -268,6 +268,7 @@ private fun beregningsresultatForPeriode(
                         ),
                     ),
                 antallReisedager = 20,
+                brukersNavKontor = null,
             ),
         beløp = 1000,
         billettdetaljer =

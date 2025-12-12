@@ -161,6 +161,7 @@ private fun beregningsgrunnlagOffentligTransport(
     antallReisedagerPerUke = antallReisedagerPerUke,
     vedtaksperioder = vedtaksperioder,
     antallReisedager = antallReisedager,
+    brukersNavKontor = null,
 )
 
 private fun vedtaksperiodeGrunnlag(
