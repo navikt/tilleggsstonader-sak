@@ -23,7 +23,7 @@ enum class FaktiskMålgruppe(
         prioritet = 4,
         gyldigeAktiviter = setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING),
     ),
-    TILTAK(
+    ARBEIDSSØKER(
         prioritet = 5,
         gyldigeAktiviter = setOf(AktivitetType.TILTAK),
     ),
@@ -42,6 +42,7 @@ enum class FaktiskMålgruppe(
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
                 }
             }
+
             Stønadstype.LÆREMIDLER -> {
                 when (this) {
                     NEDSATT_ARBEIDSEVNE -> TypeAndel.LÆREMIDLER_AAP
@@ -50,6 +51,7 @@ enum class FaktiskMålgruppe(
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
                 }
             }
+
             Stønadstype.BOUTGIFTER -> {
                 when (this) {
                     NEDSATT_ARBEIDSEVNE -> TypeAndel.BOUTGIFTER_AAP
@@ -58,6 +60,7 @@ enum class FaktiskMålgruppe(
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
                 }
             }
+
             Stønadstype.DAGLIG_REISE_TSO -> {
                 when (this) {
                     NEDSATT_ARBEIDSEVNE -> TypeAndel.DAGLIG_REISE_AAP
@@ -66,6 +69,7 @@ enum class FaktiskMålgruppe(
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
                 }
             }
+
             Stønadstype.DAGLIG_REISE_TSR -> error("Kan ikke utlede Typeandel for Daglig reise TSR fra FaktiskMålgruppe")
         }
 }

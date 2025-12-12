@@ -39,7 +39,7 @@ class FaktiskMålgruppeTest {
                 FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 FaktiskMålgruppe.ENSLIG_FORSØRGER,
                 FaktiskMålgruppe.GJENLEVENDE,
-                FaktiskMålgruppe.TILTAK,
+                FaktiskMålgruppe.ARBEIDSSØKER,
             )
     }
 

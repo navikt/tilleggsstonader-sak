@@ -16,15 +16,15 @@ class MålgruppeTypeTest {
                     it to
                         when (it) {
                             MålgruppeType.AAP -> FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
-                            MålgruppeType.DAGPENGER -> null
+                            MålgruppeType.DAGPENGER -> FaktiskMålgruppe.ARBEIDSSØKER
                             MålgruppeType.OMSTILLINGSSTØNAD -> FaktiskMålgruppe.GJENLEVENDE
                             MålgruppeType.OVERGANGSSTØNAD -> FaktiskMålgruppe.ENSLIG_FORSØRGER
                             MålgruppeType.NEDSATT_ARBEIDSEVNE -> FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
                             MålgruppeType.UFØRETRYGD -> FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
                             MålgruppeType.SYKEPENGER_100_PROSENT -> null
                             MålgruppeType.INGEN_MÅLGRUPPE -> null
-                            MålgruppeType.TILTAKSPENGER -> FaktiskMålgruppe.TILTAK
-                            MålgruppeType.KVALIFISERINGSSTØNAD -> null
+                            MålgruppeType.TILTAKSPENGER -> FaktiskMålgruppe.ARBEIDSSØKER
+                            MålgruppeType.KVALIFISERINGSSTØNAD -> FaktiskMålgruppe.ARBEIDSSØKER
                         }
                 }
 
