@@ -6,7 +6,7 @@ enum class LovverketsMålgruppeDvh {
     NEDSATT_ARBEIDSEVNE,
     ENSLIG_FORSØRGER,
     GJENLEVENDE,
-    TILTAK,
+    ARBEIDSSØKER,
     ;
 
     companion object {
@@ -15,7 +15,7 @@ enum class LovverketsMålgruppeDvh {
                 FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE -> NEDSATT_ARBEIDSEVNE
                 FaktiskMålgruppe.ENSLIG_FORSØRGER -> ENSLIG_FORSØRGER
                 FaktiskMålgruppe.GJENLEVENDE -> GJENLEVENDE
-                FaktiskMålgruppe.TILTAK -> TILTAK
+                FaktiskMålgruppe.ARBEIDSSØKER -> ARBEIDSSØKER
             }
     }
 }
