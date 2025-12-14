@@ -2,17 +2,17 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20250922094930_4bb329c"
-val tilleggsstønaderLibsVersion = "2025.09.11-09.26.d3123ecc47ce"
-val tilleggsstønaderKontrakterVersion = "2025.11.27-22.38.29b9e7f1339a"
-val avroVersion = "1.12.0"
-val confluentVersion = "8.0.1"
-val joarkHendelseVersion = "1.1.6"
-val tokenSupportVersion = "5.0.37"
-val wiremockVersion = "3.13.1"
-val mockkVersion = "1.14.6"
+val familieProsesseringVersion = "2.20251205101334_e75fc2d"
+val tilleggsstønaderLibsVersion = "2025.12.08-13.31.45988779312e"
+val tilleggsstønaderKontrakterVersion = "2025.12.08-13.30.6abb540f410e"
+val avroVersion = "1.12.1"
+val confluentVersion = "8.1.1"
+val joarkHendelseVersion = "1.1.7"
+val tokenSupportVersion = "6.0.0"
+val wiremockVersion = "3.13.2"
+val mockkVersion = "1.14.7"
 val testcontainerVersion = "1.21.3"
-val springDocVersion = "2.8.13"
+val springDocVersion = "3.0.0"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -24,14 +24,14 @@ ext["junit-jupiter.version"] = "5.13.4"
 plugins {
     application
 
-    kotlin("jvm") version "2.2.20"
-    id("com.diffplug.spotless") version "8.0.0"
+    kotlin("jvm") version "2.2.21"
+    id("com.diffplug.spotless") version "8.1.0"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
-    id("org.springframework.boot") version "3.5.6"
+    id("org.springframework.boot") version "4.0.0"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.spring") version "2.2.20"
+    kotlin("plugin.spring") version "2.2.21"
 }
 
 repositories {
@@ -76,7 +76,7 @@ dependencies {
     implementation("no.nav.teamdokumenthandtering:teamdokumenthandtering-avro-schemas:$joarkHendelseVersion")
 
     // Logging
-    implementation("net.logstash.logback:logstash-logback-encoder:8.1")
+    implementation("net.logstash.logback:logstash-logback-encoder:9.0")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
 
@@ -111,13 +111,13 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.30.0"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.32.0"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 
     // Transitiv avhengighet fra mock-oauth2-server -> bcpix. Disse under er definert som dynamisk versjon, noe bygget vårt ikke vil ha noe av
-    testImplementation("org.bouncycastle:bcutil-jdk18on:1.82")
-    testImplementation("org.bouncycastle:bcprov-jdk18on:1.82")
+    testImplementation("org.bouncycastle:bcutil-jdk18on:1.83")
+    testImplementation("org.bouncycastle:bcprov-jdk18on:1.83")
 }
 
 kotlin {
