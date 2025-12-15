@@ -177,6 +177,7 @@
             "billettdetaljer" : {
               "SYVDAGERSBILLETT" : 1
             },
+            "antallReisedager" : 5,
             "fraTidligereVedtak" : false
           }, {
             "fom" : "2024-02-05",
@@ -189,6 +190,7 @@
             "billettdetaljer" : {
               "SYVDAGERSBILLETT" : 1
             },
+            "antallReisedager" : 5,
             "fraTidligereVedtak" : false
           } ]
         }, {
@@ -204,6 +206,7 @@
             "billettdetaljer" : {
               "ENKELTBILLETT" : 4
             },
+            "antallReisedager" : 2,
             "fraTidligereVedtak" : false
           } ]
         } ]

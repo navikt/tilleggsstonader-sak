@@ -87,13 +87,14 @@ class DagligReiseVedtakController(
                 behandling.id,
                 vedtak.vedtaksperioder.tilDomene(),
             )
-        val beregningsresultat = beregningService
-            .beregn(
-                vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
-                behandling = behandling,
-                typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = tidligsteEndring
-            )
+        val beregningsresultat =
+            beregningService
+                .beregn(
+                    vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
+                    behandling = behandling,
+                    typeVedtak = TypeVedtak.INNVILGELSE,
+                    tidligsteEndring = tidligsteEndring,
+                )
 
         return beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring)
     }

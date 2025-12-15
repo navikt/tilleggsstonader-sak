@@ -103,6 +103,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                                                     antallReisedagerPerUke = 4,
                                                     beløp = 750,
                                                     billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1),
+                                                    antallReisedager = 19,
                                                     fraTidligereVedtak = false,
                                                 ),
                                             ),

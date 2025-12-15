@@ -53,7 +53,7 @@ class DagligReiseBeregningService(
                     vedtaksperioder = vedtaksperioder,
                     behandling = behandling,
                     brukersNavKontor = brukersNavKontor,
-                    tidligsteEndring = tidligsteEndring
+                    tidligsteEndring = tidligsteEndring,
                 ),
         )
     }
