@@ -43,7 +43,7 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
     fun `Skal ikke kunne innvilge daglig reise for både Nay og Tiltaksenheten samtidig`() {
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoTiltakspengerTpsak()
 
-        //Gjennomfører behandling for Tiltaksenheten
+        // Gjennomfører behandling for Tiltaksenheten
         gjennomførBehandlingsløp(
             fraJournalpost =
                 journalpost(
@@ -76,41 +76,44 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
 
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
 
-        //Gjennomfører behandling for Nay
-        val behandlingId = gjennomførBehandlingsløp(
-            fraJournalpost =
-                journalpost(
-                    journalpostId = "1",
-                    journalstatus = Journalstatus.MOTTATT,
-                    dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
-                    bruker = Bruker("12345678910", BrukerIdType.FNR),
-                    tema = Tema.TSO.name,
-                ),
-            medAktivitet = { behandlingId ->
-                lagreVilkårperiodeAktivitet(
-                    behandlingId = behandlingId,
-                    aktivitetType = AktivitetType.UTDANNING,
-                    typeAktivitet = null,
-                    fom = fomNay,
-                    tom = tomNay,
-                    faktaOgSvar = FaktaOgSvarAktivitetDagligReiseTsoDto(),
-                )
-            },
-            medMålgruppe = { behandlingId ->
-                lagreVilkårperiodeMålgruppe(
-                    behandlingId = behandlingId,
-                    målgruppeType = MålgruppeType.AAP,
-                    fom = fomNay,
-                    tom = tomNay,
-                )
-            },
-            medVilkår = listOf(lagreDagligReiseDto(fom = fomNay, tom = tomNay)),
-            tilSteg = StegType.BEREGNE_YTELSE
-        )
+        // Gjennomfører behandling for Nay
+        val behandlingId =
+            gjennomførBehandlingsløp(
+                fraJournalpost =
+                    journalpost(
+                        journalpostId = "1",
+                        journalstatus = Journalstatus.MOTTATT,
+                        dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
+                        bruker = Bruker("12345678910", BrukerIdType.FNR),
+                        tema = Tema.TSO.name,
+                    ),
+                medAktivitet = { behandlingId ->
+                    lagreVilkårperiodeAktivitet(
+                        behandlingId = behandlingId,
+                        aktivitetType = AktivitetType.UTDANNING,
+                        typeAktivitet = null,
+                        fom = fomNay,
+                        tom = tomNay,
+                        faktaOgSvar = FaktaOgSvarAktivitetDagligReiseTsoDto(),
+                    )
+                },
+                medMålgruppe = { behandlingId ->
+                    lagreVilkårperiodeMålgruppe(
+                        behandlingId = behandlingId,
+                        målgruppeType = MålgruppeType.AAP,
+                        fom = fomNay,
+                        tom = tomNay,
+                    )
+                },
+                medVilkår = listOf(lagreDagligReiseDto(fom = fomNay, tom = tomNay)),
+                tilSteg = StegType.BEREGNE_YTELSE,
+            )
 
-
-        gjennomførBeregningSteg(behandlingId, Stønadstype.DAGLIG_REISE_TSO).expectStatus().isBadRequest.expectBody()
-            .jsonPath("$.detail").isEqualTo("Kan ikke ha overlappende vedtaksperioder for Nay og Tiltaksenheten")
-
+        gjennomførBeregningSteg(behandlingId, Stønadstype.DAGLIG_REISE_TSO)
+            .expectStatus()
+            .isBadRequest
+            .expectBody()
+            .jsonPath("$.detail")
+            .isEqualTo("Kan ikke ha overlappende vedtaksperioder for Nay og Tiltaksenheten")
     }
 }

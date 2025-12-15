@@ -22,7 +22,6 @@ class DagligReiseVedtaksperioderValideringService(
     private val behandlingService: BehandlingService,
     private val vedtakRepository: VedtakRepository,
 ) {
-
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
@@ -31,54 +30,54 @@ class DagligReiseVedtaksperioderValideringService(
         vedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
-            typeVedtak = typeVedtak
+            typeVedtak = typeVedtak,
         )
         validerIkkeOverlappendeVedtaksperioderForTsrOgTso(
             behandling = behandling,
-            vedtaksperioder = vedtaksperioder
+            vedtaksperioder = vedtaksperioder,
         )
     }
 
     fun validerIkkeOverlappendeVedtaksperioderForTsrOgTso(
         behandling: Saksbehandling,
-        vedtaksperioder: List<Vedtaksperiode>
+        vedtaksperioder: List<Vedtaksperiode>,
     ) {
-        val fagsakIdAnnenEnhet = when (behandling.stønadstype) {
-            Stønadstype.DAGLIG_REISE_TSR -> fagsakService.finnFagsakerForFagsakPersonId(behandling.fagsakPersonId).dagligReiseTso?.id
-            Stønadstype.DAGLIG_REISE_TSO -> fagsakService.finnFagsakerForFagsakPersonId(behandling.fagsakPersonId).dagligReiseTsr?.id
-            else -> error("Kan ikke finne fagsakId for annen enhet for daglig reise når stønadstype er: ${behandling.stønadstype}")
-        } ?: return
+        val fagsakIdAnnenEnhet =
+            when (behandling.stønadstype) {
+                Stønadstype.DAGLIG_REISE_TSR -> fagsakService.finnFagsakerForFagsakPersonId(behandling.fagsakPersonId).dagligReiseTso?.id
+                Stønadstype.DAGLIG_REISE_TSO -> fagsakService.finnFagsakerForFagsakPersonId(behandling.fagsakPersonId).dagligReiseTsr?.id
+                else -> error("Kan ikke finne fagsakId for annen enhet for daglig reise når stønadstype er: ${behandling.stønadstype}")
+            }
 
         val vedtaksperioderAnnenEnhet =
-            hentVedtaksdataForSisteIverksatteBehandling(fagsakIdAnnenEnhet)?.vedtaksperioder ?: return
-
-        brukerfeilHvis(
-            harOverlappendeVedtaksperioderPåTversAvEnheter(
-                vedtaksperioderDenneEnhenten = vedtaksperioder,
-                vedtaksperioderAnnenEnhet = vedtaksperioderAnnenEnhet
-            )
-        ) { "Kan ikke ha overlappende vedtaksperioder for Nay og Tiltaksenheten" }
+            fagsakIdAnnenEnhet?.let {
+                hentVedtaksdataForSisteIverksatteBehandling(it)?.vedtaksperioder
+            }
+        if (vedtaksperioderAnnenEnhet != null) {
+            brukerfeilHvis(
+                harOverlappendeVedtaksperioderPåTversAvEnheter(
+                    vedtaksperioderDenneEnhenten = vedtaksperioder,
+                    vedtaksperioderAnnenEnhet = vedtaksperioderAnnenEnhet,
+                ),
+            ) { "Kan ikke ha overlappende vedtaksperioder for Nay og Tiltaksenheten" }
+        }
     }
 
     private fun harOverlappendeVedtaksperioderPåTversAvEnheter(
         vedtaksperioderDenneEnhenten: List<Vedtaksperiode>,
-        vedtaksperioderAnnenEnhet: List<Vedtaksperiode>
+        vedtaksperioderAnnenEnhet: List<Vedtaksperiode>,
     ) = vedtaksperioderDenneEnhenten.any { vedaksperiodeDenneEnheten ->
         vedtaksperioderAnnenEnhet.any { vedtaksperiodeAnnenEnhet ->
             vedaksperiodeDenneEnheten.overlapper(
-                vedtaksperiodeAnnenEnhet
+                vedtaksperiodeAnnenEnhet,
             )
         }
     }
 
-    private fun hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId?): InnvilgelseEllerOpphørDagligReise? {
-        if (fagsakId == null) {
-            return null
-        }
-        val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId) ?: return null
-        val vedtak = vedtakRepository.findByIdOrNull(sisteIverksatteBehandling.id)
-            ?.withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>() ?: return null
-        return vedtak.data
-    }
-
+    private fun hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): InnvilgelseEllerOpphørDagligReise? =
+        behandlingService
+            .finnSisteIverksatteBehandling(fagsakId)
+            ?.let {
+                vedtakRepository.findByIdOrNull(it.id)?.withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
+            }?.data
 }
