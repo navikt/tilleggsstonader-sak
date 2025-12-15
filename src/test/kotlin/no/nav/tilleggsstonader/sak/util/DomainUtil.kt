@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import no.nav.tilleggsstonader.kontrakter.journalpost.AvsenderMottaker
+import no.nav.tilleggsstonader.kontrakter.journalpost.AvsenderMottakerIdType
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariant
@@ -434,7 +436,6 @@ fun journalpostMedStrukturertSøknad(
 ) = journalpost(
     journalpostId = journalpostId,
     journalposttype = Journalposttype.I,
-    journalstatus = Journalstatus.UNDER_ARBEID,
     tema = tema.name,
     dokumenter = listOf(dokumentInfoMedOriginalVariant(dokumentBrevkode)),
     bruker = Bruker(søkerIdent, BrukerIdType.FNR),
@@ -442,13 +443,14 @@ fun journalpostMedStrukturertSøknad(
 )
 
 fun journalpost(
-    journalpostId: String = UUID.randomUUID().toString(),
+    journalpostId: String = Random.nextLong(10000L, 10000000L).toString(),
     journalposttype: Journalposttype = Journalposttype.I,
-    journalstatus: Journalstatus = Journalstatus.FERDIGSTILT,
+    journalstatus: Journalstatus = Journalstatus.MOTTATT,
     tema: String = Tema.TSO.toString(),
     dokumenter: List<DokumentInfo>? = null,
     bruker: Bruker? = null,
     kanal: String? = "NAV_NO",
+    avsenderMottaker: AvsenderMottaker = avsenderMottaker(),
 ) = Journalpost(
     journalpostId = journalpostId,
     journalposttype = journalposttype,
@@ -457,7 +459,17 @@ fun journalpost(
     dokumenter = dokumenter,
     bruker = bruker,
     kanal = kanal,
+    avsenderMottaker = avsenderMottaker,
 )
+
+fun avsenderMottaker() =
+    AvsenderMottaker(
+        id = "12345678910",
+        type = AvsenderMottakerIdType.FNR,
+        navn = "Ola Nordmann",
+        land = "NOR",
+        erLikBruker = true,
+    )
 
 fun dokumentInfoMedOriginalVariant(dokumentBrevkode: DokumentBrevkode) =
     dokumentInfo(

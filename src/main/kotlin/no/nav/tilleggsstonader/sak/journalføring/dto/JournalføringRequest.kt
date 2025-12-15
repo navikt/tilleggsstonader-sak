@@ -12,7 +12,6 @@ data class JournalføringRequest(
     val logiskeVedlegg: Map<String, List<LogiskVedlegg>>? = null,
     val stønadstype: Stønadstype,
     val oppgaveId: String,
-    val journalførendeEnhet: String,
     val årsak: Journalføringsårsak,
     val aksjon: Journalføringsaksjon,
     val mottattDato: LocalDate? = null, // Brukes av klage

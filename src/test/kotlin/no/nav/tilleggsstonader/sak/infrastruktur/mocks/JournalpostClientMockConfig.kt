@@ -6,6 +6,7 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostResponse
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.journalpost.AvsenderMottakerIdType
@@ -57,11 +58,14 @@ class JournalpostClientMockConfig {
             }
             every { journalpostClient.ferdigstillJournalpost(any(), any(), any()) } answers {
                 val journalpostId = firstArg<String>()
+
+                val journalpost = journalposter[journalpostId.toLong()] ?: error("Finner ikke journalpost med id=$journalpostId")
+                journalposter[journalpostId.toLong()] = journalpost.copy(journalstatus = Journalstatus.FERDIGSTILT)
+
                 OppdaterJournalpostResponse(journalpostId)
             }
             mockFeiletDistribusjon(journalpostClient)
 
-            every { journalpostClient.ferdigstillJournalpost(any(), any(), any()) } returns mockk()
             every { journalpostClient.oppdaterJournalpost(any(), any(), any()) } returns mockk()
             every { journalpostClient.oppdaterLogiskeVedlegg(any(), any()) } answers { firstArg() }
             every { journalpostClient.finnJournalposterForBruker(any()) } answers {
@@ -196,7 +200,7 @@ class JournalpostClientMockConfig {
                 tittel = "Søknad om barnetilsyn",
                 bruker = Bruker("12345678910", BrukerIdType.FNR),
                 avsenderMottaker = avsenderMottaker(),
-                journalforendeEnhet = "tilleggsstonader-sak",
+                journalforendeEnhet = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
                 relevanteDatoer =
                     listOf(
                         RelevantDato(LocalDateTime.now().minusDays(7), "DATO_REGISTRERT"),
