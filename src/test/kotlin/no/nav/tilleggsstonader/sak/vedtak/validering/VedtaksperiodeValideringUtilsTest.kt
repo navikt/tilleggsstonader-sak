@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.validering
 
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -366,14 +368,14 @@ class VedtaksperiodeValideringUtilsTest {
             }
 
             @Test
-            fun `kaster feil hvis det ikke finnes utgifter i hele vedtaksperioden`() {
+            fun `skal kaste feil hvis én av utgiftene er utenfor vedtaksperioden`() {
                 assertThatExceptionOfType(ApiFeil::class.java)
                     .isThrownBy {
                         validerUtgiftHeleVedtaksperioden(
                             vedtaksperioder =
                                 listOf(
-                                    vedtaksperiode.copy(tom = LocalDate.of(2025, 2, 28)),
-                                    vedtaksperiode.copy(tom = LocalDate.of(2025, 1, 31)),
+                                    vedtaksperiode.copy(tom = 28 februar 2025),
+                                    vedtaksperiode.copy(tom = 31 januar 2025),
                                 ),
                             utgifter = utgifter,
                         )
