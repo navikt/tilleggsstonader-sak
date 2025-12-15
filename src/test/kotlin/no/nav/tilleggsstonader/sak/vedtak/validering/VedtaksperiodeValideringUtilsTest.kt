@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mergeSammenheng
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mergeSammenhengendeOppfylteMålgrupper
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
+import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Nested
@@ -365,9 +366,9 @@ class VedtaksperiodeValideringUtilsTest {
             }
 
             @Test
-            fun `kaster feil hvis det ikke finnes alle utgifter i hele vedtaksperioden`() {
-                val feil =
-                    assertThrows<ApiFeil> {
+            fun `kaster feil hvis det ikke finnes utgifter i hele vedtaksperioden`() {
+                assertThatExceptionOfType(ApiFeil::class.java)
+                    .isThrownBy {
                         validerUtgiftHeleVedtaksperioden(
                             vedtaksperioder =
                                 listOf(
@@ -376,8 +377,7 @@ class VedtaksperiodeValideringUtilsTest {
                                 ),
                             utgifter = utgifter,
                         )
-                    }
-                assertThat(feil.feil).contains("Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden")
+                    }.withMessage("Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden")
             }
 
             @Test
