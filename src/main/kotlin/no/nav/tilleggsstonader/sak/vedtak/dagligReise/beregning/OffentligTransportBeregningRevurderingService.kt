@@ -58,12 +58,15 @@ class OffentligTransportBeregningRevurderingService(
         tidligsteEndring: LocalDate,
     ): BeregningsresultatForReise {
         val perioderSomSkalReberegnes =
-            nyBeregningForReise.perioder.filter { it.grunnlag.fom.plusDays(30L) > tidligsteEndring }
+            nyBeregningForReise.perioder
+                .filter { it.grunnlag.fom.plusDays(30L) > tidligsteEndring }
+                .map { it.copy(fraTidligereVedtak = false) }
         val beholdFraForrigeVedtak =
             forrigeBeregning.reiser
                 .singleOrNull { it.reiseId == nyBeregningForReise.reiseId }
                 ?.perioder
                 ?.filter { it.grunnlag.fom.plusDays(30L) <= tidligsteEndring }
+                ?.map { it.copy(fraTidligereVedtak = true) }
                 ?: emptyList()
 
         return nyBeregningForReise.copy(

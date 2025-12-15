@@ -176,7 +176,8 @@
             "beløp" : 400,
             "billettdetaljer" : {
               "SYVDAGERSBILLETT" : 1
-            }
+            },
+            "fraTidligereVedtak" : false
           }, {
             "fom" : "2024-02-05",
             "tom" : "2024-02-10",
@@ -187,7 +188,8 @@
             "beløp" : 400,
             "billettdetaljer" : {
               "SYVDAGERSBILLETT" : 1
-            }
+            },
+            "fraTidligereVedtak" : false
           } ]
         }, {
           "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
@@ -201,7 +203,8 @@
             "beløp" : 320,
             "billettdetaljer" : {
               "ENKELTBILLETT" : 4
-            }
+            },
+            "fraTidligereVedtak" : false
           } ]
         } ]
       },
