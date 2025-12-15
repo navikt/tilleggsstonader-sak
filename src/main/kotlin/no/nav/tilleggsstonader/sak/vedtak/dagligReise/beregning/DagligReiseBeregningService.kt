@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Service
 @Service
 class DagligReiseBeregningService(
     private val vilkårService: VilkårService,
-    private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
+    private val dagligReiseVedtaksperioderValideringService: DagligReiseVedtaksperioderValideringService,
     private val offentligTransportBeregningService: OffentligTransportBeregningService,
     private val offentligTransportBeregningRevurderingService: OffentligTransportBeregningRevurderingService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
@@ -28,7 +27,7 @@ class DagligReiseBeregningService(
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
     ): BeregningsresultatDagligReise {
-        vedtaksperiodeValideringService.validerVedtaksperioder(
+        dagligReiseVedtaksperioderValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             typeVedtak = typeVedtak,
