@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
@@ -59,7 +60,7 @@ class OppgaveClientMockConfig {
             clearMocks(oppgaveClient)
             oppgavelager.clear()
 
-            oppgavelager.leggTilOppgave(journalføringsoppgaveRequest.tilNyOppgave())
+            oppgavelager.leggTilOppgave(journalføringsoppgaveRequest().tilNyOppgave())
             oppgavelager.leggTilOppgave(klageOppgaveRequest.tilNyOppgave())
 
             every { oppgaveClient.hentOppgaver(any()) } answers {
@@ -224,18 +225,22 @@ class OppgaveClientMockConfig {
 
         var journalPostId = 0L
 
-        private val journalføringsoppgaveRequest =
-            OpprettOppgaveRequest(
-                tema = Tema.TSO,
-                oppgavetype = Oppgavetype.Journalføring,
-                fristFerdigstillelse = LocalDate.now().plusDays(14),
-                beskrivelse = "Dummy søknad",
-                behandlingstema = "ab0300",
-                enhetsnummer = "",
-                ident = OppgaveIdentV2(ident = "12345678910", gruppe = IdentGruppe.FOLKEREGISTERIDENT),
-                journalpostId = (++journalPostId).toString(),
-                mappeId = MAPPE_ID_KLAR,
-            )
+        fun journalføringsoppgaveRequest(
+            tema: Tema = Tema.TSO,
+            behandlingstema: String = "ab0300",
+            tildeltEnhetsnummer: String = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+            journalpostId: String = (++journalPostId).toString(),
+        ) = OpprettOppgaveRequest(
+            tema = tema,
+            oppgavetype = Oppgavetype.Journalføring,
+            fristFerdigstillelse = LocalDate.now().plusDays(14),
+            beskrivelse = "Dummy søknad",
+            behandlingstema = behandlingstema,
+            enhetsnummer = tildeltEnhetsnummer,
+            ident = OppgaveIdentV2(ident = "12345678910", gruppe = IdentGruppe.FOLKEREGISTERIDENT),
+            journalpostId = journalpostId,
+            mappeId = MAPPE_ID_KLAR,
+        )
 
         private val klageOppgaveRequest =
             OpprettOppgaveRequest(
@@ -303,7 +308,7 @@ class Oppgavelager {
     fun hentOppgave(oppgaveId: Long): Oppgave = oppgavelager[oppgaveId] ?: error("Finner ikke oppgave=$oppgaveId")
 }
 
-private fun OpprettOppgaveRequest.tilNyOppgave(id: Long = 0) =
+fun OpprettOppgaveRequest.tilNyOppgave(id: Long = 0) =
     Oppgave(
         id = id,
         versjon = 1,

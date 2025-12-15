@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.hendelser.TypeHendelse
 import no.nav.tilleggsstonader.sak.hendelser.journalføring.JournalhendelseKafkaListener
 import no.nav.tilleggsstonader.sak.hendelser.journalføring.JournalpostHendelseType
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.Oppgavelager
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpost
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
@@ -164,7 +165,7 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `mottar daglig-resise-søknad fra kafka, bruker mottar tiltakspenger, journalføres og oppretter sak på TSR`() {
+    fun `mottar daglig-reise-søknad fra kafka, bruker mottar tiltakspenger, journalføres og oppretter sak på TSR`() {
         val hendelse = journalfoeringHendelseRecord()
 
         journalhendelseKafkaListener.listen(
@@ -281,7 +282,7 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
                 journalstatus = Journalstatus.MOTTATT,
             )
 
-        every { journalpostClient.hentJournalpost(journalpostId.toString()) } returns journalpost
+        opprettJournalpost(journalpost)
 
         if (søknad != null) {
             every {

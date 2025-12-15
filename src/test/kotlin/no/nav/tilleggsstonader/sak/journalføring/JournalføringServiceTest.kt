@@ -8,6 +8,7 @@ import io.mockk.verify
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.AvsenderMottakerIdType
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
@@ -17,6 +18,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
@@ -27,7 +29,6 @@ import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -106,6 +107,13 @@ class JournalføringServiceTest {
             avsenderMottaker = avsenderMottaker,
         )
     val oppgaveBeskrivelse = "Beskrivelse"
+    val oppgaveId = "111222"
+    val oppgave =
+        Oppgave(
+            id = oppgaveId.toLong(),
+            versjon = 1,
+            tildeltEnhetsnr = Enhet.NAV_TILTAK_OSLO.enhetsnr,
+        )
 
     val nyAvsenderSlot = slot<AvsenderMottaker?>()
 
@@ -134,6 +142,7 @@ class JournalføringServiceTest {
             )
         }
         every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
+        every { oppgaveService.hentOppgave(oppgaveId.toLong()) } returns oppgave
 
         every { gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(any<FagsakId>()) } returns null
     }
@@ -208,8 +217,7 @@ class JournalføringServiceTest {
         val journalføringRequest =
             JournalføringRequest(
                 stønadstype = Stønadstype.BARNETILSYN,
-                oppgaveId = "1",
-                journalførendeEnhet = "123",
+                oppgaveId = oppgaveId,
                 årsak = JournalføringRequest.Journalføringsårsak.PAPIRSØKNAD,
                 aksjon = Journalføringsaksjon.JOURNALFØR_PÅ_FAGSAK,
                 nyAvsender = nyAvsender,
@@ -227,8 +235,7 @@ class JournalføringServiceTest {
         val requestNyBehandling =
             JournalføringRequest(
                 stønadstype = Stønadstype.BARNETILSYN,
-                oppgaveId = "1",
-                journalførendeEnhet = "123",
+                oppgaveId = oppgaveId,
                 årsak = JournalføringRequest.Journalføringsårsak.PAPIRSØKNAD,
                 aksjon = Journalføringsaksjon.OPPRETT_BEHANDLING,
             )
@@ -269,8 +276,7 @@ class JournalføringServiceTest {
         val requestOpprettBehandling =
             JournalføringRequest(
                 stønadstype = Stønadstype.BARNETILSYN,
-                oppgaveId = "1",
-                journalførendeEnhet = "123",
+                oppgaveId = oppgaveId,
                 årsak = JournalføringRequest.Journalføringsårsak.ETTERSENDING,
                 aksjon = Journalføringsaksjon.OPPRETT_BEHANDLING,
             )

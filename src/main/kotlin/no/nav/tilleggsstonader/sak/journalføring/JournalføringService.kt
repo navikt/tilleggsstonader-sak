@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandling
@@ -68,12 +69,17 @@ class JournalføringService(
         journalføringRequest.valider()
         validerGyldigAvsender(journalpost, journalføringRequest)
 
+        // Skal i praksis være umulig at en oppgave ikke har en tildelt enhet her
+        val journalførendeEnhet =
+            oppgaveService.hentOppgave(journalføringRequest.oppgaveId.toLong()).tildeltEnhetsnr
+                ?: MASKINELL_JOURNALFOERENDE_ENHET
+
         if (journalføringRequest.skalJournalføreTilNyBehandling() && !journalføringRequest.gjelderKlage()) {
             journalførTilNyBehandling(
                 journalpost = journalpost,
                 stønadstype = journalføringRequest.stønadstype,
                 behandlingÅrsak = journalføringRequest.årsak.behandlingsårsak,
-                journalførendeEnhet = journalføringRequest.journalførendeEnhet,
+                journalførendeEnhet = journalførendeEnhet,
                 dokumentTitler = journalføringRequest.dokumentTitler,
                 logiskVedlegg = journalføringRequest.logiskeVedlegg,
                 avsenderMottaker = journalføringRequest.nyAvsender?.tilAvsenderMottaker(),
@@ -82,9 +88,10 @@ class JournalføringService(
             journalførTilNyKlage(
                 journalpost = journalpost,
                 journalføringRequest = journalføringRequest,
+                journalførendeEnhet = journalførendeEnhet,
             )
         } else {
-            journalførUtenNyBehandling(journalføringRequest, journalpost)
+            journalførUtenNyBehandling(journalføringRequest, journalpost, journalførendeEnhet)
         }
 
         ferdigstillJournalføringsoppgave(journalføringRequest.oppgaveId, stønadstype = journalføringRequest.stønadstype)
@@ -162,6 +169,7 @@ class JournalføringService(
     private fun journalførTilNyKlage(
         journalpost: Journalpost,
         journalføringRequest: JournalføringRequest,
+        journalførendeEnhet: String,
     ) {
         val personIdent = journalpostService.hentIdentFraJournalpost(journalpost)
         val behandlingÅrsak = journalføringRequest.årsak.behandlingsårsak
@@ -178,7 +186,7 @@ class JournalføringService(
 
         ferdigstillJournalpost(
             journalpost = journalpost,
-            journalførendeEnhet = journalføringRequest.journalførendeEnhet,
+            journalførendeEnhet = journalførendeEnhet,
             fagsak = fagsak,
             dokumentTitler = journalføringRequest.dokumentTitler,
             logiskVedlegg = journalføringRequest.logiskeVedlegg,
@@ -189,6 +197,7 @@ class JournalføringService(
     private fun journalførUtenNyBehandling(
         journalføringRequest: JournalføringRequest,
         journalpost: Journalpost,
+        journalførendeEnhet: String,
     ) {
         val fagsak =
             hentEllerOpprettFagsakIEgenTransaksjon(
@@ -198,7 +207,7 @@ class JournalføringService(
 
         ferdigstillJournalpost(
             journalpost = journalpost,
-            journalførendeEnhet = journalføringRequest.journalførendeEnhet,
+            journalførendeEnhet = journalførendeEnhet,
             fagsak = fagsak,
             dokumentTitler = journalføringRequest.dokumentTitler,
             logiskVedlegg = journalføringRequest.logiskeVedlegg,
