@@ -71,6 +71,7 @@ class DagligReiseBeregnYtelseSteg(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
+                tidligsteEndring = tidligsteEndring,
             )
         lagreInnvilgetVedtak(
             behandling = saksbehandling,

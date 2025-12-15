@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class DagligReiseBeregningService(
@@ -27,6 +28,7 @@ class DagligReiseBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
+        tidligsteEndring: LocalDate?,
     ): BeregningsresultatDagligReise {
         vedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
@@ -51,6 +53,7 @@ class DagligReiseBeregningService(
                     vedtaksperioder = vedtaksperioder,
                     behandling = behandling,
                     brukersNavKontor = brukersNavKontor,
+                    tidligsteEndring = tidligsteEndring
                 ),
         )
     }
@@ -60,6 +63,7 @@ class DagligReiseBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         brukersNavKontor: String?,
+        tidligsteEndring: LocalDate?,
     ): BeregningsresultatOffentligTransport? {
         val oppfylteVilkårOffentligTransport = oppfylteVilkårDagligReise.filter { it.fakta is FaktaOffentligTransport }
 
@@ -75,8 +79,8 @@ class DagligReiseBeregningService(
         return offentligTransportBeregningRevurderingService
             .flettMedForrigeVedtakHvisRevurdering(
                 nyttBeregningsresultat = nyttBeregningsresultat,
-                vedtaksperioder = vedtaksperioder,
                 behandling = behandling,
+                tidligsteEndring = tidligsteEndring,
             ).sorterReiserOgPerioder()
     }
 }

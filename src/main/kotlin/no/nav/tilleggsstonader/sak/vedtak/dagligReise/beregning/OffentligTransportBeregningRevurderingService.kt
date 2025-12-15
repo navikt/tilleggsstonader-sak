@@ -3,37 +3,30 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
-import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
 class OffentligTransportBeregningRevurderingService(
     private val vedtakRepository: VedtakRepository,
-    private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
     fun flettMedForrigeVedtakHvisRevurdering(
         nyttBeregningsresultat: BeregningsresultatOffentligTransport,
-        vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
+        tidligsteEndring: LocalDate?,
     ): BeregningsresultatOffentligTransport {
         val forrigeIverksatte =
             hentForrigeVedtak(behandling)?.beregningsresultat?.offentligTransport ?: return nyttBeregningsresultat
 
-        val tidligsteEndring =
-            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
-                behandlingId = behandling.id,
-                vedtaksperioder = vedtaksperioder,
-            ) ?: brukerfeil("Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen")
+        brukerfeilHvis(tidligsteEndring == null) { "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen" }
 
-        validerRevurdering(
+        validerEndringAvAlleredeUtbetaltPeriode(
             nyttBeregningsresultat = nyttBeregningsresultat,
             reiserForrigeBehandling = forrigeIverksatte.reiser,
         )
