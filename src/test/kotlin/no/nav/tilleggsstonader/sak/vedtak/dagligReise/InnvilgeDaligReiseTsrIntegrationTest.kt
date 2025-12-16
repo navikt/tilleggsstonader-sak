@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import io.mockk.every
+import no.nav.familie.prosessering.domene.Status
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
@@ -11,6 +12,7 @@ import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelseRepository
@@ -83,6 +85,6 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(andeler).allMatch { it.type == TypeAndel.DAGLIG_REISE_TILTAK_ENKELTPLASS_AMO }
         assertThat(andeler).allMatch { it.brukersNavKontor != null }
 
-        // TODO - også validere internt vedtak
+        assertThat(taskService.finnAlleTaskerMedType(InterntVedtakTask.TYPE)).allMatch { it.status == Status.FERDIG }
     }
 }

@@ -34,6 +34,7 @@ data class BeregningsresultatForPeriodeDto(
     val billettdetaljer: Map<Billettype, Int>,
     val antallReisedager: Int,
     val fraTidligereVedtak: Boolean,
+    val brukersNavKontor: String?,
 ) : Periode<LocalDate>
 
 fun BeregningsresultatDagligReise.tilDto(tidligsteEndring: LocalDate?): BeregningsresultatDagligReiseDto =
@@ -65,4 +66,5 @@ fun BeregningsresultatForPeriode.tilDto(): BeregningsresultatForPeriodeDto =
         billettdetaljer = billettdetaljer,
         antallReisedager = grunnlag.antallReisedager,
         fraTidligereVedtak = fraTidligereVedtak,
+        brukersNavKontor = grunnlag.brukersNavKontor,
     )
