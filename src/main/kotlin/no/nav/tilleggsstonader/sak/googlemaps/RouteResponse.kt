@@ -20,9 +20,14 @@ data class Step(
     val travelMode: Reisetype,
     val startLocation: Location,
     val endLocation: Location,
+    val navigationInstruction: NavigationInstruction,
     val transitDetails: TransitDetails?,
     val distanceMeters: Int?,
     val staticDuration: String,
+)
+
+data class NavigationInstruction(
+    val maneuver: Maneuver?,
 )
 
 data class TransitDetails(
@@ -106,4 +111,28 @@ enum class RouteLabel {
     DEFAULT_ROUTE_ALTERNATE,
     FUEL_EFFICIENT,
     SHORTER_DISTANCE,
+}
+
+enum class Maneuver {
+    MANEUVER_UNSPECIFIED,
+    TURN_SLIGHT_LEFT,
+    TURN_SHARP_LEFT,
+    UTURN_LEFT,
+    TURN_LEFT,
+    TURN_SLIGHT_RIGHT,
+    TURN_SHARP_RIGHT,
+    UTURN_RIGHT,
+    TURN_RIGHT,
+    STRAIGHT,
+    RAMP_LEFT,
+    RAMP_RIGHT,
+    MERGE,
+    FORK_LEFT,
+    FORK_RIGHT,
+    FERRY,
+    FERRY_TRAIN,
+    ROUNDABOUT_LEFT,
+    ROUNDABOUT_RIGHT,
+    DEPART,
+    NAME_CHANGE,
 }
