@@ -722,6 +722,7 @@ object InterntVedtakTestdata {
             )
 
         fun innvilgetVedtakTso() = innvilgetVedtak(beregningsresultatTso())
+
         fun innvilgetVedtakTsr() = innvilgetVedtak(beregningsresultatTsr())
 
         private fun innvilgetVedtak(beregningsresultatDagligReise: BeregningsresultatDagligReise) =
