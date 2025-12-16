@@ -18,7 +18,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
@@ -46,18 +46,18 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
             assertThat(size).isEqualTo(3)
 
             // Forventer at første andel, som er langt unna tidligste endring-datoen, ikke har blitt reberegnet
-            assertThat(first().grunnlag.fom).isEqualTo(1 januar 2025)
+            assertThat(first().fom).isEqualTo(1 januar 2025)
             assertThat(first().beløp).isEqualTo(999999999)
 
-            assertThat(get(1).grunnlag.fom).isEqualTo(31 januar 2025)
+            assertThat(get(1).fom).isEqualTo(31 januar 2025)
             assertThat(get(1).beløp).isEqualTo(800)
 
-            assertThat(last().grunnlag.fom).isEqualTo(2 mars 2025)
+            assertThat(last().fom).isEqualTo(2 mars 2025)
             assertThat(last().beløp).isEqualTo(800)
         }
     }
 
-    private fun hentBeregningsresultat(revurderingId: BehandlingId): List<BeregningsresultatForPeriode> =
+    private fun hentBeregningsresultat(revurderingId: BehandlingId): List<BeregningsresultatForPeriodeDto> =
         kall.vedtak
             .hentVedtak(
                 Stønadstype.DAGLIG_REISE_TSO,

@@ -16,13 +16,11 @@ import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkårDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForPeriodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForReiseDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
@@ -87,41 +85,26 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                     ),
                 ),
             beregningsresultat =
-                BeregningsresultatDagligReise(
+                BeregningsresultatDagligReiseDto(
                     offentligTransport =
-                        BeregningsresultatOffentligTransport(
+                        BeregningsresultatOffentligTransportDto(
                             reiser =
                                 listOf(
-                                    BeregningsresultatForReise(
+                                    BeregningsresultatForReiseDto(
                                         reiseId = dummyReiseId,
                                         perioder =
                                             listOf(
-                                                BeregningsresultatForPeriode(
-                                                    grunnlag =
-                                                        BeregningsgrunnlagOffentligTransport(
-                                                            fom = dummyFom,
-                                                            tom = dummyTom,
-                                                            prisEnkeltbillett = 44,
-                                                            prisSyvdagersbillett = null,
-                                                            pris30dagersbillett = 750,
-                                                            antallReisedagerPerUke = 4,
-                                                            vedtaksperioder =
-                                                                listOf(
-                                                                    VedtaksperiodeGrunnlag(
-                                                                        id = vedtaksperiode.id,
-                                                                        fom = dummyFom,
-                                                                        tom = dummyTom,
-                                                                        målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-                                                                        aktivitet = AktivitetType.TILTAK,
-                                                                        typeAktivitet = null,
-                                                                        antallReisedagerIVedtaksperioden = 19,
-                                                                    ),
-                                                                ),
-                                                            antallReisedager = 19,
-                                                            brukersNavKontor = null,
-                                                        ),
+                                                BeregningsresultatForPeriodeDto(
+                                                    fom = dummyFom,
+                                                    tom = dummyTom,
+                                                    prisEnkeltbillett = 44,
+                                                    prisSyvdagersbillett = null,
+                                                    pris30dagersbillett = 750,
+                                                    antallReisedagerPerUke = 4,
                                                     beløp = 750,
                                                     billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1),
+                                                    antallReisedager = 19,
+                                                    fraTidligereVedtak = false,
                                                 ),
                                             ),
                                     ),
