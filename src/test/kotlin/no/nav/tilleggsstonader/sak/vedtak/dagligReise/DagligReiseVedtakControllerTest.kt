@@ -105,6 +105,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                                                     billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1),
                                                     antallReisedager = 19,
                                                     fraTidligereVedtak = false,
+                                                    brukersNavKontor = null,
                                                 ),
                                             ),
                                     ),

@@ -178,7 +178,8 @@
               "SYVDAGERSBILLETT" : 1
             },
             "antallReisedager" : 5,
-            "fraTidligereVedtak" : false
+            "fraTidligereVedtak" : false,
+            "brukersNavKontor" : null
           }, {
             "fom" : "2024-02-05",
             "tom" : "2024-02-10",
@@ -191,7 +192,8 @@
               "SYVDAGERSBILLETT" : 1
             },
             "antallReisedager" : 5,
-            "fraTidligereVedtak" : false
+            "fraTidligereVedtak" : false,
+            "brukersNavKontor" : null
           } ]
         }, {
           "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
@@ -207,7 +209,8 @@
               "ENKELTBILLETT" : 4
             },
             "antallReisedager" : 2,
-            "fraTidligereVedtak" : false
+            "fraTidligereVedtak" : false,
+            "brukersNavKontor" : null
           } ]
         } ]
       },

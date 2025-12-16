@@ -647,7 +647,11 @@ object InterntVedtakTestdata {
         val grunnlagsdata =
             lagGrunnlagsdata(personopplysninger = lagFaktaGrunnlagPersonopplysninger(barn = emptyList()))
 
-        val beregningsresultat =
+        fun beregningsresultatTso() = beregningsresultat(brukersNavKontor = null)
+
+        fun beregningsresultatTsr() = beregningsresultat(brukersNavKontor = "1234")
+
+        fun beregningsresultat(brukersNavKontor: String?) =
             BeregningsresultatDagligReise(
                 offentligTransport =
                     BeregningsresultatOffentligTransport(
@@ -668,7 +672,7 @@ object InterntVedtakTestdata {
                                                         antallReisedagerPerUke = 5,
                                                         vedtaksperioder = emptyList(),
                                                         antallReisedager = 5,
-                                                        brukersNavKontor = null,
+                                                        brukersNavKontor = brukersNavKontor,
                                                     ),
                                                 beløp = 400,
                                                 billettdetaljer = mapOf(Billettype.SYVDAGERSBILLETT to 1),
@@ -684,7 +688,7 @@ object InterntVedtakTestdata {
                                                         antallReisedagerPerUke = 5,
                                                         vedtaksperioder = emptyList(),
                                                         antallReisedager = 5,
-                                                        brukersNavKontor = null,
+                                                        brukersNavKontor = brukersNavKontor,
                                                     ),
                                                 beløp = 400,
                                                 billettdetaljer = mapOf(Billettype.SYVDAGERSBILLETT to 1),
@@ -706,7 +710,7 @@ object InterntVedtakTestdata {
                                                         antallReisedagerPerUke = 2,
                                                         vedtaksperioder = emptyList(),
                                                         antallReisedager = 2,
-                                                        brukersNavKontor = null,
+                                                        brukersNavKontor = brukersNavKontor,
                                                     ),
                                                 beløp = 320,
                                                 billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 4),
@@ -716,14 +720,18 @@ object InterntVedtakTestdata {
                             ),
                     ),
             )
-        val innvilgetVedtak =
+
+        fun innvilgetVedtakTso() = innvilgetVedtak(beregningsresultatTso())
+        fun innvilgetVedtakTsr() = innvilgetVedtak(beregningsresultatTsr())
+
+        private fun innvilgetVedtak(beregningsresultatDagligReise: BeregningsresultatDagligReise) =
             GeneriskVedtak(
                 behandlingId = behandlingId,
                 type = TypeVedtak.INNVILGELSE,
                 data =
                     InnvilgelseDagligReise(
                         vedtaksperioder = vedtaksperioder,
-                        beregningsresultat = beregningsresultat,
+                        beregningsresultat = beregningsresultatDagligReise,
                         begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
