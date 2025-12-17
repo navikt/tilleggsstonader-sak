@@ -7,6 +7,7 @@ data class ReisedataDto(
 data class RuteDto(
     val polyline: Polyline,
     val avstandMeter: Int,
+    val avstandUtenFerje: Int,
     val varighetSekunder: Double,
     val strekninger: List<StrekningDto>,
     val startLokasjon: Lokasjon,
@@ -46,6 +47,7 @@ private fun Route.tilDto(): RuteDto =
     RuteDto(
         polyline = polyline,
         avstandMeter = distanceMeters,
+        avstandUtenFerje = distanceMeters - legs.finnFerjeavstand(),
         varighetSekunder = staticDuration.tilDouble(),
         strekninger = legs.tilDto(),
         startLokasjon =
@@ -63,6 +65,9 @@ private fun Route.tilDto(): RuteDto =
                 .endLocation
                 .tilLokasjon(),
     )
+
+private fun List<Leg>.finnFerjeavstand(): Int =
+    flatMap { it.steps }.filter { it.navigationInstruction.maneuver == Maneuver.FERRY }.sumOf { it.distanceMeters ?: 0 }
 
 private fun List<Leg>.tilDto(): List<StrekningDto> {
     val steps = this.flatMap { leg -> leg.steps }.mergeSammenhengende()
