@@ -46,8 +46,8 @@ fun Route?.tilReisedataDto(): ReisedataDto =
 private fun Route.tilDto(): RuteDto =
     RuteDto(
         polyline = polyline,
-        avstandMeter = distanceMeters,
-        avstandUtenFerje = distanceMeters - legs.finnFerjeavstand(),
+        avstandMeter = distanceMeters ?: 0,
+        avstandUtenFerje = (distanceMeters ?: 0) - legs.finnFerjeavstand(),
         varighetSekunder = staticDuration.tilDouble(),
         strekninger = legs.tilDto(),
         startLokasjon =

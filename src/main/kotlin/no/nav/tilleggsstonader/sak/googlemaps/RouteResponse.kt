@@ -7,7 +7,7 @@ data class RuteResponse(
 data class Route(
     val routeLabels: List<RouteLabel>,
     val polyline: Polyline,
-    val distanceMeters: Int,
+    val distanceMeters: Int?,
     val staticDuration: String,
     val legs: List<Leg>,
 )
