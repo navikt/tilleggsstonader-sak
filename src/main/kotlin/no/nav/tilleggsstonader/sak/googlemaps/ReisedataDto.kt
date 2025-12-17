@@ -23,7 +23,7 @@ data class StrekningDto(
 data class KollektivDetaljerDto(
     val startHoldeplass: String,
     val sluttHoldeplass: String,
-    val linjeNavn: String,
+    val linjeNavn: String?,
     val linjeType: LinjeType,
     val operatør: List<Operatør>,
 )

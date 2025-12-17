@@ -57,7 +57,7 @@ data class LatLng(
 
 data class TransitLine(
     val shortName: String?,
-    val name: String,
+    val name: String?,
     val vehicle: Vehicle,
     val agencies: List<TransitAgency>,
 )
