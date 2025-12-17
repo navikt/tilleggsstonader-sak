@@ -67,7 +67,7 @@ private fun Route.tilDto(): RuteDto =
     )
 
 private fun List<Leg>.finnFerjeavstand(): Int =
-    flatMap { it.steps }.filter { it.navigationInstruction.maneuver == Maneuver.FERRY }.sumOf { it.distanceMeters ?: 0 }
+    flatMap { it.steps }.filter { it.navigationInstruction?.maneuver == Maneuver.FERRY }.sumOf { it.distanceMeters ?: 0 }
 
 private fun List<Leg>.tilDto(): List<StrekningDto> {
     val steps = this.flatMap { leg -> leg.steps }.mergeSammenhengende()

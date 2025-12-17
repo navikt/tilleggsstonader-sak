@@ -20,7 +20,7 @@ data class Step(
     val travelMode: Reisetype,
     val startLocation: Location,
     val endLocation: Location,
-    val navigationInstruction: NavigationInstruction,
+    val navigationInstruction: NavigationInstruction?,
     val transitDetails: TransitDetails?,
     val distanceMeters: Int?,
     val staticDuration: String,
