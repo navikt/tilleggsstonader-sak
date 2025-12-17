@@ -18,7 +18,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
-    val utbetalingTopic = "tilleggsstonader.utbetaling.v1"
 
     @Test
     fun `utbetalingsdato i fremtiden - ingen andeler skal bli utbetalt`() {
@@ -30,7 +29,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             medVilkår = listOf(reiseFramITid),
         )
 
-        KafkaTestConfig.sendteMeldinger().forventAntallMeldingerPåTopic(utbetalingTopic, 0)
+        KafkaTestConfig.sendteMeldinger().forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
     }
 
     @Test
@@ -50,7 +49,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 medVilkår = reiser,
             )
 
-        val utbetalinger = KafkaTestConfig.sendteMeldinger().finnPåTopic(utbetalingTopic)
+        val utbetalinger = KafkaTestConfig.sendteMeldinger().finnPåTopic(kafkaTopics.utbetaling)
         val utbetaling = utbetalinger.single().verdiEllerFeil<IverksettingDto>()
 
         with(utbetaling.utbetalingsgrunnlag) {
@@ -85,7 +84,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         val utbetaling =
             KafkaTestConfig
                 .sendteMeldinger()
-                .finnPåTopic(utbetalingTopic)
+                .finnPåTopic(kafkaTopics.utbetaling)
                 .single()
                 .verdiEllerFeil<IverksettingDto>()
 
