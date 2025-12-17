@@ -39,7 +39,6 @@ class BehandlingsstatistikkService(
         hendelse: Hendelse,
         hendelseTidspunkt: LocalDateTime,
         gjeldendeSaksbehandler: String?,
-        oppgaveId: Long?,
         behandlingMetode: BehandlingMetode?,
     ) {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
@@ -49,7 +48,6 @@ class BehandlingsstatistikkService(
                 hendelse = hendelse,
                 hendelseTidspunkt = hendelseTidspunkt,
                 gjeldendeSaksbehandler = gjeldendeSaksbehandler,
-                oppgaveId = oppgaveId,
                 behandlingMetode = behandlingMetode,
                 saksbehandling = saksbehandling,
             )
@@ -62,10 +60,9 @@ class BehandlingsstatistikkService(
         hendelse: Hendelse,
         hendelseTidspunkt: LocalDateTime,
         gjeldendeSaksbehandler: String?,
-        oppgaveId: Long?,
         behandlingMetode: BehandlingMetode?,
     ): BehandlingDVH {
-        val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId, oppgaveId)
+        val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId)
         val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling)
         val søkerHarStrengtFortroligAdresse = evaluerAdresseBeskyttelseStrengtFortrolig(saksbehandling.ident)
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(behandlingId)
@@ -92,14 +89,8 @@ class BehandlingsstatistikkService(
     private fun utledRelatertBehandling(saksbehandling: Saksbehandling) =
         saksbehandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).id.toString() }
 
-    private fun finnSisteOppgaveForBehandlingen(
-        behandlingId: BehandlingId,
-        oppgaveId: Long?,
-    ): Oppgave? {
-        val gsakOppgaveId = oppgaveId ?: oppgaveService.finnSisteBehandlingsoppgaveForBehandling(behandlingId)?.gsakOppgaveId
-
-        return gsakOppgaveId?.let { oppgaveService.hentOppgave(it) }
-    }
+    private fun finnSisteOppgaveForBehandlingen(behandlingId: BehandlingId): Oppgave? =
+        oppgaveService.finnSisteBehandlingsoppgaveForBehandling(behandlingId)?.gsakOppgaveId?.let { oppgaveService.hentOppgave(it) }
 
     private fun finnSaksbehandler(
         hendelse: Hendelse,

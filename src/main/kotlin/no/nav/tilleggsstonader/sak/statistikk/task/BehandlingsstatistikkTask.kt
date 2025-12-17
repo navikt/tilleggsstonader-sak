@@ -23,7 +23,7 @@ class BehandlingsstatistikkTask(
     private val behandlingsstatistikkService: BehandlingsstatistikkService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val (behandlingId, hendelse, hendelseTidspunkt, gjeldendeSaksbehandler, oppgaveId, behandlingMetode) =
+        val (behandlingId, hendelse, hendelseTidspunkt, gjeldendeSaksbehandler, behandlingMetode) =
             objectMapper.readValue<BehandlingsstatistikkTaskPayload>(task.payload)
 
         behandlingsstatistikkService.sendBehandlingstatistikk(
@@ -31,7 +31,6 @@ class BehandlingsstatistikkTask(
             hendelse,
             hendelseTidspunkt,
             gjeldendeSaksbehandler,
-            oppgaveId,
             behandlingMetode,
         )
     }
@@ -40,13 +39,11 @@ class BehandlingsstatistikkTask(
         fun opprettMottattTask(
             behandlingId: BehandlingId,
             hendelseTidspunkt: LocalDateTime,
-            oppgaveId: Long?,
         ): Task =
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.MOTTATT,
                 hendelseTidspunkt = hendelseTidspunkt,
-                oppgaveId = oppgaveId,
             )
 
         fun opprettPåbegyntTask(behandlingId: BehandlingId): Task =
@@ -101,7 +98,6 @@ class BehandlingsstatistikkTask(
         private fun opprettTask(
             behandlingId: BehandlingId,
             hendelse: Hendelse,
-            oppgaveId: Long? = null,
             hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
             gjeldendeSaksbehandler: String? = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
             behandlingMetode: BehandlingMetode? = BehandlingMetode.MANUELL,
@@ -115,7 +111,6 @@ class BehandlingsstatistikkTask(
                             hendelse,
                             hendelseTidspunkt,
                             gjeldendeSaksbehandler,
-                            oppgaveId,
                             behandlingMetode,
                         ),
                     ),
@@ -125,7 +120,6 @@ class BehandlingsstatistikkTask(
                         this["behandlingId"] = behandlingId.toString()
                         this["hendelse"] = hendelse.name
                         this["hendelseTidspunkt"] = hendelseTidspunkt.toString()
-                        this["oppgaveId"] = oppgaveId?.toString() ?: ""
                     },
             )
 
@@ -137,7 +131,6 @@ class BehandlingsstatistikkTask(
         val hendelse: Hendelse,
         val hendelseTidspunkt: LocalDateTime,
         val gjeldendeSaksbehandler: String?,
-        val oppgaveId: Long?,
         val behandlingMetode: BehandlingMetode?,
     )
 }

@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -122,6 +123,13 @@ class OpprettBehandlingService(
                 ),
             )
         }
+
+        taskService.save(
+            BehandlingsstatistikkTask.opprettMottattTask(
+                behandlingId = behandling.id,
+                hendelseTidspunkt = behandling.kravMottatt?.atStartOfDay() ?: LocalDateTime.now(),
+            ),
+        )
 
         return behandling
     }
