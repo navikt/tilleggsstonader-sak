@@ -1,0 +1,194 @@
+{
+  "routes": [
+    {
+      "routeLabels": ["DEFAULT_ROUTE"],
+      "polyline": {
+        "encodedPolyline": "{bm}Jukxl@o@jAwA^]M_AMoBs@kAg@sAyBQSYz@?PH\\rBtDLx@b@v@h@ZUz@Yx@eBuBUr@MFYKIIi@{@{DcHi@gA[gAg@_DS_AACMQ}AuBaA}@[KE?[?_@RUXiErKgGpO}HzRmVxm@gYps@kn@v}AUhAGp@CpCAvB?rE@fBFtMB~CAtCA~BMnD[tEK`AQxA]zBWt@]b@A@OLUF"
+      },
+      "distanceMeters": 4693,
+      "staticDuration": "2407s",
+      "legs": [
+        {
+          "steps": [
+            {
+              "travelMode": "DRIVE",
+              "startLocation": {
+                "latLng": {
+                  "latitude": 62.659176200000005,
+                  "longitude": 7.502830500000001
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": 62.6617806,
+                  "longitude": 7.5036007
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART"
+              },
+              "transitDetails": null,
+              "distanceMeters": 310,
+              "staticDuration": "41s"
+            },
+            {
+              "travelMode": "DRIVE",
+              "startLocation": {
+                "latLng": {
+                  "latitude": 62.6617806,
+                  "longitude": 7.5036007
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": 62.66190749999999,
+                  "longitude": 7.503214400000001
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT"
+              },
+              "transitDetails": null,
+              "distanceMeters": 25,
+              "staticDuration": "10s"
+            },
+            {
+              "travelMode": "DRIVE",
+              "startLocation": {
+                "latLng": {
+                  "latitude": 62.66190749999999,
+                  "longitude": 7.503214400000001
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": 62.660819399999994,
+                  "longitude": 7.5014448
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT"
+              },
+              "transitDetails": null,
+              "distanceMeters": 155,
+              "staticDuration": "28s"
+            },
+            {
+              "travelMode": "DRIVE",
+              "startLocation": {
+                "latLng": {
+                  "latitude": 62.660819399999994,
+                  "longitude": 7.5014448
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": 62.6610619,
+                  "longitude": 7.5008469
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT"
+              },
+              "transitDetails": null,
+              "distanceMeters": 41,
+              "staticDuration": "16s"
+            },
+            {
+              "travelMode": "DRIVE",
+              "startLocation": {
+                "latLng": {
+                  "latitude": 62.6610619,
+                  "longitude": 7.5008469
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": 62.6615668,
+                  "longitude": 7.5014372
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT"
+              },
+              "transitDetails": null,
+              "distanceMeters": 64,
+              "staticDuration": "10s"
+            },
+            {
+              "travelMode": "DRIVE",
+              "startLocation": {
+                "latLng": {
+                  "latitude": 62.6615668,
+                  "longitude": 7.5014372
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": 62.66380969999999,
+                  "longitude": 7.5049619000000005
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT"
+              },
+              "transitDetails": null,
+              "distanceMeters": 334,
+              "staticDuration": "138s"
+            },
+            {
+              "travelMode": "DRIVE",
+              "startLocation": {
+                "latLng": {
+                  "latitude": 62.66380969999999,
+                  "longitude": 7.5049619000000005
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": 62.6848171,
+                  "longitude": 7.4648305
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "FERRY"
+              },
+              "transitDetails": null,
+              "distanceMeters": 3208,
+              "staticDuration": "2088s"
+            },
+            {
+              "travelMode": "DRIVE",
+              "startLocation": {
+                "latLng": {
+                  "latitude": 62.6848171,
+                  "longitude": 7.4648305
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": 62.6857511,
+                  "longitude": 7.454786800000001
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "STRAIGHT"
+              },
+              "transitDetails": null,
+              "distanceMeters": 556,
+              "staticDuration": "76s"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "geocodingResults": {
+    "origin": {
+      "placeId": "ChIJtS1aVfb4E0YRRJobI6t2Mdw"
+    },
+    "destination": {
+      "placeId": "ChIJ6fHTti_5E0YRJhSJLbVl_Rk"
+    }
+  }
+}

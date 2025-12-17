@@ -5,66 +5,33 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDate
-import java.time.ZoneId
 
 @RestController
 @RequestMapping(path = ["/api/kart"])
 @ProtectedWithClaims(issuer = "azuread")
 class GooglemapsController(
-    private val googleRoutesClient: GoogleRoutesClient,
     private val googleAutocompleteClient: GoogleAutocompleteClient,
     private val staticMapClient: GoogleStaticMapClient,
+    private val googlemapsService: GooglemapsService,
 ) {
     @PostMapping("/kjoreavstand")
     fun hentKjoreavstand(
         @RequestBody finnReiseAvstandDto: FinnReiseavstandDto,
-    ) = googleRoutesClient
-        .hentRuter(
-            RuteRequest(
-                origin = Address(finnReiseAvstandDto.fraAdresse),
-                destination = Address(finnReiseAvstandDto.tilAdresse),
-                travelMode = "DRIVE",
-                departureTime = null,
-                transitPreferences = null,
-                polylineQuality = "OVERVIEW",
-                computeAlternativeRoutes = true,
-            ),
-        )?.finnKortesteRute()
-        ?.tilReisedataDto()
+    ): ReisedataDto? =
+        googlemapsService
+            .hentKjøreruter(
+                fraAdresse = Address(finnReiseAvstandDto.fraAdresse),
+                tilAdresse = Address(finnReiseAvstandDto.tilAdresse),
+            )
 
     @PostMapping("/kollektiv-detaljer")
     fun hentKollektivDetalher(
         @RequestBody finnReiseAvstandDto: FinnReiseavstandDto,
-    ) = googleRoutesClient
-        .hentRuter(
-            RuteRequest(
-                origin = Address(finnReiseAvstandDto.fraAdresse),
-                destination = Address(finnReiseAvstandDto.tilAdresse),
-                travelMode = "TRANSIT",
-                departureTime =
-                    LocalDate
-                        .now()
-                        .atTime(8, 0)
-                        .atZone(ZoneId.of("Europe/Oslo"))
-                        .toInstant()
-                        .toString(),
-                transitPreferences =
-                    TransitPreferences(
-                        allowedTravelModes =
-                            listOf(
-                                TransitOption.TRAIN.value,
-                                TransitOption.SUBWAY.value,
-                                TransitOption.BUS.value,
-                                TransitOption.LIGHT_RAIL.value,
-                                TransitOption.RAIL.value,
-                            ),
-                    ),
-                polylineQuality = "OVERVIEW",
-                computeAlternativeRoutes = false,
-            ),
-        )?.finnDefaultRute()
-        ?.tilReisedataDto()
+    ) = googlemapsService
+        .hentKollektivRute(
+            fraAdresse = Address(finnReiseAvstandDto.fraAdresse),
+            tilAdresse = Address(finnReiseAvstandDto.tilAdresse),
+        )
 
     @PostMapping("/statisk-kart")
     fun hentStatiskKart(
