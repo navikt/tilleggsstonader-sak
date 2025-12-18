@@ -13,7 +13,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
@@ -240,7 +243,30 @@ data class TidligsteEndringIBehandlingUtleder(
             barnIdTilIdentMap[vilkårNå.barnId] != barnIdTilIdentMap[vilkårTidligereBehandling.barnId] ||
             vilkårNå.erFremtidigUtgift != vilkårTidligereBehandling.erFremtidigUtgift ||
             vilkårNå.type != vilkårTidligereBehandling.type ||
-            vilkårNå.resultat != vilkårTidligereBehandling.resultat
+            vilkårNå.resultat != vilkårTidligereBehandling.resultat ||
+            erVilkårFaktaEndret(vilkårNå.fakta, vilkårTidligereBehandling.fakta)
+
+    private fun erVilkårFaktaEndret(
+        faktaNå: VilkårFakta?,
+        faktaTidligere: VilkårFakta?,
+    ): Boolean =
+        when {
+            faktaNå is FaktaDagligReiseOffentligTransport && faktaTidligere is FaktaDagligReiseOffentligTransport -> {
+                faktaNå.reisedagerPerUke != faktaTidligere.reisedagerPerUke ||
+                    faktaNå.prisEnkelbillett != faktaTidligere.prisEnkelbillett ||
+                    faktaNå.prisSyvdagersbillett != faktaTidligere.prisSyvdagersbillett ||
+                    faktaNå.prisTrettidagersbillett != faktaTidligere.prisTrettidagersbillett
+            }
+
+            faktaNå is FaktaDagligReisePrivatBil && faktaTidligere is FaktaDagligReisePrivatBil -> {
+                faktaNå.reisedagerPerUke != faktaTidligere.reisedagerPerUke ||
+                    faktaNå.reiseavstandEnVei != faktaTidligere.reiseavstandEnVei ||
+                    faktaNå.prisBompengerPerDag != faktaTidligere.prisBompengerPerDag ||
+                    faktaNå.prisFergekostandPerDag != faktaTidligere.prisFergekostandPerDag
+            }
+
+            else -> false
+        }
 
     private fun erMålgruppeEllerAktivitetEndret(
         vilkårperiode: GeneriskVilkårperiode<*>,
