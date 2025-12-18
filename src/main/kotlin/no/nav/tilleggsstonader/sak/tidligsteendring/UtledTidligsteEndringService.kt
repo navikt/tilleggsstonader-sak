@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -83,7 +84,8 @@ class UtledTidligsteEndringService(
     ): TidligsteEndringResultat? {
         val behandling = behandlingService.hentBehandling(behandlingId)
 
-        val sisteIverksatteBehandling = behandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentBehandling(it) }
+        val sisteIverksatteBehandling =
+            behandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentBehandling(it) }
 
         if (sisteIverksatteBehandling == null) {
             return null
@@ -95,7 +97,8 @@ class UtledTidligsteEndringService(
         val vilkårTidligereBehandling = vilkårService.hentVilkår(sisteIverksatteBehandling.id)
         val vilkårsperioderTidligereBehandling = vilkårperiodeService.hentVilkårperioder(sisteIverksatteBehandling.id)
 
-        val vedtaksperioderTidligereBehandling = hentVedtaksperioderTidligereBehandlingFunction(sisteIverksatteBehandling.id)
+        val vedtaksperioderTidligereBehandling =
+            hentVedtaksperioderTidligereBehandlingFunction(sisteIverksatteBehandling.id)
 
         val barnIder = barnService.finnBarnPåBehandling(behandlingId)
         val barnIderTidligereBehandling = barnService.finnBarnPåBehandling(sisteIverksatteBehandling.id)
@@ -244,7 +247,8 @@ data class TidligsteEndringIBehandlingUtleder(
             vilkårNå.erFremtidigUtgift != vilkårTidligereBehandling.erFremtidigUtgift ||
             vilkårNå.type != vilkårTidligereBehandling.type ||
             vilkårNå.resultat != vilkårTidligereBehandling.resultat ||
-            erVilkårFaktaEndret(vilkårNå.fakta, vilkårTidligereBehandling.fakta)
+            erVilkårFaktaEndret(vilkårNå.fakta, vilkårTidligereBehandling.fakta) ||
+            harNyttSvarForSkalDekkeFaktiskeUtgifter(vilkårNå, vilkårTidligereBehandling)
 
     private fun erVilkårFaktaEndret(
         faktaNå: VilkårFakta?,
@@ -267,6 +271,25 @@ data class TidligsteEndringIBehandlingUtleder(
 
             else -> false
         }
+
+    /**
+     * Dersom svar på om bruker har høyere utgifter pga. helsemessige årsaker endrer seg
+     * skal det plukkes opp som en endring på vilkår fordi det påvirker hvordan man beregner.
+     *
+     * Gjelder kun boutgifter og fører til at bruker vil få dekt faktiske utgifter.
+     */
+    private fun harNyttSvarForSkalDekkeFaktiskeUtgifter(
+        vilkårNå: Vilkår,
+        vilkårTidligereBehandling: Vilkår,
+    ): Boolean {
+        val tidligereSvar =
+            vilkårTidligereBehandling.delvilkårsett.firstOrNull { it.hovedregel == RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER }
+
+        val nyttSvar =
+            vilkårNå.delvilkårsett.firstOrNull { it.hovedregel == RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER }
+
+        return tidligereSvar != nyttSvar
+    }
 
     private fun erMålgruppeEllerAktivitetEndret(
         vilkårperiode: GeneriskVilkårperiode<*>,
