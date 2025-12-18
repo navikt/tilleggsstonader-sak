@@ -206,6 +206,8 @@ google:
     uri: https://maps.googleapis.com/maps/api/staticmap
   autocomplete:
     uri: https://places.googleapis.com/v1/places:autocomplete
+  place-details:
+    uri: https://places.googleapis.com/v1/places/
 
 clients:
   integrasjoner:

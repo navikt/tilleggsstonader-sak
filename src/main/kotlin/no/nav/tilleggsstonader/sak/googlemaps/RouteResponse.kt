@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.googlemaps
 
 data class RuteResponse(
     val routes: List<Route>?,
+    val geocodingResults: GeocodingResults,
 )
 
 data class Route(
@@ -73,6 +74,15 @@ data class Vehicle(
 
 data class Polyline(
     val encodedPolyline: String,
+)
+
+data class GeocodingResults(
+    val origin: GeocodedWaypoint,
+    val destination: GeocodedWaypoint,
+)
+
+data class GeocodedWaypoint(
+    val placeId: String,
 )
 
 enum class LinjeType {

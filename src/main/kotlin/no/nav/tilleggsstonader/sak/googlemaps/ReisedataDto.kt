@@ -2,7 +2,22 @@ package no.nav.tilleggsstonader.sak.googlemaps
 
 data class ReisedataDto(
     val reiserute: RuteDto?,
-)
+) {
+    constructor(rute: Rute, startOgSluttAdresse: StartOgSluttAdresse, avstandUtenFerje: Int) : this(
+        reiserute =
+            RuteDto(
+                polyline = rute.polyline,
+                avstandMeter = rute.avstandMeter,
+                avstandUtenFerje = avstandUtenFerje,
+                varighetSekunder = rute.varighetSekunder,
+                strekninger = rute.strekninger.map { it.tilDto() },
+                startLokasjon = rute.startLokasjon.tilDto(),
+                sluttLokasjon = rute.sluttLokasjon.tilDto(),
+                startAdresse = startOgSluttAdresse.startAdresse,
+                sluttAdresse = startOgSluttAdresse.sluttAdresse,
+            ),
+    )
+}
 
 data class RuteDto(
     val polyline: Polyline,
@@ -10,8 +25,10 @@ data class RuteDto(
     val avstandUtenFerje: Int,
     val varighetSekunder: Double,
     val strekninger: List<StrekningDto>,
-    val startLokasjon: Lokasjon,
-    val sluttLokasjon: Lokasjon,
+    val startLokasjon: LokasjonDto,
+    val sluttLokasjon: LokasjonDto,
+    val startAdresse: String?,
+    val sluttAdresse: String?,
 )
 
 data class StrekningDto(
@@ -25,107 +42,43 @@ data class KollektivDetaljerDto(
     val sluttHoldeplass: String,
     val linjeNavn: String?,
     val linjeType: LinjeType,
-    val operatør: List<Operatør>,
+    val operatør: List<OperatørDto>,
 )
 
-data class Operatør(
+data class OperatørDto(
     val navn: String,
     val url: String,
 )
 
-data class Lokasjon(
+data class LokasjonDto(
     val lat: Double,
     val lng: Double,
 )
 
-fun Route?.tilReisedataDto(): ReisedataDto =
-    ReisedataDto(
-        reiserute = this?.tilDto(),
+fun Lokasjon.tilDto() =
+    LokasjonDto(
+        lat = lat,
+        lng = lng,
     )
 
-private fun Route.tilDto(): RuteDto =
-    RuteDto(
-        polyline = polyline,
-        avstandMeter = distanceMeters ?: 0,
-        avstandUtenFerje = (distanceMeters ?: 0) - legs.finnFerjeavstand(),
-        varighetSekunder = staticDuration.tilDouble(),
-        strekninger = legs.tilDto(),
-        startLokasjon =
-            legs
-                .first()
-                .steps
-                .first()
-                .startLocation
-                .tilLokasjon(),
-        sluttLokasjon =
-            legs
-                .last()
-                .steps
-                .last()
-                .endLocation
-                .tilLokasjon(),
+fun Strekning.tilDto() =
+    StrekningDto(
+        varighetSekunder = varighetSekunder,
+        reisetype = reisetype,
+        kollektivDetaljer = kollektivDetaljer?.tilDto(),
     )
 
-private fun List<Leg>.finnFerjeavstand(): Int =
-    flatMap { it.steps }.filter { it.navigationInstruction?.maneuver == Maneuver.FERRY }.sumOf { it.distanceMeters ?: 0 }
-
-private fun List<Leg>.tilDto(): List<StrekningDto> {
-    val steps = this.flatMap { leg -> leg.steps }.mergeSammenhengende()
-    return steps.map {
-        StrekningDto(
-            varighetSekunder = it.staticDuration.tilDouble(),
-            reisetype = it.travelMode,
-            kollektivDetaljer = it.transitDetails?.tilDto(),
-        )
-    }
-}
-
-private fun TransitDetails.tilDto(): KollektivDetaljerDto =
+fun KollektivDetaljer.tilDto() =
     KollektivDetaljerDto(
-        startHoldeplass = stopDetails.departureStop.name,
-        sluttHoldeplass = stopDetails.arrivalStop.name,
-        linjeNavn = transitLine.name,
-        linjeType = transitLine.vehicle.type,
-        operatør = transitLine.agencies.map { it.tilDto() },
+        startHoldeplass = startHoldeplass,
+        sluttHoldeplass = sluttHoldeplass,
+        linjeNavn = linjeNavn,
+        linjeType = linjeType,
+        operatør = operatør.map { it.tilDto() },
     )
 
-private fun TransitAgency.tilDto(): Operatør =
-    Operatør(
-        navn = this.name,
-        url = this.uri,
+fun Operatør.tilDto() =
+    OperatørDto(
+        navn = navn,
+        url = url,
     )
-
-private fun List<Step>.mergeSammenhengende(): List<Step> =
-    this.fold(mutableListOf()) { acc, entry ->
-        val last = acc.lastOrNull()
-        val skalMerges =
-            last != null &&
-                last.travelMode == entry.travelMode &&
-                last.transitDetails == entry.transitDetails
-        if (skalMerges) {
-            acc.removeLast()
-            acc.add(
-                last.copy(
-                    endLocation = entry.endLocation,
-                    distanceMeters = listOfNotNull(last.distanceMeters, entry.distanceMeters).sum(),
-                    staticDuration = summerSekunderStrings(last.staticDuration, entry.staticDuration),
-                ),
-            )
-        } else {
-            acc.add(entry)
-        }
-        acc
-    }
-
-private fun Location.tilLokasjon(): Lokasjon =
-    Lokasjon(
-        lat = this.latLng.latitude,
-        lng = this.latLng.longitude,
-    )
-
-private fun String.tilDouble(): Double = this.removeSuffix("s").toDouble()
-
-private fun summerSekunderStrings(
-    string1: String,
-    string2: String,
-): String = (string1.tilDouble() + string2.tilDouble()).toString() + "s"
