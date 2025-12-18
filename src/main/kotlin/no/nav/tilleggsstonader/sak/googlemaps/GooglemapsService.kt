@@ -34,7 +34,7 @@ class GooglemapsService(
         val startOgSluttAdresse = finnStartOgSluttAdresse(kortesteRute)
         val avstandUtenFerje = kortesteRute.avstandMeter - kortesteRute.finnFerjeavstand()
 
-        return tilReisedataDto(
+        return ReisedataDto(
             rute = kortesteRute,
             startOgSluttAdresse = startOgSluttAdresse,
             avstandUtenFerje = avstandUtenFerje,
@@ -81,7 +81,7 @@ class GooglemapsService(
         val startOgSluttAdresse = finnStartOgSluttAdresse(defaultRute)
         val avstandUtenFerje = defaultRute.avstandMeter - defaultRute.finnFerjeavstand()
 
-        return tilReisedataDto(
+        return ReisedataDto(
             rute = defaultRute,
             startOgSluttAdresse = startOgSluttAdresse,
             avstandUtenFerje = avstandUtenFerje,

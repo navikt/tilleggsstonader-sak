@@ -2,7 +2,22 @@ package no.nav.tilleggsstonader.sak.googlemaps
 
 data class ReisedataDto(
     val reiserute: RuteDto?,
-)
+) {
+    constructor(rute: Rute, startOgSluttAdresse: StartOgSluttAdresse, avstandUtenFerje: Int) : this(
+        reiserute =
+            RuteDto(
+                polyline = rute.polyline,
+                avstandMeter = rute.avstandMeter,
+                avstandUtenFerje = avstandUtenFerje,
+                varighetSekunder = rute.varighetSekunder,
+                strekninger = rute.strekninger.map { it.tilDto() },
+                startLokasjon = rute.startLokasjon.tilDto(),
+                sluttLokasjon = rute.sluttLokasjon.tilDto(),
+                startAdresse = startOgSluttAdresse.startAdresse,
+                sluttAdresse = startOgSluttAdresse.sluttAdresse,
+            ),
+    )
+}
 
 data class RuteDto(
     val polyline: Polyline,
@@ -39,28 +54,6 @@ data class LokasjonDto(
     val lat: Double,
     val lng: Double,
 )
-
-fun tilReisedataDto(
-    rute: Rute,
-    startOgSluttAdresse: StartOgSluttAdresse,
-    avstandUtenFerje: Int,
-): ReisedataDto =
-    (
-        ReisedataDto(
-            reiserute =
-                RuteDto(
-                    polyline = rute.polyline,
-                    avstandMeter = rute.avstandMeter,
-                    avstandUtenFerje = avstandUtenFerje,
-                    varighetSekunder = rute.varighetSekunder,
-                    strekninger = rute.strekninger.map { it.tilDto() },
-                    startLokasjon = rute.startLokasjon.tilDto(),
-                    sluttLokasjon = rute.sluttLokasjon.tilDto(),
-                    startAdresse = startOgSluttAdresse.startAdresse,
-                    sluttAdresse = startOgSluttAdresse.sluttAdresse,
-                ),
-        )
-    )
 
 fun Lokasjon.tilDto() =
     LokasjonDto(
