@@ -6,28 +6,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligRe
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 
 object DetaljertVedtaksperioderDagligReiseMapper {
-    fun InnvilgelseEllerOpphørDagligReise.finnDetaljerteVedtaksperioderTso(): List<DetaljertVedtaksperiodeDagligReiseTso> {
-        val alleReisePerioder =
-            this.beregningsresultat.offentligTransport?.reiser?.flatMap { reise ->
-                reise.perioder
-            }
-
-        val vedaksperioderFraBeregningsresultat =
-            alleReisePerioder?.flatMap { periode ->
-                periode.grunnlag.vedtaksperioder.map { vedtaksperiode ->
-                    DetaljertVedtaksperiodeDagligReiseTso(
-                        fom = vedtaksperiode.fom,
-                        tom = vedtaksperiode.tom,
-                        aktivitet = vedtaksperiode.aktivitet,
-                        målgruppe = vedtaksperiode.målgruppe,
-                        typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
-                    )
-                }
-            }
-        return vedaksperioderFraBeregningsresultat?.sorterOgMergeSammenhengendeEllerOverlappende()
-            ?: error("Fant ikke vedtsksperioder for offentlig transport.")
-    }
-
     fun finnDetaljerteVedtaksperioderDagligReise(
         vedtaksdataTso: InnvilgelseEllerOpphørDagligReise?,
         vedtaksdataTsr: InnvilgelseEllerOpphørDagligReise?,

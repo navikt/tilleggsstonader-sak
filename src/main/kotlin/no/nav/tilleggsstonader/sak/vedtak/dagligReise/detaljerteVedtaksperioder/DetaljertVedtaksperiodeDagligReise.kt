@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
-import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
@@ -34,7 +33,8 @@ data class DetaljertVedtaksperiodeDagligReise(
         val erLik =
             this.aktivitet == other.aktivitet &&
                 this.målgruppe == other.målgruppe &&
-                this.typeDagligReise == other.typeDagligReise
+                this.typeDagligReise == other.typeDagligReise &&
+                this.typeAktivtet == other.typeAktivtet
         return erLik && this.overlapperEllerPåfølgesAv(other)
     }
 }

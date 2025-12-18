@@ -61,7 +61,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
         opprettBehandlingOgVedtakLæremidler(fagsakPerson)
         opprettBehandlingOgVedtakBoutgifter(fagsakPerson)
         opprettBehandlingOgVedtakDagligReiseTso(fagsakPerson)
-        // TODO daglig reise tsr
+        opprettBehandlingOgVedtakDagligReiseTsr(fagsakPerson)
 
         val res = vedtaksperioderOversiktService.hentVedtaksperioderOversikt(fagsakPersonId = fagsakPerson.id)
 
@@ -69,6 +69,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
         assertThat(res.læremidler).isNotEmpty()
         assertThat(res.boutgifter).isNotEmpty()
         assertThat(res.dagligReiseTso).isNotEmpty()
+        assertThat(res.dagligReiseTsr).isNotEmpty()
     }
 
     @Test
@@ -204,6 +205,17 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
             testoppsettService.opprettBehandlingMedFagsak(
                 behandling = behandling(status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET),
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                identer = fagsakPerson.identer,
+            )
+
+        vedtakRepository.insert(DagligReiseTestUtil.innvilgelse(behandlingId = behandling.id))
+    }
+
+    private fun opprettBehandlingOgVedtakDagligReiseTsr(fagsakPerson: FagsakPerson) {
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(
+                behandling = behandling(status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET),
+                stønadstype = Stønadstype.DAGLIG_REISE_TSR,
                 identer = fagsakPerson.identer,
             )
 

@@ -12,10 +12,8 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder.
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder.DetaljertVedtaksperioderTilsynBarnMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperiodeBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperioderBoutgifterMapper.finnDetaljerteVedtaksperioder
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReiseTso
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReiseTsr
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperioderDagligReiseMapper.finnDetaljerteVedtaksperioderDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperioderDagligReiseMapper.finnDetaljerteVedtaksperioderTso
 import no.nav.tilleggsstonader.sak.vedtak.domain.DetaljertVedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
@@ -128,15 +126,27 @@ class VedtaksperioderOversiktService(
         return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder()
     }
 
-    private fun oppsummerVedtaksperioderDagligReiseTso(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReiseTso> {
+    private fun oppsummerVedtaksperioderDagligReiseTso(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReise> {
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørDagligReise>(fagsakId)
                 ?: return emptyList()
 
-        return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioderTso()
+        return finnDetaljerteVedtaksperioderDagligReise(
+            vedtaksdataTso = vedtakForSisteIverksatteBehandling,
+            vedtaksdataTsr = null,
+        )
     }
 
-    private fun oppsummerVedtaksperioderDagligReiseTsr(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReiseTsr> = emptyList()
+    private fun oppsummerVedtaksperioderDagligReiseTsr(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReise> {
+        val vedtakForSisteIverksatteBehandling =
+            hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørDagligReise>(fagsakId)
+                ?: return emptyList()
+
+        return finnDetaljerteVedtaksperioderDagligReise(
+            vedtaksdataTso = null,
+            vedtaksdataTsr = vedtakForSisteIverksatteBehandling,
+        )
+    }
 
     private inline fun <reified T : Vedtaksdata> hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): T? {
         val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId) ?: return null
