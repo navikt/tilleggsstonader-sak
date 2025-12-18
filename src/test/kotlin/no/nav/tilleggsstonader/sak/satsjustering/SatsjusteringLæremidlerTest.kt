@@ -3,12 +3,17 @@ package no.nav.tilleggsstonader.sak.satsjustering
 import io.mockk.clearMocks
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
+import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -69,7 +74,7 @@ class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
                 kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
             }
 
-        kjørTasksKlareForProsessering()
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
         assertThat(behandlingerForSatsjustering).containsExactly(behandling.id)
 
@@ -86,6 +91,22 @@ class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
                 it.statusIverksetting ==
                     StatusIverksetting.VENTER_PÅ_SATS_ENDRING
             }
+        validerHarBlittSendtMottattOgFerdigTilBehandlingsstatistikk(sistIverksatteBehandling.id)
+    }
+
+    private fun validerHarBlittSendtMottattOgFerdigTilBehandlingsstatistikk(behandlingId: BehandlingId) {
+        val sendteHendelsetyperTilBehandlingsstatistikk =
+            KafkaTestConfig
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.dvhBehandling, 2)
+                .map { it.verdiEllerFeil<BehandlingDVH>() }
+                .filter { it.behandlingUuid == behandlingId.toString() }
+                .map { it.behandlingStatus }
+
+        assertThat(sendteHendelsetyperTilBehandlingsstatistikk).containsExactlyInAnyOrder(
+            Hendelse.MOTTATT.name,
+            Hendelse.FERDIG.name,
+        )
     }
 
     @Test
