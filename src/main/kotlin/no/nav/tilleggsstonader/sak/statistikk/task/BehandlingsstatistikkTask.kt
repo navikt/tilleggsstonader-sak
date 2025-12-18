@@ -4,9 +4,13 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.statistikk.behandling.BehandlingsstatistikkService
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
@@ -21,10 +25,16 @@ import java.util.Properties
 )
 class BehandlingsstatistikkTask(
     private val behandlingsstatistikkService: BehandlingsstatistikkService,
+    private val behandlingService: BehandlingService,
+    private val oppgaveService: OppgaveService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
         val (behandlingId, hendelse, hendelseTidspunkt, gjeldendeSaksbehandler, behandlingMetode) =
             objectMapper.readValue<BehandlingsstatistikkTaskPayload>(task.payload)
+
+        if (hendelse == Hendelse.MOTTATT) {
+            kastFeilOmOppgaveIkkeHarBlittOpprettet(behandlingId)
+        }
 
         behandlingsstatistikkService.sendBehandlingstatistikk(
             behandlingId,
@@ -33,6 +43,18 @@ class BehandlingsstatistikkTask(
             gjeldendeSaksbehandler,
             behandlingMetode,
         )
+    }
+
+    // Vi sender med ansvarligEnhet til DVH, som hentes ut fra oppgave. Venter på at oppgave skal opprettes
+    private fun kastFeilOmOppgaveIkkeHarBlittOpprettet(behandlingId: BehandlingId) {
+        val behandling = behandlingService.hentBehandling(behandlingId)
+        val oppgaverForBehandling = oppgaveService.finnAlleOppgaveDomainForBehandling(behandlingId)
+        if (!behandling.erSatsendring && oppgaverForBehandling.isEmpty()) {
+            throw RekjørSenereException(
+                "Vent med å sende MOTTATT-status til DVH til oppgave er opprettet for behandling=$behandlingId",
+                triggerTid = LocalDateTime.now().plusSeconds(5),
+            )
+        }
     }
 
     companion object {
