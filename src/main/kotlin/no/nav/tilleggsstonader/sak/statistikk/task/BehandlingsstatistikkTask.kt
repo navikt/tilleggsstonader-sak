@@ -30,12 +30,15 @@ class BehandlingsstatistikkTask(
         val (behandlingId, hendelse, hendelseTidspunkt, gjeldendeSaksbehandler) =
             objectMapper.readValue<BehandlingsstatistikkTaskPayload>(task.payload)
 
-        if (hendelse == Hendelse.MOTTATT) {
+        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+
+        // Vil aldri opprettes oppgave for satsendringer
+        if (!saksbehandling.erSatsendring) {
             kastFeilOmOppgaveIkkeHarBlittOpprettet(behandlingId)
         }
 
         behandlingsstatistikkService.sendBehandlingstatistikk(
-            behandlingId,
+            saksbehandling,
             hendelse,
             hendelseTidspunkt,
             gjeldendeSaksbehandler,
@@ -44,9 +47,8 @@ class BehandlingsstatistikkTask(
 
     // Vi sender med ansvarligEnhet til DVH, som hentes ut fra oppgave. Venter på at oppgave skal opprettes
     private fun kastFeilOmOppgaveIkkeHarBlittOpprettet(behandlingId: BehandlingId) {
-        val behandling = behandlingService.hentBehandling(behandlingId)
         val oppgaverForBehandling = oppgaveService.finnAlleOppgaveDomainForBehandling(behandlingId)
-        if (!behandling.erSatsendring && oppgaverForBehandling.isEmpty()) {
+        if (oppgaverForBehandling.isEmpty()) {
             throw RekjørSenereException(
                 "Vent med å sende MOTTATT-status til DVH til oppgave er opprettet for behandling=$behandlingId",
                 triggerTid = LocalDateTime.now().plusSeconds(5),

@@ -97,18 +97,6 @@ class OpprettBehandlingService(
                 ),
         )
 
-        if (behandlingStatus == BehandlingStatus.SATT_PÅ_VENT) {
-            settPåVentService.settPåVent(
-                behandling.id,
-                SettBehandlingPåVent(
-                    årsaker = listOf(ÅrsakSettPåVent.ANNET),
-                    frist = LocalDate.now().plusWeeks(1),
-                    kommentar = "Behandlingen er automatisk satt på vent grunnet det finnes en aktiv behandling på saken",
-                    oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.IkkeOppdaterOppgave,
-                ),
-            )
-        }
-
         if (request.oppgaveMetadata is OpprettBehandlingOppgaveMetadata.OppgaveMetadata) {
             taskService.save(
                 OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
@@ -120,6 +108,19 @@ class OpprettBehandlingService(
                         hendelseTidspunkt = behandling.kravMottatt?.atStartOfDay() ?: LocalDateTime.now(),
                         prioritet = request.oppgaveMetadata.prioritet,
                     ),
+                ),
+            )
+        }
+
+
+        if (behandlingStatus == BehandlingStatus.SATT_PÅ_VENT) {
+            settPåVentService.settPåVent(
+                behandling.id,
+                SettBehandlingPåVent(
+                    årsaker = listOf(ÅrsakSettPåVent.ANNET),
+                    frist = LocalDate.now().plusWeeks(1),
+                    kommentar = "Behandlingen er automatisk satt på vent grunnet det finnes en aktiv behandling på saken",
+                    oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.IkkeOppdaterOppgave,
                 ),
             )
         }

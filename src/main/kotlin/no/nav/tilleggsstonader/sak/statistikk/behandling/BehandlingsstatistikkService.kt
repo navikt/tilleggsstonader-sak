@@ -35,15 +35,13 @@ class BehandlingsstatistikkService(
 ) {
     @Transactional
     fun sendBehandlingstatistikk(
-        behandlingId: BehandlingId,
+        saksbehandling: Saksbehandling,
         hendelse: Hendelse,
         hendelseTidspunkt: LocalDateTime,
         gjeldendeSaksbehandler: String?,
     ) {
-        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val behandlingDVH =
             hentDataOgMapTilBehandlingDVH(
-                behandlingId = behandlingId,
                 hendelse = hendelse,
                 hendelseTidspunkt = hendelseTidspunkt,
                 gjeldendeSaksbehandler = gjeldendeSaksbehandler,
@@ -54,22 +52,20 @@ class BehandlingsstatistikkService(
 
     private fun hentDataOgMapTilBehandlingDVH(
         saksbehandling: Saksbehandling,
-        behandlingId: BehandlingId,
         hendelse: Hendelse,
         hendelseTidspunkt: LocalDateTime,
         gjeldendeSaksbehandler: String?,
     ): BehandlingDVH {
-        val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId)
+        val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(saksbehandling.id)
         val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling)
         val søkerHarStrengtFortroligAdresse = evaluerAdresseBeskyttelseStrengtFortrolig(saksbehandling.ident)
-        val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(behandlingId)
+        val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(saksbehandling.id)
         val saksbehandlerId = finnSaksbehandler(hendelse, gjeldendeSaksbehandler, totrinnskontroll)
         val beslutterId = totrinnskontroll?.beslutter
         val relatertBehandlingId = utledRelatertBehandling(saksbehandling)
 
         return mapTilBehandlingDVH(
             saksbehandling = saksbehandling,
-            behandlingId = behandlingId,
             henvendelseTidspunkt = henvendelseTidspunkt,
             hendelse = hendelse,
             hendelseTidspunkt = hendelseTidspunkt,
@@ -132,7 +128,6 @@ class BehandlingsstatistikkService(
     companion object {
         fun mapTilBehandlingDVH(
             saksbehandling: Saksbehandling,
-            behandlingId: BehandlingId,
             henvendelseTidspunkt: LocalDateTime,
             hendelse: Hendelse,
             hendelseTidspunkt: LocalDateTime,
@@ -144,7 +139,7 @@ class BehandlingsstatistikkService(
             relatertBehandlingId: String?,
         ) = BehandlingDVH(
             behandlingId = saksbehandling.eksternId.toString(),
-            behandlingUuid = behandlingId.toString(),
+            behandlingUuid = saksbehandling.id.toString(),
             sakId = saksbehandling.eksternFagsakId.toString(),
             aktorId = saksbehandling.ident,
             registrertTid = henvendelseTidspunkt,
