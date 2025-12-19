@@ -40,7 +40,6 @@ class OpprettOppgaveForOpprettetBehandlingTask(
         val behandlingId: BehandlingId,
         val saksbehandler: String? = null,
         val beskrivelse: String? = null,
-        val hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
         val prioritet: OppgavePrioritet = OppgavePrioritet.NORM,
     )
 

@@ -104,8 +104,6 @@ class OpprettBehandlingService(
                         behandlingId = behandling.id,
                         saksbehandler = request.oppgaveMetadata.tilordneSaksbehandler,
                         beskrivelse = request.oppgaveMetadata.beskrivelse,
-                        // TODO - brukes for å opprette BehandlingsstatistikkTask.opprettMottattTask - bør heller opprette tasken her
-                        hendelseTidspunkt = behandling.kravMottatt?.atStartOfDay() ?: LocalDateTime.now(),
                         prioritet = request.oppgaveMetadata.prioritet,
                     ),
                 ),
