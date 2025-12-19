@@ -97,11 +97,12 @@ class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
     }
 
     private fun validerHarBlittSendtMottattOgFerdigTilBehandlingsstatistikk(behandlingId: BehandlingId) {
-        val sendteBehandlingsstatistikkMeldinger = KafkaTestConfig
-            .sendteMeldinger()
-            .forventAntallMeldingerPåTopic(kafkaTopics.dvhBehandling, 2)
-            .map { it.verdiEllerFeil<BehandlingDVH>() }
-            .filter { it.behandlingUuid == behandlingId.toString() }
+        val sendteBehandlingsstatistikkMeldinger =
+            KafkaTestConfig
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.dvhBehandling, 2)
+                .map { it.verdiEllerFeil<BehandlingDVH>() }
+                .filter { it.behandlingUuid == behandlingId.toString() }
 
         sendteBehandlingsstatistikkMeldinger.forEach {
             assertThat(it.behandlingMetode).isEqualTo(BehandlingMetode.BATCH.name)

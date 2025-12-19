@@ -186,12 +186,11 @@ class BehandlingsstatistikkService(
             papirSøknad = null,
         )
 
-        private fun utledBehandlingsMetode(saksbehandling: Saksbehandling): String {
-            return when {
+        private fun utledBehandlingsMetode(saksbehandling: Saksbehandling): String =
+            when {
                 saksbehandling.erSatsendring -> BehandlingMetode.BATCH.name
                 else -> BehandlingMetode.MANUELL.name
             }
-        }
 
         private fun finnAnsvarligBeslutter(
             beslutterId: String?,

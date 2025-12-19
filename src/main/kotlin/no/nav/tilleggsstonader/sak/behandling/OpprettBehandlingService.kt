@@ -112,7 +112,6 @@ class OpprettBehandlingService(
             )
         }
 
-
         if (behandlingStatus == BehandlingStatus.SATT_PÅ_VENT) {
             settPåVentService.settPåVent(
                 behandling.id,
