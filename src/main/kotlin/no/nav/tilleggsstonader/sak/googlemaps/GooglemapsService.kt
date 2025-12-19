@@ -29,7 +29,7 @@ class GooglemapsService(
                 )?.tilDomene()
 
         val kortesteRute = ruteForslag?.finnKortesteRute()
-        feilHvis(kortesteRute == null) { "Kunne ikke finne reiserute" }
+        feilHvis(kortesteRute == null) { "Kunne ikke finne reiserute fra ${fraAdresse.address} til ${tilAdresse.address}" }
 
         val startOgSluttAdresse = finnStartOgSluttAdresse(kortesteRute)
         val avstandUtenFerje = kortesteRute.avstandMeter - kortesteRute.finnFerjeavstand()
@@ -88,8 +88,8 @@ class GooglemapsService(
     }
 
     private fun finnStartOgSluttAdresse(rute: Rute): StartOgSluttAdresse {
-        val startAdresse = googlePlaceDetailsClient.finnStedDetaljer(rute.startLokasjonId)?.formattedAddress
-        val sluttAdresse = googlePlaceDetailsClient.finnStedDetaljer(rute.sluttLokasjonId)?.formattedAddress
+        val startAdresse = rute.startLokasjonId?.let { googlePlaceDetailsClient.finnStedDetaljer(it)?.formattedAddress }
+        val sluttAdresse = rute.sluttLokasjonId?.let { googlePlaceDetailsClient.finnStedDetaljer(it)?.formattedAddress }
 
         feilHvis(startAdresse == null || sluttAdresse == null) { "Kunne ikke finne start eller slutt adresse for reise" }
         return StartOgSluttAdresse(

@@ -82,7 +82,7 @@ data class GeocodingResults(
 )
 
 data class GeocodedWaypoint(
-    val placeId: String,
+    val placeId: String?,
 )
 
 enum class LinjeType {
