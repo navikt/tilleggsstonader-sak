@@ -75,17 +75,16 @@ class GooglemapsService(
                     ),
                 )?.tilDomene()
 
-        val defaultRute = ruteForslag?.finnDefaultRute()
-        feilHvis(defaultRute == null) { "Kunne ikke finne reiserute" }
+        return ruteForslag?.finnDefaultRute()?.let { defaultRute ->
+            val startOgSluttAdresse = finnStartOgSluttAdresse(defaultRute)
+            val avstandUtenFerje = defaultRute.avstandMeter - defaultRute.finnFerjeavstand()
 
-        val startOgSluttAdresse = finnStartOgSluttAdresse(defaultRute)
-        val avstandUtenFerje = defaultRute.avstandMeter - defaultRute.finnFerjeavstand()
-
-        return ReisedataDto(
-            rute = defaultRute,
-            startOgSluttAdresse = startOgSluttAdresse,
-            avstandUtenFerje = avstandUtenFerje,
-        )
+            ReisedataDto(
+                rute = defaultRute,
+                startOgSluttAdresse = startOgSluttAdresse,
+                avstandUtenFerje = avstandUtenFerje,
+            )
+        }
     }
 
     private fun finnStartOgSluttAdresse(rute: Rute): StartOgSluttAdresse {
