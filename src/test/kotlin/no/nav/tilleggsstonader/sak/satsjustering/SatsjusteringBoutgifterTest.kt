@@ -9,7 +9,9 @@ import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
@@ -35,11 +37,12 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
-class SatsjusteringBoutgifterTest : CleanDatabaseIntegrationTest() {
+class SatsjusteringBoutgifterTest(@Autowired private val kafkaTestConfig: KafkaTestConfig) : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var faktaGrunnlagService: FaktaGrunnlagService
 
-    @Autowired private lateinit var vilkårRepository: VilkårRepository
+    @Autowired
+    private lateinit var vilkårRepository: VilkårRepository
 
     @Autowired
     private lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
@@ -83,6 +86,7 @@ class SatsjusteringBoutgifterTest : CleanDatabaseIntegrationTest() {
         val satsjusteringBehandling = behandlingRepository.finnSisteIverksatteBehandling(behandling.fagsakId)!!
         assertThat(behandling.id).isNotEqualTo(satsjusteringBehandling.id)
         assertThat(satsjusteringBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
         validerHarKopiertOverFaktagrunnlagFraForrigeBehandling(satsjusteringBehandling)
         validerHarIngenAndelserSomVenterPåSatsEndring(satsjusteringBehandling.id)
@@ -194,7 +198,7 @@ class SatsjusteringBoutgifterTest : CleanDatabaseIntegrationTest() {
                 .andelerTilkjentYtelse
                 .filter {
                     it.statusIverksetting ==
-                        StatusIverksetting.VENTER_PÅ_SATS_ENDRING
+                            StatusIverksetting.VENTER_PÅ_SATS_ENDRING
                 },
         ).hasSize(6)
     }
@@ -204,7 +208,7 @@ class SatsjusteringBoutgifterTest : CleanDatabaseIntegrationTest() {
         assertThat(tilkjentYtelseRevurdering.andelerTilkjentYtelse)
             .noneMatch {
                 it.statusIverksetting ==
-                    StatusIverksetting.VENTER_PÅ_SATS_ENDRING
+                        StatusIverksetting.VENTER_PÅ_SATS_ENDRING
             }
     }
 }

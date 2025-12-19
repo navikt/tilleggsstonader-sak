@@ -16,6 +16,10 @@ import java.time.LocalDate
 class OffentligTransportBeregningRevurderingService(
     private val vedtakRepository: VedtakRepository,
 ) {
+    /**
+     * Beholder de reisene og perioder fra forrige iverksatte behandling som er berørt av revurderingen, slik at vi ikke risikerer at gamle
+     * vedtak blir reberegnet med et annet resultat, fordi vi eksempelvis har gjort endringer i beregningskoden siden sist.
+     */
     fun flettMedForrigeVedtakHvisRevurdering(
         nyttBeregningsresultat: BeregningsresultatOffentligTransport,
         behandling: Saksbehandling,
@@ -34,36 +38,42 @@ class OffentligTransportBeregningRevurderingService(
         return BeregningsresultatOffentligTransport(
             reiser =
                 nyttBeregningsresultat.reiser.map { reise ->
-                    slåSammenNyttOgGammeltBeregningsresultat(reise, forrigeIverksatte, tidligsteEndring)
+                    slåSammenNyeOgGamlePerioder(reise, forrigeIverksatte, tidligsteEndring)
                 },
         )
     }
 
     /**
-     * Beholder de periodene fra forrige iverksatte behandling som har fom-dato som ligger mer enn 30 dager unna tidligste endring-datoen.
+     * Beholder alle perioder som er eldre enn 30 dager unna tidligste endring-datoen. Reiser som kke har blitt endret på i det hele
+     * tatt av saksbehandler, beholdes i sin helhet fra forrige iverksatte vedtak.
      *
-     * Dette gjøres for ikke å reberegne mer enn vi trenger å gjøre, men vi er samtidig nødt til å reberegne perioder som er f.eks. 25 dager
-     * unna tidligste endring-datoen, ettersom det kan skje at denne perioden etter revurderingen skulle vært en 30-dagersperiode i stedet.
+     * Dette gjøres for ikke å reberegne mer enn vi trenger å gjøre, men vi er samtidig nødt til å reberegne enkelte perioder som er f.eks.
+     * 25 dager unna tidligste endring-datoen, ettersom det kan skje at denne perioden etter revurderingen skulle vært en 30-dagersperiode
+     * i stedet.
      */
-    private fun slåSammenNyttOgGammeltBeregningsresultat(
+    private fun slåSammenNyeOgGamlePerioder(
         nyBeregningForReise: BeregningsresultatForReise,
         forrigeBeregning: BeregningsresultatOffentligTransport,
         tidligsteEndring: LocalDate,
     ): BeregningsresultatForReise {
-        val perioderSomSkalReberegnes =
-            nyBeregningForReise.perioder
-                .filter { it.grunnlag.fom.plusDays(30L) > tidligsteEndring }
-                .map { it.copy(fraTidligereVedtak = false) }
-        val beholdFraForrigeVedtak =
-            forrigeBeregning.reiser
-                .singleOrNull { it.reiseId == nyBeregningForReise.reiseId }
-                ?.perioder
-                ?.filter { it.grunnlag.fom.plusDays(30L) <= tidligsteEndring }
-                ?.map { it.copy(fraTidligereVedtak = true) }
-                ?: emptyList()
+        // hvis ikke reisen eksisterer i forrige vedtak, er det bare ny beregning som gjelder
+        val reisenIForrigeVedtak = forrigeBeregning.reiser.find { it.reiseId == nyBeregningForReise.reiseId }?.perioder
+            ?: return nyBeregningForReise
+
+        // Alle perioder som er tidligere enn 30 dager fra endringsdatoen skal kopieres fra tidligere vedtak
+        val bevarteGamlePerioder = reisenIForrigeVedtak
+            .filter { it.grunnlag.fom.plusDays(30L) <= tidligsteEndring }
+            .map { it.copy(fraTidligereVedtak = true) }
+
+        val nyeEllerOppdatertePerioder = nyBeregningForReise.perioder
+            .filter { it.grunnlag.fom.plusDays(30L) > tidligsteEndring }
+            .map { nyPeriode ->
+                val tilsvarendePeriodeIForrigeVedtak = reisenIForrigeVedtak.singleOrNull { it.grunnlag == nyPeriode.grunnlag }
+                tilsvarendePeriodeIForrigeVedtak?.copy(fraTidligereVedtak = true) ?: nyPeriode.copy(fraTidligereVedtak = false)
+            }
 
         return nyBeregningForReise.copy(
-            perioder = (beholdFraForrigeVedtak + perioderSomSkalReberegnes).sortedBy { it.grunnlag.fom },
+            perioder = (bevarteGamlePerioder + nyeEllerOppdatertePerioder).sortedBy { it.grunnlag.fom },
         )
     }
 
