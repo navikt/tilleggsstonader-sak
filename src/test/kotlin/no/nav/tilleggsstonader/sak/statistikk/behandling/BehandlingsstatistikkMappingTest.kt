@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
-import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import org.assertj.core.api.Assertions.assertThat
@@ -514,7 +513,6 @@ class BehandlingsstatistikkMappingTest {
         hendelseTidspunkt: LocalDateTime,
         tekniskTid: LocalDateTime,
         søkerHarStrengtFortroligAdresse: Boolean = false,
-        behandlingMetode: BehandlingMetode = BehandlingMetode.AUTOMATISK,
     ) = BehandlingsstatistikkService.mapTilBehandlingDVH(
         saksbehandling,
         behandlingId = saksbehandling.id,
@@ -524,7 +522,6 @@ class BehandlingsstatistikkMappingTest {
         søkerHarStrengtFortroligAdresse = søkerHarStrengtFortroligAdresse,
         saksbehandlerId = saksbehandlerId,
         sisteOppgaveForBehandling = null,
-        behandlingMetode = behandlingMetode,
         beslutterId = null,
         tekniskTid = tekniskTid,
         relatertBehandlingId = null,

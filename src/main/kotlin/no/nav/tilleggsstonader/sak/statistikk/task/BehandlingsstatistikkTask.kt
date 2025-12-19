@@ -7,12 +7,10 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.statistikk.behandling.BehandlingsstatistikkService
-import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -29,7 +27,7 @@ class BehandlingsstatistikkTask(
     private val oppgaveService: OppgaveService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val (behandlingId, hendelse, hendelseTidspunkt, gjeldendeSaksbehandler, behandlingMetode) =
+        val (behandlingId, hendelse, hendelseTidspunkt, gjeldendeSaksbehandler) =
             objectMapper.readValue<BehandlingsstatistikkTaskPayload>(task.payload)
 
         if (hendelse == Hendelse.MOTTATT) {
@@ -41,7 +39,6 @@ class BehandlingsstatistikkTask(
             hendelse,
             hendelseTidspunkt,
             gjeldendeSaksbehandler,
-            behandlingMetode,
         )
     }
 
@@ -122,7 +119,6 @@ class BehandlingsstatistikkTask(
             hendelse: Hendelse,
             hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
             gjeldendeSaksbehandler: String? = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
-            behandlingMetode: BehandlingMetode? = BehandlingMetode.MANUELL,
         ): Task =
             Task(
                 type = TYPE,
@@ -133,7 +129,6 @@ class BehandlingsstatistikkTask(
                             hendelse,
                             hendelseTidspunkt,
                             gjeldendeSaksbehandler,
-                            behandlingMetode,
                         ),
                     ),
                 properties =
@@ -153,6 +148,5 @@ class BehandlingsstatistikkTask(
         val hendelse: Hendelse,
         val hendelseTidspunkt: LocalDateTime,
         val gjeldendeSaksbehandler: String?,
-        val behandlingMetode: BehandlingMetode?,
     )
 }

@@ -39,7 +39,6 @@ class BehandlingsstatistikkService(
         hendelse: Hendelse,
         hendelseTidspunkt: LocalDateTime,
         gjeldendeSaksbehandler: String?,
-        behandlingMetode: BehandlingMetode?,
     ) {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val behandlingDVH =
@@ -48,7 +47,6 @@ class BehandlingsstatistikkService(
                 hendelse = hendelse,
                 hendelseTidspunkt = hendelseTidspunkt,
                 gjeldendeSaksbehandler = gjeldendeSaksbehandler,
-                behandlingMetode = behandlingMetode,
                 saksbehandling = saksbehandling,
             )
         behandlingsstatistikkProducer.sendBehandling(behandlingDVH, saksbehandling.stønadstype)
@@ -60,7 +58,6 @@ class BehandlingsstatistikkService(
         hendelse: Hendelse,
         hendelseTidspunkt: LocalDateTime,
         gjeldendeSaksbehandler: String?,
-        behandlingMetode: BehandlingMetode?,
     ): BehandlingDVH {
         val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId)
         val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling)
@@ -79,7 +76,6 @@ class BehandlingsstatistikkService(
             søkerHarStrengtFortroligAdresse = søkerHarStrengtFortroligAdresse,
             saksbehandlerId = saksbehandlerId,
             sisteOppgaveForBehandling = sisteOppgaveForBehandling,
-            behandlingMetode = behandlingMetode,
             beslutterId = beslutterId,
             tekniskTid = LocalDateTime.now(),
             relatertBehandlingId = relatertBehandlingId,
@@ -143,7 +139,6 @@ class BehandlingsstatistikkService(
             søkerHarStrengtFortroligAdresse: Boolean,
             saksbehandlerId: String,
             sisteOppgaveForBehandling: Oppgave?,
-            behandlingMetode: BehandlingMetode?,
             beslutterId: String?,
             tekniskTid: LocalDateTime,
             relatertBehandlingId: String?,
@@ -174,7 +169,7 @@ class BehandlingsstatistikkService(
                     erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
                     verdi = sisteOppgaveForBehandling?.tildeltEnhetsnr ?: MASKINELL_JOURNALFOERENDE_ENHET,
                 ),
-            behandlingMetode = behandlingMetode?.name ?: "MANUELL",
+            behandlingMetode = utledBehandlingsMetode(saksbehandling),
             behandlingÅrsak = saksbehandling.årsak.name,
             avsender = "Nav Tilleggstønader",
             behandlingType = saksbehandling.type.name,
@@ -195,6 +190,13 @@ class BehandlingsstatistikkService(
             venteAarsak = null,
             papirSøknad = null,
         )
+
+        private fun utledBehandlingsMetode(saksbehandling: Saksbehandling): String {
+            return when {
+                saksbehandling.erSatsendring -> BehandlingMetode.BATCH.name
+                else -> BehandlingMetode.MANUELL.name
+            }
+        }
 
         private fun finnAnsvarligBeslutter(
             beslutterId: String?,
