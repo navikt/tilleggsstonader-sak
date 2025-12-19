@@ -12,7 +12,7 @@ val tokenSupportVersion = "6.0.0"
 val wiremockVersion = "3.13.1"
 val mockkVersion = "1.14.6"
 val testcontainerVersion = "1.21.3"
-val springDocVersion = "2.8.13"
+val springDocVersion = "3.0.0"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -25,7 +25,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.53.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
-    id("org.springframework.boot") version "4.0.0"
+    id("org.springframework.boot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.3.0"
 }
@@ -58,6 +58,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-jackson")
     implementation("tools.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")

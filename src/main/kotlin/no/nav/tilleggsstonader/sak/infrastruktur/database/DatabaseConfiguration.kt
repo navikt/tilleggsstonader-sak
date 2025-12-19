@@ -21,6 +21,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeT
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
+import no.nav.tilleggsstonader.sak.behandling.vent.ÅrsakSettPåVent
+import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.flyway.autoconfigure.FlywayConfigurationCustomizer
@@ -116,6 +118,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             VilkårFaktaDataWriter(),
             TilbakekrevingJsonDataReader(),
             TilbakekrevingJsonDataWriter(),
+            //ÅrsakSettPåVentListWriter(),
+            ÅrsakSettPåVentListReader(),
         ) + alleVedtaksstatistikkJsonConverters +
             alleValueClassConverters
 
@@ -131,12 +135,12 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     @ReadingConverter
     abstract class JsonReader<T : Any>(
         val clazz: KClass<T>,
-    ) : Converter<PGobject, T> {
+    ) : Converter<PGobject, T?> {
         override fun convert(pGobject: PGobject): T? = pGobject.value?.let { jsonMapper.readValue(it, clazz.java) }
     }
 
     @ReadingConverter
-    class PGobjectTilJsonWrapperConverter : Converter<PGobject, JsonWrapper> {
+    class PGobjectTilJsonWrapperConverter : Converter<PGobject, JsonWrapper?> {
         override fun convert(pGobject: PGobject): JsonWrapper? = pGobject.value?.let { JsonWrapper(it) }
     }
 
@@ -164,6 +168,13 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
         override fun convert(pGobject: PGobject): DelvilkårWrapper =
             DelvilkårWrapper(pGobject.value?.let { jsonMapper.readValue(it) } ?: emptyList())
     }
+
+    @ReadingConverter
+    class ÅrsakSettPåVentListReader : Converter<PgArray, List<ÅrsakSettPåVent>> {
+        override fun convert(pgArray: PgArray): List<ÅrsakSettPåVent> =
+            (pgArray.array as Array<*>).map { ÅrsakSettPåVent.valueOf(it.toString()) }
+    }
+
 
     @WritingConverter
     class DelvilkårTilPGobjectConverter : Converter<DelvilkårWrapper, PGobject> {
