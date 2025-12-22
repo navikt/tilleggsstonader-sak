@@ -35,10 +35,11 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
         val førsteJanuarPlussEnTrettidagersperiode = førsteJanuar.plusDays(30)
         val førsteJanuarPlussToTrettidagersperioder = førsteJanuar.plusDays(60)
 
-        val fagsakId = gjennomførEnFørstegangsbehandling(
-            reiseFom = førsteJanuar,
-            reiseTom = førsteJanuarPlussToTrettidagersperioder
-        )
+        val fagsakId =
+            gjennomførEnFørstegangsbehandling(
+                reiseFom = førsteJanuar,
+                reiseTom = førsteJanuarPlussToTrettidagersperioder,
+            )
 
         endreAlleBeløpTilNoeHeltTulleteStort()
 
@@ -48,7 +49,7 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
         forlengReiseperioden(
             revurderingId = revurderingId,
             fra = førsteJanuar,
-            til = førsteJanuarPlussTreTrettidagersperioder
+            til = førsteJanuarPlussTreTrettidagersperioder,
         )
 
         gjennomførBeregningSteg(revurderingId, Stønadstype.DAGLIG_REISE_TSO)
@@ -143,21 +144,24 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
     private fun leggTilNyReise(
         fom: LocalDate,
         tom: LocalDate,
-        revurderingId: BehandlingId
+        revurderingId: BehandlingId,
     ) {
         gjennomførVilkårSteg(
-            medVilkår = listOf(
-                lagreDagligReiseDto(
-                    fom = fom, tom = tom, fakta = faktaOffentligTransport(
-                        reiseId = ReiseId.random()
-                    )
-                )
-            ),
+            medVilkår =
+                listOf(
+                    lagreDagligReiseDto(
+                        fom = fom,
+                        tom = tom,
+                        fakta =
+                            faktaOffentligTransport(
+                                reiseId = ReiseId.random(),
+                            ),
+                    ),
+                ),
             behandlingId = revurderingId,
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         )
     }
-
 
     private fun hentBeregnedeReiser(revurderingId: BehandlingId): List<BeregningsresultatForReiseDto> =
         kall.vedtak

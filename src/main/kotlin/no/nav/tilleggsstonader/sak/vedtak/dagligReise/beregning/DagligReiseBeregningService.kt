@@ -80,16 +80,14 @@ class DagligReiseBeregningService(
 
     private fun BeregningsresultatOffentligTransport.flettMedForrigeVedtakHvisRevurdering(
         behandling: Saksbehandling,
-        tidligsteEndring: LocalDate?
-    ) =
-        offentligTransportBeregningRevurderingService
-            .flettMedForrigeVedtakHvisRevurdering(
-                nyttBeregningsresultat = this,
-                behandling = behandling,
-                tidligsteEndring = tidligsteEndring,
-            )
+        tidligsteEndring: LocalDate?,
+    ) = offentligTransportBeregningRevurderingService
+        .flettMedForrigeVedtakHvisRevurdering(
+            nyttBeregningsresultat = this,
+            behandling = behandling,
+            tidligsteEndring = tidligsteEndring,
+        )
 }
-
 
 private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {
     brukerfeilHvis(vilkår.isEmpty()) {

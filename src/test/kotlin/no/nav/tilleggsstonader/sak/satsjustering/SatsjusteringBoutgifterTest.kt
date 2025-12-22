@@ -37,7 +37,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
-class SatsjusteringBoutgifterTest(@Autowired private val kafkaTestConfig: KafkaTestConfig) : CleanDatabaseIntegrationTest() {
+class SatsjusteringBoutgifterTest(
+    @Autowired private val kafkaTestConfig: KafkaTestConfig,
+) : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var faktaGrunnlagService: FaktaGrunnlagService
 
@@ -198,7 +200,7 @@ class SatsjusteringBoutgifterTest(@Autowired private val kafkaTestConfig: KafkaT
                 .andelerTilkjentYtelse
                 .filter {
                     it.statusIverksetting ==
-                            StatusIverksetting.VENTER_PÅ_SATS_ENDRING
+                        StatusIverksetting.VENTER_PÅ_SATS_ENDRING
                 },
         ).hasSize(6)
     }
@@ -208,7 +210,7 @@ class SatsjusteringBoutgifterTest(@Autowired private val kafkaTestConfig: KafkaT
         assertThat(tilkjentYtelseRevurdering.andelerTilkjentYtelse)
             .noneMatch {
                 it.statusIverksetting ==
-                        StatusIverksetting.VENTER_PÅ_SATS_ENDRING
+                    StatusIverksetting.VENTER_PÅ_SATS_ENDRING
             }
     }
 }

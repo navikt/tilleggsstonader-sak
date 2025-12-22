@@ -57,20 +57,23 @@ class OffentligTransportBeregningRevurderingService(
         tidligsteEndring: LocalDate,
     ): BeregningsresultatForReise {
         // hvis ikke reisen eksisterer i forrige vedtak, er det bare ny beregning som gjelder
-        val reisenIForrigeVedtak = forrigeBeregning.reiser.find { it.reiseId == nyBeregningForReise.reiseId }?.perioder
-            ?: return nyBeregningForReise
+        val reisenIForrigeVedtak =
+            forrigeBeregning.reiser.find { it.reiseId == nyBeregningForReise.reiseId }?.perioder
+                ?: return nyBeregningForReise
 
         // Alle perioder som er tidligere enn 30 dager fra endringsdatoen skal kopieres fra tidligere vedtak
-        val bevarteGamlePerioder = reisenIForrigeVedtak
-            .filter { it.grunnlag.fom.plusDays(30L) <= tidligsteEndring }
-            .map { it.copy(fraTidligereVedtak = true) }
+        val bevarteGamlePerioder =
+            reisenIForrigeVedtak
+                .filter { it.grunnlag.fom.plusDays(30L) <= tidligsteEndring }
+                .map { it.copy(fraTidligereVedtak = true) }
 
-        val nyeEllerOppdatertePerioder = nyBeregningForReise.perioder
-            .filter { it.grunnlag.fom.plusDays(30L) > tidligsteEndring }
-            .map { nyPeriode ->
-                val tilsvarendePeriodeIForrigeVedtak = reisenIForrigeVedtak.singleOrNull { it.grunnlag == nyPeriode.grunnlag }
-                tilsvarendePeriodeIForrigeVedtak?.copy(fraTidligereVedtak = true) ?: nyPeriode.copy(fraTidligereVedtak = false)
-            }
+        val nyeEllerOppdatertePerioder =
+            nyBeregningForReise.perioder
+                .filter { it.grunnlag.fom.plusDays(30L) > tidligsteEndring }
+                .map { nyPeriode ->
+                    val tilsvarendePeriodeIForrigeVedtak = reisenIForrigeVedtak.singleOrNull { it.grunnlag == nyPeriode.grunnlag }
+                    tilsvarendePeriodeIForrigeVedtak?.copy(fraTidligereVedtak = true) ?: nyPeriode.copy(fraTidligereVedtak = false)
+                }
 
         return nyBeregningForReise.copy(
             perioder = (bevarteGamlePerioder + nyeEllerOppdatertePerioder).sortedBy { it.grunnlag.fom },
