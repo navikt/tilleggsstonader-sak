@@ -68,20 +68,24 @@ class DagligReiseBeregningService(
 
         if (oppfylteVilkårOffentligTransport.isEmpty()) return null
 
-        val nyttBeregningsresultat =
-            offentligTransportBeregningService.beregn(
+        return offentligTransportBeregningService
+            .beregn(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkår = oppfylteVilkårOffentligTransport,
                 brukersNavKontor = brukersNavKontor,
-            )
-
-        return offentligTransportBeregningRevurderingService
-            .flettMedForrigeVedtakHvisRevurdering(
-                nyttBeregningsresultat = nyttBeregningsresultat,
-                behandling = behandling,
-                tidligsteEndring = tidligsteEndring,
-            ).sorterReiserOgPerioder()
+            ).flettMedForrigeVedtakHvisRevurdering(behandling, tidligsteEndring)
+            .sorterReiserOgPerioder()
     }
+
+    private fun BeregningsresultatOffentligTransport.flettMedForrigeVedtakHvisRevurdering(
+        behandling: Saksbehandling,
+        tidligsteEndring: LocalDate?,
+    ) = offentligTransportBeregningRevurderingService
+        .flettMedForrigeVedtakHvisRevurdering(
+            nyttBeregningsresultat = this,
+            behandling = behandling,
+            tidligsteEndring = tidligsteEndring,
+        )
 }
 
 private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {
