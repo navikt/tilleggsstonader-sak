@@ -22,7 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Re
 sealed interface VilkårFakta
 
 data class FaktaDagligReiseOffentligTransport(
-    val reiseId: ReiseId? = ReiseId.random(), // TODO: Fjern nullbarhet
+    val reiseId: ReiseId,
     val reisedagerPerUke: Int,
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,

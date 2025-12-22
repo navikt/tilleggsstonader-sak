@@ -25,7 +25,7 @@ sealed interface FaktaDagligReiseDto {
 }
 
 data class FaktaDagligReiseOffentligTransportDto(
-    val reiseId: ReiseId?, // TODO: Fjern nullbarhet
+    val reiseId: ReiseId,
     val reisedagerPerUke: Int,
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
