@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
@@ -9,7 +10,7 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperioderDagligReiseMapper.finnDetaljerteVedtaksperioderTso
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperioderDagligReiseMapper.finnDetaljerteVedtaksperioderDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
@@ -52,7 +53,11 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 ),
             )
 
-        val resultat = vedtak.data.finnDetaljerteVedtaksperioderTso()
+        val resultat =
+            finnDetaljerteVedtaksperioderDagligReise(
+                vedtaksdataTso = vedtak.data,
+                vedtaksdataTsr = null,
+            )
         val forventetResultat =
             listOf(
                 detaljertVedtaksperiodeDagligReiseTso(fom = førsteJanuar, tom = sisteFeb),
@@ -71,8 +76,11 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                     sisteFeb,
                 ),
             )
-        val resultat = vedtak.data.finnDetaljerteVedtaksperioderTso()
-
+        val resultat =
+            finnDetaljerteVedtaksperioderDagligReise(
+                vedtaksdataTso = vedtak.data,
+                vedtaksdataTsr = null,
+            )
         val forventetResultat =
             listOf(
                 detaljertVedtaksperiodeDagligReiseTso(førsteFeb, sisteFeb),
@@ -92,7 +100,11 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 ),
             )
 
-        val resultat = vedtak.data.finnDetaljerteVedtaksperioderTso()
+        val resultat =
+            finnDetaljerteVedtaksperioderDagligReise(
+                vedtaksdataTso = vedtak.data,
+                vedtaksdataTsr = null,
+            )
         val forventetResultat =
             listOf(
                 detaljertVedtaksperiodeDagligReiseTso(førsteJanuar, sisteJanuar),
@@ -117,12 +129,14 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         aktivitet: AktivitetType = defaultAktivitet,
         målgruppe: FaktiskMålgruppe = defaultMålgruppe,
         typeDagligReise: TypeDagligReise = defaultTypeDagligReise,
-    ) = DetaljertVedtaksperiodeDagligReiseTso(
+    ) = DetaljertVedtaksperiodeDagligReise(
         fom = fom,
         tom = tom,
         aktivitet = aktivitet,
         målgruppe = målgruppe,
         typeDagligReise = typeDagligReise,
+        stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        typeAktivtet = null,
     )
 
     private fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =

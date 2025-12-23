@@ -114,6 +114,8 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             .isBadRequest
             .expectBody()
             .jsonPath("$.detail")
-            .isEqualTo("Kan ikke ha overlappende vedtaksperioder for Nay og Tiltaksenheten")
+            .isEqualTo(
+                "Kan ikke ha overlappende vedtaksperioder for Nay og Tiltaksenheten. Se oversikt øverst på siden for å finne overlappende vedtaksperiode.",
+            )
     }
 }
