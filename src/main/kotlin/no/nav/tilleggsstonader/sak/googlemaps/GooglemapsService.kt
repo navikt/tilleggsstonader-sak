@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -29,7 +30,7 @@ class GooglemapsService(
                 )?.tilDomene()
 
         val kortesteRute = ruteForslag?.finnKortesteRute()
-        feilHvis(kortesteRute == null) { "Kunne ikke finne reiserute fra ${fraAdresse.address} til ${tilAdresse.address}" }
+        brukerfeilHvis(kortesteRute == null) { "Kunne ikke beregne kjørerute mellom adressene. Sjekk at begge adresser er korrekt angitt." }
 
         val startOgSluttAdresse = finnStartOgSluttAdresse(kortesteRute)
         val avstandUtenFerje = kortesteRute.avstandMeter - kortesteRute.finnFerjeavstand()
@@ -91,7 +92,7 @@ class GooglemapsService(
         val startAdresse = rute.startLokasjonId?.let { googlePlaceDetailsClient.finnStedDetaljer(it)?.formattedAddress }
         val sluttAdresse = rute.sluttLokasjonId?.let { googlePlaceDetailsClient.finnStedDetaljer(it)?.formattedAddress }
 
-        feilHvis(startAdresse == null || sluttAdresse == null) { "Kunne ikke finne start eller slutt adresse for reise" }
+        feilHvis(startAdresse == null || sluttAdresse == null) { "Kunne ikke finne start- eller sluttadresse for den valgte reisen." }
         return StartOgSluttAdresse(
             startAdresse = startAdresse,
             sluttAdresse = sluttAdresse,
