@@ -35,22 +35,16 @@ class BehandlingsstatistikkService(
 ) {
     @Transactional
     fun sendBehandlingstatistikk(
-        behandlingId: BehandlingId,
+        saksbehandling: Saksbehandling,
         hendelse: Hendelse,
         hendelseTidspunkt: LocalDateTime,
         gjeldendeSaksbehandler: String?,
-        oppgaveId: Long?,
-        behandlingMetode: BehandlingMetode?,
     ) {
-        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val behandlingDVH =
             hentDataOgMapTilBehandlingDVH(
-                behandlingId = behandlingId,
                 hendelse = hendelse,
                 hendelseTidspunkt = hendelseTidspunkt,
                 gjeldendeSaksbehandler = gjeldendeSaksbehandler,
-                oppgaveId = oppgaveId,
-                behandlingMetode = behandlingMetode,
                 saksbehandling = saksbehandling,
             )
         behandlingsstatistikkProducer.sendBehandling(behandlingDVH, saksbehandling.stønadstype)
@@ -58,31 +52,26 @@ class BehandlingsstatistikkService(
 
     private fun hentDataOgMapTilBehandlingDVH(
         saksbehandling: Saksbehandling,
-        behandlingId: BehandlingId,
         hendelse: Hendelse,
         hendelseTidspunkt: LocalDateTime,
         gjeldendeSaksbehandler: String?,
-        oppgaveId: Long?,
-        behandlingMetode: BehandlingMetode?,
     ): BehandlingDVH {
-        val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId, oppgaveId)
+        val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(saksbehandling.id)
         val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling)
         val søkerHarStrengtFortroligAdresse = evaluerAdresseBeskyttelseStrengtFortrolig(saksbehandling.ident)
-        val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(behandlingId)
+        val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(saksbehandling.id)
         val saksbehandlerId = finnSaksbehandler(hendelse, gjeldendeSaksbehandler, totrinnskontroll)
         val beslutterId = totrinnskontroll?.beslutter
         val relatertBehandlingId = utledRelatertBehandling(saksbehandling)
 
         return mapTilBehandlingDVH(
             saksbehandling = saksbehandling,
-            behandlingId = behandlingId,
             henvendelseTidspunkt = henvendelseTidspunkt,
             hendelse = hendelse,
             hendelseTidspunkt = hendelseTidspunkt,
             søkerHarStrengtFortroligAdresse = søkerHarStrengtFortroligAdresse,
             saksbehandlerId = saksbehandlerId,
             sisteOppgaveForBehandling = sisteOppgaveForBehandling,
-            behandlingMetode = behandlingMetode,
             beslutterId = beslutterId,
             tekniskTid = LocalDateTime.now(),
             relatertBehandlingId = relatertBehandlingId,
@@ -92,14 +81,8 @@ class BehandlingsstatistikkService(
     private fun utledRelatertBehandling(saksbehandling: Saksbehandling) =
         saksbehandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).id.toString() }
 
-    private fun finnSisteOppgaveForBehandlingen(
-        behandlingId: BehandlingId,
-        oppgaveId: Long?,
-    ): Oppgave? {
-        val gsakOppgaveId = oppgaveId ?: oppgaveService.finnSisteBehandlingsoppgaveForBehandling(behandlingId)?.gsakOppgaveId
-
-        return gsakOppgaveId?.let { oppgaveService.hentOppgave(it) }
-    }
+    private fun finnSisteOppgaveForBehandlingen(behandlingId: BehandlingId): Oppgave? =
+        oppgaveService.finnSisteBehandlingsoppgaveForBehandling(behandlingId)?.gsakOppgaveId?.let { oppgaveService.hentOppgave(it) }
 
     private fun finnSaksbehandler(
         hendelse: Hendelse,
@@ -145,20 +128,18 @@ class BehandlingsstatistikkService(
     companion object {
         fun mapTilBehandlingDVH(
             saksbehandling: Saksbehandling,
-            behandlingId: BehandlingId,
             henvendelseTidspunkt: LocalDateTime,
             hendelse: Hendelse,
             hendelseTidspunkt: LocalDateTime,
             søkerHarStrengtFortroligAdresse: Boolean,
             saksbehandlerId: String,
             sisteOppgaveForBehandling: Oppgave?,
-            behandlingMetode: BehandlingMetode?,
             beslutterId: String?,
             tekniskTid: LocalDateTime,
             relatertBehandlingId: String?,
         ) = BehandlingDVH(
             behandlingId = saksbehandling.eksternId.toString(),
-            behandlingUuid = behandlingId.toString(),
+            behandlingUuid = saksbehandling.id.toString(),
             sakId = saksbehandling.eksternFagsakId.toString(),
             aktorId = saksbehandling.ident,
             registrertTid = henvendelseTidspunkt,
@@ -183,7 +164,7 @@ class BehandlingsstatistikkService(
                     erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
                     verdi = sisteOppgaveForBehandling?.tildeltEnhetsnr ?: MASKINELL_JOURNALFOERENDE_ENHET,
                 ),
-            behandlingMetode = behandlingMetode?.name ?: "MANUELL",
+            behandlingMetode = utledBehandlingsMetode(saksbehandling),
             behandlingÅrsak = saksbehandling.årsak.name,
             avsender = "Nav Tilleggstønader",
             behandlingType = saksbehandling.type.name,
@@ -204,6 +185,12 @@ class BehandlingsstatistikkService(
             venteAarsak = null,
             papirSøknad = null,
         )
+
+        private fun utledBehandlingsMetode(saksbehandling: Saksbehandling): String =
+            when {
+                saksbehandling.erSatsendring -> BehandlingMetode.BATCH.name
+                else -> BehandlingMetode.MANUELL.name
+            }
 
         private fun finnAnsvarligBeslutter(
             beslutterId: String?,

@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.hendelser.Hendelse
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.MockClientService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
+import no.nav.tilleggsstonader.sak.integrasjonstest.KafkaTopics
 import no.nav.tilleggsstonader.sak.integrasjonstest.Kall
 import no.nav.tilleggsstonader.sak.migrering.routing.SkjemaRouting
 import no.nav.tilleggsstonader.sak.oppfølging.Oppfølging
@@ -53,10 +54,12 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.cache.CacheManager
+import org.springframework.context.annotation.Import
 import org.springframework.data.jdbc.core.JdbcAggregateOperations
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
@@ -89,6 +92,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 )
 @EnableMockOAuth2Server
 @AutoConfigureWebTestClient
+@EnableConfigurationProperties(KafkaTopics::class)
 abstract class IntegrationTest {
     @LocalServerPort
     private var port: Int? = 0
@@ -128,6 +132,9 @@ abstract class IntegrationTest {
 
     @Autowired
     lateinit var oppgaveRepository: OppgaveRepository
+
+    @Autowired
+    lateinit var kafkaTopics: KafkaTopics
 
     lateinit var testBrukerkontekst: TestBrukerKontekst
 

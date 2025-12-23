@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class BehandlingKafkaProducer(
-    @Value("\${DVH_BEHANDLING_TOPIC}") private val topic: String,
+    @Value("\${topics.dvh-behandling}") private val topic: String,
     val kafkaTemplate: KafkaTemplate<String, String>,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)

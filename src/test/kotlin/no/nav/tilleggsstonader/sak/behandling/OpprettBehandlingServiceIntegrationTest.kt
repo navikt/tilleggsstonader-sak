@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
+import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -9,10 +10,16 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.assertFinnesTaskMedType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
+import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
+import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -118,6 +125,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
 
             assertThat(nyBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
             assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
+            assertFinnesTaskMedType(BehandlingsstatistikkTask.TYPE)
         }
 
         @Test
@@ -126,7 +134,6 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
             val fagsak = testoppsettService.lagreFagsak(fagsak())
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.OPPRETTET))
 
-            // Sjekker at denne ikke kaster feil
             val nyBehandling =
                 opprettBehandlingService.opprettBehandling(
                     OpprettBehandling(
@@ -137,10 +144,15 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                     ),
                 )
 
+            assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
+            assertFinnesTaskMedType(BehandlingsstatistikkTask.TYPE, 2)
+
             // For å opprette oppgave slik at ikke settPåVentService-kall feiler
             kjørTasksKlareForProsessering()
             assertThat(nyBehandling.status).isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
             assertThat(settPåVentService.hentStatusSettPåVent(nyBehandling.id)).isNotNull
+
+            validerHarSendtMottattOgVenterBehandlingsstistikk(nyBehandling.id)
         }
 
         // TODO: Slett når snike i køen er implementert
@@ -182,6 +194,9 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                 )
 
             assertThat(nyBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
+
+            assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
+            assertFinnesTaskMedType(BehandlingsstatistikkTask.TYPE)
         }
 
         @Test
@@ -190,6 +205,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
             val fagsak = testoppsettService.lagreFagsak(fagsak())
             val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak))
             testoppsettService.ferdigstillBehandling(førstegangsbehandling)
+            kjørTasksKlareForProsessering()
 
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.OPPRETTET, type = BehandlingType.REVURDERING))
 
@@ -203,11 +219,16 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                     ),
                 )
 
-            // For å opprette oppgave slik at ikke settPåVentService-kall feiler
             assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
+            assertFinnesTaskMedType(BehandlingsstatistikkTask.TYPE, 2)
+
+            // For å opprette oppgave slik at ikke settPåVentService-kall feiler
             kjørTasksKlareForProsessering()
             assertThat(nyBehandling.status).isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
             assertThat(settPåVentService.hentStatusSettPåVent(nyBehandling.id)).isNotNull
+
+            // Validerer har blitt sendt 2 behandlingsstatistikk, og mottatt-status har tidligste tidspunkt
+            validerHarSendtMottattOgVenterBehandlingsstistikk(nyBehandling.id)
         }
     }
 
@@ -254,6 +275,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
 
         assertThat(nyBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
         assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
+        assertFinnesTaskMedType(BehandlingsstatistikkTask.TYPE)
     }
 
     @Test
@@ -271,5 +293,22 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
         )
 
         assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE, antall = 0)
+        assertFinnesTaskMedType(BehandlingsstatistikkTask.TYPE)
+    }
+
+    /*
+    Forventer at hendelse MOTTATT skal ha tidligere endretTid enn VENTER, selv om de ikke blir sendt i samme rekkefølge
+     */
+    private fun validerHarSendtMottattOgVenterBehandlingsstistikk(behandlingId: BehandlingId) {
+        val behandlingsstatistikkRecords =
+            KafkaTestConfig
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.dvhBehandling, 2)
+                .map { it.verdiEllerFeil<BehandlingDVH>() }
+                .sortedBy { it.endretTid }
+
+        assertThat(behandlingsstatistikkRecords.map { it.behandlingUuid }.toSet()).containsExactlyInAnyOrder(behandlingId.toString())
+        assertThat(behandlingsstatistikkRecords.first().behandlingStatus).isEqualTo(Hendelse.MOTTATT.name)
+        assertThat(behandlingsstatistikkRecords.last().behandlingStatus).isEqualTo(Hendelse.VENTER.name)
     }
 }

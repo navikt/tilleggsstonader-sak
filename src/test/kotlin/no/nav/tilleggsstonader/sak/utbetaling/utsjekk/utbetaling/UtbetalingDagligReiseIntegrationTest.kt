@@ -11,15 +11,12 @@ import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøn
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
-import no.nav.tilleggsstonader.sak.util.toYearMonth
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
 
 class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
-    val utbetalingTopic = "tilleggsstonader.utbetaling.v1"
-
     @Test
     fun `utbetalingsdato i fremtiden - ingen andeler skal bli utbetalt`() {
         val reiseFramITid = lagreDagligReiseDto(fom = LocalDate.now().plusDays(1), tom = LocalDate.now().plusWeeks(1))
@@ -30,7 +27,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             medVilkår = listOf(reiseFramITid),
         )
 
-        KafkaTestConfig.sendteMeldinger().forventAntallMeldingerPåTopic(utbetalingTopic, 0)
+        KafkaTestConfig.sendteMeldinger().forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
     }
 
     @Test
@@ -50,7 +47,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 medVilkår = reiser,
             )
 
-        val utbetalinger = KafkaTestConfig.sendteMeldinger().finnPåTopic(utbetalingTopic)
+        val utbetalinger = KafkaTestConfig.sendteMeldinger().finnPåTopic(kafkaTopics.utbetaling)
         val utbetaling = utbetalinger.single().verdiEllerFeil<IverksettingDto>()
 
         with(utbetaling.utbetalingsgrunnlag) {
@@ -85,7 +82,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         val utbetaling =
             KafkaTestConfig
                 .sendteMeldinger()
-                .finnPåTopic(utbetalingTopic)
+                .finnPåTopic(kafkaTopics.utbetaling)
                 .single()
                 .verdiEllerFeil<IverksettingDto>()
 

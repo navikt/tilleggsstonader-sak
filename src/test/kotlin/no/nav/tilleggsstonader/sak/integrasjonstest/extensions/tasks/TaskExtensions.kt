@@ -22,6 +22,7 @@ fun IntegrationTest.kjørTasksKlareForProsessering() {
     logger.info("Kjører tasks klare for prosessering")
     taskService
         .finnAlleTasksKlareForProsessering(Pageable.unpaged())
+        .sortedBy { it.opprettetTid }
         .forEach { kjørTask(it) }
     logger.info("Tasks kjørt OK")
 }

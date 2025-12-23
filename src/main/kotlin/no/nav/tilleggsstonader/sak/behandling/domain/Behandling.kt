@@ -54,6 +54,8 @@ data class Behandling(
 
     fun erOpphørt(): Boolean = resultat == BehandlingResultat.OPPHØRT
 
+    val erSatsendring get() = årsak == BehandlingÅrsak.SATSENDRING
+
     init {
         if (erHenlagt()) {
             feilHvis(henlagtÅrsak == null) { "Kan ikke henlegge behandling uten en årsak" }
