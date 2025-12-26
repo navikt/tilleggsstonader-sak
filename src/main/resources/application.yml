@@ -208,6 +208,9 @@ google:
     uri: https://places.googleapis.com/v1/places:autocomplete
   place-details:
     uri: https://places.googleapis.com/v1/places/
+  embedded-map:
+    api-key: ${GOOGLE_MAPS_EMBEDDED_MAP_API_KEY}
+    uri: https://www.google.com/maps/embed/v1/directions
 
 clients:
   integrasjoner:

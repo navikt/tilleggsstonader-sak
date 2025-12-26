@@ -19,3 +19,5 @@ unleash:
 
 google:
   api-key: mock-key
+  embedded-map:
+    api-key: mock-key
