@@ -7,8 +7,8 @@ import org.springframework.web.util.UriComponentsBuilder
 
 @Service
 class GoogleEmbeddedMapClient(
-    @Value($$"${google.embedded-map.api-key}") private val apiKey: String,
     @Value($$"${google.embedded-map.uri}") private val baseUrl: String,
+    @Value($$"${google.api-key}") private val apiKey: String,
 ) {
     fun embeddedMapRedirect(
         origin: String,
