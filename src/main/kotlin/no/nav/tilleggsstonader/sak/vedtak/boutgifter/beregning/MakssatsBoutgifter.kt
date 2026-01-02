@@ -26,6 +26,11 @@ private val MAX = LocalDate.of(2099, 12, 31)
 val bekreftedeSatser =
     listOf(
         MakssatsBoutgifter(
+            fom = LocalDate.of(2026, 1, 1),
+            tom = LocalDate.of(2026, 12, 31),
+            beløp = 5062,
+        ),
+        MakssatsBoutgifter(
             fom = LocalDate.of(2025, 1, 1),
             tom = LocalDate.of(2025, 12, 31),
             beløp = 4953,
