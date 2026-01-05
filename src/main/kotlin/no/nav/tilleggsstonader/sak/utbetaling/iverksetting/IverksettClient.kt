@@ -31,6 +31,13 @@ class IverksettClient(
             .encode()
             .toUriString()
 
+    private val migreringUrl =
+        UriComponentsBuilder
+            .fromUri(uri)
+            .pathSegment("api", "iverksetting", "v2", "migrate")
+            .encode()
+            .toUriString()
+
     fun iverksett(dto: IverksettDto) {
         try {
             postForEntityNullable<Void>(iverksettingUrl, dto)
@@ -41,6 +48,10 @@ class IverksettClient(
             }
             throw e
         }
+    }
+
+    fun migrer(dto: MigrerUtbetalingDto) {
+        postForEntityNullable<Void>(migreringUrl, dto)
     }
 
     fun hentStatus(
