@@ -77,7 +77,7 @@ class SatsLæremidlerTest {
         val sisteBekreftetSats = satsLæremidlerService.alleSatser().filter { it.bekreftet }.maxBy { it.tom }
 
         assertThat(ubekreftedeSatser).hasSize(1)
-        assertThat(ubekreftedeSatser[0].fom).isEqualTo(LocalDate.of(2026, 1, 1))
+        assertThat(ubekreftedeSatser[0].fom).isEqualTo(LocalDate.of(2027, 1, 1))
         assertThat(ubekreftedeSatser[0].tom).isEqualTo(LocalDate.of(2099, 12, 31))
         assertThat(ubekreftedeSatser[0].fom).isEqualTo(sisteBekreftetSats.tom.plusDays(1))
     }
