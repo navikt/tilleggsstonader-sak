@@ -196,8 +196,6 @@ no.nav.security.jwt:
         client-secret: ${AZURE_APP_CLIENT_SECRET}
         client-auth-method: client_secret_basic
 
-DVH_BEHANDLING_TOPIC: tilleggsstonader.aapen-tilleggsstonader-dvh-behandling
-
 google:
   api-key: ${GOOGLE_MAPS_API_KEY}
   routes:
@@ -249,3 +247,4 @@ topics:
   oppgavehendelser: oppgavehandtering.oppgavehendelse-v1
   utbetaling: tilleggsstonader.utbetaling.v1
   utbetaling-status: helved.status.v1
+  dvh-behandling: tilleggsstonader.aapen-tilleggsstonader-dvh-behandling

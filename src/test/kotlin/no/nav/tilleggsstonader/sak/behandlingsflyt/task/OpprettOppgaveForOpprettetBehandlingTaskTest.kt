@@ -4,8 +4,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -21,23 +19,19 @@ import org.junit.jupiter.params.provider.EnumSource
 internal class OpprettOppgaveForOpprettetBehandlingTaskTest {
     val behandlingService = mockk<BehandlingService>()
     val oppgaveService = mockk<OppgaveService>()
-    val taskService = mockk<TaskService>()
     val opprettOppgaveForOpprettetBehandlingTask =
         OpprettOppgaveForOpprettetBehandlingTask(
             behandlingService = behandlingService,
             oppgaveService = oppgaveService,
-            taskService = taskService,
         )
 
     val oppgaveId = 1L
 
-    val opprettTaskSlot = slot<Task>()
     val opprettOppgaveSlot = slot<OpprettOppgave>()
 
     @BeforeEach
     internal fun setUp() {
         every { oppgaveService.opprettOppgave(any(), any()) } returns oppgaveId
-        every { taskService.save(capture(opprettTaskSlot)) } answers { firstArg() }
     }
 
     @EnumSource(

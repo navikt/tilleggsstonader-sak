@@ -33,7 +33,6 @@ import java.util.Properties
 class OpprettOppgaveForOpprettetBehandlingTask(
     private val behandlingService: BehandlingService,
     private val oppgaveService: OppgaveService,
-    private val taskService: TaskService,
 ) : AsyncTaskStep {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -41,21 +40,12 @@ class OpprettOppgaveForOpprettetBehandlingTask(
         val behandlingId: BehandlingId,
         val saksbehandler: String? = null,
         val beskrivelse: String? = null,
-        val hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
         val prioritet: OppgavePrioritet = OppgavePrioritet.NORM,
     )
 
     override fun doTask(task: Task) {
         val data = objectMapper.readValue<OpprettOppgaveTaskData>(task.payload)
-        val oppgaveId = opprettOppgave(data, task)
-
-        taskService.save(
-            BehandlingsstatistikkTask.opprettMottattTask(
-                behandlingId = data.behandlingId,
-                hendelseTidspunkt = data.hendelseTidspunkt,
-                oppgaveId = oppgaveId,
-            ),
-        )
+        opprettOppgave(data, task)
     }
 
     private fun opprettOppgave(
