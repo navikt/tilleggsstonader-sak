@@ -82,10 +82,9 @@ class VedtaksperioderOversiktService(
     }
 
     private fun finnDetaljerteVedtaksperioderForDagligReise(behandling: Saksbehandling): List<DetaljertVedtaksperiode> {
-        val fagsakIdDagligReiseTso =
-            fagsakService.finnFagsakerForFagsakPersonId(behandling.fagsakPersonId).dagligReiseTso?.id
-        val fagsakIdDagligReiseTsr =
-            fagsakService.finnFagsakerForFagsakPersonId(behandling.fagsakPersonId).dagligReiseTsr?.id
+        val fagsak = fagsakService.finnFagsakerForFagsakPersonId(behandling.fagsakPersonId)
+        val fagsakIdDagligReiseTso = fagsak.dagligReiseTso?.id
+        val fagsakIdDagligReiseTsr = fagsak.dagligReiseTsr?.id
 
         val vedtaksdataTso =
             fagsakIdDagligReiseTso?.let {
