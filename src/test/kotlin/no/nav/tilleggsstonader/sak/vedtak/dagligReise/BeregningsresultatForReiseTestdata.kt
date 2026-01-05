@@ -36,6 +36,7 @@ fun lagVedtaksperiodeGrunnlag(
     tom = fom,
     målgruppe = målgruppe,
     aktivitet = AktivitetType.TILTAK,
+    typeAktivitet = null,
     antallReisedagerIVedtaksperioden = 5,
 )
 
@@ -52,4 +53,5 @@ fun lagBeregningsgrunnlagOffentligTransport(
         antallReisedagerPerUke = 5,
         vedtaksperioder = vedtaksperioder,
         antallReisedager = 20,
+        brukersNavKontor = null,
     )

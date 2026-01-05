@@ -75,10 +75,10 @@ class DagligReiseBeregnYtelseSteg(
             )
         val beregningsresultat =
             beregningService.beregn(
-                behandlingId = saksbehandling.id,
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
+                tidligsteEndring = tidligsteEndring,
             )
         lagreInnvilgetVedtak(
             behandling = saksbehandling,
@@ -94,7 +94,7 @@ class DagligReiseBeregnYtelseSteg(
 
         tilkjentYtelseService.lagreTilkjentYtelse(
             behandlingId = saksbehandling.id,
-            andeler = beregningsresultat.offentligTransport.mapTilAndelTilkjentYtelse(saksbehandling.id),
+            andeler = beregningsresultat.offentligTransport.mapTilAndelTilkjentYtelse(saksbehandling),
         )
     }
 

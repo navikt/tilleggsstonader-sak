@@ -19,7 +19,7 @@ data class BeregningsresultatOffentligTransportDto(
 )
 
 data class BeregningsresultatForReiseDto(
-    val reiseId: ReiseId?, // TODO: Fjern nullbarhet
+    val reiseId: ReiseId,
     val perioder: List<BeregningsresultatForPeriodeDto>,
 )
 
@@ -32,6 +32,9 @@ data class BeregningsresultatForPeriodeDto(
     val antallReisedagerPerUke: Int,
     val beløp: Int,
     val billettdetaljer: Map<Billettype, Int>,
+    val antallReisedager: Int,
+    val fraTidligereVedtak: Boolean,
+    val brukersNavKontor: String?,
 ) : Periode<LocalDate>
 
 fun BeregningsresultatDagligReise.tilDto(tidligsteEndring: LocalDate?): BeregningsresultatDagligReiseDto =
@@ -61,4 +64,7 @@ fun BeregningsresultatForPeriode.tilDto(): BeregningsresultatForPeriodeDto =
         antallReisedagerPerUke = grunnlag.antallReisedagerPerUke,
         beløp = beløp,
         billettdetaljer = billettdetaljer,
+        antallReisedager = grunnlag.antallReisedager,
+        fraTidligereVedtak = fraTidligereVedtak,
+        brukersNavKontor = grunnlag.brukersNavKontor,
     )

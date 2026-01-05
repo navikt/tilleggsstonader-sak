@@ -103,8 +103,8 @@ class InterntVedtakGenereringTest {
             Stønadstype.BARNETILSYN -> mockTilsynBarn()
             Stønadstype.LÆREMIDLER -> mockLæremidler()
             Stønadstype.BOUTGIFTER -> mockBoutgifter()
-            Stønadstype.DAGLIG_REISE_TSO -> mockDagligReise()
-            Stønadstype.DAGLIG_REISE_TSR -> mockDagligReise()
+            Stønadstype.DAGLIG_REISE_TSO -> mockDagligReiseTso()
+            Stønadstype.DAGLIG_REISE_TSR -> mockDagligReiseTsr()
         }
     }
 
@@ -135,13 +135,22 @@ class InterntVedtakGenereringTest {
         every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.Boutgifter.innvilgetVedtak
     }
 
-    private fun mockDagligReise() {
+    private fun mockDagligReiseTso() {
         every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.DagligReise.behandling
         every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårperioder
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.DagligReise.grunnlagsdata
         every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
         every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårOffentligTransport
-        every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.DagligReise.innvilgetVedtak
+        every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.DagligReise.innvilgetVedtakTso()
+    }
+
+    private fun mockDagligReiseTsr() {
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.DagligReise.behandling
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårperioder
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.DagligReise.grunnlagsdata
+        every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
+        every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårOffentligTransport
+        every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.DagligReise.innvilgetVedtakTsr()
     }
 
     @Test
@@ -194,9 +203,8 @@ class InterntVedtakGenereringTest {
                     Stønadstype.LÆREMIDLER,
                     Stønadstype.BOUTGIFTER,
                     Stønadstype.DAGLIG_REISE_TSO,
-                    -> it.håndteres()
                     Stønadstype.DAGLIG_REISE_TSR,
-                    -> it.håndteresIkke()
+                    -> it.håndteres()
                 }
             }
 

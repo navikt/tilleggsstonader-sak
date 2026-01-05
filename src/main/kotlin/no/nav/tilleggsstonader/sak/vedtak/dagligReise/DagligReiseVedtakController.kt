@@ -4,17 +4,19 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
@@ -38,6 +40,7 @@ class DagligReiseVedtakController(
     private val vedtakService: VedtakService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
+    private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -86,16 +89,24 @@ class DagligReiseVedtakController(
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseDagligReiseRequest,
-    ): BeregningsresultatDagligReise {
+    ): BeregningsresultatDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        return beregningService
-            .beregn(
-                behandlingId = behandlingId,
-                vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
-                behandling = behandling,
-                typeVedtak = TypeVedtak.INNVILGELSE,
+        val tidligsteEndring =
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                behandling.id,
+                vedtak.vedtaksperioder.tilDomene(),
             )
+        val beregningsresultat =
+            beregningService
+                .beregn(
+                    vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
+                    behandling = behandling,
+                    typeVedtak = TypeVedtak.INNVILGELSE,
+                    tidligsteEndring = tidligsteEndring,
+                )
+
+        return beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring)
     }
 
     private fun lagreVedtak(

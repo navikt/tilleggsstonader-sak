@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.dto.KodeverkDto
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -86,5 +88,16 @@ class VilkårperiodeController(
         val periode = vilkårperiodeService.slettVilkårperiode(id, slettVikårperiode)
 
         return LagreVilkårperiodeResponse(periode = periode?.tilDto())
+    }
+
+    @GetMapping("/aktivitet/type-aktivitet")
+    fun hentTypeAktivitet(): List<KodeverkDto> {
+        // TODO burde ha en annen filtrering?
+        return TypeAktivitet.entries.filter { it.rettTilStønad }.map {
+            KodeverkDto(
+                kode = it.name,
+                beskrivelse = it.beskrivelse,
+            )
+        }
     }
 }

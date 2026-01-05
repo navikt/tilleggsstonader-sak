@@ -311,6 +311,7 @@ class InterntVedtakService(
             Stønadstype.LÆREMIDLER -> {}
             Stønadstype.BOUTGIFTER -> {}
             Stønadstype.DAGLIG_REISE_TSO -> {}
+            Stønadstype.DAGLIG_REISE_TSR -> {}
             else -> error("Internt vedtak håndterer ikke stønadstype=$stønadstype ennå")
         }
     }

@@ -81,7 +81,6 @@ class VedtakDtoMapper(
 
             is VedtakDagligReise ->
                 mapVedtakDagligReise(
-                    vedtak,
                     data,
                     vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
@@ -198,7 +197,6 @@ class VedtakDtoMapper(
         }
 
     private fun mapVedtakDagligReise(
-        vedtak: Vedtak,
         data: VedtakDagligReise,
         tidligsteEndring: LocalDate?,
         forrigeIverksatteBehandlingId: BehandlingId?,
@@ -210,7 +208,7 @@ class VedtakDtoMapper(
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    beregningsresultat = data.beregningsresultat,
+                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,

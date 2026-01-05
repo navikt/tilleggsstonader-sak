@@ -1,7 +1,4 @@
 {
-  "årsaker": [
-    "ANNET"
-  ],
   "begrunnelse": "En begrunnelse",
   "beregningsresultat": {
     "offentligTransport": {
@@ -30,7 +27,10 @@
                 "antallReisedager": 6
               },
               "beløp": 528,
-              "billettdetaljer" : {"ENKELTBILLETT": 12}
+              "billettdetaljer": {
+                "ENKELTBILLETT": 12
+              },
+              "fraTidligereVedtak": false
             }
           ]
         }
@@ -46,5 +46,8 @@
       "målgruppe": "NEDSATT_ARBEIDSEVNE",
       "aktivitet": "TILTAK"
     }
+  ],
+  "årsaker": [
+    "ANNET"
   ]
 }

@@ -162,10 +162,10 @@ class LæremidlerBeregnYtelseStegTest : CleanDatabaseIntegrationTest() {
     // Ved ny sats må man oppdatere datoer her
     @Test
     fun `skal splitte andeler i 2, en for høsten og en for våren som ikke har bekreftet sats ennå`() {
-        val fom = 15 august 2025
-        val tom = 20 april 2026
-        val datoUtbetalingDel1 = 15 august 2025
-        val datoUtbetalingDel2 = 15 januar 2026
+        val fom = 14 august 2026
+        val tom = 20 april 2027
+        val datoUtbetalingDel1 = 14 august 2026
+        val datoUtbetalingDel2 = 14 januar 2027
 
         lagreMålgruppeOgAktivitet(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
@@ -183,7 +183,7 @@ class LæremidlerBeregnYtelseStegTest : CleanDatabaseIntegrationTest() {
         with(andeler[0]) {
             assertThat(this.fom).isEqualTo(datoUtbetalingDel1)
             assertThat(this.tom).isEqualTo(datoUtbetalingDel1)
-            assertThat(beløp).isEqualTo(4505)
+            assertThat(beløp).isEqualTo(4605)
             assertThat(type).isEqualTo(TypeAndel.LÆREMIDLER_AAP)
             assertThat(statusIverksetting).isEqualTo(StatusIverksetting.UBEHANDLET)
             assertThat(satstype).isEqualTo(Satstype.DAG)
@@ -191,7 +191,7 @@ class LæremidlerBeregnYtelseStegTest : CleanDatabaseIntegrationTest() {
         with(andeler[1]) {
             assertThat(this.fom).isEqualTo(datoUtbetalingDel2)
             assertThat(this.tom).isEqualTo(datoUtbetalingDel2)
-            assertThat(beløp).isEqualTo(3604)
+            assertThat(beløp).isEqualTo(3684)
             assertThat(type).isEqualTo(TypeAndel.LÆREMIDLER_AAP)
             assertThat(statusIverksetting).isEqualTo(StatusIverksetting.VENTER_PÅ_SATS_ENDRING)
             assertThat(satstype).isEqualTo(Satstype.DAG)

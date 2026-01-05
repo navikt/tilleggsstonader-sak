@@ -69,11 +69,13 @@ fun lagDagligReiseInnvilgelseMedBeløp(
                                                                 fom = fom,
                                                                 tom = tom,
                                                                 aktivitet = aktivitet.type,
+                                                                typeAktivitet = vedtaksperiode.typeAktivitet,
                                                                 målgruppe = målgruppe,
                                                                 antallReisedagerIVedtaksperioden = 20,
                                                             ),
                                                         ),
                                                     antallReisedager = 20,
+                                                    brukersNavKontor = null,
                                                 ),
                                             beløp = beløp,
                                             billettdetaljer =

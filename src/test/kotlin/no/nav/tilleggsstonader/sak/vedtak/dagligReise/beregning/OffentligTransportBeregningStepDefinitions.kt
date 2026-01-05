@@ -99,6 +99,7 @@ class OffentligTransportBeregningStepDefinitions {
             offentligTransportBeregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkår = vilkår,
+                brukersNavKontor = null,
             )
     }
 

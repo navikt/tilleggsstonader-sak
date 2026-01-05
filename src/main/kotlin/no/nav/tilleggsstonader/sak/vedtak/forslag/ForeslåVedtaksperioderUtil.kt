@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.forslag
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
@@ -107,6 +108,7 @@ object ForeslåVedtaksperioderUtil {
                     fom = it.fom,
                     tom = it.tom,
                     type = mapType(it),
+                    typeAktivitet = it.typeAktivitet,
                 )
             }.groupBy { it.type }
             .mapValues { it.value.sorted().mergeSammenhengende(ForenkletVilkårperiode<T>::skalMerges) }
@@ -119,6 +121,7 @@ object ForeslåVedtaksperioderUtil {
                 tom = it.tom,
                 målgruppe = this.type,
                 aktivitet = aktivitet.type,
+                typeAktivitet = aktivitet.typeAktivitet,
             )
         }
 
@@ -126,6 +129,7 @@ object ForeslåVedtaksperioderUtil {
         override val fom: LocalDate,
         override val tom: LocalDate,
         val type: TYPE,
+        val typeAktivitet: TypeAktivitet?,
     ) : Periode<LocalDate>,
         Mergeable<LocalDate, ForenkletVilkårperiode<TYPE>>,
         KopierPeriode<ForenkletVilkårperiode<TYPE>> {

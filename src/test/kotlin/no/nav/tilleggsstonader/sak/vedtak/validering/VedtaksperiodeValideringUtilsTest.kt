@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.validering
 
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -25,6 +27,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mergeSammenheng
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mergeSammenhengendeOppfylteMålgrupper
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
+import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Nested
@@ -362,6 +365,21 @@ class VedtaksperiodeValideringUtilsTest {
                         )
                     }
                 assertThat(feil.feil).contains("Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden")
+            }
+
+            @Test
+            fun `skal kaste feil hvis én av utgiftene er utenfor vedtaksperioden`() {
+                assertThatExceptionOfType(ApiFeil::class.java)
+                    .isThrownBy {
+                        validerUtgiftHeleVedtaksperioden(
+                            vedtaksperioder =
+                                listOf(
+                                    vedtaksperiode.copy(tom = 28 februar 2025),
+                                    vedtaksperiode.copy(tom = 31 januar 2025),
+                                ),
+                            utgifter = utgifter,
+                        )
+                    }.withMessage("Kan ikke innvilge når det ikke finnes utgifter hele vedtaksperioden")
             }
 
             @Test

@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
@@ -12,7 +14,7 @@ import java.util.UUID
 data class BeregningsresultatOffentligTransport(
     val reiser: List<BeregningsresultatForReise>,
 ) {
-    fun sorterReiser(): BeregningsresultatOffentligTransport =
+    fun sorterReiserOgPerioder(): BeregningsresultatOffentligTransport =
         BeregningsresultatOffentligTransport(
             reiser
                 .sortedBy { reise -> reise.perioder.minOf { it.grunnlag.fom } }
@@ -23,7 +25,7 @@ data class BeregningsresultatOffentligTransport(
 }
 
 data class BeregningsresultatForReise(
-    val reiseId: ReiseId?, // TODO: Fjern nullbarhet
+    val reiseId: ReiseId,
     val perioder: List<BeregningsresultatForPeriode>,
 )
 
@@ -31,6 +33,7 @@ data class BeregningsresultatForPeriode(
     val grunnlag: BeregningsgrunnlagOffentligTransport,
     val beløp: Int,
     val billettdetaljer: Map<Billettype, Int>,
+    val fraTidligereVedtak: Boolean = false,
 )
 
 data class BeregningsgrunnlagOffentligTransport(
@@ -42,14 +45,19 @@ data class BeregningsgrunnlagOffentligTransport(
     val antallReisedagerPerUke: Int,
     val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
     val antallReisedager: Int,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val brukersNavKontor: String?,
 ) : Periode<LocalDate>
 
+// Legger på Include.NON_NULL for å unngå at vi serialiserer "typeAktivitet": null" i JSON for TSO som er i produksjon
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class VedtaksperiodeGrunnlag(
     val id: UUID,
     val fom: LocalDate,
     val tom: LocalDate,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
+    val typeAktivitet: TypeAktivitet?,
     val antallReisedagerIVedtaksperioden: Int,
 ) {
     constructor(vedtaksperiode: Vedtaksperiode, antallReisedager: Int) : this(
@@ -58,6 +66,7 @@ data class VedtaksperiodeGrunnlag(
         tom = vedtaksperiode.tom,
         målgruppe = vedtaksperiode.målgruppe,
         aktivitet = vedtaksperiode.aktivitet,
+        typeAktivitet = vedtaksperiode.typeAktivitet,
         antallReisedagerIVedtaksperioden = antallReisedager,
     )
 }

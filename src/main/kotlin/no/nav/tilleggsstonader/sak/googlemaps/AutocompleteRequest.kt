@@ -5,5 +5,4 @@ data class AutocompleteRequest(
     val includedRegionCodes: List<String>,
     val languageCode: String,
     val regionCode: String,
-    val includedPrimaryTypes: List<String>,
 )

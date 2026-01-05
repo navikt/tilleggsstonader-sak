@@ -10,6 +10,7 @@ enum class DomenenøkkelFelles(
     ID("Id"),
     FOM("Fom"),
     TOM("Tom"),
+    TYPE_AKTIVITET("TypeAktivitet"),
     BELØP("Beløp"),
     MÅLGRUPPE("FaktiskMålgruppe"),
     AKTIVITET("Aktivitet"),

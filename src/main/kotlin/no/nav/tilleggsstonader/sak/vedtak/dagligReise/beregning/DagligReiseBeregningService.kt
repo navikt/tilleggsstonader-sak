@@ -1,94 +1,95 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class DagligReiseBeregningService(
     private val vilkårService: VilkårService,
-    private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
+    private val dagligReiseVedtaksperioderValideringService: DagligReiseVedtaksperioderValideringService,
     private val offentligTransportBeregningService: OffentligTransportBeregningService,
-    private val vedtakRepository: VedtakRepository,
-    private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val offentligTransportBeregningRevurderingService: OffentligTransportBeregningRevurderingService,
+    private val arbeidsfordelingService: ArbeidsfordelingService,
 ) {
     fun beregn(
-        behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
+        tidligsteEndring: LocalDate?,
     ): BeregningsresultatDagligReise {
-        vedtaksperiodeValideringService.validerVedtaksperioder(
+        dagligReiseVedtaksperioderValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             typeVedtak = typeVedtak,
         )
 
-        val oppfylteVilkår =
-            vilkårService.hentOppfylteDagligReiseVilkår(behandlingId).map { it.mapTilVilkårDagligReise() }
+        val oppfylteVilkårDagligReise = vilkårService.hentOppfylteDagligReiseVilkår(behandling.id).map { it.mapTilVilkårDagligReise() }
+        validerFinnesReiser(oppfylteVilkårDagligReise)
 
-        validerReiser(oppfylteVilkår, vedtaksperioder)
-
-        val oppfylteVilkårGruppertPåType = oppfylteVilkår.filter { it.fakta != null }.groupBy { it.fakta!!.type }
+        val brukersNavKontor =
+            if (behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
+                arbeidsfordelingService.hentBrukersNavKontor(behandling.ident, behandling.stønadstype)
+            } else {
+                null
+            }
 
         return BeregningsresultatDagligReise(
-            offentligTransport = beregnOffentligTransport(oppfylteVilkårGruppertPåType, vedtaksperioder, behandling),
+            offentligTransport =
+                beregnOffentligTransport(
+                    oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
+                    vedtaksperioder = vedtaksperioder,
+                    behandling = behandling,
+                    brukersNavKontor = brukersNavKontor,
+                    tidligsteEndring = tidligsteEndring,
+                ),
         )
     }
 
     private fun beregnOffentligTransport(
-        vilkår: Map<TypeDagligReise, List<VilkårDagligReise>>,
+        oppfylteVilkårDagligReise: List<VilkårDagligReise>,
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
+        brukersNavKontor: String?,
+        tidligsteEndring: LocalDate?,
     ): BeregningsresultatOffentligTransport? {
-        val vilkårOffentligTransport = vilkår[TypeDagligReise.OFFENTLIG_TRANSPORT] ?: return null
+        val oppfylteVilkårOffentligTransport = oppfylteVilkårDagligReise.filter { it.fakta is FaktaOffentligTransport }
 
-        val beregnignsresultat =
-            offentligTransportBeregningService.beregn(
+        if (oppfylteVilkårOffentligTransport.isEmpty()) return null
+
+        return offentligTransportBeregningService
+            .beregn(
                 vedtaksperioder = vedtaksperioder,
-                oppfylteVilkår = vilkårOffentligTransport,
-            )
-
-        val forrigeIverksatteVedtak = hentForrigeVedtak(behandling)
-
-        if (forrigeIverksatteVedtak != null) {
-            val tidligsteEndring =
-                utledTidligsteEndringService.utledTidligsteEndringForBeregning(
-                    behandlingId = behandling.id,
-                    vedtaksperioder = vedtaksperioder,
-                )
-
-            validerRevurdering(
-                beregningsresultat = beregnignsresultat,
-                tidligsteEndring = tidligsteEndring,
-                forrigeIverksatteVedtak = forrigeIverksatteVedtak,
-            )
-        }
-        return beregnignsresultat
+                oppfylteVilkår = oppfylteVilkårOffentligTransport,
+                brukersNavKontor = brukersNavKontor,
+            ).flettMedForrigeVedtakHvisRevurdering(behandling, tidligsteEndring)
+            .sorterReiserOgPerioder()
     }
 
-    private fun hentVedtak(behandlingId: BehandlingId) =
-        vedtakRepository
-            .findByIdOrThrow(behandlingId)
-            .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
+    private fun BeregningsresultatOffentligTransport.flettMedForrigeVedtakHvisRevurdering(
+        behandling: Saksbehandling,
+        tidligsteEndring: LocalDate?,
+    ) = offentligTransportBeregningRevurderingService
+        .flettMedForrigeVedtakHvisRevurdering(
+            nyttBeregningsresultat = this,
+            behandling = behandling,
+            tidligsteEndring = tidligsteEndring,
+        )
+}
 
-    private fun hentForrigeVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørDagligReise? =
-        behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
+private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {
+    brukerfeilHvis(vilkår.isEmpty()) {
+        "Innvilgelse er ikke et gyldig vedtaksresultat når det ikke er lagt inn perioder med reise"
+    }
 }

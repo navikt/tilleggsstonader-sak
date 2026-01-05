@@ -35,7 +35,7 @@ private fun erUtgiftperiodeSomInneholderVedtaksperiode(
             }.sorted()
             .mergeSammenhengende { p1, p2 -> p1.overlapperEllerPåfølgesAv(p2) }
 
-    return vedtaksperioder.any { vedtaksperiode ->
+    return vedtaksperioder.all { vedtaksperiode ->
         sammenslåtteUtgiftPerioder.any { utgiftPeriode -> utgiftPeriode.inneholder(vedtaksperiode) }
     }
 }

@@ -25,10 +25,42 @@ class ArbeidsfordelingClient(
         return postForEntity(bestMatchUri, arbeidsfordelingskriterie)
     }
 
+    fun finnNavKontorForGeografiskOmråde(
+        geografiskOmraade: String?,
+        diskresjonskode: String?,
+        erEgenAnsatt: Boolean,
+    ): NavKontor? {
+        val uri =
+            UriComponentsBuilder
+                .fromUri(enhetUri)
+                .pathSegment("navkontor/{geografiskOmraade}")
+                .queryParam("disk", "{disk}")
+                .queryParam("skjermet", "{skjermet}")
+                .build()
+                .toUriString()
+
+        return getForEntity<NavKontor>(
+            uri = uri,
+            uriVariables =
+                mapOf(
+                    "geografiskOmraade" to geografiskOmraade,
+                    "disk" to (diskresjonskode ?: "ANY"),
+                    "skjermet" to erEgenAnsatt,
+                ),
+        )
+    }
+
     private val arbeidsfordelingUri =
         UriComponentsBuilder
             .fromUri(uri)
             .pathSegment("api/v1/arbeidsfordeling")
+            .build()
+            .toUri()
+
+    private val enhetUri =
+        UriComponentsBuilder
+            .fromUri(uri)
+            .pathSegment("api/v1/enhet")
             .build()
             .toUri()
 }

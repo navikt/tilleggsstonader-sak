@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
-import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import org.assertj.core.api.Assertions.assertThat
@@ -71,7 +70,7 @@ class BehandlingsstatistikkMappingTest {
                 sakUtland = "Nasjonal",
                 behandlingType = "FØRSTEGANGSBEHANDLING",
                 behandlingStatus = "MOTTATT",
-                behandlingMetode = "AUTOMATISK",
+                behandlingMetode = "MANUELL",
                 kravMottatt = null,
                 opprettetAv = "VL",
                 saksbehandler = saksbehandlerId,
@@ -143,7 +142,7 @@ class BehandlingsstatistikkMappingTest {
                 sakUtland = "Nasjonal",
                 behandlingType = "FØRSTEGANGSBEHANDLING",
                 behandlingStatus = "FERDIG",
-                behandlingMetode = "AUTOMATISK",
+                behandlingMetode = "MANUELL",
                 kravMottatt = null,
                 opprettetAv = "VL",
                 saksbehandler = saksbehandlerId,
@@ -217,7 +216,7 @@ class BehandlingsstatistikkMappingTest {
                 sakUtland = "Nasjonal",
                 behandlingType = "FØRSTEGANGSBEHANDLING",
                 behandlingStatus = "MOTTATT",
-                behandlingMetode = "AUTOMATISK",
+                behandlingMetode = "MANUELL",
                 kravMottatt = null,
                 opprettetAv = "-5",
                 saksbehandler = "-5",
@@ -294,7 +293,7 @@ class BehandlingsstatistikkMappingTest {
                 sakUtland = "Nasjonal",
                 behandlingType = "REVURDERING",
                 behandlingStatus = "MOTTATT",
-                behandlingMetode = "AUTOMATISK",
+                behandlingMetode = "MANUELL",
                 kravMottatt = null,
                 opprettetAv = "VL",
                 saksbehandler = saksbehandlerId,
@@ -366,7 +365,7 @@ class BehandlingsstatistikkMappingTest {
                 sakUtland = "Nasjonal",
                 behandlingType = "FØRSTEGANGSBEHANDLING",
                 behandlingStatus = "FERDIG",
-                behandlingMetode = "AUTOMATISK",
+                behandlingMetode = "MANUELL",
                 kravMottatt = null,
                 opprettetAv = "VL",
                 saksbehandler = saksbehandlerId,
@@ -441,7 +440,7 @@ class BehandlingsstatistikkMappingTest {
                 sakUtland = "Nasjonal",
                 behandlingType = "FØRSTEGANGSBEHANDLING",
                 behandlingStatus = "FERDIG",
-                behandlingMetode = "AUTOMATISK",
+                behandlingMetode = "MANUELL",
                 kravMottatt = null,
                 opprettetAv = "VL",
                 saksbehandler = saksbehandlerId,
@@ -514,17 +513,14 @@ class BehandlingsstatistikkMappingTest {
         hendelseTidspunkt: LocalDateTime,
         tekniskTid: LocalDateTime,
         søkerHarStrengtFortroligAdresse: Boolean = false,
-        behandlingMetode: BehandlingMetode = BehandlingMetode.AUTOMATISK,
     ) = BehandlingsstatistikkService.mapTilBehandlingDVH(
-        saksbehandling,
-        behandlingId = saksbehandling.id,
+        saksbehandling = saksbehandling,
         henvendelseTidspunkt = henvendelseTidspunkt,
         hendelse = hendelse,
         hendelseTidspunkt = hendelseTidspunkt,
         søkerHarStrengtFortroligAdresse = søkerHarStrengtFortroligAdresse,
         saksbehandlerId = saksbehandlerId,
         sisteOppgaveForBehandling = null,
-        behandlingMetode = behandlingMetode,
         beslutterId = null,
         tekniskTid = tekniskTid,
         relatertBehandlingId = null,

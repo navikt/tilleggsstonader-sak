@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningStegKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførInngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførVilkårSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
@@ -83,7 +83,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         )
 
-        gjennomførBeregningStegKall(
+        gjennomførBeregningSteg(
             behandlingId = revurderingId,
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         ).expectStatus()

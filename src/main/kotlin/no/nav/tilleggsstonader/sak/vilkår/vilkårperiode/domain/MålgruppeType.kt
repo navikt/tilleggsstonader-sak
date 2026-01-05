@@ -17,7 +17,7 @@ enum class MålgruppeType(
     ),
     DAGPENGER(
         gyldigeAktiviter = setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING),
-        faktiskMålgruppe = null,
+        faktiskMålgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
     ),
     OMSTILLINGSSTØNAD(
         gyldigeAktiviter = setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING),
@@ -41,7 +41,7 @@ enum class MålgruppeType(
     ),
     TILTAKSPENGER(
         gyldigeAktiviter = setOf(AktivitetType.TILTAK),
-        faktiskMålgruppe = null,
+        faktiskMålgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
     ),
     INGEN_MÅLGRUPPE(
         gyldigeAktiviter = emptySet(),
@@ -49,7 +49,7 @@ enum class MålgruppeType(
     ),
     KVALIFISERINGSSTØNAD(
         gyldigeAktiviter = setOf(AktivitetType.TILTAK),
-        faktiskMålgruppe = null,
+        faktiskMålgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
     ),
     ;
 

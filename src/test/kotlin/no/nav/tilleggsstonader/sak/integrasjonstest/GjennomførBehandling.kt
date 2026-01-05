@@ -172,14 +172,6 @@ private fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId
 fun IntegrationTest.gjennomførBeregningSteg(
     behandlingId: BehandlingId,
     stønadstype: Stønadstype,
-) {
-    gjennomførBeregningStegKall(behandlingId, stønadstype).expectStatus().isOk
-    kjørTasksKlareForProsessering()
-}
-
-fun IntegrationTest.gjennomførBeregningStegKall(
-    behandlingId: BehandlingId,
-    stønadstype: Stønadstype,
 ): WebTestClient.ResponseSpec {
     val foreslåtteVedtaksperioder = kall.vedtak.foreslåVedtaksperioder(behandlingId)
 

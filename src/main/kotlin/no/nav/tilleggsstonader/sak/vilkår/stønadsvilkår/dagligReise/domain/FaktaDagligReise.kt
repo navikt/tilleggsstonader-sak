@@ -15,7 +15,7 @@ sealed interface FaktaDagligReise {
 }
 
 data class FaktaOffentligTransport(
-    val reiseId: ReiseId? = ReiseId.random(), // TODO: Fjern nullbarhet
+    val reiseId: ReiseId,
     val reisedagerPerUke: Int,
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
