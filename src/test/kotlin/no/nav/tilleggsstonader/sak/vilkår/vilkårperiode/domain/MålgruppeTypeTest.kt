@@ -25,6 +25,7 @@ class MålgruppeTypeTest {
                             MålgruppeType.INGEN_MÅLGRUPPE -> null
                             MålgruppeType.TILTAKSPENGER -> FaktiskMålgruppe.ARBEIDSSØKER
                             MålgruppeType.KVALIFISERINGSSTØNAD -> FaktiskMålgruppe.ARBEIDSSØKER
+                            MålgruppeType.INNSATT_I_FENGSEL -> FaktiskMålgruppe.ARBEIDSSØKER
                         }
                 }
 
