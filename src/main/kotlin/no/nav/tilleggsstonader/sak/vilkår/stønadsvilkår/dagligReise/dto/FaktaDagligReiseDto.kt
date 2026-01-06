@@ -44,18 +44,20 @@ data class FaktaDagligReiseOffentligTransportDto(
 }
 
 data class FaktaDagligReisePrivatBilDto(
+    val reiseId: ReiseId,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: Int,
-    val prisBompengerPerDag: Int?,
-    val prisFergekostandPerDag: Int?,
+    val bompengerPerDag: Int?,
+    val fergekostandPerDag: Int?,
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.PRIVAT_BIL
 
     override fun mapTilFakta() =
         FaktaPrivatBil(
+            reiseId = reiseId,
             reisedagerPerUke = reisedagerPerUke,
             reiseavstandEnVei = reiseavstandEnVei,
-            prisBompengerPerDag = prisBompengerPerDag,
-            prisFergekostandPerDag = prisFergekostandPerDag,
+            bompengerPerDag = bompengerPerDag,
+            fergekostandPerDag = fergekostandPerDag,
         )
 }

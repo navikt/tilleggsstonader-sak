@@ -30,10 +30,11 @@ class VilkårDagligReiseTest {
     fun `skal kaste feil hvis fakta ikke er av forventet type`() {
         val faktaPrivatBil =
             FaktaPrivatBil(
+                reiseId = ReiseId.random(),
                 reisedagerPerUke = 4,
                 reiseavstandEnVei = 10,
-                prisBompengerPerDag = 0,
-                prisFergekostandPerDag = 0,
+                bompengerPerDag = 0,
+                fergekostandPerDag = 0,
             )
         val feil =
             assertThrows<Feil> {

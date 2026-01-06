@@ -197,10 +197,11 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaPrivatBil(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = 4,
                         reiseavstandEnVei = 10,
-                        prisBompengerPerDag = -10,
-                        prisFergekostandPerDag = 0,
+                        bompengerPerDag = -10,
+                        fergekostandPerDag = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Bompenge- og fergeprisen må være større enn 0")
@@ -211,10 +212,11 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaPrivatBil(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = 4,
                         reiseavstandEnVei = -10,
-                        prisBompengerPerDag = 0,
-                        prisFergekostandPerDag = 0,
+                        bompengerPerDag = 0,
+                        fergekostandPerDag = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Reiseavstanden må være større enn 0")
@@ -225,10 +227,11 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaPrivatBil(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = -4,
                         reiseavstandEnVei = 10,
-                        prisBompengerPerDag = 0,
-                        prisFergekostandPerDag = 0,
+                        bompengerPerDag = 0,
+                        fergekostandPerDag = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke må være 0 eller mer")
@@ -239,10 +242,11 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaPrivatBil(
+                        reiseId = ReiseId.random(),
                         reisedagerPerUke = 8,
                         reiseavstandEnVei = 10,
-                        prisBompengerPerDag = 0,
-                        prisFergekostandPerDag = 0,
+                        bompengerPerDag = 0,
+                        fergekostandPerDag = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke kan ikke være mer enn 7")

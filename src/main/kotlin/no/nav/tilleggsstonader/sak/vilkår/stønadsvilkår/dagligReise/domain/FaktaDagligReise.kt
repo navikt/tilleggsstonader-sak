@@ -107,10 +107,11 @@ data class FaktaOffentligTransport(
 }
 
 data class FaktaPrivatBil(
+    val reiseId: ReiseId,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: Int,
-    val prisBompengerPerDag: Int?,
-    val prisFergekostandPerDag: Int?,
+    val bompengerPerDag: Int?,
+    val fergekostandPerDag: Int?,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.PRIVAT_BIL
 
@@ -122,8 +123,8 @@ data class FaktaPrivatBil(
 
     private fun validerIngenNegativeUtgifter() {
         brukerfeilHvis(
-            (prisBompengerPerDag != null && prisBompengerPerDag < 0) ||
-                (prisFergekostandPerDag != null && prisFergekostandPerDag < 0),
+            (bompengerPerDag != null && bompengerPerDag < 0) ||
+                (fergekostandPerDag != null && fergekostandPerDag < 0),
         ) {
             "Bompenge- og fergeprisen må være større enn 0"
         }
@@ -147,9 +148,10 @@ data class FaktaPrivatBil(
 
     override fun mapTilVilkårFakta() =
         FaktaDagligReisePrivatBil(
+            reiseId = reiseId,
             reisedagerPerUke = reisedagerPerUke,
             reiseavstandEnVei = reiseavstandEnVei,
-            prisBompengerPerDag = prisBompengerPerDag,
-            prisFergekostandPerDag = prisFergekostandPerDag,
+            bompengerPerDag = bompengerPerDag,
+            fergekostandPerDag = fergekostandPerDag,
         )
 }
