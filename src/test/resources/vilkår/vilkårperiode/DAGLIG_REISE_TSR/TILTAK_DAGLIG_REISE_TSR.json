@@ -1,5 +1,10 @@
 {
   "type": "TILTAK_DAGLIG_REISE_TSR",
   "fakta": {},
-  "vurderinger": {}
+  "vurderinger": {
+    "harUtgifter": {
+      "svar": "JA",
+      "resultat": "OPPFYLT"
+    }
+  }
 }

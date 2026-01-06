@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import org.junit.jupiter.api.Test
@@ -60,7 +61,10 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                     typeAktivitet = TypeAktivitet.ENKELAMO,
                     fom = fomTiltaksenheten,
                     tom = tomTiltaksenheten,
-                    faktaOgSvar = FaktaOgSvarAktivitetDagligReiseTsrDto,
+                    faktaOgSvar =
+                        FaktaOgSvarAktivitetDagligReiseTsrDto(
+                            svarHarUtgifter = SvarJaNei.JA,
+                        ),
                 )
             },
             medMålgruppe = { behandlingId ->

@@ -20,7 +20,7 @@ sealed interface AktivitetDagligReiseTsr :
 }
 
 data class TiltakDagligReiseTsr(
-    override val vurderinger: IngenVurderinger = IngenVurderinger,
+    override val vurderinger: VurderingTiltakDagligReiseTsr,
 ) : AktivitetDagligReiseTsr {
     override val fakta: IngenFakta = IngenFakta
     override val type: AktivitetDagligReiseTsrType = AktivitetDagligReiseTsrType.TILTAK_DAGLIG_REISE_TSR
@@ -58,6 +58,10 @@ data class KvalifiseringsstønadDagligReiseTsr(
     override val type: MålgruppeDagligReiseTsrType = MålgruppeDagligReiseTsrType.KVALIFISERINGSSTØNAD_DAGLIG_REISE_TSR
     override val fakta: IngenFakta = IngenFakta
 }
+
+data class VurderingTiltakDagligReiseTsr(
+    override val harUtgifter: VurderingHarUtgifter,
+) : HarUtgifterVurdering
 
 sealed interface TypeFaktaOgVurderingDagligReiseTsr : TypeFaktaOgVurdering
 
