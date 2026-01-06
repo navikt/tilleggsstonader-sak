@@ -59,7 +59,9 @@ class DagligReiseVedtaksperioderValideringService(
                     vedtaksperioderDenneEnhenten = vedtaksperioder,
                     vedtaksperioderAnnenEnhet = vedtaksperioderAnnenEnhet,
                 ),
-            ) { "Kan ikke ha overlappende vedtaksperioder for Nay og Tiltaksenheten" }
+            ) {
+                "Kan ikke ha overlappende vedtaksperioder for Nay og Tiltaksenheten. Se oversikt øverst på siden for å finne overlappende vedtaksperiode."
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -16,21 +17,25 @@ class DetaljertVedtaksperiodeDagligReiseTsoTest {
     val sisteFeb = 29 februar 2024
 
     val vedtaksperiodeJan =
-        DetaljertVedtaksperiodeDagligReiseTso(
+        DetaljertVedtaksperiodeDagligReise(
             fom = førsteJan,
             tom = sisteJan,
             aktivitet = AktivitetType.TILTAK,
             målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
             typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
+            typeAktivtet = null,
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         )
 
     val vedtaksperiodeFeb =
-        DetaljertVedtaksperiodeDagligReiseTso(
+        DetaljertVedtaksperiodeDagligReise(
             fom = førsteFeb,
             tom = sisteFeb,
             aktivitet = AktivitetType.TILTAK,
             målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
             typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
+            typeAktivtet = null,
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         )
 
     @Test

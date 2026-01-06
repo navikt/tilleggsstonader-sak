@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -96,6 +97,19 @@ class OpprettBehandlingService(
                 ),
         )
 
+        if (request.oppgaveMetadata is OpprettBehandlingOppgaveMetadata.OppgaveMetadata) {
+            taskService.save(
+                OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                    OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                        behandlingId = behandling.id,
+                        saksbehandler = request.oppgaveMetadata.tilordneSaksbehandler,
+                        beskrivelse = request.oppgaveMetadata.beskrivelse,
+                        prioritet = request.oppgaveMetadata.prioritet,
+                    ),
+                ),
+            )
+        }
+
         if (behandlingStatus == BehandlingStatus.SATT_PÅ_VENT) {
             settPåVentService.settPåVent(
                 behandling.id,
@@ -108,20 +122,12 @@ class OpprettBehandlingService(
             )
         }
 
-        if (request.oppgaveMetadata is OpprettBehandlingOppgaveMetadata.OppgaveMetadata) {
-            taskService.save(
-                OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
-                    OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                        behandlingId = behandling.id,
-                        saksbehandler = request.oppgaveMetadata.tilordneSaksbehandler,
-                        beskrivelse = request.oppgaveMetadata.beskrivelse,
-                        // TODO - brukes for å opprette BehandlingsstatistikkTask.opprettMottattTask - bør heller opprette tasken her
-                        hendelseTidspunkt = behandling.kravMottatt?.atStartOfDay() ?: LocalDateTime.now(),
-                        prioritet = request.oppgaveMetadata.prioritet,
-                    ),
-                ),
-            )
-        }
+        taskService.save(
+            BehandlingsstatistikkTask.opprettMottattTask(
+                behandlingId = behandling.id,
+                hendelseTidspunkt = behandling.kravMottatt?.atStartOfDay() ?: LocalDateTime.now(),
+            ),
+        )
 
         return behandling
     }
