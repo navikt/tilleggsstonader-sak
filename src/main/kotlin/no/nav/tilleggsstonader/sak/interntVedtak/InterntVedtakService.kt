@@ -373,8 +373,8 @@ class InterntVedtakService(
                 VilkårFaktaPrivatBil(
                     reisedagerPerUke = fakta.reisedagerPerUke,
                     reiseavstandEnVei = fakta.reiseavstandEnVei,
-                    bompengerPerDag = fakta.bompengerPerDag,
-                    fergekostandPerDag = fakta.fergekostandPerDag,
+                    bompengerEnVei = fakta.bompengerEnVei,
+                    fergekostandEnVei = fakta.fergekostandEnVei,
                 )
             }
 

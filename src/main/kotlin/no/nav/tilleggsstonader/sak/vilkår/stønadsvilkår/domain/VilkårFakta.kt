@@ -33,8 +33,8 @@ data class FaktaDagligReisePrivatBil(
     val reiseId: ReiseId,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: Int,
-    val bompengerPerDag: Int?,
-    val fergekostandPerDag: Int?,
+    val bompengerEnVei: Int?,
+    val fergekostandEnVei: Int?,
 ) : VilkårFakta
 
 enum class TypeVilkårFakta {

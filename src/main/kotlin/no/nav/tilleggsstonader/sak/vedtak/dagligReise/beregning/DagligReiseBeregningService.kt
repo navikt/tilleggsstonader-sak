@@ -7,10 +7,12 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -21,6 +23,7 @@ class DagligReiseBeregningService(
     private val dagligReiseVedtaksperioderValideringService: DagligReiseVedtaksperioderValideringService,
     private val offentligTransportBeregningService: OffentligTransportBeregningService,
     private val offentligTransportBeregningRevurderingService: OffentligTransportBeregningRevurderingService,
+    private val privatBilBeregningService: PrivatBilBeregningService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
 ) {
     fun beregn(
@@ -35,7 +38,8 @@ class DagligReiseBeregningService(
             typeVedtak = typeVedtak,
         )
 
-        val oppfylteVilkårDagligReise = vilkårService.hentOppfylteDagligReiseVilkår(behandling.id).map { it.mapTilVilkårDagligReise() }
+        val oppfylteVilkårDagligReise =
+            vilkårService.hentOppfylteDagligReiseVilkår(behandling.id).map { it.mapTilVilkårDagligReise() }
         validerFinnesReiser(oppfylteVilkårDagligReise)
 
         val brukersNavKontor =
@@ -53,6 +57,10 @@ class DagligReiseBeregningService(
                     behandling = behandling,
                     brukersNavKontor = brukersNavKontor,
                     tidligsteEndring = tidligsteEndring,
+                ),
+            privatBil =
+                beregnPrivatBil(
+                    oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
                 ),
         )
     }
@@ -86,6 +94,13 @@ class DagligReiseBeregningService(
             behandling = behandling,
             tidligsteEndring = tidligsteEndring,
         )
+
+    private fun beregnPrivatBil(oppfylteVilkårDagligReise: List<VilkårDagligReise>): BeregningsresultatPrivatBil? {
+        val oppfylteVilkårPrivatBil = oppfylteVilkårDagligReise.filter { it.fakta is FaktaPrivatBil }
+
+        if (oppfylteVilkårPrivatBil.isEmpty()) return null
+        return privatBilBeregningService.beregn(oppfylteVilkårPrivatBil)
+    }
 }
 
 private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {

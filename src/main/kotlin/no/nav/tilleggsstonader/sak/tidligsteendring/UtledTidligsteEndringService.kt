@@ -265,8 +265,8 @@ data class TidligsteEndringIBehandlingUtleder(
             faktaNå is FaktaDagligReisePrivatBil && faktaTidligere is FaktaDagligReisePrivatBil -> {
                 faktaNå.reisedagerPerUke != faktaTidligere.reisedagerPerUke ||
                     faktaNå.reiseavstandEnVei != faktaTidligere.reiseavstandEnVei ||
-                    faktaNå.bompengerPerDag != faktaTidligere.bompengerPerDag ||
-                    faktaNå.fergekostandPerDag != faktaTidligere.fergekostandPerDag
+                    faktaNå.bompengerEnVei != faktaTidligere.bompengerEnVei ||
+                    faktaNå.fergekostandEnVei != faktaTidligere.fergekostandEnVei
             }
 
             else -> {

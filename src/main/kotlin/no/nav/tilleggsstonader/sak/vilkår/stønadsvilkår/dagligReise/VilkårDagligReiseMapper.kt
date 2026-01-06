@@ -62,8 +62,8 @@ object VilkårDagligReiseMapper {
             reiseId = this.reiseId,
             reisedagerPerUke = this.reisedagerPerUke,
             reiseavstandEnVei = this.reiseavstandEnVei,
-            bompengerPerDag = this.bompengerPerDag,
-            fergekostandPerDag = this.fergekostandPerDag,
+            bompengerEnVei = this.bompengerEnVei,
+            fergekostandEnVei = this.fergekostandEnVei,
         )
 
     fun TypeVilkårFakta.tilTypeDagligReise() =

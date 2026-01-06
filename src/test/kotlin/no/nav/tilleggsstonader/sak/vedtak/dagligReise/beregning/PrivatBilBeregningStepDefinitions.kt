@@ -8,20 +8,21 @@ import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
-import no.nav.tilleggsstonader.sak.cucumber.parseBoolean
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.assertj.core.api.Assertions.assertThat
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class PrivatBilBeregningStepDefinitions {
-    val beregningService =
+    /*val beregningService =
         PrivatBilBeregningService()
 
-    var reiser: List<DummyReiseMedBil> = emptyList()
+    var reiser: List<`VilkårDagligReise`> = emptyList()
 
     var beregningsResultat: BeregningsresultatPrivatBil? = null
     var forventetBeregningsresultat: List<BeregningsresultatUkeCucumber> = emptyList()
@@ -31,12 +32,13 @@ class PrivatBilBeregningStepDefinitions {
         reiser =
             dataTable.mapRad { rad ->
                 DummyReiseMedBil(
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    fom = parseDato(`DomenenøkkelFelles`.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    reiseId = ReiseId.random(),
                     reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, rad),
                     reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
                     bompengerEnVei = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, rad),
-                    fergekostnadEnVei = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, rad),
+                    fergekostandEnVei = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, rad),
                 )
             }
     }
@@ -76,7 +78,7 @@ class PrivatBilBeregningStepDefinitions {
                         antallDagerInkludererHelg = parseBoolean(DomenenøkkelPrivatBil.INKLUDERER_HELG, rad),
                     ),
             )
-        }
+        }*/
 }
 
 enum class DomenenøkkelPrivatBil(

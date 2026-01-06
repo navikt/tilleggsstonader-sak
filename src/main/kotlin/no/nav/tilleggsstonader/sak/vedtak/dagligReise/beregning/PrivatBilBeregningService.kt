@@ -1,12 +1,17 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -14,10 +19,11 @@ import java.time.LocalDate
 data class DummyReiseMedBil(
     override val fom: LocalDate,
     override val tom: LocalDate,
+    val reiseId: ReiseId,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
     val bompengerEnVei: Int?,
-    val fergekostnadEnVei: Int?,
+    val fergekostandEnVei: Int?,
 ) : Periode<LocalDate>
 
 // Gjenstår:
@@ -26,10 +32,16 @@ data class DummyReiseMedBil(
 // Skrive tester - dukker nok opp flere caser som ikke fungerer om man gjør det
 // Tilpasse slik at beregningen kan brukes basert på kjørelister
 
+@Service
 class PrivatBilBeregningService {
-    fun beregn(reiser: List<DummyReiseMedBil>): BeregningsresultatPrivatBil =
+    fun beregn(oppfylteVilkår: List<VilkårDagligReise>): BeregningsresultatPrivatBil =
         BeregningsresultatPrivatBil(
-            reiser = reiser.map { beregnForReise(it) },
+            reiser =
+                oppfylteVilkår.map {
+                    beregnForReise(
+                        it.tilUtgiftPrivatbil(),
+                    )
+                },
         )
 
     private fun beregnForReise(reise: DummyReiseMedBil): BeregningsresultatForReiseMedPrivatBil {
@@ -82,7 +94,7 @@ class PrivatBilBeregningService {
             kilometersats = finnRelevantKilometerSats(periode = reise),
             ekstrakostnader =
                 Ekstrakostnader(
-                    fergekostnadEnVei = reise.fergekostnadEnVei,
+                    fergekostnadEnVei = reise.fergekostandEnVei,
                     bompengerEnVei = reise.bompengerEnVei,
                 ),
         )
@@ -112,6 +124,22 @@ class PrivatBilBeregningService {
             tom = uke.tom,
             antallDagerDenneUkaSomKanDekkes = antallDager,
             antallDagerInkludererHelg = antallDagerInkludererHelg,
+        )
+    }
+
+    private fun VilkårDagligReise.tilUtgiftPrivatbil(): DummyReiseMedBil {
+        feilHvis(this.fakta !is FaktaPrivatBil) {
+            "Forventer kun å få inn vilkår med fakta som er av type privat bil ved beregning av privat bil"
+        }
+
+        return DummyReiseMedBil(
+            fom = this.fom,
+            tom = this.tom,
+            reiseId = this.fakta.reiseId,
+            reisedagerPerUke = this.fakta.reisedagerPerUke,
+            reiseavstandEnVei = this.fakta.reiseavstandEnVei.toBigDecimal(), // TODO denne må skrives om til å være BigDecimal
+            bompengerEnVei = this.fakta.bompengerEnVei,
+            fergekostandEnVei = this.fakta.fergekostandEnVei,
         )
     }
 }

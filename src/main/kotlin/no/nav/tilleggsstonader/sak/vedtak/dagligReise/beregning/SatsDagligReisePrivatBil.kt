@@ -13,6 +13,11 @@ data class SatsDagligReisePrivatBil(
 val satser: List<SatsDagligReisePrivatBil> =
     listOf(
         SatsDagligReisePrivatBil(
+            fom = LocalDate.of(2026, 1, 1),
+            tom = LocalDate.of(2026, 12, 31),
+            beløp = BigDecimal("2.94"),
+        ),
+        SatsDagligReisePrivatBil(
             fom = LocalDate.of(2025, 1, 1),
             tom = LocalDate.of(2025, 12, 31),
             beløp = BigDecimal("2.88"),

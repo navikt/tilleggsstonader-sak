@@ -719,6 +719,7 @@ object InterntVedtakTestdata {
                                 ),
                             ),
                     ),
+                privatBil = null,
             )
 
         fun innvilgetVedtakTso() = innvilgetVedtak(beregningsresultatTso())

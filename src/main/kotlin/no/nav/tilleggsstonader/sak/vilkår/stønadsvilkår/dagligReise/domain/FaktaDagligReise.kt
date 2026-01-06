@@ -110,8 +110,8 @@ data class FaktaPrivatBil(
     val reiseId: ReiseId,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: Int,
-    val bompengerPerDag: Int?,
-    val fergekostandPerDag: Int?,
+    val bompengerEnVei: Int?,
+    val fergekostandEnVei: Int?,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.PRIVAT_BIL
 
@@ -123,8 +123,8 @@ data class FaktaPrivatBil(
 
     private fun validerIngenNegativeUtgifter() {
         brukerfeilHvis(
-            (bompengerPerDag != null && bompengerPerDag < 0) ||
-                (fergekostandPerDag != null && fergekostandPerDag < 0),
+            (bompengerEnVei != null && bompengerEnVei < 0) ||
+                (fergekostandEnVei != null && fergekostandEnVei < 0),
         ) {
             "Bompenge- og fergeprisen må være større enn 0"
         }
@@ -151,7 +151,7 @@ data class FaktaPrivatBil(
             reiseId = reiseId,
             reisedagerPerUke = reisedagerPerUke,
             reiseavstandEnVei = reiseavstandEnVei,
-            bompengerPerDag = bompengerPerDag,
-            fergekostandPerDag = fergekostandPerDag,
+            bompengerEnVei = bompengerEnVei,
+            fergekostandEnVei = fergekostandEnVei,
         )
 }

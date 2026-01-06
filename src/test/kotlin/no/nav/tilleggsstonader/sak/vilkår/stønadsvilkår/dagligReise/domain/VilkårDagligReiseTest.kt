@@ -33,8 +33,8 @@ class VilkårDagligReiseTest {
                 reiseId = ReiseId.random(),
                 reisedagerPerUke = 4,
                 reiseavstandEnVei = 10,
-                bompengerPerDag = 0,
-                fergekostandPerDag = 0,
+                bompengerEnVei = 0,
+                fergekostandEnVei = 0,
             )
         val feil =
             assertThrows<Feil> {
